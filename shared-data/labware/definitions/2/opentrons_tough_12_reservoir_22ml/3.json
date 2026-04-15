@@ -195,7 +195,7 @@
       "touchTipDisabled",
       "offsetPipetteFor96GridSubwells"
     ],
-    "loadName": "opentrons_12_well_aluminumblock_tough_22mL"
+    "loadName": "opentrons_tough_12_reservoir_22ml"
   },
   "namespace": "opentrons",
   "version": 2,
@@ -206,8 +206,8 @@
     "z": 0
   },
   "stackingOffsetWithLabware": {
-    "opentrons_12_well_adapter": {
-      "x": 0,
+    "opentrons_12_well_aluminumblock_tough_22ml": {
+      "x": 0.3,
       "y": 0,
       "z": 23.75
     }

@@ -27,7 +27,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_1_well_aluminumblock_tough_300mL"
+    "loadName": "opentrons_1_well_aluminumblock_tough_300ml"
   },
   "namespace": "opentrons",
   "version": 1,
