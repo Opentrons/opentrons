@@ -63,7 +63,7 @@ import {
 import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
-import { PortalRoot as ModalPortalRoot } from './portal'
+import { ModalPortalRoot } from './portal'
 
 import type { Dispatch } from '/app/redux/types'
 
