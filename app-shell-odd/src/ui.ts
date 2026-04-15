@@ -65,7 +65,7 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   return mainWindow
 }
 
-export function waitForRobotServerAndShowMainWindow(
+export function waitForBackendAndShowMainWindow(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
 ): void {
@@ -122,16 +122,16 @@ export function waitForRobotServerAndShowMainWindow(
   _NODE_ENV_ !== 'development' &&
     setTimeout(function () {
       systemd
-        .getisRobotServerReady()
+        .getIsBackendReady()
         .then((isReady: boolean) => {
           dispatch(sendReadyStatus(isReady))
           if (!isReady) {
-            waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+            waitForBackendAndShowMainWindow(dispatch, mainWindow)
           }
         })
         .catch(e => {
           log.debug('Could not get status of robot server service', { e })
-          waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+          waitForBackendAndShowMainWindow(dispatch, mainWindow)
         })
     }, 1500)
 }
