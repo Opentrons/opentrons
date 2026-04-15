@@ -244,7 +244,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             <ProtocolAnalysisStale protocolKey={protocolKey} />
           ) : null}
 
-          {!isFlex ? (
+          {!isFlex && analysisStatus === 'complete' ? (
             <Box paddingRight={SPACING.spacing24}>
               <InlineNotification
                 type="alert"
