@@ -19,10 +19,10 @@ export type CommandAnnotationV1 =
 
 export interface UserCommandAnnotation {
   annotationType: 'userCommand'
-  annotationId: string
+  id: string
   params: { [key: string]: any }
-  userSpecifiedName: string
-  userSpecifiedDescription?: string
+  name: string
+  description?: string
 }
 
 export type CommandAnnotationV2 = UserCommandAnnotation

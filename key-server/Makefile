@@ -90,6 +90,7 @@ test-cov:
 lint:
 	$(python) -m mypy $(SRC_PATH) $(TESTS_PATH)
 	$(ruff) check .
+	$(ruff) format --check .
 
 .PHONY: format
 format:
@@ -98,7 +99,7 @@ format:
 
 .PHONY: dev
 dev:
-	$(python) -m key_server --port $(dev_port) --reload --log-level=debug
+	OT_KEY_SERVER_dot_env_path=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))/dev.env $(python) -m key_server --port $(dev_port) --reload --log-level=debug
 
 # Note: No `push` target, since this project only runs on Flex (OT-3), not OT-2.
 

@@ -235,12 +235,15 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="text"
               value={String(speed ?? '')}
               label={t('speed')}
-              readOnly
               onBlur={e => {
                 e.target.focus()
+              }}
+              onChange={e => {
+                handleSpeedChange(e.target.value as string)
               }}
             />
           </Flex>
@@ -278,13 +281,16 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              autoFocus
               type="text"
               value={String(position ?? '')}
               label={t('touch_tip_position_mm')}
               error={positionError}
-              readOnly
               onBlur={e => {
                 e.target.focus()
+              }}
+              onChange={e => {
+                setPosition(e.target.value as string)
               }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>

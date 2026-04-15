@@ -1,51 +1,22 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
-import enum
-import inspect
-from typing import Any, Callable, Dict
-
-import serpent
-from Pyro5 import api as pyro
+import datetime
+from typing import Dict
 
 import opentrons.config.types
+import opentrons.hardware_control.dev_types
+import opentrons.hardware_control.instruments.ot3.instrument_calibration
+import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
 import opentrons.types
-
-
-def _serpent_enum_serializer(obj, serializer, stream, level):  # type: ignore
-    """Serpent serializer for generic Enum values."""
-    serializer._serialize(obj.value, stream, level)
-
-
-# Opentrons Enum types registry
-def _generic_enum_class_to_dict(obj: Any) -> Dict:  # type: ignore
-    return {
-        "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
-        "value": obj.value,
-    }
-
-
-def _generic_enum_dict_to_class(classname: str, d: Any) -> Any:
-    module_path, class_name = classname.rsplit(".", 1)
-    # Check type imports here, for now we only take from known opentrons modules
-    if "opentrons.hardware_control.types" in module_path:
-        opentrons_type = getattr(opentrons.hardware_control.types, class_name)
-    elif "opentrons.config.types" in module_path:
-        opentrons_type = getattr(opentrons.config.types, class_name)
-    elif "opentrons.types" in module_path:
-        opentrons_type = getattr(opentrons.types, class_name)
-    else:
-        raise RuntimeError(f"Unsupported module processed in Pyro request: {classname}")
-    return opentrons_type(d["value"])
-
-
-def find_enums_in_packages(modules: list) -> list:  # type: ignore
-    enums = []
-    for module in modules:
-        for name, obj in inspect.getmembers(module, inspect.isclass):
-            if issubclass(obj, enum.Enum) and obj is not enum.Enum:
-                enums.append(obj)
-    return enums
+from opentrons.util.pyro.pyro_serialization import (
+    OpentronsPyroSerializer,
+    find_enums_in_packages,
+    find_pydantic_classes_in_packages,
+    find_typed_dict_classes_in_packages,
+    register_type_to_serpent,
+    serpent_enum_registration,
+)
 
 
 # Estop Overall Status registry
@@ -72,35 +43,133 @@ def _estop_overall_status_class_to_dict(obj) -> Dict:  # type: ignore
     }
 
 
-# UpdateStatus registry
-def _update_status_dict_to_class(  # type: ignore
+# GRIPPER CALIBRATION
+# todo(chb, 04-08-2026): This should be consumed into an automated registry process
+def _GripperCalibrationOffset_dict_to_class(  # type: ignore
     classname, d
-) -> opentrons.hardware_control.types.UpdateStatus:
-    return opentrons.hardware_control.types.UpdateStatus(
-        subsystem=opentrons.hardware_control.types.SubSystem(d["subsystem"]),
-        state=opentrons.hardware_control.types.UpdateState(d["state"]),
-        progress=d["progress"],
+) -> opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset:
+    modified = (
+        None
+        if d["last_modified"] is None
+        else datetime.datetime.fromisoformat(d["last_modified"])
+    )
+    markedAt = (
+        None
+        if d["status_markedAt"] is None
+        else datetime.datetime.fromisoformat(d["status_markedAt"])
+    )
+    status_source = (
+        None
+        if d["status_source"] is None
+        else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["status_source"]
+        )
+    )
+    return opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset(
+        offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
+        source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["source"]
+        ),
+        status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
+            markedBad=(d["status_markedBad"] == "True"),
+            source=status_source,
+            markedAt=markedAt,
+        ),
+        last_modified=modified,
     )
 
 
-def _update_status_class_to_dict(obj) -> Dict:  # type: ignore
+def _GripperCalibrationOffset_class_to_dict(obj) -> Dict:  # type: ignore
+    if isinstance(obj.last_modified, datetime.datetime):
+        modified = obj.last_modified.isoformat()
+    else:
+        modified = None
+    if isinstance(obj.status.markedAt, datetime.datetime):
+        markedAt = obj.status.markedAt.isoformat()
+    else:
+        markedAt = None
     return {
-        "__class__": "opentrons.hardware_control.types.UpdateStatus",
-        "subsystem": obj.subsystem.value,
-        "state": obj.state.value,
-        "progress": obj.progress,
+        "__class__": "opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset",
+        "offset_x": obj.offset.x,
+        "offset_y": obj.offset.y,
+        "offset_z": obj.offset.z,
+        "source": obj.source,
+        "status_markedBad": obj.status.markedBad,
+        "status_source": obj.status.source,
+        "status_markedAt": markedAt,
+        "last_modified": modified,
     }
 
 
-def register_type_to_serpent(
-    class_type: Any,
-    dict_to_class: Callable[[str, Any], Any],
-    class_to_dict: Callable[[Any], dict[Any, Any]],
-) -> None:
-    """Adapter function to call the serpent registries for individual types."""
-    class_path = ".".join((class_type.__module__, class_type.__qualname__))
-    pyro.register_dict_to_class(class_path, dict_to_class)  # type: ignore
-    pyro.register_class_to_dict(class_type, class_to_dict)  # type: ignore
+# PIPETTER CALIBRATION
+# todo(chb, 04-08-2026): This should be consumed into an automated registry process
+def _PipetteOffsetSummary_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary:
+    modified = (
+        None
+        if d["last_modified"] is None
+        else datetime.datetime.fromisoformat(d["last_modified"])
+    )
+    markedAt = (
+        None
+        if d["status_markedAt"] is None
+        else datetime.datetime.fromisoformat(d["status_markedAt"])
+    )
+    status_source = (
+        None
+        if d["status_source"] is None
+        else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["status_source"]
+        )
+    )
+    return opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary(
+        offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
+        source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+            d["source"]
+        ),
+        status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
+            markedBad=(d["status_markedBad"] == "True"),
+            source=status_source,
+            markedAt=markedAt,
+        ),
+        last_modified=modified,
+        reasonability_check_failures=[],  # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
+    )
+
+
+def _PipetteOffsetSummary_class_to_dict(obj) -> Dict:  # type: ignore
+    if isinstance(obj.last_modified, datetime.datetime):
+        modified = obj.last_modified.isoformat()
+    else:
+        modified = None
+    if isinstance(obj.status.markedAt, datetime.datetime):
+        markedAt = obj.status.markedAt.isoformat()
+    else:
+        markedAt = None
+    return {
+        "__class__": "opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary",
+        "offset_x": obj.offset.x,
+        "offset_y": obj.offset.y,
+        "offset_z": obj.offset.z,
+        "source": obj.source,
+        "status_markedBad": obj.status.markedBad,
+        "status_source": obj.status.source,
+        "status_markedAt": markedAt,
+        "last_modified": modified,
+        "reasonability_check_failures": None,  # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
+    }
+
+
+# Robot type registry - of note, this is meant to return a "pure" type
+def _robot_type_class_to_dict(obj) -> Dict:  # type: ignore
+    return {"__class__": ".".join((obj.__module__, obj.__class__.__name__))}
+
+
+def _robot_type_dict_to_class(  # type: ignore
+    classname, d
+) -> type[opentrons.hardware_control.protocols.types.FlexRobotType]:
+    return opentrons.hardware_control.protocols.types.FlexRobotType
 
 
 # Handy function to map all registries for the Hardware controller
@@ -109,21 +178,45 @@ def register_hardware_types() -> None:
     Pyro serializes our dataclasses into dicts, but doesn't convert them back to their native types automatically.
     """
     opentrons_types = find_enums_in_packages(
-        [opentrons.types, opentrons.config.types, opentrons.hardware_control.types]
+        [
+            opentrons.types,
+            opentrons.config.types,
+            opentrons.hardware_control.types,
+            opentrons.hardware_control.dev_types,
+        ]
     )
-    # Serpent matches by first isinstance() in registry order, so unregister enums first so that
-    # types like "Mount" don't automatically become strings/ints, then register the enums after.
-    serpent.unregister_class(enum.Enum)  # type: ignore
 
-    for enum_type in opentrons_types:
-        register_type_to_serpent(
-            class_type=enum_type,
-            dict_to_class=_generic_enum_dict_to_class,
-            class_to_dict=_generic_enum_class_to_dict,
-        )
+    with serpent_enum_registration():
+        for enum_type in opentrons_types:
+            OpentronsPyroSerializer.register_enum(enum_type)
 
-    serpent.register_class(enum.Enum, _serpent_enum_serializer)  # type: ignore
+    opentrons_pydantic_types = find_pydantic_classes_in_packages(
+        [
+            opentrons.types,
+            opentrons.config.types,
+            opentrons.hardware_control.types,
+            opentrons.hardware_control.protocols.types,
+        ]
+    )
+    for pydantic_type in opentrons_pydantic_types:
+        OpentronsPyroSerializer.register_pydantic_model(pydantic_type)
 
+    opentrons_typed_dicts = find_typed_dict_classes_in_packages(
+        [opentrons.hardware_control.dev_types]
+    )
+    for typed_dict in opentrons_typed_dicts:
+        OpentronsPyroSerializer.register_typed_dict(typed_dict)
+
+    OpentronsPyroSerializer.register_unhashable_dicts()
+
+    # Specialized registrations:
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.protocols.types.FlexRobotType,
+        dict_to_class=_robot_type_dict_to_class,
+        class_to_dict=_robot_type_class_to_dict,
+    )
+
+    # todo(chb, 04-03-2026): This one should probably be removed and classes like it converted to an appropriate, automated format
     # E-Stop Overall registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.EstopOverallStatus,
@@ -131,9 +224,17 @@ def register_hardware_types() -> None:
         class_to_dict=_estop_overall_status_class_to_dict,
     )
 
-    # UpdateStatus registration
+    # todo(chb: 04-09-2026): These are termporary direct serializations to support the initial robot server intergration, replace with automated solution
+    # gripper calibration
     register_type_to_serpent(
-        class_type=opentrons.hardware_control.types.UpdateStatus,
-        dict_to_class=_update_status_dict_to_class,
-        class_to_dict=_update_status_class_to_dict,
+        class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset,
+        dict_to_class=_GripperCalibrationOffset_dict_to_class,
+        class_to_dict=_GripperCalibrationOffset_class_to_dict,
+    )
+
+    # pipette calibration
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary,
+        dict_to_class=_PipetteOffsetSummary_dict_to_class,
+        class_to_dict=_PipetteOffsetSummary_class_to_dict,
     )

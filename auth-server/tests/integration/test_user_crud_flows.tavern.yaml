@@ -5,6 +5,7 @@ marks:
       - run_server
       - admin_access_token
       - admin_scopes_list
+      - user_scopes_list
 
 stages:
   - name: Create a new user
@@ -26,7 +27,9 @@ stages:
           userName: test_new_user
           fullName: Test New User
           accountType: user
-          scopes: [runs.write]
+          locked: false
+          scopes: !force_original_structure '{user_scopes_list}'
+          resetPassword: false
 
   - name: Create a new user with a password less than 8 characters
     request:
@@ -58,7 +61,9 @@ stages:
           accountType: user
           fullName: Test New User
           userName: test_new_user
-          scopes: [runs.write]
+          locked: false
+          scopes: !force_original_structure '{user_scopes_list}'
+          resetPassword: false
 
   - name: Update the user
     request:
@@ -77,7 +82,9 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user
+          locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: false
 
   - name: Update the username and password
     request:
@@ -96,7 +103,46 @@ stages:
           accountType: admin
           fullName: Test New User Updated
           userName: test_new_user_updated
+          locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: false  
+
+  - name: Update the reset password flag
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      json:
+        data:
+          resetPassword: true
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: true
+
+  - name: Get the user information
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: true
 
   - name: Get a new access token with the updated username and password
     request:

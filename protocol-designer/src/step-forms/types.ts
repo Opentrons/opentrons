@@ -2,6 +2,7 @@ import type { Mount } from '@opentrons/components'
 import type {
   CutoutId,
   FlexModuleCutoutFixtureId,
+  LoadedLabwareLocation,
   ModuleModel,
   ModuleType,
   NozzleConfigurationStyle,
@@ -55,6 +56,10 @@ export type NormalizedLabware =
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {
   stack: string[] // a stack of ids from top to bottom
+  // The single entity this labware is stacked on (labware, module, slot, hopper, etc.).
+  stackedOnNode?: LoadedLabwareLocation
+  // The single labware ID this labware contains when that applies.
+  contains?: string
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE

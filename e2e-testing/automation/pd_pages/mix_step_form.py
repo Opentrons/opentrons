@@ -103,7 +103,7 @@ class MixStepForm(BasePage):
                 "Select wells to mix liquid in Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt", exact=False
             ).first
         )
-        self.wait_for_visible(modal.get_by_role("button", name="Continue"))
+        self.wait_for_visible(modal.get_by_role("button", name="Save"))
 
     def select_wells(self, wells: Iterable[str]) -> None:
         """Select each well in the provided iterable."""
@@ -111,7 +111,7 @@ class MixStepForm(BasePage):
         for well in wells:
             self.page.locator(f"#{well}").click()
         modal = self._modal_area()
-        modal.get_by_role("button", name="Continue").click()
+        modal.get_by_role("button", name="Save").click()
 
     def save_modal(self) -> None:
         """Click the Save button within the currently open modal."""
@@ -201,31 +201,27 @@ class MixStepForm(BasePage):
         # Try checkbox role (Checkbox component from @opentrons/components)
         checkbox = self.page.get_by_role("checkbox").nth(index)
         if checkbox.count() > 0:
-            self.wait_for_visible(checkbox)
-            checkbox.click()
-            return
-
-        # Try CheckboxExpandStepFormField - these use ListButton with a Btn containing Check icon
-        # The inner Btn has a testId like "delay_checkbox", "blowout_checkbox", etc.
-        checkbox_buttons = self.page.locator('[data-testid*="checkbox"]')
-        if checkbox_buttons.count() > index:
-            checkbox_button = checkbox_buttons.nth(index)
-            self.wait_for_visible(checkbox_button)
-            checkbox_button.click()
-            return
-
-        # Fallback: CheckboxExpandStepFormField wraps everything in a ListButton that's also clickable
-        # Find ListButtons that contain checkbox-related text (Delay, Push out, Blowout, etc.)
-        # These are the clickable containers for CheckboxExpandStepFormField
-        # Look for buttons containing text that matches checkbox labels
-        checkbox_texts = ["Delay", "Push out", "Blowout", "Touch tip", "Air gap", "Mix"]
-        for text in checkbox_texts:
-            buttons_with_text = self.page.locator("button").filter(has_text=text)
-            if buttons_with_text.count() > index:
-                list_button = buttons_with_text.nth(index)
-                self.wait_for_visible(list_button)
-                list_button.click()
+            try:
+                self.wait_for_visible(checkbox)
+                checkbox.click()
                 return
+            except Exception:
+                # New Checkbox implementation may expose a hidden input;
+                # continue to label/test-id based fallbacks.
+                pass
+
+        # CheckboxExpandStepFormField renders ListButton rows with visible titles.
+        checkbox_titles = ["Delay", "Push out", "Blowout", "Touch tip", "Air gap", "Mix"]
+        visible_rows: list[Locator] = []
+        for title in checkbox_titles:
+            row = self.page.locator('[data-testid="ListButton_noActive"]').filter(has_text=title).first
+            if row.count() > 0 and row.is_visible():
+                visible_rows.append(row)
+        if len(visible_rows) > index:
+            checkbox_row = visible_rows[index]
+            self.wait_for_visible(checkbox_row)
+            checkbox_row.click()
+            return
 
         # Last resort: try to find input[type="checkbox"] (CheckboxField component)
         checkbox_input = self.page.locator('input[type="checkbox"]').nth(index)
@@ -261,31 +257,9 @@ class MixStepForm(BasePage):
 
     def open_blowout_location_dropdown(self) -> None:
         """Open the blowout location dropdown menu."""
-
-        # First, ensure the blowout checkbox is checked (dropdown only appears when checked)
-        # The checkbox has testId="blowout_checkbox"
-        blowout_checkbox_button = self.page.get_by_test_id("blowout_checkbox").first
-        if blowout_checkbox_button.count() > 0:
-            # Check if checkbox is already checked by looking for the checked state
-            # If not checked, click it to enable the dropdown
-            try:
-                # Try to find if the checkbox area is expanded (dropdown should be visible)
-                dropdown_check = self.page.locator('[data-testid="blowout_location_dropdownMenu"]')
-                if dropdown_check.count() == 0:
-                    # Checkbox is not checked, click it to enable
-                    self.wait_for_visible(blowout_checkbox_button)
-                    blowout_checkbox_button.click()
-                    # Wait a moment for React to update the DOM
-                    self.page.wait_for_timeout(500)
-            except Exception:
-                pass
-
-        # Now wait for the dropdown to appear in the DOM
-        # The dropdown has testId="blowout_location_dropdownMenu" (field name + _dropdownMenu)
+        # Prefer the rendered dropdown if the blowout row is already expanded.
         dropdown_locator = self.page.locator('[data-testid="blowout_location_dropdownMenu"]')
 
-        # Wait for the dropdown to be attached to the DOM with a longer timeout
-        # This handles the case where the checkbox was just toggled and the DOM is updating
         try:
             dropdown_locator.wait_for(state="attached", timeout=15000)
             dropdown = dropdown_locator.first
@@ -293,8 +267,20 @@ class MixStepForm(BasePage):
             dropdown.click()
             return
         except Exception:
-            # If waiting for attached fails, try alternative approaches
-            pass
+            # If the dropdown isn't rendered yet, explicitly expand the Blowout row.
+            blowout_row = self.page.locator('[data-testid="ListButton_noActive"]').filter(has_text="Blowout").first
+            if blowout_row.count() > 0 and blowout_row.is_visible():
+                self.wait_for_visible(blowout_row)
+                blowout_row.click()
+                self.page.wait_for_timeout(300)
+                try:
+                    dropdown_locator.wait_for(state="attached", timeout=5000)
+                    dropdown = dropdown_locator.first
+                    self.wait_for_visible(dropdown, timeout=5000)
+                    dropdown.click()
+                    return
+                except Exception:
+                    pass
 
         # Fallback: Try using the dropdown_by_title helper which finds dropdowns by their label text
         try:
@@ -346,7 +332,7 @@ class MixStepForm(BasePage):
         self.page.get_by_role("button", name="Rename").click()
         modal = self._modal_area()
         modal.locator('input[name="stepName_input"]').fill(name)
-        modal.locator('[data-testid="TextAreaField"]').fill(notes)
+        modal.get_by_role("textbox", name="Step Notes").fill(notes)
         modal.get_by_role("button", name="Save").click()
 
     def save_step(self) -> None:

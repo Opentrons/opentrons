@@ -49,6 +49,8 @@ dev = [
 dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 [tool.uv.sources]
 server-utils = { path = "../server-utils", editable = true }
@@ -68,6 +70,9 @@ known-first-party = ["server_utils"]
 "otupdate/_version.py" = ["I"]
 "buildroot_upload.py" = ["T201"]
 "oe_upload.py" = ["T201"]
+
+[tool.ruff.format]
+exclude = ["otupdate/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="otupdate/_version.py"
@@ -169,4 +174,3 @@ module = [
     "tests.openembedded.test_updater",
 ]
 ignore_errors = true
-

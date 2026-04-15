@@ -7,11 +7,10 @@ from pathlib import Path
 from typing import Generator
 
 import sqlalchemy
-from sqlalchemy.orm import declarative_base
 
 from server_utils import sql_utils
 
-Base = declarative_base()
+from auth_server.persistence import orm_models
 
 
 @contextmanager
@@ -19,10 +18,7 @@ def sql_engine_ctx(
     db_path: Path,
 ) -> Generator[sqlalchemy.engine.Engine, None, None]:
     """Context-managed engine that disposes itself on exit."""
-    engine = sqlalchemy.create_engine(
-        sql_utils.get_connection_url(db_path),
-        future=True,
-    )
+    engine = sqlalchemy.create_engine(sql_utils.get_connection_url(db_path))
     try:
         sql_utils.enable_foreign_key_constraints(engine)
         sql_utils.fix_transactions(engine)
@@ -33,7 +29,4 @@ def sql_engine_ctx(
 
 def create_schema(engine: sqlalchemy.engine.Engine) -> None:
     """Create all ORM-mapped tables that don't yet exist."""
-    # we need to import the User model to ensure it is created in the database
-    from auth_server.persistence.orm_models import User  # noqa: F401
-
-    Base.metadata.create_all(engine)
+    orm_models.Base.metadata.create_all(engine)

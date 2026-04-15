@@ -34,6 +34,7 @@ import {
   engageHeightRequired,
   fileNameRequired,
   fillQuantityOutOfRange,
+  gaugePressureRequired,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
@@ -71,6 +72,12 @@ import {
   tiprackRequired,
   tipSelectionRequired,
   transferVolumeMin,
+  vacuumDurationRequired,
+  vacuumModeRequired,
+  vacuumModuleIdRequired,
+  vacuumProfileRequired,
+  vacuumProgramRequired,
+  vacuumStateRequired,
   volumeRequired,
   volumeTooHigh,
   wavelengthOutOfRange,
@@ -291,7 +298,15 @@ const stepFormHelperMap: {
     getErrors: composeErrors(fillQuantityOutOfRange, moduleIdRequired),
   },
   vacuum: {
-    getErrors: composeErrors(),
+    getErrors: composeErrors(
+      vacuumProgramRequired,
+      vacuumStateRequired,
+      vacuumModeRequired,
+      gaugePressureRequired,
+      vacuumDurationRequired,
+      vacuumProfileRequired,
+      vacuumModuleIdRequired
+    ),
   },
 }
 

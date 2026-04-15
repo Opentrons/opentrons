@@ -26,7 +26,7 @@ interface CheckboxExpandStepFormFieldProps {
 export function CheckboxExpandStepFormField(
   props: CheckboxExpandStepFormFieldProps
 ): JSX.Element {
-  const { children, title, tooltipOverride, testId, fieldProps } = props
+  const { children, title, tooltipOverride, fieldProps } = props
 
   const {
     value,
@@ -64,7 +64,6 @@ export function CheckboxExpandStepFormField(
             <>
               <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
               <Btn
-                data-testid={testId}
                 onClick={() => {
                   updateValue(!value)
                 }}

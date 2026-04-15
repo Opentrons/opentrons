@@ -162,8 +162,6 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   D4: 'hopperD4',
 }
 
-export const AIR_GAP_LIQUID_STATE_CONST: '__air_gap__' = '__air_gap__'
-
 export const VACUUM_VENT_OPEN: 'open' = 'open'
 export const VACUUM_VENT_CLOSED: 'closed' = 'closed'
 
@@ -175,7 +173,7 @@ export const VACUUM_PROGRAM_PROFILE: 'profile' = 'profile'
 export const VACUUM_STATE_PUMP: 'pump' = 'pump'
 export const VACUUM_STATE_VENT: 'vent' = 'vent'
 export const VACUUM_VENT_SET_OPEN: 'open' = 'open'
-export const VACUUM_VENT_SET_CLOSED: 'close' = 'close'
+export const VACUUM_VENT_SET_CLOSED: 'closed' = 'closed'
 
 // TODO (nd:2026-03-09) These should match physical min/max when defined
 export const VACUUM_MIN_PRESSURE_MBAR = 0.1

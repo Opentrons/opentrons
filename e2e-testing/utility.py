@@ -1,4 +1,5 @@
 import functools
+import re
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, TimeoutError, expect
@@ -55,7 +56,7 @@ def troubleshoot_and_pause(func):
     return wrapper
 
 
-def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
+def import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
     """This test takes two inputs:
     1. page: The Playwright Page object.
     2. PROTOCOL_PATH: The file path of the protocol to import
@@ -110,7 +111,7 @@ def create_new_protocol_flow(pipette: str, gripper: bool, tc: bool, waste_chute:
     page.get_by_text("Add a pipette").click()
     page.get_by_text(pipette).click()
     page.get_by_text("50 µL").click()
-    page.get_by_role("checkbox", name="Tip Rack 50 µL", exact=True).click()
+    page.locator("label").filter(has=page.get_by_text(re.compile(r"^Tip Rack 50 µL$"))).first.click()
     page.get_by_role("button", name="Save").click()
     page.get_by_text("Yes", exact=True).click()
     if gripper:

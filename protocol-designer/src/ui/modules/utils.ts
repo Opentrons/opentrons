@@ -2,12 +2,15 @@ import values from 'lodash/values'
 
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getLabwareDefaultEngageHeight,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   VACUUM_MODULE_LOCATION,
@@ -20,7 +23,7 @@ import {
 } from '../../utils'
 
 import type { DropdownOption } from '@opentrons/components'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleType, RobotType } from '@opentrons/shared-data'
 import type {
   InitialDeckSetup,
   LabwareOnDeck,
@@ -80,10 +83,18 @@ export const getModuleShortNames = (type: ModuleType): string => {
   }
 }
 
-const getModuleDisplayLocation = (moduleOnDeck: ModuleOnDeck): string => {
+export const getModuleDisplayLocation = (
+  moduleOnDeck: ModuleOnDeck,
+  robotType: RobotType
+): string => {
   const { type, slot } = moduleOnDeck
   if (type === VACUUM_MODULE_TYPE) {
     return VACUUM_MODULE_LOCATION
+  }
+  if (type === THERMOCYCLER_MODULE_TYPE) {
+    return robotType === FLEX_ROBOT_TYPE
+      ? TC_MODULE_LOCATION_OT3
+      : TC_MODULE_LOCATION_OT2
   }
   return slot
 }
@@ -91,7 +102,8 @@ const getModuleDisplayLocation = (moduleOnDeck: ModuleOnDeck): string => {
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,
   nicknamesById: Record<string, string>,
-  type: ModuleType
+  type: ModuleType,
+  robotType: RobotType
 ): DropdownOption[] {
   const labwares = initialDeckSetup.labware
   const modulesOnDeck = getModulesOnDeckByType(initialDeckSetup, type)
@@ -104,7 +116,10 @@ export function getModuleLabwareOptions(
         moduleOnDeck.id,
         Object.values(labwares)
       )
-      const moduleDisplayLocation = getModuleDisplayLocation(moduleOnDeck)
+      const moduleDisplayLocation = getModuleDisplayLocation(
+        moduleOnDeck,
+        robotType
+      )
       if (topMostId != null) {
         return {
           name: nicknamesById[topMostId],

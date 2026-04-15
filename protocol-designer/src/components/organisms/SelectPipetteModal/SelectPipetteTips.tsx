@@ -93,7 +93,7 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
               key={value}
               isChecked={selectedValues.includes(value)}
               labelText={removeOpentronsPhrases(name)}
-              onClick={() => {
+              onChange={() => {
                 handleSelectTips(value)
               }}
             />
@@ -106,7 +106,6 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
               {t('add_custom_tips')}
             </StyledText>
             <input
-              data-testid="SelectPipettes_customTipInput"
               type="file"
               onChange={e => dispatch(createCustomTiprackDef(e))}
             />

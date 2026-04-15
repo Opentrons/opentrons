@@ -2,7 +2,7 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -40,10 +40,10 @@ describe('EditProtocolMetadataModal', () => {
     screen.getByText('Name')
     screen.getByText('Description')
     screen.getByText('Author/Organization')
-    let input = screen.getAllByRole('textbox', { name: '' })[1]
-    fireEvent.change(input, { target: { value: 'mockProtocolName' } })
-    input = screen.getAllByRole('textbox', { name: '' })[2]
-    fireEvent.change(input, { target: { value: 'mock org' } })
+    screen.getAllByRole('textbox')
+    screen.getByDisplayValue('mockName')
+    screen.getByDisplayValue('mockDescription')
+    screen.getByDisplayValue('mockAuthor')
     screen.getByText('Save')
   })
 })

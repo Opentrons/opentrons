@@ -1,14 +1,14 @@
-test_name: Protected resource access
+test_name: Accessing protected resources within auth-server
 
 marks:
   - usefixtures:
       - run_server
 
 stages:
-  - name: Enable access control so protected resources require a valid token
+  - name: Enable access control enabled so protected resources require a valid token
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/settings'
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
       json:
         data:
           accessControlEnabled: true
@@ -52,7 +52,7 @@ stages:
         grant_type: password
         username: test_admin
         password: test_admin_password
-        scope: users.read runs.write # Omit users.write.
+        scope: users.read # Omit users.write.
     response:
       status_code: 200
       json:
@@ -60,7 +60,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: users.read runs.write
+        scope: users.read
       save:
         json:
           access_token: access_token

@@ -2,7 +2,13 @@
 
 import asyncio
 import logging
-from typing import Callable, Dict, List, Mapping, Optional, Sequence
+import os
+import subprocess
+import sys
+import time
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union, cast
+
+import Pyro5.api
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -53,7 +59,7 @@ from opentrons.protocol_runner import (
     RunOrchestrator,
     RunResult,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.types import NozzleMapInterface
 from opentrons_shared_data.errors.exceptions import ModuleNotPresent
@@ -61,6 +67,8 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
+from . import run_process_entry_point
+from .run_process import DirectedRunProcess, register_process_types
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
@@ -123,7 +131,9 @@ async def handle_hardware_event(
 ) -> None:
     """Handle an E-stop event from the hardware API.
 
-    This is meant to run in the engine's thread and asyncio event loop.
+    When in subprocess mode this executes in the RobotServerPyroResource's event loop.
+
+    Otherwise, this is meant to run in the engine's thread and asyncio event loop.
 
     This is a public function for unit-testing purposes, but it's an implementation
     detail of the store.
@@ -177,12 +187,19 @@ class RunOrchestratorStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        self._run_orchestrator: Optional[RunOrchestrator] = None
+        # TODO come up with a better name for this.
+        self._run_orchestrator: Optional[Union[RunOrchestrator, DirectedRunProcess]] = (
+            None
+        )
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
-        hardware_api.register_callback(_get_hardware_listener(self))
+        self._run_process: Optional[subprocess.Popen[bytes]] = None
+        if feature_flags.protocol_subprocess_enabled():
+            register_process_types()
+        if not feature_flags.hardware_subprocess_enabled():
+            hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
-    def run_orchestrator(self) -> RunOrchestrator:
+    def run_orchestrator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
         """Get the "current" RunOrchestrator."""
         if self._run_orchestrator is None:
             raise NoRunOrchestrator()
@@ -265,6 +282,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             a new one may not be created.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.create_pyro(run_id=run_id)
+
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
         else:
@@ -325,6 +345,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.clear_pyro()
+
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
@@ -350,6 +373,68 @@ class RunOrchestratorStore:
             parameters=run_time_parameters,
             command_annotations=command_annotations,
             command_preconditions=preconditions,
+        )
+
+    async def create_pyro(
+        self,
+        run_id: str,
+    ) -> StateSummary:
+        """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
+        if self._run_process is not None:
+            raise RunConflictError("Another run is currently active.")
+
+        self._run_process = subprocess.Popen(
+            args=[sys.executable, "-m", run_process_entry_point.__name__],
+            env={k: v for k, v in os.environ.items()},
+            # user="ot-protocol"  # TODO how do we make sure this works locally?
+        )
+
+        # TODO This timeout sucks
+        start_time = time.monotonic()
+        with Pyro5.api.locate_ns() as ns:
+            while time.monotonic() - start_time < 60:
+                if "ot-protocol" in ns.list():
+                    proxy = Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
+                    self._run_orchestrator = cast(
+                        DirectedRunProcess, cast(object, proxy)
+                    )
+                    break
+                time.sleep(0.01)
+            else:
+                self._run_process.terminate()
+                self._run_process = None
+                ns.remove("ot-protocol")
+                raise ValueError("Can't find process")
+
+        proxy.create(run_id)
+        return self._run_orchestrator.get_state_summary()
+
+    async def clear_pyro(self) -> RunResult:
+        """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
+        if self.run_orchestrator.get_is_okay_to_clear():
+            await self.run_orchestrator.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
+        else:
+            raise RunConflictError("Current run is not idle or stopped.")
+
+        run_data = self.run_orchestrator.get_state_summary()
+
+        assert self._run_process is not None
+        self._run_process.terminate()
+        self._run_process = None
+        self._run_orchestrator = None
+        with Pyro5.api.locate_ns() as ns:
+            ns.remove("ot-protocol")
+
+        return RunResult(
+            state_summary=run_data,
+            commands=[],
+            parameters=[],
+            command_annotations=[],
+            command_preconditions=None,
         )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?

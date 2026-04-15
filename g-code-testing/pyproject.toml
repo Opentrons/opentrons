@@ -55,6 +55,9 @@ known-first-party = ["opentrons", "opentrons_shared_data"]
 "g_code_parsing/_version.py" = ["I"]
 "cli.py" = ["T201"]
 
+[tool.ruff.format]
+exclude = ["g_code_parsing/_version.py"]
+
 # uv: global settings and dependency tweaks
 [tool.uv]
 # Provide static metadata so uv can resolve systemd-python without building its sdist on
@@ -63,6 +66,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/g-code-testing"

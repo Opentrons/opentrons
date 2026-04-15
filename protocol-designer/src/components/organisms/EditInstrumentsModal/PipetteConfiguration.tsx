@@ -218,7 +218,7 @@ export function PipetteConfiguration({
                       }
                       isChecked={selectedTips.includes(option.value)}
                       labelText={removeOpentronsPhrases(option.name)}
-                      onClick={() => {
+                      onChange={() => {
                         const updatedTips = selectedTips.includes(option.value)
                           ? selectedTips.filter(v => v !== option.value)
                           : [...selectedTips, option.value]
@@ -236,7 +236,6 @@ export function PipetteConfiguration({
                         {t('add_custom_tips')}
                       </StyledText>
                       <input
-                        data-testid="SelectPipettes_customTipInput"
                         type="file"
                         onChange={e => dispatch(createCustomTiprackDef(e))}
                       />
