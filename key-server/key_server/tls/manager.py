@@ -4,9 +4,10 @@ import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Final, Literal, Self, Type
+from typing import Awaitable, Callable, Final, Literal, Self, Type, cast
 
 from .ca_manager import TLSCAManager
+from .cryptography_utils import make_pem_bundle
 from .ee_manager import TLSEEManager
 from .robot_details.interface import RobotDetails
 
@@ -37,7 +38,8 @@ class TLSManager:
         ca_cert_dir: Path,
         ca_key_dir: Path,
         tls_ee_dir: Path,
-        terminator_reload: Literal["systemd-nginx", "dev-none"],
+        terminator_reload: Literal["systemd-nginx", "dev-none", "dev-mitmproxy"],
+        mitmproxy_touch_path: Path | None = None,
     ) -> Self:
         """Create a TLS manager, taking several useful setup steps."""
         if terminator_reload == "systemd-nginx":
@@ -52,6 +54,12 @@ class TLSManager:
 
         robot_hostname, robot_ips = await robot_details.get_details()
         ca_manager = TLSCAManager(key_dir=ca_key_dir, ca_cert_dir=ca_cert_dir)
+        mitm_rotator = _MITMProxyCertRotator(mitmproxy_touch_path)
+        rotators = {
+            "systemd-nginx": TLSEEManager.rotate_cert_nginx,
+            "dev-none": TLSEEManager.rotate_cert_none,
+            "dev-mitmproxy": cast(Callable[[], Awaitable[None]], mitm_rotator),
+        }
         ee_manager = TLSEEManager(
             key_dir=tls_ee_dir,
             ee_cert_dir=tls_ee_dir,
@@ -61,16 +69,14 @@ class TLSManager:
             # the easiest way is to start with no IP addresses and then to let the system that configures
             # IP addresses tell us when they start to exist.
             robot_ips=robot_ips,
-            rotate_fn=(
-                TLSEEManager.rotate_cert_nginx
-                if terminator_reload == "systemd-nginx"
-                else TLSEEManager.rotate_cert_none
-            ),
+            rotate_fn=rotators[terminator_reload],
         )
 
         obj = cls(
             ca_manager=ca_manager, ee_manager=ee_manager, robot_details=robot_details
         )
+        if terminator_reload == "dev-mitmproxy":
+            mitm_rotator.set_manager(obj)
         await obj.refresh_ee()
         await obj.schedule_expiry_task(cls.EXPIRY_CHECKER_POLL_PERIOD)
         await obj.schedule_robot_details_task()
@@ -179,3 +185,26 @@ class TLSManager:
         except BaseException:
             LOG.exception("Robot details task failed")
             raise
+
+
+class _MITMProxyCertRotator:
+    def __init__(self, touch_path: Path | None) -> None:
+        self._manager: TLSManager | None = None
+        self._path = touch_path
+
+    def set_manager(self, manager: TLSManager) -> None:
+        self._manager = manager
+
+    async def __call__(self) -> None:
+        """Rotate and tell the MITMProxy about it."""
+        if not self._manager:
+            return
+        if not self._manager._ee_manager._ee_pair:
+            return
+        make_pem_bundle(
+            self._manager._ca_manager._current_ca,
+            self._manager._ee_manager._ee_pair,
+            self._manager._ee_manager._ee_cert_dir / "flex-certs.pem",
+        )
+        if self._path:
+            self._path.touch()
