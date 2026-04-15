@@ -33,9 +33,21 @@ export function EmptyWell({
   const viewBoxHeight = isCircular ? circularSize : height
   const viewBox = `0 0 ${viewBoxWidth} ${viewBoxHeight}`
   const lineStrokeWidth = isCircular ? 2 : 1
-  const lineProps = isLabware
-    ? { x1: 0, y1: 0, x2: viewBoxWidth, y2: viewBoxHeight }
-    : { x1: viewBoxWidth, y1: 0, x2: 0, y2: viewBoxHeight }
+
+  const cx = 10
+  const cy = 10
+  const r = 9
+  const angle = Math.PI / 4
+  const dx = r * Math.cos(angle)
+  const dy = r * Math.sin(angle)
+  const lineProps = isCircular
+    ? {
+        x1: cx - dx,
+        y1: cy - dy,
+        x2: cx + dx,
+        y2: cy + dy,
+      }
+    : { x1: 0, y1: 0, x2: viewBoxWidth, y2: viewBoxHeight }
 
   const maskId = 'emptyWellMask'
 
@@ -47,21 +59,6 @@ export function EmptyWell({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <mask
-        id={maskId}
-        maskUnits="userSpaceOnUse"
-        x="0"
-        y="0"
-        width={viewBoxWidth}
-        height={viewBoxHeight}
-      >
-        {isCircular ? (
-          <circle cx="10" cy="10" r="9.5" fill="white" {...commonProps} />
-        ) : (
-          <rect width={width} height={height} fill="white" {...commonProps} />
-        )}
-      </mask>
-
       <g mask={`url(#${maskId})`}>
         {isCircular ? (
           <circle
@@ -70,7 +67,7 @@ export function EmptyWell({
             r="9"
             fill="#CBCCCC"
             stroke={outlineColor}
-            strokeWidth="3"
+            strokeWidth="2"
             {...commonProps}
           />
         ) : (

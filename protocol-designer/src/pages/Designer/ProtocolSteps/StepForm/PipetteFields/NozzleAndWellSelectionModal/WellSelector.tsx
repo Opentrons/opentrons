@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 
 import {
   COLORS,
-  DEFAULT_TIP_SIZE,
   INACCESSIBLE,
   Module,
   SELECTED,
@@ -485,7 +484,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           </div>
         </SelectionRect>
         <div className={styles.well_legend_box}>
-          <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
+          <SelectionLegend selectionType={WELL} />
         </div>
       </div>
     </>
