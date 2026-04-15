@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   Chip,
   COLORS,
-  DEFAULT_TIP_SIZE,
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
@@ -472,7 +471,7 @@ export function SelectTips(
           </SelectionRect>
         </div>
         <div className={styles.legend_box}>
-          <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
+          <SelectionLegend selectionType={TIP} />
         </div>
       </div>
     </div>
