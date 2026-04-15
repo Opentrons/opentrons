@@ -53,6 +53,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
+import { Login } from '../pages/ODD/Login'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
@@ -66,7 +67,6 @@ import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { Dispatch } from '/app/redux/types'
-import { Login } from '../pages/ODD/Login'
 
 // forces electron to think we're online which means axios won't elide
 // network calls to localhost. see ./hacks.ts for more.

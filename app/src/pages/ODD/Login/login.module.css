@@ -4,8 +4,13 @@
 
 .form_container {
   display: flex;
+  width: 51.5rem;
   flex-direction: column;
   align-items: center;
-  width: 51.5rem;
   margin: 0 auto;
+}
+
+.field_label {
+  align-self: flex-start;
+  padding-bottom: var(--spacing-8);
 }
