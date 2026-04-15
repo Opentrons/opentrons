@@ -30,7 +30,6 @@ class TLSManager:
         self._expiry_task: "asyncio.Task[None] | None" = None
         self._robot_details_task: "asyncio.Task[None] | None" = None
         self._robot_details = robot_details
-        self._robot_details_lock = asyncio.Lock()
 
     @classmethod
     async def create(
@@ -167,11 +166,10 @@ class TLSManager:
             new_ips,
         ) in self._robot_details.yield_details_on_change():
             LOG.info(f"Robot details changed to hostname={new_hostname} ips={new_ips}")
-            async with self._robot_details_lock:
-                if not self._ee_manager.set_robot_details(
-                    datetime.now(timezone.utc), new_hostname, new_ips
-                ):
-                    await self.refresh_ee()
+            if not self._ee_manager.set_robot_details(
+                datetime.now(timezone.utc), new_hostname, new_ips
+            ):
+                await self.refresh_ee()
 
     async def _robot_details_task_outer(self) -> None:
         try:
