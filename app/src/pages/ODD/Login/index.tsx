@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { InputField, LEGACY_INPUT_TYPE_PASSWORD } from '@opentrons/components'
+import {
+  Btn,
+  Icon,
+  InputField,
+  LEGACY_INPUT_TYPE_PASSWORD,
+} from '@opentrons/components'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
@@ -17,6 +22,7 @@ export function Login(): JSX.Element {
   const [step, setStep] = useState<LoginField>('username')
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [showPassword, setShowPassword] = useState(false)
   const [showKeyboard, setShowKeyboard] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
@@ -32,6 +38,7 @@ export function Login(): JSX.Element {
   }, [showKeyboard, fieldValue, step])
 
   useEffect(() => {
+    setShowPassword(false)
     if (step === 'password') {
       inputRef.current?.focus()
     }
@@ -52,16 +59,21 @@ export function Login(): JSX.Element {
   }
 
   const primaryDisabled =
+    step === 'username' ? username.trim() === '' : password.trim() === ''
+
+  const inputType =
     step === 'username'
-      ? username.trim() === ''
-      : password.trim() === ''
+      ? 'text'
+      : showPassword
+        ? 'text'
+        : LEGACY_INPUT_TYPE_PASSWORD
 
   return (
     <>
       <div className={styles.nav_container}>
         <ChildNavigation
           header="Login"
-          buttonText="next"
+          buttonText={step === 'username' ? 'next' : 'confirm'}
           buttonIsDisabled={primaryDisabled}
           secondaryButtonProps={{
             buttonText: 'cancel',
@@ -78,9 +90,7 @@ export function Login(): JSX.Element {
         <InputField
           ref={inputRef}
           testId="login-field"
-          type={
-            step === 'username' ? 'text' : LEGACY_INPUT_TYPE_PASSWORD
-          }
+          type={inputType}
           size="medium"
           value={fieldValue}
           onChange={e => {
@@ -94,6 +104,26 @@ export function Login(): JSX.Element {
           onFocus={() => {
             setShowKeyboard(true)
           }}
+          rightElement={
+            step === 'password' ? (
+              <Btn
+                type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => {
+                  setShowPassword(current => !current)
+                  inputRef.current?.focus()
+                }}
+              >
+                <Icon
+                  name={showPassword ? 'eye-slash' : 'eye'}
+                  size="1.5rem"
+                  data-testid={
+                    showPassword ? 'login-password-hide' : 'login-password-show'
+                  }
+                />
+              </Btn>
+            ) : undefined
+          }
         />
       </div>
       {showKeyboard ? (

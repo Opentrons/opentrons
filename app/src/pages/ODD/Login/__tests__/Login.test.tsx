@@ -113,4 +113,20 @@ describe('Login', () => {
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
     expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
   })
+
+  it('toggles password visibility when the eye control is pressed', () => {
+    renderLogin()
+    fireEvent.change(screen.getByTestId('login-field'), {
+      target: { value: 'user1' },
+    })
+    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    const input = screen.getByTestId('login-field')
+    expect(input).toHaveAttribute('type', 'password')
+    fireEvent.click(screen.getByRole('button', { name: 'Show password' }))
+    expect(input).toHaveAttribute('type', 'text')
+    expect(screen.getByTestId('login-password-hide')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Hide password' }))
+    expect(input).toHaveAttribute('type', 'password')
+    expect(screen.getByTestId('login-password-show')).toBeInTheDocument()
+  })
 })

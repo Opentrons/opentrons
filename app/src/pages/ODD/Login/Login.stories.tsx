@@ -1,4 +1,5 @@
 import { Provider } from 'react-redux'
+import { MemoryRouter } from 'react-router-dom'
 import { legacy_createStore } from 'redux'
 
 import { VIEWPORT } from '@opentrons/components'
@@ -9,7 +10,6 @@ import { Login as LoginComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
-import { MemoryRouter } from 'react-router-dom'
 
 const dummyConfig = {
   config: {
@@ -33,7 +33,7 @@ const meta: Meta<typeof LoginComponent> = {
     Story => (
       <Provider store={store}>
         <MemoryRouter>
-        <Story />
+          <Story />
         </MemoryRouter>
       </Provider>
     ),
