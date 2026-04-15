@@ -11,7 +11,7 @@ interface EmptyWellProps {
   wellMap: LabwareWellMap
   parentType: ParentType
   wellName: string
-  size?: string
+  size: string
 }
 
 export function EmptyWell(props: EmptyWellProps): JSX.Element {
@@ -21,13 +21,16 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
   }
   const firstWell = wellMap.A1
   const isCircular = firstWell.shape === 'circular'
+  const isRectangular = firstWell.shape === 'rectangular'
   const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
   const isLabware = parentType === LABWARE
   const outlineColor = isLabware ? COLORS.grey50 : COLORS.black90
   const circularDimension = 20
   const viewBoxWidth = isCircular ? circularDimension : width
   const viewBoxHeight = isCircular ? circularDimension : height
-  const viewBox = `0 0 ${viewBoxWidth} ${viewBoxHeight}`
+  const viewBox = !isRectangular
+    ? `0 0 20 20`
+    : `0 0 ${viewBoxWidth} ${viewBoxHeight}`
   const lineStrokeWidth = isCircular ? 2 : 1
   const lineProps = isLabware
     ? {
@@ -44,8 +47,8 @@ export function EmptyWell(props: EmptyWellProps): JSX.Element {
       }
   return (
     <svg
-      width={size ?? width}
-      height={size ?? height}
+      width={isRectangular ? width : size}
+      height={isRectangular ? height : size}
       viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
