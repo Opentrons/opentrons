@@ -29,10 +29,7 @@ The Vacuum Module accepts the G-code commands listed below.
       <td>
         <strong>Command:</strong> get reset reason<br>
         <strong>Arguments:</strong> none <br>
-        <strong>Response elements:</strong>
-        <ul>
-          <li><code>R</code>: last reset reason</li>
-        </ul>
+        <strong>Response elements:</strong> <code>R:</code>, last reset reason<br>
         <strong>Example:</strong> <code>M114</code> returns <code>M114 R:1 OK</code> 
       </td>
     </tr>
@@ -59,8 +56,8 @@ The Vacuum Module accepts the G-code commands listed below.
       <li><code>S</code>: Start/stop control. Accepts <code>1</code> (on) or <code>0</code> (off).</li>
       <li><code>P</code>: Target gauge pressure in mbar. Range: <code>-1013</code> (full vacuum) to <code>0</code> (atmospheric) mbar.
           <br><strong>Note:</strong> While the firmware accepts -1013 mbar, the hardware’s achievable vacuum will fall short of this theoretical limit and depends on local atmospheric pressure.</li>
-      <li><code>D</code>: Duration in seconds. Range: <code>0–86400</code> (up to 24 hours).</li>
-      <li><code>T</code>: Timeout in seconds to reach target pressure. Range: <code>0–86400</code> (up to 24 hours).</li>
+      <li><code>D</code>: Duration in seconds. Range: <code>0–86400</code> seconds (up to 24 hours).</li>
+      <li><code>T</code>: Timeout in seconds to reach target pressure. Range: <code>0–86400</code> seconds (up to 24 hours).</li>
       <li><code>R</code>: Ramp rate in mbar/s. Range: <code>0–50</code>.</li>
       <li><code>V</code>: Vent state after cycle. Accepts <code>1</code> (open) or <code>0</code> (close).</li>
     </ul>
@@ -75,29 +72,32 @@ The Vacuum Module accepts the G-code commands listed below.
         <strong>Arguments:</strong> none<br>
         <strong>Response elements:</strong>
         <ul>
-          <li><code>T</code>: target pressure / <code>C</code>: current pressure</li>
-          <li><code>A</code>/<code>B</code>: ABS pressure from Sensor A/B</li>
-          <li><code>H</code>: ATM pressure</li>
-          <li><code>E</code>: pressure control enabled (0: Off, 1: On)</li>
-          <li><code>V</code>: vent state (0: Closed, 1: Open)</li>
+          <li><code>T</code>: target pressure (absolute)</li>
+          <li><code>C</code>: current pressure (absolute)</li>
+          <li><code>A</code>: pressure from sensor A (absolute)
+          <li><code>B</code>: pressure from sensor B (absolute)</li>
+          <li><code>H</code>: atmospheric pressure</li>
+          <li><code>E</code>: pressure control. Returns <code>1</code> (on) or <code>0</code> (off).</li>
+          <li><code>V</code>: vent state. Returns <code>1</code> (open) or <code>0</code> (closed).</li>
         </ul>
         <strong>Response:</strong> <code>M121 T:400 C:1011.0 A:1010.9 B:1012.2 H:819.2 E:1 V:0 OK</code>
       </td>
     </tr>
     <tr>
-      <td><code>M122</code></td>
-      <td>
-        <strong>Command:</strong> set pump state (Manual Mode)<br>
-        <strong>Arguments:</strong>
-        <ul>
-          <li><code>S</code>: start RPM control (0: Stop, 1: Start)</li>
-          <li><code>R</code>: target RPM (0–3500)</li>
-          <li><code>D</code>: duty cycle/PWM (0–100, ignores <code>R</code> if provided)</li>
-        </ul>
-        <strong>Note:</strong> Sending this command puts the module into "Manual Mode," causing it to ignore pressure targets set by <code>M120</code>. <br>
-        <strong>Response:</strong> <code>M122 OK</code>
-      </td>
-    </tr>
+<tr>
+  <td><code>M122</code></td>
+  <td>
+    <strong>Command:</strong> set pump state. Sending this command puts the module into "Manual Mode," causing it to ignore any pressure targets previously set via <code>M120</code>.<br>
+    <strong>Arguments:</strong>
+    <ul>
+      <li><code>S</code>: Start/stop control. Accepts <code>1</code> (start) or <code>0</code> (stop).</li>
+      <li><code>R</code>: Target rpm. Range: <code>0–3500</code> rpm.</li>
+      <li><code>D</code>: PWM duty cycle. Range: <code>0–100</code> (percentage). When specified, the module ignores the rpm value target (<code>R</code>).</li>
+    </ul>
+    <strong>Response: Returns </strong> <code>M123 OK</code>.
+  </td>
+</tr>
+</tr>
     <tr>
       <td><code>M123</code></td>
       <td>
