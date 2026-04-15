@@ -166,6 +166,7 @@ async def update_user(
             new_full_name=update_data.fullName,
             new_account_type=update_data.accountType,
             new_locked=update_data.locked,
+            reset_password=update_data.resetPassword,
         )
     except UserNotFoundError:
         raise fastapi.HTTPException(
