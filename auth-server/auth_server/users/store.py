@@ -82,6 +82,7 @@ class UserStore:
         hashed_password: str | None = None,
         full_name: str | None = None,
         account_type: str | None = None,
+        reset_password: bool = False,
     ) -> User:
         """Update a user's fields and return the updated User.
 
@@ -98,6 +99,7 @@ class UserStore:
                 "account_type": AccountType(account_type)
                 if account_type is not None
                 else None,
+                "reset_password": reset_password,
             }
             for attr, value in updates.items():
                 if value is not None:

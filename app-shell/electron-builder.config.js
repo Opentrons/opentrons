@@ -26,6 +26,12 @@ module.exports = async () => ({
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
   electronVersion: '39.1.2',
   npmRebuild: false,
+  protocols: [
+    {
+      name: 'Flex App',
+      schemes: ['com-opentrons-flex-app'],
+    },
+  ],
   releaseInfo: {
     releaseNotesFile:
       project === 'robot-stack'
