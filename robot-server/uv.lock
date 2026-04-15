@@ -7,6 +7,10 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[options]
+exclude-newer = "2026-04-03T21:12:30.433578Z"
+exclude-newer-span = "P1W"
+
 [manifest]
 
 [[manifest.dependency-metadata]]
@@ -1088,12 +1092,14 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyserial" },
     { name = "python-can" },
+    { name = "setuptools" },
     { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
 flex = [
     { name = "python-can" },
+    { name = "setuptools" },
 ]
 
 [package.metadata]
@@ -1105,6 +1111,8 @@ requires-dist = [
     { name = "pyserial", specifier = "==3.5" },
     { name = "python-can", specifier = "==4.2.2" },
     { name = "python-can", marker = "extra == 'flex'", specifier = "==4.2.2" },
+    { name = "setuptools", specifier = ">=69.1.1,<82.0.0" },
+    { name = "setuptools", marker = "extra == 'flex'", specifier = ">=69.1.1,<82.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
 ]
 provides-extras = ["flex"]
@@ -2107,6 +2115,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "idna" },
     { name = "pydantic" },
+    { name = "pydantic-settings" },
     { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "sqlalchemy" },
@@ -2123,6 +2132,7 @@ requires-dist = [
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "idna", specifier = "==3.3" },
     { name = "pydantic", specifier = ">2.0.0,<3" },
+    { name = "pydantic-settings", specifier = ">=2.0.0,<3" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "python-multipart", specifier = "==0.0.6" },
     { name = "sqlalchemy", specifier = ">=1.4.51,<3" },

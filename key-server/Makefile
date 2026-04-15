@@ -42,7 +42,7 @@ clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
 clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
-dev_port ?= "33950"
+dev_port ?= "33960"
 
 .PHONY: all
 all: clean wheel
@@ -97,9 +97,16 @@ format:
 	$(ruff) format .
 	$(ruff) check --select I --fix .
 
+# the dev task is pretty good for running the server just locally for quick tests.
 .PHONY: dev
 dev:
-	OT_KEY_SERVER_dot_env_path=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))/dev.env $(python) -m key_server --port $(dev_port) --reload --log-level=debug
+	OT_KEY_SERVER_dot_env_path=dev.env $(python) -m key_server --port $(dev_port) --reload --log-level=debug
+
+# the dev-mitmproxy task integrates with the whole-backend mode that runs a reverse proxy in
+# front of all the servers. don't run it unless you're going to run mitmproxy
+.PHONY: dev-mitmproxy
+dev-mitmproxy:
+	OT_KEY_SERVER_dot_env_path=dev-mitmproxy.env $(python) -m key_server --port $(dev_port) --reload --log-level=debug
 
 # Note: No `push` target, since this project only runs on Flex (OT-3), not OT-2.
 

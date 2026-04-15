@@ -12,6 +12,7 @@ export function AnnotatedStepsRowItem(
 ): JSX.Element {
   const { index, style, ariaAttributes, ...data } = props
   const row = data.rows[index]
+
   return (
     <div style={style} {...ariaAttributes}>
       <div className={styles.annotated_steps_row}>
@@ -26,12 +27,13 @@ export function AnnotatedStepsRowItem(
             allRunDefs={data.allRunDefs}
             setSelectedCommand={data.setSelectedCommand}
             handlePause={data.handlePause}
+            annotationDescription={row.annotationDescription}
           />
         ) : row.type === 'command' ? (
           <IndividualCommand
             scrollTargetId={data.scrollTargetId}
             listElement={data.listElement}
-            fromGroup={row.fromGroup}
+            fromGroup={false}
             command={row.command}
             isHighlighted={row.isHighlighted}
             analysis={data.analysis}

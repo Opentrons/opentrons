@@ -1,5 +1,6 @@
 """A wrapper for a protocol run that lives as a proxy in its own process."""
 
+import asyncio
 from typing import Any, Dict, List, Mapping, Optional, Tuple, get_args
 
 from opentrons.hardware_control.modules import (
@@ -107,6 +108,18 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._deck_type = deck_type
         self._run_id: Optional[str] = None
         self._run_orchestrator: Optional[RunOrchestrator] = None
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
+
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        """Event loop for use in allowing async methods via Pyro."""
+        assert self._loop is not None
+        return self._loop
+
+    @loop.setter
+    def loop(self, loop: asyncio.AbstractEventLoop) -> None:
+        """Set an abstract event loop."""
+        self._loop = loop
 
     def create(self, run_id: str) -> None:
         """Create a run orchestrator and protocol engine for a given run."""

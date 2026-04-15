@@ -16,7 +16,7 @@ const USB_PORT_LOCATIONS = [
   ['1.3.3', 'USB-6'],
   ['1.3.2', 'USB-7'],
   ['1.3.1', 'USB-8'],
-  ['1.7', 'FrontPort'],
+  ['1.7', 'FRONTPORT'],
 ] as const
 
 const readFileSafe = async (filePath: string): Promise<string | null> => {
