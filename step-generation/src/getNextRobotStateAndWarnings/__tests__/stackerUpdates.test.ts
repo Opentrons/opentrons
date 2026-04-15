@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  FLEX_STACKER_D4_ADDRESSABLE_AREA,
   FLEX_STACKER_MODULE_TYPE,
   SYSTEM_LOCATION,
 } from '@opentrons/shared-data'
@@ -191,6 +192,43 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       stack: ['tiprack1Id', '1'],
     })
   })
+
+  it('sets stackedOnNode to the stacker shuttle addressable area for the bottom retrieved labware', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    robotState.modules[FLEX_STACKER_ID] = {
+      slot: 'D4',
+      moduleState: {
+        type: FLEX_STACKER_MODULE_TYPE,
+        labwareInHopper: [
+          {
+            primaryLabwareId: 'tiprack1Id',
+            adapterLabwareId: null,
+            lidLabwareId: null,
+          },
+          {
+            primaryLabwareId: 'tiprack2Id',
+            adapterLabwareId: null,
+            lidLabwareId: null,
+          },
+        ],
+        storedLabwareDetails: {
+          primaryLabwareURI: LABWARE_ID,
+        },
+        labwareOnShuttle: null,
+      },
+    }
+
+    forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+
+    expect(robotState.labware.tiprack1Id.stackedOnNode).toEqual({
+      addressableAreaName: FLEX_STACKER_D4_ADDRESSABLE_AREA,
+    })
+    expect(robotState.labware.tiprack1Id.stack).toEqual(['tiprack1Id', 'D4'])
+    warnSpy.mockRestore()
+  })
 })
 
 describe('flex stacker state updates forFlexStackerStore', () => {
@@ -259,5 +297,29 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       FLEX_STACKER_ID,
       '1',
     ])
+  })
+
+  it('sets stackedOnNode to inStackerHopper for labware moved from the shuttle into the hopper', () => {
+    robotState.labware = {
+      [LABWARE_ID]: {
+        stack: [LABWARE_ID, SYSTEM_LOCATION],
+      },
+      tiprack4Id: {
+        stack: ['tiprack4Id', FLEX_STACKER_ID, '1'],
+      },
+    }
+    forFlexStackerStore(
+      { moduleId: FLEX_STACKER_ID, strategy: 'automatic' },
+      invariantContext,
+      {
+        robotState,
+        warnings: [],
+      }
+    )
+
+    expect(robotState.labware.tiprack4Id.stackedOnNode).toEqual({
+      kind: 'inStackerHopper',
+      moduleId: FLEX_STACKER_ID,
+    })
   })
 })

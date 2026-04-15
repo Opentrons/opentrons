@@ -19,8 +19,6 @@ import type {
 import type { RobotState } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
 
-export { enrichRobotStateForStackGraphTraversals }
-
 /** Initial-deck robot state with `stackedOnNode` (and sibling `contains` when applicable) for traversals. */
 export const getRobotStateEnrichedForStackGraphFromRobotState: Selector<RobotState> =
   createSelector(

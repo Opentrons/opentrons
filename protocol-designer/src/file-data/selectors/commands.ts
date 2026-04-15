@@ -71,7 +71,7 @@ export const getInitialRobotState: (
     )
     const labware: Record<string, LabwareTemporalProperties> = mapValues(
       initialDeckSetup.labware,
-      ({ id, stack }): LabwareTemporalProperties => {
+      ({ id, stack, stackedOnNode, contains }): LabwareTemporalProperties => {
         const labwareEntity = invariantContext.labwareEntities[id]
         const isLid = getIsLid(labwareEntity.def)
         const nearestParent = getNearestParentInStack(stack)
@@ -83,6 +83,8 @@ export const getInitialRobotState: (
           )
         return {
           stack,
+          ...(stackedOnNode != null ? { stackedOnNode } : {}),
+          ...(contains != null ? { contains } : {}),
           // set sterility to TOUCHED_PIPETTABLE_LABWARE if the labware is a lid and the parent is pipettable labware
           ...(isLid && isParentPipettableLabware
             ? { sterility: TOUCHED_PIPETTABLE_LABWARE }
