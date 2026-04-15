@@ -8,7 +8,22 @@ import { i18n } from '/app/i18n'
 import { Login } from '..'
 
 vi.mock('/app/atoms/SoftwareKeyboard', () => ({
-  FullKeyboard: () => <div data-testid="mock-full-keyboard">keyboard</div>,
+  FullKeyboard: ({
+    onChange,
+  }: {
+    onChange: (input: string) => void
+  }): JSX.Element => (
+    <div data-testid="mock-full-keyboard">
+      <button
+        type="button"
+        onClick={() => {
+          onChange('from_keyboard')
+        }}
+      >
+        simulate keyboard input
+      </button>
+    </div>
+  ),
 }))
 
 const render = () => {
@@ -35,5 +50,21 @@ describe('Login', () => {
     expect(screen.queryByTestId('mock-full-keyboard')).not.toBeInTheDocument()
     fireEvent.focus(screen.getByRole('textbox'))
     expect(screen.getByTestId('mock-full-keyboard')).toBeInTheDocument()
+  })
+
+  it('updates the username when typing in the text field', () => {
+    render()
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'lab_user' } })
+    expect(input).toHaveValue('lab_user')
+  })
+
+  it('updates the username when FullKeyboard reports a new value', () => {
+    render()
+    fireEvent.focus(screen.getByRole('textbox'))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'simulate keyboard input' })
+    )
+    expect(screen.getByRole('textbox')).toHaveValue('from_keyboard')
   })
 })
