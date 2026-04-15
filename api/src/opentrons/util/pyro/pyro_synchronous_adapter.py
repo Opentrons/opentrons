@@ -6,12 +6,11 @@ import inspect
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
-import numpy
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 
 from opentrons.util.pyro.pyro_serialization import (
-    SpecialDictWrapper,
+    TypedDictWrapper,
     UnhashableDictWrapper,
 )
 
@@ -486,32 +485,44 @@ def convert_type_to_instance(
     return wrapper  # type: ignore
 
 
-# CASEY NOTE: REMOVE AND REPLACE FUNCTIONALITY
-def debug_attribute(
+def convert_result_to_wrapped_typed_dict(
     utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
 ) -> Callable[P, T]:
+    """Wrapper that ensures a result of a method call through Pyro is a wrapped Typed Dict.
+
+    The result of this is later deserialzed by serpent using special registries for TypedDictWrapper. This
+    is useful for complex Typed Dictionaries such as PipetteDict that require reconstruction.
+    """
+
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
             result = bound_method(*args, **kwargs)
+            return_type = attr.__annotations__["return"]
         elif isinstance(attr, FunctionType):
             bound_method = MethodType(attr, core_obj)
             result = bound_method(*args, **kwargs)
+            return_type = attr.__annotations__["return"]
         elif isinstance(attr, property):
             result = getattr(core_obj, name)
+            return_type = attr.fget.__annotations__["return"]
         else:
             raise ValueError(
                 "Provided base attribute must be a Property, a Method or an Async method."
             )
-        # log some useful things!
-        print(f"type of result: {type(result)}")
         if isinstance(result, dict):
-            print("WE GOT A DICT")
-            return SpecialDictWrapper(dictionary=result)
-
-        return result
+            return TypedDictWrapper(
+                dictionary=result,
+                typed_dict_name=".".join(
+                    (return_type.__module__, return_type.__qualname__)
+                ),
+            )
+        else:
+            raise ValueError(
+                "Pyro behavior for Typed Dict wrapping is only available for use with dictionaries."
+            )
 
     return wrapper  # type: ignore
 

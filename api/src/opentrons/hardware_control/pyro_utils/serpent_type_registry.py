@@ -22,8 +22,7 @@ import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
-    SpecialDictWrapper,
-    _serpent_enum_serializer,
+    TypedDictWrapper,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
@@ -173,12 +172,14 @@ def _PipetteOffsetSummary_class_to_dict(obj) -> Dict:  # type: ignore
         "reasonability_check_failures": None,  # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
     }
 
-# CASEY TODO: the special dict wrapper should include a __class__ name and here we should check it with an if statement, and have a handler function that does the pipette dict stuff
+
+# Type Dict registration handlers
 
 
-def _special_dict_wrapper_dict_dict_to_class(  # type: ignore
+def _pipetted_dict_dict_to_class(  # type: ignore
     classname, d
 ) -> opentrons.hardware_control.dev_types.PipetteDict:
+    """Reconstruction handler for PipetteDict TypedDicts."""
     dictionary = d["dictionary"]
 
     converted_supported_tips: Dict[
@@ -197,18 +198,19 @@ def _special_dict_wrapper_dict_dict_to_class(  # type: ignore
         opentrons_shared_data.pipette.pipette_definition.PipetteLiquidPropertiesDefinition,
     ] = {}
 
-
     for liquid_class, props in dictionary["available_volume_modes"].items():
-        liquid_class_enum = opentrons_shared_data.pipette.types.LiquidClasses(int(liquid_class))
-        print(f"LQ PROPS: {props}")
-        props["supportedTips"] = {f"t{key}": value for key, value in props["supportedTips"].items()}
+        liquid_class_enum = opentrons_shared_data.pipette.types.LiquidClasses(
+            int(liquid_class)
+        )
+        props["supportedTips"] = {
+            f"t{key}": value for key, value in props["supportedTips"].items()
+        }
         prop_model = opentrons_shared_data.pipette.pipette_definition.PipetteLiquidPropertiesDefinition.model_validate(
             props
         )
         converted_available_volume_modes[liquid_class_enum] = prop_model
 
-
-    new_dict = opentrons.hardware_control.dev_types.PipetteDict(
+    return opentrons.hardware_control.dev_types.PipetteDict(
         display_name=str(dictionary["display_name"]),
         name=dictionary["name"],  # TODO take a look at it
         model=opentrons_shared_data.pipette.types.PipetteModel(dictionary["model"]),
@@ -261,7 +263,16 @@ def _special_dict_wrapper_dict_dict_to_class(  # type: ignore
         ),
         available_volume_modes=converted_available_volume_modes,
     )
-    return new_dict
+
+
+def _typed_dict_dict_to_class(classname, d) -> Any:
+    """This is a unique serializaiton handler that can be expanded to support TypedDicts that need reconstruction."""
+    if d["typed_dict_name"] == "opentrons.hardware_control.dev_types.PipetteDict":
+        return _pipetted_dict_dict_to_class(classname, d)
+    else:
+        raise ValueError(
+            f"No registration handler available for classname: {classname}"
+        )
 
 
 # numpy float serialization
@@ -363,7 +374,7 @@ def register_hardware_types() -> None:
         class_to_dict=_estop_overall_status_class_to_dict,
     )
 
-    # todo(chb: 04-09-2026): These are termporary direct serializations to support the initial robot server intergration, replace with automated solution
+    # todo(chb: 04-09-2026): These are direct serializations to support the initial robot server intergration, replace with automated solution where approprite
     # gripper calibration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset,
@@ -392,9 +403,5 @@ def register_hardware_types() -> None:
         class_to_dict=_point_class_to_dict,
     )
 
-    # handle special dicts
-    register_type_to_serpent(
-        class_type=SpecialDictWrapper,
-        dict_to_class=_special_dict_wrapper_dict_dict_to_class,
-        class_to_dict=OpentronsPyroSerializer._pydantic_class_to_dict,
-    )
+    # handle Typed Dicts for the hardware controller
+    OpentronsPyroSerializer.register_opentrons_typed_dicts(_typed_dict_dict_to_class)

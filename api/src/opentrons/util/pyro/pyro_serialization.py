@@ -13,8 +13,14 @@ from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
 
 
-class SpecialDictWrapper(BaseModel):
+class TypedDictWrapper(BaseModel):
+    """This is a specialty model create to safely wrap TypedDicts like PipetteDict.
+
+    Each typed dict requires custom handling in their native serializer.
+    """
+
     dictionary: dict[Any, Any]
+    typed_dict_name: str
 
 
 class UnhashableDictWrapper(BaseModel):
@@ -161,6 +167,18 @@ class OpentronsPyroSerializer:
         """Registered a TypedDict type to the OpentronsPyroSerializer for tracking and deserialization purposes only."""
         class_name = ".".join((typed_dict.__module__, typed_dict.__qualname__))
         cls._typed_dict_class_name_to_model[class_name] = typed_dict
+
+    @classmethod
+    def register_opentrons_typed_dicts(
+        cls, dict_to_class: Callable[[str, Any], Any]
+    ) -> None:
+        """Registers the specialty handler for typed dicts using TypeDictWrapper."""
+        class_name = register_type_to_serpent(
+            TypedDictWrapper,
+            dict_to_class,
+            cls._pydantic_class_to_dict,
+        )
+        cls._pydantic_class_name_to_model[class_name] = TypedDictWrapper
 
     @classmethod
     def register_unhashable_dicts(cls) -> None:
