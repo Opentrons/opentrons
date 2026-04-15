@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal, Type
 
 from ...errors.error_occurrence import ErrorOccurrence
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
     from opentrons.protocol_engine.state.state import StateView
 
-StartSetVacuumPumpCommandType = Literal["vacuum_module/startSetVacuumPump"]
+StartSetVacuumPumpCommandType = Literal["vacuumModule/startSetVacuumPower"]
 
 
 class StartSetVacuumPumpParams(BaseModel):
@@ -25,6 +26,21 @@ class StartSetVacuumPumpParams(BaseModel):
     percentPower: int = Field(
         ...,
         description="Desired duty cycle of the vacuum pump as a percentage between 1 and 100%.",
+    )
+    duration: int | SkipJsonSchema[None] = Field(
+        None,
+        description="Duration in sec. to hold target power for after it is reached.",
+    )
+    rate: float | SkipJsonSchema[None] = Field(
+        None, description="Target rate of power change in mbar/sec"
+    )
+    timeout: int | SkipJsonSchema[None] = Field(
+        None,
+        description="Specify timeframe in seconds that target power must be reached in before a timeout error occurs.",
+    )
+    ventAfter: bool = Field(
+        True,
+        description="Whether the system should open the vent after the target power is held for the duration.",
     )
 
 
@@ -73,7 +89,7 @@ class StartSetVacuumPump(
 ):
     """A command to start the vacuum pump."""
 
-    commandType: StartSetVacuumPumpCommandType = "vacuum_module/startSetVacuumPump"
+    commandType: StartSetVacuumPumpCommandType = "vacuumModule/startSetVacuumPower"
     params: StartSetVacuumPumpParams
     result: Optional[StartSetVacuumPumpResult] = None
 
@@ -83,7 +99,7 @@ class StartSetVacuumPump(
 class StartSetVacuumPumpCreate(BaseCommandCreate[StartSetVacuumPumpParams]):
     """A request to start the vacuum pump."""
 
-    commandType: StartSetVacuumPumpCommandType = "vacuum_module/startSetVacuumPump"
+    commandType: StartSetVacuumPumpCommandType = "vacuumModule/startSetVacuumPower"
     params: StartSetVacuumPumpParams
 
     _CommandCls: Type[StartSetVacuumPump] = StartSetVacuumPump
