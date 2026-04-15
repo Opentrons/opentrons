@@ -86,16 +86,25 @@ async def test_load_labware_on_slot_or_addressable_area(
         ]
     )
 
-    decoy.when(state_view.geometry.ensure_location_not_occupied(location)).then_return(
-        sentinel.validated_empty_location
-    )
     decoy.when(
-        await equipment.load_labware(
-            location=sentinel.validated_empty_location,
+        await equipment.load_definition_for_details(
             load_name="some-load-name",
             namespace="opentrons-test",
             version=1,
-            labware_id=None,
+        )
+    ).then_return((well_plate_def, "opentrons-test/some-load-name/1"))
+
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(location, None, well_plate_def)
+    ).then_return(sentinel.validated_empty_location)
+
+    decoy.when(
+        await equipment._load_labware_from_def_and_uri(
+            well_plate_def,
+            "opentrons-test/some-load-name/1",
+            sentinel.validated_empty_location,
+            None,
+            None,
         )
     ).then_return(
         LoadedLabwareData(
@@ -177,17 +186,26 @@ async def test_load_labware_on_labware(
     )
 
     decoy.when(
-        state_view.geometry.ensure_location_not_occupied(
-            OnLabwareLocation(labwareId="other-labware-id")
-        )
-    ).then_return(OnLabwareLocation(labwareId="another-labware-id"))
-    decoy.when(
-        await equipment.load_labware(
-            location=OnLabwareLocation(labwareId="another-labware-id"),
+        await equipment.load_definition_for_details(
             load_name="some-load-name",
             namespace="opentrons-test",
             version=1,
-            labware_id=None,
+        )
+    ).then_return((well_plate_def, "opentrons-test/some-load-name/1"))
+
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(
+            OnLabwareLocation(labwareId="other-labware-id"), None, well_plate_def
+        )
+    ).then_return(OnLabwareLocation(labwareId="another-labware-id"))
+
+    decoy.when(
+        await equipment._load_labware_from_def_and_uri(
+            well_plate_def,
+            "opentrons-test/some-load-name/1",
+            OnLabwareLocation(labwareId="another-labware-id"),
+            None,
+            None,
         )
     ).then_return(
         LoadedLabwareData(
@@ -262,8 +280,16 @@ async def test_load_labware_raises_if_location_occupied(
     )
 
     decoy.when(
+        await equipment.load_definition_for_details(
+            load_name="some-load-name",
+            namespace="opentrons-test",
+            version=1,
+        )
+    ).then_return((well_plate_def, "opentrons-test/some-load-name/1"))
+
+    decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None, well_plate_def
         )
     ).then_raise(LocationIsOccupiedError("Get your own spot!"))
 

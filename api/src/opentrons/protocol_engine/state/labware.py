@@ -1140,6 +1140,28 @@ class LabwareView:
             )
         return True
 
+    def raise_if_labware_incompatible_with_vacuum_module_dock(
+        self,
+        location: LabwareLocation,
+        labware_definition: LabwareDefinition,
+    ) -> bool:
+        """Raise an error if the labware is not compatible with the vacuum module dock.
+
+        Returns True if it does not raise.
+        """
+        if isinstance(location, AddressableAreaLocation):
+            # If the module is a Vacuum Module and we are loading
+            # a compatible adapter into its designated staging dock,
+            # do NOT raise.
+            if not (
+                location.addressableAreaName[-1] == "4"
+                and labware_definition.parameters.quirks is not None
+                and "vacuumModuleDock" in labware_definition.parameters.quirks
+            ):
+                raise ValueError("Labware not compatible with vacuum module dock")
+
+        return True
+
     def raise_if_stacker_labware_pool_is_not_valid(
         self,
         primary_labware_definition: LabwareDefinition,
