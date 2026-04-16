@@ -1,7 +1,9 @@
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { legacy_createStore } from 'redux'
 
+import { ApiHostProvider } from '@opentrons/react-api-client'
 import { VIEWPORT } from '@opentrons/components'
 
 import { configReducer } from '/app/redux/config/reducer'
@@ -25,6 +27,8 @@ const store: Store<any> = legacy_createStore(
   dummyConfig as StoreEnhancer
 )
 
+const queryClient = new QueryClient()
+
 const meta: Meta<typeof LoginComponent> = {
   title: 'ODD/Pages/Login',
   component: LoginComponent,
@@ -32,9 +36,13 @@ const meta: Meta<typeof LoginComponent> = {
   decorators: [
     Story => (
       <Provider store={store}>
-        <MemoryRouter>
-          <Story />
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+          <ApiHostProvider hostname="127.0.0.1">
+            <MemoryRouter>
+              <Story />
+            </MemoryRouter>
+          </ApiHostProvider>
+        </QueryClientProvider>
       </Provider>
     ),
   ],
