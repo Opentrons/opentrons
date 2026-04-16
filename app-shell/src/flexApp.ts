@@ -1,4 +1,4 @@
-import { shell } from 'electron'
+import { app, shell } from 'electron'
 
 import { createLogger } from './log'
 
@@ -21,10 +21,24 @@ export async function openFlexAppExternal(payload?: {
       ? `${PROTOCOL_NAME}://open?${params.toString()}`
       : `${PROTOCOL_NAME}://open`
 
+  if (app.getApplicationNameForProtocol(url) === '') {
+    try {
+      await shell.openExternal(FLEX_APP_DOWNLOAD_PAGE)
+    } catch (error) {
+      log.error(
+        'Flex App is not installed and open the download page',
+        error instanceof Error ? error.message : String(error)
+      )
+    }
+    return
+  }
+
   try {
     await shell.openExternal(url)
-  } catch {
-    log.debug('Flex App is not installed and open the download page')
-    await shell.openExternal(FLEX_APP_DOWNLOAD_PAGE)
+  } catch (error) {
+    log.error(
+      'Failed to open OT-2 App external URL',
+      error instanceof Error ? error.message : String(error)
+    )
   }
 }

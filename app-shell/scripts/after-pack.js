@@ -34,7 +34,6 @@ module.exports = async function afterPack(context) {
   // arch 4 is universal. sorry. it's not in the arch enum of the builder-util we have for some reason.
   if (platformName === 'darwin') {
     const productFilename = packager.appInfo.productFilename
-
     await copyAssetCar(appOutDir, productFilename)
 
     if (arch !== 4) {

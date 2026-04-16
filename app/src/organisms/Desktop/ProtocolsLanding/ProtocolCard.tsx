@@ -224,7 +224,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {analysisStatus === 'parameterRequired' ? (
             <ProtocolStatusBanner />
           ) : null}
-          {analysisStatus === 'error' ? (
+          {analysisStatus === 'error' && !isFlex ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
               errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}

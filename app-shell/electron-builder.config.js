@@ -78,6 +78,11 @@ module.exports = async () => ({
   },
   dmg: {
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
+    // The final universal OT-2 app exceeds 1 GiB once the bundled Python
+    // runtime is copied in. Use a fixed DMG image size with extra headroom
+    // minumizing the dmg size after copying files works so use shrink
+    size: '3g',
+    shrink: true,
   },
   win: {
     target: ['nsis'],
