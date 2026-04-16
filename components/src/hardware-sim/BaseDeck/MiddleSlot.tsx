@@ -9,7 +9,7 @@ export interface MiddleSlotProps {
   slotClipColor: SVGProps<SVGPathElement>['stroke']
   stroke?: string
 }
-
+// This slot is based of coordinates of slot A2. To reuse, wrap in <g transpose(x, y)>
 export function MiddleSlot(props: MiddleSlotProps): JSX.Element {
   const { showSlotClips, fixtureBaseColor, slotClipColor, stroke } = props
   return (
