@@ -3,9 +3,13 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   fixture96Plate,
+  FLEX_STACKER_A4_ADDRESSABLE_AREA,
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   MOVABLE_TRASH_A3_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 
+import { FLEX_STACKER_MODULE_INITIAL_STATE } from '../../constants'
 import {
   DEST_LABWARE,
   getInitialRobotStateStandard,
@@ -195,6 +199,42 @@ describe('forMoveLabware', () => {
       expect(robotState.labware.lwBig.stackedOnNode).toEqual(newLocation)
       expect(robotState.labware.lwBig.contains).toBe('lwSmall')
       expect(robotState.labware.lwSmall.contains).toBeUndefined()
+    })
+
+    it('moves labware onto flex stacker shuttle (moduleId): updates stack and shuttle stackedOnNode', () => {
+      const stackerModuleId = 'stackerModForMoveTest'
+      const ic = {
+        ...invariantContext,
+        moduleEntities: {
+          ...invariantContext.moduleEntities,
+          [stackerModuleId]: {
+            id: stackerModuleId,
+            type: FLEX_STACKER_MODULE_TYPE,
+            model: FLEX_STACKER_MODULE_V1,
+            pythonName: 'flex_stacker',
+          },
+        },
+      }
+      const rs = cloneDeep(getInitialRobotStateStandard(ic))
+      rs.modules[stackerModuleId] = {
+        slot: 'A3',
+        moduleState: cloneDeep(FLEX_STACKER_MODULE_INITIAL_STATE),
+      }
+
+      forMoveLabware(
+        {
+          labwareId: SOURCE_LABWARE,
+          newLocation: { moduleId: stackerModuleId },
+          strategy: 'usingGripper',
+        },
+        ic,
+        { robotState: rs, warnings: [] }
+      )
+
+      expect(rs.labware[SOURCE_LABWARE].stack).toEqual([SOURCE_LABWARE, 'A3'])
+      expect(rs.labware[SOURCE_LABWARE].stackedOnNode).toEqual({
+        addressableAreaName: FLEX_STACKER_A4_ADDRESSABLE_AREA,
+      })
     })
 
     it('only sets stackedOnNode on the primary moved labware id, not labware left behind in the stack', () => {
