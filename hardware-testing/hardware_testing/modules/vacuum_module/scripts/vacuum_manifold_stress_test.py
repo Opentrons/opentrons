@@ -16,7 +16,7 @@ import csv
 from typing import Dict
 
 
-metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
+metadata = {"protocolName": "VM 200mbar Stress Test-water pump impl"}
 requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 # Tunables (can move some to parameters)
@@ -47,7 +47,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "pressure",
         "pressure",
-        default=400,
+        default=200,
         minimum=200,
         maximum=800,
         description="Target absolute pressure (mbar).",
@@ -71,7 +71,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "vm_run_sec",
         "vm_run_sec",
-        default=120,
+        default=360,
         minimum=1,
         maximum=1000,
         description="Amount of time to hold steady pressure.",
@@ -111,7 +111,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "perstaltic_flow_rate",
         "perstaltic_flow_rate",
-        default=76,
+        default=64,
         minimum=1,
         maximum=400,
         description="Reservoir water fill time.",
@@ -145,8 +145,8 @@ async def _write_to_csv(
                 writer.writerow(
                     [
                         "Time(s)",
-                        "target_guage_pressure",
-                        "current_guage_pressure",
+                        "target_gauge_pressure",
+                        "current_gauge_pressure",
                         "pressure_abs_a",
                         "pressure_abs_b",
                         "pressure_atm",
@@ -157,8 +157,8 @@ async def _write_to_csv(
             writer.writerow(
                 [
                     f"{timestamp:.2f}",
-                    f"{data['target_guage_pressure']}",
-                    f"{data['current_guage_pressure']}",
+                    f"{data['target_gauge_pressure']}",
+                    f"{data['current_gauge_pressure']}",
                     f"{data['pressure_abs_a']}",
                     f"{data['pressure_abs_b']}",
                     f"{data['pressure_atm']}",
@@ -245,13 +245,16 @@ async def _run_single_pump_api_cycle(
     ctx: protocol_api.ProtocolContext,
 ) -> None:
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
-    target_to_pump = target_pressure - 1023
+    target_to_pump = target_pressure - 1013.25
+    await pump.set_vent_state(VentState.OPENED)
     # Start the filling of the water pump while the vacuum is running
     await water_pump_fixture.water_fill_timer(trough_fill_time)
+    await pump.set_vent_state(VentState.CLOSED)
+    await asyncio.sleep(1)
     # Set Pressure and Vacuum to target for x amount of time.
     await pump.set_vacuum_state(
         enable_vacuum=True,
-        guage_pressure_mbar=target_to_pump,
+        gauge_pressure_mbar=target_to_pump,
     )
     ctx.comment(f"[cycle {cycle_index}] pump started at target {target_pressure} mbar")
 
@@ -280,7 +283,7 @@ async def _run_single_pump_api_cycle(
     # Stop the pump
     await pump.set_vacuum_state(
         enable_vacuum=False,
-        guage_pressure_mbar=target_to_pump,
+        gauge_pressure_mbar=target_to_pump,
     )
     # Vent the pump system to atmospheric pressure while pump is on
     await pump.set_vent_state(VentState.OPENED)
