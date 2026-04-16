@@ -3,8 +3,8 @@ import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { legacy_createStore } from 'redux'
 
-import { ApiHostProvider } from '@opentrons/react-api-client'
 import { VIEWPORT } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { configReducer } from '/app/redux/config/reducer'
 

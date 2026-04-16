@@ -10,6 +10,7 @@ import {
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import styles from './login.module.css'
 
@@ -19,6 +20,11 @@ type LoginField = 'username' | 'password'
 
 export function Login(): JSX.Element {
   const navigate = useNavigate()
+  const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
+    onSuccess: () => {
+      navigate(-1)
+    },
+  })
   const [step, setStep] = useState<LoginField>('username')
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -55,11 +61,13 @@ export function Login(): JSX.Element {
       return
     }
     if (password.trim() === '') return
-    // TODO: call auth API with username + password
+    submitPassword(username, password)
   }
 
   const primaryDisabled =
-    step === 'username' ? username.trim() === '' : password.trim() === ''
+    step === 'username'
+      ? username.trim() === ''
+      : password.trim() === '' || isAuthLoading
 
   const inputType =
     step === 'username'

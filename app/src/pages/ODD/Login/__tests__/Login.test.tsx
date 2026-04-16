@@ -9,6 +9,17 @@ import { Login } from '..'
 
 const mockNavigate = vi.fn()
 
+const { mockSubmitPassword } = vi.hoisted(() => ({
+  mockSubmitPassword: vi.fn(),
+}))
+
+vi.mock('/app/resources/auth', () => ({
+  useOAuth2PasswordLogin: () => ({
+    submitPassword: mockSubmitPassword,
+    isAuthLoading: false,
+  }),
+}))
+
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof import('react-router-dom')>()
   return {
@@ -48,6 +59,7 @@ const renderLogin = () => {
 describe('Login', () => {
   beforeEach(() => {
     mockNavigate.mockReset()
+    mockSubmitPassword.mockReset()
   })
 
   it('renders navigation, username field, and action buttons', () => {
@@ -128,5 +140,18 @@ describe('Login', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Hide password' }))
     expect(input).toHaveAttribute('type', 'password')
     expect(screen.getByTestId('login-password-show')).toBeInTheDocument()
+  })
+
+  it('submits username and password when confirming a non-empty password', () => {
+    renderLogin()
+    fireEvent.change(screen.getByTestId('login-field'), {
+      target: { value: 'user1' },
+    })
+    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    fireEvent.change(screen.getByTestId('login-field'), {
+      target: { value: 'secret' },
+    })
+    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    expect(mockSubmitPassword).toHaveBeenCalledWith('user1', 'secret')
   })
 })
