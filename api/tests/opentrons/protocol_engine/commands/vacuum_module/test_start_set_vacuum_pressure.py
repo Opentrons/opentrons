@@ -5,8 +5,8 @@ from decoy import Decoy
 from opentrons.hardware_control.modules import VacuumModule
 from opentrons.protocol_engine.commands import vacuum_module as vm_commands
 from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.vacuum_module.start_set_vacuum import (
-    StartSetVacuumImpl,
+from opentrons.protocol_engine.commands.vacuum_module.start_set_vacuum_pressure import (
+    StartSetVacuumPressureImpl,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.state import update_types
@@ -17,14 +17,14 @@ from opentrons.protocol_engine.state.module_substates import (
 from opentrons.protocol_engine.state.state import StateView
 
 
-async def test_start_set_vacuum(
+async def test_start_set_vacuum_presure(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
     movement: MovementHandler,
 ) -> None:
-    """It should call down to the hardware controller's start_set_vacuum function."""
-    subject = StartSetVacuumImpl(
+    """It should call down to the hardware controller's start_set_vacuum_pressure function."""
+    subject = StartSetVacuumPressureImpl(
         state_view=state_view, equipment=equipment, movement=movement
     )
 
@@ -33,7 +33,7 @@ async def test_start_set_vacuum(
     duration_s = 100
     timeout_s = 60
 
-    data = vm_commands.StartSetVacuumParams(
+    data = vm_commands.StartSetVacuumPressureParams(
         moduleId="input-vacuum-id",
         gaugePressure=gauge_pressure,
         duration=duration_s,
@@ -41,7 +41,7 @@ async def test_start_set_vacuum(
         timeout=timeout_s,
     )
     expected_module_id = VacuumModuleId("vacuum-id")
-    expected_result = vm_commands.StartSetVacuumResult()
+    expected_result = vm_commands.StartSetVacuumPressureResult()
 
     vm_module_substate = decoy.mock(cls=VacuumModuleSubState)
     vm_hardware = decoy.mock(cls=VacuumModule)

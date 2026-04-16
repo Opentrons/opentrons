@@ -2,7 +2,6 @@ import { createSelector } from 'reselect'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import {
-  enrichRobotStateForStackGraphTraversals,
   getAllLargestStacks,
   getAllProvidedAddressableAreasFromDeckConfig as getAllProvidedAddressableAreasFromDeckConfigUtil,
   getProvidedAddressableAreasExposed,
@@ -19,28 +18,18 @@ import type {
 import type { RobotState } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
 
-export { enrichRobotStateForStackGraphTraversals }
-
-/** Initial-deck robot state with `stackedOnNode` (and sibling `contains` when applicable) for traversals. */
-export const getRobotStateEnrichedForStackGraphFromRobotState: Selector<RobotState> =
-  createSelector(
-    getInitialRobotState,
-    stepFormSelectors.getModuleEntities,
-    stepFormSelectors.getLabwareEntities,
-    (robotState, moduleEntities, labwareEntities) =>
-      enrichRobotStateForStackGraphTraversals(
-        robotState,
-        moduleEntities,
-        labwareEntities
-      )
-  )
+/**
+ * Alias of {@link getInitialRobotState}: stack-graph fields (`stackedOnNode`, sibling `contains`)
+ * are applied once when that selector builds robot state, not when reading timeline frames.
+ */
+export const getInitialEnrichedRobotState: Selector<RobotState> =
+  getInitialRobotState
 
 /** All largest `LoadedLabwareLocation` stacks on the initial deck. */
 export const getAllLargestStacksForInitialRobotState: Selector<
   LoadedLabwareLocation[][]
-> = createSelector(
-  getRobotStateEnrichedForStackGraphFromRobotState,
-  robotState => getAllLargestStacks(robotState)
+> = createSelector(getInitialEnrichedRobotState, robotState =>
+  getAllLargestStacks(robotState)
 )
 
 /** Addressable areas provided by the current deck fixture configuration. */
@@ -62,7 +51,7 @@ export const getAllProvidedAddressableAreasFromDeckConfig: Selector<
 export const getProvidedAddressableAreasExposedForRobotState: Selector<
   Set<AddressableAreaName>
 > = createSelector(
-  getRobotStateEnrichedForStackGraphFromRobotState,
+  getInitialEnrichedRobotState,
   getRobotType,
   stepFormSelectors.getDeckConfiguration,
   stepFormSelectors.getModuleEntities,

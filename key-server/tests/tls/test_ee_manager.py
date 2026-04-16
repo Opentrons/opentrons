@@ -125,11 +125,11 @@ def test_subject_uses_robot_details(
 
 
 def test_generate_precert_saves_key(ee_dir: Path, subject: TLSEEManager) -> None:
-    """Generating a precert should save the key and the key alone."""
+    """Generating a precert should save the key (in a temp name) and the key alone."""
     precert = subject.generate_precert()
     contents = list(ee_dir.iterdir())
     assert len(contents) == 1
-    assert contents[0].name == constants.TLS_KEY_NAME
+    assert contents[0].name.startswith(constants.TLS_KEY_NAME)
     loaded = file_utils.load_key(contents[0])
     assert loaded
     assert (
@@ -138,13 +138,14 @@ def test_generate_precert_saves_key(ee_dir: Path, subject: TLSEEManager) -> None
     )
 
 
-def test_install_cert_saves_cert(
+def test_install_cert_saves_cert_and_moves_key(
     ee_dir: Path, initialized_subject: TLSEEManager
 ) -> None:
     """Installing a cert should save it."""
     ee_contents = list(ee_dir.iterdir())
     assert len(ee_contents) == 2
     assert constants.TLS_CERT_NAME in [entry.name for entry in ee_contents]
+    assert constants.TLS_KEY_NAME in [entry.name for entry in ee_contents]
     cert = file_utils.load_cert(ee_dir / constants.TLS_CERT_NAME, "PEM")
     assert cert
     assert initialized_subject._ee_pair
