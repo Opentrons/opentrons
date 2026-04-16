@@ -352,7 +352,7 @@ export const getIsSafePipetteMovement = (args: {
 
   const pipetteEntity = pipetteEntities[pipetteId]
 
-  const { spec: pipetteSpecs } = pipetteEntity ?? {}
+  const { spec: pipetteSpecs } = pipetteEntity
 
   // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
   const displayCategory = pipetteSpecs?.displayCategory
@@ -360,12 +360,8 @@ export const getIsSafePipetteMovement = (args: {
   const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckDefinition = getDeckDefFromRobotType(robotType)
 
-  //  early exit if labwareId is a trashBin or wasteChute or if no nozzle is provided
-  if (
-    labwareEntities[labwareId] == null ||
-    wellTargetName == null ||
-    nozzleConfiguration === ALL
-  ) {
+  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided
+  if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
   }
 
@@ -407,7 +403,7 @@ export const getIsSafePipetteMovement = (args: {
     pipetteHasTip
   )
 
-  const { channels } = pipetteEntity.spec
+  const { channels } = pipetteSpecs
 
   const tipOverlapOnNozzle =
     tiprackEntity != null

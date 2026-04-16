@@ -28,12 +28,16 @@ import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getCollidingWells } from '/protocol-designer/utils/index'
 
+import { canPipetteUseLabware } from '../../../../../../utils'
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
 import { INACCESSIBLE_COLLISION } from '../TipSelectionWizard/constants'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
-import { INACCESSIBLE_PARTIAL_TIP } from './constants'
+import {
+  INACCESSIBLE_PARTIAL_TIP,
+  INACCESSIBLE_WELL_SPACING_MISMATCH,
+} from './constants'
 import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import styles from './nozzleandwellwizard.module.css'
 import {
@@ -53,6 +57,7 @@ import type {
 import type { GenericRect } from '/protocol-designer/collision-types'
 import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
+import type { InaccessibleReason } from '../../PipetteFields/TipSelectionWizard/types'
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectorProps {
@@ -396,12 +401,20 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           return allWellsWithState[w] !== SELECTED_ERROR
         })
       : true
-
-    const inaccessibleReason =
+    let inaccessibleReason: InaccessibleReason
+    if (
       inaccessiblePartialWells.filter(well => hoveredWells?.includes(well))
         .length > 0
-        ? INACCESSIBLE_PARTIAL_TIP
-        : INACCESSIBLE_COLLISION
+    ) {
+      inaccessibleReason = INACCESSIBLE_PARTIAL_TIP
+    } else if (
+      !canPipetteUseLabware(pipetteSpecs, nozzleConfiguration, labwareDef)
+    ) {
+      inaccessibleReason = INACCESSIBLE_WELL_SPACING_MISMATCH
+    } else {
+      inaccessibleReason = INACCESSIBLE_COLLISION
+    }
+
     const is96Channel = channels === 96
 
     const labwarePositionProps = isLabwareOnModule

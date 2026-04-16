@@ -122,6 +122,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
 
   if (
     isMultiChannelPipette &&
+    pipetteSpec &&
     !getIsSafePipetteMovement({
       robotState: prevRobotState,
       invariantContext,

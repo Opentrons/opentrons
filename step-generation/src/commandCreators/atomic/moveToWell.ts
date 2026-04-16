@@ -185,9 +185,10 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   }
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
-
+  const pipetteSpecs = invariantContext.pipetteEntities[pipetteId]?.spec
   if (
     isMultiChannelPipette &&
+    pipetteSpecs &&
     !getIsSafePipetteMovement({
       robotState: prevRobotState,
       invariantContext,
