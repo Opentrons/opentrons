@@ -127,7 +127,7 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>O</code>: overshoot error limit</li>
           <li><code>V</code>: velocity constant (K<sub>v</sub>)</li>
           <li><code>H</code>: holding constant (K<sub>h</sub>)</li>
-          <li><code>T</code>: relative tolerance, expressed as a % <font color="red">Check if %</font></li>
+          <li><code>T</code>: relative tolerance, expressed as a %. 0-100, The allowable percentage deviation from the target pressure.</li>
           <li><code>R</code>: reset PID (accepts <code>1</code> to trigger)</li>
         </ul>
         <strong>Response: Returns </strong> <code>M125 OK</code>.
