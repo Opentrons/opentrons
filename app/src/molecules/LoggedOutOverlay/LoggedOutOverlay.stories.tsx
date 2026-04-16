@@ -9,7 +9,7 @@ import {
 
 import { MediumButton } from '/app/atoms/buttons'
 
-import { LoggedOutOverlay } from './LoggedOutOverlay'
+import { LoggedOutOverlay } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
