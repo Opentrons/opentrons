@@ -88,7 +88,7 @@ describe('useVacuumModuleControls', () => {
           commandType: 'vacuumModule/startSetVacuumPressure',
           params: {
             moduleId: 'vacuum_id',
-            pressure: 500,
+            gaugePressure: 500,
           },
         },
       })

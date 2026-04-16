@@ -75,7 +75,7 @@ export function useVacuumModuleControls(
       commandType: 'vacuumModule/startSetVacuumPressure',
       params: {
         moduleId: module.id,
-        pressure,
+        gaugePressure: pressure,
       },
     }
     executeCommand(command)

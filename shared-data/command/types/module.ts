@@ -671,7 +671,7 @@ interface BaseVacuumModulePumpParams extends ModuleOnlyParams {
 
 interface VacuumModuleSetTargetPressureParams extends BaseVacuumModulePumpParams {
   // in mbar
-  pressure: number
+  gaugePressure: number
 }
 
 interface VacuumModuleSetTargetPowerParams extends BaseVacuumModulePumpParams {
