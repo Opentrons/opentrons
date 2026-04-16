@@ -352,8 +352,7 @@ export const getIsSafePipetteMovement = (args: {
 
   const pipetteEntity = pipetteEntities[pipetteId]
 
-  const { spec: pipetteSpecs } = pipetteEntity ?? {}
-  if (pipetteSpecs === undefined) return false
+  const { spec: pipetteSpecs } = pipetteEntity
 
   // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
   const displayCategory = pipetteSpecs?.displayCategory
