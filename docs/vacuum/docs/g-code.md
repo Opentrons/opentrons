@@ -144,7 +144,7 @@ The Vacuum Module accepts the G-code commands listed below.
     <tr>
       <td><code>M127</code></td>
       <td>
-        <strong>Command:</strong> set waste detection configurations. These parameters define the heuristic logic used to detect a "waste full" condition based on pressure fluctuations.<br>
+        <strong>Command:</strong> set waste detection configurations. These parameters are used to detect a "waste full" condition based on pressure fluctuations.<br>
         <strong>Arguments:</strong>
         <ul>
           <li><code>E</code>: enable waste full detection. Accepts <code>1</code> (on) or <code>0</code> (off).</li>
@@ -154,9 +154,9 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>D</code>: max delta per tick. <font color="red">what or how much is a "tick"?</font></li>
           <li><code>R</code>: max rise per tick. <font color="red">what or how much is a "tick"?</font></li>
           <li><code>C</code>: max cumulative rise.</li>
-          <li><code>A</code>: alpha (smoothing factor). <font color="red">guessing: "smoothing"</font></li>
-          <li><code>M</code>: minimum window time (ms). <font color="red">milliseconds?</font></li>
-          <li><code>X</code>: maximum window time (ms). <font color="red">milliseconds?</font></li>
+          <li><code>A</code>: alpha (smoothing factor).</li>
+          <li><code>M</code>: minimum window time (ms).</li>
+          <li><code>X</code>: maximum window time (ms).</font></li>
         </ul>
         <strong>Response: Returns </strong> <code>M127 OK</code>.
       </td>
