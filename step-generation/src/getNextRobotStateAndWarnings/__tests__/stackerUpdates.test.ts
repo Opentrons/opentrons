@@ -1,18 +1,30 @@
+import cloneDeep from 'lodash/cloneDeep'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  fixture96Plate,
+  FLEX_STACKER_D4_ADDRESSABLE_AREA,
   FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
+  getLabwareDefURI,
   SYSTEM_LOCATION,
 } from '@opentrons/shared-data'
 
-import { HOPPER_STACKER_LOCATION } from '../../constants'
+import {
+  FLEX_STACKER_MODULE_INITIAL_STATE,
+  HOPPER_STACKER_LOCATION,
+} from '../../constants'
 import { getInitialRobotStateStandard, makeContext } from '../../fixtures'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
   forFlexStackerEmpty,
+  forFlexStackerFillItems,
   forFlexStackerRetrieve,
   forFlexStackerStore,
 } from '../stackerUpdates'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { FlexStackerModuleState } from '../../types'
 
 vi.mock('@opentrons/shared-data', async importOriginal => ({
   ...(await importOriginal()),
@@ -191,6 +203,127 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       stack: ['tiprack1Id', '1'],
     })
   })
+
+  it('sets stackedOnNode to the stacker shuttle addressable area for the bottom retrieved labware', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    robotState.modules[FLEX_STACKER_ID] = {
+      slot: 'D4',
+      moduleState: {
+        type: FLEX_STACKER_MODULE_TYPE,
+        labwareInHopper: [
+          {
+            primaryLabwareId: 'tiprack1Id',
+            adapterLabwareId: null,
+            lidLabwareId: null,
+          },
+          {
+            primaryLabwareId: 'tiprack2Id',
+            adapterLabwareId: null,
+            lidLabwareId: null,
+          },
+        ],
+        storedLabwareDetails: {
+          primaryLabwareURI: LABWARE_ID,
+        },
+        labwareOnShuttle: null,
+      },
+    }
+
+    forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+
+    expect(robotState.labware.tiprack1Id.stackedOnNode).toEqual({
+      addressableAreaName: FLEX_STACKER_D4_ADDRESSABLE_AREA,
+    })
+    expect(robotState.labware.tiprack1Id.stack).toEqual(['tiprack1Id', 'D4'])
+    warnSpy.mockRestore()
+  })
+
+  it('sets stackedOnNode chain when retrieving adapter-with-primary from hopper', () => {
+    const ic = makeContext()
+    const rs = cloneDeep(getInitialRobotStateStandard(ic))
+    const primaryUri = ic.labwareEntities.tiprack4Id.labwareDefURI
+    const adapterUri = ic.labwareEntities.tiprack4AdapterId.labwareDefURI
+    rs.modules[FLEX_STACKER_ID] = {
+      slot: 'D4',
+      moduleState: {
+        ...cloneDeep(FLEX_STACKER_MODULE_INITIAL_STATE),
+        labwareInHopper: [
+          {
+            primaryLabwareId: 'tiprack4Id',
+            adapterLabwareId: 'tiprack4AdapterId',
+            lidLabwareId: null,
+          },
+        ],
+        storedLabwareDetails: {
+          primaryLabwareURI: primaryUri,
+          adapterLabwareURI: adapterUri,
+          lidLabwareURI: null,
+        },
+        labwareOnShuttle: null,
+      } as FlexStackerModuleState,
+    }
+
+    forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, ic, {
+      robotState: rs,
+      warnings: [],
+    })
+
+    expect(rs.labware.tiprack4AdapterId.stackedOnNode).toEqual({
+      addressableAreaName: FLEX_STACKER_D4_ADDRESSABLE_AREA,
+    })
+    expect(rs.labware.tiprack4Id.stackedOnNode).toEqual({
+      labwareId: 'tiprack4AdapterId',
+    })
+  })
+})
+
+describe('forFlexStackerFillItems stackedOnNode', () => {
+  it('assigns hopper stackedOnNode only to real labware ids (not hopper sentinel or module id)', () => {
+    const ic = makeContext()
+    const rs = cloneDeep(getInitialRobotStateStandard(ic))
+    const moduleId = 'flexStackerFillTest'
+    const plateDef = fixture96Plate as LabwareDefinition2
+    const primaryUri = getLabwareDefURI(plateDef)
+    ic.moduleEntities[moduleId] = {
+      id: moduleId,
+      type: FLEX_STACKER_MODULE_TYPE,
+      model: FLEX_STACKER_MODULE_V1,
+      pythonName: 'flex_stacker_fill',
+    }
+    ic.labwareEntities.fillTestLw = {
+      id: 'fillTestLw',
+      labwareDefURI: primaryUri,
+      def: plateDef,
+      pythonName: 'fill_test_lw',
+    }
+    rs.modules[moduleId] = {
+      slot: 'D4',
+      moduleState: {
+        ...cloneDeep(FLEX_STACKER_MODULE_INITIAL_STATE),
+        storedLabwareDetails: {
+          primaryLabwareURI: primaryUri,
+          adapterLabwareURI: null,
+          lidLabwareURI: null,
+        },
+        labwareInHopper: [],
+        labwareOnShuttle: null,
+      } as FlexStackerModuleState,
+    }
+    rs.labware.fillTestLw = { stack: ['fillTestLw', 'offDeck'] }
+
+    forFlexStackerFillItems({ moduleId, labware: ['fillTestLw'] }, ic, {
+      robotState: rs,
+      warnings: [],
+    })
+
+    expect(rs.labware.fillTestLw.stackedOnNode).toEqual({
+      kind: 'inStackerHopper',
+      moduleId,
+    })
+  })
 })
 
 describe('flex stacker state updates forFlexStackerStore', () => {
@@ -259,5 +392,29 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       FLEX_STACKER_ID,
       '1',
     ])
+  })
+
+  it('sets stackedOnNode to inStackerHopper for labware moved from the shuttle into the hopper', () => {
+    robotState.labware = {
+      [LABWARE_ID]: {
+        stack: [LABWARE_ID, SYSTEM_LOCATION],
+      },
+      tiprack4Id: {
+        stack: ['tiprack4Id', FLEX_STACKER_ID, '1'],
+      },
+    }
+    forFlexStackerStore(
+      { moduleId: FLEX_STACKER_ID, strategy: 'automatic' },
+      invariantContext,
+      {
+        robotState,
+        warnings: [],
+      }
+    )
+
+    expect(robotState.labware.tiprack4Id.stackedOnNode).toEqual({
+      kind: 'inStackerHopper',
+      moduleId: FLEX_STACKER_ID,
+    })
   })
 })

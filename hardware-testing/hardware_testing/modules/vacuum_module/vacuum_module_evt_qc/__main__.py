@@ -19,6 +19,7 @@ from .config import TestSection, TestConfig, build_report, TESTS
 from ...common.utils import find_module_port
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.vacuum_module.types import VentState
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 
 
@@ -70,6 +71,10 @@ async def _main(cfg: TestConfig) -> None:
             await test_run(vacuum_module, report, section.value)
     except Exception as e:
         ui.print_error(f"An error occurred: {e}")
+
+    # Always turn off the pump and close the vent
+    await vacuum_module.set_vacuum_state(False)
+    await vacuum_module.set_vent_state(VentState.CLOSED)
 
     # SAVE REPORT
     ui.print_title("DONE")

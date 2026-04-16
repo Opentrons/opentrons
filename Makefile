@@ -3,6 +3,8 @@
 
 # make OT_PYTHON available
 include ./scripts/python.mk
+# make UV available
+include ./scripts/python-uv.mk
 
 API_CLIENT_DIR := api-client
 API_DIR := api
@@ -329,3 +331,51 @@ test-js-%:
 .PHONY: validate-codecov-yml
 validate-codecov-yml:
 	curl --data-binary @.codecov.yml https://codecov.io/validate
+
+# Convenience commands for running all of our servers in dev mode, together,
+# behind a reverse proxy listening on port 31950.
+#
+# This naively amalgamates all of the logs into a single stdout stream.
+# If that's a bit much, you can also just manually run these commands in separate terminals.
+.PHONY: dev-backend
+dev-backend:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C robot-server dev BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev ';' \
+		$(MAKE) dev-proxy
+.PHONY: dev-backend-flex
+dev-backend-flex:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C auth-server dev ';' \
+		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
+		$(MAKE) -C key-server dev-mitmproxy ';' \
+		$(MAKE) dev-proxy ';' \
+		$(MAKE) dev-proxy-tls
+
+
+# Assuming our dev servers are running separately (make -C robot-server dev, make -C auth-server dev, etc.),
+# this sets up a reverse proxy that listens on localhost:31950 and forwards each request
+# to the appropriate dev server.
+.PHONY: dev-proxy
+dev-proxy:
+# In this command, the first port (:2) is a placeholder for the origin server's port.
+# dev_proxy.py *should* overwrite it in all cases, but in case something goes wrong
+# with that, we choose port 2 because it's probably not assigned to anything.
+# `connection_strategy=lazy` gives dev_proxy.py a chance to overwrite the port before
+# mitmproxy tries use port 2.
+#
+# The second port (@31950) is where the reverse proxy should listen.
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1  mitmdump \
+	    --mode reverse:http://localhost:2@31950 \
+	    --set connection_strategy=lazy \
+	    --script scripts/dev_proxy.py
+
+.PHONY: dev-proxy-tls
+dev-proxy-tls:
+	sleep 1 # give key-server time to prep certs for mitmproxy
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1 mitmdump \
+		--mode reverse:http://localhost:2@32313 \
+		--set connection_strategy=lazy \
+		--script scripts/dev_proxy.py \
+		--certs key-server/.key-server-storage/tls/flex-certs.pem

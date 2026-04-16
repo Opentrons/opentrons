@@ -77,6 +77,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
@@ -135,6 +137,11 @@ filterwarnings = [
 plugins = ["pydantic.mypy", "decoy.mypy"]
 show_error_codes = true
 strict = true
+
+# dbus can't work off of linux in dev environments, sadly
+[[tool.mypy.overrides]]
+module = ['dbus.*']
+ignore_missing_imports = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

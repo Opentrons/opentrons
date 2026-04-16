@@ -1,4 +1,5 @@
 'use strict'
+const fs = require('fs')
 const path = require('path')
 
 const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER } = process.env
@@ -6,6 +7,8 @@ const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const WINDOWS_SIGN = process.env.WINDOWS_SIGN === 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
+const MAC_ASSET_CATALOG_PATH = path.join(__dirname, 'build/Assets.car')
+const HAS_MAC_ASSET_CATALOG = fs.existsSync(MAC_ASSET_CATALOG_PATH)
 
 // this will generate either
 // https://builds.opentrons.com/app/ or https://ot3-development.builds.opentrons.com/app/
@@ -23,6 +26,12 @@ module.exports = async () => ({
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
   electronVersion: '39.1.2',
   npmRebuild: false,
+  protocols: [
+    {
+      name: 'Flex App',
+      schemes: ['com-opentrons-flex-app'],
+    },
+  ],
   releaseInfo: {
     releaseNotesFile:
       project === 'robot-stack'
@@ -56,12 +65,20 @@ module.exports = async () => ({
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
+    extendInfo: HAS_MAC_ASSET_CATALOG
+      ? { CFBundleIconName: 'AppIcon' }
+      : undefined,
     forceCodeSigning: !DEV_MODE,
     gatekeeperAssess: true,
     // note: notarize.teamId is passed by implicitly sending through the APPLE_TEAM_ID env var
   },
   dmg: {
-    icon: null,
+    icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
+    // The final universal Flex app exceeds 1 GiB once the bundled Python
+    // runtime is copied in. Use a fixed DMG image size with extra headroom
+    // instead of relying on auto-sizing, which has been too small in CI.
+    size: '3g',
+    shrink: false,
   },
   win: {
     target: ['nsis'],
