@@ -233,7 +233,7 @@ async def test_encrypt_cert_roundtrips_from_password(
     kdf = pbkdf2.PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
-        salt=encrypted.current.key_salt,
+        salt=base64.urlsafe_b64decode(encrypted.current.key_salt),
         iterations=encrypted.current.kdf_iterations,
     )
     key = await asyncio.to_thread(kdf.derive, current_key.key.password.encode("utf-8"))

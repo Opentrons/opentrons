@@ -1,32 +1,16 @@
 """Code for handling certificate encryption for export."""
 
 import asyncio
+import base64
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
 from typing import Self, Type
 
 from . import cryptography_utils
+from .types import EncryptedCert, OldAndNewEncryptedCert
 
 LOG = getLogger(__name__)
-
-
-@dataclass
-class EncryptedCert:
-    """A certificate whose data has been encrypted by a specific key."""
-
-    cert_data: bytes
-    key_salt: bytes
-    key_expires_at: datetime
-    kdf_iterations: int
-
-
-@dataclass
-class OldAndNewEncryptedCert:
-    """Both the certificates."""
-
-    current: EncryptedCert
-    previous: EncryptedCert | None
 
 
 @dataclass
@@ -82,6 +66,11 @@ class CertEncryptionManager:
             password_timestep_s,
             now or datetime.now(timezone.utc),
         )
+
+    @property
+    def key_validity_time(self) -> timedelta:
+        """Get the amount of time a key is valid."""
+        return timedelta(seconds=self._password_timestep_s)
 
     @staticmethod
     async def _create_key(words: int) -> cryptography_utils.FernetKey:
@@ -188,26 +177,34 @@ class CertEncryptionManager:
         await self._ensure_keys(now)
         return self._previous_key
 
-    def _encrypt(
-        self, cert: cryptography_utils.X509Pair, key: UsedEncryptionKey
-    ) -> EncryptedCert:
+    def _encrypt(self, encoded_cert: bytes, key: UsedEncryptionKey) -> EncryptedCert:
         return EncryptedCert(
-            cryptography_utils.encrypt_cert(cert.cert, key.key),
-            key_salt=key.key.salt,
+            cryptography_utils.encrypt_cert(encoded_cert, key.key),
+            key_salt=base64.urlsafe_b64encode(key.key.salt),
             key_expires_at=key.first_used_at_discretized
             + timedelta(seconds=self._password_timestep_s),
             kdf_iterations=key.key.kdf_iterations,
         )
 
+    async def encrypt_cert_der_bytes(
+        self, now: datetime, encoded_cert: bytes
+    ) -> OldAndNewEncryptedCert:
+        """Encrypt some bytes (which should be a DER-encoded cert) using the current and previous keys."""
+        current_key = await self.current_pass(now)
+        previous_key = await self.previous_pass(now)
+        current_encrypted = self._encrypt(encoded_cert, current_key)
+        if isinstance(previous_key, UsedEncryptionKey):
+            previous_encrypted: EncryptedCert | None = self._encrypt(
+                encoded_cert, previous_key
+            )
+        else:
+            previous_encrypted = None
+        return OldAndNewEncryptedCert(current_encrypted, previous_encrypted)
+
     async def encrypt_cert(
         self, now: datetime, cert: cryptography_utils.X509Pair
     ) -> OldAndNewEncryptedCert:
         """Encrypt a certificate using the current and previous (if existing) keys."""
-        current_key = await self.current_pass(now)
-        previous_key = await self.previous_pass(now)
-        current_encrypted = self._encrypt(cert, current_key)
-        if isinstance(previous_key, UsedEncryptionKey):
-            previous_encrypted: EncryptedCert | None = self._encrypt(cert, previous_key)
-        else:
-            previous_encrypted = None
-        return OldAndNewEncryptedCert(current_encrypted, previous_encrypted)
+        return await self.encrypt_cert_der_bytes(
+            now, cryptography_utils.get_cert_bytes_der(cert.cert)
+        )

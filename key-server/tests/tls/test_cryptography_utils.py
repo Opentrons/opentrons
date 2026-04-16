@@ -261,7 +261,9 @@ async def test_fernet_roundtrip(tmp_path: Path) -> None:
     cert = cryptography_utils.create_ca(
         certpath, certpath, datetime.now(timezone.utc), timedelta(days=24)
     )
-    encrypted = cryptography_utils.encrypt_cert(cert.cert, key)
+    encrypted = cryptography_utils.encrypt_cert(
+        cryptography_utils.get_cert_bytes_der(cert.cert), key
+    )
 
     decrypted_bytes = fernet.Fernet(key.urlencoded_key).decrypt(encrypted)
     decrypted_cert = x509.load_der_x509_certificate(decrypted_bytes)
