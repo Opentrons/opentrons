@@ -2,7 +2,7 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Any, Dict, Generic, List, Mapping, Tuple, TypeVar, cast
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, ValidationInfo, field_validator
 from typing_extensions import Literal, TypedDict
 
 
@@ -212,31 +212,25 @@ class LiquidProbeSettings(BaseModel):
     sample_time_sec: float
 
 
-@dataclass(frozen=True)
-class EdgeSenseSettings:
+class EdgeSenseSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     overrun_tolerance_mm: float
     early_sense_tolerance_mm: float
     pass_settings: CapacitivePassSettings
     search_initial_tolerance_mm: float
     search_iteration_limit: int
 
-    def __init__(
-        self,
-        overrun_tolerance_mm: float,
-        early_sense_tolerance_mm: float,
-        pass_settings: CapacitivePassSettings,
-        search_initial_tolerance_mm: float,
-        search_iteration_limit: int,
-    ) -> None:
-        if overrun_tolerance_mm > pass_settings.max_overrun_distance_mm:
+    @field_validator("pass_settings")
+    @classmethod
+    def _validate_pass_settings(
+        cls, v: CapacitivePassSettings, info: ValidationInfo
+    ) -> CapacitivePassSettings:
+        overrun_tolerance_mm = info.data.get("overrun_tolerance_mm")
+        assert isinstance(overrun_tolerance_mm, float)
+        if overrun_tolerance_mm > v.max_overrun_distance_mm:
             raise ValueError("Overrun tolerance and pass setting distance do not match")
-        object.__setattr__(self, "overrun_tolerance_mm", overrun_tolerance_mm)
-        object.__setattr__(self, "early_sense_tolerance_mm", early_sense_tolerance_mm)
-        object.__setattr__(self, "pass_settings", pass_settings)
-        object.__setattr__(
-            self, "search_initial_tolerance_mm", search_initial_tolerance_mm
-        )
-        object.__setattr__(self, "search_iteration_limit", search_iteration_limit)
+        return v
 
 
 class OT3CalibrationSettings(BaseModel):

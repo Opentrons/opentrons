@@ -1893,7 +1893,7 @@ class OT3API(
 
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
-        self._config = self._config.model_copy(update={**kwargs})
+        self._config = self._config.model_copy(update=kwargs)
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
