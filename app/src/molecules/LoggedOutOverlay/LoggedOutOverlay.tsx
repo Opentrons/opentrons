@@ -14,10 +14,8 @@ export interface LoggedOutOverlayProps {
 export function LoggedOutOverlay(props: LoggedOutOverlayProps): JSX.Element {
   const { onClick } = props
 
-  // todo(mm, 2026-04-16): Handle keyboard interaction:
-  // - Allow Enter/Spacebar/whatever to dismiss the overlay just like tapping does.
-  //   (Maybe put the icon in a <button> for focusability.)
-  // - Trap focus so the user can't use the keyboard to navigate underneath the overlay.
+  // todo(mm, 2026-04-16): Handle keyboard interaction.
+  // Trap focus so the user can't use the keyboard to navigate underneath the overlay.
 
   return (
     <div
@@ -27,9 +25,9 @@ export function LoggedOutOverlay(props: LoggedOutOverlayProps): JSX.Element {
       aria-modal="true"
       aria-label="Logged out"
     >
-      <div className={styles.acm_badge}>
+      <button className={styles.acm_badge} type="button" onClick={onClick}>
         <Icon name="acm" className={styles.acm_icon} />
-      </div>
+      </button>
     </div>
   )
 }
