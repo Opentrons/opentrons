@@ -1,7 +1,6 @@
 """Pyro related utilities for daemons and request handling."""
 
 import logging
-import os
 import socket
 from typing import Any, Callable
 

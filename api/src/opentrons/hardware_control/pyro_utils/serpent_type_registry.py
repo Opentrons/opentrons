@@ -1,14 +1,9 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
 import datetime
-from importlib import util
-from typing import Any, Dict, cast
+from typing import Any, Dict
 
-import numpy
-import Pyro5.api as pyro
-import serpent
 from numpy import float64
-from pydantic import BaseModel
 
 import opentrons_shared_data.pipette.pipette_definition
 import opentrons_shared_data.pipette.types
@@ -22,7 +17,6 @@ import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
-    TypedDictWrapper,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
@@ -265,7 +259,7 @@ def _pipetted_dict_dict_to_class(  # type: ignore
     )
 
 
-def _typed_dict_dict_to_class(classname, d) -> Any:
+def _typed_dict_dict_to_class(classname, d) -> Any:  # type: ignore
     """This is a unique serializaiton handler that can be expanded to support TypedDicts that need reconstruction."""
     if d["typed_dict_name"] == "opentrons.hardware_control.dev_types.PipetteDict":
         return _pipetted_dict_dict_to_class(classname, d)
@@ -276,16 +270,16 @@ def _typed_dict_dict_to_class(classname, d) -> Any:
 
 
 # numpy float serialization
-def _numpy_float_class_to_dict(obj) -> Dict:
+def _numpy_float_class_to_dict(obj) -> Dict:  # type: ignore
     return {"__class__": "numpy.float64", "value": float(obj)}
 
 
-def _numpy_float_dict_to_class(classname, d) -> float64:
+def _numpy_float_dict_to_class(classname, d) -> float64:  # type: ignore
     return float64(d["value"])
 
 
 # point named tuple
-def _point_class_to_dict(obj) -> Dict:
+def _point_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
         "x": obj.x,
@@ -294,7 +288,7 @@ def _point_class_to_dict(obj) -> Dict:
     }
 
 
-def _point_dict_to_class(clasname, d) -> opentrons.types.Point:
+def _point_dict_to_class(clasname, d) -> opentrons.types.Point:  # type: ignore
     x_data = d["x"]
     y_data = d["y"]
     z_data = d["z"]

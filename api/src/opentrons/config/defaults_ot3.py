@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from typing_extensions import Final
 
@@ -486,23 +485,4 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 
 
 def serialize(config: OT3Config) -> Dict[str, Any]:
-    # inline import prevents circular import error from hardware_control.types
-    from opentrons.hardware_control.types import InstrumentProbeType
-
-    def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
-        def _normalize_key(key: Any) -> Any:
-            if isinstance(key, OT3AxisKind) or isinstance(key, InstrumentProbeType):
-                return key.name
-            return key
-
-        def _normalize_value(value: Any) -> Any:
-            if isinstance(value, dict):
-                return {
-                    _normalize_key(k): _normalize_value(v) for k, v in value.items()
-                }
-            else:
-                return value
-
-        return dict((_normalize_key(key), _normalize_value(val)) for key, val in pairs)
-
-    return asdict(config, dict_factory=_build_dict)
+    return config.model_dump(mode="json")

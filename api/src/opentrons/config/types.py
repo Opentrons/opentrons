@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Any, Dict, Generic, List, Mapping, Tuple, TypeVar, cast
 

@@ -4,7 +4,6 @@ import logging
 from collections import OrderedDict
 from concurrent.futures import Future
 from copy import deepcopy
-from dataclasses import replace
 from functools import lru_cache, partial, wraps
 from typing import (
     Any,
@@ -1894,7 +1893,7 @@ class OT3API(
 
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
-        self._config = replace(self._config, **kwargs)
+        self._config = self._config.model_copy(update={**kwargs})
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
@@ -2706,7 +2705,8 @@ class OT3API(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
         # Warning: don't use this in new code, used `get_attached_pipette` instead
-        return self.get_attached_pipette(mount)
+        pipette_dict: PipetteDict = self.get_attached_pipette(mount)
+        return pipette_dict
 
     @property
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
