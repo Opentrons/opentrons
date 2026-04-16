@@ -161,6 +161,8 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
 
 const TURN_OFF_BACKLIGHT = '7'
 
+const RETRY_DELAY_MS = 1000
+
 export const OnDeviceDisplayApp = (): JSX.Element => {
   const dispatch = useDispatch<Dispatch>()
 
@@ -206,7 +208,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const robotSettingsQuery = useRobotSettingsQuery(
     {
       retry: true,
-      retryDelay: 1000,
+      retryDelay: RETRY_DELAY_MS,
     },
     hostConfig
   )
@@ -214,7 +216,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const accessControlEnabledQuery = useAccessControlEnabledQuery(
     {
       retry: true,
-      retryDelay: 1000,
+      retryDelay: RETRY_DELAY_MS,
     },
     hostConfig
   )
