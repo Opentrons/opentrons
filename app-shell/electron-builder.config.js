@@ -74,7 +74,7 @@ module.exports = async () => ({
   },
   dmg: {
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
-    // The final universal OT-2 app exceeds 1 GiB once the bundled Python
+    // The final universal Flex app exceeds 1 GiB once the bundled Python
     // runtime is copied in. Use a fixed DMG image size with extra headroom
     // instead of relying on auto-sizing, which has been too small in CI.
     size: '3g',
