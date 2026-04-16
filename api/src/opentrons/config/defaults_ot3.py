@@ -485,4 +485,21 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 
 
 def serialize(config: OT3Config) -> Dict[str, Any]:
-    return config.model_dump(mode="json")
+    from opentrons.hardware_control.types import InstrumentProbeType
+
+    def _scrub_key_types(obj: Any, target_type: Any) -> Any:
+        if isinstance(obj, dict):
+            new = {}
+            for k, v in obj.items():
+                new_key = k.name if isinstance(k, target_type) else k
+                new[new_key] = _scrub_key_types(v, target_type)
+            return new
+        if isinstance(obj, list):
+            return [_scrub_key_types(i, target_type) for i in obj]
+        return obj
+
+    raw = config.model_dump()
+    clean_axis: Dict[str, Any] = _scrub_key_types(raw, OT3AxisKind)
+    clean_probe: Dict[str, Any] = _scrub_key_types(clean_axis, InstrumentProbeType)
+
+    return clean_probe
