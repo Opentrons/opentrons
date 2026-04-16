@@ -21,7 +21,7 @@ The Vacuum Module accepts the G-code commands listed below.
       <td>
         <strong>Command:</strong> get reset reason<br>
         <strong>Arguments:</strong> none <br>
-        <strong>Response elements:</strong> <code>R:</code>, last reset reason<br>
+        <strong>Response elements:</strong> <code>R:</code>, last reset reason <font color="red">Is there a list of reasons?</font><br>
         <strong>Example:</strong> <code>M114</code> returns <code>M114 R:1 OK</code> 
       </td>
     </tr>
@@ -45,12 +45,12 @@ The Vacuum Module accepts the G-code commands listed below.
         <strong>Command:</strong> set pressure state <br>
         <strong>Arguments:</strong>
         <ul>
-          <li><code>S</code>: Start/stop control. Accepts <code>1</code> (on) or <code>0</code> (off).</li>
-          <li><code>P</code>: Target gauge pressure in mbar. Range: <code>-1013</code> (full vacuum) to <code>0</code> (atmospheric) mbar.
-            <br><strong>Note:</strong> While the firmware accepts -1013 mbar, the hardware’s achievable vacuum will fall short of this theoretical limit and depends on local atmospheric pressure.</li>
+          <li><code>S</code>: Start/stop control. Accepts <code>1</code> (start/on) or <code>0</code> (stop/off).</li>
+          <li><code>P</code>: Target gauge pressure in mbar. Range: <code>-1013</code>mbar (full vacuum) to <code>0</code> mbar (atmospheric).
+            <br><strong>Note:</strong> While the firmware accepts -1013 mbar, the vacuum the pump can achieve will fall short of this theoretical limit and depends on local atmospheric pressure.</li>
           <li><code>D</code>: Duration in seconds. Range: <code>0–86400</code> seconds (up to 24 hours).</li>
           <li><code>T</code>: Timeout in seconds to reach target pressure. Range: <code>0–86400</code> seconds (up to 24 hours).</li>
-          <li><code>R</code>: Ramp rate in mbar/s. Range: <code>0–50</code>.</li>
+          <li><code>R</code>: Ramp rate in mbar/s. Range: <code>0–50</code> mbar/s.</li>
           <li><code>V</code>: Vent state after cycle. Accepts <code>1</code> (open) or <code>0</code> (close).</li>
         </ul>
         <strong>Response: Returns </strong> <code>M120 OK</code>. If the target pressure is not reached within the timeout interval <code>T</code>, the module returns <code>err400: pressure not reached</code>.
@@ -96,8 +96,8 @@ The Vacuum Module accepts the G-code commands listed below.
         <ul>
           <li><code>T</code>: target rpm</li>
           <li><code>R</code>: current rpm</li>
-          <li><code>A</code>: target PWM duty cycle, expressed as a %</li>
-          <li><code>D</code>: current PWM duty cycle, expressed as a %</li>
+          <li><code>A</code>: target PWM duty cycle, expressed as a %.</li>
+          <li><code>D</code>: current PWM duty cycle, expressed as a %.</li>
           <li><code>E</code>: pump running state. Returns <code>1</code> (running) or <code>0</code> (stopped).</li>
           <li><code>M</code>: manual mode state. Returns <code>1</code> (enabled) or <code>0</code> (disabled).</li>
         </ul>
@@ -125,8 +125,8 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>I</code>: integral gain</li>
           <li><code>D</code>: derivative gain</li>
           <li><code>O</code>: overshoot error limit</li>
-          <li><code>V</code>: velocity constant (K velocity)</li>
-          <li><code>H</code>: holding constant (K holding)</li>
+          <li><code>V</code>: velocity constant (K<sub>v</sub>)</li>
+          <li><code>H</code>: holding constant (K<sub>h</sub>)</li>
           <li><code>T</code>: relative tolerance, expressed as a % <font color="red">Check if %</font></li>
           <li><code>R</code>: reset PID (accepts <code>1</code> to trigger)</li>
         </ul>
@@ -151,12 +151,12 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>S</code>: pressure window start.</li>
           <li><code>P</code>: pressure window end.</li>
           <li><code>F</code>: baseline fast factor.</li>
-          <li><code>D</code>: max delta per tick.<font color="red">what or how much is a "tick"?</font></li>
-          <li><code>R</code>: max rise per tick.<font color="red">what or how much is a "tick"?</font></li>
+          <li><code>D</code>: max delta per tick. <font color="red">what or how much is a "tick"?</font></li>
+          <li><code>R</code>: max rise per tick. <font color="red">what or how much is a "tick"?</font></li>
           <li><code>C</code>: max cumulative rise.</li>
-          <li><code>A</code>: alpha (smoothing factor).<font color="red">guessing: "smoothing"</font></li>
-          <li><code>M</code>: minimum window time (ms).<font color="red">milliseconds?</font></li>
-          <li><code>X</code>: maximum window time (ms).<font color="red">milliseconds?</font></li>
+          <li><code>A</code>: alpha (smoothing factor). <font color="red">guessing: "smoothing"</font></li>
+          <li><code>M</code>: minimum window time (ms). <font color="red">milliseconds?</font></li>
+          <li><code>X</code>: maximum window time (ms). <font color="red">milliseconds?</font></li>
         </ul>
         <strong>Response: Returns </strong> <code>M127 OK</code>.
       </td>
@@ -188,7 +188,7 @@ The Vacuum Module accepts the G-code commands listed below.
     <tr>
       <td><code>M996</code></td>
       <td>
-        <strong>Command:</strong> set module serial number. This is typically used during factory calibration to assign a unique identifier.<font color="red">Exclude this? Do we want people setting the SN?</font><br>
+        <strong>Command:</strong> set module serial number. This is typically used during factory calibration to assign a unique identifier. <font color="red">Exclude this? Do we want people setting the SN?</font><br>
         <strong>Arguments:</strong>
         <ul>
           <li>Takes a single string argument (e.g., <code>vacuum-module-v1</code>).</li>
