@@ -148,22 +148,6 @@ class TaskHandler:
         """Run a list of tasks at the same time."""
         yield
 
-    async def wait_for_lock_release(self, group_id: str) -> None:
-        """Wait until the specified group's lock is released.
-
-        This is useful when a command needs to wait for a background task
-        to complete its critical section before proceeding. The lock is
-        acquired momentarily to ensure the previous holder has finished,
-        then immediately released.
-
-        This solves race conditions where an explicit wait command might
-        otherwise read stale state before a background task has finished
-        updating it.
-        """
-        lock = self._concurrency_provider.lock_for_group(group_id)
-        async with lock:
-            pass
-
     def cancel_all(self, message: str | None = None) -> None:
         """Cancel all asyncio tasks immediately.
 

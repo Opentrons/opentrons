@@ -11,7 +11,7 @@ from ...errors.error_occurrence import ErrorOccurrence
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler
     from opentrons.protocol_engine.state.state import StateView
 
 
@@ -39,12 +39,10 @@ class WaitForBlockTemperatureImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
-        task_handler: TaskHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
-        self._task_handler = task_handler
 
     async def execute(
         self,
@@ -63,11 +61,6 @@ class WaitForBlockTemperatureImpl(
         )
 
         if thermocycler_hardware is not None:
-            # Wait for any pending background task to complete its critical section.
-            # Doing so prevents potential race conditions where we read stale state.
-            await self._task_handler.wait_for_lock_release(
-                thermocycler_state.module_id + "-block"
-            )
             await thermocycler_hardware.wait_for_block_target()
 
         return SuccessData(
