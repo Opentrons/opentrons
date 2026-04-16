@@ -63,127 +63,135 @@ The Vacuum Module accepts the G-code commands listed below.
     </ul>
     <strong>Response: Returns </strong> <code>M120 OK</code>. If the target pressure is not reached within the timeout interval <code>T</code>, the module returns <code>err400: pressure not reached</code>.
   </td>
+<tr>
+  <td><code>M121</code></td>
+  <td>
+    <strong>Command:</strong> get pressure state<br>
+    <strong>Arguments:</strong> none<br>
+    <strong>Response elements:</strong>
+    <ul>
+      <li><code>T</code>: target pressure (absolute)</li>
+      <li><code>C</code>: current pressure (absolute)</li>
+      <li><code>A</code>: pressure from sensor A (absolute)</li>
+      <li><code>B</code>: pressure from sensor B (absolute)</li>
+      <li><code>H</code>: atmospheric pressure</li>
+      <li><code>E</code>: pressure control enabled. Returns <code>1</code> (on) or <code>0</code> (off).</li>
+      <li><code>V</code>: vent state. Returns <code>1</code> (open) or <code>0</code> (closed).</li>
+    </ul>
+    <strong>Response: Returns </strong> <code>M121 T:&lt;target&gt; C:&lt;current&gt; A:&lt;sensor_a&gt; B:&lt;sensor_b&gt; H:&lt;atm&gt; E:&lt;enabled&gt; V:&lt;vent&gt; OK</code>
+  </td>
 </tr>
-    </tr>
-    <tr>
-      <td><code>M121</code></td>
-      <td>
-        <strong>Command:</strong> get pressure state<br>
-        <strong>Arguments:</strong> none<br>
-        <strong>Response elements:</strong>
-        <ul>
-          <li><code>T</code>: target pressure (absolute)</li>
-          <li><code>C</code>: current pressure (absolute)</li>
-          <li><code>A</code>: pressure from sensor A (absolute)
-          <li><code>B</code>: pressure from sensor B (absolute)</li>
-          <li><code>H</code>: atmospheric pressure</li>
-          <li><code>E</code>: pressure control. Returns <code>1</code> (on) or <code>0</code> (off).</li>
-          <li><code>V</code>: vent state. Returns <code>1</code> (open) or <code>0</code> (closed).</li>
-        </ul>
-        <strong>Response:</strong> <code>M121 T:400 C:1011.0 A:1010.9 B:1012.2 H:819.2 E:1 V:0 OK</code>
-      </td>
-    </tr>
     <tr>
 <tr>
   <td><code>M122</code></td>
   <td>
-    <strong>Command:</strong> set pump state. Sending this command puts the module into "Manual Mode," causing it to ignore any pressure targets previously set via <code>M120</code>.<br>
+    <strong>Command:</strong> set pump state. Sending this command puts the module into "manual mode," causing it to ignore any pressure targets previously set via <code>M120</code>.<br>
     <strong>Arguments:</strong>
     <ul>
       <li><code>S</code>: Start/stop control. Accepts <code>1</code> (start) or <code>0</code> (stop).</li>
       <li><code>R</code>: Target rpm. Range: <code>0–3500</code> rpm.</li>
-      <li><code>D</code>: PWM duty cycle. Range: <code>0–100</code> (percentage). When specified, the module ignores the rpm value target (<code>R</code>).</li>
+      <li><code>D</code>: PWM duty cycle. Range: <code>0–100</code>, expressed as a %. When specified, the module ignores the rpm value target (<code>R</code>).</li>
     </ul>
-    <strong>Response: Returns </strong> <code>M123 OK</code>.
+    <strong>Response: Returns </strong> <code>M123 OK</code><font color="red">Does this fail, similar to M120?</font>.
   </td>
 </tr>
+<tr>
+  <td><code>M123</code></td>
+  <td>
+    <strong>Command:</strong> get pump state<br>
+    <strong>Arguments:</strong> none<br>
+    <strong>Response elements:</strong>
+    <ul>
+      <li><code>T</code>: target rpm</li>
+      <li><code>R</code>: current rpm</li>
+      <li><code>A</code>: target PWM duty cycle, expressed as a %</li>
+      <li><code>D</code>: current PWM duty cycle, expressed as a %</li>
+      <li><code>E</code>: pump running state. Returns <code>1</code> (running) or <code>0</code> (stopped).</li>
+      <li><code>M</code>: manual mode state. Returns <code>1</code> (enabled) or <code>0</code> (disabled).</li>
+    </ul>
+    <strong>Response: Returns </strong> <code>M123 T:&lt;target_rpm&gt; R:&lt;current_rpm&gt; A:&lt;target_pwm&gt; D:&lt;current_pwm&gt; E:&lt;running&gt; M:&lt;manual&gt; OK</code>
+  </td>
 </tr>
-    <tr>
-      <td><code>M123</code></td>
-      <td>
-        <strong>Command:</strong> get pump state<br>
-        <strong>Arguments:</strong> none<br>
-        <strong>Response elements:</strong>
-        <ul>
-          <li><code>T</code>: target RPM / <code>R</code>: current RPM</li>
-          <li><code>A</code>: target duty cycle (PWM) / <code>D</code>: current duty cycle (PWM)</li>
-          <li><code>E</code>: pump running state</li>
-          <li><code>M</code>: manual mode enabled</li>
-        </ul>
-        <strong>Response:</strong> <code>M123 T:1000 R:998 A:0 D:0 E:1 M:1 OK</code>
-      </td>
-    </tr>
-    <tr>
-      <td><code>M124</code></td>
-      <td>
-        <strong>Command:</strong> set vent state<br>
-        <strong>Arguments:</strong> <code>V</code> (0: Close, 1: Open) <br>
-        <strong>Note:</strong> Opening the vent returns the system to atmospheric pressure. <br>
-        <strong>Response:</strong> <code>M124 OK</code>
-      </td>
-    </tr>
-    <tr>
-      <td><code>M125</code></td>
-      <td>
-        <strong>Command:</strong> set pressure tunings (PID)<br>
-        <strong>Arguments:</strong>
-        <ul>
-          <li><code>P</code>: Proportional / <code>I</code>: Integral / <code>D</code>: Derivative</li>
-          <li><code>O</code>: Overshoot Error</li>
-          <li><code>V</code>: K Velocity / <code>H</code>: K Holding</li>
-          <li><code>T</code>: Relative Tolerance %</li>
-          <li><code>R</code>: Reset PID</li>
-        </ul>
-        <strong>Response:</strong> <code>M125 OK</code>
-      </td>
-    </tr>
-    <tr>
-      <td><code>M126</code></td>
-      <td>
-        <strong>Command:</strong> get pressure tunings<br>
-        <strong>Response:</strong> <code>M126 P:1 I:2 D:3 O:2 V:10 H:43 T:2 OK</code>
-      </td>
-    </tr>
-    <tr>
-      <td><code>M127</code></td>
-      <td>
-        <strong>Command:</strong> set waste detection configurations<br>
-        <strong>Arguments:</strong>
-        <ul>
-          <li><code>E</code>: Enable Waste Full Detection (0: Disable, 1: Enable)</li>
-          <li><code>S</code>: Pressure Window Start / <code>P</code>: Pressure Window End</li>
-          <li><code>F</code>: Baseline Fast Factor</li>
-          <li><code>D</code>: Max Delta Per Tick / <code>R</code>: Max Rise Per Tick</li>
-          <li><code>C</code>: Max Cumulative Rise</li>
-          <li><code>A</code>: Waste Full Sensor Alpha (Smoothing)</li>
-          <li><code>M</code>: Min Window Time / <code>X</code>: Max Window Time</li>
-        </ul>
-        <strong>Response:</strong> <code>M127 OK</code>
-      </td>
-    </tr>
-    <tr>
-      <td><code>M128</code></td>
-      <td>
-        <strong>Command:</strong> get waste detection configurations<br>
-        <strong>Response:</strong> <code>M128 S:0.10 P:0.95 F:0.75 D:3.4 R:250 C:11.4 A:0.95 M:600 X:20000 E:1 OK</code>
-      </td>
-    </tr>
-    <tr>
-      <td><code>M200</code></td>
-      <td>
-        <strong>Command:</strong> set status bar color and power<br>
-        <strong>Arguments:</strong>
-        <ul>
-          <li><code>P</code>: power (float 0.0–1.0; >0 turns ON)</li>
-          <li><code>C</code>: color (int 0: White, 1: Red, 2: Green, 3: Blue, 4: Yellow)</li>
-          <li><code>K</code>: kind (0: internal, 1: external status bar)</li>
-          <li><code>A</code>: pattern (0: Static, 1: Flash, 2: Pulse, 3: Confirm)</li>
-          <li><code>D</code>: duration (int 25–10000 ms)</li>
-          <li><code>R</code>: repetitions (-1 for forever)</li>
-        </ul>
-        <strong>Response:</strong> <code>M200 OK</code>
-      </td>
-    </tr>
+ <tr>
+  <td><code>M124</code></td>
+  <td>
+    <strong>Command:</strong> set vent state.<br>
+    <strong>Arguments:</strong>
+    <ul>
+      <li><code>V</code>: vent state. Accepts <code>1</code> (open) or <code>0</code> (close). Opening the vent (<code>V1</code>) returns the system to atmospheric pressure.</li>
+    </ul>
+    <strong>Response: Returns </strong><code>M124 OK</code>.
+  </td>
+<tr>
+  <td><code>M125</code></td>
+  <td>
+    <strong>Command:</strong> set pressure tunings (PID parameters). These values control the responsiveness and stability of the vacuum control loop.<br>
+    <strong>Arguments:</strong>
+    <ul>
+      <li><code>P</code>: proportional gain</li>
+      <li><code>I</code>: integral gain</li>
+      <li><code>D</code>: derivative gain</li>
+      <li><code>O</code>: overshoot error limit</li>
+      <li><code>V</code>: velocity constant (K velocity)</li>
+      <li><code>H</code>: holding constant (K holding)</li>
+      <li><code>T</code>: relative tolerance, expressed as a % <font color="red">Check if %</font></li>
+      <li><code>R</code>: reset PID (accepts <code>1</code> to trigger)</li>
+    </ul>
+    <strong>Response: Returns </strong> <code>M125 OK</code>.
+  </td>
+</tr>
+<tr>
+  <td><code>M126</code></td>
+  <td>
+    <strong>Command:</strong> get pressure tunings<br>
+    <strong>Arguments:</strong> none<br>
+    <strong>Response: Returns </strong> <code>M126 P:&lt;p&gt; I:&lt;i&gt; D:&lt;d&gt; O:&lt;o&gt; V:&lt;v&gt; H:&lt;h&gt; T:&lt;tolerance&gt; OK</code>
+  </td>
+</tr>
+<tr>
+  <td><code>M127</code></td>
+  <td>
+    <strong>Command:</strong> set waste detection configurations. These parameters define the heuristic logic used to detect a "waste full" condition based on pressure fluctuations.<br>
+    <strong>Arguments:</strong>
+    <ul>
+      <li><code>E</code>: enable waste full detection. Accepts <code>1</code> (on) or <code>0</code> (off).</li>
+      <li><code>S</code>: pressure window start.</li>
+      <li><code>P</code>: pressure window end.</li>
+      <li><code>F</code>: baseline fast factor.</li>
+      <li><code>D</code>: max delta per tick.<font color="red">what or how much is a "tick"?</font></li>
+      <li><code>R</code>: max rise per tick.<font color="red">what or how much is a "tick"?</font></li>
+      <li><code>C</code>: max cumulative rise.</li>
+      <li><code>A</code>: alpha (smoothing factor).<font color="red">guessing: "smoothing"</font></li>
+      <li><code>M</code>: minimum window time (ms).<font color="red">milliseconds?</font></li>
+      <li><code>X</code>: maximum window time (ms).<font color="red">milliseconds?</font></li>
+    </ul>
+    <strong>Response: Returns </strong> <code>M127 OK</code>.
+  </td>
+</tr>
+<tr>
+  <td><code>M128</code></td>
+  <td>
+    <strong>Command:</strong> get waste detection configurations<br>
+    <strong>Arguments:</strong> none<br>
+    <strong>Response: Returns </strong> <code>M128 S:&lt;start&gt; P:&lt;end&gt; F:&lt;fast&gt; D:&lt;delta&gt; R:&lt;rise&gt; C:&lt;cumulative&gt; A:&lt;alpha&gt; M:&lt;min&gt; X:&lt;max&gt; E:&lt;enabled&gt; OK</code>
+  </td>
+</tr>
+ <tr>
+  <td><code>M200</code></td>
+  <td>
+    <strong>Command:</strong> set status bar color and pattern.<br>
+    <strong>Arguments:</strong>
+    <ul>
+      <li><code>P</code>: power. Float range <code>0.0–1.0</code> (0 is off, 1.0 is full brightness).</li>
+      <li><code>C</code>: color. Accepts: <code>0</code> (white), <code>1</code> (red), <code>2</code> (green), <code>3</code> (blue), <code>4</code> (yellow).</li>
+      <li><code>K</code>: kind. Accepts <code>0</code> (internal status bar) or <code>1</code> (external status bar).</li>
+      <li><code>A</code>: animation pattern. Accepts: <code>0</code> (static), <code>1</code> (flash), <code>2</code> (pulse), <code>3</code> (confirm).</li>
+      <li><code>D</code>: duration in ms. Range: <code>25–10000</code>.</li>
+      <li><code>R</code>: repetitions. Use <code>-1</code> for infinite loop.</li>
+    </ul>
+    <strong>Response: Returns </strong> <code>M200 OK</code>.
+  </td>
+</tr>
     <tr>
       <td><code>M996</code></td>
       <td>
