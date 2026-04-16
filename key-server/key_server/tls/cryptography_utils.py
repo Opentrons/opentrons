@@ -282,8 +282,11 @@ async def make_fernet_key(password: str) -> FernetKey:
     return FernetKey(password, salt, encoded_key, constants.KDF_ITERATIONS)
 
 
-def encrypt_cert(cert: x509.Certificate, key: FernetKey) -> bytes:
+def encrypt_cert(encoded_cert: bytes, key: FernetKey) -> bytes:
     """Encrypt a certificate using Fernet with the specified key and return URL-safe encoded bytes."""
-    return fernet.Fernet(key.urlencoded_key).encrypt(
-        cert.public_bytes(serialization.Encoding.DER)
-    )
+    return fernet.Fernet(key.urlencoded_key).encrypt(encoded_cert)
+
+
+def get_cert_bytes_der(cert: x509.Certificate) -> bytes:
+    """Get the bytes of a certificate in DER-encoded form."""
+    return cert.public_bytes(serialization.Encoding.DER)
