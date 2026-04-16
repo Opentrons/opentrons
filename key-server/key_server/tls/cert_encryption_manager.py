@@ -18,6 +18,7 @@ class EncryptedCert:
     cert_data: bytes
     key_salt: bytes
     key_expires_at: datetime
+    kdf_iterations: int
 
 
 @dataclass
@@ -186,3 +187,27 @@ class CertEncryptionManager:
         """The last-used key."""
         await self._ensure_keys(now)
         return self._previous_key
+
+    def _encrypt(
+        self, cert: cryptography_utils.X509Pair, key: UsedEncryptionKey
+    ) -> EncryptedCert:
+        return EncryptedCert(
+            cryptography_utils.encrypt_cert(cert.cert, key.key),
+            key_salt=key.key.salt,
+            key_expires_at=key.first_used_at_discretized
+            + timedelta(seconds=self._password_timestep_s),
+            kdf_iterations=key.key.kdf_iterations,
+        )
+
+    async def encrypt_cert(
+        self, now: datetime, cert: cryptography_utils.X509Pair
+    ) -> OldAndNewEncryptedCert:
+        """Encrypt a certificate using the current and previous (if existing) keys."""
+        current_key = await self.current_pass(now)
+        previous_key = await self.previous_pass(now)
+        current_encrypted = self._encrypt(cert, current_key)
+        if isinstance(previous_key, UsedEncryptionKey):
+            previous_encrypted: EncryptedCert | None = self._encrypt(cert, previous_key)
+        else:
+            previous_encrypted = None
+        return OldAndNewEncryptedCert(current_encrypted, previous_encrypted)
