@@ -38,11 +38,6 @@ import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
-import type { UseQueryResult } from 'react-query'
-import type {
-  AccessControlEnabledSettingsResponse,
-  RobotSettingsResponse,
-} from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
 import type { LocalizationProviderProps } from '../../LocalizationProvider'
@@ -54,11 +49,11 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useRobotSettingsQuery: vi.fn(() => ({
       data: { settings: [] },
       isSuccess: true,
-    })) as typeof actual.useRobotSettingsQuery,
+    })) as any,
     useAccessControlEnabledQuery: vi.fn(() => ({
       data: { data: { accessControlEnabled: false } },
       isSuccess: true,
-    })) as typeof actual.useAccessControlEnabledQuery,
+    })) as any,
   }
 })
 vi.mock('../../LocalizationProvider')
@@ -109,11 +104,11 @@ describe('OnDeviceDisplayApp', () => {
     vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: { settings: [] },
       isSuccess: true,
-    } as unknown as UseQueryResult<RobotSettingsResponse>)
+    } as any)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: false } },
       isSuccess: true,
-    } as unknown as UseQueryResult<AccessControlEnabledSettingsResponse>)
+    } as any)
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
     vi.mocked(getIsShellReady).mockReturnValue(true)
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(null)
@@ -237,7 +232,7 @@ describe('OnDeviceDisplayApp', () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: true } },
       isSuccess: true,
-    } as unknown as UseQueryResult<AccessControlEnabledSettingsResponse>)
+    } as any)
     vi.mocked(LoggedOutOverlay).mockReturnValue(
       <div>MOCK_LOGGED_OUT_OVERLAY</div>
     )
