@@ -6,17 +6,23 @@ import { useHost } from '../../api'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { AccessControlEnabledSettingsResponse } from '@opentrons/api-client'
+import type {
+  AccessControlEnabledSettingsResponse,
+  HostConfig,
+} from '@opentrons/api-client'
 
 export function useAccessControlEnabledQuery(
   options: UseQueryOptions<
     AccessControlEnabledSettingsResponse,
     AxiosError
-  > = {}
+  > = {},
+  hostOverride?: HostConfig | null
 ): UseQueryResult<AccessControlEnabledSettingsResponse, AxiosError> {
-  const host = useHost()
+  const contextHost = useHost()
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery<AccessControlEnabledSettingsResponse, AxiosError>(
-    [host, 'auth', 'settings', 'accessControlEnabled'],
+    [host!, 'auth', 'settings', 'accessControlEnabled'],
     () => getAccessControlEnabled(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
