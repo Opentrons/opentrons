@@ -112,7 +112,9 @@ describe('OnDeviceDisplayApp', () => {
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
     vi.mocked(getIsShellReady).mockReturnValue(true)
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(null)
-    vi.mocked(LoggedOutOverlay).mockReturnValue(null)
+    vi.mocked(LoggedOutOverlay).mockReturnValue(
+      <div>MOCK_LOGGED_OUT_OVERLAY</div>
+    )
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useScrollRef).mockReturnValue({
       isScrolling: false,
@@ -233,9 +235,6 @@ describe('OnDeviceDisplayApp', () => {
       data: { data: { accessControlEnabled: true } },
       isSuccess: true,
     } as any)
-    vi.mocked(LoggedOutOverlay).mockReturnValue(
-      <div>MOCK_LOGGED_OUT_OVERLAY</div>
-    )
     render('/dashboard')
     screen.getByText('MOCK_LOGGED_OUT_OVERLAY')
     expect(vi.mocked(LoggedOutOverlay)).toHaveBeenCalled()
