@@ -68,6 +68,7 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/lib/**',
+      '**/js-package-testing/tests/**',
     ],
     setupFiles: ['./setup-vitest.mts'],
     coverage: {
@@ -76,6 +77,7 @@ export default defineConfig({
         '**/dist/**',
         '**/__tests__/**',
         '**/lib/**',
+        '**/js-package-testing/tests/**',
         ...configDefaults.exclude,
       ],
       provider: 'v8',

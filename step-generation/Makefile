@@ -17,7 +17,7 @@ all: lib
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf lib
+	pnpm shx rm -rf lib
 
 # artifacts
 #####################################################################
@@ -25,18 +25,18 @@ clean:
 # Declarations go to lib/ via tsc; JS entrypoints are lib/index.mjs and lib/index.cjs from Vite.
 .PHONY: build-ts
 build-ts:
-	cd .. && yarn tsc --build --force step-generation/tsconfig.json
+	cd .. && pnpm tsc --build --force step-generation/tsconfig.json
 
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
 	$(MAKE) clean
 	$(MAKE) build-ts
-	yarn vite build
+	pnpm vite build
 
 .PHONY: pack
 pack: lib
-	yarn pack
+	pnpm pack
 
 .PHONY: test
 test:
