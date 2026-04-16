@@ -32,8 +32,8 @@ import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getIsShellReady } from '/app/redux/shell'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
-import { LoggedOutOverlay } from '../../molecules/LoggedOutOverlay'
 import { LocalizationProvider } from '../../LocalizationProvider'
+import { LoggedOutOverlay } from '../../molecules/LoggedOutOverlay'
 import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
@@ -43,9 +43,9 @@ import type {
   AccessControlEnabledSettingsResponse,
   RobotSettingsResponse,
 } from '@opentrons/api-client'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
 import type { LocalizationProviderProps } from '../../LocalizationProvider'
-import type * as ReactApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()

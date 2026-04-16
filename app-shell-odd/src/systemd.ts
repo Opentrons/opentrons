@@ -63,15 +63,21 @@ const provideExports = (): SystemD => {
         ),
       getIsBackendReady: async () => {
         // trimming string because stdout returns a new line
-        const isRobotServerReady = (await promisifyProcess(
-          '/bin/systemctl is-active opentrons-robot-server',
-          true
-        )).trim() === 'active';
-        const isAuthServerReady = (await promisifyProcess(
-          '/bin/systemctl is-active opentrons-auth-server',
-          true
-        )).trim() === 'active';
-        return isRobotServerReady && isAuthServerReady;
+        const isRobotServerReady =
+          (
+            await promisifyProcess(
+              '/bin/systemctl is-active opentrons-robot-server',
+              true
+            )
+          ).trim() === 'active'
+        const isAuthServerReady =
+          (
+            await promisifyProcess(
+              '/bin/systemctl is-active opentrons-auth-server',
+              true
+            )
+          ).trim() === 'active'
+        return isRobotServerReady && isAuthServerReady
       },
       restartApp: () =>
         promisifyProcess(`/bin/systemctl restart opentrons-robot-app`),
