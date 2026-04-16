@@ -169,7 +169,6 @@ export function Navigation(props: NavigationProps): JSX.Element {
                   color={COLORS.grey60}
                 />
               ) : null}
-              <NavigationLink to="/login" name="login" />
               {NAV_LINKS.map(path => (
                 <Flex
                   ref={path === location.pathname ? navBarScrollRef : null}
