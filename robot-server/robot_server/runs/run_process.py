@@ -1,8 +1,10 @@
 """A wrapper for a protocol run that lives as a proxy in its own process."""
 
 import asyncio
-from typing import Any, Dict, List, Mapping, Optional, Tuple, get_args
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, get_args
 
+from opentrons import identify_hardware_process
+from opentrons.config import feature_flags
 from opentrons.hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
 )
@@ -19,7 +21,12 @@ from opentrons.protocol_engine import (
     DeckType,
     ErrorOccurrence,
     StateSummary,
+    error_recovery_policy,
 )
+from opentrons.protocol_engine import (
+    Config as ProtocolEngineConfig,
+)
+from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
@@ -41,6 +48,7 @@ from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.types import NozzleMapInterface
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
@@ -52,7 +60,9 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition3,
 )
 from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+
+from robot_server.protocols.protocol_store import ProtocolResource
 
 
 # register_process_types runs for both the robot server process and the run subprocess
@@ -121,9 +131,74 @@ class DirectedRunProcess(AbstractRunCoordinator):
         """Set an abstract event loop."""
         self._loop = loop
 
-    def create(self, run_id: str) -> None:
+    async def create(
+        self,
+        run_id: str,
+        labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
+        # TODO include this
+        # initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
+        deck_configuration: DeckConfigurationType,
+        # TODO and these
+        # file_provider: FileProvider,
+        # camera_provider: CameraProvider,
+        # notify_publishers: Callable[[], None],
+        protocol: Optional[ProtocolResource],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
+    ) -> None:
         """Create a run orchestrator and protocol engine for a given run."""
         self._run_id = run_id
+
+        if protocol is not None:
+            load_fixed_trash = should_load_fixed_trash(protocol.source.config)
+        else:
+            load_fixed_trash = False
+
+        hardware_api = identify_hardware_process()
+        engine = await create_protocol_engine(
+            hardware_api=hardware_api,
+            config=ProtocolEngineConfig(
+                robot_type=self._robot_type,
+                deck_type=self._deck_type,
+                block_on_door_open=feature_flags.enable_door_safety_switch(
+                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+                ),
+            ),
+            # TODO stop hardcoding this at some point
+            error_recovery_policy=error_recovery_policy.never_recover,
+            load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
+            # file_provider=file_provider,
+            # camera_provider=camera_provider,
+            # notify_publishers=notify_publishers,
+        )
+
+        orchestrator = RunOrchestrator.build_orchestrator(
+            run_id=run_id,
+            protocol_engine=engine,
+            hardware_api=hardware_api,
+            # camera_provider=camera_provider,
+            protocol_config=protocol.source.config if protocol else None,
+        )
+
+        # FIXME(mm, 2022-12-21): These `await runner.load()`s introduce a
+        # concurrency hazard. If two requests simultaneously call this method,
+        # they will both "succeed" (with undefined results) instead of one
+        # raising RunConflictError.
+        if protocol:
+            await orchestrator.load(
+                protocol.source,
+                run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
+                parse_mode=ParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+            )
+        else:
+            orchestrator.prepare()
+
+        for offset in labware_offsets:
+            orchestrator.add_labware_offset(offset)
+
+        self._run_orchestrator = orchestrator
 
     @property
     def run_id(self) -> Optional[str]:
