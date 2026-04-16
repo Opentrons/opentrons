@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   ApiHostProvider,
+  useAccessControlEnabledQuery,
   useRobotSettingsQuery,
 } from '@opentrons/react-api-client'
 
@@ -56,6 +57,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
+import { LoggedOutOverlay } from '../molecules/LoggedOutOverlay'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
@@ -199,13 +201,32 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   }, [dispatch, isIdle, userSetBrightness])
 
-  // ensure robot-server api, etc. is up and running
   const isShellReady = useSelector(getIsShellReady)
-  // ensure settings query data is available for localization provider
-  const { settings } =
-    useRobotSettingsQuery({ retry: true, retryDelay: 1000 }, hostConfig).data ??
-    {}
-  const isReady = isShellReady && settings != null
+
+  const robotSettingsQuery = useRobotSettingsQuery(
+    {
+      retry: true,
+      retryDelay: 1000,
+    },
+    hostConfig
+  )
+
+  const accessControlEnabledQuery = useAccessControlEnabledQuery(
+    {
+      retry: true,
+      retryDelay: 1000,
+    },
+    hostConfig
+  )
+  const isAccessControlEnabled =
+    accessControlEnabledQuery.data?.data.accessControlEnabled ?? null
+  // todo(mm, 2026-04-15): Replace this with a real login implementation.
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  const isReady =
+    isShellReady && // ensure robot-server api, etc. is up and running
+    robotSettingsQuery.isSuccess && // ensure settings query data is available for localization provider
+    isAccessControlEnabled != null
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
@@ -242,6 +263,13 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             }}
                           />
                         ) : null}
+                        {isAccessControlEnabled && !isLoggedIn && (
+                          <LoggedOutOverlay
+                            onClick={() => {
+                              setIsLoggedIn(true)
+                            }}
+                          />
+                        )}
                         <SharedScrollRefProvider>
                           <OnDeviceDisplayAppRoutes />
                         </SharedScrollRefProvider>
