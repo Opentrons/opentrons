@@ -5,12 +5,12 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
-import type * as ReactApiClient from '@opentrons/react-api-client'
 
 import { useOAuth2PasswordLogin } from '../useOAuth2PasswordLogin'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 
 const mockGetOAuth2Token = vi.fn()
 

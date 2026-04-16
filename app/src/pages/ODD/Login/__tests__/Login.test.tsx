@@ -1,5 +1,4 @@
 import { MemoryRouter } from 'react-router-dom'
-import type * as ReactRouterDom from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -8,6 +7,8 @@ import { i18n } from '/app/i18n'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { Login } from '..'
+
+import type * as ReactRouterDom from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 const mockSubmitPassword = vi.fn()
