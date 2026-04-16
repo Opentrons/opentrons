@@ -4,20 +4,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { Login } from '..'
 
 const mockNavigate = vi.fn()
-
-const { mockSubmitPassword } = vi.hoisted(() => ({
-  mockSubmitPassword: vi.fn(),
-}))
+const mockSubmitPassword = vi.fn()
 
 vi.mock('/app/resources/auth', () => ({
-  useOAuth2PasswordLogin: () => ({
-    submitPassword: mockSubmitPassword,
-    isAuthLoading: false,
-  }),
+  useOAuth2PasswordLogin: vi.fn(),
 }))
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -60,6 +55,10 @@ describe('Login', () => {
   beforeEach(() => {
     mockNavigate.mockReset()
     mockSubmitPassword.mockReset()
+    vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
+      submitPassword: mockSubmitPassword,
+      isAuthLoading: false,
+    })
   })
 
   it('renders navigation, username field, and action buttons', () => {
