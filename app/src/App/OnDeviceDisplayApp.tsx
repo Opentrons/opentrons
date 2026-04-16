@@ -224,9 +224,13 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const isReady =
-    isShellReady && // ensure robot-server api, etc. is up and running
-    robotSettingsQuery.isSuccess && // ensure settings query data is available for localization provider
-    isAccessControlEnabled != null
+    // ensure robot-server api, etc. is up and running
+    isShellReady &&
+    // ensure settings query data is available for localization provider
+    robotSettingsQuery.isSuccess &&
+    // ensure we know whether access control is enabled or not,
+    // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
+    isAccessControlEnabled != null //
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
