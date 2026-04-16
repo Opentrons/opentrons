@@ -104,6 +104,27 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const hasFlexStacker = Object.values(moduleEntities).some(
     module => module.type === FLEX_STACKER_MODULE_TYPE
   )
+  const flexStackerLocations = new Set(
+    Object.values(modules)
+      .filter(module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE)
+      .map(module => `${module.slot.slice(0, 1)}3`)
+  )
+  const flexStackerAsStagingAreas = Object.fromEntries(
+    Object.values(modules)
+      .filter(module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE)
+      .map(module => {
+        const location = `cutout${module.slot.slice(0, 1)}3`
+
+        return [
+          `flex-stacker-${module.slot}`, // fake ID
+          {
+            id: `flex-stacker-${module.slot}`,
+            location,
+          },
+        ]
+      })
+  )
+
   const baseViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
   const stackerViewBox = useMemo(() => {
     if (!hasFlexStacker) return baseViewBox
@@ -137,9 +158,22 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const wasteChuteStagingAreaFixtures = Object.values(
     stagingAreaEntities
   ).filter(stagingArea => stagingArea.location === WASTE_CHUTE_CUTOUT)
+  const filteredStagingAreas = {
+    ...flexStackerAsStagingAreas,
+    ...stagingAreaEntities,
+  }
 
+  const stagingAreaLocations = new Set(
+    Object.values(filteredStagingAreas).map(sa => sa.location)
+  )
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
-    aa => isAddressableAreaStandardSlot(aa.id, deckDef)
+    aa => {
+      return (
+        isAddressableAreaStandardSlot(aa.id, deckDef) &&
+        !stagingAreaLocations.has(`cutout${aa.id}`) &&
+        !flexStackerLocations.has(aa.id)
+      )
+    }
   )
 
   const selectedCommandIndex =
@@ -225,7 +259,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         />
                       ) : null
                     })}
-                    {Object.values(stagingAreaEntities).map(entity => (
+                    {Object.values(filteredStagingAreas).map(entity => (
                       <StagingAreaFixture
                         key={entity.id}
                         cutoutId={entity.location as StagingAreaLocation}

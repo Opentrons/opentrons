@@ -136,6 +136,12 @@ export function DeckSetupContainer(
   const hasFlexStacker = Object.values(activeDeckSetup.modules).some(
     module => module.type === FLEX_STACKER_MODULE_TYPE
   )
+  const flexStackerLocations = Object.values(activeDeckSetup.modules)
+    .filter(stacker => stacker.type === FLEX_STACKER_MODULE_TYPE)
+    .map(({ slot: location, ...rest }) => ({ ...rest, location }))
+  flexStackerLocations.forEach(
+    stacker => (stacker.location = `cutout${stacker.location.slice(0, 1)}3`)
+  )
   const isZoomed = Object.values(zoomIn).some(val => val != null)
   const viewBoxNumerical = viewBox?.split(' ').map(val => Number(val)) ?? []
   const viewBoxAdjustedNumerical = [
@@ -216,11 +222,19 @@ export function DeckSetupContainer(
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea'
   )
-
-  const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
-    aa => isAddressableAreaStandardSlot(aa.id, deckDef)
+  const stagingAreaFixturesAndStacker = [
+    ...stagingAreaFixtures,
+    ...flexStackerLocations,
+  ]
+  const stagingAreaCutoutIds = stagingAreaFixturesAndStacker.map(
+    stagingArea => stagingArea.location.split('cutout')[1]
   )
 
+  const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
+    aa =>
+      isAddressableAreaStandardSlot(aa.id, deckDef) &&
+      !stagingAreaCutoutIds.includes(aa.id)
+  )
   const svgContainerWidth = getSVGContainerWidth(robotType, isZoomed)
   return (
     <>
@@ -281,7 +295,10 @@ export function DeckSetupContainer(
                           addressableArea.id,
                           deckDef.cutoutFixtures
                         )
-                        return cutoutId != null ? (
+                        return cutoutId != null &&
+                          !Object.keys(stagingAreaFixturesAndStacker).includes(
+                            cutoutId
+                          ) ? (
                           <SingleSlotFixture
                             key={addressableArea.id}
                             cutoutId={cutoutId}
@@ -289,10 +306,11 @@ export function DeckSetupContainer(
                             slotClipColor={darkFill}
                             showExpansion={cutoutId === 'cutoutA1'}
                             fixtureBaseColor={lightFill}
+                            showSlotClips={false}
                           />
                         ) : null
                       })}
-                      {stagingAreaFixtures.map(fixture => {
+                      {stagingAreaFixturesAndStacker.map(fixture => {
                         if (
                           zoomIn.cutout == null ||
                           zoomIn.cutout !== fixture.location
@@ -304,6 +322,7 @@ export function DeckSetupContainer(
                               deckDefinition={deckDef}
                               slotClipColor={darkFill}
                               fixtureBaseColor={lightFill}
+                              showSlotClips={false}
                             />
                           )
                         }
@@ -319,6 +338,7 @@ export function DeckSetupContainer(
                                   deckDefinition={deckDef}
                                   slotClipColor={COLORS.transparent}
                                   fixtureBaseColor={lightFill}
+                                  showSlotClips={false}
                                 />
                                 <FlexTrash
                                   robotType={robotType}
@@ -361,6 +381,7 @@ export function DeckSetupContainer(
                               deckDefinition={deckDef}
                               slotClipColor={darkFill}
                               fixtureBaseColor={lightFill}
+                              showSlotClips={false}
                             />
                           )
                         }
@@ -375,7 +396,7 @@ export function DeckSetupContainer(
                     addEquipment={addEquipment}
                     activeDeckSetup={activeDeckSetup}
                     currentStep={currentStep}
-                    stagingAreaCutoutIds={stagingAreaFixtures.map(
+                    stagingAreaCutoutIds={stagingAreaFixturesAndStacker.map(
                       areas => areas.location as CutoutId
                     )}
                     {...{
@@ -385,7 +406,7 @@ export function DeckSetupContainer(
                   />
                   <SlotLabels
                     robotType={robotType}
-                    show4thColumn={stagingAreaFixtures.length > 0}
+                    show4thColumn={stagingAreaFixturesAndStacker.length > 0}
                   />
                 </>
               )}
