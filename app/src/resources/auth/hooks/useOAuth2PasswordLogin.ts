@@ -3,8 +3,6 @@ import axios from 'axios'
 import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation } from '@opentrons/react-api-client'
 
-import { useToaster } from '/app/organisms/ToasterOven'
-
 function getOAuth2PasswordLoginErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as
@@ -25,6 +23,11 @@ export interface UseOAuth2PasswordLoginOptions {
    * Use `useNavigate` from the caller for desktop vs ODD routing.
    */
   onSuccess: () => void
+  /**
+   * Called with a user-facing message when the token request fails.
+   * Wire to `makeSnackbar` / toast in the page or organism, not in this hook.
+   */
+  onError: (message: string) => void
 }
 
 export interface UseOAuth2PasswordLoginResult {
@@ -40,15 +43,14 @@ export interface UseOAuth2PasswordLoginResult {
 export function useOAuth2PasswordLogin(
   options: UseOAuth2PasswordLoginOptions
 ): UseOAuth2PasswordLoginResult {
-  const { onSuccess } = options
-  const { makeSnackbar } = useToaster()
+  const { onSuccess, onError } = options
 
   const { getOAuth2Token, isLoading } = useGetOAuth2TokenMutation({
     onSuccess: () => {
       onSuccess()
     },
     onError: (error: unknown) => {
-      makeSnackbar(getOAuth2PasswordLoginErrorMessage(error))
+      onError(getOAuth2PasswordLoginErrorMessage(error))
     },
   })
 

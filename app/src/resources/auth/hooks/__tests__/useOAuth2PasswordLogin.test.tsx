@@ -5,6 +5,7 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 
 import { useOAuth2PasswordLogin } from '../useOAuth2PasswordLogin'
 
@@ -12,11 +13,6 @@ import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 
 const mockGetOAuth2Token = vi.fn()
-const mockMakeSnackbar = vi.fn()
-
-vi.mock('/app/organisms/ToasterOven', () => ({
-  useToaster: () => ({ makeSnackbar: mockMakeSnackbar }),
-}))
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
@@ -34,6 +30,7 @@ const store: Store<any> = legacy_createStore(vi.fn(), {})
 describe('useOAuth2PasswordLogin', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>
   const onSuccess = vi.fn()
+  const onError = vi.fn()
 
   beforeEach(() => {
     const queryClient = new QueryClient()
@@ -45,8 +42,8 @@ describe('useOAuth2PasswordLogin', () => {
       </Provider>
     )
     mockGetOAuth2Token.mockReset()
-    mockMakeSnackbar.mockReset()
     onSuccess.mockReset()
+    onError.mockReset()
   })
 
   afterEach(() => {
@@ -54,9 +51,12 @@ describe('useOAuth2PasswordLogin', () => {
   })
 
   it('calls getOAuth2Token with ROPC body including client_id', () => {
-    const { result } = renderHook(() => useOAuth2PasswordLogin({ onSuccess }), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useOAuth2PasswordLogin({ onSuccess, onError }),
+      {
+        wrapper,
+      }
+    )
 
     act(() => {
       result.current.submitPassword('alice', 'secret')
@@ -71,9 +71,12 @@ describe('useOAuth2PasswordLogin', () => {
   })
 
   it('trims username and password', () => {
-    const { result } = renderHook(() => useOAuth2PasswordLogin({ onSuccess }), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useOAuth2PasswordLogin({ onSuccess, onError }),
+      {
+        wrapper,
+      }
+    )
 
     act(() => {
       result.current.submitPassword('  alice  ', '  pwd  ')

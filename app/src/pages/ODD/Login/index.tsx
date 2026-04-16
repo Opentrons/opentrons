@@ -10,6 +10,7 @@ import {
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import styles from './login.module.css'
@@ -20,9 +21,13 @@ type LoginField = 'username' | 'password'
 
 export function Login(): JSX.Element {
   const navigate = useNavigate()
+  const { makeSnackbar } = useToaster()
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: () => {
       navigate(-1)
+    },
+    onError: message => {
+      makeSnackbar(message)
     },
   })
   const [step, setStep] = useState<LoginField>('username')

@@ -16,6 +16,14 @@ vi.mock('/app/resources/auth', () => ({
   useOAuth2PasswordLogin: vi.fn(),
 }))
 
+vi.mock('/app/organisms/ToasterOven', () => ({
+  useToaster: () => ({
+    makeSnackbar: vi.fn(),
+    makeToast: vi.fn(),
+    eatToast: vi.fn(),
+  }),
+}))
+
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
