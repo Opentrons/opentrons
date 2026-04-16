@@ -21,7 +21,7 @@ interface AnnotatedGroupProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   allRunDefs: LabwareDefinition[]
   commandStartNumber: number
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>  // remove redux dependency
   handlePause?: () => void
 }
 export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {

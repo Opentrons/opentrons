@@ -24,7 +24,7 @@ interface IndividualCommandProps {
   allRunDefs: LabwareDefinition[]
   fromGroup: boolean
   commandNumber: number
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>  // remove redux dependency
 }
 export function IndividualCommand({
   command,
