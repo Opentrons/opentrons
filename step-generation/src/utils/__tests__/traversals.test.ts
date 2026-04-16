@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { fixture96Plate, flexDeckDefV5 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  FLEX_STACKER_A4_ADDRESSABLE_AREA,
+  FLEX_STACKER_MODULE_TYPE,
+  flexDeckDefV5,
+} from '@opentrons/shared-data'
 
 import {
   enrichRobotStateForStackGraphTraversals,
@@ -12,6 +17,7 @@ import {
   getLargestStackContainingLabware,
   getNodeParentModuleId,
   getProvidedAddressableAreasExposed,
+  getStackedOnNodeFromPdStack,
 } from '../traversals'
 
 import type {
@@ -434,7 +440,8 @@ describe('traversals', () => {
     it('derives stackedOnNode from PD-style stack for labware on a deck slot', () => {
       const result = enrichRobotStateForStackGraphTraversals(
         pdStyleStackRobotState,
-        {} as ModuleEntities
+        {} as ModuleEntities,
+        {} as LabwareEntities
       )
       expect(result.labware.plate).toMatchObject({
         stack: ['plate', 'B2'],
@@ -448,7 +455,8 @@ describe('traversals', () => {
       }
       const result = enrichRobotStateForStackGraphTraversals(
         pdStyleStackRobotState,
-        {} as ModuleEntities
+        {} as ModuleEntities,
+        {} as LabwareEntities
       )
       expect(result.labware.plate.stackedOnNode).toEqual({ slotName: 'C3' })
     })
@@ -658,5 +666,61 @@ describe('traversals', () => {
       expect(result.labware.b.contains).toBeUndefined()
       expect(result.labware.c.contains).toBeUndefined()
     })
+  })
+})
+
+describe('getStackedOnNodeFromPdStack flex stacker', () => {
+  it('returns shuttle addressable area when stack uses the stacker module slot', () => {
+    const moduleEntities = {
+      stackerMod: {
+        id: 'stackerMod',
+        type: FLEX_STACKER_MODULE_TYPE,
+        model: 'flexStackerModuleV1',
+        pythonName: 'stacker_mod',
+      },
+    } as unknown as ModuleEntities
+    const modules = {
+      stackerMod: {
+        slot: 'A3',
+        moduleState: { type: FLEX_STACKER_MODULE_TYPE },
+      },
+    } as unknown as RobotState['modules']
+
+    expect(
+      getStackedOnNodeFromPdStack({
+        stack: ['plateId', 'A3'],
+        subjectLabwareId: 'plateId',
+        moduleEntities,
+        labwareEntityIds: new Set(['plateId']),
+        modules,
+      })
+    ).toEqual({ addressableAreaName: FLEX_STACKER_A4_ADDRESSABLE_AREA })
+  })
+
+  it('returns shuttle AA when stack parent is staging A4 and a stacker occupies the cutout', () => {
+    const moduleEntities = {
+      stackerMod: {
+        id: 'stackerMod',
+        type: FLEX_STACKER_MODULE_TYPE,
+        model: 'flexStackerModuleV1',
+        pythonName: 'stacker_mod',
+      },
+    } as unknown as ModuleEntities
+    const modules = {
+      stackerMod: {
+        slot: 'A3',
+        moduleState: { type: FLEX_STACKER_MODULE_TYPE },
+      },
+    } as unknown as RobotState['modules']
+
+    expect(
+      getStackedOnNodeFromPdStack({
+        stack: ['plateId', 'A4'],
+        subjectLabwareId: 'plateId',
+        moduleEntities,
+        labwareEntityIds: new Set(['plateId']),
+        modules,
+      })
+    ).toEqual({ addressableAreaName: FLEX_STACKER_A4_ADDRESSABLE_AREA })
   })
 })
