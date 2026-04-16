@@ -19,8 +19,7 @@ vi.mock('/app/organisms/ToasterOven', () => ({
 }))
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual =
-    await importOriginal<typeof import('@opentrons/react-api-client')>()
+  const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
     useGetOAuth2TokenMutation: () => ({

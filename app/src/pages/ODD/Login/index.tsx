@@ -40,7 +40,9 @@ export function Login(): JSX.Element {
     const id = window.setTimeout(() => {
       keyboardRef.current?.setInput(fieldValue)
     }, 0)
-    return () => window.clearTimeout(id)
+    return () => {
+      window.clearTimeout(id)
+    }
   }, [showKeyboard, fieldValue, step])
 
   useEffect(() => {

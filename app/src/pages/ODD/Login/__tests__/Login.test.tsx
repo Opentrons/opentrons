@@ -1,4 +1,5 @@
 import { MemoryRouter } from 'react-router-dom'
+import type * as ReactRouterDom from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -16,7 +17,7 @@ vi.mock('/app/resources/auth', () => ({
 }))
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-router-dom')>()
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,
