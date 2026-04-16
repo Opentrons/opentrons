@@ -1,5 +1,6 @@
 .overlay {
   position: fixed;
+
   /* This z-index is chosen to beat everything else on the ODD. This overlay should
   appear over modals, toasts, everything. */
   z-index: 1500;
