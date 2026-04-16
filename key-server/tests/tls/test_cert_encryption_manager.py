@@ -1,9 +1,16 @@
 """Tests for the certificate encryption manager."""
 
+import asyncio
+import base64
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
+from cryptography import fernet, x509
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf import pbkdf2
 
+from key_server.tls import cryptography_utils
 from key_server.tls.cert_encryption_manager import CertEncryptionManager
 
 
@@ -152,3 +159,88 @@ def test_discretize_now(
     assert subject._discretize_now(
         t0 + timedelta(seconds=password_timestep_s * quantum_multiple)
     ) == (t0 + timedelta(seconds=password_timestep_s * quanta))
+
+
+async def test_encrypt_cert_roundtrips_both_passwords(
+    subject: CertEncryptionManager,
+    t0: datetime,
+    password_timestep_s: int,
+    tmp_path: Path,
+) -> None:
+    """It should encrypt certs with old and new passwords."""
+    previous_pass = await subject.current_pass(
+        t0 + timedelta(seconds=password_timestep_s * 0.5)
+    )
+    current_pass = await subject.current_pass(
+        t0 + timedelta(seconds=password_timestep_s * 1.5)
+    )
+    cert_path = tmp_path / "certs"
+    cert_path.mkdir()
+    cert = cryptography_utils.create_ca(cert_path, cert_path, t0, timedelta(days=2))
+    encrypted = await subject.encrypt_cert(
+        t0 + timedelta(seconds=password_timestep_s * 1.8), cert
+    )
+    assert encrypted.previous is not None
+    assert encrypted.previous != encrypted.current
+    current_decrypt = fernet.Fernet(current_pass.key.urlencoded_key).decrypt(
+        encrypted.current.cert_data
+    )
+    previous_decrypt = fernet.Fernet(previous_pass.key.urlencoded_key).decrypt(
+        encrypted.previous.cert_data
+    )
+    current_loaded = x509.load_der_x509_certificate(current_decrypt)
+    previous_loaded = x509.load_der_x509_certificate(previous_decrypt)
+    assert cryptography_utils.fingerprint(cert.cert) == cryptography_utils.fingerprint(
+        current_loaded
+    )
+    assert cryptography_utils.fingerprint(cert.cert) == cryptography_utils.fingerprint(
+        previous_loaded
+    )
+
+
+async def test_encrypt_cert_handles_no_previous(
+    subject: CertEncryptionManager,
+    t0: datetime,
+    password_timestep_s: int,
+    tmp_path: Path,
+) -> None:
+    """If there is no previous key it should not send a previous-encryption cert."""
+    cert_path = tmp_path / "certs"
+    cert_path.mkdir()
+    cert = cryptography_utils.create_ca(cert_path, cert_path, t0, timedelta(days=10))
+    encrypted = await subject.encrypt_cert(
+        t0 + timedelta(seconds=password_timestep_s * 10.3), cert
+    )
+    assert encrypted.previous is None
+
+
+async def test_encrypt_cert_roundtrips_from_password(
+    subject: CertEncryptionManager,
+    t0: datetime,
+    password_timestep_s: int,
+    tmp_path: Path,
+) -> None:
+    """It should rountrip decrypt with only the password."""
+    cert_path = tmp_path / "certs"
+    cert_path.mkdir()
+    cert = cryptography_utils.create_ca(cert_path, cert_path, t0, timedelta(days=10))
+    encrypted = await subject.encrypt_cert(
+        t0 + timedelta(seconds=password_timestep_s * 100.2), cert
+    )
+    current_key = await subject.current_pass(
+        t0 + timedelta(seconds=password_timestep_s * 100.2)
+    )
+    kdf = pbkdf2.PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=encrypted.current.key_salt,
+        iterations=encrypted.current.kdf_iterations,
+    )
+    key = await asyncio.to_thread(kdf.derive, current_key.key.password.encode("utf-8"))
+    decrypted_bytes = fernet.Fernet(base64.urlsafe_b64encode(key)).decrypt(
+        encrypted.current.cert_data
+    )
+    decrypted_cert = x509.load_der_x509_certificate(decrypted_bytes)
+    assert cryptography_utils.fingerprint(cert.cert) == cryptography_utils.fingerprint(
+        decrypted_cert
+    )
