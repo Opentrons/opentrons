@@ -206,13 +206,13 @@ def _pipetted_dict_dict_to_class(  # type: ignore
 
     return opentrons.hardware_control.dev_types.PipetteDict(
         display_name=str(dictionary["display_name"]),
-        name=dictionary["name"],  # TODO take a look at it
+        name=dictionary["name"],
         model=opentrons_shared_data.pipette.types.PipetteModel(dictionary["model"]),
         back_compat_names=dictionary["back_compat_names"],
         pipette_id=str(dictionary["pipette_id"]),
         min_volume=float(dictionary["min_volume"]),
         max_volume=float(dictionary["max_volume"]),
-        channels=dictionary["channels"],  # TODO here too
+        channels=dictionary["channels"],
         aspirate_flow_rate=float(dictionary["aspirate_flow_rate"]),
         dispense_flow_rate=float(dictionary["dispense_flow_rate"]),
         blow_out_flow_rate=float(dictionary["blow_out_flow_rate"]),
@@ -278,7 +278,7 @@ def _numpy_float_dict_to_class(classname, d) -> float64:  # type: ignore
     return float64(d["value"])
 
 
-# point named tuple
+# Point type serialization
 def _point_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
@@ -368,7 +368,7 @@ def register_hardware_types() -> None:
         class_to_dict=_estop_overall_status_class_to_dict,
     )
 
-    # todo(chb: 04-09-2026): These are direct serializations to support the initial robot server intergration, replace with automated solution where approprite
+    # todo(chb: 04-09-2026): These are direct serializations to support the initial robot server intergration, replace with automated solution where appropriate
     # gripper calibration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset,

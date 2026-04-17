@@ -485,6 +485,7 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 
 
 def serialize(config: OT3Config) -> Dict[str, Any]:
+    # inline import prevents circular import error from hardware_control.types
     from opentrons.hardware_control.types import InstrumentProbeType
 
     def _scrub_key_types(obj: Any, target_type: Any) -> Any:
