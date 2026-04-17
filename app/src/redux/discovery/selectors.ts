@@ -99,8 +99,8 @@ const isNotOT2Robot = (robot: DiscoveredRobot): boolean => {
 
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
-    state => state.discovery.robotsByName,
-    state => getFeatureFlags(state).ignoreOT2App ?? false,
+    (state: State) => state.discovery.robotsByName,
+    (state: State) => getFeatureFlags(state).ignoreOT2App ?? false,
     (robotsMap, ignoreOT2App) => {
       const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
