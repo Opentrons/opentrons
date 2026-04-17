@@ -1,5 +1,7 @@
-import { COLUMN, ROW } from '@opentrons/shared-data'
+import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 import { getIsSafePipetteMovement } from '@opentrons/step-generation'
+
+import { canPipetteUseLabware } from '../../../../../../utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -31,7 +33,21 @@ export function getAllWellsSafetyStatus(
   } = args
 
   const allWellsWithStatus: Record<string, number> = {}
-
+  const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
+  const labwareDef = invariantContext.labwareEntities[labwareId].def
+  const channels = pipetteSpec.channels
+  const pipetteCanUseLabware = canPipetteUseLabware(
+    pipetteSpec,
+    nozzleConfiguration,
+    labwareDef
+  )
+  if (!pipetteCanUseLabware) {
+    Object.assign(
+      allWellsWithStatus,
+      Object.fromEntries(allWells.map(well => [well, 1]))
+    )
+    return allWellsWithStatus
+  }
   if (nozzleConfiguration === ROW) {
     // ROW mode: each row = 12 wells across
     const numRows = allWells[0].length
@@ -54,7 +70,10 @@ export function getAllWellsSafetyStatus(
         allWellsWithStatus[column[rowIndex]] = safe ? 0 : 1
       })
     }
-  } else if (nozzleConfiguration === COLUMN) {
+  } else if (
+    nozzleConfiguration === COLUMN ||
+    (channels === 8 && nozzleConfiguration === ALL)
+  ) {
     // COLUMN mode: each column = 8 wells
     for (let colIndex = 0; colIndex < allWells.length; colIndex++) {
       const column = allWells[colIndex]
@@ -75,6 +94,22 @@ export function getAllWellsSafetyStatus(
         allWellsWithStatus[wellName] = safe ? 0 : 1
       })
     }
+  } else if (nozzleConfiguration === ALL && channels === 96) {
+    // ALL 96 Nozzles: only check the first well
+    const safe = robotState
+      ? getIsSafePipetteMovement({
+          robotState,
+          invariantContext,
+          pipetteId,
+          labwareId,
+          wellTargetName: allWells[0][0],
+          primaryNozzle,
+          nozzleConfiguration,
+        })
+      : true
+    allWells.flat().forEach(wellName => {
+      allWellsWithStatus[wellName] = safe ? 0 : 1
+    })
   } else {
     // SINGLE nozzle: check every well individually
     allWells.flat().forEach(wellName => {

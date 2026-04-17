@@ -176,17 +176,6 @@ export function forMoveLabware(
       FLEX_STACKER_MODULE_TYPE
     ) {
       newLocationStack.push(modules[newLocation.moduleId].slot)
-
-      // if the new location is a flex stacker shuttle, set the stackedOnNode to the shuttle addressable area
-      const shuttleAa = getFlexStackerShuttleAddressableArea(
-        modules[newLocation.moduleId].slot
-      )
-      if (shuttleAa != null) {
-        robotState.labware[labwareId].stackedOnNode = {
-          addressableAreaName: shuttleAa,
-        }
-        return
-      }
     } else {
       newLocationStack.push(
         newLocation.moduleId,
@@ -234,7 +223,21 @@ export function forMoveLabware(
     typeof newLocation === 'object' &&
     'labwareId' in newLocation &&
     getIsPipettableLabware(labwareEntities[newLocation.labwareId].def)
-  robotState.labware[labwareId].stackedOnNode = newLocation
+  let stackedOnNodeForMovedPrimary = newLocation
+  if (
+    typeof newLocation === 'object' &&
+    newLocation !== null &&
+    'moduleId' in newLocation &&
+    modules[newLocation.moduleId].moduleState.type === FLEX_STACKER_MODULE_TYPE
+  ) {
+    const shuttleAa = getFlexStackerShuttleAddressableArea(
+      modules[newLocation.moduleId].slot
+    )
+    if (shuttleAa != null) {
+      stackedOnNodeForMovedPrimary = { addressableAreaName: shuttleAa }
+    }
+  }
+  robotState.labware[labwareId].stackedOnNode = stackedOnNodeForMovedPrimary
   if (isNewParentPipettableLabware) {
     robotState.labware[labwareId].sterility = TOUCHED_PIPETTABLE_LABWARE
   }

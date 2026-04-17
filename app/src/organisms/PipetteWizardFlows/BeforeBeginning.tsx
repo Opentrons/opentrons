@@ -105,8 +105,9 @@ export const BeforeBeginning = (
   if (
     pipetteId == null &&
     (flowType === FLOWS.CALIBRATE || flowType === FLOWS.DETACH)
-  )
+  ) {
     return null
+  }
 
   let equipmentList = [CALIBRATION_PROBE]
   const proceedButtonText = t('move_gantry_to_front')
@@ -249,8 +250,9 @@ export const BeforeBeginning = (
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
 
   return errorMessage != null ? (
     <SimpleWizardBody
