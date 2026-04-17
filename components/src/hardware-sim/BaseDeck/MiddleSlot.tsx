@@ -22,9 +22,9 @@ export function MiddleSlot(props: MiddleSlotProps): JSX.Element {
       />
       {showSlotClips ? (
         <>
-          <SlotClip d="M162.1,398.9V409h10.8" stroke={slotClipColor} />,
-          <SlotClip d="M162.1,329.8v-10.5h10.6" stroke={slotClipColor} />,
-          <SlotClip d="M293.9,398.9V409h-10.8" stroke={slotClipColor} />,
+          <SlotClip d="M162.1,398.9V409h10.8" stroke={slotClipColor} />
+          <SlotClip d="M162.1,329.8v-10.5h10.6" stroke={slotClipColor} />
+          <SlotClip d="M293.9,398.9V409h-10.8" stroke={slotClipColor} />
           <SlotClip d="M293.9,329.8v-10.7h-10.8" stroke={slotClipColor} />
         </>
       ) : null}

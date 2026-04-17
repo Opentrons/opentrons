@@ -104,25 +104,28 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const hasFlexStacker = Object.values(moduleEntities).some(
     module => module.type === FLEX_STACKER_MODULE_TYPE
   )
-  const flexStackerLocations = new Set(
-    Object.values(modules)
-      .filter(module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE)
-      .map(module => `${module.slot.slice(0, 1)}3`)
+  const flexStackerModules = Object.values(modules).filter(
+    module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE
   )
-  const flexStackerAsStagingAreas = Object.fromEntries(
-    Object.values(modules)
-      .filter(module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE)
-      .map(module => {
-        const location = `cutout${module.slot.slice(0, 1)}3`
 
-        return [
-          `flex-stacker-${module.slot}`, // fake ID
-          {
-            id: `flex-stacker-${module.slot}`,
-            location,
-          },
-        ]
-      })
+  const flexStackerLocations = new Set(
+    flexStackerModules.map(module => `${module.slot.slice(0, 1)}3`)
+  )
+
+  const flexStackerAsStagingAreas = Object.fromEntries(
+    flexStackerModules.map(module => {
+      const row = module.slot.slice(0, 1)
+      const location = `cutout${row}3`
+      const id = `flex-stacker-${module.slot}`
+
+      return [
+        id,
+        {
+          id,
+          location,
+        },
+      ]
+    })
   )
 
   const baseViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`

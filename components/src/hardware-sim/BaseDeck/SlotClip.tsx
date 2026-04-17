@@ -8,6 +8,7 @@ export function SlotClip(props: SVGProps<SVGPathElement>): JSX.Element {
       fill="none"
       stroke={COLORS.black90}
       strokeWidth={3}
+      data-testid="slot-clip"
       strokeOpacity={0.7}
       {...props}
     />
