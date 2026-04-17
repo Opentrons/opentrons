@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
+
+import { useActivityListener } from './useActivityListener'
 
 const USER_EVENTS: Array<keyof DocumentEventMap> = [
   'click',
@@ -42,32 +44,35 @@ export function useScreenIdle(
   const [idle, setIdle] = useState<boolean>(initialState)
   const idleTimer = useRef<number>()
 
-  useEffect(() => {
-    const handleEvents = (): void => {
-      setIdle(false)
+  const startOrResetTimer = useCallback(() => {
+    if (idleTimer.current != null) {
+      window.clearTimeout(idleTimer.current)
+    }
+    // See RQA-3813 and associated PR.
+    if (idleTime !== SLEEP_NEVER_MS) {
+      idleTimer.current = window.setTimeout(() => {
+        setIdle(true)
+      }, idleTime)
+    }
+  }, [idleTime])
 
+  // Start the initial timer when we mount.
+  // Clear any ongoing timer when we unmount.
+  useEffect(() => {
+    startOrResetTimer()
+    return () => {
       if (idleTimer.current != null) {
         window.clearTimeout(idleTimer.current)
       }
-
-      // See RQA-3813 and associated PR.
-      if (idleTime !== SLEEP_NEVER_MS) {
-        idleTimer.current = window.setTimeout(() => {
-          setIdle(true)
-        }, idleTime)
-      }
     }
+  }, [startOrResetTimer])
 
-    events.forEach(event => {
-      document.addEventListener(event, handleEvents)
-    })
-
-    return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, handleEvents)
-      })
-    }
-  }, [events, idleTime])
+  // Reset the timer whenever there's user activity.
+  const handleActivity = useCallback(() => {
+    setIdle(false)
+    startOrResetTimer()
+  }, [startOrResetTimer])
+  useActivityListener(handleActivity, events)
 
   return idle
 }
