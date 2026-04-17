@@ -66,6 +66,7 @@ from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D,
 )
+from opentrons.protocol_engine.state.containment_utils import is_fully_contained
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
@@ -1158,9 +1159,46 @@ class LabwareView:
                 and labware_definition.parameters.quirks is not None
                 and "vacuumModuleDock" in labware_definition.parameters.quirks
             ):
-                raise ValueError("Labware not compatible with vacuum module dock")
+                raise errors.LabwareIsNotAllowedInLocationError(
+                    f'Labware "{labware_definition.parameters.loadName}" is not compatible with '
+                    f"the vacuum module dock ({location.addressableAreaName}).\n"
+                )
 
         return True
+
+    def raise_if_labware_is_contained(self, labware_id: str) -> None:
+        """Raise an error if this labware is currently contained inside another labware.
+
+        This prevents moving an inner labware (e.g. collection_plate inside collar)
+        while it is still physically contained via containedSpace.
+        """
+        labware = self.get(labware_id)
+        if not labware:
+            return
+
+        labware_definition = self.get_definition(labware_id)
+        # Check every other loaded labware to see if any contains this one
+        for container in self.get_all():
+            if container.id == labware_id:
+                continue
+
+            if container.location != labware.location:
+                continue
+
+            container_definition = self.get_definition(container.id)
+            if container_definition.containedSpace is None:
+                continue
+
+            # If this labware fits inside the container's containedSpace, block the move
+            if is_fully_contained(
+                resident_def=labware_definition,
+                boundary_space=container_definition.containedSpace,
+            ):
+                raise errors.LabwareIsContainedError(
+                    f'Cannot move "{labware.loadName}" because it is currently contained '
+                    f'inside "{container.loadName}".\n'
+                    f'Move the outer container ("{container.loadName}") first.'
+                )
 
     def raise_if_stacker_labware_pool_is_not_valid(
         self,

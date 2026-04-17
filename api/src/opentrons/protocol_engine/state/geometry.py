@@ -17,7 +17,6 @@ from opentrons_shared_data.errors.exceptions import (
 )
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
-    ContainedSpace,
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
@@ -93,6 +92,7 @@ from ..types.liquid_level_detection import LiquidTrackingType, SimulatedProbeRes
 from ._well_math import nozzles_per_well, wells_covered_by_pipette_configuration
 from .addressable_areas import AddressableAreaView
 from .config import Config
+from .containment_utils import is_fully_contained
 from .inner_well_math_utils import (
     find_height_inner_well_geometry,
     find_height_user_defined_volumes,
@@ -910,72 +910,6 @@ class GeometryView:
                 details={"eventual-location": repr(labware.location)},
             )
 
-    def get_parent_from_location(self, location: LabwareLocation) -> str:
-        """Resolves a LabwareLocation down to its root Addressable Area Name."""
-        current_loc = location
-        seen: Set[str] = set()
-
-        while isinstance(current_loc, OnLabwareLocation):
-            parent_id = current_loc.labwareId
-            if parent_id in seen:
-                raise InvalidLabwarePositionError(
-                    f"Cycle detected in labware positioning at location: {location}"
-                )
-
-            seen.add(parent_id)
-            parent_labware = self._labware.get(parent_id)
-            current_loc = parent_labware.location
-
-        if isinstance(current_loc, DeckSlotLocation):
-            return current_loc.slotName.id
-        elif isinstance(current_loc, AddressableAreaLocation):
-            return current_loc.addressableAreaName
-        elif isinstance(current_loc, ModuleFixtureLocation):
-            return current_loc.addressable_area_name
-        elif isinstance(current_loc, ModuleLocation):
-            return self._modules.get_provided_addressable_area(current_loc.moduleId)
-
-        else:
-            raise LabwareNotOnDeckError(
-                "Provided location is not linked to an addressable area on the deck.",
-                details={"terminal-location": repr(current_loc)},
-            )
-
-    def _is_fully_contained(
-        self, resident_def: LabwareDefinition, boundary_space: ContainedSpace
-    ) -> bool:
-        """Validates that the resident fits entirely within the boundary_space box.
-
-        All coordinates are relative to the parent's (0,0,0).
-        """
-        # TODO: Add LabwareSchemaV3 support
-        if isinstance(resident_def, LabwareDefinition3):
-            return True
-        # Resident Extents (Standard labware starts at 0,0,0 relative to parent)
-        res_min_x, res_max_x = 0.0, resident_def.dimensions.xDimension
-        res_min_y, res_max_y = 0.0, resident_def.dimensions.yDimension
-        res_min_z, res_max_z = 0.0, resident_def.dimensions.zDimension
-
-        # Boundary Extents (The 'hole' defined in the JSON)
-        bound_min_x = boundary_space.origin.x
-        bound_max_x = bound_min_x + boundary_space.dimensions.xDimension
-
-        bound_min_y = boundary_space.origin.y
-        bound_max_y = bound_min_y + boundary_space.dimensions.yDimension
-
-        bound_min_z = boundary_space.origin.z
-        bound_max_z = bound_min_z + boundary_space.dimensions.zDimension
-
-        # Logical Check: Resident must be bounded by the boundary planes
-        return (
-            res_min_x >= bound_min_x
-            and res_max_x <= bound_max_x
-            and res_min_y >= bound_min_y
-            and res_max_y <= bound_max_y
-            and res_min_z >= bound_min_z
-            and res_max_z <= bound_max_z
-        )
-
     def ensure_location_not_occupied(  # noqa: C901
         self,
         location: _LabwareLocation,
@@ -1047,7 +981,7 @@ class GeometryView:
 
                         # Standard Nesting: Loading a resident into an existing container
                         if existing_contained is not None:
-                            if not self._is_fully_contained(
+                            if not is_fully_contained(
                                 resident_def=new_labware_def,
                                 boundary_space=existing_contained,
                             ):
@@ -1057,7 +991,7 @@ class GeometryView:
                                 )
                         # Contained Logic: Loading a container over an existing resident
                         elif new_contained is not None:
-                            if not self._is_fully_contained(
+                            if not is_fully_contained(
                                 resident_def=child_def, boundary_space=new_contained
                             ):
                                 raise errors.LocationIsOccupiedError(
