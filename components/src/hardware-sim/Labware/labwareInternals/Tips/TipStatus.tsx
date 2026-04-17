@@ -20,7 +20,7 @@ interface TipStatusProps {
   type: TipType
   wellMap: LabwareWellMap
   wellName: string
-  size?: string
+  size: string
   text?: string
 }
 
