@@ -53,7 +53,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
-import { OnDeviceLoginPage } from '../pages/ODD/Login'
+import { OnDeviceLoginPage } from '/app/pages/ODD/OnDeviceLoginPage'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
