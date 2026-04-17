@@ -471,39 +471,45 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing10}
           >
-            {conflictedFixture && isFlex ? (
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing10}
-              >
-                <StatusLabel
-                  status={t('location_conflict')}
-                  backgroundColor={COLORS.yellow30}
-                  iconColor={COLORS.yellow60}
-                  textColor={COLORS.yellow60}
-                />
-                <TertiaryButton
-                  width="max-content"
-                  onClick={() => {
-                    setShowLocationConflictModal(true)
-                  }}
-                >
-                  <LegacyStyledText forwardedAs="label" cursor="pointer">
-                    {t('resolve')}
-                  </LegacyStyledText>
-                </TertiaryButton>
-              </Flex>
-            ) : moduleModel === MAGNETIC_BLOCK_V1 ? (
-              <StatusLabel
-                status={t('n_a')}
-                backgroundColor={COLORS.grey30}
-                textColor={COLORS.grey60}
-                showIcon={false}
-                capitalizeStatus={false}
-              />
-            ) : (
-              renderModuleStatus
-            )}
+            {(() => {
+              if (conflictedFixture && isFlex) {
+                return (
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing10}
+                  >
+                    <StatusLabel
+                      status={t('location_conflict')}
+                      backgroundColor={COLORS.yellow30}
+                      iconColor={COLORS.yellow60}
+                      textColor={COLORS.yellow60}
+                    />
+                    <TertiaryButton
+                      width="max-content"
+                      onClick={() => {
+                        setShowLocationConflictModal(true)
+                      }}
+                    >
+                      <LegacyStyledText forwardedAs="label" cursor="pointer">
+                        {t('resolve')}
+                      </LegacyStyledText>
+                    </TertiaryButton>
+                  </Flex>
+                )
+              }
+              if (moduleModel === MAGNETIC_BLOCK_V1) {
+                return (
+                  <StatusLabel
+                    status={t('n_a')}
+                    backgroundColor={COLORS.grey30}
+                    textColor={COLORS.grey60}
+                    showIcon={false}
+                    capitalizeStatus={false}
+                  />
+                )
+              }
+              return renderModuleStatus
+            })()}
           </Flex>
         </Flex>
       </Box>

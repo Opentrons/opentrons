@@ -115,19 +115,22 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
       {/* when commandSummary happens on a trash bin */}
       {isPipetteOverTrashBin &&
       selectedRunTimeCommand != null &&
-      trashCutoutId != null ? (
-        robotType === FLEX_ROBOT_TYPE ? (
-          <FixtureCommandSummary
-            commandType={selectedRunTimeCommand.commandType}
-            cutoutId={trashCutoutId as CutoutId}
-            type="trashBin"
-          />
-        ) : (
-          <Ot2FixedTrashCommandSummary
-            commandType={selectedRunTimeCommand.commandType}
-            cutoutId={trashCutoutId as CutoutId}
-          />
-        )
+      trashCutoutId != null &&
+      robotType === FLEX_ROBOT_TYPE ? (
+        <FixtureCommandSummary
+          commandType={selectedRunTimeCommand.commandType}
+          cutoutId={trashCutoutId as CutoutId}
+          type="trashBin"
+        />
+      ) : null}
+      {isPipetteOverTrashBin &&
+      selectedRunTimeCommand != null &&
+      trashCutoutId != null &&
+      robotType !== FLEX_ROBOT_TYPE ? (
+        <Ot2FixedTrashCommandSummary
+          commandType={selectedRunTimeCommand.commandType}
+          cutoutId={trashCutoutId as CutoutId}
+        />
       ) : null}
       {/* when commandSummary happens on a waste chute */}
       {isPipetteOverWasteChute &&

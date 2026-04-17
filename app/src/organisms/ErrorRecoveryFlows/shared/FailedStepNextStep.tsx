@@ -27,12 +27,15 @@ export function FailedStepNextStep({
     stepCounts.currentStepNumber == null
       ? undefined
       : stepCounts.currentStepNumber + n
-  const nthCommand = (n: number): typeof failedCommandByAnalysis =>
-    commandsAfterFailedCommand != null
-      ? n < commandsAfterFailedCommand.length
-        ? commandsAfterFailedCommand[n]
-        : null
-      : null
+  const nthCommand = (n: number): typeof failedCommandByAnalysis => {
+    if (commandsAfterFailedCommand == null) {
+      return null
+    }
+    if (n < commandsAfterFailedCommand.length) {
+      return commandsAfterFailedCommand[n]
+    }
+    return null
+  }
 
   const commandsAfter = [nthCommand(0), nthCommand(1)] as const
 

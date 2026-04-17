@@ -71,9 +71,15 @@ const Template: Story<MultiDeckLabelTagBtnsStoryProps> = args => {
       <RobotInfoLabel
         key={`deck-label-${i}`}
         highlight={i === 1}
-        iconName={
-          i === 0 ? 'stacked' : i === 1 ? 'ot-heater-shaker' : 'ot-absorbance'
-        }
+        iconName={(() => {
+          if (i === 0) {
+            return 'stacked'
+          }
+          if (i === 1) {
+            return 'ot-heater-shaker'
+          }
+          return 'ot-absorbance'
+        })()}
       />
     )
   }

@@ -22,18 +22,22 @@ export function ErrorContent({
   return (
     <>
       <LegacyStyledText forwardedAs="p" className={styles.error_info_text}>
-        {isSingleError
-          ? t('error_info', {
+        {(() => {
+          if (isSingleError) {
+            return t('error_info', {
               errorType: errors[0].errorType,
               errorCode: errors[0].errorCode,
             })
-          : runStatus === RUN_STATUS_SUCCEEDED
-            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
-                count: errors.length,
-              })
-            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
-                count: errors.length,
-              })}
+          }
+          if (runStatus === RUN_STATUS_SUCCEEDED) {
+            return t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+              count: errors.length,
+            })
+          }
+          return t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+            count: errors.length,
+          })
+        })()}
       </LegacyStyledText>
       <div className={styles.error_container}>
         <div className={styles.error_list}>

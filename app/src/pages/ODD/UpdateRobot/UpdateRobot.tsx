@@ -38,42 +38,52 @@ export function UpdateRobot(): JSX.Element {
 
   return (
     <Flex padding={SPACING.spacing40}>
-      {errorString !== null ? (
-        <ErrorUpdateSoftware errorMessage={errorString}>
-          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-            <MediumButton
-              flex="1"
-              buttonType="secondary"
-              buttonText={t('cancel_software_update')}
-              onClick={() => {
-                dispatch(clearRobotUpdateSession())
+      {(() => {
+        if (errorString !== null) {
+          return (
+            <ErrorUpdateSoftware errorMessage={errorString}>
+              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+                <MediumButton
+                  flex="1"
+                  buttonType="secondary"
+                  buttonText={t('cancel_software_update')}
+                  onClick={() => {
+                    dispatch(clearRobotUpdateSession())
+                    navigate(-1)
+                  }}
+                />
+                <MediumButton
+                  flex="1"
+                  onClick={() => {
+                    setErrorString(null)
+                    dispatchStartRobotUpdate(robotName)
+                  }}
+                  buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
+                />
+              </Flex>
+            </ErrorUpdateSoftware>
+          )
+        }
+        if (
+          localRobot === null ||
+          localRobot.status === UNREACHABLE ||
+          robotUpdateType !== 'upgrade'
+        ) {
+          return (
+            <NoUpdateFound
+              onContinue={() => {
                 navigate(-1)
               }}
             />
-            <MediumButton
-              flex="1"
-              onClick={() => {
-                setErrorString(null)
-                dispatchStartRobotUpdate(robotName)
-              }}
-              buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
-            />
-          </Flex>
-        </ErrorUpdateSoftware>
-      ) : localRobot === null ||
-        localRobot.status === UNREACHABLE ||
-        robotUpdateType !== 'upgrade' ? (
-        <NoUpdateFound
-          onContinue={() => {
-            navigate(-1)
-          }}
-        />
-      ) : (
-        <UpdateRobotSoftware
-          localRobot={localRobot}
-          afterError={setErrorString}
-        />
-      )}
+          )
+        }
+        return (
+          <UpdateRobotSoftware
+            localRobot={localRobot}
+            afterError={setErrorString}
+          />
+        )
+      })()}
     </Flex>
   )
 }

@@ -599,11 +599,16 @@ function PrepareToRun({
 
   const doorStatus = useIsDoorOpen(robotName)
 
-  const parametersDetail = hasRunTimeParameters
-    ? hasCustomRunTimeParameters
-      ? t('custom_values')
-      : t('default_values')
-    : t('no_parameters_specified')
+  const getParametersDetail = (): string => {
+    if (!hasRunTimeParameters) {
+      return t('no_parameters_specified')
+    }
+    if (hasCustomRunTimeParameters) {
+      return t('custom_values')
+    }
+    return t('default_values')
+  }
+  const parametersDetail = getParametersDetail()
 
   return (
     <>

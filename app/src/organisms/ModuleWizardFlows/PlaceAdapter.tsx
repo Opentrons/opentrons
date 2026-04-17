@@ -237,21 +237,27 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
             </AnimationVideo>
           </Flex>
         }
-        bodyText={
-          attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE ? (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush_heater_shaker')}
-            </LegacyStyledText>
-          ) : attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE ? (
-            <LegacyStyledText css={BODY_STYLE}>
-              {t('place_flush_thermocycler')}
-            </LegacyStyledText>
-          ) : (
+        bodyText={(() => {
+          if (attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE) {
+            return (
+              <LegacyStyledText css={BODY_STYLE}>
+                {t('place_flush_heater_shaker')}
+              </LegacyStyledText>
+            )
+          }
+          if (attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE) {
+            return (
+              <LegacyStyledText css={BODY_STYLE}>
+                {t('place_flush_thermocycler')}
+              </LegacyStyledText>
+            )
+          }
+          return (
             <LegacyStyledText css={BODY_STYLE}>
               {t('place_flush')}
             </LegacyStyledText>
           )
-        }
+        })()}
         proceedButtonText={t('confirm_placement')}
         proceed={handleOnClick}
         proceedIsDisabled={maintenanceRunId == null}

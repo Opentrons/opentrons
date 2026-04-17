@@ -231,11 +231,15 @@ const SUBBUTTON_LABEL_STYLE = (
   isSelected: boolean,
   buttonSubLabel: RadioButtonSubLabel
 ): FlattenSimpleInterpolation => css`
-  color: ${disabled
-    ? COLORS.grey50
-    : isSelected
-      ? COLORS.white
-      : COLORS.grey60};
+  color: ${(() => {
+    if (disabled) {
+      return COLORS.grey50
+    }
+    if (isSelected) {
+      return COLORS.white
+    }
+    return COLORS.grey60
+  })()};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${buttonSubLabel?.align === 'vertical' ? 2 : 1};

@@ -41,11 +41,13 @@ export function ParametersTable({
     const count = choices.length
 
     if (count > 0) {
-      return count > 2
-        ? t != null
-          ? t('num_options', { num: count })
-          : `${count} options`
-        : orderRuntimeParameterRangeOptions(choices)
+      if (count > 2) {
+        if (t != null) {
+          return t('num_options', { num: count })
+        }
+        return `${count} options`
+      }
+      return orderRuntimeParameterRangeOptions(choices)
     }
 
     switch (type) {

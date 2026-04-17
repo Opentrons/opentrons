@@ -42,14 +42,18 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
         low: `${MIN_ENGAGE_HEIGHT_V2} ${mmUnits}`,
         high: `${MAX_ENGAGE_HEIGHT_V2} ${mmUnits}`,
       })
-  const engageHeightDefault =
-    defaultEngageHeight != null
-      ? isGen1
-        ? t('magnet_recommended', { default: defaultEngageHeight })
-        : t('magnet_recommended', {
-            default: `${defaultEngageHeight} ${mmUnits}`,
-          })
-      : ''
+  const getEngageHeightDefault = (): string => {
+    if (defaultEngageHeight == null) {
+      return ''
+    }
+    if (isGen1) {
+      return t('magnet_recommended', { default: defaultEngageHeight })
+    }
+    return t('magnet_recommended', {
+      default: `${defaultEngageHeight} ${mmUnits}`,
+    })
+  }
+  const engageHeightDefault = getEngageHeightDefault()
   const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
 
   return (

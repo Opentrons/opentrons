@@ -54,11 +54,15 @@ export function InterventionCommandMessage({
         {t('notes')}
       </LegacyStyledText>
       <LegacyStyledText css={INTERVENTION_COMMAND_MESSAGE_STYLE}>
-        {commandMessage != null && commandMessage !== ''
-          ? commandMessage.length > 220
-            ? `${commandMessage.substring(0, 217)}...`
-            : commandMessage
-          : t('wait_for_resume')}
+        {(() => {
+          if (commandMessage == null || commandMessage === '') {
+            return t('wait_for_resume')
+          }
+          if (commandMessage.length > 220) {
+            return `${commandMessage.substring(0, 217)}...`
+          }
+          return commandMessage
+        })()}
       </LegacyStyledText>
     </Flex>
   )

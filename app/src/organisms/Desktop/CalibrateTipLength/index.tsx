@@ -154,36 +154,43 @@ export function CalibrateTipLength({
         />
       }
     >
-      {showSpinner || currentStep == null || Panel == null ? (
-        <LoadingState />
-      ) : showConfirmExit ? (
-        <ConfirmExit
-          exit={confirmExit}
-          back={cancelExit}
-          heading={t('progress_will_be_lost', {
-            sessionType: t('tip_length_calibration'),
-          })}
-          body={t('confirm_exit_before_completion', {
-            sessionType: t('tip_length_calibration'),
-          })}
-        />
-      ) : errorInfo != null ? (
-        <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
-      ) : (
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          tipRack={tipRack}
-          calBlock={calBlock}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          supportedCommands={supportedCommands}
-          calInvalidationHandler={offsetInvalidationHandler}
-          allowChangeTipRack={allowChangeTipRack}
-        />
-      )}
+      {(() => {
+        if (showSpinner || currentStep == null || Panel == null) {
+          return <LoadingState />
+        }
+        if (showConfirmExit) {
+          return (
+            <ConfirmExit
+              exit={confirmExit}
+              back={cancelExit}
+              heading={t('progress_will_be_lost', {
+                sessionType: t('tip_length_calibration'),
+              })}
+              body={t('confirm_exit_before_completion', {
+                sessionType: t('tip_length_calibration'),
+              })}
+            />
+          )
+        }
+        if (errorInfo != null) {
+          return <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
+        }
+        return (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            tipRack={tipRack}
+            calBlock={calBlock}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            supportedCommands={supportedCommands}
+            calInvalidationHandler={offsetInvalidationHandler}
+            allowChangeTipRack={allowChangeTipRack}
+          />
+        )
+      })()}
     </ModalShell>,
     getTopPortalEl()
   )

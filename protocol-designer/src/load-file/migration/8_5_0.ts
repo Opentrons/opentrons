@@ -103,12 +103,19 @@ const getClippedFlowRateForMoveLiquid = (args: {
   )
   let correctionVolume: number = 0
   if (tipLiquidSpecs != null && flowRateType !== 'blowout') {
-    const liquidClassLookup =
-      flowRateType === 'dispense'
-        ? path === 'multiDispense'
-          ? (tipLiquidSpecs.multiDispense ?? tipLiquidSpecs.singleDispense)
-          : tipLiquidSpecs.singleDispense
-        : tipLiquidSpecs.aspirate
+    const getLiquidClassLookup = ():
+      | typeof tipLiquidSpecs.aspirate
+      | typeof tipLiquidSpecs.singleDispense
+      | typeof tipLiquidSpecs.multiDispense => {
+      if (flowRateType !== 'dispense') {
+        return tipLiquidSpecs.aspirate
+      }
+      if (path === 'multiDispense') {
+        return tipLiquidSpecs.multiDispense ?? tipLiquidSpecs.singleDispense
+      }
+      return tipLiquidSpecs.singleDispense
+    }
+    const liquidClassLookup = getLiquidClassLookup()
     const conditioningByVolume =
       path === 'multiDispense'
         ? (tipLiquidSpecs.multiDispense?.conditioningByVolume ?? [])
@@ -134,10 +141,12 @@ const getClippedFlowRateForMoveLiquid = (args: {
     })
 
     correctionVolume =
-      linearInterpolate(
-        referenceVolumes.correction[flowRateType],
-        liquidClassLookup.correctionByVolume as Array<[number, number]>
-      ) ?? 0
+      liquidClassLookup != null
+        ? (linearInterpolate(
+            referenceVolumes.correction[flowRateType],
+            liquidClassLookup.correctionByVolume as Array<[number, number]>
+          ) ?? 0)
+        : 0
   }
 
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(

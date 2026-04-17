@@ -236,11 +236,15 @@ export const mixInPlaceUtil = (args: {
           pipetteId: pipette,
           volume,
           flowRate: dispenseFlowRateUlSec,
-          ...(i < times - 1
-            ? { pushOut: 0 }
-            : finalPushOut == null
-              ? {}
-              : { pushOut: finalPushOut }), // only push out if final repetition
+          ...(() => {
+            if (i < times - 1) {
+              return { pushOut: 0 }
+            }
+            if (finalPushOut == null) {
+              return {}
+            }
+            return { pushOut: finalPushOut }
+          })(), // only push out if final repetition
           ...(correctionVolumeDispense > 0
             ? { correctionVolume: correctionVolumeDispense }
             : {}),

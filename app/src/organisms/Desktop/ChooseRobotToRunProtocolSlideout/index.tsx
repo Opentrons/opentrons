@@ -239,71 +239,71 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 
   const footer = (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {hasRunTimeParameters ? (
-        currentPage === 1 ? (
-          <>
-            {offsetsComponent}
-            <PrimaryButton
-              onClick={() => {
-                setCurrentPage(2)
-              }}
-              width="100%"
-              disabled={
-                isCreatingRun ||
-                selectedRobot == null ||
-                isSelectedRobotOnDifferentSoftwareVersion
-              }
-            >
-              {t('shared:continue_to_param')}
-            </PrimaryButton>
-          </>
-        ) : (
-          <Flex
-            gridGap={SPACING.spacing8}
-            flexDirection={DIRECTION_ROW}
-            whiteSpace={NO_WRAP}
+      {hasRunTimeParameters && currentPage === 1 ? (
+        <>
+          {offsetsComponent}
+          <PrimaryButton
+            onClick={() => {
+              setCurrentPage(2)
+            }}
+            width="100%"
+            disabled={
+              isCreatingRun ||
+              selectedRobot == null ||
+              isSelectedRobotOnDifferentSoftwareVersion
+            }
           >
-            <SecondaryButton
-              onClick={() => {
-                setCurrentPage(1)
-              }}
-              width="50%"
-            >
-              {t('shared:change_robot')}
-            </SecondaryButton>
-            <PrimaryButton
-              width="50%"
-              onClick={handleProceed}
-              disabled={hasParamError || hasMissingFileParam}
-              {...targetProps}
-            >
-              {isCreatingRun ? (
-                <Flex
-                  gridGap={SPACING.spacing4}
-                  alignItems={ALIGN_CENTER}
-                  whiteSpace={NO_WRAP}
-                  marginLeft={`-${SPACING.spacing4}`}
-                >
-                  <Icon name="ot-spinner" spin size="1rem" />
-                  {t('shared:confirm_values')}
-                </Flex>
-              ) : (
-                t('shared:confirm_values')
-              )}
-            </PrimaryButton>
-            {hasMissingFileParam ? (
-              <Tooltip tooltipProps={tooltipProps}>
-                {t('add_required_csv_file')}
-              </Tooltip>
-            ) : null}
-          </Flex>
-        )
-      ) : (
+            {t('shared:continue_to_param')}
+          </PrimaryButton>
+        </>
+      ) : null}
+      {hasRunTimeParameters && currentPage !== 1 ? (
+        <Flex
+          gridGap={SPACING.spacing8}
+          flexDirection={DIRECTION_ROW}
+          whiteSpace={NO_WRAP}
+        >
+          <SecondaryButton
+            onClick={() => {
+              setCurrentPage(1)
+            }}
+            width="50%"
+          >
+            {t('shared:change_robot')}
+          </SecondaryButton>
+          <PrimaryButton
+            width="50%"
+            onClick={handleProceed}
+            disabled={hasParamError || hasMissingFileParam}
+            {...targetProps}
+          >
+            {isCreatingRun ? (
+              <Flex
+                gridGap={SPACING.spacing4}
+                alignItems={ALIGN_CENTER}
+                whiteSpace={NO_WRAP}
+                marginLeft={`-${SPACING.spacing4}`}
+              >
+                <Icon name="ot-spinner" spin size="1rem" />
+                {t('shared:confirm_values')}
+              </Flex>
+            ) : (
+              t('shared:confirm_values')
+            )}
+          </PrimaryButton>
+          {hasMissingFileParam ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('add_required_csv_file')}
+            </Tooltip>
+          ) : null}
+        </Flex>
+      ) : null}
+      {!hasRunTimeParameters ? (
         <>
           {offsetsComponent}
           {singlePageButton}
         </>
-      )}
+      ) : null}
     </Flex>
   )
 

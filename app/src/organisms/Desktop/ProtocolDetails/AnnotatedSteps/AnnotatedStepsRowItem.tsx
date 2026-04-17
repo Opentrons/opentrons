@@ -16,62 +16,70 @@ export function AnnotatedStepsRowItem(
   return (
     <div style={style} {...ariaAttributes}>
       <div className={styles.annotated_steps_row}>
-        {row.type === 'group' ? (
-          <AnnotatedGroup
-            scrollTargetId={data.scrollTargetId}
-            listElement={data.listElement}
-            analysis={data.analysis}
-            annotationType={row.annotationType}
-            subCommands={row.group.subCommands}
-            commandStartNumber={row.commandStartNumber}
-            allRunDefs={data.allRunDefs}
-            setSelectedCommand={data.setSelectedCommand}
-            handlePause={data.handlePause}
-            annotationDescription={row.annotationDescription}
-          />
-        ) : row.type === 'command' ? (
-          <IndividualCommand
-            scrollTargetId={data.scrollTargetId}
-            listElement={data.listElement}
-            fromGroup={false}
-            command={row.command}
-            isHighlighted={row.isHighlighted}
-            analysis={data.analysis}
-            allRunDefs={data.allRunDefs}
-            setSelectedCommand={data.setSelectedCommand}
-            commandNumber={row.commandNumber}
-          />
-        ) : (
-          <div className={styles.annotated_steps_error_wrapper}>
-            {row.errors.map(error => (
-              <div
-                className={styles.annotated_steps_error_container}
-                key={error.id}
-                onClick={() => {
-                  data.onShowErrorDetails()
-                }}
-              >
-                <div className={styles.annotated_steps_header}>
-                  <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
-                  <StyledText
-                    desktopStyle="captionSemiBold"
-                    color={COLORS.red60}
-                  >
-                    {data.t('step_error')}
+        {(() => {
+          if (row.type === 'group') {
+            return (
+              <AnnotatedGroup
+                scrollTargetId={data.scrollTargetId}
+                listElement={data.listElement}
+                analysis={data.analysis}
+                annotationType={row.annotationType}
+                subCommands={row.group.subCommands}
+                commandStartNumber={row.commandStartNumber}
+                allRunDefs={data.allRunDefs}
+                setSelectedCommand={data.setSelectedCommand}
+                handlePause={data.handlePause}
+                annotationDescription={row.annotationDescription}
+              />
+            )
+          }
+          if (row.type === 'command') {
+            return (
+              <IndividualCommand
+                scrollTargetId={data.scrollTargetId}
+                listElement={data.listElement}
+                fromGroup={false}
+                command={row.command}
+                isHighlighted={row.isHighlighted}
+                analysis={data.analysis}
+                allRunDefs={data.allRunDefs}
+                setSelectedCommand={data.setSelectedCommand}
+                commandNumber={row.commandNumber}
+              />
+            )
+          }
+          return (
+            <div className={styles.annotated_steps_error_wrapper}>
+              {row.errors.map(error => (
+                <div
+                  className={styles.annotated_steps_error_container}
+                  key={error.id}
+                  onClick={() => {
+                    data.onShowErrorDetails()
+                  }}
+                >
+                  <div className={styles.annotated_steps_header}>
+                    <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
+                    <StyledText
+                      desktopStyle="captionSemiBold"
+                      color={COLORS.red60}
+                    >
+                      {data.t('step_error')}
+                    </StyledText>
+                  </div>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {error.detail}
                   </StyledText>
                 </div>
+              ))}
+              <div className={styles.annotated_steps_final_command}>
                 <StyledText desktopStyle="bodyDefaultRegular">
-                  {error.detail}
+                  {data.t('unable_to_show_steps_past_errors')}
                 </StyledText>
               </div>
-            ))}
-            <div className={styles.annotated_steps_final_command}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {data.t('unable_to_show_steps_past_errors')}
-              </StyledText>
             </div>
-          </div>
-        )}
+          )
+        })()}
       </div>
     </div>
   )

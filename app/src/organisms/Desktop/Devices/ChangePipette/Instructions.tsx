@@ -144,37 +144,40 @@ export function Instructions(props: Props): JSX.Element {
                     }}
                   />
 
-                  {direction === 'attach' && currentStepCount === 1 ? (
-                    channels === 8 ? (
-                      <Flex flexDirection={DIRECTION_ROW}>
-                        <Trans
-                          t={t}
-                          i18nKey="tighten_screws_multi"
-                          components={{
-                            strong: (
-                              <strong
-                                style={{
-                                  fontWeight: TYPOGRAPHY.fontWeightSemiBold,
-                                }}
-                              />
-                            ),
-                            block: (
-                              <LegacyStyledText
-                                forwardedAs="p"
-                                marginTop={SPACING.spacing16}
-                              />
-                            ),
-                          }}
-                        />
-                      </Flex>
-                    ) : (
-                      <LegacyStyledText
-                        marginTop={SPACING.spacing16}
-                        forwardedAs="p"
-                      >
-                        {t('tighten_screws_single')}
-                      </LegacyStyledText>
-                    )
+                  {direction === 'attach' &&
+                  currentStepCount === 1 &&
+                  channels === 8 ? (
+                    <Flex flexDirection={DIRECTION_ROW}>
+                      <Trans
+                        t={t}
+                        i18nKey="tighten_screws_multi"
+                        components={{
+                          strong: (
+                            <strong
+                              style={{
+                                fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+                              }}
+                            />
+                          ),
+                          block: (
+                            <LegacyStyledText
+                              forwardedAs="p"
+                              marginTop={SPACING.spacing16}
+                            />
+                          ),
+                        }}
+                      />
+                    </Flex>
+                  ) : null}
+                  {direction === 'attach' &&
+                  currentStepCount === 1 &&
+                  channels !== 8 ? (
+                    <LegacyStyledText
+                      marginTop={SPACING.spacing16}
+                      forwardedAs="p"
+                    >
+                      {t('tighten_screws_single')}
+                    </LegacyStyledText>
                   ) : null}
                 </Flex>
               </InstructionStep>

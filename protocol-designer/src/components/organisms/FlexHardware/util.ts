@@ -281,11 +281,16 @@ function handleWasteChuteStagingAreaComboRemoval(
   state: CutoutFixtureState,
   props: UpdateInitialDeckSetupProps
 ): void {
-  const targetFixtureName = WASTE_CHUTE_FIXTURES.includes(state.newFixtureName!)
-    ? 'stagingArea'
-    : STAGING_AREA_FIXTURES.includes(state.newFixtureName!)
-      ? 'wasteChute'
-      : null
+  const getTargetFixtureName = (): string | null => {
+    if (WASTE_CHUTE_FIXTURES.includes(state.newFixtureName!)) {
+      return 'stagingArea'
+    }
+    if (STAGING_AREA_FIXTURES.includes(state.newFixtureName!)) {
+      return 'wasteChute'
+    }
+    return null
+  }
+  const targetFixtureName = getTargetFixtureName()
   const fixtureToDelete =
     targetFixtureName != null
       ? state.matchingFixturesOnDeck.find(f => f.name === targetFixtureName)

@@ -30,12 +30,15 @@ import type { AxiosRequestConfig } from 'axios'
 
 type Env = 'production' | 'development' | 'staging'
 
-const getEnv = (): Env =>
-  _NODE_ENV_ === 'production'
-    ? 'production'
-    : _NODE_ENV_ === 'development'
-      ? 'development'
-      : 'staging'
+const getEnv = (): Env => {
+  if (_NODE_ENV_ === 'production') {
+    return 'production'
+  }
+  if (_NODE_ENV_ === 'development') {
+    return 'development'
+  }
+  return 'staging'
+}
 
 const pickEndpoint = (endpoints: {
   production: string

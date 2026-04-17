@@ -255,22 +255,24 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           }`
         )
       }
-      rightHandBody={
-        isFetching ? (
-          <Skeleton
-            width="100%"
-            height="14.375rem"
-            backgroundSize={BACKGROUND_SIZE}
-          />
-        ) : is96ChannelPipette ? (
-          getPipetteAnimations96({
+      rightHandBody={(() => {
+        if (isFetching) {
+          return (
+            <Skeleton
+              width="100%"
+              height="14.375rem"
+              backgroundSize={BACKGROUND_SIZE}
+            />
+          )
+        }
+        if (is96ChannelPipette) {
+          return getPipetteAnimations96({
             section: pipetteWizardStep.section,
             flowType,
           })
-        ) : (
-          getPipetteAnimations({ pipetteWizardStep, channel })
-        )
-      }
+        }
+        return getPipetteAnimations({ pipetteWizardStep, channel })
+      })()}
       bodyText={bodyText}
       backIsDisabled={isFetching}
       back={goBack}

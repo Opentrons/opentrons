@@ -153,12 +153,16 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     id =>
       labware[id] != null && labwareEntities[id].labwareDefURI === topLabwareURI
   ).length
-  const quantity =
-    hopperGroups != null
-      ? hopperGroups.length
-      : stackQuantity > 0
-        ? stackQuantity
-        : (lidStackCommand?.params?.quantity ?? 1)
+  const getQuantity = (): number => {
+    if (hopperGroups != null) {
+      return hopperGroups.length
+    }
+    if (stackQuantity > 0) {
+      return stackQuantity
+    }
+    return lidStackCommand?.params?.quantity ?? 1
+  }
+  const quantity = getQuantity()
   const adapterId = labware[topLabwareOnSlotId].stack.find(
     id =>
       labwareEntities[id]?.def.allowedRoles?.includes('adapter') &&

@@ -707,22 +707,19 @@ export function ChooseProtocolSlideoutComponent(
         </ApiHostProvider>
       }
     >
-      {showSlideout ? (
-        currentPage === 1 ? (
-          <StoredProtocolList
-            handleSelectProtocol={storedProtocol => {
-              if (!isCreatingRun) {
-                resetCreateRun()
-                setSelectedProtocol(storedProtocol)
-              }
-            }}
-            robot={robot}
-            {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
-          />
-        ) : (
-          pageTwoBody
-        )
+      {showSlideout && currentPage === 1 ? (
+        <StoredProtocolList
+          handleSelectProtocol={storedProtocol => {
+            if (!isCreatingRun) {
+              resetCreateRun()
+              setSelectedProtocol(storedProtocol)
+            }
+          }}
+          robot={robot}
+          {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
+        />
       ) : null}
+      {showSlideout && currentPage !== 1 ? pageTwoBody : null}
     </MultiSlideout>
   )
 }

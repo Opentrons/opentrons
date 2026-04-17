@@ -7,8 +7,15 @@ import type { FileDetails } from './scan-zip'
 
 const log = createLogger('system-udpate/from-usb/scan-device')
 
-const higherVersion = (a: FileDetails | null, b: FileDetails): FileDetails =>
-  a == null ? b : Semver.gt(a.version, b.version) ? a : b
+const higherVersion = (a: FileDetails | null, b: FileDetails): FileDetails => {
+  if (a == null) {
+    return b
+  }
+  if (Semver.gt(a.version, b.version)) {
+    return a
+  }
+  return b
+}
 
 const mostRecentUpdateOf = (candidates: FileDetails[]): FileDetails | null =>
   candidates.reduce<FileDetails | null>(

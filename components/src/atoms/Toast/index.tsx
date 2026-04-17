@@ -231,12 +231,16 @@ export function Toast(props: ToastProps): JSX.Element {
     },
   }
 
-  const headingText =
-    heading !== undefined
-      ? showODDStyle
-        ? truncateString(heading, 45, 40)
-        : heading
-      : ''
+  const getHeadingText = (): string => {
+    if (heading === undefined) {
+      return ''
+    }
+    if (showODDStyle) {
+      return truncateString(heading, 45, 40)
+    }
+    return heading
+  }
+  const headingText = getHeadingText()
 
   const calculatedDuration = (
     message: string,

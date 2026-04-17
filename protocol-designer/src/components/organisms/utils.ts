@@ -106,12 +106,16 @@ export const getLabwareCompatibleForEditHardware = (
 ): boolean => {
   const labwareDef = getLabwareOnSlot(labware, cutoutId)
   const labwareDefB1 = getLabwareOnSlot(labware, 'cutoutB1')
-  const moduleType =
-    newModule != null
-      ? newModule.addressableAreaId === 'thermocyclerModuleV2'
-        ? THERMOCYCLER_MODULE_TYPE
-        : getModuleType(newModule.cutoutFixtureId as ModuleModel)
-      : null
+  const getModuleTypeFromConfig = (): ModuleType | null => {
+    if (newModule == null) {
+      return null
+    }
+    if (newModule.addressableAreaId === 'thermocyclerModuleV2') {
+      return THERMOCYCLER_MODULE_TYPE
+    }
+    return getModuleType(newModule.cutoutFixtureId as ModuleModel)
+  }
+  const moduleType = getModuleTypeFromConfig()
 
   let labwareCompatible = true
   if (moduleType != null && moduleType === THERMOCYCLER_MODULE_TYPE) {

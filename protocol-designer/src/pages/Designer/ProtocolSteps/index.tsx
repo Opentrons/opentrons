@@ -285,15 +285,19 @@ export function ProtocolSteps({
             <Flex
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing24}
-              width={
-                (isZoomedIn && !isOffDeck) ||
-                (selectedTerminalItemId === HARDWARE_ID &&
-                  robotType === OT2_ROBOT_TYPE)
-                  ? '90%'
-                  : isZoomedIn && isOffDeck
-                    ? '100%'
-                    : CONTENT_MAX_WIDTH
-              }
+              width={(() => {
+                if (
+                  (isZoomedIn && !isOffDeck) ||
+                  (selectedTerminalItemId === HARDWARE_ID &&
+                    robotType === OT2_ROBOT_TYPE)
+                ) {
+                  return '90%'
+                }
+                if (isZoomedIn && isOffDeck) {
+                  return '100%'
+                }
+                return CONTENT_MAX_WIDTH
+              })()}
               justifyContent={JUSTIFY_CENTER}
               paddingTop={
                 isZoomedIn || showTimelineAlerts ? '0' : SPACING.spacing60
@@ -340,22 +344,26 @@ export function ProtocolSteps({
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing16}
               >
-                {selectedTerminalItemId === HARDWARE_ID ? (
-                  <TimelineEditHardware />
-                ) : deckView === leftString ? (
-                  <DeckSetupContainer
-                    viewBox={viewBox}
-                    setViewBox={setViewBox}
-                    deckDef={deckDef}
-                    initialViewBox={initialViewBox}
-                    hoverSlot={hoverSlot}
-                    setHoverSlot={setHoverSlot}
-                    robotType={robotType}
-                    currentStep={currentStep}
-                  />
-                ) : (
-                  <OffDeck setOverflowMenu={showLiquidOverflowMenu} />
-                )}
+                {(() => {
+                  if (selectedTerminalItemId === HARDWARE_ID) {
+                    return <TimelineEditHardware />
+                  }
+                  if (deckView === leftString) {
+                    return (
+                      <DeckSetupContainer
+                        viewBox={viewBox}
+                        setViewBox={setViewBox}
+                        deckDef={deckDef}
+                        initialViewBox={initialViewBox}
+                        hoverSlot={hoverSlot}
+                        setHoverSlot={setHoverSlot}
+                        robotType={robotType}
+                        currentStep={currentStep}
+                      />
+                    )
+                  }
+                  return <OffDeck setOverflowMenu={showLiquidOverflowMenu} />
+                })()}
                 {isZoomedIn || selectedTerminalItemId === HARDWARE_ID ? null : (
                   <>
                     {/* avoid shifting the deck view container */}

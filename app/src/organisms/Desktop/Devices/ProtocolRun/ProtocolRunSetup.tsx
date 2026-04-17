@@ -586,26 +586,30 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size="1rem"
-          color={
-            props.disabledHardware
-              ? COLORS.red60
-              : props.missingHardware
-                ? COLORS.yellow60
-                : COLORS.grey60
-          }
+          color={(() => {
+            if (props.disabledHardware) {
+              return COLORS.red60
+            }
+            if (props.missingHardware) {
+              return COLORS.yellow60
+            }
+            return COLORS.grey60
+          })()}
           marginRight={SPACING.spacing8}
           name="ot-alert"
           id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
-          color={
-            props.disabledHardware
-              ? COLORS.red60
-              : props.missingHardware
-                ? COLORS.yellow60
-                : COLORS.grey60
-          }
+          color={(() => {
+            if (props.disabledHardware) {
+              return COLORS.red60
+            }
+            if (props.missingHardware) {
+              return COLORS.yellow60
+            }
+            return COLORS.grey60
+          })()}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
         >

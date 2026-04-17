@@ -59,13 +59,15 @@ export function DeprecatedCheckboxField(
     <label className={outerClassName}>
       <div className={innerDivClassName}>
         <Icon
-          name={
-            props.isIndeterminate
-              ? 'minus-box'
-              : props.value
-                ? 'ot-checkbox'
-                : 'checkbox-blank-outline'
-          }
+          name={(() => {
+            if (props.isIndeterminate) {
+              return 'minus-box'
+            }
+            if (props.value) {
+              return 'ot-checkbox'
+            }
+            return 'checkbox-blank-outline'
+          })()}
           width="100%"
         />
       </div>

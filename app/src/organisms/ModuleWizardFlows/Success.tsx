@@ -71,25 +71,28 @@ export function Success(props: SuccessProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
         <>
-          {newModules.length > 0 && attachedModuleOnLaunch == null ? (
-            isOnDevice ? (
-              <SmallButton
-                buttonType="secondary"
-                onClick={() => {
-                  handleOnClick(true)
-                }}
-                buttonText={t('setup_another_module')}
-              />
-            ) : (
-              <SecondaryButton
-                disabled={isRobotMoving}
-                onClick={() => {
-                  handleOnClick(true)
-                }}
-              >
-                {t('setup_another_module')}
-              </SecondaryButton>
-            )
+          {newModules.length > 0 &&
+          attachedModuleOnLaunch == null &&
+          isOnDevice ? (
+            <SmallButton
+              buttonType="secondary"
+              onClick={() => {
+                handleOnClick(true)
+              }}
+              buttonText={t('setup_another_module')}
+            />
+          ) : null}
+          {newModules.length > 0 &&
+          attachedModuleOnLaunch == null &&
+          !isOnDevice ? (
+            <SecondaryButton
+              disabled={isRobotMoving}
+              onClick={() => {
+                handleOnClick(true)
+              }}
+            >
+              {t('setup_another_module')}
+            </SecondaryButton>
           ) : null}
 
           {isOnDevice ? (

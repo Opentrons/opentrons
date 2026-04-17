@@ -9,12 +9,16 @@ import type {
 const usedChannelsFromCommand = (
   command: ConfigureNozzleLayoutRunTimeCommand | undefined,
   defaultChannels: number
-): number =>
-  command?.params?.configurationParams?.style === 'SINGLE'
-    ? 1
-    : command?.params?.configurationParams?.style === 'COLUMN'
-      ? 8
-      : defaultChannels
+): number => {
+  const style = command?.params?.configurationParams?.style
+  if (style === 'SINGLE') {
+    return 1
+  }
+  if (style === 'COLUMN') {
+    return 8
+  }
+  return defaultChannels
+}
 
 const usedChannelsForPipette = (
   pipetteId: string,

@@ -161,6 +161,19 @@ export function ProtocolDashboard(): JSX.Element {
     }
   }
 
+  const getSortIconName = (
+    activeSortKeys: ProtocolsOnDeviceSortKey[],
+    ascendingKey: ProtocolsOnDeviceSortKey
+  ): 'arrow-down' | 'arrow-up' | undefined => {
+    if (!activeSortKeys.includes(sortBy)) {
+      return undefined
+    }
+    if (sortBy === ascendingKey) {
+      return 'arrow-down'
+    }
+    return 'arrow-up'
+  }
+
   return (
     <>
       {showDeleteConfirmationModal ? (
@@ -235,13 +248,10 @@ export function ProtocolDashboard(): JSX.Element {
                         ? 'secondary'
                         : 'tertiaryLowLight'
                     }
-                    iconName={
-                      sortBy === 'alphabetical' || sortBy === 'reverse'
-                        ? sortBy === 'alphabetical'
-                          ? 'arrow-down'
-                          : 'arrow-up'
-                        : undefined
-                    }
+                    iconName={getSortIconName(
+                      ['alphabetical', 'reverse'],
+                      'alphabetical'
+                    )}
                     iconPlacement="endIcon"
                     onClick={handleSortByName}
                   />
@@ -254,13 +264,10 @@ export function ProtocolDashboard(): JSX.Element {
                         ? 'secondary'
                         : 'tertiaryLowLight'
                     }
-                    iconName={
-                      sortBy === 'recentRun' || sortBy === 'oldRun'
-                        ? sortBy === 'recentRun'
-                          ? 'arrow-down'
-                          : 'arrow-up'
-                        : undefined
-                    }
+                    iconName={getSortIconName(
+                      ['recentRun', 'oldRun'],
+                      'recentRun'
+                    )}
                     iconPlacement="endIcon"
                     onClick={handleSortByLastRun}
                   />
@@ -273,13 +280,10 @@ export function ProtocolDashboard(): JSX.Element {
                         ? 'secondary'
                         : 'tertiaryLowLight'
                     }
-                    iconName={
-                      sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                        ? sortBy === 'recentCreated'
-                          ? 'arrow-down'
-                          : 'arrow-up'
-                        : undefined
-                    }
+                    iconName={getSortIconName(
+                      ['recentCreated', 'oldCreated'],
+                      'recentCreated'
+                    )}
                     iconPlacement="endIcon"
                     onClick={handleSortByDate}
                   />
@@ -308,7 +312,8 @@ export function ProtocolDashboard(): JSX.Element {
                 })}
               </Flex>
             </>
-          ) : pinnedProtocols.length === 0 ? (
+          ) : null}
+          {sortedProtocols.length === 0 && pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
           <FloatingActionButton

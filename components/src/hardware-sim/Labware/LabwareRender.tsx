@@ -160,13 +160,15 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         }
       >
         <g
-          transform={
-            positioningMode === 'offsetInSlot'
-              ? shouldRotateAdapterOrientation
-                ? `translate(${-cornerOffsetFromSlot.x}, ${-cornerOffsetFromSlot.y})`
-                : `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
-              : undefined
-          }
+          transform={(() => {
+            if (positioningMode !== 'offsetInSlot') {
+              return undefined
+            }
+            if (shouldRotateAdapterOrientation) {
+              return `translate(${-cornerOffsetFromSlot.x}, ${-cornerOffsetFromSlot.y})`
+            }
+            return `translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`
+          })()}
           ref={gRef}
           onClick={onLabwareClick}
         >

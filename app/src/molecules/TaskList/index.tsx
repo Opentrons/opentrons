@@ -28,6 +28,34 @@ export type * from './types'
 
 const TASK_CONNECTOR_STYLE = `1px solid ${COLORS.grey40}`
 
+const getSubTaskBackgroundColor = (
+  isTaskListComplete: boolean,
+  isPastSubTask: boolean,
+  isSubTaskComplete: boolean | undefined
+): string => {
+  if (isTaskListComplete || isPastSubTask) {
+    return COLORS.blue50
+  }
+  if (isSubTaskComplete === true) {
+    return COLORS.grey40
+  }
+  return 'initial'
+}
+
+const getSubTaskConnectorColor = (
+  isFinalSubTaskOfTaskList: boolean,
+  isTaskListComplete: boolean,
+  isPastSubTask: boolean
+): string => {
+  if (isFinalSubTaskOfTaskList) {
+    return COLORS.transparent
+  }
+  if (isTaskListComplete || isPastSubTask) {
+    return COLORS.blue50
+  }
+  return COLORS.grey40
+}
+
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
   subTasks: SubTaskProps[]
@@ -143,14 +171,11 @@ function ProgressTrackerItem({
                   alignItems={ALIGN_CENTER}
                   justifyContent={JUSTIFY_CENTER}
                   // fill in circle for past or completed subtasks
-                  backgroundColor={
-                    // is in the past or list is complete
-                    isTaskListComplete || isPastSubTask
-                      ? COLORS.blue50
-                      : subTask.isComplete === true
-                        ? COLORS.grey40
-                        : 'initial'
-                  }
+                  backgroundColor={getSubTaskBackgroundColor(
+                    isTaskListComplete,
+                    isPastSubTask,
+                    subTask.isComplete
+                  )}
                   border={TASK_CONNECTOR_STYLE}
                   borderColor={isFutureSubTask ? COLORS.grey40 : COLORS.blue50}
                   borderWidth={SPACING.spacing2}
@@ -164,14 +189,11 @@ function ProgressTrackerItem({
                 <Flex
                   flex="1"
                   borderLeft={TASK_CONNECTOR_STYLE}
-                  borderColor={
-                    // do not show the subtask connector if it's the final subtask of the task list
-                    isFinalSubTaskOfTaskList
-                      ? COLORS.transparent
-                      : isTaskListComplete || isPastSubTask
-                        ? COLORS.blue50
-                        : COLORS.grey40
-                  }
+                  borderColor={getSubTaskConnectorColor(
+                    isFinalSubTaskOfTaskList,
+                    isTaskListComplete,
+                    isPastSubTask
+                  )}
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
                     // extend connector for last subtask
@@ -431,7 +453,8 @@ function Task({
               name={isTaskOpen ? 'chevron-up' : 'chevron-down'}
               height="15px"
             />
-          ) : (isTaskListComplete || isPastTask) && cta != null ? (
+          ) : null}
+          {!hasSubTasks && (isTaskListComplete || isPastTask) && cta != null ? (
             <>
               <Link
                 {...targetProps}

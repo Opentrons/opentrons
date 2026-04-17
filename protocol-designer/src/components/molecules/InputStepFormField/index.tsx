@@ -44,13 +44,19 @@ export function InputStepFormField(
     fillQuantityLocalState,
     ...otherProps
   } = props
-  const verifiedValue: string | number | null =
-    fillQuantityLocalState ??
-    (Array.isArray(value)
-      ? value.length
-      : typeof value === 'string' || typeof value === 'number'
-        ? value
-        : null)
+  const getVerifiedValue = (): string | number | null => {
+    if (fillQuantityLocalState != null) {
+      return fillQuantityLocalState
+    }
+    if (Array.isArray(value)) {
+      return value.length
+    }
+    if (typeof value === 'string' || typeof value === 'number') {
+      return value
+    }
+    return null
+  }
+  const verifiedValue = getVerifiedValue()
   const { t } = useTranslation('tooltip')
   return (
     <Flex padding={padding} width="100%">

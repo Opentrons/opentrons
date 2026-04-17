@@ -190,13 +190,15 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={
-        isOk
-          ? isReadyToBeReRun
-            ? COLORS.green35
-            : COLORS.yellow35
-          : COLORS.red35
-      }
+      backgroundColor={(() => {
+        if (!isOk) {
+          return COLORS.red35
+        }
+        if (isReadyToBeReRun) {
+          return COLORS.green35
+        }
+        return COLORS.yellow35
+      })()}
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadius16}
@@ -205,7 +207,15 @@ export function ProtocolWithLastRun({
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Chip
           paddingLeft="0"
-          type={isOk ? (isReadyToBeReRun ? 'success' : 'warning') : 'error'}
+          type={(() => {
+            if (!isOk) {
+              return 'error'
+            }
+            if (isReadyToBeReRun) {
+              return 'success'
+            }
+            return 'warning'
+          })()}
           background={false}
           text={i18n.format(chipText, 'capitalize')}
         />

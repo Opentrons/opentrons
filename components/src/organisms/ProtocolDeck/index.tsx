@@ -95,8 +95,10 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
                 protocolAnalysis.commands
               )
             : undefined,
-        moduleChildren: showLabwareLabels ? (
-          topLabwareDefinition != null && topLabwareInfo != null ? (
+        moduleChildren:
+          showLabwareLabels &&
+          topLabwareDefinition != null &&
+          topLabwareInfo != null ? (
             <AlignToModuleChildSlot
               deckId={deckDef.otId}
               slotId={slotName}
@@ -114,8 +116,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
                 }
               />
             </AlignToModuleChildSlot>
-          ) : null
-        ) : null,
+          ) : null,
       }
     }
   )

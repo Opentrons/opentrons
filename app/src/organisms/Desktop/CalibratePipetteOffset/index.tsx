@@ -149,36 +149,43 @@ export function CalibratePipetteOffset({
         />
       }
     >
-      {showSpinner || currentStep == null || Panel == null ? (
-        <LoadingState />
-      ) : showConfirmExit ? (
-        <ConfirmExit
-          exit={confirmExit}
-          back={cancelExit}
-          heading={t('progress_will_be_lost', {
-            sessionType: t('pipette_offset_calibration'),
-          })}
-          body={t('confirm_exit_before_completion', {
-            sessionType: t('pipette_offset_calibration'),
-          })}
-        />
-      ) : errorInfo != null ? (
-        <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
-      ) : (
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          tipRack={tipRack}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          calBlock={calBlock}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          robotName={robotName}
-          supportedCommands={supportedCommands}
-          defaultTipracks={instrument?.defaultTipracks}
-        />
-      )}
+      {(() => {
+        if (showSpinner || currentStep == null || Panel == null) {
+          return <LoadingState />
+        }
+        if (showConfirmExit) {
+          return (
+            <ConfirmExit
+              exit={confirmExit}
+              back={cancelExit}
+              heading={t('progress_will_be_lost', {
+                sessionType: t('pipette_offset_calibration'),
+              })}
+              body={t('confirm_exit_before_completion', {
+                sessionType: t('pipette_offset_calibration'),
+              })}
+            />
+          )
+        }
+        if (errorInfo != null) {
+          return <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
+        }
+        return (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={tipRack}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            calBlock={calBlock}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            robotName={robotName}
+            supportedCommands={supportedCommands}
+            defaultTipracks={instrument?.defaultTipracks}
+          />
+        )
+      })()}
     </ModalShell>,
     getTopPortalEl()
   )

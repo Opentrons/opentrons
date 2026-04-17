@@ -156,36 +156,43 @@ export function CalibrateDeck({
         />
       }
     >
-      {showSpinner || currentStep == null || Panel == null ? (
-        <LoadingState />
-      ) : showConfirmExit ? (
-        <ConfirmExit
-          exit={confirmExit}
-          back={cancelExit}
-          heading={t('progress_will_be_lost', {
-            sessionType: t('deck_calibration'),
-          })}
-          body={t('confirm_exit_before_completion', {
-            sessionType: t('deck_calibration'),
-          })}
-        />
-      ) : errorInfo != null ? (
-        <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
-      ) : (
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          tipRack={tipRack}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          supportedCommands={supportedCommands}
-          defaultTipracks={instrument?.defaultTipracks}
-          calInvalidationHandler={offsetInvalidationHandler}
-          allowChangeTipRack
-        />
-      )}
+      {(() => {
+        if (showSpinner || currentStep == null || Panel == null) {
+          return <LoadingState />
+        }
+        if (showConfirmExit) {
+          return (
+            <ConfirmExit
+              exit={confirmExit}
+              back={cancelExit}
+              heading={t('progress_will_be_lost', {
+                sessionType: t('deck_calibration'),
+              })}
+              body={t('confirm_exit_before_completion', {
+                sessionType: t('deck_calibration'),
+              })}
+            />
+          )
+        }
+        if (errorInfo != null) {
+          return <CalibrationError {...errorInfo} onClose={cleanUpAndExit} />
+        }
+        return (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={tipRack}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            supportedCommands={supportedCommands}
+            defaultTipracks={instrument?.defaultTipracks}
+            calInvalidationHandler={offsetInvalidationHandler}
+            allowChangeTipRack
+          />
+        )
+      })()}
     </ModalShell>,
     getTopPortalEl()
   )

@@ -377,7 +377,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />
-            ) : !hideBanners && module.hasAvailableUpdate && showFWBanner ? (
+            ) : null}
+            {!hideBanners &&
+            !(requireModuleCalibration || requireModuleSetup) &&
+            module.hasAvailableUpdate &&
+            showFWBanner ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="firmware"

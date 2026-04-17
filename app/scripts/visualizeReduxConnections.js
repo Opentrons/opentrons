@@ -35,11 +35,16 @@ assert(process.argv.length === 3, USAGE)
         if (m) {
           const reduxDep = m[1]
           const key = dir.match(new RegExp(`${searchDirPath}([^/]*)/?`))[1]
-          const value = map[key]
-            ? map[key].includes(reduxDep)
-              ? map[key]
-              : [...map[key], reduxDep]
-            : [reduxDep]
+          const getValue = () => {
+            if (!map[key]) {
+              return [reduxDep]
+            }
+            if (map[key].includes(reduxDep)) {
+              return map[key]
+            }
+            return [...map[key], reduxDep]
+          }
+          const value = getValue()
           map = { ...map, [key]: value }
         }
       }

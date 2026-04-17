@@ -33,11 +33,13 @@ export function CalibrationResult({
   const { t } = useTranslation('robot_calibration')
 
   const switchText = (calType: CalibrationType): string => {
-    return calType === 'deck'
-      ? 'deck_calibration'
-      : calType === 'pipetteOffset'
-        ? 'pipette_offset_title'
-        : 'tip_length'
+    if (calType === 'deck') {
+      return 'deck_calibration'
+    }
+    if (calType === 'pipetteOffset') {
+      return 'pipette_offset_title'
+    }
+    return 'tip_length'
   }
   return (
     <Flex

@@ -150,11 +150,17 @@ export const SetupModuleAndDeck = ({
       runHasStarted ||
       !moduleCalibrationStatus.complete ? (
         <Tooltip tooltipProps={tooltipProps}>
-          {runHasStarted
-            ? t('protocol_run_started')
-            : missingModuleIds.length > 0
-              ? t('plug_in_required_module', { count: missingModuleIds.length })
-              : t('calibrate_module_failure_reason')}
+          {(() => {
+            if (runHasStarted) {
+              return t('protocol_run_started')
+            }
+            if (missingModuleIds.length > 0) {
+              return t('plug_in_required_module', {
+                count: missingModuleIds.length,
+              })
+            }
+            return t('calibrate_module_failure_reason')
+          })()}
         </Tooltip>
       ) : null}
     </>

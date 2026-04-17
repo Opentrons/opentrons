@@ -69,14 +69,18 @@ export function RunFailedModal({
   const { commandErrorList, highestPriorityError } = runErrors
 
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
+  const getModalTitle = (): string => {
+    if (commandErrorList == null || commandErrorList?.length === 0) {
+      return t('run_failed_modal_title')
+    }
+    if (runStatus === RUN_STATUS_SUCCEEDED) {
+      return t('warning_details')
+    }
+    return t('error_details')
+  }
   const modalProps: ModalProps = {
     type: runStatus === RUN_STATUS_SUCCEEDED ? 'warning' : 'error',
-    title:
-      commandErrorList == null || commandErrorList?.length === 0
-        ? t('run_failed_modal_title')
-        : runStatus === RUN_STATUS_SUCCEEDED
-          ? t('warning_details')
-          : t('error_details'),
+    title: getModalTitle(),
     onClose: () => {
       toggleModal()
     },
@@ -100,13 +104,15 @@ export function RunFailedModal({
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <ErrorContent
-          errors={
-            highestPriorityError != null
-              ? [highestPriorityError]
-              : commandErrorList != null && commandErrorList.length > 0
-                ? commandErrorList
-                : []
-          }
+          errors={(() => {
+            if (highestPriorityError != null) {
+              return [highestPriorityError]
+            }
+            if (commandErrorList != null && commandErrorList.length > 0) {
+              return commandErrorList
+            }
+            return []
+          })()}
           isSingleError={!!highestPriorityError}
           runStatus={runStatus}
         />

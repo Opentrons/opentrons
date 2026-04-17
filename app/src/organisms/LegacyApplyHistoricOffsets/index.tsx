@@ -165,28 +165,27 @@ export function LegacyApplyHistoricOffsets(
                 >
                   {t('see_how_offsets_work')}
                 </ExternalLink>
-                {!noOffsetData ? (
-                  isLabwareOffsetCodeSnippetsOn ? (
-                    <LegacyLabwareOffsetTabs
-                      TableComponent={
-                        <LegacyLabwareOffsetTable
-                          offsetCandidates={offsetCandidates}
-                          labwareDefinitions={getLabwareDefinitionsFromCommands(
-                            commands
-                          )}
-                        />
-                      }
-                      JupyterComponent={JupyterSnippet}
-                      CommandLineComponent={CommandLineSnippet}
-                    />
-                  ) : (
-                    <LegacyLabwareOffsetTable
-                      offsetCandidates={offsetCandidates}
-                      labwareDefinitions={getLabwareDefinitionsFromCommands(
-                        commands
-                      )}
-                    />
-                  )
+                {!noOffsetData && isLabwareOffsetCodeSnippetsOn ? (
+                  <LegacyLabwareOffsetTabs
+                    TableComponent={
+                      <LegacyLabwareOffsetTable
+                        offsetCandidates={offsetCandidates}
+                        labwareDefinitions={getLabwareDefinitionsFromCommands(
+                          commands
+                        )}
+                      />
+                    }
+                    JupyterComponent={JupyterSnippet}
+                    CommandLineComponent={CommandLineSnippet}
+                  />
+                ) : null}
+                {!noOffsetData && !isLabwareOffsetCodeSnippetsOn ? (
+                  <LegacyLabwareOffsetTable
+                    offsetCandidates={offsetCandidates}
+                    labwareDefinitions={getLabwareDefinitionsFromCommands(
+                      commands
+                    )}
+                  />
                 ) : null}
               </Flex>
             </ModalShell>,

@@ -204,11 +204,15 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .hoverBackgroundColor};
 
-      border: ${buttonType === 'stroke'
-        ? `2px solid ${COLORS.blue55}`
-        : buttonType === 'primary'
-          ? `4px solid ${COLORS.blue55}`
-          : computedBorderStyle()};
+      border: ${(() => {
+        if (buttonType === 'stroke') {
+          return `2px solid ${COLORS.blue55}`
+        }
+        if (buttonType === 'primary') {
+          return `4px solid ${COLORS.blue55}`
+        }
+        return computedBorderStyle()
+      })()};
     }
 
     &:focus-visible {

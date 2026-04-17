@@ -32,12 +32,15 @@ interface EnvEndpoints {
   staging: string
 }
 
-const getEnv = (): Env =>
-  _NODE_ENV_ === 'production'
-    ? 'production'
-    : _NODE_ENV_ === 'development'
-      ? 'development'
-      : 'staging'
+const getEnv = (): Env => {
+  if (_NODE_ENV_ === 'production') {
+    return 'production'
+  }
+  if (_NODE_ENV_ === 'development') {
+    return 'development'
+  }
+  return 'staging'
+}
 
 const pickEndpoint = (endpoints: EnvEndpoints): string => endpoints[getEnv()]
 

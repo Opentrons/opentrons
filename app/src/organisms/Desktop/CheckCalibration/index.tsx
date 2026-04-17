@@ -193,35 +193,41 @@ export function CheckCalibration(
         />
       }
     >
-      {showSpinner || currentStep == null || Panel == null ? (
-        <LoadingState />
-      ) : showConfirmExit ? (
-        <ConfirmExit
-          exit={confirmExit}
-          back={cancelExit}
-          heading={t('progress_will_be_lost', {
-            sessionType: t('calibration_health_check'),
-          })}
-          body={t('confirm_exit_before_completion', {
-            sessionType: t('calibration_health_check'),
-          })}
-        />
-      ) : (
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          tipRack={activeTipRack}
-          calBlock={calBlock}
-          isMulti={isMulti}
-          mount={activePipette?.mount.toLowerCase() as Mount}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          checkBothPipettes={checkBothPipettes}
-          instruments={instruments}
-          comparisonsByPipette={comparisonsByPipette}
-          activePipette={activePipette}
-        />
-      )}
+      {(() => {
+        if (showSpinner || currentStep == null || Panel == null) {
+          return <LoadingState />
+        }
+        if (showConfirmExit) {
+          return (
+            <ConfirmExit
+              exit={confirmExit}
+              back={cancelExit}
+              heading={t('progress_will_be_lost', {
+                sessionType: t('calibration_health_check'),
+              })}
+              body={t('confirm_exit_before_completion', {
+                sessionType: t('calibration_health_check'),
+              })}
+            />
+          )
+        }
+        return (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={activeTipRack}
+            calBlock={calBlock}
+            isMulti={isMulti}
+            mount={activePipette?.mount.toLowerCase() as Mount}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            checkBothPipettes={checkBothPipettes}
+            instruments={instruments}
+            comparisonsByPipette={comparisonsByPipette}
+            activePipette={activePipette}
+          />
+        )
+      })()}
     </ModalShell>,
     getTopPortalEl()
   )

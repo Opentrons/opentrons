@@ -25,19 +25,25 @@ export function useFailedPipetteUtils(
 ): UseFailedPipetteUtilsResult {
   const { failedCommandByRunRecord, runId } = props
 
-  const failedPipetteId =
-    failedCommandByRunRecord != null
-      ? 'pipetteId' in failedCommandByRunRecord.params
-        ? failedCommandByRunRecord.params.pipetteId
-        : null
-      : null
+  const getFailedPipetteId = (): string | null => {
+    if (failedCommandByRunRecord == null) {
+      return null
+    }
+    if ('pipetteId' in failedCommandByRunRecord.params) {
+      return failedCommandByRunRecord.params.pipetteId
+    }
+    return null
+  }
+  const failedPipetteId = getFailedPipetteId()
 
   const { data: runCurrentState } = useRunCurrentState(runId, {
     enabled: failedPipetteId != null,
   })
 
   const relevantActiveNozzleLayout =
-    runCurrentState?.data.activeNozzleLayouts[failedPipetteId] ?? null
+    failedPipetteId != null
+      ? (runCurrentState?.data.activeNozzleLayouts[failedPipetteId] ?? null)
+      : null
 
   const failedPipetteInfo = getFailedCommandPipetteInfo(props)
 

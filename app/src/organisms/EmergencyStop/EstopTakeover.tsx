@@ -55,24 +55,32 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const localRobotName = localRobot?.name ?? 'no name'
 
-  const targetEstopModal =
-    estopState === NOT_PRESENT ? (
-      <EstopMissingModal
-        robotName={robotName != null ? robotName : localRobotName}
-        closeModal={closeModal}
-        isDismissedModal={isDismissedModal}
-        setIsDismissedModal={setIsDismissedModal}
-      />
-    ) : estopState !== DISENGAGED || isWaitingForResumeOperation ? (
-      <EstopPressedModal
-        isEngaged={estopState === PHYSICALLY_ENGAGED}
-        closeModal={closeModal}
-        isWaitingForResumeOperation={isWaitingForResumeOperation}
-        setIsWaitingForResumeOperation={() => {
-          setIsWatingForResumeOperation(true)
-        }}
-      />
-    ) : null
+  const getTargetEstopModal = (): JSX.Element | null => {
+    if (estopState === NOT_PRESENT) {
+      return (
+        <EstopMissingModal
+          robotName={robotName != null ? robotName : localRobotName}
+          closeModal={closeModal}
+          isDismissedModal={isDismissedModal}
+          setIsDismissedModal={setIsDismissedModal}
+        />
+      )
+    }
+    if (estopState !== DISENGAGED || isWaitingForResumeOperation) {
+      return (
+        <EstopPressedModal
+          isEngaged={estopState === PHYSICALLY_ENGAGED}
+          closeModal={closeModal}
+          isWaitingForResumeOperation={isWaitingForResumeOperation}
+          setIsWaitingForResumeOperation={() => {
+            setIsWatingForResumeOperation(true)
+          }}
+        />
+      )
+    }
+    return null
+  }
+  const targetEstopModal = getTargetEstopModal()
 
   return (
     <>

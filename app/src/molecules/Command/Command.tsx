@@ -50,13 +50,18 @@ export type CommandProps = SkeletonCommandProps | NonSkeletonCommandProps
 export function Command(props: CommandProps): JSX.Element {
   // This uses the dynamic function variant to work with storybook
   const isOnDevice = RESPONSIVENESS.isTouchscreenDynamic()
-  return props.state === 'loading' ? (
-    <Skeleton width="100%" height={SKELETON_HEIGHT} backgroundSize="47rem" />
-  ) : props.aligned === 'left' ? (
-    <LeftAlignedCommand {...props} isOnDevice={isOnDevice} />
-  ) : (
-    <CenteredCommand {...props} isOnDevice={isOnDevice} />
-  )
+
+  if (props.state === 'loading') {
+    return (
+      <Skeleton width="100%" height={SKELETON_HEIGHT} backgroundSize="47rem" />
+    )
+  }
+
+  if (props.aligned === 'left') {
+    return <LeftAlignedCommand {...props} isOnDevice={isOnDevice} />
+  }
+
+  return <CenteredCommand {...props} isOnDevice={isOnDevice} />
 }
 
 const ICON_SIZE_ODD = SPACING.spacing32

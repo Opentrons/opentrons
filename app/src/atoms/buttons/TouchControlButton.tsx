@@ -54,6 +54,16 @@ const getFocusBorderColor = (
   return COLORS.white
 }
 
+const getTextColor = (isActive: boolean, isOnDevice: boolean): string => {
+  if (isActive && !isOnDevice) {
+    return COLORS.blue50
+  }
+  if (isOnDevice && isActive) {
+    return COLORS.white
+  }
+  return COLORS.black90
+}
+
 const StyledTouchButton = styled(Btn)<{
   isActive: boolean
   isOnDevice: boolean
@@ -115,13 +125,7 @@ export function TouchControlButton(props: TouchControlProps): JSX.Element {
       <StyledText
         oddStyle="bodyTextSemiBold"
         desktopStyle="bodyDefaultSemiBold"
-        color={
-          isActive && !isOnDevice
-            ? COLORS.blue50
-            : isOnDevice && isActive
-              ? COLORS.white
-              : COLORS.black90
-        }
+        color={getTextColor(isActive, isOnDevice)}
       >
         {title}
       </StyledText>

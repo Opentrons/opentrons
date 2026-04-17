@@ -197,20 +197,24 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
         </Flex>
         <Flex>
           <TipPositionZOnlyView
-            mmFromBottom={
-              isPositionFromTop
-                ? undefined
-                : value !== null
-                  ? Number(value)
-                  : defaultMm
-            }
-            mmFromTop={
-              isPositionFromTop
-                ? value !== null
-                  ? Number(value)
-                  : defaultMm
-                : undefined
-            }
+            mmFromBottom={(() => {
+              if (isPositionFromTop) {
+                return undefined
+              }
+              if (value !== null) {
+                return Number(value)
+              }
+              return defaultMm
+            })()}
+            mmFromTop={(() => {
+              if (!isPositionFromTop) {
+                return undefined
+              }
+              if (value !== null) {
+                return Number(value)
+              }
+              return defaultMm
+            })()}
             wellDepthMm={wellDepthMm}
           />
         </Flex>

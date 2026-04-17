@@ -46,13 +46,17 @@ export function RunFailedModal({
   ) {
     return null
   }
+  const getModalTitle = (): string => {
+    if (commandErrorList == null || commandErrorList?.data.length === 0) {
+      return t('run_failed_modal_title')
+    }
+    if (runStatus === RUN_STATUS_SUCCEEDED) {
+      return t('warning_details')
+    }
+    return t('error_details')
+  }
   const modalHeader: OddModalHeaderBaseProps = {
-    title:
-      commandErrorList == null || commandErrorList?.data.length === 0
-        ? t('run_failed_modal_title')
-        : runStatus === RUN_STATUS_SUCCEEDED
-          ? t('warning_details')
-          : t('error_details'),
+    title: getModalTitle(),
   }
 
   const highestPriorityError = getHighestPriorityError(errors ?? [])
@@ -83,13 +87,15 @@ export function RunFailedModal({
       <div className={styles.container}>
         <div className={styles.error_content}>
           <ErrorContent
-            errors={
-              highestPriorityError
-                ? [highestPriorityError]
-                : commandErrorList?.data && commandErrorList?.data.length > 0
-                  ? commandErrorList?.data
-                  : []
-            }
+            errors={(() => {
+              if (highestPriorityError) {
+                return [highestPriorityError]
+              }
+              if (commandErrorList?.data && commandErrorList?.data.length > 0) {
+                return commandErrorList?.data
+              }
+              return []
+            })()}
             isSingleError={!!highestPriorityError}
             runStatus={runStatus}
           />

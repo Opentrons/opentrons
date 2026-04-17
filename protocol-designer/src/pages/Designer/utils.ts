@@ -221,12 +221,15 @@ export const getSlotInformation = (
     slotPosition: slotPosition,
     isSlotAHopper,
     matchingLabwareFor4thColumn: matchingLabware,
-    createdStackForSlot:
-      slot === 'offDeck'
-        ? []
-        : offDeckLabware != null
-          ? [offDeckLabware.id]
-          : remainingLabwareIds,
+    createdStackForSlot: (() => {
+      if (slot === 'offDeck') {
+        return []
+      }
+      if (offDeckLabware != null) {
+        return [offDeckLabware.id]
+      }
+      return remainingLabwareIds
+    })(),
     createdLidForSlot:
       lidIdFromStack != null ? deckSetupLabware[lidIdFromStack] : undefined,
   }

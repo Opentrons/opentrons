@@ -134,38 +134,37 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           />
         ) : null}
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
-        {proceed != null && proceedButton == null ? (
-          isOnDevice ? (
-            <>
-              <SmallButton
-                disabled={proceedIsDisabled}
-                buttonText={proceedButtonText}
-                onClick={proceed}
-                {...targetProps}
-              />
-              {disableProceedReason != null && (
-                <Tooltip tooltipProps={tooltipProps}>
-                  {disableProceedReason}
-                </Tooltip>
-              )}
-            </>
-          ) : (
-            <>
-              <PrimaryButton
-                disabled={proceedIsDisabled}
-                css={CAPITALIZE_FIRST_LETTER_STYLE}
-                onClick={proceed}
-                {...targetProps}
-              >
-                {proceedButtonText}
-              </PrimaryButton>
-              {disableProceedReason != null && (
-                <Tooltip tooltipProps={tooltipProps}>
-                  {disableProceedReason}
-                </Tooltip>
-              )}
-            </>
-          )
+        {proceed != null && proceedButton == null && isOnDevice ? (
+          <>
+            <SmallButton
+              disabled={proceedIsDisabled}
+              buttonText={proceedButtonText}
+              onClick={proceed}
+              {...targetProps}
+            />
+            {disableProceedReason != null && (
+              <Tooltip tooltipProps={tooltipProps}>
+                {disableProceedReason}
+              </Tooltip>
+            )}
+          </>
+        ) : null}
+        {proceed != null && proceedButton == null && !isOnDevice ? (
+          <>
+            <PrimaryButton
+              disabled={proceedIsDisabled}
+              css={CAPITALIZE_FIRST_LETTER_STYLE}
+              onClick={proceed}
+              {...targetProps}
+            >
+              {proceedButtonText}
+            </PrimaryButton>
+            {disableProceedReason != null && (
+              <Tooltip tooltipProps={tooltipProps}>
+                {disableProceedReason}
+              </Tooltip>
+            )}
+          </>
         ) : null}
         {proceed == null && proceedButton != null ? proceedButton : null}
       </Flex>

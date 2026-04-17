@@ -732,11 +732,13 @@ export const pauseForTimeOrUntilTold = (
     )
     // user selected pause for amount of time
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
-    return totalSeconds <= 0
-      ? TIME_PARAM_REQUIRED
-      : isTimeFormat(fields.pauseTime)
-        ? null
-        : PAUSE_TIME_FORMAT
+    if (totalSeconds <= 0) {
+      return TIME_PARAM_REQUIRED
+    }
+    if (isTimeFormat(fields.pauseTime)) {
+      return null
+    }
+    return PAUSE_TIME_FORMAT
   } else if (
     'pauseAction' in fields &&
     fields.pauseAction === PAUSE_UNTIL_TEMP

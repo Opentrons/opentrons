@@ -43,12 +43,16 @@ export function generatePromptPreviewApplicationItems(
     application: { scientificApplication, otherApplication, description },
   } = watch()
 
-  const scientificOrOtherApplication =
-    scientificApplication === OTHER
-      ? otherApplication
-      : scientificApplication !== ''
-        ? t(scientificApplication)
-        : ''
+  const getScientificOrOtherApplication = (): string => {
+    if (scientificApplication === OTHER) {
+      return otherApplication
+    }
+    if (scientificApplication !== '') {
+      return t(scientificApplication)
+    }
+    return ''
+  }
+  const scientificOrOtherApplication = getScientificOrOtherApplication()
 
   return [
     scientificOrOtherApplication !== '' && scientificOrOtherApplication,
@@ -359,33 +363,41 @@ export function generateChatPrompt(
   const rightPipettePromptName =
     rightPipetteApiLoadName ?? values.instruments.rightPipette
 
-  const mounts: string[] =
-    values.instruments.pipettes === TWO_PIPETTES
-      ? [
-          values.instruments.leftPipette !== NO_PIPETTES
-            ? `left pipette ${leftPipettePromptName}`
-            : '',
-          values.instruments.rightPipette !== NO_PIPETTES
-            ? `right pipette ${rightPipettePromptName}`
-            : '',
-        ].filter(Boolean)
-      : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
-        ? [values.instruments.ninetySixChannelPipette]
-        : [values.instruments.pipettes]
+  const getMounts = (): string[] => {
+    if (values.instruments.pipettes === TWO_PIPETTES) {
+      return [
+        values.instruments.leftPipette !== NO_PIPETTES
+          ? `left pipette ${leftPipettePromptName}`
+          : '',
+        values.instruments.rightPipette !== NO_PIPETTES
+          ? `right pipette ${rightPipettePromptName}`
+          : '',
+      ].filter(Boolean)
+    }
+    if (values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE) {
+      return [values.instruments.ninetySixChannelPipette]
+    }
+    return [values.instruments.pipettes]
+  }
+  const mounts: string[] = getMounts()
 
-  const pipetteMounts =
-    values.instruments.pipettes === TWO_PIPETTES
-      ? [
-          values.instruments.leftPipette !== NO_PIPETTES &&
-            `- ${leftPipettePromptName} ${t('mounted_left')}`,
-          values.instruments.rightPipette !== NO_PIPETTES &&
-            `- ${rightPipettePromptName} ${t('mounted_right')}`,
-        ]
-          .filter(Boolean)
-          .join('\n')
-      : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
-        ? `- ${t(values.instruments.ninetySixChannelPipette)}`
-        : `- ${t(values.instruments.pipettes)}`
+  const getPipetteMounts = (): string => {
+    if (values.instruments.pipettes === TWO_PIPETTES) {
+      return [
+        values.instruments.leftPipette !== NO_PIPETTES &&
+          `- ${leftPipettePromptName} ${t('mounted_left')}`,
+        values.instruments.rightPipette !== NO_PIPETTES &&
+          `- ${rightPipettePromptName} ${t('mounted_right')}`,
+      ]
+        .filter(Boolean)
+        .join('\n')
+    }
+    if (values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE) {
+      return `- ${t(values.instruments.ninetySixChannelPipette)}`
+    }
+    return `- ${t(values.instruments.pipettes)}`
+  }
+  const pipetteMounts = getPipetteMounts()
   const flexGripper =
     values.instruments.flexGripper === FLEX_GRIPPER &&
     values.instruments.robot === OPENTRONS_FLEX
