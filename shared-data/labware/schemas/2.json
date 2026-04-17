@@ -466,6 +466,23 @@
           }
         }
       }
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Dimensions in mm (x, y, z)",
+      "required": ["xDimension", "yDimension", "zDimension"],
+      "properties": {
+        "yDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "zDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "xDimension": {
+          "$ref": "#/definitions/positiveNumber"
+        }
+      }
     }
   },
   "type": "object",
@@ -578,7 +595,7 @@
           "default": true
         },
         "isMovableAdapter": {
-          "description": "Flag marking whether a adapter can be moved by the gripper, defaults to false",
+          "description": "Flag marking whether this adapter can be moved by the gripper, defaults to false",
           "type": "boolean",
           "default": false
         },
@@ -603,21 +620,8 @@
       "$ref": "#/definitions/vector"
     },
     "dimensions": {
-      "type": "object",
-      "additionalProperties": false,
       "description": "Outer dimensions of a labware",
-      "required": ["xDimension", "yDimension", "zDimension"],
-      "properties": {
-        "yDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "zDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "xDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        }
-      }
+      "$ref": "#/definitions/dimensions"
     },
     "wells": {
       "type": "object",
@@ -760,28 +764,20 @@
       "type": ["object"],
       "description": "The extents and dimensions of the geometrical space within a labware that can house other labware.",
       "additionalProperties": false,
-      "required": ["origin", "dimensions"],
+      "required": ["type", "origin", "dimensions"],
       "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["rectangular"],
+          "description": "The geometric shape of the contained space. Currently only 'rectangular' is supported."
+        },
         "origin": {
           "$ref": "#/definitions/vector",
-          "description": "The point in 3D space where the contained space start from."
+          "description": "The origin of the contained space, expressed as an (x, y, z) offset in mm from the bottom-left-front corner of this labware's outer bounding box."
         },
         "dimensions": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Inner dimensions of a labware",
-          "required": ["xDimension", "yDimension", "zDimension"],
-          "properties": {
-            "yDimension": {
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "zDimension": {
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "xDimension": {
-              "$ref": "#/definitions/positiveNumber"
-            }
-          }
+          "$ref": "#/definitions/dimensions",
+          "description": "Inner dimensions of the contained space in mm."
         }
       }
     }

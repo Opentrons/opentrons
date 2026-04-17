@@ -120,6 +120,10 @@ class Quirks(Enum):
     disableGeometryBasedGripCheck = "disableGeometryBasedGripCheck"
 
 
+class ContainmentShape(StrEnum):
+    rectangular = "rectangular"
+
+
 class Metadata(BaseModel):
     displayName: str
     displayCategory: DisplayCategory
@@ -570,6 +574,7 @@ class Extents(BaseModel):
 
 
 class ContainedSpace(BaseModel):
+    shape: ContainmentShape
     origin: Vector3D
     dimensions: Dimensions
 
