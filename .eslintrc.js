@@ -29,6 +29,7 @@ module.exports = {
   reportUnusedDisableDirectives: true,
 
   rules: {
+    'no-nested-ternary': 'error',
     curly: 'error',
     camelcase: 'off',
     'no-var': 'error',
