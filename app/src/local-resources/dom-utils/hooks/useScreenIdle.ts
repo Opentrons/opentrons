@@ -5,24 +5,12 @@ import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
 import { useActivityListener } from './useActivityListener'
 
 const USER_EVENTS: Array<keyof DocumentEventMap> = [
-  'click',
-  'dblclick',
-  'keypress',
-  'mousemove',
-  'pointerover',
-  'pointerenter',
-  'pointerdown',
-  'pointermove',
-  'pointerout',
-  'pointerleave',
-  'scroll',
-  'touchmove',
-  'touchstart',
   'mousedown',
+  'click',
+  'scroll',
 ]
 
 const DEFAULT_OPTIONS = {
-  events: USER_EVENTS,
   initialState: true,
 }
 
@@ -30,17 +18,16 @@ const DEFAULT_OPTIONS = {
  * React hook to check user events
  *
  * @param {number} idleTime (idle time)
- * @param {object} options (events that the app need to check, initialState: initial state true => idle)
+ * @param {object} options (initialState: initial state true => idle)
  * @returns {boolean}
  */
 export function useScreenIdle(
   idleTime: number,
   options?: Partial<{
-    events: Array<keyof DocumentEventMap>
     initialState: boolean
   }>
 ): boolean {
-  const { events, initialState } = { ...DEFAULT_OPTIONS, ...options }
+  const { initialState } = { ...DEFAULT_OPTIONS, ...options }
   const [idle, setIdle] = useState<boolean>(initialState)
   const idleTimer = useRef<number>()
 
@@ -72,7 +59,7 @@ export function useScreenIdle(
     setIdle(false)
     startOrResetTimer()
   }, [startOrResetTimer])
-  useActivityListener(handleActivity, events)
+  useActivityListener(handleActivity, USER_EVENTS)
 
   return idle
 }

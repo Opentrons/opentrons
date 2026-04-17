@@ -5,14 +5,7 @@ import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
 
 import { useScreenIdle } from '../useScreenIdle'
 
-const MOCK_EVENTS: Array<keyof DocumentEventMap> = [
-  'mousedown',
-  'click',
-  'scroll',
-]
-
 const MOCK_OPTIONS = {
-  events: MOCK_EVENTS,
   initialState: false,
 }
 
