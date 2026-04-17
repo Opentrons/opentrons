@@ -32,6 +32,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="new"
+        size="20"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
         wellName="A1"
       />
@@ -43,6 +44,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="used"
+        size="20"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
         wellName="A1"
       />
@@ -54,6 +56,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="selected"
+        size="20"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
         wellName="A1"
       />
@@ -65,6 +68,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="no"
+        size="20"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
         wellName="A1"
       />
@@ -76,6 +80,7 @@ describe('TipStatus', () => {
     render(
       <TipStatus
         type="inaccessible"
+        size="20"
         wellMap={fixtureTiprack1000ul.wells as LabwareWellMap}
         wellName="A1"
       />

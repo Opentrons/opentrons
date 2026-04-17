@@ -28,8 +28,7 @@ import type {
   NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
@@ -123,6 +122,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
 
   if (
     isMultiChannelPipette &&
+    pipetteSpec &&
     !getIsSafePipetteMovement({
       robotState: prevRobotState,
       invariantContext,
