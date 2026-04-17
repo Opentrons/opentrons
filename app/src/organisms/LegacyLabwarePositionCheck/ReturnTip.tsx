@@ -214,10 +214,11 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
+  }
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PrepareSpace

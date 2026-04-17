@@ -567,8 +567,9 @@ export const _hasFormLevelErrors = (
       invariantContext.moduleEntities,
       invariantContext.labwareEntities
     ).length > 0
-  )
+  ) {
     return true
+  }
 
   if (
     hydratedForm.stepType === 'thermocycler' &&

@@ -338,8 +338,9 @@ export function replaceTCDStepsWithMoveLiquidStep(
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, formData => {
     const { stepType } = formData
-    if (!['transfer', 'consolidate', 'distribute'].includes(stepType))
+    if (!['transfer', 'consolidate', 'distribute'].includes(stepType)) {
       return formData
+    }
     const pathMap = {
       transfer: 'single',
       consolidate: 'multiAspirate',

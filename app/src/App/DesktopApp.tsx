@@ -178,8 +178,9 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
-  if (deviceRouteMatch == null || robot == null || robotName == null)
+  if (deviceRouteMatch == null || robot == null || robotName == null) {
     return null
+  }
 
   return (
     <ApiHostProvider
