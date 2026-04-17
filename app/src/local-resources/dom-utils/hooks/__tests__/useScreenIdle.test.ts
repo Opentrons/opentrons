@@ -1,5 +1,5 @@
-import { fireEvent, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
 
@@ -18,7 +18,11 @@ const MOCK_OPTIONS = {
 
 describe('useIdle', () => {
   beforeEach(() => {
-    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('should initially return the default initialState', () => {
@@ -39,13 +43,19 @@ describe('useIdle', () => {
 
     expect(result.current).toBe(false)
 
-    await vi.advanceTimersByTimeAsync(mockTime - 1)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(mockTime - 1)
+    })
     expect(result.current).toBe(false)
 
-    await vi.advanceTimersByTimeAsync(1)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1)
+    })
     expect(result.current).toBe(true)
 
-    fireEvent.click(document)
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(result.current).toBe(false)
   })
 
@@ -53,22 +63,38 @@ describe('useIdle', () => {
     const mockTime = 1000
     const { result } = renderHook(() => useScreenIdle(mockTime, MOCK_OPTIONS))
 
-    fireEvent.click(document)
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(result.current).toBe(false)
 
-    await vi.advanceTimersByTimeAsync(mockTime - 1)
-    fireEvent.click(document)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(mockTime - 1)
+    })
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(result.current).toBe(false)
 
-    await vi.advanceTimersByTimeAsync(mockTime - 1)
-    fireEvent.click(document)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(mockTime - 1)
+    })
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(result.current).toBe(false)
 
-    await vi.advanceTimersByTimeAsync(mockTime - 1)
-    fireEvent.click(document)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(mockTime - 1)
+    })
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(result.current).toBe(false)
 
-    await vi.advanceTimersByTimeAsync(mockTime)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(mockTime)
+    })
     expect(result.current).toBe(true)
   })
 
@@ -78,7 +104,9 @@ describe('useIdle', () => {
 
     expect(result.current).toBe(false)
 
-    await vi.advanceTimersByTimeAsync(SLEEP_NEVER_MS * 2)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SLEEP_NEVER_MS * 2)
+    })
     expect(result.current).toBe(false)
   })
 })

@@ -1,4 +1,4 @@
-import { fireEvent, renderHook } from '@testing-library/react'
+import { act, fireEvent, renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { useActivityListener } from '../useActivityListener'
@@ -10,10 +10,14 @@ describe('useActivityListener', () => {
       useActivityListener(onActivity, ['click'])
     })
 
-    fireEvent.click(document)
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(onActivity).toHaveBeenCalledTimes(1)
 
-    fireEvent.click(document)
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(onActivity).toHaveBeenCalledTimes(2)
   })
 
@@ -23,11 +27,15 @@ describe('useActivityListener', () => {
       useActivityListener(onActivity, ['click'])
     })
 
-    fireEvent.click(document)
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(onActivity).toHaveBeenCalledTimes(1)
 
     unmount()
-    fireEvent.click(document)
+    act(() => {
+      fireEvent.click(document)
+    })
     expect(onActivity).toHaveBeenCalledTimes(1)
   })
 })
