@@ -413,3 +413,20 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT use semicolons (Prettier removes them)
 - Do NOT use `console.log` or `debugger` in committed code
 - Do NOT omit curly braces for control statements — ESLint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
+- Do NOT use nested ternary expressions — extract to a function with early returns:
+
+```typescript
+// Bad
+const x = a ? 'a' : b ? 'b' : 'c'
+
+// Good
+const getX = (): string => {
+  if (a) {
+    return 'a'
+  }
+  if (b) {
+    return 'b'
+  }
+  return 'c'
+}
+```
