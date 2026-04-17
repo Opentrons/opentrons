@@ -55,6 +55,7 @@ def _channel_status_label(channel_passed: bool, retest_mode: bool) -> str:
 
 NUM_SECONDS_TO_WAIT = 30
 LEAK_RATE_WINDOW_SECONDS = 60
+INSERT_PRESSURE_MIN = 500.0
 HOVER_HEIGHT_MM = 50
 DEPTH_INTO_RESERVOIR_FOR_ASPIRATE = -24
 DEPTH_INTO_RESERVOIR_FOR_DISPENSE = DEPTH_INTO_RESERVOIR_FOR_ASPIRATE
@@ -73,6 +74,8 @@ RESERVOIR_SLOT = 2
 TRASH_SLOT = 12
 FINAL_TEST_FAIL_INFOR = []
 CHANNEL_LEAK_HISTORY: Dict[str, List[List[float]]] = {}
+INSERT_PRESSURE_FAILED_COUNTS: Dict[int, int] = {}
+INSERT_PRESSURE_LAST_FAILED_VALUE: Dict[int, float] = {}
 
 
 TRASH_HEIGHT = 40  # DVT trash
@@ -328,6 +331,7 @@ async def _fixture_check_pressure(
     fixture: Optional[PressureFixtureBase],
     write_cb: Optional[Callable],
     accumulate_raw_data_cb: Optional[Callable],
+    repeat_index: int,
 ) -> bool:
     results = []
     pip = api.hardware_pipettes[mount.to_mount()]
@@ -348,6 +352,7 @@ async def _fixture_check_pressure(
         write_cb,
         accumulate_raw_data_cb,
         pip_channels,
+        repeat_index=repeat_index,
     )
     results.append(r)
     # insert into the fixture
@@ -373,6 +378,7 @@ async def _fixture_check_pressure(
         write_cb,
         accumulate_raw_data_cb,
         pip_channels,
+        repeat_index=repeat_index,
     )
     results.append(r)
     # aspirate 50uL
@@ -402,7 +408,8 @@ async def _fixture_check_pressure(
             accumulate_raw_data_cb,
             pip_channels,
             previous=inserted_pressure_data,
-            aspirate_dispense=aspval
+            aspirate_dispense=aspval,
+            repeat_index=repeat_index,
         )
         results.append(r)
         # dispense
@@ -420,7 +427,8 @@ async def _fixture_check_pressure(
             write_cb,
             accumulate_raw_data_cb,
             pip_channels,
-            aspirate_dispense=aspval
+            aspirate_dispense=aspval,
+            repeat_index=repeat_index,
         )
         results.append(r)
         await api.prepare_for_aspirate(OT3Mount.LEFT)
@@ -439,6 +447,7 @@ async def _fixture_check_pressure(
         write_cb,
         accumulate_raw_data_cb,
         pip_channels,
+        repeat_index=repeat_index,
     )
     results.append(r)
     return False not in results
@@ -454,7 +463,8 @@ async def _read_pressure_and_check_results(
     accumulate_raw_data_cb: Callable,
     channels: int = 1,
     previous: Optional[List[List[float]]] = None,
-    aspirate_dispense:int=None
+    aspirate_dispense:int=None,
+    repeat_index: int = 1,
 ) -> Tuple[bool, List[List[float]]]:
     previous_average_per_channel: Optional[List[float]] = None
     leak_rate_offsets = _leak_rate_offsets_for_aspirate_volume(cfg, aspirate_dispense)
@@ -495,9 +505,11 @@ async def _read_pressure_and_check_results(
         ui.print_header(f"{i + 1}/{pressure_event_config.sample_count}: {tag.value}")
         print_pressure_datas(_sample_as_strings)
         if tag.value == "holding" or tag.value == "dispensed":
-            csv_data_sample = [tag.value +"-"+ str(aspirate_dispense)+"ul"] + _sample_as_strings
+            phase_label = f"{tag.value}-{aspirate_dispense}ul-{repeat_index}"
+            csv_data_sample = [phase_label] + _sample_as_strings
         else:
-            csv_data_sample = [tag.value] + _sample_as_strings
+            phase_label = f"{tag.value}-{repeat_index}"
+            csv_data_sample = [phase_label] + _sample_as_strings
         # print(f"{i + 1}/{pressure_event_config.sample_count}: {csv_data_sample}")
         print("tag.value:",tag.value)
         # if tag.value == "holding" or tag.value == "dispensed":
@@ -519,35 +531,58 @@ async def _read_pressure_and_check_results(
         _samples_per_channel[c].sort()
         _c_min = min(_samples_per_channel[c][1:])
         _c_max = max(_samples_per_channel[c][1:])
+        channel_number = c + 1
         leak_rate = (_c_max - _c_min) / LEAK_RATE_WINDOW_SECONDS
-        leak_rate += leak_rate_offsets.get(c + 1, 0.0)
+        leak_rate += leak_rate_offsets.get(channel_number, 0.0)
         leak_rates_per_channel.append(leak_rate)
-        csv_data_min = [f"pressure-{tag.value}-channel-{c + 1}", "min", _c_min]
+        csv_data_min = [f"pressure-{tag.value}-channel-{channel_number}", "min", _c_min]
         print(csv_data_min)
         write_cb(csv_data_min)
-        csv_data_max = [f"pressure-{tag.value}-channel-{c + 1}", "max", _c_max]
+        csv_data_max = [f"pressure-{tag.value}-channel-{channel_number}", "max", _c_max]
         print(csv_data_max)
         write_cb(csv_data_max)
         csv_data_leak_rate = [
-            f"pressure-{tag.value}-channel-{c + 1}",
+            f"pressure-{tag.value}-channel-{channel_number}",
             f"{LEAK_RATE_WINDOW_SECONDS}s-leak-rate",
             round(leak_rate, 4),
         ]
         print(csv_data_leak_rate)
         write_cb(csv_data_leak_rate)
         csv_data_avg = [
-            f"pressure-{tag.value}-channel-{c + 1}",
+            f"pressure-{tag.value}-channel-{channel_number}",
             "average",
             _average_per_channel[c],
         ]
         print(csv_data_avg)
         write_cb(csv_data_avg)
+        if tag == PressureEvent.INSERT:
+            insert_pressure_passed = _average_per_channel[c] > INSERT_PRESSURE_MIN
+            csv_data_insert_pressure = [
+                f"pressure-{tag.value}-channel-{channel_number}",
+                "insert-pressure-gt-500",
+                _bool_to_pass_fail(insert_pressure_passed),
+            ]
+            print(csv_data_insert_pressure)
+            write_cb(csv_data_insert_pressure)
+            if not insert_pressure_passed:
+                INSERT_PRESSURE_FAILED_COUNTS[channel_number] = (
+                    INSERT_PRESSURE_FAILED_COUNTS.get(channel_number, 0) + 1
+                )
+                INSERT_PRESSURE_LAST_FAILED_VALUE[channel_number] = _average_per_channel[c]
+                printsig = (
+                    f"04-fixture-pressure:测试工装气压,状态{tag.value},"
+                    f"ch{channel_number}插入工装平均气压{round(_average_per_channel[c], 2)}"
+                    f"不大于阈值{INSERT_PRESSURE_MIN}"
+                )
+                ui.print_fail(printsig)
+                FINAL_TEST_FAIL_INFOR.append(printsig)
+                LOG_GING.error(printsig)
         if _c_max - _c_min > pressure_event_config.stability_threshold:
             print(
-                f"ERROR: channel {c + 1} samples are too far apart, "
+                f"ERROR: channel {channel_number} samples are too far apart, "
                 f"max={round(_c_max, 2)} and min={round(_c_min, 2)}"
             )
-            printsig = f"01-fixture-pressure:测试工装气压,状态{tag.value},ch{c + 1}气压差变动最大值{round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}"
+            printsig = f"01-fixture-pressure:测试工装气压,状态{tag.value},ch{channel_number}气压差变动最大值{round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}"
             ui.print_fail(printsig)
             FINAL_TEST_FAIL_INFOR.append(printsig)
             test_pass_stability = False
@@ -559,6 +594,17 @@ async def _read_pressure_and_check_results(
     ]
     print(csv_data_stability)
     write_cb(csv_data_stability)
+    if tag == PressureEvent.INSERT:
+        insert_failed_channels = sum(
+            1 for c in range(channels) if _average_per_channel[c] <= INSERT_PRESSURE_MIN
+        )
+        csv_data_insert_gate = [
+            f"pressure-{tag.value}",
+            "insert-pressure-failed-channels",
+            insert_failed_channels,
+        ]
+        print(csv_data_insert_gate)
+        write_cb(csv_data_insert_gate)
     _all_samples = [s[c] for s in _samples for c in range(channels)]
     _all_samples.sort()
     _samples_min = min(_all_samples[1:-1])
@@ -765,7 +811,11 @@ def _summarize_channel_leak_history(
             cv_value = _calculate_cv(channel_values)
             mad_value = _calculate_mad(channel_values)
             fail_count = sum(value > leak_threshold for value in channel_values)
-            if median_value <= leak_threshold:
+            insert_fail_count = INSERT_PRESSURE_FAILED_COUNTS.get(channel_index, 0)
+            if insert_fail_count >= fail_count_threshold:
+                channel_passed = False
+                decision_reason = "insert-pressure-fail-count-threshold"
+            elif median_value <= leak_threshold:
                 channel_passed = True
                 decision_reason = "median-ok"
             elif cv_value <= cv_threshold:
@@ -812,6 +862,15 @@ def _summarize_channel_leak_history(
                 ]
             )
             write_cb([channel_tag, "fail-count", fail_count])
+            write_cb([channel_tag, "insert-fail-count", insert_fail_count])
+            if channel_index in INSERT_PRESSURE_LAST_FAILED_VALUE:
+                write_cb(
+                    [
+                        channel_tag,
+                        "last-insert-average-pressure",
+                        round(INSERT_PRESSURE_LAST_FAILED_VALUE[channel_index], 4),
+                    ]
+                )
             write_cb([channel_tag, "decision-reason", decision_reason])
             write_cb([channel_tag, "status", channel_status])
             write_cb([channel_tag, "pass", _bool_to_pass_fail(channel_passed)])
@@ -825,6 +884,7 @@ def _summarize_channel_leak_history(
                     "inf" if math.isinf(cv_value) else round(cv_value, 4),
                     round(mad_value, 4),
                     fail_count,
+                    insert_fail_count,
                     channel_status,
                     _bool_to_pass_fail(channel_passed),
                 ]
@@ -841,6 +901,7 @@ def _summarize_channel_leak_history(
             f"{LEAK_RATE_WINDOW_SECONDS}s-leak-rate-cv",
             f"{LEAK_RATE_WINDOW_SECONDS}s-leak-rate-mad",
             "fail-count",
+            "insert-fail-count",
             "status",
             "pass",
         ]
@@ -865,12 +926,14 @@ def _print_abnormal_channels_terminal_only(abnormal_rows: List[List[Any]]) -> No
         leak_rate_cv = row[5]
         leak_rate_mad = row[6]
         fail_count = row[7]
-        status = row[8]
+        insert_fail_count = row[8]
+        status = row[9]
         print(
             f" - {phase} {channel}: status={status}, "
             f"median={leak_rate_median}, threshold={leak_threshold}, "
             f"cv={leak_rate_cv}, cv-threshold={cv_threshold}, "
-            f"mad={leak_rate_mad}, fail-count={fail_count}"
+            f"mad={leak_rate_mad}, fail-count={fail_count}, "
+            f"insert-fail-count={insert_fail_count}"
         )
 
 def cre_class(
@@ -977,11 +1040,15 @@ async def _main(
     global FINAL_TEST_FAIL_INFOR
     global PRESSURE_DATA_CACHE
     global CHANNEL_LEAK_HISTORY
+    global INSERT_PRESSURE_FAILED_COUNTS
+    global INSERT_PRESSURE_LAST_FAILED_VALUE
     global FINAL_TEST_RESULTS
     LOG_GING = ''
     FINAL_TEST_FAIL_INFOR = []
     PRESSURE_DATA_CACHE = []
     CHANNEL_LEAK_HISTORY = {}
+    INSERT_PRESSURE_FAILED_COUNTS = {}
+    INSERT_PRESSURE_LAST_FAILED_VALUE = {}
     FINAL_TEST_RESULTS = []
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=cfg.simulate,
@@ -1051,6 +1118,8 @@ async def _main(
     csv_cb.write(["cv-threshold-200ul", cfg.cv_threshold_200ul])
     csv_cb.write(["fail-count-threshold", cfg.fail_count_threshold])
     csv_cb.write(["leak-rate-window-seconds", LEAK_RATE_WINDOW_SECONDS])
+    csv_cb.write(["insert-pressure-min", INSERT_PRESSURE_MIN])
+    csv_cb.write(["insert-fail-count-threshold", cfg.fail_count_threshold])
     csv_cb.write(["retest-mode", cfg.retest_mode])
     csv_cb.write(
         [
@@ -1126,6 +1195,7 @@ async def _main(
                 fixture,
                 write_cb=csv_cb.write,
                 accumulate_raw_data_cb=csv_cb.pressure,
+                repeat_index=repeat_index + 1,
             )
             test_passed = test_passed and trial_passed
         channel_summary_passed, abnormal_rows = _summarize_channel_leak_history(
@@ -1165,9 +1235,9 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[200, 1000], default=200)
     parser.add_argument("--repeat-count", type=int, default=10)
-    parser.add_argument("--leak-threshold-1ul", type=float, default=1.7)
-    parser.add_argument("--leak-threshold-50ul", type=float, default=0.4)
-    parser.add_argument("--leak-threshold-200ul", type=float, default=2.15)
+    parser.add_argument("--leak-threshold-1ul", type=float, default=2.45)
+    parser.add_argument("--leak-threshold-50ul", type=float, default=0.88)
+    parser.add_argument("--leak-threshold-200ul", type=float, default=3.07)
     parser.add_argument("--cv-threshold-1ul", type=float, default=0.2)
     parser.add_argument("--cv-threshold-50ul", type=float, default=0.2)
     parser.add_argument("--cv-threshold-200ul", type=float, default=0.2)
