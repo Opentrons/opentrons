@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, get_args
 
 from opentrons import identify_hardware_process
 from opentrons.config import feature_flags
+from opentrons.hardware_control.pyro_utils.serpent_type_registry import register_hardware_types
 from opentrons.hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
 )
@@ -22,6 +23,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     StateSummary,
     error_recovery_policy,
+    ProtocolEngine,
 )
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
@@ -94,6 +96,7 @@ def register_process_types() -> None:
         LegacyLabwareOffsetCreate,
         NozzleMap,
         ProtocolSource,
+        ProtocolResource,
         RunResult,
         StateSummary,
     ]:
@@ -103,6 +106,10 @@ def register_process_types() -> None:
         OpentronsPyroSerializer.register_pydantic_model(command)
     for command_create in get_args(get_args(CommandCreate)[0]):
         OpentronsPyroSerializer.register_pydantic_model(command_create)
+
+def register_all_needed_types() -> None:
+    register_process_types()
+    register_hardware_types()
 
 
 # DirectedRunProcess is created and run as a pyro daemon in its own subprocess

@@ -7,7 +7,7 @@ from typing import Any
 from opentrons.protocol_engine import DeckType
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 
-from robot_server.runs.run_process import DirectedRunProcess, register_process_types
+from robot_server.runs.run_process import DirectedRunProcess, register_all_needed_types
 
 
 def initialize_run_process() -> threading.Thread:
@@ -47,7 +47,7 @@ def initialize_run_process() -> threading.Thread:
         kwargs={
             "pyroname": "ot-protocol",
             "process": run_process,
-            "registry": register_process_types,
+            "registry": register_all_needed_types,
         },
         daemon=True,
     )
