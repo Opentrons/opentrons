@@ -412,3 +412,4 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT skip `afterEach(() => vi.clearAllMocks())` in test suites
 - Do NOT use semicolons (Prettier removes them)
 - Do NOT use `console.log` or `debugger` in committed code
+- Do NOT omit curly braces for control statements — ESLint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
