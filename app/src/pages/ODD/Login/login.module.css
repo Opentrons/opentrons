@@ -14,7 +14,7 @@
 .field_label {
   align-self: flex-start;
   padding-bottom: 0.375rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
 }
 
 .keyboard_container {
