@@ -57,8 +57,8 @@ export function useOAuth2PasswordLogin(
   const submitPassword = (username: string, password: string): void => {
     getOAuth2Token({
       grant_type: 'password',
-      username: username.trim(),
-      password: password.trim(),
+      username: username,
+      password: password,
       client_id: OAUTH2_CLIENT_ID,
     })
   }

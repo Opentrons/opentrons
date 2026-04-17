@@ -8,6 +8,7 @@ import {
   LEGACY_INPUT_TYPE_PASSWORD,
 } from '@opentrons/components'
 
+import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -148,16 +149,18 @@ export function Login(): JSX.Element {
             event.preventDefault()
           }}
         >
-          <FullKeyboard
-            onChange={(input: string) => {
-              if (step === 'username') {
-                setUsername(input)
-              } else {
-                setPassword(input)
-              }
-            }}
-            keyboardRef={keyboardRef}
-          />
+          <AccordionKeyboard isOpen={showKeyboard} onToggle={() => {}}>
+            <FullKeyboard
+              onChange={(input: string) => {
+                if (step === 'username') {
+                  setUsername(input)
+                } else {
+                  setPassword(input)
+                }
+              }}
+              keyboardRef={keyboardRef}
+            />
+          </AccordionKeyboard>
         </div>
       ) : null}
     </>
