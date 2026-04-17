@@ -6,7 +6,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import { Login } from '..'
+import { OnDeviceLoginPage } from '..'
 
 import type * as ReactRouterDom from 'react-router-dom'
 
@@ -55,7 +55,7 @@ vi.mock('/app/atoms/SoftwareKeyboard', () => ({
 const renderLogin = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <Login />
+      <OnDeviceLoginPage />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )[0]

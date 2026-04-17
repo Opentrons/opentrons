@@ -28,7 +28,7 @@ interface LoginFormValues {
   password: string
 }
 
-export function Login(): JSX.Element {
+export function OnDeviceLoginPage(): JSX.Element {
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({

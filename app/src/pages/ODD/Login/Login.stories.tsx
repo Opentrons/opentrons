@@ -8,7 +8,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { configReducer } from '/app/redux/config/reducer'
 
-import { Login as LoginComponent } from '.'
+import { OnDeviceLoginPage as LoginComponent } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'

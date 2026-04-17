@@ -53,7 +53,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
-import { Login } from '../pages/ODD/Login'
+import { OnDeviceLoginPage } from '../pages/ODD/Login'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
@@ -109,7 +109,7 @@ function getPathComponent(
     case '/deck-configuration':
       return <DeckConfigurationEditor />
     case '/login':
-      return <Login />
+      return <OnDeviceLoginPage />
     case '/emergency-stop':
       return <EmergencyStop />
     case '/instruments':
