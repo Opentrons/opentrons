@@ -6517,6 +6517,83 @@
       "title": "StartRunExtendedProfileParams",
       "type": "object"
     },
+    "StartSetVacuumPowerCreate": {
+      "description": "A request to set the vacuum pump power.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/startSetVacuumPower",
+          "default": "vacuumModule/startSetVacuumPower",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartSetVacuumPowerParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartSetVacuumPowerCreate",
+      "type": "object"
+    },
+    "StartSetVacuumPowerParams": {
+      "description": "Input parameters to start the vacuum pump.",
+      "properties": {
+        "duration": {
+          "default": null,
+          "description": "Duration in sec. to hold target power for after it is reached.",
+          "title": "Duration",
+          "type": "integer"
+        },
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "percentPower": {
+          "description": "Desired duty cycle of the vacuum pump as a percentage between 1 and 100%.",
+          "title": "Percentpower",
+          "type": "integer"
+        },
+        "rate": {
+          "default": null,
+          "description": "Target rate of power change in mbar/sec",
+          "title": "Rate",
+          "type": "number"
+        },
+        "timeout": {
+          "default": null,
+          "description": "Specify timeframe in seconds that target power must be reached in before a timeout error occurs.",
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "ventAfter": {
+          "default": true,
+          "description": "Whether the system should open the vent after the target power is held for the duration.",
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": ["moduleId", "percentPower"],
+      "title": "StartSetVacuumPowerParams",
+      "type": "object"
+    },
     "StartSetVacuumPressureCreate": {
       "description": "A request to start the vacuum pump.",
       "properties": {
@@ -6592,83 +6669,6 @@
       },
       "required": ["moduleId", "gaugePressure"],
       "title": "StartSetVacuumPressureParams",
-      "type": "object"
-    },
-    "StartSetVacuumPumpCreate": {
-      "description": "A request to start the vacuum pump.",
-      "properties": {
-        "commandAnnotationIds": {
-          "description": "A list of command annotation IDs (if any) that apply to this command.",
-          "items": {
-            "type": "string"
-          },
-          "title": "Commandannotationids",
-          "type": "array"
-        },
-        "commandType": {
-          "const": "vacuumModule/startSetVacuumPower",
-          "default": "vacuumModule/startSetVacuumPower",
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/StartSetVacuumPumpParams"
-        }
-      },
-      "required": ["params"],
-      "title": "StartSetVacuumPumpCreate",
-      "type": "object"
-    },
-    "StartSetVacuumPumpParams": {
-      "description": "Input parameters to start the vacuum pump.",
-      "properties": {
-        "duration": {
-          "default": null,
-          "description": "Duration in sec. to hold target power for after it is reached.",
-          "title": "Duration",
-          "type": "integer"
-        },
-        "moduleId": {
-          "description": "Unique ID of the vacuum module.",
-          "title": "Moduleid",
-          "type": "string"
-        },
-        "percentPower": {
-          "description": "Desired duty cycle of the vacuum pump as a percentage between 1 and 100%.",
-          "title": "Percentpower",
-          "type": "integer"
-        },
-        "rate": {
-          "default": null,
-          "description": "Target rate of power change in mbar/sec",
-          "title": "Rate",
-          "type": "number"
-        },
-        "timeout": {
-          "default": null,
-          "description": "Specify timeframe in seconds that target power must be reached in before a timeout error occurs.",
-          "title": "Timeout",
-          "type": "integer"
-        },
-        "ventAfter": {
-          "default": true,
-          "description": "Whether the system should open the vent after the target power is held for the duration.",
-          "title": "Ventafter",
-          "type": "boolean"
-        }
-      },
-      "required": ["moduleId", "percentPower"],
-      "title": "StartSetVacuumPumpParams",
       "type": "object"
     },
     "StatusBarAnimation": {
@@ -8511,7 +8511,7 @@
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
       "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
-      "vacuumModule/startSetVacuumPower": "#/$defs/StartSetVacuumPumpCreate",
+      "vacuumModule/startSetVacuumPower": "#/$defs/StartSetVacuumPowerCreate",
       "vacuumModule/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
       "vacuumModule/stopVacuum": "#/$defs/StopVacuumCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
@@ -8790,7 +8790,7 @@
       "$ref": "#/$defs/StartSetVacuumPressureCreate"
     },
     {
-      "$ref": "#/$defs/StartSetVacuumPumpCreate"
+      "$ref": "#/$defs/StartSetVacuumPowerCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
