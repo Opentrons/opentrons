@@ -36,6 +36,7 @@ class DevServer:
         env["OT_KEY_SERVER_secure_storage_implementation"] = "dev"
         env["OT_KEY_SERVER_base_directory"] = self._base_dir.name
         env["OT_KEY_SERVER_image_mount_point"] = self._mount_dir.name
+        env["OT_KEY_SERVER_tls_server_integration"] = "dev-none"
         # In order to collect coverage we run using `coverage`.
         # `-a` is to append to existing `.coverage` file.
         # `--source` is the source code folder to collect coverage stats on.

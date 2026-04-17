@@ -1,5 +1,6 @@
 // react api client entry point
 export * from './api'
+export * from './auth'
 export * from './calibration'
 export * from './camera'
 export * from './deck_configuration'

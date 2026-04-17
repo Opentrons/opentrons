@@ -45,7 +45,7 @@ Two plots are shown by default, each driven by its own CSV file pattern:
 
 | Plot | File Pattern | Columns |
 |---|---|---|
-| **Pressure vs Time** | `PressureData` | `current_guage_pressure`, `target_guage_pressure`, `pressure_abs_a`, `pressure_abs_b`, `pressure_atm` |
+| **Pressure vs Time** | `PressureData` | `current_gauge_pressure`, `target_gauge_pressure`, `pressure_abs_a`, `pressure_abs_b`, `pressure_atm` |
 | **Flow Rate vs Time** | `FlowrateData` | `Flow_rate(sLM)` |
 
 The server performs a recursive search for the most recently modified file whose stem contains the pattern string (e.g. a file named `PressureData_2024-01-01.csv` is matched by the `PressureData` pattern).
@@ -53,7 +53,7 @@ The server performs a recursive search for the most recently modified file whose
 CSV files must have a header row. Example:
 
 ```csv
-Time(s),current_guage_pressure,target_guage_pressure
+Time(s),current_gauge_pressure,target_gauge_pressure
 0.0,1013.2,1013.0
 0.1,1013.5,1013.0
 ```

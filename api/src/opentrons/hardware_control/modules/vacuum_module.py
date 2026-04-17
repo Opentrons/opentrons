@@ -314,7 +314,7 @@ class VacuumModule(mod_abc.AbstractModule):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
+        gauge_pressure_mbar: Optional[float] = None,
         duration_s: Optional[int] = None,
         timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
@@ -323,7 +323,7 @@ class VacuumModule(mod_abc.AbstractModule):
         """Handler for internal pressure controls."""
         await self._driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
-            guage_pressure_mbar=guage_pressure_mbar,
+            gauge_pressure_mbar=gauge_pressure_mbar,
             duration_s=duration_s,
             timeout_s=timeout_s,
             rate=rate,
@@ -337,6 +337,8 @@ class VacuumModule(mod_abc.AbstractModule):
         duty_cycle: Optional[int] = None,
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
+        # clear any existing vacuum state before rewriting the pump state
+        await self._driver.set_vacuum_state(enable_vacuum=False)
         await self._driver.set_pump_state(
             start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
         )
@@ -348,8 +350,8 @@ class VacuumModuleReader(Reader):
     def __init__(self, driver: AbstractVacuumModuleDriver) -> None:
         self.error: Optional[str] = None
         self.vacuum_state: VacuumState = VacuumState(
-            target_guage_pressure=0,
-            current_guage_pressure=0,
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
             pressure_abs_a=0,
             pressure_abs_b=0,
             pressure_atm=0,

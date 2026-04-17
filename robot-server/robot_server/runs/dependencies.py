@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import Depends, status
 from sqlalchemy.engine import Engine as SQLEngine
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.file_provider import FileProvider
@@ -44,6 +45,10 @@ from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.service.notifications import (
     RunsPublisher,
     get_runs_publisher,
+)
+from robot_server.service.pyro_utils.resource_utilities import (
+    get_pyro_resource,
+    register_run_orchestrator_store_to_pyro_resource,
 )
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.settings import get_settings
@@ -134,9 +139,21 @@ async def get_run_orchestrator_store(
 
     if run_orchestrator_store is None:
         run_orchestrator_store = RunOrchestratorStore(
-            hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+            hardware_api=hardware_api,
+            robot_type=robot_type,
+            deck_type=deck_type,
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
+        # Handle remote hardware registry, if needed
+        if feature_flags.hardware_subprocess_enabled():
+            register_run_orchestrator_store_to_pyro_resource(
+                app_state=app_state, run_orchestrator_store=run_orchestrator_store
+            )
+            pyro_resource = get_pyro_resource()
+            hardware_api.register_callback(
+                pyro_resource.create_run_hardware_event_callback()
+            )
+
         # Provide the engine store to the light controller
         light_controller.update_run_orchestrator_store(
             run_orchestrator_store=run_orchestrator_store
