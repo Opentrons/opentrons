@@ -9,6 +9,7 @@ import time
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union, cast
 
 import Pyro5.api
+import Pyro5.errors
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -418,13 +419,18 @@ class RunOrchestratorStore:
                 self._run_process = None
                 ns.remove("ot-protocol")
                 raise ValueError("Can't find process")
-
-        await self._run_orchestrator.create(
-            run_id=run_id,
-            labware_offsets=labware_offsets,
-            deck_configuration=deck_configuration,
-            protocol=protocol,
-        )
+        try:
+            await self._run_orchestrator.create(
+                run_id=run_id,
+                labware_offsets=labware_offsets,
+                deck_configuration=deck_configuration,
+                protocol=protocol,
+            )
+        except:
+            self._run_process.terminate()
+            self._run_process = None
+            ns.remove("ot-protocol")
+            raise ZeroDivisionError("".join(Pyro5.errors.get_pyro_traceback()))
         return self._run_orchestrator.get_state_summary()
 
     async def clear_pyro(self) -> RunResult:
