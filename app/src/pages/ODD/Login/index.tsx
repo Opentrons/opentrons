@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -6,6 +7,7 @@ import {
   Icon,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
+  setRefs,
 } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
@@ -16,9 +18,15 @@ import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import styles from './login.module.css'
 
+import type { ChangeEvent } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 type LoginField = 'username' | 'password'
+
+interface LoginFormValues {
+  username: string
+  password: string
+}
 
 export function Login(): JSX.Element {
   const navigate = useNavigate()
@@ -31,14 +39,20 @@ export function Login(): JSX.Element {
       makeSnackbar(message)
     },
   })
+  const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  })
   const [step, setStep] = useState<LoginField>('username')
-  const [username, setUsername] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
   const [showPassword, setShowPassword] = useState(false)
   const [showKeyboard, setShowKeyboard] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
+  const username = watch('username')
+  const password = watch('password')
   const fieldValue = step === 'username' ? username : password
 
   useEffect(() => {
@@ -63,13 +77,14 @@ export function Login(): JSX.Element {
   }
 
   const handleNext = (): void => {
+    const { username: u, password: p } = getValues()
     if (step === 'username') {
-      if (username.trim() === '') return
+      if (u.trim() === '') return
       setStep('password')
       return
     }
-    if (password.trim() === '') return
-    submitPassword(username, password)
+    if (p.trim() === '') return
+    submitPassword(u, p)
   }
 
   const primaryDisabled =
@@ -83,6 +98,8 @@ export function Login(): JSX.Element {
       : showPassword
         ? 'text'
         : LEGACY_INPUT_TYPE_PASSWORD
+
+  const activeFieldName = step === 'username' ? 'username' : 'password'
 
   return (
     <>
@@ -103,43 +120,51 @@ export function Login(): JSX.Element {
         <h4 className={styles.field_label}>
           {step === 'username' ? 'Username' : 'Password'}
         </h4>
-        <InputField
-          ref={inputRef}
-          testId="login-field"
-          type={inputType}
-          size="medium"
-          value={fieldValue}
-          onChange={e => {
-            const next = e.target.value
-            if (step === 'username') {
-              setUsername(next)
-            } else {
-              setPassword(next)
-            }
-          }}
-          onFocus={() => {
-            setShowKeyboard(true)
-          }}
-          rightElement={
-            step === 'password' ? (
-              <Btn
-                type="button"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                onClick={() => {
-                  setShowPassword(current => !current)
-                  inputRef.current?.focus()
-                }}
-              >
-                <Icon
-                  name={showPassword ? 'eye-slash' : 'eye'}
-                  size="1.5rem"
-                  data-testid={
-                    showPassword ? 'login-password-hide' : 'login-password-show'
-                  }
-                />
-              </Btn>
-            ) : undefined
-          }
+        <Controller
+          key={activeFieldName}
+          control={control}
+          name={activeFieldName}
+          render={({ field }) => (
+            <InputField
+              ref={setRefs(inputRef, field.ref)}
+              testId="login-field"
+              type={inputType}
+              size="medium"
+              value={field.value ?? ''}
+              name={field.name}
+              onBlur={field.onBlur}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                field.onChange(e.target.value)
+              }}
+              onFocus={() => {
+                setShowKeyboard(true)
+              }}
+              rightElement={
+                step === 'password' ? (
+                  <Btn
+                    type="button"
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
+                    onClick={() => {
+                      setShowPassword(current => !current)
+                      inputRef.current?.focus()
+                    }}
+                  >
+                    <Icon
+                      name={showPassword ? 'eye-slash' : 'eye'}
+                      size="1.5rem"
+                      data-testid={
+                        showPassword
+                          ? 'login-password-hide'
+                          : 'login-password-show'
+                      }
+                    />
+                  </Btn>
+                ) : undefined
+              }
+            />
+          )}
         />
       </div>
       {showKeyboard ? (
@@ -152,11 +177,10 @@ export function Login(): JSX.Element {
           <AccordionKeyboard isOpen={showKeyboard} onToggle={() => {}}>
             <FullKeyboard
               onChange={(input: string) => {
-                if (step === 'username') {
-                  setUsername(input)
-                } else {
-                  setPassword(input)
-                }
+                setValue(step === 'username' ? 'username' : 'password', input, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                })
               }}
               keyboardRef={keyboardRef}
             />
