@@ -13,7 +13,7 @@
 
 .field_label {
   align-self: flex-start;
-  padding-bottom: 0.375rem;
+  padding-bottom: var(--spacing-6);
   font-weight: var(--font-weight-regular);
 }
 
