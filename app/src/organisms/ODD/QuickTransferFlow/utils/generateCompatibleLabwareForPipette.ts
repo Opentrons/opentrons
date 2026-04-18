@@ -6,13 +6,30 @@ import {
 
 import { getAllLatestDefs } from '/app/local-resources/labware'
 
-import { QUICK_TRANSFER_INCOMPATIBLE_LABWARE } from '../constants'
+import {
+  EIGHT_CHANNEL_COMPATIBLE_LABWARE,
+  NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+  QUICK_TRANSFER_INCOMPATIBLE_LABWARE,
+  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
+} from '../constants'
 
 import type { PipetteV2Specs } from '@opentrons/shared-data'
 
 export function generateCompatibleLabwareForPipette(
   pipetteSpecs: PipetteV2Specs
 ): string[] {
+  if (pipetteSpecs.channels === 1) {
+    return SINGLE_CHANNEL_COMPATIBLE_LABWARE
+  }
+
+  if (pipetteSpecs.channels === 8) {
+    return EIGHT_CHANNEL_COMPATIBLE_LABWARE
+  }
+
+  if (pipetteSpecs.channels === 96) {
+    return NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE
+  }
+
   const allLabwareDefinitions = getAllLatestDefs()
   const compatibleDefUriList: string[] = []
   const { canPipetteUseLabware } = makeWellSetHelpers()
