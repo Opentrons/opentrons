@@ -6,7 +6,7 @@ import { fetchRobotApi, robotApiUrl } from '../http'
 
 import type { RobotHost } from '../types'
 
-type MockResponse = {
+interface MockResponse {
   ok: boolean
   status: number
   json: ReturnType<typeof vi.fn>
@@ -56,9 +56,7 @@ describe('robot-api http client', () => {
       query: { refresh: true, meaning: 42 },
     })
 
-    expect(url).toEqual(
-      'http://127.0.0.1:31950/health?refresh=true&meaning=42'
-    )
+    expect(url).toEqual('http://127.0.0.1:31950/health?refresh=true&meaning=42')
   })
 
   it('removes any empty query params', () => {
@@ -108,13 +106,10 @@ describe('robot-api http client', () => {
       path: '/not-found',
     }).toPromise()
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      'http://127.0.0.1:31950/not-found',
-      {
-        method: GET,
-        headers: { 'Opentrons-Version': '3' },
-      }
-    )
+    expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:31950/not-found', {
+      method: GET,
+      headers: { 'Opentrons-Version': '3' },
+    })
     expect(result).toEqual({
       host: robot,
       method: GET,
