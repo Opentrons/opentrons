@@ -764,7 +764,7 @@
       "type": ["object"],
       "description": "The extents and dimensions of the geometrical space within a labware that can house other labware.",
       "additionalProperties": false,
-      "required": ["type", "origin", "dimensions"],
+      "required": ["shape", "origin", "dimensions"],
       "properties": {
         "shape": {
           "type": "string",
