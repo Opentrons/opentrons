@@ -67,6 +67,14 @@ describe('ConfirmCancelRunModal', () => {
   let props: ComponentProps<typeof ConfirmCancelRunModal>
 
   beforeEach(() => {
+    mockNavigate.mockClear()
+    mockStopRun.mockClear()
+    mockDeleteRun.mockClear()
+    mockDismissCurrentRun.mockClear()
+    mockTrackEvent.mockClear()
+    mockTrackProtocolRunEvent.mockClear()
+    mockFn.mockClear()
+
     props = {
       isActiveRun: true,
       runId: RUN_ID,
@@ -103,10 +111,6 @@ describe('ConfirmCancelRunModal', () => {
         },
       },
     } as any)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
   })
 
   it('should render correct text and buttons', () => {
