@@ -7,7 +7,21 @@ import {
   getActiveInterfaces,
 } from '../network-interfaces'
 
-vi.mock('os')
+const { networkInterfacesMock } = vi.hoisted(() => ({
+  networkInterfacesMock: vi.fn(),
+}))
+
+vi.mock('os', async importOriginal => {
+  const actual = await importOriginal<typeof import('os')>()
+  return {
+    ...actual,
+    networkInterfaces: networkInterfacesMock,
+    default: {
+      ...(actual as { default?: unknown }).default,
+      networkInterfaces: networkInterfacesMock,
+    },
+  }
+})
 
 const mockV4: os.NetworkInterfaceInfoIPv4 = {
   address: '192.168.1.17',
@@ -40,7 +54,7 @@ describe('system-info::network-interfaces', () => {
   })
 
   it('should return external network interfaces', () => {
-    vi.mocked(os.networkInterfaces).mockReturnValue({
+    networkInterfacesMock.mockReturnValue({
       en0: [mockV4, mockV6],
       en1: [mockV6],
       lo0: [
@@ -57,35 +71,35 @@ describe('system-info::network-interfaces', () => {
   })
 
   it('should be able to poll the attached network interfaces', () => {
-    vi.mocked(os.networkInterfaces).mockReturnValue({})
+    networkInterfacesMock.mockReturnValue({})
 
     const monitor = createNetworkInterfaceMonitor({
       pollInterval: 30000,
       onInterfaceChange: noop,
     })
 
-    expect(vi.mocked(os.networkInterfaces)).toHaveBeenCalledTimes(1)
+    expect(networkInterfacesMock).toHaveBeenCalledTimes(1)
     vi.advanceTimersByTime(30000)
-    expect(vi.mocked(os.networkInterfaces)).toHaveBeenCalledTimes(2)
+    expect(networkInterfacesMock).toHaveBeenCalledTimes(2)
     vi.advanceTimersByTime(30000)
-    expect(vi.mocked(os.networkInterfaces)).toHaveBeenCalledTimes(3)
+    expect(networkInterfacesMock).toHaveBeenCalledTimes(3)
 
     monitor.stop()
     vi.advanceTimersByTime(30000)
-    expect(vi.mocked(os.networkInterfaces)).toHaveBeenCalledTimes(3)
+    expect(networkInterfacesMock).toHaveBeenCalledTimes(3)
   })
 
   it('should be able to signal interface changes', () => {
     const handleInterfaceChange = vi.fn()
 
-    vi.mocked(os.networkInterfaces).mockReturnValue({})
+    networkInterfacesMock.mockReturnValue({})
 
     createNetworkInterfaceMonitor({
       pollInterval: 30000,
       onInterfaceChange: handleInterfaceChange,
     })
 
-    vi.mocked(os.networkInterfaces).mockReturnValueOnce({
+    networkInterfacesMock.mockReturnValueOnce({
       en0: [mockV4, mockV6],
     })
     vi.advanceTimersByTime(30000)
@@ -95,14 +109,14 @@ describe('system-info::network-interfaces', () => {
     ])
     handleInterfaceChange.mockClear()
 
-    vi.mocked(os.networkInterfaces).mockReturnValueOnce({
+    networkInterfacesMock.mockReturnValueOnce({
       en0: [mockV4, mockV6],
     })
     vi.advanceTimersByTime(30000)
     expect(handleInterfaceChange).toHaveBeenCalledTimes(0)
     handleInterfaceChange.mockClear()
 
-    vi.mocked(os.networkInterfaces).mockReturnValueOnce({
+    networkInterfacesMock.mockReturnValueOnce({
       en0: [mockV4, mockV6],
       en1: [mockV4],
     })
@@ -118,14 +132,14 @@ describe('system-info::network-interfaces', () => {
   it('should be able to stop monitoring interface changes', () => {
     const handleInterfaceChange = vi.fn()
 
-    vi.mocked(os.networkInterfaces).mockReturnValue({})
+    networkInterfacesMock.mockReturnValue({})
 
     const monitor = createNetworkInterfaceMonitor({
       pollInterval: 30000,
       onInterfaceChange: handleInterfaceChange,
     })
 
-    vi.mocked(os.networkInterfaces).mockReturnValueOnce({ en0: [mockV4] })
+    networkInterfacesMock.mockReturnValueOnce({ en0: [mockV4] })
     monitor.stop()
     vi.advanceTimersByTime(30000)
     expect(handleInterfaceChange).toHaveBeenCalledTimes(0)
