@@ -109,7 +109,7 @@ describe('InterventionModal', () => {
         target: expect.objectContaining({ value: 'first' }),
       })
     )
-    vi.restoreAllMocks()
+    onChange.mockClear()
 
     fireEvent.click(inputElForButtonFromButtonText('second button'))
     expect(onChange).not.toHaveBeenCalled()

@@ -14,7 +14,7 @@ describe('useCurrentRunId hook', () => {
 
   it('should return the run id specified in the current link', async () => {
     when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith({ pageLength: 0 }, {})
+      .calledWith({ pageLength: 0 }, {}, undefined)
       .thenReturn({
         data: { links: { current: { href: '/runs/run_id' } } },
       } as any)
@@ -26,7 +26,7 @@ describe('useCurrentRunId hook', () => {
 
   it('should return null if no current run link', async () => {
     when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith({ pageLength: 0 }, {})
+      .calledWith({ pageLength: 0 }, {}, undefined)
       .thenReturn({ data: { links: {} } } as any)
 
     const { result } = renderHook(useCurrentRunId)
@@ -36,7 +36,7 @@ describe('useCurrentRunId hook', () => {
 
   it('should pass through runs query options', async () => {
     when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith({ pageLength: 0 }, { enabled: true })
+      .calledWith({ pageLength: 0 }, { enabled: true }, undefined)
       .thenReturn({
         data: {
           links: { current: { href: '/runs/run_id' } },

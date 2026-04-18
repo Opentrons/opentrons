@@ -1,4 +1,3 @@
-import os from 'os'
 import noop from 'lodash/noop'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -7,17 +6,33 @@ import {
   getActiveInterfaces,
 } from '../network-interfaces'
 
+import type * as os from 'os'
+
+type OsModulePartialForMock = Record<string, unknown> & {
+  default?: Record<string, unknown>
+}
+
+function assertOsModulePartialForMock(
+  value: unknown
+): asserts value is OsModulePartialForMock {
+  if (typeof value !== 'object' || value === null) {
+    throw new Error('importOriginal(os) expected an object')
+  }
+}
+
 const { networkInterfacesMock } = vi.hoisted(() => ({
   networkInterfacesMock: vi.fn(),
 }))
 
 vi.mock('os', async importOriginal => {
-  const actual = await importOriginal<typeof import('os')>()
+  const actual = await importOriginal()
+  assertOsModulePartialForMock(actual)
+  const previousDefault: Record<string, unknown> = actual.default ?? {}
   return {
     ...actual,
     networkInterfaces: networkInterfacesMock,
     default: {
-      ...(actual as { default?: unknown }).default,
+      ...previousDefault,
       networkInterfaces: networkInterfacesMock,
     },
   }

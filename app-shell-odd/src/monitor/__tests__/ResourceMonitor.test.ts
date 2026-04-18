@@ -21,13 +21,27 @@ const { execMock } = vi.hoisted(() => ({
   execMock: vi.fn(),
 }))
 
+type ChildProcessModulePartialForMock = Record<string, unknown> & {
+  default?: Record<string, unknown>
+}
+
+function assertChildProcessModulePartialForMock(
+  value: unknown
+): asserts value is ChildProcessModulePartialForMock {
+  if (typeof value !== 'object' || value === null) {
+    throw new Error('importOriginal(child_process) expected an object')
+  }
+}
+
 vi.mock('child_process', async importOriginal => {
-  const actual = await importOriginal<typeof import('child_process')>()
+  const actual = await importOriginal()
+  assertChildProcessModulePartialForMock(actual)
+  const previousDefault: Record<string, unknown> = actual.default ?? {}
   return {
     ...actual,
     exec: execMock,
     default: {
-      ...(actual as { default?: unknown }).default,
+      ...previousDefault,
       exec: execMock,
     },
   }

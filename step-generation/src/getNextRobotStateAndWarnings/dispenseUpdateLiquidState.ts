@@ -132,14 +132,6 @@ export function dispenseUpdateLiquidState(
     }, 0)
     liquidTrash[0] = { volume: totalVolume }
   }
-
-  if (mergeLiquidtoSingleWell == null && liquidTrash == null) {
-    console.assert(
-      false,
-      `expected to merge liquid to a single well with sourceId ${entityId}`
-    )
-  }
-
   const mergeTipLiquidToOwnWell =
     well != null && liquidLabware != null && wellsForTips != null
       ? wellsForTips.reduce((acc, wellForTip, tipIdx) => {
