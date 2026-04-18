@@ -4831,3 +4831,193 @@ def test_raise_if_labware_in_stacker_hopper(
         errors.LocationNotAccessibleByPipetteError, match="in a stacker hopper"
     ):
         subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_ancestor_addressable_area_name_simple_deck_slot(
+    labware_store: LabwareStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Directly loaded labware on a deck slot returns the slot name."""
+    action = load_labware_action(
+        labware_id="lw-1",
+        labware_def=nice_labware_definition,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+    )
+    labware_store.handle_action(action)
+
+    assert subject.get_ancestor_addressable_area_name("lw-1") == "C2"
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_ancestor_addressable_area_name_on_module(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """Labware on a module returns the module's provided addressable area."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=tempdeck_v2_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+    load_labware = load_labware_action(
+        labware_id="lw-1",
+        labware_def=nice_labware_definition,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_labware)
+
+    assert subject.get_ancestor_addressable_area_name("lw-1") == "vacuumModuleV1A3"
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_ancestor_addressable_area_name_stacked_labware(
+    labware_store: LabwareStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Deeply nested labware resolves to the root deck slot."""
+    load_bottom = load_labware_action(
+        labware_id="bottom",
+        labware_def=nice_labware_definition,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
+    )
+    load_middle = load_labware_action(
+        labware_id="middle",
+        labware_def=nice_labware_definition,
+        location=OnLabwareLocation(labwareId="bottom"),
+    )
+    load_top = load_labware_action(
+        labware_id="top",
+        labware_def=nice_labware_definition,
+        location=OnLabwareLocation(labwareId="middle"),
+    )
+
+    labware_store.handle_action(load_bottom)
+    labware_store.handle_action(load_middle)
+    labware_store.handle_action(load_top)
+
+    assert subject.get_ancestor_addressable_area_name("top") == "D3"
+
+
+def test_get_ancestor_addressable_area_name_raises_on_cycle(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """Cycle in nesting chain raises InvalidLabwarePositionError."""
+    decoy.when(mock_labware_view.get("lw-a")).then_return(
+        LoadedLabware(
+            id="lw-a",
+            loadName="a",
+            definitionUri="a",
+            location=OnLabwareLocation(labwareId="lw-b"),
+        )
+    )
+    decoy.when(mock_labware_view.get("lw-b")).then_return(
+        LoadedLabware(
+            id="lw-b",
+            loadName="b",
+            definitionUri="b",
+            location=OnLabwareLocation(labwareId="lw-c"),
+        )
+    )
+    decoy.when(mock_labware_view.get("lw-c")).then_return(
+        LoadedLabware(
+            id="lw-c",
+            loadName="c",
+            definitionUri="c",
+            location=OnLabwareLocation(labwareId="lw-a"),  # cycle
+        )
+    )
+
+    with pytest.raises(errors.InvalidLabwarePositionError, match="Cycle detected"):
+        subject.get_ancestor_addressable_area_name("lw-a")
+
+
+def test_get_parent_from_location_addressable_area(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """AddressableAreaLocation returns the area name."""
+    location = AddressableAreaLocation(addressableAreaName="D4")
+    assert subject.get_parent_from_location(location) == "D4"
+
+
+def test_get_parent_from_location_module(
+    decoy: Decoy, mock_module_view: ModuleView, subject: GeometryView
+) -> None:
+    """ModuleLocation resolves to the module's provided addressable area."""
+    decoy.when(mock_module_view.get_provided_addressable_area("mod-123")).then_return(
+        "vacuumModuleV1A3"
+    )
+
+    location = ModuleLocation(moduleId="mod-123")
+    assert subject.get_parent_from_location(location) == "vacuumModuleV1A3"
+
+
+def test_get_parent_from_location_on_labware_chain(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """get_parent_from_location walks up OnLabwareLocation until it hits a root."""
+    decoy.when(mock_labware_view.get("adapter")).then_return(
+        LoadedLabware(
+            id="adapter",
+            loadName="adapter",
+            definitionUri="adapter",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+        )
+    )
+
+    location = OnLabwareLocation(labwareId="adapter")
+    assert subject.get_parent_from_location(location) == "C2"
+
+
+def test_get_parent_from_location_raises_on_cycle(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """Cycle while resolving location raises InvalidLabwarePositionError."""
+    decoy.when(mock_labware_view.get("a")).then_return(
+        LoadedLabware(
+            id="a",
+            loadName="a",
+            definitionUri="a",
+            location=OnLabwareLocation(labwareId="b"),
+        )
+    )
+    decoy.when(mock_labware_view.get("b")).then_return(
+        LoadedLabware(
+            id="b",
+            loadName="b",
+            definitionUri="b",
+            location=OnLabwareLocation(labwareId="c"),
+        )
+    )
+    decoy.when(mock_labware_view.get("c")).then_return(
+        LoadedLabware(
+            id="c",
+            loadName="c",
+            definitionUri="c",
+            location=OnLabwareLocation(labwareId="a"),
+        )
+    )
+
+    with pytest.raises(errors.InvalidLabwarePositionError, match="Cycle detected"):
+        subject.get_parent_from_location(OnLabwareLocation(labwareId="a"))
+
+
+def test_get_parent_from_location_raises_when_not_on_deck(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """OFF_DECK_LOCATION or other unsupported terminal locations raise LabwareNotOnDeckError."""
+    with pytest.raises(errors.LabwareNotOnDeckError):
+        subject.get_parent_from_location(OFF_DECK_LOCATION)
+
+    with pytest.raises(errors.LabwareNotOnDeckError):
+        subject.get_parent_from_location(SYSTEM_LOCATION)
