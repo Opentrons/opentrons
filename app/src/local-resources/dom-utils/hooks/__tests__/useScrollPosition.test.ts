@@ -24,10 +24,7 @@ describe('useScrollPosition', () => {
       }
     }
 
-    vi.stubGlobal(
-      'IntersectionObserver',
-      MockIntersectionObserver
-    )
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
   })
 
   it('should return initial state and ref', () => {

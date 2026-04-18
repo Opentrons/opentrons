@@ -404,7 +404,9 @@ describe('downloadReleaseFiles', () => {
           (_url, dest, options) =>
             new Promise((resolve, reject) => {
               if (options?.signal == null) {
-                throw new Error('expected fetchToFile to receive an abort signal')
+                throw new Error(
+                  'expected fetchToFile to receive an abort signal'
+                )
               }
               const { signal } = options
               const listener = () => {
