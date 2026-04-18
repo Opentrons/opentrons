@@ -996,7 +996,9 @@ class GeometryView:
                 # in their definition to do a containment occupancy check.
                 # This lets us determine if the empty space (containedSpace) of
                 # a labware is able to fit other labware inside of it.
-                if labware_definition is not None:
+                if labware_definition is not None and isinstance(
+                    labware_definition, LabwareDefinition2
+                ):
                     children = []
                     for lw in self._labware.get_all():
                         if lw.location == location:
@@ -1008,6 +1010,8 @@ class GeometryView:
                     # if we have children check if either siblings have 'containedSpace'
                     for child in children:
                         child_def = self._labware.get_definition(child.id)
+                        if not isinstance(child_def, LabwareDefinition2):
+                            continue
                         existing_contained = child_def.containedSpace
 
                         # Standard Nesting: Loading a resident into an existing container
