@@ -118,7 +118,9 @@ export default defineConfig({
       },
       {
         find: '@opentrons/shared-data/pipette/fixtures/name',
-        replacement: path.resolve('./shared-data/pipette/fixtures/name/index.ts'),
+        replacement: path.resolve(
+          './shared-data/pipette/fixtures/name/index.ts'
+        ),
       },
       {
         find: '@opentrons/shared-data/labware/fixtures/1',
@@ -158,7 +160,9 @@ export default defineConfig({
       },
       {
         find: '@opentrons/labware-library',
-        replacement: path.resolve('./labware-library/src/labware-creator/index.tsx'),
+        replacement: path.resolve(
+          './labware-library/src/labware-creator/index.tsx'
+        ),
       },
       {
         find: '@opentrons/protocol-visualization',
