@@ -87,6 +87,14 @@ class NoRunOrchestrator(RuntimeError):
     """Raised if you try to get the current run orchestrator while there is none."""
 
 
+class RunProcessRunningError(RuntimeError):
+    """Raised if a run process is attempted to be opened when one is already running."""
+
+
+class NoRunProcessRunningError(RuntimeError):
+    """Raised if a run process is attempted to be closed when one is not running."""
+
+
 async def _do_handle_hardware_event(  # noqa: C901
     run_orchestrator_store: "RunOrchestratorStore", event: HardwareEvent
 ) -> None:
@@ -196,6 +204,7 @@ class RunOrchestratorStore:
         self._run_process: Optional[subprocess.Popen[bytes]] = None
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
+            self._start_run_process()
         if not feature_flags.hardware_subprocess_enabled():
             hardware_api.register_callback(_get_hardware_listener(self))
 
@@ -212,6 +221,25 @@ class RunOrchestratorStore:
         return (
             self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
+
+    def _start_run_process(self) -> None:
+        """Starts a protocol run process in the background if one hasn't been created already."""
+        if self._run_process is not None:
+            raise RunProcessRunningError("Protocol run process already running.")
+
+        self._run_process = subprocess.Popen(
+            args=[sys.executable, "-m", run_process_entry_point.__name__],
+            env={k: v for k, v in os.environ.items()},
+            # user="ot-protocol"  # TODO how do we make sure this works locally?
+        )
+
+    def _end_run_process(self) -> None:
+        if self._run_process is None:
+            raise NoRunProcessRunningError("No protocol run process currently running.")
+        self._run_process.terminate()
+        self._run_process = None
+        with Pyro5.api.locate_ns() as ns:
+            ns.remove("ot-protocol")
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
@@ -381,19 +409,16 @@ class RunOrchestratorStore:
         run_id: str,
     ) -> StateSummary:
         """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
-        if self._run_process is not None:
+        if self._run_orchestrator is not None:
             raise RunConflictError("Another run is currently active.")
 
-        self._run_process = subprocess.Popen(
-            args=[sys.executable, "-m", run_process_entry_point.__name__],
-            env={k: v for k, v in os.environ.items()},
-            # user="ot-protocol"  # TODO how do we make sure this works locally?
-        )
+        if self._run_process is None:
+            self._start_run_process()
 
         # TODO This timeout sucks
         start_time = time.monotonic()
         with Pyro5.api.locate_ns() as ns:
-            while time.monotonic() - start_time < 60:
+            while time.monotonic() - start_time < 30:
                 if "ot-protocol" in ns.list():
                     proxy = AsyncClientPyroObject(
                         Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
@@ -404,10 +429,8 @@ class RunOrchestratorStore:
                     break
                 time.sleep(0.01)
             else:
-                self._run_process.terminate()
-                self._run_process = None
-                ns.remove("ot-protocol")
-                raise ValueError("Can't find process")
+                self._end_run_process()
+                raise RuntimeError("Can't resolve pyro proxy 'ot-protocol'")
 
         self._run_orchestrator.create(run_id)
         return self._run_orchestrator.get_state_summary()
@@ -425,12 +448,9 @@ class RunOrchestratorStore:
 
         run_data = self.run_orchestrator.get_state_summary()
 
-        assert self._run_process is not None
-        self._run_process.terminate()
-        self._run_process = None
+        self._end_run_process()
         self._run_orchestrator = None
-        with Pyro5.api.locate_ns() as ns:
-            ns.remove("ot-protocol")
+        self._start_run_process()
 
         return RunResult(
             state_summary=run_data,
