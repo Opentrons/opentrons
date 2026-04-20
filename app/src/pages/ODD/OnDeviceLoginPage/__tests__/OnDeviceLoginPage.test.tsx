@@ -39,7 +39,7 @@ vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   }: {
     onChange: (input: string) => void
   }): JSX.Element => (
-    <div data-testid="mock-full-keyboard">
+    <div>
       <button
         type="button"
         onClick={() => {
@@ -86,24 +86,31 @@ describe('Login', () => {
     screen.getByText('next')
     screen.getByText('cancel')
     expect(getLoginInput(container)).toHaveAttribute('type', 'text')
+    expect(
+      screen.queryByRole('button', { name: 'Back' })
+    ).not.toBeInTheDocument()
   })
 
   it('navigates back when cancel is pressed', () => {
     renderLogin()
-    fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
     expect(mockNavigate).toHaveBeenCalledWith(-1)
   })
 
   it('disables next when username is empty', () => {
     renderLogin()
-    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'next' })
+    ).toBeDisabled()
   })
 
   it('shows the software keyboard when the field is focused', () => {
     const { container } = renderLogin()
-    expect(screen.queryByTestId('mock-full-keyboard')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'simulate keyboard input' })
+    ).not.toBeInTheDocument()
     fireEvent.focus(getLoginInput(container))
-    expect(screen.getByTestId('mock-full-keyboard')).toBeInTheDocument()
+    screen.getByRole('button', { name: 'simulate keyboard input' })
   })
 
   it('updates the username when typing in the text field', () => {
@@ -129,9 +136,25 @@ describe('Login', () => {
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
     screen.getByText('Password')
+    screen.getByTestId('ChildNavigation_Back_Button')
     const input = getLoginInput(container)
     expect(input).toHaveAttribute('type', 'password')
     expect(input).toHaveValue('')
+  })
+
+  it('returns to the username step when the back control is pressed on password', () => {
+    const { container } = renderLogin()
+    fireEvent.change(getLoginInput(container), {
+      target: { value: 'user1' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'next' }))
+    screen.getByText('Password')
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+    screen.getByText('Username')
+    expect(getLoginInput(container)).toHaveValue('user1')
+    expect(
+      screen.queryByRole('button', { name: 'Back' })
+    ).not.toBeInTheDocument()
   })
 
   it('disables next on the password step when password is empty', () => {
@@ -163,11 +186,11 @@ describe('Login', () => {
     fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
-    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    fireEvent.click(screen.getByRole('button', { name: 'next' }))
     fireEvent.change(getLoginInput(container), {
       target: { value: 'secret' },
     })
-    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    fireEvent.click(screen.getByRole('button', { name: 'confirm' }))
     expect(mockSubmitPassword).toHaveBeenCalledWith('user1', 'secret')
   })
 })

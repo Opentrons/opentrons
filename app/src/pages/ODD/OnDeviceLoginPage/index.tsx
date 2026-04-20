@@ -106,6 +106,13 @@ export function OnDeviceLoginPageView({
           header="Login"
           buttonText={step === 'username' ? 'next' : 'confirm'}
           buttonIsDisabled={primaryDisabled}
+          onClickBack={
+            step === 'password'
+              ? () => {
+                  setStep('username')
+                }
+              : undefined
+          }
           secondaryButtonProps={{
             buttonText: 'cancel',
             buttonType: 'tertiaryLowLight',
