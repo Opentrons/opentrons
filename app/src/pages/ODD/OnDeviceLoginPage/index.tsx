@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
+  COLORS,
   Icon,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
@@ -104,6 +105,8 @@ export function OnDeviceLoginPageView({
         : LEGACY_INPUT_TYPE_PASSWORD
 
   const activeFieldName = step === 'username' ? 'username' : 'password'
+  const passwordLabelHasError =
+    step === 'password' && loginError != null && loginError !== ''
 
   return (
     <>
@@ -136,6 +139,7 @@ export function OnDeviceLoginPageView({
             <StyledText
               oddStyle="bodyTextRegular"
               className={styles.field_label}
+              color={passwordLabelHasError ? COLORS.red50 : COLORS.black90}
             >
               {step === 'username'
                 ? t('device_settings:username')

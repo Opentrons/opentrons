@@ -68,7 +68,7 @@ export const Default: Story = {
   },
 }
 
-/** Password step with inline error — play() advances from username → password */
+/** Password step with inline error — play() advances username → password */
 export const WithLoginError: Story = {
   args: {
     ...Default.args,
