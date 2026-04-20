@@ -29,17 +29,21 @@ interface LoginFormValues {
   password: string
 }
 
-export function OnDeviceLoginPage(): JSX.Element {
-  const navigate = useNavigate()
-  const { makeSnackbar } = useToaster()
-  const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
-    onSuccess: () => {
-      navigate(-1)
-    },
-    onError: message => {
-      makeSnackbar(message)
-    },
-  })
+export interface OnDeviceLoginPageViewProps {
+  submitPassword: (username: string, password: string) => void
+  isAuthLoading: boolean
+  onCancel: () => void
+}
+
+/**
+ * Presentational shell + form for on-device login. Storybook renders this
+ * with stub handlers so we do not wire ApiHostProvider / OAuth.
+ */
+export function OnDeviceLoginPageView({
+  submitPassword,
+  isAuthLoading,
+  onCancel,
+}: OnDeviceLoginPageViewProps): JSX.Element {
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
     defaultValues: {
       username: '',
@@ -69,10 +73,6 @@ export function OnDeviceLoginPage(): JSX.Element {
   useEffect(() => {
     setShowPassword(false)
   }, [step])
-
-  const handleCancel = (): void => {
-    navigate(-1)
-  }
 
   const handleNext = (): void => {
     const { username: u, password: p } = getValues()
@@ -109,13 +109,16 @@ export function OnDeviceLoginPage(): JSX.Element {
           secondaryButtonProps={{
             buttonText: 'cancel',
             buttonType: 'tertiaryLowLight',
-            onClick: handleCancel,
+            onClick: onCancel,
           }}
           onClickButton={handleNext}
         />
         <div className={styles.content_container}>
           <div className={styles.form_inner_container}>
-            <StyledText oddStyle="bodyTextRegular" className={styles.field_label}>
+            <StyledText
+              oddStyle="bodyTextRegular"
+              className={styles.field_label}
+            >
               {step === 'username' ? 'Username' : 'Password'}
             </StyledText>
             <Controller
@@ -183,5 +186,27 @@ export function OnDeviceLoginPage(): JSX.Element {
         </div>
       ) : null}
     </>
+  )
+}
+
+export function OnDeviceLoginPage(): JSX.Element {
+  const navigate = useNavigate()
+  const { makeSnackbar } = useToaster()
+  const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
+    onSuccess: () => {
+      navigate(-1)
+    },
+    onError: message => {
+      makeSnackbar(message)
+    },
+  })
+  return (
+    <OnDeviceLoginPageView
+      submitPassword={submitPassword}
+      isAuthLoading={isAuthLoading}
+      onCancel={() => {
+        navigate(-1)
+      }}
+    />
   )
 }

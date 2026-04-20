@@ -11,7 +11,7 @@ function getOAuth2PasswordLoginErrorMessage(error: unknown): string {
     const detail = data?.errors?.[0]?.detail
     if (detail != null && detail !== '') return detail
     if (error.response?.status != null) {
-      return `Login failed (${error.response.status})`
+      return `${error.response.data.message}`
     }
   }
   return error instanceof Error ? error.message : 'Login failed'
