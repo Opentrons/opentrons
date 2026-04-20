@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
+  COLORS,
   Icon,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
@@ -15,7 +16,6 @@ import {
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import styles from './OnDeviceLoginPage.module.css'
@@ -34,6 +34,9 @@ export interface OnDeviceLoginPageViewProps {
   submitPassword: (username: string, password: string) => void
   isAuthLoading: boolean
   onCancel: () => void
+  /** Shown under the password field with error styling when login fails */
+  loginError?: string | null
+  onClearLoginError?: () => void
 }
 
 /**
@@ -44,6 +47,8 @@ export function OnDeviceLoginPageView({
   submitPassword,
   isAuthLoading,
   onCancel,
+  loginError = null,
+  onClearLoginError,
 }: OnDeviceLoginPageViewProps): JSX.Element {
   const { t } = useTranslation(['shared', 'device_settings'])
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
@@ -115,6 +120,7 @@ export function OnDeviceLoginPageView({
           onClickBack={
             step === 'password'
               ? () => {
+                  onClearLoginError?.()
                   setStep('username')
                 }
               : undefined
@@ -146,11 +152,17 @@ export function OnDeviceLoginPageView({
                   autoFocus={step === 'password'}
                   type={inputType}
                   size="medium"
+                  error={
+                    step === 'password' && loginError != null && loginError !== ''
+                      ? loginError
+                      : null
+                  }
                   value={field.value ?? ''}
                   name={field.name}
                   onBlur={field.onBlur}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     field.onChange(e.target.value)
+                    onClearLoginError?.()
                   }}
                   onFocus={() => {
                     setShowKeyboard(true)
@@ -208,19 +220,25 @@ export function OnDeviceLoginPageView({
 
 export function OnDeviceLoginPage(): JSX.Element {
   const navigate = useNavigate()
-  const { makeSnackbar } = useToaster()
+  const { t } = useTranslation('device_settings')
+  const [loginError, setLoginError] = useState<string | null>(null)
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: () => {
+      setLoginError(null)
       navigate(-1)
     },
-    onError: message => {
-      makeSnackbar(message)
+    onError: () => {
+      setLoginError(t('on_device_login_error_incorrect'))
     },
   })
   return (
     <OnDeviceLoginPageView
       submitPassword={submitPassword}
       isAuthLoading={isAuthLoading}
+      loginError={loginError}
+      onClearLoginError={() => {
+        setLoginError(null)
+      }}
       onCancel={() => {
         navigate(-1)
       }}

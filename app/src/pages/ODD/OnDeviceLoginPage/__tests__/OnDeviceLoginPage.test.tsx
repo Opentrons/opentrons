@@ -17,14 +17,6 @@ vi.mock('/app/resources/auth', () => ({
   useOAuth2PasswordLogin: vi.fn(),
 }))
 
-vi.mock('/app/organisms/ToasterOven', () => ({
-  useToaster: () => ({
-    makeSnackbar: vi.fn(),
-    makeToast: vi.fn(),
-    eatToast: vi.fn(),
-  }),
-}))
-
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<typeof ReactRouterDom>()
   return {
@@ -188,5 +180,26 @@ describe('Login', () => {
     })
     fireEvent.click(screen.getByText('Confirm'))
     expect(mockSubmitPassword).toHaveBeenCalledWith('user1', 'secret')
+  })
+
+  it('shows login failure under the password field instead of a snackbar', () => {
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onError }) => ({
+      submitPassword: () => {
+        onError('ignored api message')
+      },
+      isAuthLoading: false,
+    }))
+    const { container } = renderLogin()
+    fireEvent.change(getLoginInput(container), {
+      target: { value: 'user1' },
+    })
+    fireEvent.click(screen.getByText('Next'))
+    fireEvent.change(getLoginInput(container), {
+      target: { value: 'secret' },
+    })
+    fireEvent.click(screen.getByText('Confirm'))
+    screen.getByText(
+      'Incorrect username or password (4 attempts remaining before lockout)'
+    )
   })
 })

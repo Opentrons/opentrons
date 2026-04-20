@@ -262,6 +262,7 @@
   "off": "Off",
   "on": "On",
   "on_device_login": "Login",
+  "on_device_login_error_incorrect": "Incorrect username or password (4 attempts remaining before lockout)",
   "one_hour": "1 hour",
   "other_networks": "Other Networks",
   "other_robot_updating": "Unable to update because the app is currently updating a different robot.",

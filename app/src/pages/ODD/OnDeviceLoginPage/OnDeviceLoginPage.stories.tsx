@@ -61,5 +61,7 @@ export const Default: Story = {
     ) => void,
     isAuthLoading: false,
     onCancel: action('onCancel'),
+    loginError: null,
+    onClearLoginError: action('onClearLoginError'),
   },
 }
