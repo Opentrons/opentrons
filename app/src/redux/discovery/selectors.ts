@@ -242,7 +242,7 @@ export const getDiscoverableRobotByName: (
   {
     memoize: lruMemoize,
     memoizeOptions: {
-      equalityCheck: isEqual,
+      resultEqualityCheck: isEqual,
     },
   }
 )
