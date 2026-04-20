@@ -19,7 +19,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
-  enrichRobotStateForStackGraphTraversals,
   getAllLargestStacks,
   getProvidedAddressableAreasExposed,
   getSlotInLocationStack,
@@ -351,13 +350,14 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
     getLabwareEntities,
 
     (robotState, initialDeckSetup, labwareEntities) => {
-      if (robotState == null)
+      if (robotState == null) {
         return {
           pipettes: {},
           labware: {},
           modules: {},
           additionalEquipmentOnDeck: {},
         }
+      }
       const { pipettes, modules, additionalEquipmentOnDeck } = initialDeckSetup
       return {
         pipettes: mapValues(pipettes, (pipEntity, pipId) => ({
@@ -382,28 +382,21 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
     }
   )
 
-/** Memoized largest stacks at the active timeline item (`stack` → `stackedOnNode`; sibling `contains` when applicable). */
+/**
+ * Largest stacks at the active timeline item.
+ * Expects `robotState` from simulation to already carry `stackedOnNode` / `contains` (initial deck
+ * from {@link getInitialRobotState}, then per-command updaters such as `forMoveLabware`).
+ */
 export const getAllLargestStacksAtActiveItem: Selector<
   LoadedLabwareLocation[][]
-> = createSelector(
-  getRobotStateAtActiveItem,
-  getModuleEntities,
-  getLabwareEntities,
-  (robotState, moduleEntities, labwareEntities) => {
-    if (robotState == null) {
-      return []
-    }
-    return getAllLargestStacks(
-      enrichRobotStateForStackGraphTraversals(
-        robotState,
-        moduleEntities,
-        labwareEntities
-      )
-    )
+> = createSelector(getRobotStateAtActiveItem, robotState => {
+  if (robotState == null) {
+    return []
   }
-)
+  return getAllLargestStacks(robotState)
+})
 
-/** Memoized: provided addressable areas not covered by a labware stack at the timeline’s active item. */
+/** Provided addressable areas not covered by a labware stack at the timeline’s active item. */
 export const getProvidedAddressableAreasExposedAtActiveItem: Selector<
   Set<AddressableAreaName>
 > = createSelector(
@@ -411,23 +404,12 @@ export const getProvidedAddressableAreasExposedAtActiveItem: Selector<
   getRobotType,
   stepFormSelectors.getDeckConfiguration,
   getModuleEntities,
-  getLabwareEntities,
-  (
-    robotState,
-    robotType,
-    deckConfigurationState,
-    moduleEntities,
-    labwareEntities
-  ) => {
+  (robotState, robotType, deckConfigurationState, moduleEntities) => {
     if (robotState == null) {
       return new Set<AddressableAreaName>()
     }
     return getProvidedAddressableAreasExposed({
-      robotState: enrichRobotStateForStackGraphTraversals(
-        robotState,
-        moduleEntities,
-        labwareEntities
-      ),
+      robotState,
       deckConfiguration: deckConfigurationState.deckConfig,
       deckDefinition: getDeckDefFromRobotType(robotType),
       moduleEntities,

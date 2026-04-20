@@ -264,3 +264,25 @@ def load_ca_cert(maybe_cert: Path) -> x509.Certificate | None:  # noqa: C901
         )
         return None
     return cert
+
+
+def make_pem_bundle(
+    ca_cert: x509.Certificate,
+    tls_cert: x509.Certificate,
+    tls_key: ec.EllipticCurvePrivateKey,
+    path: Path,
+) -> None:
+    """Write a CA cert, end entity cert, and end entity key to a single PEM for certain TLS terminators."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as combined_pem:
+        combined_pem.write(
+            tls_key.private_bytes(
+                serialization.Encoding.PEM,
+                serialization.PrivateFormat.PKCS8,
+                serialization.NoEncryption(),
+            )
+        )
+        combined_pem.write(b"\n")
+        combined_pem.write(tls_cert.public_bytes(serialization.Encoding.PEM))
+        combined_pem.write(b"\n")
+        combined_pem.write(ca_cert.public_bytes(serialization.Encoding.PEM))

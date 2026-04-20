@@ -22,8 +22,7 @@ import {
 } from '../../utils'
 
 import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
 export const moveToWell: CommandCreator<MoveToWellParams> = (
@@ -186,9 +185,10 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   }
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
-
+  const pipetteSpecs = invariantContext.pipetteEntities[pipetteId]?.spec
   if (
     isMultiChannelPipette &&
+    pipetteSpecs &&
     !getIsSafePipetteMovement({
       robotState: prevRobotState,
       invariantContext,
