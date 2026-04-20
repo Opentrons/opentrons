@@ -3,7 +3,7 @@ title: "Vacuum Module: G-Code"
 description: "Vacuum Module G-code commands and responses."
 ---
 
-The Vacuum Module accepts the G-code commands listed below. 
+The Vacuum Module accepts the G-code commands listed below.
 
 !!! tip
     These commands rarely change, but you can always check for updates in the [module's driver files](https://github.com/Opentrons/opentrons/tree/edge/api/src/opentrons/drivers/vacuum_module) on GitHub.
@@ -22,13 +22,14 @@ The Vacuum Module accepts the G-code commands listed below.
         <strong>Command:</strong> get reset reason<br>
         <strong>Arguments:</strong> none <br>
         <strong>Response elements:</strong> <code>R:</code>, last reset reason <font color="red">Is there a list of reasons?</font><br>
-        <strong>Example:</strong> <code>M114</code> returns <code>M114 R:1 OK</code> 
+        <strong>Example: </strong> <code>M114</code><br>
+        <strong>Response:</strong> <code>M114 R:1 OK</code>
       </td>
     </tr>
     <tr>
       <td><code>M115</code></td>
       <td>
-        <strong>Command:</strong> get device info <br>
+        <strong>Command:</strong> get firmware and software version and serial number<br>
         <strong>Arguments:</strong> none<br>
         <strong>Response elements:</strong>
         <ul>
@@ -36,7 +37,8 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>HW</code>: hardware version</li>
           <li><code>SerialNo</code>: serial number of the module</li>
         </ul>
-        <strong>Response:</strong> <code>M115 FW:&lt;version&gt; HW:&lt;version&gt; SerialNo:&lt;serial number&gt; OK</code>
+        <strong>Example:</strong> <code>M115</code><br>
+        <strong>Response:</strong> <code>M115 FW: v1.0 HW: Opentrons-vacuum-module SerialNo:&lt;serial_number&gt; OK</code>
       </td>
     </tr>
     <tr>
@@ -48,12 +50,14 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>S</code>: Start/stop control. Accepts <code>1</code> (start/on) or <code>0</code> (stop/off).</li>
           <li><code>P</code>: Target gauge pressure in mbar. Range: <code>-1013</code>mbar (full vacuum) to <code>0</code> mbar (atmospheric).
             <br><strong>Note:</strong> While the firmware accepts -1013 mbar, the vacuum the pump can achieve will fall short of this theoretical limit and depends on local atmospheric pressure.</li>
-          <li><code>D</code>: Duration in seconds. Range: <code>0–86400</code> seconds (up to 24 hours).</li>
-          <li><code>T</code>: Timeout in seconds to reach target pressure. Range: <code>0–86400</code> seconds (up to 24 hours).</li>
-          <li><code>R</code>: Ramp rate in mbar/s. Range: <code>0–50</code> mbar/s.</li>
-          <li><code>V</code>: Vent state after cycle. Accepts <code>1</code> (open) or <code>0</code> (close).</li>
+          <li><code>D</code>: Duration in seconds <i>(optional)</i>. Range: <code>0</code> (indefinite) to <code>86400</code> seconds (24 hours).</li>
+          <li><code>T</code>: Timeout in seconds to reach target pressure <i>(optional)</i>. Range: <code>0</code> (indefinite) to <code>86400</code> seconds (24 hours).
+            <br><strong>Note:</strong> If the target pressure is not reached within the timeout interval, the module returns <code>err400: pressure not reached</code>.</li>
+          <li><code>R</code>: Ramp rate in mbar/s <i>(optional)</i>. Range: <code>0–50</code> mbar/s.</li>
+          <li><code>V</code>: Vent state after cycle <i>(optional)</i>. Accepts <code>1</code> (open) or <code>0</code> (close).</li>
         </ul>
-        <strong>Response: Returns </strong> <code>M120 OK</code>. If the target pressure is not reached within the timeout interval <code>T</code>, the module returns <code>err400: pressure not reached</code>.
+        <strong>Example:</strong> <code>M120 S1 P-400</code> sets the gague pressure to -400 mbar.<br>
+        <strong>Response:</strong> <code>M120 OK</code>.<br>
       </td>
     </tr>
     <tr>
