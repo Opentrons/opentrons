@@ -25,6 +25,4 @@ getHealth(host)
 
 ## Details
 
-The `@opentrons/api-client` module is built using [axios][].
-
-[axios]: https://github.com/axios/axios
+The `@opentrons/api-client` module is built on a shared fetch-based HTTP transport.

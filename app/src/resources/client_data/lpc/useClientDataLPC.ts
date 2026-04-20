@@ -1,6 +1,6 @@
 import { useNotifyClientDataLPC } from './useNotifyClientDataLPC'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type { ClientDataResponse } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '/app/resources/useNotifyDataReady'
 import type { ClientDataLPC } from './types'

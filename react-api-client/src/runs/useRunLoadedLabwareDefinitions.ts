@@ -4,23 +4,23 @@ import { getRunLoadedLabwareDefintions } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   HostConfig,
+  HttpClientError,
   RunLoadedLabwareDefinitions,
 } from '@opentrons/api-client'
 
 export function useRunLoadedLabwareDefinitions(
   runId: string | null,
-  options: UseQueryOptions<RunLoadedLabwareDefinitions, AxiosError> = {},
+  options: UseQueryOptions<RunLoadedLabwareDefinitions, HttpClientError> = {},
   hostOverride?: HostConfig
-): UseQueryResult<RunLoadedLabwareDefinitions, AxiosError> {
+): UseQueryResult<RunLoadedLabwareDefinitions, HttpClientError> {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  return useQuery<RunLoadedLabwareDefinitions, AxiosError>(
+  return useQuery<RunLoadedLabwareDefinitions, HttpClientError>(
     [host, 'runs', runId, 'loaded_labware_definitions'],
     () =>
       getRunLoadedLabwareDefintions(host!, runId!).then(

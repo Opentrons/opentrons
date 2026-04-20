@@ -4,12 +4,12 @@ import { addCameraSettingsToRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
 import type {
   CameraData,
   CameraResponse,
   ErrorResponse,
+  HttpClientError,
 } from '@opentrons/api-client'
 
 export interface AddCameraSettingsToRunParams {
@@ -19,12 +19,12 @@ export interface AddCameraSettingsToRunParams {
 
 export type UseAddCameraSettingsToRunMutationResult = UseMutationResult<
   CameraResponse,
-  AxiosError<ErrorResponse>,
+  HttpClientError<ErrorResponse>,
   AddCameraSettingsToRunParams
 > & {
   addCameraSettingsToRun: UseMutateFunction<
     CameraResponse,
-    AxiosError<ErrorResponse>,
+    HttpClientError<ErrorResponse>,
     AddCameraSettingsToRunParams
   >
 }
@@ -35,7 +35,7 @@ export function useAddCameraSettingsToRunMutation(): UseAddCameraSettingsToRunMu
 
   const mutation = useMutation<
     CameraResponse,
-    AxiosError<ErrorResponse>,
+    HttpClientError<ErrorResponse>,
     AddCameraSettingsToRunParams
   >(({ runId, settings }) =>
     addCameraSettingsToRun(host!, runId, settings)

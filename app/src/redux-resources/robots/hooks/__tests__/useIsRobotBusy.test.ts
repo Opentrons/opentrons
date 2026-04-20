@@ -12,7 +12,7 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
 import type { Runs, Sessions } from '@opentrons/api-client'
 

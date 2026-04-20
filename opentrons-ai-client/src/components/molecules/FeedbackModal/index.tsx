@@ -26,7 +26,7 @@ import { useApiCall } from '/ai-client/resources/hooks'
 import { useGetAccessToken } from '/ai-client/resources/hooks/useGetAccessToken'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
-import type { AxiosRequestConfig } from 'axios'
+import type { HttpRequestConfig } from '@opentrons/api-client'
 
 type Env = 'production' | 'development' | 'staging'
 
@@ -82,7 +82,7 @@ export function FeedbackModal(): JSX.Element {
       },
     }
     setIsSubmitting(true)
-    await callApi(config as AxiosRequestConfig)
+    await callApi(config as HttpRequestConfig)
   }
 
   useEffect(

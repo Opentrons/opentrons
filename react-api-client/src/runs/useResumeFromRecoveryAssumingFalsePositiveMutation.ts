@@ -7,7 +7,7 @@ import {
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type {
   UseMutateFunction,
   UseMutationOptions,

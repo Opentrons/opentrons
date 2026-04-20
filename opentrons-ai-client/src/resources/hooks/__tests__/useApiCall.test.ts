@@ -1,16 +1,21 @@
 import { act, renderHook } from '@testing-library/react'
-import axios from 'axios'
-import MockAdapter from 'axios-mock-adapter'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useApiCall } from '../useApiCall'
 
-const mock = new MockAdapter(axios)
-
 describe('useApiCall', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('should post data successfully', async () => {
     const mockData = { message: 'Hello, World!' }
-    mock.onPost('/test').reply(200, mockData)
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(mockData), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
 
     const { result } = renderHook(() => useApiCall())
 
@@ -28,7 +33,7 @@ describe('useApiCall', () => {
   })
 
   it('should handle network error as structured ApiErrorResponse', async () => {
-    mock.onPost('/test').networkError()
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network Error'))
 
     const { result } = renderHook(() => useApiCall())
 
@@ -45,10 +50,18 @@ describe('useApiCall', () => {
   })
 
   it('should use API error response body (camelCase) as ApiErrorResponse', async () => {
-    mock.onPost('/test').reply(400, {
-      message: 'Your request is too large.',
-      errorType: 'context_length_exceeded',
-    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Your request is too large.',
+          errorType: 'context_length_exceeded',
+        }),
+        {
+          status: 400,
+          headers: { 'content-type': 'application/json' },
+        }
+      )
+    )
 
     const { result } = renderHook(() => useApiCall())
 
@@ -65,10 +78,18 @@ describe('useApiCall', () => {
   })
 
   it('should use 504 timeout error (camelCase) as ApiErrorResponse', async () => {
-    mock.onPost('/test').reply(504, {
-      message: 'Your request timed out.',
-      errorType: 'request_timeout',
-    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Your request timed out.',
+          errorType: 'request_timeout',
+        }),
+        {
+          status: 504,
+          headers: { 'content-type': 'application/json' },
+        }
+      )
+    )
 
     const { result } = renderHook(() => useApiCall())
 
@@ -85,7 +106,7 @@ describe('useApiCall', () => {
   })
 
   it('should clear error when clearError is called', async () => {
-    mock.onPost('/test').networkError()
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network Error'))
 
     const { result } = renderHook(() => useApiCall())
 

@@ -4,20 +4,23 @@ import { getRunCurrentState } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, RunCurrentState } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  HttpClientError,
+  RunCurrentState,
+} from '@opentrons/api-client'
 
 export function useRunCurrentState(
   runId: string | null,
-  options: UseQueryOptions<RunCurrentState, AxiosError> = {},
+  options: UseQueryOptions<RunCurrentState, HttpClientError> = {},
   hostOverride?: HostConfig
-): UseQueryResult<RunCurrentState, AxiosError> {
+): UseQueryResult<RunCurrentState, HttpClientError> {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  return useQuery<RunCurrentState, AxiosError>(
+  return useQuery<RunCurrentState, HttpClientError>(
     [host, 'runs', runId, 'currentState'],
     () => getRunCurrentState(host!, runId!).then(response => response.data),
     {

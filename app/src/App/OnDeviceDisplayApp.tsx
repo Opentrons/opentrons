@@ -71,7 +71,7 @@ import { ModalPortalRoot } from './portal'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
-// forces electron to think we're online which means axios won't elide
+// forces electron to think we're online so localhost network calls are not elided
 // network calls to localhost. see ./hacks.ts for more.
 hackWindowNavigatorOnLine()
 

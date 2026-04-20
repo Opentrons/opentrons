@@ -4,12 +4,12 @@ import { addCapturePreviewImageToRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
 import type {
   CameraImageSettings,
   DownloadedPreviewImageFileResponse,
   ErrorResponse,
+  HttpClientError,
 } from '@opentrons/api-client'
 
 export interface AddCapturePreviewImageToRunParams {
@@ -19,12 +19,12 @@ export interface AddCapturePreviewImageToRunParams {
 
 export type UseAddCapturePreviewImageToRunMutationResult = UseMutationResult<
   DownloadedPreviewImageFileResponse,
-  AxiosError<ErrorResponse>,
+  HttpClientError<ErrorResponse>,
   AddCapturePreviewImageToRunParams
 > & {
   createCapturePreviewImageToRun: UseMutateFunction<
     DownloadedPreviewImageFileResponse,
-    AxiosError<ErrorResponse>,
+    HttpClientError<ErrorResponse>,
     AddCapturePreviewImageToRunParams
   >
 }
@@ -36,7 +36,7 @@ export function useCapturePreviewImageToRun(
 
   const mutation = useMutation<
     DownloadedPreviewImageFileResponse,
-    AxiosError<ErrorResponse>,
+    HttpClientError<ErrorResponse>,
     AddCapturePreviewImageToRunParams
   >(({ settings }) =>
     addCapturePreviewImageToRun(host!, runId, settings, {

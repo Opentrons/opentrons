@@ -1,14 +1,17 @@
 import * as React from 'react'
 
-import type { AxiosRequestConfig } from 'axios'
-import type { HostConfig, ResponsePromise } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  HttpRequestConfig,
+  ResponsePromise,
+} from '@opentrons/api-client'
 
 export const ApiHostContext = React.createContext<HostConfig | null>(null)
 
 export interface ApiHostProviderProps {
   hostname: string | null
   port?: number | null
-  requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
+  requestor?: <ResData>(config: HttpRequestConfig) => ResponsePromise<ResData>
   robotName?: string | null
   token?: string
   children?: React.ReactNode

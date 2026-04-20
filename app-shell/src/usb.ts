@@ -1,6 +1,7 @@
-import axios from 'axios'
 import { ipcMain } from 'electron'
 import FormData from 'form-data'
+import fetch from 'node-fetch'
+import { HttpClientError } from '@opentrons/api-client'
 
 import {
   DEFAULT_PRODUCT_ID,
@@ -17,8 +18,9 @@ import {
 } from './constants'
 import { createLogger } from './log'
 
-import type { AxiosRequestConfig } from 'axios'
 import type { IpcMainInvokeEvent } from 'electron'
+import type { HttpRequestConfig, HttpResponse } from '@opentrons/api-client'
+import type { BodyInit as NodeFetchBodyInit } from 'node-fetch'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
@@ -94,9 +96,12 @@ function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
   return result
 }
 
-const cloneError = (e: any): Record<string, unknown> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  Object.entries(axios.isAxiosError(e) ? e.toJSON() : e).reduce<
+const cloneError = (e: HttpClientError | Record<string, unknown>): Record<string, unknown> =>
+  Object.entries(
+    'toJSON' in e && typeof e.toJSON === 'function'
+      ? (e.toJSON() as Record<string, unknown>)
+      : e
+  ).reduce<
     Record<string, unknown>
   >((acc, [k, v]) => {
     try {
@@ -107,20 +112,46 @@ const cloneError = (e: any): Record<string, unknown> =>
     }
   }, {})
 
+async function parseResponseData(
+  response: Awaited<ReturnType<typeof fetch>>,
+  responseType?: HttpRequestConfig['responseType']
+): Promise<unknown> {
+  if (response.status === 204 || response.status === 205) {
+    return undefined
+  }
+
+  if (responseType === 'blob' || responseType === 'arrayBuffer') {
+    return await response.arrayBuffer()
+  }
+
+  const contentType = response.headers.get('content-type') ?? ''
+  if (
+    responseType === 'json' ||
+    contentType.includes('application/json') ||
+    contentType.includes('+json')
+  ) {
+    return await response.json()
+  }
+
+  return await response.text()
+}
+
 async function usbListener(
   _event: IpcMainInvokeEvent,
-  config: AxiosRequestConfig
+  config: HttpRequestConfig
 ): Promise<unknown> {
   // TODO(bh, 2023-05-03): remove mutation
   let { data } = config
   let formHeaders = {}
+  const proxiedData =
+    data != null && typeof data === 'object'
+      ? (data as { proxiedFormData?: IPCSafeFormData })
+      : null
 
   // check for formDataProxy
-  if (data?.proxiedFormData != null) {
+  if (proxiedData?.proxiedFormData != null) {
     // reconstruct FormData
-    const formData = reconstructFormData(
-      data.proxiedFormData as IPCSafeFormData
-    )
+    const formData = reconstructFormData(proxiedData.proxiedFormData)
     formHeaders = formData.getHeaders()
     data = formData
   }
@@ -128,35 +159,54 @@ async function usbListener(
   const usbHttpAgent = getSerialPortHttpAgent()
   try {
     usbLog.silly(`${config.method} ${config.url} timeout=${config.timeout}`)
-    const response = await axios.request({
-      httpAgent: usbHttpAgent,
-      ...config,
-      data,
+    const response = await fetch(config.url ?? '', {
+      method: config.method,
       headers: { ...config.headers, ...formHeaders },
-      // Axios can't create proper blob types on the node layer, so we use
-      // arraybuffer instead.
-      responseType:
-        config.responseType === 'blob' ? 'arraybuffer' : config.responseType,
+      body: (data ?? undefined) as NodeFetchBodyInit | undefined,
+      agent: usbHttpAgent,
     })
+    const parsedData = await parseResponseData(response, config.responseType)
+    const normalizedResponse: HttpResponse<unknown> = {
+      config,
+      data: parsedData,
+      headers: Object.fromEntries(response.headers.entries()),
+      status: response.status,
+      statusText: response.statusText,
+    }
+
+    if (!response.ok) {
+      const httpClientError: HttpClientError = new HttpClientError({
+        config,
+        message: `Request failed with status code ${response.status}`,
+        response: normalizedResponse,
+      })
+      throw httpClientError
+    }
     usbLog.silly(`${config.method} ${config.url} resolved ok`)
 
     // Convert ArrayBuffer to regular Array for IPC transfer, since ArrayBuffer
     //  objects cannot be sent across the IPC reliably.
     const responseData =
-      config.responseType === 'blob' && response.data instanceof ArrayBuffer
-        ? Array.from(new Uint8Array(response.data))
-        : response.data
+      config.responseType === 'blob' && parsedData instanceof ArrayBuffer
+        ? Array.from(new Uint8Array(parsedData))
+        : parsedData
 
     return {
       error: null,
       data: responseData,
-      status: response.status,
-      statusText: response.statusText,
+      headers: normalizedResponse.headers,
+      status: normalizedResponse.status,
+      statusText: normalizedResponse.statusText,
+      config,
     }
-  } catch (e: any) {
-    usbLog.info(`${config.method} ${config.url} failed: ${e}`)
+  } catch (e: unknown) {
+    usbLog.info(`${config.method} ${config.url} failed: ${String(e)}`)
     return {
-      error: cloneError(e),
+      error: cloneError(
+        (typeof e === 'object' && e != null
+          ? e
+          : { message: String(e) }) as HttpClientError | Record<string, unknown>
+      ),
     }
   }
 }

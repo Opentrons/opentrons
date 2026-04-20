@@ -13,7 +13,7 @@ import { useNotifyAllRunsQuery, useRunStatuses } from '/app/resources/runs'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
 import type { Protocols, Runs } from '@opentrons/api-client'
 

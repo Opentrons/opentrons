@@ -4,7 +4,6 @@ import { createProtocol } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
 import type {
   UseMutateFunction,
   UseMutationOptions,
@@ -13,6 +12,7 @@ import type {
 import type {
   ErrorResponse,
   HostConfig,
+  HttpClientError,
   Protocol,
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
@@ -27,19 +27,19 @@ export interface CreateProtocolVariables {
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
   Protocol,
-  AxiosError<ErrorResponse>,
+  HttpClientError<ErrorResponse>,
   CreateProtocolVariables
 > & {
   createProtocol: UseMutateFunction<
     Protocol,
-    AxiosError<ErrorResponse>,
+    HttpClientError<ErrorResponse>,
     CreateProtocolVariables
   >
 }
 
 export type UseCreateProtocolMutationOptions = UseMutationOptions<
   Protocol,
-  AxiosError<ErrorResponse>,
+  HttpClientError<ErrorResponse>,
   CreateProtocolVariables
 >
 
@@ -54,7 +54,7 @@ export function useCreateProtocolMutation(
 
   const mutation = useMutation<
     Protocol,
-    AxiosError<ErrorResponse>,
+    HttpClientError<ErrorResponse>,
     CreateProtocolVariables
   >(
     [host, 'protocols'],

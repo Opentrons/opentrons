@@ -12,6 +12,7 @@ import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
 import type {
+  ErrorResponse,
   HostConfig,
   LegacyLabwareOffsetCreateData,
   Protocol,
@@ -57,10 +58,10 @@ export function useCreateRunFromProtocol(
     {
       ...options,
       onSuccess: (...args) => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
+        void queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
           console.error(`error invalidating runs query: ${e.message}`)
         })
-        options.onSuccess?.(...args)
+        void options.onSuccess?.(...args)
       },
     },
     host
@@ -84,12 +85,23 @@ export function useCreateRunFromProtocol(
     host
   )
 
+  const protocolErrorData = protocolError?.response?.data as
+    | ErrorResponse
+    | string
+    | undefined
+  const runErrorData = runError?.response?.data as
+    | ErrorResponse
+    | string
+    | undefined
+
   let error =
     protocolError != null || runError != null
-      ? (protocolError?.response?.data?.errors?.[0]?.detail ??
-        protocolError?.response?.data ??
-        runError?.response?.data?.errors?.[0]?.detail ??
-        runError?.response?.data ??
+      ? ((protocolErrorData != null && typeof protocolErrorData !== 'string'
+          ? protocolErrorData.errors?.[0]?.detail
+          : protocolErrorData) ??
+        (runErrorData != null && typeof runErrorData !== 'string'
+          ? runErrorData.errors?.[0]?.detail
+          : runErrorData) ??
         t('protocol_run_general_error_msg'))
       : null
   error != null && console.error(error)

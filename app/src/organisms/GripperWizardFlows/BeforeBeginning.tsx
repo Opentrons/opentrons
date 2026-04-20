@@ -20,7 +20,7 @@ import {
   SCREWDRIVER_LOADNAME,
 } from './constants'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,

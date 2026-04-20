@@ -10,7 +10,7 @@ import { OPENTRONS_USB } from '../discovery'
 import { appShellRequestor } from '../shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError, HttpHeaders } from '@opentrons/api-client'
 import type { Observable } from 'rxjs'
 import type {
   RobotApiRequestOptions,
@@ -20,6 +20,19 @@ import type {
 
 const checkEmpty = (val: unknown): boolean => val == null || val === ''
 
+function toHttpHeaders(headers: HeadersInit | undefined): HttpHeaders | undefined {
+  if (headers == null) {
+    return undefined
+  }
+  if (headers instanceof Headers) {
+    return Object.fromEntries(headers.entries())
+  }
+  if (Array.isArray(headers)) {
+    return Object.fromEntries(headers)
+  }
+  return headers
+}
+
 export function robotApiUrl(
   host: RobotHost,
   request: RobotApiRequestOptions
@@ -27,7 +40,7 @@ export function robotApiUrl(
   const { path, query } = request
   let url = `http://${host.ip}:${host.port}${path}`
 
-  if (query && Object.keys(query).length > 0) {
+  if (query != null && Object.keys(query).length > 0) {
     const queryNoEmptyParams = omitBy(query, checkEmpty)
     const stringParamsMap = mapValues(queryNoEmptyParams, toString)
     const queryParams = new URLSearchParams(stringParamsMap)
@@ -58,7 +71,7 @@ export function fetchRobotApi(
   return host.ip === OPENTRONS_USB
     ? from(
         appShellRequestor({
-          headers: options.headers,
+          headers: toHttpHeaders(options.headers),
           method,
           url,
           data: options.body,
@@ -80,7 +93,7 @@ export function fetchRobotApi(
           // FIXME(sf) this doesn't seem right, but also the type interface isn't written to allow for request
           // failures that don't come from valid connections
           status: result?.response?.status ?? 444,
-          // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
+          // appShellRequestor returns a response object without an ok boolean, so derive it from status.
           ok: result.isError
             ? false
             : inRange(result?.response?.status, 200, 300),

@@ -1,4 +1,4 @@
-import { createAxiosConfig, GET, request } from '../../request'
+import { createRequestConfig, GET, request } from '../../request'
 
 import type { CommandsData } from '..'
 import type { ResponsePromise } from '../../request'
@@ -15,6 +15,6 @@ export function getCommands(
     `/runs/${runId}/commands`,
     null,
     config,
-    params && createAxiosConfig({ params })
+    params && createRequestConfig({ params })
   )
 }

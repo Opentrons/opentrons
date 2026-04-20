@@ -14,7 +14,7 @@ import { buildMultipartFormData } from './buildMultipartFormData'
 import { detectProtocolFormat } from './protocolFormat'
 import { getUpdateOrCreatePrompt } from './protocolUtils'
 
-import type { AxiosRequestConfig } from 'axios'
+import type { HttpRequestConfig } from '@opentrons/api-client'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type {
   Chat,
@@ -78,7 +78,7 @@ export const buildRequestConfig = (
   pdProtocolContent: ProtocolFile | null,
   createProtocol: CreatePrompt,
   updateProtocol: UpdatePrompt
-): AxiosRequestConfig => {
+): HttpRequestConfig => {
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',

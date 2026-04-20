@@ -4,7 +4,7 @@ import { createMaintenanceRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type {
   UseMutateAsyncFunction,
   UseMutationOptions,

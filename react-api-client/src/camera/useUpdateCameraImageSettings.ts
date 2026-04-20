@@ -4,17 +4,17 @@ import { createCameraImageSettings } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
+import type {
+  AxiosError,
+  CameraImageSettings,
+  CameraImageSettingsResponse,
+  ErrorResponse,
+} from '@opentrons/api-client'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type {
-  CameraImageSettings,
-  CameraImageSettingsResponse,
-  ErrorResponse,
-} from '@opentrons/api-client'
 
 export type UseCreateCameraImageSettingsMutationResult = UseMutationResult<
   CameraImageSettingsResponse,
@@ -44,16 +44,27 @@ export function useCreateCameraImageSettings(
     CameraImageSettings
   >(
     [host, 'camera', 'cameraSettings'],
-    (data: CameraImageSettings) =>
-      createCameraImageSettings(host!, data).then(response => {
+    async (data: CameraImageSettings) => {
+      if (host == null) {
+        throw new Error('Host config is required')
+      }
+      return await createCameraImageSettings(host, data).then(response => {
         queryClient
           .invalidateQueries([host, 'camera', 'cameraSettings'])
           .catch(e => {
             throw e
           })
         return response.data
-      }),
-    options
+      })
+    },
+    options as Omit<
+      UseMutationOptions<
+        CameraImageSettingsResponse,
+        AxiosError<ErrorResponse>,
+        CameraImageSettings
+      >,
+      'mutationFn' | 'mutationKey'
+    >
   )
 
   return {

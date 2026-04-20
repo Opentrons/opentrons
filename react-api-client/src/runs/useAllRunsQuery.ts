@@ -4,13 +4,17 @@ import { getRuns } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { GetRunsParams, HostConfig, Runs } from '@opentrons/api-client'
+import type {
+  GetRunsParams,
+  HostConfig,
+  HttpClientError,
+  Runs,
+} from '@opentrons/api-client'
 
 export type UseAllRunsQueryOptions = UseQueryOptions<
   Runs,
-  AxiosError,
+  HttpClientError,
   Runs,
   Array<string | HostConfig>
 >
@@ -23,7 +27,7 @@ export function useAllRunsQuery(
   params: GetRunsParams = {},
   options: UseAllRunsQueryOptions = {},
   hostOverride?: HostConfig | null
-): UseQueryResult<Runs, AxiosError> {
+): UseQueryResult<Runs, HttpClientError> {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
@@ -36,7 +40,7 @@ export function useAllRunsQuery(
     () =>
       getRuns(host!, params)
         .then(response => response.data)
-        .catch((e: AxiosError) => {
+        .catch((e: HttpClientError) => {
           throw e
         }),
     { enabled: host !== null, ...options }

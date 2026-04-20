@@ -1,4 +1,4 @@
-import { createAxiosConfig, POST, request } from '../request'
+import { createRequestConfig, POST, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
@@ -13,6 +13,6 @@ export function createRegistration(
     '/system/register',
     null,
     config,
-    params && createAxiosConfig({ params })
+    params && createRequestConfig({ params })
   )
 }

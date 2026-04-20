@@ -10,7 +10,6 @@
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
     "@types/lodash": "4.17.24",
-    "axios": "^0.21.1",
     "lodash": "4.18.1"
   }
 }

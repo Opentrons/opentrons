@@ -4,32 +4,36 @@ import { createSplash } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError, AxiosResponse } from 'axios'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { ErrorResponse, HostConfig } from '@opentrons/api-client'
+import type {
+  ErrorResponse,
+  HostConfig,
+  HttpClientError,
+  HttpResponse,
+} from '@opentrons/api-client'
 
 export interface CreateSplashRequestData {
   file: File
 }
 export type UseCreateSplashMutationResult = UseMutationResult<
-  AxiosResponse<void>,
-  AxiosError<ErrorResponse>,
+  HttpResponse<void>,
+  HttpClientError<ErrorResponse>,
   CreateSplashRequestData
 > & {
   createSplash: UseMutateFunction<
-    AxiosResponse<void>,
-    AxiosError<ErrorResponse>,
+    HttpResponse<void>,
+    HttpClientError<ErrorResponse>,
     CreateSplashRequestData
   >
 }
 
 export type UseCreateSplashMutationOptions = UseMutationOptions<
-  AxiosResponse<void>,
-  AxiosError<ErrorResponse>,
+  HttpResponse<void>,
+  HttpClientError<ErrorResponse>,
   CreateSplashRequestData
 >
 
@@ -42,8 +46,8 @@ export function useCreateSplashMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
   const mutation = useMutation<
-    AxiosResponse<void>,
-    AxiosError<ErrorResponse>,
+    HttpResponse<void>,
+    HttpClientError<ErrorResponse>,
     CreateSplashRequestData
   >(
     [host, 'splash'],

@@ -1,10 +1,11 @@
-import type { AxiosRequestConfig } from 'axios'
 import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
-import type { ResponsePromise } from './request'
+import type { HttpRequestConfig, ResponsePromise } from './request'
 
 export interface HostConfig {
   hostname: string
-  requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
+  requestor?: <ResData>(
+    config: HttpRequestConfig
+  ) => ResponsePromise<ResData>
   port?: number | null
   robotName?: string | null
   token?: string

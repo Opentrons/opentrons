@@ -22,7 +22,7 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type { IconProps, StyleProps } from '@opentrons/components'
 import type { Robot } from '/app/redux/discovery/types'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'

@@ -4,7 +4,7 @@ import { getCamera } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
+import type { AxiosError } from '@opentrons/api-client'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CameraResponse } from '@opentrons/api-client'
 

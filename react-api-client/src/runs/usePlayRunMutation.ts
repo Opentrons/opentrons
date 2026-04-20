@@ -4,25 +4,24 @@ import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { RunAction } from '@opentrons/api-client'
+import type { HttpClientError, RunAction } from '@opentrons/api-client'
 
 export type UsePlayRunMutationResult = UseMutationResult<
   RunAction,
-  AxiosError,
+  HttpClientError,
   string
 > & {
-  playRun: UseMutateFunction<RunAction, AxiosError, string>
+  playRun: UseMutateFunction<RunAction, HttpClientError, string>
 }
 
 export type UsePlayRunMutationOptions = UseMutationOptions<
   RunAction,
-  AxiosError,
+  HttpClientError,
   string
 >
 
@@ -30,7 +29,7 @@ export const usePlayRunMutation = (
   options: UsePlayRunMutationOptions = {}
 ): UsePlayRunMutationResult => {
   const host = useHost()
-  const mutation = useMutation<RunAction, AxiosError, string>(
+  const mutation = useMutation<RunAction, HttpClientError, string>(
     [host, 'runs', RUN_ACTION_TYPE_PLAY],
     (runId: string) =>
       createRunAction(host!, runId, {

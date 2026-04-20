@@ -4,7 +4,7 @@ import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError, AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from '@opentrons/api-client'
 import type {
   UseMutateFunction,
   UseMutationOptions,
