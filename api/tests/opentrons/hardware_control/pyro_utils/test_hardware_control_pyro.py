@@ -159,7 +159,6 @@ async def test_pyro_behavior_on_modules(
 
 async def test_pyro_behavior_ot3api_unhashable_dicts(
     managed_obj: OT3API,
-    decoy: Decoy,
 ) -> None:
     """Test the pyro behavior for unhashable dictionaries with pyro by ensuring several OT3API commands have the expected results."""
     sock = socket.socket()
@@ -257,6 +256,12 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(
     assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
     assert ot3api.attached_pipettes == managed_obj.attached_pipettes
     assert ot3api.attached_subsystems == managed_obj.attached_subsystems
+
+    # Ensure that functions which return "types" work as intended
+    value = ot3api.get_robot_type()
+    assert isinstance(value, type)
+
+    assert ot3api.get_attached_instruments() == managed_obj.get_attached_instruments()
 
     # Clean up client resources.
     ot3_proxy._pyroRelease()  # type: ignore

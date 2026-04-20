@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
@@ -11,7 +11,10 @@ import {
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import {
+  ApiHostProvider,
+  useRobotSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { ReactQueryDevtools } from '/app/App/tools'
 import { SleepScreen } from '/app/atoms/SleepScreen'
@@ -50,7 +53,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
-import { updateBrightness } from '/app/redux/shell'
+import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
 import { hackWindowNavigatorOnLine } from './hacks'
@@ -63,8 +66,9 @@ import {
 import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
-import { PortalRoot as ModalPortalRoot } from './portal'
+import { ModalPortalRoot } from './portal'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
 // forces electron to think we're online which means axios won't elide
@@ -147,30 +151,31 @@ function getPathComponent(
   }
 }
 
-const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
-  'mousedown',
-  'click',
-  'scroll',
-]
-
 const TURN_OFF_BACKLIGHT = '7'
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const dispatch = useDispatch<Dispatch>()
+
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
+
   useSoftwareUpdatePoll()
-  const { brightness: userSetBrightness, sleepMs } = useSelector(
-    getOnDeviceDisplaySettings
+
+  // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
+  // But here at the app root, that doesn't exist. So we need to make sure we pass this
+  // override into all the hooks in this component that will try to use the robot API.
+  const hostConfig = useMemo<HostConfig>(
+    () => ({
+      hostname: '127.0.0.1',
+    }),
+    []
   )
   const localRobot = useSelector(getLocalRobot)
 
+  const { brightness: userSetBrightness, sleepMs } = useSelector(
+    getOnDeviceDisplaySettings
+  )
   const sleepTime = sleepMs ?? SLEEP_NEVER_MS
-  const options = {
-    events: onDeviceDisplayEvents,
-    initialState: false,
-  }
-  const dispatch = useDispatch<Dispatch>()
-  const isIdle = useScreenIdle(sleepTime, options)
-  const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
-
+  const isIdle = useScreenIdle(sleepTime, { initialState: false })
   useEffect(() => {
     if (isIdle) {
       dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
@@ -184,11 +189,19 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   }, [dispatch, isIdle, userSetBrightness])
 
+  // ensure robot-server api, etc. is up and running
+  const isShellReady = useSelector(getIsShellReady)
+  // ensure settings query data is available for localization provider
+  const { settings } =
+    useRobotSettingsQuery({ retry: true, retryDelay: 1000 }, hostConfig).data ??
+    {}
+  const isReady = isShellReady && settings != null
+
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="127.0.0.1">
+    <ApiHostProvider hostname={hostConfig.hostname}>
       <ReactQueryDevtools />
-      <InitialLoadingScreen>
+      {isReady ? (
         <LocalizationProvider>
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
@@ -231,7 +244,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
             <ODDTopLevelRedirects />
           </ErrorBoundary>
         </LocalizationProvider>
-      </InitialLoadingScreen>
+      ) : (
+        <InitialLoadingScreen />
+      )}
     </ApiHostProvider>
   )
 }

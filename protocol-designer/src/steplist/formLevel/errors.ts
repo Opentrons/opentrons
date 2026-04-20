@@ -788,8 +788,9 @@ export const wellRatioMoveLiquid = (
     dispenseLabware != null
       ? dispenseLabware === 'wasteChute' || dispenseLabware === 'trashBin'
       : false
-  if (!aspirate_wells || (!isDispensingIntoTrash && !dispense_wells))
+  if (!aspirate_wells || (!isDispensingIntoTrash && !dispense_wells)) {
     return null
+  }
   const wellRatioFormError = isDispensingIntoTrash
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID

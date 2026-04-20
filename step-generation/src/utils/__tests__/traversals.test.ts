@@ -1,24 +1,32 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { flexDeckDefV5 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  FLEX_STACKER_A4_ADDRESSABLE_AREA,
+  FLEX_STACKER_MODULE_TYPE,
+  flexDeckDefV5,
+} from '@opentrons/shared-data'
 
 import {
+  enrichRobotStateForStackGraphTraversals,
   getAddressableAreaFromModule,
   getAddressableAreaNameFromLabwareLocation,
   getAllLargestStacks,
-  getAllProvidedAddressableAreasInDeckConfig,
+  getAllProvidedAddressableAreasFromDeckConfig,
   getFullStackFromNodeTopDownRecursive,
   getLargestStackContainingLabware,
   getNodeParentModuleId,
   getProvidedAddressableAreasExposed,
+  getStackedOnNodeFromPdStack,
 } from '../traversals'
 
 import type {
   AddressableAreaName,
   DeckConfiguration,
   DeckDefinition,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { ModuleEntities, RobotState } from '../../types'
+import type { LabwareEntities, ModuleEntities, RobotState } from '../../types'
 
 let mockRobotState: RobotState
 let mockModuleEntities: ModuleEntities
@@ -331,7 +339,7 @@ describe('traversals', () => {
     })
   })
 
-  describe('getAllProvidedAddressableAreasInDeckConfig', () => {
+  describe('getAllProvidedAddressableAreasFromDeckConfig', () => {
     beforeEach(() => {
       mockDeckConfiguration = [
         ...mockDeckConfiguration,
@@ -339,7 +347,7 @@ describe('traversals', () => {
       ]
     })
     it('returns all the provided addressable areas in the deck configuration', () => {
-      const result = getAllProvidedAddressableAreasInDeckConfig({
+      const result = getAllProvidedAddressableAreasFromDeckConfig({
         deckConfiguration: mockDeckConfiguration,
         deckDefinition: flexDeckDefV5 as unknown as DeckDefinition,
       })
@@ -350,7 +358,7 @@ describe('traversals', () => {
 
     it('returns an empty set when deck configuration is empty', () => {
       expect(
-        getAllProvidedAddressableAreasInDeckConfig({
+        getAllProvidedAddressableAreasFromDeckConfig({
           deckConfiguration: [],
           deckDefinition: flexDeckDefV5 as unknown as DeckDefinition,
         })
@@ -397,7 +405,6 @@ describe('traversals', () => {
     it('returns the provided addressable areas exposed', () => {
       expect(
         getProvidedAddressableAreasExposed({
-          labwareId: 'lw1',
           robotState: mockRobotState,
           deckConfiguration: mockDeckConfiguration,
           deckDefinition: flexDeckDefV5 as unknown as DeckDefinition,
@@ -408,5 +415,312 @@ describe('traversals', () => {
         new Set(['vacuumModuleV1DockA4'])
       )
     })
+  })
+
+  describe('enrichRobotStateForStackGraphTraversals', () => {
+    let pdStyleStackRobotState: RobotState
+
+    beforeEach(() => {
+      pdStyleStackRobotState = {
+        labware: {
+          plate: { stack: ['plate', 'B2'] },
+        },
+        modules: {},
+        pipettes: {},
+        tipState: { tipracks: {}, pipettes: {} },
+        liquidState: {
+          pipettes: {},
+          labware: {},
+          trashBins: {},
+          wasteChute: {},
+        },
+      }
+    })
+
+    it('derives stackedOnNode from PD-style stack for labware on a deck slot', () => {
+      const result = enrichRobotStateForStackGraphTraversals(
+        pdStyleStackRobotState,
+        {} as ModuleEntities,
+        {} as LabwareEntities
+      )
+      expect(result.labware.plate).toMatchObject({
+        stack: ['plate', 'B2'],
+        stackedOnNode: { slotName: 'B2' },
+      })
+    })
+
+    it('preserves existing stackedOnNode when already set', () => {
+      pdStyleStackRobotState.labware.plate.stackedOnNode = {
+        slotName: 'C3',
+      }
+      const result = enrichRobotStateForStackGraphTraversals(
+        pdStyleStackRobotState,
+        {} as ModuleEntities,
+        {} as LabwareEntities
+      )
+      expect(result.labware.plate.stackedOnNode).toEqual({ slotName: 'C3' })
+    })
+
+    it('sets contains on the smaller-footprint sibling when one labware strictly exceeds the other in X and Y', () => {
+      const largeDef = {
+        ...fixture96Plate,
+        dimensions: {
+          ...fixture96Plate.dimensions,
+          xDimension: 200,
+          yDimension: 150,
+        },
+      } as LabwareDefinition2
+      const smallDef = {
+        ...fixture96Plate,
+        dimensions: {
+          ...fixture96Plate.dimensions,
+          xDimension: 100,
+          yDimension: 80,
+        },
+      } as LabwareDefinition2
+      const state: RobotState = {
+        ...pdStyleStackRobotState,
+        labware: {
+          lwBig: {
+            stack: ['lwBig', 'A1'],
+          },
+          lwSmall: {
+            stack: ['lwSmall', 'A1'],
+          },
+        },
+      }
+      const labwareEntities: LabwareEntities = {
+        lwBig: {
+          id: 'lwBig',
+          labwareDefURI: 'fixture/large/1',
+          def: largeDef,
+          pythonName: 'lw_big',
+        },
+        lwSmall: {
+          id: 'lwSmall',
+          labwareDefURI: 'fixture/small/1',
+          def: smallDef,
+          pythonName: 'lw_small',
+        },
+      }
+      const result = enrichRobotStateForStackGraphTraversals(
+        state,
+        {} as ModuleEntities,
+        labwareEntities
+      )
+      expect(result.labware.lwSmall).toEqual({
+        stack: ['lwSmall', 'A1'],
+        stackedOnNode: { slotName: 'A1' },
+      })
+      expect(result.labware.lwBig).toEqual({
+        stack: ['lwBig', 'A1'],
+        contains: 'lwSmall',
+        stackedOnNode: { slotName: 'A1' },
+      })
+    })
+
+    it('does not set contains when neither footprint strictly dominates in both X and Y', () => {
+      const defWide = {
+        ...fixture96Plate,
+        dimensions: {
+          ...fixture96Plate.dimensions,
+          xDimension: 150,
+          yDimension: 80,
+        },
+      } as LabwareDefinition2
+      const defTall = {
+        ...fixture96Plate,
+        dimensions: {
+          ...fixture96Plate.dimensions,
+          xDimension: 80,
+          yDimension: 150,
+        },
+      } as LabwareDefinition2
+      const state: RobotState = {
+        ...pdStyleStackRobotState,
+        labware: {
+          lwWide: {
+            stack: ['lwWide', 'A1'],
+            stackedOnNode: { slotName: 'A1' },
+          },
+          lwTall: {
+            stack: ['lwTall', 'A1'],
+            stackedOnNode: { slotName: 'A1' },
+          },
+        },
+      }
+      const labwareEntities: LabwareEntities = {
+        lwWide: {
+          id: 'lwWide',
+          labwareDefURI: 'fixture/wide/1',
+          def: defWide,
+          pythonName: 'lw_wide',
+        },
+        lwTall: {
+          id: 'lwTall',
+          labwareDefURI: 'fixture/tall/1',
+          def: defTall,
+          pythonName: 'lw_tall',
+        },
+      }
+      const result = enrichRobotStateForStackGraphTraversals(
+        state,
+        {} as ModuleEntities,
+        labwareEntities
+      )
+      expect(result.labware.lwWide.contains).toBeUndefined()
+      expect(result.labware.lwTall.contains).toBeUndefined()
+    })
+
+    it('does not set contains for siblings on inStackerHopper', () => {
+      const largeDef = {
+        ...fixture96Plate,
+        dimensions: {
+          ...fixture96Plate.dimensions,
+          xDimension: 200,
+          yDimension: 150,
+        },
+      } as LabwareDefinition2
+      const smallDef = {
+        ...fixture96Plate,
+        dimensions: {
+          ...fixture96Plate.dimensions,
+          xDimension: 100,
+          yDimension: 80,
+        },
+      } as LabwareDefinition2
+      const hopperNode = { kind: 'inStackerHopper' as const, moduleId: 'mod1' }
+      const state: RobotState = {
+        ...pdStyleStackRobotState,
+        labware: {
+          a: {
+            stack: ['a', 'hopper', 'mod1', 'A1'],
+            stackedOnNode: hopperNode,
+          },
+          b: {
+            stack: ['b', 'hopper', 'mod1', 'A1'],
+            stackedOnNode: hopperNode,
+          },
+        },
+      }
+      const labwareEntities: LabwareEntities = {
+        a: {
+          id: 'a',
+          labwareDefURI: 'fixture/a/1',
+          def: largeDef,
+          pythonName: 'a',
+        },
+        b: {
+          id: 'b',
+          labwareDefURI: 'fixture/b/1',
+          def: smallDef,
+          pythonName: 'b',
+        },
+      }
+      const result = enrichRobotStateForStackGraphTraversals(
+        state,
+        {} as ModuleEntities,
+        labwareEntities
+      )
+      expect(result.labware.a.contains).toBeUndefined()
+      expect(result.labware.b.contains).toBeUndefined()
+    })
+
+    it('does not set contains when more than two labware share the same parent', () => {
+      const def = fixture96Plate as LabwareDefinition2
+      const parent = { slotName: 'A1' as const }
+      const state: RobotState = {
+        ...pdStyleStackRobotState,
+        labware: {
+          a: { stack: ['a', 'A1'], stackedOnNode: parent },
+          b: { stack: ['b', 'A1'], stackedOnNode: parent },
+          c: { stack: ['c', 'A1'], stackedOnNode: parent },
+        },
+      }
+      const labwareEntities: LabwareEntities = {
+        a: {
+          id: 'a',
+          labwareDefURI: 'fixture/96/1',
+          def,
+          pythonName: 'a',
+        },
+        b: {
+          id: 'b',
+          labwareDefURI: 'fixture/96/1',
+          def,
+          pythonName: 'b',
+        },
+        c: {
+          id: 'c',
+          labwareDefURI: 'fixture/96/1',
+          def,
+          pythonName: 'c',
+        },
+      }
+      const result = enrichRobotStateForStackGraphTraversals(
+        state,
+        {} as ModuleEntities,
+        labwareEntities
+      )
+      expect(result.labware.a.contains).toBeUndefined()
+      expect(result.labware.b.contains).toBeUndefined()
+      expect(result.labware.c.contains).toBeUndefined()
+    })
+  })
+})
+
+describe('getStackedOnNodeFromPdStack flex stacker', () => {
+  it('returns shuttle addressable area when stack uses the stacker module slot', () => {
+    const moduleEntities = {
+      stackerMod: {
+        id: 'stackerMod',
+        type: FLEX_STACKER_MODULE_TYPE,
+        model: 'flexStackerModuleV1',
+        pythonName: 'stacker_mod',
+      },
+    } as unknown as ModuleEntities
+    const modules = {
+      stackerMod: {
+        slot: 'A3',
+        moduleState: { type: FLEX_STACKER_MODULE_TYPE },
+      },
+    } as unknown as RobotState['modules']
+
+    expect(
+      getStackedOnNodeFromPdStack({
+        stack: ['plateId', 'A3'],
+        subjectLabwareId: 'plateId',
+        moduleEntities,
+        labwareEntityIds: new Set(['plateId']),
+        modules,
+      })
+    ).toEqual({ addressableAreaName: FLEX_STACKER_A4_ADDRESSABLE_AREA })
+  })
+
+  it('returns shuttle AA when stack parent is staging A4 and a stacker occupies the cutout', () => {
+    const moduleEntities = {
+      stackerMod: {
+        id: 'stackerMod',
+        type: FLEX_STACKER_MODULE_TYPE,
+        model: 'flexStackerModuleV1',
+        pythonName: 'stacker_mod',
+      },
+    } as unknown as ModuleEntities
+    const modules = {
+      stackerMod: {
+        slot: 'A3',
+        moduleState: { type: FLEX_STACKER_MODULE_TYPE },
+      },
+    } as unknown as RobotState['modules']
+
+    expect(
+      getStackedOnNodeFromPdStack({
+        stack: ['plateId', 'A4'],
+        subjectLabwareId: 'plateId',
+        moduleEntities,
+        labwareEntityIds: new Set(['plateId']),
+        modules,
+      })
+    ).toEqual({ addressableAreaName: FLEX_STACKER_A4_ADDRESSABLE_AREA })
   })
 })

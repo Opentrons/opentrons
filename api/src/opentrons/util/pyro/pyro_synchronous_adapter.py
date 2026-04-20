@@ -9,7 +9,10 @@ from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 
-from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
+from opentrons.util.pyro.pyro_serialization import (
+    TypedDictWrapper,
+    UnhashableDictWrapper,
+)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -225,7 +228,7 @@ def _build_classdict(  # noqa: C901
                 try:
                     # Grab the inner instance of the core object to modify
                     local_obj = core_obj.__weakref__()
-                except TypeError:
+                except (TypeError, AttributeError):
                     # Otherwise, just use the object passed in as-is
                     local_obj = core_obj
                 wrapped_attr = specialty_behavior.specialty_function(
@@ -291,7 +294,7 @@ def _build_classdict(  # noqa: C901
     try:
         # If the `core_obj` contains a weakref then for tracking we yield the inner instance
         yield ("_core_obj", core_obj.__weakref__())
-    except TypeError:
+    except (TypeError, AttributeError):
         yield ("_core_obj", core_obj)
 
 
@@ -340,7 +343,7 @@ def convert_result_to_proxy(  # noqa: C901
     """
 
     @functools.wraps(attr)
-    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
@@ -361,6 +364,9 @@ def convert_result_to_proxy(  # noqa: C901
             for r in result:
                 pyro_synchronous_obj = utility.find_PSO(r)
                 if pyro_synchronous_obj is None:
+                    if not hasattr(r, "_loop"):
+                        # Append the parents event loop to the child object for PSO forwarding
+                        setattr(r, "_loop", core_obj._loop)
                     pyro_synchronous_obj = PyroSynchronousObject(r, utility)
                     utility.add_PSO(pyro_synchronous_obj)
                 proxy_list.append(utility.proxy_for(pyro_synchronous_obj))
@@ -368,6 +374,9 @@ def convert_result_to_proxy(  # noqa: C901
         except TypeError:
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
+                if not hasattr(result, "_loop"):
+                    # Append the parents event loop to the child object for PSO forwarding
+                    setattr(result, "_loop", core_obj._loop)
                 pyro_synchronous_obj = PyroSynchronousObject(result, utility)
                 utility.add_PSO(pyro_synchronous_obj)
             return utility.proxy_for(pyro_synchronous_obj)
@@ -441,6 +450,80 @@ def convert_result_to_wrapped_dict(  # noqa: C901
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is
         return property(wrapper)
+    return wrapper  # type: ignore
+
+
+def convert_type_to_instance(
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Callable[P, T]:
+    """Wrapper that enforces functions that return Types and not instances to return an instance of that type.
+
+    On the other end, it is expected that the serpent serializer will have a specialized handler strip the
+    result and return the original type as intended.
+    """
+
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+        if inspect.iscoroutinefunction(attr):
+            sync_func = synchronous(attr)
+            result = sync_func(self, *args, **kwargs)
+        elif isinstance(attr, FunctionType):
+            result = attr(self, *args, **kwargs)
+        elif isinstance(attr, property):
+            result = getattr(core_obj, name)
+        else:
+            raise ValueError(
+                "Provided base attribute must be a Property, a Method or an Async method."
+            )
+        if isinstance(result, type):
+            return result()
+        else:
+            raise ValueError(
+                "Pyro behavior for type to instance conversion is only available for use with pure types."
+            )
+
+    return wrapper  # type: ignore
+
+
+def convert_result_to_wrapped_typed_dict(
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Callable[P, T]:
+    """Wrapper that ensures a result of a method call through Pyro is a wrapped Typed Dict.
+
+    The result of this is later deserialzed by serpent using special registries for TypedDictWrapper. This
+    is useful for complex Typed Dictionaries such as PipetteDict that require reconstruction.
+    """
+
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+        if inspect.iscoroutinefunction(attr):
+            sync_func = synchronous(attr)
+            bound_method = MethodType(sync_func, core_obj)
+            result = bound_method(*args, **kwargs)
+            return_type = attr.__annotations__["return"]
+        elif isinstance(attr, FunctionType):
+            bound_method = MethodType(attr, core_obj)
+            result = bound_method(*args, **kwargs)
+            return_type = attr.__annotations__["return"]
+        elif isinstance(attr, property):
+            result = getattr(core_obj, name)
+            return_type = attr.fget.__annotations__["return"]
+        else:
+            raise ValueError(
+                "Provided base attribute must be a Property, a Method or an Async method."
+            )
+        if isinstance(result, dict):
+            return TypedDictWrapper(
+                dictionary=result,
+                typed_dict_name=".".join(
+                    (return_type.__module__, return_type.__qualname__)
+                ),
+            )
+        else:
+            raise ValueError(
+                "Pyro behavior for Typed Dict wrapping is only available for use with dictionaries."
+            )
+
     return wrapper  # type: ignore
 
 
