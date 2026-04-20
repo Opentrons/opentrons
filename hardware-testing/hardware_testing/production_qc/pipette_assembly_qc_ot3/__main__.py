@@ -834,14 +834,27 @@ async def _fixture_check_pressure(
     return False not in results
 
 
-def _reset_available_tip() -> None:
+def _fixture_tips_for_channels(pipette_channels: int) -> List[str]:
+    """Build fixture tip order.
+
+    Single-channel fixture testing uses A1 for the open-air pressure check,
+    then A2 for the fixture pressure check, followed by the rest of row A.
+    """
+    if pipette_channels == 1:
+        a_row = [f"A{col}" for col in range(1, 13)]
+        remaining_rows = [f"{row}{col}" for col in range(1, 13) for row in "BCDEFGH"]
+        return a_row + remaining_rows
+    return [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"]
+
+
+def _reset_available_tip(pipette_channels: int) -> None:
     for tip_size in [50, 200, 1000]:
         _available_tips[tip_size] = [
             f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"
         ]
-        _available_tips_fixture[tip_size] = [
-            f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"
-        ]
+        _available_tips_fixture[tip_size] = _fixture_tips_for_channels(
+            pipette_channels
+        )
 
 
 async def _test_for_leak(
@@ -2035,11 +2048,10 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                 "qc this pipette?"
             ):
                 continue
-            _reset_available_tip()
-
             # setup our labware locations
             pipette_volume = int(pipette.working_volume)
             pipette_channels = int(pipette.channels)
+            _reset_available_tip(pipette_channels)
             IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
                 test_config, pipette_channels
             )
@@ -2468,4 +2480,3 @@ if __name__ == "__main__":
     for tag in [PressureEvent.ASPIRATE_P50, PressureEvent.ASPIRATE_P1000]:
         PRESSURE_CFG[tag].sample_count = _cfg.fixture_aspirate_sample_count
     asyncio.run(_main(_cfg))
-
