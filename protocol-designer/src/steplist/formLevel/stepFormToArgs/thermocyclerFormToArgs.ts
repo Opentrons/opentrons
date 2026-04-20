@@ -68,9 +68,15 @@ export const thermocyclerFormToArgs = (
     }
 
     case THERMOCYCLER_PROFILE: {
+      // `GetCastFieldType<'profileItemsById'>` unions thermocycler and vacuum shapes
+      // because both steps use the same field name. This branch is thermocycler-only.
+      const profileItemsById = castFormData.profileItemsById as Record<
+        string,
+        ProfileItem
+      >
       const profileElements = _convertToProfileElements({
         orderedProfileItems: castFormData.orderedProfileItems,
-        profileItemsById: castFormData.profileItemsById,
+        profileItemsById,
       })
 
       const args = {
@@ -84,7 +90,7 @@ export const thermocyclerFormToArgs = (
 
         meta: {
           rawProfileItems: castFormData.orderedProfileItems.map(
-            (itemId: string | number) => castFormData.profileItemsById[itemId]
+            (itemId: string | number) => profileItemsById[itemId]
           ),
         },
         profileElements,

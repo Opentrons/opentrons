@@ -291,7 +291,7 @@ export interface VacuumProfileStep extends ProfileStepItemBase {
   pumpData: VacuumPumpData
 }
 
-export type VacuumProfileCycle = ProfileCycleItemBase & {
+export interface VacuumProfileCycle extends ProfileCycleItemBase {
   profileStepItemsById: Record<string, VacuumProfileStep>
   orderedProfileStepIds: string[]
 }
@@ -591,7 +591,7 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   orderedProfileIds: string[]
   powerPercent: number | null
   pressureMbar: number | null
-  profileItemsById: Record<string, ProfileItem>
+  profileItemsById: Record<string, VacuumProfileItem>
   programType: typeof VACUUM_PROGRAM_STATE | typeof VACUUM_PROGRAM_PROFILE
   pumpDurationCheckbox: boolean | null
   pumpDurationTime: string | null

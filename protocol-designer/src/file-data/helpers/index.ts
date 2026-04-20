@@ -138,6 +138,36 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.flexStackerStore,
         { ...args, strategy: 'automatic' }
       )
+
+    case 'vacuumCloseVent':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumCloseVent,
+        args
+      )
+
+    case 'vacuumOpenVent':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumOpenVent,
+        args
+      )
+
+    case 'vacuumSetPumpPower':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumSetPumpPower,
+        args
+      )
+
+    case 'vacuumSetPumpPressure':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumSetPumpPressure,
+        args
+      )
+
+    case 'vacuumSetPumpProfile':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumSetPumpProfile,
+        args
+      )
   }
 
   args satisfies never // Make sure we handle every commandCreatorFnName.

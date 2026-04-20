@@ -665,6 +665,20 @@ interface ProfileCycleItem {
   repetitions: string
 }
 
+interface VacuumProfileStepItem {
+  type: typeof PROFILE_STEP
+  id: string
+  durationSeconds: number
+  pumpData: VacuumPumpData
+}
+
+interface VacuumProfileCycleItem {
+  type: typeof PROFILE_CYCLE
+  id: string
+  steps: VacuumProfileStepItem[]
+  repetitions: number
+}
+
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
@@ -769,6 +783,75 @@ export interface FlexStackerRetrieveArgs extends CommonArgs {
   commandCreatorFnName: 'flexStackerRetrieve'
 }
 
+export interface VacuumPumpAdvancedArgs {
+  duration?: number
+  rate?: number
+  timeout?: number
+  ventAfter?: boolean
+}
+
+export interface VacuumPumpPressureArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpPressure'
+  gaugePressure: number
+}
+
+export interface VacuumPumpPowerArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpPower'
+  powerPercent: number
+}
+
+export interface VacuumOpenVentArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumOpenVent'
+}
+
+export interface VacuumCloseVentArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVent'
+}
+
+// Vacuum
+export interface VacuumPressureData {
+  mode: typeof VACUUM_MODE_PRESSURE
+  pressureMbar: string | null
+}
+
+export interface VacuumPowerData {
+  mode: typeof VACUUM_MODE_POWER
+  powerPercent: number
+}
+
+type VacuumPumpData = VacuumPressureData | VacuumPowerData
+interface ProfileStepItemBase {
+  type: typeof PROFILE_STEP
+  id: string
+  title: string
+}
+export interface VacuumProfileStep extends ProfileStepItemBase {
+  durationSeconds: number
+  pumpData: VacuumPumpData
+}
+
+export type VacuumProfileItem = VacuumProfileStepItem | VacuumProfileCycleItem
+
+export type VacuumPumpArgs = VacuumPumpPressureArgs | VacuumPumpPowerArgs
+
+export interface VacuumProfileArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpProfile'
+  profileElements: VacuumProfileItem[]
+}
+
+export type VacuumArgs =
+  | VacuumPumpArgs
+  | VacuumProfileArgs
+  | VacuumOpenVentArgs
+  | VacuumCloseVentArgs
+
 export type FlexStackerArgs =
   | FlexStackerEmptyArgs
   | FlexStackerFillItemsArgs
@@ -797,6 +880,7 @@ export type CommandCreatorArgs =
   | MoveLabwareArgs
   | CommentArgs
   | FlexStackerArgs
+  | VacuumArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
