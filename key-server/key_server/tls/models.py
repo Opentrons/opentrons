@@ -43,3 +43,17 @@ class CertPassword(_StrictBaseModel):
     password: str
     valid_from_utc: datetime
     valid_until_utc: datetime
+
+
+class EncryptedCACertificates(_StrictBaseModel):
+    """The CA certificates the robot uses, encrypted with Fernet."""
+
+    current: OldAndNewEncryptedCert
+    next: OldAndNewEncryptedCert | None
+
+
+class PlaintextCACertificates(_StrictBaseModel):
+    """The CA certificates the robot uses, unencrypted."""
+
+    current: UnencryptedCert
+    next: UnencryptedCert | None
