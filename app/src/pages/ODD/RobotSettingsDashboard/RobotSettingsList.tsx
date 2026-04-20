@@ -197,6 +197,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="privacy"
         />
         <RobotSettingButton
+          settingName={t('robot_encryption_key')}
+          dataTestId="RobotSettingButton_encryption"
+          onClick={() => {
+            setCurrentOption('RobotEncryptionKey')
+          }}
+          iconName="verified"
+        />
+        <RobotSettingButton
           settingName={i18n.format(
             t('app_settings:error_recovery_mode'),
             'titleCase'
