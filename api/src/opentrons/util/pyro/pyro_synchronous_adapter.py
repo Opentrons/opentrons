@@ -1,9 +1,9 @@
 """Synchronous class wrapper and functions for creating Pyro compatible objects."""
 
 import asyncio
+import enum
 import functools
 import inspect
-import enum
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
@@ -62,25 +62,29 @@ class DaemonUtility:
         # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
         return self._daemon.proxyFor(pso)  # type: ignore
 
+
 class PyroFunctionWrapper:
     """Wrapper class to safely wrap callable responses as Proxy objects.."""
+
     def __init__(
         self,
         callable: Callable,
     ):
         self.callable = callable
-    
+
     @property
     def is_callable(self) -> bool:
         return True
-    
+
     def call(self, *args, **kwargs) -> Any:
         """Remote deployable function call."""
         return self.callable(*args, **kwargs)
-    
+
+
 class ResultMeta(enum.Enum):
     PROXY = enum.auto()
     UNKNOWN = enum.auto()
+
 
 class _PyroSpecialBehavior(BaseModel):
     specialty_function: Callable[[DaemonUtility, Any, str, Any], Any]
@@ -267,8 +271,10 @@ def _build_classdict(  # noqa: C901
                 if inspect.iscoroutinefunction(attr):
                     async_metadata = _build_metadata_dictionary(attr)
                     async_methods[name] = async_metadata
-                
-                result_meta = _determine_attribute_result_metadata(specialty_behavior.specialty_function)
+
+                result_meta = _determine_attribute_result_metadata(
+                    specialty_behavior.specialty_function
+                )
                 # NOTE: extend this further as needed for custom result types
                 if result_meta is ResultMeta.PROXY:
                     proxy_attributes.append(name)
@@ -316,10 +322,12 @@ def _build_classdict(  # noqa: C901
     # Attach the known async methods list to the PSO as a private member and expose a getter method
     yield ("_pyro_async_methods", async_methods)
     yield ("get_pyro_async_methods", pyro.expose(property(get_pyro_async_methods)))  # type: ignore
-    # Attach an initially empty proxy-providing methods list to the PSO as a private member and expose a getter method
+    # Attach an proxy-providing methods list to the PSO as a private member and expose a getter method
     yield ("_pyro_attributes_with_proxy_results", proxy_attributes)
-    yield( "get_pyro_attributes_with_proxy_result", pyro.expose(property(get_pyro_attributes_with_proxy_result)))  # type: ignore
-
+    yield (
+        "get_pyro_attributes_with_proxy_result",
+        pyro.expose(property(get_pyro_attributes_with_proxy_result)),
+    )  # type: ignore
 
     # Attach the `core_obj` instance as a private member for internal tracking
     try:
@@ -364,6 +372,7 @@ def get_pyro_async_methods(self: Any) -> dict[str, dict[str, Any]]:
     """Helper function to access the dictionary of known async method metadata on a PyroSynchronousObject."""
     result: dict[str, dict[str, Any]] = self._pyro_async_methods
     return result
+
 
 def get_pyro_attributes_with_proxy_result(self) -> list[str]:
     """Helper function to access the list of known methods that provide their results as Proxies."""

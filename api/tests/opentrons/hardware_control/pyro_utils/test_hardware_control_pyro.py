@@ -7,10 +7,15 @@ from typing import Dict, cast
 
 import pytest
 from decoy import Decoy
+from mock import AsyncMock
 from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    AsyncResponseSerialConnection,
+)
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
+from opentrons.drivers.thermocycler import driver
 from opentrons.hardware_control import ThreadManager, modules
 from opentrons.hardware_control import types as hw_types
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -27,20 +32,22 @@ from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject, AsyncPyroFunctionWrapper
+from opentrons.hardware_control.types import (
+    DoorStateNotification,
+    HardwareEvent,
+    HardwareEventHandler,
+)
+from opentrons.util.pyro.pyro_client_async_adapter import (
+    AsyncClientPyroObject,
+    AsyncPyroFunctionWrapper,
+)
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
     PyroSynchronousObject,
+    convert_result_to_proxy,
     pyro_behavior,
-    convert_result_to_proxy
 )
-from mock import AsyncMock
-from opentrons.drivers.thermocycler import driver
-from opentrons.drivers.asyncio.communication.serial_connection import (
-    AsyncResponseSerialConnection,
-)
-from opentrons.hardware_control.types import DoorStateNotification, HardwareEvent, HardwareEventHandler
 
 
 @pytest.fixture
@@ -110,11 +117,11 @@ def connection() -> AsyncMock:
     return AsyncMock(spec=AsyncResponseSerialConnection)
 
 
-
 @pytest.fixture
 def mock_thermo_driver(connection: AsyncMock) -> driver.ThermocyclerDriverV2:
     connection.send_command.return_value = ""
     return driver.ThermocyclerDriverV2(connection)
+
 
 async def test_pyro_behavior_on_modules(
     ot3_hardware: ThreadManager[OT3API],
@@ -285,12 +292,13 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(
     # Clean up client resources.
     ot3_proxy._pyroRelease()  # type: ignore
 
+
 async def test_pyro_async_wrapped_calls(
     ot3_hardware: ThreadManager[OT3API],
     mock_driver: SimulatingDriver,
     decoy: Decoy,
     tc_reader_mocked_driver: modules.thermocycler.ThermocyclerReader,
-    mock_thermo_driver: driver.ThermocyclerDriverV2
+    mock_thermo_driver: driver.ThermocyclerDriverV2,
 ) -> None:
     """Test the pyro behavior for callback and asynchronous module calls through an automatically wrapped proxy child."""
     sock = socket.socket()
@@ -307,9 +315,7 @@ async def test_pyro_async_wrapped_calls(
     api = ot3_hardware.wrapped()
     api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
     tc = decoy.mock(cls=Thermocycler)
-    decoy.when(api._backend.module_controls.available_modules).then_return(
-        [tc]
-    )
+    decoy.when(api._backend.module_controls.available_modules).then_return([tc])
     tc._loop = ot3_hardware.managed_obj._loop
     for mod in api._backend.module_controls.available_modules:
         decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
@@ -329,15 +335,11 @@ async def test_pyro_async_wrapped_calls(
         create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
 
     class cool_door_class:
-        def __init__(
-            self,
-            loop: bool
-        ):
-            self._loop = loop # placeholder dummy - never used by this object
+        def __init__(self, loop: bool):
+            self._loop = loop  # placeholder dummy - never used by this object
 
         @pyro_behavior(convert_result_to_proxy, False)
         def cool_hardware_event(self) -> HardwareEventHandler:
-            print("IN THIS")
             def run_handler(
                 event: HardwareEvent,
             ) -> None:
@@ -396,4 +398,3 @@ async def test_pyro_async_wrapped_calls(
     # Verify the resulting callback proxy (which is wrapped automagically) is wrapped and callable
     assert isinstance(result, AsyncPyroFunctionWrapper)
     result()
-
