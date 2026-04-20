@@ -1,11 +1,15 @@
 """Types for the TLS system as a whole."""
 
-from dataclasses import dataclass
 from datetime import datetime
 
+import pydantic
 
-@dataclass
-class UnencryptedCert:
+
+class _StrictBaseModel(pydantic.BaseModel):
+    model_config = {"strict": True}
+
+
+class UnencryptedCert(_StrictBaseModel):
     """A certificate whose data is DER-encoded but not encrypted.
 
     All bytes fields in this object are urlsafe base64 encoded.
@@ -14,8 +18,7 @@ class UnencryptedCert:
     cert_data: bytes
 
 
-@dataclass
-class EncryptedCert:
+class EncryptedCert(_StrictBaseModel):
     """A certificate whose data has been encrypted by a specific key.
 
     All bytes fields in this object are urlsafe base64 encoded.
@@ -27,16 +30,14 @@ class EncryptedCert:
     kdf_iterations: int
 
 
-@dataclass
-class OldAndNewEncryptedCert:
-    """Both the certificates."""
+class OldAndNewEncryptedCert(_StrictBaseModel):
+    """A certificate encrypted with the current and previous (if it exists) passwords."""
 
     current: EncryptedCert
     previous: EncryptedCert | None
 
 
-@dataclass
-class CertPassword:
+class CertPassword(_StrictBaseModel):
     """The password that will be used to encrypt a certificate."""
 
     password: str
