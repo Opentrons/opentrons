@@ -217,12 +217,7 @@ export async function request<ResData, ReqData = null>(
   config: HostConfig,
   requestConfig?: HttpRequestConfig
 ): ResponsePromise<ResData> {
-  const {
-    hostname,
-    port,
-    requestor,
-    token,
-  } = config
+  const { hostname, port, requestor, token } = config
 
   const tokenHeader: HttpHeaders =
     token != null ? { authenticationBearer: token } : {}
@@ -245,7 +240,10 @@ export async function request<ResData, ReqData = null>(
     return await requestor<ResData>(mergedConfig)
   }
 
-  const requestUrl = appendQueryParams(joinURL(baseURL, url), mergedConfig.params)
+  const requestUrl = appendQueryParams(
+    joinURL(baseURL, url),
+    mergedConfig.params
+  )
   const controller = new AbortController()
   const timeoutId =
     mergedConfig.timeout != null

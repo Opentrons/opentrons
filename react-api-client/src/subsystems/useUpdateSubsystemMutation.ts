@@ -4,13 +4,13 @@ import { updateSubsystem } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
 import type {
+  AxiosError,
   Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'

@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { useAtom } from 'jotai'
 
-import {
-  HttpClientError,
-  isHttpClientError,
-} from '@opentrons/api-client'
+import { HttpClientError, isHttpClientError } from '@opentrons/api-client'
 
 import { emailVerifiedAtom, featureFlagsAtom } from '../atoms'
 import { isApiErrorResponse } from '../utils'

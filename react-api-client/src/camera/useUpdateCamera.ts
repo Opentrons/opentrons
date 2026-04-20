@@ -5,16 +5,16 @@ import { createCamera } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type {
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import type {
   AxiosError,
   CameraData,
   CameraResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
-import type {
-  UseMutateFunction,
-  UseMutationOptions,
-  UseMutationResult,
-} from 'react-query'
 
 export type UseUpdateCameraMutationResult = UseMutationResult<
   CameraResponse,
@@ -56,11 +56,7 @@ export function useUpdateCamera(
       })
     },
     options as Omit<
-      UseMutationOptions<
-        CameraResponse,
-        AxiosError<ErrorResponse>,
-        CameraData
-      >,
+      UseMutationOptions<CameraResponse, AxiosError<ErrorResponse>, CameraData>,
       'mutationFn' | 'mutationKey'
     >
   )

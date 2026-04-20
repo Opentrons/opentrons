@@ -35,9 +35,9 @@ import {
 } from './constants'
 import { getIsGantryEmpty, isWasteChuteOnDeck } from './utils'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type { UseMutateFunction, UseQueryResult } from 'react-query'
 import type {
+  AxiosError,
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'

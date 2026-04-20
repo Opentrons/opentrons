@@ -10,8 +10,8 @@ import { OPENTRONS_USB } from '../discovery'
 import { appShellRequestor } from '../shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
-import type { AxiosError, HttpHeaders } from '@opentrons/api-client'
 import type { Observable } from 'rxjs'
+import type { AxiosError, HttpHeaders } from '@opentrons/api-client'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
@@ -20,7 +20,9 @@ import type {
 
 const checkEmpty = (val: unknown): boolean => val == null || val === ''
 
-function toHttpHeaders(headers: HeadersInit | undefined): HttpHeaders | undefined {
+function toHttpHeaders(
+  headers: HeadersInit | undefined
+): HttpHeaders | undefined {
   if (headers == null) {
     return undefined
   }

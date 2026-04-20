@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron'
 import FormData from 'form-data'
 import fetch from 'node-fetch'
-import { HttpClientError } from '@opentrons/api-client'
 
+import { HttpClientError } from '@opentrons/api-client'
 import {
   DEFAULT_PRODUCT_ID,
   DEFAULT_VENDOR_ID,
@@ -19,8 +19,8 @@ import {
 import { createLogger } from './log'
 
 import type { IpcMainInvokeEvent } from 'electron'
-import type { HttpRequestConfig, HttpResponse } from '@opentrons/api-client'
 import type { BodyInit as NodeFetchBodyInit } from 'node-fetch'
+import type { HttpRequestConfig, HttpResponse } from '@opentrons/api-client'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
@@ -96,14 +96,14 @@ function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
   return result
 }
 
-const cloneError = (e: HttpClientError | Record<string, unknown>): Record<string, unknown> =>
+const cloneError = (
+  e: HttpClientError | Record<string, unknown>
+): Record<string, unknown> =>
   Object.entries(
     'toJSON' in e && typeof e.toJSON === 'function'
       ? (e.toJSON() as Record<string, unknown>)
       : e
-  ).reduce<
-    Record<string, unknown>
-  >((acc, [k, v]) => {
+  ).reduce<Record<string, unknown>>((acc, [k, v]) => {
     try {
       acc[k] = structuredClone(v)
       return acc
@@ -203,9 +203,9 @@ async function usbListener(
     usbLog.info(`${config.method} ${config.url} failed: ${String(e)}`)
     return {
       error: cloneError(
-        (typeof e === 'object' && e != null
-          ? e
-          : { message: String(e) }) as HttpClientError | Record<string, unknown>
+        (typeof e === 'object' && e != null ? e : { message: String(e) }) as
+          | HttpClientError
+          | Record<string, unknown>
       ),
     }
   }

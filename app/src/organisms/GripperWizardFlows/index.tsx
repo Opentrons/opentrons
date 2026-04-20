@@ -38,9 +38,9 @@ import { MovePin } from './MovePin'
 import { Success } from './Success'
 import { UnmountGripper } from './UnmountGripper'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type { UseMutateFunction } from 'react-query'
 import type {
+  AxiosError,
   CommandData,
   CreateMaintenanceRunData,
   InstrumentData,

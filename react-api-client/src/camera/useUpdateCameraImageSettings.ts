@@ -5,16 +5,16 @@ import { createCameraImageSettings } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type {
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import type {
   AxiosError,
   CameraImageSettings,
   CameraImageSettingsResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
-import type {
-  UseMutateFunction,
-  UseMutationOptions,
-  UseMutationResult,
-} from 'react-query'
 
 export type UseCreateCameraImageSettingsMutationResult = UseMutationResult<
   CameraImageSettingsResponse,

@@ -4,13 +4,13 @@ import { updatePipetteSettings } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type {
   UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
 import type {
+  AxiosError,
   HostConfig,
   IndividualPipetteSettings,
   UpdatePipetteSettingsData,

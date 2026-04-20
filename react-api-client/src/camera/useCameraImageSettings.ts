@@ -5,9 +5,11 @@ import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { CameraImageSettingsResponse } from '@opentrons/api-client'
+import type {
+  AxiosError,
+  CameraImageSettingsResponse,
+} from '@opentrons/api-client'
 
 export function useCameraImageSettings(
   options: UseQueryOptions<CameraImageSettingsResponse> = {}

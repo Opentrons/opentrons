@@ -4,13 +4,13 @@ import { createMaintenanceRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type {
   UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
 import type {
+  AxiosError,
   CreateMaintenanceRunData,
   HostConfig,
   MaintenanceRun,

@@ -5,17 +5,17 @@ import { uploadCsvFile } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type {
+  UseMutateAsyncFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import type {
   AxiosError,
   ErrorResponse,
   FileData,
   HostConfig,
   UploadedCsvFileResponse,
 } from '@opentrons/api-client'
-import type {
-  UseMutateAsyncFunction,
-  UseMutationOptions,
-  UseMutationResult,
-} from 'react-query'
 
 export type UseUploadCsvFileMutationResult = UseMutationResult<
   UploadedCsvFileResponse,

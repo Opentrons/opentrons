@@ -4,7 +4,6 @@ import { patchAccessControlEnabled } from '@opentrons/api-client'
 
 import { useHost } from '../../api'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type {
   UseMutateFunction,
   UseMutationOptions,
@@ -12,6 +11,7 @@ import type {
 } from 'react-query'
 import type {
   AccessControlEnabledSettingsResponse,
+  AxiosError,
   PatchAccessControlEnabledSettingsRequest,
 } from '@opentrons/api-client'
 

@@ -1,8 +1,7 @@
 import { useNotifyClientDataRecovery } from './useNotifyClientDataRecovery'
 
-import type { AxiosError } from '@opentrons/api-client'
 import type { UseQueryOptions } from 'react-query'
-import type { ClientDataResponse } from '@opentrons/api-client'
+import type { AxiosError, ClientDataResponse } from '@opentrons/api-client'
 import type { ClientDataRecovery } from './types'
 
 // Returns the client data store value associated with the error recovery key, if any.

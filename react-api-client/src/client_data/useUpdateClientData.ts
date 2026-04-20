@@ -5,15 +5,15 @@ import { updateClientData } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type {
-  AxiosError,
-  ClientDataResponse,
-  DefaultClientData,
-} from '@opentrons/api-client'
-import type {
   UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
+import type {
+  AxiosError,
+  ClientDataResponse,
+  DefaultClientData,
+} from '@opentrons/api-client'
 
 export type UseUpdateClientDataMutationResult<T = DefaultClientData> =
   UseMutationResult<ClientDataResponse<T>, AxiosError, T> & {

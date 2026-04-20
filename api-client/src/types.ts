@@ -3,9 +3,7 @@ import type { HttpRequestConfig, ResponsePromise } from './request'
 
 export interface HostConfig {
   hostname: string
-  requestor?: <ResData>(
-    config: HttpRequestConfig
-  ) => ResponsePromise<ResData>
+  requestor?: <ResData>(config: HttpRequestConfig) => ResponsePromise<ResData>
   port?: number | null
   robotName?: string | null
   token?: string
