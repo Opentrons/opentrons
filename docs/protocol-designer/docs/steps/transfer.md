@@ -27,7 +27,7 @@ To start, use the dropdown menus to select your source and destination labware. 
   <figcaption>Select the nozzles the Flex 96-channel pipette will use for the transfer.</figcaption>
 </figure>
 
-For Flex 96-channel and Flex or OT-2 8-channel pipettes, choose from single, column, or row nozzle configurations, depending on your attached pipettes. For more, see [partial tip pickup](transfer.md#partial-tip-pickup).
+Choose from single, column, or row nozzle configurations, depending on your attached pipettes. For more, see [partial tip pickup](transfer.md#partial-tip-pickup).
 
 Next, select source and destination wells. Protocol Designer shows available wells based on your pipette nozzle selections. 
 
@@ -90,7 +90,7 @@ Additional advanced pipetting settings are available in the Aspirate and Dispens
 | Delay | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Hold the pipette tip at the submerge, aspirate or dispense, or retract position for a defined amount of time after aspirating or dispensing</li><li>Customize duration and position from bottom of well</li></ul> |
 | Condition | <ul><li>Aspirate</li></ul> | <ul><li>Aspirate a small conditioning volume after aspirating the total volume to be transferred</li><li>Pipetted back into the source for a more accurate first dispense</li><li>Only available for distribute, or multi-dispenses</li></ul> |
 | Push out | <ul><li>Dispense</li><ul> | <ul><li>Dispense past the pipette's plunger bottom to ensure all liquid leaves the tip</li><li>Customize volume</li></ul> |
-| Blowout | <ul><li>Dispense</li></ul> | <ul><li>Blow any remaining liquid out of the tip</li><li>Customize location (source well, destination well, trash bin, or trash chute)</li><li>Customize flow rate and tip position from bottom during blowout</li><li>If you'll blow out liquid into a source or destination well, customize blowout start point</li></ul> |
+| Blowout | <ul><li>Dispense</li></ul> | <ul><li>Blow any remaining liquid out of the tip</li><li>Customize location (source well, destination well, trash bin, or trash chute)</li><li>Customize flow rate and tip position from bottom during blowout</li><li>Customize blowout start point, if blowing out liquid into a source or destination well</li></ul> |
 | Disposal volume | <ul><li>Dispense</li></ul> | <ul><li>Aspirate a small amount of liquid before completing a multi-dispense</li><li>Ensures each dispense is the correct volume</li><li>Customize disposal volume and blowout volume and flow rate</li><li>Only available for distribute, or multi-dispenses</li></ul> |
 | Touch tip | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Touch the tip to the four sides of the well to remove droplets after aspirating or dispensing</li><li>Customize touch tip position from the top of the well</li></ul> |
 | Air gap | <ul><li>Aspirate</li></ul> | <ul><li>Draw air into the tip after aspirating transfer volume</li><li>Customize air gap volume</li><li>Occurs at your retract location, as long as it's safe to do so (more than 2 mm above the top of the well)</li></ul> |
@@ -142,11 +142,11 @@ You can use partial tip pickup to use less tips than a Flex or OT-2 multi-channe
 
 | **Pipette** | **Available Nozzle Configurations** |
 | ----------- | ----------------------------------- |  
-| Flex 96-channel | <ul><li>All nozzles (recommended)</li><li>Single nozzle (A1, A12, H1, or H12)</li><li>Single column (column 1 or 12)</li><li>Single row (row A or H)</li></ul> |
-| Flex 8-channel | <ul><li>All nozzles (recommended)</li><li>Single nozzle (A1 or H1)</li><li>Partial nozzles (2–7 consecutive nozzles)</li></ul> |
-| OT-2 8-channel | <ul><li>All nozzles (recommended)</li><li>Single nozzle (A1 or H1)</li><li>Partial nozzles (2–7 consecutive nozzles)</li></ul> |
+| Flex 96-channel | <ul><li>All nozzles</li><li>Single nozzle (A1, A12, H1, or H12)</li><li>Single column (column 1 or 12)</li><li>Single row (row A or H)</li></ul> |
+| Flex 8-channel | <ul><li>All nozzles</li><li>Single nozzle (A1 or H1)</li><li>Partial nozzles (2–7 consecutive nozzles)</li></ul> |
+| OT-2 8-channel | <ul><li>All nozzles</li><li>Single nozzle (A1 or H1)</li><li>Partial nozzles (2–7 consecutive nozzles)</li></ul> |
 
-Here, choose a single column of nozzles ( 1 or 12) for the Flex 96-channel pipette to use in partial tip pickup.  
+The example below uses a single column of nozzles (1 or 12) for the Flex 96-channel pipette to use in partial tip pickup.  
 <figure class="screenshot" markdown>
   ![Partial tip options for the Flex 96-channel pipette.](../images/partial_nozzles.png)
   <figcaption>Choose an individual, single column, or single row of nozzles for the Flex 96-channel pipette to use in the transfer.</figcaption>
@@ -163,20 +163,18 @@ In the fourth form, you can choose between automatic and manual tip tracking for
 
 ### Collision errors
 
-Partial tip pickup requires the pipette to hover above adjacent deck slots, and can increase the risk of collisions.Protocol Designer will always recommend selecting the total number of nozzles for your attached pipette. 
+Partial tip pickup requires the pipette to hover above adjacent deck slots, and can increase the risk of collisions. Protocol Designer will always recommend selecting the total number of nozzles for your attached pipette. 
 
 When you choose a partial tip pickup nozzle configuration, Protocol Designer includes [warnings and errors](../warnings-errors.md) to reduce collision risk. These errors can require you to change your well, tip, or deck selections in order to avoid risky situations. 
 
-Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision.
-
 <figure class="screenshot" markdown>
   ![Pipette collision risk](../images/partial-tip-collision.png)
-  <figcaption>Labware in adjacent slots can cause pipette collisions.</figcaption>
+  <figcaption>Protocol Designer shows a collision error because the tip rack in C2 blocks partial tip pickup from the rack in C3.</figcaption>
 </figure> 
 
 Even though the tip rack above is full of pipette tips, the "not enough tips" warning tells you that there aren't enough tips that the pipette can safely access. This results in a collision error to prevent the pipette from striking adjacent labware in your final protocol. 
 
-To fix the collision error, move the tip racks from adjacent deck slots or change your tip pickup selections.
+To fix the collision error, move the tip racks so they are no longer adjacent, or change your tip pickup selections.
 
 Fix all errors before exporting to ensure your protocol runs successfully. You won't be able to run protocols with unresolved errors. 
 
