@@ -1,13 +1,16 @@
-.nav_container {
-  height: 7.75rem;
+.container {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--spacing-40);
 }
 
-.form_container {
-  width: 944px;
-  height: 249px;
-  padding-right: 60px;
-  padding-left: 60px;
-  margin-top: var(--spacing-24);
+.content_container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16) var(--spacing-60) var(--spacing-120)
+    var(--spacing-60);
+  margin-top: 7.75rem;
+  gap: var(--spacing-24);
 }
 
 .form_inner_container {

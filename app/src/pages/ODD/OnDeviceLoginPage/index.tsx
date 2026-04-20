@@ -101,7 +101,7 @@ export function OnDeviceLoginPage(): JSX.Element {
 
   return (
     <>
-      <div className={styles.nav_container}>
+      <div className={styles.container}>
         <ChildNavigation
           header="Login"
           buttonText={step === 'username' ? 'next' : 'confirm'}
@@ -113,53 +113,53 @@ export function OnDeviceLoginPage(): JSX.Element {
           }}
           onClickButton={handleNext}
         />
-      </div>
-      <div className={styles.form_container}>
-        <div className={styles.form_inner_container}>
-          <StyledText oddStyle="bodyTextRegular" className={styles.field_label}>
-            {step === 'username' ? 'Username' : 'Password'}
-          </StyledText>
-          <Controller
-            key={activeFieldName}
-            control={control}
-            name={activeFieldName}
-            render={({ field }) => (
-              <InputField
-                ref={setRefs(inputRef, field.ref)}
-                autoFocus={step === 'password'}
-                type={inputType}
-                size="medium"
-                value={field.value ?? ''}
-                name={field.name}
-                onBlur={field.onBlur}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  field.onChange(e.target.value)
-                }}
-                onFocus={() => {
-                  setShowKeyboard(true)
-                }}
-                rightElement={
-                  step === 'password' ? (
-                    <div>
-                      <Button
-                        type="button"
-                        title="Toggle password visibility"
-                        onClick={() => {
-                          setShowPassword(current => !current)
-                          inputRef.current?.focus()
-                        }}
-                      >
-                        <Icon
-                          name={showPassword ? 'eye-slash' : 'eye'}
-                          size="1.5rem"
-                        />
-                      </Button>
-                    </div>
-                  ) : null
-                }
-              />
-            )}
-          />
+        <div className={styles.content_container}>
+          <div className={styles.form_inner_container}>
+            <StyledText oddStyle="bodyTextRegular" className={styles.field_label}>
+              {step === 'username' ? 'Username' : 'Password'}
+            </StyledText>
+            <Controller
+              key={activeFieldName}
+              control={control}
+              name={activeFieldName}
+              render={({ field }) => (
+                <InputField
+                  ref={setRefs(inputRef, field.ref)}
+                  autoFocus={step === 'password'}
+                  type={inputType}
+                  size="medium"
+                  value={field.value ?? ''}
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    field.onChange(e.target.value)
+                  }}
+                  onFocus={() => {
+                    setShowKeyboard(true)
+                  }}
+                  rightElement={
+                    step === 'password' ? (
+                      <div>
+                        <Button
+                          type="button"
+                          title="Toggle password visibility"
+                          onClick={() => {
+                            setShowPassword(current => !current)
+                            inputRef.current?.focus()
+                          }}
+                        >
+                          <Icon
+                            name={showPassword ? 'eye-slash' : 'eye'}
+                            size="1.5rem"
+                          />
+                        </Button>
+                      </div>
+                    ) : null
+                  }
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
       {showKeyboard ? (
