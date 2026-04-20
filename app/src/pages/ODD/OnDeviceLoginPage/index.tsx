@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
-  COLORS,
   Icon,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
