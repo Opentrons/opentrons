@@ -135,7 +135,7 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>T</code>: the allowable percentage deviation (range 1—100 %) from the target pressure. <i>(optional)</i></li>
           <li><code>R</code>: <code>1</code> resets the pressure control PID error and integral terms.</li>
         </ul>
-        <strong>Example:</strong> <code>M125, P1, I2, D3, T2. Sets the PID to 1, 2, and 3 (respectively), and sets the pressure target deviation to 2%.
+        <strong>Example:</strong> <code>M125, P1, I2, D3, T2. Sets the PID to 1, 2, and 3 (respectively), and sets the pressure target deviation to 2%.</code><br>
         <strong>Response:</strong> <code>M125 OK</code>
       </td>
     </tr>
