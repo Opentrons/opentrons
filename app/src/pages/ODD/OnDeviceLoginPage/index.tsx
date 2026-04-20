@@ -8,6 +8,7 @@ import {
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
   setRefs,
+  StyledText,
 } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
@@ -114,9 +115,9 @@ export function OnDeviceLoginPage(): JSX.Element {
         />
       </div>
       <div className={styles.form_container}>
-        <h4 className={styles.field_label}>
+        <StyledText oddStyle="level4HeaderRegular">
           {step === 'username' ? 'Username' : 'Password'}
-        </h4>
+        </StyledText>
         <Controller
           key={activeFieldName}
           control={control}

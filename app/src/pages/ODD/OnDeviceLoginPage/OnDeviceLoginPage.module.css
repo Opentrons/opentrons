@@ -11,11 +11,11 @@
   margin-top: 4.625rem;
 }
 
-.field_label {
+/* .field_label {
   align-self: flex-start;
   padding-bottom: var(--spacing-6);
   font-weight: var(--font-weight-regular);
-}
+} */
 
 .keyboard_container {
   position: fixed;
