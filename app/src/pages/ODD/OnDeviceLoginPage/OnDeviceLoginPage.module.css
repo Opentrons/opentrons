@@ -3,19 +3,26 @@
 }
 
 .form_container {
+  width: 944px;
+  height: 249px;
+  padding-right: 60px;
+  padding-left: 60px;
+  margin-top: var(--spacing-24);
+}
+
+.form_inner_container {
   display: flex;
   width: 51.5rem;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  margin-top: 4.625rem;
+  gap: var(--spacing-6);
 }
 
-/* .field_label {
+.field_label {
+  display: block;
   align-self: flex-start;
-  padding-bottom: var(--spacing-6);
-  font-weight: var(--font-weight-regular);
-} */
+}
 
 .keyboard_container {
   position: fixed;

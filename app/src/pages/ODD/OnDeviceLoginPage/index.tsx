@@ -115,50 +115,52 @@ export function OnDeviceLoginPage(): JSX.Element {
         />
       </div>
       <div className={styles.form_container}>
-        <StyledText oddStyle="level4HeaderRegular">
-          {step === 'username' ? 'Username' : 'Password'}
-        </StyledText>
-        <Controller
-          key={activeFieldName}
-          control={control}
-          name={activeFieldName}
-          render={({ field }) => (
-            <InputField
-              ref={setRefs(inputRef, field.ref)}
-              autoFocus={step === 'password'}
-              testId="login-field"
-              type={inputType}
-              size="medium"
-              value={field.value ?? ''}
-              name={field.name}
-              onBlur={field.onBlur}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                field.onChange(e.target.value)
-              }}
-              onFocus={() => {
-                setShowKeyboard(true)
-              }}
-              rightElement={
-                step === 'password' ? (
-                  <Button
-                    type="button"
-                    aria-label="Toggle password visibility"
-                    aria-pressed={showPassword}
-                    onClick={() => {
-                      setShowPassword(current => !current)
-                      inputRef.current?.focus()
-                    }}
-                  >
-                    <Icon
-                      name={showPassword ? 'eye-slash' : 'eye'}
-                      size="1.5rem"
-                    />
-                  </Button>
-                ) : null
-              }
-            />
-          )}
-        />
+        <div className={styles.form_inner_container}>
+          <StyledText oddStyle="bodyTextRegular" className={styles.field_label}>
+            {step === 'username' ? 'Username' : 'Password'}
+          </StyledText>
+          <Controller
+            key={activeFieldName}
+            control={control}
+            name={activeFieldName}
+            render={({ field }) => (
+              <InputField
+                ref={setRefs(inputRef, field.ref)}
+                autoFocus={step === 'password'}
+                type={inputType}
+                size="medium"
+                value={field.value ?? ''}
+                name={field.name}
+                onBlur={field.onBlur}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  field.onChange(e.target.value)
+                }}
+                onFocus={() => {
+                  setShowKeyboard(true)
+                }}
+                rightElement={
+                  step === 'password' ? (
+                    <div>
+                      <Button
+                        type="button"
+                        title="Toggle password visibility"
+                        onClick={() => {
+                          setShowPassword(current => !current)
+                          inputRef.current?.focus()
+                        }}
+                      >
+                        <Icon
+                          name={showPassword ? 'eye-slash' : 'eye'}
+                          size="1.5rem"
+                        />
+                      </Button>
+                    </div>
+                  ) : null
+                }
+              />
+            )}
+          />
+        </div>
       </div>
       {showKeyboard ? (
         <div

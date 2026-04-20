@@ -1,5 +1,5 @@
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -143,16 +143,13 @@ describe('Login', () => {
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
     const input = screen.getByTestId('login-field')
     expect(input).toHaveAttribute('type', 'password')
-    const toggleBtn = screen.getByRole('button', {
-      name: 'Toggle password visibility',
-    })
-    expect(toggleBtn).toHaveAttribute('aria-pressed', 'false')
+    const toggleBtn = within(
+      screen.getByTestId('login-password-visibility-toggle')
+    ).getByRole('button')
     fireEvent.click(toggleBtn)
     expect(input).toHaveAttribute('type', 'text')
-    expect(toggleBtn).toHaveAttribute('aria-pressed', 'true')
     fireEvent.click(toggleBtn)
     expect(input).toHaveAttribute('type', 'password')
-    expect(toggleBtn).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('submits username and password when confirming a non-empty password', () => {
