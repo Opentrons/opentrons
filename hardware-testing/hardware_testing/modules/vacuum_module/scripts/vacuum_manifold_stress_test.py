@@ -111,7 +111,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "perstaltic_flow_rate",
         "perstaltic_flow_rate",
-        default=64,
+        default=76,
         minimum=1,
         maximum=400,
         description="Reservoir water fill time.",
