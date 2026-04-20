@@ -2,6 +2,7 @@
 
 import asyncio
 from typing import Any, Iterator, ParamSpec, TypeVar
+from collections.abc import Iterable
 
 import Pyro5.api
 
@@ -10,6 +11,19 @@ from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
 T = TypeVar("T")
 P = ParamSpec("P")
 
+class AsyncPyroFunctionWrapper:
+    """Wrapper class to make Proxy response objects callable."""
+    def __init__(
+        self,
+        proxy: Pyro5.api.Proxy,
+    ):
+        self.proxy = proxy
+    
+    def __call__(self, *args, **kwargs) -> Any:
+        # Overload client-side call references with proxy-safe callable reference
+        threadsafe_proxy = Pyro5.api.Proxy(self.proxy._pyroUri)  # type: ignore
+        return threadsafe_proxy.call(*args, **kwargs)
+    
 
 class _ACPO:
     pass
@@ -60,7 +74,7 @@ def _build_classdict(
             yield (method, async_method)
         else:
             # For standard method calls forward the direct call to the method on the PSO Proxy.
-            yield (method, wrap_parameter_validation(attribute))
+            yield (method, wrap_parameter_validation(pso, method, attribute))
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
         # For property attributes we use to attach a wrapped `getattr` call for that attribute.
@@ -93,7 +107,7 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
             # This must be done because Pyro only accepts proxy calls from the thread that owns the proxy
             thread_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
             func = getattr(thread_proxy, func_name)
-            validated_func = wrap_parameter_validation(func)
+            validated_func = wrap_parameter_validation(proxy, func_name, func)
             return validated_func(self, *args, **kwargs)
 
         # Return a Coroutine that may be awaited, it will execute the `_thread_call` when called
@@ -113,10 +127,13 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
 
 def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
     """Wrapper to produce a call forward to a specified attribute of a Proxy object."""
-    return lambda self, current_attr=attr: getattr(proxy, current_attr)
+    return lambda self, current_attr=attr: wrap_result_validation(proxy, attr, getattr(proxy, current_attr))
 
 
-def wrap_parameter_validation(attr: Any) -> Any:
+### Parameter Validations
+
+
+def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str, attr: Any) -> Any:
     """Validate outbound parameter requests before allowing serialization."""
 
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
@@ -124,6 +141,7 @@ def wrap_parameter_validation(attr: Any) -> Any:
         def _validations(arg: Any) -> Any:
             # NOTE: Extend this as further validations are needed
             arg = _validate_hashable(arg)
+            arg = _validate_outbound_callback(arg)
             return arg
 
         validated_args = tuple()  # type: ignore
@@ -133,7 +151,8 @@ def wrap_parameter_validation(attr: Any) -> Any:
         # Validate each keyword argument and reconstruct the kwargs dictionary
         kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
 
-        return attr(*validated_args, **kwargs)
+        result = attr(*validated_args, **kwargs)
+        return wrap_result_validation(proxy, func_name, result)
 
     return wrapper
 
@@ -167,3 +186,46 @@ def _validate_hashable(arg: Any) -> Any:
                 value_type=".".join((value_type.__module__, value_type.__qualname__)),
             )
     return arg
+
+def _validate_outbound_callback(arg: Any) -> Any:
+    """Handle an argument which is a remote callback in an AsyncPyroFunctionWrapper.
+    
+    For roundtrip functions, which may be sent across multiple processes, we only want to perserve the inner Proxy.
+    """
+    if isinstance(arg, AsyncPyroFunctionWrapper):
+        arg = arg.proxy
+
+    return arg
+
+
+### Result Validations
+
+def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any):
+    """Validate incoming result format before returning from a remote call.
+    
+    This is not to be confused with serialization. The validation process can be used to reformat
+    result data into more client-acceptable shapes. For example, autowrapping of Proxy responses
+    as AsyncClientPyroObjects.
+    """
+
+    validated_result = result
+    threadsafe_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
+    attributes_with_proxy_result: list[str] = getattr(threadsafe_proxy, "get_pyro_attributes_with_proxy_result", [])
+    if func_name in attributes_with_proxy_result:
+        # Check if the result is a list of proxies or singular entity
+        try:
+            if result.is_callable:
+                validated_result = AsyncPyroFunctionWrapper(result)
+
+        except:
+            if isinstance(result, Iterable):
+                validated_result = []
+                for r in result:
+                    assert isinstance(r, Pyro5.api.Proxy)
+                    validated_result.append(AsyncClientPyroObject(r))
+            else:
+                assert isinstance(result, Pyro5.api.Proxy)
+                validated_result = AsyncClientPyroObject(result)
+
+    return validated_result
+

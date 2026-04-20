@@ -3,6 +3,7 @@
 import asyncio
 import functools
 import inspect
+import enum
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
@@ -61,6 +62,25 @@ class DaemonUtility:
         # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
         return self._daemon.proxyFor(pso)  # type: ignore
 
+class PyroFunctionWrapper:
+    """Wrapper class to safely wrap callable responses as Proxy objects.."""
+    def __init__(
+        self,
+        callable: Callable,
+    ):
+        self.callable = callable
+    
+    @property
+    def is_callable(self) -> bool:
+        return True
+    
+    def call(self, *args, **kwargs) -> Any:
+        """Remote deployable function call."""
+        return self.callable(*args, **kwargs)
+    
+class ResultMeta(enum.Enum):
+    PROXY = enum.auto()
+    UNKNOWN = enum.auto()
 
 class _PyroSpecialBehavior(BaseModel):
     specialty_function: Callable[[DaemonUtility, Any, str, Any], Any]
@@ -216,6 +236,7 @@ def _build_classdict(  # noqa: C901
     core_obj: Any, utility: DaemonUtility
 ) -> Iterator[tuple[str, Any]]:
     async_methods: dict[str, dict[str, Any]] = {}
+    proxy_attributes: list[str] = []
     for name, attr in inspect.getmembers(core_obj.__class__):
         if "__" not in name and not name.startswith("_"):
             specialty_behavior = _get_specialty_behavior(attr, name)
@@ -246,6 +267,12 @@ def _build_classdict(  # noqa: C901
                 if inspect.iscoroutinefunction(attr):
                     async_metadata = _build_metadata_dictionary(attr)
                     async_methods[name] = async_metadata
+                
+                result_meta = _determine_attribute_result_metadata(specialty_behavior.specialty_function)
+                # NOTE: extend this further as needed for custom result types
+                if result_meta is ResultMeta.PROXY:
+                    proxy_attributes.append(name)
+
                 exposed = pyro.expose(
                     specialty_behavior.specialty_function(utility, core_obj, name, attr)
                 )
@@ -289,6 +316,10 @@ def _build_classdict(  # noqa: C901
     # Attach the known async methods list to the PSO as a private member and expose a getter method
     yield ("_pyro_async_methods", async_methods)
     yield ("get_pyro_async_methods", pyro.expose(property(get_pyro_async_methods)))  # type: ignore
+    # Attach an initially empty proxy-providing methods list to the PSO as a private member and expose a getter method
+    yield ("_pyro_attributes_with_proxy_results", proxy_attributes)
+    yield( "get_pyro_attributes_with_proxy_result", pyro.expose(property(get_pyro_attributes_with_proxy_result)))  # type: ignore
+
 
     # Attach the `core_obj` instance as a private member for internal tracking
     try:
@@ -311,6 +342,14 @@ def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
     }
 
 
+def _determine_attribute_result_metadata(specialty_func: Any) -> ResultMeta:
+    # Determines the result metadata for an attribute wrapped in a speciality function
+    if specialty_func.__name__ == "convert_result_to_proxy":
+        return ResultMeta.PROXY
+    # NOTE: extend this further as needed in the future for other custom return types
+    return ResultMeta.UNKNOWN
+
+
 def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None:
     if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
         if hasattr(func, "_pyro_specialty_behavior"):
@@ -324,6 +363,11 @@ def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None
 def get_pyro_async_methods(self: Any) -> dict[str, dict[str, Any]]:
     """Helper function to access the dictionary of known async method metadata on a PyroSynchronousObject."""
     result: dict[str, dict[str, Any]] = self._pyro_async_methods
+    return result
+
+def get_pyro_attributes_with_proxy_result(self) -> list[str]:
+    """Helper function to access the list of known methods that provide their results as Proxies."""
+    result: list[str] = self._pyro_attributes_with_proxy_results
     return result
 
 
@@ -372,6 +416,9 @@ def convert_result_to_proxy(  # noqa: C901
                 proxy_list.append(utility.proxy_for(pyro_synchronous_obj))
             return proxy_list
         except TypeError:
+            if isinstance(result, FunctionType):
+                # Wrap callable result in Proxy-safe format
+                result = PyroFunctionWrapper(result)
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
                 if not hasattr(result, "_loop"):
