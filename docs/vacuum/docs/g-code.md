@@ -75,20 +75,22 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>E</code>: pressure control enabled. Returns <code>1</code> (on) or <code>0</code> (off).</li>
           <li><code>V</code>: vent state. Returns <code>1</code> (open) or <code>0</code> (closed).</li>
         </ul>
-        <strong>Response: Returns </strong> <code>M121 T:&lt;target&gt; C:&lt;current&gt; A:&lt;sensor_a&gt; B:&lt;sensor_b&gt; H:&lt;atm&gt; E:&lt;enabled&gt; V:&lt;vent&gt; OK</code>
+        <strong>Example:</strong> <code>M121</code><br>
+        <strong>Response:</strong> <code>M121 T:400 C:1011.0 A:1010.9 B:1012.2 H:819.2 E:1 V:0 OK</code>
       </td>
     </tr>
     <tr>
       <td><code>M122</code></td>
       <td>
-        <strong>Command:</strong> set pump state. Sending this command puts the module into "manual mode," causing it to ignore any pressure targets previously set via <code>M120</code>.<br>
+        <strong>Command:</strong> set pump state. This command enables "manual mode," which overrides any active pressure targets set via <code>M120</code>.<br>
         <strong>Arguments:</strong>
         <ul>
           <li><code>S</code>: Start/stop control. Accepts <code>1</code> (start) or <code>0</code> (stop).</li>
           <li><code>R</code>: Target rpm. Range: <code>0–3500</code> rpm.</li>
           <li><code>D</code>: PWM duty cycle. Range: <code>0–100</code>, expressed as a %. When specified, the module ignores the rpm value target (<code>R</code>).</li>
         </ul>
-        <strong>Response: Returns </strong> <code>M122 OK</code><font color="red">Does this fail, similar to M120?</font>.
+        <strong>Example:</strong> <code>M122 S1 D50</code>, run the motor at 50% duty cycle.<br>
+        <strong>Response:</strong> <code>M122 OK</code>
       </td>
     </tr>
     <tr>
