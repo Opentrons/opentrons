@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -44,6 +45,7 @@ export function OnDeviceLoginPageView({
   isAuthLoading,
   onCancel,
 }: OnDeviceLoginPageViewProps): JSX.Element {
+  const { t } = useTranslation(['shared', 'device_settings'])
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
     defaultValues: {
       username: '',
@@ -103,8 +105,12 @@ export function OnDeviceLoginPageView({
     <>
       <div className={styles.container}>
         <ChildNavigation
-          header="Login"
-          buttonText={step === 'username' ? 'next' : 'confirm'}
+          header={t('on_device_login', { ns: 'device_settings' })}
+          buttonText={
+            step === 'username'
+              ? t('next', { ns: 'shared' })
+              : t('confirm', { ns: 'shared' })
+          }
           buttonIsDisabled={primaryDisabled}
           onClickBack={
             step === 'password'
@@ -114,7 +120,7 @@ export function OnDeviceLoginPageView({
               : undefined
           }
           secondaryButtonProps={{
-            buttonText: 'cancel',
+            buttonText: t('cancel', { ns: 'shared' }),
             buttonType: 'tertiaryLowLight',
             onClick: onCancel,
           }}
@@ -126,7 +132,9 @@ export function OnDeviceLoginPageView({
               oddStyle="bodyTextRegular"
               className={styles.field_label}
             >
-              {step === 'username' ? 'Username' : 'Password'}
+              {step === 'username'
+                ? t('device_settings:username')
+                : t('device_settings:password')}
             </StyledText>
             <Controller
               key={activeFieldName}
@@ -152,7 +160,9 @@ export function OnDeviceLoginPageView({
                       <div>
                         <Button
                           type="button"
-                          title="Toggle password visibility"
+                          title={t('toggle_password_visibility', {
+                            ns: 'device_settings',
+                          })}
                           onClick={() => {
                             setShowPassword(current => !current)
                             inputRef.current?.focus()

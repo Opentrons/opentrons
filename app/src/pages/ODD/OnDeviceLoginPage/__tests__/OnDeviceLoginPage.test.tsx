@@ -83,7 +83,7 @@ describe('Login', () => {
     const { container } = renderLogin()
     expect(screen.getAllByText('Login').length).toBeGreaterThanOrEqual(1)
     screen.getByText('Username')
-    screen.getByText('next')
+    screen.getByText('Next')
     screen.getByText('cancel')
     expect(getLoginInput(container)).toHaveAttribute('type', 'text')
     expect(
@@ -93,24 +93,22 @@ describe('Login', () => {
 
   it('navigates back when cancel is pressed', () => {
     renderLogin()
-    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
+    fireEvent.click(screen.getByText('cancel'))
     expect(mockNavigate).toHaveBeenCalledWith(-1)
   })
 
   it('disables next when username is empty', () => {
     renderLogin()
-    expect(
-      screen.getByRole('button', { name: 'next' })
-    ).toBeDisabled()
+    expect(screen.getByText('Next').closest('button')).toBeDisabled()
   })
 
   it('shows the software keyboard when the field is focused', () => {
     const { container } = renderLogin()
     expect(
-      screen.queryByRole('button', { name: 'simulate keyboard input' })
+      screen.queryByText('simulate keyboard input')
     ).not.toBeInTheDocument()
     fireEvent.focus(getLoginInput(container))
-    screen.getByRole('button', { name: 'simulate keyboard input' })
+    screen.getByText('simulate keyboard input')
   })
 
   it('updates the username when typing in the text field', () => {
@@ -123,9 +121,7 @@ describe('Login', () => {
   it('updates the username when FullKeyboard reports a new value', () => {
     const { container } = renderLogin()
     fireEvent.focus(getLoginInput(container))
-    fireEvent.click(
-      screen.getByRole('button', { name: 'simulate keyboard input' })
-    )
+    fireEvent.click(screen.getByText('simulate keyboard input'))
     expect(getLoginInput(container)).toHaveValue('from_keyboard')
   })
 
@@ -134,9 +130,9 @@ describe('Login', () => {
     fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
-    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    fireEvent.click(screen.getByText('Next'))
     screen.getByText('Password')
-    screen.getByTestId('ChildNavigation_Back_Button')
+    screen.getByRole('button', { name: 'Back' })
     const input = getLoginInput(container)
     expect(input).toHaveAttribute('type', 'password')
     expect(input).toHaveValue('')
@@ -147,7 +143,7 @@ describe('Login', () => {
     fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'next' }))
+    fireEvent.click(screen.getByText('Next'))
     screen.getByText('Password')
     fireEvent.click(screen.getByRole('button', { name: 'Back' }))
     screen.getByText('Username')
@@ -162,8 +158,8 @@ describe('Login', () => {
     fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
-    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
-    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+    fireEvent.click(screen.getByText('Next'))
+    expect(screen.getByText('Confirm').closest('button')).toBeDisabled()
   })
 
   it('toggles password visibility when the eye control is pressed', () => {
@@ -171,7 +167,7 @@ describe('Login', () => {
     fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
-    fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
+    fireEvent.click(screen.getByText('Next'))
     const input = getLoginInput(container)
     expect(input).toHaveAttribute('type', 'password')
     const toggleBtn = screen.getByTitle('Toggle password visibility')
@@ -186,11 +182,11 @@ describe('Login', () => {
     fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'next' }))
+    fireEvent.click(screen.getByText('Next'))
     fireEvent.change(getLoginInput(container), {
       target: { value: 'secret' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'confirm' }))
+    fireEvent.click(screen.getByText('Confirm'))
     expect(mockSubmitPassword).toHaveBeenCalledWith('user1', 'secret')
   })
 })

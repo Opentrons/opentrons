@@ -1,4 +1,5 @@
 import React from 'react'
+import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { action } from '@storybook/addon-actions'
@@ -6,6 +7,7 @@ import { legacy_createStore } from 'redux'
 
 import { VIEWPORT } from '@opentrons/components'
 
+import { i18n } from '/app/i18n'
 import { configReducer } from '/app/redux/config/reducer'
 
 import { OnDeviceLoginPageView } from '.'
@@ -39,7 +41,9 @@ const meta: Meta<typeof OnDeviceLoginPageView> = {
     Story => (
       <Provider store={store}>
         <MemoryRouter>
-          <Story />
+          <I18nextProvider i18n={i18n}>
+            <Story />
+          </I18nextProvider>
         </MemoryRouter>
       </Provider>
     ),
