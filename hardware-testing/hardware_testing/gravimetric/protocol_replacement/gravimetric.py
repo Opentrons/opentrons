@@ -78,6 +78,7 @@ if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
         _download_and_extract(release, base_dir)
     sys.path.append(base_dir)
 
+from hardware_testing.scripts.data_center_client import upload_data_to_google_drive
 from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
 from hardware_testing.data.ui import (  # noqa: F401, E402
     set_output_file,
@@ -848,6 +849,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="use_impact_protection",
         default=True,
         description="Whether to use impact protection device during testing.",
+    )
+
+    parameters.add_bool(
+        display_name="Upload CSV Automatically",
+        variable_name="upload_csv_automatically",
+        default=False,
+        description="Whether to upload the CSV file automatically after testing.",
     )
 
     parameters.add_str(
@@ -1868,6 +1876,11 @@ def run(ctx: ProtocolContext) -> None:
         if fixture_settings.increment:
             _adjust_settings_for_increment(fixture_settings)
         _run(ctx, fixture_settings)
+        if fixture_settings.ctx.params.upload_csv_automatically:
+            print_info("Uploading CSV to Google Drive...")
+            result = upload_data_to_google_drive(csv_file_path=fixture_settings.test_report.file_path)
+            if not result:
+                print_error("Failed to upload CSV to Google Drive.")
     except Exception as e:
         print_error(f"Captured traceback:\n{traceback.format_exc()}")
         raise e
