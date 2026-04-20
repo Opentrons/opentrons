@@ -2,7 +2,7 @@
 
 import { createSlice } from '@reduxjs/toolkit'
 
-import { type ActionTypesFromSlice } from '../actionTypesFromSlice'
+import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { State } from '/app/redux/types'
