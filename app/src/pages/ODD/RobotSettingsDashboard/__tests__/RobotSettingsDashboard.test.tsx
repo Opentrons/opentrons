@@ -11,6 +11,7 @@ import {
   LanguageSetting,
   NetworkSettings,
   Privacy,
+  RobotEncryptionKey,
   RobotSystemVersion,
   TouchscreenBrightness,
   TouchScreenSleep,
@@ -304,5 +305,12 @@ describe('RobotSettingsDashboard', () => {
     const button = screen.getByText('Devices')
     fireEvent.click(button)
     expect(vi.mocked(Devices)).toHaveBeenCalled()
+  })
+
+  it('should render the component when tapping show encryption key', () => {
+    render()
+    const button = screen.getByText('Robot encryption key')
+    fireEvent.click(button)
+    screen.getByText('View robot generated key')
   })
 })
