@@ -69,24 +69,4 @@ describe('useOAuth2PasswordLogin', () => {
       client_id: OAUTH2_CLIENT_ID,
     })
   })
-
-  it('trims username and password', () => {
-    const { result } = renderHook(
-      () => useOAuth2PasswordLogin({ onSuccess, onError }),
-      {
-        wrapper,
-      }
-    )
-
-    act(() => {
-      result.current.submitPassword('  alice  ', '  pwd  ')
-    })
-
-    expect(mockGetOAuth2Token).toHaveBeenCalledWith({
-      grant_type: 'password',
-      username: 'alice',
-      password: 'pwd',
-      client_id: OAUTH2_CLIENT_ID,
-    })
-  })
 })

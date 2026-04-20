@@ -1,5 +1,5 @@
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen, within } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -61,6 +61,14 @@ const renderLogin = () => {
   )[0]
 }
 
+function getLoginInput(container: HTMLElement): HTMLInputElement {
+  const el = container.querySelector(
+    'input[name="username"], input[name="password"]'
+  )
+  expect(el).not.toBeNull()
+  return el as HTMLInputElement
+}
+
 describe('Login', () => {
   beforeEach(() => {
     mockNavigate.mockReset()
@@ -72,12 +80,12 @@ describe('Login', () => {
   })
 
   it('renders navigation, username field, and action buttons', () => {
-    renderLogin()
+    const { container } = renderLogin()
     expect(screen.getAllByText('Login').length).toBeGreaterThanOrEqual(1)
     screen.getByText('Username')
     screen.getByText('next')
     screen.getByText('cancel')
-    expect(screen.getByTestId('login-field')).toHaveAttribute('type', 'text')
+    expect(getLoginInput(container)).toHaveAttribute('type', 'text')
   })
 
   it('navigates back when cancel is pressed', () => {
@@ -92,43 +100,43 @@ describe('Login', () => {
   })
 
   it('shows the software keyboard when the field is focused', () => {
-    renderLogin()
+    const { container } = renderLogin()
     expect(screen.queryByTestId('mock-full-keyboard')).not.toBeInTheDocument()
-    fireEvent.focus(screen.getByTestId('login-field'))
+    fireEvent.focus(getLoginInput(container))
     expect(screen.getByTestId('mock-full-keyboard')).toBeInTheDocument()
   })
 
   it('updates the username when typing in the text field', () => {
-    renderLogin()
-    const input = screen.getByTestId('login-field')
+    const { container } = renderLogin()
+    const input = getLoginInput(container)
     fireEvent.change(input, { target: { value: 'lab_user' } })
     expect(input).toHaveValue('lab_user')
   })
 
   it('updates the username when FullKeyboard reports a new value', () => {
-    renderLogin()
-    fireEvent.focus(screen.getByTestId('login-field'))
+    const { container } = renderLogin()
+    fireEvent.focus(getLoginInput(container))
     fireEvent.click(
       screen.getByRole('button', { name: 'simulate keyboard input' })
     )
-    expect(screen.getByTestId('login-field')).toHaveValue('from_keyboard')
+    expect(getLoginInput(container)).toHaveValue('from_keyboard')
   })
 
   it('switches label and input to password after next with a non-empty username', () => {
-    renderLogin()
-    fireEvent.change(screen.getByTestId('login-field'), {
+    const { container } = renderLogin()
+    fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
     screen.getByText('Password')
-    const input = screen.getByTestId('login-field')
+    const input = getLoginInput(container)
     expect(input).toHaveAttribute('type', 'password')
     expect(input).toHaveValue('')
   })
 
   it('disables next on the password step when password is empty', () => {
-    renderLogin()
-    fireEvent.change(screen.getByTestId('login-field'), {
+    const { container } = renderLogin()
+    fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
@@ -136,16 +144,14 @@ describe('Login', () => {
   })
 
   it('toggles password visibility when the eye control is pressed', () => {
-    renderLogin()
-    fireEvent.change(screen.getByTestId('login-field'), {
+    const { container } = renderLogin()
+    fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
-    const input = screen.getByTestId('login-field')
+    const input = getLoginInput(container)
     expect(input).toHaveAttribute('type', 'password')
-    const toggleBtn = within(
-      screen.getByTestId('login-password-visibility-toggle')
-    ).getByRole('button')
+    const toggleBtn = screen.getByTitle('Toggle password visibility')
     fireEvent.click(toggleBtn)
     expect(input).toHaveAttribute('type', 'text')
     fireEvent.click(toggleBtn)
@@ -153,12 +159,12 @@ describe('Login', () => {
   })
 
   it('submits username and password when confirming a non-empty password', () => {
-    renderLogin()
-    fireEvent.change(screen.getByTestId('login-field'), {
+    const { container } = renderLogin()
+    fireEvent.change(getLoginInput(container), {
       target: { value: 'user1' },
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
-    fireEvent.change(screen.getByTestId('login-field'), {
+    fireEvent.change(getLoginInput(container), {
       target: { value: 'secret' },
     })
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
