@@ -3,7 +3,8 @@
 import asyncio
 import socket
 import threading
-from typing import cast
+from typing import Any, cast
+from unittest.mock import patch
 
 import pytest
 from decoy import Decoy
@@ -100,4 +101,78 @@ async def test_client_async_on_ot3api(decoy: Decoy, managed_obj: OT3API) -> None
     assert estop_state is hw_types.EstopState.DISENGAGED
 
     # Clean up client resources.
+    ot3_proxy._pyroRelease()  # type: ignore
+
+
+async def test_thread_local_proxy_reuses_connections(
+    managed_obj: OT3API,
+) -> None:
+    """Test that async calls reuse proxies instead of creating a new one per call."""
+    sock = socket.socket()
+    sock.bind(("localhost", 0))
+    host, port = sock.getsockname()
+    sock.close()
+
+    pyro.config.NS_HOST = host
+    pyro.config.NS_PORT = port
+
+    name_server_ready = threading.Event()
+
+    def _nameserver_loop() -> None:
+        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)  # type: ignore
+        name_server_ready.set()
+        ns_daemon.requestLoop()
+
+    def _pyro_daemon() -> None:
+        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        create_pyro_daemon("OT3API", managed_obj, register_hardware_types)
+
+    ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
+    server_thread = threading.Thread(target=_pyro_daemon, daemon=True)
+
+    ns_thread.start()
+    server_thread.start()
+
+    register_hardware_types()
+    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    ns = pyro.locate_ns()
+
+    retries_counter = 0
+    while ns.count() < 2:
+        await asyncio.sleep(0.01)
+        retries_counter += 1
+        if retries_counter > 10:
+            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+
+    uri = pyro.resolve(uri="PYRONAME:OT3API")
+    ot3_proxy = pyro.Proxy(uri)  # type: ignore
+    casted_ot3api = cast(HardwareControlAPI, AsyncClientPyroObject(ot3_proxy))
+
+    original_proxy_init = pyro.Proxy.__init__
+    proxy_creation_count = 0
+
+    def counting_proxy_init(
+        self_instance: pyro.Proxy, *args: Any, **kwargs: Any
+    ) -> None:
+        nonlocal proxy_creation_count
+        proxy_creation_count += 1
+        
+        return original_proxy_init(self_instance, *args, **kwargs)
+
+    call_count = 20
+    with patch.object(pyro.Proxy, "__init__", counting_proxy_init):
+        for _ in range(call_count):
+            await casted_ot3api.home()
+
+    # Without thread-local proxy reuse, each call creates a new Proxy inside
+    # _thread_call, so we'd expect proxy_creation_count == call_count.
+    # With thread-local reuse, we'd expect far fewer (roughly one per worker
+    # thread in asyncio's thread pool).
+    # The assertion threshold leaves generous room for the thread pool size
+    # while still catching the "new proxy every call" antipattern.
+    assert proxy_creation_count < call_count, (
+        f"Expected proxy reuse but got {proxy_creation_count} proxy creations "
+        f"for {call_count} calls."
+    )
+
     ot3_proxy._pyroRelease()  # type: ignore
