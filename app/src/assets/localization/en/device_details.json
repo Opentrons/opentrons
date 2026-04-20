@@ -241,6 +241,7 @@
   "usb_port_stacker": "S-{{port}}",
   "vacuum_module": "Vacuum Module",
   "vacuum_pump": "Vacuum Pump",
+  "vacuum_range_error": "Gauge pressure must be between {{min}} and {{max}} mbar",
   "valid_range": "Valid range between {{min}}-{{max}}",
   "vent": "Vent",
   "vent_closed": "Closed",
