@@ -68,20 +68,23 @@ class PyroFunctionWrapper:
 
     def __init__(
         self,
-        callable: Callable,
-    ):
+        callable: Callable[P, T],
+    ) -> None:
         self.callable = callable
 
     @property
     def is_callable(self) -> bool:
+        """Callable status for validation of a wrapped function, always true."""
         return True
 
-    def call(self, *args, **kwargs) -> Any:
+    def call(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         """Remote deployable function call."""
         return self.callable(*args, **kwargs)
 
 
-class ResultMeta(enum.Enum):
+class _ResultMeta(enum.Enum):
+    """Result type metadata for attributes that are wrapped in special PyroBehaviors."""
+
     PROXY = enum.auto()
     UNKNOWN = enum.auto()
 
@@ -276,7 +279,7 @@ def _build_classdict(  # noqa: C901
                     specialty_behavior.specialty_function
                 )
                 # NOTE: extend this further as needed for custom result types
-                if result_meta is ResultMeta.PROXY:
+                if result_meta is _ResultMeta.PROXY:
                     proxy_attributes.append(name)
 
                 exposed = pyro.expose(
@@ -326,8 +329,8 @@ def _build_classdict(  # noqa: C901
     yield ("_pyro_attributes_with_proxy_results", proxy_attributes)
     yield (
         "get_pyro_attributes_with_proxy_result",
-        pyro.expose(property(get_pyro_attributes_with_proxy_result)),
-    )  # type: ignore
+        pyro.expose(property(get_pyro_attributes_with_proxy_result)),  # type: ignore
+    )
 
     # Attach the `core_obj` instance as a private member for internal tracking
     try:
@@ -350,12 +353,12 @@ def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
     }
 
 
-def _determine_attribute_result_metadata(specialty_func: Any) -> ResultMeta:
+def _determine_attribute_result_metadata(specialty_func: Any) -> _ResultMeta:
     # Determines the result metadata for an attribute wrapped in a speciality function
     if specialty_func.__name__ == "convert_result_to_proxy":
-        return ResultMeta.PROXY
+        return _ResultMeta.PROXY
     # NOTE: extend this further as needed in the future for other custom return types
-    return ResultMeta.UNKNOWN
+    return _ResultMeta.UNKNOWN
 
 
 def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None:
@@ -374,7 +377,7 @@ def get_pyro_async_methods(self: Any) -> dict[str, dict[str, Any]]:
     return result
 
 
-def get_pyro_attributes_with_proxy_result(self) -> list[str]:
+def get_pyro_attributes_with_proxy_result(self: Any) -> list[str]:
     """Helper function to access the list of known methods that provide their results as Proxies."""
     result: list[str] = self._pyro_attributes_with_proxy_results
     return result

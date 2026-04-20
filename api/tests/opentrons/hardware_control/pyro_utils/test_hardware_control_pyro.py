@@ -293,7 +293,7 @@ async def test_pyro_behavior_ot3api_unhashable_dicts(
     ot3_proxy._pyroRelease()  # type: ignore
 
 
-async def test_pyro_async_wrapped_calls(
+async def test_pyro_async_wrapped_calls(  # noqa: C901
     ot3_hardware: ThreadManager[OT3API],
     mock_driver: SimulatingDriver,
     decoy: Decoy,
@@ -316,7 +316,7 @@ async def test_pyro_async_wrapped_calls(
     api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
     tc = decoy.mock(cls=Thermocycler)
     decoy.when(api._backend.module_controls.available_modules).then_return([tc])
-    tc._loop = ot3_hardware.managed_obj._loop
+    tc._loop = ot3_hardware.managed_obj._loop  # type: ignore
     for mod in api._backend.module_controls.available_modules:
         decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
 
@@ -393,7 +393,7 @@ async def test_pyro_async_wrapped_calls(
     assert await async_remote_tc.open() == "open"
 
     # Test registering an outbound function from one remote resource with another remote resouce
-    result = ot3api.register_callback(cb=door_async.cool_hardware_event())
+    result = ot3api.register_callback(cb=door_async.cool_hardware_event())  # type: ignore
 
     # Verify the resulting callback proxy (which is wrapped automagically) is wrapped and callable
     assert isinstance(result, AsyncPyroFunctionWrapper)

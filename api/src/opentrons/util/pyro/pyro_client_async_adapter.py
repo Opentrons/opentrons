@@ -18,11 +18,11 @@ class AsyncPyroFunctionWrapper:
     def __init__(
         self,
         proxy: Pyro5.api.Proxy,
-    ):
+    ) -> None:
         self.proxy = proxy
 
-    def __call__(self, *args, **kwargs) -> Any:
-        # Overload client-side call references with proxy-safe callable reference
+    def __call__(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+        """Overload client-side call references with proxy-safe callable reference."""
         threadsafe_proxy = Pyro5.api.Proxy(self.proxy._pyroUri)  # type: ignore
         return threadsafe_proxy.call(*args, **kwargs)
 
@@ -206,26 +206,26 @@ def _validate_outbound_callback(arg: Any) -> Any:
 ### Result Validations
 
 
-def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any):
+def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) -> Any:
     """Validate incoming result format before returning from a remote call.
 
     This is not to be confused with serialization. The validation process can be used to reformat
     result data into more client-acceptable shapes. For example, autowrapping of Proxy responses
     as AsyncClientPyroObjects.
     """
-
     validated_result = result
     threadsafe_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
     attributes_with_proxy_result: list[str] = getattr(
         threadsafe_proxy, "get_pyro_attributes_with_proxy_result", []
     )
+
     if func_name in attributes_with_proxy_result:
         # Check if the result is a list of proxies or singular entity
         try:
             if result.is_callable:
                 validated_result = AsyncPyroFunctionWrapper(result)
 
-        except:
+        except AttributeError:
             if isinstance(result, Iterable):
                 validated_result = []
                 for r in result:
