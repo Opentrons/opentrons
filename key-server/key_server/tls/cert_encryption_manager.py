@@ -8,7 +8,7 @@ from logging import getLogger
 from typing import Self, Type
 
 from . import cryptography_utils
-from .types import EncryptedCert, OldAndNewEncryptedCert
+from .models import EncryptedCert, OldAndNewEncryptedCert
 
 LOG = getLogger(__name__)
 
@@ -179,7 +179,7 @@ class CertEncryptionManager:
 
     def _encrypt(self, encoded_cert: bytes, key: UsedEncryptionKey) -> EncryptedCert:
         return EncryptedCert(
-            cryptography_utils.encrypt_cert(encoded_cert, key.key),
+            cert_data=cryptography_utils.encrypt_cert(encoded_cert, key.key),
             key_salt=base64.urlsafe_b64encode(key.key.salt),
             key_expires_at=key.first_used_at_discretized
             + timedelta(seconds=self._password_timestep_s),
@@ -199,7 +199,9 @@ class CertEncryptionManager:
             )
         else:
             previous_encrypted = None
-        return OldAndNewEncryptedCert(current_encrypted, previous_encrypted)
+        return OldAndNewEncryptedCert(
+            current=current_encrypted, previous=previous_encrypted
+        )
 
     async def encrypt_cert(
         self, now: datetime, cert: cryptography_utils.X509Pair

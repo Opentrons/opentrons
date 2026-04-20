@@ -11,8 +11,8 @@ from .ca_manager import TLSCAManager
 from .cert_encryption_manager import CertEncryptionManager
 from .cryptography_utils import make_pem_bundle
 from .ee_manager import TLSEEManager
+from .models import CertPassword, OldAndNewEncryptedCert, UnencryptedCert
 from .robot_details.interface import RobotDetails
-from .types import CertPassword, OldAndNewEncryptedCert, UnencryptedCert
 
 LOG = logging.getLogger(__name__)
 
