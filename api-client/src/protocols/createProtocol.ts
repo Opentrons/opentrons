@@ -20,18 +20,24 @@ export function createProtocol(
   files.forEach(file => {
     formData.append('files', file, file.name)
   })
-  if (protocolKind != null) formData.append('protocolKind', protocolKind)
-  if (protocolKey != null) formData.append('key', protocolKey)
-  if (runTimeParameterValues != null)
+  if (protocolKind != null) {
+    formData.append('protocolKind', protocolKind)
+  }
+  if (protocolKey != null) {
+    formData.append('key', protocolKey)
+  }
+  if (runTimeParameterValues != null) {
     formData.append(
       'runTimeParameterValues',
       JSON.stringify(runTimeParameterValues)
     )
-  if (runTimeParameterFiles != null)
+  }
+  if (runTimeParameterFiles != null) {
     formData.append(
       'runTimeParameterFiles',
       JSON.stringify(runTimeParameterFiles)
     )
+  }
 
   return request<Protocol, FormData>(POST, '/protocols', formData, config)
 }

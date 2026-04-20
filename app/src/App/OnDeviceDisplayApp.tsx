@@ -151,12 +151,6 @@ function getPathComponent(
   }
 }
 
-const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
-  'mousedown',
-  'click',
-  'scroll',
-]
-
 const TURN_OFF_BACKLIGHT = '7'
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
@@ -181,11 +175,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     getOnDeviceDisplaySettings
   )
   const sleepTime = sleepMs ?? SLEEP_NEVER_MS
-  const options = {
-    events: onDeviceDisplayEvents,
-    initialState: false,
-  }
-  const isIdle = useScreenIdle(sleepTime, options)
+  const isIdle = useScreenIdle(sleepTime, { initialState: false })
   useEffect(() => {
     if (isIdle) {
       dispatch(updateBrightness(TURN_OFF_BACKLIGHT))

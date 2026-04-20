@@ -480,6 +480,22 @@ jobs:
           node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
           aws s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
 
+      # Robot-stack prod (builds.opentrons.com) only — not ot3-development.builds.opentrons.com.
+      # Set repo variable OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID to the CloudFront distribution
+      # that fronts builds.opentrons.com. Extend OT_APP_OT3_DEPLOY_ROLE with cloudfront:CreateInvalidation.
+      - name: 'invalidate CloudFront cache (builds.opentrons.com)'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') && vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID != ''
+        run: |
+          set -euo pipefail
+          INVALIDATION_ID="$(
+            aws cloudfront create-invalidation \
+              --distribution-id '${{ vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID }}' \
+              --paths '/app/*' \
+              --output text \
+              --query 'Invalidation.Id'
+          )"
+          echo "Started CloudFront invalidation: ${INVALIDATION_ID}"
+
   # Notification jobs for tagged builds
   notify-success:
     name: 'Notify Build Success'

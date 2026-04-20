@@ -16,7 +16,7 @@ export function truncateString(
   breakPoint?: number
 ): string {
   const dots = '...'
-  if (text.length > maxLength)
+  if (text.length > maxLength) {
     if (breakPoint != null) {
       return `${text.substring(0, breakPoint)}${dots}${text.slice(
         breakPoint - maxLength + dots.length
@@ -24,5 +24,7 @@ export function truncateString(
     } else {
       return `${text.slice(0, maxLength - dots.length)}${dots}`
     }
-  else return text
+  } else {
+    return text
+  }
 }

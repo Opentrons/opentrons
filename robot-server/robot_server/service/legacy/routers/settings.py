@@ -17,6 +17,7 @@ from opentrons.config import (
 from opentrons.config import (
     reset as reset_util,
 )
+from opentrons.config.types import OT3Config
 from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
@@ -385,6 +386,8 @@ async def post_settings_reset_options(
 async def get_robot_settings(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
+    if isinstance(hardware.config, OT3Config):
+        return hardware.config.model_dump()
     return asdict(hardware.config)
 
 
