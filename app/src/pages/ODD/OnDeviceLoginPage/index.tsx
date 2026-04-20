@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Btn,
+  Button,
   Icon,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
@@ -16,7 +16,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import styles from './login.module.css'
+import styles from './OnDeviceLoginPage.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -67,9 +67,6 @@ export function OnDeviceLoginPage(): JSX.Element {
 
   useEffect(() => {
     setShowPassword(false)
-    if (step === 'password') {
-      inputRef.current?.focus()
-    }
   }, [step])
 
   const handleCancel = (): void => {
@@ -127,6 +124,7 @@ export function OnDeviceLoginPage(): JSX.Element {
           render={({ field }) => (
             <InputField
               ref={setRefs(inputRef, field.ref)}
+              autoFocus={step === 'password'}
               testId="login-field"
               type={inputType}
               size="medium"
@@ -141,11 +139,10 @@ export function OnDeviceLoginPage(): JSX.Element {
               }}
               rightElement={
                 step === 'password' ? (
-                  <Btn
+                  <Button
                     type="button"
-                    aria-label={
-                      showPassword ? 'Hide password' : 'Show password'
-                    }
+                    aria-label="Toggle password visibility"
+                    aria-pressed={showPassword}
                     onClick={() => {
                       setShowPassword(current => !current)
                       inputRef.current?.focus()
@@ -154,14 +151,9 @@ export function OnDeviceLoginPage(): JSX.Element {
                     <Icon
                       name={showPassword ? 'eye-slash' : 'eye'}
                       size="1.5rem"
-                      data-testid={
-                        showPassword
-                          ? 'login-password-hide'
-                          : 'login-password-show'
-                      }
                     />
-                  </Btn>
-                ) : undefined
+                  </Button>
+                ) : null
               }
             />
           )}

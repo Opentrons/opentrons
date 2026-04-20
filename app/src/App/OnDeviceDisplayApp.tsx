@@ -34,6 +34,7 @@ import { InstrumentDetail } from '/app/pages/ODD/InstrumentDetail'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
 import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
+import { OnDeviceLoginPage } from '/app/pages/ODD/OnDeviceLoginPage'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
@@ -53,7 +54,6 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
-import { OnDeviceLoginPage } from '/app/pages/ODD/OnDeviceLoginPage'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,

@@ -143,12 +143,16 @@ describe('Login', () => {
     fireEvent.click(screen.getByTestId('ChildNavigation_Primary_Button'))
     const input = screen.getByTestId('login-field')
     expect(input).toHaveAttribute('type', 'password')
-    fireEvent.click(screen.getByRole('button', { name: 'Show password' }))
+    const toggleBtn = screen.getByRole('button', {
+      name: 'Toggle password visibility',
+    })
+    expect(toggleBtn).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(toggleBtn)
     expect(input).toHaveAttribute('type', 'text')
-    expect(screen.getByTestId('login-password-hide')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Hide password' }))
+    expect(toggleBtn).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(toggleBtn)
     expect(input).toHaveAttribute('type', 'password')
-    expect(screen.getByTestId('login-password-show')).toBeInTheDocument()
+    expect(toggleBtn).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('submits username and password when confirming a non-empty password', () => {
