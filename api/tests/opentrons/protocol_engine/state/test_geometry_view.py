@@ -4846,12 +4846,12 @@ def test_get_ancestor_addressable_area_name_on_module(
     addressable_area_store: AddressableAreaStore,
     subject: GeometryView,
     nice_labware_definition: LabwareDefinition,
-    tempdeck_v2_def: ModuleDefinition,
+    vacuum_module_v1_def: ModuleDefinition,
 ) -> None:
     """Labware on a module returns the module's provided addressable area."""
     load_module = load_module_action(
         module_id="mod-1",
-        module_def=tempdeck_v2_def,
+        module_def=vacuum_module_v1_def,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
         used_addressable_area="vacuumModuleV1A3",
     )
