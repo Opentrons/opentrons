@@ -3,7 +3,7 @@
 import asyncio
 import socket
 import threading
-from typing import Any, cast
+from typing import cast
 from unittest.mock import patch
 
 import pytest
@@ -17,6 +17,7 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
+from opentrons.util.pyro import pyro_client_async_adapter as _get_thread_proxy_module
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 
@@ -148,30 +149,35 @@ async def test_thread_local_proxy_reuses_connections(
     ot3_proxy = pyro.Proxy(uri)  # type: ignore
     casted_ot3api = cast(HardwareControlAPI, AsyncClientPyroObject(ot3_proxy))
 
-    original_proxy_init = pyro.Proxy.__init__
-    proxy_creation_count = 0
+    original_get_thread_proxy = _get_thread_proxy_module._get_thread_proxy
+    seen_proxy_ids: set[int] = set()
+    new_proxy_count = 0
 
-    def counting_proxy_init(
-        self_instance: pyro.Proxy, *args: Any, **kwargs: Any
-    ) -> None:
-        nonlocal proxy_creation_count
-        proxy_creation_count += 1
-        original_proxy_init(self_instance, *args, **kwargs)  # type: ignore[no-untyped-call]
+    def counting_get_thread_proxy(
+        proxy: pyro.Proxy,
+    ) -> pyro.Proxy:
+        nonlocal new_proxy_count
+        result = original_get_thread_proxy(proxy)
+        proxy_id = id(result)
+        if proxy_id not in seen_proxy_ids:
+            seen_proxy_ids.add(proxy_id)
+            new_proxy_count += 1
+        return result
 
     call_count = 20
-    with patch.object(pyro.Proxy, "__init__", counting_proxy_init):
+    with patch.object(
+        _get_thread_proxy_module, "_get_thread_proxy", counting_get_thread_proxy
+    ):
         for _ in range(call_count):
             await casted_ot3api.home()
 
-    # Without thread-local proxy reuse, each call creates a new Proxy inside
-    # _thread_call, so we'd expect proxy_creation_count == call_count.
-    # With thread-local reuse, we'd expect far fewer (roughly one per worker
-    # thread in asyncio's thread pool).
-    # The assertion threshold leaves generous room for the thread pool size
-    # while still catching the "new proxy every call" antipattern.
-    assert proxy_creation_count < call_count, (
-        f"Expected proxy reuse but got {proxy_creation_count} proxy creations "
-        f"for {call_count} calls."
+    # With thread-local proxy reuse, new_proxy_count should be much less
+    # than call_count. Each worker thread creates one proxy and reuses it.
+    # Without reuse (the old behavior), every call would create a new proxy.
+    assert new_proxy_count < call_count, (
+        f"Expected proxy reuse but got {new_proxy_count} new proxies for "
+        f"{call_count} calls. Each call should reuse a thread-local proxy "
+        f"rather than creating a new one."
     )
 
     ot3_proxy._pyroRelease()  # type: ignore
