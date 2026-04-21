@@ -40,6 +40,7 @@ export {
   vacuumSetPumpPower,
   vacuumSetPumpPressure,
   vacuumSetPumpProfile,
+  vacuumStopPump,
   waitForTemperature,
   waitForModuleTask,
 } from './commandCreators'

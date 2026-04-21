@@ -18,7 +18,8 @@ import type {
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_OFF,
+  VACUUM_STATE_PUMP_ON,
   VACUUM_VENT_SET_CLOSED,
   VACUUM_VENT_SET_OPEN,
   WasteChuteEntity,
@@ -596,7 +597,8 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   pumpDurationCheckbox: boolean | null
   pumpDurationTime: string | null
   stateType:
-    | typeof VACUUM_STATE_PUMP
+    | typeof VACUUM_STATE_PUMP_ON
+    | typeof VACUUM_STATE_PUMP_OFF
     | typeof VACUUM_VENT_SET_OPEN
     | typeof VACUUM_VENT_SET_CLOSED
     | null

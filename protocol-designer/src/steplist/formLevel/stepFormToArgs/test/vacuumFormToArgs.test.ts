@@ -5,7 +5,8 @@ import {
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_OFF,
+  VACUUM_STATE_PUMP_ON,
   VACUUM_VENT_SET_CLOSED,
   VACUUM_VENT_SET_OPEN,
 } from '@opentrons/step-generation'
@@ -34,7 +35,7 @@ const baseStateForm = (
   id: 'vacuumStepId',
   moduleId,
   programType: VACUUM_PROGRAM_STATE,
-  stateType: VACUUM_STATE_PUMP,
+  stateType: VACUUM_STATE_PUMP_ON,
   modeType: VACUUM_MODE_PRESSURE,
   pressureMbar: 100,
   powerPercent: null,
@@ -73,7 +74,7 @@ describe('vacuumFormToArgs', () => {
 
   it('maps pump + pressure mode to vacuumSetPumpPressure args', () => {
     const formData = baseStateForm({
-      stateType: VACUUM_STATE_PUMP,
+      stateType: VACUUM_STATE_PUMP_ON,
       modeType: VACUUM_MODE_PRESSURE,
       pressureMbar: 250.5,
       powerPercent: null,
@@ -90,7 +91,7 @@ describe('vacuumFormToArgs', () => {
 
   it('maps pump + power mode to vacuumSetPumpPower args', () => {
     const formData = baseStateForm({
-      stateType: VACUUM_STATE_PUMP,
+      stateType: VACUUM_STATE_PUMP_ON,
       modeType: VACUUM_MODE_POWER,
       pressureMbar: null,
       powerPercent: 75,
@@ -260,6 +261,18 @@ describe('vacuumFormToArgs', () => {
           ],
         },
       ],
+    }
+    expect(vacuumFormToArgs(formData)).toEqual(expected)
+  })
+  it('maps pump off state to vacuumStopPump args', () => {
+    const formData = baseStateForm({
+      stateType: VACUUM_STATE_PUMP_OFF,
+    })
+    const expected: VacuumArgs = {
+      commandCreatorFnName: 'vacuumStopPump',
+      moduleId,
+      name: annotation.stepName,
+      description: annotation.stepDetails,
     }
     expect(vacuumFormToArgs(formData)).toEqual(expected)
   })

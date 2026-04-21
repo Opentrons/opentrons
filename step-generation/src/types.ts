@@ -814,6 +814,11 @@ export interface VacuumCloseVentArgs extends CommonArgs {
   commandCreatorFnName: 'vacuumCloseVent'
 }
 
+export interface VacuumStopPumpArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumStopPump'
+}
+
 // Vacuum
 export interface VacuumPressureData {
   mode: typeof VACUUM_MODE_PRESSURE
@@ -851,6 +856,7 @@ export type VacuumArgs =
   | VacuumProfileArgs
   | VacuumOpenVentArgs
   | VacuumCloseVentArgs
+  | VacuumStopPumpArgs
 
 export type FlexStackerArgs =
   | FlexStackerEmptyArgs

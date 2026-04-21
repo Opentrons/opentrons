@@ -7,6 +7,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
@@ -166,6 +167,20 @@ export const addAndSelectStep: (arg: {
       dispatch(
         selectDropdownItem({
           selection: { id: flexStackerId, text: 'Selected', field: '1' },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'vacuum') {
+    const vacuumModules = Object.entries(modules).filter(
+      ([_, module]) => module.type === VACUUM_MODULE_TYPE
+    )
+    const vacuumModuleId =
+      vacuumModules.length === 1 ? vacuumModules[0][0] : null
+    if (vacuumModuleId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: { id: vacuumModuleId, text: 'Selected', field: '1' },
           mode: 'add',
         })
       )

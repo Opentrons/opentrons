@@ -44,5 +44,6 @@ export {
   touchTip,
   vacuumCloseVent,
   vacuumOpenVent,
+  vacuumStopPump,
   waitForTemperature,
 } from './atomic'
