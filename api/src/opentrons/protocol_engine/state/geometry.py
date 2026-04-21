@@ -876,18 +876,27 @@ class GeometryView:
         """Get the name of the addressable area the labware is eventually on."""
         labware = self._labware.get(labware_id)
         original_display_name = self._labware.get_display_name(labware_id)
-        seen: Set[str] = set((labware_id,))
+
+        # Track visited IDs to truly detect cycles (A nested on B nested on A)
+        seen: Set[str] = {labware_id}
+
         while isinstance(labware.location, OnLabwareLocation):
-            labware = self._labware.get(labware.location.labwareId)
-            if labware.id in seen:
+            parent_id = labware.location.labwareId
+            if parent_id in seen:
                 raise InvalidLabwarePositionError(
-                    f"Cycle detected in labware positioning for {original_display_name}"
+                    f"Cycle detected in labware positioning for {original_display_name}. "
                 )
-            seen.add(labware.id)
+
+            seen.add(parent_id)
+            labware = self._labware.get(parent_id)
+
+        # Once we've reached the 'Base' labware of a stack, find the deck anchor
         if isinstance(labware.location, DeckSlotLocation):
             return labware.location.slotName.id
+
         elif isinstance(labware.location, AddressableAreaLocation):
             return labware.location.addressableAreaName
+
         elif isinstance(labware.location, ModuleLocation):
             return self._modules.get_provided_addressable_area(
                 labware.location.moduleId
@@ -896,6 +905,35 @@ class GeometryView:
             raise LabwareNotOnDeckError(
                 f"Labware {original_display_name} is not loaded on deck",
                 details={"eventual-location": repr(labware.location)},
+            )
+
+    def get_parent_from_location(self, location: LabwareLocation) -> str:
+        """Resolves a LabwareLocation down to its root Addressable Area Name."""
+        current_loc = location
+        seen: Set[str] = set()
+
+        while isinstance(current_loc, OnLabwareLocation):
+            parent_id = current_loc.labwareId
+            if parent_id in seen:
+                raise InvalidLabwarePositionError(
+                    f"Cycle detected in labware positioning at location: {location}"
+                )
+
+            seen.add(parent_id)
+            parent_labware = self._labware.get(parent_id)
+            current_loc = parent_labware.location
+
+        if isinstance(current_loc, DeckSlotLocation):
+            return current_loc.slotName.id
+        elif isinstance(current_loc, AddressableAreaLocation):
+            return current_loc.addressableAreaName
+        elif isinstance(current_loc, ModuleLocation):
+            return self._modules.get_provided_addressable_area(current_loc.moduleId)
+
+        else:
+            raise LabwareNotOnDeckError(
+                "Provided location is not linked to an addressable area on the deck.",
+                details={"terminal-location": repr(current_loc)},
             )
 
     def ensure_location_not_occupied(
