@@ -1,5 +1,6 @@
 """Manages protocol run subprocesses and provides Pyro proxies to communicate with them."""
 
+import asyncio
 import logging
 import os
 import subprocess
@@ -22,14 +23,6 @@ _RUN_PROXY_TIMEOUT = 30  # seconds
 _RUN_PROCESS_TERMINATE_TIMEOUT = 10  # seconds
 
 
-class RunProcessRunningError(RuntimeError):
-    """Raised if a run process is attempted to be opened when one is already running."""
-
-
-class NoRunProcessRunningError(RuntimeError):
-    """Raised if a run process is attempted to be closed when one is not running."""
-
-
 class RunProcessPyroProvider:
     """A provider for run subprocesses and pyro run process proxies."""
 
@@ -47,25 +40,25 @@ class RunProcessPyroProvider:
             register_process_types()
             self._start_run_process()
 
-    def teardown(self) -> None:
+    async def teardown(self) -> None:
         """Called when server ends.
 
         If feature flag is on for protocol subprocess, ends the process and removes
         the run process proxy name from the nameserver.
         """
         if feature_flags.protocol_subprocess_enabled():
-            self._end_run_process()
+            await self._end_run_process()
             with Pyro5.api.locate_ns() as ns:
                 ns.remove(_RUN_PROXY_NAME)
 
-    def refresh(self) -> None:
+    async def refresh(self) -> None:
         """Ends the currently running process and starts a new one."""
-        self._end_run_process()
+        await self._end_run_process()
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_RUN_PROXY_NAME)
         self._start_run_process()
 
-    def wait_for_run_proxy(self) -> DirectedRunProcess:
+    async def wait_for_run_proxy(self) -> DirectedRunProcess:
         """Returns a proxy for the run process.
 
         Depending on how recently it started, this may take up to around 25 seconds to resolve.
@@ -81,25 +74,25 @@ class RunProcessPyroProvider:
                         Pyro5.api.Proxy(ns.list()[_RUN_PROXY_NAME])  # type: ignore[no-untyped-call]
                     )
                     return cast(DirectedRunProcess, cast(object, proxy))
-                time.sleep(0.01)
+                await asyncio.sleep(0.01)
             else:
-                self._end_run_process()
+                await self._end_run_process()
                 self._start_run_process()
                 raise RuntimeError("Can't resolve pyro proxy 'ot-protocol'")
 
     def _start_run_process(self) -> None:
         if self._run_process is not None:
-            raise RunProcessRunningError("Protocol run process already running.")
+            return
 
         self._run_process = subprocess.Popen(
             args=[sys.executable, "-m", run_process_entry_point.__name__],
             env={k: v for k, v in os.environ.items()},
-            # user="ot-protocol"  # TODO how do we make sure this works locally?
+            # user="ot-protocol"
         )
 
-    def _end_run_process(self) -> None:
+    async def _end_run_process(self) -> None:
         if self._run_process is None:
-            raise NoRunProcessRunningError("No protocol run process currently running.")
+            return
 
         self._run_process.terminate()
         start_time = time.monotonic()
@@ -107,7 +100,7 @@ class RunProcessPyroProvider:
             self._run_process.poll() is None
             and time.monotonic() - start_time < _RUN_PROCESS_TERMINATE_TIMEOUT
         ):
-            time.sleep(0.01)
+            await asyncio.sleep(0.01)
         else:
             self._run_process.kill()
 

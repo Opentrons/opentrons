@@ -1,7 +1,7 @@
 """Run router dependency-injection wire-up."""
 
 import contextlib
-from typing import Annotated, Generator
+from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends, status
 from sqlalchemy.engine import Engine as SQLEngine
@@ -132,10 +132,10 @@ async def get_light_controller(
     return controller
 
 
-@contextlib.contextmanager
-def set_up_run_process_pyro_provider(
+@contextlib.asynccontextmanager
+async def set_up_run_process_pyro_provider(
     app_state: Annotated[AppState, Depends(get_app_state)],
-) -> Generator[None, None, None]:
+) -> AsyncGenerator[None, None]:
     """Set up the server's singleton `RunProcessPyroProvider`."""
     run_process_pyro_provider = RunProcessPyroProvider()
     _run_process_pyro_provider_accessor.set_on(app_state, run_process_pyro_provider)
@@ -145,7 +145,7 @@ def set_up_run_process_pyro_provider(
     try:
         yield
     finally:
-        run_process_pyro_provider.teardown()
+        await run_process_pyro_provider.teardown()
 
 
 async def get_run_process_pyro_provider(

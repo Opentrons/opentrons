@@ -387,7 +387,9 @@ class RunOrchestratorStore:
             raise RunConflictError("Another run is currently active.")
 
         # "Run orchestrator" here is a proxy of a directed run process
-        self._run_orchestrator = self._run_process_pyro_provider.wait_for_run_proxy()
+        self._run_orchestrator = (
+            await self._run_process_pyro_provider.wait_for_run_proxy()
+        )
 
         self._run_orchestrator.create(run_id)
         return self._run_orchestrator.get_state_summary()
@@ -405,7 +407,7 @@ class RunOrchestratorStore:
 
         run_data = self.run_orchestrator.get_state_summary()
 
-        self._run_process_pyro_provider.refresh()
+        await self._run_process_pyro_provider.refresh()
 
         self._run_orchestrator = None
 

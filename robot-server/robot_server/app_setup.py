@@ -112,7 +112,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         start_initializing_pyro_resource(app_state=app.state)
 
         # Start the run process pyro provider so a process is ready when a run starts
-        exit_stack.enter_context(set_up_run_process_pyro_provider(app.state))
+        await exit_stack.enter_async_context(
+            set_up_run_process_pyro_provider(app.state)
+        )
 
         yield  # Start handling HTTP requests.
 
