@@ -2,13 +2,7 @@
 
 import asyncio
 import logging
-import os
-import subprocess
-import sys
-import time
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union, cast
-
-import Pyro5.api
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -62,14 +56,13 @@ from opentrons.protocol_runner import (
 from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.types import NozzleMapInterface
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons_shared_data.errors.exceptions import ModuleNotPresent
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
-from . import run_process_entry_point
-from .run_process import DirectedRunProcess, register_process_types
+from .run_process import DirectedRunProcess
+from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
@@ -184,6 +177,7 @@ class RunOrchestratorStore:
         hardware_api: HardwareControlAPI,
         robot_type: RobotType,
         deck_type: DeckType,
+        run_process_pyro_provider: RunProcessPyroProvider,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -192,6 +186,8 @@ class RunOrchestratorStore:
                 construction.
             robot_type: Passed along to `opentrons.protocol_engine.Config`.
             deck_type: Passed along to `opentrons.protocol_engine.Config`.
+            run_process_pyro_provider: If in protocol subprocess mode, provides
+                the run process proxy when running a protocol.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
@@ -201,10 +197,7 @@ class RunOrchestratorStore:
             None
         )
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
-        self._run_process: Optional[subprocess.Popen[bytes]] = None
-        if feature_flags.protocol_subprocess_enabled():
-            register_process_types()
-            self._start_run_process()
+        self._run_process_pyro_provider = run_process_pyro_provider
         if not feature_flags.hardware_subprocess_enabled():
             hardware_api.register_callback(_get_hardware_listener(self))
 
@@ -221,25 +214,6 @@ class RunOrchestratorStore:
         return (
             self.run_orchestrator.run_id if self._run_orchestrator is not None else None
         )
-
-    def _start_run_process(self) -> None:
-        """Starts a protocol run process in the background if one hasn't been created already."""
-        if self._run_process is not None:
-            raise RunProcessRunningError("Protocol run process already running.")
-
-        self._run_process = subprocess.Popen(
-            args=[sys.executable, "-m", run_process_entry_point.__name__],
-            env={k: v for k, v in os.environ.items()},
-            # user="ot-protocol"  # TODO how do we make sure this works locally?
-        )
-
-    def _end_run_process(self) -> None:
-        if self._run_process is None:
-            raise NoRunProcessRunningError("No protocol run process currently running.")
-        self._run_process.terminate()
-        self._run_process = None
-        with Pyro5.api.locate_ns() as ns:
-            ns.remove("ot-protocol")
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
@@ -412,25 +386,8 @@ class RunOrchestratorStore:
         if self._run_orchestrator is not None:
             raise RunConflictError("Another run is currently active.")
 
-        if self._run_process is None:
-            self._start_run_process()
-
-        # TODO This timeout sucks
-        start_time = time.monotonic()
-        with Pyro5.api.locate_ns() as ns:
-            while time.monotonic() - start_time < 30:
-                if "ot-protocol" in ns.list():
-                    proxy = AsyncClientPyroObject(
-                        Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
-                    )
-                    self._run_orchestrator = cast(
-                        DirectedRunProcess, cast(object, proxy)
-                    )
-                    break
-                time.sleep(0.01)
-            else:
-                self._end_run_process()
-                raise RuntimeError("Can't resolve pyro proxy 'ot-protocol'")
+        # "Run orchestrator" here is a proxy of a directed run process
+        self._run_orchestrator = self._run_process_pyro_provider.wait_for_run_proxy()
 
         self._run_orchestrator.create(run_id)
         return self._run_orchestrator.get_state_summary()
@@ -448,9 +405,9 @@ class RunOrchestratorStore:
 
         run_data = self.run_orchestrator.get_state_summary()
 
-        self._end_run_process()
+        self._run_process_pyro_provider.refresh()
+
         self._run_orchestrator = None
-        self._start_run_process()
 
         return RunResult(
             state_summary=run_data,

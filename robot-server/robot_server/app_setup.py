@@ -30,6 +30,7 @@ from .persistence.fastapi_dependencies import (
 from .router import router
 from .runs.dependencies import (
     mark_light_control_startup_finished,
+    set_up_run_process_pyro_provider,
     start_light_control_task,
 )
 from .service.logging import initialize_logging
@@ -109,6 +110,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Always make an empty Robot Server Pyro Resource, and populate if appropriate
         start_initializing_pyro_resource(app_state=app.state)
+
+        # Start the run process pyro provider so a process is ready when a run starts
+        exit_stack.enter_context(set_up_run_process_pyro_provider(app.state))
 
         yield  # Start handling HTTP requests.
 
