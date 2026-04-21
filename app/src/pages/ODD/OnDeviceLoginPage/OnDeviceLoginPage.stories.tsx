@@ -1,4 +1,3 @@
-import React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
@@ -15,10 +14,6 @@ import { OnDeviceLoginPageView } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
 
-/**
- * Visual-only: no ApiHostProvider / react-query OAuth. Redux is still required
- * because FullKeyboard uses useSelector(getAppLanguage).
- */
 const dummyConfig = {
   config: {
     isOnDevice: false,

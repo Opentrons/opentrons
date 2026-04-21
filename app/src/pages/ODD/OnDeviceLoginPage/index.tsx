@@ -39,10 +39,6 @@ export interface OnDeviceLoginPageViewProps {
   onClearLoginError?: () => void
 }
 
-/**
- * Presentational shell + form for on-device login. Storybook renders this
- * with stub handlers so we do not wire ApiHostProvider / OAuth.
- */
 export function OnDeviceLoginPageView({
   step,
   onStepChange,
