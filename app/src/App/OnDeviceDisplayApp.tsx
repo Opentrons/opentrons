@@ -34,7 +34,7 @@ import { InstrumentDetail } from '/app/pages/ODD/InstrumentDetail'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
 import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
-import { OnDeviceLoginPage } from '/app/pages/ODD/OnDeviceLoginPage'
+import { OnDeviceLoginOverlayProvider } from '/app/pages/ODD/OnDeviceLoginPage'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
@@ -95,7 +95,6 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/runs/:runId/setup',
   '/runs/:runId/summary',
   '/welcome',
-  '/login',
 ] as const
 
 function getPathComponent(
@@ -108,8 +107,6 @@ function getPathComponent(
       return <RobotDashboard />
     case '/deck-configuration':
       return <DeckConfigurationEditor />
-    case '/login':
-      return <OnDeviceLoginPage />
     case '/emergency-stop':
       return <EmergencyStop />
     case '/instruments':
@@ -223,9 +220,11 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             }}
                           />
                         ) : null}
-                        <SharedScrollRefProvider>
-                          <OnDeviceDisplayAppRoutes />
-                        </SharedScrollRefProvider>
+                        <OnDeviceLoginOverlayProvider>
+                          <SharedScrollRefProvider>
+                            <OnDeviceDisplayAppRoutes />
+                          </SharedScrollRefProvider>
+                        </OnDeviceLoginOverlayProvider>
                       </ToasterOven>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>

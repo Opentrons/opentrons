@@ -13,7 +13,6 @@ import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
 import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
-import { OnDeviceLoginPage } from '/app/pages/ODD/OnDeviceLoginPage'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
@@ -64,7 +63,6 @@ vi.mock('/app/pages/ODD/InstrumentsDashboard')
 vi.mock('/app/pages/ODD/RunningProtocol')
 vi.mock('/app/pages/ODD/RunSummary')
 vi.mock('/app/pages/ODD/NameRobot')
-vi.mock('/app/pages/ODD/OnDeviceLoginPage')
 vi.mock('/app/pages/ODD/EmergencyStop')
 vi.mock('/app/pages/ODD/DeckConfiguration')
 vi.mock('/app/redux/config')
@@ -129,10 +127,6 @@ describe('OnDeviceDisplayApp', () => {
   it('renders NetworkSetupMenu component from /network-setup', () => {
     render('/network-setup')
     expect(vi.mocked(NetworkSetupMenu)).toHaveBeenCalled()
-  })
-  it('renders OnDeviceLoginPage component from /login', () => {
-    render('/login')
-    expect(vi.mocked(OnDeviceLoginPage)).toHaveBeenCalled()
   })
   it('renders ConnectViaEthernet component from /network-setup/ethernet', () => {
     render('/network-setup/ethernet')

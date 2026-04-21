@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
@@ -16,7 +15,6 @@ import {
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import styles from './OnDeviceLoginPage.module.css'
 
@@ -226,33 +224,13 @@ export function OnDeviceLoginPageView({
   )
 }
 
-export function OnDeviceLoginPage(): JSX.Element {
-  const navigate = useNavigate()
-  const { t } = useTranslation('device_settings')
-  const [step, setStep] = useState<LoginStep>('username')
-  const [loginError, setLoginError] = useState<string | null>(null)
-  const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
-    onSuccess: () => {
-      setLoginError(null)
-      navigate(-1)
-    },
-    onError: () => {
-      setLoginError(t('on_device_login_error_incorrect'))
-    },
-  })
-  return (
-    <OnDeviceLoginPageView
-      step={step}
-      onStepChange={setStep}
-      submitPassword={submitPassword}
-      isAuthLoading={isAuthLoading}
-      loginError={loginError}
-      onClearLoginError={() => {
-        setLoginError(null)
-      }}
-      onCancel={() => {
-        navigate(-1)
-      }}
-    />
-  )
-}
+export * from './onDeviceLoginRedirect'
+export {
+  OnDeviceLoginContext,
+  OnDeviceLoginOverlayProvider,
+  useOnDeviceLoginModal,
+} from './OnDeviceLoginOverlay'
+export type {
+  OnDeviceLoginModalContextValue,
+  OpenOnDeviceLoginOptions,
+} from './OnDeviceLoginOverlay'
