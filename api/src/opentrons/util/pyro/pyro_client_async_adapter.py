@@ -86,15 +86,16 @@ def _get_async_methods(proxy: Pyro5.api.Proxy) -> dict[str, dict[str, Any]]:
 
 def _get_thread_proxy(proxy: Pyro5.api.Proxy) -> Pyro5.api.Proxy:
     """Get or create a thread-local proxy for the given URI, reconnecting if needed."""
-    existing = getattr(_thread_local, "proxy", None)
-    if existing is not None and existing._pyroUri == proxy._pyroUri:  # type: ignore[comparison-overlap]
-        if existing._pyroConnection is not None:  # type: ignore
+    existing: Pyro5.api.Proxy | None = getattr(_thread_local, "proxy", None)
+
+    if existing is not None and existing._pyroUri == proxy._pyroUri:
+        if existing._pyroConnection is not None:
             return existing
         else:  # Connection was lost, proxy needs reconnect
-            existing._pyroReconnect()  # type: ignore
+            existing._pyroReconnect()  # type: ignore[no-untyped-call]
             return existing
 
-    new_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
+    new_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore[no-untyped-call]
     _thread_local.proxy = new_proxy
 
     return new_proxy

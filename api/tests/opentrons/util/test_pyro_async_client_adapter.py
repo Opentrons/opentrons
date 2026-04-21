@@ -156,8 +156,7 @@ async def test_thread_local_proxy_reuses_connections(
     ) -> None:
         nonlocal proxy_creation_count
         proxy_creation_count += 1
-        
-        return original_proxy_init(self_instance, *args, **kwargs)
+        original_proxy_init(self_instance, *args, **kwargs)  # type: ignore[no-untyped-call]
 
     call_count = 20
     with patch.object(pyro.Proxy, "__init__", counting_proxy_init):
