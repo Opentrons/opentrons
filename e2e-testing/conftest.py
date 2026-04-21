@@ -158,10 +158,50 @@ def _ensure_applitools_batch_env() -> None:
         os.environ["_APPLITOOLS_BATCH_DEBUG_PRINTED"] = "true"
 
 
+def _log_applitools_baseline_branch_context() -> None:
+    """Log Eyes SDK baseline branch env for CI/debug (once per process).
+
+    When ``APPLITOOLS_BRANCH`` is unset, the Applitools dashboard shows baselines
+    under the internal branch name ``default`` — independent of GitHub's default
+    branch or ``APPLITOOLS_BATCH_NAME``.
+    """
+
+    is_ci = os.environ.get("CI", "false").lower() == "true"
+    debug_enabled = os.environ.get("APPLITOOLS_DEBUG", "false").lower() == "true"
+    if not (is_ci or debug_enabled):
+        return
+
+    if os.environ.get("_APPLITOOLS_BASELINE_BRANCH_DEBUG_PRINTED") == "true":
+        return
+
+    branch_raw = os.getenv("APPLITOOLS_BRANCH")
+    parent = os.getenv("APPLITOOLS_PARENT_BRANCH")
+    baseline_override = os.getenv("APPLITOOLS_BASELINE_BRANCH")
+
+    def _line(msg: str) -> None:
+        print(f"[applitools] {msg}")
+
+    _line("--- Eyes baseline branch (not the same as batch name / Git default) ---")
+    _line(f"APPLITOOLS_BRANCH={branch_raw!r}")
+    _line(f"APPLITOOLS_PARENT_BRANCH={parent!r}")
+    _line(f"APPLITOOLS_BASELINE_BRANCH={baseline_override!r}")
+    _line(f"GITHUB_BASE_REF={os.environ.get('GITHUB_BASE_REF')!r}")
+    if branch_raw in (None, ""):
+        _line(
+            'Eyes UI baseline: branch name will be "default" '
+            "(unset APPLITOOLS_BRANCH → Applitools built-in default baseline branch)."
+        )
+    else:
+        _line(f'Eyes UI baseline: baselines for this run use branch name "{branch_raw}".')
+
+    os.environ["_APPLITOOLS_BASELINE_BRANCH_DEBUG_PRINTED"] = "true"
+
+
 def pytest_sessionstart(session: pytest.Session) -> None:
     """Ensure artifacts directory exists before tests begin."""
     _ensure_test_results_dir()
     _ensure_applitools_batch_env()
+    _log_applitools_baseline_branch_context()
 
 
 @pytest.hookimpl(tryfirst=True)
