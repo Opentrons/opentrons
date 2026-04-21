@@ -87,17 +87,14 @@ const getPumpEndSettings = (args: {
   pumpDurationCheckbox: HydratedVacuumFormData['pumpDurationCheckbox']
   pumpDurationTime: HydratedVacuumFormData['pumpDurationTime']
   endingHoldVentCheckbox: HydratedVacuumFormData['endingHoldVentCheckbox']
-}): Partial<VacuumPumpAdvancedArgs> => {
+}): VacuumPumpAdvancedArgs | null => {
   const { pumpDurationCheckbox, pumpDurationTime, endingHoldVentCheckbox } =
     args
   if (!(pumpDurationCheckbox === true && pumpDurationTime != null)) {
-    return {}
+    return null
   }
   const duration = getTimeSecondsFromString(pumpDurationTime)
-  return {
-    duration,
-    ventAfter: endingHoldVentCheckbox === true,
-  }
+  return { duration, ventAfter: endingHoldVentCheckbox === true }
 }
 
 export const vacuumFormToArgs = (

@@ -785,8 +785,6 @@ export interface FlexStackerRetrieveArgs extends CommonArgs {
 
 export interface VacuumPumpAdvancedArgs {
   duration?: number
-  rate?: number
-  timeout?: number
   ventAfter?: boolean
 }
 
@@ -819,7 +817,6 @@ export interface VacuumStopPumpArgs extends CommonArgs {
   commandCreatorFnName: 'vacuumStopPump'
 }
 
-// Vacuum
 export interface VacuumPressureData {
   mode: typeof VACUUM_MODE_PRESSURE
   pressureMbar: string | null
