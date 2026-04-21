@@ -3,8 +3,6 @@ import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { action } from '@storybook/addon-actions'
-import { within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { legacy_createStore } from 'redux'
 
 import { VIEWPORT } from '@opentrons/components'
@@ -57,6 +55,8 @@ type Story = StoryObj<typeof OnDeviceLoginPageView>
 
 export const Default: Story = {
   args: {
+    step: 'username',
+    onStepChange: action('onStepChange'),
     submitPassword: action('submitPassword') as (
       username: string,
       password: string
@@ -68,19 +68,14 @@ export const Default: Story = {
   },
 }
 
-/** Password step with inline error — play() advances username → password */
+/** Password step with inline error */
 export const WithLoginError: Story = {
   args: {
     ...Default.args,
+    step: 'password',
     loginError: i18n.t('on_device_login_error_incorrect', {
       ns: 'device_settings',
     }),
     onClearLoginError: action('onClearLoginError'),
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const user = userEvent.setup()
-    await user.type(canvas.getByRole('textbox'), 'demo_user')
-    await user.click(canvas.getByText('Next'))
   },
 }

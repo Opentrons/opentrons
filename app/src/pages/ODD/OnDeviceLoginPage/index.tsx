@@ -23,7 +23,7 @@ import styles from './OnDeviceLoginPage.module.css'
 import type { ChangeEvent } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
-type LoginField = 'username' | 'password'
+export type LoginStep = 'username' | 'password'
 
 interface LoginFormValues {
   username: string
@@ -31,6 +31,8 @@ interface LoginFormValues {
 }
 
 export interface OnDeviceLoginPageViewProps {
+  step: LoginStep
+  onStepChange: (step: LoginStep) => void
   submitPassword: (username: string, password: string) => void
   isAuthLoading: boolean
   onCancel: () => void
@@ -44,6 +46,8 @@ export interface OnDeviceLoginPageViewProps {
  * with stub handlers so we do not wire ApiHostProvider / OAuth.
  */
 export function OnDeviceLoginPageView({
+  step,
+  onStepChange,
   submitPassword,
   isAuthLoading,
   onCancel,
@@ -57,7 +61,6 @@ export function OnDeviceLoginPageView({
       password: '',
     },
   })
-  const [step, setStep] = useState<LoginField>('username')
   const [showPassword, setShowPassword] = useState(false)
   const [showKeyboard, setShowKeyboard] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -85,7 +88,7 @@ export function OnDeviceLoginPageView({
     const { username: u, password: p } = getValues()
     if (step === 'username') {
       if (u.trim() === '') return
-      setStep('password')
+      onStepChange('password')
       return
     }
     if (p.trim() === '') return
@@ -123,7 +126,7 @@ export function OnDeviceLoginPageView({
             step === 'password'
               ? () => {
                   onClearLoginError?.()
-                  setStep('username')
+                  onStepChange('username')
                 }
               : undefined
           }
@@ -156,7 +159,9 @@ export function OnDeviceLoginPageView({
                   type={inputType}
                   size="medium"
                   error={
-                    step === 'password' && loginError != null && loginError !== ''
+                    step === 'password' &&
+                    loginError != null &&
+                    loginError !== ''
                       ? loginError
                       : null
                   }
@@ -224,6 +229,7 @@ export function OnDeviceLoginPageView({
 export function OnDeviceLoginPage(): JSX.Element {
   const navigate = useNavigate()
   const { t } = useTranslation('device_settings')
+  const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: () => {
@@ -236,6 +242,8 @@ export function OnDeviceLoginPage(): JSX.Element {
   })
   return (
     <OnDeviceLoginPageView
+      step={step}
+      onStepChange={setStep}
       submitPassword={submitPassword}
       isAuthLoading={isAuthLoading}
       loginError={loginError}
