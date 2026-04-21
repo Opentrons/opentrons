@@ -13,6 +13,7 @@ import {
 } from './config'
 import { registerDiscovery } from './discovery'
 import { setUserDataPath } from './early'
+import { registerInternalApiListener } from './internal-api'
 import { createLogger } from './log'
 import { registerResourceMonitor } from './monitor'
 import {
@@ -132,6 +133,8 @@ function startUp(): void {
       })
     })
   }
+
+  registerInternalApiListener()
 
   mainWindow = createUi(dispatch)
   rendererLogger = createRendererLogger()

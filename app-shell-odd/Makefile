@@ -84,6 +84,7 @@ push-ot3: deps dist-ot3
 
 .PHONY: dev
 dev: export NODE_ENV := development
+dev: export ODD_key_server_host := http://localhost:33960
 dev:
 	vite build
 	$(electron)
