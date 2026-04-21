@@ -80,14 +80,6 @@ class NoRunOrchestrator(RuntimeError):
     """Raised if you try to get the current run orchestrator while there is none."""
 
 
-class RunProcessRunningError(RuntimeError):
-    """Raised if a run process is attempted to be opened when one is already running."""
-
-
-class NoRunProcessRunningError(RuntimeError):
-    """Raised if a run process is attempted to be closed when one is not running."""
-
-
 async def _do_handle_hardware_event(  # noqa: C901
     run_orchestrator_store: "RunOrchestratorStore", event: HardwareEvent
 ) -> None:
