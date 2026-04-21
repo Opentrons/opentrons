@@ -1,7 +1,6 @@
 """Class wrapper that ingests a PyroSynchronousObject and maps 'synchronized' async functions to awaitable methods."""
 
 import asyncio
-from collections.abc import Iterable
 from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
@@ -226,12 +225,13 @@ def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) 
                 validated_result = AsyncPyroFunctionWrapper(result)
 
         except AttributeError:
-            if isinstance(result, Iterable):
+            try:
+                iter(result)
                 validated_result = []
                 for r in result:
                     assert isinstance(r, Pyro5.api.Proxy)
                     validated_result.append(AsyncClientPyroObject(r))
-            else:
+            except AttributeError:
                 assert isinstance(result, Pyro5.api.Proxy)
                 validated_result = AsyncClientPyroObject(result)
 

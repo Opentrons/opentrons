@@ -25,7 +25,10 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
     UserDefinedCSVCmdFileNameMetadata,
 )
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_client_async_adapter import (
+    AsyncClientPyroObject,
+    AsyncPyroFunctionWrapper,
+)
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from opentrons_shared_data.robot.types import RobotTypeEnum
@@ -165,7 +168,7 @@ async def test_run_hardware_event_callback(
         robot_server_resource.create_run_hardware_event_callback()
     )
 
-    assert isinstance(result, pyro.Proxy)
+    assert isinstance(result, AsyncPyroFunctionWrapper)
 
 
 async def test_maintenance_run_hardware_event_callback(
@@ -201,7 +204,7 @@ async def test_maintenance_run_hardware_event_callback(
         robot_server_resource.create_maintenance_run_hardware_event_callback()
     )
 
-    assert isinstance(result, pyro.Proxy)
+    assert isinstance(result, AsyncPyroFunctionWrapper)
 
 
 async def test_camera_provider(
@@ -222,11 +225,10 @@ async def test_camera_provider(
         mock_app_state, empty_cam_provider
     )
 
-    camera_proxy = robot_server_resource.get_camera_provider()
+    # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
+    camera_proxy_async = robot_server_resource.get_camera_provider()
 
-    # todo(chb: 04-10-2026): When AsyncClientPyroObjects start auto-wrapping child proxies as async this can simplify
-    async_cam = AsyncClientPyroObject(camera_proxy)
-    cam_provider = cast(CameraProvider, async_cam)
+    cam_provider = cast(CameraProvider, camera_proxy_async)
     settings = await cam_provider.get_camera_settings()
 
     # Empty Camera settings defaults all to True, assert the proxy gave us that
@@ -253,11 +255,10 @@ async def test_file_provider(
         mock_app_state, empty_file_provider
     )
 
-    file_proxy = robot_server_resource.get_file_provider()
+    # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
+    file_proxy_async = robot_server_resource.get_file_provider()
 
-    # todo(chb: 04-10-2026): When AsyncClientPyroObjects start auto-wrapping child proxies as async this can simplify
-    async_file = AsyncClientPyroObject(file_proxy)
-    file_provider = cast(FileProvider, async_file)
+    file_provider = cast(FileProvider, file_proxy_async)
     results = await file_provider.write_file(
         data=bytes([1, 2, 3]),
         mime_type=MimeType("text/csv"),
