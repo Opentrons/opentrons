@@ -10,11 +10,14 @@ from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 
+from opentrons.util.pyro.pyro_client_async_adapter import (
+    AsyncClientPyroObject,
+    AsyncPyroFunctionWrapper,
+)
 from opentrons.util.pyro.pyro_serialization import (
     TypedDictWrapper,
     UnhashableDictWrapper,
 )
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject, AsyncPyroFunctionWrapper
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -295,12 +298,12 @@ def _build_classdict(  # noqa: C901
                 async_methods[name] = async_metadata
 
                 bound_method = MethodType(exposed, core_obj)
-                yield (name, bound_method)
+                yield (name, parameter_validation_wrapper(bound_method))
             elif isinstance(attr, FunctionType):
                 # Expose standard functions and bound the exposed function to the original instance
                 exposed = pyro.expose(attr)
                 bound_method = MethodType(exposed, core_obj)
-                yield (name, bound_method)
+                yield (name, parameter_validation_wrapper(bound_method))
             elif isinstance(attr, property):
                 # Bound property to the original instance and expose the bounded property
                 # Accepts the functional arguments (Callables) of a property to rebind
@@ -383,25 +386,29 @@ def get_pyro_attributes_with_proxy_result(self: Any) -> list[str]:
     result: list[str] = self._pyro_attributes_with_proxy_results
     return result
 
-# Validators
-# CASEY NOTE: This won't be called on non-pyro behavior functions. Maybe those need to be checked too.
-def _validated_parameters(*args: P.args, **kwargs: P.kwargs) -> tuple[tuple, dict]:
-        def _validations(arg: Any) -> Any:
-            # NOTE: Extend this as further validations are needed
-            arg = _validate_inbound_proxy(arg)
-            return arg
 
-        validated_args = tuple()  # type: ignore
-        for arg in args:
-            # Validate each non-keyword argument and reconstruct the argument tuple
-            validated_args = (*validated_args, _validations(arg))
-        # Validate each keyword argument and reconstruct the kwargs dictionary
-        kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
-        return (validated_args, kwargs)
+# Validators
+
+
+def _validated_parameters(*args: P.args, **kwargs: P.kwargs) -> tuple[tuple, dict]:  # type: ignore
+    def _validations(arg: Any) -> Any:
+        # NOTE: Extend this as further validations are needed
+        arg = _validate_inbound_proxy(arg)
+        return arg
+
+    validated_args = tuple()  # type: ignore
+    for arg in args:
+        # Validate each non-keyword argument and reconstruct the argument tuple
+        validated_args = (*validated_args, _validations(arg))
+    # Validate each keyword argument and reconstruct the kwargs dictionary
+    kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
+    return (validated_args, kwargs)
+
 
 def _validate_inbound_proxy(arg: Any) -> Any:
     """Handle an argument which is a remote Proxy that may have been forwarded through multiple processes."""
     if isinstance(arg, pyro.Proxy):
+        # NOTE: Cases like this are the result of multi-process callback forwarding
         try:
             if arg.is_callable:
                 arg = AsyncPyroFunctionWrapper(proxy=arg)
@@ -416,7 +423,18 @@ def _validate_inbound_proxy(arg: Any) -> Any:
                 arg = AsyncClientPyroObject(arg)
     return arg
 
-# CASEY NOTE: put some kind of generic "validator wrapper" here? is there even a usecase where non-pso decorated functions get these? maybe create() for protocol engine
+
+def parameter_validation_wrapper(attr: Callable[P, T]) -> Callable[P, T]:
+    """Validate incoming parameters on any generically generated PSO bound method function call."""
+
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
+        # Of note, the wrapper passes self to terminate the self instance passed by the PSO
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
+        return attr(*args, **kwargs)
+
+    return wrapper  # type: ignore
+
 
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
 
@@ -436,8 +454,7 @@ def convert_result_to_proxy(  # noqa: C901
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
-        args, kwargs = _validated_parameters(*args, **kwargs)
-        print(f"HERE WITH: {args} --- {kwargs}")
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
@@ -495,7 +512,7 @@ def convert_result_to_wrapped_dict(  # noqa: C901
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
-        args, kwargs = _validated_parameters(*args, **kwargs)
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
@@ -561,7 +578,7 @@ def convert_type_to_instance(
 
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
-        args, kwargs = _validated_parameters(*args, **kwargs)
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             result = sync_func(self, *args, **kwargs)
@@ -594,7 +611,7 @@ def convert_result_to_wrapped_typed_dict(
 
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
-        args, kwargs = _validated_parameters(*args, **kwargs)
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
