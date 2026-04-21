@@ -16,6 +16,9 @@ export { SlotDetailsEmptyState } from './molecules/SlotDetailsEmptyState'
 /**
  * Package identifier string (useful for diagnostics or feature flags).
  */
-export function getProtocolVisualizationPackageName(): string {
-  return '@opentrons/protocol-visualization'
-}
+// export function getProtocolVisualizationPackageName(): string {
+//   return '@opentrons/protocol-visualization'
+// }
+
+export { ProtocolVisualization } from './organisms/VisualizerContainer'
+export { registerProtocolVisualizationI18n } from './i18n'

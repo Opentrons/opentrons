@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getProtocolVisualizationPackageName } from '../index'
+import { ProtocolVisualization } from '../index'
 
 describe('@opentrons/protocol-visualization', () => {
   it('exposes stable package name', () => {
-    expect(getProtocolVisualizationPackageName()).toBe(
+    expect(ProtocolVisualization()).toBe(
       '@opentrons/protocol-visualization'
     )
   })

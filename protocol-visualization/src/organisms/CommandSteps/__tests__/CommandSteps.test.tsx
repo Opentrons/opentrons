@@ -2,14 +2,14 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '/app/i18n'
+import { i18n } from '../../../i18n'
 import { AnnotatedSteps } from '../../AnnotatedSteps'
 
 import { CommandSteps } from '../'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../AnnotatedSteps')
+vi.mock('../../AnnotatedSteps')
 
 const render = (props: ComponentProps<typeof CommandSteps>) => {
   return renderWithProviders(<CommandSteps {...props} />, {

@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { NewIconButton, TimelineScrubber } from '@opentrons/components'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../i18n'
 
 import { Controls } from '../'
 
