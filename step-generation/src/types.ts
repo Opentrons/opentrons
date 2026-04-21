@@ -825,6 +825,10 @@ export interface VacuumStopPumpArgs extends CommonArgs {
   commandCreatorFnName: 'vacuumStopPump'
 }
 
+<<<<<<< HEAD
+=======
+// Vacuum
+>>>>>>> 1144ad9c95 (feat(monorepo): update stop vacuum live command and wire up in PD + step-gen)
 export interface VacuumPressureData {
   mode: typeof VACUUM_MODE_PRESSURE
   pressureMbar: string | null
