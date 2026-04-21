@@ -46,6 +46,7 @@
     "@types/pump": "^1.1.0",
     "@types/uuid": "^3.4.7",
     "ajv": "6.12.3",
+    "axios": "^0.21.1",
     "dateformat": "3.0.3",
     "electron-devtools-installer": "4.0.0",
     "electron-store": "5.1.1",
