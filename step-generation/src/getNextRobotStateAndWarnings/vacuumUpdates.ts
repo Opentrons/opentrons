@@ -1,4 +1,5 @@
 import {
+  VACUUM_APPROACHING_TARGET,
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
   VACUUM_VENT_CLOSED,
@@ -12,24 +13,7 @@ import type {
   VacuumModuleSetTargetPressureCreateCommand,
   VacuumModuleStopPumpCreateCommand,
 } from '@opentrons/shared-data'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-  VentStatus,
-} from '../types'
-
-function _vacuumVentUpdate(args: {
-  state: VentStatus
-  moduleId: string
-  robotState: RobotState
-}): void {
-  const { state, moduleId, robotState } = args
-  const moduleState = vacuumModuleStateGetter(robotState, moduleId)
-  if (moduleState != null) {
-    moduleState.ventStatus = state
-  }
-}
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export const forVacuumOpenVent = (
   params: VacuumModuleOpenVentCreateCommand['params'],
@@ -38,11 +22,11 @@ export const forVacuumOpenVent = (
 ): void => {
   const { moduleId } = params
   const { robotState } = robotStateAndWarnings
-  _vacuumVentUpdate({
-    state: VACUUM_VENT_OPEN,
-    moduleId,
-    robotState,
-  })
+  const moduleState = vacuumModuleStateGetter(robotState, moduleId)
+  if (moduleState != null) {
+    moduleState.ventStatus = VACUUM_VENT_OPEN
+    moduleState.vacuumState = null
+  }
 }
 
 export const forVacuumCloseVent = (
@@ -52,11 +36,10 @@ export const forVacuumCloseVent = (
 ): void => {
   const { moduleId } = params
   const { robotState } = robotStateAndWarnings
-  _vacuumVentUpdate({
-    state: VACUUM_VENT_CLOSED,
-    moduleId,
-    robotState,
-  })
+  const moduleState = vacuumModuleStateGetter(robotState, moduleId)
+  if (moduleState != null) {
+    moduleState.ventStatus = VACUUM_VENT_CLOSED
+  }
 }
 
 export const forVacuumSetPumpPressure = (
@@ -75,7 +58,7 @@ export const forVacuumSetPumpPressure = (
     moduleState.vacuumState = {
       modeType: VACUUM_MODE_PRESSURE,
       targetPressure: gaugePressure,
-      currentPressure: null,
+      status: VACUUM_APPROACHING_TARGET,
     }
     moduleState.ventStatus = VACUUM_VENT_CLOSED
   } else {
@@ -100,7 +83,7 @@ export const forVacuumSetPumpPower = (
     moduleState.vacuumState = {
       modeType: VACUUM_MODE_POWER,
       targetPower: percentPower,
-      currentPower: null,
+      status: VACUUM_APPROACHING_TARGET,
     }
     moduleState.ventStatus = VACUUM_VENT_CLOSED
   } else {
