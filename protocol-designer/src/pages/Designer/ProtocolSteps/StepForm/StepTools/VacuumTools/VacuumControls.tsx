@@ -169,7 +169,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
     formData.programType === VACUUM_PROGRAM_PROFILE &&
     formData.modeType != null
   ) {
-    const numSavedStepsInProfile = formData.orderedProfileIds.length
+    const numSavedStepsInProfile = formData.vacuumOrderedProfileIds.length
     sections.push(
       <Flex
         key="profile-steps"
@@ -183,7 +183,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
         <ListButton
           type={
             showFormErrors &&
-            propsForFields.orderedProfileIds.errorToShow != null
+            propsForFields.vacuumOrderedProfileIds.errorToShow != null
               ? 'error'
               : 'noActive'
           }

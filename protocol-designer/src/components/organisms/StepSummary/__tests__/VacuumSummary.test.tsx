@@ -33,8 +33,8 @@ const baseStep: FormData = {
   pumpDurationCheckbox: null,
   pumpDurationTime: null,
   endingHoldVentCheckbox: false,
-  orderedProfileIds: [],
-  profileItemsById: {},
+  vacuumOrderedProfileIds: [],
+  vacuumProfileItemsById: {},
 }
 
 const render = (currentStep: FormData) => {
@@ -156,7 +156,7 @@ describe('VacuumSummary', () => {
         ...baseStep,
         programType: VACUUM_PROGRAM_PROFILE,
         stateType: null,
-        orderedProfileIds: ['p1', 'p2', 'p3'],
+        vacuumOrderedProfileIds: ['p1', 'p2', 'p3'],
         endingHoldVentCheckbox: true,
       })
       expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()
@@ -170,7 +170,7 @@ describe('VacuumSummary', () => {
         ...baseStep,
         programType: VACUUM_PROGRAM_PROFILE,
         stateType: null,
-        orderedProfileIds: ['p1'],
+        vacuumOrderedProfileIds: ['p1'],
         endingHoldVentCheckbox: false,
       })
       expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()
@@ -184,7 +184,7 @@ describe('VacuumSummary', () => {
         ...baseStep,
         programType: VACUUM_PROGRAM_PROFILE,
         stateType: null,
-        orderedProfileIds: ['p1', 'p2', 'p3'],
+        vacuumOrderedProfileIds: ['p1', 'p2', 'p3'],
         endingHoldVentCheckbox: false,
       })
       expect(screen.getByText(/Run vacuum profile with/)).toBeInTheDocument()

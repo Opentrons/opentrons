@@ -41,8 +41,8 @@ const baseStateForm = (
   pumpDurationCheckbox: false,
   pumpDurationTime: null,
   endingHoldVentCheckbox: false,
-  orderedProfileIds: [],
-  profileItemsById: {},
+  vacuumOrderedProfileIds: [],
+  vacuumProfileItemsById: {},
   ...overrides,
 })
 
@@ -196,8 +196,8 @@ describe('vacuumFormToArgs', () => {
       modeType: null,
       pressureMbar: null,
       powerPercent: null,
-      orderedProfileIds: [stepAId, cycleId],
-      profileItemsById: {
+      vacuumOrderedProfileIds: [stepAId, cycleId],
+      vacuumProfileItemsById: {
         [stepAId]: {
           type: PROFILE_STEP,
           id: stepAId,

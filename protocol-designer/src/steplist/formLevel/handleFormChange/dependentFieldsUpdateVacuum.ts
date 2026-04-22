@@ -27,8 +27,8 @@ const updatePatchOnVacuumProgramType = (
         'pumpDurationCheckbox',
         'pumpDurationTime',
         'endingHoldVentCheckbox',
-        'orderedProfileIds',
-        'profileItemsById'
+        'vacuumOrderedProfileIds',
+        'vacuumProfileItemsById'
       ),
     }
   }

@@ -15,10 +15,7 @@ import type {
   VacuumProfileStep,
   VacuumPumpAdvancedArgs,
 } from '@opentrons/step-generation'
-import type {
-  VacuumProfileItem as FormVacuumProfileItem,
-  VacuumProfileStep as FormVacuumProfileStep,
-} from '/protocol-designer/form-types'
+import type { VacuumProfileStep as FormVacuumProfileStep } from '/protocol-designer/form-types'
 import type { HydratedVacuumFormData } from '../../../form-types'
 import type { GetCastFormData } from '../../fieldLevel'
 
@@ -59,13 +56,13 @@ const formVacuumProfileStepToItem = (
   pumpData: pumpDataToStepGeneration(step.pumpData),
 })
 
-/** Builds step-generation profile elements from ordered profile IDs and `profileItemsById`. */
+/** Builds step-generation profile elements from `vacuumOrderedProfileIds` and `vacuumProfileItemsById`. */
 const getProfileElementsFromForm = (
-  orderedProfileIds: HydratedVacuumFormData['orderedProfileIds'],
-  profileItemsById: HydratedVacuumFormData['profileItemsById']
+  vacuumOrderedProfileIds: HydratedVacuumFormData['vacuumOrderedProfileIds'],
+  vacuumProfileItemsById: HydratedVacuumFormData['vacuumProfileItemsById']
 ): VacuumProfileItem[] => {
-  return orderedProfileIds.map(profileItemId => {
-    const profileItem = profileItemsById[profileItemId]
+  return vacuumOrderedProfileIds.map(profileItemId => {
+    const profileItem = vacuumProfileItemsById[profileItemId]
     if (profileItem.type === PROFILE_STEP) {
       return formVacuumProfileStepToItem(profileItem)
     }
@@ -115,8 +112,8 @@ export const vacuumFormToArgs = (
     pumpDurationCheckbox,
     pumpDurationTime,
     endingHoldVentCheckbox,
-    orderedProfileIds,
-    profileItemsById,
+    vacuumOrderedProfileIds,
+    vacuumProfileItemsById,
     stepDetails,
     stepName,
   } = castFormData
@@ -168,8 +165,8 @@ export const vacuumFormToArgs = (
       return {
         commandCreatorFnName: 'vacuumSetPumpProfile',
         profileElements: getProfileElementsFromForm(
-          orderedProfileIds,
-          profileItemsById as Record<string, FormVacuumProfileItem>
+          vacuumOrderedProfileIds,
+          vacuumProfileItemsById
         ),
         ...baseValues,
       }

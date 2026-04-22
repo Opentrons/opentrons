@@ -13,8 +13,8 @@ import type { FieldPropsByName } from '/protocol-designer/pages/Designer/Protoco
 
 const createPropsForFields = (): FieldPropsByName =>
   ({
-    orderedProfileIds: { updateValue: vi.fn() },
-    profileItemsById: { updateValue: vi.fn() },
+    vacuumOrderedProfileIds: { updateValue: vi.fn() },
+    vacuumProfileItemsById: { updateValue: vi.fn() },
     modeType: { updateValue: vi.fn() },
   }) as unknown as FieldPropsByName
 
@@ -23,8 +23,8 @@ const createVacuumFormData = (overrides: Partial<FormData> = {}): FormData =>
   ({
     stepType: 'vacuum',
     id: 'step-1',
-    orderedProfileIds: ['profile-1'],
-    profileItemsById: {
+    vacuumOrderedProfileIds: ['profile-1'],
+    vacuumProfileItemsById: {
       'profile-1': {
         type: 'profileStep',
         id: 'profile-1',
@@ -53,8 +53,8 @@ describe('useVacuumModeUpdate', () => {
       expect(result.current.showVacuumModeUpdateModal).toBe(false)
     })
 
-    it('returns false when vacuum step has no profile (empty orderedProfileIds)', () => {
-      const formData = createVacuumFormData({ orderedProfileIds: [] })
+    it('returns false when vacuum step has no profile (empty vacuumOrderedProfileIds)', () => {
+      const formData = createVacuumFormData({ vacuumOrderedProfileIds: [] })
       const propsForFields = createPropsForFields()
 
       const { result } = renderHook(() =>
@@ -88,8 +88,8 @@ describe('useVacuumModeUpdate', () => {
 
     it('returns false when saved profile mode cannot be determined (null)', () => {
       const formData = createVacuumFormData({
-        orderedProfileIds: ['profile-1'],
-        profileItemsById: {},
+        vacuumOrderedProfileIds: ['profile-1'],
+        vacuumProfileItemsById: {},
         modeType: VACUUM_MODE_POWER,
       })
       const propsForFields = createPropsForFields()
@@ -122,19 +122,19 @@ describe('useVacuumModeUpdate', () => {
         handleConfirm()
       })
 
-      expect(propsForFields.orderedProfileIds.updateValue).toHaveBeenCalledWith(
-        []
-      )
-      expect(propsForFields.profileItemsById.updateValue).toHaveBeenCalledWith(
-        {}
-      )
+      expect(
+        propsForFields.vacuumOrderedProfileIds.updateValue
+      ).toHaveBeenCalledWith([])
+      expect(
+        propsForFields.vacuumProfileItemsById.updateValue
+      ).toHaveBeenCalledWith({})
       expect(result.current.showVacuumModeUpdateModal).toBe(false)
     })
 
     it('does not expose handleConfirmVacuumModeUpdate when not vacuum with profile', () => {
       const formData = createVacuumFormData({
         stepType: 'moveLabware',
-        orderedProfileIds: [],
+        vacuumOrderedProfileIds: [],
       })
       const propsForFields = createPropsForFields()
 
@@ -186,10 +186,10 @@ describe('useVacuumModeUpdate', () => {
     })
 
     it('does not expose handleCancelVacuumModeUpdate when saved profile mode is null', () => {
-      // firstProfileItem is undefined when profileItemsById is empty, modal never shows
+      // firstProfileItem is undefined when vacuumProfileItemsById is empty, modal never shows
       const formData = createVacuumFormData({
-        orderedProfileIds: ['profile-1'],
-        profileItemsById: {},
+        vacuumOrderedProfileIds: ['profile-1'],
+        vacuumProfileItemsById: {},
       })
       const propsForFields = createPropsForFields()
 
