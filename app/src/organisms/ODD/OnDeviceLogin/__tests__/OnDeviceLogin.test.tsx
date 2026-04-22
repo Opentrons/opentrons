@@ -49,7 +49,7 @@ function OpenOnMount({ from }: { from?: string }): null {
   const { openLoginModal } = useOnDeviceLoginModal()
   useEffect(() => {
     openLoginModal(from != null ? { from } : undefined)
-  }, [])
+  }, [from, openLoginModal])
   return null
 }
 
@@ -65,6 +65,11 @@ function renderLoginModal(options?: { returnToPath?: string }) {
 }
 
 function getLoginInput(): HTMLInputElement {
+  // InputField from @opentrons/components renders the password input as
+  // type="password" without an associated <label>, so neither getByRole nor
+  // getByLabelText can locate it. Selecting by name attribute is the most
+  // reliable way to grab the field across both the username and password steps.
+  // eslint-disable-next-line testing-library/no-node-access
   const el = document.body.querySelector(
     'input[name="username"], input[name="password"]'
   )
@@ -96,14 +101,14 @@ describe('Login', () => {
 
   it('closes the overlay when cancel is pressed', () => {
     renderLoginModal()
-    expect(screen.queryByText('Username')).toBeInTheDocument()
+    expect(screen.getByText('Username')).toBeInTheDocument()
     fireEvent.click(screen.getByText('cancel'))
     expect(screen.queryByText('Username')).not.toBeInTheDocument()
   })
 
   it('disables next when username is empty', () => {
     renderLoginModal()
-    expect(screen.getByText('Next').closest('button')).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
   })
 
   it('shows the software keyboard when the field is focused', () => {
@@ -163,7 +168,7 @@ describe('Login', () => {
       target: { value: 'user1' },
     })
     fireEvent.click(screen.getByText('Next'))
-    expect(screen.getByText('Confirm').closest('button')).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled()
   })
 
   it('toggles password visibility when the eye control is pressed', () => {

@@ -9,7 +9,7 @@ import { VIEWPORT } from '@opentrons/components'
 import { i18n } from '/app/i18n'
 import { configReducer } from '/app/redux/config/reducer'
 
-import { OnDeviceLoginPageView } from '.'
+import { OnDeviceLoginView } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
@@ -28,9 +28,9 @@ const store: Store<any> = legacy_createStore(
   dummyConfig as StoreEnhancer
 )
 
-const meta: Meta<typeof OnDeviceLoginPageView> = {
-  title: 'ODD/Pages/Login',
-  component: OnDeviceLoginPageView,
+const meta: Meta<typeof OnDeviceLoginView> = {
+  title: 'ODD/Organisms/OnDeviceLogin',
+  component: OnDeviceLoginView,
   parameters: VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
@@ -46,7 +46,7 @@ const meta: Meta<typeof OnDeviceLoginPageView> = {
 }
 export default meta
 
-type Story = StoryObj<typeof OnDeviceLoginPageView>
+type Story = StoryObj<typeof OnDeviceLoginView>
 
 export const Default: Story = {
   args: {

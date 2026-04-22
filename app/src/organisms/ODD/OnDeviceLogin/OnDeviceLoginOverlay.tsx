@@ -14,7 +14,7 @@ import { Box, COLORS, POSITION_FIXED } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import { OnDeviceLoginPageView } from './index'
+import { OnDeviceLoginView } from './index'
 import { getSafePostLoginPath } from './onDeviceLoginRedirect'
 
 import type { ReactNode } from 'react'
@@ -110,11 +110,11 @@ function LoginOverlayBody({
       onDismiss()
     },
     onError: () => {
-      setLoginError(t('on_device_login_error_incorrect'))
+      setLoginError(t('on_device_login_error_incorrect') as string)
     },
   })
   return (
-    <OnDeviceLoginPageView
+    <OnDeviceLoginView
       step={step}
       onStepChange={setStep}
       submitPassword={submitPassword}

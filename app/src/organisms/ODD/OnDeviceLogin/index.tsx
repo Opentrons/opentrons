@@ -16,7 +16,7 @@ import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './OnDeviceLoginPage.module.css'
+import styles from './OnDeviceLogin.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -28,7 +28,7 @@ interface LoginFormValues {
   password: string
 }
 
-export interface OnDeviceLoginPageViewProps {
+export interface OnDeviceLoginViewProps {
   step: LoginStep
   onStepChange: (step: LoginStep) => void
   submitPassword: (username: string, password: string) => void
@@ -39,7 +39,7 @@ export interface OnDeviceLoginPageViewProps {
   onClearLoginError?: () => void
 }
 
-export function OnDeviceLoginPageView({
+export function OnDeviceLoginView({
   step,
   onStepChange,
   submitPassword,
@@ -47,7 +47,7 @@ export function OnDeviceLoginPageView({
   onCancel,
   loginError = null,
   onClearLoginError,
-}: OnDeviceLoginPageViewProps): JSX.Element {
+}: OnDeviceLoginViewProps): JSX.Element {
   const { t } = useTranslation(['shared', 'device_settings'])
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
     defaultValues: {
