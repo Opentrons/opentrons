@@ -96,6 +96,13 @@ class VentState(Enum):
     CLOSED = 0
     OPENED = 1
 
+    def __str__(self) -> str:
+        if self.value == 0:
+            return "closed"
+        elif self.value == 1:
+            return "opened"
+        return "closed"
+
 
 @dataclass
 class VacuumState:

@@ -32,6 +32,7 @@ from opentrons.hardware_control.modules.types import (
     ModuleType,
     UploadFunction,
     VacuumModuleData,
+    VacuumModuleOperationMode,
     VacuumModuleStatus,
 )
 from opentrons.hardware_control.poller import Poller, Reader
@@ -192,7 +193,12 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def status(self) -> VacuumModuleStatus:
         """Module status or error state details."""
-        return self._device_status
+        # TODO : make sure that the pump state is getting updated
+        return (
+            VacuumModuleStatus.RUNNING
+            if self._reader.pump_state.pump_running
+            else VacuumModuleStatus.IDLE
+        )
 
     @property
     def is_simulated(self) -> bool:
@@ -203,6 +209,12 @@ class VacuumModule(mod_abc.AbstractModule):
         data: VacuumModuleData = {
             "errorDetails": self._reader.error,
             "pumpEngaged": self._reader.pump_state.pump_running,
+            "currentPressure": self._reader.vacuum_state.current_gauge_pressure,
+            "targetPressure": self._reader.vacuum_state.target_gauge_pressure,
+            "currentPower": self._reader.pump_state.current_rpm,
+            "targetPower": self._reader.pump_state.target_rpm,
+            "ventStatus": str(self._reader.vacuum_state.vent_state),
+            "modeType": self._reader.operation_mode,
         }
         return {"status": self.status.value, "data": data}
 
@@ -217,6 +229,10 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def pump_state(self) -> PumpState:
         return self._reader.pump_state
+
+    @property
+    def operation_mode(self) -> VacuumModuleOperationMode:
+        return self._reader.operation_mode
 
     async def prep_for_update(self) -> str:
         await self._poller.stop()
@@ -321,6 +337,7 @@ class VacuumModule(mod_abc.AbstractModule):
         vent_after: Optional[bool] = None,
     ) -> None:
         """Handler for internal pressure controls."""
+        self._reader.set_operation_mode(VacuumModuleOperationMode.PRESSURE)
         await self._driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
             gauge_pressure_mbar=gauge_pressure_mbar,
@@ -337,7 +354,7 @@ class VacuumModule(mod_abc.AbstractModule):
         duty_cycle: Optional[int] = None,
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
-        # clear any existing vacuum state before rewriting the pump state
+        self._reader.set_operation_mode(VacuumModuleOperationMode.PRESSURE)
         await self._driver.set_vacuum_state(enable_vacuum=False)
         await self._driver.set_pump_state(
             start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
@@ -365,6 +382,9 @@ class VacuumModuleReader(Reader):
             current_pwm=0,
             pump_running=False,
             manual_control=False,
+        )
+        self.operation_mode: VacuumModuleOperationMode = (
+            VacuumModuleOperationMode.PRESSURE
         )
         self._driver = driver
         self.initialized = False
@@ -430,3 +450,6 @@ class VacuumModuleReader(Reader):
     async def update_pump_state(self) -> None:
         """Get latest pump state from driver and save updated values."""
         self.pump_state = await self._driver.get_pump_state()
+
+    def set_operation_mode(self, mode_type: VacuumModuleOperationMode) -> None:
+        self.operation_mode = mode_type
