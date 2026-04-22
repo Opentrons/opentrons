@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,7 +37,14 @@ import { ConnectedStepInfo } from './ConnectedStepInfo'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
-import type { StepIdType } from '/protocol-designer/form-types'
+import type { FormData, StepIdType } from '/protocol-designer/form-types'
+
+function getIsVacuumStepPredicate(
+  steps: FormData[]
+): (id: StepIdType) => boolean {
+  const stepTypeById = new Map(steps.map(form => [form.id, form.stepType]))
+  return (id: StepIdType) => stepTypeById.get(id) === 'vacuum'
+}
 
 interface DraggableStepsProps {
   sidebarWidth: number
@@ -86,8 +93,35 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
               sidebarWidth={sidebarWidth}
             />
           )
+        } else if (nestedStepElement.type === 'vacuumProfileGroup') {
+          return (
+            <VacuumProfile
+              key={'concurrent-group-' + nestedStepElement.vacuumProfileStepId}
+              vacuumProfileStepId={nestedStepElement.vacuumProfileStepId}
+              concurrentStepIds={nestedStepElement.concurrentSteps.map(
+                step => step.stepId
+              )}
+              openedOverflowMenuId={openedOverflowMenuId}
+              setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+              sidebarWidth={sidebarWidth}
+            />
+          )
+        } else if (nestedStepElement.type === 'vacuumStateDurationGroup') {
+          return (
+            <VacuumStateDurationConcurrent
+              key={'concurrent-group-' + nestedStepElement.vacuumStateStepId}
+              vacuumStateStepId={nestedStepElement.vacuumStateStepId}
+              concurrentStepIds={nestedStepElement.concurrentSteps.map(
+                step => step.stepId
+              )}
+              openedOverflowMenuId={openedOverflowMenuId}
+              setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+              sidebarWidth={sidebarWidth}
+            />
+          )
         } else {
           nestedStepElement satisfies never // Exhaustiveness check.
+          return null
         }
       })}
     </Flex>
@@ -125,6 +159,7 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
+  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -139,13 +174,17 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const getStepsAfterMovingHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(convertStepArrayToHierarchy(steps), {
-        moveType: 'insertBeforeDestinationStep',
-        movedStepId: idOfStepBeingMoved,
-        destinationStepId: stepId,
-      })
+      return computeStepMove(
+        convertStepArrayToHierarchy(steps),
+        {
+          moveType: 'insertBeforeDestinationStep',
+          movedStepId: idOfStepBeingMoved,
+          destinationStepId: stepId,
+        },
+        { isVacuumStep }
+      )
     },
-    [steps, stepId]
+    [steps, stepId, isVacuumStep]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
@@ -201,7 +240,6 @@ function DragDropPreviewBar(): JSX.Element {
   return (
     <Box paddingY={SPACING.spacing2}>
       <Divider
-        marginY="0"
         borderBottom="none"
         height="0.25rem" // 4px
         width="100%"
@@ -293,6 +331,275 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
  * The "wait for profile to complete" checkpoint at the end of a Thermocycler profile's
  * nested block. The user can drag a step onto it to move that step right above it.
  */
+interface VacuumProfileProps {
+  vacuumProfileStepId: StepIdType
+  concurrentStepIds: StepIdType[]
+
+  openedOverflowMenuId?: string | null
+  setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
+
+  sidebarWidth: number
+}
+
+/**
+ * A Vacuum profile step and the nested block that immediately follows it.
+ *
+ * The profile step can be dragged around to move the whole group.
+ * The nested block can have other steps dropped into it.
+ */
+function VacuumProfile(props: VacuumProfileProps): JSX.Element {
+  const {
+    vacuumProfileStepId,
+    concurrentStepIds,
+    openedOverflowMenuId,
+    setOpenedOverflowMenuId,
+    sidebarWidth,
+  } = props
+
+  const selectedStepId = useSelector(getSelectedStepId)
+  const multiSelectItemIds = useSelector(getMultiSelectItemIds)
+  const isRootSelected =
+    multiSelectItemIds != null && multiSelectItemIds.length > 0
+      ? multiSelectItemIds.includes(vacuumProfileStepId)
+      : selectedStepId === vacuumProfileStepId
+
+  const { t } = useTranslation()
+
+  return (
+    <div>
+      <DragDropStep
+        stepId={vacuumProfileStepId}
+        openedOverflowMenuId={openedOverflowMenuId}
+        setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+        sidebarWidth={sidebarWidth}
+      />
+
+      <ConcurrentGroup active={isRootSelected}>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint
+            text={t('protocol_steps:vacuum.profile_timeline.start')}
+          />
+        </ConcurrentGroupChild>
+        {concurrentStepIds.map(concurrentStepId => (
+          <ConcurrentGroupChild key={concurrentStepId} type="step">
+            <DragDropStep
+              stepId={concurrentStepId}
+              openedOverflowMenuId={openedOverflowMenuId}
+              setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+              sidebarWidth={sidebarWidth}
+            />
+          </ConcurrentGroupChild>
+        ))}
+        <ConcurrentGroupChild type="checkpoint">
+          <VacuumProfileEndCheckpoint
+            vacuumProfileStepId={vacuumProfileStepId}
+          />
+        </ConcurrentGroupChild>
+      </ConcurrentGroup>
+    </div>
+  )
+}
+
+interface VacuumStateDurationConcurrentProps {
+  vacuumStateStepId: StepIdType
+  concurrentStepIds: StepIdType[]
+
+  openedOverflowMenuId?: string | null
+  setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
+
+  sidebarWidth: number
+}
+
+/**
+ * A timed Vacuum state step and the nested block that immediately follows it.
+ */
+function VacuumStateDurationConcurrent(
+  props: VacuumStateDurationConcurrentProps
+): JSX.Element {
+  const {
+    vacuumStateStepId,
+    concurrentStepIds,
+    openedOverflowMenuId,
+    setOpenedOverflowMenuId,
+    sidebarWidth,
+  } = props
+
+  const selectedStepId = useSelector(getSelectedStepId)
+  const multiSelectItemIds = useSelector(getMultiSelectItemIds)
+  const isRootSelected =
+    multiSelectItemIds != null && multiSelectItemIds.length > 0
+      ? multiSelectItemIds.includes(vacuumStateStepId)
+      : selectedStepId === vacuumStateStepId
+
+  const { t } = useTranslation()
+
+  return (
+    <div>
+      <DragDropStep
+        stepId={vacuumStateStepId}
+        openedOverflowMenuId={openedOverflowMenuId}
+        setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+        sidebarWidth={sidebarWidth}
+      />
+
+      <ConcurrentGroup active={isRootSelected}>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint
+            text={t('protocol_steps:vacuum.state_timeline.start')}
+          />
+        </ConcurrentGroupChild>
+        {concurrentStepIds.map(concurrentStepId => (
+          <ConcurrentGroupChild key={concurrentStepId} type="step">
+            <DragDropStep
+              stepId={concurrentStepId}
+              openedOverflowMenuId={openedOverflowMenuId}
+              setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+              sidebarWidth={sidebarWidth}
+            />
+          </ConcurrentGroupChild>
+        ))}
+        <ConcurrentGroupChild type="checkpoint">
+          <VacuumStateDurationEndCheckpoint
+            vacuumStateStepId={vacuumStateStepId}
+          />
+        </ConcurrentGroupChild>
+      </ConcurrentGroup>
+    </div>
+  )
+}
+
+/**
+ * The "wait for profile to complete" checkpoint at the end of a Vacuum profile's
+ * nested block. The user can drag a step onto it to move that step right above it.
+ */
+function VacuumProfileEndCheckpoint(props: {
+  vacuumProfileStepId: string
+}): JSX.Element {
+  const { vacuumProfileStepId } = props
+
+  const dispatch = useDispatch()
+  const steps = useSelector(getOrderedSavedForms)
+  const { t } = useTranslation()
+  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
+
+  const getStepsAfterMovingStepHere = useCallback(
+    (idOfStepBeingMoved: StepIdType) => {
+      return computeStepMove(
+        convertStepArrayToHierarchy(steps),
+        {
+          moveType: 'insertAsLastStepOfGroup',
+          movedStepId: idOfStepBeingMoved,
+          destinationGroupRootStepId: vacuumProfileStepId,
+        },
+        { isVacuumStep }
+      )
+    },
+    [steps, vacuumProfileStepId, isVacuumStep]
+  )
+
+  const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
+    () => ({
+      accept: DND_TYPES.STEP_ITEM,
+      canDrop: (item: DropType) => {
+        const stepsAfterMove = getStepsAfterMovingStepHere(item.stepId)
+        return stepsAfterMove.isMoveAllowed
+      },
+      drop: (item: DropType) => {
+        const stepsAfterMove = getStepsAfterMovingStepHere(item.stepId)
+        if (stepsAfterMove.isMoveAllowed) {
+          dispatch(
+            steplistActions.reorderSteps(
+              convertStepHierarchyToArray(stepsAfterMove.stepsAfterMove)
+            )
+          )
+        } else {
+          console.error(
+            "Unexpected attempt to move a step in a way that isn't allowed."
+          )
+        }
+      },
+      collect: monitor => ({
+        isHoveredOver: monitor.isOver(),
+        canBeDroppedUpon: monitor.canDrop(),
+      }),
+    }),
+    [dispatch, getStepsAfterMovingStepHere]
+  )
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} ref={drop}>
+      {isHoveredOver && canBeDroppedUpon && <DragDropPreviewBar />}
+      <ConcurrentGroupCheckpoint
+        text={t('protocol_steps:vacuum.profile_timeline.wait_for_complete')}
+      />
+    </Flex>
+  )
+}
+
+function VacuumStateDurationEndCheckpoint(props: {
+  vacuumStateStepId: string
+}): JSX.Element {
+  const { vacuumStateStepId } = props
+
+  const dispatch = useDispatch()
+  const steps = useSelector(getOrderedSavedForms)
+  const { t } = useTranslation()
+  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
+
+  const getStepsAfterMovingStepHere = useCallback(
+    (idOfStepBeingMoved: StepIdType) => {
+      return computeStepMove(
+        convertStepArrayToHierarchy(steps),
+        {
+          moveType: 'insertAsLastStepOfGroup',
+          movedStepId: idOfStepBeingMoved,
+          destinationGroupRootStepId: vacuumStateStepId,
+        },
+        { isVacuumStep }
+      )
+    },
+    [steps, vacuumStateStepId, isVacuumStep]
+  )
+
+  const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
+    () => ({
+      accept: DND_TYPES.STEP_ITEM,
+      canDrop: (item: DropType) => {
+        const stepsAfterMove = getStepsAfterMovingStepHere(item.stepId)
+        return stepsAfterMove.isMoveAllowed
+      },
+      drop: (item: DropType) => {
+        const stepsAfterMove = getStepsAfterMovingStepHere(item.stepId)
+        if (stepsAfterMove.isMoveAllowed) {
+          dispatch(
+            steplistActions.reorderSteps(
+              convertStepHierarchyToArray(stepsAfterMove.stepsAfterMove)
+            )
+          )
+        } else {
+          console.error(
+            "Unexpected attempt to move a step in a way that isn't allowed."
+          )
+        }
+      },
+      collect: monitor => ({
+        isHoveredOver: monitor.isOver(),
+        canBeDroppedUpon: monitor.canDrop(),
+      }),
+    }),
+    [dispatch, getStepsAfterMovingStepHere]
+  )
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} ref={drop}>
+      {isHoveredOver && canBeDroppedUpon && <DragDropPreviewBar />}
+      <ConcurrentGroupCheckpoint
+        text={t('protocol_steps:vacuum.state_timeline.wait_for_complete')}
+      />
+    </Flex>
+  )
+}
+
 function ThermocyclerProfileEndCheckpoint(props: {
   thermocyclerProfileStepId: string
 }): JSX.Element {
@@ -301,16 +608,21 @@ function ThermocyclerProfileEndCheckpoint(props: {
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
   const { t } = useTranslation()
+  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const getStepsAfterMovingStepHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(convertStepArrayToHierarchy(steps), {
-        moveType: 'insertAsLastStepOfGroup',
-        movedStepId: idOfStepBeingMoved,
-        destinationGroupRootStepId: thermocyclerProfileStepId,
-      })
+      return computeStepMove(
+        convertStepArrayToHierarchy(steps),
+        {
+          moveType: 'insertAsLastStepOfGroup',
+          movedStepId: idOfStepBeingMoved,
+          destinationGroupRootStepId: thermocyclerProfileStepId,
+        },
+        { isVacuumStep }
+      )
     },
-    [steps, thermocyclerProfileStepId]
+    [steps, thermocyclerProfileStepId, isVacuumStep]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(

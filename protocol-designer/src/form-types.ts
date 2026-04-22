@@ -38,6 +38,8 @@ import type {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
 } from './constants'
 
 export type StepIdType = string
@@ -234,6 +236,8 @@ export type HydratedPauseFormData = AnnotationFields & {
     | typeof PAUSE_UNTIL_TIME
     | typeof PAUSE_UNTIL_TEMP
     | typeof PAUSE_UNTIL_TC_PROFILE_COMPLETE
+    | typeof PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE
+    | typeof PAUSE_UNTIL_VACUUM_STATE_COMPLETE
   pauseMessage?: string
   /** If `PAUSE_UNTIL_TEMP`, the temperature to wait for. */
   pauseTemperature?: string

@@ -35,6 +35,8 @@ describe('selectedItem reducer', () => {
       type: 'SAVE_STEP_FORM',
       payload: {
         form: { id: stepId } as FormData,
+        thermocyclerPauseStepId: 'tc-pause',
+        vacuumPauseStepId: 'vac-pause',
       },
     } as SaveStepFormAction
     expect(selectedItem(null, action)).toEqual({

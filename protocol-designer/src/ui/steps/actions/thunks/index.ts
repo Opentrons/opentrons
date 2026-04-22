@@ -354,6 +354,15 @@ export interface SaveStepFormAction {
      * If no wait step needs to be created, this is ignored.
      */
     thermocyclerPauseStepId: StepIdType
+
+    /**
+     * If a new Vacuum profile step is being saved, a "wait for profile to complete"
+     * pause step will be saved along with it, implicitly. This is the ID to use for
+     * that new wait step.
+     *
+     * If no wait step needs to be created, this is ignored.
+     */
+    vacuumPauseStepId: StepIdType
   }
 }
 export const _saveStepForm = (form: FormData): SaveStepFormAction => {
@@ -366,6 +375,7 @@ export const _saveStepForm = (form: FormData): SaveStepFormAction => {
     payload: {
       form: adjustedForm,
       thermocyclerPauseStepId: uuid(),
+      vacuumPauseStepId: uuid(),
     },
   }
 }

@@ -1,7 +1,10 @@
 import { describe, expect, it, test } from 'vitest'
 
+import { VACUUM_PROGRAM_STATE } from '@opentrons/step-generation'
+
 import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '/protocol-designer/constants'
 import {
@@ -135,6 +138,42 @@ describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray(
             concurrentSteps: [],
             waitForThermocyclerProfileStepId: 'f',
           },
+        ],
+      },
+    },
+    {
+      label: 'timed Vacuum state group with concurrent steps',
+      flat: [
+        { id: 'a', stepType: 'comment' },
+        {
+          id: 'b',
+          stepType: 'vacuum',
+          programType: VACUUM_PROGRAM_STATE,
+          pumpDurationCheckbox: true,
+          pumpDurationTime: '00:01:00',
+        },
+        { id: 'c', stepType: 'comment' },
+        { id: 'd', stepType: 'comment' },
+        {
+          id: 'e',
+          stepType: 'pause',
+          pauseAction: PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
+        },
+        { id: 'f', stepType: 'comment' },
+      ],
+      hierarchy: {
+        topLevelItems: [
+          { type: 'standaloneStep', stepId: 'a' },
+          {
+            type: 'vacuumStateDurationGroup',
+            vacuumStateStepId: 'b',
+            concurrentSteps: [
+              { type: 'standaloneStep', stepId: 'c' },
+              { type: 'standaloneStep', stepId: 'd' },
+            ],
+            waitForVacuumStateStepId: 'e',
+          },
+          { type: 'standaloneStep', stepId: 'f' },
         ],
       },
     },
@@ -311,6 +350,178 @@ describe('computeStepMove()', () => {
       },
     }
     expect(result).toStrictEqual(expectedResult)
+  })
+
+  it('disallows moving a vacuum step to the end of a Vacuum profile concurrent group when isVacuumStep is provided', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'vacMove' },
+        {
+          type: 'vacuumProfileGroup',
+          vacuumProfileStepId: 'vp',
+          concurrentSteps: [],
+          waitForVacuumProfileStepId: 'w',
+        },
+        { type: 'standaloneStep', stepId: 'x' },
+      ],
+    }
+    const result = computeStepMove(
+      originalHierarchy,
+      {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: 'vacMove',
+        destinationGroupRootStepId: 'vp',
+      },
+      { isVacuumStep: id => id === 'vacMove' }
+    )
+    expect(result).toStrictEqual({ isMoveAllowed: false })
+  })
+
+  it('disallows moving a vacuum step to the end of a timed Vacuum state concurrent group when isVacuumStep is provided', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'vacMove' },
+        {
+          type: 'vacuumStateDurationGroup',
+          vacuumStateStepId: 'vs',
+          concurrentSteps: [],
+          waitForVacuumStateStepId: 'w',
+        },
+        { type: 'standaloneStep', stepId: 'x' },
+      ],
+    }
+    const result = computeStepMove(
+      originalHierarchy,
+      {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: 'vacMove',
+        destinationGroupRootStepId: 'vs',
+      },
+      { isVacuumStep: id => id === 'vacMove' }
+    )
+    expect(result).toStrictEqual({ isMoveAllowed: false })
+  })
+
+  it('allows moving a non-vacuum step to the end of a Vacuum profile concurrent group when isVacuumStep is provided', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'pipette' },
+        {
+          type: 'vacuumProfileGroup',
+          vacuumProfileStepId: 'vp',
+          concurrentSteps: [],
+          waitForVacuumProfileStepId: 'w',
+        },
+      ],
+    }
+    const result = computeStepMove(
+      originalHierarchy,
+      {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: 'pipette',
+        destinationGroupRootStepId: 'vp',
+      },
+      { isVacuumStep: () => false }
+    )
+    const expectedResult: typeof result = {
+      isMoveAllowed: true,
+      stepsAfterMove: {
+        topLevelItems: [
+          {
+            type: 'vacuumProfileGroup',
+            vacuumProfileStepId: 'vp',
+            concurrentSteps: [{ type: 'standaloneStep', stepId: 'pipette' }],
+            waitForVacuumProfileStepId: 'w',
+          },
+        ],
+      },
+    }
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it('allows moving a non-vacuum step to the end of a timed Vacuum state concurrent group when isVacuumStep is provided', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'pipette' },
+        {
+          type: 'vacuumStateDurationGroup',
+          vacuumStateStepId: 'vs',
+          concurrentSteps: [],
+          waitForVacuumStateStepId: 'w',
+        },
+      ],
+    }
+    const result = computeStepMove(
+      originalHierarchy,
+      {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: 'pipette',
+        destinationGroupRootStepId: 'vs',
+      },
+      { isVacuumStep: () => false }
+    )
+    const expectedResult: typeof result = {
+      isMoveAllowed: true,
+      stepsAfterMove: {
+        topLevelItems: [
+          {
+            type: 'vacuumStateDurationGroup',
+            vacuumStateStepId: 'vs',
+            concurrentSteps: [{ type: 'standaloneStep', stepId: 'pipette' }],
+            waitForVacuumStateStepId: 'w',
+          },
+        ],
+      },
+    }
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it('disallows inserting a vacuum step before a step inside a Vacuum profile concurrent group when isVacuumStep is provided', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'vacMove' },
+        {
+          type: 'vacuumProfileGroup',
+          vacuumProfileStepId: 'vp',
+          concurrentSteps: [{ type: 'standaloneStep', stepId: 'inside' }],
+          waitForVacuumProfileStepId: 'w',
+        },
+      ],
+    }
+    const result = computeStepMove(
+      originalHierarchy,
+      {
+        moveType: 'insertBeforeDestinationStep',
+        movedStepId: 'vacMove',
+        destinationStepId: 'inside',
+      },
+      { isVacuumStep: id => id === 'vacMove' }
+    )
+    expect(result).toStrictEqual({ isMoveAllowed: false })
+  })
+
+  it('disallows inserting a vacuum step before a step inside a timed Vacuum state concurrent group when isVacuumStep is provided', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'vacMove' },
+        {
+          type: 'vacuumStateDurationGroup',
+          vacuumStateStepId: 'vs',
+          concurrentSteps: [{ type: 'standaloneStep', stepId: 'inside' }],
+          waitForVacuumStateStepId: 'w',
+        },
+      ],
+    }
+    const result = computeStepMove(
+      originalHierarchy,
+      {
+        moveType: 'insertBeforeDestinationStep',
+        movedStepId: 'vacMove',
+        destinationStepId: 'inside',
+      },
+      { isVacuumStep: id => id === 'vacMove' }
+    )
+    expect(result).toStrictEqual({ isMoveAllowed: false })
   })
 
   it('can move an entire Thermocycler group', () => {

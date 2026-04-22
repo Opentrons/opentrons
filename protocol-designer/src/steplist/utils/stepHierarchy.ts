@@ -1,6 +1,15 @@
 import { produce } from 'immer'
 
-import { PAUSE_UNTIL_TC_PROFILE_COMPLETE } from '/protocol-designer/constants'
+import {
+  VACUUM_PROGRAM_PROFILE,
+  VACUUM_PROGRAM_STATE,
+} from '@opentrons/step-generation'
+
+import {
+  PAUSE_UNTIL_TC_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
+} from '/protocol-designer/constants'
 
 import type { FormData, StepIdType } from '/protocol-designer/form-types'
 
@@ -21,9 +30,11 @@ import type { FormData, StepIdType } from '/protocol-designer/form-types'
  * 2. Start Thermocycler profile. And while it's running...
  *   2a. Transfer B1->B2
  * 3. Transfer C1->C2
+ *
+ * The same nesting applies to Vacuum module profile steps and timed Vacuum state steps.
  */
 export interface StepHierarchy {
-  topLevelItems: Array<StandaloneStep | ThermocyclerProfileGroup>
+  topLevelItems: Array<StandaloneStep | ProfileConcurrentGroup>
 }
 
 /** A normal, standalone step. */
@@ -46,6 +57,63 @@ export interface ThermocyclerProfileGroup {
   waitForThermocyclerProfileStepId: StepIdType
 }
 
+/** A group of steps representing a Vacuum profile and stuff happening concurrently to it. */
+export interface VacuumProfileGroup {
+  type: 'vacuumProfileGroup'
+  vacuumProfileStepId: StepIdType
+  concurrentSteps: StandaloneStep[]
+  waitForVacuumProfileStepId: StepIdType
+}
+
+/** Timed Vacuum state (pump with duration) with steps that may run concurrently until the wait pause. */
+export interface VacuumStateDurationGroup {
+  type: 'vacuumStateDurationGroup'
+  vacuumStateStepId: StepIdType
+  concurrentSteps: StandaloneStep[]
+  waitForVacuumStateStepId: StepIdType
+}
+
+export type ProfileConcurrentGroup =
+  | ThermocyclerProfileGroup
+  | VacuumProfileGroup
+  | VacuumStateDurationGroup
+
+function isProfileConcurrentGroup(
+  item: StandaloneStep | ProfileConcurrentGroup
+): item is ProfileConcurrentGroup {
+  return (
+    item.type === 'thermocyclerProfileGroup' ||
+    item.type === 'vacuumProfileGroup' ||
+    item.type === 'vacuumStateDurationGroup'
+  )
+}
+
+function isVacuumStateWithPumpDuration(step: FormData): boolean {
+  return (
+    step.stepType === 'vacuum' &&
+    step.programType === VACUUM_PROGRAM_STATE &&
+    step.pumpDurationCheckbox === true &&
+    step.pumpDurationTime != null
+  )
+}
+
+type OpenConcurrentGroup =
+  | {
+      kind: 'thermocycler'
+      startId: StepIdType
+      concurrentStepIds: StepIdType[]
+    }
+  | {
+      kind: 'vacuumProfile'
+      startId: StepIdType
+      concurrentStepIds: StepIdType[]
+    }
+  | {
+      kind: 'vacuumStateDuration'
+      startId: StepIdType
+      concurrentStepIds: StepIdType[]
+    }
+
 /**
  * Given a flat array of steps, return the equivalent hierarchy.
  */
@@ -57,40 +125,57 @@ export function convertStepArrayToHierarchy(steps: FormData[]): StepHierarchy {
 
 function* _convertStepArrayToHierarchy(
   steps: FormData[]
-): Generator<StandaloneStep | ThermocyclerProfileGroup> {
-  let currentGroup: {
-    thermocyclerProfileStepId: StepIdType
-    concurrentStepIds: StepIdType[]
-  } | null = null
+): Generator<StandaloneStep | ProfileConcurrentGroup> {
+  let currentGroup: OpenConcurrentGroup | null = null
 
   for (const step of steps) {
     if (
       step.stepType === 'thermocycler' &&
       step.thermocyclerFormType === 'thermocyclerProfile'
     ) {
-      // Open a new group.
       if (currentGroup != null) {
         console.error(
           'More than 1 level of step groups trying to nest within each other. This should not be able to happen.'
         )
       }
       currentGroup = {
-        thermocyclerProfileStepId: step.id,
+        kind: 'thermocycler',
+        startId: step.id,
+        concurrentStepIds: [],
+      }
+    } else if (
+      step.stepType === 'vacuum' &&
+      step.programType === VACUUM_PROGRAM_PROFILE
+    ) {
+      if (currentGroup != null) {
+        console.error(
+          'More than 1 level of step groups trying to nest within each other. This should not be able to happen.'
+        )
+      }
+      currentGroup = {
+        kind: 'vacuumProfile',
+        startId: step.id,
+        concurrentStepIds: [],
+      }
+    } else if (isVacuumStateWithPumpDuration(step)) {
+      if (currentGroup != null) {
+        console.error(
+          'More than 1 level of step groups trying to nest within each other. This should not be able to happen.'
+        )
+      }
+      currentGroup = {
+        kind: 'vacuumStateDuration',
+        startId: step.id,
         concurrentStepIds: [],
       }
     } else if (
       step.stepType === 'pause' &&
       step.pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE
     ) {
-      // Close an existing group.
-      if (currentGroup == null) {
-        console.error(
-          'A step is trying to close a group, but there is no group to close. This should not be able to happen.'
-        )
-      } else {
+      if (currentGroup?.kind === 'thermocycler') {
         yield {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: currentGroup.thermocyclerProfileStepId,
+          thermocyclerProfileStepId: currentGroup.startId,
           concurrentSteps: currentGroup.concurrentStepIds.map(stepId => ({
             type: 'standaloneStep',
             stepId,
@@ -98,6 +183,71 @@ function* _convertStepArrayToHierarchy(
           waitForThermocyclerProfileStepId: step.id,
         }
         currentGroup = null
+      } else {
+        if (currentGroup == null) {
+          console.error(
+            'A Thermocycler profile wait step is trying to close a group, but there is no Thermocycler profile group to close. This should not be able to happen.'
+          )
+        } else {
+          console.error(
+            'A Thermocycler profile wait step appeared while a different concurrent group was open. This should not be able to happen.'
+          )
+          currentGroup.concurrentStepIds.push(step.id)
+        }
+      }
+    } else if (
+      step.stepType === 'pause' &&
+      step.pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE
+    ) {
+      if (currentGroup?.kind === 'vacuumProfile') {
+        yield {
+          type: 'vacuumProfileGroup',
+          vacuumProfileStepId: currentGroup.startId,
+          concurrentSteps: currentGroup.concurrentStepIds.map(stepId => ({
+            type: 'standaloneStep',
+            stepId,
+          })),
+          waitForVacuumProfileStepId: step.id,
+        }
+        currentGroup = null
+      } else {
+        if (currentGroup == null) {
+          console.error(
+            'A Vacuum profile wait step is trying to close a group, but there is no Vacuum profile group to close. This should not be able to happen.'
+          )
+        } else {
+          console.error(
+            'A Vacuum profile wait step appeared while a different concurrent group was open. This should not be able to happen.'
+          )
+          currentGroup.concurrentStepIds.push(step.id)
+        }
+      }
+    } else if (
+      step.stepType === 'pause' &&
+      step.pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE
+    ) {
+      if (currentGroup?.kind === 'vacuumStateDuration') {
+        yield {
+          type: 'vacuumStateDurationGroup',
+          vacuumStateStepId: currentGroup.startId,
+          concurrentSteps: currentGroup.concurrentStepIds.map(stepId => ({
+            type: 'standaloneStep',
+            stepId,
+          })),
+          waitForVacuumStateStepId: step.id,
+        }
+        currentGroup = null
+      } else {
+        if (currentGroup == null) {
+          console.error(
+            'A Vacuum state wait step is trying to close a group, but there is no timed Vacuum state group to close. This should not be able to happen.'
+          )
+        } else {
+          console.error(
+            'A Vacuum state wait step appeared while a different concurrent group was open. This should not be able to happen.'
+          )
+          currentGroup.concurrentStepIds.push(step.id)
+        }
       }
     } else {
       if (currentGroup == null) {
@@ -117,7 +267,7 @@ export function convertStepHierarchyToArray(
   stepHierarchy: StepHierarchy
 ): StepIdType[] {
   const getStepIdsContainedInTopLevelItem = (
-    topLevelItem: StandaloneStep | ThermocyclerProfileGroup
+    topLevelItem: StandaloneStep | ProfileConcurrentGroup
   ): StepIdType[] => {
     switch (topLevelItem.type) {
       case 'standaloneStep':
@@ -125,12 +275,32 @@ export function convertStepHierarchyToArray(
       case 'thermocyclerProfileGroup':
         return [
           topLevelItem.thermocyclerProfileStepId,
-          ...topLevelItem.concurrentSteps.map(step => step.stepId),
+          ...topLevelItem.concurrentSteps.map(s => s.stepId),
           topLevelItem.waitForThermocyclerProfileStepId,
+        ]
+      case 'vacuumProfileGroup':
+        return [
+          topLevelItem.vacuumProfileStepId,
+          ...topLevelItem.concurrentSteps.map(s => s.stepId),
+          topLevelItem.waitForVacuumProfileStepId,
+        ]
+      case 'vacuumStateDurationGroup':
+        return [
+          topLevelItem.vacuumStateStepId,
+          ...topLevelItem.concurrentSteps.map(s => s.stepId),
+          topLevelItem.waitForVacuumStateStepId,
         ]
     }
   }
   return stepHierarchy.topLevelItems.flatMap(getStepIdsContainedInTopLevelItem)
+}
+
+export interface ComputeStepMoveOptions {
+  /**
+   * When provided, steps for which this returns true may not be inserted into the
+   * concurrent section of a vacuum profile or timed vacuum state group.
+   */
+  isVacuumStep?: (stepId: StepIdType) => boolean
 }
 
 type MoveStepParams =
@@ -166,7 +336,7 @@ type MoveStepResult =
  * standalone step, or to the root of a group.
  *
  * The match's location in the tree is returned: either the top-level `StepHierarchy`,
- * if the match was found at the top level, or the `ThermocyclerProfileGroup`, if the
+ * if the match was found at the top level, or the concurrent profile group, if the
  * match was found inside that group.
  *
  * Returns `null` if there's no match.
@@ -175,8 +345,8 @@ export function findStep(
   stepHierarchy: StepHierarchy,
   stepIdToFind: StepIdType
 ): null | {
-  foundNode: StandaloneStep | ThermocyclerProfileGroup
-  enclosingNode: StepHierarchy | ThermocyclerProfileGroup
+  foundNode: StandaloneStep | ProfileConcurrentGroup
+  enclosingNode: StepHierarchy | ProfileConcurrentGroup
   indexInEnclosingNode: number
 } {
   const { topLevelItems } = stepHierarchy
@@ -190,7 +360,11 @@ export function findStep(
       (topLevelItem.type === 'standaloneStep' &&
         topLevelItem.stepId === stepIdToFind) ||
       (topLevelItem.type === 'thermocyclerProfileGroup' &&
-        topLevelItem.thermocyclerProfileStepId === stepIdToFind)
+        topLevelItem.thermocyclerProfileStepId === stepIdToFind) ||
+      (topLevelItem.type === 'vacuumProfileGroup' &&
+        topLevelItem.vacuumProfileStepId === stepIdToFind) ||
+      (topLevelItem.type === 'vacuumStateDurationGroup' &&
+        topLevelItem.vacuumStateStepId === stepIdToFind)
     ) {
       return {
         foundNode: topLevelItem,
@@ -198,7 +372,7 @@ export function findStep(
         indexInEnclosingNode: topLevelIndex,
       }
     }
-    if (topLevelItem.type === 'thermocyclerProfileGroup') {
+    if (isProfileConcurrentGroup(topLevelItem)) {
       for (
         let indexInGroup = 0;
         indexInGroup < topLevelItem.concurrentSteps.length;
@@ -224,8 +398,10 @@ export function findStep(
  */
 export function computeStepMove(
   originalStepHierarchy: StepHierarchy,
-  params: MoveStepParams
+  params: MoveStepParams,
+  options?: ComputeStepMoveOptions
 ): MoveStepResult {
+  const isVacuumStep = options?.isVacuumStep
   const popResult = popFromStepHierarchy(
     originalStepHierarchy,
     params.movedStepId
@@ -249,7 +425,8 @@ export function computeStepMove(
           return insertBeforeDestinationStep(
             stepHierarchyWithoutItem,
             movedItem,
-            params.destinationStepId
+            params.destinationStepId,
+            isVacuumStep
           )
         }
       }
@@ -257,7 +434,8 @@ export function computeStepMove(
         return insertAsLastStepOfGroup(
           stepHierarchyWithoutItem,
           movedItem,
-          params.destinationGroupRootStepId
+          params.destinationGroupRootStepId,
+          isVacuumStep
         )
       }
     }
@@ -320,8 +498,9 @@ interface InsertResult {
 
 function insertBeforeDestinationStep(
   stepHierarchy: StepHierarchy,
-  toInsert: StandaloneStep | ThermocyclerProfileGroup,
-  destinationStepId: StepIdType
+  toInsert: StandaloneStep | ProfileConcurrentGroup,
+  destinationStepId: StepIdType,
+  isVacuumStep?: (stepId: StepIdType) => boolean
 ): InsertResult {
   return produce<InsertResult>({ isAllowed: false, stepHierarchy }, draft => {
     const findResult = findStep(draft.stepHierarchy, destinationStepId)
@@ -338,9 +517,16 @@ function insertBeforeDestinationStep(
       )
       draft.isAllowed = true
     } else {
-      if (toInsert.type === 'thermocyclerProfileGroup') {
+      if (isProfileConcurrentGroup(toInsert)) {
         // Concurrent step groups can't be inserted into other concurrent step groups.
         // This is disallowed mostly for UX reasons; we could probably technically support it.
+        draft.isAllowed = false
+      } else if (
+        (findResult.enclosingNode.type === 'vacuumProfileGroup' ||
+          findResult.enclosingNode.type === 'vacuumStateDurationGroup') &&
+        toInsert.type === 'standaloneStep' &&
+        isVacuumStep?.(toInsert.stepId) === true
+      ) {
         draft.isAllowed = false
       } else {
         findResult.enclosingNode.concurrentSteps.splice(
@@ -356,10 +542,11 @@ function insertBeforeDestinationStep(
 
 function insertAsLastStepOfGroup(
   stepHierarchy: StepHierarchy,
-  toInsert: StandaloneStep | ThermocyclerProfileGroup,
-  destinationGroupRootStepId: StepIdType
+  toInsert: StandaloneStep | ProfileConcurrentGroup,
+  destinationGroupRootStepId: StepIdType,
+  isVacuumStep?: (stepId: StepIdType) => boolean
 ): InsertResult {
-  if (toInsert.type === 'thermocyclerProfileGroup') {
+  if (isProfileConcurrentGroup(toInsert)) {
     // Concurrent step groups can't be inserted into other concurrent step groups.
     // This is disallowed mostly for UX reasons; we could probably technically support it.
     return { isAllowed: false, stepHierarchy }
@@ -367,13 +554,29 @@ function insertAsLastStepOfGroup(
 
   return produce<InsertResult>({ isAllowed: false, stepHierarchy }, draft => {
     const matchingGroupDraft = draft.stepHierarchy.topLevelItems.find(
-      (item): item is ThermocyclerProfileGroup =>
-        item.type === 'thermocyclerProfileGroup' &&
-        item.thermocyclerProfileStepId === destinationGroupRootStepId
+      item =>
+        (item.type === 'thermocyclerProfileGroup' &&
+          item.thermocyclerProfileStepId === destinationGroupRootStepId) ||
+        (item.type === 'vacuumProfileGroup' &&
+          item.vacuumProfileStepId === destinationGroupRootStepId) ||
+        (item.type === 'vacuumStateDurationGroup' &&
+          item.vacuumStateStepId === destinationGroupRootStepId)
     )
-    if (matchingGroupDraft != null) {
-      matchingGroupDraft.concurrentSteps.push(toInsert)
-      draft.isAllowed = true
+    if (
+      matchingGroupDraft != null &&
+      isProfileConcurrentGroup(matchingGroupDraft)
+    ) {
+      if (
+        (matchingGroupDraft.type === 'vacuumProfileGroup' ||
+          matchingGroupDraft.type === 'vacuumStateDurationGroup') &&
+        toInsert.type === 'standaloneStep' &&
+        isVacuumStep?.(toInsert.stepId) === true
+      ) {
+        draft.isAllowed = false
+      } else {
+        matchingGroupDraft.concurrentSteps.push(toInsert)
+        draft.isAllowed = true
+      }
     } else {
       console.error(
         `Couldn't find insertion point. Looking for group rooted at step ID ${destinationGroupRootStepId}.`
@@ -385,7 +588,7 @@ function insertAsLastStepOfGroup(
 
 interface PopResult {
   /** The item that was removed, or null if no matching element was found. */
-  poppedItem: StandaloneStep | ThermocyclerProfileGroup | null
+  poppedItem: StandaloneStep | ProfileConcurrentGroup | null
   newStepHierarchy: StepHierarchy
 }
 
@@ -437,12 +640,26 @@ export function getPairedSteps(
 ): Set<StepIdType> {
   const result = new Set<StepIdType>()
   for (const item of stepHierarchy.topLevelItems) {
-    if (item.type !== 'standaloneStep') {
+    if (item.type === 'thermocyclerProfileGroup') {
       if (stepIds.has(item.thermocyclerProfileStepId)) {
         result.add(item.waitForThermocyclerProfileStepId)
       }
       if (stepIds.has(item.waitForThermocyclerProfileStepId)) {
         result.add(item.thermocyclerProfileStepId)
+      }
+    } else if (item.type === 'vacuumProfileGroup') {
+      if (stepIds.has(item.vacuumProfileStepId)) {
+        result.add(item.waitForVacuumProfileStepId)
+      }
+      if (stepIds.has(item.waitForVacuumProfileStepId)) {
+        result.add(item.vacuumProfileStepId)
+      }
+    } else if (item.type === 'vacuumStateDurationGroup') {
+      if (stepIds.has(item.vacuumStateStepId)) {
+        result.add(item.waitForVacuumStateStepId)
+      }
+      if (stepIds.has(item.waitForVacuumStateStepId)) {
+        result.add(item.vacuumStateStepId)
       }
     }
   }

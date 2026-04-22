@@ -2,9 +2,12 @@ import { produce } from 'immer'
 
 import type { StepIdType } from '/protocol-designer/form-types'
 import type {
+  ProfileConcurrentGroup,
   StandaloneStep,
   StepHierarchy,
   ThermocyclerProfileGroup,
+  VacuumProfileGroup,
+  VacuumStateDurationGroup,
 } from './stepHierarchy'
 
 /**
@@ -15,7 +18,7 @@ import type {
  * - The new steps are inserted at some point after `stepIdToInsertAfter`.
  *   - Ideally, they will be inserted DIRECTLY after `stepIdToInsertAfter`.
  *     However, we'll compromise on that if it would do something invalid,
- *     like put a Thermocycler profile group inside another Thermocycler profile group.
+ *     like put a concurrent profile group inside another concurrent profile group.
  */
 export function getStepHierarchyAfterDuplication(
   originalStepHierarchy: StepHierarchy,
@@ -69,7 +72,7 @@ export function getStepHierarchyAfterDuplication(
 function getNewSteps(
   stepHierarchy: StepHierarchy,
   originalIdsToDuplicateIds: Record<StepIdType, StepIdType | undefined>
-): Array<StandaloneStep | ThermocyclerProfileGroup> {
+): Array<StandaloneStep | ProfileConcurrentGroup> {
   const reduceStandaloneSteps = <T>(
     acc: T[],
     next: StandaloneStep
@@ -87,13 +90,12 @@ function getNewSteps(
   }
 
   const reduceGroupsAndStandaloneSteps = (
-    acc: Array<StandaloneStep | ThermocyclerProfileGroup>,
-    next: StandaloneStep | ThermocyclerProfileGroup
-  ): Array<StandaloneStep | ThermocyclerProfileGroup> => {
+    acc: Array<StandaloneStep | ProfileConcurrentGroup>,
+    next: StandaloneStep | ProfileConcurrentGroup
+  ): Array<StandaloneStep | ProfileConcurrentGroup> => {
     if (next.type === 'standaloneStep') {
       return reduceStandaloneSteps(acc, next)
-    } else {
-      next.type satisfies 'thermocyclerProfileGroup'
+    } else if (next.type === 'thermocyclerProfileGroup') {
       const newProfileStepId =
         originalIdsToDuplicateIds[next.thermocyclerProfileStepId]
       const newWaitForProfileStepId =
@@ -122,6 +124,56 @@ function getNewSteps(
           ),
         ]
       }
+    } else if (next.type === 'vacuumProfileGroup') {
+      const newProfileStepId =
+        originalIdsToDuplicateIds[next.vacuumProfileStepId]
+      const newWaitForProfileStepId =
+        originalIdsToDuplicateIds[next.waitForVacuumProfileStepId]
+      if (newProfileStepId != null && newWaitForProfileStepId != null) {
+        const newGroup: VacuumProfileGroup = {
+          type: 'vacuumProfileGroup',
+          vacuumProfileStepId: newProfileStepId,
+          waitForVacuumProfileStepId: newWaitForProfileStepId,
+          concurrentSteps: next.concurrentSteps.reduce<StandaloneStep[]>(
+            reduceStandaloneSteps,
+            []
+          ),
+        }
+        return [...acc, newGroup]
+      } else {
+        return [
+          ...acc,
+          ...next.concurrentSteps.reduce<StandaloneStep[]>(
+            reduceStandaloneSteps,
+            []
+          ),
+        ]
+      }
+    } else {
+      next.type satisfies 'vacuumStateDurationGroup'
+      const newStateStepId = originalIdsToDuplicateIds[next.vacuumStateStepId]
+      const newWaitForStateStepId =
+        originalIdsToDuplicateIds[next.waitForVacuumStateStepId]
+      if (newStateStepId != null && newWaitForStateStepId != null) {
+        const newGroup: VacuumStateDurationGroup = {
+          type: 'vacuumStateDurationGroup',
+          vacuumStateStepId: newStateStepId,
+          waitForVacuumStateStepId: newWaitForStateStepId,
+          concurrentSteps: next.concurrentSteps.reduce<StandaloneStep[]>(
+            reduceStandaloneSteps,
+            []
+          ),
+        }
+        return [...acc, newGroup]
+      } else {
+        return [
+          ...acc,
+          ...next.concurrentSteps.reduce<StandaloneStep[]>(
+            reduceStandaloneSteps,
+            []
+          ),
+        ]
+      }
     }
   }
 
@@ -129,7 +181,7 @@ function getNewSteps(
 }
 
 function everyStepIsStandalone(
-  steps: Array<StandaloneStep | ThermocyclerProfileGroup>
+  steps: Array<StandaloneStep | ProfileConcurrentGroup>
 ): steps is StandaloneStep[] {
   return steps.every(({ type }) => type === 'standaloneStep')
 }
@@ -142,7 +194,7 @@ function everyStepIsStandalone(
  *
  * 1. An insertion point outside of any group. Any step can be inserted here.
  * 2. Possibly, an insertion point inside a group. This is a better user experience
- *    (if the user duplicates a step that's inside a Thermocycler profile, they'd expect the
+ *    (if the user duplicates a step that's inside a concurrent profile group, they'd expect the
  *    new step to be placed inside the profile, too), but not every step can be inserted here.
  *
  * The caller can then pick which one to use depending on what kind of steps it's inserting.
@@ -217,6 +269,90 @@ function findInsertionPoints(
           }
         }
       }
+    } else if (topLevelItem.type === 'vacuumProfileGroup') {
+      if (topLevelItem.vacuumProfileStepId === stepIdToInsertAfter) {
+        return {
+          insertionPointOutsideGroup: {
+            parentArray: originalStepHierarchy.topLevelItems,
+            insertionIndex: topLevelItemIndex + 1,
+          },
+          insertionPointInsideGroup: {
+            parentArray: topLevelItem.concurrentSteps,
+            insertionIndex: 0,
+          },
+        }
+      } else if (
+        topLevelItem.waitForVacuumProfileStepId === stepIdToInsertAfter
+      ) {
+        return {
+          insertionPointOutsideGroup: {
+            parentArray: originalStepHierarchy.topLevelItems,
+            insertionIndex: topLevelItemIndex + 1,
+          },
+        }
+      } else {
+        for (
+          let innerIndex = 0;
+          innerIndex < topLevelItem.concurrentSteps.length;
+          innerIndex++
+        ) {
+          const innerItem = topLevelItem.concurrentSteps[innerIndex]
+          if (innerItem.stepId === stepIdToInsertAfter) {
+            return {
+              insertionPointOutsideGroup: {
+                parentArray: originalStepHierarchy.topLevelItems,
+                insertionIndex: topLevelItemIndex + 1,
+              },
+              insertionPointInsideGroup: {
+                parentArray: topLevelItem.concurrentSteps,
+                insertionIndex: innerIndex + 1,
+              },
+            }
+          }
+        }
+      }
+    } else if (topLevelItem.type === 'vacuumStateDurationGroup') {
+      if (topLevelItem.vacuumStateStepId === stepIdToInsertAfter) {
+        return {
+          insertionPointOutsideGroup: {
+            parentArray: originalStepHierarchy.topLevelItems,
+            insertionIndex: topLevelItemIndex + 1,
+          },
+          insertionPointInsideGroup: {
+            parentArray: topLevelItem.concurrentSteps,
+            insertionIndex: 0,
+          },
+        }
+      } else if (
+        topLevelItem.waitForVacuumStateStepId === stepIdToInsertAfter
+      ) {
+        return {
+          insertionPointOutsideGroup: {
+            parentArray: originalStepHierarchy.topLevelItems,
+            insertionIndex: topLevelItemIndex + 1,
+          },
+        }
+      } else {
+        for (
+          let innerIndex = 0;
+          innerIndex < topLevelItem.concurrentSteps.length;
+          innerIndex++
+        ) {
+          const innerItem = topLevelItem.concurrentSteps[innerIndex]
+          if (innerItem.stepId === stepIdToInsertAfter) {
+            return {
+              insertionPointOutsideGroup: {
+                parentArray: originalStepHierarchy.topLevelItems,
+                insertionIndex: topLevelItemIndex + 1,
+              },
+              insertionPointInsideGroup: {
+                parentArray: topLevelItem.concurrentSteps,
+                insertionIndex: innerIndex + 1,
+              },
+            }
+          }
+        }
+      }
     } else {
       topLevelItem satisfies never
     }
@@ -230,7 +366,7 @@ interface InsertionPoints {
     insertionIndex: number
   }
   insertionPointOutsideGroup: {
-    parentArray: Array<StandaloneStep | ThermocyclerProfileGroup>
+    parentArray: Array<StandaloneStep | ProfileConcurrentGroup>
     insertionIndex: number
   }
 }

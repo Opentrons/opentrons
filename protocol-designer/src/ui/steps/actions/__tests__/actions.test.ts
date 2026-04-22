@@ -322,6 +322,7 @@ describe('steps actions', () => {
             payload: {
               form: temperatureForm,
               thermocyclerPauseStepId: expect.any(String),
+              vacuumPauseStepId: expect.any(String),
             },
           })
 
@@ -396,6 +397,7 @@ describe('steps actions', () => {
             payload: {
               form: heaterShakerForm,
               thermocyclerPauseStepId: expect.any(String),
+              vacuumPauseStepId: expect.any(String),
             },
           })
 

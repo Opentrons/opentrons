@@ -9,8 +9,9 @@ interface StepVisibilities {
 
 /**
  * Certain steps exist internally in state but are never shown to the user;
- * they're managed implicitly by the system. e.g. Thermocycler profile steps are
- * permanently paired with implicit "wait for profile" steps.
+ * they're managed implicitly by the system. e.g. Thermocycler and Vacuum profile
+ * steps are permanently paired with implicit "wait for profile" pause steps, and
+ * timed Vacuum state steps with implicit "wait for vacuum state" pause steps.
  *
  * This returns which steps are visible and which ones are invisible.
  *
@@ -38,6 +39,23 @@ function* yieldStepVisibilities(
         topLevelItem.waitForThermocyclerProfileStepId,
         { isVisibleToUser: false },
       ]
+    } else if (topLevelItem.type === 'vacuumProfileGroup') {
+      yield [topLevelItem.vacuumProfileStepId, { isVisibleToUser: true }]
+      for (const concurrentStep of topLevelItem.concurrentSteps) {
+        concurrentStep.type satisfies 'standaloneStep'
+        yield [concurrentStep.stepId, { isVisibleToUser: true }]
+      }
+      yield [
+        topLevelItem.waitForVacuumProfileStepId,
+        { isVisibleToUser: false },
+      ]
+    } else if (topLevelItem.type === 'vacuumStateDurationGroup') {
+      yield [topLevelItem.vacuumStateStepId, { isVisibleToUser: true }]
+      for (const concurrentStep of topLevelItem.concurrentSteps) {
+        concurrentStep.type satisfies 'standaloneStep'
+        yield [concurrentStep.stepId, { isVisibleToUser: true }]
+      }
+      yield [topLevelItem.waitForVacuumStateStepId, { isVisibleToUser: false }]
     } else {
       topLevelItem satisfies never
     }

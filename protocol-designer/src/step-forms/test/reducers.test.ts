@@ -91,6 +91,7 @@ describe('orderedStepIds reducer', () => {
           stepType: 'moveLiquid',
         },
         thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+        vacuumPauseStepId: 'vacuumPauseStepId',
       },
     }
     expect(orderedStepIds(state as RootState, action)).toEqual(['99', '123'])
@@ -121,6 +122,7 @@ describe('orderedStepIds reducer', () => {
           stepType: 'moveLiquid',
         },
         thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+        vacuumPauseStepId: 'vacuumPauseStepId',
       },
     }
     expect(orderedStepIds(state as RootState, action)).toBe(
@@ -147,6 +149,7 @@ describe('orderedStepIds reducer', () => {
           moduleId: 'thermocyclerModuleId',
         },
         thermocyclerPauseStepId: 'id-3',
+        vacuumPauseStepId: 'vacuum-pause-unused',
       },
     }
     const expectedOrder = ['id-1', 'id-2', 'id-3']
@@ -183,6 +186,7 @@ describe('orderedStepIds reducer', () => {
           moduleId: 'thermocyclerModuleId',
         },
         thermocyclerPauseStepId: 'pause-for-2',
+        vacuumPauseStepId: 'vacuum-pause-unused',
       },
     }
 
@@ -242,6 +246,7 @@ describe('orderedStepIds reducer', () => {
           moduleId: 'thermocyclerModuleId',
         },
         thermocyclerPauseStepId: 'pause-for-4',
+        vacuumPauseStepId: 'vacuum-pause-unused',
       },
     }
 
@@ -288,6 +293,7 @@ describe('orderedStepIds reducer', () => {
           moduleId: 'thermocyclerModuleId',
         },
         thermocyclerPauseStepId: 'unused-thermocycler-pause-step-id',
+        vacuumPauseStepId: 'unused-vacuum-pause-step-id',
       },
     }
 
@@ -1457,6 +1463,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         payload: {
           form: tcProfileForm,
           thermocyclerPauseStepId: pauseStepFormId,
+          vacuumPauseStepId: 'unused-vacuum-pause-step-id',
         },
       }
 
@@ -1516,6 +1523,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         payload: {
           form: form2ThermocyclerProfile,
           thermocyclerPauseStepId: pauseFormId,
+          vacuumPauseStepId: 'unused-vacuum-pause-step-id',
         },
       }
 
@@ -1575,6 +1583,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         payload: {
           form: form2ThermocyclerState,
           thermocyclerPauseStepId: 'unused-thermocycler-pause-step-id',
+          vacuumPauseStepId: 'unused-vacuum-pause-step-id',
         },
       }
 
