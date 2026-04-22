@@ -34,6 +34,10 @@ This release adds full support for Flex 20 µL pipette tips and all available pa
 - Protocol Designer lets you add compatible Opentrons Tough Universal Lids on custom well plates or reservoirs without errors.
 - Labware nicknames now apply to the topmost labware that is not a lid.
 
+### Known Issues
+ 
+- Opentrons pipettes' [low volume mode](https://docs.opentrons.com/python-api/pipettes/volume-modes/) makes small changes to pipette settings and behavior to ensure accuracy when aspirating and dispensing small volumes. Protocol Designer can make errors in these changes for Flex 20 µL pipette tips. If your protocol includes an error for tip bounds, you'll need to adjust the volumes used in your step.
+
 ## Opentrons Protocol Designer Changes in 8.9.1
 
 **Welcome to Protocol Designer 8.9.1!**
