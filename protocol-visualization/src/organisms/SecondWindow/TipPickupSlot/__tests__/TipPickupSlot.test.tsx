@@ -4,8 +4,8 @@ import { beforeEach, describe, it, vi } from 'vitest'
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 import { CLEAN, DIRTY, EMPTY } from '@opentrons/step-generation'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
+import { renderWithProviders } from "../../../../../../../../../../app/__testing-utils__"
+import { i18n } from "../../../../../../../../../../app/i18n"
 
 import { TipPickupSlot } from '..'
 

@@ -24,7 +24,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
-import type { LabwareEntityExtended } from '../../../../organisms/Desktop/ProtocolVisualization/DeckView'
+import type { LabwareEntityExtended } from './index'
 
 const FLEX_STACKER_SLOT_POSITION = 178
 

@@ -3,10 +3,9 @@ import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { NewIconButton, TimelineScrubber } from '@opentrons/components'
 
+import { Controls } from '../'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-
-import { Controls } from '../'
 
 import type { ComponentProps } from 'react'
 

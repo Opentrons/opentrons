@@ -1,11 +1,10 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { CommandSteps } from '../'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AnnotatedSteps } from '../../AnnotatedSteps'
-
-import { CommandSteps } from '../'
 
 import type { ComponentProps } from 'react'
 

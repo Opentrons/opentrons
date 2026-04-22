@@ -12,7 +12,6 @@ import {
 import { CommandSteps } from '../CommandSteps'
 import { Controls } from '../Controls'
 import { DeckView } from '../DeckView'
-
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
@@ -141,14 +140,14 @@ export function ProtocolVisualization(
       const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
       if (nextIndex < 0) return
 
-      const nextSpotlight = {
-        slot: selectedSlot,
-        command: commands[nextIndex],
-        robotState,
-        invariantContext,
-        analysis,
-        liquids,
-      }
+      // const nextSpotlight = {
+      //   slot: selectedSlot,
+      //   command: commands[nextIndex],
+      //   robotState,
+      //   invariantContext,
+      //   analysis,
+      //   liquids,
+      // }
 
       // if (nextSpotlight.slot != null && nextSpotlight.command != null) {
       //   setShowModal(null)
@@ -156,7 +155,7 @@ export function ProtocolVisualization(
       // }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [
       selectedCommandId,
       selectedSlot,
@@ -172,7 +171,10 @@ export function ProtocolVisualization(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
   )
 
-  const protocolDisplayName = props.protocolDisplayName ?? analysis.metadata?.protocolName ?? 'Untitled Protocol'
+  const protocolDisplayName =
+    props.protocolDisplayName ??
+    analysis.metadata?.protocolName ??
+    'Untitled Protocol'
   const clamp = (n: number, min: number, max: number): number =>
     Math.min(max, Math.max(min, n))
   let percentComplete = 0

@@ -162,7 +162,7 @@ export function WellTooltip({
                 </>
               ) : null}
             </div>,
-              document.body
+            document.body
           )
         : null}
     </>

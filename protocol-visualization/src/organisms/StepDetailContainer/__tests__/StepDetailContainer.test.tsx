@@ -2,12 +2,11 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-
 import { LabwareSlotContainer } from '../../LabwareSlotContainer'
 import { PipetteContainer } from '../../PipetteContainer'
-import { StepDetailContainer } from '../index'
 import { TipDisposalContainer } from '../../TipDisposalContainer'
 import { TipPickupContainer } from '../../TipPickupContainer'
+import { StepDetailContainer } from '../index'
 
 import type { ComponentProps } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -113,6 +112,6 @@ describe('StepDetailContainer', () => {
   it('renders the pipette containers and tip container', () => {
     render(props)
     expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
-    screen.getByText('mock Tip Disposal Container')
+    expect(screen.queryByText('mock Tip Disposal Container')).toBeNull()
   })
 })

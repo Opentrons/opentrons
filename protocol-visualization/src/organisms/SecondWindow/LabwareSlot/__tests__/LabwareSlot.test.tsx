@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
+import { renderWithProviders } from "../../../../../../../../../../app/__testing-utils__"
+import { i18n } from "../../../../../../../../../../app/i18n"
 
 import { LabwareSlot } from '..'
 

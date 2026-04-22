@@ -1,27 +1,23 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
-import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
-import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
-
-import { VisualizerContainer } from '../../../../../organisms/Desktop/ProtocolVisualization/VisualizerContainer'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { CommandSteps } from '../../CommandSteps'
+import { Controls } from '../../Controls'
+import { DeckView } from '../../DeckView'
 import { StepDetailContainer } from '../../StepDetailContainer'
+import { ProtocolVisualization } from '../index'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/organisms/Desktop/ProtocolVisualization/Controls')
-vi.mock('/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer')
-vi.mock('/app/organisms/Desktop/ProtocolVisualization/CommandSteps')
-vi.mock('/app/organisms/Desktop/ProtocolVisualization/DeckView')
+vi.mock('../../Controls')
+vi.mock('../../StepDetailContainer')
+vi.mock('../../CommandSteps')
+vi.mock('../../DeckView')
 
-const render = (props: ComponentProps<typeof VisualizerContainer>) => {
-  return renderWithProviders(<VisualizerContainer {...props} />)[0]
+const render = (props: ComponentProps<typeof ProtocolVisualization>) => {
+  return renderWithProviders(<ProtocolVisualization {...props} />)[0]
 }
-
-const mockProtocolKey = 'mockProtocolKey'
-const mockSrcFileNames = ['mockFile.py']
 
 const mockAnalysis = {
   createdAt: '2025-10-21T21:19:44.432392Z',
@@ -74,16 +70,13 @@ const mockAnalysis = {
   commandAnnotations: [],
 } as any
 
-describe('VisualizerContainer', () => {
-  let props: ComponentProps<typeof VisualizerContainer>
+describe('ProtocolVisualization', () => {
+  let props: ComponentProps<typeof ProtocolVisualization>
 
   beforeEach(() => {
     props = {
-      analysisOutput: mockAnalysis,
-      runId: null,
+      analysis: mockAnalysis,
       groupedCommands: [],
-      protocolKey: mockProtocolKey,
-      srcFileNames: mockSrcFileNames,
     }
     vi.mocked(Controls).mockReturnValue(<div>mock Controls</div>)
     vi.mocked(StepDetailContainer).mockReturnValue(
@@ -96,7 +89,6 @@ describe('VisualizerContainer', () => {
   it('should render mock components', () => {
     render(props)
     screen.getByText('mock Controls')
-    screen.getByText('mock StepDetailContainer')
     screen.getByText('mock CommandSteps')
     screen.getByText('mock DeckView')
   })

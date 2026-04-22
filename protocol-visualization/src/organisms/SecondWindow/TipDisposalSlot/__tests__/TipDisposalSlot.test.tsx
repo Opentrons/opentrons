@@ -3,8 +3,8 @@ import { beforeEach, describe, it } from 'vitest'
 
 import { CLEAN, EMPTY } from '@opentrons/step-generation'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
+import { renderWithProviders } from "../../../../../../../../../../app/__testing-utils__"
+import { i18n } from "../../../../../../../../../../app/i18n"
 
 import { TipDisposalSlot } from '..'
 

@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import { Chip, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
-
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import styles from './pipettecontainer.module.css'
