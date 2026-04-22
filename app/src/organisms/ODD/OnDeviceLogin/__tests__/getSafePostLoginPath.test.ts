@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getSafePostLoginPath } from '../onDeviceLoginRedirect'
+import { getSafePostLoginPath } from '../getSafePostLoginPath'
 
 describe('getSafePostLoginPath', () => {
   it('returns the path when from is a valid internal path', () => {

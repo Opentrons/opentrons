@@ -15,7 +15,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { OnDeviceLoginView } from './index'
-import { getSafePostLoginPath } from './onDeviceLoginRedirect'
+import { getSafePostLoginPath } from './getSafePostLoginPath'
 
 import type { ReactNode } from 'react'
 import type { LoginStep } from './index'

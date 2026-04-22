@@ -220,7 +220,7 @@ export function OnDeviceLoginView({
   )
 }
 
-export * from './onDeviceLoginRedirect'
+export * from './getSafePostLoginPath'
 export {
   OnDeviceLoginContext,
   OnDeviceLoginOverlayProvider,
