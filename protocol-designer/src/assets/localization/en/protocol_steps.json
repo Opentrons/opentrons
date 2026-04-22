@@ -345,7 +345,10 @@
       "state": {
         "label": "Select the state to change",
         "options": {
-          "pump": "Turn on Vacuum pump",
+          "pump": {
+            "off": "Turn off Vacuum pump",
+            "on": "Turn on Vacuum pump"
+          },
           "vent": {
             "closed": "Close vent",
             "open": "Open vent"
@@ -376,6 +379,7 @@
         "closed": "Closed",
         "open": "Open",
         "pump": {
+          "off": "Stop pump",
           "power": "<text>Set pump power to</text><tag/>",
           "pressure": "<text>Set gauge pressure to</text><tag/>"
         },

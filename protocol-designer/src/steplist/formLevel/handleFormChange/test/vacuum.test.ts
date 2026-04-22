@@ -71,4 +71,33 @@ describe('dependentFieldsUpdateVacuum', () => {
       pumpDurationTime: null,
     })
   })
+
+  it('sets endingHoldVentCheckbox when pump duration is enabled', () => {
+    const stateForm: FormData = {
+      ...formData,
+      programType: 'state',
+      pumpDurationCheckbox: false,
+      endingHoldVentCheckbox: false,
+    }
+    expect(
+      dependentFieldsUpdateVacuum({ pumpDurationCheckbox: true }, stateForm)
+    ).toEqual({
+      pumpDurationCheckbox: true,
+      endingHoldVentCheckbox: true,
+    })
+  })
+
+  it('does not set endingHoldVentCheckbox when pump duration is disabled', () => {
+    const stateForm: FormData = {
+      ...formData,
+      programType: 'state',
+      pumpDurationCheckbox: true,
+      endingHoldVentCheckbox: true,
+    }
+    expect(
+      dependentFieldsUpdateVacuum({ pumpDurationCheckbox: false }, stateForm)
+    ).toEqual({
+      pumpDurationCheckbox: false,
+    })
+  })
 })

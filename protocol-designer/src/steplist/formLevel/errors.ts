@@ -11,7 +11,7 @@ import {
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_ON,
 } from '@opentrons/step-generation'
 
 import {
@@ -1599,8 +1599,12 @@ export const vacuumStateRequired = (
 export const vacuumModeRequired = (
   fields: HydratedVacuumFormData
 ): FormError | null => {
-  const { modeType } = fields
-  return modeType == null ? VACUUM_MODE_REQUIRED : null
+  const { programType, modeType, stateType } = fields
+  return modeType == null &&
+    programType === VACUUM_PROGRAM_STATE &&
+    stateType === VACUUM_STATE_PUMP_ON
+    ? VACUUM_MODE_REQUIRED
+    : null
 }
 
 export const vacuumProfileRequired = (
@@ -1618,7 +1622,7 @@ export const gaugePressureRequired = (
 ): FormError | null => {
   const { programType, stateType, modeType, pressureMbar } = fields
   return programType === VACUUM_PROGRAM_STATE &&
-    stateType === VACUUM_STATE_PUMP &&
+    stateType === VACUUM_STATE_PUMP_ON &&
     modeType === VACUUM_MODE_PRESSURE &&
     (pressureMbar == null ||
       pressureMbar < VACUUM_MIN_PRESSURE_MBAR ||
@@ -1632,7 +1636,7 @@ export const vacuumDurationRequired = (
   const { programType, stateType, pumpDurationCheckbox, pumpDurationTime } =
     fields
   return programType === VACUUM_PROGRAM_STATE &&
-    stateType === VACUUM_STATE_PUMP &&
+    stateType === VACUUM_STATE_PUMP_ON &&
     pumpDurationCheckbox === true &&
     !pumpDurationTime
     ? VACUUM_DURATION_REQUIRED

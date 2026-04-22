@@ -2,7 +2,8 @@ import {
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_OFF,
+  VACUUM_STATE_PUMP_ON,
   VACUUM_VENT_SET_CLOSED,
   VACUUM_VENT_SET_OPEN,
 } from '@opentrons/step-generation'
@@ -126,7 +127,7 @@ export const vacuumFormToArgs = (
   switch (programType) {
     case VACUUM_PROGRAM_STATE:
       switch (stateType) {
-        case VACUUM_STATE_PUMP:
+        case VACUUM_STATE_PUMP_ON:
           const pumpAdvancedArgs = getPumpEndSettings({
             pumpDurationCheckbox,
             pumpDurationTime,
@@ -144,6 +145,11 @@ export const vacuumFormToArgs = (
             commandCreatorFnName: 'vacuumSetPumpPower',
             powerPercent: powerPercent!,
             ...pumpAdvancedArgs,
+            ...baseValues,
+          }
+        case VACUUM_STATE_PUMP_OFF:
+          return {
+            commandCreatorFnName: 'vacuumStopPump',
             ...baseValues,
           }
         case VACUUM_VENT_SET_OPEN:

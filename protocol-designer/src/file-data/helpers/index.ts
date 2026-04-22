@@ -168,6 +168,12 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.vacuumSetPumpProfile,
         args
       )
+
+    case 'vacuumStopPump':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumStopPump,
+        args
+      )
   }
 
   args satisfies never // Make sure we handle every commandCreatorFnName.

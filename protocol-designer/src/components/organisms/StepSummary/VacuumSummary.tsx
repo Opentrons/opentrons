@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next'
 
+import { StyledText } from '@opentrons/components'
 import {
   VACUUM_MODE_POWER,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_OFF,
+  VACUUM_STATE_PUMP_ON,
 } from '@opentrons/step-generation'
 
 import { StyledTrans } from './StyledTrans'
@@ -30,7 +32,8 @@ export function VacuumSummary(props: {
   if (
     programType === VACUUM_PROGRAM_STATE &&
     stateType !== null &&
-    stateType !== VACUUM_STATE_PUMP
+    stateType !== VACUUM_STATE_PUMP_ON &&
+    stateType !== VACUUM_STATE_PUMP_OFF
   ) {
     // Vent state
     return (
@@ -42,7 +45,7 @@ export function VacuumSummary(props: {
   }
   if (
     programType === VACUUM_PROGRAM_STATE &&
-    stateType === VACUUM_STATE_PUMP &&
+    stateType === VACUUM_STATE_PUMP_ON &&
     modeType != null
   ) {
     // Pump state
@@ -87,6 +90,16 @@ export function VacuumSummary(props: {
           },
         ]}
       />
+    )
+  }
+  if (
+    programType === VACUUM_PROGRAM_STATE &&
+    stateType === VACUUM_STATE_PUMP_OFF
+  ) {
+    return (
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('vacuum.step_summary.state.pump.off')}
+      </StyledText>
     )
   }
   if (
