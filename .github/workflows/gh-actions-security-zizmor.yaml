@@ -27,3 +27,11 @@ jobs:
           # Pin to a specific zizmor version so rules added in the future don't make random PRs fail.
           # If we ever set `advanced-security: true`, we'll probably want to change this to `latest`.
           version: 1.23.1
+
+# If this workflow fails with zizmor violations, and you want to reproduce the failure
+# locally, try something like this. This assumes you have `uv` and `gh` installed.
+#
+#   uvx zizmor==<version> --gh-token $(gh auth token) .
+#
+# zizmor needs GitHub auth to detect certain violations.
+# If you omit `--gh-token $(gh auth token)`, it won't output anything for them.
