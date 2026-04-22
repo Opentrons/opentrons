@@ -16,7 +16,7 @@ import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './OnDeviceLogin.module.css'
+import styles from './OnDeviceLoginOverlayProvider.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -225,8 +225,8 @@ export {
   OnDeviceLoginContext,
   OnDeviceLoginOverlayProvider,
   useOnDeviceLoginModal,
-} from './OnDeviceLoginOverlay'
+} from './OnDeviceLoginOverlayProvider'
 export type {
   OnDeviceLoginModalContextValue,
   OpenOnDeviceLoginOptions,
-} from './OnDeviceLoginOverlay'
+} from './OnDeviceLoginOverlayProvider'
