@@ -43,8 +43,9 @@ export function RunFailedModal({
   if (
     (errors == null || errors.length === 0) &&
     (commandErrorList == null || commandErrorList.data.length === 0)
-  )
+  ) {
     return null
+  }
   const modalHeader: OddModalHeaderBaseProps = {
     title:
       commandErrorList == null || commandErrorList?.data.length === 0

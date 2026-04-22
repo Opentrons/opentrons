@@ -278,6 +278,13 @@ def flex_stacker_v1_def() -> ModuleDefinition:
 
 
 @pytest.fixture(scope="session")
+def vacuum_module_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 Vacuum Module."""
+    definition = load_shared_data("module/definitions/3/vacuumModuleV1.json")
+    return ModuleDefinition.model_validate_json(definition)
+
+
+@pytest.fixture(scope="session")
 def supported_tip_fixture() -> pipette_definition.SupportedTipsDefinition:
     """Get a mock supported tip definition."""
     return pipette_definition.SupportedTipsDefinition(

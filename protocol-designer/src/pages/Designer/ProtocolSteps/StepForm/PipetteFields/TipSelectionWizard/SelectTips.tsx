@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   Chip,
   COLORS,
-  DEFAULT_TIP_SIZE,
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
@@ -36,7 +35,10 @@ import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labw
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import { getCollidingWells } from '/protocol-designer/utils/index'
 
-import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
+import {
+  INACCESSIBLE_PARTIAL_TIP,
+  INACCESSIBLE_WELL_SPACING_MISMATCH,
+} from '../NozzleAndWellSelectionModal/constants'
 import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
@@ -103,10 +105,13 @@ export function SelectTips(
     primaryNozzle,
   } = props
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
+  const robotState = useSelector(getRobotStateAtActiveItem)
+
   const viewBox =
     selectedTiprackId != null
       ? getViewboxFromSelectedLabware(
           selectedTiprackId,
+          robotState,
           activeDeckSetup,
           deckDef
         )
@@ -116,7 +121,6 @@ export function SelectTips(
     console.warn(`no viewbox for selected tiprack ${selectedTiprackId}`)
   }
 
-  const robotState = useSelector(getRobotStateAtActiveItem)
   const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
 
   const labwareDef = activeDeckSetup.labware[selectedTiprackId ?? '']?.def
@@ -141,6 +145,7 @@ export function SelectTips(
     INACCESSIBLE_INCOMPLETE,
     INACCESSIBLE_TOO_MANY_PICKUPS,
     INACCESSIBLE_PARTIAL_TIP,
+    INACCESSIBLE_WELL_SPACING_MISMATCH,
   ]
 
   const hoveredWellsInaccessibilityStatus =
@@ -470,7 +475,7 @@ export function SelectTips(
           </SelectionRect>
         </div>
         <div className={styles.legend_box}>
-          <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
+          <SelectionLegend selectionType={TIP} />
         </div>
       </div>
     </div>

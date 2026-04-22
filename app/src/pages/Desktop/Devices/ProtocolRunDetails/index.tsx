@@ -347,8 +347,9 @@ const ModuleControlsTab = (
   )}`
 
   useEffect(() => {
-    if (disabled && protocolRunDetailsTab === 'module-controls')
+    if (disabled && protocolRunDetailsTab === 'module-controls') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+    }
   }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])
 
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (

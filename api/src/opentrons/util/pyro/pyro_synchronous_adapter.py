@@ -1,6 +1,7 @@
 """Synchronous class wrapper and functions for creating Pyro compatible objects."""
 
 import asyncio
+import enum
 import functools
 import inspect
 from types import FunctionType, MethodType
@@ -9,7 +10,14 @@ from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 
-from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
+from opentrons.util.pyro.pyro_client_async_adapter import (
+    AsyncClientPyroObject,
+    AsyncPyroFunctionWrapper,
+)
+from opentrons.util.pyro.pyro_serialization import (
+    TypedDictWrapper,
+    UnhashableDictWrapper,
+)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -57,6 +65,32 @@ class DaemonUtility:
         # todo(chb, 2026-03-11): Add proper error handling here - what kind of raise case do we want this to result in?
         # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
         return self._daemon.proxyFor(pso)  # type: ignore
+
+
+class PyroFunctionWrapper:
+    """Wrapper class to safely wrap callable responses as Proxy objects.."""
+
+    def __init__(
+        self,
+        callable: Callable[P, T],
+    ) -> None:
+        self.callable = callable
+
+    @property
+    def is_callable(self) -> bool:
+        """Callable status for validation of a wrapped function, always true."""
+        return True
+
+    def call(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+        """Remote deployable function call."""
+        return self.callable(*args, **kwargs)
+
+
+class _ResultMeta(enum.Enum):
+    """Result type metadata for attributes that are wrapped in special PyroBehaviors."""
+
+    PROXY = enum.auto()
+    UNKNOWN = enum.auto()
 
 
 class _PyroSpecialBehavior(BaseModel):
@@ -213,6 +247,7 @@ def _build_classdict(  # noqa: C901
     core_obj: Any, utility: DaemonUtility
 ) -> Iterator[tuple[str, Any]]:
     async_methods: dict[str, dict[str, Any]] = {}
+    proxy_attributes: list[str] = []
     for name, attr in inspect.getmembers(core_obj.__class__):
         if "__" not in name and not name.startswith("_"):
             specialty_behavior = _get_specialty_behavior(attr, name)
@@ -243,6 +278,14 @@ def _build_classdict(  # noqa: C901
                 if inspect.iscoroutinefunction(attr):
                     async_metadata = _build_metadata_dictionary(attr)
                     async_methods[name] = async_metadata
+
+                result_meta = _determine_attribute_result_metadata(
+                    specialty_behavior.specialty_function
+                )
+                # NOTE: extend this further as needed for custom result types
+                if result_meta is _ResultMeta.PROXY:
+                    proxy_attributes.append(name)
+
                 exposed = pyro.expose(
                     specialty_behavior.specialty_function(utility, core_obj, name, attr)
                 )
@@ -255,12 +298,12 @@ def _build_classdict(  # noqa: C901
                 async_methods[name] = async_metadata
 
                 bound_method = MethodType(exposed, core_obj)
-                yield (name, bound_method)
+                yield (name, parameter_validation_wrapper(bound_method))
             elif isinstance(attr, FunctionType):
                 # Expose standard functions and bound the exposed function to the original instance
                 exposed = pyro.expose(attr)
                 bound_method = MethodType(exposed, core_obj)
-                yield (name, bound_method)
+                yield (name, parameter_validation_wrapper(bound_method))
             elif isinstance(attr, property):
                 # Bound property to the original instance and expose the bounded property
                 # Accepts the functional arguments (Callables) of a property to rebind
@@ -286,6 +329,12 @@ def _build_classdict(  # noqa: C901
     # Attach the known async methods list to the PSO as a private member and expose a getter method
     yield ("_pyro_async_methods", async_methods)
     yield ("get_pyro_async_methods", pyro.expose(property(get_pyro_async_methods)))  # type: ignore
+    # Attach an proxy-providing methods list to the PSO as a private member and expose a getter method
+    yield ("_pyro_attributes_with_proxy_results", proxy_attributes)
+    yield (
+        "get_pyro_attributes_with_proxy_result",
+        pyro.expose(property(get_pyro_attributes_with_proxy_result)),  # type: ignore
+    )
 
     # Attach the `core_obj` instance as a private member for internal tracking
     try:
@@ -308,6 +357,14 @@ def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
     }
 
 
+def _determine_attribute_result_metadata(specialty_func: Any) -> _ResultMeta:
+    # Determines the result metadata for an attribute wrapped in a speciality function
+    if specialty_func.__name__ == "convert_result_to_proxy":
+        return _ResultMeta.PROXY
+    # NOTE: extend this further as needed in the future for other custom return types
+    return _ResultMeta.UNKNOWN
+
+
 def _get_specialty_behavior(func: Any, name: str) -> _PyroSpecialBehavior | None:
     if inspect.iscoroutinefunction(func) or isinstance(func, FunctionType):
         if hasattr(func, "_pyro_specialty_behavior"):
@@ -322,6 +379,61 @@ def get_pyro_async_methods(self: Any) -> dict[str, dict[str, Any]]:
     """Helper function to access the dictionary of known async method metadata on a PyroSynchronousObject."""
     result: dict[str, dict[str, Any]] = self._pyro_async_methods
     return result
+
+
+def get_pyro_attributes_with_proxy_result(self: Any) -> list[str]:
+    """Helper function to access the list of known methods that provide their results as Proxies."""
+    result: list[str] = self._pyro_attributes_with_proxy_results
+    return result
+
+
+# Validators
+
+
+def _validated_parameters(*args: P.args, **kwargs: P.kwargs) -> tuple[tuple, dict]:  # type: ignore
+    def _validations(arg: Any) -> Any:
+        # NOTE: Extend this as further validations are needed
+        arg = _validate_inbound_proxy(arg)
+        return arg
+
+    validated_args = tuple()  # type: ignore
+    for arg in args:
+        # Validate each non-keyword argument and reconstruct the argument tuple
+        validated_args = (*validated_args, _validations(arg))
+    # Validate each keyword argument and reconstruct the kwargs dictionary
+    kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
+    return (validated_args, kwargs)
+
+
+def _validate_inbound_proxy(arg: Any) -> Any:
+    """Handle an argument which is a remote Proxy that may have been forwarded through multiple processes."""
+    if isinstance(arg, pyro.Proxy):
+        # NOTE: Cases like this are the result of multi-process callback forwarding
+        try:
+            if arg.is_callable:
+                arg = AsyncPyroFunctionWrapper(proxy=arg)
+        except AttributeError:
+            try:
+                iter(arg)
+                validated_arg = []
+                for r in arg:
+                    validated_arg.append(AsyncClientPyroObject(r))
+                arg = validated_arg
+            except AttributeError:
+                arg = AsyncClientPyroObject(arg)
+    return arg
+
+
+def parameter_validation_wrapper(attr: Callable[P, T]) -> Callable[P, T]:
+    """Validate incoming parameters on any generically generated PSO bound method function call."""
+
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
+        # Of note, the wrapper passes self to terminate the self instance passed by the PSO
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
+        return attr(*args, **kwargs)
+
+    return wrapper  # type: ignore
 
 
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
@@ -342,6 +454,7 @@ def convert_result_to_proxy(  # noqa: C901
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
@@ -369,6 +482,9 @@ def convert_result_to_proxy(  # noqa: C901
                 proxy_list.append(utility.proxy_for(pyro_synchronous_obj))
             return proxy_list
         except TypeError:
+            if isinstance(result, FunctionType):
+                # Wrap callable result in Proxy-safe format
+                result = PyroFunctionWrapper(result)
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
                 if not hasattr(result, "_loop"):
@@ -396,6 +512,7 @@ def convert_result_to_wrapped_dict(  # noqa: C901
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
         # Of note, the wrapper passes self to terminate the self instance passed by the PSO
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             bound_method = MethodType(sync_func, core_obj)
@@ -461,6 +578,7 @@ def convert_type_to_instance(
 
     @functools.wraps(attr)
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
         if inspect.iscoroutinefunction(attr):
             sync_func = synchronous(attr)
             result = sync_func(self, *args, **kwargs)
@@ -477,6 +595,49 @@ def convert_type_to_instance(
         else:
             raise ValueError(
                 "Pyro behavior for type to instance conversion is only available for use with pure types."
+            )
+
+    return wrapper  # type: ignore
+
+
+def convert_result_to_wrapped_typed_dict(
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Callable[P, T]:
+    """Wrapper that ensures a result of a method call through Pyro is a wrapped Typed Dict.
+
+    The result of this is later deserialzed by serpent using special registries for TypedDictWrapper. This
+    is useful for complex Typed Dictionaries such as PipetteDict that require reconstruction.
+    """
+
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
+        if inspect.iscoroutinefunction(attr):
+            sync_func = synchronous(attr)
+            bound_method = MethodType(sync_func, core_obj)
+            result = bound_method(*args, **kwargs)
+            return_type = attr.__annotations__["return"]
+        elif isinstance(attr, FunctionType):
+            bound_method = MethodType(attr, core_obj)
+            result = bound_method(*args, **kwargs)
+            return_type = attr.__annotations__["return"]
+        elif isinstance(attr, property):
+            result = getattr(core_obj, name)
+            return_type = attr.fget.__annotations__["return"]
+        else:
+            raise ValueError(
+                "Provided base attribute must be a Property, a Method or an Async method."
+            )
+        if isinstance(result, dict):
+            return TypedDictWrapper(
+                dictionary=result,
+                typed_dict_name=".".join(
+                    (return_type.__module__, return_type.__qualname__)
+                ),
+            )
+        else:
+            raise ValueError(
+                "Pyro behavior for Typed Dict wrapping is only available for use with dictionaries."
             )
 
     return wrapper  # type: ignore

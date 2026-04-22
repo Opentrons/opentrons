@@ -1,4 +1,4 @@
-"""Command models to start the vacuum pump."""
+"""Command models to operate the vacuum pump with respect to pressure."""
 
 from __future__ import annotations
 
@@ -16,16 +16,16 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
     from opentrons.protocol_engine.state.state import StateView
 
-StartSetVacuumCommandType = Literal["vacuum_module/startSetVacuum"]
+StartSetVacuumPressureCommandType = Literal["vacuumModule/startSetVacuumPressure"]
 
 
-class StartSetVacuumParams(BaseModel):
-    """Input parameters to start the vacuum pump."""
+class StartSetVacuumPressureParams(BaseModel):
+    """Input parameters to set the internal vacuum pressure."""
 
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
     gaugePressure: float = Field(..., description="Target gauge pressure in mBar.")
-    duration: int = Field(
-        ...,
+    duration: int | SkipJsonSchema[None] = Field(
+        None,
         description="Duration in sec. to hold target pressure for after it is reached.",
     )
     rate: float | SkipJsonSchema[None] = Field(
@@ -41,12 +41,14 @@ class StartSetVacuumParams(BaseModel):
     )
 
 
-class StartSetVacuumResult(BaseModel):
+class StartSetVacuumPressureResult(BaseModel):
     """Result data from starting the vacuum pump."""
 
 
-class StartSetVacuumImpl(
-    AbstractCommandImpl[StartSetVacuumParams, SuccessData[StartSetVacuumResult]]
+class StartSetVacuumPressureImpl(
+    AbstractCommandImpl[
+        StartSetVacuumPressureParams, SuccessData[StartSetVacuumPressureResult]
+    ]
 ):
     """Execution implementation of a start set vacuum command."""
 
@@ -62,8 +64,8 @@ class StartSetVacuumImpl(
         self._movement = movement
 
     async def execute(
-        self, params: StartSetVacuumParams
-    ) -> SuccessData[StartSetVacuumResult]:
+        self, params: StartSetVacuumPressureParams
+    ) -> SuccessData[StartSetVacuumPressureResult]:
         """Start the vacuum pump."""
         state_update = update_types.StateUpdate()
         vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
@@ -79,25 +81,33 @@ class StartSetVacuumImpl(
                 vent_after=params.ventAfter,
             )
 
-        return SuccessData(public=StartSetVacuumResult(), state_update=state_update)
+        return SuccessData(
+            public=StartSetVacuumPressureResult(), state_update=state_update
+        )
 
 
-class StartSetVacuum(
-    BaseCommand[StartSetVacuumParams, StartSetVacuumResult, ErrorOccurrence]
+class StartSetVacuumPressure(
+    BaseCommand[
+        StartSetVacuumPressureParams, StartSetVacuumPressureResult, ErrorOccurrence
+    ]
 ):
     """A command to start the vacuum pump."""
 
-    commandType: StartSetVacuumCommandType = "vacuum_module/startSetVacuum"
-    params: StartSetVacuumParams
-    result: Optional[StartSetVacuumResult] = None
+    commandType: StartSetVacuumPressureCommandType = (
+        "vacuumModule/startSetVacuumPressure"
+    )
+    params: StartSetVacuumPressureParams
+    result: Optional[StartSetVacuumPressureResult] = None
 
-    _ImplementationCls: Type[StartSetVacuumImpl] = StartSetVacuumImpl
+    _ImplementationCls: Type[StartSetVacuumPressureImpl] = StartSetVacuumPressureImpl
 
 
-class StartSetVacuumCreate(BaseCommandCreate[StartSetVacuumParams]):
+class StartSetVacuumPressureCreate(BaseCommandCreate[StartSetVacuumPressureParams]):
     """A request to start the vacuum pump."""
 
-    commandType: StartSetVacuumCommandType = "vacuum_module/startSetVacuum"
-    params: StartSetVacuumParams
+    commandType: StartSetVacuumPressureCommandType = (
+        "vacuumModule/startSetVacuumPressure"
+    )
+    params: StartSetVacuumPressureParams
 
-    _CommandCls: Type[StartSetVacuum] = StartSetVacuum
+    _CommandCls: Type[StartSetVacuumPressure] = StartSetVacuumPressure

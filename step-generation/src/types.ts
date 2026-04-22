@@ -97,6 +97,12 @@ export interface TemperatureModuleState {
   targetTemperature: number | null
 }
 
+export interface Point {
+  x: number
+  y: number
+  z?: number
+}
+
 export interface ThermocyclerModuleState {
   type: typeof THERMOCYCLER_MODULE_TYPE
 

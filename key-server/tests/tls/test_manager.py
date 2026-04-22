@@ -90,7 +90,7 @@ async def test_tears_down_ee_manager(subject: TLSManager, ee_dir: Path) -> None:
 
 
 async def test_expiry_task_lifetime(subject: TLSManager) -> None:
-    """Its task control methods should work."""
+    """Its expiry task control methods should work."""
     assert subject.expiry_task_running()
     await subject.cancel_expiry_task()
     assert not subject.expiry_task_running()
@@ -106,6 +106,25 @@ async def test_expiry_task_lifetime(subject: TLSManager) -> None:
     assert subject.expiry_task_running()
     await subject.teardown()
     assert not subject.expiry_task_running()
+
+
+async def test_robot_details_task_lifetime(subject: TLSManager) -> None:
+    """Its robot details task control methods should work."""
+    assert subject.robot_details_task_running()
+    await subject.cancel_robot_details_task()
+    assert not subject.robot_details_task_running()
+    await subject.schedule_robot_details_task()
+    assert subject.robot_details_task_running()
+    await subject.schedule_robot_details_task()
+    assert subject.robot_details_task_running()
+    await subject.cancel_robot_details_task()
+    assert not subject.robot_details_task_running()
+    await subject.cancel_robot_details_task()
+    assert not subject.robot_details_task_running()
+    await subject.schedule_robot_details_task()
+    assert subject.robot_details_task_running()
+    await subject.teardown()
+    assert not subject.robot_details_task_running()
 
 
 async def test_rotates_ca_while_live(
