@@ -149,10 +149,11 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
   }
 
   useEffect(() => {
-    if (isCopied)
+    if (isCopied) {
       delay(() => {
         setIsCopied(false)
       }, 2000)
+    }
   }, [isCopied])
 
   const protocolName =

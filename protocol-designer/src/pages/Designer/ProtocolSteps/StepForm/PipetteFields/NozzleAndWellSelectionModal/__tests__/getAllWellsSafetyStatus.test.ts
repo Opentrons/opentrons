@@ -1,19 +1,50 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { COLUMN, ROW } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  fixture96Plate,
+  fixtureP100096V2Specs,
+  fixtureTiprack1000ul,
+  getLabwareDefURI,
+  ROW,
+} from '@opentrons/shared-data'
 import { getIsSafePipetteMovement } from '@opentrons/step-generation'
 
 import { getAllWellsSafetyStatus } from '../getAllWellsSafetyStatus'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/step-generation', () => ({
   getIsSafePipetteMovement: vi.fn(),
 }))
 
 describe('getAllWellsSafetyStatus', () => {
-  const mockInvariantContext = {} as any
-  const mockRobotState = {} as any
   const pipetteId = 'pipette-id'
   const labwareId = 'labware-id'
+
+  const mockInvariantContext = {
+    pipetteEntities: {
+      [pipetteId]: {
+        name: 'p1000_96',
+        id: pipetteId,
+        tiprackDefURI: [
+          getLabwareDefURI(fixtureTiprack1000ul as LabwareDefinition),
+        ],
+        tiprackLabwareDef: [fixtureTiprack1000ul],
+        spec: fixtureP100096V2Specs,
+        pythonName: 'mock_pipette_p1000_96',
+      },
+    },
+    labwareEntities: {
+      [labwareId]: {
+        id: labwareId,
+        pythonName: 'mock_source_plate',
+        labwareDefURI: getLabwareDefURI(fixture96Plate as LabwareDefinition),
+        def: fixture96Plate,
+      },
+    },
+  } as any
+  const mockRobotState = {} as any
   const primaryNozzle = 'A1' as any
   const singleNozzle = 'SINGLE' as any
 

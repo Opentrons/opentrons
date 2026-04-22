@@ -4,10 +4,15 @@ import mapValues from 'lodash/mapValues'
 
 import {
   FLEX_CUTOUT_BY_SLOT_ID,
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaNamesFromLoadedModule,
 } from '@opentrons/shared-data'
 
 import { HOPPER_STACKER_LOCATION } from '../constants'
+import {
+  getFlexStackerShuttleAddressableArea,
+  resolveDeckSlotKeyForLabwareStackInSlot,
+} from './misc'
 
 import type {
   AddressableAreaName,
@@ -412,8 +417,10 @@ export const getStackedOnNodeFromPdStack = (args: {
   subjectLabwareId: string
   moduleEntities: ModuleEntities
   labwareEntityIds: ReadonlySet<string>
+  modules: RobotState['modules']
 }): LoadedLabwareLocation | undefined => {
-  const { stack, subjectLabwareId, moduleEntities, labwareEntityIds } = args
+  const { stack, subjectLabwareId, moduleEntities, labwareEntityIds, modules } =
+    args
 
   if (stack.length === 0 || stack[0] !== subjectLabwareId || stack.length < 2) {
     return undefined
@@ -451,6 +458,21 @@ export const getStackedOnNodeFromPdStack = (args: {
 
   if (shouldUseAddressableAreaNameForStackParent(parent)) {
     return { addressableAreaName: parent as AddressableAreaName }
+  }
+
+  const deckSlotForShuttleAa =
+    resolveDeckSlotKeyForLabwareStackInSlot(parent, modules, moduleEntities) ??
+    parent
+  const hasFlexStackerAtDeckSlot = Object.entries(modules).some(
+    ([moduleId, mod]) =>
+      moduleEntities[moduleId]?.type === FLEX_STACKER_MODULE_TYPE &&
+      mod.slot === deckSlotForShuttleAa
+  )
+  if (hasFlexStackerAtDeckSlot) {
+    const shuttleAa = getFlexStackerShuttleAddressableArea(deckSlotForShuttleAa)
+    if (shuttleAa != null) {
+      return { addressableAreaName: shuttleAa }
+    }
   }
 
   return { slotName: parent }
@@ -507,7 +529,7 @@ const getPotentiallyContainedLabwareRelationship = (
  * footprint strictly exceeds the other in both X and Y, set `contains` on the **larger** labware
  * to the id of the smaller-footprint labware. Groups of size other than 2, ties, or missing defs are skipped.
  */
-const assignContainsAmongSiblings = (
+export const assignContainsAmongSiblings = (
   labware: RobotState['labware'],
   labwareEntities: LabwareEntities
 ): RobotState['labware'] => {
@@ -567,11 +589,16 @@ const assignContainsAmongSiblings = (
  *
  * When `labwareEntities` is passed, pairs of labware that share the same eligible parent
  * `stackedOnNode` may set `contains` on the larger footprint to the smaller labware id.
+ *
+ * **Protocol Designer:** call once when composing initial robot state (see PD
+ * {@link getInitialEnrichedRobotState}). After that, timeline `robotState` frames should keep this metadata
+ * current via command-specific updaters (`forMoveLabware`, stacker handlers, etc.), not by
+ * re-running this helper on every active step.
  */
 export const enrichRobotStateForStackGraphTraversals = (
   robotState: RobotState,
   moduleEntities: ModuleEntities,
-  labwareEntities?: LabwareEntities
+  labwareEntities: LabwareEntities
 ): RobotState => {
   const labwareIds = Object.keys(robotState.labware)
   const labwareEntityIds = new Set(labwareIds)
@@ -583,12 +610,13 @@ export const enrichRobotStateForStackGraphTraversals = (
         subjectLabwareId: id,
         moduleEntities,
         labwareEntityIds,
+        modules: robotState.modules,
       })
     return stackedOnNode != null ? { ...lw, stackedOnNode } : { ...lw }
   })
-  if (labwareEntities != null) {
-    labware = assignContainsAmongSiblings(labware, labwareEntities)
-  }
+  // assign contains among siblings
+  labware = assignContainsAmongSiblings(labware, labwareEntities)
+
   return {
     ...robotState,
     labware,

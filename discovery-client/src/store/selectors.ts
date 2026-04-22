@@ -16,17 +16,17 @@ import type { DiscoveryClientRobot } from '../types'
 import type { Address, HostState, RobotState, State } from './types'
 
 export const getRobotStates: (state: State) => RobotState[] = createSelector(
-  state => state.robotsByName,
+  (state: State) => state.robotsByName,
   robotsMap => Object.keys(robotsMap).map((name: string) => robotsMap[name])
 )
 
 export const getHostStates: (state: State) => HostState[] = createSelector(
-  state => state.hostsByIp,
+  (state: State) => state.hostsByIp,
   hostsMap => Object.keys(hostsMap).map((ip: string) => hostsMap[ip])
 )
 
 export const getAddresses: (state: State) => Address[] = createSelector(
-  state => state.manualAddresses,
+  (state: State) => state.manualAddresses,
   getHostStates,
   (manualAddresses, hosts) => {
     const trackedAddresses = hosts.map(({ ip, port, agent }) =>

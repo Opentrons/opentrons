@@ -62,6 +62,7 @@ from opentrons.protocol_runner import (
 from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.types import NozzleMapInterface
+from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons_shared_data.errors.exceptions import ModuleNotPresent
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
@@ -394,7 +395,9 @@ class RunOrchestratorStore:
         with Pyro5.api.locate_ns() as ns:
             while time.monotonic() - start_time < 60:
                 if "ot-protocol" in ns.list():
-                    proxy = Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
+                    proxy = AsyncClientPyroObject(
+                        Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
+                    )
                     self._run_orchestrator = cast(
                         DirectedRunProcess, cast(object, proxy)
                     )
@@ -406,7 +409,7 @@ class RunOrchestratorStore:
                 ns.remove("ot-protocol")
                 raise ValueError("Can't find process")
 
-        proxy.create(run_id)
+        self._run_orchestrator.create(run_id)
         return self._run_orchestrator.get_state_summary()
 
     async def clear_pyro(self) -> RunResult:
