@@ -262,7 +262,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                         ) : null}
 
                         <OnDeviceLoginOverlayProvider>
-                          {isAccessControlEnabled && !isLoggedIn && (
+                          {isAccessControlEnabled === true && !isLoggedIn && (
                             <LoggedOutOverlay
                               onClick={() => {
                                 setIsLoggedIn(true)
