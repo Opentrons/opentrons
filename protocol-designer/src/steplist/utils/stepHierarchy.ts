@@ -271,6 +271,14 @@ export function convertStepHierarchyToArray(
   return stepHierarchy.topLevelItems.flatMap(getStepIdsContainedInTopLevelItem)
 }
 
+export interface ComputeStepMoveOptions {
+  /**
+   * When provided, steps for which this returns true may not be inserted into the
+   * concurrent section of a vacuum profile or timed vacuum state group.
+   */
+  isVacuumStep?: (stepId: StepIdType) => boolean
+}
+
 type MoveStepParams =
   | {
       moveType: 'insertBeforeDestinationStep'
@@ -362,8 +370,10 @@ export function findStep(
  */
 export function computeStepMove(
   originalStepHierarchy: StepHierarchy,
-  params: MoveStepParams
+  params: MoveStepParams,
+  options?: ComputeStepMoveOptions
 ): MoveStepResult {
+  const isVacuumStep = options?.isVacuumStep
   const popResult = popFromStepHierarchy(
     originalStepHierarchy,
     params.movedStepId
@@ -387,7 +397,8 @@ export function computeStepMove(
           return insertBeforeDestinationStep(
             stepHierarchyWithoutItem,
             movedItem,
-            params.destinationStepId
+            params.destinationStepId,
+            isVacuumStep
           )
         }
       }
@@ -395,7 +406,8 @@ export function computeStepMove(
         return insertAsLastStepOfGroup(
           stepHierarchyWithoutItem,
           movedItem,
-          params.destinationGroupRootStepId
+          params.destinationGroupRootStepId,
+          isVacuumStep
         )
       }
     }
@@ -479,6 +491,13 @@ function insertBeforeDestinationStep(
       if (isConcurrentGroup(toInsert)) {
         // Concurrent step groups can't be inserted into other concurrent step groups.
         // This is disallowed mostly for UX reasons; we could probably technically support it.
+        draft.isAllowed = false
+      } else if (
+        (findResult.enclosingNode.type === 'vacuumProfileGroup' ||
+          findResult.enclosingNode.type === 'vacuumStateDurationGroup') &&
+        toInsert.type === 'standaloneStep' &&
+        isVacuumStep?.(toInsert.stepId) === true
+      ) {
         draft.isAllowed = false
       } else {
         findResult.enclosingNode.concurrentSteps.splice(
