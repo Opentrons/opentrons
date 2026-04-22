@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -45,16 +44,22 @@ vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   ),
 }))
 
-function OpenOnMount({ from }: { from?: string }): null {
+function OpenOnMount({ from }: { from?: string }): JSX.Element {
   const { openLoginModal } = useOnDeviceLoginModal()
-  useEffect(() => {
-    openLoginModal(from != null ? { from } : undefined)
-  }, [from, openLoginModal])
-  return null
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        openLoginModal(from != null ? { from } : undefined)
+      }}
+    >
+      open
+    </button>
+  )
 }
 
 function renderLoginModal(options?: { returnToPath?: string }) {
-  return renderWithProviders(
+  const result = renderWithProviders(
     <MemoryRouter>
       <OnDeviceLoginOverlayProvider>
         <OpenOnMount from={options?.returnToPath} />
@@ -62,19 +67,12 @@ function renderLoginModal(options?: { returnToPath?: string }) {
     </MemoryRouter>,
     { i18nInstance: i18n }
   )[0]
+  fireEvent.click(screen.getByRole('button', { name: 'open' }))
+  return result
 }
 
 function getLoginInput(): HTMLInputElement {
-  // InputField from @opentrons/components renders the password input as
-  // type="password" without an associated <label>, so neither getByRole nor
-  // getByLabelText can locate it. Selecting by name attribute is the most
-  // reliable way to grab the field across both the username and password steps.
-  // eslint-disable-next-line testing-library/no-node-access
-  const el = document.body.querySelector(
-    'input[name="username"], input[name="password"]'
-  )
-  expect(el).not.toBeNull()
-  return el as HTMLInputElement
+  return screen.getByLabelText(/^(Username|Password)$/) as HTMLInputElement
 }
 
 describe('Login', () => {
@@ -95,7 +93,7 @@ describe('Login', () => {
     screen.getByText('cancel')
     expect(getLoginInput()).toHaveAttribute('type', 'text')
     expect(
-      screen.queryByRole('button', { name: 'Back' })
+      screen.queryByRole('button', { name: 'Back to previous page' })
     ).not.toBeInTheDocument()
   })
 
@@ -141,7 +139,7 @@ describe('Login', () => {
     })
     fireEvent.click(screen.getByText('Next'))
     screen.getByText('Password')
-    screen.getByRole('button', { name: 'Back' })
+    screen.getByRole('button', { name: 'Back to previous page' })
     const input = getLoginInput()
     expect(input).toHaveAttribute('type', 'password')
     expect(input).toHaveValue('')
@@ -154,11 +152,13 @@ describe('Login', () => {
     })
     fireEvent.click(screen.getByText('Next'))
     screen.getByText('Password')
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Back to previous page' })
+    )
     screen.getByText('Username')
     expect(getLoginInput()).toHaveValue('user1')
     expect(
-      screen.queryByRole('button', { name: 'Back' })
+      screen.queryByRole('button', { name: 'Back to previous page' })
     ).not.toBeInTheDocument()
   })
 

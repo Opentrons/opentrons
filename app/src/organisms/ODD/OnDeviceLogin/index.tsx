@@ -110,6 +110,8 @@ export function OnDeviceLoginView({
         <div className={styles.content_container}>
           <div className={styles.form_inner_container}>
             <StyledText
+              as="label"
+              htmlFor={activeFieldName}
               oddStyle="bodyTextRegular"
               className={styles.field_label}
               color={passwordLabelHasError ? COLORS.red50 : COLORS.black90}
@@ -197,6 +199,7 @@ function LoginFieldInput({
       error={loginError}
       value={field.value ?? ''}
       name={field.name}
+      id={field.name}
       onBlur={field.onBlur}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         field.onChange(e.target.value)

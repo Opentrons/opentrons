@@ -79,7 +79,7 @@ export function ChildNavigation({
         {onClickBack != null ? (
           <IconButton
             type="button"
-            aria-label="Back"
+            aria-label="Back to previous page"
             onClick={onClickBack}
             data-testid="ChildNavigation_Back_Button"
           >
