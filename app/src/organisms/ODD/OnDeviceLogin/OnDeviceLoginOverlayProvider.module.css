@@ -33,3 +33,10 @@
   left: 0;
   width: 100%;
 }
+
+.overlay {
+  position: fixed;
+  z-index: 10001;
+  background-color: var(--white);
+  inset: 0;
+}

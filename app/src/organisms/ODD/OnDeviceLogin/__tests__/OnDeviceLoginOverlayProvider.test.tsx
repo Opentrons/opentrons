@@ -9,7 +9,7 @@ import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { OnDeviceLoginOverlayProvider, useOnDeviceLoginModal } from '..'
 
-import type * as ReactRouterDom from 'react-router-dom'
+import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 const mockSubmitPassword = vi.fn()
@@ -19,7 +19,7 @@ vi.mock('/app/resources/auth', () => ({
 }))
 
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,

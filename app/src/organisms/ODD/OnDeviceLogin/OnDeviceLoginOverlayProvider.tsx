@@ -9,13 +9,12 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { Box, COLORS, POSITION_FIXED } from '@opentrons/components'
-
 import { getTopPortalEl } from '/app/App/portal'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { getSafePostLoginPath } from './getSafePostLoginPath'
 import { OnDeviceLoginView } from './index'
+import styles from './OnDeviceLoginOverlayProvider.module.css'
 
 import type { ReactNode } from 'react'
 import type { LoginStep } from './index'
@@ -67,20 +66,12 @@ export function OnDeviceLoginOverlayProvider({
       {children}
       {open
         ? createPortal(
-            <Box
-              position={POSITION_FIXED}
-              top="0"
-              right="0"
-              bottom="0"
-              left="0"
-              zIndex={10001}
-              backgroundColor={COLORS.white}
-            >
+            <div className={styles.overlay}>
               <LoginOverlayBody
                 onDismiss={closeLoginModal}
                 returnToPath={returnToPath}
               />
-            </Box>,
+            </div>,
             getTopPortalEl()
           )
         : null}
