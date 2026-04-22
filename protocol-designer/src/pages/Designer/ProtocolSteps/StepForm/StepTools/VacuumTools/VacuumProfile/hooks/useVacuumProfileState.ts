@@ -38,10 +38,12 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
   hasUnsavedPresavedItems: boolean
 } {
   const { vacuumOrderedProfileIds, vacuumProfileItemsById, mode } = args
-  const [orderedProfileItemIds, setOrderedProfileItemIds] =
-    useState<string[]>(vacuumOrderedProfileIds)
-  const [itemsById, setItemsById] =
-    useState<Record<string, VacuumProfileItem>>(vacuumProfileItemsById)
+  const [orderedProfileItemIds, setOrderedProfileItemIds] = useState<string[]>(
+    vacuumOrderedProfileIds
+  )
+  const [itemsById, setItemsById] = useState<Record<string, VacuumProfileItem>>(
+    vacuumProfileItemsById
+  )
 
   const defaultStepData = getDefaultStepData(mode)
 
