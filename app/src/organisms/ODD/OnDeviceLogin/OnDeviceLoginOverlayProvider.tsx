@@ -30,7 +30,7 @@ export interface OnDeviceLoginModalContextValue {
   closeLoginModal: () => void
 }
 
-export const OnDeviceLoginContext =
+const OnDeviceLoginContext =
   createContext<OnDeviceLoginModalContextValue | null>(null)
 
 /**
