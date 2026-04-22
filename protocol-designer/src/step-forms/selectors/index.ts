@@ -157,7 +157,7 @@ export const getLabwareEntities: Selector<BaseState, LabwareEntities> =
 export const _getLabwareEntitiesRootState: (
   arg0: RootState
 ) => LabwareEntities = createSelector(
-  rs => rs.labwareInvariantProperties,
+  (rs: RootState) => rs.labwareInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
   (normalizedLabwareById, labwareDefs) =>
     mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
@@ -173,7 +173,7 @@ export const getModuleEntities: Selector<BaseState, ModuleEntities> =
 // Special version of `getPipetteEntities` selector for use in step-forms reducers
 export const _getPipetteEntitiesRootState: (arg: RootState) => PipetteEntities =
   createSelector(
-    rs => rs.pipetteInvariantProperties,
+    (rs: RootState) => rs.pipetteInvariantProperties,
     labwareDefSelectors._getLabwareDefsByIdRootState,
     _getInitialDeckSetupStepFormRootState,
     (pipetteInvariantProperties, labwareDefs, initialDeckSetupStepForm) =>

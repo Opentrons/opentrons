@@ -1131,6 +1131,54 @@
       "title": "CloseLabwareLatchParams",
       "type": "object"
     },
+    "CloseVentCreate": {
+      "description": "A request to close the vent.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/closeVent",
+          "default": "vacuumModule/closeVent",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CloseVentParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CloseVentCreate",
+      "type": "object"
+    },
+    "CloseVentParams": {
+      "description": "Input parameters to close the vent.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "CloseVentParams",
+      "type": "object"
+    },
     "ColumnNozzleLayoutConfiguration": {
       "description": "Information required for nozzle configurations of type ROW and COLUMN.",
       "properties": {
@@ -4697,6 +4745,54 @@
       },
       "required": ["moduleId"],
       "title": "OpenLabwareLatchParams",
+      "type": "object"
+    },
+    "OpenVentCreate": {
+      "description": "A request to open the vent.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/openVent",
+          "default": "vacuumModule/openVent",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/OpenVentParams"
+        }
+      },
+      "required": ["params"],
+      "title": "OpenVentCreate",
+      "type": "object"
+    },
+    "OpenVentParams": {
+      "description": "Input parameters to open the vent.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "OpenVentParams",
       "type": "object"
     },
     "PickUpTipCreate": {
@@ -8511,6 +8607,8 @@
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
       "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
+      "vacuumModule/closeVent": "#/$defs/CloseVentCreate",
+      "vacuumModule/openVent": "#/$defs/OpenVentCreate",
       "vacuumModule/startSetVacuumPower": "#/$defs/StartSetVacuumPowerCreate",
       "vacuumModule/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
       "vacuumModule/stopVacuum": "#/$defs/StopVacuumCreate",
@@ -8791,6 +8889,12 @@
     },
     {
       "$ref": "#/$defs/StartSetVacuumPowerCreate"
+    },
+    {
+      "$ref": "#/$defs/OpenVentCreate"
+    },
+    {
+      "$ref": "#/$defs/CloseVentCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
