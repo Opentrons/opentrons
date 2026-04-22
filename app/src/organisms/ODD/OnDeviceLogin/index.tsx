@@ -3,7 +3,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Button,
   COLORS,
   Icon,
   InputField,
@@ -172,7 +171,10 @@ export function OnDeviceLoginView({
                   rightElement={
                     step === 'password' ? (
                       <div>
-                        <Button
+                        <button
+                          aria-label={t('toggle_password_visibility', {
+                            ns: 'device_settings',
+                          })}
                           type="button"
                           title={t('toggle_password_visibility', {
                             ns: 'device_settings',
@@ -186,7 +188,7 @@ export function OnDeviceLoginView({
                             name={showPassword ? 'eye-slash' : 'eye'}
                             size="1.5rem"
                           />
-                        </Button>
+                        </button>
                       </div>
                     ) : null
                   }

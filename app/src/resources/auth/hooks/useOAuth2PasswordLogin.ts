@@ -30,7 +30,7 @@ export interface UseOAuth2PasswordLoginOptions {
   onError: (message: string) => void
 }
 
-export interface UseOAuth2PasswordLoginResult {
+interface UseOAuth2PasswordLoginResult {
   submitPassword: (username: string, password: string) => void
   isAuthLoading: boolean
 }

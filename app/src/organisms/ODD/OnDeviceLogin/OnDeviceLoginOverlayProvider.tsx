@@ -14,8 +14,8 @@ import { Box, COLORS, POSITION_FIXED } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import { OnDeviceLoginView } from './index'
 import { getSafePostLoginPath } from './getSafePostLoginPath'
+import { OnDeviceLoginView } from './index'
 
 import type { ReactNode } from 'react'
 import type { LoginStep } from './index'
