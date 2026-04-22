@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -18,6 +18,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import styles from './OnDeviceLoginOverlayProvider.module.css'
 
 import type { ChangeEvent } from 'react'
+import type { ControllerRenderProps } from 'react-hook-form'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 export type LoginStep = 'username' | 'password'
@@ -54,17 +55,11 @@ export function OnDeviceLoginView({
       password: '',
     },
   })
-  const [showPassword, setShowPassword] = useState(false)
   const [showKeyboard, setShowKeyboard] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
   const username = watch('username')
   const password = watch('password')
-
-  useEffect(() => {
-    setShowPassword(false)
-  }, [step])
 
   const handleNext = (): void => {
     const { username: username, password: password } = getValues()
@@ -81,13 +76,6 @@ export function OnDeviceLoginView({
     step === 'username'
       ? username.trim() === ''
       : password.trim() === '' || isAuthLoading
-
-  const inputType =
-    step === 'username'
-      ? 'text'
-      : showPassword
-        ? 'text'
-        : LEGACY_INPUT_TYPE_PASSWORD
 
   const activeFieldName = step === 'username' ? 'username' : 'password'
   const passwordLabelHasError =
@@ -135,46 +123,14 @@ export function OnDeviceLoginView({
               control={control}
               name={activeFieldName}
               render={({ field }) => (
-                <InputField
-                  ref={setRefs(inputRef, field.ref)}
-                  autoFocus={step === 'password'}
-                  type={inputType}
-                  size="medium"
-                  error={passwordLabelHasError ? loginError : null}
-                  value={field.value ?? ''}
-                  name={field.name}
-                  onBlur={field.onBlur}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    field.onChange(e.target.value)
-                    onClearLoginError?.()
-                  }}
+                <LoginFieldInput
+                  field={field}
+                  step={step}
+                  loginError={passwordLabelHasError ? loginError : null}
+                  onClearLoginError={onClearLoginError}
                   onFocus={() => {
                     setShowKeyboard(true)
                   }}
-                  rightElement={
-                    step === 'password' ? (
-                      <div>
-                        <button
-                          aria-label={t('toggle_password_visibility', {
-                            ns: 'device_settings',
-                          })}
-                          type="button"
-                          title={t('toggle_password_visibility', {
-                            ns: 'device_settings',
-                          })}
-                          onClick={() => {
-                            setShowPassword(current => !current)
-                            inputRef.current?.focus()
-                          }}
-                        >
-                          <Icon
-                            name={showPassword ? 'eye-slash' : 'eye'}
-                            size="1.5rem"
-                          />
-                        </button>
-                      </div>
-                    ) : null
-                  }
                 />
               )}
             />
@@ -202,6 +158,69 @@ export function OnDeviceLoginView({
         </div>
       ) : null}
     </>
+  )
+}
+
+interface LoginFieldInputProps {
+  field: ControllerRenderProps<LoginFormValues, 'username' | 'password'>
+  step: LoginStep
+  loginError: string | null
+  onClearLoginError?: () => void
+  onFocus: () => void
+}
+
+/**
+ * Renders the active username/password input. Lives inside the Controller's
+ * render prop so its `showPassword` state is reset automatically when the
+ * Controller remounts on step change (via its `key` prop).
+ */
+function LoginFieldInput({
+  field,
+  step,
+  loginError,
+  onClearLoginError,
+  onFocus,
+}: LoginFieldInputProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const [showPassword, setShowPassword] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const isPasswordHidden = step === 'password' && !showPassword
+  const inputType = isPasswordHidden ? LEGACY_INPUT_TYPE_PASSWORD : 'text'
+  const toggleLabel = t('toggle_password_visibility')
+
+  return (
+    <InputField
+      ref={setRefs(inputRef, field.ref)}
+      autoFocus={step === 'password'}
+      type={inputType}
+      size="medium"
+      error={loginError}
+      value={field.value ?? ''}
+      name={field.name}
+      onBlur={field.onBlur}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+        field.onChange(e.target.value)
+        onClearLoginError?.()
+      }}
+      onFocus={onFocus}
+      rightElement={
+        step === 'password' ? (
+          <div>
+            <button
+              aria-label={toggleLabel}
+              type="button"
+              title={toggleLabel}
+              onClick={() => {
+                setShowPassword(current => !current)
+                inputRef.current?.focus()
+              }}
+            >
+              <Icon name={showPassword ? 'eye-slash' : 'eye'} size="1.5rem" />
+            </button>
+          </div>
+        ) : null
+      }
+    />
   )
 }
 
