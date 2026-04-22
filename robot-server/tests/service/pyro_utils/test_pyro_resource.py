@@ -40,6 +40,7 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
 )
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.pyro_utils import (
     pyro_resource,
     resource_utilities,
@@ -76,6 +77,12 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
 def mock_app_state(decoy: Decoy) -> AppState:
     """Get a mock DataFilesStore."""
     return decoy.mock(cls=AppState)
+
+
+@pytest.fixture
+def mock_run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
+    """A mock RunProcessPyroProvider."""
+    return decoy.mock(cls=RunProcessPyroProvider)
 
 
 async def _host_pyro_nameserver_and_ot3api(
@@ -139,6 +146,7 @@ async def test_run_hardware_event_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
     mock_feature_flags: None,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a proxy of a callback.
@@ -158,6 +166,7 @@ async def test_run_hardware_event_callback(
         hardware_api=ot3api,
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
