@@ -1,0 +1,27 @@
+.overlay {
+  position: fixed;
+
+  /* This z-index is chosen to beat everything else on the ODD. This overlay should
+  appear over modals, toasts, everything. */
+  z-index: 1500;
+  background-color: var(--transparent-black-10);
+  inset: 0;
+}
+
+.acm_badge {
+  position: absolute;
+  right: var(--spacing-24);
+  bottom: var(--spacing-24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-24);
+  border-radius: var(--border-radius-8);
+  background-color: var(--black-90);
+  color: var(--white);
+}
+
+.acm_icon {
+  width: 4rem;
+  height: 4rem;
+}

@@ -1,5 +1,19 @@
 """Command models for Vacuum Module commands."""
 
+from .close_vent import (
+    CloseVent,
+    CloseVentCommandType,
+    CloseVentCreate,
+    CloseVentParams,
+    CloseVentResult,
+)
+from .open_vent import (
+    OpenVent,
+    OpenVentCommandType,
+    OpenVentCreate,
+    OpenVentParams,
+    OpenVentResult,
+)
 from .start_set_vacuum_power import (
     StartSetVacuumPower,
     StartSetVacuumPowerCommandType,
@@ -41,4 +55,16 @@ __all__ = [
     "StartSetVacuumPowerCreate",
     "StartSetVacuumPowerParams",
     "StartSetVacuumPowerResult",
+    # open vent command models
+    "OpenVent",
+    "OpenVentCommandType",
+    "OpenVentCreate",
+    "OpenVentParams",
+    "OpenVentResult",
+    # close vent command models
+    "CloseVent",
+    "CloseVentCommandType",
+    "CloseVentCreate",
+    "CloseVentParams",
+    "CloseVentResult",
 ]
