@@ -1,15 +1,15 @@
 import * as errorCreators from '../../errorCreators'
 import { uuid } from '../../utils'
 
-import type { CommandCreator, VacuumCloseVentArgs } from '../../types'
+import type { CommandCreator, VacuumPumpPowerArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
-export const vacuumCloseVent: CommandCreator<VacuumCloseVentArgs> = (
+export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { moduleId } = args
+  const { moduleId, powerPercent, duration, ventAfter } = args
   const module = invariantContext.moduleEntities[moduleId]
 
   if (module == null) {
@@ -18,14 +18,25 @@ export const vacuumCloseVent: CommandCreator<VacuumCloseVentArgs> = (
     }
   }
 
+  const holdArgs =
+    duration != null
+      ? {
+          duration,
+          // defaults to true per PE command
+          ventAfter: ventAfter ?? true,
+        }
+      : {}
+
   // TODO: (nd, 2026-04-20) implement Python emission
   return {
     commands: [
       {
-        commandType: 'vacuumModule/closeVent',
+        commandType: 'vacuumModule/startSetVacuumPower',
         key: uuid(),
         params: {
           moduleId,
+          percentPower: powerPercent,
+          ...holdArgs,
         },
       },
     ],
