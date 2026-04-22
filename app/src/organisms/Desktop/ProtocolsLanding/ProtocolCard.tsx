@@ -23,7 +23,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getGripperDisplayName,
   getModuleType,
   getPipetteNameSpecs,
@@ -49,6 +48,8 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { Dispatch, State } from '/app/redux/types'
 
+const INVALID_ROBOT_TYPE_ERROR = 'This protocol is designed for an OT-2 robot.'
+
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
   handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
@@ -69,8 +70,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     srcFileNames,
     mostRecentAnalysis
   )
-
-  const isFlex = mostRecentAnalysis?.robotType === FLEX_ROBOT_TYPE
 
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
   instruments or modules from a future version of Opentrons software. Please update
@@ -109,7 +108,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           protocolDisplayName={protocolDisplayName}
           isAnalyzing={isAnalyzing}
           modified={modified}
-          isFlex={isFlex}
         />
       </ErrorBoundary>
       <Box
@@ -133,7 +131,6 @@ interface AnalysisInfoProps {
   modified: number
   isAnalyzing: boolean
   mostRecentAnalysis?: ProtocolAnalysisOutput | null
-  isFlex: boolean
 }
 function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const {
@@ -142,7 +139,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     isAnalyzing,
     mostRecentAnalysis,
     modified,
-    isFlex,
   } = props
   const dispatch = useDispatch<Dispatch>()
   const { t, i18n } = useTranslation(['protocol_list', 'shared'])
@@ -160,6 +156,11 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
 
   const hasPeripherals =
     mostRecentAnalysis?.commandPreconditions?.isCameraUsed ?? false
+
+  const invalidRobotType =
+    mostRecentAnalysis?.errors.some(error =>
+      error.detail.includes(INVALID_ROBOT_TYPE_ERROR)
+    ) ?? false
 
   // If OT-2 app is installed, OT-2 app will be opened.
   // If OT-2 app isn't installed, a web browser will open the OT-2 app download page
@@ -212,7 +213,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               />
             ),
             complete:
-              mostRecentAnalysis != null && isFlex ? (
+              mostRecentAnalysis != null && !invalidRobotType ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
               ) : (
                 <Box
@@ -234,7 +235,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {analysisStatus === 'parameterRequired' ? (
             <ProtocolStatusBanner />
           ) : null}
-          {analysisStatus === 'error' && isFlex ? (
+          {!invalidRobotType && analysisStatus === 'error' ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
               errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
@@ -244,7 +245,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             <ProtocolAnalysisStale protocolKey={protocolKey} />
           ) : null}
 
-          {!isFlex ? (
+          {invalidRobotType && analysisStatus === 'error' ? (
             <Box paddingRight={SPACING.spacing24}>
               <InlineNotification
                 type="alert"
