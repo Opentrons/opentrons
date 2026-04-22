@@ -1,6 +1,7 @@
 """Class wrapper that ingests a PyroSynchronousObject and maps 'synchronized' async functions to awaitable methods."""
 
 import asyncio
+import threading
 from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
@@ -28,6 +29,9 @@ class AsyncPyroFunctionWrapper:
 
 class _ACPO:
     pass
+
+
+_thread_local = threading.local()
 
 
 def AsyncClientPyroObject(pyro_synchronous_object: Pyro5.api.Proxy) -> _ACPO:
@@ -95,6 +99,23 @@ def _get_async_methods(proxy: Pyro5.api.Proxy) -> dict[str, dict[str, Any]]:
     return result
 
 
+def _get_thread_proxy(proxy: Pyro5.api.Proxy) -> Pyro5.api.Proxy:
+    """Get or create a thread-local proxy for the given URI, reconnecting if needed."""
+    existing: Pyro5.api.Proxy | None = getattr(_thread_local, "proxy", None)
+
+    if existing is not None and existing._pyroUri == proxy._pyroUri:
+        if existing._pyroConnection is not None:
+            return existing
+        else:  # Connection was lost, proxy needs reconnect
+            existing._pyroReconnect()  # type: ignore[no-untyped-call]
+            return existing
+
+    new_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore[no-untyped-call]
+    _thread_local.proxy = new_proxy
+
+    return new_proxy
+
+
 def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
     """Wrapper to make a callable element on a PyroSynchronousObject into an awaitable element on a AsyncClientPyroObject."""
 
@@ -105,13 +126,11 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
             *args: P.args,  # type: ignore
             **kwargs: P.kwargs,  # type: ignore
         ) -> Any:
-            # This must be done because Pyro only accepts proxy calls from the thread that owns the proxy
-            thread_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
+            thread_proxy = _get_thread_proxy(proxy)
             func = getattr(thread_proxy, func_name)
             validated_func = wrap_parameter_validation(proxy, func_name, func)
             return validated_func(self, *args, **kwargs)
 
-        # Return a Coroutine that may be awaited, it will execute the `_thread_call` when called
         return await asyncio.to_thread(
             _thread_call, self._proxy, method_metadata["__name__"], *args, **kwargs
         )
