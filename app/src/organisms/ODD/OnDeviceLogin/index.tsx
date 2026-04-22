@@ -207,7 +207,6 @@ export function OnDeviceLoginView({
 
 export * from './getSafePostLoginPath'
 export {
-  OnDeviceLoginContext,
   OnDeviceLoginOverlayProvider,
   useOnDeviceLoginModal,
 } from './OnDeviceLoginOverlayProvider'
