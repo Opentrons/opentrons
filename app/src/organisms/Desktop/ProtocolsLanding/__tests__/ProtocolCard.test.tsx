@@ -114,16 +114,21 @@ describe('ProtocolCard', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/protocols/protocolKeyStub')
   })
 
-  it('does not navigate for Flex protocol', () => {
+  it('does not navigate for Flex protocol and renders install CTA', () => {
     render({
       ...props,
       storedProtocolData: makeStoredProtocolData({
         robotType: FLEX_ROBOT_TYPE,
-        errors: [],
+        errors: [
+          {
+            detail: 'This protocol is not designed for an OT-2 robot.',
+          },
+        ] as ProtocolAnalysisOutput['errors'],
       }),
     })
 
     screen.getByTestId('InlineNotification_alert')
+    screen.getByText('Flex protocol detected.')
     screen.getByText('Get the app')
 
     fireEvent.click(screen.getByText('Mock Protocol'))
