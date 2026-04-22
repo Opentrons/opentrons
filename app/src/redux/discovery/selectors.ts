@@ -4,7 +4,7 @@ import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import orderBy from 'lodash/orderBy'
-import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
+import { createSelector, lruMemoize } from 'reselect'
 import semver from 'semver'
 
 import { getFeatureFlags } from '../config/selectors'
@@ -42,9 +42,6 @@ type GetUnreachableRobots = (state: State) => UnreachableRobot[]
 type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
-
-// from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
 
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
@@ -99,8 +96,8 @@ const isNotOT2Robot = (robot: DiscoveredRobot): boolean => {
 
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
-    state => state.discovery.robotsByName,
-    state => getFeatureFlags(state).ignoreOT2App ?? false,
+    (state: State) => state.discovery.robotsByName,
+    (state: State) => getFeatureFlags(state).ignoreOT2App ?? false,
     (robotsMap, ignoreOT2App) => {
       const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
@@ -239,10 +236,16 @@ export const getRobotByName = (
 export const getDiscoverableRobotByName: (
   state: State,
   robotName: string | null
-) => DiscoveredRobot | null = createDeepEqualSelector(
+) => DiscoveredRobot | null = createSelector(
   getAllRobots,
   (state: State, robotName: string | null) => robotName,
-  (robots, robotName) => robots.find(r => r.name === robotName) ?? null
+  (robots, robotName) => robots.find(r => r.name === robotName) ?? null,
+  {
+    memoize: lruMemoize,
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
+  }
 )
 
 export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>
