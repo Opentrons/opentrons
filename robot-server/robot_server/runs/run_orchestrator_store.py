@@ -283,6 +283,8 @@ class RunOrchestratorStore:
                 labware_offsets=labware_offsets,
                 deck_configuration=deck_configuration,
                 protocol=protocol,
+                run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
             )
 
         if protocol is not None:
@@ -398,6 +400,8 @@ class RunOrchestratorStore:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             protocol=protocol,
+            run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
         )
         return self._run_orchestrator.get_state_summary()
 

@@ -102,6 +102,8 @@ def register_process_types() -> None:
         StateSummary,
     ]:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_model)  # type: ignore[arg-type]
+    for rtp in get_args(RunTimeParameter):
+        OpentronsPyroSerializer.register_pydantic_model(rtp)
     # We do two levels of get_args because it's an annotated type union
     for command in get_args(get_args(Command)[0]):
         OpentronsPyroSerializer.register_pydantic_model(command)
