@@ -24,7 +24,7 @@ export function VacuumSummary(props: {
     pumpDurationCheckbox,
     pumpDurationTime,
     endingHoldVentCheckbox,
-    orderedProfileIds,
+    vacuumOrderedProfileIds,
   } = currentStep
   const { t } = useTranslation('protocol_steps')
   if (
@@ -89,8 +89,11 @@ export function VacuumSummary(props: {
       />
     )
   }
-  if (programType === VACUUM_PROGRAM_PROFILE && orderedProfileIds.length > 0) {
-    const numProfileSteps = orderedProfileIds.length
+  if (
+    programType === VACUUM_PROGRAM_PROFILE &&
+    vacuumOrderedProfileIds.length > 0
+  ) {
+    const numProfileSteps = vacuumOrderedProfileIds.length
     return (
       <StyledTrans
         i18nKey="vacuum.step_summary.profile"

@@ -16,8 +16,8 @@ const formData: FormData = {
   pumpDurationCheckbox: true,
   pumpDurationTime: '1:00',
   endingHoldVentCheckbox: true,
-  orderedProfileIds: ['1'],
-  profileItemsById: {
+  vacuumOrderedProfileIds: ['1'],
+  vacuumProfileItemsById: {
     '1': {
       type: 'profileStep',
       id: '1',
@@ -41,8 +41,8 @@ describe('dependentFieldsUpdateVacuum', () => {
       pumpDurationCheckbox: null,
       pumpDurationTime: null,
       endingHoldVentCheckbox: null,
-      orderedProfileIds: [],
-      profileItemsById: {},
+      vacuumOrderedProfileIds: [],
+      vacuumProfileItemsById: {},
     })
   })
 

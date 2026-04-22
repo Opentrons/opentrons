@@ -33,4 +33,6 @@ export { thermocyclerStartRunExtendedProfile } from './thermocyclerStartRunExten
 export { prepareToAspirate } from './prepareToAspirate'
 export { setTemperature } from './setTemperature'
 export { touchTip } from './touchTip'
+export { vacuumOpenVent } from './vacuumOpenVent'
+export { vacuumCloseVent } from './vacuumCloseVent'
 export { waitForTemperature } from './waitForTemperature'

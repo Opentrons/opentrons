@@ -647,7 +647,7 @@ const VACUUM_DURATION_REQUIRED: FormError = {
 }
 const VACUUM_PROFILE_REQUIRED: FormError = {
   title: 'Select vacuum profile',
-  dependentFields: ['orderedProfileIds', 'profileItemsById'],
+  dependentFields: ['vacuumOrderedProfileIds', 'vacuumProfileItemsById'],
   location: ['field'],
 }
 const VACUUM_MODULE_ID_REQUIRED: FormError = {
@@ -1606,9 +1606,9 @@ export const vacuumModeRequired = (
 export const vacuumProfileRequired = (
   fields: HydratedVacuumFormData
 ): FormError | null => {
-  const { programType, orderedProfileIds } = fields
+  const { programType, vacuumOrderedProfileIds } = fields
   return programType === VACUUM_PROGRAM_PROFILE &&
-    orderedProfileIds.length === 0
+    vacuumOrderedProfileIds.length === 0
     ? VACUUM_PROFILE_REQUIRED
     : null
 }
