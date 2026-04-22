@@ -93,6 +93,16 @@ export function VacuumSummary(props: {
     )
   }
   if (
+    programType === VACUUM_PROGRAM_STATE &&
+    stateType === VACUUM_STATE_PUMP_OFF
+  ) {
+    return (
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('vacuum.step_summary.state.pump.off')}
+      </StyledText>
+    )
+  }
+  if (
     programType === VACUUM_PROGRAM_PROFILE &&
     vacuumOrderedProfileIds.length > 0
   ) {
