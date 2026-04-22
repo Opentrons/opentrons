@@ -261,18 +261,18 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                           />
                         ) : null}
 
-                       <OnDeviceLoginOverlayProvider>
-                        {isAccessControlEnabled && !isLoggedIn && (
-                          <LoggedOutOverlay
-                            onClick={() => {
-                              setIsLoggedIn(true)
-                            }}
-                          />
-                        )}
-                        <SharedScrollRefProvider>
-                          <OnDeviceDisplayAppRoutes />
-                        </SharedScrollRefProvider>
-                       </OnDeviceLoginOverlayProvider>
+                        <OnDeviceLoginOverlayProvider>
+                          {isAccessControlEnabled && !isLoggedIn && (
+                            <LoggedOutOverlay
+                              onClick={() => {
+                                setIsLoggedIn(true)
+                              }}
+                            />
+                          )}
+                          <SharedScrollRefProvider>
+                            <OnDeviceDisplayAppRoutes />
+                          </SharedScrollRefProvider>
+                        </OnDeviceLoginOverlayProvider>
                       </ToasterOven>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
