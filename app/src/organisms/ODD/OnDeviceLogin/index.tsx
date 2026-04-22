@@ -61,31 +61,20 @@ export function OnDeviceLoginView({
 
   const username = watch('username')
   const password = watch('password')
-  const fieldValue = step === 'username' ? username : password
-
-  useEffect(() => {
-    if (!showKeyboard) return
-    const id = window.setTimeout(() => {
-      keyboardRef.current?.setInput(fieldValue)
-    }, 0)
-    return () => {
-      window.clearTimeout(id)
-    }
-  }, [showKeyboard, fieldValue, step])
 
   useEffect(() => {
     setShowPassword(false)
   }, [step])
 
   const handleNext = (): void => {
-    const { username: u, password: p } = getValues()
+    const { username: username, password: password } = getValues()
     if (step === 'username') {
-      if (u.trim() === '') return
+      if (username.trim() === '') return
       onStepChange('password')
       return
     }
-    if (p.trim() === '') return
-    submitPassword(u, p)
+    if (password.trim() === '') return
+    submitPassword(username, password)
   }
 
   const primaryDisabled =
@@ -151,13 +140,7 @@ export function OnDeviceLoginView({
                   autoFocus={step === 'password'}
                   type={inputType}
                   size="medium"
-                  error={
-                    step === 'password' &&
-                    loginError != null &&
-                    loginError !== ''
-                      ? loginError
-                      : null
-                  }
+                  error={passwordLabelHasError ? loginError : null}
                   value={field.value ?? ''}
                   name={field.name}
                   onBlur={field.onBlur}
