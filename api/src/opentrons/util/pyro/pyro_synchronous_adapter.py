@@ -15,8 +15,8 @@ from opentrons.util.pyro.pyro_client_async_adapter import (
     AsyncPyroFunctionWrapper,
 )
 from opentrons.util.pyro.pyro_serialization import (
+    NonBuiltinKeyDictWrapper,
     TypedDictWrapper,
-    UnhashableDictWrapper,
 )
 
 T = TypeVar("T")
@@ -505,8 +505,8 @@ def convert_result_to_wrapped_dict(  # noqa: C901
 ) -> Callable[P, T]:
     """Wrapper that ensures a result of a method call through Pyro is a wrapped dictionary.
 
-    The result of this is later deserialzed by serpent using special registries for UnhashableDictWrapper. This
-    particularly pretains to dictionary results that may contain keys which are mutable, such as SubSystem.
+    The result of this is later deserialized by serpent using special registries for NonBuiltinKeyDictWrapper. This
+    particularly pertains to dictionary results that may contain keys which are mutable, such as SubSystem.
     """
 
     @functools.wraps(attr)
@@ -544,7 +544,7 @@ def convert_result_to_wrapped_dict(  # noqa: C901
                     )
                 except AttributeError:
                     pass
-                wrapped_dict = UnhashableDictWrapper(
+                wrapped_dict = NonBuiltinKeyDictWrapper(
                     dictionary=result,
                     key_type=".".join((key_type.__module__, key_type.__qualname__)),
                     value_type=".".join(
