@@ -13,11 +13,23 @@ authors = [
 classifiers = [
     "Private :: Do Not Upload"  # Prevent uploading to PyPI.
 ]
-dependencies = []
+dependencies = [
+    "opentrons[flex-hardware]",
+    "opentrons-shared-data==0.0.0",
+    "opentrons-hardware[FLEX]==0.0.0",
+    "hardware-testing",
+    "abr-testing",
+    "pyserial==3.5",
+    "types-pytz",
+    "paramiko",
+    "types-paramiko",
+    "anyio==4.9.0",
+]
 dynamic = ["version"]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/hardware-testing"
+
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "hardware_testing/_version.py"
@@ -49,3 +61,35 @@ include = ['hardware_testing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.f
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'hardware_testing/LICENSE'
+
+[tool.uv]
+# cooldown time for security
+exclude-newer = "1 week"
+
+[tool.uv.sources]
+opentrons = {path = "./../api", editable = true}
+opentrons-shared-data = {path = "./../shared-data", editable = true}
+opentrons-hardware = {path = "./../hardware", editable = true}
+hardware-testing = {path = ".", editable = true}
+abr-testing = {path = "./../abr-testing", editable = true}
+
+[dependency-groups]
+dev = [
+    "atomicwrites==1.4.1",
+    "colorama==0.4.4",
+    "pytest<9,>=8",
+    "pytest-cov==4.1.0",
+    "mypy==1.11.0",
+    "black==22.3.0",
+    "flake8~=7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "requests==2.27.1",
+    "types-requests==2.25.6",
+    "types-setuptools==57.0.2",
+    "pyusb==1.2.1",
+    "build~=1.2.0",
+    "matplotlib==3.10.0",
+    "setuptools<82",
+]

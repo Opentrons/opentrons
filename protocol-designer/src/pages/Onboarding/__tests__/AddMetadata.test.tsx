@@ -61,11 +61,17 @@ describe('AddMetadata', () => {
     screen.getByText('Name')
     screen.getByText('Description')
     screen.getByText('Author/Organization')
-    let input = screen.getAllByRole('textbox', { name: '' })[1]
-    fireEvent.change(input, { target: { value: 'mockProtocolName' } })
+    expect(screen.getAllByRole('textbox')).toHaveLength(3)
+    const nameInput = screen.getByRole('textbox', { name: 'Name' })
+    screen.getByRole('textbox', { name: 'Description' })
+    const orgInput = screen.getByRole('textbox', {
+      name: 'Author/Organization',
+    })
+
+    fireEvent.change(nameInput, { target: { value: 'mockProtocolName' } })
     expect(props.register).toHaveBeenCalled()
-    input = screen.getAllByRole('textbox', { name: '' })[2]
-    fireEvent.change(input, { target: { value: 'mock org' } })
+
+    fireEvent.change(orgInput, { target: { value: 'mock org' } })
     expect(props.register).toHaveBeenCalled()
   })
 })

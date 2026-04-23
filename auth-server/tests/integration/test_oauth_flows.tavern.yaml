@@ -3,6 +3,7 @@ test_name: Successful OAuth 2 flow
 marks:
   - usefixtures:
       - run_server
+      - admin_scopes_str
 
 stages:
   - name: Exchange a username and password for an access token and refresh token
@@ -21,7 +22,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write users.write
+        scope: &returned_scope '{admin_scopes_str}'
       save:
         json:
           initial_access_token: access_token
@@ -39,9 +40,9 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.write
+        scope: *returned_scope
 
-  - name: Introspect the refresh token to confirm that it's active
+  - name: Introspect the refresh token and confirm it's inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -51,9 +52,9 @@ stages:
     response:
       status_code: 200
       json:
-        active: true
-        username: test_admin
-        scope: runs.read runs.write users.write
+        active: false
+      strict:
+        - json:off
 
   - name: Exchange the refresh token for a new access token and refresh token
     request:
@@ -70,7 +71,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write users.write
+        scope: *returned_scope
       save:
         json:
           refreshed_access_token: access_token
@@ -88,9 +89,9 @@ stages:
       json:
         active: true
         username: test_admin
-        scope: runs.read runs.write users.write
+        scope: *returned_scope
 
-  - name: Introspect the new refresh token to confirm that it's active
+  - name: Introspect the new refresh token and confirm it's inactive (only access tokens are active)
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -100,16 +101,16 @@ stages:
     response:
       status_code: 200
       json:
-        active: true
-        username: test_admin
-        scope: runs.read runs.write users.write
-
+        active: false
+      strict:
+        - json:off
 ---
 test_name: Getting a token should fail if the request asks for scopes beyond what the user is authorized for
 
 marks:
   - usefixtures:
       - run_server
+      - user_scopes_str
 
 stages:
   - name: Send a password authorization request with invalid scopes
@@ -121,7 +122,7 @@ stages:
         grant_type: password
         username: test_user
         password: test_user_password
-        scope: runs.read runs.write users.write # test_user is not authorized for users.write.
+        scope: robot_control.write users.write # test_user is not authorized for users.write.
     response:
       status_code: 400
       json:
@@ -145,7 +146,9 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write
+        # With no scopes explicitly specified in the request, the server should return
+        # all the scopes that this account type (user) is authorized for.
+        scope: '{user_scopes_str}'
       save:
         json:
           refresh_token: refresh_token
@@ -158,7 +161,7 @@ stages:
         client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{refresh_token}'
-        scope: runs.read runs.write users.write # test_user is not authorized for users.write.
+        scope: robot_control.write users.write # test_user is not authorized for users.write.
     response:
       status_code: 400
       json:
@@ -172,6 +175,7 @@ test_name: The client should be able to request scopes narrower than what the us
 marks:
   - usefixtures:
       - run_server
+      - admin_scopes_str
 
 stages:
   - name: Send a password authorization request with narrower-than-default scope
@@ -183,7 +187,9 @@ stages:
         grant_type: password
         username: test_admin
         password: test_admin_password
-        scope: runs.read runs.write # test_admin would also be authorized for users.write.
+        # test_admin would also be authorized for a bunch of other scopes.
+        # This should narrow it to just robot_control.write.
+        scope: &requested_scope_1 robot_control.write
     response:
       status_code: 200
       json:
@@ -191,7 +197,27 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read runs.write
+        # We should get back only the narrow scopes that we requested,
+        # not all the scopes that an admin could theoretically have.
+        scope: *requested_scope_1
+
+  - name: Send a password authorization request with default scope
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_admin
+        password: test_admin_password
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        expires_in: !anyint
+        token_type: Bearer
+        scope: '{admin_scopes_str}'
       save:
         json:
           refresh_token: refresh_token
@@ -204,7 +230,10 @@ stages:
         client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{refresh_token}'
-        scope: runs.read # The request above set this to "runs.read runs.write". This narrows it to just "runs.read".
+        # The token that we're refreshing had default scopes.
+        # In the new token, this should narrow it to just robot_control.write.
+        scope: &requested_scope_2 robot_control.write
+
     response:
       status_code: 200
       json:
@@ -212,7 +241,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read
+        scope: *requested_scope_2
 
 ---
 test_name: Wrong username and password credentials should be rejected
@@ -222,7 +251,7 @@ marks:
       - run_server
 
 stages:
-  - name: Send an invalid username and password to the token endpoint
+  - name: Send an invalid username+password combo to the token endpoint
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -235,8 +264,23 @@ stages:
       status_code: 400
       json:
         error: invalid_grant
-      strict:
-        - json:off
+        error_description: Invalid credentials given.
+        opentrons_login_attempts_remaining: !anyint
+
+  - name: Send an unrecognized username to the token endpoint
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: nonexistent_user
+        password: definitely_not_the_right_password
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+        error_description: Invalid credentials given.
 
 ---
 test_name: Invalid refresh tokens should be rejected

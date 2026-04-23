@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from 'react'
+import { forwardRef, useEffect, useId, useState } from 'react'
 import clsx from 'clsx'
 
 import { StyledText, Tooltip } from '../../atoms'
@@ -9,12 +9,11 @@ import { SPACING } from '../../ui-style-constants'
 import styles from './textareafield.module.css'
 
 import type {
-  ChangeEventHandler,
-  FocusEvent,
-  MouseEvent,
-  MutableRefObject,
+  ComponentPropsWithoutRef,
+  CSSProperties,
+  MouseEventHandler,
+  ReactNode,
 } from 'react'
-import type { IconName } from '../../icons'
 
 // hook to detect tab focus vs mouse focus
 const useFocusVisible = (): boolean => {
@@ -42,59 +41,37 @@ const useFocusVisible = (): boolean => {
   return isKeyboardFocus
 }
 
-interface TextAreaFieldProps {
-  /** field is disabled if value is true */
-  disabled?: boolean
-  /** change handler */
-  onChange?: ChangeEventHandler<HTMLTextAreaElement>
-  /** name of field in form */
-  name?: string
-  /** optional ID of <textarea> element */
-  id?: string
-  /** placeholder text */
-  placeholder?: string
-  /** current value of text in box, defaults to '' */
-  value?: string | number | null
+type NativeTextareaProps = Omit<ComponentPropsWithoutRef<'textarea'>, 'title'>
+
+interface TextAreaFieldProps extends NativeTextareaProps {
+  /** optional label */
+  label?: string | null
   /** if included, TextAreaField will use error style and display error instead of caption */
   error?: string | null
-  /** optional title */
-  title?: string | null
   /** optional text for tooltip */
   tooltipText?: string
   /** optional caption. hidden when `error` is given */
   caption?: string | null
-  /** mouse click handler */
-  onClick?: (event: MouseEvent<HTMLTextAreaElement | HTMLDivElement>) => unknown
-  /** focus handler */
-  onFocus?: (event: FocusEvent<HTMLTextAreaElement>) => unknown
-  /** blur handler */
-  onBlur?: (event: FocusEvent<HTMLTextAreaElement>) => unknown
-  /** makes textarea field read-only */
-  readOnly?: boolean
-  /** automatically focus field on renders */
-  autoFocus?: boolean
-  /** if true, clear out value and add '-' placeholder */
-  isIndeterminate?: boolean
   /** horizontal text alignment for title, textarea, and (sub)captions */
   textAlign?: 'left' | 'center'
-  /** react useRef to control textarea field instead of react event */
-  ref?: MutableRefObject<HTMLTextAreaElement | null>
-  /** optional IconName to display icon aligned to left of textarea field */
-  leftIcon?: IconName
-  /** if true, show delete icon aligned to right of textarea field */
-  showDeleteIcon?: boolean
-  /** callback passed to optional delete icon onClick */
-  onDelete?: () => void
+  /** optional element to display aligned to the left of the input field */
+  leftElement?: ReactNode
+  /** optional element to display aligned to the right of the input field */
+  rightElement?: ReactNode
   /** if true, style the background of textarea field to error state */
   hasBackgroundError?: boolean
+  /** optional prop to support focus when tapping text area */
+  onWrapperClick?: MouseEventHandler<HTMLDivElement>
   /** optional prop to override textarea field border radius */
-  borderRadius?: string
+  borderRadius?: CSSProperties['borderRadius']
   /** optional prop to override textarea field padding */
-  padding?: string
+  padding?: CSSProperties['padding']
   /** optional prop to override textarea field height */
-  height?: string
+  height?: CSSProperties['height']
   /** optional prop to override textarea field resize default is none */
-  resize?: 'none' | 'vertical' | 'horizontal' | 'both'
+  resize?: CSSProperties['resize']
+  /** if true, clear out value and add '-' placeholder */
+  isIndeterminate?: boolean
 }
 
 export const TextAreaField = forwardRef<
@@ -102,41 +79,41 @@ export const TextAreaField = forwardRef<
   TextAreaFieldProps
 >((props, ref): JSX.Element => {
   const {
-    placeholder,
-    textAlign = 'left',
-    title,
-    tooltipText,
+    label,
     error,
-    disabled,
-    isIndeterminate,
-    showDeleteIcon = false,
+    tooltipText,
+    caption,
+    textAlign = 'left',
+    leftElement,
+    rightElement,
     hasBackgroundError = false,
-    onDelete,
+    onWrapperClick,
     borderRadius,
     padding,
     height,
-    leftIcon,
-    caption,
     resize = 'none',
-    id,
-    name,
-    onChange,
-    onFocus,
-    onBlur,
-    readOnly,
-    autoFocus,
+    isIndeterminate,
+    ...textareaProps
   } = props
+  const {
+    disabled: rawDisabled,
+    placeholder: rawPlaceholder,
+    value: rawValue,
+    ...restTextareaProps
+  } = textareaProps
+  const generatedId = useId()
+  const textareaId = restTextareaProps.id ?? generatedId
 
   const hasError = error != null
-  const value = (isIndeterminate ?? false) ? '' : (props.value ?? '')
-  const placeHolder = (isIndeterminate ?? false) ? '-' : placeholder
+  const value = (isIndeterminate ?? false) ? '' : (rawValue ?? '')
+  const placeHolderText = (isIndeterminate ?? false) ? '-' : rawPlaceholder
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isKeyboardFocus = useFocusVisible() // Track focus method
 
   const wrapperClasses = clsx(
     styles.wrapper,
     error != null ? styles.warning_color : styles.default_color,
-    disabled === true && styles.disabled
+    rawDisabled === true && styles.disabled
   )
 
   const textareaClasses = clsx(
@@ -147,26 +124,28 @@ export const TextAreaField = forwardRef<
   )
 
   const titleClasses = clsx(
-    styles.title_text,
-    textAlign === 'center' ? styles.title_text_center : styles.title_text_left
+    styles.label_text,
+    textAlign === 'center' ? styles.label_text_center : styles.label_text_left
   )
 
   const textareaRowClasses = clsx(
     styles.textarea_row,
-    leftIcon !== undefined && styles.textarea_row_with_icon
+    leftElement != null && styles.textarea_row_with_icon
   )
 
   return (
     <div className={wrapperClasses}>
       <div className={styles.column_container}>
-        {title != null && (
-          <div className={styles.title_row}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={titleClasses}
-            >
-              {title}
-            </StyledText>
+        {label != null && (
+          <div className={styles.label_row}>
+            <label htmlFor={textareaId}>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                className={titleClasses}
+              >
+                {label}
+              </StyledText>
+            </label>
             {tooltipText != null && (
               <>
                 <div {...targetProps} className={styles.tooltip_wrapper}>
@@ -184,21 +163,14 @@ export const TextAreaField = forwardRef<
         )}
         <div
           className={styles.clickable_column}
-          onClick={!disabled ? props.onClick : undefined}
+          onClick={!rawDisabled ? onWrapperClick : undefined}
         >
           <div className={textareaRowClasses}>
-            {leftIcon !== undefined && (
-              <div className={styles.left_icon_wrapper}>
-                <Icon
-                  name={leftIcon}
-                  color={COLORS.grey60}
-                  size="1.25rem"
-                  data-testid="left-icon"
-                />
-              </div>
+            {leftElement !== undefined && (
+              <div className={styles.left_element_wrapper}>{leftElement}</div>
             )}
             <textarea
-              data-testid="TextAreaField"
+              id={textareaId}
               className={textareaClasses}
               style={{
                 borderRadius: borderRadius ?? undefined,
@@ -206,29 +178,28 @@ export const TextAreaField = forwardRef<
                 height: height ?? undefined,
                 resize: resize,
               }}
+              disabled={rawDisabled}
               value={value}
-              placeholder={placeHolder}
+              placeholder={placeHolderText}
               onWheel={event => {
                 event.currentTarget.blur()
               }} // prevent value change with scrolling
               ref={ref}
-              disabled={disabled}
-              id={id}
-              name={name}
-              onChange={onChange}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              readOnly={readOnly}
-              autoFocus={autoFocus}
+              {...restTextareaProps}
             />
-            {showDeleteIcon && (
-              <div className={styles.delete_icon_wrapper} onClick={onDelete}>
-                <Icon name="close" size="1.75rem" />
+            {rightElement != null && (
+              <div
+                className={styles.right_element_wrapper}
+                onClick={e => {
+                  e.stopPropagation()
+                }}
+              >
+                {rightElement}
               </div>
             )}
           </div>
         </div>
-        {caption != null && (
+        {!hasError && caption != null && (
           <StyledText
             desktopStyle="bodyDefaultRegular"
             className={styles.caption_text}

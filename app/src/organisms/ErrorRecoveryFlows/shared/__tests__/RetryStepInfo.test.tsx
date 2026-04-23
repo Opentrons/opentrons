@@ -103,6 +103,26 @@ describe('RetryStepInfo', () => {
     screen.getByText('Close the robot door before proceeding.')
   })
 
+  it(`renders correct body text for ${ERROR_KINDS.VACUUM_CARBOY_FULL} error`, () => {
+    props.errorKind = ERROR_KINDS.VACUUM_CARBOY_FULL
+
+    render(props)
+
+    screen.getByText(
+      'Take any necessary additional actions to prepare the robot to retry the failed step.'
+    )
+  })
+
+  it(`renders correct body text for ${ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED} error`, () => {
+    props.errorKind = ERROR_KINDS.VACUUM_PRESSURE_NOT_REACHED
+
+    render(props)
+
+    screen.getByText(
+      'Take any necessary additional actions to prepare the robot to retry the failed step.'
+    )
+  })
+
   it('renders default body text for other error kinds', () => {
     props.errorKind = ERROR_KINDS.GENERAL_ERROR
 

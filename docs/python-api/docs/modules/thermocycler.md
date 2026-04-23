@@ -1,5 +1,6 @@
 ---
 title: "Python API: Thermocycler"
+description: "Control the Thermocycler: lid, block temperature, and profiles in protocols."
 ---
 
 The Thermocycler Module provides on-deck, fully automated thermocycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
@@ -116,7 +117,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 === "Concurrent"
     ```python
     # set block temperature
-    cool_task = tc_mod.start_set_block_temperature(celsius=4)
+    cool_task = tc_mod.start_set_block_temperature(temperature=4)
     # complete pipetting actions while the block cools
     pipette.pick_up_tip()
     pipette.aspirate(50, plate["A1"])
@@ -125,7 +126,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
     # wait for the block to reach the target temperature
     protocol.wait_for_tasks([cool_task])
     # hold samples on the block at target temperature
-    block_timer = create_timer(seconds=255)
+    block_timer = protocol.create_timer(seconds=255)
     protocol.wait_for_tasks([block_timer])
     ```
 

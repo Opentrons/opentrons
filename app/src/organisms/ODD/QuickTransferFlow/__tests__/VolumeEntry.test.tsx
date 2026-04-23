@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -16,10 +16,10 @@ vi.mock('/app/atoms/SoftwareKeyboard')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 
@@ -63,7 +63,7 @@ describe('VolumeEntry', () => {
     const exitBtn = screen.getByText('Exit')
     fireEvent.click(exitBtn)
     expect(props.exitButtonProps.onClick).toHaveBeenCalled()
-    expect(vi.mocked(InputField)).toHaveBeenCalled()
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalled()
     expect(vi.mocked(NumericalKeyboard)).toHaveBeenCalled()
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(continueBtn).toBeDisabled()
@@ -72,13 +72,15 @@ describe('VolumeEntry', () => {
   it('renders transfer text if there are more destination wells than source wells', () => {
     render(props)
     screen.getByText('Set transfer volume')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Volume per well (µL)',
+        autoFocus: true,
+        label: 'Volume per well (µL)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '',
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -95,13 +97,15 @@ describe('VolumeEntry', () => {
     })
     render(props)
     screen.getByText('Set dispense volume')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Dispense volume per well (µL)',
+        autoFocus: true,
+        label: 'Dispense volume per well (µL)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '',
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -118,13 +122,15 @@ describe('VolumeEntry', () => {
     })
     render(props)
     screen.getByText('Set aspirate volume')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate volume per well (µL)',
+        autoFocus: true,
+        label: 'Aspirate volume per well (µL)',
         error: null,
-        readOnly: true,
         type: 'text',
         value: '',
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -159,13 +165,15 @@ describe('VolumeEntry', () => {
     })
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(continueBtn).toBeDisabled()
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate volume per well (µL)',
+        autoFocus: true,
+        label: 'Aspirate volume per well (µL)',
         error: 'Value must be between 5 to 50',
-        readOnly: true,
         type: 'text',
         value: '90',
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )

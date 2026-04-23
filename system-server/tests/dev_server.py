@@ -1,38 +1,32 @@
 from __future__ import annotations
 
-import random
 import signal
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from types import TracebackType
-from typing import Optional
 
 
 class DevServer:
-    def __init__(
-        self, port: int | None = None, persistence_directory: Optional[Path] = None
-    ) -> None:
-        """Initialize a dev server."""
+    def __init__(self, port: int, persistence_directory: Path | None = None) -> None:
+        """Initialize a dev server with the given port."""
         self.server_temp_directory: str = tempfile.mkdtemp()
         self.persistence_directory: Path = (
             persistence_directory
             if persistence_directory is not None
             else Path(tempfile.mkdtemp())
         )
-        self.port: int = (
-            port if port is not None else random.randrange(2**15 + 2**14, 2**16 - 1)
-        )
+        self.port: int = port
 
     def __enter__(self) -> DevServer:
         return self
 
     def __exit__(
         self,
-        exc_type: Optional[BaseException],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: BaseException | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.stop()
 

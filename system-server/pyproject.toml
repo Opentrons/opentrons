@@ -58,7 +58,7 @@ dev = [
     "pytest-xdist~=2.5.0",
     "tavern>=3.0.2",
     "coverage==7.4.0",
-    "sqlalchemy2-stubs==0.0.2a21",
+    "sqlalchemy2-stubs==0.0.2a38",
     "mypy==1.19.1",
     "decoy<3,>=2.2.0",
     "types-requests==2.27.1",
@@ -88,6 +88,9 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-first-party = ["opentrons", "opentrons_shared_data", "server_utils"]
 known-local-folder = ["system_server"]
+
+[tool.ruff.format]
+exclude = ["system_server/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="system_server/_version.py"
@@ -132,11 +135,14 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 [tool.pytest]
 addopts = ["--cov=system_server", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
+    "error::sqlalchemy.exc.RemovedIn20Warning",
     "error::pydantic.PydanticDeprecatedSince20",
 ]
 

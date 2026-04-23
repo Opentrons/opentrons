@@ -1,4 +1,4 @@
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -6,6 +6,7 @@ import {
   absorbanceReaderCollision,
   formatPyStr,
   formatPyWellLocation,
+  getDefaultPrimaryNozzle,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
@@ -21,8 +22,7 @@ import {
 } from '../../utils'
 
 import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
 export const moveToWell: CommandCreator<MoveToWellParams> = (
@@ -42,8 +42,17 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   const actionName = 'moveToWell'
   const errors: CommandCreatorError[] = []
   const labwareState = prevRobotState.labware
+
   const { pipetteEntities, labwareEntities } = invariantContext
   const pipetteSpec = pipetteEntities[pipetteId]?.spec
+  const nozzleConfiguration = prevRobotState.pipettes[pipetteId]?.nozzles ?? ALL
+  const primaryNozzle =
+    prevRobotState.pipettes[pipetteId]?.primaryNozzle ??
+    getDefaultPrimaryNozzle({
+      nozzles: nozzleConfiguration,
+      channels: pipetteSpec?.channels,
+    })
+
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
@@ -176,9 +185,10 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   }
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
-
+  const pipetteSpecs = invariantContext.pipetteEntities[pipetteId]?.spec
   if (
     isMultiChannelPipette &&
+    pipetteSpecs &&
     !getIsSafePipetteMovement({
       robotState: prevRobotState,
       invariantContext,
@@ -190,6 +200,8 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
         z: 0,
       },
       wellTargetName: wellName,
+      nozzleConfiguration,
+      primaryNozzle,
     })
   ) {
     errors.push(errorCreators.possiblePipetteCollision())

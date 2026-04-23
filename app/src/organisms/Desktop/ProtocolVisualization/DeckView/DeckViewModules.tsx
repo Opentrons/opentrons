@@ -1,10 +1,6 @@
 import { Fragment } from 'react'
 
-import {
-  CenterLabwareInModuleChildSlot,
-  COLORS,
-  Module,
-} from '@opentrons/components'
+import { COLORS, Module } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getModuleDef,
@@ -18,7 +14,6 @@ import { getModuleInnerProps } from '../utils/getModuleInnerProps'
 import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOnModuleFromStack'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { DeckViewStacker } from './DeckViewStacker'
-import { LabwareOnDeck } from './LabwareOnDeck'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
@@ -107,29 +102,6 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
           !showLabwareCommandSummary
         return (
           <Fragment key={id}>
-            {isThermocyclerLidClosed && labwareLoadedOnModuleId != null ? (
-              <CenterLabwareInModuleChildSlot
-                deckId={deckDef.otId}
-                slotId={slot}
-                moduleDefinition={moduleDef}
-                labwareDefinition={
-                  labwareEntitiesExtended[labwareLoadedOnModuleId].def
-                }
-              >
-                <LabwareOnDeck
-                  robotState={robotState}
-                  labwareDef={
-                    labwareEntitiesExtended[labwareLoadedOnModuleId].def
-                  }
-                  liquids={liquids}
-                  labwareId={labwareLoadedOnModuleId}
-                  x={0}
-                  y={0}
-                  setSelectedSlot={setSelectedSlot}
-                  setHoveredSlot={setHoveredSlot}
-                />
-              </CenterLabwareInModuleChildSlot>
-            ) : null}
             <Module
               key={id}
               x={slotPosition[0]}

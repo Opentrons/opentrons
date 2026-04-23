@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from './LabwareOutline'
 import { TipStatus } from './Tips'
+import { LABWARE } from './types'
 import { WellStatus } from './Wells'
 import { STYLE_BY_WELL_CONTENTS } from './Wells/StyledWells'
 import { Well } from './Wells/Well'
@@ -81,6 +82,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     selectedTipsByIndex,
     borderStroke,
   } = props
+
   const { isTiprack } = definition.parameters
   return (
     <g onClick={onLabwareClick}>
@@ -137,10 +139,12 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                         onMouseLeaveWell?.({ wellName, event: e })
                       }
                       onClick={() => handleClickWell?.(wellName)} // TODO: add select logic
+                      id={wellName}
                     >
                       {isTiprack ? (
                         <TipStatus
-                          labwareDefinition={definition}
+                          wellMap={definition.wells}
+                          wellName={wellName}
                           type={statusByWellName[wellName] as TipType}
                           text={
                             selectedTipsByIndex != null &&
@@ -152,8 +156,11 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                         />
                       ) : (
                         <WellStatus
-                          labwareDefinition={definition}
+                          wellMap={definition.wells}
                           type={statusByWellName[wellName] as WellType}
+                          parentType={LABWARE}
+                          wellName={wellName}
+                          size={wellWidth.toString()}
                         />
                       )}
                     </svg>

@@ -3,7 +3,7 @@ import contextlib
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, Generator
+from typing import Any, Callable, Dict, Generator
 
 import pytest
 import requests
@@ -19,8 +19,6 @@ from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADE
 
 _SESSION_SERVER_SCHEME = "http://"
 _SESSION_SERVER_HOST = "localhost"
-_OT2_SESSION_SERVER_PORT = "31950"
-_OT3_SESSION_SERVER_PORT = "31960"
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
 
@@ -62,12 +60,16 @@ def ot3_server_base_url(_ot3_session_server: str) -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session")
-def _ot2_session_server(server_temp_directory: str) -> Generator[str, None, None]:
-    base_url = (
-        f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT2_SESSION_SERVER_PORT}"
-    )
+def _ot2_session_server(
+    server_temp_directory: str,
+    # We need unused_tcp_port_factory instead of unused_tcp_port to avoid a ScopeMismatch
+    # error, since it's function-scoped and we're session-scoped.
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    port = unused_tcp_port_factory()
+    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
     with DevServer(
-        port=_OT2_SESSION_SERVER_PORT,
+        port=str(port),
         ot_api_config_dir=Path(server_temp_directory),
     ) as dev_server:
         dev_server.start()
@@ -76,12 +78,16 @@ def _ot2_session_server(server_temp_directory: str) -> Generator[str, None, None
 
 
 @pytest.fixture(scope="session")
-def _ot3_session_server(server_temp_directory: str) -> Generator[str, None, None]:
-    base_url = (
-        f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}"
-    )
+def _ot3_session_server(
+    server_temp_directory: str,
+    # We need unused_tcp_port_factory instead of unused_tcp_port to avoid a ScopeMismatch
+    # error, since it's function-scoped and we're session-scoped.
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    port = unused_tcp_port_factory()
+    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
     with DevServer(
-        port=_OT3_SESSION_SERVER_PORT,
+        port=str(port),
         is_ot3=True,
         ot_api_config_dir=Path(server_temp_directory),
     ) as dev_server:

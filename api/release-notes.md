@@ -12,7 +12,7 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 
 ### New Features
 
-- Use the `set_empty()` method to load an empty tip rack on the deck.
+- Use Opentrons Flex 20 µL pipette tips in your protocols. The tips are fully compatible with [liquid class](https://docs.opentrons.com/python-api/liquid-classes/) commands and with Flex 1- and 8-Channel (1-50 µL range) and 96-Channel (1-200 µL range) pipettes.
 
 ### Feature Improvements
 
@@ -21,6 +21,15 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 - Choose a blowout flow rate and location for custom liquid class transfer settings.
 - Change the position to dispose of tips in any trash bin, including a non-default trash bin, with the `drop_tip()` method.
 - Liquid class transfers are optimized to prevent unnecessary movements to the top of a well before proceeding.
+- This release includes improved handling of CSV files added to protocols.
+
+### Bug Fixes
+
+- This release fixes the Flex boot issue on some network configurations.
+
+### Known Issues
+
+- Returning a full rack of Flex 20 µL pipette tips can result in incorrect placement in the tip rack. If you experience this, check to make sure your Flex is operating in [ideal conditions](https://docs.opentrons.com/flex/installation/requirements/#environmental-conditions-flex).
 
 ---
 

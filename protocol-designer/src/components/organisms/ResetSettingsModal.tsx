@@ -61,7 +61,6 @@ export function ResetSettingsModal(
             {t('shared:cancel')}
           </SecondaryButton>
           <PrimaryButton
-            data-testid="ResetSettingsModal_continueButton"
             onClick={() => {
               handleContinue()
             }}

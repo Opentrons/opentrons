@@ -4,6 +4,7 @@ Thanks for your interest in contributing to the Opentrons platform! This Contrib
 
 - [Opening Issues](#opening-issues)
 - [Opening Pull Requests](#opening-pull-requests)
+- [PR Etiquette](#pr-etiquette)
 - [Commit Guidelines](#commit-guidelines)
 - [Project and Repository Structure](#project-and-repository-structure)
 - [Development Setup](#development-setup)
@@ -28,17 +29,7 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 
 ## Opening Issues
 
-Filing an issue is a great way to contribute to the project! Bug reports and feature requests are really useful for us as we plan our work. If you’d like to open an issue, please consider the following questions before opening:
-
-- Is this issue for a bug, a feature request, or something else?
-  - Please make this is clear in your description so it’s easier to address
-- Has this issue already been opened?
-  - Duplicate tickets slow things down, so make sure to search before you open!
-  - If there’s already a ticket, please comment on the existing thread!
-- Is this a support request?
-  - If yes, you're better off checking out our [support page][support] rather than opening a GitHub issue
-
-To ensure your issue can be addressed quickly, please fill out the sections in the existing issue template to the best of your ability!
+Please note that the issues tab on this repo is disabled. This doesn't mean we don't want to hear from you; it just means that our [support page][support] is a much better way to do so.
 
 ## Opening Pull Requests
 
@@ -73,6 +64,26 @@ After your Pull Request is merged (or otherwise closed), you’ll want to make s
 ### Deciding What to Work On
 
 If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up.
+
+## PR Etiquette
+
+Following these practices helps reviewers focus on substance rather than cleanup and keeps our codebase healthy. A guiding principle: **Does this PR alleviate the burden of the reviewer as best as possible?** Please also read through the [LLM Usage Guidelines](#LLM-system-usage-guidelines)
+
+### Before Marking a PR "Ready for Review"
+
+- **Proofread the code.** Present a best-effort, functional solution.
+- **Add appropriate tests.** Include tests as appropriate for the scope of the PR.
+- **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended.
+
+### While Opening a PR
+
+- **Fill out the PR template thoughtfully.** A well-filled template lets reviewers focus on substance rather than chasing basic questions. It reduces back-and-forth, speeds up review, and helps future maintainers. You're welcome to bend the template when it helps you communicate better (e.g., for a bug fix, overview + details might serve readers better than overview + changelog). Just be thoughtful about what you change and why.
+- **Use semantic commit titling.** Use conventional prefixes such as `feat`, `fix`, `refactor`, `style`, `docs`, etc. See [Commit Guidelines](#commit-guidelines) for our [commitizen][] workflow.
+
+### After Receiving PR Approval
+
+- **Perform a final smoke test** before merging, to confirm nothing regressed after approval.
+- **Truncate the commit message before merging.** Keep only the ticket reference and a concise Overview snippet—avoid long, unwieldy merge messages.
 
 ## Commit Guidelines
 
@@ -129,6 +140,23 @@ This will launch the commitizen wizard, which will ask you to:
     - e.g. `Closes #xyz`
 
 ![commitizen](https://user-images.githubusercontent.com/2963448/40452320-776de7e0-5eaf-11e8-9aa7-ad706713b197.gif)
+
+## LLM system usage guidelines
+
+When submitting pull requests to the Opentrons repo, please keep the following rule in mind: **don't make anybody else interact with your LLM**. The code you submit is under your name, no matter what tools were used to generate it, and questions asked about it are asked to you.
+
+That means:
+
+- Look over the code before you submit it and make sure you're comfortable with it going out under your name
+- Don't respond to reviews or questions with LLM output
+- Don't cite "this is how the LLM did it" in response to a review
+
+That doesn't mean:
+
+- Every pull request must be perfect
+- Anything with an em dash will be rejected
+
+Maintainers of the repo follow the same rules, and will never ask you to respond to their LLM outputs.
 
 ## Project and Repository Structure
 

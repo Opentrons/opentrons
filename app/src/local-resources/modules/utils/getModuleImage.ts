@@ -11,6 +11,7 @@ import absorbanceReader from '/app/assets/images/opentrons_plate_reader.png'
 import temperatureModule from '/app/assets/images/temp_deck_gen_2_transparent.png'
 import thermoModuleGen1 from '/app/assets/images/thermocycler_closed.png'
 import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
+import vacuumModule from '/app/assets/images/vacuum_module_v1.png'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 
@@ -37,6 +38,8 @@ export function getModuleImage(
       return absorbanceReader
     case 'flexStackerModuleV1':
       return flexStackerModule
+    case 'vacuumModuleV1':
+      return vacuumModule
     default:
       return 'Error: unknown module model'
   }

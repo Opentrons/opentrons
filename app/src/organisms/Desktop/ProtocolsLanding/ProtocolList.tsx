@@ -29,10 +29,10 @@ import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
 } from '/app/redux/config'
+import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { useSortedProtocols } from './hooks'
 import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
@@ -54,8 +54,15 @@ const SORT_BY_BUTTON_STYLE = css`
     background-color: ${COLORS.grey40};
   }
 `
-const FLEX = 'Flex'
-const OT2 = 'OT-2'
+
+const DEFAULT_PROTOCOL_SORT: ProtocolSort = 'alphabetical'
+
+const isProtocolSort = (sortKey: unknown): sortKey is ProtocolSort =>
+  sortKey === 'alphabetical' ||
+  sortKey === 'reverse' ||
+  sortKey === 'recent' ||
+  sortKey === 'oldest'
+
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
@@ -68,7 +75,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   ] = useState<boolean>(false)
   const [showSendProtocolToFlexSlideout, setShowSendProtocolToFlexSlideout] =
     useState<boolean>(false)
-  const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
+  const configuredSortBy = useSelector(getProtocolsDesktopSortKey)
+  const sortBy = isProtocolSort(configuredSortBy)
+    ? configuredSortBy
+    : DEFAULT_PROTOCOL_SORT
   const [showSortByMenu, setShowSortByMenu] = useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => {
     setShowSortByMenu(!showSortByMenu)
@@ -108,12 +118,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     },
     oldest: {
       label: t('oldest_updates'),
-    },
-    flex: {
-      label: t('robot_type_first', { robotType: FLEX }),
-    },
-    ot2: {
-      label: t('robot_type_first', { robotType: OT2 }),
     },
   }
 
@@ -236,20 +240,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               >
                 {t('oldest_updates')}
               </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleProtocolsSortKey('flex')
-                }}
-              >
-                {t('robot_type_first', { robotType: FLEX })}
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleProtocolsSortKey('ot2')
-                }}
-              >
-                {t('robot_type_first', { robotType: OT2 })}
-              </MenuItem>
             </Flex>
           )}
           {showSortByMenu ? (
@@ -272,15 +262,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         gridGap={SPACING.spacing8}
         marginBottom={SPACING.spacing40}
       >
-        {sortedStoredProtocols != null &&
-          sortedStoredProtocols.map(storedProtocol => (
-            <ProtocolCard
-              key={storedProtocol.protocolKey}
-              handleRunProtocol={handleRunProtocol}
-              handleSendProtocolToFlex={handleSendProtocolToFlex}
-              storedProtocolData={storedProtocol}
-            />
-          ))}
+        {sortedStoredProtocols?.map(storedProtocol => (
+          <ProtocolCard
+            key={storedProtocol.protocolKey}
+            handleRunProtocol={handleRunProtocol}
+            handleSendProtocolToFlex={handleSendProtocolToFlex}
+            storedProtocolData={storedProtocol}
+          />
+        ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout

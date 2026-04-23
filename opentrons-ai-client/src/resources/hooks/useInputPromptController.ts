@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -8,16 +9,17 @@ import {
   chatHistoryAtom,
   createProtocolChatAtom,
   regenerateProtocolAtom,
-  tokenAtom,
   updateProtocolChatAtom,
 } from '/ai-client/resources/atoms'
 import { useApiCall } from '/ai-client/resources/hooks'
 import { useAttachFiles } from '/ai-client/resources/hooks/useAttachFiles'
+import { useGetAccessToken } from '/ai-client/resources/hooks/useGetAccessToken'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 import {
   buildChatHistory,
   buildRequestConfig,
   createUserInput,
+  resolveErrorMessage,
 } from '/ai-client/resources/utils'
 import { detectProtocolFormat } from '/ai-client/resources/utils/protocolFormat'
 import {
@@ -25,6 +27,7 @@ import {
   getUpdateOrCreatePrompt,
 } from '/ai-client/resources/utils/protocolUtils'
 
+import type { TFunction } from 'i18next'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { ChatData, ProtocolFormat } from '/ai-client/resources/types'
 
@@ -38,6 +41,7 @@ interface UseInputPromptControllerResult {
   submitChat: () => void
   isLoading: boolean
   errorMessage: string | null
+  dismissError: () => void
   attachedFiles: File[]
   handleFileSelect: (files: FileList | null) => void
   handleRemoveFile: (index: number) => void
@@ -48,6 +52,7 @@ export function useInputPromptController(
 ): UseInputPromptControllerResult {
   const { userPrompt, resetForm, setUserPrompt } = args
 
+  const { t } = useTranslation('protocol_generator')
   const trackEvent = useTrackEvent()
 
   const [updateProtocol] = useAtom(updateProtocolChatAtom)
@@ -60,22 +65,18 @@ export function useInputPromptController(
 
   const [, setChatData] = useAtom(chatDataAtom)
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom)
-  const [token] = useAtom(tokenAtom)
+  const { getAccessToken } = useGetAccessToken()
 
   const [sendAutoFilledPrompt, setSendAutoFilledPrompt] =
     useState<boolean>(false)
   const [submitted, setSubmitted] = useState<boolean>(false)
   const [requestId, setRequestId] = useState<string>(uuidv4())
 
-  const { data, isLoading, callApi, error } = useApiCall()
+  const { data, isLoading, callApi, error, clearError } = useApiCall()
 
   const pdProtocolContent: null | ProtocolFile = useMemo(() => {
-    if (
-      data != null &&
-      typeof data === 'object' &&
-      'protocol_content' in data
-    ) {
-      return (data as any).protocol_content as ProtocolFile
+    if (data != null && typeof data === 'object' && 'protocolContent' in data) {
+      return (data as any).protocolContent as ProtocolFile
     }
     return null
   }, [data])
@@ -89,34 +90,48 @@ export function useInputPromptController(
     clearFiles,
   } = useAttachFiles()
 
-  useEffect(() => {
-    const prefilledPrompt = isNewProtocol
-      ? createProtocol.prompt
-      : updateProtocol.prompt
+  useEffect(
+    () => {
+      const prefilledPrompt = isNewProtocol
+        ? createProtocol.prompt
+        : updateProtocol.prompt
 
-    if (prefilledPrompt !== '') {
-      setUserPrompt(prefilledPrompt)
-      setSendAutoFilledPrompt(true)
-    }
+      if (prefilledPrompt !== '') {
+        setUserPrompt(prefilledPrompt)
+        setSendAutoFilledPrompt(true)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    []
+  )
 
-  useEffect(() => {
-    if (sendAutoFilledPrompt) {
-      void handleClick(true)
-      setSendAutoFilledPrompt(false)
-    }
-  }, [sendAutoFilledPrompt])
+  useEffect(
+    () => {
+      if (sendAutoFilledPrompt) {
+        void handleClick(true)
+        setSendAutoFilledPrompt(false)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sendAutoFilledPrompt]
+  )
 
-  useEffect(() => {
-    if (regenerateProtocol.regenerate) {
-      void handleClick(regenerateProtocol.isCreateOrUpdateProtocol, true)
-      setRegenerateProtocol({
-        isCreateOrUpdateProtocol: false,
-        regenerate: false,
-      })
-    }
-  }, [regenerateProtocol])
+  useEffect(
+    () => {
+      if (regenerateProtocol.regenerate) {
+        void handleClick(regenerateProtocol.isCreateOrUpdateProtocol, true)
+        setRegenerateProtocol({
+          isCreateOrUpdateProtocol: false,
+          regenerate: false,
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [regenerateProtocol]
+  )
 
   const prepareValidatedFiles = (
     isUpdateOrCreateRequest: boolean
@@ -149,7 +164,7 @@ export function useInputPromptController(
       name: ANALYTICS.CHAT_SUBMITTED,
       properties: {
         chat: userPrompt,
-        protocol_format: protocolFormat,
+        protocolFormat: protocolFormat,
       },
     })
 
@@ -170,6 +185,13 @@ export function useInputPromptController(
 
     const validatedFiles = prepareValidatedFiles(isUpdateOrCreateRequest)
     if (validatedFiles === null) return
+
+    let token: string
+    try {
+      token = await getAccessToken()
+    } catch {
+      return
+    }
 
     const userInput = createUserInput(
       newRequestId,
@@ -222,15 +244,15 @@ export function useInputPromptController(
   // Process API response
   useEffect(() => {
     if (submitted && !isLoading) {
-      if (error) {
+      if (error != null) {
         setSubmitted(false)
       } else if (data != null) {
-        const { role, reply, protocol_content } = data as ChatData
+        const { role, reply, protocolContent } = data as ChatData
         const assistantResponse: ChatData = {
           requestId,
           role,
           reply,
-          protocol_content,
+          protocolContent,
         }
 
         setChatHistory(prev => [
@@ -238,8 +260,8 @@ export function useInputPromptController(
           {
             role: 'assistant',
             content: reply,
-            protocol_content: JSON.stringify(
-              protocol_content
+            protocolContent: JSON.stringify(
+              protocolContent
             ) as unknown as string,
           },
         ])
@@ -270,14 +292,7 @@ export function useInputPromptController(
   ])
 
   const errorMessage: string | null =
-    fileError ??
-    (typeof error === 'string'
-      ? error
-      : error instanceof Error
-        ? error.message
-        : error != null
-          ? String(error)
-          : null)
+    fileError ?? resolveErrorMessage(error, t as TFunction)
 
   return {
     submitChat: () => {
@@ -285,6 +300,7 @@ export function useInputPromptController(
     },
     isLoading,
     errorMessage,
+    dismissError: clearError,
     attachedFiles,
     handleFileSelect: (files: FileList | null) => {
       if (files == null) return

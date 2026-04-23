@@ -198,7 +198,6 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           })
         case 'robotUpdate:UPLOAD_FILE': {
           const { host, path, systemFile } = action.payload
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           return postFile(
             `http://${host.ip}:${host.port}${path}`,
             SYSTEM_FILENAME,

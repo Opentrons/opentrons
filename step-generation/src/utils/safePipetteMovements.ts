@@ -1,5 +1,6 @@
 import {
   A1_NOZZLE,
+  A12_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -10,23 +11,30 @@ import {
   getOt2SurroundingSlots,
   getPositionFromSlotId,
   getRobotDefFromRobotType,
+  H1_NOZZLE,
   OT2_ROBOT_TYPE,
-  PARTIAL,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { EMPTY, OT2_TC_SLOTS } from '../constants'
+import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
 import type {
   AddressableArea,
   CoordinateTuple,
+  CutoutId,
   LabwareDefinition,
   ModuleModel,
   NozzleConfigurationStyle,
   OT2AddressableAreaName,
+  PartialPrimaryNozzles,
   PipetteChannels,
   PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
@@ -37,11 +45,11 @@ import type {
   LabwareEntity,
   ModuleEntities,
   PipetteEntity,
+  Point,
   RobotState,
   TipState,
 } from '../types'
 
-export const PRIMARY_NOZZLE = 'A12'
 const FLEX_TC_LID_COLLISION_ZONE = {
   back_left: { x: -43.25, y: 454.9, z: 211.91 },
   front_right: { x: 128.75, y: 402, z: 211.91 },
@@ -62,10 +70,15 @@ interface SlotInfo {
   addressableArea: AddressableArea | null
   position: CoordinateTuple | null
 }
-export interface Point {
-  x: number
-  y: number
-  z?: number
+
+export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
+  if (slotInfo.addressableArea?.areaType === 'slot') {
+    const testCutoutId = `cutoutId${slotInfo.addressableArea?.id}`
+    if (testCutoutId as CutoutId) {
+      return testCutoutId as CutoutId
+    }
+  }
+  return null
 }
 
 // return pipette bounds at a sepcific position
@@ -76,15 +89,18 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
+  labwareDefinition: LabwareDefinition,
   primaryNozzle: PrimaryNozzleConfigurationStyle,
+  nozzleConfiguration: NozzleConfigurationStyle,
   tipOverlapOnNozzle: number
 ): Point[] => {
-  const { nozzleMap, nozzleOffset, pipetteBoundingBoxOffsets } =
-    pipetteEntity.spec
-  const primaryNozzlePoint =
-    nozzleMap == null || primaryNozzle == null
-      ? nozzleOffset
-      : nozzleMap[primaryNozzle]
+  const { pipetteBoundingBoxOffsets } = pipetteEntity.spec
+  const primaryNozzlePoint = getPipetteCriticalPoint(
+    nozzleConfiguration,
+    pipetteEntity,
+    primaryNozzle,
+    labwareDefinition
+  )
   const pipetteBoundingBoxLeftXOffset =
     pipetteBoundingBoxOffsets.backLeftCorner[0]
   const pipetteBoundingBoxRightXOffset =
@@ -94,13 +110,13 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   const pipetteBoundingBoxFrontYOffset =
     pipetteBoundingBoxOffsets.frontRightCorner[1]
   const leftX =
-    wellTargetPoint.x - (primaryNozzlePoint[0] - pipetteBoundingBoxLeftXOffset)
+    wellTargetPoint.x - (primaryNozzlePoint.x - pipetteBoundingBoxLeftXOffset)
   const rightX =
-    wellTargetPoint.x + (pipetteBoundingBoxRightXOffset - primaryNozzlePoint[0])
+    wellTargetPoint.x + (pipetteBoundingBoxRightXOffset - primaryNozzlePoint.x)
   const backY =
-    wellTargetPoint.y + (pipetteBoundingBoxBackYOffset - primaryNozzlePoint[1])
+    wellTargetPoint.y + (pipetteBoundingBoxBackYOffset - primaryNozzlePoint.y)
   const frontY =
-    wellTargetPoint.y - (primaryNozzlePoint[1] - pipetteBoundingBoxFrontYOffset)
+    wellTargetPoint.y - (primaryNozzlePoint.y - pipetteBoundingBoxFrontYOffset)
 
   const zNozzles = (wellTargetPoint.z ?? 0) + tipLength - tipOverlapOnNozzle
 
@@ -140,43 +156,63 @@ const getModuleHeightFromDeckDefinition = (
   return getModuleDef(moduleModel).dimensions.bareOverallHeight
 }
 
+const getWasteChuteHeightFromDeckDefinition = (
+  robotType: RobotType
+): number => {
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const wasteChute = Object.values(deckDef.cutoutFixtures).find(cutoutFixture =>
+    WASTE_CHUTE_FIXTURES.includes(cutoutFixture.id)
+  )
+  return wasteChute?.height ?? 0 // returns 0 if no waste chute
+}
+
 //  check the highest Z-point of all items stacked given a deck slot (including modules,
-//  adapters, and modules on adapters)
+//  adapters, waste chute, and modules on adapters)
 const getHighestZInSlot = (
   robotState: RobotState,
   invariantContext: InvariantContext,
-  slotId: string,
+  slotInfo: SlotInfo,
   robotType: RobotType
 ): number => {
   const { modules, labware } = robotState
-  const { moduleEntities, labwareEntities } = invariantContext
-
+  const { moduleEntities, labwareEntities, wasteChuteEntities } =
+    invariantContext
   let totalHeight: number = 0
-  const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
-  const moduleInSlot = Object.keys(modules).find(
-    moduleId => modules[moduleId].slot === slotId
-  )
-
-  //  if slot has labware, includes labware, adapters, and module
-  if (largestLabwareStack.length > 0) {
-    largestLabwareStack.forEach(item => {
-      if (modules[item] != null) {
-        totalHeight += getModuleHeightFromDeckDefinition(
-          moduleEntities[item].model,
-          robotType
-        )
-      }
-      if (labware[item] != null) {
-        totalHeight += labwareEntities[item].def.dimensions.zDimension
-      }
-    })
-    // if slot only has module
-  } else if (moduleInSlot != null) {
-    totalHeight += getModuleHeightFromDeckDefinition(
-      moduleEntities[moduleInSlot].model,
-      robotType
+  const slotId = slotInfo?.addressableArea?.id
+  if (slotId) {
+    const largestLabwareStack = getFullStackFromLabwares(labware, slotId)
+    const moduleInSlot = Object.keys(modules).find(
+      moduleId => modules[moduleId].slot === slotId
     )
+    const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
+      wasteChute => wasteChute.location === getCutoutIdFromSlot(slotInfo)
+    )
+    // if slot has waste chute
+    if (wasteChuteInSlot) {
+      totalHeight += getWasteChuteHeightFromDeckDefinition(robotType)
+    }
+    //  if slot has labware, includes labware, adapters, and module
+    if (largestLabwareStack.length > 0) {
+      largestLabwareStack.forEach(item => {
+        if (modules[item] != null) {
+          totalHeight += getModuleHeightFromDeckDefinition(
+            moduleEntities[item].model,
+            robotType
+          )
+        }
+        if (labware[item] != null) {
+          totalHeight += labwareEntities[item].def.dimensions.zDimension
+        }
+      })
+      // if slot only has module
+    } else if (moduleInSlot != null) {
+      totalHeight += getModuleHeightFromDeckDefinition(
+        moduleEntities[moduleInSlot].model,
+        robotType
+      )
+    }
   }
+
   return totalHeight
 }
 
@@ -191,10 +227,10 @@ const getSlotHasPotentialCollidingObject = (
   const isThermocyclerOnDeck = Object.values(
     invariantContext.moduleEntities
   ).some(({ type }) => type === THERMOCYCLER_MODULE_TYPE)
+
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
-
     // explicit OT-2 check for if the pipette will enter the space above a thermocycler-occupied slot
     const willCollideWithThermocycler =
       isThermocyclerOnDeck &&
@@ -229,15 +265,12 @@ const getSlotHasPotentialCollidingObject = (
       ) &&
       pipetteBounds[0].z != null
     ) {
-      const highestZInSurroundingSlot =
-        slot.addressableArea?.id != null
-          ? getHighestZInSlot(
-              robotState,
-              invariantContext,
-              slot.addressableArea.id,
-              robotType
-            )
-          : 0
+      const highestZInSurroundingSlot = getHighestZInSlot(
+        robotState,
+        invariantContext,
+        slot,
+        robotType
+      )
       if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
         return true
       }
@@ -296,8 +329,8 @@ export const getIsSafePipetteMovement = (args: {
   labwareId: string
   wellLocationOffset?: Point
   wellTargetName?: string
-  primaryNozzle?: PrimaryNozzleConfigurationStyle
-  nozzleConfiguration?: NozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzleConfiguration: NozzleConfigurationStyle
 }): boolean => {
   const {
     robotState,
@@ -307,7 +340,7 @@ export const getIsSafePipetteMovement = (args: {
     wellLocationOffset = { x: 0, y: 0, z: 0 },
     wellTargetName,
     primaryNozzle,
-    nozzleConfiguration: nozzleConfigurationOverride,
+    nozzleConfiguration,
   } = args
   const {
     pipetteEntities,
@@ -318,9 +351,8 @@ export const getIsSafePipetteMovement = (args: {
   const { labware: labwareState, tipState } = robotState
 
   const pipetteEntity = pipetteEntities[pipetteId]
-  const nozzleConfiguration =
-    nozzleConfigurationOverride ?? robotState.pipettes[pipetteId]?.nozzles
-  const { spec: pipetteSpecs } = pipetteEntity ?? {}
+
+  const { spec: pipetteSpecs } = pipetteEntity
 
   // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
   const displayCategory = pipetteSpecs?.displayCategory
@@ -328,13 +360,8 @@ export const getIsSafePipetteMovement = (args: {
   const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckDefinition = getDeckDefFromRobotType(robotType)
 
-  //  early exit if labwareId is a trashBin or wasteChute or if no nozzle is provided
-  if (
-    labwareEntities[labwareId] == null ||
-    wellTargetName == null ||
-    nozzleConfiguration == null ||
-    nozzleConfiguration === ALL
-  ) {
+  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided
+  if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
   }
 
@@ -376,15 +403,7 @@ export const getIsSafePipetteMovement = (args: {
     pipetteHasTip
   )
 
-  const { channels } = pipetteEntity.spec
-  const confirmedPrimaryNozzle =
-    nozzleConfiguration === PARTIAL
-      ? A1_NOZZLE
-      : (primaryNozzle ??
-        getDefaultPrimaryNozzle({
-          nozzles: nozzleConfiguration,
-          channels,
-        }))
+  const { channels } = pipetteSpecs
 
   const tipOverlapOnNozzle =
     tiprackEntity != null
@@ -394,13 +413,18 @@ export const getIsSafePipetteMovement = (args: {
           nozzles: nozzleConfiguration,
         })
       : 0
+  const labwareDefinition = labwareEntities[labwareId].def
   const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
     pipetteEntity,
     tipLength,
     wellTargetPoint,
-    confirmedPrimaryNozzle,
+    labwareDefinition,
+    primaryNozzle ??
+      getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels }),
+    nozzleConfiguration,
     tipOverlapOnNozzle
   )
+
   const isWithinPipetteExtents = getIsMovementWithinDeckExtents({
     channels,
     boundingBox: pipetteBoundsAtWellLocation,
@@ -443,7 +467,7 @@ interface TipPickupAvailability {
 
 export const getIsSafePickupWithinTiprack = (args: {
   tipState: Record<string, TipState>
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   channels: PipetteChannels
   nozzleConfiguration: NozzleConfigurationStyle
   wellName: string
@@ -459,13 +483,14 @@ export const getIsSafePickupWithinTiprack = (args: {
     tiprackDef,
     tipsToIgnore = [],
   } = args
+
   const { ordering } = tiprackDef
 
   if (channels === 1) {
     return { isSafe: true, isComplete: tipState[wellName] !== EMPTY }
   }
   if (channels === 8) {
-    const shouldReverse = primaryNozzle === 'H1'
+    const shouldReverse = primaryNozzle !== A1_NOZZLE
     const columnIndex = getTipColumnIndex(wellName)
     const tipColumn = ordering[columnIndex]
     const tipColumnOrdered = shouldReverse
@@ -476,6 +501,19 @@ export const getIsSafePickupWithinTiprack = (args: {
       return {
         isSafe: tipColumnOrdered
           .slice(targetWellIndex + 1) // don't check the actual target well
+          .every(
+            well => tipState[well] === EMPTY || tipsToIgnore.includes(well)
+          ),
+        isComplete: tipState[wellName] !== EMPTY,
+      }
+    }
+    if (nozzleConfiguration === PARTIAL_COLUMN) {
+      const targetWellIndex = tipColumnOrdered.indexOf(wellName)
+      const targetWellLength =
+        PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+      return {
+        isSafe: tipColumnOrdered
+          .slice(targetWellIndex + targetWellLength, tipColumnOrdered.length)
           .every(
             well => tipState[well] === EMPTY || tipsToIgnore.includes(well)
           ),
@@ -500,12 +538,14 @@ export const getIsSafePickupWithinTiprack = (args: {
   }
   // channels = 96, 8 nozzles configured
   if (nozzleConfiguration === COLUMN) {
-    const shouldReverseColumns = primaryNozzle === 'A12'
+    const shouldReverseColumns = primaryNozzle === A12_NOZZLE
     const columnIndex = getTipColumnIndex(wellName)
     const columnPreOrdering = ordering[columnIndex]
+
     const tipColumnsOrdered = shouldReverseColumns
       ? [...ordering].reverse()
       : ordering
+
     const targetColumnIndex = tipColumnsOrdered.indexOf(columnPreOrdering)
     return {
       isSafe: tipColumnsOrdered
@@ -517,10 +557,39 @@ export const getIsSafePickupWithinTiprack = (args: {
       ),
     }
   }
+  // channels = 96, ROW configured
+  if (nozzleConfiguration === ROW) {
+    // build rows from column ordering
+    const rowsPreOrdering = ordering[0].map((_, rowIndex) =>
+      ordering.map(column => column[rowIndex])
+    )
+    const shouldReverse = primaryNozzle === H1_NOZZLE
+    const tipRowsOrdered = shouldReverse
+      ? [...rowsPreOrdering].reverse()
+      : rowsPreOrdering
+    const targetRowIndex = tipRowsOrdered.findIndex(row =>
+      row.some(rowWell => rowWell === wellName)
+    )
+    return {
+      isSafe: tipRowsOrdered
+        .slice(targetRowIndex + 1)
+        .flat()
+        .every(well => tipState[well] === EMPTY || tipsToIgnore.includes(well)),
+      isComplete: tipRowsOrdered[targetRowIndex].every(
+        well => tipState[well] !== EMPTY
+      ),
+    }
+  }
   // channels = 96, 1 nozzle configured
   if (nozzleConfiguration === SINGLE) {
-    const primaryRowName = getTipRowName(primaryNozzle)
-    const primaryColumnName = getTipColumnName(primaryNozzle)
+    const primaryRowName = getTipRowName(
+      primaryNozzle ??
+        getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels })
+    )
+    const primaryColumnName = getTipColumnName(
+      primaryNozzle ??
+        getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels })
+    )
     const shouldReverseRows = primaryRowName === 'H'
     const shouldReverseColumns = primaryColumnName === '12'
     const tipColumnsOrdered = shouldReverseColumns
@@ -583,13 +652,27 @@ export const getTargetTipsFromWellSets = (args: {
   primaryNozzle: string
 }): string[] => {
   const { wellSets, nozzles, channels, primaryNozzle } = args
+  // 96-channel pipette with ROW nozzle configuration needs to transpose wellSets
+  if (nozzles === ROW) {
+    const numCols = wellSets[0].length
+    const transposed: string[][] = Array.from(
+      { length: numCols },
+      (_, colIndex) => wellSets.map(row => row[colIndex])
+    )
+    // Pick the first well from each row
+    return transposed.map(row => row[0])
+  }
   return wellSets.map(wellSet => {
-    // 96-channel pipette with ALL nozzle configuration
+    // 96-channel pipette with ALL nozzle configuration or 8ch with PARTIAL
     if (channels === 96 && nozzles === ALL) {
       return primaryNozzle
     }
     // 96- or 8-channel pipette with COLUMN nozzle configuration
-    if (nozzles === COLUMN || (channels === 8 && nozzles === ALL)) {
+    if (
+      nozzles === COLUMN ||
+      (channels === 8 && nozzles === ALL) ||
+      (channels === 8 && nozzles === PARTIAL_COLUMN)
+    ) {
       const shouldReverse = getTipRowName(primaryNozzle) === 'H'
       return shouldReverse ? wellSet[wellSet.length - 1] : wellSet[0]
     }
@@ -647,6 +730,8 @@ const getOverlapKeyForPipetteSpecs = (
       return 'SingleH12'
     } else if (nozzles === COLUMN) {
       return 'Column12'
+    } else if (nozzles === ROW) {
+      return 'RowA'
     }
   }
   // default

@@ -31,7 +31,6 @@ import {
 } from '@opentrons/shared-data'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'
-import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -83,11 +82,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         navigate(`/devices/${robotName}`)
       }}
     >
-      <img
-        src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
-        style={{ width: '6rem' }}
-        id={`RobotCard_${String(robotName)}_robotImage`}
-      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing12}
@@ -103,13 +97,22 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           />
         ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <RobotStatusHeader
-            local={local}
-            name={robotName}
-            robotModel={robotModel}
-            alignItems={ALIGN_START}
-            paddingRight={SPACING.spacing24}
-          />
+          <Flex gap={SPACING.spacing16}>
+            <img
+              src={FLEX_PNG}
+              width="52.9px"
+              height="50.14px"
+              id={`RobotCard_${String(robotName)}_robotImage`}
+              alt="Flex image"
+            />
+            <RobotStatusHeader
+              local={local}
+              name={robotName}
+              robotModel={robotModel}
+              alignItems={ALIGN_START}
+              paddingRight={SPACING.spacing24}
+            />
+          </Flex>
 
           {robot.status === CONNECTABLE ? (
             <Flex

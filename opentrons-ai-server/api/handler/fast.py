@@ -4,6 +4,7 @@ import os
 import time
 from typing import Annotated, Any, Awaitable, Callable, Dict, List, Literal, Optional, Union, cast
 
+import anthropic
 import structlog
 from anthropic.types import MessageParam
 from asgi_correlation_id import CorrelationIdMiddleware
@@ -39,12 +40,13 @@ from api.models.feedback_request import FeedbackRequest
 from api.models.feedback_response import FeedbackResponse
 from api.models.internal_server_error import InternalServerError
 from api.models.protocol_format import ProtocolFormat
+from api.models.timeout_error import TimeoutError as TimeoutErrorResponse
 from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
 from api.services.file_processor import FileProcessor
-from api.settings import Settings
+from api.settings import Settings, get_settings
 
-settings: Settings = Settings()
+settings: Settings = get_settings()
 setup_logging(json_logs=settings.json_logging, log_level=settings.log_level.upper())
 
 access_logger = structlog.stdlib.get_logger("api.access")
@@ -71,10 +73,13 @@ ALLOWED_HEADERS: List[str] = ["content-type", "authorization", "origin", "accept
 ALLOWED_ACCESS_CONTROL_EXPOSE_HEADERS: List[str] = ["content-type"]
 ALLOWED_ACCESS_CONTROL_MAX_AGE: str = "600"
 
-# Add CORS middleware
+# Add CORS middleware. Parse comma-separated origins.
+_cors_origins: List[str] = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]
+if not _cors_origins:
+    raise ValueError("allowed_origins setting is empty")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=_cors_origins,
     allow_credentials=ALLOWED_CREDENTIALS,
     allow_methods=ALLOWED_METHODS,
     allow_headers=ALLOWED_HEADERS,
@@ -91,14 +96,17 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
         try:
             return await asyncio.wait_for(call_next(request), timeout=self.timeout_s)
         except asyncio.TimeoutError:
-            return JSONResponse({"detail": "API Request timed out"}, status_code=504)
+            body = TimeoutErrorResponse(
+                detail="The request took too long to complete and was cancelled.",
+                message=("Your request exceeded 3 minutes. Please simplify your request and try again."),
+                timeout_seconds=self.timeout_s,
+            )
+            return JSONResponse(body.model_dump(by_alias=True), status_code=504)
 
 
-# Control the timeout message by timing out before cloudfront would
-# 2 seconds before the CloudFront timeout (180 seconds)
-# 12 second before the uvicorn timeout (190 seconds)
-# 22 seconds before the ALB timeout (200 seconds)
-app.add_middleware(TimeoutMiddleware, timeout_s=178)
+# Request timeout in seconds. Set via settings.request_timeout_seconds.
+# Kept below CloudFront/ALB (e.g. 180s) so we return a clear 504 and message.
+app.add_middleware(TimeoutMiddleware, timeout_s=int(settings.request_timeout_seconds))
 
 
 @app.middleware("http")
@@ -125,19 +133,20 @@ async def logging_middleware(request: Request, call_next) -> Response:  # type: 
         client_port = request.client.port if request.client and request.client.port else "unknown"
         http_method = request.method if request.method else "unknown"
         http_version = request.scope["http_version"]
-        # Recreate the Uvicorn access log format, but add all parameters as structured information
-        access_logger.info(
-            f"""{client_host}:{client_port} - "{http_method} {url} HTTP/{http_version}" {status_code}""",
-            http={
-                "url": str(request.url),
-                "status_code": status_code,
-                "method": http_method,
-                "request_id": request_id,
-                "version": http_version,
-            },
-            network={"client": {"ip": client_host, "port": client_port}},
-            duration=process_time,
-        )
+        # Skip access log for health checks to avoid spam from load balancers in deployed environments
+        if request.url.path not in ("/health", "/api/health"):
+            access_logger.info(
+                f"""{client_host}:{client_port} - "{http_method} {url} HTTP/{http_version}" {status_code}""",
+                http={
+                    "url": str(request.url),
+                    "status_code": status_code,
+                    "method": http_method,
+                    "request_id": request_id,
+                    "version": http_version,
+                },
+                network={"client": {"ip": client_host, "port": client_port}},
+                duration=process_time,
+            )
         response.headers["X-Process-Time"] = str(process_time / 10**9)
     return response
 
@@ -171,12 +180,50 @@ class CorsHeadersResponse(BaseModel):
     Access_Control_Max_Age: str = Field(alias="Access-Control-Max-Age")
 
 
+def _extract_anthropic_error_message(exc: anthropic.APIError) -> str:
+    """Pull the human-readable message out of an Anthropic error."""
+    try:
+        body = getattr(exc, "body", None)
+        if isinstance(body, dict):
+            error_detail = body.get("error", {})
+            if isinstance(error_detail, dict) and "message" in error_detail:
+                return str(error_detail["message"])
+    except Exception:
+        pass
+    return str(exc)
+
+
+def _anthropic_error_to_json_response(exc: anthropic.APIError) -> JSONResponse:
+    """Convert any Anthropic SDK error into a safe, serializable JSONResponse."""
+    message = _extract_anthropic_error_message(exc)
+    error_type = type(exc).__name__
+
+    if isinstance(exc, anthropic.BadRequestError):
+        http_status = status.HTTP_400_BAD_REQUEST
+        if "too long" in message.lower() or "maximum" in message.lower():
+            error_type = "context_length_exceeded"
+    elif isinstance(exc, anthropic.RateLimitError):
+        http_status = status.HTTP_429_TOO_MANY_REQUESTS
+    elif isinstance(exc, anthropic.APITimeoutError):
+        http_status = status.HTTP_504_GATEWAY_TIMEOUT
+    elif isinstance(exc, anthropic.APIConnectionError):
+        http_status = status.HTTP_503_SERVICE_UNAVAILABLE
+    elif isinstance(exc, anthropic.APIStatusError):
+        http_status = status.HTTP_502_BAD_GATEWAY
+    else:
+        http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    body = ErrorResponse(message=message, error_type=error_type)
+    return JSONResponse(body.model_dump(by_alias=True), status_code=http_status)
+
+
 def _validate_request(data: Any, field_name: str) -> None:
     """Generic request validation for empty fields."""
     value = getattr(data, field_name, None)
     if not value:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=EmptyRequestError(message=f"{field_name} is empty").model_dump()
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=EmptyRequestError(message=f"{field_name} is empty").model_dump(by_alias=True),
         )
 
 
@@ -202,7 +249,7 @@ def _handle_fake_response(fake: bool, fake_key: Optional[str] = None) -> Optiona
     return None
 
 
-def _generate_llm_response_with_history(
+async def _generate_llm_response_with_history(
     model_type: str,
     user_id: str,
     prompt: str,
@@ -230,13 +277,13 @@ def _generate_llm_response_with_history(
 
         # Use existing Claude logic with all files
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
-            return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
+            return await claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
 
         # For regular chat, use the new history-aware method or fallback to create
         if protocol_action == "create":
-            return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
+            return await claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], converted_history))
         else:
-            return claude.process_chat_with_attachments(
+            return await claude.process_chat_with_attachments(
                 user_id=user_id,
                 prompt=prompt,
                 history_with_attachments=history_with_attachments,
@@ -245,7 +292,7 @@ def _generate_llm_response_with_history(
             )
 
 
-def _generate_llm_response(
+async def _generate_llm_response(
     model_type: str,
     user_id: str,
     prompt: str,
@@ -263,11 +310,11 @@ def _generate_llm_response(
 
         # Claude models
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER:
-            return claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+            return await claude.create_pd(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
         # For regular chat, we use the process_message method directly with file references
         if file_references and protocol_action != "create":
-            return claude.process_message(
+            return await claude.process_message(
                 user_id=user_id,
                 prompt=prompt,
                 history=cast(Optional[List[MessageParam]], history),
@@ -276,10 +323,10 @@ def _generate_llm_response(
             )
 
         if protocol_action == "create":
-            return claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+            return await claude.create(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
         # Default to update for chat completion and update_protocol
-        return claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
+        return await claude.update(user_id=user_id, prompt=prompt, history=cast(Optional[List[MessageParam]], history))
 
 
 def _format_response(
@@ -350,6 +397,7 @@ def _format_response(
 @app.post(
     "/api/chat/completion",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Create Chat Completion",
     description="Generate a chat response based on the provided prompt.",
 )
@@ -362,7 +410,7 @@ async def create_chat_completion(
     - **request**: The HTTP request containing the chat message.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/completion", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/completion")
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -390,8 +438,7 @@ async def create_chat_completion(
                     }
                     history_with_attachments.append(history_msg)
 
-        # Use the new history-aware response generation
-        response = _generate_llm_response_with_history(
+        response = await _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.message,
@@ -403,16 +450,19 @@ async def create_chat_completion(
         )
         return _format_response(response, protocol_format, bool(body.fake))
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing chat completion")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 
 @app.post(
     "/api/chat/completion-multipart",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Create Chat Completion with File Uploads",
     description="Generate a chat response with multipart file uploads (more efficient than base64).",
 )
@@ -429,10 +479,7 @@ async def create_chat_completion_multipart(
     Generate a chat completion response using multipart/form-data for file uploads.
     This is more efficient than base64 encoding for binary files like PDFs.
     """
-    logger.info(
-        "POST /api/chat/completion-multipart",
-        extra={"message": message, "num_files": len(files), "file_names": [f.filename for f in files], "user": user},
-    )
+    logger.info("POST /api/chat/completion-multipart", extra={"num_files": len(files)})
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request) if request else False
@@ -462,7 +509,7 @@ async def create_chat_completion_multipart(
         if protocol_format.lower() == "protocol_designer":
             protocol_format_enum = ProtocolFormat.PROTOCOL_DESIGNER
 
-        response = _generate_llm_response_with_history(
+        response = await _generate_llm_response_with_history(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=message,
@@ -474,10 +521,12 @@ async def create_chat_completion_multipart(
         )
         return _format_response(response, protocol_format_enum, fake, token_warning)
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing multipart chat completion")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 
@@ -510,7 +559,12 @@ async def _process_multipart_files_with_mapping(files: List[UploadFile]) -> tupl
     all_files = [file for file_list in files_by_message.values() for file in file_list]
     token_warning = None
     if all_files:
-        token_warning = FileProcessor.check_files_token_warning(all_files, claude.client, settings.anthropic_model_name)
+        token_warning = await asyncio.to_thread(
+            FileProcessor.check_files_token_warning,
+            all_files,
+            claude._sync_client,
+            settings.anthropic_model_name,
+        )
 
     return files_by_message, token_warning
 
@@ -532,8 +586,9 @@ def _determine_protocol_action(body: ChatRequest) -> str:
 
 
 @app.post(
-    "/api/chat/createProtocol",
+    "/api/chat/create-protocol",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Creates protocol",
     description="Generate a chat response based on the provided prompt that will create a new protocol with the required changes.",
 )
@@ -546,7 +601,7 @@ async def create_protocol(
     - **request**: The HTTP request containing the chat message.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/createProtocol", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/create-protocol")
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -554,20 +609,14 @@ async def create_protocol(
 
         _validate_request(body, "prompt")
 
-        # Special handling for fake_key with delay in createProtocol
-        if body.fake_key is not None:
-            await asyncio.sleep(6)  # Wait 6 seconds before returning to simulate actual behavior
-            fake_response = _handle_fake_response(True, body.fake_key)
-            return fake_response if fake_response else ChatResponse(reply="Fake response", fake=True)
-
-        fake_response = _handle_fake_response(bool(body.fake))
+        fake_response = _handle_fake_response(bool(body.fake), body.fake_key)
         if fake_response:
             return fake_response
 
         protocol_format = body.protocol_format
         logger.debug(f"Received protocol_format: {protocol_format.value}")
 
-        response = _generate_llm_response(
+        response = await _generate_llm_response(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.prompt,
@@ -580,11 +629,13 @@ async def create_protocol(
         if protocol_format == ProtocolFormat.PROTOCOL_DESIGNER and response is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=InternalServerError(exception_object=Exception("No response received from LLM")).model_dump(),
+                detail=InternalServerError(exception_object=Exception("No response received from LLM")).model_dump(by_alias=True),
             )
 
         return _format_response(response, protocol_format, bool(body.fake))
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.error(
             f"Unhandled error in create_protocol: {str(e)}", extra={"error_details": str(e), "exception_type": e.__class__.__name__}
@@ -602,8 +653,9 @@ async def create_protocol(
 
 
 @app.post(
-    "/api/chat/updateProtocol",
+    "/api/chat/update-protocol",
     response_model=Union[ChatResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Updates protocol",
     description="Generate a chat response based on the provided prompt that will update an existing protocol with the required changes.",
 )
@@ -616,7 +668,7 @@ async def update_protocol(
     - **request**: The HTTP request containing the existing protocol and other relevant parameters.
     - **returns**: A chat response or an error message.
     """
-    logger.info("POST /api/chat/updateProtocol", extra={"body": body.model_dump(), "user": user})
+    logger.info("POST /api/chat/update-protocol")
     try:
         # Setup Weave analytics based on frontend preference
         enable_analytics = _get_analytics_preference(request)
@@ -628,7 +680,7 @@ async def update_protocol(
         if fake_response:
             return fake_response
 
-        response = _generate_llm_response(
+        response = await _generate_llm_response(
             model_type=settings.model,
             user_id=str(user.sub),
             prompt=body.prompt,
@@ -642,10 +694,12 @@ async def update_protocol(
 
         return ChatResponse(reply=response, fake=bool(body.fake))
 
+    except anthropic.APIError:
+        raise
     except Exception as e:
         logger.exception("Error processing protocol update")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 
@@ -694,6 +748,7 @@ async def redoc_html() -> HTMLResponse:
 @app.post(
     "/api/chat/feedback",
     response_model=Union[FeedbackResponse, ErrorResponse],
+    response_model_by_alias=True,
     summary="Feedback",
     description="Send feedback to the team.",
 )
@@ -704,8 +759,8 @@ async def feedback(
     try:
         if body.fake:
             return FeedbackResponse(reply="Fake response", fake=bool(body.fake))
-        feedback_text = body.feedbackText
-        logger.info("Feedback received", user_id=user.sub, feedback=feedback_text)
+        feedback_text = body.feedback_text
+        logger.info("Feedback received")
         background_tasks.add_task(google_sheets_client.append_feedback_to_sheet, user_id=str(user.sub), feedback=feedback_text)
         return FeedbackResponse(
             reply=f"Feedback Received and sanitized: {google_sheets_client.sanitize_for_google_sheets(feedback_text)}", fake=False
@@ -714,7 +769,7 @@ async def feedback(
     except Exception as e:
         logger.exception("Error processing feedback")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=InternalServerError(exception_object=e).model_dump(by_alias=True)
         ) from e
 
 
@@ -745,6 +800,21 @@ async def handle_options(request: Request) -> JSONResponse:
         }
     )
     return JSONResponse(response.model_dump(by_alias=True))
+
+
+# Catch all Anthropic SDK errors at the app level so they are always serializable
+# and never reach FastAPI's default http_exception_handler as a raw Python object.
+# BadRequestError and RateLimitError are expected operational errors (warning);
+# everything else is unexpected (error + traceback).
+@app.exception_handler(anthropic.APIError)
+async def anthropic_error_handler(request: Request, exc: anthropic.APIError) -> JSONResponse:
+    message = _extract_anthropic_error_message(exc)
+    error_type = type(exc).__name__
+    if isinstance(exc, (anthropic.BadRequestError, anthropic.RateLimitError)):
+        logger.warning("Anthropic API error", extra={"error_type": error_type, "message": message})
+    else:
+        logger.error("Anthropic API error", extra={"error_type": error_type, "message": message}, exc_info=True)
+    return _anthropic_error_to_json_response(exc)
 
 
 # General exception handler for validation errors

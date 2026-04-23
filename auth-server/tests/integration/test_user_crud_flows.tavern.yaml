@@ -1,0 +1,179 @@
+test_name: Successful Create, delete, and update User flow
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - admin_scopes_list
+      - user_scopes_list
+
+stages:
+  - name: Create a new user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: test_new_user
+          password: securepassword123
+          fullName: Test New User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      json:
+        data:
+          userName: test_new_user
+          fullName: Test New User
+          accountType: user
+          locked: false
+          scopes: !force_original_structure '{user_scopes_list}'
+          resetPassword: false
+
+  - name: Create a new user with a password less than 8 characters
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          userName: test_new_user_password_less_than_8_characters
+          password: '1234567'
+          fullName: Test New User
+          accountType: user
+    response:
+      status_code: 400
+      json:
+        detail: Password must be at least 8 characters long
+
+  - name: Get a user information
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/test_new_user'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: user
+          fullName: Test New User
+          userName: test_new_user
+          locked: false
+          scopes: !force_original_structure '{user_scopes_list}'
+          resetPassword: false
+
+  - name: Update the user
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/test_new_user'
+      json:
+        data:
+          fullName: Test New User Updated
+          accountType: admin
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: false
+
+  - name: Update the username and password
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/test_new_user'
+      json:
+        data:
+          userName: test_new_user_updated
+          password: securepassword123
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: false  
+
+  - name: Update the reset password flag
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      json:
+        data:
+          resetPassword: true
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: true
+
+  - name: Get the user information
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: true
+
+  - name: Get a new access token with the updated username and password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_new_user_updated
+        password: securepassword123
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+      strict:
+        - json:off
+
+  - name: Delete the user
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+
+  - name: Try to get the deleted user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 404

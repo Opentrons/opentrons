@@ -14,9 +14,12 @@
 import uniq from 'lodash/uniq'
 
 import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
+import { SINGLE } from '../../command/types'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 
+import type { NozzleConfigurationStyle } from '../../command/types'
 import type {
+  ActiveNozzleNumber,
   LabwareDefinition,
   NozzleLayoutConfig,
   PipetteV2Specs,
@@ -29,18 +32,16 @@ function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition
 ): WellSetByPrimaryWell {
   const allWells: string[] = Object.keys(labwareDef.wells)
+  const wellSets: WellSetByPrimaryWell = []
 
-  return allWells.reduce(
-    (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
-      const wellSet = getWellNamePerMultiTip(labwareDef, well, 8)
-      if (wellSet === null) {
-        return acc
-      } else {
-        return [...acc, wellSet]
-      }
-    },
-    []
-  )
+  for (const well of allWells) {
+    const wellSet = getWellNamePerMultiTip(labwareDef, well, 8)
+    if (wellSet != null) {
+      wellSets.push(wellSet)
+    }
+  }
+
+  return wellSets
 }
 
 export interface NozzleLayoutDetails {
@@ -54,7 +55,7 @@ export interface NozzleLayoutDetails {
 export interface WellSetForMultiChannelParams {
   labwareDef: LabwareDefinition
   wellName: string
-  channels: 8 | 96
+  channels: ActiveNozzleNumber
   pipetteNozzleDetails?: NozzleLayoutDetails
 }
 
@@ -78,6 +79,7 @@ export interface WellSetHelpers {
 
   canPipetteUseLabware: (
     pipetteSpec: PipetteV2Specs,
+    nozzleConfiguration: NozzleConfigurationStyle,
     labwareDef?: LabwareDefinition,
     trashName?: string
   ) => boolean
@@ -153,7 +155,6 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
     if (channels === 8) {
       const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
-
       switch (nozzleConfig) {
         case null:
         case 'full':
@@ -179,6 +180,16 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
           console.error('Unhandled nozzleConfig case.')
           return null
       }
+    } else if (channels === 12) {
+      return getActiveRowFromWell(labwareDef.ordering)
+    } else if (channels > 1 && channels < 8) {
+      const flatListOfWells = labwareDef.ordering.flat()
+      const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
+      const partialWellIndex = allWellSetsFor8Channel.flat().indexOf(wellName)
+      return flatListOfWells.slice(
+        partialWellIndex,
+        partialWellIndex + channels
+      )
     } else {
       switch (nozzleConfig) {
         case null:
@@ -217,10 +228,13 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
   const canPipetteUseLabware = (
     pipetteSpec: PipetteV2Specs,
+    nozzleConfiguration: NozzleConfigurationStyle,
     labwareDef?: LabwareDefinition,
     trashName?: string
   ): boolean => {
-    if (pipetteSpec.channels === 1 || trashName != null) {
+    const has1ActiveNozzle =
+      pipetteSpec.channels === 1 || nozzleConfiguration === SINGLE
+    if (has1ActiveNozzle || trashName != null) {
       // assume all labware can be used by single-channel
       return true
     }

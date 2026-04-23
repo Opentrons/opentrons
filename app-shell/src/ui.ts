@@ -3,8 +3,9 @@ import path from 'path'
 import { app, BrowserWindow, shell } from 'electron'
 
 import { getConfig } from './config'
-import { RELOAD_UI, UI_INITIALIZED } from './constants'
+import { OT2_APP_OPEN, RELOAD_UI, UI_INITIALIZED } from './constants'
 import { createLogger } from './log'
+import { openOT2AppExternal } from './ot2App'
 
 import type { Action, Dispatch } from './types'
 
@@ -63,7 +64,6 @@ export function createUi(): BrowserWindow {
 
   // open new windows (<a target="_blank" ...) in browser windows
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // eslint-disable-next-line no-void
     void shell.openExternal(url)
     return { action: 'deny' }
   })
@@ -101,6 +101,17 @@ export function registerSystemLanguage(
           meta: { shell: true },
         })
 
+        break
+      }
+    }
+  }
+}
+
+export function registerOT2AppOpen(): (action: Action) => unknown {
+  return function handleAction(action: Action) {
+    switch (action.type) {
+      case OT2_APP_OPEN: {
+        void openOT2AppExternal(action.payload)
         break
       }
     }

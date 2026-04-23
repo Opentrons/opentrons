@@ -1,3 +1,4 @@
+import { LABWARE } from '../types'
 import { EmptyWell, SelectedWell } from '../Wells'
 import {
   INACCESSIBLE,
@@ -12,31 +13,42 @@ import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
 import { UsedTip } from './UsedTip'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
 import type { TipType } from '../types'
 
-export function TipStatus(props: {
+interface TipStatusProps {
   type: TipType
-  labwareDefinition: LabwareDefinition
-  size?: string
+  wellMap: LabwareWellMap
+  wellName: string
+  size: string
   text?: string
-}): JSX.Element {
-  const { type, size, text, labwareDefinition } = props
+}
+
+export function TipStatus(props: TipStatusProps): JSX.Element {
+  const { type, size, text, wellMap, wellName } = props
   switch (type) {
     case NEW:
-      return <NewTip size={size} />
+      return <NewTip size={size} wellName={wellName} />
     case USED:
-      return <UsedTip size={size} />
+      return <UsedTip size={size} wellName={wellName} />
     case SELECTED:
       return (
         <SelectedWell
           size={size}
           textInsideTip={text}
-          labwareDefinition={labwareDefinition}
+          wellMap={wellMap}
+          wellName={wellName}
         />
       )
     case NO:
-      return <EmptyWell size={size} labwareDefinition={labwareDefinition} />
+      return (
+        <EmptyWell
+          size={size}
+          wellMap={wellMap}
+          parentType={LABWARE}
+          wellName={wellName}
+        />
+      )
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:
@@ -45,7 +57,8 @@ export function TipStatus(props: {
           size={size}
           textInsideTip={text}
           isUsed
-          labwareDefinition={labwareDefinition}
+          wellMap={wellMap}
+          wellName={wellName}
         />
       )
     case SELECTED_ERROR:
@@ -54,7 +67,8 @@ export function TipStatus(props: {
           size={size}
           textInsideTip={text}
           isError
-          labwareDefinition={labwareDefinition}
+          wellMap={wellMap}
+          wellName={wellName}
         />
       )
   }

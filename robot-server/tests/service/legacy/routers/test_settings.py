@@ -17,6 +17,7 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.app import app
 from robot_server.deck_configuration.fastapi_dependencies import (
@@ -28,7 +29,6 @@ from robot_server.persistence.fastapi_dependencies import (
     get_persistence_resetter,
 )
 from robot_server.persistence.images_directory import ImagesResetter
-from robot_server.persistence.persistence_directory import PersistenceResetter
 
 
 def test_get_robot_settings(api_client, hardware):

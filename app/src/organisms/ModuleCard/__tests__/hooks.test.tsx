@@ -182,7 +182,7 @@ const mockFlexStacker = {
 
 const mockVacuumModule = {
   id: 'vacuum_id',
-  moduleModel: 'vacuumModuleMilliporeV1',
+  moduleModel: 'vacuumModuleV1',
   moduleType: 'vacuumModuleType',
   serialNumber: 'vac123',
   hardwareRevision: 'vacuum_v1.0',
@@ -202,7 +202,7 @@ const mockVacuumModule = {
 
 const mockVacuumModuleActive = {
   id: 'vacuum_id_active',
-  moduleModel: 'vacuumModuleMilliporeV1',
+  moduleModel: 'vacuumModuleV1',
   moduleType: 'vacuumModuleType',
   serialNumber: 'vac456',
   hardwareRevision: 'vacuum_v1.0',
@@ -715,7 +715,7 @@ describe('useModuleOverflowMenu', () => {
     expect(flexStackerMenu[0].menuButtons).toHaveLength(2)
   })
 
-  it.only('should return vacuum module menu items and call handleSlideoutClick when module is idle', () => {
+  it('should return vacuum module menu items and call handleSlideoutClick when module is idle', () => {
     const mockHandleSlideoutClick = vi.fn()
     const wrapper: FunctionComponent<{ children: ReactNode }> = ({
       children,
@@ -775,7 +775,7 @@ describe('useModuleOverflowMenu', () => {
     const vacuumMenu = menuOverflowItemsByModuleType.vacuumModuleType
 
     expect(vacuumMenu).toHaveLength(2)
-    expect(vacuumMenu[1].menuButtons).toHaveLength(1)
+    expect(vacuumMenu[1].menuButtons).toHaveLength(2)
   })
 })
 

@@ -3,6 +3,8 @@
 
 # make OT_PYTHON available
 include ./scripts/python.mk
+# make UV available
+include ./scripts/python-uv.mk
 
 API_CLIENT_DIR := api-client
 API_DIR := api
@@ -12,8 +14,10 @@ APP_SHELL_ODD_DIR := app-shell-odd
 AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
+DOCS_DIR := docs
 G_CODE_TESTING_DIR := g-code-testing
 HARDWARE_DIR := hardware
+KEY_SERVER_DIR := key-server
 LABWARE_LIBRARY_DIR := labware-library
 NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 PROTOCOL_DESIGNER_DIR := protocol-designer
@@ -26,7 +30,7 @@ SYSTEM_SERVER_DIR := system-server
 UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
 
-PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(KEY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -179,6 +183,7 @@ push-ot3:
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
 	$(MAKE) -C $(AUTH_SERVER_DIR) push-ot3
+	$(MAKE) -C $(KEY_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
@@ -237,7 +242,10 @@ lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	pnpm eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	pnpm eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
@@ -246,7 +254,9 @@ lint-js-prettier:
 
 .PHONY: lint-json
 lint-json:
-	pnpm eslint --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	pnpm eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
@@ -303,7 +313,7 @@ circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
 
 .PHONY: test-js-internal
 test-js-internal:
-	pnpm vitest $(tests) $(test_opts) $(cov_opts)
+	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
 test-js-%:
@@ -312,3 +322,51 @@ test-js-%:
 .PHONY: validate-codecov-yml
 validate-codecov-yml:
 	curl --data-binary @.codecov.yml https://codecov.io/validate
+
+# Convenience commands for running all of our servers in dev mode, together,
+# behind a reverse proxy listening on port 31950.
+#
+# This naively amalgamates all of the logs into a single stdout stream.
+# If that's a bit much, you can also just manually run these commands in separate terminals.
+.PHONY: dev-backend
+dev-backend:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C robot-server dev BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev ';' \
+		$(MAKE) dev-proxy
+.PHONY: dev-backend-flex
+dev-backend-flex:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C auth-server dev ';' \
+		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
+		$(MAKE) -C key-server dev-mitmproxy ';' \
+		$(MAKE) dev-proxy ';' \
+		$(MAKE) dev-proxy-tls
+
+
+# Assuming our dev servers are running separately (make -C robot-server dev, make -C auth-server dev, etc.),
+# this sets up a reverse proxy that listens on localhost:31950 and forwards each request
+# to the appropriate dev server.
+.PHONY: dev-proxy
+dev-proxy:
+# In this command, the first port (:2) is a placeholder for the origin server's port.
+# dev_proxy.py *should* overwrite it in all cases, but in case something goes wrong
+# with that, we choose port 2 because it's probably not assigned to anything.
+# `connection_strategy=lazy` gives dev_proxy.py a chance to overwrite the port before
+# mitmproxy tries use port 2.
+#
+# The second port (@31950) is where the reverse proxy should listen.
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1  mitmdump \
+	    --mode reverse:http://localhost:2@31950 \
+	    --set connection_strategy=lazy \
+	    --script scripts/dev_proxy.py
+
+.PHONY: dev-proxy-tls
+dev-proxy-tls:
+	sleep 1 # give key-server time to prep certs for mitmproxy
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1 mitmdump \
+		--mode reverse:http://localhost:2@32313 \
+		--set connection_strategy=lazy \
+		--script scripts/dev_proxy.py \
+		--certs key-server/.key-server-storage/tls/flex-certs.pem

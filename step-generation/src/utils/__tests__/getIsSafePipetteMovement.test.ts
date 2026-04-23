@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
+  A1_NOZZLE,
+  A12_NOZZLE,
+  ALL,
   COLUMN,
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  SINGLE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
@@ -107,8 +111,42 @@ describe('getIsSafePipetteMovement', () => {
       labwareId: 'mockId',
       wellLocationOffset: { x: 0, y: 0, z: 0 },
       wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ALL,
     })
     expect(result).toEqual(true)
+  })
+  it('returns false when 96ch single tip pick up will overlap with waste chute', () => {
+    const result = getIsSafePipetteMovement({
+      robotState: {
+        ...mockRobotState,
+        pipettes: {
+          ...mockRobotState.pipettes,
+          [mockPipId]: {
+            ...mockRobotState.pipettes[mockPipId],
+            nozzles: SINGLE,
+            primaryNozzle: A1_NOZZLE,
+          },
+        },
+      },
+      invariantContext: {
+        ...mockInvariantProperties,
+        wasteChuteEntities: {
+          id: {
+            id: 'id',
+            location: 'cutoutD3',
+            pythonName: 'waste_chute',
+          },
+        },
+      },
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellLocationOffset: { x: -12, y: -100, z: 20 },
+      wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: SINGLE,
+    })
+    expect(result).toEqual(false)
   })
   it('returns false when within pipette extents is false', () => {
     const result = getIsSafePipetteMovement({
@@ -127,6 +165,8 @@ describe('getIsSafePipetteMovement', () => {
       labwareId: mockLabwareId,
       wellLocationOffset: { x: -12, y: -100, z: 20 },
       wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: COLUMN,
     })
     expect(result).toEqual(false)
   })
@@ -149,6 +189,8 @@ describe('getIsSafePipetteMovement', () => {
       labwareId: mockLabwareId,
       wellLocationOffset: { x: -1, y: 5, z: 20 },
       wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ALL,
     })
     expect(result).toEqual(true)
   })
@@ -176,6 +218,8 @@ describe('getIsSafePipetteMovement', () => {
       labwareId: mockLabwareId,
       wellLocationOffset: { x: -1, y: 5, z: 0 },
       wellTargetName: mockWellName,
+      primaryNozzle: A12_NOZZLE,
+      nozzleConfiguration: COLUMN,
     })
     expect(result).toEqual(false)
   })
@@ -216,6 +260,8 @@ describe('getIsSafePipetteMovement', () => {
       labwareId: mockLabwareId,
       wellLocationOffset: { x: 0, y: 0, z: 0 },
       wellTargetName: mockWellName,
+      primaryNozzle: A12_NOZZLE,
+      nozzleConfiguration: COLUMN,
     })
     expect(result).toEqual(false)
   })

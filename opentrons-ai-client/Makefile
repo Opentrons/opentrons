@@ -9,8 +9,6 @@ PATH := $(shell cd .. && pnpm exec bin):$(PATH)
 # dev server port
 PORT ?= 5173
 
-benchmark_output := $(shell node -e 'console.log(new Date());')
-
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
@@ -48,6 +46,10 @@ build-staging: export NODE_ENV := staging
 build-staging:
 	pnpm exec vite build
 	git rev-parse HEAD > dist/.commit
+
+.PHONY: build
+build:
+	vite build
 
 # development
 #####################################################################

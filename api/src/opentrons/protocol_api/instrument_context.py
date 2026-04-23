@@ -1216,7 +1216,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Raises:
             UnexpectedTipRemovalError: If no tip is attached to the pipette.
-            RuntimeError: 
+            RuntimeError:
                 - If no location is specified and the location cache is `None`.
                     This should happen if `touch_tip()` is called without first calling a
                     method that takes a location, like

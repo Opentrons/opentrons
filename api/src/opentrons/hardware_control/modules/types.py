@@ -121,6 +121,7 @@ class FlexStackerData(TypedDict):
 
 class VacuumModuleData(TypedDict):
     errorDetails: str | None
+    pumpEngaged: bool | None
 
 
 ModuleData = Union[
@@ -230,7 +231,7 @@ class ModuleType(StrEnum):
         if module_type == ModuleType.FLEX_STACKER:
             return "flexStackerModuleV1"
         if module_type == ModuleType.VACUUM_MODULE:
-            return "vacuumModuleMilliporeV1"
+            return "vacuumModuleV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
@@ -269,7 +270,7 @@ class FlexStackerModuleModel(StrEnum):
 
 
 class VacuumModuleModel(StrEnum):
-    VACUUM_MODULE_V1 = "vacuumModuleMilliporeV1"
+    VACUUM_MODULE_V1 = "vacuumModuleV1"
 
 
 def module_model_from_string(model_string: str) -> ModuleModel:

@@ -1,5 +1,6 @@
 ---
 title: "Python API Reference: Protocols"
+description: "Protocol context, metadata, and protocol-level API reference."
 ---
 
 ::: opentrons.protocol_api.ProtocolContext

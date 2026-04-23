@@ -21,6 +21,10 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 
 ### Improvements
 
+- Quick transfer protocols now include the same features as any other Flex protocol:
+  - Go to the Protocols tab on the touchscreen to start a quick transfer.
+  - Find completed quick transfers in the Protocols tab.
+  - Pin a quick transfer protocol to find it easily.
 - Enable the Flex or OT-2's built-in camera for additional settings:
   - Adjust image and video settings like zoom, brightness, contrast, and saturation.
   - Preview an image of the Flex or OT-2's deck when customizing camera controls.
@@ -31,6 +35,13 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 - Drop tip locations are properly exported in Quick Transfer protocols.
 - Adding a CSV file to an imported protocol no longer causes analysis errors.
 - Protocol run logs include correct descriptions for partial tip pickup with the Flex 96-channel pipette.
+
+### Known Issues
+
+- To access the most accurate protocol details, we recommend using the computer your robot was connected to at protocol runtime:
+  - When re-running a completed protocol, you won't be able to open protocol visualization if the protocol was started on a different computer. Open visualization from the protocol details page instead.
+  - You may not be able to download protocol images onto computers that weren't connected during the protocol run.
+- Protocol visualization will produce an error for protocols that dispose of tips into a standard labware instead of a trash container.
 
 ---
 

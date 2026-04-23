@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import { TextAreaField as TextAreaFieldComponent } from '.'
-import { Flex } from '../../primitives'
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
@@ -23,7 +22,7 @@ export const TextAreaField: Story = (
 ) => {
   const [value, setValue] = React.useState(args.value)
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <div style={{ flexDirection: DIRECTION_COLUMN, gap: SPACING.spacing4 }}>
       <TextAreaFieldComponent
         {...args}
         value={value}
@@ -31,12 +30,12 @@ export const TextAreaField: Story = (
           setValue(e.currentTarget.value)
         }}
       />
-    </Flex>
+    </div>
   )
 }
 
 TextAreaField.args = {
-  title: 'TextAreaField',
+  label: 'TextAreaField',
   height: '6.8125rem',
   placeholder: 'Placeholder Text',
 }

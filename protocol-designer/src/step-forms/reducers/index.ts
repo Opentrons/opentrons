@@ -890,7 +890,8 @@ export const savedStepForms = (
             form.stepType === 'absorbanceReader' ||
             form.stepType === 'thermocycler' ||
             form.stepType === 'flexStacker' ||
-            form.stepType === 'pause') &&
+            form.stepType === 'pause' ||
+            form.stepType === 'vacuum') &&
           form.moduleId === moduleId
         ) {
           return { ...form, moduleId: null }

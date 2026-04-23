@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex Stacker Instruction Manual"
+description: "High-capacity labware storage and shuttle for Flex; up to four Stackers per robot."
 hide: toc
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Relocation"
+description: "How to prepare and move Flex for short or long-distance relocation."
 ---
 
 This section provides advice and instructions about how to move your Opentrons Flex robot over short and long distances.

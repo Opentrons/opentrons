@@ -1,25 +1,47 @@
-test_name: Protected resource access
+test_name: Accessing protected resources within auth-server
 
 marks:
   - usefixtures:
       - run_server
 
 stages:
+  - name: Enable access control enabled so protected resources require a valid token
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+
   - name: Accessing the resource without a token should fail
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: test_user
+          password: test_user_password
+          fullName: Test User
+          accountType: user
     response:
-      status_code: 403
+      status_code: 401
 
   - name: Accessing the resource with a bogus token should fail
     request:
       method: POST
+      json:
+        data:
+          userName: test_user
+          password: test_user_password
+          fullName: Test User
+          accountType: user
       url: '{run_server.base_url}/auth/users'
       headers:
         Authorization: Bearer bogus_token_1234
     response:
-      status_code: 403
+      status_code: 401
 
   - name: Get an access token with insufficient scopes
     request:
@@ -30,7 +52,7 @@ stages:
         grant_type: password
         username: test_admin
         password: test_admin_password
-        scope: runs.read # Omit users.write.
+        scope: users.read # Omit users.write.
     response:
       status_code: 200
       json:
@@ -38,7 +60,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: runs.read
+        scope: users.read
       save:
         json:
           access_token: access_token
@@ -47,6 +69,12 @@ stages:
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: test_user
+          password: test_user_password
+          fullName: Test User
+          accountType: user
       headers:
         Authorization: 'Bearer {access_token}'
     response:
@@ -78,7 +106,13 @@ stages:
     request:
       method: POST
       url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: test_user_new
+          password: test_user_password
+          fullName: Test User
+          accountType: user
       headers:
         Authorization: 'Bearer {access_token}'
     response:
-      status_code: 200
+      status_code: 201

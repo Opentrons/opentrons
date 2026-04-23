@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import { UNSELECTED } from '@opentrons/components'
 import {
   A1_NOZZLE,
   ALL,
   COLUMN,
   F1_NOZZLE,
+  fixture384Plate,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
-  PARTIAL,
+  PARTIAL_COLUMN,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
@@ -15,9 +17,11 @@ import {
 import {
   getAvailableNozzleConfigurations,
   getEntireWellSelection,
+  getInaccessibleWellsForPartialNozzleRowMap,
+  getWellGroupLength,
 } from '../utils'
 
-import type { DropdownOption } from '@opentrons/components'
+import type { DropdownOption, WellType } from '@opentrons/components'
 import type {
   LabwareDefinition,
   LabwareDefinition2,
@@ -34,7 +38,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         96
@@ -60,7 +64,7 @@ describe('getEntireWellSelection', () => {
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         primaryNozzle,
         96
@@ -69,12 +73,12 @@ describe('getEntireWellSelection', () => {
   })
 
   it('returns the correct number of wells when the pipette configuration is PARTIAL', () => {
-    const nozzleConfiguration = PARTIAL
+    const nozzleConfiguration = PARTIAL_COLUMN
     const partialPrimaryNozzle = F1_NOZZLE
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        labwareDef.ordering,
         nozzleConfiguration,
         partialPrimaryNozzle,
         8
@@ -82,19 +86,57 @@ describe('getEntireWellSelection', () => {
     ).toStrictEqual(['A1', 'B1', 'C1'])
   })
 
-  it('returns an error if there are not enough wells to select when the pipette configuration is PARTIAL', () => {
-    const nozzleConfiguration = PARTIAL
-    const partialPrimaryNozzle = F1_NOZZLE
-    const wellName = 'H12'
+  it('returns the correct wells when the 96CH configuration is ROW and the labware is a 384 plate', () => {
+    const nozzleConfiguration = ROW
+    const partialPrimaryNozzle = A1_NOZZLE
     expect(
       getEntireWellSelection(
         wellName,
-        labwareDef,
+        fixture384Plate.ordering,
+        nozzleConfiguration,
+        partialPrimaryNozzle,
+        96
+      )
+    ).toStrictEqual([
+      'A1',
+      'A3',
+      'A5',
+      'A7',
+      'A9',
+      'A11',
+      'A13',
+      'A15',
+      'A17',
+      'A19',
+      'A21',
+      'A23',
+    ])
+  })
+  it('returns the correct wells when the 96CH configuration is COLUMN and the labware is a 384 plate', () => {
+    const nozzleConfiguration = COLUMN
+    const partialPrimaryNozzle = A1_NOZZLE
+    expect(
+      getEntireWellSelection(
+        wellName,
+        fixture384Plate.ordering,
+        nozzleConfiguration,
+        partialPrimaryNozzle,
+        96
+      )
+    ).toStrictEqual(['A1', 'C1', 'E1', 'G1', 'I1', 'K1', 'M1', 'O1'])
+  })
+  it('returns the correct wells when the pipette configuration is PARTIAL and the labware is a 384 plate', () => {
+    const nozzleConfiguration = PARTIAL_COLUMN
+    const partialPrimaryNozzle = F1_NOZZLE
+    expect(
+      getEntireWellSelection(
+        'B1',
+        fixture384Plate.ordering,
         nozzleConfiguration,
         partialPrimaryNozzle,
         8
       )
-    ).toStrictEqual([])
+    ).toStrictEqual(['B1', 'D1', 'F1'])
   })
 })
 
@@ -144,7 +186,7 @@ describe('getAvailableNozzleConfigurations', () => {
       },
       {
         name: 'partial_nozzles',
-        value: PARTIAL,
+        value: PARTIAL_COLUMN,
       },
     ]
     expect(
@@ -185,5 +227,129 @@ describe('getAvailableNozzleConfigurations', () => {
     expect(
       getAvailableNozzleConfigurations(channels, mockDeckSetup, mockT)
     ).toStrictEqual(nozzleConfigurationOptions)
+  })
+  it('returns length of well group when the nozzle configuration is ROW', () => {
+    const totalSelected = 2
+    const nozzleConfiguration = ROW
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 0)
+    ).toStrictEqual(2)
+  })
+  it('returns length of well group when the nozzle configuration is COLUMN', () => {
+    const totalSelected = 2
+    const nozzleConfiguration = COLUMN
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 0)
+    ).toStrictEqual(2)
+  })
+  it('returns length of well group when the nozzle configuration is ALL', () => {
+    const totalSelected = 13
+    const nozzleConfiguration = ALL
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 0)
+    ).toStrictEqual(13)
+  })
+  it('returns length of well group when the nozzle configuration is PARTIAL', () => {
+    const totalSelected = 3
+    const nozzleConfiguration = PARTIAL_COLUMN
+    const mockTiprack = {
+      stack: ['tiprack2', '3'],
+      id: 'tiprack2',
+      labwareDefURI: 'tiprackURI2',
+      def: fixtureTiprack1000ul as LabwareDefinition2,
+      pythonName: 'tiprack2',
+    }
+    const ordering = mockTiprack.def.ordering
+    expect(
+      getWellGroupLength(totalSelected, ordering, nozzleConfiguration, 3)
+    ).toStrictEqual(9)
+  })
+})
+
+describe('getInaccessibleWellsForPartialNozzleRowMap', () => {
+  const mockTiprack = {
+    stack: ['tiprack2', '3'],
+    id: 'tiprack2',
+    labwareDefURI: 'tiprackURI2',
+    def: fixtureTiprack1000ul as LabwareDefinition2,
+    pythonName: 'tiprack2',
+  }
+  const wellDefMap = mockTiprack.def.ordering
+  const allWellsWithState: Record<string, WellType> = {}
+  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+  const cols = Array.from({ length: 12 }, (_, i) => (i + 1).toString())
+
+  for (const row of rows) {
+    for (const col of cols) {
+      const well = `${row}${col}`
+      allWellsWithState[well] = UNSELECTED
+    }
+  }
+  const threeChannels = 3
+  const selectedWells3Grouping = [
+    ['A1', 'B1', 'C1'],
+    ['F1', 'G1', 'H1'],
+  ]
+  it('marks wells D1 and E1 as inaccessible when two 3 well chunks are selected', () => {
+    expect(
+      getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells3Grouping,
+        wellDefMap,
+        allWellsWithState,
+        threeChannels
+      )
+    ).toStrictEqual(['D1', 'E1'])
+  })
+
+  it('marks wells A1 and H1 as inaccessible and [D1, E1] as accessible when two 2 well chunks are selected', () => {
+    const twoChannels = 2
+    const selectedWells2Grouping = [
+      ['B1', 'C1'],
+      ['F1', 'G1'],
+    ]
+    expect(
+      getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells2Grouping,
+        wellDefMap,
+        allWellsWithState,
+        twoChannels
+      )
+    ).toStrictEqual(['A1', 'H1'])
+  })
+  it('marks does not mark wells as inaccessible during 384 plate', () => {
+    const twoChannels = 4
+    const selectedWells4Grouping = [['A1', 'C1', 'E1', 'G1']]
+    expect(
+      getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells4Grouping,
+        fixture384Plate.ordering,
+        allWellsWithState,
+        twoChannels
+      )
+    ).toStrictEqual([])
   })
 })

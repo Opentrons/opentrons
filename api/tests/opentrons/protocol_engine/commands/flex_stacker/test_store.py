@@ -406,7 +406,7 @@ async def test_store_raises_if_labware_does_not_match(
         moduleId=stacker_id, strategy=StackerLabwareMovementStrategy.AUTOMATIC
     )
 
-    fs_module_substate = FlexStackerSubState(
+    fs_module_substate = FlexStackerSubState.model_construct(
         module_id=stacker_id,
         pool_primary_definition=sentinel.primary,
         pool_adapter_definition=pool_adapter,

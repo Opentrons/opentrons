@@ -24,7 +24,7 @@
     "@opentrons/components": "link:../components",
     "@opentrons/shared-data": "link:../shared-data",
     "axios": "^0.21.1",
-    "lodash": "4.17.21",
+    "lodash": "4.18.1",
     "jotai": "2.8.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -41,6 +41,7 @@
     "node": ">=18.19.0"
   },
   "devDependencies": {
+    "@types/lodash": "4.17.24",
     "@types/styled-components": "^5.1.26",
     "axios-mock-adapter": "1.22.0",
     "lost": "8.3.1",

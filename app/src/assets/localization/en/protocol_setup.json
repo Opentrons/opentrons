@@ -48,6 +48,7 @@
   "camera": "Camera",
   "camera_disabled": "Camera disabled",
   "camera_enabled": "Camera enabled",
+  "camera_required": "Camera is required to run this protocol",
   "camera_settings": "camera settings",
   "camera_setup_step_description": "Review camera preferences for this protocol run.",
   "camera_setup_step_title": "Camera",
