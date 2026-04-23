@@ -358,7 +358,7 @@ class VacuumModule(mod_abc.AbstractModule):
         duty_cycle: Optional[int] = None,
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
-        self._reader.set_operation_mode(VacuumModuleOperationMode.PRESSURE)
+        self._reader.set_operation_mode(VacuumModuleOperationMode.POWER)
         await self._driver.set_vacuum_state(enable_vacuum=False)
         await self._driver.set_pump_state(
             start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
