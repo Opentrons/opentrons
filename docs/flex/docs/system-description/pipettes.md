@@ -45,57 +45,69 @@ Flex 1-channel pipettes meet the following accuracy and precision specifications
 <table>
   <thead>
     <tr>
-      <th>Pipette Capacity</th>
-      <th>Tip Capacity</th>
-      <th>Tested Volume</th>
-      <th>Accuracy %D</th>
-      <th>Precision %CV</th>
+      <th>Pipette Type</th>
+      <th>Tip Size</th>
+      <th>Volume (µL)</th>
+      <th>Random Error (% CV)</th>
+      <th>Systematic Error (% D)</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><b>1–50 µL</b></td>
-      <td>50 µL</td>
-      <td>1 µL</td>
+      <td rowspan="5"><b>1-Channel (1–50 µL)</b></td>
+      <td>20 µL</td>
+      <td>1</td>
+      <td>3.50%</td>
       <td>±8.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>1</td>
       <td>7.00%</td>
+      <td>±8.00%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>10 µL</td>
+      <td>20 µL</td>
+      <td>5</td>
+      <td>0.75%</td>
       <td>±1.50%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>10</td>
       <td>0.50%</td>
+      <td>±1.00%</td>
     </tr>
     <tr>
       <td>50 µL</td>
-      <td>50 µL</td>
-      <td>±1.25%</td>
+      <td>50</td>
       <td>0.40%</td>
+      <td>±1.25%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>5–1000 µL</b></td>
+      <td rowspan="4"><b>1-Channel (5–1000 µL)</b></td>
       <td>50 µL</td>
-      <td>5 µL</td>
-      <td>±5.00%</td>
+      <td>5</td>
       <td>2.50%</td>
+      <td>±5.00%</td>
     </tr>
     <tr>
       <td>50 µL</td>
-      <td>50 µL</td>
-      <td>±0.50%</td>
+      <td>50</td>
       <td>0.30%</td>
+      <td>±0.50%</td>
     </tr>
     <tr>
       <td>200 µL</td>
-      <td>200 µL</td>
-      <td>±0.50%</td>
+      <td>200</td>
       <td>0.15%</td>
+      <td>±0.50%</td>
     </tr>
     <tr>
       <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>±0.50%</td>
+      <td>1000</td>
       <td>0.15%</td>
+      <td>±0.50%</td>
     </tr>
   </tbody>
 </table>
