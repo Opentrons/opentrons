@@ -26,6 +26,7 @@ class DoorWatcher:
         state_store: StateStore,
         hardware_api: HardwareControlAPI,
         action_dispatcher: ActionDispatcher,
+        proxy_of_callback_for_handling_door_events = None,
     ) -> None:
         """Initialize the DoorWatcher.
 

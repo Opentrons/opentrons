@@ -402,6 +402,7 @@ class RunOrchestratorStore:
             protocol=protocol,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,
+            proxy_of_callback_for_handling_door_events=self._run_orchestrator.register_hardware_door_event()
         )
         return self._run_orchestrator.get_state_summary()
 

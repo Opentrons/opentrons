@@ -40,6 +40,7 @@ async def create_protocol_engine(
     file_provider: typing.Optional[FileProvider] = None,
     camera_provider: typing.Optional[CameraProvider] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
+    proxy_of_callback_for_handling_door_events = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
@@ -82,7 +83,7 @@ async def create_protocol_engine(
     plugin_starter = PluginStarter(state_store, action_dispatcher)
     model_utils = ModelUtils()
     hardware_stopper = HardwareStopper(hardware_api, state_store)
-    door_watcher = DoorWatcher(state_store, hardware_api, action_dispatcher)
+    door_watcher = DoorWatcher(state_store, hardware_api, action_dispatcher, proxy_of_callback_for_handling_door_events)
     module_data_provider = ModuleDataProvider()
     file_provider = file_provider or FileProvider()
     camera_provider = camera_provider or CameraProvider()

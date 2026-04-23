@@ -66,6 +66,12 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from robot_server.protocols.protocol_store import ProtocolResource
+from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
+
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
+    pyro_behavior,
+)
 
 
 # register_process_types runs for both the robot server process and the run subprocess
@@ -132,6 +138,23 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._run_orchestrator: Optional[RunOrchestrator] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def register_hardware_door_event(self) -> HardwareEventHandler:
+        """Create a callback for the door watcher on the hardware controller via the protocol engine.
+
+        The returned callback is meant to run in the hardware API's thread.
+        """
+
+        def door_event_handler(
+            event: HardwareEvent,
+        ) -> None:
+            self._run_orchestrator._protocol_engine._door_watcher._handle_hardware_door_event(
+                event
+            )
+
+        return door_event_handler
+    
+    
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         """Event loop for use in allowing async methods via Pyro."""
@@ -157,6 +180,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
+        proxy_of_callback_for_handling_door_events = None
     ) -> None:
         """Create a run orchestrator and protocol engine for a given run."""
         self._run_id = run_id
@@ -183,6 +207,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             # file_provider=file_provider,
             # camera_provider=camera_provider,
             # notify_publishers=notify_publishers,
+            proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
