@@ -1,7 +1,7 @@
 import net from 'net'
-import { pick } from 'lodash'
 import intersectionBy from 'lodash/intersectionBy'
 import isEqual from 'lodash/isEqual'
+import pick from 'lodash/pick'
 import unionBy from 'lodash/unionBy'
 import xorWith from 'lodash/xorWith'
 import fetch from 'node-fetch'
