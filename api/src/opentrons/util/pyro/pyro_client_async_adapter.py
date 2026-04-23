@@ -6,7 +6,7 @@ from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
 
-from opentrons.util.pyro.pyro_serialization import UnhashableDictWrapper
+from opentrons.util.pyro.pyro_serialization import NonBuiltinKeyDictWrapper
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -162,7 +162,7 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str, attr: Any)
         # Validate individual arguments before forwarding the call
         def _validations(arg: Any) -> Any:
             # NOTE: Extend this as further validations are needed
-            arg = _validate_hashable(arg)
+            arg = _validate_keys_builtins(arg)
             arg = _validate_outbound_callback(arg)
             return arg
 
@@ -180,17 +180,15 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str, attr: Any)
 
 
 # Hashable dictionary parameter validation
-def _validate_hashable(arg: Any) -> Any:
-    """Handle an argument which is a dictionary and is not hashable (uses mutable Opentrons types as keys).
+def _validate_keys_builtins(arg: Any) -> Any:
+    """Handle an argument which is a dictionary and contains keys that are NOT builtins.
 
-    This function will do the above by stripping out the types for a given key and value (multityped dictionaries
-    not supported) and wrapping the entire dictionary and these known types into an UnhashableDictWrapper. This
+    This function will handle those by stripping out the types for a given key and value (multityped dictionaries
+    not supported) and wrapping the entire dictionary and these known types into an NonBuiltinKeyDictWrapper. This
     will then be deserialized back into it's original form by the OpentronsPyroSerializer library.
     """
     if isinstance(arg, dict):
-        try:
-            hash(arg)
-        except TypeError:
+        if not all(k.__class__.__module__ == "builtins" for k in arg.keys()):
             if all(
                 isinstance(key, type(list(arg.keys())[0])) for key in arg.keys()
             ) and all(
@@ -202,7 +200,7 @@ def _validate_hashable(arg: Any) -> Any:
                 raise KeyError(
                     "Async Client Pyro Object does not support transmission of multitype unhashable dictionaries."
                 )
-            return UnhashableDictWrapper(
+            return NonBuiltinKeyDictWrapper(
                 dictionary=arg,
                 key_type=".".join((key_type.__module__, key_type.__qualname__)),
                 value_type=".".join((value_type.__module__, value_type.__qualname__)),

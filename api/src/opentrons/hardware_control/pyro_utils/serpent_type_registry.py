@@ -351,7 +351,7 @@ def register_hardware_types() -> None:
     for typed_dict in opentrons_typed_dicts:
         OpentronsPyroSerializer.register_typed_dict(typed_dict)
 
-    OpentronsPyroSerializer.register_unhashable_dicts()
+    OpentronsPyroSerializer.register_dicts_with_non_builtin_keys()
 
     # Specialized registrations:
     register_type_to_serpent(

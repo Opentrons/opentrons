@@ -278,7 +278,14 @@ class RunOrchestratorStore:
             a new one may not be created.
         """
         if feature_flags.protocol_subprocess_enabled():
-            return await self.create_pyro(run_id=run_id)
+            return await self.create_pyro(
+                run_id=run_id,
+                labware_offsets=labware_offsets,
+                deck_configuration=deck_configuration,
+                protocol=protocol,
+                run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
+            )
 
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
@@ -373,6 +380,11 @@ class RunOrchestratorStore:
     async def create_pyro(
         self,
         run_id: str,
+        labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
+        protocol: Optional[ProtocolResource],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
     ) -> StateSummary:
         """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
         if self._run_orchestrator is not None:
@@ -383,7 +395,14 @@ class RunOrchestratorStore:
             await self._run_process_pyro_provider.wait_for_run_proxy()
         )
 
-        self._run_orchestrator.create(run_id)
+        await self._run_orchestrator.create(
+            run_id=run_id,
+            labware_offsets=labware_offsets,
+            deck_configuration=deck_configuration,
+            protocol=protocol,
+            run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
+        )
         return self._run_orchestrator.get_state_summary()
 
     async def clear_pyro(self) -> RunResult:
