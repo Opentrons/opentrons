@@ -181,7 +181,7 @@ function fetchAndParse<SuccessBody>(
  * Poll both /heath and /server/update/health of an IP address and combine the
  * responses into a single result object
  */
-function pollHealth({
+async function pollHealth({
   ip,
   port,
   agent,
@@ -201,19 +201,21 @@ function pollHealth({
     `http://${urlIp}:${port}${UPDATE_SERVER_HEALTH_PATH}`,
     { agent }
   )
+  const [healthResp, serverHealthResp] = await Promise.all([
+    healthReq,
+    serverHealthReq,
+  ])
 
-  return Promise.all([healthReq, serverHealthReq]).then(
-    ([healthResp, serverHealthResp]) => ({
-      ip,
-      port,
-      health: healthResp.ok ? healthResp.body : null,
-      serverHealth: serverHealthResp.ok ? serverHealthResp.body : null,
-      healthError: !healthResp.ok
-        ? { status: healthResp.status, body: healthResp.body }
-        : null,
-      serverHealthError: !serverHealthResp.ok
-        ? { status: serverHealthResp.status, body: serverHealthResp.body }
-        : null,
-    })
-  )
+  return {
+    ip,
+    port,
+    health: healthResp.ok ? healthResp.body : null,
+    serverHealth: serverHealthResp.ok ? serverHealthResp.body : null,
+    healthError: !healthResp.ok
+      ? { status: healthResp.status, body: healthResp.body }
+      : null,
+    serverHealthError: !serverHealthResp.ok
+      ? { status: serverHealthResp.status, body: serverHealthResp.body }
+      : null,
+  }
 }
