@@ -16,6 +16,7 @@ import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
 import opentrons.types
+from opentrons.hardware_control import modules
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     find_enums_in_packages,
@@ -396,10 +397,10 @@ def _enumerated_error_reconstructor(
 
 def _module_model_reconstructor(
     m_dict: Dict[str, Any],
-) -> opentrons.hardware_control.types.ModuleModel:  # type: ignore
-    for model in get_args(opentrons.hardware_control.types.ModuleModel):  # type: ignore
+) -> modules.types.ModuleModel:
+    for model in get_args(modules.types.ModuleModel):
         if isinstance(m_dict["value"], model):
-            return model(m_dict["value"])
+            return model(m_dict["value"])  # type: ignore
     raise ValueError(
         f"Cannot determine module model during deserialization for: {m_dict}"
     )
