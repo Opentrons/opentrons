@@ -140,9 +140,7 @@ export function OnDeviceLogin({
         </div>
       </div>
       {showKeyboard ? (
-        <div
-          className={styles.keyboard_container}
-        >
+        <div className={styles.keyboard_container}>
           <AccordionKeyboard isOpen={showKeyboard} onToggle={() => {}}>
             <FullKeyboard
               onChange={(input: string) => {
