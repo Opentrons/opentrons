@@ -4,7 +4,30 @@ title: "Vacuum Module: Product Specifications"
 
 ![Labeled parts placeholder](images/labeled-parts-placeholder.png)
 
-## Included parts
+## Vacuum Module box parts
+
+The Vacuum Module ships in three separate boxes.
+
+### Box 1: labware components
+
+This box includes manifold components that sit on the deck and hold ANSI/SLAS compliant vacuum filtration labware.
+
+(1) Short vacuum collar  
+(1) Tall vacuum collar  
+(1) Vacuum manifold base  
+(3) Spacers
+
+### Box 2: module components
+
+(1) Vacuum module (pump and electronics)  
+(1) Deck adapter  
+(2) Deck plate screws (M4 x 10)
+
+### Box 3: accessories
+
+
+
+
 
 <div class="parts-list" markdown>
 
