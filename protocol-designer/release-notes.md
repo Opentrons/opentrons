@@ -36,7 +36,7 @@ This release adds full support for Flex 20 µL pipette tips and all available pa
 
 ### Known Issues
 
-- Opentrons pipettes' [low volume mode](https://docs.opentrons.com/python-api/pipettes/volume-modes/) makes small changes to pipette settings and behavior to ensure accuracy when aspirating and dispensing small volumes. Protocol Designer can make errors in these changes for Flex 20 µL pipette tips. If your protocol includes an error for tip bounds, you'll need to adjust the volumes used in your step.
+- Opentrons pipettes' [low volume mode](https://docs.opentrons.com/python-api/pipettes/volume-modes/) makes small changes to pipette settings and behavior to ensure accuracy when aspirating and dispensing small volumes. Protocol Designer can make errors in these changes when distributing less than 5 µL with Flex 20 µL pipette tips. If your protocol fails analysis with an error for tip bounds, you'll need to adjust the volumes used in your step.
 
 ## Opentrons Protocol Designer Changes in 8.9.1
 
