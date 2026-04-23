@@ -142,9 +142,6 @@ export function OnDeviceLogin({
       {showKeyboard ? (
         <div
           className={styles.keyboard_container}
-          onMouseDown={event => {
-            event.preventDefault()
-          }}
         >
           <AccordionKeyboard isOpen={showKeyboard} onToggle={() => {}}>
             <FullKeyboard
