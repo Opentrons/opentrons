@@ -31,6 +31,7 @@ electron := yarn electron . \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
+	--discovery.candidates=localhost \
 
 OPENTRONS_PROJECT ?= robot-stack
 
