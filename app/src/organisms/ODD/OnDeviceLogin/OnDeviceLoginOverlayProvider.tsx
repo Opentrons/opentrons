@@ -13,7 +13,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { getSafePostLoginPath } from './getSafePostLoginPath'
-import { OnDeviceLoginView } from './index'
+import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLoginOverlayProvider.module.css'
 
 import type { ReactNode } from 'react'
@@ -105,7 +105,7 @@ function LoginOverlayBody({
     },
   })
   return (
-    <OnDeviceLoginView
+    <OnDeviceLogin
       step={step}
       onStepChange={setStep}
       submitPassword={submitPassword}

@@ -28,7 +28,7 @@ interface LoginFormValues {
   password: string
 }
 
-export interface OnDeviceLoginViewProps {
+export interface OnDeviceLoginProps {
   step: LoginStep
   onStepChange: (step: LoginStep) => void
   submitPassword: (username: string, password: string) => void
@@ -39,7 +39,7 @@ export interface OnDeviceLoginViewProps {
   onClearLoginError?: () => void
 }
 
-export function OnDeviceLoginView({
+export function OnDeviceLogin({
   step,
   onStepChange,
   submitPassword,
@@ -47,7 +47,7 @@ export function OnDeviceLoginView({
   onCancel,
   loginError = null,
   onClearLoginError,
-}: OnDeviceLoginViewProps): JSX.Element {
+}: OnDeviceLoginProps): JSX.Element {
   const { t } = useTranslation(['shared', 'device_settings'])
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
     defaultValues: {
