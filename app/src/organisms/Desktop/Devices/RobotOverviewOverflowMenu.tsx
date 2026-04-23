@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -24,7 +24,9 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
+import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
+import * as Config from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { restartRobot } from '/app/redux/robot-admin'
 import { home, ROBOT } from '/app/redux/robot-controls'
@@ -38,6 +40,7 @@ import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
 import type { MouseEvent, MouseEventHandler } from 'react'
+import type { DevInternalFlag } from '/app/redux/config/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
 
@@ -49,7 +52,12 @@ export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
 ): JSX.Element => {
   const { robot } = props
-  const { t } = useTranslation(['devices_landing', 'robot_controls', 'shared'])
+  const { t } = useTranslation([
+    'devices_landing',
+    'robot_controls',
+    'shared',
+    'device_settings',
+  ])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -98,6 +106,9 @@ export const RobotOverviewOverflowMenu = (
     isRobotOnWrongVersionOfSoftware &&
     !isRobotUnavailable &&
     !isEstopNotDisengaged
+  const [showRobotCertImportModal, setShowRobotCertImportModal] =
+    useState<boolean>(false)
+  const devInternalFlags = useSelector(Config.getFeatureFlags)
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
@@ -106,6 +117,17 @@ export const RobotOverviewOverflowMenu = (
             <DisconnectModal
               onCancel={() => {
                 setShowDisconnectModal(false)
+              }}
+              robotName={robot.name}
+            />,
+            getTopPortalEl()
+          )
+        : null}
+      {showRobotCertImportModal
+        ? createPortal(
+            <RobotCertImportModal
+              onClose={() => {
+                setShowRobotCertImportModal(false)
               }}
               robotName={robot.name}
             />,
@@ -222,6 +244,20 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('robot_settings')}
           </MenuItem>
+          {!!devInternalFlags.accessControlMode ? (
+            <MenuItem
+              onClick={() => {
+                setShowRobotCertImportModal(true)
+              }}
+              data-testid={`RobotOverviewOverflowMenu_robotCertImport_${String(robot.name)}`}
+              css={css`
+                border-radius: 0 0 ${BORDERS.borderRadius8}
+                  ${BORDERS.borderRadius8};
+              `}
+            >
+              {t('device_settings:verify_robot_encryption_key')}
+            </MenuItem>
+          ) : null}
         </Flex>
       ) : null}
       {robot.status === CONNECTABLE ? (
@@ -233,6 +269,7 @@ export const RobotOverviewOverflowMenu = (
           }}
         />
       ) : null}
+
       {menuOverlay}
     </Flex>
   )
