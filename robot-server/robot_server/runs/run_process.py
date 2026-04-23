@@ -159,6 +159,8 @@ class DirectedRunProcess(AbstractRunCoordinator):
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
     ) -> None:
         """Create a run orchestrator and protocol engine for a given run."""
+        self._run_id = run_id
+
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
         else:
@@ -209,7 +211,6 @@ class DirectedRunProcess(AbstractRunCoordinator):
             orchestrator.add_labware_offset(offset)
 
         self._run_orchestrator = orchestrator
-        self._run_id = run_id
 
     @property
     def run_id(self) -> Optional[str]:
