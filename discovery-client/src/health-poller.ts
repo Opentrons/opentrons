@@ -1,4 +1,5 @@
 import net from 'net'
+import { pick } from 'lodash'
 import intersectionBy from 'lodash/intersectionBy'
 import isEqual from 'lodash/isEqual'
 import unionBy from 'lodash/unionBy'
@@ -9,6 +10,7 @@ import {
   ROBOT_SERVER_HEALTH_PATH,
   UPDATE_SERVER_HEALTH_PATH,
 } from './constants'
+import { HEALTH_RESPONSE_KEYS, SERVER_HEALTH_RESPONSE_KEYS } from './types'
 
 import type { Agent } from 'http'
 import type { RequestInit } from 'node-fetch'
@@ -209,8 +211,10 @@ async function pollHealth({
   return {
     ip,
     port,
-    health: healthResp.ok ? healthResp.body : null,
-    serverHealth: serverHealthResp.ok ? serverHealthResp.body : null,
+    health: healthResp.ok ? trimHealthResponse(healthResp.body) : null,
+    serverHealth: serverHealthResp.ok
+      ? trimServerHealthResponse(serverHealthResp.body)
+      : null,
     healthError: !healthResp.ok
       ? { status: healthResp.status, body: healthResp.body }
       : null,
@@ -218,4 +222,20 @@ async function pollHealth({
       ? { status: serverHealthResp.status, body: serverHealthResp.body }
       : null,
   }
+}
+
+/**
+ * To avoid unnecessary client updates, this removes any extra fields that the
+ * server might have returned but that aren't relevant for robot discovery purposes.
+ * Especially fields that change over time, like disk usage.
+ */
+function trimHealthResponse(response: HealthResponse): HealthResponse {
+  return pick(response, HEALTH_RESPONSE_KEYS)
+}
+
+/** Like trimHealthResponse(), but for ServerHealthResponse. */
+function trimServerHealthResponse(
+  response: ServerHealthResponse
+): ServerHealthResponse {
+  return pick(response, SERVER_HEALTH_RESPONSE_KEYS)
 }
