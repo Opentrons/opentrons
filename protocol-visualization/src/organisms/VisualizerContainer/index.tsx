@@ -155,7 +155,7 @@ export function ProtocolVisualization(
       // }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-     
+
     [
       selectedCommandId,
       selectedSlot,

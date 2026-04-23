@@ -22,5 +22,5 @@
       "@opentrons/step-generation": ["../step-generation/src/index.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "src/**/*.json"]
 }

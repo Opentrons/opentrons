@@ -16,7 +16,7 @@ vi.mock('../../CommandSteps')
 vi.mock('../../DeckView')
 
 const render = (props: ComponentProps<typeof ProtocolVisualization>) => {
-  return renderWithProviders(<ProtocolVisualization {...props} />)[0]
+  return renderWithProviders(<ProtocolVisualization {...props} />)
 }
 
 const mockAnalysis = {

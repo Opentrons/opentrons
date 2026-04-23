@@ -25,7 +25,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
-import type { LabwareEntityExtended } from '../../../../organisms/Desktop/ProtocolVisualization/DeckView'
+import type { LabwareEntityExtended } from './index'
 
 const STACKER_X_OFFSET = 17
 const STACKER_POSITION_OFFSET = 178

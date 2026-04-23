@@ -4,10 +4,9 @@ import { beforeEach, describe, it, vi } from 'vitest'
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 import { CLEAN, DIRTY, EMPTY } from '@opentrons/step-generation'
 
-import { renderWithProviders } from "../../../../../../../../../../app/__testing-utils__"
-import { i18n } from "../../../../../../../../../../app/i18n"
-
 import { TipPickupSlot } from '..'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
