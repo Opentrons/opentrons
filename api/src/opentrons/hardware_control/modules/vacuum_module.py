@@ -210,7 +210,7 @@ class VacuumModule(mod_abc.AbstractModule):
             "targetPressure": self._reader.vacuum_state.target_gauge_pressure,
             "currentPower": self._reader.pump_state.current_rpm,
             "targetPower": self._reader.pump_state.target_rpm,
-            "ventStatus": str(self._reader.vacuum_state.vent_state),
+            "ventStatus": self._reader.vacuum_state.vent_state.formatted,
             "modeType": self._reader.operation_mode,
         }
         return {"status": self.status.value, "data": data}
