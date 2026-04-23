@@ -3,16 +3,25 @@ import axios from 'axios'
 import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation } from '@opentrons/react-api-client'
 
+/**
+ * Shape of an error response from `POST /auth/oauth2/token`: the standard
+ * RFC 6749 § 5.2 fields plus the opentrons-specific
+ * `opentrons_login_attempts_remaining` field returned when the lockout limit
+ * is configured.
+ */
+interface OAuth2TokenErrorResponse {
+  error?: string
+  error_description?: string
+  opentrons_login_attempts_remaining?: number
+}
+
 function getOAuth2PasswordLoginErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    const data = error.response?.data as
-      | { errors?: Array<{ detail?: string }> }
-      | undefined
-    const detail = data?.errors?.[0]?.detail
-    if (detail != null && detail !== '') return detail
-    if (error.response?.status != null) {
-      return `${error.response.data.message}`
-    }
+    const data = error.response?.data as OAuth2TokenErrorResponse | undefined
+    const description = data?.error_description
+    if (description != null && description !== '') return description
+    const code = data?.error
+    if (code != null && code !== '') return code
   }
   return error instanceof Error ? error.message : 'Login failed'
 }
