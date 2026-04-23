@@ -24,9 +24,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": [
-      "**"
-    ]
+    "nohoist": ["**"]
   },
   "devDependencies": {
     "@opentrons/app": "link:../app",
@@ -68,5 +66,8 @@
     "winston": "3.15.0",
     "winston-transport": "^4.9.0",
     "yargs-parser": "13.1.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["electron"]
   }
 }
