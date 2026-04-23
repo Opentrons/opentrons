@@ -1,5 +1,6 @@
 """Registry for use with a Pyro Daemon client and server to allow serialization of Opentrons Hardware types and classes."""
 
+import dataclasses
 import datetime
 from typing import Any, Dict, get_args
 
@@ -9,6 +10,7 @@ import opentrons_shared_data.errors.codes
 import opentrons_shared_data.pipette.pipette_definition
 import opentrons_shared_data.pipette.types
 
+import opentrons.calibration_storage.types
 import opentrons.config.types
 import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
@@ -280,20 +282,18 @@ def _numpy_float_dict_to_class(classname, d) -> float64:  # type: ignore
     return float64(d["value"])
 
 
-# Point type serialization
-def _point_class_to_dict(obj) -> Dict:  # type: ignore
+def _point_to_dict(point: opentrons.types.Point) -> Dict:  # type: ignore
     return {
-        "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
-        "x": obj.x,
-        "y": obj.y,
-        "z": obj.z,
+        "x": point.x,
+        "y": point.y,
+        "z": point.z,
     }
 
 
-def _point_dict_to_class(clasname, d) -> opentrons.types.Point:  # type: ignore
-    x_data = d["x"]
-    y_data = d["y"]
-    z_data = d["z"]
+def _dict_to_point(point_dict: Dict) -> opentrons.types.Point:  # type: ignore
+    x_data = point_dict["x"]
+    y_data = point_dict["y"]
+    z_data = point_dict["z"]
     if isinstance(x_data, dict):
         x_data = x_data["value"]
     if isinstance(y_data, dict):
@@ -301,6 +301,82 @@ def _point_dict_to_class(clasname, d) -> opentrons.types.Point:  # type: ignore
     if isinstance(z_data, dict):
         z_data = z_data["value"]
     return opentrons.types.Point(x=float(x_data), y=float(y_data), z=float(z_data))
+
+
+# Point type serialization
+def _point_class_to_dict(obj) -> Dict:  # type: ignore
+    _point_dict = _point_to_dict(obj)
+    _point_dict["__class__"] = ".".join((obj.__module__, obj.__class__.__name__))
+    return _point_dict
+
+
+def _point_dict_to_class(classname, d) -> opentrons.types.Point:  # type: ignore
+    return _dict_to_point(d)
+
+
+def _ot3_transforms_class_to_dict(
+    obj: opentrons.hardware_control.ot3_calibration.OT3Transforms,
+) -> Dict:  # type: ignore
+    transform_dict = dataclasses.asdict(obj)
+    transform_dict["deck_calibration"]["source"] = obj.deck_calibration.source.value
+    transform_dict["deck_calibration"]["status"] = {
+        "markedBad": obj.deck_calibration.status.markedBad,
+        "source": obj.deck_calibration.status.source.value
+        if obj.deck_calibration.status.source is not None
+        else None,
+        "markedAt": obj.deck_calibration.status.markedAt.isoformat()
+        if obj.deck_calibration.status.markedAt is not None
+        else None,
+    }
+    transform_dict["deck_calibration"]["last_modified"] = (
+        obj.deck_calibration.last_modified.isoformat()
+        if obj.deck_calibration.last_modified is not None
+        else None
+    )
+
+    transform_dict["carriage_offset"] = _point_to_dict(obj.carriage_offset)
+    transform_dict["left_mount_offset"] = _point_to_dict(obj.left_mount_offset)
+    transform_dict["right_mount_offset"] = _point_to_dict(obj.right_mount_offset)
+    transform_dict["gripper_mount_offset"] = _point_to_dict(obj.gripper_mount_offset)
+    transform_dict["__class__"] = (
+        "opentrons.hardware_control.ot3_calibration.OT3Transforms"
+    )
+    return transform_dict
+
+
+def _ot3_transforms_dict_to_class(
+    classname: str, d: Any
+) -> opentrons.hardware_control.ot3_calibration.OT3Transforms:
+    status_source = d["deck_calibration"]["status"]["source"]
+    status_marked_at = d["deck_calibration"]["status"]["markedAt"]
+    last_modified = d["deck_calibration"]["last_modified"]
+    return opentrons.hardware_control.ot3_calibration.OT3Transforms(
+        deck_calibration=opentrons.hardware_control.robot_calibration.DeckCalibration(
+            attitude=d["deck_calibration"]["attitude"],
+            source=opentrons.calibration_storage.types.SourceType(
+                d["deck_calibration"]["source"]
+            ),
+            status=opentrons.calibration_storage.types.CalibrationStatus(
+                markedBad=d["deck_calibration"]["status"]["markedBad"],
+                source=opentrons.calibration_storage.types.SourceType(status_source)
+                if status_source is not None
+                else None,
+                markedAt=datetime.datetime.fromisoformat(status_marked_at)
+                if status_marked_at is not None
+                else None,
+            ),
+            belt_attitude=d["deck_calibration"]["belt_attitude"],
+            last_modified=datetime.datetime.fromisoformat(last_modified)
+            if last_modified is not None
+            else None,
+            pipette_calibrated_with=d["deck_calibration"]["pipette_calibrated_with"],
+            tiprack=d["deck_calibration"]["tiprack"],
+        ),
+        carriage_offset=_dict_to_point(d["carriage_offset"]),
+        left_mount_offset=_dict_to_point(d["left_mount_offset"]),
+        right_mount_offset=_dict_to_point(d["right_mount_offset"]),
+        gripper_mount_offset=_dict_to_point(d["gripper_mount_offset"]),
+    )
 
 
 # todo(chb, 2026-04-21): Do we want to change how notifications are serialized? Pydantic maybe?
@@ -533,6 +609,13 @@ def register_hardware_types() -> None:
         class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary,
         dict_to_class=_PipetteOffsetSummary_dict_to_class,
         class_to_dict=_PipetteOffsetSummary_class_to_dict,
+    )
+
+    # OT3 Transforms
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.ot3_calibration.OT3Transforms,
+        dict_to_class=_ot3_transforms_dict_to_class,
+        class_to_dict=_ot3_transforms_class_to_dict,
     )
 
     # numpy registration

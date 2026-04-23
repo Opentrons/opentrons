@@ -391,11 +391,8 @@ class RunOrchestratorStore:
             raise RunConflictError("Another run is currently active.")
 
         # "Run orchestrator" here is a proxy of a directed run process
-        self._run_orchestrator = (
-            await self._run_process_pyro_provider.wait_for_run_proxy()
-        )
-
-        await self._run_orchestrator.create(
+        run_orchestrator = await self._run_process_pyro_provider.wait_for_run_proxy()
+        await run_orchestrator.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
@@ -404,7 +401,10 @@ class RunOrchestratorStore:
             run_time_param_paths=run_time_param_paths,
             proxy_of_callback_for_handling_door_events=self._run_orchestrator.register_hardware_door_event(),
         )
-        return self._run_orchestrator.get_state_summary()
+
+        summary = run_orchestrator.get_state_summary()
+        self._run_orchestrator = run_orchestrator
+        return summary
 
     async def clear_pyro(self) -> RunResult:
         """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
