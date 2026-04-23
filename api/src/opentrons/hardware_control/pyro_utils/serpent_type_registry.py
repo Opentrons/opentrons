@@ -300,6 +300,21 @@ def _point_dict_to_class(clasname, d) -> opentrons.types.Point:  # type: ignore
         z_data = z_data["value"]
     return opentrons.types.Point(x=float(x_data), y=float(y_data), z=float(z_data))
 
+# todo(chb, 2026-04-21): Do we want to change how notifications are serialized? Pydantic maybe?
+def _door_notif_class_to_dict(obj) -> Dict:   # type: ignore
+    return {
+        "__class__": "opentrons.hardware_control.types.DoorStateNotification",
+        "event": obj.event,
+        "new_state": obj.new_state,
+        "module_serial": obj.module_serial,
+    }
+
+def _door_notif_dict_to_class(classname, d) -> opentrons.hardware_control.types.DoorStateNotification:
+    return opentrons.hardware_control.types.DoorStateNotification(
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),
+        new_state=opentrons.hardware_control.types.DoorState(d["new_state"]["value"]),
+        module_serial=d["module_serial"],
+    )
 
 # Robot type registry - of note, this is meant to return a "pure" type
 def _robot_type_class_to_dict(obj) -> Dict:  # type: ignore
@@ -395,6 +410,13 @@ def register_hardware_types() -> None:
         class_type=opentrons.types.Point,
         dict_to_class=_point_dict_to_class,
         class_to_dict=_point_class_to_dict,
+    )
+
+    # DoorStateNotification registration
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.types.DoorStateNotification,
+        dict_to_class=_door_notif_dict_to_class,
+        class_to_dict=_door_notif_class_to_dict
     )
 
     # handle Typed Dicts for the hardware controller
