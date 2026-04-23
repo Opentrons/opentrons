@@ -62,7 +62,7 @@ export function OnDeviceLogin({
   const password = watch('password')
 
   const handleNext = (): void => {
-    const { username: username, password: password } = getValues()
+    const { username, password } = getValues()
     if (step === 'username') {
       if (username.trim() === '') return
       onStepChange('password')

@@ -28,10 +28,6 @@ describe('useOAuth2PasswordLogin', () => {
     onError.mockReset()
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it('calls getOAuth2Token with ROPC body including client_id', () => {
     const { result } = renderHook(() =>
       useOAuth2PasswordLogin({ onSuccess, onError })
