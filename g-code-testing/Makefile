@@ -110,10 +110,8 @@ FORMAT_FILE_GLOB = "g-code-testing/**/*.{json,md,yml,yaml}"
 
 .PHONY: format-other
 format-other:
-	cd ..
-	pnpm exec prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	cd .. && pnpm exec prettier --ignore-path .eslintignore --write g-code-testing
 
 .PHONY: lint-other
 lint-other:
-	cd ..
-	pnpm exec prettier --check --ignore-path .eslintignore $(FORMAT_FILE_GLOB)
+	cd .. && pnpm exec prettier --check --ignore-path .eslintignore g-code-testing
