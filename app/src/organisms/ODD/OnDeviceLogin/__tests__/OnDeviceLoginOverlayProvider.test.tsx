@@ -235,8 +235,6 @@ describe('Login', () => {
       target: { value: 'secret' },
     })
     fireEvent.click(screen.getByText('Confirm'))
-    screen.getByText(
-      'Incorrect username or password (4 attempts remaining before lockout)'
-    )
+    screen.getByText('Incorrect username or password.')
   })
 })
