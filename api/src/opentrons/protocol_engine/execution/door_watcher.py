@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import (
     DoorState,
     DoorStateNotification,
     HardwareEvent,
+    HardwareEventHandler,
     PauseType,
 )
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
@@ -26,7 +27,9 @@ class DoorWatcher:
         state_store: StateStore,
         hardware_api: HardwareControlAPI,
         action_dispatcher: ActionDispatcher,
-        proxy_of_callback_for_handling_door_events = None,
+        proxy_of_callback_for_handling_door_events: Optional[
+            HardwareEventHandler
+        ] = None,
     ) -> None:
         """Initialize the DoorWatcher.
 
@@ -37,13 +40,17 @@ class DoorWatcher:
             action_dispatcher: The ActionDispatcher to dispatch actions into.
                 Assumed to be owned by the same event loop that this
                 DoorWatcher was constructed in.
+            proxy_of_callback_for_handling_door_events: The Optional remote proxy of
+                the callback to used when handling door events, subprocess mode only.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
         self._action_dispatcher = action_dispatcher
         self._loop = get_running_loop()
         self._unsubscribe_callback: Optional[_UnsubscribeCallback] = None
-        self._proxy_of_callback_for_handling_door_events = proxy_of_callback_for_handling_door_events
+        self._proxy_of_callback_for_handling_door_events = (
+            proxy_of_callback_for_handling_door_events
+        )
 
     def start(self) -> None:
         """Subscribe to hardware events and start forwarding them as PE actions."""

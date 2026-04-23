@@ -5,9 +5,9 @@ from typing import Any, Dict, get_args
 
 from numpy import float64
 
+import opentrons_shared_data.errors.codes
 import opentrons_shared_data.pipette.pipette_definition
 import opentrons_shared_data.pipette.types
-import opentrons_shared_data.errors.codes
 
 import opentrons.config.types
 import opentrons.hardware_control.dev_types
@@ -301,9 +301,10 @@ def _point_dict_to_class(clasname, d) -> opentrons.types.Point:  # type: ignore
         z_data = z_data["value"]
     return opentrons.types.Point(x=float(x_data), y=float(y_data), z=float(z_data))
 
+
 # todo(chb, 2026-04-21): Do we want to change how notifications are serialized? Pydantic maybe?
 # DoorStateNotification serializers
-def _door_notif_class_to_dict(obj) -> Dict:   # type: ignore
+def _door_notif_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.DoorStateNotification",
         "event": obj.event,
@@ -311,15 +312,19 @@ def _door_notif_class_to_dict(obj) -> Dict:   # type: ignore
         "module_serial": obj.module_serial,
     }
 
-def _door_notif_dict_to_class(classname, d) -> opentrons.hardware_control.types.DoorStateNotification:
+
+def _door_notif_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.types.DoorStateNotification:
     return opentrons.hardware_control.types.DoorStateNotification(
-        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
         new_state=opentrons.hardware_control.types.DoorState(d["new_state"]["value"]),
         module_serial=d["module_serial"],
     )
 
+
 # EstopStateNotification serializers
-def _estop_notif_class_to_dict(obj) -> Dict:   # type: ignore
+def _estop_notif_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.EstopStateNotification",
         "event": obj.event,
@@ -327,56 +332,81 @@ def _estop_notif_class_to_dict(obj) -> Dict:   # type: ignore
         "new_state": obj.new_state,
     }
 
-def _estop_notif_dict_to_class(classname, d) -> opentrons.hardware_control.types.EstopStateNotification:
+
+def _estop_notif_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.types.EstopStateNotification:
     return opentrons.hardware_control.types.EstopStateNotification(
-        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
         old_state=opentrons.hardware_control.types.EstopState(d["new_state"]["value"]),
         new_state=opentrons.hardware_control.types.EstopState(d["new_state"]["value"]),
     )
 
+
 # ErrorMessageNotification serializers
-def _error_notif_class_to_dict(obj) -> Dict:   # type: ignore
+def _error_notif_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.ErrorMessageNotification",
         "event": obj.event,
         "message": obj.message,
     }
 
-def _error_notif_dict_to_class(classname, d) -> opentrons.hardware_control.types.ErrorMessageNotification:
+
+def _error_notif_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.types.ErrorMessageNotification:
     return opentrons.hardware_control.types.ErrorMessageNotification(
-        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
         message=d["message"],
     )
 
+
 # enumerate error helpers
-def _enumerated_error_deconstructor(e_obj) -> Dict:
+def _enumerated_error_deconstructor(e_obj) -> Dict:  # type: ignore
     # unzip the error and any nested ones
     return {
         "code": e_obj.code,
         "message": e_obj.message,
         "detail": e_obj.detail,
-        "wrapping": None if e_obj.wrapping is None else [_enumerated_error_deconstructor(wrapped_item) for wrapped_item in e_obj.wrapping]
+        "wrapping": None
+        if e_obj.wrapping is None
+        else [
+            _enumerated_error_deconstructor(wrapped_item)
+            for wrapped_item in e_obj.wrapping
+        ],
     }
 
-def _enumerated_error_reconstructor(e_dict) -> opentrons.hardware_control.types.EnumeratedError:
+
+def _enumerated_error_reconstructor(
+    e_dict: Dict[str, Any],
+) -> opentrons.hardware_control.types.EnumeratedError:  # type: ignore
     # reassmble the error and any nested ones
-    return opentrons.hardware_control.types.EnumeratedError(
+    return opentrons.hardware_control.types.EnumeratedError(  # type: ignore
         code=opentrons_shared_data.errors.codes.ErrorCodes(e_dict["code"]["value"]),
         message=e_dict["message"],
         detail=e_dict["detail"],
-        wrapping=None if e_dict["wrapping"] is None else [_enumerated_error_reconstructor(wrapped_dict) for wrapped_dict in e_dict["wrapping"]],
+        wrapping=None
+        if e_dict["wrapping"] is None
+        else [
+            _enumerated_error_reconstructor(wrapped_dict)
+            for wrapped_dict in e_dict["wrapping"]
+        ],
     )
 
 
-def _module_model_reconstructor(m_dict) -> opentrons.hardware_control.types.ModuleModel:
-    for model in get_args(opentrons.hardware_control.types.ModuleModel):
+def _module_model_reconstructor(
+    m_dict: Dict[str, Any],
+) -> opentrons.hardware_control.types.ModuleModel:  # type: ignore
+    for model in get_args(opentrons.hardware_control.types.ModuleModel):  # type: ignore
         if isinstance(m_dict["value"], model):
             return model(m_dict["value"])
-    raise ValueError(f"Cannot determine module model during deserialization for: {m_dict}")
+    raise ValueError(
+        f"Cannot determine module model during deserialization for: {m_dict}"
+    )
+
 
 # AsynchronousModuleErrorNotification serializers
-def _async_mod_error_notif_class_to_dict(obj) -> Dict:   # type: ignore
-
+def _async_mod_error_notif_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.AsynchronousModuleErrorNotification",
         "event": obj.event,
@@ -386,34 +416,40 @@ def _async_mod_error_notif_class_to_dict(obj) -> Dict:   # type: ignore
         "port": obj.port,
     }
 
-def _async_mod_error_notif_dict_to_class(classname, d) -> opentrons.hardware_control.types.AsynchronousModuleErrorNotification:
+
+def _async_mod_error_notif_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.types.AsynchronousModuleErrorNotification:
     return opentrons.hardware_control.types.AsynchronousModuleErrorNotification(
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
         exception=_enumerated_error_reconstructor(d["exception"]),
         module_serial=d["module_serial"],
         module_model=_module_model_reconstructor(d["module_model"]),
         port=d["port"],
-        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),
     )
 
 
 # ModuleDisconnectedNotification serializers
-def _mod_disconnect_notif_class_to_dict(obj) -> Dict:   # type: ignore
-
+def _mod_disconnect_notif_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.ModuleDisconnectedNotification",
         "event": obj.event,
         "module_serial": obj.module_serial,
         "module_model": obj.module_model.name,
-        "port": obj.port
+        "port": obj.port,
     }
 
-def _mod_disconnect_notif_dict_to_class(classname, d) -> opentrons.hardware_control.types.ModuleDisconnectedNotification:
+
+def _mod_disconnect_notif_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.types.ModuleDisconnectedNotification:
     return opentrons.hardware_control.types.ModuleDisconnectedNotification(
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
         module_serial=d["module_serial"],
         module_model=_module_model_reconstructor(d["module_model"]),
         port=d["port"],
-        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),
     )
+
 
 # Robot type registry - of note, this is meant to return a "pure" type
 def _robot_type_class_to_dict(obj) -> Dict:  # type: ignore
@@ -516,35 +552,35 @@ def register_hardware_types() -> None:
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.DoorStateNotification,
         dict_to_class=_door_notif_dict_to_class,
-        class_to_dict=_door_notif_class_to_dict
+        class_to_dict=_door_notif_class_to_dict,
     )
 
     # EstopStateNotification registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.EstopStateNotification,
         dict_to_class=_estop_notif_dict_to_class,
-        class_to_dict=_estop_notif_class_to_dict
+        class_to_dict=_estop_notif_class_to_dict,
     )
 
     # ErrorMessageNotification registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.ErrorMessageNotification,
         dict_to_class=_error_notif_dict_to_class,
-        class_to_dict=_error_notif_class_to_dict
+        class_to_dict=_error_notif_class_to_dict,
     )
 
     # AsynchronousModuleErrorNotification registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.AsynchronousModuleErrorNotification,
         dict_to_class=_async_mod_error_notif_dict_to_class,
-        class_to_dict=_async_mod_error_notif_class_to_dict
+        class_to_dict=_async_mod_error_notif_class_to_dict,
     )
 
     # ModuleDisconnectedNotification registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.ModuleDisconnectedNotification,
         dict_to_class=_mod_disconnect_notif_dict_to_class,
-        class_to_dict=_mod_disconnect_notif_class_to_dict
+        class_to_dict=_mod_disconnect_notif_class_to_dict,
     )
 
     # handle Typed Dicts for the hardware controller

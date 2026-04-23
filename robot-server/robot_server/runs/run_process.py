@@ -15,6 +15,7 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
+from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
 from opentrons.protocol_engine import (
     Command,
     CommandCreate,
@@ -57,6 +58,10 @@ from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     serpent_enum_registration,
 )
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
+    pyro_behavior,
+)
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
@@ -66,12 +71,6 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from robot_server.protocols.protocol_store import ProtocolResource
-from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
-
-from opentrons.util.pyro.pyro_synchronous_adapter import (
-    convert_result_to_proxy,
-    pyro_behavior,
-)
 
 
 # register_process_types runs for both the robot server process and the run subprocess
@@ -148,13 +147,13 @@ class DirectedRunProcess(AbstractRunCoordinator):
         def door_event_handler(
             event: HardwareEvent,
         ) -> None:
-            self._run_orchestrator._protocol_engine._door_watcher._handle_hardware_door_event(
-                event
-            )
+            if self._run_orchestrator is not None:
+                self._run_orchestrator._protocol_engine._door_watcher._handle_hardware_door_event(
+                    event
+                )
 
         return door_event_handler
-    
-    
+
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         """Event loop for use in allowing async methods via Pyro."""
@@ -180,7 +179,9 @@ class DirectedRunProcess(AbstractRunCoordinator):
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
-        proxy_of_callback_for_handling_door_events = None
+        proxy_of_callback_for_handling_door_events: Optional[
+            HardwareEventHandler
+        ] = None,
     ) -> None:
         """Create a run orchestrator and protocol engine for a given run."""
         self._run_id = run_id
@@ -207,7 +208,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             # file_provider=file_provider,
             # camera_provider=camera_provider,
             # notify_publishers=notify_publishers,
-            proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events
+            proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
