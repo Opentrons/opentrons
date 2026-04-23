@@ -255,8 +255,6 @@
   "oem_mode": "OEM模式",
   "off": "关闭",
   "on": "开启",
-  "on_device_login": "登录",
-  "on_device_login_error_incorrect": "用户名或密码不正确（锁定前还可尝试 4 次）",
   "one_hour": "1小时",
   "other_networks": "其他网络",
   "other_robot_updating": "无法更新，因为该APP目前正在更新其他设备。",
