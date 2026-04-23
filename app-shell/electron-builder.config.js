@@ -68,6 +68,7 @@ module.exports = async () => ({
     extendInfo: HAS_MAC_ASSET_CATALOG
       ? { CFBundleIconName: 'AppIcon' }
       : undefined,
+    identity: DEV_MODE ? null : undefined,
     forceCodeSigning: !DEV_MODE,
     gatekeeperAssess: true,
     // note: notarize.teamId is passed by implicitly sending through the APPLE_TEAM_ID env var
