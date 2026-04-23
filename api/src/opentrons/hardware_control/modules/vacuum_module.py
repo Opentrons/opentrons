@@ -193,11 +193,8 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def status(self) -> VacuumModuleStatus:
         """Module status or error state details."""
-        # TODO : make sure that the pump state is getting updated
         return (
-            VacuumModuleStatus.RUNNING
-            if self._reader.pump_state.pump_running
-            else VacuumModuleStatus.IDLE
+            VacuumModuleStatus.RUNNING if self.pump_running else VacuumModuleStatus.IDLE
         )
 
     @property
@@ -233,6 +230,13 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def operation_mode(self) -> VacuumModuleOperationMode:
         return self._reader.operation_mode
+
+    @property
+    def pump_running(self) -> bool:
+        return (
+            self._reader.pump_state.pump_running
+            or self._reader.vacuum_state.vacuum_enabled
+        )
 
     async def prep_for_update(self) -> str:
         await self._poller.stop()
@@ -413,6 +417,8 @@ class VacuumModuleReader(Reader):
         self._error_callback = None
 
     async def read(self) -> None:
+        await self.update_vacuum_state()
+        await self.update_pump_state()
         if not self.initialized or self._refresh_state:
             initialized = True
             self._refresh_state = False
