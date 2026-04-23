@@ -322,7 +322,8 @@ circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
 
 .PHONY: test-js-internal
 test-js-internal:
-	pnpm vitest $(tests) $(test_opts) $(cov_opts)
+	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
+
 
 .PHONY: test-js-%
 test-js-%:

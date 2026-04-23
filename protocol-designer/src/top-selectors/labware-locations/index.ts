@@ -350,13 +350,14 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
     getLabwareEntities,
 
     (robotState, initialDeckSetup, labwareEntities) => {
-      if (robotState == null)
+      if (robotState == null) {
         return {
           pipettes: {},
           labware: {},
           modules: {},
           additionalEquipmentOnDeck: {},
         }
+      }
       const { pipettes, modules, additionalEquipmentOnDeck } = initialDeckSetup
       return {
         pipettes: mapValues(pipettes, (pipEntity, pipId) => ({

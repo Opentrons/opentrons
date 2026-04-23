@@ -25,7 +25,10 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
     UserDefinedCSVCmdFileNameMetadata,
 )
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_client_async_adapter import (
+    AsyncClientPyroObject,
+    AsyncPyroFunctionWrapper,
+)
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from opentrons_shared_data.robot.types import RobotTypeEnum
@@ -37,6 +40,7 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
 )
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.pyro_utils import (
     pyro_resource,
     resource_utilities,
@@ -73,6 +77,12 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
 def mock_app_state(decoy: Decoy) -> AppState:
     """Get a mock DataFilesStore."""
     return decoy.mock(cls=AppState)
+
+
+@pytest.fixture
+def mock_run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
+    """A mock RunProcessPyroProvider."""
+    return decoy.mock(cls=RunProcessPyroProvider)
 
 
 async def _host_pyro_nameserver_and_ot3api(
@@ -136,6 +146,7 @@ async def test_run_hardware_event_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
     mock_feature_flags: None,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a proxy of a callback.
@@ -155,6 +166,7 @@ async def test_run_hardware_event_callback(
         hardware_api=ot3api,
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
@@ -165,7 +177,7 @@ async def test_run_hardware_event_callback(
         robot_server_resource.create_run_hardware_event_callback()
     )
 
-    assert isinstance(result, pyro.Proxy)
+    assert isinstance(result, AsyncPyroFunctionWrapper)
 
 
 async def test_maintenance_run_hardware_event_callback(
@@ -201,7 +213,7 @@ async def test_maintenance_run_hardware_event_callback(
         robot_server_resource.create_maintenance_run_hardware_event_callback()
     )
 
-    assert isinstance(result, pyro.Proxy)
+    assert isinstance(result, AsyncPyroFunctionWrapper)
 
 
 async def test_camera_provider(
@@ -222,11 +234,10 @@ async def test_camera_provider(
         mock_app_state, empty_cam_provider
     )
 
-    camera_proxy = robot_server_resource.get_camera_provider()
+    # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
+    camera_proxy_async = robot_server_resource.get_camera_provider()
 
-    # todo(chb: 04-10-2026): When AsyncClientPyroObjects start auto-wrapping child proxies as async this can simplify
-    async_cam = AsyncClientPyroObject(camera_proxy)
-    cam_provider = cast(CameraProvider, async_cam)
+    cam_provider = cast(CameraProvider, camera_proxy_async)
     settings = await cam_provider.get_camera_settings()
 
     # Empty Camera settings defaults all to True, assert the proxy gave us that
@@ -253,11 +264,10 @@ async def test_file_provider(
         mock_app_state, empty_file_provider
     )
 
-    file_proxy = robot_server_resource.get_file_provider()
+    # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
+    file_proxy_async = robot_server_resource.get_file_provider()
 
-    # todo(chb: 04-10-2026): When AsyncClientPyroObjects start auto-wrapping child proxies as async this can simplify
-    async_file = AsyncClientPyroObject(file_proxy)
-    file_provider = cast(FileProvider, async_file)
+    file_provider = cast(FileProvider, file_proxy_async)
     results = await file_provider.write_file(
         data=bytes([1, 2, 3]),
         mime_type=MimeType("text/csv"),

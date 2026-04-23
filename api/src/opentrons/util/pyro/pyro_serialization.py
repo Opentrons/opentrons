@@ -13,10 +13,21 @@ from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
 
 
-class UnhashableDictWrapper(BaseModel):
-    """This is a specialty model created to safely wrap dictionaries with mutable elements provided by Opentrons APIs.
+class TypedDictWrapper(BaseModel):
+    """This is a specialty model create to safely wrap TypedDicts like PipetteDict.
 
-    When registering types, be sure to utilize `register_unhashable_dicts` to ensure proper serialization between processes.
+    Each typed dict requires custom handling in their native serializer.
+    """
+
+    dictionary: dict[Any, Any]
+    typed_dict_name: str
+
+
+class NonBuiltinKeyDictWrapper(BaseModel):
+    """This is a specialty model created to safely wrap dictionaries with non builtin keys provided by Opentrons APIs.
+
+    When registering types, be sure to utilize `register_dicts_with_non_builtin_keys` to ensure proper serialization
+    between processes.
     """
 
     dictionary: dict[Any, Any]
@@ -159,14 +170,26 @@ class OpentronsPyroSerializer:
         cls._typed_dict_class_name_to_model[class_name] = typed_dict
 
     @classmethod
-    def register_unhashable_dicts(cls) -> None:
-        """Registers the specialty handler for unhashable dicts using UnhashableDictWrapper."""
+    def register_opentrons_typed_dicts(
+        cls, dict_to_class: Callable[[str, Any], Any]
+    ) -> None:
+        """Registers the specialty handler for typed dicts using TypeDictWrapper."""
         class_name = register_type_to_serpent(
-            UnhashableDictWrapper,
+            TypedDictWrapper,
+            dict_to_class,
+            cls._pydantic_class_to_dict,
+        )
+        cls._pydantic_class_name_to_model[class_name] = TypedDictWrapper
+
+    @classmethod
+    def register_dicts_with_non_builtin_keys(cls) -> None:
+        """Registers the specialty handler for dicts with non builtin keys using NonBuiltinKeyDictWrapper."""
+        class_name = register_type_to_serpent(
+            NonBuiltinKeyDictWrapper,
             cls._unhashable_dict_wrapper_dict_to_class,
             cls._pydantic_class_to_dict,
         )
-        cls._pydantic_class_name_to_model[class_name] = UnhashableDictWrapper
+        cls._pydantic_class_name_to_model[class_name] = NonBuiltinKeyDictWrapper
 
     @classmethod
     def _unhashable_dict_wrapper_dict_to_class(  # noqa: C901

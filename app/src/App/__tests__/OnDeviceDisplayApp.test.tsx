@@ -2,6 +2,11 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  useAccessControlEnabledQuery,
+  useRobotSettingsQuery,
+} from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
@@ -28,23 +33,27 @@ import { getIsShellReady } from '/app/redux/shell'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { LocalizationProvider } from '../../LocalizationProvider'
+import { LoggedOutOverlay } from '../../molecules/LoggedOutOverlay'
 import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
-import type { UseQueryResult } from 'react-query'
-import type { RobotSettingsResponse } from '@opentrons/api-client'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
 import type { LocalizationProviderProps } from '../../LocalizationProvider'
 
-vi.mock('@opentrons/react-api-client', async () => {
-  const actual = await vi.importActual('@opentrons/react-api-client')
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
-    useRobotSettingsQuery: () =>
-      ({
-        data: { settings: [] },
-      }) as unknown as UseQueryResult<RobotSettingsResponse>,
+    useRobotSettingsQuery: vi.fn(() => ({
+      data: { settings: [] },
+      isSuccess: true,
+    })) as any,
+    useAccessControlEnabledQuery: vi.fn(() => ({
+      data: { data: { accessControlEnabled: false } },
+      isSuccess: true,
+    })) as any,
   }
 })
 vi.mock('../../LocalizationProvider')
@@ -72,6 +81,7 @@ vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../hooks')
 vi.mock('../ODDTopLevelRedirects')
+vi.mock('../../molecules/LoggedOutOverlay')
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
@@ -91,9 +101,20 @@ const render = (path = '/') => {
 
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: { settings: [] },
+      isSuccess: true,
+    } as any)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: false } },
+      isSuccess: true,
+    } as any)
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
     vi.mocked(getIsShellReady).mockReturnValue(true)
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(null)
+    vi.mocked(LoggedOutOverlay).mockReturnValue(
+      <div>MOCK_LOGGED_OUT_OVERLAY</div>
+    )
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useScrollRef).mockReturnValue({
       isScrolling: false,
@@ -203,5 +224,19 @@ describe('OnDeviceDisplayApp', () => {
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(<div>MOCK_REDIRECTS</div>)
     render('/')
     screen.getByText('MOCK_REDIRECTS')
+  })
+  it('does not render LoggedOutOverlay when access control is disabled', () => {
+    render('/dashboard')
+    expect(screen.queryByText('MOCK_LOGGED_OUT_OVERLAY')).toBeNull()
+    expect(vi.mocked(LoggedOutOverlay)).not.toHaveBeenCalled()
+  })
+  it('renders LoggedOutOverlay when access control is enabled', () => {
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: true } },
+      isSuccess: true,
+    } as any)
+    render('/dashboard')
+    screen.getByText('MOCK_LOGGED_OUT_OVERLAY')
+    expect(vi.mocked(LoggedOutOverlay)).toHaveBeenCalled()
   })
 })

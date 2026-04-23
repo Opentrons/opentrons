@@ -192,8 +192,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     )
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
   if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody

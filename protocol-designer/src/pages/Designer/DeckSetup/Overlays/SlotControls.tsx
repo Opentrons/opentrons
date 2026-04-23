@@ -147,8 +147,9 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     slotPosition == null ||
     terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected
-  )
+  ) {
     return null
+  }
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
   // when dragging labware over a slot many times quickly

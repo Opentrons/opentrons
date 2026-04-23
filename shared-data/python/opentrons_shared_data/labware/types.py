@@ -80,6 +80,7 @@ class LabwareParameters2(TypedDict):
     loadName: str
     isMagneticModuleCompatible: bool
     isDeckSlotCompatible: NotRequired[bool]
+    isMovableAdapter: NotRequired[bool]
     quirks: NotRequired[list[str]]
     tipLength: NotRequired[float]
     tipOverlap: NotRequired[float]

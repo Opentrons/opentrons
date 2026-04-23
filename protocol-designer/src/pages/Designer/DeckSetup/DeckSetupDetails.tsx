@@ -670,8 +670,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         if (
           allModules.some(m => labware.stack.includes(m.id)) ||
           getSlotInLocationStack(labware.stack) === 'offDeck'
-        )
+        ) {
           return null
+        }
         if (
           deckDef.locations.addressableAreas.some(addressableArea =>
             labware.stack.includes(addressableArea.id)

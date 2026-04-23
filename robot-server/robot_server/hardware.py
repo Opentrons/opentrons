@@ -348,7 +348,11 @@ def get_ot2_hardware(
     thread_manager: Annotated[ThreadManagedHardware, Depends(get_hardware_resource)],
 ) -> "API":
     """Get an OT2 hardware controller."""
-    if not thread_manager.wraps_instance(API):
+    if not isinstance(
+        # If this isn't a thread manager, it's an Async Pyro object and this is on OT-3
+        thread_manager,
+        ThreadManager,
+    ) or not thread_manager.wraps_instance(API):
         raise NotSupportedOnFlex(
             detail="This route is only available on an OT-2."
         ).as_error(status.HTTP_403_FORBIDDEN)
