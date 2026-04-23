@@ -117,7 +117,9 @@ export function LabwareSlotContainer(
   const selectedWellName =
     commandLabwareId === topLabwareOnSlotId && commandWellName != null
       ? commandWellName
-      : activeWellName
+      : activeWellName != null && labwareDef.wells[activeWellName] != null
+      ? activeWellName
+      : null
   const shouldShowWellContainer =
     selectedWellName != null &&
     !HIDE_WELL_CONTAINER_COMMAND_TYPES.includes(commandType)
@@ -128,7 +130,7 @@ export function LabwareSlotContainer(
         }
       : null
   const hoveredWellGroup: WellGroup | null =
-    hoveredWellName != null
+    hoveredWellName != null && labwareDef.wells[hoveredWellName] != null
       ? {
           [hoveredWellName]: null,
         }
