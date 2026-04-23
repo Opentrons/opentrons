@@ -135,11 +135,10 @@ export function ProtocolVisualization(
   //  whenever the command index changes
   useEffect(
     () => {
-      if (selectedCommandId == null) return
-
-      const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
-      if (nextIndex < 0) return
-
+      // if (selectedCommandId == null) return
+      //
+      // const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
+      // if (nextIndex < 0) return
       // const nextSpotlight = {
       //   slot: selectedSlot,
       //   command: commands[nextIndex],
@@ -148,7 +147,6 @@ export function ProtocolVisualization(
       //   analysis,
       //   liquids,
       // }
-
       // if (nextSpotlight.slot != null && nextSpotlight.command != null) {
       //   setShowModal(null)
       //   // dispatch(stepDetailViewerUpdateAction(nextSpotlight))
