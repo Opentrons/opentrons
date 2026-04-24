@@ -146,9 +146,14 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
 
 
 def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
-    """Wrapper to produce a call forward to a specified attribute of a Proxy object."""
+    """Wrapper to produce a call forward to a specified attribute of a Proxy object.
+
+    This will take the provided Proxy instance and ensure a thread-safe version is executed upon.
+    """
     return lambda self, current_attr=attr: wrap_result_validation(
-        proxy, attr, getattr(proxy, current_attr)
+        proxy,
+        attr,
+        getattr(Pyro5.api.Proxy(proxy._pyroUri), current_attr),  # type: ignore
     )
 
 
@@ -172,8 +177,14 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str, attr: Any)
             validated_args = (*validated_args, _validations(arg))
         # Validate each keyword argument and reconstruct the kwargs dictionary
         kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
-
-        result = attr(*validated_args, **kwargs)
+        try:
+            threadsafe_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
+            threadsafe_attr = getattr(threadsafe_proxy, func_name)
+            result = threadsafe_attr(*validated_args, **kwargs)
+        except Exception as e:
+            raise ValueError(
+                f"ERROR ON THREADSAFE PROXY: {e} funcname: {func_name} proxy: {threadsafe_proxy}"
+            )
         return wrap_result_validation(proxy, func_name, result)
 
     return wrapper
