@@ -45,6 +45,9 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
+      - uses: 'pnpm/action-setup@v4'
+        with:
+          version: 10.32.1
       - name: 'install udev'
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
@@ -63,17 +66,19 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'g-code-testing'
-      - name: 'cache yarn cache'
+      - name: 'cache pnpm cache'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+            ${{ github.workspace }}/.pnpm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
       - name: 'setup-js-ci'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
           make setup-js-ci
       - name: Lint
         run: make -C g-code-testing lint
