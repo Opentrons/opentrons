@@ -231,16 +231,6 @@ const getSlotHasPotentialCollidingObject = (
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
-    // explicit OT-2 check for if the pipette will enter the space above a thermocycler-occupied slot
-    const willCollideWithThermocycler =
-      isThermocyclerOnDeck &&
-      robotType === OT2_ROBOT_TYPE &&
-      slot.addressableArea?.id != null &&
-      OT2_TC_SLOTS.includes(slot.addressableArea.id as OT2AddressableAreaName)
-
-    if (willCollideWithThermocycler) {
-      return true
-    }
 
     // If slotPosition or slotBounds is null, continue to the next iteration
     if (slotPosition == null || slotBounds == null) {
