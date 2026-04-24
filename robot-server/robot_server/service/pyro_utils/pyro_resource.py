@@ -3,13 +3,14 @@
 import asyncio
 import logging
 import threading
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
@@ -20,6 +21,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
 )
 
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
     handle_estop_event,
@@ -58,8 +60,10 @@ class RobotServerPyroResource:
         self._maintenance_run_orchestrator_store: Optional[
             MaintenanceRunOrchestratorStore
         ] = None
+        self._deck_configuration_store: Optional[DeckConfigurationStore] = None
         self._camera_provider: Optional[CameraProvider] = None
         self._file_provider: Optional[FileProvider] = None
+        self._notify_publishers: Optional[Callable[[], None]] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
     def set_run_orchestrator_store(
@@ -78,6 +82,13 @@ class RobotServerPyroResource:
                 maintenance_run_orchestrator_store
             )
 
+    def set_deck_configuration_store(
+        self, deck_configuration_store: DeckConfigurationStore
+    ) -> None:
+        """Set the DeckConfigurationStore of the RobotServerPyroResource, not serialized for remote processes."""
+        if self._deck_configuration_store is None:
+            self._deck_configuration_store = deck_configuration_store
+
     def set_camera_provider(self, camera_provider: CameraProvider) -> None:
         """Set the CameraProvider of the RobotServerPyroResource, not serialized for remote processes."""
         if self._camera_provider is None:
@@ -87,6 +98,13 @@ class RobotServerPyroResource:
         """Set the FileProvider of the RobotServerPyroResource, not serialized for remote processes."""
         if self._file_provider is None:
             self._file_provider = file_provider
+
+    def set_notify_publishers(self, notify_publishers: Callable[[], None]) -> None:
+        """Set the Notificaiton Publishers of the RobotServerPyroResource, not serialized for remote processes."""
+        # todo(chb, 2026-04-24): This is allowed to be overwritten since it will only be set once per run, it has yet to be determined if
+        # they need refreshing. Will this cause problems with multi-run situations, like maintenance runs on top of existing runs?
+        # Do we need an entirely seperate notification publisher for maintenance runs?
+        self._notify_publishers = notify_publishers
 
     ### Interface methods for remote access ###
 
@@ -137,6 +155,16 @@ class RobotServerPyroResource:
                 "Cannot provider a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
             )
 
+    async def get_deck_configuration(self) -> DeckConfigurationType:
+        """Provide the current recognized DeckConfiguration of the robot server."""
+
+        if self._deck_configuration_store is not None:
+            return await self._deck_configuration_store.get_deck_configuration()
+        else:
+            raise RuntimeError(
+                "Cannot return a CameraProvider from the RobotServerPyroResource without initializing."
+            )
+
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def get_camera_provider(self) -> CameraProvider:
         """Provide a Pyro Proxy for the CameraProvider.
@@ -164,6 +192,17 @@ class RobotServerPyroResource:
             raise RuntimeError(
                 "Cannot return a FileProvider from the RobotServerPyroResource without initializing."
             )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_notify_publishers(self) -> Callable[[], None] | None:
+        """Provide a Pyro Proxy for the Notification Publishers callback.
+
+        The returned instance is meant to execute in the Robot Server's process. Of note
+        Notification publishers are only registered with the Pyro Resource for runs created by
+        the Robot Server.
+        """
+
+        return self._notify_publishers
 
 
 ### Utility methods for initializing and registering state within the RobotServerPyroResource

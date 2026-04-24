@@ -1,7 +1,7 @@
 """Support utilities for accessing the RobotServerPyroResource."""
 
 import time
-from typing import cast
+from typing import Callable, cast
 
 import Pyro5.api as pyro
 import Pyro5.errors as pyro_errors
@@ -15,6 +15,7 @@ from server_utils.fastapi_utils.app_state import (
     AppState,
 )
 
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
@@ -84,6 +85,22 @@ def register_maintenance_run_orchestrator_store_to_pyro_resource(
         )
 
 
+def register_deck_configuraiton_store_to_pyro_resource(
+    app_state: AppState,
+    deck_configuration_store: DeckConfigurationStore,
+) -> None:
+    """Set a provided DeckConfiguraitonStore as the active store to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_deck_configuration_store(
+            deck_configuration_store
+        )
+    else:
+        raise RuntimeError(
+            "Cannot set DeckConfiguraitonStore, RobotServerPyroResource is not initialized."
+        )
+
+
 def register_camera_provider_to_pyro_resource(
     app_state: AppState,
     camera_provider: CameraProvider,
@@ -109,4 +126,18 @@ def register_file_provider_to_pyro_resource(
     else:
         raise RuntimeError(
             "Cannot set FileProvider, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_notify_publishers_to_pyro_resource(
+    app_state: AppState,
+    notify_publishers: Callable[[], None],
+) -> None:
+    """Set the provided Notification Publishers as the callback to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_notify_publishers(notify_publishers)
+    else:
+        raise RuntimeError(
+            "Cannot set Notification Publishers, RobotServerPyroResource is not initialized."
         )
