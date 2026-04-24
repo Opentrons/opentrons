@@ -15,12 +15,18 @@ packages:
   - 'react-api-client'
   - 'usb-bridge/node-client'
   - 'js-package-testing'
+configDependencies:
+  '@pnpm/trusted-deps': 0.1.1+sha512-jI3PWNv2zCg9+KHI3qQTsa534c5nisZQrHFeWSyyHoUXcuzvjkXxQKPFLJ/qtNAF+PtKHDlRntO2aZKb3VDuHQ==
 
 onlyBuiltDependencies:
-  - electron
-  - electron-winstaller
-  - esbuild
-  - '@serialport/bindings-cpp'
-  - usb
+   - '@sentry/cli'
+   - aws-sdk
+   - browser-tabs-lock
+   - core-js
+   - core-js-pure
+   - es5-ext
+   - sharp
+   - styled-components
+onlyBuiltDependenciesFile: node_modules/.pnpm-config/@pnpm/trusted-deps/allow.json
 
 minimumReleaseAge: 10080 # 1 week
