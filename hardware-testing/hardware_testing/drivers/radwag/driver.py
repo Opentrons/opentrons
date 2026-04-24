@@ -143,7 +143,7 @@ class RadwagScale(RadwagScaleBase):
             if append:
                 self._write_command(f"{cmd} {append}")
             else:
-                self._write_command(cmd)                      
+                self._write_command(cmd)
             return self._read_response(cmd, timeout)
         except KeyboardInterrupt as e:
             raise e

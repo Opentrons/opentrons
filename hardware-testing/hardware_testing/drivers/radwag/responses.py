@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 
-class RadwagResponseCodes(StrEnum): 
+class RadwagResponseCodes(StrEnum):
     """Radwag response codes."""
 
     NONE = ""
