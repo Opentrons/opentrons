@@ -32,6 +32,7 @@ class HardwareRevision(Enum):
     """Hardware Revision."""
 
     NFF = "nff"
+    EVT = "a1"
 
 
 @dataclass
@@ -95,13 +96,16 @@ class VentState(Enum):
     CLOSED = 0
     OPENED = 1
 
+    def __init__(self, val: int) -> None:
+        self.formatted = self.name.lower()
+
 
 @dataclass
 class VacuumState:
     """Get the vacuum state."""
 
-    target_guage_pressure: float
-    current_guage_pressure: float
+    target_gauge_pressure: float
+    current_gauge_pressure: float
     pressure_abs_a: float
     pressure_abs_b: float
     pressure_atm: float

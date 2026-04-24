@@ -12,6 +12,10 @@ resolution-markers = [
     "python_full_version < '3.14' and sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32'",
 ]
 
+[options]
+exclude-newer = "2026-03-30T17:27:44.113487Z"
+exclude-newer-span = "P1W"
+
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"

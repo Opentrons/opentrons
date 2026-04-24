@@ -25,10 +25,10 @@ export function VacuumModuleState(props: VacuumModuleStateProps): JSX.Element {
     pumpText =
       vacuumState.modeType === VACUUM_MODE_POWER
         ? t('vacuum.previous_state.pump.power', {
-            power: vacuumState.currentPower,
+            power: vacuumState.targetPower,
           })
         : t('vacuum.previous_state.pump.pressure', {
-            pressure: vacuumState.currentPressure,
+            pressure: vacuumState.targetPressure,
           })
   }
   return (

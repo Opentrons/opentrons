@@ -4,9 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
-
-benchmark_output := $(shell node -e 'console.log(new Date());')
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overridden when make is invoked to customize the
 # behavior of jest
@@ -22,31 +20,24 @@ all: clean build
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm install
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # artifacts
 #####################################################################
 
 .PHONY: build
 build: export NODE_ENV := production
-build: export NODE_OPTIONS := --max-old-space-size=8192
+build: export NODE_OPTIONS := --max-old-space-size=5120
 build:
 	vite build
 	git rev-parse HEAD > dist/.commit
 
 # development
 #####################################################################
-
-.PHONY: benchmarks
-benchmarks: export NODE_ENV := test
-benchmarks:
-	shx mkdir -p benchmarks/output
-	node ../scripts/runBenchmarks "./benchmarks/*.js" | \
-	ntee "./benchmarks/output/$(benchmark_output)"
 
 .PHONY: dev
 dev: export NODE_ENV := development

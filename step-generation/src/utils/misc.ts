@@ -5,9 +5,13 @@ import reduce from 'lodash/reduce'
 
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_CUTOUT_BY_SLOT_ID,
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_V1_FIXTURE,
   getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
@@ -39,6 +43,7 @@ import {
 } from '../commandCreators/compound'
 import {
   CLEAN,
+  COLUMN_4_SLOTS,
   EMPTY,
   FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
@@ -921,6 +926,75 @@ export const getLargestStackInSlot = (
     }
     return acc
   }, [])
+
+/** Single-slot deck id (e.g. A3) for a staging-area slot (e.g. A4) on Flex. */
+export const getFlexStackerCutoutBaseDeckSlotId = (
+  column4StagingSlotId: (typeof COLUMN_4_SLOTS)[number]
+): string =>
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID[FLEX_CUTOUT_BY_SLOT_ID[column4StagingSlotId]]
+
+export const column4StagingSlotIdFromFlexStackerShuttleAddressableArea = (
+  addressableAreaName: AddressableAreaName
+): (typeof COLUMN_4_SLOTS)[number] | null => {
+  const index = FLEX_STACKER_ADDRESSABLE_AREAS.indexOf(addressableAreaName)
+  return index === -1 ? null : COLUMN_4_SLOTS[index]
+}
+
+/** Deck slot id used as the stack suffix for labware on the stacker shuttle. */
+export const deckSlotKeyForFlexStackerShuttleAddressableArea = (
+  addressableAreaName: AddressableAreaName
+): string | null => {
+  const stagingSlotId =
+    column4StagingSlotIdFromFlexStackerShuttleAddressableArea(
+      addressableAreaName
+    )
+  return stagingSlotId != null
+    ? getFlexStackerCutoutBaseDeckSlotId(stagingSlotId)
+    : null
+}
+
+/**
+ * Staging column ids (A4, B4, …) are the same physical cutout as the stacker's
+ * module slot (A3, B3, …). Labware on the shuttle uses the module slot in
+ * `labware.stack`; normalize here so stack-height checks match.
+ */
+export const resolveDeckSlotKeyForLabwareStackInSlot = (
+  deckSlotKey: string | null,
+  modules: RobotState['modules'],
+  moduleEntities: ModuleEntities
+): string | null => {
+  if (deckSlotKey == null) {
+    return null
+  }
+  if (COLUMN_4_SLOTS.includes(deckSlotKey)) {
+    const baseSlot = getFlexStackerCutoutBaseDeckSlotId(
+      deckSlotKey as (typeof COLUMN_4_SLOTS)[number]
+    )
+    const hasStackerOnCutout = Object.entries(modules).some(
+      ([moduleId, mod]) =>
+        moduleEntities[moduleId]?.type === FLEX_STACKER_MODULE_TYPE &&
+        mod.slot === baseSlot
+    )
+    return hasStackerOnCutout ? baseSlot : deckSlotKey
+  }
+  return deckSlotKey
+}
+
+export const getFlexStackerShuttleAddressableArea = (
+  moduleSlot: string
+): AddressableAreaName | null => {
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const transformedSlot = `${moduleSlot[0]}3`
+  const cutoutId = FLEX_CUTOUT_BY_SLOT_ID[transformedSlot]
+  const flexStackerAAs = deckDef.cutoutFixtures.find(
+    ({ id }) => id === FLEX_STACKER_V1_FIXTURE
+  )?.providesAddressableAreas[cutoutId]
+
+  return (
+    FLEX_STACKER_ADDRESSABLE_AREAS.find(aa => flexStackerAAs?.includes(aa)) ??
+    null
+  )
+}
 
 interface CompatibleWithStack {
   isCompatible: boolean

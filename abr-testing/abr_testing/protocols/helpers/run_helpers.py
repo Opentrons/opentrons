@@ -321,7 +321,7 @@ def create_dot_bottom_parameter(parameters: ParameterContext) -> None:
         variable_name="dot_bottom",
         display_name=".bottom",
         description="Lowest value pipette will go to.",
-        default=0.3,
+        default=0.5,
         choices=[
             {"display_name": "0.0", "value": 0.0},
             {"display_name": "0.1", "value": 0.1},

@@ -117,7 +117,7 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 **Flex brand:** `--flex-40`, `--flex-50`, `--flex-55`
 
-**Semi-transparent:** `--transparent-white-80`, `--transparent-white-50`, `--transparent-black-60`, `--transparent-black-80`, `--transparent`
+**Semi-transparent:** `--transparent-white-80`, `--transparent-white-50`, `--transparent-black-10`, `--transparent-black-60`, `--transparent-black-80`, `--transparent`
 
 > Some colors (green, purple) have touchscreen variants that activate when `components/src/styles/global.css` applies the `.enable_touchscreen_colors` class. The default values are non-touchscreen.
 

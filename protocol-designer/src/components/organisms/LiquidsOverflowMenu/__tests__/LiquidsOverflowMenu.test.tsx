@@ -32,7 +32,7 @@ const render = (props: ComponentProps<typeof LiquidsOverflowMenu>) => {
   })[0]
 }
 
-describe('SlotOverflowMenu', () => {
+describe('LiquidsOverflowMenu', () => {
   let props: ComponentProps<typeof LiquidsOverflowMenu>
 
   beforeEach(() => {
@@ -57,13 +57,11 @@ describe('SlotOverflowMenu', () => {
   })
   it('renders the overflow buttons with 1 liquid defined', () => {
     render(props)
-    screen.getByText('mockname')
-    fireEvent.click(screen.getByTestId('mockname_0'))
+    fireEvent.click(screen.getByRole('button', { name: 'mockname' }))
     expect(props.onClose).toHaveBeenCalled()
     expect(props.showLiquidsModal).toHaveBeenCalled()
     expect(vi.mocked(labwareIngredActions.selectLiquidGroup)).toHaveBeenCalled()
-    screen.getByText('Define a liquid')
-    fireEvent.click(screen.getByTestId('defineLiquid'))
+    fireEvent.click(screen.getByRole('button', { name: 'Define a liquid' }))
     expect(props.onClose).toHaveBeenCalled()
     expect(
       vi.mocked(labwareIngredActions.createNewLiquidGroup)

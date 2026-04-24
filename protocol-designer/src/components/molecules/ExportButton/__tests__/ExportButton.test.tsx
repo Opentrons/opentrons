@@ -26,13 +26,14 @@ describe('ExportButton', () => {
   })
   it('should render icon and text', () => {
     render(props)
-    screen.getByTestId('export-icon')
-    screen.getByText('Export')
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    expect(exportButton).toBeInTheDocument()
   })
 
   it('should call a mock function when clicking', () => {
     render(props)
-    fireEvent.click(screen.getByText('Export'))
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    fireEvent.click(exportButton)
     expect(mockOnClick).toHaveBeenCalled()
   })
 })

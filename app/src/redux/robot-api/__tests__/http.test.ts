@@ -1,72 +1,52 @@
-import { promisify } from 'util'
-// todo(mm, 2025-09-10): This test file looks like the last remaining use of express.
-// Try to remove the dependency if this test file ever gets rethought.
-import express from 'express'
 import FormData from 'form-data'
-import multer from 'multer'
-import fetch from 'node-fetch'
-import portfinder from 'portfinder'
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DELETE, GET, HTTP_API_VERSION, PATCH, POST } from '../constants'
 import { fetchRobotApi, robotApiUrl } from '../http'
 
-import type { Application } from 'express'
 import type { RobotHost } from '../types'
 
-vi.unmock('node-fetch')
+interface MockResponse {
+  ok: boolean
+  status: number
+  json: ReturnType<typeof vi.fn>
+}
+
+const mockJsonResponse = (
+  body: unknown,
+  {
+    ok = true,
+    status = 200,
+  }: {
+    ok?: boolean
+    status?: number
+  } = {}
+): MockResponse => ({
+  ok,
+  status,
+  json: vi.fn().mockResolvedValue(body),
+})
 
 describe('robot-api http client', () => {
-  let testApp: Application
-  let testServer: any
-  let testPort: number
+  let fetchMock: ReturnType<typeof vi.fn>
   let robot: RobotHost
 
-  beforeAll(() => {
-    ;(global as any).fetch = fetch
-    testApp = express()
-    testApp.use((express as any).json())
-
-    return portfinder.getPortPromise({ port: 31950 }).then(port => {
-      testPort = port
-      robot = { name: 'robot-name', ip: '127.0.0.1', port }
-
-      return new Promise<void>((resolve, reject) => {
-        const server = testApp.listen(port)
-
-        if (server) {
-          const handleListening = () => {
-            server.removeListener('error', handleError)
-            resolve()
-          }
-
-          const handleError = (error: Error) => {
-            server.removeListener('listening', handleListening)
-            reject(error)
-          }
-
-          testServer = server
-          server.once('listening', handleListening)
-          server.once('error', handleError)
-        }
-      })
-    })
+  beforeEach(() => {
+    fetchMock = vi.fn()
+    ;(global as any).fetch = fetchMock
+    robot = { name: 'robot-name', ip: '127.0.0.1', port: 31950 }
   })
 
-  afterAll(() => {
+  afterEach(() => {
+    vi.restoreAllMocks()
     // @ts-expect-error(sa, 2021-6-28): can't delete non optional properties
     delete global.fetch
-
-    if (testServer) {
-      const close = promisify(testServer.close.bind(testServer))
-      return close()
-    }
   })
 
   it('can form a valid robot URL', () => {
     const url = robotApiUrl(robot, { method: GET, path: '/health' })
 
-    expect(url).toEqual(`http://127.0.0.1:${testPort}/health`)
+    expect(url).toEqual('http://127.0.0.1:31950/health')
   })
 
   it('can form a valid robot URL with query params', () => {
@@ -76,9 +56,7 @@ describe('robot-api http client', () => {
       query: { refresh: true, meaning: 42 },
     })
 
-    expect(url).toEqual(
-      `http://127.0.0.1:${testPort}/health?refresh=true&meaning=42`
-    )
+    expect(url).toEqual('http://127.0.0.1:31950/health?refresh=true&meaning=42')
   })
 
   it('removes any empty query params', () => {
@@ -92,20 +70,23 @@ describe('robot-api http client', () => {
         falseParam: false,
       },
     })
-    expect(url).toEqual(`http://127.0.0.1:${testPort}/health?falseParam=false`)
+
+    expect(url).toEqual('http://127.0.0.1:31950/health?falseParam=false')
   })
 
-  it('can make a get request', () => {
-    testApp.get('/health', (req, res) => {
-      res.status(200).send('{ "hello": "world" }')
-    })
+  it('can make a get request', async () => {
+    fetchMock.mockResolvedValueOnce(mockJsonResponse({ hello: 'world' }))
 
-    const result = fetchRobotApi(robot, {
+    const result = await fetchRobotApi(robot, {
       method: GET,
       path: '/health',
     }).toPromise()
 
-    return expect(result).resolves.toEqual({
+    expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:31950/health', {
+      method: GET,
+      headers: { 'Opentrons-Version': '3' },
+    })
+    expect(result).toEqual({
       host: robot,
       method: GET,
       path: '/health',
@@ -115,17 +96,21 @@ describe('robot-api http client', () => {
     })
   })
 
-  it('resolves with ok: false on non-2xx', () => {
-    testApp.get('/not-found', (req, res) => {
-      res.status(404).send('{ "message": "not found" }')
-    })
+  it('resolves with ok: false on non-2xx', async () => {
+    fetchMock.mockResolvedValueOnce(
+      mockJsonResponse({ message: 'not found' }, { ok: false, status: 404 })
+    )
 
-    const result = fetchRobotApi(robot, {
+    const result = await fetchRobotApi(robot, {
       method: GET,
       path: '/not-found',
     }).toPromise()
 
-    return expect(result).resolves.toEqual({
+    expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:31950/not-found', {
+      method: GET,
+      headers: { 'Opentrons-Version': '3' },
+    })
+    expect(result).toEqual({
       host: robot,
       method: GET,
       path: '/not-found',
@@ -135,59 +120,81 @@ describe('robot-api http client', () => {
     })
   })
 
-  it('can POST a JSON body', () => {
-    testApp.post('/post-echo', (req, res) => {
-      res.status(201).send(req.body)
-    })
+  it('can POST a JSON body', async () => {
+    const body = { hello: { from: 'the', other: 'side' } }
+    fetchMock.mockResolvedValueOnce(mockJsonResponse(body, { status: 201 }))
 
-    const result = fetchRobotApi(robot, {
+    const result = await fetchRobotApi(robot, {
       method: POST,
       path: '/post-echo',
-      body: { hello: { from: 'the', other: 'side' } },
+      body,
     }).toPromise()
 
-    return expect(result).resolves.toEqual({
+    expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:31950/post-echo', {
+      method: POST,
+      headers: {
+        'Opentrons-Version': '3',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+    expect(result).toEqual({
       host: robot,
       method: POST,
       path: '/post-echo',
-      body: { hello: { from: 'the', other: 'side' } },
+      body,
       status: 201,
       ok: true,
     })
   })
 
-  it('can PATCH a JSON body', () => {
-    testApp.patch('/patch-echo', (req, res) => {
-      res.status(200).send(req.body)
-    })
+  it('can PATCH a JSON body', async () => {
+    const body = { i: { must: 'have' }, called: { '1000': 'times' } }
+    fetchMock.mockResolvedValueOnce(mockJsonResponse(body))
 
-    const result = fetchRobotApi(robot, {
+    const result = await fetchRobotApi(robot, {
       method: PATCH,
       path: '/patch-echo',
-      body: { i: { must: 'have' }, called: { '1000': 'times' } },
+      body,
     }).toPromise()
 
-    return expect(result).resolves.toEqual({
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://127.0.0.1:31950/patch-echo',
+      {
+        method: PATCH,
+        headers: {
+          'Opentrons-Version': '3',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    )
+    expect(result).toEqual({
       host: robot,
       method: PATCH,
       path: '/patch-echo',
-      body: { i: { must: 'have' }, called: { '1000': 'times' } },
+      body,
       status: 200,
       ok: true,
     })
   })
 
-  it('can make a DELETE request', () => {
-    testApp.delete('/thing-to-delete', (req, res) => {
-      res.status(200).send('{}')
-    })
+  it('can make a DELETE request', async () => {
+    fetchMock.mockResolvedValueOnce(mockJsonResponse({}))
 
-    const result = fetchRobotApi(robot, {
+    const result = await fetchRobotApi(robot, {
       method: DELETE,
       path: '/thing-to-delete',
     }).toPromise()
 
-    return expect(result).resolves.toEqual({
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://127.0.0.1:31950/thing-to-delete',
+      {
+        method: DELETE,
+        headers: { 'Opentrons-Version': '3' },
+      }
+    )
+    expect(result).toEqual({
       host: robot,
       method: DELETE,
       path: '/thing-to-delete',
@@ -197,34 +204,38 @@ describe('robot-api http client', () => {
     })
   })
 
-  it('can POST a multipart body', () => {
-    testApp.post(
-      '/file',
-      multer({ storage: multer.memoryStorage() }).any(),
-      (req, res) => {
-        const files = (req as any).files ?? []
-
-        res.status(201).send({
-          files: files.map((f: any) => ({
-            key: f.fieldname,
-            filename: f.originalname,
-            contents: f.buffer.toString('utf-8'),
-          })),
-        })
-      }
-    )
-
+  it('can POST a multipart body', async () => {
     const form = new FormData() as any
     form.append('file1', Buffer.from('lorem ipsum') as any, '1.txt')
     form.append('file2', Buffer.from('dolor sit amet') as any, '2.txt')
 
-    const result = fetchRobotApi(robot, {
+    fetchMock.mockResolvedValueOnce(
+      mockJsonResponse(
+        {
+          files: [
+            { key: 'file1', filename: '1.txt', contents: 'lorem ipsum' },
+            { key: 'file2', filename: '2.txt', contents: 'dolor sit amet' },
+          ],
+        },
+        { status: 201 }
+      )
+    )
+
+    const result = await fetchRobotApi(robot, {
       method: POST,
       path: '/file',
       form,
     }).toPromise()
 
-    return expect(result).resolves.toEqual({
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [url, options] = fetchMock.mock.calls[0]
+    expect(url).toBe('http://127.0.0.1:31950/file')
+    expect(options).toEqual({
+      method: POST,
+      headers: { 'Opentrons-Version': '3' },
+      body: form,
+    })
+    expect(result).toEqual({
       host: robot,
       method: POST,
       path: '/file',
@@ -239,20 +250,21 @@ describe('robot-api http client', () => {
     })
   })
 
-  it('adds the Opentrons-Version header', () => {
-    testApp.get('/version', (req, res) => {
-      const version: any = req.header('Opentrons-Version')
-      res.status(200).send(`{ "version": "${version}" }`)
-    })
+  it('adds the Opentrons-Version header', async () => {
+    fetchMock.mockResolvedValueOnce(
+      mockJsonResponse({ version: `${HTTP_API_VERSION}` })
+    )
 
-    const result = fetchRobotApi(robot, {
+    const result = await fetchRobotApi(robot, {
       method: GET,
       path: '/version',
     }).toPromise()
 
     expect(HTTP_API_VERSION).toEqual(expect.any(Number))
-
-    return expect(result).resolves.toEqual({
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [, options] = fetchMock.mock.calls[0]
+    expect(options.headers).toEqual({ 'Opentrons-Version': '3' })
+    expect(result).toEqual({
       host: robot,
       method: GET,
       path: '/version',

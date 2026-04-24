@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 import aiohttp
 import pydantic
 
-SETTINGS_ENDPOINT_PATH = "auth/settings"
+SETTINGS_ENDPOINT_PATH = "auth/settings/accessControlEnabled"
 TOKEN_ENDPOINT_PATH = "auth/oauth2/token"
 TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 

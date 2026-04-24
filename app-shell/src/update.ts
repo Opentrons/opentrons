@@ -101,12 +101,13 @@ function downloadUpdate(dispatch: Dispatch): void {
     autoUpdater.removeListener('download-progress', onDownloading)
     autoUpdater.removeListener('update-downloaded', onDownloaded)
     autoUpdater.removeListener('error', onError)
-    if (payload.error == null)
+    if (payload.error == null) {
       dispatch({
         type: UPDATE_VALUE,
         payload: { path: 'update.hasJustUpdated', value: true },
         meta: { shell: true },
       })
+    }
     dispatch({ type: 'shell:DOWNLOAD_UPDATE_RESULT', payload })
   }
 }

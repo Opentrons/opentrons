@@ -1,10 +1,10 @@
 # opentrons react-api-client makefile
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-# TODO(mc, 2021-02-12): this may be unnecessary by using `yarn run` instead
+# TODO(mc, 2021-02-12): this may be unnecessary by using `pnpm run` instead
 SHELL := bash
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
@@ -20,7 +20,7 @@ all: clean build
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf dist
+  pnpm shx rm -rf dist
 
 .PHONY: build
 build: export NODE_ENV := production

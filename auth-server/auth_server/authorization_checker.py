@@ -37,7 +37,10 @@ from server_utils.auth.resource_server.authorization_checker import (
 
 from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
-from auth_server.settings.store import SettingsStore, get_settings_store
+from auth_server.settings.store import (
+    SettingsStore,
+    get_settings_store,
+)
 
 
 def build_authorization_checker(
@@ -64,9 +67,10 @@ class _SelfClient(Client):
     @override
     async def get_auth_settings(self) -> AuthSettingsResponse:
         # Mimic an HTTP response body from our own /auth/settings endpoint.
-        response_body = {
-            "data": self._settings_store.get().model_dump(mode="json", by_alias=True)
-        }
+        access_control_enabled = (
+            self._settings_store.get_access_control_settings().accessControlEnabled
+        )
+        response_body = {"data": {"accessControlEnabled": access_control_enabled}}
         converted_response_body = AuthSettingsResponse.model_validate(response_body)
         return converted_response_body
 

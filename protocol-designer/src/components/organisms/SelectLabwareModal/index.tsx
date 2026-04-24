@@ -367,7 +367,6 @@ export function SelectLabwareModal(
                     {t('upload_custom_labware')}
                   </StyledText>
                   <input
-                    data-testid="customLabwareInput"
                     type="file"
                     onChange={e => {
                       dispatch(createCustomLabwareDef(e))
@@ -395,10 +394,7 @@ export function SelectLabwareModal(
             >
               {t('shared:cancel')}
             </SecondaryButton>
-            <PrimaryButton
-              data-testid="SelectLabwareModal_confirm"
-              onClick={handleAddLabwareClick}
-            >
+            <PrimaryButton onClick={handleAddLabwareClick}>
               {t('add_labware')}
             </PrimaryButton>
           </Flex>

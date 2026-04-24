@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime
 import json
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
 from logging import getLogger
@@ -315,10 +315,12 @@ async def find_slot_center_binary(
     estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
 
     # since we have a good idea where the edges are now we can reduce the second set of sweeps
-    fast_edge_settings = replace(
-        edge_settings,
-        search_initial_tolerance_mm=edge_settings.search_initial_tolerance_mm / 4,
-        search_iteration_limit=edge_settings.search_iteration_limit - 2,
+    fast_edge_settings = edge_settings.model_copy(
+        update={
+            "search_initial_tolerance_mm": edge_settings.search_initial_tolerance_mm
+            / 4,
+            "search_iteration_limit": edge_settings.search_iteration_limit - 2,
+        }
     )
     minus_x_edge = await find_edge_binary(
         hcapi,

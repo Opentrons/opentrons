@@ -1,9 +1,13 @@
 """User data manager – business logic between the router and the store."""
 
+from typing import Literal
+
 from pwdlib import PasswordHash
 
 from auth_server.persistence.orm_models import User
-from auth_server.users.models import AccountType, UserResponse
+from auth_server.settings.store import SettingsStore
+from auth_server.users.is_account_locked import is_account_locked
+from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType, UserResponse
 from auth_server.users.store import UserStore
 
 password_hash = PasswordHash.recommended()
@@ -44,8 +48,28 @@ def _validate_fields(
 class UserDataManager:
     """Manages user data operations."""
 
-    def __init__(self, user_store: UserStore) -> None:
-        self._store = user_store
+    def __init__(self, user_store: UserStore, settings_store: SettingsStore) -> None:
+        self._user_store = user_store
+        self._settings_store = settings_store
+
+    def _to_response(self, user: User) -> UserResponse:
+        is_currently_locked, _ = is_account_locked(
+            failed_login_count=self._user_store.get_failed_login_count(user.username),
+            max_attempts=self._settings_store.get_settings().maxNumberOfLoginAttempts,
+        )
+
+        account_type = AccountType(user.account_type)
+
+        return UserResponse(
+            userName=user.username,
+            fullName=user.full_name,
+            accountType=account_type,
+            scopes=sorted(
+                scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]
+            ),
+            locked=is_currently_locked,
+            resetPassword=user.reset_password,
+        )
 
     def seed_initial_users(self) -> None:
         """Insert default placeholder users if they don't already exist."""
@@ -63,7 +87,7 @@ class UserDataManager:
                 account_type=AccountType.USER,
             ),
         ]
-        self._store.seed(defaults)
+        self._user_store.seed(defaults)
 
     def create_user(
         self,
@@ -79,55 +103,61 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
         )
-        if self._store.get(username) is not None:
+        if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
-        new_user = self._store.add(
+        new_user = self._user_store.add(
             username=username,
             hashed_password=password_hash.hash(password),
             full_name=full_name,
             account_type=account_type,
         )
-        return UserResponse.from_orm_user(new_user)
+        return self._to_response(new_user)
 
     def get_user(self, username: str) -> UserResponse:
         """Return the user or raise UserNotFoundError."""
-        user = self._store.get(username)
+        user = self._user_store.get(username)
         if user is None:
             raise UserNotFoundError(f"User {username!r} not found")
-        return UserResponse.from_orm_user(user)
+        return self._to_response(user)
 
     def delete_user(self, username: str) -> None:
         """Delete a user or raise UserNotFoundError."""
         try:
-            self._store.remove(username)
+            self._user_store.remove(username)
         except ValueError as e:
             raise UserNotFoundError(e) from e
 
     def update_user(
         self,
-        username: str,
+        username_to_update: str,
         new_username: str | None = None,
-        password: str | None = None,
-        full_name: str | None = None,
-        account_type: str | None = None,
+        new_password: str | None = None,
+        new_full_name: str | None = None,
+        new_account_type: str | None = None,
+        new_locked: Literal[False] | None = None,
+        reset_password: bool = False,
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
             user_name=new_username,
-            password=password,
-            full_name=full_name,
-            account_type=account_type,
+            password=new_password,
+            full_name=new_full_name,
+            account_type=new_account_type,
         )
         try:
-            updated_user = self._store.update(
-                username,
+            if new_locked is not None and not new_locked:
+                # Note: do this BEFORE the username is potentially changed
+                self._user_store.clear_failed_logins(username_to_update)
+            updated_user = self._user_store.update(
+                username_to_update,
                 new_username=new_username,
-                hashed_password=password_hash.hash(password)
-                if password is not None
+                hashed_password=password_hash.hash(new_password)
+                if new_password is not None
                 else None,
-                full_name=full_name,
-                account_type=account_type,
+                full_name=new_full_name,
+                account_type=new_account_type,
+                reset_password=reset_password,
             )
-            return UserResponse.from_orm_user(updated_user)
+            return self._to_response(updated_user)
         except ValueError as e:
             raise UserNotFoundError(e) from e

@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
 
 import {
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   InputField,
   JUSTIFY_FLEX_END,
   ListButton,
@@ -146,11 +148,22 @@ export function LabwareModal({
                     }}
                     placeholder={t('search_for_labware_placeholder')}
                     size="medium"
-                    leftIcon="search"
-                    showDeleteIcon
-                    onDelete={() => {
-                      setSearchTerm('')
-                    }}
+                    leftElement={
+                      <Icon
+                        name="search"
+                        size="1.25rem"
+                        color={COLORS.grey60}
+                      />
+                    }
+                    rightElement={
+                      <Icon
+                        name="close"
+                        size="1.75rem"
+                        onClick={() => {
+                          setSearchTerm('')
+                        }}
+                      />
+                    }
                   />
                 </Flex>
                 <Flex

@@ -20,6 +20,9 @@ nav:
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
 
+exclude_docs: |
+  python-api/liquid-class-tables/*.md
+
 plugins:
   - monorepo
   - search

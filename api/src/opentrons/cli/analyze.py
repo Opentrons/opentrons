@@ -31,7 +31,7 @@ from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     PythonException,
 )
-from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from opentrons_shared_data.util import StrEnum
 
 from opentrons.protocol_engine import (
@@ -67,7 +67,7 @@ from opentrons.protocol_runner import RunResult
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.types import APIVersion
 
 OutputKind = Literal["json", "human-json"]
@@ -391,6 +391,17 @@ async def _analyze(  # noqa: C901
         )
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
+
+    if (
+        RobotTypeEnum.robot_literal_to_enum(protocol_source.robot_type)
+        == RobotTypeEnum.OT2
+    ):
+        raise RuntimeError(
+            "This protocol is designed for an OT-2 robot. "
+            "To utilize this protocol, please download the "
+            "most recent version of the Opentrons-OT2 app from "
+            "https://github.com/Opentrons/opentrons-ot2/releases"
+        )
 
     analysis = await _do_analyze(protocol_source, parsed_rtp_values, rtp_paths)
     return_code = _get_return_code(analysis)

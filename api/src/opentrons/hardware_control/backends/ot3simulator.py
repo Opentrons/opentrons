@@ -623,7 +623,9 @@ class OT3Simulator(FlexBackend):
                         model=module_details.model,
                     )
                 )
-        await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
+        await self.module_controls.register_devices(
+            new_devices_at_ports=new_mods_at_ports
+        )
 
     @property
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
