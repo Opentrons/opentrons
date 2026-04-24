@@ -120,10 +120,10 @@ Import individual functions only:
 
 ```typescript
 // Good
+import mapValues from 'lodash/mapValues'
 
 // Bad — imports entire library
 import { mapValues } from 'lodash'
-import mapValues from 'lodash/mapValues'
 ```
 
 ### Type Imports
@@ -167,7 +167,9 @@ The `app` package separates Desktop and ODD (On-Device Display) UIs. ESLint rule
 
 ### Component Library (`@opentrons/components`)
 
-Use primitives from the shared component library for layout and common UI:
+**Do not use primitives from the shared component library when you create a new component from zero.**
+premitives are located in `components/src/primitives`.
+Use primitives if you update an existing component or fix an existing component for layout and common UI:
 
 ```typescript
 import {
@@ -249,6 +251,12 @@ React component tests MUST use `renderWithProviders` (wraps Redux Provider + Que
 
 ```typescript
 import { renderWithProviders } from '/app/__testing-utils__'  // or /protocol-designer/__testing-utils__
+import { i18n } from '/app/i18n'
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof MyComponent>) => {
+  return renderWithProviders(<MyComponent {...props} />)[0]
+}
 
 describe('MyComponent', () => {
   let props: ComponentProps<typeof MyComponent>
@@ -261,9 +269,14 @@ describe('MyComponent', () => {
     vi.clearAllMocks()
   })
 
-  it('renders', () => {
-    renderWithProviders(<MyComponent {...props} />)
+  it('renders the button', () => {
+    render(props)
     expect(screen.getByRole('button')).toBeInTheDocument()
+  })
+  
+  it('renders the text', () => {
+    render(props)
+    screen.getByText('Opentrons Flex')
   })
 })
 ```
@@ -339,8 +352,10 @@ yarn prettier --write path/to/file.tsx   # auto-fix
 ## Event Handlers
 
 ```typescript
+import type { MouseEvent } from 'react'
+
 // Named handlers for complex logic
-const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+const handleClick = (e: MouseEvent<HTMLButtonElement>): void => {
   e.preventDefault()
   onClick()
 }
@@ -413,3 +428,7 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT use semicolons (Prettier removes them)
 - Do NOT use `console.log` or `debugger` in committed code
 - Do NOT omit curly braces for control statements — ESLint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
+- Do NOT use premitives (premitives are located in `components/src/primitives`) for new component - use HTML 5 tags and CSS Modules
+- Do NOT margins to create a layout in a component - use padding and gap
+- Do NOT use a conditinal statement for `aria-label`
+- Do NOT use a nested ternary
