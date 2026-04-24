@@ -452,9 +452,6 @@ importers:
       node-fetch:
         specifier: 2.6.7
         version: 2.6.7(encoding@0.1.13)
-      path-to-regexp:
-        specifier: 3.0.0
-        version: 3.0.0
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -651,10 +648,10 @@ importers:
       lodash:
         specifier: 4.18.1
         version: 4.18.1
-      merge-options:
+      mdns-js:
         specifier: 1.0.1
         version: 1.0.1
-      mdns-js:
+      merge-options:
         specifier: 1.0.1
         version: 1.0.1
       mqtt:
@@ -9854,9 +9851,6 @@ packages:
   path-scurry@1.11.1:
     resolution: {integrity: sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==}
     engines: {node: '>=16 || 14 >=14.18'}
-
-  path-to-regexp@3.0.0:
-    resolution: {integrity: sha512-ZOtfhPttCrqp2M1PBBH4X13XlvnfhIwD7yCLx+GoGoXRPQyxGOTdQMpIzPSPKXAJT/JQrdfFrgdJOyAzvgpQ9A==}
 
   path-type@1.1.0:
     resolution: {integrity: sha512-S4eENJz1pkiQn9Znv33Q+deTOKmbl+jj1Fl+qiP/vYezj+S8x+J3Uo0ISrx/QoEvIlOaDWJhPaRd1flJ9HXZqg==}
@@ -23454,8 +23448,6 @@ snapshots:
     dependencies:
       lru-cache: 10.4.3
       minipass: 7.1.2
-
-  path-to-regexp@3.0.0: {}
 
   path-type@1.1.0:
     dependencies:
