@@ -352,7 +352,7 @@ describe('computeStepMove()', () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it('allows moving a non-vacuum step to the end of a Vacuum profile concurrent group', () => {
+  it('allows moving a standalone step to the end of a Vacuum profile concurrent group', () => {
     const originalHierarchy: StepHierarchy = {
       topLevelItems: [
         { type: 'standaloneStep', stepId: 'pipette' },
@@ -385,7 +385,7 @@ describe('computeStepMove()', () => {
     expect(result).toStrictEqual(expectedResult)
   })
 
-  it('allows moving a non-vacuum step to the end of a timed Vacuum state concurrent group', () => {
+  it('allows moving a standalone step to the end of a timed Vacuum state concurrent group', () => {
     const originalHierarchy: StepHierarchy = {
       topLevelItems: [
         { type: 'standaloneStep', stepId: 'pipette' },

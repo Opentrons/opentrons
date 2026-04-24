@@ -492,12 +492,6 @@ function insertBeforeDestinationStep(
         // Concurrent step groups can't be inserted into other concurrent step groups.
         // This is disallowed mostly for UX reasons; we could probably technically support it.
         draft.isAllowed = false
-      } else if (
-        (findResult.enclosingNode.type === 'vacuumProfileGroup' ||
-          findResult.enclosingNode.type === 'vacuumStateDurationGroup') &&
-        toInsert.type === 'standaloneStep'
-      ) {
-        draft.isAllowed = false
       } else {
         findResult.enclosingNode.concurrentSteps.splice(
           findResult.indexInEnclosingNode,
@@ -528,16 +522,8 @@ function insertAsLastStepOfGroup(
         item.startStepId === destinationGroupRootStepId
     )
     if (matchingGroupDraft != null && isConcurrentGroup(matchingGroupDraft)) {
-      if (
-        (matchingGroupDraft.type === 'vacuumProfileGroup' ||
-          matchingGroupDraft.type === 'vacuumStateDurationGroup') &&
-        toInsert.type === 'standaloneStep'
-      ) {
-        draft.isAllowed = false
-      } else {
-        matchingGroupDraft.concurrentSteps.push(toInsert)
-        draft.isAllowed = true
-      }
+      matchingGroupDraft.concurrentSteps.push(toInsert)
+      draft.isAllowed = true
     } else {
       console.error(
         `Couldn't find insertion point. Looking for group rooted at step ID ${destinationGroupRootStepId}.`
