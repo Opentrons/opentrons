@@ -433,4 +433,4 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT use primitives (primitives are located in `components/src/primitives`) for new component - use HTML 5 tags and CSS Modules
 - Do NOT use margins to create a layout in a component - use padding and gap
 - Do NOT use a conditional statement for `aria-label`
-- Do NOT use a nested ternary
+- Do NOT use a nested ternary in non-component render code
