@@ -170,7 +170,7 @@ The `app` package separates Desktop and ODD (On-Device Display) UIs. ESLint rule
 ### Component Library (`@opentrons/components`)
 
 **Do not use primitives from the shared component library when you create a new component from zero.**
-premitives are located in `components/src/primitives`.
+Primitives are located in `components/src/primitives`.
 Use primitives if you update an existing component or fix an existing component for layout and common UI:
 
 ```typescript
