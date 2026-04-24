@@ -14,14 +14,14 @@ describe('getStepHierarchyAfterDuplication', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: '2',
+          startStepId: '2',
           concurrentSteps: [
             {
               type: 'standaloneStep',
               stepId: '3',
             },
           ],
-          waitForThermocyclerProfileStepId: '4',
+          waitStepId: '4',
         },
         {
           type: 'standaloneStep',
@@ -46,14 +46,14 @@ describe('getStepHierarchyAfterDuplication', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: '2',
+          startStepId: '2',
           concurrentSteps: [
             {
               type: 'standaloneStep',
               stepId: '3',
             },
           ],
-          waitForThermocyclerProfileStepId: '4',
+          waitStepId: '4',
         },
         {
           type: 'standaloneStep',
@@ -79,14 +79,14 @@ describe('getStepHierarchyAfterDuplication', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: '2',
+          startStepId: '2',
           concurrentSteps: [
             {
               type: 'standaloneStep',
               stepId: '3',
             },
           ],
-          waitForThermocyclerProfileStepId: '4',
+          waitStepId: '4',
         },
         {
           type: 'standaloneStep',
@@ -103,7 +103,7 @@ describe('getStepHierarchyAfterDuplication', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: '2',
+          startStepId: '2',
           concurrentSteps: [
             {
               type: 'standaloneStep',
@@ -118,7 +118,7 @@ describe('getStepHierarchyAfterDuplication', () => {
               stepId: '3-duplicated',
             },
           ],
-          waitForThermocyclerProfileStepId: '4',
+          waitStepId: '4',
         },
         {
           type: 'standaloneStep',
@@ -144,14 +144,14 @@ describe('getStepHierarchyAfterDuplication', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: '2',
+          startStepId: '2',
           concurrentSteps: [
             {
               type: 'standaloneStep',
               stepId: '3',
             },
           ],
-          waitForThermocyclerProfileStepId: '4',
+          waitStepId: '4',
         },
         {
           type: 'standaloneStep',
@@ -168,20 +168,20 @@ describe('getStepHierarchyAfterDuplication', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: '2',
+          startStepId: '2',
           concurrentSteps: [
             {
               type: 'standaloneStep',
               stepId: '3',
             },
           ],
-          waitForThermocyclerProfileStepId: '4',
+          waitStepId: '4',
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: '2-duplicated',
+          startStepId: '2-duplicated',
           concurrentSteps: [],
-          waitForThermocyclerProfileStepId: '4-duplicated',
+          waitStepId: '4-duplicated',
         },
         {
           type: 'standaloneStep',

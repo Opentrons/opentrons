@@ -22,6 +22,7 @@ import {
   convertStepArrayToHierarchy,
   findStep,
   getPairedSteps,
+  isConcurrentGroup,
 } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import {
@@ -1752,16 +1753,7 @@ function getWaitStepIdAfterEnclosingConcurrentGroup(
   if (!('type' in enclosingNode)) {
     return null
   }
-  switch (enclosingNode.type) {
-    case 'thermocyclerProfileGroup':
-      return enclosingNode.waitForThermocyclerProfileStepId
-    case 'vacuumProfileGroup':
-      return enclosingNode.waitForVacuumProfileStepId
-    case 'vacuumStateDurationGroup':
-      return enclosingNode.waitForVacuumStateStepId
-    default:
-      return null
-  }
+  return isConcurrentGroup(enclosingNode) ? enclosingNode.waitStepId : null
 }
 
 function saveStepFormHelper(
@@ -1789,7 +1781,7 @@ function saveStepFormHelper(
       getThermocyclerFormType(newForm) === 'thermocyclerProfile'
         ? getThermocyclerProfilePauseForm(
             newForm as ThermocyclerFormData,
-            action.payload.thermocyclerPauseStepId
+            action.payload.concurrentGroupPauseStepId
           )
         : null
     const newVacVacKind = getVacuumConcurrentPauseKind(newForm)
@@ -1797,12 +1789,12 @@ function saveStepFormHelper(
       newVacVacKind === 'profile'
         ? getVacuumProfilePauseForm(
             newForm as VacuumFormData,
-            action.payload.vacuumPauseStepId
+            action.payload.concurrentGroupPauseStepId
           )
         : newVacVacKind === 'stateDuration'
           ? getVacuumStateDurationPauseForm(
               newForm as VacuumFormData,
-              action.payload.vacuumPauseStepId
+              action.payload.concurrentGroupPauseStepId
             )
           : null
     const newPauseForms = [newThermoPauseForm, newVacuumPauseForm].filter(
@@ -1874,11 +1866,11 @@ function saveStepFormHelper(
         newVacKind === 'profile'
           ? getVacuumProfilePauseForm(
               newForm as VacuumFormData,
-              action.payload.vacuumPauseStepId
+              action.payload.concurrentGroupPauseStepId
             )
           : getVacuumStateDurationPauseForm(
               newForm as VacuumFormData,
-              action.payload.vacuumPauseStepId
+              action.payload.concurrentGroupPauseStepId
             )
       const orderWithoutOldPauses = originalOrderedStepIds.filter(
         id => id === newForm.id || !pairedToRemove.has(id)
@@ -1915,11 +1907,11 @@ function saveStepFormHelper(
         newVacKind === 'profile'
           ? getVacuumProfilePauseForm(
               newForm as VacuumFormData,
-              action.payload.vacuumPauseStepId
+              action.payload.concurrentGroupPauseStepId
             )
           : getVacuumStateDurationPauseForm(
               newForm as VacuumFormData,
-              action.payload.vacuumPauseStepId
+              action.payload.concurrentGroupPauseStepId
             )
       const stepIdToMoveEditedStepAfter =
         getWaitStepIdAfterEnclosingConcurrentGroup(findResult)
@@ -1957,7 +1949,7 @@ function saveStepFormHelper(
 
       const newPauseForm = getThermocyclerProfilePauseForm(
         newForm as ThermocyclerFormData,
-        action.payload.thermocyclerPauseStepId
+        action.payload.concurrentGroupPauseStepId
       )
 
       // If the edited step was is inside a Thermocycler profile, we'll move it to just after the profile.

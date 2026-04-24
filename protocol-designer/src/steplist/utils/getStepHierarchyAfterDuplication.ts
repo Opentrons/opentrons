@@ -1,13 +1,12 @@
 import { produce } from 'immer'
 
+import { isConcurrentGroup } from './stepHierarchy'
+
 import type { StepIdType } from '/protocol-designer/form-types'
 import type {
   ConcurrentGroup,
   StandaloneStep,
   StepHierarchy,
-  ThermocyclerProfileGroup,
-  VacuumProfileGroup,
-  VacuumStateDurationGroup,
 } from './stepHierarchy'
 
 /**
@@ -63,6 +62,57 @@ export function getStepHierarchyAfterDuplication(
   })
 }
 
+interface ProfileLikeGroupIds {
+  startStepId: StepIdType
+  waitStepId: StepIdType
+  concurrentSteps: StandaloneStep[]
+}
+
+type ProfileLikeConcurrentGroupKind = ConcurrentGroup['type']
+
+function buildDuplicatedProfileLikeGroup(
+  groupKind: ProfileLikeConcurrentGroupKind,
+  newStart: StepIdType,
+  newWait: StepIdType,
+  concurrentSteps: StandaloneStep[]
+): ConcurrentGroup {
+  return {
+    type: groupKind,
+    startStepId: newStart,
+    waitStepId: newWait,
+    concurrentSteps,
+  }
+}
+
+/**
+ * Thermocycler profile, vacuum profile, and timed vacuum-state groups share duplication rules:
+ * if both the root step and the paired wait are duplicated, emit a new group whose concurrent
+ * list only includes steps that were duplicated; otherwise flatten any duplicated concurrent steps.
+ */
+function reduceDuplicateOfProfileLikeGroup(
+  acc: Array<StandaloneStep | ConcurrentGroup>,
+  group: ProfileLikeGroupIds,
+  idMap: Record<StepIdType, StepIdType | undefined>,
+  duplicateConcurrentSteps: (steps: StandaloneStep[]) => StandaloneStep[],
+  groupKind: ProfileLikeConcurrentGroupKind
+): Array<StandaloneStep | ConcurrentGroup> {
+  const newStart = idMap[group.startStepId]
+  const newWait = idMap[group.waitStepId]
+  const concurrentDuplicated = duplicateConcurrentSteps(group.concurrentSteps)
+  if (newStart != null && newWait != null) {
+    return [
+      ...acc,
+      buildDuplicatedProfileLikeGroup(
+        groupKind,
+        newStart,
+        newWait,
+        concurrentDuplicated
+      ),
+    ]
+  }
+  return [...acc, ...concurrentDuplicated]
+}
+
 /**
  * Get the new, duplicated steps that we should insert.
  *
@@ -89,92 +139,34 @@ function getNewSteps(
       : acc
   }
 
+  const duplicateConcurrentSteps = (
+    steps: StandaloneStep[]
+  ): StandaloneStep[] =>
+    steps.reduce<StandaloneStep[]>(reduceStandaloneSteps, [])
+
   const reduceGroupsAndStandaloneSteps = (
     acc: Array<StandaloneStep | ConcurrentGroup>,
     next: StandaloneStep | ConcurrentGroup
   ): Array<StandaloneStep | ConcurrentGroup> => {
     if (next.type === 'standaloneStep') {
       return reduceStandaloneSteps(acc, next)
-    } else if (next.type === 'thermocyclerProfileGroup') {
-      const newProfileStepId =
-        originalIdsToDuplicateIds[next.thermocyclerProfileStepId]
-      const newWaitForProfileStepId =
-        originalIdsToDuplicateIds[next.waitForThermocyclerProfileStepId]
-      if (newProfileStepId != null && newWaitForProfileStepId != null) {
-        // Duplicating the group itself, and possibly also some of the steps inside of it.
-        const newGroup: ThermocyclerProfileGroup = {
-          type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: newProfileStepId,
-          waitForThermocyclerProfileStepId: newWaitForProfileStepId,
-          // When duplicating a group, the new group should only contain steps
-          // that were themselves duplicated.
-          concurrentSteps: next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        }
-        return [...acc, newGroup]
-      } else {
-        // Not duplicating the group itself, but possibly duplicating some of the steps inside of it.
-        return [
-          ...acc,
-          ...next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        ]
-      }
-    } else if (next.type === 'vacuumProfileGroup') {
-      const newProfileStepId =
-        originalIdsToDuplicateIds[next.vacuumProfileStepId]
-      const newWaitForProfileStepId =
-        originalIdsToDuplicateIds[next.waitForVacuumProfileStepId]
-      if (newProfileStepId != null && newWaitForProfileStepId != null) {
-        const newGroup: VacuumProfileGroup = {
-          type: 'vacuumProfileGroup',
-          vacuumProfileStepId: newProfileStepId,
-          waitForVacuumProfileStepId: newWaitForProfileStepId,
-          concurrentSteps: next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        }
-        return [...acc, newGroup]
-      } else {
-        return [
-          ...acc,
-          ...next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        ]
-      }
-    } else {
-      next.type satisfies 'vacuumStateDurationGroup'
-      const newStateStepId = originalIdsToDuplicateIds[next.vacuumStateStepId]
-      const newWaitForStateStepId =
-        originalIdsToDuplicateIds[next.waitForVacuumStateStepId]
-      if (newStateStepId != null && newWaitForStateStepId != null) {
-        const newGroup: VacuumStateDurationGroup = {
-          type: 'vacuumStateDurationGroup',
-          vacuumStateStepId: newStateStepId,
-          waitForVacuumStateStepId: newWaitForStateStepId,
-          concurrentSteps: next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        }
-        return [...acc, newGroup]
-      } else {
-        return [
-          ...acc,
-          ...next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        ]
-      }
     }
+    if (isConcurrentGroup(next)) {
+      return reduceDuplicateOfProfileLikeGroup(
+        acc,
+        {
+          startStepId: next.startStepId,
+          waitStepId: next.waitStepId,
+          concurrentSteps: next.concurrentSteps,
+        },
+        originalIdsToDuplicateIds,
+        duplicateConcurrentSteps,
+        next.type
+      )
+    }
+    throw new Error(
+      'getNewSteps: unexpected top-level step hierarchy item (not standalone or concurrent group)'
+    )
   }
 
   return stepHierarchy.topLevelItems.reduce(reduceGroupsAndStandaloneSteps, [])
@@ -284,42 +276,14 @@ function findInsertionPoints(
           },
         }
       }
-    } else if (topLevelItem.type === 'thermocyclerProfileGroup') {
+    } else if (isConcurrentGroup(topLevelItem)) {
       const found = tryInsertionPointsForConcurrentGroup(
         topLevelItems,
         topLevelItemIndex,
         stepIdToInsertAfter,
         {
-          startStepId: topLevelItem.thermocyclerProfileStepId,
-          waitStepId: topLevelItem.waitForThermocyclerProfileStepId,
-          concurrentSteps: topLevelItem.concurrentSteps,
-        }
-      )
-      if (found != null) {
-        return found
-      }
-    } else if (topLevelItem.type === 'vacuumProfileGroup') {
-      const found = tryInsertionPointsForConcurrentGroup(
-        topLevelItems,
-        topLevelItemIndex,
-        stepIdToInsertAfter,
-        {
-          startStepId: topLevelItem.vacuumProfileStepId,
-          waitStepId: topLevelItem.waitForVacuumProfileStepId,
-          concurrentSteps: topLevelItem.concurrentSteps,
-        }
-      )
-      if (found != null) {
-        return found
-      }
-    } else if (topLevelItem.type === 'vacuumStateDurationGroup') {
-      const found = tryInsertionPointsForConcurrentGroup(
-        topLevelItems,
-        topLevelItemIndex,
-        stepIdToInsertAfter,
-        {
-          startStepId: topLevelItem.vacuumStateStepId,
-          waitStepId: topLevelItem.waitForVacuumStateStepId,
+          startStepId: topLevelItem.startStepId,
+          waitStepId: topLevelItem.waitStepId,
           concurrentSteps: topLevelItem.concurrentSteps,
         }
       )

@@ -9,7 +9,6 @@ import {
 } from '../reducers'
 
 import type { FormData } from '/protocol-designer/form-types'
-import type { SaveStepFormAction } from '../actions/thunks'
 import type { SelectMultipleStepsAction } from '../actions/types'
 import type { SelectableItem } from '../reducers'
 
@@ -38,7 +37,7 @@ describe('selectedItem reducer', () => {
         thermocyclerPauseStepId: 'tc-pause',
         vacuumPauseStepId: 'vac-pause',
       },
-    } as SaveStepFormAction
+    }
     expect(selectedItem(null, action)).toEqual({
       selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: stepId,

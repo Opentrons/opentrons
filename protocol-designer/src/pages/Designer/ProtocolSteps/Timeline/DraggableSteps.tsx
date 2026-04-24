@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,14 +37,7 @@ import { ConnectedStepInfo } from './ConnectedStepInfo'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
-import type { FormData, StepIdType } from '/protocol-designer/form-types'
-
-function getIsVacuumStepPredicate(
-  steps: FormData[]
-): (id: StepIdType) => boolean {
-  const stepTypeById = new Map(steps.map(form => [form.id, form.stepType]))
-  return (id: StepIdType) => stepTypeById.get(id) === 'vacuum'
-}
+import type { StepIdType } from '/protocol-designer/form-types'
 
 interface DraggableStepsProps {
   sidebarWidth: number
@@ -78,13 +71,8 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
         } else if (nestedStepElement.type === 'thermocyclerProfileGroup') {
           return (
             <ThermocyclerProfile
-              key={
-                'concurrent-group-' +
-                nestedStepElement.thermocyclerProfileStepId
-              }
-              thermocyclerProfileStepId={
-                nestedStepElement.thermocyclerProfileStepId
-              }
+              key={'concurrent-group-' + nestedStepElement.startStepId}
+              startStepId={nestedStepElement.startStepId}
               concurrentStepIds={nestedStepElement.concurrentSteps.map(
                 step => step.stepId
               )}
@@ -96,8 +84,8 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
         } else if (nestedStepElement.type === 'vacuumProfileGroup') {
           return (
             <VacuumProfile
-              key={'concurrent-group-' + nestedStepElement.vacuumProfileStepId}
-              vacuumProfileStepId={nestedStepElement.vacuumProfileStepId}
+              key={'concurrent-group-' + nestedStepElement.startStepId}
+              startStepId={nestedStepElement.startStepId}
               concurrentStepIds={nestedStepElement.concurrentSteps.map(
                 step => step.stepId
               )}
@@ -109,8 +97,8 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
         } else if (nestedStepElement.type === 'vacuumStateDurationGroup') {
           return (
             <VacuumStateDurationConcurrent
-              key={'concurrent-group-' + nestedStepElement.vacuumStateStepId}
-              vacuumStateStepId={nestedStepElement.vacuumStateStepId}
+              key={'concurrent-group-' + nestedStepElement.startStepId}
+              startStepId={nestedStepElement.startStepId}
               concurrentStepIds={nestedStepElement.concurrentSteps.map(
                 step => step.stepId
               )}
@@ -159,7 +147,6 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
-  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -174,17 +161,13 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const getStepsAfterMovingHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(
-        convertStepArrayToHierarchy(steps),
-        {
-          moveType: 'insertBeforeDestinationStep',
-          movedStepId: idOfStepBeingMoved,
-          destinationStepId: stepId,
-        },
-        { isVacuumStep }
-      )
+      return computeStepMove(convertStepArrayToHierarchy(steps), {
+        moveType: 'insertBeforeDestinationStep',
+        movedStepId: idOfStepBeingMoved,
+        destinationStepId: stepId,
+      })
     },
-    [steps, stepId, isVacuumStep]
+    [steps, stepId]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
@@ -251,7 +234,7 @@ function DragDropPreviewBar(): JSX.Element {
 }
 
 interface ThermocyclerProfileProps {
-  thermocyclerProfileStepId: StepIdType
+  startStepId: StepIdType
   concurrentStepIds: StepIdType[]
 
   openedOverflowMenuId?: string | null
@@ -268,7 +251,7 @@ interface ThermocyclerProfileProps {
  */
 function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
   const {
-    thermocyclerProfileStepId,
+    startStepId,
     concurrentStepIds,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
@@ -279,15 +262,15 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
   const isRootSelected =
     multiSelectItemIds != null && multiSelectItemIds.length > 0
-      ? multiSelectItemIds.includes(thermocyclerProfileStepId)
-      : selectedStepId === thermocyclerProfileStepId
+      ? multiSelectItemIds.includes(startStepId)
+      : selectedStepId === startStepId
 
   const { t } = useTranslation()
 
   return (
     <div>
       <DragDropStep
-        stepId={thermocyclerProfileStepId}
+        stepId={startStepId}
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         sidebarWidth={sidebarWidth}
@@ -318,9 +301,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
           </ConcurrentGroupChild>
         ))}
         <ConcurrentGroupChild type="checkpoint">
-          <ThermocyclerProfileEndCheckpoint
-            thermocyclerProfileStepId={thermocyclerProfileStepId}
-          />
+          <ThermocyclerProfileEndCheckpoint startStepId={startStepId} />
         </ConcurrentGroupChild>
       </ConcurrentGroup>
     </div>
@@ -332,7 +313,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
  * nested block. The user can drag a step onto it to move that step right above it.
  */
 interface VacuumProfileProps {
-  vacuumProfileStepId: StepIdType
+  startStepId: StepIdType
   concurrentStepIds: StepIdType[]
 
   openedOverflowMenuId?: string | null
@@ -349,7 +330,7 @@ interface VacuumProfileProps {
  */
 function VacuumProfile(props: VacuumProfileProps): JSX.Element {
   const {
-    vacuumProfileStepId,
+    startStepId,
     concurrentStepIds,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
@@ -360,15 +341,15 @@ function VacuumProfile(props: VacuumProfileProps): JSX.Element {
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
   const isRootSelected =
     multiSelectItemIds != null && multiSelectItemIds.length > 0
-      ? multiSelectItemIds.includes(vacuumProfileStepId)
-      : selectedStepId === vacuumProfileStepId
+      ? multiSelectItemIds.includes(startStepId)
+      : selectedStepId === startStepId
 
   const { t } = useTranslation()
 
   return (
     <div>
       <DragDropStep
-        stepId={vacuumProfileStepId}
+        stepId={startStepId}
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         sidebarWidth={sidebarWidth}
@@ -391,9 +372,7 @@ function VacuumProfile(props: VacuumProfileProps): JSX.Element {
           </ConcurrentGroupChild>
         ))}
         <ConcurrentGroupChild type="checkpoint">
-          <VacuumProfileEndCheckpoint
-            vacuumProfileStepId={vacuumProfileStepId}
-          />
+          <VacuumProfileEndCheckpoint startStepId={startStepId} />
         </ConcurrentGroupChild>
       </ConcurrentGroup>
     </div>
@@ -401,7 +380,7 @@ function VacuumProfile(props: VacuumProfileProps): JSX.Element {
 }
 
 interface VacuumStateDurationConcurrentProps {
-  vacuumStateStepId: StepIdType
+  startStepId: StepIdType
   concurrentStepIds: StepIdType[]
 
   openedOverflowMenuId?: string | null
@@ -417,7 +396,7 @@ function VacuumStateDurationConcurrent(
   props: VacuumStateDurationConcurrentProps
 ): JSX.Element {
   const {
-    vacuumStateStepId,
+    startStepId,
     concurrentStepIds,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
@@ -428,15 +407,15 @@ function VacuumStateDurationConcurrent(
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
   const isRootSelected =
     multiSelectItemIds != null && multiSelectItemIds.length > 0
-      ? multiSelectItemIds.includes(vacuumStateStepId)
-      : selectedStepId === vacuumStateStepId
+      ? multiSelectItemIds.includes(startStepId)
+      : selectedStepId === startStepId
 
   const { t } = useTranslation()
 
   return (
     <div>
       <DragDropStep
-        stepId={vacuumStateStepId}
+        stepId={startStepId}
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         sidebarWidth={sidebarWidth}
@@ -459,9 +438,7 @@ function VacuumStateDurationConcurrent(
           </ConcurrentGroupChild>
         ))}
         <ConcurrentGroupChild type="checkpoint">
-          <VacuumStateDurationEndCheckpoint
-            vacuumStateStepId={vacuumStateStepId}
-          />
+          <VacuumStateDurationEndCheckpoint startStepId={startStepId} />
         </ConcurrentGroupChild>
       </ConcurrentGroup>
     </div>
@@ -473,28 +450,23 @@ function VacuumStateDurationConcurrent(
  * nested block. The user can drag a step onto it to move that step right above it.
  */
 function VacuumProfileEndCheckpoint(props: {
-  vacuumProfileStepId: string
+  startStepId: string
 }): JSX.Element {
-  const { vacuumProfileStepId } = props
+  const { startStepId } = props
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
   const { t } = useTranslation()
-  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const getStepsAfterMovingStepHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(
-        convertStepArrayToHierarchy(steps),
-        {
-          moveType: 'insertAsLastStepOfGroup',
-          movedStepId: idOfStepBeingMoved,
-          destinationGroupRootStepId: vacuumProfileStepId,
-        },
-        { isVacuumStep }
-      )
+      return computeStepMove(convertStepArrayToHierarchy(steps), {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: idOfStepBeingMoved,
+        destinationGroupRootStepId: startStepId,
+      })
     },
-    [steps, vacuumProfileStepId, isVacuumStep]
+    [steps, startStepId]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
@@ -537,28 +509,23 @@ function VacuumProfileEndCheckpoint(props: {
 }
 
 function VacuumStateDurationEndCheckpoint(props: {
-  vacuumStateStepId: string
+  startStepId: string
 }): JSX.Element {
-  const { vacuumStateStepId } = props
+  const { startStepId } = props
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
   const { t } = useTranslation()
-  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const getStepsAfterMovingStepHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(
-        convertStepArrayToHierarchy(steps),
-        {
-          moveType: 'insertAsLastStepOfGroup',
-          movedStepId: idOfStepBeingMoved,
-          destinationGroupRootStepId: vacuumStateStepId,
-        },
-        { isVacuumStep }
-      )
+      return computeStepMove(convertStepArrayToHierarchy(steps), {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: idOfStepBeingMoved,
+        destinationGroupRootStepId: startStepId,
+      })
     },
-    [steps, vacuumStateStepId, isVacuumStep]
+    [steps, startStepId]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
@@ -601,28 +568,23 @@ function VacuumStateDurationEndCheckpoint(props: {
 }
 
 function ThermocyclerProfileEndCheckpoint(props: {
-  thermocyclerProfileStepId: string
+  startStepId: string
 }): JSX.Element {
-  const { thermocyclerProfileStepId } = props
+  const { startStepId } = props
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
   const { t } = useTranslation()
-  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const getStepsAfterMovingStepHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(
-        convertStepArrayToHierarchy(steps),
-        {
-          moveType: 'insertAsLastStepOfGroup',
-          movedStepId: idOfStepBeingMoved,
-          destinationGroupRootStepId: thermocyclerProfileStepId,
-        },
-        { isVacuumStep }
-      )
+      return computeStepMove(convertStepArrayToHierarchy(steps), {
+        moveType: 'insertAsLastStepOfGroup',
+        movedStepId: idOfStepBeingMoved,
+        destinationGroupRootStepId: startStepId,
+      })
     },
-    [steps, thermocyclerProfileStepId, isVacuumStep]
+    [steps, startStepId]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
