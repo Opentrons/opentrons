@@ -480,12 +480,6 @@ function insertBeforeDestinationStep(
         // Concurrent step groups can't be inserted into other concurrent step groups.
         // This is disallowed mostly for UX reasons; we could probably technically support it.
         draft.isAllowed = false
-      } else if (
-        (findResult.enclosingNode.type === 'vacuumProfileGroup' ||
-          findResult.enclosingNode.type === 'vacuumStateDurationGroup') &&
-        toInsert.type === 'standaloneStep'
-      ) {
-        draft.isAllowed = false
       } else {
         findResult.enclosingNode.concurrentSteps.splice(
           findResult.indexInEnclosingNode,
