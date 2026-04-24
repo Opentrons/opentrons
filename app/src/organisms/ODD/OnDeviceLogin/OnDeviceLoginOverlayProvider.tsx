@@ -33,7 +33,16 @@ const OnDeviceLoginContext =
   createContext<OnDeviceLoginModalContextValue | null>(null)
 
 /**
- * Full-screen login layer above ODD routes so the current screen stays mounted.
+ * This component does a few things when access control is enabled on the robot:
+ *
+ * - As a context provider, it passes context down to children to let them open/close
+ *   the login page.
+ *
+ * - It does the actual rendering of the login page (when it's open). We implement
+ *   it as an overlay, as opposed to a react-router-dom page, in order to preserve the
+ *   local component state of the main page underneath it.
+ *
+ * - It also renders the "logged out" overlay (when the user is logged out).
  */
 export function OnDeviceLoginOverlayProvider({
   children,
