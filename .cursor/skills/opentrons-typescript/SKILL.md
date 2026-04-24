@@ -119,9 +119,11 @@ ESLint enforces `import/no-default-export`. Always use named exports. Exceptions
 Import individual functions only:
 
 ```typescript
-// Good
+// Good — imports a specific function
 import mapValues from 'lodash/mapValues'
+```
 
+```typescript
 // Bad — imports entire library
 import { mapValues } from 'lodash'
 ```
@@ -273,7 +275,7 @@ describe('MyComponent', () => {
     render(props)
     expect(screen.getByRole('button')).toBeInTheDocument()
   })
-  
+
   it('renders the text', () => {
     render(props)
     screen.getByText('Opentrons Flex')
