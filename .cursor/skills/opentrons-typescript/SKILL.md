@@ -431,6 +431,6 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT use `console.log` or `debugger` in committed code
 - Do NOT omit curly braces for control statements — ESLint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
 - Do NOT use primitives (primitives are located in `components/src/primitives`) for new component - use HTML 5 tags and CSS Modules
-- Do NOT margins to create a layout in a component - use padding and gap
+- Do NOT use margins to create a layout in a component - use padding and gap
 - Do NOT use a conditinal statement for `aria-label`
 - Do NOT use a nested ternary
