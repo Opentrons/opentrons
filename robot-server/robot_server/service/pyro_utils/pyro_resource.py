@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import threading
-from typing import Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
 from opentrons.protocol_engine.resources.camera_provider import (
@@ -21,18 +21,20 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
 )
 
-from robot_server.deck_configuration.store import DeckConfigurationStore
-from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
-    MaintenanceRunOrchestratorStore,
-    handle_estop_event,
-)
-from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
-    handle_hardware_event,
-)
 from robot_server.service.pyro_utils.serpent_type_registry import (
     register_robot_server_types,
 )
+
+if TYPE_CHECKING:
+    from robot_server.deck_configuration.store import DeckConfigurationStore
+    from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+        MaintenanceRunOrchestratorStore,
+        handle_estop_event,
+    )
+    from robot_server.runs.run_orchestrator_store import (
+        RunOrchestratorStore,
+        handle_hardware_event,
+    )
 
 robot_server_pyro_resource_accessor = AppStateAccessor["RobotServerPyroResource"](
     "robot_server_pyro_resource"
@@ -56,25 +58,25 @@ class RobotServerPyroResource:
         self._loop = loop
 
         # Default the resource variables to None - these will be set as services spin up
-        self._run_orchestrator_store: Optional[RunOrchestratorStore] = None
+        self._run_orchestrator_store: Optional["RunOrchestratorStore"] = None
         self._maintenance_run_orchestrator_store: Optional[
-            MaintenanceRunOrchestratorStore
+            "MaintenanceRunOrchestratorStore"
         ] = None
-        self._deck_configuration_store: Optional[DeckConfigurationStore] = None
+        self._deck_configuration_store: Optional["DeckConfigurationStore"] = None
         self._camera_provider: Optional[CameraProvider] = None
         self._file_provider: Optional[FileProvider] = None
         self._notify_publishers: Optional[Callable[[], None]] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
     def set_run_orchestrator_store(
-        self, run_orchestrator_store: RunOrchestratorStore
+        self, run_orchestrator_store: "RunOrchestratorStore"
     ) -> None:
         """Set the RunOrchestratorStore of the RobotServerPyroResource, not serialized for remote processes."""
         if self._run_orchestrator_store is None:
             self._run_orchestrator_store = run_orchestrator_store
 
     def set_maintenance_run_orchestorator_store(
-        self, maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore
+        self, maintenance_run_orchestrator_store: "MaintenanceRunOrchestratorStore"
     ) -> None:
         """Set the MaintenanceRunOrchestratorStore of the RobotServerPyroResource, not serialized for remote processes."""
         if self._maintenance_run_orchestrator_store is None:
@@ -83,7 +85,7 @@ class RobotServerPyroResource:
             )
 
     def set_deck_configuration_store(
-        self, deck_configuration_store: DeckConfigurationStore
+        self, deck_configuration_store: "DeckConfigurationStore"
     ) -> None:
         """Set the DeckConfigurationStore of the RobotServerPyroResource, not serialized for remote processes."""
         if self._deck_configuration_store is None:
