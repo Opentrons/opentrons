@@ -150,7 +150,7 @@ def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
     return lambda self, current_attr=attr: wrap_result_validation(
         proxy,
         attr,
-        getattr(_get_thread_proxy(proxy), current_attr),  # type: ignore
+        getattr(_get_thread_proxy(proxy), current_attr),
     )
 
 
