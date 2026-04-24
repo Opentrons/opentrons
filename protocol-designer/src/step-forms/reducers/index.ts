@@ -1740,9 +1740,15 @@ interface SaveStepFormHelperResult {
 function getVacuumConcurrentPauseKind(
   form: FormData | null
 ): null | 'profile' | 'stateDuration' {
-  if (form == null) return null
-  if (getIsVacuumProfileForm(form)) return 'profile'
-  if (getIsVacuumStateWithDurationForm(form)) return 'stateDuration'
+  if (form == null) {
+    return null
+  }
+  if (getIsVacuumProfileForm(form)) {
+    return 'profile'
+  }
+  if (getIsVacuumStateWithDurationForm(form)) {
+    return 'stateDuration'
+  }
   return null
 }
 
@@ -1779,24 +1785,24 @@ function saveStepFormHelper(
 
     const newThermoPauseForm: PauseFormData | null =
       getThermocyclerFormType(newForm) === 'thermocyclerProfile'
-        ? getThermocyclerProfilePauseForm(
+        ? buildThermocyclerProfilePauseForm(
             newForm as ThermocyclerFormData,
             action.payload.concurrentGroupPauseStepId
           )
         : null
     const newVacVacKind = getVacuumConcurrentPauseKind(newForm)
-    const newVacuumPauseForm: PauseFormData | null =
-      newVacVacKind === 'profile'
-        ? getVacuumProfilePauseForm(
-            newForm as VacuumFormData,
-            action.payload.concurrentGroupPauseStepId
-          )
-        : newVacVacKind === 'stateDuration'
-          ? getVacuumStateDurationPauseForm(
-              newForm as VacuumFormData,
-              action.payload.concurrentGroupPauseStepId
-            )
-          : null
+    let newVacuumPauseForm: PauseFormData | null = null
+    if (newVacVacKind === 'profile') {
+      newVacuumPauseForm = buildVacuumProfilePauseForm(
+        newForm as VacuumFormData,
+        action.payload.concurrentGroupPauseStepId
+      )
+    } else if (newVacVacKind === 'stateDuration') {
+      newVacuumPauseForm = buildVacuumStateDurationPauseForm(
+        newForm as VacuumFormData,
+        action.payload.concurrentGroupPauseStepId
+      )
+    }
     const newPauseForms = [newThermoPauseForm, newVacuumPauseForm].filter(
       (f): f is PauseFormData => f != null
     )
@@ -1864,19 +1870,19 @@ function saveStepFormHelper(
       const newVacKind = getVacuumConcurrentPauseKind(newForm)
       const newPauseForm =
         newVacKind === 'profile'
-          ? getVacuumProfilePauseForm(
+          ? buildVacuumProfilePauseForm(
               newForm as VacuumFormData,
               action.payload.concurrentGroupPauseStepId
             )
-          : getVacuumStateDurationPauseForm(
+          : buildVacuumStateDurationPauseForm(
               newForm as VacuumFormData,
               action.payload.concurrentGroupPauseStepId
             )
       const orderWithoutOldPauses = originalOrderedStepIds.filter(
         id => id === newForm.id || !pairedToRemove.has(id)
       )
-      const vacIdx = orderWithoutOldPauses.indexOf(newForm.id)
-      if (vacIdx === -1) {
+      const vacuumStepIndex = orderWithoutOldPauses.indexOf(newForm.id)
+      if (vacuumStepIndex === -1) {
         console.error(
           'Error rearranging steps for a vacuum concurrent pairing change. Leaving the steps unchanged.'
         )
@@ -1886,9 +1892,9 @@ function saveStepFormHelper(
         }
       }
       const newOrderedStepIds = [
-        ...orderWithoutOldPauses.slice(0, vacIdx + 1),
+        ...orderWithoutOldPauses.slice(0, vacuumStepIndex + 1),
         newPauseForm.id,
-        ...orderWithoutOldPauses.slice(vacIdx + 1),
+        ...orderWithoutOldPauses.slice(vacuumStepIndex + 1),
       ]
       return {
         newOrderedStepIds,
@@ -1905,11 +1911,11 @@ function saveStepFormHelper(
       const newVacKind = getVacuumConcurrentPauseKind(newForm)
       const newPauseForm =
         newVacKind === 'profile'
-          ? getVacuumProfilePauseForm(
+          ? buildVacuumProfilePauseForm(
               newForm as VacuumFormData,
               action.payload.concurrentGroupPauseStepId
             )
-          : getVacuumStateDurationPauseForm(
+          : buildVacuumStateDurationPauseForm(
               newForm as VacuumFormData,
               action.payload.concurrentGroupPauseStepId
             )
@@ -1947,7 +1953,7 @@ function saveStepFormHelper(
       // 1) Potentially find a new position to move it to, since we can't allow Thermocycler profiles to nest.
       // 2) Create a hidden "wait for profile to complete" step that it will be permanently paired with.
 
-      const newPauseForm = getThermocyclerProfilePauseForm(
+      const newPauseForm = buildThermocyclerProfilePauseForm(
         newForm as ThermocyclerFormData,
         action.payload.concurrentGroupPauseStepId
       )
@@ -2001,7 +2007,7 @@ function saveStepFormHelper(
   }
 }
 
-function getThermocyclerProfilePauseForm(
+function buildThermocyclerProfilePauseForm(
   thermocyclerForm: ThermocyclerFormData,
   id: string
 ): PauseFormData {
@@ -2016,7 +2022,7 @@ function getThermocyclerProfilePauseForm(
   }
 }
 
-function getVacuumProfilePauseForm(
+function buildVacuumProfilePauseForm(
   vacuumForm: VacuumFormData,
   id: string
 ): PauseFormData {
@@ -2031,7 +2037,7 @@ function getVacuumProfilePauseForm(
   }
 }
 
-function getVacuumStateDurationPauseForm(
+function buildVacuumStateDurationPauseForm(
   vacuumForm: VacuumFormData,
   id: string
 ): PauseFormData {

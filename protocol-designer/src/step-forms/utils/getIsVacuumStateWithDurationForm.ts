@@ -9,8 +9,12 @@ import type { FormData } from '/protocol-designer/form-types'
 export function getIsVacuumStateWithDurationForm(
   formData: FormData | null
 ): boolean {
-  if (formData?.stepType !== 'vacuum') return false
-  if (formData.programType !== VACUUM_PROGRAM_STATE) return false
+  if (formData?.stepType !== 'vacuum') {
+    return false
+  }
+  if (formData.programType !== VACUUM_PROGRAM_STATE) {
+    return false
+  }
   return (
     formData.pumpDurationCheckbox === true && formData.pumpDurationTime != null
   )

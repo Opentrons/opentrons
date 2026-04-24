@@ -79,13 +79,8 @@ export type ConcurrentGroup =
 export function isConcurrentGroup(
   item: StandaloneStep | ConcurrentGroup
 ): item is ConcurrentGroup {
-  return (
-    item.type === 'thermocyclerProfileGroup' ||
-    item.type === 'vacuumProfileGroup' ||
-    item.type === 'vacuumStateDurationGroup'
-  )
+  return item.type !== 'standaloneStep'
 }
-
 function isVacuumStateWithPumpDuration(step: FormData): boolean {
   return (
     step.stepType === 'vacuum' &&
@@ -95,23 +90,16 @@ function isVacuumStateWithPumpDuration(step: FormData): boolean {
   )
 }
 
-type OpenConcurrentGroup =
-  | {
-      kind: 'thermocycler'
-      startId: StepIdType
-      concurrentStepIds: StepIdType[]
-    }
-  | {
-      kind: 'vacuumProfile'
-      startId: StepIdType
-      concurrentStepIds: StepIdType[]
-    }
-  | {
-      kind: 'vacuumStateDuration'
-      startId: StepIdType
-      concurrentStepIds: StepIdType[]
-    }
+type OpenConcurrentGroupKind =
+  | 'thermocycler'
+  | 'vacuumProfile'
+  | 'vacuumStateDuration'
 
+interface OpenConcurrentGroup {
+  kind: OpenConcurrentGroupKind
+  startId: StepIdType
+  concurrentStepIds: StepIdType[]
+}
 /**
  * Given a flat array of steps, return the equivalent hierarchy.
  */
