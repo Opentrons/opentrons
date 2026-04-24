@@ -855,7 +855,6 @@ export interface VacuumStopPumpArgs extends CommonArgs {
   commandCreatorFnName: 'vacuumStopPump'
 }
 
-// Vacuum
 export interface VacuumPressureData {
   mode: typeof VACUUM_MODE_PRESSURE
   pressureMbar: string | null
