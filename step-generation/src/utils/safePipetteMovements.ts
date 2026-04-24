@@ -22,7 +22,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { EMPTY, OT2_TC_SLOTS } from '../constants'
+import { EMPTY } from '../constants'
 import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
@@ -224,10 +224,6 @@ const getSlotHasPotentialCollidingObject = (
   invariantContext: InvariantContext,
   robotType: RobotType
 ): boolean => {
-  const isThermocyclerOnDeck = Object.values(
-    invariantContext.moduleEntities
-  ).some(({ type }) => type === THERMOCYCLER_MODULE_TYPE)
-
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
