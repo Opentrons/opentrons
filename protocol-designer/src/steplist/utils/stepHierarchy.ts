@@ -34,7 +34,7 @@ import type { FormData, StepIdType } from '/protocol-designer/form-types'
  * The same nesting applies to Vacuum module profile steps and timed Vacuum state steps.
  */
 export interface StepHierarchy {
-  topLevelItems: Array<StandaloneStep | ProfileConcurrentGroup>
+  topLevelItems: Array<StandaloneStep | ConcurrentGroup>
 }
 
 /** A normal, standalone step. */
@@ -73,14 +73,14 @@ export interface VacuumStateDurationGroup {
   waitForVacuumStateStepId: StepIdType
 }
 
-export type ProfileConcurrentGroup =
+export type ConcurrentGroup =
   | ThermocyclerProfileGroup
   | VacuumProfileGroup
   | VacuumStateDurationGroup
 
-function isProfileConcurrentGroup(
-  item: StandaloneStep | ProfileConcurrentGroup
-): item is ProfileConcurrentGroup {
+function isConcurrentGroup(
+  item: StandaloneStep | ConcurrentGroup
+): item is ConcurrentGroup {
   return (
     item.type === 'thermocyclerProfileGroup' ||
     item.type === 'vacuumProfileGroup' ||
@@ -125,7 +125,7 @@ export function convertStepArrayToHierarchy(steps: FormData[]): StepHierarchy {
 
 function* _convertStepArrayToHierarchy(
   steps: FormData[]
-): Generator<StandaloneStep | ProfileConcurrentGroup> {
+): Generator<StandaloneStep | ConcurrentGroup> {
   let currentGroup: OpenConcurrentGroup | null = null
 
   for (const step of steps) {
@@ -267,7 +267,7 @@ export function convertStepHierarchyToArray(
   stepHierarchy: StepHierarchy
 ): StepIdType[] {
   const getStepIdsContainedInTopLevelItem = (
-    topLevelItem: StandaloneStep | ProfileConcurrentGroup
+    topLevelItem: StandaloneStep | ConcurrentGroup
   ): StepIdType[] => {
     switch (topLevelItem.type) {
       case 'standaloneStep':
@@ -345,8 +345,8 @@ export function findStep(
   stepHierarchy: StepHierarchy,
   stepIdToFind: StepIdType
 ): null | {
-  foundNode: StandaloneStep | ProfileConcurrentGroup
-  enclosingNode: StepHierarchy | ProfileConcurrentGroup
+  foundNode: StandaloneStep | ConcurrentGroup
+  enclosingNode: StepHierarchy | ConcurrentGroup
   indexInEnclosingNode: number
 } {
   const { topLevelItems } = stepHierarchy
@@ -372,7 +372,7 @@ export function findStep(
         indexInEnclosingNode: topLevelIndex,
       }
     }
-    if (isProfileConcurrentGroup(topLevelItem)) {
+    if (isConcurrentGroup(topLevelItem)) {
       for (
         let indexInGroup = 0;
         indexInGroup < topLevelItem.concurrentSteps.length;
@@ -498,7 +498,7 @@ interface InsertResult {
 
 function insertBeforeDestinationStep(
   stepHierarchy: StepHierarchy,
-  toInsert: StandaloneStep | ProfileConcurrentGroup,
+  toInsert: StandaloneStep | ConcurrentGroup,
   destinationStepId: StepIdType,
   isVacuumStep?: (stepId: StepIdType) => boolean
 ): InsertResult {
@@ -517,7 +517,7 @@ function insertBeforeDestinationStep(
       )
       draft.isAllowed = true
     } else {
-      if (isProfileConcurrentGroup(toInsert)) {
+      if (isConcurrentGroup(toInsert)) {
         // Concurrent step groups can't be inserted into other concurrent step groups.
         // This is disallowed mostly for UX reasons; we could probably technically support it.
         draft.isAllowed = false
@@ -542,11 +542,11 @@ function insertBeforeDestinationStep(
 
 function insertAsLastStepOfGroup(
   stepHierarchy: StepHierarchy,
-  toInsert: StandaloneStep | ProfileConcurrentGroup,
+  toInsert: StandaloneStep | ConcurrentGroup,
   destinationGroupRootStepId: StepIdType,
   isVacuumStep?: (stepId: StepIdType) => boolean
 ): InsertResult {
-  if (isProfileConcurrentGroup(toInsert)) {
+  if (isConcurrentGroup(toInsert)) {
     // Concurrent step groups can't be inserted into other concurrent step groups.
     // This is disallowed mostly for UX reasons; we could probably technically support it.
     return { isAllowed: false, stepHierarchy }
@@ -562,10 +562,7 @@ function insertAsLastStepOfGroup(
         (item.type === 'vacuumStateDurationGroup' &&
           item.vacuumStateStepId === destinationGroupRootStepId)
     )
-    if (
-      matchingGroupDraft != null &&
-      isProfileConcurrentGroup(matchingGroupDraft)
-    ) {
+    if (matchingGroupDraft != null && isConcurrentGroup(matchingGroupDraft)) {
       if (
         (matchingGroupDraft.type === 'vacuumProfileGroup' ||
           matchingGroupDraft.type === 'vacuumStateDurationGroup') &&
@@ -588,7 +585,7 @@ function insertAsLastStepOfGroup(
 
 interface PopResult {
   /** The item that was removed, or null if no matching element was found. */
-  poppedItem: StandaloneStep | ProfileConcurrentGroup | null
+  poppedItem: StandaloneStep | ConcurrentGroup | null
   newStepHierarchy: StepHierarchy
 }
 
