@@ -71,7 +71,6 @@ def _build_classdict(
     async_method_names = [method["__name__"] for method in async_methods.values()]
     # Attach PSO exposed methods to the AsyncClientPyroObject
     for method in pso._pyroMethods:
-        attribute = getattr(pso, method)
         if method in async_method_names:
             # For methods that are awaitable wrap them as an async reference that forwards the call to the PSO Proxy.
             method_metadata: dict[str, Any] = async_methods[method]
@@ -79,7 +78,7 @@ def _build_classdict(
             yield (method, async_method)
         else:
             # For standard method calls forward the direct call to the method on the PSO Proxy.
-            yield (method, wrap_parameter_validation(pso, method, attribute))
+            yield (method, wrap_parameter_validation(pso, method))
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
         # For property attributes we use to attach a wrapped `getattr` call for that attribute.
@@ -126,9 +125,7 @@ def wrap_as_async(method_metadata: dict[str, Any]) -> Any:
             *args: P.args,  # type: ignore
             **kwargs: P.kwargs,  # type: ignore
         ) -> Any:
-            thread_proxy = _get_thread_proxy(proxy)
-            func = getattr(thread_proxy, func_name)
-            validated_func = wrap_parameter_validation(proxy, func_name, func)
+            validated_func = wrap_parameter_validation(proxy, func_name)
             return validated_func(self, *args, **kwargs)
 
         return await asyncio.to_thread(
@@ -153,14 +150,14 @@ def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
     return lambda self, current_attr=attr: wrap_result_validation(
         proxy,
         attr,
-        getattr(Pyro5.api.Proxy(proxy._pyroUri), current_attr),  # type: ignore
+        getattr(_get_thread_proxy(proxy), current_attr),  # type: ignore
     )
 
 
 ### Parameter Validations
 
 
-def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str, attr: Any) -> Any:
+def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str) -> Any:
     """Validate outbound parameter requests before allowing serialization."""
 
     def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
@@ -177,14 +174,9 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str, attr: Any)
             validated_args = (*validated_args, _validations(arg))
         # Validate each keyword argument and reconstruct the kwargs dictionary
         kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
-        try:
-            threadsafe_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
-            threadsafe_attr = getattr(threadsafe_proxy, func_name)
-            result = threadsafe_attr(*validated_args, **kwargs)
-        except Exception as e:
-            raise ValueError(
-                f"ERROR ON THREADSAFE PROXY: {e} funcname: {func_name} proxy: {threadsafe_proxy}"
-            )
+        threadsafe_proxy = _get_thread_proxy(proxy)
+        threadsafe_attr = getattr(threadsafe_proxy, func_name)
+        result = threadsafe_attr(*validated_args, **kwargs)
         return wrap_result_validation(proxy, func_name, result)
 
     return wrapper
