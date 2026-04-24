@@ -15,7 +15,7 @@ import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './OnDeviceLoginOverlayProvider.module.css'
+import styles from './OnDeviceLoginModal.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
@@ -224,10 +224,7 @@ function LoginFieldInput({
 
 export * from './getSafePostLoginPath'
 export {
-  OnDeviceLoginOverlayProvider,
-  useOnDeviceLoginModal,
-} from './OnDeviceLoginOverlayProvider'
-export type {
-  OnDeviceLoginModalContextValue,
-  OpenOnDeviceLoginOptions,
-} from './OnDeviceLoginOverlayProvider'
+  OnDeviceLoginModal,
+  handleOnDeviceLoginModal,
+} from './OnDeviceLoginModal'
+export type { OnDeviceLoginModalProps } from './OnDeviceLoginModal'

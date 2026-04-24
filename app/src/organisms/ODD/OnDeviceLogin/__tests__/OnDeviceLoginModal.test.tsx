@@ -1,12 +1,13 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import NiceModal from '@ebay/nice-modal-react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import { OnDeviceLoginOverlayProvider, useOnDeviceLoginModal } from '..'
+import { handleOnDeviceLoginModal } from '../OnDeviceLoginModal'
 
 import type { NavigateFunction } from 'react-router-dom'
 
@@ -44,38 +45,34 @@ vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   ),
 }))
 
-function OpenOnMount({ from }: { from?: string }): JSX.Element {
-  const { openLoginModal } = useOnDeviceLoginModal()
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        openLoginModal(from != null ? { from } : undefined)
-      }}
-    >
-      open
-    </button>
-  )
-}
-
-function renderLoginModal(options?: { returnToPath?: string }) {
-  const result = renderWithProviders(
+function renderLoginModal(options?: { returnToPath?: string }): void {
+  renderWithProviders(
     <MemoryRouter>
-      <OnDeviceLoginOverlayProvider>
-        <OpenOnMount from={options?.returnToPath} />
-      </OnDeviceLoginOverlayProvider>
+      <NiceModal.Provider>
+        <button
+          type="button"
+          onClick={() => {
+            void handleOnDeviceLoginModal(
+              options?.returnToPath != null
+                ? { from: options.returnToPath }
+                : undefined
+            )
+          }}
+        >
+          open
+        </button>
+      </NiceModal.Provider>
     </MemoryRouter>,
     { i18nInstance: i18n }
-  )[0]
+  )
   fireEvent.click(screen.getByRole('button', { name: 'open' }))
-  return result
 }
 
 function getLoginInput(): HTMLInputElement {
   return screen.getByLabelText(/^(Username|Password)$/) as HTMLInputElement
 }
 
-describe('Login', () => {
+describe('OnDeviceLoginModal', () => {
   beforeEach(() => {
     mockNavigate.mockReset()
     mockSubmitPassword.mockReset()
