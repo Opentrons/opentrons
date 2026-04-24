@@ -1,4 +1,4 @@
-import isIp from 'is-ip'
+import { isIPv6 } from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
 import head from 'lodash/head'
@@ -55,7 +55,7 @@ const isLocal = (ip: string): boolean => {
   )
 }
 
-const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
+const ipToHostname = (ip: string): string => (isIPv6(ip) ? `[${ip}]` : ip)
 
 const makeRobotModel = (
   healthModel: string | null,

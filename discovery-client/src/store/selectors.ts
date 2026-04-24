@@ -1,4 +1,4 @@
-import isIp from 'is-ip'
+import { isIP } from 'is-ip'
 import unionBy from 'lodash/unionBy'
 import { createSelector } from 'reselect'
 
@@ -99,7 +99,7 @@ export function compareHostsByConnectability(
   if (ipSort !== 0) return ipSort
 
   // prefer ip hostname
-  const isIpSort = isIp(b.ip) ? 1 : -1
+  const isIpSort = isIP(b.ip) ? 1 : -1
 
   return isIpSort
 }
