@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 import opentrons.util.helpers as datetime_helper
+from opentrons.config import feature_flags
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
@@ -62,10 +63,17 @@ class ProtocolAnalyzer:
 
         Returns: The RunOrchestrator instance.
         """
-        self._coordinator = await simulating_runner.create_simulating_orchestrator(
-            robot_type=self._protocol_resource.source.robot_type,
-            protocol_config=self._protocol_resource.source.config,
-        )
+        if feature_flags.protocol_subprocess_enabled():
+            # TODO we need to both have a way of locking a run proxy in to a particular task
+            #   AND also have a separate simulating process/proxy
+            run_coordinator = await self._run_process_pyro_provider.wait_for_run_proxy()
+            await run_coordinator.create_simulating(self._protocol_resource)
+            self._coordinator = run_coordinator
+        else:
+            self._coordinator = await simulating_runner.create_simulating_orchestrator(
+                robot_type=self._protocol_resource.source.robot_type,
+                protocol_config=self._protocol_resource.source.config,
+            )
         await self._coordinator.load(
             protocol_source=self._protocol_resource.source,
             parse_mode=ParseMode.NORMAL,
@@ -159,6 +167,11 @@ class ProtocolAnalyzer:
                 asyncio.run_coroutine_threadsafe(
                     self._coordinator.stop(), asyncio.get_running_loop()
                 )
+                if feature_flags.protocol_subprocess_enabled():
+                    asyncio.run_coroutine_threadsafe(
+                        self._run_process_pyro_provider.refresh(),
+                        asyncio.get_running_loop(),
+                    )
             else:
                 log.warning(
                     "Analyzer is no longer in use but orchestrator is busy. "
