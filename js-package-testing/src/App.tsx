@@ -1,5 +1,3 @@
-import '@opentrons/protocol-visualization/styles'
-
 import { ProtocolVisualization } from '@opentrons/protocol-visualization'
 
 import StackerAnalysis from './StackerAnalysis.json'

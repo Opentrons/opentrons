@@ -8,6 +8,8 @@
 /* Import bundled styles from components package */
 @import url('@opentrons/components/styles');
 
+@import url('@opentrons/protocol-visualization/styles');
+
 * {
   font-family: 'Public Sans', sans-serif;
 }
@@ -38,6 +40,7 @@
 }
 
 .demo_section {
+  max-width: 80rem;
   padding-bottom: var(--spacing-32);
   border-bottom: 0.0625rem solid var(--grey-30);
   margin-bottom: var(--spacing-48);
@@ -79,11 +82,44 @@
 
 .protocol_visualization_demo {
   width: 100%;
-  height: 600px;
-  /*display: flex;*/
-  /*border: 0.0625rem solid var(--grey-35);*/
-  /*border-radius: var(--border-radius-8);*/
-  /*margin-top: var(--spacing-16);*/
-  /*background-color: var(--white);*/
-  /*overflow: hidden;*/
+  height: 700px;
+}
+
+/*
+ * layout_container is a flex container that measures its width via a ref for
+ * column resizing. Without an explicit width it can compute narrower than its
+ * parent due to min-content pressure from nested flex children. Force it to
+ * always fill the wrapper.
+ */
+.protocol_visualization_demo .layout_container {
+  width: 100%;
+}
+
+/*
+ * center_column uses flex:1 to fill remaining space, but min-width:9.25rem
+ * (from the package) combined with the DeckView's min-width:380px on
+ * body_container can prevent the column from shrinking below its content
+ * minimum, pushing the right column out of bounds. Setting min-width:0
+ * allows the flex item to shrink as needed and lets the explicit flex:1
+ * distribute space correctly.
+ */
+.protocol_visualization_demo .center_column {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/*
+ * .container is used by many components in protocol-visualization with
+ * generateScopedName:'[local]' (unscoped). The first .container rule in
+ * the built CSS sets container-type:inline-size, which no later rule
+ * overrides. container-type:inline-size on a flex item prevents the
+ * normal stretch/percentage-width resolution, making the Controls panel
+ * narrower than the DeckView. Override to restore normal sizing so both
+ * fill the center column equally.
+ */
+.protocol_visualization_demo .center_column > .container {
+  container-type: normal;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
 }
