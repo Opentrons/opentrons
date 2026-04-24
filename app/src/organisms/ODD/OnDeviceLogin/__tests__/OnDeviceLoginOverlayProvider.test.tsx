@@ -1,4 +1,3 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -8,22 +7,11 @@ import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { OnDeviceLoginOverlayProvider, useOnDeviceLoginModal } from '..'
 
-import type { NavigateFunction } from 'react-router-dom'
-
-const mockNavigate = vi.fn()
 const mockSubmitPassword = vi.fn()
 
 vi.mock('/app/resources/auth', () => ({
   useOAuth2PasswordLogin: vi.fn(),
 }))
-
-vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<NavigateFunction>()
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  }
-})
 
 vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   FullKeyboard: ({
@@ -44,13 +32,13 @@ vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   ),
 }))
 
-function OpenOnMount({ from }: { from?: string }): JSX.Element {
+function OpenOnMount(): JSX.Element {
   const { openLoginModal } = useOnDeviceLoginModal()
   return (
     <button
       type="button"
       onClick={() => {
-        openLoginModal(from != null ? { from } : undefined)
+        openLoginModal()
       }}
     >
       open
@@ -58,13 +46,11 @@ function OpenOnMount({ from }: { from?: string }): JSX.Element {
   )
 }
 
-function renderLoginModal(options?: { returnToPath?: string }) {
+function renderLoginModal() {
   const result = renderWithProviders(
-    <MemoryRouter>
-      <OnDeviceLoginOverlayProvider>
-        <OpenOnMount from={options?.returnToPath} />
-      </OnDeviceLoginOverlayProvider>
-    </MemoryRouter>,
+    <OnDeviceLoginOverlayProvider>
+      <OpenOnMount />
+    </OnDeviceLoginOverlayProvider>,
     { i18nInstance: i18n }
   )[0]
   fireEvent.click(screen.getByRole('button', { name: 'open' }))
@@ -72,12 +58,11 @@ function renderLoginModal(options?: { returnToPath?: string }) {
 }
 
 function getLoginInput(): HTMLInputElement {
-  return screen.getByLabelText(/^(Username|Password)$/) as HTMLInputElement
+  return screen.getByLabelText(/^(Username|Password)$/)
 }
 
 describe('Login', () => {
   beforeEach(() => {
-    mockNavigate.mockReset()
     mockSubmitPassword.mockReset()
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: mockSubmitPassword,
@@ -206,7 +191,7 @@ describe('Login', () => {
       },
       isAuthLoading: false,
     }))
-    renderLoginModal({ returnToPath: '/protocols' })
+    renderLoginModal()
     fireEvent.change(getLoginInput(), {
       target: { value: 'user1' },
     })
@@ -215,7 +200,6 @@ describe('Login', () => {
       target: { value: 'secret' },
     })
     fireEvent.click(screen.getByText('Confirm'))
-    expect(mockNavigate).toHaveBeenCalledWith('/protocols', { replace: true })
     expect(screen.queryByText('Password')).not.toBeInTheDocument()
   })
 
