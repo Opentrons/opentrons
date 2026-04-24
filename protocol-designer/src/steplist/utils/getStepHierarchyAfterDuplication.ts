@@ -2,7 +2,7 @@ import { produce } from 'immer'
 
 import type { StepIdType } from '/protocol-designer/form-types'
 import type {
-  ProfileConcurrentGroup,
+  ConcurrentGroup,
   StandaloneStep,
   StepHierarchy,
   ThermocyclerProfileGroup,
@@ -72,7 +72,7 @@ export function getStepHierarchyAfterDuplication(
 function getNewSteps(
   stepHierarchy: StepHierarchy,
   originalIdsToDuplicateIds: Record<StepIdType, StepIdType | undefined>
-): Array<StandaloneStep | ProfileConcurrentGroup> {
+): Array<StandaloneStep | ConcurrentGroup> {
   const reduceStandaloneSteps = <T>(
     acc: T[],
     next: StandaloneStep
@@ -90,9 +90,9 @@ function getNewSteps(
   }
 
   const reduceGroupsAndStandaloneSteps = (
-    acc: Array<StandaloneStep | ProfileConcurrentGroup>,
-    next: StandaloneStep | ProfileConcurrentGroup
-  ): Array<StandaloneStep | ProfileConcurrentGroup> => {
+    acc: Array<StandaloneStep | ConcurrentGroup>,
+    next: StandaloneStep | ConcurrentGroup
+  ): Array<StandaloneStep | ConcurrentGroup> => {
     if (next.type === 'standaloneStep') {
       return reduceStandaloneSteps(acc, next)
     } else if (next.type === 'thermocyclerProfileGroup') {
@@ -181,9 +181,73 @@ function getNewSteps(
 }
 
 function everyStepIsStandalone(
-  steps: Array<StandaloneStep | ProfileConcurrentGroup>
+  steps: Array<StandaloneStep | ConcurrentGroup>
 ): steps is StandaloneStep[] {
   return steps.every(({ type }) => type === 'standaloneStep')
+}
+
+interface InsertionPoints {
+  insertionPointInsideGroup?: {
+    parentArray: StandaloneStep[]
+    insertionIndex: number
+  }
+  insertionPointOutsideGroup: {
+    parentArray: Array<StandaloneStep | ConcurrentGroup>
+    insertionIndex: number
+  }
+}
+
+/**
+ * Thermocycler profile, vacuum profile, and timed vacuum-state groups all share the same
+ * shape: a root step, concurrent steps, and a hidden wait step. Duplication insertion uses
+ * the same rules for each.
+ *
+ * @returns insertion points when `stepIdToInsertAfter` belongs to this group; `undefined`
+ *   when it does not (caller should keep scanning top-level items).
+ */
+function tryInsertionPointsForConcurrentGroup(
+  topLevelItems: StepHierarchy['topLevelItems'],
+  topLevelItemIndex: number,
+  stepIdToInsertAfter: StepIdType,
+  group: {
+    startStepId: StepIdType
+    waitStepId: StepIdType
+    concurrentSteps: StandaloneStep[]
+  }
+): InsertionPoints | undefined {
+  const insertionPointOutsideGroup = {
+    parentArray: topLevelItems,
+    insertionIndex: topLevelItemIndex + 1,
+  }
+
+  if (group.startStepId === stepIdToInsertAfter) {
+    // After the step that opens the group: prefer first slot inside the group, with a
+    // fallback of inserting after the whole group.
+    return {
+      insertionPointOutsideGroup,
+      insertionPointInsideGroup: {
+        parentArray: group.concurrentSteps,
+        insertionIndex: 0,
+      },
+    }
+  }
+  if (group.waitStepId === stepIdToInsertAfter) {
+    // After the hidden wait that closes the group: only after the whole group.
+    return { insertionPointOutsideGroup }
+  }
+  for (let i = 0; i < group.concurrentSteps.length; i++) {
+    if (group.concurrentSteps[i].stepId === stepIdToInsertAfter) {
+      // After a concurrent step: prefer still inside the group, with fallback after the group.
+      return {
+        insertionPointOutsideGroup,
+        insertionPointInsideGroup: {
+          parentArray: group.concurrentSteps,
+          insertionIndex: i + 1,
+        },
+      }
+    }
+  }
+  return undefined
 }
 
 /**
@@ -203,170 +267,68 @@ function findInsertionPoints(
   originalStepHierarchy: StepHierarchy,
   stepIdToInsertAfter: StepIdType
 ): InsertionPoints | null {
+  const { topLevelItems } = originalStepHierarchy
   for (
     let topLevelItemIndex = 0;
-    topLevelItemIndex < originalStepHierarchy.topLevelItems.length;
+    topLevelItemIndex < topLevelItems.length;
     topLevelItemIndex++
   ) {
-    const topLevelItem = originalStepHierarchy.topLevelItems[topLevelItemIndex]
+    const topLevelItem = topLevelItems[topLevelItemIndex]
     if (topLevelItem.type === 'standaloneStep') {
       if (topLevelItem.stepId === stepIdToInsertAfter) {
         // Inserting after a top-level step.
         return {
           insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
+            parentArray: topLevelItems,
             insertionIndex: topLevelItemIndex + 1,
           },
         }
       }
     } else if (topLevelItem.type === 'thermocyclerProfileGroup') {
-      if (topLevelItem.thermocyclerProfileStepId === stepIdToInsertAfter) {
-        // Trying to insert after a step that's the beginning of a group.
-        // Ideally, insert to become the first element inside that group;
-        // but in case that wouldn't be valid, also allow inserting after the whole group.
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-          insertionPointInsideGroup: {
-            parentArray: topLevelItem.concurrentSteps,
-            insertionIndex: 0,
-          },
+      const found = tryInsertionPointsForConcurrentGroup(
+        topLevelItems,
+        topLevelItemIndex,
+        stepIdToInsertAfter,
+        {
+          startStepId: topLevelItem.thermocyclerProfileStepId,
+          waitStepId: topLevelItem.waitForThermocyclerProfileStepId,
+          concurrentSteps: topLevelItem.concurrentSteps,
         }
-      } else if (
-        topLevelItem.waitForThermocyclerProfileStepId === stepIdToInsertAfter
-      ) {
-        // Trying to insert after a step that's the end of a group.
-        // So, insert after the whole group.
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-        }
-      } else {
-        for (
-          let innerIndex = 0;
-          innerIndex < topLevelItem.concurrentSteps.length;
-          innerIndex++
-        ) {
-          const innerItem = topLevelItem.concurrentSteps[innerIndex]
-          if (innerItem.stepId === stepIdToInsertAfter) {
-            // Trying to insert after a step that's inside a group.
-            // Ideally, insert directly after that step (still inside the group);
-            // but in case that wouldn't be valid, also allow inserting after the whole group.
-            return {
-              insertionPointOutsideGroup: {
-                parentArray: originalStepHierarchy.topLevelItems,
-                insertionIndex: topLevelItemIndex + 1,
-              },
-              insertionPointInsideGroup: {
-                parentArray: topLevelItem.concurrentSteps,
-                insertionIndex: innerIndex + 1,
-              },
-            }
-          }
-        }
+      )
+      if (found != null) {
+        return found
       }
     } else if (topLevelItem.type === 'vacuumProfileGroup') {
-      if (topLevelItem.vacuumProfileStepId === stepIdToInsertAfter) {
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-          insertionPointInsideGroup: {
-            parentArray: topLevelItem.concurrentSteps,
-            insertionIndex: 0,
-          },
+      const found = tryInsertionPointsForConcurrentGroup(
+        topLevelItems,
+        topLevelItemIndex,
+        stepIdToInsertAfter,
+        {
+          startStepId: topLevelItem.vacuumProfileStepId,
+          waitStepId: topLevelItem.waitForVacuumProfileStepId,
+          concurrentSteps: topLevelItem.concurrentSteps,
         }
-      } else if (
-        topLevelItem.waitForVacuumProfileStepId === stepIdToInsertAfter
-      ) {
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-        }
-      } else {
-        for (
-          let innerIndex = 0;
-          innerIndex < topLevelItem.concurrentSteps.length;
-          innerIndex++
-        ) {
-          const innerItem = topLevelItem.concurrentSteps[innerIndex]
-          if (innerItem.stepId === stepIdToInsertAfter) {
-            return {
-              insertionPointOutsideGroup: {
-                parentArray: originalStepHierarchy.topLevelItems,
-                insertionIndex: topLevelItemIndex + 1,
-              },
-              insertionPointInsideGroup: {
-                parentArray: topLevelItem.concurrentSteps,
-                insertionIndex: innerIndex + 1,
-              },
-            }
-          }
-        }
+      )
+      if (found != null) {
+        return found
       }
     } else if (topLevelItem.type === 'vacuumStateDurationGroup') {
-      if (topLevelItem.vacuumStateStepId === stepIdToInsertAfter) {
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-          insertionPointInsideGroup: {
-            parentArray: topLevelItem.concurrentSteps,
-            insertionIndex: 0,
-          },
+      const found = tryInsertionPointsForConcurrentGroup(
+        topLevelItems,
+        topLevelItemIndex,
+        stepIdToInsertAfter,
+        {
+          startStepId: topLevelItem.vacuumStateStepId,
+          waitStepId: topLevelItem.waitForVacuumStateStepId,
+          concurrentSteps: topLevelItem.concurrentSteps,
         }
-      } else if (
-        topLevelItem.waitForVacuumStateStepId === stepIdToInsertAfter
-      ) {
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-        }
-      } else {
-        for (
-          let innerIndex = 0;
-          innerIndex < topLevelItem.concurrentSteps.length;
-          innerIndex++
-        ) {
-          const innerItem = topLevelItem.concurrentSteps[innerIndex]
-          if (innerItem.stepId === stepIdToInsertAfter) {
-            return {
-              insertionPointOutsideGroup: {
-                parentArray: originalStepHierarchy.topLevelItems,
-                insertionIndex: topLevelItemIndex + 1,
-              },
-              insertionPointInsideGroup: {
-                parentArray: topLevelItem.concurrentSteps,
-                insertionIndex: innerIndex + 1,
-              },
-            }
-          }
-        }
+      )
+      if (found != null) {
+        return found
       }
     } else {
       topLevelItem satisfies never
     }
   }
   return null
-}
-
-interface InsertionPoints {
-  insertionPointInsideGroup?: {
-    parentArray: StandaloneStep[]
-    insertionIndex: number
-  }
-  insertionPointOutsideGroup: {
-    parentArray: Array<StandaloneStep | ProfileConcurrentGroup>
-    insertionIndex: number
-  }
 }
