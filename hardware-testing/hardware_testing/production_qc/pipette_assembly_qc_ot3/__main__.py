@@ -84,6 +84,7 @@ LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM = 1.5
 
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 0
+PRESSURE_FIXTURE_RETRACT_MM = 80
 
 ENCODER_ALIGNMENT_THRESHOLD_HOME_MM = 0.005
 ENCODER_ALIGNMENT_THRESHOLD_MM = 0.1
@@ -99,6 +100,7 @@ PRESSURE_DATA_CACHE = []
 # save final test results, to be saved and displayed at the end
 FINAL_TEST_RESULTS = []
 FINAL_TEST_FAIL_INFOR = []
+PRESSURE_FIXTURE_RECOVERY_ACTIVE = False
 
 
 _available_tips: Dict[int, List[str]] = {}
@@ -735,103 +737,111 @@ async def _fixture_check_pressure(
     accumulate_raw_data_cb: Callable,
     tip_volume: int,
 ) -> bool:
+    global PRESSURE_FIXTURE_RECOVERY_ACTIVE
     results = []
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
     pip_channels = int(pip.channels)
+    fixture_needs_retract = False
 
-    await _pick_up_tip_for_fixture(api, mount, tip_volume=tip_volume, movez=False)
-    # above the fixture
-    r, _ = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        PressureEvent.PRE,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-    )
-    results.append(r)
-    # insert into the fixture
-    # : unknown amount of pressure here (depends on where Z was calibrated)
-    fixture_depth = 80
-    await api.move_rel(mount, Point(z=fixture_depth))
-    await _drop_tip_in_trash(api, mount)
-    await api.move_rel(mount, Point(z=fixture_depth))
-    await _pick_up_tip_for_fixture(api, mount, tip_volume=tip_volume, movez=False)
-    await asyncio.sleep(10)
-    r, inserted_pressure_data = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        PressureEvent.INSERT,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-    )
-    results.append(r)
-    # aspirate 50uL
-    await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
-    await asyncio.sleep(2)
-    if pip_vol == 50:
-        asp_evt = PressureEvent.ASPIRATE_P50
-    else:
-        asp_evt = PressureEvent.ASPIRATE_P1000
-    r, _ = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        asp_evt,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-        previous=inserted_pressure_data,
-    )
-    results.append(r)
-    # dispense
-    await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol], 0.5)
-    await asyncio.sleep(2)
-    r, _ = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        PressureEvent.DISPENSE,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-    )
-    results.append(r)
-    # retract out of fixture
-    # await api.move_rel(mount, Point(z=fixture_depth))
-    await api.drop_tip(mount, home_after=False)
-    tip_length2 = helpers_ot3.get_default_tip_length(int(tip_volume))
-    await api.move_rel(mount, Point(z=int(tip_length2 * 0.1)))
-    await asyncio.sleep(2)
-    r, _ = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        PressureEvent.POST,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-    )
-    results.append(r)
-    # print(3)
-    # drop tip fixture
-    # input("tuzg1")
-    # await api.drop_tip(mount, home_after=False)
-    # input("tuzg2")
-    await api.move_rel(mount, Point(z=fixture_depth))
-    # input("JX")
-    print("results", results)
-    return False not in results
+    async def _best_effort_retract_from_fixture() -> None:
+        await _emergency_fixture_recovery(api, mount, try_drop_tip=False)
+
+    try:
+        PRESSURE_FIXTURE_RECOVERY_ACTIVE = True
+        await _pick_up_tip_for_fixture(api, mount, tip_volume=tip_volume, movez=False)
+        # above the fixture
+        r, _ = await _read_pressure_and_check_results(
+            api,
+            pip_channels,
+            pip_vol,
+            fixture,
+            PressureEvent.PRE,
+            write_cb,
+            accumulate_raw_data_cb,
+            pip_channels,
+        )
+        results.append(r)
+        # insert into the fixture
+        # : unknown amount of pressure here (depends on where Z was calibrated)
+        await api.move_rel(mount, Point(z=PRESSURE_FIXTURE_RETRACT_MM))
+        fixture_needs_retract = True
+        await _drop_tip_in_trash(api, mount)
+        fixture_needs_retract = False
+        await api.move_rel(mount, Point(z=PRESSURE_FIXTURE_RETRACT_MM))
+        await _pick_up_tip_for_fixture(api, mount, tip_volume=tip_volume, movez=False)
+        fixture_needs_retract = True
+        await asyncio.sleep(10)
+        r, inserted_pressure_data = await _read_pressure_and_check_results(
+            api,
+            pip_channels,
+            pip_vol,
+            fixture,
+            PressureEvent.INSERT,
+            write_cb,
+            accumulate_raw_data_cb,
+            pip_channels,
+        )
+        results.append(r)
+        # aspirate 50uL
+        await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
+        await asyncio.sleep(2)
+        if pip_vol == 50:
+            asp_evt = PressureEvent.ASPIRATE_P50
+        else:
+            asp_evt = PressureEvent.ASPIRATE_P1000
+        r, _ = await _read_pressure_and_check_results(
+            api,
+            pip_channels,
+            pip_vol,
+            fixture,
+            asp_evt,
+            write_cb,
+            accumulate_raw_data_cb,
+            pip_channels,
+            previous=inserted_pressure_data,
+        )
+        results.append(r)
+        # dispense
+        await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol], 0.5)
+        await asyncio.sleep(2)
+        r, _ = await _read_pressure_and_check_results(
+            api,
+            pip_channels,
+            pip_vol,
+            fixture,
+            PressureEvent.DISPENSE,
+            write_cb,
+            accumulate_raw_data_cb,
+            pip_channels,
+        )
+        results.append(r)
+        await api.drop_tip(mount, home_after=False)
+        tip_length2 = helpers_ot3.get_default_tip_length(int(tip_volume))
+        await api.move_rel(mount, Point(z=int(tip_length2 * 0.1)))
+        await asyncio.sleep(2)
+        r, _ = await _read_pressure_and_check_results(
+            api,
+            pip_channels,
+            pip_vol,
+            fixture,
+            PressureEvent.POST,
+            write_cb,
+            accumulate_raw_data_cb,
+            pip_channels,
+        )
+        results.append(r)
+        await api.move_rel(mount, Point(z=PRESSURE_FIXTURE_RETRACT_MM))
+        fixture_needs_retract = False
+        PRESSURE_FIXTURE_RECOVERY_ACTIVE = False
+        print("results", results)
+        return False not in results
+    finally:
+        if fixture_needs_retract:
+            await _best_effort_retract_from_fixture()
+        if not fixture_needs_retract:
+            PRESSURE_FIXTURE_RECOVERY_ACTIVE = False
 
 
 def _fixture_tips_for_channels(pipette_channels: int) -> List[str]:
@@ -1819,6 +1829,51 @@ async def _test_liquid_probe(
     return trial_results
 
 
+async def _emergency_fixture_recovery(
+    api: OT3API, mount: OT3Mount, try_drop_tip: bool = True
+) -> None:
+    """Force a fixture recovery path by disabling pressure monitoring first."""
+    pip_axis = Axis.of_main_tool_actuator(mount)
+    pressure_was_available = False
+    try:
+        pressure_was_available = api.get_pressure_sensor_available(mount)
+    except Exception:
+        pressure_was_available = False
+
+    try:
+        if pressure_was_available:
+            api._backend.set_pressure_sensor_available(pip_axis, False)  # type: ignore[attr-defined]
+
+        try:
+            await api.move_rel(mount, Point(z=PRESSURE_FIXTURE_RETRACT_MM))
+        except Exception as retract_err:
+            if LOG_GING:
+                LOG_GING.error(
+                    "pressure fixture recovery failed to retract tip: "
+                    f"{retract_err}"
+                )
+
+        if try_drop_tip:
+            try:
+                await api.drop_tip(mount, home_after=False)
+            except Exception as drop_err:
+                if LOG_GING:
+                    LOG_GING.error(
+                        "pressure fixture recovery failed to drop tip: "
+                        f"{drop_err}"
+                    )
+    finally:
+        if pressure_was_available:
+            try:
+                api._backend.set_pressure_sensor_available(pip_axis, True)  # type: ignore[attr-defined]
+            except Exception as sensor_err:
+                if LOG_GING:
+                    LOG_GING.error(
+                        "pressure fixture recovery failed to restore pressure sensor: "
+                        f"{sensor_err}"
+                    )
+
+
 @dataclass
 class CSVCallbacks:
     """CSV callback functions."""
@@ -1995,9 +2050,11 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         global PIP_CURRENT
         global PIP_CHANNELS_CURRENT  # pip_channels_stecurrent
         global PIP_VOL_CURRENT  # pip_vol_setcurrent
+        global PRESSURE_FIXTURE_RECOVERY_ACTIVE
         LOG_GING = ""
 
         FINAL_TEST_FAIL_INFOR = []
+        PRESSURE_FIXTURE_RECOVERY_ACTIVE = False
         # connect to the pressure fixture (or simulate one)
         fixture = connect_to_fixture(
             test_config.simulate or test_config.skip_fixture,
@@ -2406,8 +2463,14 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             LOG_GING = _save_logging_print("Pipette-test-system-err")
         LOG_GING.error(printsig)
         LOG_GING.critical(err)
+        recovered_fixture_tip = False
+        if PRESSURE_FIXTURE_RECOVERY_ACTIVE:
+            await _emergency_fixture_recovery(api, mount, try_drop_tip=True)
+            PRESSURE_FIXTURE_RECOVERY_ACTIVE = False
+            recovered_fixture_tip = True
         await api.home()
-        await api.drop_tip(mount, home_after=False)
+        if not recovered_fixture_tip:
+            await api.drop_tip(mount, home_after=False)
 
 
 if __name__ == "__main__":
