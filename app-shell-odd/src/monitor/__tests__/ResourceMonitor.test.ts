@@ -17,8 +17,14 @@ import {
 import { UI_INITIALIZED } from '../../constants'
 import { PARENT_PROCESSES, ResourceMonitor } from '../ResourceMonitor'
 
-const { execMock } = vi.hoisted(() => ({
+const { execMock, fakeLogger } = vi.hoisted(() => ({
   execMock: vi.fn(),
+  fakeLogger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
 }))
 
 type ChildProcessModulePartialForMock = Record<string, unknown> & {
@@ -46,8 +52,7 @@ vi.mock('child_process', async importOriginal => {
     },
   }
 })
-vi.mock('../../log', async importOriginal => {
-  const actual = await importOriginal<typeof createLogger>()
+vi.mock('../../log', () => {
   return {
     createLogger: () => fakeLogger,
   }
