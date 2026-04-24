@@ -23,7 +23,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
       commonjsOptions: {
         transformMixedEsModules: true,
         esmExternals: true,
-        exclude: [/node_modules/],
       },
       lib: {
         entry: {
