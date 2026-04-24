@@ -66,12 +66,10 @@ export function OnDeviceLoginOverlayProvider({
       {children}
       {open
         ? createPortal(
-            <div className={styles.overlay}>
-              <LoginOverlayBody
-                onDismiss={closeLoginModal}
-                returnToPath={returnToPath}
-              />
-            </div>,
+            <LoginOverlay
+              onDismiss={closeLoginModal}
+              returnToPath={returnToPath}
+            />,
             getTopPortalEl()
           )
         : null}
@@ -79,15 +77,23 @@ export function OnDeviceLoginOverlayProvider({
   )
 }
 
-interface LoginOverlayBodyProps {
+interface LoginOverlayProps {
   onDismiss: () => void
   returnToPath: string | null
+}
+
+function LoginOverlay(props: LoginOverlayProps): JSX.Element {
+  return (
+    <div className={styles.overlay}>
+      <LoginOverlayBody {...props} />
+    </div>
+  )
 }
 
 function LoginOverlayBody({
   onDismiss,
   returnToPath,
-}: LoginOverlayBodyProps): JSX.Element {
+}: LoginOverlayProps): JSX.Element {
   const navigate = useNavigate()
   const { t } = useTranslation('device_settings')
   const [step, setStep] = useState<LoginStep>('username')
