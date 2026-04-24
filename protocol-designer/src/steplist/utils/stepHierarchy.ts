@@ -271,14 +271,6 @@ export function convertStepHierarchyToArray(
   return stepHierarchy.topLevelItems.flatMap(getStepIdsContainedInTopLevelItem)
 }
 
-export interface ComputeStepMoveOptions {
-  /**
-   * When provided, steps for which this returns true may not be inserted into the
-   * concurrent section of a vacuum profile or timed vacuum state group.
-   */
-  isVacuumStep?: (stepId: StepIdType) => boolean
-}
-
 type MoveStepParams =
   | {
       moveType: 'insertBeforeDestinationStep'
@@ -370,10 +362,8 @@ export function findStep(
  */
 export function computeStepMove(
   originalStepHierarchy: StepHierarchy,
-  params: MoveStepParams,
-  options?: ComputeStepMoveOptions
+  params: MoveStepParams
 ): MoveStepResult {
-  const isVacuumStep = options?.isVacuumStep
   const popResult = popFromStepHierarchy(
     originalStepHierarchy,
     params.movedStepId
@@ -397,8 +387,7 @@ export function computeStepMove(
           return insertBeforeDestinationStep(
             stepHierarchyWithoutItem,
             movedItem,
-            params.destinationStepId,
-            isVacuumStep
+            params.destinationStepId
           )
         }
       }
@@ -406,8 +395,7 @@ export function computeStepMove(
         return insertAsLastStepOfGroup(
           stepHierarchyWithoutItem,
           movedItem,
-          params.destinationGroupRootStepId,
-          isVacuumStep
+          params.destinationGroupRootStepId
         )
       }
     }
@@ -495,8 +483,7 @@ function insertBeforeDestinationStep(
       } else if (
         (findResult.enclosingNode.type === 'vacuumProfileGroup' ||
           findResult.enclosingNode.type === 'vacuumStateDurationGroup') &&
-        toInsert.type === 'standaloneStep' &&
-        isVacuumStep?.(toInsert.stepId) === true
+        toInsert.type === 'standaloneStep'
       ) {
         draft.isAllowed = false
       } else {

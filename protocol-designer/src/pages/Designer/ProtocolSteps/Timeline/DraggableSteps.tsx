@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,14 +37,7 @@ import { ConnectedStepInfo } from './ConnectedStepInfo'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
-import type { FormData, StepIdType } from '/protocol-designer/form-types'
-
-function getIsVacuumStepPredicate(
-  steps: FormData[]
-): (id: StepIdType) => boolean {
-  const stepTypeById = new Map(steps.map(form => [form.id, form.stepType]))
-  return (id: StepIdType) => stepTypeById.get(id) === 'vacuum'
-}
+import type { StepIdType } from '/protocol-designer/form-types'
 
 interface DraggableStepsProps {
   sidebarWidth: number
@@ -154,7 +147,6 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
-  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -169,17 +161,13 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   const getStepsAfterMovingHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
-      return computeStepMove(
-        convertStepArrayToHierarchy(steps),
-        {
-          moveType: 'insertBeforeDestinationStep',
-          movedStepId: idOfStepBeingMoved,
-          destinationStepId: stepId,
-        },
-        { isVacuumStep }
-      )
+      return computeStepMove(convertStepArrayToHierarchy(steps), {
+        moveType: 'insertBeforeDestinationStep',
+        movedStepId: idOfStepBeingMoved,
+        destinationStepId: stepId,
+      })
     },
-    [steps, stepId, isVacuumStep]
+    [steps, stepId]
   )
 
   const [{ isHoveredOver, canBeDroppedUpon }, drop] = useDrop(
@@ -587,7 +575,6 @@ function ThermocyclerProfileEndCheckpoint(props: {
   const dispatch = useDispatch()
   const steps = useSelector(getOrderedSavedForms)
   const { t } = useTranslation()
-  const isVacuumStep = useMemo(() => getIsVacuumStepPredicate(steps), [steps])
 
   const getStepsAfterMovingStepHere = useCallback(
     (idOfStepBeingMoved: StepIdType) => {
