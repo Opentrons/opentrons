@@ -16,7 +16,7 @@ import { SmallButton } from '/app/atoms/buttons'
 
 import { TerseOffsetTable } from './ResultsSummary'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 

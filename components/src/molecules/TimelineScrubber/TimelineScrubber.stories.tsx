@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { action } from '@storybook/addon-actions'
+import { action } from 'storybook/actions'
 
 import { DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { TimelineScrubber as TimelineScrubberComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { TrackData } from './TrackSlider'
 
 const meta: Meta<typeof TimelineScrubberComponent> = {

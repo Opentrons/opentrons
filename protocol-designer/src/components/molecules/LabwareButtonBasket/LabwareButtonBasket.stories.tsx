@@ -2,7 +2,7 @@ import { fixture96Plate } from '@opentrons/shared-data'
 
 import { LabwareButtonBasket as LabwareButtonBasketComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

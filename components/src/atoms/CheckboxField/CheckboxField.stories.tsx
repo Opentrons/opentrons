@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { CheckboxField as CheckboxFieldComponent } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'Helix/Atoms/Checkbox Field',

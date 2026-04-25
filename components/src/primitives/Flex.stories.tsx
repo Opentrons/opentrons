@@ -4,7 +4,7 @@ import { Box, Flex as FlexComponent } from '../primitives'
 import { DIRECTION_COLUMN, JUSTIFY_SPACE_AROUND } from '../styles'
 import { SPACING } from '../ui-style-constants'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof FlexComponent> = {
   title: 'Library/Atoms/Flex',

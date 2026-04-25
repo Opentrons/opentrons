@@ -3,7 +3,7 @@ import { Flex } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { LegacyStyledText } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof LegacyStyledText> = {
   title: 'Library/Atoms/LegacyStyledText',

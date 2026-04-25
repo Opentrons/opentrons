@@ -4,7 +4,7 @@ import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { TouchInputField as TouchInputFieldComponent } from './'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ChangeEvent, ComponentProps } from 'react'
 
 const meta: Meta<typeof TouchInputFieldComponent> = {

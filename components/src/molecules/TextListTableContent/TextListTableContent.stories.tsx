@@ -7,7 +7,7 @@ import { StyledText } from '../../atoms'
 import { DISPLAY_GRID } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 
 export default {

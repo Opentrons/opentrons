@@ -15,7 +15,7 @@ import { configReducer } from '/app/redux/config/reducer'
 
 import { AlphanumericKeyboard } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { Store, StoreEnhancer } from 'redux'
 
 const dummyConfig = {

@@ -6,7 +6,7 @@ import {
   ModalContentMixed as ModalContentMixedComponent,
 } from './ModalContentMixed'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof ModalContentMixedComponent> = {
   title: 'App/Molecules/InterventionModal/ModalContentMixed',

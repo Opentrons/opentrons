@@ -1,7 +1,7 @@
 import { VIEWPORT } from '../../ui-style-constants'
 import { StepMeter as StepMeterComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof StepMeterComponent> = {
   title: 'Helix/Atoms/StepMeter',

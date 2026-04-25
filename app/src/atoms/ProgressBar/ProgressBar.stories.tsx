@@ -11,7 +11,7 @@ import {
 
 import { ProgressBar } from './index'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react-vite'
 
 export default {
   title: 'App/Atoms/ProgressBar',

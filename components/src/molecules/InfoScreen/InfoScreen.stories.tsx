@@ -6,7 +6,7 @@ import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { InfoScreen as InfoScreenComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const mockContent = [
   'No deck hardware',

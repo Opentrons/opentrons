@@ -7,7 +7,7 @@ import { PrimaryButton } from '../buttons'
 import { LegacyStyledText } from '../StyledText'
 import { Toast } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'Helix/Atoms/Toast',

@@ -9,7 +9,7 @@ import {
 
 import { MoveLabwareOnDeck as MoveLabwareOnDeckComponent } from './MoveLabwareOnDeck'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type * as React from 'react'
 import type {
   DeckConfiguration,

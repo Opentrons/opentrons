@@ -3,7 +3,7 @@ import { Box, RESPONSIVENESS } from '@opentrons/components'
 import { OneColumn as OneColumnComponent } from './'
 import { StandInContent } from './story-utils/StandIn'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type * as React from 'react'
 
 const meta: Meta<React.ComponentProps<typeof OneColumnComponent>> = {

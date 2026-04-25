@@ -2,7 +2,7 @@ import { COLORS, Flex, SPACING } from '@opentrons/components'
 
 import { ExternalLink as ExternalLinkComponent } from './ExternalLink'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof ExternalLinkComponent> = {
   title: 'App/Atoms/ExternalLink',

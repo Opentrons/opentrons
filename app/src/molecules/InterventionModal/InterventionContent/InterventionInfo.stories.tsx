@@ -2,7 +2,7 @@ import { Box, ICON_DATA_BY_NAME } from '@opentrons/components'
 
 import { InterventionInfo } from './InterventionInfo'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof InterventionInfo> = {
   title: 'App/Molecules/InterventionModal/InterventionContent/InterventionInfo',

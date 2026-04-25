@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { VIEWPORT } from '../../../../../../components/src/ui-style-constants'
 import { AnalysisFailedModal } from './AnalysisFailedModal'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 const queryClient = new QueryClient()
 

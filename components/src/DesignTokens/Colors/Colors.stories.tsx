@@ -10,7 +10,7 @@ import {
 } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 type ColorEntry = [token: string, value: string]
 interface StoryArgs {

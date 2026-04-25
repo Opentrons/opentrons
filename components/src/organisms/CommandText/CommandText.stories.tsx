@@ -3,7 +3,7 @@ import { Box } from '../../primitives'
 import { CommandText as CommandTextComponent } from './index'
 import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface StorybookArgs {

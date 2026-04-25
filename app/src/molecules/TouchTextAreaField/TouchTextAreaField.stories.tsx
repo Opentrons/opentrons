@@ -4,7 +4,7 @@ import { DIRECTION_COLUMN, SPACING, VIEWPORT } from '@opentrons/components'
 
 import { TouchTextAreaField as TouchTextAreaFieldComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 
 const meta: Meta<typeof TouchTextAreaFieldComponent> = {

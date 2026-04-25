@@ -4,7 +4,7 @@ import { Box, STYLE_PROPS } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { LargeButton } from './LargeButton'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof LargeButton> = {
   title: 'Helix/Atoms/Buttons/LargeButton',

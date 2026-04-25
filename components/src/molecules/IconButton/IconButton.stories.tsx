@@ -5,7 +5,7 @@ import { SPACING } from '../../ui-style-constants'
 // Note: this will be renamed to IconButton when remove IconButton from components
 import { NewIconButton as IconButtonComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof IconButtonComponent> = {
   title: 'Helix/Molecules/IconButton',

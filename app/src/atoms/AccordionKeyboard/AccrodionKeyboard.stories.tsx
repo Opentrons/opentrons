@@ -14,7 +14,7 @@ import { configReducer } from '/app/redux/config/reducer'
 import { AccordionKeyboard as AccordionKeyboardComponent } from '.'
 import { FullKeyboard } from '../SoftwareKeyboard'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { Store, StoreEnhancer } from 'redux'
 
 const dummyConfig = {

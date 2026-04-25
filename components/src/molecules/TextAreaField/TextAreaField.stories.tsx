@@ -4,7 +4,7 @@ import { TextAreaField as TextAreaFieldComponent } from '.'
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 
 const meta: Meta<typeof TextAreaFieldComponent> = {

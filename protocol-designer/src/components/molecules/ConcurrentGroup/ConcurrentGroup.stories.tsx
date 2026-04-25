@@ -3,7 +3,7 @@ import { ConcurrentGroup } from './ConcurrentGroup'
 import { ConcurrentGroupCheckpoint } from './ConcurrentGroupCheckpoint'
 import { ConcurrentGroupChild } from './ConcurrentGroupChild'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof ConcurrentGroup> = {
   title: 'Protocol-Designer/Molecules/ConcurrentGroup',

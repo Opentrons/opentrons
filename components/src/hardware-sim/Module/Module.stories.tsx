@@ -21,7 +21,7 @@ import { LabwareRender } from '../Labware'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module as ModuleComponent } from './'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react-vite'
 import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const moduleModels: ModuleModel[] = [

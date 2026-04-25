@@ -9,7 +9,7 @@ import {
 
 import { BackgroundOverlay } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'ODD/Molecules/BackgroundOverlay',

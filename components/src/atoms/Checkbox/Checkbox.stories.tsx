@@ -1,9 +1,9 @@
-import { action } from '@storybook/addon-actions'
-import { useArgs } from '@storybook/preview-api'
+import { action } from 'storybook/actions'
+import { useArgs } from 'storybook/preview-api'
 
 import { Checkbox } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof Checkbox> = {
   title: 'Helix/Atoms/Checkbox',

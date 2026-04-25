@@ -2,7 +2,7 @@ import { StyledText } from '../../atoms/StyledText'
 import { STYLE_PROPS } from '../../primitives'
 import { Banner } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof Banner> = {
   title: 'Helix/Molecules/Banner',

@@ -12,7 +12,7 @@ import {
 import { Slideout } from '../../atoms/Slideout'
 import { MiniCard as MiniCardComponent } from './'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const ROBOT_IMG = '/images/FLEX.png'
 

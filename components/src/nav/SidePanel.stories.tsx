@@ -2,7 +2,7 @@ import { ALIGN_CENTER, Flex, JUSTIFY_CENTER, Text } from '@opentrons/components'
 
 import { SidePanel as SidePanelComponent } from './SidePanel'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 
 export default {

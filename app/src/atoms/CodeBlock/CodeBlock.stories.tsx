@@ -2,7 +2,7 @@ import { Flex, SPACING, STYLE_PROPS } from '@opentrons/components'
 
 import { CodeBlock as CodeBlockComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof CodeBlockComponent> = {
   title: 'App/Atoms/CodeBlock',

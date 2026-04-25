@@ -11,7 +11,7 @@ import {
 import { ListAccordion as ListAccordionComponent } from '.'
 import { DISPLAY_FLEX, DISPLAY_GRID } from '../../styles'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 
 export default {

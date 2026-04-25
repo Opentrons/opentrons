@@ -11,7 +11,7 @@ import SuccessIcon from '/app/assets/images/icon_success.png'
 import { TwoColumn as TwoColumnComponent } from './'
 import { StandInContent } from './story-utils/StandIn'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type * as React from 'react'
 
 interface StorybookArgs {

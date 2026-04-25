@@ -8,7 +8,7 @@ import { BasicButton as BasicButtonComponent } from './BasicButton'
 import { PrimaryButton as PrimaryButtonComponent } from './PrimaryButton'
 import { SecondaryButton as SecondaryButtonComponent } from './SecondaryButton'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta = {
   title: 'Helix/Atoms/Buttons',

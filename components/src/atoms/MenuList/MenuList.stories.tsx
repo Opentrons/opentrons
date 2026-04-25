@@ -1,9 +1,9 @@
-import { action } from '@storybook/addon-actions'
+import { action } from 'storybook/actions'
 
 import { MenuList as MenuListComponent } from './index'
 import { MenuItem } from './MenuItem'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const menuBtn = 'example menu btn'
 

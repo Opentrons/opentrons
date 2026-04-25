@@ -4,7 +4,7 @@ import { PrimaryButton, StyledText } from '@opentrons/components'
 
 import { MultiSlideout } from './MultiSlideout'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'App/Atoms/MultiSlideout',

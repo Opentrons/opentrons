@@ -3,7 +3,7 @@ import { COLORS } from '../../helix-design-system'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof ChipComponent> = {
   title: 'Helix/Atoms/Chip',

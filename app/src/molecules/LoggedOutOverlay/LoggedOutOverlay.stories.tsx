@@ -11,7 +11,7 @@ import { MediumButton } from '/app/atoms/buttons'
 
 import { LoggedOutOverlay } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof LoggedOutOverlay> = {
   title: 'ODD/Molecules/LoggedOutOverlay',

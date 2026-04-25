@@ -15,7 +15,7 @@ import {
 } from './__fixtures__'
 import { BaseDeck as BaseDeckComponent } from './BaseDeck'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type * as React from 'react'
 import type {
   DeckConfiguration,

@@ -4,7 +4,7 @@ import { i18n } from '/ai-client/i18n'
 
 import { PromptGuide as PromptGuideComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof PromptGuideComponent> = {
   title: 'AI/molecules/PromptGuide',

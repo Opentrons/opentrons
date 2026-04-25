@@ -2,7 +2,7 @@ import { VIEWPORT } from '@opentrons/components'
 
 import { SmallModalChildren } from './SmallModalChildren'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 
 export default {

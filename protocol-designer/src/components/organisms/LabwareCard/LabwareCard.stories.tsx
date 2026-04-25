@@ -10,7 +10,7 @@ import { configureStore } from '/protocol-designer/configureStore'
 
 import { LabwareCard as LabwareCardComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

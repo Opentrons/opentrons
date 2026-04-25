@@ -2,7 +2,7 @@ import { RobotInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { DeckInfoLabelTextTag as DeckInfoLabelTextTagComponent } from '.'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'App/Molecules/DeckInfoLabelTextTag',

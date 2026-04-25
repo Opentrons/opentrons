@@ -12,7 +12,7 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
 import { Tooltip } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'App/Atoms/Tooltip',

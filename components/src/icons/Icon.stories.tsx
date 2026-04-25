@@ -3,7 +3,7 @@ import { SPACING } from '../ui-style-constants'
 import { Icon as IconComponent } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof IconComponent> = {
   title: 'Helix/Atoms/Icon',

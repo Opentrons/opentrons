@@ -10,7 +10,7 @@ import {
 
 import { Divider as DividerComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof DividerComponent> = {
   title: 'App/Atoms/Divider',

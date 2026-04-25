@@ -1,6 +1,6 @@
 import { FileUpload } from '.'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react-vite'
 import type * as React from 'react'
 
 import testFile from './__tests__/test-file.png'

@@ -4,7 +4,7 @@ import { legacy_createStore } from 'redux'
 import { EstopMissingModal } from '.'
 import { configReducer } from '../../redux/config/reducer'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type { Store, StoreEnhancer } from 'redux'
 import type * as React from 'react'
 

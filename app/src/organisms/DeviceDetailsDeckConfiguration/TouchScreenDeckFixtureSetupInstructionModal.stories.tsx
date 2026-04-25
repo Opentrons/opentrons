@@ -2,7 +2,7 @@ import { VIEWPORT } from '@opentrons/components'
 
 import { DeckFixtureSetupInstructionsModal as DeckFixtureSetupInstructionsModalComponent } from './DeckFixtureSetupInstructionsModal'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof DeckFixtureSetupInstructionsModalComponent> = {
   title: 'ODD/Organisms/DeckFixtureSetupInstructionsModal',

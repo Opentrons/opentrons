@@ -12,7 +12,7 @@ import { configReducer } from '/app/redux/config/reducer'
 
 import { AddFixtureModal } from './AddFixtureModal'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type { Store, StoreEnhancer } from 'redux'
 
 const dummyConfig = {

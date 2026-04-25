@@ -1,10 +1,10 @@
-import { action } from '@storybook/addon-actions'
+import { action } from 'storybook/actions'
 
 import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import { VIEWPORT } from '../../ui-style-constants'
 import { RadioButton as RadioButtonComponent } from './RadioButton'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof RadioButtonComponent> = {
   title: 'Helix/Atoms/Buttons/RadioButton',

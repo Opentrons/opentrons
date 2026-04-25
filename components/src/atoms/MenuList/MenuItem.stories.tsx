@@ -2,7 +2,7 @@ import { STYLE_PROPS } from '../../primitives'
 import { VIEWPORT } from '../../ui-style-constants'
 import { MenuItem as MenuItemComponent } from './MenuItem'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof MenuItemComponent> = {
   title: 'Helix/Atoms/MenuItem',

@@ -16,7 +16,7 @@ import { configReducer } from '/app/redux/config/reducer'
 
 import { GenericWizardTile } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type { Store, StoreEnhancer } from 'redux'
 import type * as React from 'react'
 

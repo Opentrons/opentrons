@@ -2,7 +2,7 @@ import { BORDERS, COLORS, Flex, SPACING, VIEWPORT } from '@opentrons/components'
 
 import { OddModal } from './OddModal'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 
 export default {

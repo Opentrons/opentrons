@@ -7,7 +7,7 @@ import { i18n } from '/protocol-designer/assets/localization'
 
 import { SlotInformation as SlotInformationComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const mockLocations = [
   'A1',

@@ -6,7 +6,7 @@ import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from '../Labware'
 import { PipetteRender as PipetteRenderComponent } from './'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 
 const DECK_MAP_VIEWBOX = '0 -140 230 230'

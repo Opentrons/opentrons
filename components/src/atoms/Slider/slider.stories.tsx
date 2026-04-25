@@ -2,7 +2,7 @@ import { ALIGN_CENTER, Flex, JUSTIFY_CENTER } from '@opentrons/components'
 
 import { Slider } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof Slider> = {
   title: 'Helix/Atoms/Slider',

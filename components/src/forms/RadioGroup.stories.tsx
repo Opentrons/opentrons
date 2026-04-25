@@ -4,7 +4,7 @@ import { Box, SIZE_6 } from '@opentrons/components'
 
 import { RadioGroup as RadioGroupComponent } from './RadioGroup'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react-vite'
 
 export default {
   title: 'Library/Molecules/Forms/Radio Group',

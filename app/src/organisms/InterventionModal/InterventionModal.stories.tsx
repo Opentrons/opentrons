@@ -15,7 +15,7 @@ import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtu
 import { InterventionModal as InterventionModalComponent } from './'
 import { mockRunData } from './__fixtures__'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type { Store, StoreEnhancer } from 'redux'
 import type * as React from 'react'
 

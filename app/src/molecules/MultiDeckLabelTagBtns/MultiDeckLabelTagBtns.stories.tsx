@@ -2,7 +2,7 @@ import { Chip, RobotInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { MultiDeckLabelTagBtns as MultiDeckLabelTagBtnsComponent } from '.'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'App/Molecules/MultiDeckLabelTagBtns',

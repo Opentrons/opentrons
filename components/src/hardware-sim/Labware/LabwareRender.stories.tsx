@@ -10,7 +10,7 @@ import {
 import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from './LabwareRender'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 

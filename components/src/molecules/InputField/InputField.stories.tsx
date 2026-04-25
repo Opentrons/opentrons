@@ -4,7 +4,7 @@ import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { InputField as InputFieldComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof InputFieldComponent> = {
   // ToDo (kk05/02/2024) this should be in Library but at this moment there is the same name component in components

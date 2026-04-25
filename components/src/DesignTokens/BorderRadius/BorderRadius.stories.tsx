@@ -3,7 +3,7 @@ import { BORDERS } from '../../helix-design-system'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import styles from './borderradius.stories.module.css'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 type BorderRadiusEntry = [token: string, value: string | number]
 

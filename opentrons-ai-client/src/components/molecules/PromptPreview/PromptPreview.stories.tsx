@@ -6,7 +6,7 @@ import { i18n } from '/ai-client/i18n'
 
 import { PromptPreview } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof PromptPreview> = {
   title: 'AI/molecules/PromptPreview',

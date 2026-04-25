@@ -1,6 +1,6 @@
 import { DescriptionContent as DescriptionContentComponent } from './'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<DescriptionContentComponent> = {
   title: 'App/Molecules/InterventionModal/DescriptionContent',

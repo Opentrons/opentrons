@@ -2,7 +2,7 @@ import { Icon, SIZE_1, Text } from '@opentrons/components'
 
 import { TitleBar } from './TitleBar'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 
 export default {

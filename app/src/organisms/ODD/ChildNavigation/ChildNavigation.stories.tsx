@@ -2,7 +2,7 @@ import { VIEWPORT } from '@opentrons/components'
 
 import { ChildNavigation as ChildNavigationComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { SmallButton } from '/app/atoms/buttons'
 
 const meta: Meta<typeof ChildNavigationComponent> = {

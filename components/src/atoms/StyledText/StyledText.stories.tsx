@@ -2,7 +2,7 @@ import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import { HELIX_STYLES, ODD_STYLES, StyledText } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof StyledText> = {
   title: 'Helix/Atoms/StyledText',

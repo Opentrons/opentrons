@@ -7,7 +7,7 @@ import { i18n } from '/ai-client/i18n'
 
 import { ChatDisplay } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const FormProviderWrapper = ({
   children,

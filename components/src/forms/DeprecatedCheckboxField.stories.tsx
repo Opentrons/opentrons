@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { DeprecatedCheckboxField as DeprecatedCheckboxComponent } from './DeprecatedCheckboxField'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'Library/Molecules/Forms/Deprecated Checkbox Field',

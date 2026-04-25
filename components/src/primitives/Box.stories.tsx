@@ -2,7 +2,7 @@ import { BORDERS, COLORS } from '../helix-design-system'
 import { SPACING } from '../ui-style-constants'
 import { Box as BoxComponent } from './Box'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof BoxComponent> = {
   title: 'Library/Atoms/Box',

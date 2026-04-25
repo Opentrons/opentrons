@@ -6,7 +6,7 @@ import { configureStore } from '/protocol-designer/configureStore'
 
 import { MaterialsListModal as MaterialsListModalComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type {
   AdditionalEquipmentEntity,
   LiquidEntities,

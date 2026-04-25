@@ -5,7 +5,7 @@ import { i18n } from '/ai-client/i18n'
 
 import { Chat as ChatComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof ChatComponent> = {
   title: 'AI/organisms/ChatContainer',

@@ -3,7 +3,7 @@ import { getAllDefinitions, getLabwareViewBox } from '@opentrons/shared-data'
 import { RobotWorkSpace } from '../Deck'
 import { CalibrationBlockRender } from './CalibrationBlockRender'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const LOAD_NAMES = [
   'opentrons_calibrationblock_short_side_left',

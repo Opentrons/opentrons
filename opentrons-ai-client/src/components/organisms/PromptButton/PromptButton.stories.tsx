@@ -2,7 +2,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import { PromptButton as PromptButtonComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const buttonTextOptions = [
   'Reagent Transfer',

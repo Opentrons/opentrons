@@ -3,7 +3,7 @@ import { Flex } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { Tag as TagComponent } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof TagComponent> = {
   title: 'Helix/Atoms/Tag',

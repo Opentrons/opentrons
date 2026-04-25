@@ -2,7 +2,7 @@ import { COLORS, Flex } from '@opentrons/components'
 
 import { Footer } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof Footer> = {
   title: 'AI/Molecules/Footer',

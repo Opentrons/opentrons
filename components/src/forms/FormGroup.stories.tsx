@@ -1,7 +1,7 @@
 import { DeprecatedCheckboxField } from './DeprecatedCheckboxField.stories'
 import { FormGroup as FormGroupComponent } from './FormGroup'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 
 export default {

@@ -7,7 +7,7 @@ import { CategorizedStepContent, TwoColumn } from '.'
 import * as Fixtures from '../Command/__fixtures__'
 import { StandInContent } from './story-utils/StandIn'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type * as React from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CategorizedStepContentProps } from './CategorizedStepContent'

@@ -1,6 +1,6 @@
 import { DropdownMenu as DropdownMenuComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { DropdownOption } from '.'
 
 function createMockOptions(): DropdownOption[] {

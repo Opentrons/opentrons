@@ -4,7 +4,7 @@ import * as React from 'react-remove-scroll'
 import { SPACING } from '../../ui-style-constants'
 import { ParametersTable } from './index'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const runTimeParameters: RunTimeParameter[] = [

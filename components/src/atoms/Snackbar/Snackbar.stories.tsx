@@ -12,7 +12,7 @@ import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
 import { StyledText } from '../StyledText'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof SnackbarComponent> = {
   title: 'Helix/Atoms/Snackbar',

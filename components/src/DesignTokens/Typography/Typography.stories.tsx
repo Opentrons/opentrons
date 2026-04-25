@@ -5,7 +5,7 @@ import { Box, Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 const fontStyles = {

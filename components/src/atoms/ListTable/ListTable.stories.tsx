@@ -4,7 +4,7 @@ import { Flex, VIEWPORT } from '@opentrons/components'
 
 import { ListTable as ListTableComponent } from '.'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 
 export default {

@@ -2,7 +2,7 @@ import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
 
 import { MediumButton } from './'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof MediumButton> = {
   title: 'ODD/Atoms/Buttons/MediumButton',

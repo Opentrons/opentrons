@@ -12,7 +12,7 @@ import {
 
 import { Skeleton as SkeletonComponent } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof SkeletonComponent> = {
   title: 'App/Atoms/Skeleton',

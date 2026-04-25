@@ -2,7 +2,7 @@ import { VIEWPORT } from '@opentrons/components'
 
 import { OverlayModal } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 const meta: Meta<typeof OverlayModal> = {
   title: 'PROTOCOL_DESIGNER/organisms/OverlayModal',

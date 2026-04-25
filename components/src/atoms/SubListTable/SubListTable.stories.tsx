@@ -4,7 +4,7 @@ import { Flex, VIEWPORT } from '@opentrons/components'
 
 import { SubListTable as SubListTableComponent } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type { ComponentProps } from 'react'
 
 export default {

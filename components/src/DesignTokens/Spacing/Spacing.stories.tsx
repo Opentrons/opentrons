@@ -2,7 +2,7 @@ import { StyledText } from '../../atoms/StyledText'
 import { SPACING } from '../../ui-style-constants'
 import styles from './spacing.stories.module.css'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 type SpacingEntry = readonly [key: string, value: string]
 

@@ -12,7 +12,7 @@ import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { PrimaryButton } from '../buttons'
 import { StyledText } from '../StyledText'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 
 export default {
   title: 'ODD/Atoms/Toast',

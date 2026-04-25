@@ -1,6 +1,6 @@
 import { InstrumentContainer as InstrumentContainerComponent } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react-vite'
 import type * as React from 'react'
 
 export default {
