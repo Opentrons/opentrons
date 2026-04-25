@@ -39,7 +39,7 @@ Use the Applitools UI to accept or reject visual changes when baselines need upd
 
 ### Clean rebuild and dev server
 
-From the **monorepo root**, install JS dependencies once so `yarn pack` / `tsc` / `vite` work when this Makefile builds the four packages:
+From the **monorepo root**, install JS dependencies once so `pnpm pack` / `tsc` / `vite` work when this Makefile builds the four packages:
 
 ```bash
 make setup-js
@@ -130,7 +130,7 @@ After upgrading Playwright, run `make test-setup` or `pnpm exec playwright insta
 
 ### Pack or `make build-local-packages` fails
 
-Root `node_modules` must exist. From the monorepo root run `make setup-js` (or `yarn` with the repo’s usual workflow), then try again from `js-package-testing/`.
+Root `node_modules` must exist. From the monorepo root run `make setup-js` (or `pnpm` with the repo’s usual workflow), then try again from `js-package-testing/`.
 
 ### `pnpm install --frozen-lockfile` fails
 

@@ -5,11 +5,11 @@ description: TypeScript conventions, React patterns, testing, styling, and impor
 
 # Opentrons Monorepo — TypeScript Conventions
 
-Node.js, Yarn, Python setup, teardown, and troubleshooting are in the always-apply `monorepo-setup` rule.
+Node.js, Pnpm, Python setup, teardown, and troubleshooting are in the always-apply `monorepo-setup` rule.
 
 ## Monorepo Structure
 
-Yarn workspaces monorepo with 15 TypeScript packages. No Lerna/Nx/Turbo — uses Yarn Classic workspaces + TypeScript project references.
+Pnpm workspaces monorepo with 15 TypeScript packages. No Lerna/Nx/Turbo — uses Pnpm workspaces + TypeScript project references.
 
 ### Packages
 
@@ -313,7 +313,7 @@ Each package has a `Makefile` with some or all of:
 
 | Target                            | Description                                                        |
 | --------------------------------- | ------------------------------------------------------------------ |
-| `make setup-js`                   | Install all JS deps (`yarn`)                                       |
+| `make setup-js`                   | Install all JS deps (`pnpm`)                                       |
 | `make test-js`                    | Run ALL JS tests                                                   |
 | `make test-js-<project>`          | Run tests for one project (e.g., `make test-js-protocol-designer`) |
 | `make lint-js`                    | ESLint + Prettier check                                            |
@@ -330,13 +330,13 @@ Each package has a `Makefile` with some or all of:
 
 ```bash
 # Single file
-yarn vitest app/src/organisms/__tests__/MyComponent.test.tsx
+pnpm vitest app/src/organisms/__tests__/MyComponent.test.tsx
 
 # Entire package
-yarn vitest protocol-designer/
+pnpm vitest protocol-designer/
 
 # Watch mode
-yarn vitest --watch app/src/
+pnpm vitest --watch app/src/
 
 # Specific project via Make
 make test-js-app tests="src/organisms/__tests__/MyComponent.test.tsx"
@@ -345,10 +345,10 @@ make test-js-app tests="src/organisms/__tests__/MyComponent.test.tsx"
 ### Linting Specific Files
 
 ```bash
-yarn eslint path/to/file.tsx
-yarn stylelint path/to/file.module.css
-yarn prettier --check path/to/file.tsx
-yarn prettier --write path/to/file.tsx   # auto-fix
+pnpm eslint path/to/file.tsx
+pnpm stylelint path/to/file.module.css
+pnpm prettier --check path/to/file.tsx
+pnpm prettier --write path/to/file.tsx   # auto-fix
 ```
 
 ## Event Handlers

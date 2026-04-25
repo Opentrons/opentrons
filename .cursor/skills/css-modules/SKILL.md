@@ -225,10 +225,10 @@ make lint-css
 make format-css
 
 # Lint a single file
-yarn stylelint path/to/componentname.module.css
+pnpm stylelint path/to/componentname.module.css
 
 # Auto-fix a single file
-yarn stylelint path/to/componentname.module.css --fix
+pnpm stylelint path/to/componentname.module.css --fix
 ```
 
 Always run `make lint-css` and fix any issues before committing.
