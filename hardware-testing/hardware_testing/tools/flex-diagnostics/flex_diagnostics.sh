@@ -13,7 +13,7 @@ instructions() {
     echo "create = Creates a Tarball on the robot with the data, state, logs, etc."
     echo "set-ntp = Sets the ntp server to the value specified or default."
     echo "migrate backup <source-ip = Creates a migration tarball."
-    echo "migrate restore <target-ip> <migration-tarball.tar.gz> = Transfers tarball to target and inflates it"
+    echo "migrate restore <target-ip> <migration-tarball.tar.gz> = Transfers tarball to target, inflates it, and rebots the robot."
     echo "migrate analyze <migration-tarball.tar.gz> = Print the metadata of a migration tarball."
     echo "robot-ip = list of robot ip addresses to perform action on."
     echo ""
