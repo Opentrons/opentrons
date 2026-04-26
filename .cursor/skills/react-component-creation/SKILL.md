@@ -48,12 +48,12 @@ import { renderWithProviders } from '/ai-client/__testing-utils__'
 ### Running Tests
 
 ```bash
-yarn vitest opentrons-ai-client/src/path/to/file
-yarn vitest opentrons-ai-client/src/folder/
+pnpm vitest opentrons-ai-client/src/path/to/file
+pnpm vitest opentrons-ai-client/src/folder/
 ```
 
 ### Running Stylelint
 
 ```bash
-yarn stylelint opentrons-ai-client/src/path/to/file.module.css
+pnpm stylelint opentrons-ai-client/src/path/to/file.module.css
 ```
