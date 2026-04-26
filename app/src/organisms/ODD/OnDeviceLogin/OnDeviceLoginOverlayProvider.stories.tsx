@@ -1,7 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
-import { action } from '@storybook/addon-actions'
+import { action } from 'storybook/actions'
 import { legacy_createStore } from 'redux'
 
 import { VIEWPORT } from '@opentrons/components'
