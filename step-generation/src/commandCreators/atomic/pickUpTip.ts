@@ -7,7 +7,6 @@ import {
 } from '../../errorCreators'
 import {
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
@@ -60,8 +59,7 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
 
   const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
     tipState: prevRobotState.tipState.tipracks[labwareId],
-    primaryNozzle:
-      primaryNozzle ?? getDefaultPrimaryNozzle({ channels, nozzles }),
+    primaryNozzle,
     channels,
     nozzleConfiguration: nozzles,
     wellName,
