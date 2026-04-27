@@ -63,7 +63,7 @@ export function useOAuth2PasswordLogin(
       } else {
         // Shouldn't happen since this hook only sends request with grant_type==='password'.
         console.warn(
-          'Expeced grant_type password, got',
+          'Expected grant_type password, got',
           requestVariables.grant_type
         )
       }
