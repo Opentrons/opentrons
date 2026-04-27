@@ -366,21 +366,21 @@ export const getIsSafePipetteMovement = (args: {
     labwareSlot,
     deckDefinition
   ) ?? [0, 0, 0]
-  const isOnFlexThermocycler =
-    robotType === FLEX_ROBOT_TYPE &&
+  const isOnThermocycler =
     labwareState[labwareId].stack.some(
       item => moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
     )
-  const thermocyclerOffset = isOnFlexThermocycler
-    ? (deckDefinition.locations.addressableAreas.find(
-        addressableArea => addressableArea.id === THERMOCYCLER_MODULE_V2
-      )?.offsetFromCutoutFixture ?? [0, 0, 0])
+  console.log("🚀 ~ getIsSafePipetteMovement ~ isOnThermocycler:", isOnThermocycler)
+    console.log("🚀 ~ getIsSafePipetteMovement ~ deckDefinition:", deckDefinition)
+  const thermocyclerOffset = isOnThermocycler
+    ? [-20.005, 67.96, 10.96]
     : [0, 0, 0]
   const fullOffset = [
     thermocyclerOffset[0] + addressableAreaOffset[0],
-    thermocyclerOffset[1] + addressableAreaOffset[1],
+    thermocyclerOffset[1] + (isOnThermocycler ? 214 : addressableAreaOffset[1] ),
     thermocyclerOffset[2] + addressableAreaOffset[2],
   ]
+  console.log("🚀 ~ getIsSafePipetteMovement ~ fullOffset:", fullOffset)
   const wellTargetPoint = getWellPosition(
     labwareEntities[labwareId],
     wellTargetName,
@@ -434,6 +434,7 @@ export const getIsSafePipetteMovement = (args: {
     pipetteBoundsAtWellLocation,
     moduleEntities
   )
+  console.log("🚀 ~ getIsSafePipetteMovement ~ willCollide:", willCollide)
   return (
     !willCollide &&
     !getSlotHasPotentialCollidingObject(
