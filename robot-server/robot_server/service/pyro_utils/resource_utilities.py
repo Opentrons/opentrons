@@ -45,7 +45,7 @@ def get_pyro_resource() -> RobotServerPyroResource:
 
     if robot_server_proxy is None:
         raise pyro_errors.CommunicationError(
-            "Opentrons-robot-server could not find robot-server-resource URI on Pyro5 Nameserver."
+            "Could not find robot-server-resource URI on Pyro5 Nameserver."
         )
     else:
         robot_server_resource = cast(
