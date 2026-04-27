@@ -469,6 +469,8 @@ def convert_result_to_proxy(  # noqa: C901
                 "Provided base attribute must be a Property, a Method or an Async method."
             )
         # Convert the instance result to PSO(s) and return the Proxy objects
+        if result is None:
+            return None
         try:
             proxy_list = []
             for r in result:

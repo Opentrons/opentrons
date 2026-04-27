@@ -164,7 +164,7 @@ class RobotServerPyroResource:
             return await self._deck_configuration_store.get_deck_configuration()
         else:
             raise RuntimeError(
-                "Cannot return a CameraProvider from the RobotServerPyroResource without initializing."
+                "Cannot return a DeckConfigurationType from the RobotServerPyroResource without initializing."
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
