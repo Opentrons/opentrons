@@ -1,5 +1,3 @@
-import assert from 'assert'
-
 import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
 
 import { DIRTY } from '../constants'
@@ -30,10 +28,11 @@ export function forDropTip(
   ): string[] | undefined =>
     ordering.find(column => column.includes(targetWellName))
   const tiprackDef = invariantContext.labwareEntities[labwareId].def
-  assert(
-    tiprackDef != null && getIsTiprack(tiprackDef),
-    `forDropTip expected ${labwareId} to have definition and to be a tiprack`
-  )
+  if (tiprackDef == null || !getIsTiprack(tiprackDef)) {
+    throw new Error(
+      `forDropTip expected ${labwareId} to have definition and to be a tiprack`
+    )
+  }
 
   // TODO (nd 08/12/2025): handle tip (re)placement more elegantly depending on pipette specs and selected nozzles
   if (nozzleConfiguration === SINGLE) {

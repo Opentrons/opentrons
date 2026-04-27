@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { produce } from 'immer'
 
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
@@ -78,7 +77,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  assert(command, 'undefined command passed to getNextRobotStateAndWarning')
+  if (!command) {
+    throw new Error('undefined command passed to getNextRobotStateAndWarning')
+  }
   switch (command.commandType) {
     case 'aspirateWhileTracking':
     case 'aspirate':
