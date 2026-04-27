@@ -115,13 +115,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const handleSendProtocolToFlex = (
-    storedProtocol: StoredProtocolData
-  ): void => {
-    setSelectedProtocol(storedProtocol)
-    setShowSendProtocolToFlexSlideout(true)
-  }
-
   return (
     <Box padding={SPACING.spacing16}>
       {selectedProtocol != null ? (
@@ -256,7 +249,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <ProtocolCard
               key={storedProtocol.protocolKey}
               handleRunProtocol={handleRunProtocol}
-              handleSendProtocolToFlex={handleSendProtocolToFlex}
               storedProtocolData={storedProtocol}
             />
           ))}

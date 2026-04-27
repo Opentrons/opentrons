@@ -55,14 +55,12 @@ const INVALID_ROBOT_TYPE_ERROR =
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
-  handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const navigate = useNavigate()
-  const { handleRunProtocol, handleSendProtocolToFlex, storedProtocolData } =
-    props
+  const { handleRunProtocol, storedProtocolData } = props
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } =
     storedProtocolData
   const isAnalyzing = useSelector((state: State) =>
@@ -77,6 +75,11 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
   instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
+
+  const invalidRobotType =
+    mostRecentAnalysis?.errors.some(error =>
+      error.detail.includes(INVALID_ROBOT_TYPE_ERROR)
+    ) ?? false
 
   const UnknownAttachmentError = (
     <ProtocolAnalysisFailure
@@ -108,6 +111,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           protocolDisplayName={protocolDisplayName}
           isAnalyzing={isAnalyzing}
           modified={modified}
+          invalidRobotType={invalidRobotType}
         />
       </ErrorBoundary>
       <Box
@@ -117,8 +121,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       >
         <ProtocolOverflowMenu
           handleRunProtocol={handleRunProtocol}
-          handleSendProtocolToFlex={handleSendProtocolToFlex}
           storedProtocolData={storedProtocolData}
+          invalidRobotType={invalidRobotType}
         />
       </Box>
     </Box>
@@ -130,6 +134,7 @@ interface AnalysisInfoProps {
   protocolDisplayName: string
   modified: number
   isAnalyzing: boolean
+  invalidRobotType: boolean
   mostRecentAnalysis?: ProtocolAnalysisOutput | null
 }
 
@@ -139,6 +144,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     protocolDisplayName,
     isAnalyzing,
     mostRecentAnalysis,
+    invalidRobotType,
     modified,
   } = props
   const dispatch = useDispatch<Dispatch>()
@@ -152,11 +158,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const requiredModuleModels = parseAllRequiredModuleModels(
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   )
-
-  const invalidRobotType =
-    mostRecentAnalysis?.errors.some(error =>
-      error.detail.includes(INVALID_ROBOT_TYPE_ERROR)
-    ) ?? false
 
   const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 

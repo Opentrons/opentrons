@@ -17,7 +17,6 @@ import {
   useConditionalConfirm,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import {
@@ -40,16 +39,15 @@ import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
-  handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
+  invalidRobotType?: boolean
 }
 
 export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
 ): JSX.Element {
-  const { storedProtocolData, handleRunProtocol, handleSendProtocolToFlex } =
-    props
-  const { mostRecentAnalysis, protocolKey } = storedProtocolData
+  const { storedProtocolData, handleRunProtocol, invalidRobotType } = props
+  const { protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
@@ -68,9 +66,6 @@ export function ProtocolOverflowMenu(
     trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
   }, true)
 
-  const robotType =
-    mostRecentAnalysis != null ? (mostRecentAnalysis?.robotType ?? null) : null
-
   const handleClickShowInFolder: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -85,12 +80,6 @@ export function ProtocolOverflowMenu(
       properties: { sourceLocation: 'ProtocolsLanding' },
     })
     handleRunProtocol(storedProtocolData)
-    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
-  }
-  const handleClickSendToOT3: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    handleSendProtocolToFlex(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickDelete: MouseEventHandler<HTMLButtonElement> = e => {
@@ -131,32 +120,24 @@ export function ProtocolOverflowMenu(
           right="0"
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem
-            onClick={handleClickRun}
-            data-testid="ProtocolOverflowMenu_run"
-            css={css`
-              border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0
-                0;
-            `}
-          >
-            {t('start_setup')}
-          </MenuItem>
+          {!invalidRobotType ? (
+            <MenuItem
+              onClick={handleClickRun}
+              data-testid="ProtocolOverflowMenu_run"
+              css={css`
+                border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8}
+                  0 0;
+              `}
+            >
+              {t('start_setup')}
+            </MenuItem>
+          ) : null}
           <MenuItem
             onClick={handleClickReanalyze}
             data-testid="ProtocolOverflowMenu_reanalyze"
           >
             {t('shared:reanalyze')}
           </MenuItem>
-          {robotType !== 'OT-2 Standard' ? (
-            <MenuItem
-              onClick={handleClickSendToOT3}
-              data-testid="ProtocolOverflowMenu_sendToOT3"
-            >
-              {t('protocol_list:send_to_robot_overflow', {
-                robot_display_name: FLEX_DISPLAY_NAME,
-              })}
-            </MenuItem>
-          ) : null}
           <MenuItem
             onClick={handleClickShowInFolder}
             data-testid="ProtocolOverflowMenu_showInFolder"

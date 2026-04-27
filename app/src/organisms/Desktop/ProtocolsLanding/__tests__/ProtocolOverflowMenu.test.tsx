@@ -23,14 +23,12 @@ vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/protocol-storage')
 
 const mockHandleRunProtocol = vi.fn()
-const mockHandleSendProtocolToFlex = vi.fn()
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
       <ProtocolOverflowMenu
         handleRunProtocol={mockHandleRunProtocol}
-        handleSendProtocolToFlex={mockHandleSendProtocolToFlex}
         storedProtocolData={storedProtocolData}
       />
     </MemoryRouter>,

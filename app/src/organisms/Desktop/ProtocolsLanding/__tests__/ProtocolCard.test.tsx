@@ -84,7 +84,6 @@ describe('ProtocolCard', () => {
   beforeEach(() => {
     props = {
       handleRunProtocol: vi.fn(),
-      handleSendProtocolToFlex: vi.fn(),
       storedProtocolData: makeStoredProtocolData({
         robotType: OT2_ROBOT_TYPE,
         errors: [],

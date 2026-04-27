@@ -260,9 +260,6 @@ export function ProtocolDetailsHeader({
           handleRunProtocol={() => {
             setShowChooseRobotToRunProtocolSlideout(true)
           }}
-          handleSendProtocolToFlex={() => {
-            setShowSendProtocolToFlexSlideout(true)
-          }}
           storedProtocolData={props}
           data-testid="ProtocolDetails_overFlowMenu"
         />
