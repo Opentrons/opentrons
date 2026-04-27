@@ -157,7 +157,7 @@ Run from the `protocol-designer/` directory:
 make test tests="src/components/organisms/__tests__/MyComponent.test.tsx"
 
 # Run vitest directly from monorepo root
-yarn vitest protocol-designer/src/step-forms/
+pnpm vitest protocol-designer/src/step-forms/
 ```
 
 ### Environment Variables

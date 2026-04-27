@@ -6,7 +6,7 @@ import { COLORS } from '@opentrons/components'
 import { CLEAN, EMPTY } from '@opentrons/step-generation'
 
 /**
- * Ensures Yarn workspace `link:` dependencies resolve when running tests locally
+ * Ensures Pnpm workspace `link:` dependencies resolve when running tests locally
  * (and in CI). The package entrypoint stays a stub until visualization UI lands.
  */
 describe('workspace dependencies', () => {
