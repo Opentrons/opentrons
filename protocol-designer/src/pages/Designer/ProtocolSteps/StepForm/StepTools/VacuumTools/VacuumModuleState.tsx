@@ -13,8 +13,7 @@ interface VacuumModuleStateProps {
 export function VacuumModuleState(props: VacuumModuleStateProps): JSX.Element {
   const { vacuumModuleState } = props
   const { t } = useTranslation('protocol_steps')
-  const { currentPumpActivity: currentPumpActivity, ventStatus } =
-    vacuumModuleState ?? {}
+  const { currentPumpActivity, ventStatus } = vacuumModuleState ?? {}
   const ventText =
     ventStatus != null
       ? t(`vacuum.previous_state.vent.${ventStatus}`)
