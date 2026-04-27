@@ -75,10 +75,12 @@ from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.pyro_utils.pyro_resource import RobotServerPyroResource
 from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
-from robot_server.service.pyro_utils.serpent_type_registry import register_robot_server_types
-
+from robot_server.service.pyro_utils.serpent_type_registry import (
+    register_robot_server_types,
+)
 
 log = logging.getLogger(__name__)
+
 
 # register_process_types runs for both the robot server process and the run subprocess
 def register_process_types() -> None:

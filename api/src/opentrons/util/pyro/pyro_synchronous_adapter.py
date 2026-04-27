@@ -71,9 +71,7 @@ class PyroFunctionWrapper:
     """Wrapper class to safely wrap callable responses as Proxy objects.."""
 
     def __init__(
-        self,
-        callable: Callable[P, T],
-        loop: asyncio.AbstractEventLoop
+        self, callable: Callable[P, T], loop: asyncio.AbstractEventLoop
     ) -> None:
         self.callable = callable
         self._loop = loop
