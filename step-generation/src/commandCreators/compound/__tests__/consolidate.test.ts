@@ -89,7 +89,7 @@ beforeEach(() => {
     name: 'Consolidate Test',
     description: 'test blah blah',
     pipette: DEFAULT_PIPETTE,
-
+    primaryNozzle: 'A1',
     sourceWells: ['A1', 'A2', 'A3', 'A4'],
     destWell: 'B1',
     sourceLabware: SOURCE_LABWARE,
