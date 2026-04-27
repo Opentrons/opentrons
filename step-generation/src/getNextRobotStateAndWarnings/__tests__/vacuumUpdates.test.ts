@@ -692,11 +692,8 @@ describe('forVacuumStartRunProfile', () => {
     } as unknown as VacuumModuleStartRunProfileCreateCommand['params']
 
     expect(
-      forVacuumStartRunProfile(
-        paramsWithNullTask,
-        invariantContext,
-        before
-      ).robotState
+      forVacuumStartRunProfile(paramsWithNullTask, invariantContext, before)
+        .robotState
     ).toEqual(before)
   })
 })
