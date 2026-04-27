@@ -64,9 +64,9 @@ class ProtocolAnalyzer:
         Returns: The RunOrchestrator instance.
         """
         if feature_flags.protocol_subprocess_enabled():
-            # TODO we need to both have a way of locking a run proxy in to a particular task
-            #   AND also have a separate simulating process/proxy
-            run_coordinator = await self._run_process_pyro_provider.wait_for_run_proxy()
+            run_coordinator = (
+                await self._run_process_pyro_provider.wait_for_simulating_run_proxy()
+            )
             await run_coordinator.create_simulating(self._protocol_resource)
             self._coordinator = run_coordinator
         else:
@@ -169,7 +169,7 @@ class ProtocolAnalyzer:
                 )
                 if feature_flags.protocol_subprocess_enabled():
                     asyncio.run_coroutine_threadsafe(
-                        self._run_process_pyro_provider.refresh(),
+                        self._run_process_pyro_provider.refresh_simulating(),
                         asyncio.get_running_loop(),
                     )
             else:
