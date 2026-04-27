@@ -37,6 +37,7 @@ from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
     handle_hardware_event,
 )
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
 
 def mock_notify_publishers() -> None:
@@ -45,8 +46,16 @@ def mock_notify_publishers() -> None:
 
 
 @pytest.fixture
+def mock_run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
+    """A mock RunProcessPyroProvider."""
+    return decoy.mock(cls=RunProcessPyroProvider)
+
+
+@pytest.fixture
 async def subject(
-    decoy: Decoy, hardware_api: HardwareControlAPI
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
 ) -> RunOrchestratorStore:
     """Get a EngineStore test subject."""
     return RunOrchestratorStore(
@@ -55,6 +64,7 @@ async def subject(
         # construct their own EngineStore.
         robot_type="OT-2 Standard",
         deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
 
@@ -108,14 +118,20 @@ async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> Non
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_create_engine_uses_robot_type(
-    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
+    decoy: Decoy,
+    robot_type: RobotType,
+    deck_type: pe_types.DeckType,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
 ) -> None:
     """It should create ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
     hardware_api = decoy.mock(cls=API)
     subject = RunOrchestratorStore(
-        hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+        hardware_api=hardware_api,
+        robot_type=robot_type,
+        deck_type=deck_type,
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
     await subject.create(
@@ -230,7 +246,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
-    engine = subject._run_orchestrator._protocol_engine
+    engine = subject._run_orchestrator._protocol_engine  # type: ignore[union-attr]
     engine.state_view.state.commands.command_history._queued_command_ids.add("1231")
     result = await subject.clear()
     assert (
@@ -297,7 +313,10 @@ async def test_get_default_orchestrator_idempotent(
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_get_default_orchestrator_robot_type(
-    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
+    decoy: Decoy,
+    robot_type: RobotType,
+    deck_type: pe_types.DeckType,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
 ) -> None:
     """It should create default ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
@@ -307,6 +326,7 @@ async def test_get_default_orchestrator_robot_type(
         hardware_api=hardware_api,
         robot_type=robot_type,
         deck_type=deck_type,
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
     result = await subject.get_default_orchestrator()
@@ -376,6 +396,9 @@ async def test_estop_callback(
 ) -> None:
     """The callback should stop an active engine."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     disengage_event = EstopStateNotification(
         old_state=EstopState.PHYSICALLY_ENGAGED, new_state=EstopState.LOGICALLY_ENGAGED
@@ -413,6 +436,9 @@ async def test_estop_callback(
 async def test_async_module_callback_noops_with_no_engine(decoy: Decoy) -> None:
     """It should noop without a run."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(
@@ -441,6 +467,9 @@ async def test_async_module_callback_noops_with_no_engine(decoy: Decoy) -> None:
 async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> None:
     """It shouldn't finish if the engine doesn't want it to."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(
@@ -469,6 +498,9 @@ async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> No
 async def test_async_module_callback_finishes_if_engine_says_so(decoy: Decoy) -> None:
     """It should finish with the error if the engine says it should."""
     run_orchestrator_store = decoy.mock(cls=RunOrchestratorStore)
+    decoy.when(run_orchestrator_store.run_orchestrator).then_return(
+        decoy.mock(cls=RunOrchestrator)
+    )
 
     exc = ModuleCommunicationError()
     error_event = AsynchronousModuleErrorNotification(

@@ -313,7 +313,7 @@ export const _editModuleFormUpdate = ({
         : null
       const moduleEntity = initialDeckSetup.modules[moduleId]
       console.assert(
-        moduleEntity,
+        moduleEntity != null,
         `editModuleFormUpdate expected moduleEntity for module ${moduleId}`
       )
       const prevModuleModel = moduleEntity?.model
@@ -589,7 +589,7 @@ export const savedStepForms = (
           ? action.payload.id
           : action.payload.duplicateLabwareId
       console.assert(
-        prevInitialDeckSetupStep,
+        prevInitialDeckSetupStep != null,
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
@@ -890,7 +890,8 @@ export const savedStepForms = (
             form.stepType === 'absorbanceReader' ||
             form.stepType === 'thermocycler' ||
             form.stepType === 'flexStacker' ||
-            form.stepType === 'pause') &&
+            form.stepType === 'pause' ||
+            form.stepType === 'vacuum') &&
           form.moduleId === moduleId
         ) {
           return { ...form, moduleId: null }

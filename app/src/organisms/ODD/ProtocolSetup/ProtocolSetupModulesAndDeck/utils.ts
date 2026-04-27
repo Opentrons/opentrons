@@ -1,6 +1,13 @@
 import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleType,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
   NON_CONNECTING_MODULE_TYPES,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '/app/redux/modules/types'
@@ -22,8 +29,9 @@ export function getUnmatchedModulesForProtocol(
       (acc, module) => {
         const { model, compatibleWith } = module.moduleDef
         // Skip matching any modules that don't require an electronic robot connection
-        if (NON_CONNECTING_MODULE_TYPES.includes(getModuleType(model)))
+        if (NON_CONNECTING_MODULE_TYPES.includes(getModuleType(model))) {
           return acc
+        }
         // for this required module, find a remaining (unmatched) attached module of the requested model
         const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
           attachedModule => {
@@ -51,4 +59,25 @@ export function getUnmatchedModulesForProtocol(
       { missingModuleIds: [], remainingAttachedModules: attachedModules }
     )
   return { missingModuleIds, remainingAttachedModules }
+}
+
+export const getDoesModuleRequireCalibration = (
+  attachedModule: AttachedModule
+): boolean => {
+  const { moduleType, moduleOffset } = attachedModule
+  switch (moduleType) {
+    case ABSORBANCE_READER_TYPE:
+    case VACUUM_MODULE_TYPE:
+    case FLEX_STACKER_MODULE_TYPE:
+      return false
+    case TEMPERATURE_MODULE_TYPE:
+    case THERMOCYCLER_MODULE_TYPE:
+    case HEATERSHAKER_MODULE_TYPE:
+    case MAGNETIC_MODULE_TYPE:
+      return moduleOffset?.last_modified == null
+    // should not hit
+    default:
+      console.log(`unknown module type: ${moduleType}`)
+      return false
+  }
 }

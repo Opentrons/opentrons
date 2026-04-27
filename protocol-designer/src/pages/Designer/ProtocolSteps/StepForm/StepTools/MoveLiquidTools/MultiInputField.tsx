@@ -63,12 +63,7 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
           {t(`protocol_steps:${name}`)}
         </StyledText>
         <Flex {...targetProps}>
-          <Icon
-            name="information"
-            size="1rem"
-            color={COLORS.grey60}
-            data-testid="information_icon"
-          />
+          <Icon name="information" size="1rem" color={COLORS.grey60} />
         </Flex>
         <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
       </Flex>

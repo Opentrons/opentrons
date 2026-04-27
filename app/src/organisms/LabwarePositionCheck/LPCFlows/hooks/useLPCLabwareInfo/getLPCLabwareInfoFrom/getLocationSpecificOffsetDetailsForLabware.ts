@@ -2,14 +2,10 @@ import isEqual from 'lodash/isEqual'
 
 import { ANY_LOCATION } from '@opentrons/api-client'
 
-import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
 
 import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  LoadLabwareRunTimeCommand,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
 import type { GetLPCLabwareInfoForURI } from '.'
 
@@ -61,9 +57,9 @@ interface HardcodedOffsetInfo {
   [uri: string]: HardcodedOffsetIdAndOffsetLocSeq[]
 }
 
-// Returns hardcoded offset information for identifying other location-specific
-// offsets.
-// This logic is predicated on API level 2.18+ set_offset() behavior.
+// Returns hardcoded offset information for identifying other location-specific offsets.
+// This behavior is predicated on API level 2.18+ set_offset() behavior, since modern LPC flows
+// act on labware uris instead of specific labware instances.
 function getHardCodedOffsetInfo(
   protocolData: CompletedProtocolAnalysis | null
 ): HardcodedOffsetInfo {
@@ -71,57 +67,24 @@ function getHardCodedOffsetInfo(
 
   if (protocolData == null) {
     return result
-  } else {
-    const { labware } = protocolData
-
-    labware.forEach(lw => {
-      // The presence of this id means a labware offset is set using set_offset().
-      const hardcodedOffsetId = lw.offsetId
-
-      if (hardcodedOffsetId != null) {
-        // This is a nested command loop, but it really should only ever iterate over
-        // the initial load commands.
-        const loqSeq = getHardcodedOffsetLocSeqFor(lw.id, protocolData)
-
-        if (loqSeq.length === 0) {
-          console.error(
-            `Expected to find matching load command with result for hardcoded offset for labware: ${lw.id}`
-          )
-        }
-
-        // Initialize the array if it doesn't exist yet
-        if (!result[lw.definitionUri]) {
-          result[lw.definitionUri] = []
-        }
-
-        // Now we can safely push to the initialized array
-        result[lw.definitionUri].push([hardcodedOffsetId, loqSeq])
-      }
-    })
-
-    return result
   }
-}
 
-// Returns the offset location sequence associated with the labware that has
-// a hardcoded offset.
-function getHardcodedOffsetLocSeqFor(
-  lwId: string,
-  protocolData: CompletedProtocolAnalysis
-): LabwareOffsetLocationSequence {
-  const { commands, modules, labware } = protocolData
-
-  const matchingCommand = commands.find(c => {
-    if (c.commandType === 'loadLabware' && c.result?.labwareId === lwId) {
-      return true
+  const { labwareOffsets } = protocolData
+  labwareOffsets?.forEach(offset => {
+    if (offset.locationSequence == null) {
+      console.error(
+        `Expected to find matching labware offset location sequence for labware: ${offset.definitionUri}`
+      )
     } else {
-      return false
+      if (!(offset.definitionUri in result)) {
+        result[offset.definitionUri] = []
+      }
+
+      result[offset.definitionUri].push([offset.id, offset.locationSequence])
     }
-  }) as LoadLabwareRunTimeCommand
+  })
 
-  const loqSeq = matchingCommand.result?.locationSequence ?? []
-
-  return getLwOffsetLocSeqFromLocSeq(loqSeq, labware, modules)
+  return result
 }
 
 // Given the labware uri and offset location sequence, returns the associated

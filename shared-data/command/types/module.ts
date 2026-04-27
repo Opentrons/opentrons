@@ -86,7 +86,11 @@ export type ModuleCreateCommand =
   | FlexStackerSetStoredLabwareItemsCreateCommand
   | FlexStackerStoreCreateCommand
   | IdentifyModuleCreateCommand
-
+  | VacuumModuleSetTargetPressureCreateCommand
+  | VacuumModuleSetTargetPowerCreateCommand
+  | VacuumModuleStopPumpCreateCommand
+  | VacuumModuleOpenVentCreateCommand
+  | VacuumModuleCloseVentCreateCommand
 export interface MagneticModuleEngageMagnetCreateCommand extends CommonCommandCreateInfo {
   commandType: 'magneticModule/engage'
   params: EngageMagnetParams
@@ -653,4 +657,49 @@ export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
 export interface IdentifyModuleRunTimeCommand
   extends CommonCommandRunTimeInfo, IdentifyModuleCreateCommand {
   result?: any
+}
+
+interface BaseVacuumModulePumpParams extends ModuleOnlyParams {
+  // in seconds
+  duration?: number
+  // in mbar/s
+  rate?: number
+  // in seconds
+  timeout?: number
+  ventAfter?: boolean
+}
+
+interface VacuumModuleSetTargetPressureParams extends BaseVacuumModulePumpParams {
+  // in mbar
+  gaugePressure: number
+}
+
+interface VacuumModuleSetTargetPowerParams extends BaseVacuumModulePumpParams {
+  // in % between 0 and 100
+  percentPower: number
+}
+
+export interface VacuumModuleSetTargetPressureCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/startSetVacuumPressure'
+  params: VacuumModuleSetTargetPressureParams
+}
+
+export interface VacuumModuleSetTargetPowerCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/startSetVacuumPower'
+  params: VacuumModuleSetTargetPowerParams
+}
+
+export interface VacuumModuleStopPumpCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/stopVacuum'
+  params: ModuleOnlyParams
+}
+
+export interface VacuumModuleOpenVentCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/openVent'
+  params: ModuleOnlyParams
+}
+
+export interface VacuumModuleCloseVentCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/closeVent'
+  params: ModuleOnlyParams
 }

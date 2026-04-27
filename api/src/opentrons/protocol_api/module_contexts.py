@@ -1,3 +1,4 @@
+# ruff: noqa: I001
 from __future__ import annotations
 
 import logging
@@ -42,7 +43,9 @@ from opentrons.protocols.api_support.util import (
     requires_version,
 )
 
-from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
+from . import (
+    validation,
+)  # isort: skip  # noqa: I001  # Imported after other protocol_api imports to avoid circular import
 from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -709,8 +712,8 @@ class ThermocyclerContext(ModuleContext):
                 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
                 liquid information.
 
-                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
-                the block heats or cools.
+        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        the block heats or cools.
 
         !!! note
             If `hold_time_minutes` and `hold_time_seconds` are not specified,
@@ -759,8 +762,7 @@ class ThermocyclerContext(ModuleContext):
                 to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
                 the block will heat or cool as quickly as possible to reach the set temperature.
 
-        *Changed in version 2.27:* In API version
-        2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+        *Changed in version 2.27:* In API version 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
         liquid information.
 
         *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly

@@ -1,11 +1,12 @@
 from .abstract import AbstractBarcodeScannerDriver
+from .rtscanner_driver import RTScanner
 from .simulator import BarcodeSimulatorDriver
-from .types import BarcodeModuleInfo, LEDProfile, SoundProfile
+from .types import BarcodeModuleInfo, SoundProfile
 
 __all__ = [
     "AbstractBarcodeScannerDriver",
     "SoundProfile",
-    "LEDProfile",
     "BarcodeModuleInfo",
+    "RTScanner",
     "BarcodeSimulatorDriver",
 ]

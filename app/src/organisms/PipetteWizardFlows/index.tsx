@@ -74,9 +74,13 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
   const deckConfig = useNotifyDeckConfigurationQuery()
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedPipetteInfo = useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty = useMemo(
     () => attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null,
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
@@ -97,6 +101,8 @@ export const PipetteWizardFlows = (
             mount,
             deckConfig
           ),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
   const requiredPipette = memoizedPipetteInfo?.find(
@@ -108,6 +114,8 @@ export const PipetteWizardFlows = (
     pipetteWizardSteps != null ? pipetteWizardSteps.length - 1 : 0
   const currentStep = pipetteWizardSteps?.[currentStepIndex] ?? null
   const [isFetchingPipettes, setIsFetchingPipettes] = useState<boolean>(false)
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedAttachedPipettes = useMemo(() => attachedPipettes, [])
   const hasCalData =
     memoizedAttachedPipettes[mount]?.data.calibratedOffset?.last_modified !=
@@ -121,6 +129,8 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedWizardTitle = useMemo(() => wizardTitle, [])
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null

@@ -1,4 +1,4 @@
-name: 'OpentronsAI edge continuous deployment to dev'
+name: 'OpentronsAI edge continuous deployment to staging'
 
 on:
   push:
@@ -6,7 +6,14 @@ on:
       - edge
     paths:
       - 'opentrons-ai-server/**'
+      - '.github/workflows/opentrons-ai-server-staging-continuous-deploy.yaml'
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'edge'
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
@@ -16,7 +23,7 @@ env:
   CI: true
 
 jobs:
-  js-unit-test:
+  build-and-deploy:
     runs-on: 'ubuntu-latest'
     permissions:
       id-token: write
@@ -25,10 +32,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v6'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
 
       - name: Setup UV
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           python-version: "3.12"
           enable-cache: true
@@ -38,10 +47,10 @@ jobs:
         working-directory: ./opentrons-ai-server
         run: make setup
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
-          role-to-assume: ${{ secrets.STAGING_AI_ROLE_ARN }}
-          aws-region: ${{ secrets.STAGING_AI_REGION }}
+          role-to-assume: ${{ vars.STAGING_AI_ROLE_ARN }}
+          aws-region: ${{ vars.STAGING_AI_REGION }}
       - name: 'deploy api to staging'
         run: |
           make -C opentrons-ai-server deploy ENV=staging

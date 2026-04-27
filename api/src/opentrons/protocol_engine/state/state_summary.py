@@ -16,7 +16,6 @@ from ..types import (
     LoadedModule,
     LoadedPipette,
     TaskSummary,
-    UserCommandAnnotation,
     WellInfoSummary,
 )
 
@@ -40,5 +39,4 @@ class StateSummary(BaseModel):
     files: List[str] = Field(default_factory=list)
     liquidClasses: List[LiquidClassRecordWithId] = Field(default_factory=list)
     tasks: List[TaskSummary] = Field(default_factory=list)
-    commandAnnotations: List[UserCommandAnnotation] = Field(default_factory=list)
     cameraSettings: Optional[CameraSettings] = None

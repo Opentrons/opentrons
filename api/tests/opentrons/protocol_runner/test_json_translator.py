@@ -897,7 +897,7 @@ def test_v8_command_annotations_get_added_to_engine_commands(
             namespace="example",
         ),
         key="load-labware-key",
-        commandAnnotations=["ann1", "ann2"],
+        commandAnnotationIds=["ann1", "ann2"],
     )
     v8_output = subject.translate_commands(
         protocol=_make_v8_json_protocol(commands=[test_v8_command]),

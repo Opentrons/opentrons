@@ -18,6 +18,8 @@ export type DevInternalFlag =
   | 'reactScan'
   | 'quickTransferProtocolContentsLog'
   | 'ignoreOT2App'
+  | 'externalKeyboardTest'
+  | 'accessControlMode'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

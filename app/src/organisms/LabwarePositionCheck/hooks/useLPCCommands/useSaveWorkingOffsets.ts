@@ -32,7 +32,6 @@ export function useSaveWorkingOffsets({
 
   const deleteLabwareOffsets = (): Promise<StoredLabwareOffset[]> => {
     if (toDelete.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       const deletePromises = toDelete.map(id => deleteLabwareOffset(id))
       return Promise.all(deletePromises)
     } else {

@@ -14,18 +14,18 @@ describe('generateCompatibleLabwareForPipette', () => {
     const compatibleLabwareUris = generateCompatibleLabwareForPipette({
       channels: 1,
     } as any)
-    expect(compatibleLabwareUris).toEqual(SINGLE_CHANNEL_COMPATIBLE_LABWARE)
+    expect(compatibleLabwareUris).toBe(SINGLE_CHANNEL_COMPATIBLE_LABWARE)
   })
   it('generates the list for eight channel pipettes', () => {
     const compatibleLabwareUris = generateCompatibleLabwareForPipette({
       channels: 8,
     } as any)
-    expect(compatibleLabwareUris).toEqual(EIGHT_CHANNEL_COMPATIBLE_LABWARE)
+    expect(compatibleLabwareUris).toBe(EIGHT_CHANNEL_COMPATIBLE_LABWARE)
   })
   it('generates the list for 96 channel pipettes', () => {
     const compatibleLabwareUris = generateCompatibleLabwareForPipette({
       channels: 96,
     } as any)
-    expect(compatibleLabwareUris).toEqual(NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE)
+    expect(compatibleLabwareUris).toBe(NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE)
   })
 })

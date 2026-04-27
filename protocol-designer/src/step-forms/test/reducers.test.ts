@@ -1094,16 +1094,18 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
           // @ts-expect-error(sa, 2021-6-14): null check
-          if (action.payload.type)
+          if (action.payload.type) {
             expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+          }
         })
       })
       TCStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
           // @ts-expect-error(sa, 2021-6-14): null check
-          if (action.payload.type)
+          if (action.payload.type) {
             expect(result.TC_step_form_id.moduleId).toBe(expectedModuleId)
+          }
         })
       })
     })
@@ -1233,6 +1235,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           moduleId,
           magnetAction: 'engage',
           engageHeight: '4',
+        },
+      },
+      {
+        testName: 'vacuum step',
+        step: {
+          id: stepId,
+          stepType: 'vacuum',
+          moduleId,
         },
       },
     ]

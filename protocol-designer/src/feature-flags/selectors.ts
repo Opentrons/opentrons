@@ -30,10 +30,6 @@ export const getEnableHotKeysDisplay: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_HOT_KEYS_DISPLAY ?? false
 )
-export const getEnableReactScan: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_REACT_SCAN ?? false
-)
 export const getEnableMutlipleTempsOT2: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_MULTIPLE_TEMPS_OT2 ?? false
@@ -47,8 +43,7 @@ export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_BY_VOLUME_BUILDER ?? false
 )
-export const getEnableAdditionalPartialTipSelection: Selector<boolean> =
-  createSelector(
-    getFeatureFlagData,
-    flags => flags.OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION ?? false
-  )
+export const getEnableVacuumModule: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_VACUUM_MODULE ?? false
+)

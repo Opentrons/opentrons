@@ -95,8 +95,9 @@ export function RobotUpdateProgressModal({
     setShowFileSelect(false)
   }
   useEffect(() => {
-    if (showFileSelect && installFromFileRef.current)
+    if (showFileSelect && installFromFileRef.current) {
       installFromFileRef.current.click()
+    }
   }, [showFileSelect])
 
   const robotInitStatus = useRobotInitializationStatus()
@@ -207,11 +208,11 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const IMAGE_ALT = 'Welcome screen background image'
   let renderedImg: JSX.Element
-  if (!errorMessage)
+  if (!errorMessage) {
     renderedImg = (
       <img alt={IMAGE_ALT} src={successIcon} height="208px" width="250px" />
     )
-  else
+  } else {
     renderedImg = (
       <Icon
         name="ot-alert"
@@ -220,6 +221,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
         margin={SPACING.spacing24}
       />
     )
+  }
 
   return (
     <>
@@ -302,17 +304,26 @@ function useStatusBarAnimation(isError: boolean): void {
     }
   }
 
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(startUpdatingAnimation, [])
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(startIdleAnimationIfFailed, [isError])
 }
 
 function useCleanupRobotUpdateSessionOnDismount(): void {
   const dispatch = useDispatch()
-  useEffect(() => {
-    return () => {
-      dispatch(clearRobotUpdateSession())
-    }
-  }, [])
+  useEffect(
+    () => {
+      return () => {
+        dispatch(clearRobotUpdateSession())
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 }
 
 function useGetModalText(

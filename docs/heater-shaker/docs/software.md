@@ -1,5 +1,6 @@
 ---
 title: "Heater-Shaker Module: Software Control"
+description: "Control the Heater-Shaker via Protocol Designer, Python API, and the Opentrons App."
 ---
 
 You control the Heater-Shaker through protocols you create in [Opentrons Protocol Designer](https://designer.opentrons.com/) or the [Python API](../python-api/modules/heater-shaker.md). Running these protocols requires version 6.1.0 or newer of the [Opentrons App](https://opentrons.com/ot-app) and robot server.

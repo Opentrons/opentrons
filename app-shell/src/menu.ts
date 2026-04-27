@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 // application menu
 import { Menu, shell } from 'electron'
 

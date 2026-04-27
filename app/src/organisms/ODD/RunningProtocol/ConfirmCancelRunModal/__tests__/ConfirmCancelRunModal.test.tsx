@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
@@ -67,6 +67,14 @@ describe('ConfirmCancelRunModal', () => {
   let props: ComponentProps<typeof ConfirmCancelRunModal>
 
   beforeEach(() => {
+    mockNavigate.mockClear()
+    mockStopRun.mockClear()
+    mockDeleteRun.mockClear()
+    mockDismissCurrentRun.mockClear()
+    mockTrackEvent.mockClear()
+    mockTrackProtocolRunEvent.mockClear()
+    mockFn.mockClear()
+
     props = {
       isActiveRun: true,
       runId: RUN_ID,
@@ -103,10 +111,6 @@ describe('ConfirmCancelRunModal', () => {
         },
       },
     } as any)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
   })
 
   it('should render correct text and buttons', () => {

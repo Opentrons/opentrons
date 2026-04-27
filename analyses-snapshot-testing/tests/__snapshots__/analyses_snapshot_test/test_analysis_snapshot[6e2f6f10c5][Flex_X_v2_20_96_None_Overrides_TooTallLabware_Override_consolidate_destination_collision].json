@@ -5,7 +5,7 @@
   },
   "commands": [
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +18,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1184,7 +1184,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1204,7 +1204,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1223,7 +1223,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1463,7 +1463,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2651,7 +2651,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3841,7 +3841,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3868,14 +3868,14 @@
           "z": 97.47
         },
         "tipDiameter": 7.23,
-        "tipLength": 77.66499999999999,
+        "tipLength": 77.5,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3910,7 +3910,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4011,6 +4011,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [],
   "metadata": {

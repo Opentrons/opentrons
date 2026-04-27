@@ -3,7 +3,7 @@
 import re
 from typing import List, Literal, Optional, Union
 
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 from automation.base_page import BasePage
 
@@ -15,18 +15,8 @@ class TransferPage(BasePage):
         super().__init__(page)
 
     ## Step 1 Transfer Form Methods
-
-    def select_nozzles(self, nozzles: Literal["All", "Column", "Single"]) -> None:
-        """
-        Select nozzles for transfer step.
-        args:
-            nozzles: Choose between
-            All, Column, or Single nozzles.
-        """
-        initial_nozzle = self.page.get_by_text("All")
-        initial_nozzle.click()
-        actual_nozzle_option = self.page.get_by_text(nozzles)
-        actual_nozzle_option.click()
+    def _modal_area(self) -> Locator:
+        return self.page.get_by_label("ModalShell_ModalArea")
 
     def tip_rack_page_1_transfer_select(self, tiprack: str) -> None:
         """Select tip rack
@@ -48,29 +38,41 @@ class TransferPage(BasePage):
 
     locations = Literal["Source", "Destination"]
 
-    def wells_select(self, location: locations, wells: Union[str, List[str]], rect: bool = True) -> None:
+    def open_nozzle_and_well_selector(self) -> None:
+        """Open the well selector modal."""
+        self.page.get_by_test_id("nozzle_and_well_modal").click()
+
+    def select_nozzles(self) -> None:
+        modal = self._modal_area()
+        self.wait_for_visible(modal.get_by_text("Select Pipette nozzles to use", exact=False).first)
+        self.wait_for_visible(modal.get_by_role("button", name="Continue"))
+        modal.locator('label:has-text("All nozzles (recommended)")').click()
+        modal.get_by_role("button", name="Continue").click()
+
+    def wells_select(
+        self, location: locations, labwareName: str, wells: Union[str, List[str]], finalStep: bool
+    ) -> None:
         """
         Select source wells.
         Args:
             wells: A single well name (e.g., "A1") or a list (e.g., ["A1", "B1", "C1"]).
             rect: If True, uses the 'rect' selector logic for SVG grids.
         """
+        modal = self._modal_area()
         if location == "Source":
-            self.page.locator('input[name="aspirate_wells"]').click()
+            self.wait_for_visible(modal.get_by_text(f"Select wells to aspirate liquid from {labwareName}"))
         elif location == "Destination":
-            self.page.locator('input[name="dispense_wells"]').click()
+            self.wait_for_visible(modal.get_by_text(f"Select wells to dispense liquid into in {labwareName}"))
 
         # 2. Convert single string to list for uniform processing
         well_list = [wells] if isinstance(wells, str) else wells
 
         for well in well_list:
-            if rect:
-                # Target the SVG rect specifically by its data attribute
-                self.page.locator(f'rect[data-wellname="{well}"]').click()
-            else:
-                # Fallback for non-rect elements if applicable
-                self.page.locator(f'circle[data-wellname="{well}"]').click()
-        self.page.get_by_text("Save", exact=True).click()
+            modal.locator(f"#{well}").click()
+        if finalStep:
+            modal.get_by_role("button", name="Save").click()
+        else:
+            modal.get_by_role("button", name="Continue").click()
 
     def destination_labware_select(self, labware: str) -> None:
         """Select destination labware in transfer step."""
@@ -180,9 +182,9 @@ class TransferPage(BasePage):
             y: Y coordinate (mm).
             z: Z coordinate (mm).
         """
-        self.page.get_by_test_id("TipPositionModal_x_custom_input").fill(str(xyz[0]))
-        self.page.get_by_test_id("TipPositionModal_y_custom_input").fill(str(xyz[1]))
-        self.page.get_by_test_id("TipPositionModal_z_custom_input").fill(str(xyz[2]))
+        self.page.get_by_test_id("tip-position-modal-x-custom-input").fill(str(xyz[0]))
+        self.page.get_by_test_id("tip-position-modal-x-custom-input").fill(str(xyz[1]))
+        self.page.get_by_test_id("tip-position-modal-x-custom-input").fill(str(xyz[2]))
 
     def tip_position_asp_disp(self, aspirate: bool, xyz: tuple[float, float, float]) -> None:
         """

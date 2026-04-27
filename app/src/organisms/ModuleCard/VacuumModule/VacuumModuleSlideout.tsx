@@ -18,14 +18,17 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 
+import { useVacuumModuleControls } from './hooks/useVacuumModuleControls'
+import { parseGaugePressureValue } from './utils/parseGaugePressureValue'
+import { sanitizeGaugePressureInput } from './utils/sanitizeGaugePressureInput'
 import styles from './vacuummodule.module.css'
 
-import type { VacuumModule } from '@opentrons/api-client'
 import type { VacuumMode } from '/app/redux/modules/api-types'
+import type { VacuumModule } from '/app/redux/modules/types'
 
-// TODO: get from module definition or equivalent
-const MAX_PRESSURE = 1000
-const MIN_PRESSURE = 0
+// TODO: get from module definition or equivalent; If not, export to a shared location
+const MAX_PRESSURE = 0
+const MIN_PRESSURE = -200
 
 interface VacuumModuleSlideoutProps {
   module: VacuumModule
@@ -40,14 +43,35 @@ export function VacuumModuleSlideout(
   const { moduleModel } = module
   const { t } = useTranslation('device_details')
   const [modeType, setModeType] = useState<VacuumMode | null>(null)
-  const [pressure, setPressure] = useState<number | null>(null)
+  const [pressureInput, setPressureInput] = useState<string>('')
   const [powerPercent, setPowerPercent] = useState<number>(1)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { setVacuumPressure, setVacuumPower } = useVacuumModuleControls(module)
+  const [showPressureRangeError, setShowPressureRangeError] =
+    useState<boolean>(false)
+  const pressure = parseGaugePressureValue(pressureInput)
+  const isPressureRangeError =
+    pressure != null && (pressure < MIN_PRESSURE || pressure > MAX_PRESSURE)
 
   const handleConfirm = (): void => {
-    console.log('TODO: save settings')
+    if (modeType == null) {
+      return
+    }
+    if (modeType === 'power') {
+      setVacuumPower(powerPercent)
+    } else if (pressure != null) {
+      // non-null pressure value with pressure mode selected
+      if (isPressureRangeError) {
+        setShowPressureRangeError(true)
+        return
+      }
+      setVacuumPressure(pressure)
+    } else {
+      return
+    }
     onCloseClick()
   }
+
   return (
     <Slideout
       title={t('set_vacuum', {
@@ -120,13 +144,19 @@ export function VacuumModuleSlideout(
                 max: MAX_PRESSURE,
               })}
               units={t('mbar')}
-              type="number"
+              type="text"
               onChange={e => {
-                setPressure(e.target.valueAsNumber)
+                setPressureInput(sanitizeGaugePressureInput(e.target.value))
               }}
-              value={pressure}
-              max={MAX_PRESSURE}
-              min={MIN_PRESSURE}
+              value={pressureInput}
+              error={
+                showPressureRangeError && isPressureRangeError
+                  ? t('vacuum_range_error', {
+                      min: MIN_PRESSURE,
+                      max: MAX_PRESSURE,
+                    })
+                  : null
+              }
             />
           )}
           {modeType === 'power' && (

@@ -36,23 +36,34 @@ const UpdateBuildroot = NiceModal.create(
     const robotName = useRef<string>(robot?.name ?? '')
     const dispatch = useDispatch<Dispatch>()
     const session = useSelector(getRobotUpdateSession)
-    if (!hasSeenSessionOnce.current && session)
+    if (!hasSeenSessionOnce.current && session) {
       hasSeenSessionOnce.current = true
+    }
 
-    useEffect(() => {
-      if (robotName.current) {
-        dispatch(setRobotUpdateSeen(robotName.current))
-      }
-    }, [robotName])
+    useEffect(
+      () => {
+        if (robotName.current) {
+          dispatch(setRobotUpdateSeen(robotName.current))
+        }
+      },
+      // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [robotName]
+    )
 
-    const ignoreUpdate = useCallback(() => {
-      if (robotName.current) {
-        dispatch(robotUpdateIgnored(robotName.current))
-      }
-      modal.remove()
-    }, [robotName, close])
+    const ignoreUpdate = useCallback(
+      () => {
+        if (robotName.current) {
+          dispatch(robotUpdateIgnored(robotName.current))
+        }
+        modal.remove()
+      },
+      // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [robotName, close]
+    )
 
-    if (hasSeenSessionOnce.current)
+    if (hasSeenSessionOnce.current) {
       return (
         <ApiHostProvider
           hostname={robot?.ip ?? null}
@@ -68,7 +79,7 @@ const UpdateBuildroot = NiceModal.create(
           />
         </ApiHostProvider>
       )
-    else if (robot != null && robot.status !== UNREACHABLE)
+    } else if (robot != null && robot.status !== UNREACHABLE) {
       return (
         <ViewUpdateModal
           robotName={robotName.current}
@@ -76,6 +87,8 @@ const UpdateBuildroot = NiceModal.create(
           closeModal={ignoreUpdate}
         />
       )
-    else return null
+    } else {
+      return null
+    }
   }
 )

@@ -305,8 +305,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
       </>
     )
   }
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
   if (errorMessage != null) {
     return (
       <SimpleWizardBody

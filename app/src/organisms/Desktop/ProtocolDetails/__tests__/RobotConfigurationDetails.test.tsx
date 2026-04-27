@@ -59,6 +59,19 @@ const mockRequiredModuleDetails = [
   } as LoadModuleRunTimeCommand,
 ]
 
+const mockRequiredVacuumModuleDetails = {
+  id: 'vacuum-module-stub',
+  createdAt: new Date().toISOString(),
+  commandType: 'loadModule' as const,
+  key: 'vacuum-module-stub-key',
+  params: {
+    model: 'vacuumModuleV1',
+    location: {
+      slotName: 'A3',
+    },
+  } as any,
+} as LoadModuleRunTimeCommand
+
 const render = (props: ComponentProps<typeof RobotConfigurationDetails>) => {
   return renderWithProviders(<RobotConfigurationDetails {...props} />, {
     i18nInstance: i18n,
@@ -193,5 +206,23 @@ describe('RobotConfigurationDetails', () => {
     render(props)
     screen.getByText('right mount')
     screen.getAllByText('Loading...')
+  })
+
+  it('renders the vacuum module with correct location when the protocol contains a vacuum module', () => {
+    props = {
+      leftMountPipetteName: null,
+      rightMountPipetteName: 'p10_single',
+      extensionInstrumentName: null,
+      requiredModuleDetails: [
+        ...mockRequiredModuleDetails,
+        mockRequiredVacuumModuleDetails,
+      ],
+      requiredFixtureDetails: [],
+      isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
+    }
+    render(props)
+    screen.getByText('Slot A3+A4')
+    screen.getByText('Vacuum Module GEN1')
   })
 })

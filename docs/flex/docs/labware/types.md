@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Labware Types"
+description: "Reservoirs, well plates, tube racks, and other labware types for Flex."
 ---
 
 This section covers the different types of labware included in the Opentrons Labware Library for use with Flex. 
@@ -55,43 +56,46 @@ For a full example of a well plate lid, reference the [Opentrons Tough PCR Auto-
 
 ## Tips and tip racks 
 
-Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
+Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
 
 ### Tip sterility
 
 Sealed, unopened packages of Opentrons pipette tips are certified to be free of contaminants. Tips are sterilized based on ANSI/AAMI/ISO 11137 standards with irradiation at a Sterility Assurance Level (SAL) of 10<sup>-6</sup>. Each package includes a letter describing our test procedures and certifies that every lot is free of common contaminants such as DNase, RNase, endotoxins (pyrogens), human DNA, PCR inhibitors, and protease.
 
+!!! note
+    Opentrons recommends using sealed tips within three years from the production date.
+
 ### Tip racks 
 
-Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid. 
+Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid.
 
-To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Opentrons recommends using sealed tips within three years from the production date. Additionally, racks are color coded based on the maximum rated volume for each tip type: 
+To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labeled based on the maximum rated volume for each tip type.
 
-- 50 µL: magenta 
-- 200 µL: yellow 
-- 1000 µL: blue 
+- 20 µL: green
+- 50 µL: magenta
+- 200 µL: yellow
+- 1000 µL: blue
 
-![50 µL tip rack in magenta, 200 µL tip rack in yellow, and 1000 µL tip rack in blue.](../images/labware-flex-tip-racks.png "Flex tip racks")
+![Flex 20 µL, 50 µL, 200 µL, and 1000 µL tip racks](../images/flex-tipracks-hero.png)
 
 When ordering or reordering, tips and racks come in two different packaged configurations: 
 
-- **Racks:** Consist of separately shrink-wrapped tip racks (base plate, mid-plate with tips, and lid). Racked configurations are best when cleanliness is paramount, to avoid cross-contamination, or when your protocols don't allow for base plate or component reuse. 
-- **Refills:** Consist of one complete tip rack (base plate, mid plate with tips, and lid) and individual tip containers. Refill configurations are best when your protocols allow for base plate or component reuse. 
+- **Racks:** Consist of separately shrink-wrapped tip racks (base plate, mid-plate with tips, and lid). Racked configurations are best when cleanliness is paramount, to avoid cross-contamination, or when your protocols don't allow for base plate or component reuse.
+- **Refills:** Consist of one complete tip rack (base plate, mid-plate with tips, and lid) and individual tip containers. Refill configurations are best when your protocols allow for base plate or component reuse. 
 
-### Tip-pipette compatibility 
+### Tip-pipette compatibility
 
-Flex pipette tips are designed for the Opentrons Flex pipettes. Flex tips are not backwards compatible with Opentrons OT-2 pipettes, nor can you use OT-2 tips on Flex pipettes. 
-
-Flex pipettes only accept tips with capacities less than or equal to the pipette capacity. 
+Flex pipettes only accept tips with capacities less than or equal to the pipette capacity.
 
 | Pipette capacity | Compatible tips             |
 | :--------------- | :-------------------------- |
-| 1–50 µL          | 50 µL tips only             |
+| 1–50 µL          | 20 µL, 50 µL tips             |
+| 1–200 µL         | 20 µL, 50 µL, 200 µL tips |
 | 5–1000 µL        | 50 µL, 200 µL, and 1000 µL tips |
 
-For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate. See [Pipette specifications][pipette-specifications] for examples. 
+Flex pipette tips are designed for Opentrons Flex pipettes. Flex tips are not backwards compatible with Opentrons OT-2 pipettes, nor can you use OT-2 tips on Flex pipettes. 
 
-Other industry-standard tips may work with Flex pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons Flex tips with Flex pipettes. 
+Other industry-standard tips may work with Flex pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons Flex tips with Flex pipettes.
 
 ### Tip rack adapter 
 

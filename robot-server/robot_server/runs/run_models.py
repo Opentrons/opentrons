@@ -93,6 +93,10 @@ class RunCommandSummary(ResourceModel):
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     )
+    commandAnnotationIds: Optional[List[str]] = Field(
+        None,
+        description="List of command annotation ids associated with this command.",
+    )
 
 
 class Run(ResourceModel):

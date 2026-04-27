@@ -10,9 +10,14 @@ import { FeedbackModal } from '..'
 
 const mockUseTrackEvent = vi.fn()
 const mockCallApi = vi.fn().mockResolvedValue({})
+const mockGetAccessToken = vi.fn().mockResolvedValue('test-token')
 
 vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
+}))
+
+vi.mock('/ai-client/resources/hooks/useGetAccessToken', () => ({
+  useGetAccessToken: () => ({ getAccessToken: mockGetAccessToken }),
 }))
 
 vi.mock('/ai-client/hooks/useTrackEvent', () => ({
@@ -48,17 +53,6 @@ describe('FeedbackModal', () => {
     screen.getByText('Share why the response was not helpful')
     screen.getByText('Cancel')
     screen.getByText('Send feedback')
-  })
-
-  // should move this test to the chat page
-  it.skip('should set the showFeedbackModel atom to be false when cancel button is clicked', () => {
-    render()
-    expect(feedbackModalAtom.init).toBe(true)
-
-    const cancelButton = screen.getByText('Cancel')
-    cancelButton.click()
-    // check if the feedbackModalAtom is set to false
-    expect(feedbackModalAtom.read).toBe(false)
   })
 
   it('should track event when feedback is sent', async () => {

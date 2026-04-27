@@ -40,6 +40,7 @@ import type {
   LabwareDefinition2,
   LiquidHandlingPropertyByVolume,
   MixProperties,
+  NozzleConfigurationStyle,
   PipetteChannels,
   PositionReference,
   RetractAspirate,
@@ -242,19 +243,28 @@ interface GetDefaultWellsArgs {
   pipetteId: string | null | undefined
   labwareEntities: LabwareEntities
   pipetteEntities: PipetteEntities
+  nozzleConfiguration: NozzleConfigurationStyle
 }
 export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
-  const { labwareId, pipetteId, labwareEntities, pipetteEntities } = args
+  const {
+    labwareId,
+    pipetteId,
+    labwareEntities,
+    pipetteEntities,
+    nozzleConfiguration,
+  } = args
   if (
     !labwareId ||
     !labwareEntities[labwareId] ||
     !pipetteId ||
     !pipetteEntities[pipetteId]
-  )
+  ) {
     return []
+  }
   const labwareDef = labwareEntities[labwareId].def
   const pipetteCanUseLabware = canPipetteUseLabware(
     pipetteEntities[pipetteId].spec,
+    nozzleConfiguration,
     labwareDef
   )
   if (!pipetteCanUseLabware) return []

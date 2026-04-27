@@ -86,12 +86,13 @@ export const MountGripper = (
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
+  }
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}

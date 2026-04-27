@@ -396,7 +396,7 @@ function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
 
-  if (tipStatusUtils.aPipetteWithTip == null)
+  if (tipStatusUtils.aPipetteWithTip == null) {
     switch (selectedRecoveryOption) {
       case RETRY_NEW_TIPS.ROUTE: {
         proceedToRouteAndStep(
@@ -430,4 +430,5 @@ function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
         proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
       }
     }
+  }
 }

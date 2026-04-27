@@ -10,6 +10,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { getHighestPriorityError } from '/app/transformations/runs'
 
+import { ErrorContent } from './ErrorContent'
 import styles from './runfailedmodal.module.css'
 
 import type {
@@ -17,7 +18,6 @@ import type {
   RunError,
   RunStatus,
 } from '@opentrons/api-client'
-import type { RunCommandError } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface RunFailedModalProps {
@@ -43,8 +43,9 @@ export function RunFailedModal({
   if (
     (errors == null || errors.length === 0) &&
     (commandErrorList == null || commandErrorList.data.length === 0)
-  )
+  ) {
     return null
+  }
   const modalHeader: OddModalHeaderBaseProps = {
     title:
       commandErrorList == null || commandErrorList?.data.length === 0
@@ -72,49 +73,6 @@ export function RunFailedModal({
     })
   }
 
-  interface ErrorContentProps {
-    errors: RunCommandError[]
-    isSingleError: boolean
-  }
-  const ErrorContent = ({
-    errors,
-    isSingleError,
-  }: ErrorContentProps): JSX.Element => {
-    return (
-      <>
-        <LegacyStyledText forwardedAs="p" className={styles.error_info_text}>
-          {isSingleError
-            ? t('error_info', {
-                errorType: errors[0].errorType,
-                errorCode: errors[0].errorCode,
-              })
-            : runStatus === RUN_STATUS_SUCCEEDED
-              ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
-                  count: errors.length,
-                })
-              : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
-                  count: errors.length,
-                })}
-        </LegacyStyledText>
-        <div className={styles.error_container}>
-          <div className={styles.error_list}>
-            {errors.map((error, index) => (
-              <LegacyStyledText
-                forwardedAs="p"
-                className={styles.error_detail_text}
-                key={index}
-              >
-                {isSingleError
-                  ? error.detail
-                  : `${error.errorCode}: ${error.detail}`}
-              </LegacyStyledText>
-            ))}
-          </div>
-        </div>
-      </>
-    )
-  }
-
   return (
     <OddModal
       header={modalHeader}
@@ -133,6 +91,7 @@ export function RunFailedModal({
                   : []
             }
             isSingleError={!!highestPriorityError}
+            runStatus={runStatus}
           />
         </div>
         <LegacyStyledText forwardedAs="p" className={styles.contact_text}>

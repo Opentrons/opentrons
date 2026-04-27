@@ -152,10 +152,13 @@ convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
 [tool.ruff.format]
-exclude = ["docs/v2/example_protocols/*"]
+exclude = ["docs/v2/example_protocols/*", "src/opentrons/_version.py"]
 [tool.ruff.lint.isort]
 known-first-party = ["opentrons_shared_data", "opentrons_hardware"]
 known-local-folder = ["opentrons"]
+
+[tool.uv]
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
@@ -218,3 +221,10 @@ init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
+
+[[tool.mypy.overrides]]
+module = [
+    "Pyro5.*",
+    "serpent"
+]
+follow_untyped_imports = true

@@ -8,7 +8,13 @@ import {
   RadioButton,
   StyledText,
 } from '@opentrons/components'
-import { G1_NOZZLE, PARTIAL } from '@opentrons/shared-data'
+import {
+  A1_NOZZLE,
+  ALL,
+  G1_NOZZLE,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+} from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -17,7 +23,6 @@ import { NozzleRender } from './NozzleRender'
 import {
   getAvailableNozzleConfigurations,
   getEntireWellSelection,
-  partialNozzleMap,
 } from './utils'
 
 import type { TFunction } from 'i18next'
@@ -43,12 +48,11 @@ export function PipetteNozzleSelector(
   const { pipetteSpecs, propsForFields, robotType } = props
   const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')
-
-  const nozzleConfiguration = propsForFields.nozzles
-    .value as NozzleConfigurationStyle
-  const primaryNozzle = propsForFields.primaryNozzle
-    .value as PrimaryNozzleConfigurationStyle
-
+  const nozzleConfiguration =
+    (propsForFields.nozzles?.value as NozzleConfigurationStyle) ?? ALL
+  const primaryNozzle =
+    (propsForFields.primaryNozzle?.value as PrimaryNozzleConfigurationStyle) ??
+    A1_NOZZLE
   const deckSetup = useSelector(getInitialDeckSetup)
   const is96Channel = channels === 96
 
@@ -58,18 +62,18 @@ export function PipetteNozzleSelector(
     t as TFunction
   )
 
-  const partialOptions: DropdownOption[] = Object.entries(partialNozzleMap).map(
-    ([nozzle, num]) => ({
-      name: t('num_nozzles', { num }),
-      value: nozzle as PartialPrimaryNozzles,
-    })
-  )
+  const partialOptions: DropdownOption[] = Object.entries(
+    PARTIAL_NOZZLE_MAP
+  ).map(([nozzle, num]) => ({
+    name: t('num_nozzles', { num }),
+    value: nozzle as PartialPrimaryNozzles,
+  }))
 
   const wellOrdering = Object.values(pipetteSpecs.orderedColumns).map(
     column => column.orderedNozzles
   )
 
-  const isPartialNozzle = nozzleConfiguration === PARTIAL
+  const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
 
   const [selectedNozzle, setSelectedNozzle] = useState<string[]>([])
 
@@ -78,7 +82,7 @@ export function PipetteNozzleSelector(
     let updatedNozzles: string[]
     if (!isPartialNozzle) {
       updatedNozzles = getEntireWellSelection(
-        propsForFields.primaryNozzle.value as string,
+        primaryNozzle,
         wellOrdering,
         nozzleConfiguration,
         primaryNozzle,
@@ -86,7 +90,7 @@ export function PipetteNozzleSelector(
       )
     } else {
       const numNozzles =
-        partialNozzleMap[
+        PARTIAL_NOZZLE_MAP[
           propsForFields.primaryNozzle.value as PartialPrimaryNozzles
         ]
       const col = wellOrdering[0]
@@ -101,10 +105,20 @@ export function PipetteNozzleSelector(
     isPartialNozzle,
     propsForFields.primaryNozzle.value,
   ])
+
+  let subText = ''
+
+  if (isPartialNozzle) {
+    subText = t('number_of_nozzles_used')
+  } else if (nozzleConfiguration === ALL) {
+    subText = t('all_nozzles_are_preselected')
+  } else {
+    subText = t('click_on_highlighted_nozzles')
+  }
   return (
     <>
       <div className={styles.header_text_wrapper}>
-        <StyledText desktopStyle="headingMediumBold">
+        <StyledText desktopStyle="headingSmallBold">
           {t('select_pipette_nozzles_to_use')}
         </StyledText>
       </div>
@@ -119,7 +133,7 @@ export function PipetteNozzleSelector(
               onChange={() => {
                 propsForFields.nozzles.updateValue(value)
                 propsForFields.primaryNozzle.updateValue(
-                  value === PARTIAL ? G1_NOZZLE : null
+                  value === PARTIAL_COLUMN ? G1_NOZZLE : A1_NOZZLE
                 )
                 setSelectedNozzle([])
               }}
@@ -167,9 +181,7 @@ export function PipetteNozzleSelector(
                 desktopStyle="bodyDefaultRegular"
                 color={isPartialNozzle ? COLORS.grey60 : COLORS.black90}
               >
-                {isPartialNozzle
-                  ? t('number_of_nozzles_used')
-                  : t('click_on_highlighted_nozzles')}
+                {subText}
               </StyledText>
               {isPartialNozzle && (
                 <DropdownMenu

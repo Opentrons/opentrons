@@ -4,7 +4,7 @@ import enum
 
 import sqlalchemy
 
-from robot_server.persistence._utc_datetime import UTCDateTime
+from server_utils.sql_utils import UTCDateTime
 
 metadata = sqlalchemy.MetaData()
 
@@ -280,8 +280,8 @@ run_command_table = sqlalchemy.Table(
 class AnnotationSourceSQLEnum(enum.Enum):
     """Source of an annotation."""
 
-    USER = "user"
-    SYSTEM = "system"
+    USER_COMMAND = "userCommand"
+    SYSTEM_COMMAND = "systemCommand"
 
 
 command_annotation_table = sqlalchemy.Table(
@@ -307,8 +307,18 @@ command_annotation_table = sqlalchemy.Table(
         ),
         nullable=False,
     ),
+    sqlalchemy.Column(
+        "parent_id",
+        sqlalchemy.String,
+        nullable=True,
+    ),
     # Stores a JSON string
     sqlalchemy.Column("params", sqlalchemy.String, nullable=True),
+    sqlalchemy.ForeignKeyConstraint(
+        ["run_id", "parent_id"],
+        ["command_annotation.run_id", "command_annotation.annotation_id"],
+        ondelete="CASCADE",  # As of the addition of this table, we do not anticipate deleting a parent annotation without deleting its children. So we are enabling cascading deletes.
+    ),
     sqlalchemy.Index(
         "ix_run_id_annotation_id",
         "run_id",
@@ -349,18 +359,6 @@ command_to_annotation_table = sqlalchemy.Table(
         "run_id",
         "command_id",
         "annotation_id",
-        unique=True,
-    ),
-    sqlalchemy.Index(
-        "ix_c2a_run_id_annotation_id",
-        "run_id",
-        "annotation_id",
-        unique=True,
-    ),
-    sqlalchemy.Index(
-        "ix_c2a_run_id_command_id",
-        "run_id",
-        "command_id",
         unique=True,
     ),
 )

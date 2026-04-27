@@ -17,7 +17,7 @@ describe('Checkbox', () => {
 
   beforeEach(() => {
     props = {
-      onClick: vi.fn(),
+      onChange: vi.fn(),
       isChecked: false,
       labelText: 'fake checkbox label',
       tabIndex: 1,
@@ -32,27 +32,36 @@ describe('Checkbox', () => {
   it('renders label with disabled true', () => {
     props.disabled = true
     render(props)
-    const checkBoxInput = screen.getByRole('checkbox', {
+    const checkboxInput = screen.getByRole('checkbox', {
       name: 'fake checkbox label',
     })
-    expect(checkBoxInput).toBeDisabled()
+    expect(checkboxInput).toBeDisabled()
   })
 
-  it('renders label with correct style - tabIndex 1', () => {
+  it('renders checkbox with tabIndex 1', () => {
     props.tabIndex = 1
     render(props)
-    const checkBoxInput = screen.getByRole('checkbox', {
+    const checkboxInput = screen.getByRole('checkbox', {
       name: 'fake checkbox label',
     })
-    expect(checkBoxInput).toHaveAttribute('tabindex', '1')
+    expect(checkboxInput).toHaveAttribute('tabindex', '1')
+  })
+
+  it('renders checkbox as checked when isChecked is true', () => {
+    props.isChecked = true
+    render(props)
+    const checkboxInput = screen.getByRole('checkbox', {
+      name: 'fake checkbox label',
+    })
+    expect(checkboxInput).toBeChecked()
   })
 
   it('calls mock function when clicking checkbox', () => {
     render(props)
-    const checkBoxInput = screen.getByRole('checkbox', {
+    const checkboxInput = screen.getByRole('checkbox', {
       name: 'fake checkbox label',
     })
-    fireEvent.click(checkBoxInput)
-    expect(props.onClick).toHaveBeenCalled()
+    fireEvent.click(checkboxInput)
+    expect(props.onChange).toHaveBeenCalled()
   })
 })

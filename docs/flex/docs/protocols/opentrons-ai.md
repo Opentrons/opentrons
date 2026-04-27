@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: OpentronsAI"
+description: "Generate and run protocols using OpentronsAI for Flex."
 ---
 
 [OpentronsAI](https://ai.opentrons.com/) is a web-based tool that uses the Python Protocol API to create, modify, and optimize protocols. Create a free account and take advantage of simple forms and the chat feature to easily create Python protocols that run on the Flex. 

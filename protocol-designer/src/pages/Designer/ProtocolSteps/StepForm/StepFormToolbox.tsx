@@ -77,6 +77,7 @@ import {
   PauseTools,
   TemperatureTools,
   ThermocyclerTools,
+  VacuumTools,
 } from './StepTools'
 import {
   capitalizeFirstLetter,
@@ -115,6 +116,7 @@ const STEP_FORM_MAP: StepFormMap = {
   camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
   flexStacker: FlexStackerTools,
+  vacuum: VacuumTools,
 }
 
 // used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings
@@ -219,11 +221,16 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   // state used to determine if user has seen advanced settings page (relevant for presaved forms)
   const [hasSeenAdvancedSettings, setHasSeenAdvancedSettings] =
     useState<boolean>(false)
-  useEffect(() => {
-    if (toolboxStep === 2 && !hasSeenAdvancedSettings) {
-      setHasSeenAdvancedSettings(true)
-    }
-  }, [toolboxStep])
+  useEffect(
+    () => {
+      if (toolboxStep === 2 && !hasSeenAdvancedSettings) {
+        setHasSeenAdvancedSettings(true)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [toolboxStep]
+  )
   const isConfirmationRequired =
     robotType === FLEX_ROBOT_TYPE &&
     fieldsChangedRequiringConfirmation.length > 0 &&
@@ -272,23 +279,28 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   )
   const visibleFormErrorsTypes = visibleFormErrors.map(error => error.title)
 
-  useEffect(() => {
-    const dispatchAnalyticsEvent = (
-      eventName: string,
-      eventProperties: FormWarningType[] | string[]
-    ): void => {
-      if (eventProperties.length > 0) {
-        const event: AnalyticsEvent = {
-          name: eventName,
-          properties: { eventProperties },
+  useEffect(
+    () => {
+      const dispatchAnalyticsEvent = (
+        eventName: string,
+        eventProperties: FormWarningType[] | string[]
+      ): void => {
+        if (eventProperties.length > 0) {
+          const event: AnalyticsEvent = {
+            name: eventName,
+            properties: { eventProperties },
+          }
+          dispatch(analyticsEvent(event))
         }
-        dispatch(analyticsEvent(event))
       }
-    }
 
-    dispatchAnalyticsEvent(FORM_WARNINGS_EVENT, visibleFormWarningsTypes)
-    dispatchAnalyticsEvent(FORM_ERRORS_EVENT, visibleFormErrorsTypes)
-  }, [visibleFormWarningsTypes, visibleFormErrorsTypes])
+      dispatchAnalyticsEvent(FORM_WARNINGS_EVENT, visibleFormWarningsTypes)
+      dispatchAnalyticsEvent(FORM_ERRORS_EVENT, visibleFormErrorsTypes)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [visibleFormWarningsTypes, visibleFormErrorsTypes]
+  )
   const moduleEntities = Object.values(useSelector(getModuleEntities))
   const stackerModules = moduleEntities.filter(moduleEntity => {
     return moduleEntity.type === FLEX_STACKER_MODULE_TYPE

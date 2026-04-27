@@ -225,25 +225,30 @@ function usePositionChangeReset(
 ): boolean {
   const [shouldReset, setShouldReset] = useState(false)
 
-  useLayoutEffect(() => {
-    if (shouldReset) {
-      setShouldReset(false)
-      return
-    }
+  useLayoutEffect(
+    () => {
+      if (shouldReset) {
+        setShouldReset(false)
+        return
+      }
 
-    const isNewPosition =
-      previousInitialRef.current?.x !== initialPosition.x ||
-      previousInitialRef.current?.y !== initialPosition.y ||
-      previousFinalRef.current?.x !== finalPosition.x ||
-      previousFinalRef.current?.y !== finalPosition.y
+      const isNewPosition =
+        previousInitialRef.current?.x !== initialPosition.x ||
+        previousInitialRef.current?.y !== initialPosition.y ||
+        previousFinalRef.current?.x !== finalPosition.x ||
+        previousFinalRef.current?.y !== finalPosition.y
 
-    if (isNewPosition) {
-      setShouldReset(true)
-    }
+      if (isNewPosition) {
+        setShouldReset(true)
+      }
 
-    previousInitialRef.current = initialPosition
-    previousFinalRef.current = finalPosition
-  }, [initialPosition, finalPosition])
+      previousInitialRef.current = initialPosition
+      previousFinalRef.current = finalPosition
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [initialPosition, finalPosition]
+  )
 
   const previousInitialRef = useRef(initialPosition)
   const previousFinalRef = useRef(finalPosition)
