@@ -12,6 +12,7 @@ const emptyRemote: Remote = {} as any
 export const remote: Remote = new Proxy(emptyRemote, {
   get(_target, propName: string): unknown {
     console.assert(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       (global as any).APP_SHELL_REMOTE,
       'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.ts properly configured?'
     )

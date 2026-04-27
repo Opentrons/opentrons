@@ -24,7 +24,7 @@ clean:
 
 .PHONY: dist
 dist:
-	cd .. && pnpm sb build
+	cd .. && pnpm storybook build
 
 .PHONY: lib
 lib: export NODE_ENV := production
@@ -41,7 +41,7 @@ build-ts:
 .PHONY: dev
 dev:
 	# Run the storybook development server using pnpm
-	cd .. && pnpm sb dev --port $(port)
+	cd .. && pnpm storybook dev --port $(port)
 
 .PHONY: test
 test:
