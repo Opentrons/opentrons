@@ -182,7 +182,7 @@ async def test_run_process_proxy(
     ns = pyro.locate_ns()
 
     retries_counter = 0
-    while ns.count() < 2:
+    while ns.count() < 3:
         # Wait and try again, the resource isnt registered yet
         await asyncio.sleep(0.01)
         retries_counter += 1
@@ -275,7 +275,7 @@ async def test_run_process_create(
     ns = pyro.locate_ns()
 
     retries_counter = 0
-    while ns.count() < 2:
+    while ns.count() < 3:
         # Wait and try again, the resource isnt registered yet
         await asyncio.sleep(0.01)
         retries_counter += 1
