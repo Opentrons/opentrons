@@ -9,6 +9,7 @@ import {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer'
 
+import { registerCertHandlers, registerCertIPC } from './certs'
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
   initializeDiscovery,
@@ -132,6 +133,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerSystemLanguage(dispatch),
           registerCameraStream(dispatch),
           registerOT2AppOpen(),
+          registerCertHandlers(dispatch),
         ]
       : // Only register necessary subset for secondary windows.
         [
@@ -223,6 +225,7 @@ function startUp(): void {
       )
     }
   })
+  registerCertIPC()
 
   log.silly('Global references', { mainWindow, rendererLogger })
 }
