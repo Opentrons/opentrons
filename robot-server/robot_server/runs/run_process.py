@@ -1,6 +1,7 @@
 """A wrapper for a protocol run that lives as a proxy in its own process."""
 
 import asyncio
+import logging
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, get_args
 
 from opentrons import identify_hardware_process
@@ -74,7 +75,10 @@ from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.pyro_utils.pyro_resource import RobotServerPyroResource
 from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
+from robot_server.service.pyro_utils.serpent_type_registry import register_robot_server_types
 
+
+log = logging.getLogger(__name__)
 
 # register_process_types runs for both the robot server process and the run subprocess
 def register_process_types() -> None:
@@ -123,6 +127,7 @@ def register_all_needed_types() -> None:
     """Register both hardware types and robot server types to serialize."""
     register_process_types()
     register_hardware_types()
+    register_robot_server_types()
 
 
 # DirectedRunProcess is created and run as a pyro daemon in its own subprocess
@@ -142,6 +147,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         # Grab the Proxy resources for the Robot Server and OT3API - always expect the resources to be up before a run
         self._robot_server_resource: RobotServerPyroResource = get_pyro_resource()
         self._hardware_api: HardwareControlAPI = identify_hardware_process()
+        log.info(f"Directed Run Process initialized with Run ID: {self._run_id}")
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def register_hardware_door_event(self) -> HardwareEventHandler:
@@ -207,7 +213,8 @@ class DirectedRunProcess(AbstractRunCoordinator):
             deck_configuration=await self._robot_server_resource.get_deck_configuration(),
             file_provider=self._robot_server_resource.get_file_provider(),
             camera_provider=self._robot_server_resource.get_camera_provider(),
-            notify_publishers=self._robot_server_resource.get_notify_publishers(),
+            # TODO re-enable
+            #notify_publishers=self._robot_server_resource.get_notify_publishers(),
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
         )
 

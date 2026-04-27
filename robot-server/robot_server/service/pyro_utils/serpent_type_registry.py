@@ -9,6 +9,11 @@ from opentrons.util.pyro.pyro_serialization import (
     find_pydantic_classes_in_packages,
 )
 
+import Pyro5
+
+# Set the serpent bytes handling configuration to ensure bytes for things like images serialize correctly
+Pyro5.config.SERPENT_BYTES_REPR = True
+
 
 def register_robot_server_types() -> None:
     """Registers serialize and deserialize behavior for Robot-Server types and classes.
