@@ -7,14 +7,25 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { LoggedOutOverlay } from '/app/molecules/LoggedOutOverlay'
+import { getLocalRobot } from '/app/redux/discovery'
+import {
+  getIsLoggedInToLocalRobot,
+  logInOrRefresh,
+} from '/app/redux/robot-auth'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLoginOverlayProvider.module.css'
 
 import type { ReactNode } from 'react'
+import type { OAuth2TokenResponse } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
 export interface OnDeviceLoginModalContextValue {
@@ -42,15 +53,20 @@ export function OnDeviceLoginOverlayProvider({
 }: {
   children: ReactNode
 }): JSX.Element {
-  const [open, setOpen] = useState(false)
-
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
   const openLoginModal = useCallback(() => {
-    setOpen(true)
+    setLoginModalOpen(true)
+  }, [])
+  const closeLoginModal = useCallback(() => {
+    setLoginModalOpen(false)
   }, [])
 
-  const closeLoginModal = useCallback(() => {
-    setOpen(false)
-  }, [])
+  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
+  const shouldShowLoggedOutOverlay =
+    accessControlEnabledQuery.data != null &&
+    accessControlEnabledQuery.data.data.accessControlEnabled &&
+    !isLoggedIn
 
   const value = useMemo(
     (): OnDeviceLoginModalContextValue => ({
@@ -63,12 +79,15 @@ export function OnDeviceLoginOverlayProvider({
   return (
     <OnDeviceLoginContext.Provider value={value}>
       {children}
-      {open
+      {loginModalOpen
         ? createPortal(
             <LoginOverlay onDismiss={closeLoginModal} />,
             getTopPortalEl()
           )
         : null}
+      {shouldShowLoggedOutOverlay && !loginModalOpen && (
+        <LoggedOutOverlay onClick={openLoginModal} />
+      )}
     </OnDeviceLoginContext.Provider>
   )
 }
@@ -86,18 +105,56 @@ function LoginOverlay(props: LoginOverlayProps): JSX.Element {
 }
 
 function LoginOverlayBody({ onDismiss }: LoginOverlayProps): JSX.Element {
+  const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
+
+  const localRobotName = useSelector(
+    (state: State) => getLocalRobot(state)?.name ?? null
+  )
+
+  const storeLoginState = (
+    username: string,
+    tokenResponse: OAuth2TokenResponse
+  ): void => {
+    if (localRobotName == null) {
+      console.warn("Couldn't identify the local robot.")
+      return
+    }
+    if (tokenResponse.token_type !== 'Bearer') {
+      console.warn(
+        'The server gave us an unrecognized token type:',
+        tokenResponse.token_type
+      )
+      return
+    }
+
+    dispatch(
+      logInOrRefresh({
+        username,
+        robotName: localRobotName,
+        accessToken: tokenResponse.access_token,
+        refreshToken: tokenResponse.refresh_token ?? null,
+        expiresAt:
+          tokenResponse.expires_in == null
+            ? null
+            : Date.now() + tokenResponse.expires_in * 1000,
+      })
+    )
+  }
+
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
-    onSuccess: () => {
+    onSuccess: (username, response) => {
       setLoginError(null)
+      storeLoginState(username, response)
       onDismiss()
     },
     onError: () => {
       setLoginError(t('on_device_login_error_incorrect') as string)
     },
   })
+
   return (
     <OnDeviceLogin
       step={step}

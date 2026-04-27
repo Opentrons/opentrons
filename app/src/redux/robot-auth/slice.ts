@@ -1,8 +1,9 @@
 /** The Redux slice for authorization and authentication. */
 
-import { createSlice } from '@reduxjs/toolkit'
+import { createSelector, createSlice } from '@reduxjs/toolkit'
 
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
+import { getLocalRobot } from '../discovery'
 
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { State } from '/app/redux/types'
@@ -77,3 +78,18 @@ export function getAuthStateForRobot(
 ): PerRobotAuthState | null {
   return state.robotAuth?.[robotName] ?? null
 }
+
+/**
+ * On the on-device display, this returns whether we're currently logged in to the
+ * local robot. On the desktop app, this is not meaningful.
+ *
+ * This only considers client-side state. Robot-side state, like whether access control
+ * is enabled at all, needs to be fetched separately.
+ */
+export const getIsLoggedInToLocalRobot = createSelector(
+  (state: State) => state,
+  (state: State) => getLocalRobot(state)?.name ?? null,
+  (state: State, localRobotName: string | null): boolean =>
+    localRobotName != null &&
+    getAuthStateForRobot(state, localRobotName) != null
+)

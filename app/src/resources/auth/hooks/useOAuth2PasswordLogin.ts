@@ -3,6 +3,8 @@ import axios from 'axios'
 import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation } from '@opentrons/react-api-client'
 
+import type { OAuth2TokenResponse } from '@opentrons/api-client'
+
 /**
  * Shape of an error response from `POST /auth/oauth2/token`: the standard
  * RFC 6749 § 5.2 fields plus the opentrons-specific
@@ -31,7 +33,7 @@ export interface UseOAuth2PasswordLoginOptions {
    * Called when the token endpoint succeeds (e.g. navigate away).
    * Use `useNavigate` from the caller for desktop vs ODD routing.
    */
-  onSuccess: () => void
+  onSuccess: (username: string, response: OAuth2TokenResponse) => void
   /**
    * Called with a user-facing message when the token request fails.
    * Wire to `makeSnackbar` / toast in the page or organism, not in this hook.
@@ -55,8 +57,16 @@ export function useOAuth2PasswordLogin(
   const { onSuccess, onError } = options
 
   const { getOAuth2Token, isLoading } = useGetOAuth2TokenMutation({
-    onSuccess: () => {
-      onSuccess()
+    onSuccess: (responseData, requestVariables) => {
+      if (requestVariables.grant_type === 'password') {
+        onSuccess(requestVariables.username, responseData.data)
+      } else {
+        // Shouldn't happen since this hook only sends request with grant_type==='password'.
+        console.warn(
+          'Expeced grant_type password, got',
+          requestVariables.grant_type
+        )
+      }
     },
     onError: (error: unknown) => {
       onError(getOAuth2PasswordLoginErrorMessage(error))
@@ -66,8 +76,8 @@ export function useOAuth2PasswordLogin(
   const submitPassword = (username: string, password: string): void => {
     getOAuth2Token({
       grant_type: 'password',
-      username: username,
-      password: password,
+      username,
+      password,
       client_id: OAUTH2_CLIENT_ID,
     })
   }
