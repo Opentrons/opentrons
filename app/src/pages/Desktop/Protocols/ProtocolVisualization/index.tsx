@@ -30,9 +30,10 @@ export function ProtocolVisualization(): JSX.Element {
   const mostRecentAnalysis = storedProtocol?.mostRecentAnalysis ?? null
   const groupedCommands = useMemo(
     () =>
-      mostRecentAnalysis != null
+      mostRecentAnalysis?.commandAnnotations != null &&
+      mostRecentAnalysis.commandAnnotations.length > 0
         ? getGroupedCommands(mostRecentAnalysis)
-        : null,
+        : [],
     [mostRecentAnalysis]
   )
 
