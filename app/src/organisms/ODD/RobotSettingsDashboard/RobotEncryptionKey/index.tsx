@@ -25,7 +25,9 @@ export function RobotEncryptionKey({
   setCurrentOption,
 }: RobotEncryptionKeyProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const showPasswordModal = () => NiceModal.show(ViewPasswordModal)
+  const showPasswordModal = (): void => {
+    NiceModal.show(ViewPasswordModal)
+  }
   return (
     <div className={styles.robot_encryption_key_container}>
       <ChildNavigation

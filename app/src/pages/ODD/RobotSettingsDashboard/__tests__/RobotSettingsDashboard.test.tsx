@@ -11,7 +11,6 @@ import {
   LanguageSetting,
   NetworkSettings,
   Privacy,
-  RobotEncryptionKey,
   RobotSystemVersion,
   TouchscreenBrightness,
   TouchScreenSleep,

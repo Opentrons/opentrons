@@ -1,10 +1,11 @@
 import { useQuery } from 'react-query'
 
-import { CACertPassword, getCACertPassword } from '@opentrons/api-client'
+import { getCACertPassword } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { CACertPassword } from '@opentrons/api-client'
 
 export type UseCACertPasswordQueryOptions = UseQueryOptions<CACertPassword>
 

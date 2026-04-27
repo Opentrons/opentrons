@@ -1,12 +1,8 @@
-import * as React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  ApiHostProvider,
-  useCACertPasswordQuery,
-} from '@opentrons/react-api-client'
+import { useCACertPasswordQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -14,8 +10,9 @@ import { i18n } from '/app/i18n'
 import { refetchTimeForPassword, RobotEncryptionKey } from '..'
 
 import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
+import type { CACertPassword } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
@@ -37,9 +34,9 @@ const render = (props: ComponentProps<typeof RobotEncryptionKey>) => {
 }
 
 const renderWithModal = (props: ComponentProps<typeof RobotEncryptionKey>) => {
-  const rendered = render(props)
+  const view = render(props)
   fireEvent.click(screen.getByText('View robot generated key'))
-  return rendered
+  return view
 }
 
 describe('RobotEncryptionKey', () => {
@@ -57,7 +54,7 @@ describe('RobotEncryptionKey', () => {
           valid_until_utc: '2026-04-21T21:45:31.535178Z',
         },
       },
-    })
+    } as UseQueryResult<CACertPassword>)
   })
   it('should render a button', () => {
     render(props)
@@ -86,7 +83,7 @@ describe('RobotEncryptionKey modal', () => {
           valid_until_utc: '2026-04-21T21:45:31.535178Z',
         },
       },
-    })
+    } as UseQueryResult<CACertPassword>)
   })
   it('should close the modal when clicking ok', () => {
     renderWithModal(props)
