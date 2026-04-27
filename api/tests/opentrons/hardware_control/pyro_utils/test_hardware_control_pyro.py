@@ -183,10 +183,12 @@ async def test_pyro_behavior_on_modules(
         assert utility.find_PSO(mod) is None
 
 
-async def test_pyro_behavior_ot3api_unhashable_dicts(
+async def test_pyro_behavior_ot3api_dicts_with_non_builtin_keys(
     managed_obj: OT3API,
 ) -> None:
-    """Test the pyro behavior for unhashable dictionaries with pyro by ensuring several OT3API commands have the expected results."""
+    """Test the pyro behavior for dictionaries with keys that are not builtins with pyro by ensuring several
+    OT3API commands have the expected results.
+    """
     sock = socket.socket()
     sock.bind(("localhost", 0))
     host, port = sock.getsockname()

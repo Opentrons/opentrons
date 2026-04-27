@@ -15,7 +15,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
   const pipetteName = getPipetteNameFromSpecs(pipetteSpecs)
 
   console.assert(
-    matchingLabwareDef,
+    matchingLabwareDef != null,
     `expected to find a matching labware def with tiprack ${tiprackUri} but could not`
   )
 
@@ -48,7 +48,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
   })[0]
 
   console.assert(
-    matchingTipLiquidSpecs,
+    matchingTipLiquidSpecs != null,
     `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
       matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
     }`

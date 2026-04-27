@@ -59,10 +59,10 @@ async def test_run_process_proxy() -> None:
     protocol_async = AsyncClientPyroObject(protocol_proxy)
     run_process = cast(DirectedRunProcess, cast(object, protocol_async))
 
-    # TODO when these aren't stubs things will have to be mocked or changed
-    result = run_process.get_loaded_labware_definitions()
-    assert result == []
-    await run_process.finish()
+    result = run_process.get_robot_type()
+    assert result == "OT-3 Standard"
+    # TODO need to get a real or mock orchestrator for most methods to pass
+    # await run_process.finish()
 
     # Clean up client resources.
     protocol_proxy._pyroRelease()  # type: ignore

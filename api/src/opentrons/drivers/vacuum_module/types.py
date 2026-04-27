@@ -96,6 +96,9 @@ class VentState(Enum):
     CLOSED = 0
     OPENED = 1
 
+    def __init__(self, val: int) -> None:
+        self.formatted = self.name.lower()
+
 
 @dataclass
 class VacuumState:

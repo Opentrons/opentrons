@@ -55,10 +55,10 @@ CI runs the same Stylelint, Prettier, and ESLint as the rest of the repo. **Run 
 **Scoped checks** while editing only this package:
 
 ```bash
-yarn stylelint "js-package-testing/**/*.css"
-yarn prettier --ignore-path .eslintignore --check "js-package-testing/**/*.{ts,tsx,js,json,css,md}"
-yarn eslint --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" "js-package-testing/**/*.{ts,tsx,js}"
-yarn eslint --report-unused-disable-directives-severity error --max-warnings 0 --ext .json js-package-testing/
+pnpm stylelint "js-package-testing/**/*.css"
+pnpm prettier --ignore-path .eslintignore --check "js-package-testing/**/*.{ts,tsx,js,json,css,md}"
+pnpm eslint --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" "js-package-testing/**/*.{ts,tsx,js}"
+pnpm eslint --report-unused-disable-directives-severity error --max-warnings 0 --ext .json js-package-testing/
 ```
 
 Global `styles.css` uses **`stylelint-config-idiomatic-order`** (via root `.stylelintrc.js`): keep declarations in that order so `make lint-css` passes.

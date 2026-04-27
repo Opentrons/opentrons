@@ -52,25 +52,25 @@ endif
 
 # run at usage (=), not on makefile parse (:=)
 # todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
-usb_host=$(shell yarn -s discovery find -i 169.254)
+usb_host=$(shell pnpm -s discovery find -i 169.254)
 
 # install all project dependencies
 .PHONY: setup
 setup: setup-js setup-py
 
-# front-end dependencies handled by yarn
+# front-end dependencies handled by pnpm
 .PHONY: setup-js
 setup-js:
-	yarn config set network-timeout 60000
-	yarn
+	pnpm config set network-timeout 60000
+	pnpm install
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
 # front-end dependencies install for CI
 .PHONY: setup-js-ci
 setup-js-ci:
-	yarn config set network-timeout 60000
-	yarn install --frozen-lockfile
+	pnpm config set network-timeout 60000
+	pnpm install --frozen-lockfile
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
@@ -96,7 +96,7 @@ teardown:
 
 .PHONY: teardown-js
 teardown-js: clean-js
-	yarn shx rm -rf "**/node_modules"
+	pnpm exec shx rm -rf "**/node_modules"
 
 PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_DIRS))
 
@@ -254,22 +254,22 @@ lint-js: lint-js-eslint lint-js-prettier
 lint-js-eslint:
 # todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
 # when the file supports it (upgrade eslint and/or move away from legacy config format)
-	yarn eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	pnpm exec eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 
 .PHONY: lint-json
 lint-json:
 # todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
 # when the file supports it (upgrade eslint and/or move away from legacy config format)
-	yarn eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+	pnpm exec eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
-	yarn stylelint "**/*.css" "**/*.js"
+	pnpm stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
 format: format-js format-py format-css
@@ -287,22 +287,22 @@ $(SHARED_DATA_DIR)-py-format:
 
 .PHONY: format-js
 format-js:
-	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:
-	yarn stylelint "**/*.css" --fix
+	pnpm exec stylelint "**/*.css" --fix
 
 .PHONY: check-js
 check-js: build-ts
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build
+	pnpm tsc --build
 
 .PHONY: clean-ts
 clean-ts:
-	yarn tsc --build --clean
+	pnpm tsc --build --clean
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 JS_CIRCULAR_DEPENDENCIES_ROOTS := \
@@ -318,11 +318,12 @@ JS_CIRCULAR_DEPENDENCIES_TARGETS := $(addsuffix -circular-dependencies-js, $(JS_
 circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
 
 %-circular-dependencies-js:
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular $*
+	pnpm madge $(and $(CI),--no-spinner --no-color) --circular $*
 
 .PHONY: test-js-internal
 test-js-internal:
-	yarn vitest $(tests) $(test_opts) $(cov_opts)
+	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
+
 
 .PHONY: test-js-%
 test-js-%:
