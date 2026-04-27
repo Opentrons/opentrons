@@ -73,8 +73,10 @@ class PyroFunctionWrapper:
     def __init__(
         self,
         callable: Callable[P, T],
+        loop: asyncio.AbstractEventLoop
     ) -> None:
         self.callable = callable
+        self._loop = loop
 
     @property
     def is_callable(self) -> bool:
@@ -482,9 +484,9 @@ def convert_result_to_proxy(  # noqa: C901
                 proxy_list.append(utility.proxy_for(pyro_synchronous_obj))
             return proxy_list
         except TypeError:
-            if isinstance(result, FunctionType):
+            if isinstance(result, FunctionType) or isinstance(result, MethodType):
                 # Wrap callable result in Proxy-safe format
-                result = PyroFunctionWrapper(result)
+                result = PyroFunctionWrapper(result, core_obj._loop)
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
                 if not hasattr(result, "_loop"):
