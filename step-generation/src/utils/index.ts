@@ -4,6 +4,7 @@ import { absorbanceReaderCollision } from './absorbanceReaderCollision'
 import { commandCreatorsTimeline } from './commandCreatorsTimeline'
 import { curryCommandCreator, curryWithoutPython } from './curryCommandCreator'
 import { getLabwareSlot } from './getLabwareSlot'
+import { getModuleHasLiveTask } from './getModuleHasLiveTask'
 import { modulePipetteCollision } from './modulePipetteCollision'
 import { reduceCommandCreators } from './reduceCommandCreators'
 import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
@@ -17,6 +18,7 @@ export {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
   getLabwareSlot,
+  getModuleHasLiveTask,
 }
 export * from './commandCreatorArgsGetters'
 export * from './constructInvariantContextFromAnalysis'

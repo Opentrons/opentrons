@@ -163,9 +163,9 @@ export const commandCreatorFromStepArgs = (
         args
       )
 
-    case 'vacuumSetPumpProfile':
+    case 'vacuumStartRunProfile':
       return StepGeneration.curryCommandCreator(
-        StepGeneration.vacuumSetPumpProfile,
+        StepGeneration.vacuumStartRunProfile,
         args
       )
 
