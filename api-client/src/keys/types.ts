@@ -24,3 +24,14 @@ export interface EncryptedCACertificates {
     next?: OldAndNewEncryptedCertificate | null
   }
 }
+
+export interface UnencryptedCert {
+  cert_data: string
+}
+
+export interface PlaintextCACertificates {
+  data: {
+    current: UnencryptedCert
+    next?: UnencryptedCert | null
+  }
+}
