@@ -85,7 +85,13 @@ class RunProcessPyroProvider:
             return
 
         self._run_process = subprocess.Popen(
-            args=[sys.executable, "-m", run_process_entry_point.__name__],
+            args=[
+                sys.executable,
+                "-m",
+                run_process_entry_point.__name__,
+                "--pyroname",
+                _RUN_PROXY_NAME,
+            ],
             env={k: v for k, v in os.environ.items()},
             # user="ot-protocol"
         )

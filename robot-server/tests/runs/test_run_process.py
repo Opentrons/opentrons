@@ -37,7 +37,7 @@ async def test_run_process_proxy() -> None:
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     ns_thread.start()
 
-    pyro_thread = initialize_run_process()
+    pyro_thread = initialize_run_process("ot-protocol")
     pyro_thread.start()
 
     # Client-side requests below
