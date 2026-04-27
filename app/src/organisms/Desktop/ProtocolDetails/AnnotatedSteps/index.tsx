@@ -95,6 +95,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const filteredCommands = useMemo(
     () =>
       analysis.commands.filter(
+        // ToDo: the following condition will be updated for phase 2
         command =>
           !command.commandType.includes('load') &&
           command.commandType !== 'home'
