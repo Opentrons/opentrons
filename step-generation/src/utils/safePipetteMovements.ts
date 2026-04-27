@@ -22,7 +22,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { EMPTY, OT2_TC_SLOTS } from '../constants'
+import { EMPTY } from '../constants'
 import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
@@ -224,23 +224,9 @@ const getSlotHasPotentialCollidingObject = (
   invariantContext: InvariantContext,
   robotType: RobotType
 ): boolean => {
-  const isThermocyclerOnDeck = Object.values(
-    invariantContext.moduleEntities
-  ).some(({ type }) => type === THERMOCYCLER_MODULE_TYPE)
-
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
-    // explicit OT-2 check for if the pipette will enter the space above a thermocycler-occupied slot
-    const willCollideWithThermocycler =
-      isThermocyclerOnDeck &&
-      robotType === OT2_ROBOT_TYPE &&
-      slot.addressableArea?.id != null &&
-      OT2_TC_SLOTS.includes(slot.addressableArea.id as OT2AddressableAreaName)
-
-    if (willCollideWithThermocycler) {
-      return true
-    }
 
     // If slotPosition or slotBounds is null, continue to the next iteration
     if (slotPosition == null || slotBounds == null) {
@@ -419,8 +405,7 @@ export const getIsSafePipetteMovement = (args: {
     tipLength,
     wellTargetPoint,
     labwareDefinition,
-    primaryNozzle ??
-      getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels }),
+    primaryNozzle,
     nozzleConfiguration,
     tipOverlapOnNozzle
   )
@@ -445,11 +430,12 @@ export const getIsSafePipetteMovement = (args: {
       position,
     }
   })
+  const willCollide = getWillCollideWithThermocyclerLid(
+    pipetteBoundsAtWellLocation,
+    moduleEntities
+  )
   return (
-    !getWillCollideWithThermocyclerLid(
-      pipetteBoundsAtWellLocation,
-      moduleEntities
-    ) &&
+    !willCollide &&
     !getSlotHasPotentialCollidingObject(
       pipetteBoundsAtWellLocation,
       slotInfos,
