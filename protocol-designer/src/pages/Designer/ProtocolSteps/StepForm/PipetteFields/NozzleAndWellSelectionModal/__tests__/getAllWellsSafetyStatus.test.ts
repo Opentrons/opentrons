@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  ALL,
   COLUMN,
+  fixture384Plate,
   fixture96Plate,
+  fixtureP10MultiV2Specs,
+  fixtureP10SingleV2Specs,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   getLabwareDefURI,
@@ -182,6 +186,128 @@ describe('getAllWellsSafetyStatus', () => {
       })
 
       expect(getIsSafePipetteMovement).toHaveBeenCalledTimes(6)
+    })
+  })
+
+  describe('8-channel ALL on 384-well plate (staggered columns)', () => {
+    const firstColumn = fixture384Plate.ordering[0]
+    const secondColumn = fixture384Plate.ordering[1]
+
+    const mockInvariant384 = {
+      pipetteEntities: {
+        [pipetteId]: {
+          name: 'p10_multi',
+          id: pipetteId,
+          tiprackDefURI: [
+            getLabwareDefURI(fixtureTiprack1000ul as LabwareDefinition),
+          ],
+          tiprackLabwareDef: [fixtureTiprack1000ul],
+          spec: fixtureP10MultiV2Specs,
+          pythonName: 'mock_pipette_p10_multi',
+        },
+      },
+      labwareEntities: {
+        [labwareId]: {
+          id: labwareId,
+          pythonName: 'mock_384_plate',
+          labwareDefURI: getLabwareDefURI(fixture384Plate as LabwareDefinition),
+          def: fixture384Plate,
+        },
+      },
+    } as any
+
+    it('evaluates even and odd stagger rows separately per column', () => {
+      ;(getIsSafePipetteMovement as any).mockImplementation(
+        (args: { wellTargetName: string }) => {
+          if (args.wellTargetName === firstColumn[0]) return true
+          if (args.wellTargetName === firstColumn[1]) return false
+          if (args.wellTargetName === secondColumn[0]) return false
+          if (args.wellTargetName === secondColumn[1]) return true
+          return true
+        }
+      )
+
+      const allWells384 = [firstColumn, secondColumn]
+
+      const result = getAllWellsSafetyStatus({
+        allWells: allWells384,
+        robotState: mockRobotState,
+        invariantContext: mockInvariant384,
+        pipetteId,
+        labwareId,
+        primaryNozzle,
+        nozzleConfiguration: ALL,
+      })
+
+      firstColumn.forEach((wellName, rowIdx) => {
+        expect(result[wellName]).toBe(rowIdx % 2 === 0 ? 0 : 1)
+      })
+      secondColumn.forEach((wellName, rowIdx) => {
+        expect(result[wellName]).toBe(rowIdx % 2 === 0 ? 1 : 0)
+      })
+
+      expect(getIsSafePipetteMovement).toHaveBeenCalledTimes(4)
+    })
+  })
+
+  describe('1-channel ALL on 384-well plate (staggered columns)', () => {
+    const firstColumn = fixture384Plate.ordering[0]
+    const secondColumn = fixture384Plate.ordering[1]
+
+    const mockInvariant384Single = {
+      pipetteEntities: {
+        [pipetteId]: {
+          name: 'p10_single',
+          id: pipetteId,
+          tiprackDefURI: [
+            getLabwareDefURI(fixtureTiprack1000ul as LabwareDefinition),
+          ],
+          tiprackLabwareDef: [fixtureTiprack1000ul],
+          spec: fixtureP10SingleV2Specs,
+          pythonName: 'mock_pipette_p10_single',
+        },
+      },
+      labwareEntities: {
+        [labwareId]: {
+          id: labwareId,
+          pythonName: 'mock_384_plate',
+          labwareDefURI: getLabwareDefURI(fixture384Plate as LabwareDefinition),
+          def: fixture384Plate,
+        },
+      },
+    } as any
+
+    it('evaluates even and odd stagger rows separately per column', () => {
+      ;(getIsSafePipetteMovement as any).mockImplementation(
+        (args: { wellTargetName: string }) => {
+          if (args.wellTargetName === firstColumn[0]) return true
+          if (args.wellTargetName === firstColumn[1]) return false
+          if (args.wellTargetName === secondColumn[0]) return false
+          if (args.wellTargetName === secondColumn[1]) return true
+          return true
+        }
+      )
+
+      const allWells384 = [firstColumn, secondColumn]
+
+      const result = getAllWellsSafetyStatus({
+        allWells: allWells384,
+        robotState: mockRobotState,
+        invariantContext: mockInvariant384Single,
+        pipetteId,
+        labwareId,
+        primaryNozzle,
+        nozzleConfiguration: ALL,
+      })
+
+      firstColumn.forEach((wellName, rowIdx) => {
+        expect(result[wellName]).toBe(rowIdx % 2 === 0 ? 0 : 1)
+      })
+      secondColumn.forEach((wellName, rowIdx) => {
+        expect(result[wellName]).toBe(rowIdx % 2 === 0 ? 1 : 0)
+      })
+
+      expect(getIsSafePipetteMovement).toHaveBeenCalledTimes(4)
     })
   })
 })

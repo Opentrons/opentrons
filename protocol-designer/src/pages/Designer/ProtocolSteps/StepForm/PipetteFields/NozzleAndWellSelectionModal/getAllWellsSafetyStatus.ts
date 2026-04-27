@@ -36,6 +36,7 @@ export function getAllWellsSafetyStatus(
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
   const channels = pipetteSpec.channels
+  const is384Plate = labwareDef.ordering.flat().length === 384
   const pipetteCanUseLabware = canPipetteUseLabware(
     pipetteSpec,
     nozzleConfiguration,
@@ -72,27 +73,70 @@ export function getAllWellsSafetyStatus(
     }
   } else if (
     nozzleConfiguration === COLUMN ||
-    (channels === 8 && nozzleConfiguration === ALL)
+    (channels === 8 && nozzleConfiguration === ALL) ||
+    (channels === 1 && nozzleConfiguration === ALL && is384Plate)
   ) {
-    // COLUMN mode: each column = 8 wells
+    // 384: two vertical staggers per column. Reuse the same even/odd grouping for
+    // 8-channel ALL, COLUMN (e.g. 96ch on 384), and single-channel ALL on 384 only —
+    // PD only offers ALL for 1ch; per-well checks are overly pessimistic at tight Y pitch.
+    const use384ColumnStagger =
+      is384Plate &&
+      (nozzleConfiguration === COLUMN ||
+        (nozzleConfiguration === ALL && (channels === 1 || channels === 8)))
+
     for (let colIndex = 0; colIndex < allWells.length; colIndex++) {
       const column = allWells[colIndex]
-      const firstWell = column[0]
-      const safe = robotState
-        ? getIsSafePipetteMovement({
-            robotState,
-            invariantContext,
-            pipetteId,
-            labwareId,
-            wellTargetName: firstWell,
-            primaryNozzle,
-            nozzleConfiguration,
-          })
-        : true
 
-      column.forEach(wellName => {
-        allWellsWithStatus[wellName] = safe ? 0 : 1
-      })
+      // 384-well plates: two staggered groups per column (even / odd row index).
+      // Using only column[0] marks both groups with the same safety and can wrongly
+      // block the whole plate on OT-2 when the second stagger is actually reachable.
+      if (use384ColumnStagger) {
+        const safeEvenStagger = robotState
+          ? getIsSafePipetteMovement({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId,
+              wellTargetName: column[0],
+              primaryNozzle,
+              nozzleConfiguration,
+            })
+          : true
+        const safeOddStagger = robotState
+          ? getIsSafePipetteMovement({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId,
+              wellTargetName: column[1],
+              primaryNozzle,
+              nozzleConfiguration,
+            })
+          : true
+
+        column.forEach((wellName, rowIdx) => {
+          const safe = rowIdx % 2 === 0 ? safeEvenStagger : safeOddStagger
+          allWellsWithStatus[wellName] = safe ? 0 : 1
+        })
+      } else {
+        // COLUMN mode (96-well columns) or 8-channel ALL on 96: one pose per column.
+        const firstWell = column[0]
+        const safe = robotState
+          ? getIsSafePipetteMovement({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId,
+              wellTargetName: firstWell,
+              primaryNozzle,
+              nozzleConfiguration,
+            })
+          : true
+
+        column.forEach(wellName => {
+          allWellsWithStatus[wellName] = safe ? 0 : 1
+        })
+      }
     }
   } else if (nozzleConfiguration === ALL && channels === 96) {
     // ALL 96 Nozzles: only check the first well
