@@ -110,7 +110,7 @@ export function getAllWellsSafetyStatus(
     allWells.flat().forEach(wellName => {
       allWellsWithStatus[wellName] = safe ? 0 : 1
     })
-  } else if (nozzleConfiguration === SINGLE) {
+  } else if (nozzleConfiguration === SINGLE && channels !== 1) {
     // SINGLE nozzle for 8ch and 96ch: check every well individually
     allWells.flat().forEach(wellName => {
       const safe = robotState
