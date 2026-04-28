@@ -128,13 +128,20 @@ async def _host_pyro_nameserver_and_ot3api(
     ns = pyro.locate_ns()
 
     retries_counter = 0
-    while ns.count() < 3:
+    uri = None
+    while retries_counter <= 10:
         # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+        try:
+            uri = ns.lookup("OT3API")
+            ns.lookup("robot-server-resource")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
+
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
 
     uri = pyro.resolve(uri="PYRONAME:OT3API")
     ot3_proxy = pyro.Proxy(uri)  # type: ignore
@@ -161,15 +168,21 @@ async def test_run_process_proxy(
     ns = pyro.locate_ns()
 
     retries_counter = 0
-    while ns.count() < 3:
+    uri = None
+    while retries_counter <= 10:
         # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+        try:
+            uri = ns.lookup("ot-protocol")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
 
-    uri = pyro.resolve(uri="PYRONAME:ot-protocol")
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+
+    # uri = pyro.resolve(uri="PYRONAME:ot-protocol")
     protocol_proxy = pyro.Proxy(uri)  # type: ignore
     protocol_async = AsyncClientPyroObject(protocol_proxy)
     run_process = cast(DirectedRunProcess, cast(object, protocol_async))
@@ -252,15 +265,20 @@ async def test_run_process_create(
     ns = pyro.locate_ns()
 
     retries_counter = 0
-    while ns.count() < 3:
+    uri = None
+    while retries_counter <= 10:
         # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+        try:
+            uri = ns.lookup("ot-protocol")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
 
-    uri = pyro.resolve(uri="PYRONAME:ot-protocol")
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+
     protocol_proxy = pyro.Proxy(uri)  # type: ignore
     protocol_async = AsyncClientPyroObject(protocol_proxy)
     run_process = cast(DirectedRunProcess, cast(object, protocol_async))
