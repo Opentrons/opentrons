@@ -12,12 +12,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.10.1!**
 
-This hotfix release addresses multiple bugs to allow additional well selections when transferring liquids with:
+This hotfix release addresses the following bugs:
 
-- any Flex or OT-2 single-channel pipette with adjacent labware, like tip racks, tube racks, or reservoirs on the deck.
-- Pipettes transferring liquid to or from labware in a Thermocycler Module.
-
-These changes allow additional safe nozzle and well selections without Protocol Designer including a potential collision error.
+- Protocol Designer allows more safe nozzle and well selections without including excess collision errors:
+  - Transfer liquid to or from labware in the OT-2 Thermocycler Module.
+  - Use partial tip pickup with an 8- or 1-channel pipette in a 384-well plate.
+- Select the source or destination for a final blowout with the default well position.
 
 ## Opentrons Protocol Designer Changes in 8.10.0
 
