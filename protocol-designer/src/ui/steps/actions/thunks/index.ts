@@ -347,13 +347,13 @@ export interface SaveStepFormAction {
     form: FormData
 
     /**
-     * If a new Thermocycler profile step is being saved, a "wait for profile to
+     * If a new concurrent group step is being saved, a "wait for group to
      * complete" step will be saved along with it, implicitly. This is the ID to use
      * for that new wait step.
      *
      * If no wait step needs to be created, this is ignored.
      */
-    thermocyclerPauseStepId: StepIdType
+    concurrentGroupPauseStepId: StepIdType
   }
 }
 export const _saveStepForm = (form: FormData): SaveStepFormAction => {
@@ -365,7 +365,7 @@ export const _saveStepForm = (form: FormData): SaveStepFormAction => {
     type: SAVE_STEP_FORM,
     payload: {
       form: adjustedForm,
-      thermocyclerPauseStepId: uuid(),
+      concurrentGroupPauseStepId: uuid(),
     },
   }
 }

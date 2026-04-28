@@ -39,6 +39,8 @@ import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
@@ -982,7 +984,9 @@ export const pauseModuleRequired = (
   const { moduleId, pauseAction } = fields
   const expectingModuleId =
     pauseAction === PAUSE_UNTIL_TEMP ||
-    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE
+    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE
   return expectingModuleId && moduleId == null ? PAUSE_MODULE_REQUIRED : null
 }
 export const pauseTemperatureRequired = (
