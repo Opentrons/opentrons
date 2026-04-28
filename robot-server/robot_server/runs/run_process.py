@@ -51,6 +51,9 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.types.execution import PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
@@ -245,6 +248,13 @@ class DirectedRunProcess(AbstractRunCoordinator):
             orchestrator.add_labware_offset(offset)
 
         self._run_orchestrator = orchestrator
+
+    async def create_simulating(self, protocol_resource: ProtocolResource) -> None:
+        """Create a simulating runner for use in analysis."""
+        self._run_orchestrator = await create_simulating_orchestrator(
+            robot_type=protocol_resource.source.robot_type,
+            protocol_config=protocol_resource.source.config,
+        )
 
     @property
     def run_id(self) -> Optional[str]:

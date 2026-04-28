@@ -257,7 +257,7 @@ async def test_run_process_create(
     )
 
     # Proceed with Pyro process testing
-    pyro_thread = initialize_run_process()
+    pyro_thread = initialize_run_process("ot-protocol")
     pyro_thread.start()
 
     # Client-side requests below
