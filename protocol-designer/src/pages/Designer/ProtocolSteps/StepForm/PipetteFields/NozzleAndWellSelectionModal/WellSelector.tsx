@@ -371,16 +371,17 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   let controls: JSX.Element = <></>
   const modulesOnDeck = deckSetup.modules
   const moduleIds = new Set(Object.keys(modulesOnDeck))
-  const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
 
-  const moduleDef = moduleLocation
-    ? getModuleDef(modulesOnDeck[moduleLocation].model)
-    : null
-  const isLabwareOnModule = moduleDef !== null
   const defaultSlotPosition: [number, number, number] = [0, 0, 0]
 
   if (labware && robotState) {
     const activeLabware = robotState.labware[labwareId]
+    const moduleLocation =
+      activeLabware.stack.find(loc => moduleIds.has(loc)) ?? null
+    const isLabwareOnModule = moduleLocation !== null
+    const moduleDef = moduleLocation
+      ? getModuleDef(modulesOnDeck[moduleLocation].model)
+      : null
     const slot = getSlotInLocationStack(activeLabware.stack)
     const slotPosition =
       getPositionFromSlotId(slot, deckDef) ?? defaultSlotPosition
