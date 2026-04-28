@@ -120,12 +120,11 @@ async def _host_pyro_nameserver_and_ot3api(
     ns_thread.start()
     ot3api_thread.start()
 
-    # Initialize the RobotServerPyroResource
-    pyro_resource.start_initializing_pyro_resource(app_state)
-
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    # Initialize the RobotServerPyroResource
+    pyro_resource.start_initializing_pyro_resource(app_state)
     ns = pyro.locate_ns()
 
     retries_counter = 0
@@ -150,26 +149,6 @@ async def test_run_process_proxy(
     ot3_hardware_api: OT3API,
 ) -> None:
     """Test the run process pyro creation and a proxy can be created that returns data and async commands can be called."""
-    sock = socket.socket()
-    sock.bind(("localhost", 0))
-    host, port = sock.getsockname()
-    sock.close()
-
-    pyro.config.NS_HOST = host
-    pyro.config.NS_PORT = port
-
-    name_server_ready = threading.Event()
-
-    def _nameserver_loop() -> None:
-        # start_ns returns (nameserver, daemon, uri)
-        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)  # type: ignore
-        name_server_ready.set()
-        # Run until the test process exits; thread is marked daemon=True.
-        ns_daemon.requestLoop()
-
-    ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
-    ns_thread.start()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         ot3_hardware_api, mock_app_state
     )
@@ -197,8 +176,6 @@ async def test_run_process_proxy(
 
     result = run_process.get_robot_type()
     assert result == "OT-3 Standard"
-    # TODO need to get a real or mock orchestrator for most methods to pass
-    # await run_process.finish()
 
     # Clean up client resources.
     protocol_proxy._pyroRelease()  # type: ignore
@@ -258,7 +235,7 @@ async def test_run_process_create(
     resource_utilities.register_camera_provider_to_pyro_resource(
         mock_app_state, empty_cam_provider
     )
-    resource_utilities.register_deck_configuraiton_store_to_pyro_resource(
+    resource_utilities.register_deck_configuration_store_to_pyro_resource(
         mock_app_state, mock_deck_configuration_store
     )
     resource_utilities.register_notify_publishers_to_pyro_resource(
@@ -301,6 +278,8 @@ async def test_run_process_create(
         run_time_param_paths=None,
         proxy_of_callback_for_handling_door_events=run_process.register_hardware_door_event(),
     )
+
+    await run_process.finish()
 
     # Clean up client resources.
     protocol_proxy._pyroRelease()  # type: ignore

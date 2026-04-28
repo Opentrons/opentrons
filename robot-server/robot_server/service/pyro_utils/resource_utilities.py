@@ -87,11 +87,11 @@ def register_maintenance_run_orchestrator_store_to_pyro_resource(
         )
 
 
-def register_deck_configuraiton_store_to_pyro_resource(
+def register_deck_configuration_store_to_pyro_resource(
     app_state: AppState,
     deck_configuration_store: "DeckConfigurationStore",
 ) -> None:
-    """Set a provided DeckConfiguraitonStore as the active store to be used by the Robot Server's Pyro Resource."""
+    """Set a provided DeckConfigurationStore as the active store to be used by the Robot Server's Pyro Resource."""
     robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
     if robot_server_pyro_resource is not None:
         robot_server_pyro_resource.set_deck_configuration_store(
@@ -99,7 +99,7 @@ def register_deck_configuraiton_store_to_pyro_resource(
         )
     else:
         raise RuntimeError(
-            "Cannot set DeckConfiguraitonStore, RobotServerPyroResource is not initialized."
+            "Cannot set DeckConfigurationStore, RobotServerPyroResource is not initialized."
         )
 
 

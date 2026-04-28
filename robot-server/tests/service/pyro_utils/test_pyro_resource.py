@@ -309,7 +309,7 @@ async def test_deck_config(
     # Cast the two Async proxies on the nameserver as a locally useful type
     robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
 
-    resource_utilities.register_deck_configuraiton_store_to_pyro_resource(
+    resource_utilities.register_deck_configuration_store_to_pyro_resource(
         mock_app_state, mock_deck_configuration_store
     )
 
