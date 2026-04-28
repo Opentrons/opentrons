@@ -272,19 +272,14 @@ const getBlowoutPythonLocation = (
 const getBlowoutWellPosition = (
   args: TransferArgs | ConsolidateArgs | DistributeArgs
 ): {} | null => {
-  if (
-    args.blowoutXPosition &&
-    args.blowoutYPosition &&
-    args.blowoutOffsetFromTopMm &&
-    args.blowoutPositionReference
-  ) {
+  if (args.blowoutLocation != null) {
     return {
       offset: {
-        x: args.blowoutXPosition,
-        y: args.blowoutYPosition,
-        z: args.blowoutOffsetFromTopMm,
+        x: args.blowoutXPosition ?? 0,
+        y: args.blowoutYPosition ?? 0,
+        z: args.blowoutOffsetFromTopMm ?? 1,
       },
-      position_reference: args.blowoutPositionReference,
+      position_reference: args.blowoutPositionReference ?? 'well-top',
     }
   } else {
     return null
