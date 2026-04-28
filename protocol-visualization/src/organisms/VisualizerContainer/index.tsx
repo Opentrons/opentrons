@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { Modal } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -12,6 +13,7 @@ import {
 import { CommandSteps } from '../CommandSteps'
 import { Controls } from '../Controls'
 import { DeckView } from '../DeckView'
+import { SlotDetails } from '../SlotDetails'
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
@@ -281,7 +283,12 @@ export function ProtocolVisualization(
       window.removeEventListener('mouseup', handleMouseUpRef.current)
     }
   }, [])
-
+  const [showModal, setShowModal] = useState<boolean>(false)
+  useEffect(() => {
+    if (selectedSlot != null) {
+      setShowModal(true)
+    }
+  }, [selectedSlot])
   // useEffect(() => {
   //   return () => {
   //     dispatch(stepDetailViewerCloseAction({ protocolKey }))
@@ -289,73 +296,95 @@ export function ProtocolVisualization(
   // }, [dispatch, protocolKey])
 
   return (
-    <div ref={containerRef} className={styles.layout_container}>
-      {/* Left Column is resizable */}
-      <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
-        <CommandSteps
-          analysis={analysis}
-          currentCommandIndex={filteredSelectedCommandIndex}
-          groupedCommands={groupedCommands}
-          setSelectedCommand={setSelectedCommand}
-          percentComplete={percentComplete}
-          handlePause={() => {
-            setIsPlaying(false)
+    <>
+      {showModal ? (
+        <Modal
+          type="info"
+          title={'slot details'}
+          onClose={() => {
+            setShowModal(false)
           }}
-        />
-      </div>
-      {/* Gutter between left & center */}
-      <div
-        className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
-        onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
-          handleMouseDown(e, 'left')
-        }}
-      />
-      <div className={styles.center_column}>
-        <Controls
-          protocolName={protocolDisplayName}
-          numErrors={analysis.errors.length}
-          numCommandLength={filteredCommands.length}
-          currentCommandIndex={filteredSelectedCommandIndex}
-          setSelectedCommand={setSelectedCommand}
-          handlePlayPause={handlePlayPause}
-          isPlaying={isPlaying}
-          commands={filteredCommands}
-          groupedCommands={groupedCommands}
-          milliSecondsPerFrame={milliSecondsPerFrame}
-          setMilliSecondsPerFrame={setMilliSecondsPerFrame}
-        />
-        <DeckView
-          filteredCommands={filteredCommands}
-          commands={analysis.commands}
-          liquids={liquids}
-          invariantContext={invariantContext}
-          robotState={robotState}
-          robotType={robotType ?? FLEX_ROBOT_TYPE}
-          setSelectedSlot={slot => {
-            setSelectedSlot(slot)
-          }}
-          selectedRunTimeCommand={selectedRunTimeCommand}
-        />
-      </div>
-      {/* Gutter between center & right */}
-      <div
-        className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
-        onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
-          handleMouseDown(e, 'right')
-        }}
-      />
-      {/* Right Column is resizable */}
-      <div className={styles.right_column} style={{ width: `${rightWidth}px` }}>
-        {selectedRunTimeCommand != null ? (
-          <StepDetailContainer
-            commands={commands}
+        >
+          <SlotDetails
+            slotId={selectedSlot ?? ''}
             robotState={robotState}
             invariantContext={invariantContext}
-            currentCommand={selectedRunTimeCommand}
+            analysis={analysis}
             liquids={liquids}
           />
-        ) : null}
+        </Modal>
+      ) : null}
+      <div ref={containerRef} className={styles.layout_container}>
+        {/* Left Column is resizable */}
+        <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
+          <CommandSteps
+            analysis={analysis}
+            currentCommandIndex={filteredSelectedCommandIndex}
+            groupedCommands={groupedCommands}
+            setSelectedCommand={setSelectedCommand}
+            percentComplete={percentComplete}
+            handlePause={() => {
+              setIsPlaying(false)
+            }}
+          />
+        </div>
+        {/* Gutter between left & center */}
+        <div
+          className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
+          onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
+            handleMouseDown(e, 'left')
+          }}
+        />
+        <div className={styles.center_column}>
+          <Controls
+            protocolName={protocolDisplayName}
+            numErrors={analysis.errors.length}
+            numCommandLength={filteredCommands.length}
+            currentCommandIndex={filteredSelectedCommandIndex}
+            setSelectedCommand={setSelectedCommand}
+            handlePlayPause={handlePlayPause}
+            isPlaying={isPlaying}
+            commands={filteredCommands}
+            groupedCommands={groupedCommands}
+            milliSecondsPerFrame={milliSecondsPerFrame}
+            setMilliSecondsPerFrame={setMilliSecondsPerFrame}
+          />
+          <DeckView
+            filteredCommands={filteredCommands}
+            commands={analysis.commands}
+            liquids={liquids}
+            invariantContext={invariantContext}
+            robotState={robotState}
+            robotType={robotType ?? FLEX_ROBOT_TYPE}
+            setSelectedSlot={slot => {
+              setSelectedSlot(slot)
+            }}
+            selectedRunTimeCommand={selectedRunTimeCommand}
+          />
+        </div>
+        {/* Gutter between center & right */}
+        <div
+          className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
+          onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
+            handleMouseDown(e, 'right')
+          }}
+        />
+        {/* Right Column is resizable */}
+        <div
+          className={styles.right_column}
+          style={{ width: `${rightWidth}px` }}
+        >
+          {selectedRunTimeCommand != null ? (
+            <StepDetailContainer
+              commands={commands}
+              robotState={robotState}
+              invariantContext={invariantContext}
+              currentCommand={selectedRunTimeCommand}
+              liquids={liquids}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
