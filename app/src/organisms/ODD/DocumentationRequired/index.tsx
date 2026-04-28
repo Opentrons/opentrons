@@ -10,15 +10,9 @@ import styles from './documentationrequired.module.css'
 
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard/types'
 
-interface DocumentationRequiredProps {
-  robotName: string
-  setCurrentOption: SetSettingOption
-}
+interface DocumentationRequiredProps {}
 
-export function DocumentationRequired({
-  robotName,
-  setCurrentOption,
-}: DocumentationRequiredProps): JSX.Element {
+export function DocumentationRequired({}: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const [inputText, setInputText] = useState<string>('')
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
@@ -39,9 +33,7 @@ export function DocumentationRequired({
           iconPlacement: 'startIcon',
           onClick: () => {},
         }}
-        onClickBack={() => {
-          setCurrentOption(null)
-        }}
+        onClickBack={() => {}}
       />
       <div className={styles.content_container}>
         <div className={styles.text_area_container}>
