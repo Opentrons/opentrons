@@ -155,7 +155,6 @@ The Vacuum Module accepts the G-code commands listed below.
         <strong>Arguments:</strong> none<br>
         <strong>Example:</strong> <code>M128</code><br>
         <strong>Response:</strong> <code>M128 S:0.10 P:0.95 F:0.75 D:3.4 R:250 C:11.4 A:0.95 M:600 X:20000 E:1 OK</code><br>
-        <font color="red">what are all these?</font>
       </td>
     </tr>
   </tbody>
