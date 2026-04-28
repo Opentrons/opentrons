@@ -1,4 +1,7 @@
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  getAllLiquidClassDefs,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
 
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -282,7 +285,7 @@ const getBlowoutWellPosition = (
       y: args.blowoutYPosition ?? 0,
       z: args.blowoutOffsetFromTopMm ?? 1,
     },
-    position_reference: args.blowoutPositionReference ?? 'well-top',
+    position_reference: args.blowoutPositionReference ?? POSITION_REFERENCE_TOP,
   }
 }
 
