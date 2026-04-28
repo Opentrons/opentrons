@@ -7,7 +7,10 @@ A Vite app and Playwright suite for exercising **packed** builds of:
 - `@opentrons/step-generation`
 - `@opentrons/protocol-visualization`
 
-The demo page includes **ProtocolDeck** (components) and **AnnotatedSteps** (protocol-visualization), which is the current exported UI for protocol visualization and exercises its internal molecules and organisms (command rows, groups, icons, error modal). Visual regression uses **Applitools Eyes**, not committed screenshots.
+The demo app includes two pages: a **Deck map** page built with
+**ProtocolDeck** from `@opentrons/components`, and a **Protocol visualization**
+page built with `@opentrons/protocol-visualization`. Visual regression uses
+**Applitools Eyes**, not committed screenshots.
 
 ## Applitools Eyes
 
@@ -90,7 +93,12 @@ Playwright + Eyes (needs API key). `test-setup` installs Chromium; run after `ma
 
 ## i18n
 
-`AnnotatedSteps` uses `react-i18next` namespace `protocol_visualization`. English strings live in [`src/locale/en/protocol_visualization.json`](src/locale/en/protocol_visualization.json). Keep them aligned with [`app/src/assets/localization/en/protocol_visualization.json`](../app/src/assets/localization/en/protocol_visualization.json) when keys change.
+`ProtocolVisualization` uses the `react-i18next` namespace
+`protocol_visualization`. English strings live in
+[`src/locale/en/protocol_visualization.json`](src/locale/en/protocol_visualization.json).
+Keep them aligned with
+[`app/src/assets/localization/en/protocol_visualization.json`](../app/src/assets/localization/en/protocol_visualization.json)
+when keys change.
 
 ## Package linking
 
@@ -117,7 +125,8 @@ js-package-testing/
 │   ├── locale/en/protocol_visualization.json
 │   └── StackerAnalysis.json
 └── tests/
-    └── protocolDeck.spec.ts
+    ├── protocolDeck.spec.ts
+    └── protocolVisualization.spec.ts
 ```
 
 ## Dependencies (high level)
