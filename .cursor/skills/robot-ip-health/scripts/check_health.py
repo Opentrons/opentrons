@@ -228,8 +228,15 @@ def main() -> int:
 
     try:
         import httpx
-    except ImportError:
-        print("Install httpx: pip install httpx", file=sys.stderr)
+    except ModuleNotFoundError:
+        print(
+            "Missing httpx. Install for this Python:\n"
+            "  {} -m pip install httpx\n"
+            "(If `pip install` said satisfied but this fails, `pip` and `python3` differ — use `python3 -m pip`.)".format(
+                sys.executable
+            ),
+            file=sys.stderr,
+        )
         return 1
 
     try:

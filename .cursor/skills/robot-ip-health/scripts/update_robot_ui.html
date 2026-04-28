@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flex update — command helper</title>
+    <style>
+      :root {
+        --bg: #0f1419;
+        --panel: #1a2332;
+        --border: #2d3a4d;
+        --text: #e8eef5;
+        --muted: #8fa3b8;
+        --accent: #006cfa;
+        --accent-dim: #0047a8;
+        --ok: #2ecc71;
+        --warn: #f39c12;
+        --radius: 10px;
+        --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        padding: 1.25rem;
+      }
+      .wrap {
+        max-width: 42rem;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+      }
+      fieldset {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--panel);
+        margin: 0 0 1rem;
+        padding: 1rem 1.1rem;
+      }
+      legend {
+        padding: 0 0.5rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      label {
+        display: block;
+        font-size: 0.88rem;
+        margin-bottom: 0.35rem;
+        color: var(--muted);
+      }
+      input[type="text"],
+      input[type="number"],
+      textarea {
+        width: 100%;
+        padding: 0.55rem 0.65rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.88rem;
+      }
+      textarea {
+        min-height: 4.5rem;
+        resize: vertical;
+      }
+      .row {
+        margin-bottom: 0.85rem;
+      }
+      .row:last-child {
+        margin-bottom: 0;
+      }
+      .inline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+      }
+      .inline label {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin: 0;
+        cursor: pointer;
+        color: var(--text);
+      }
+      input[type="radio"],
+      input[type="checkbox"] {
+        accent-color: var(--accent);
+      }
+      .hidden {
+        display: none !important;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 1rem;
+      }
+      button {
+        font-family: var(--font);
+        font-size: 0.9rem;
+        padding: 0.55rem 1rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--accent-dim);
+      }
+      .btn-secondary {
+        background: var(--border);
+        color: var(--text);
+      }
+      #out {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: #0a0e14;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.82rem;
+        white-space: pre-wrap;
+        word-break: break-all;
+        min-height: 3rem;
+        color: #a8d5ff;
+      }
+      .note {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-left: 3px solid var(--warn);
+        background: rgba(243, 156, 18, 0.08);
+        border-radius: 0 6px 6px 0;
+      }
+      .okhint {
+        font-size: 0.82rem;
+        color: var(--ok);
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Opentrons Flex — update command</h1>
+      <p class="sub">
+        Builds a terminal command for
+        <code>update_robot.py</code> (Wi‑Fi or USB). Run from the folder that contains the script, or use an absolute path to the script.
+      </p>
+
+      <fieldset>
+        <legend>Script</legend>
+        <div class="row">
+          <label for="scriptPath">How you invoke the script</label>
+          <input
+            type="text"
+            id="scriptPath"
+            value="python3 update_robot.py"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Connection</legend>
+        <div class="row inline">
+          <label><input type="radio" name="conn" value="wifi" checked /> Wi‑Fi (robot IP / hostname)</label>
+          <label><input type="radio" name="conn" value="usb" /> USB (serial — no IP)</label>
+        </div>
+      </fieldset>
+
+      <fieldset id="wifiFields">
+        <legend>Wi‑Fi</legend>
+        <div class="row">
+          <label for="ip">Robot IP or hostname</label>
+          <input type="text" id="ip" placeholder="10.14.19.233 or flex-xxxx.local" autocomplete="off" />
+        </div>
+        <div class="row">
+          <label for="port">Port (robot server)</label>
+          <input type="number" id="port" value="31950" min="1" max="65535" />
+        </div>
+        <div class="row">
+          <label class="inline">
+            <input type="radio" name="wifiSource" value="version" checked />
+            Version(s) — download <code>ot3-system-*.zip</code> from GitHub
+          </label>
+          <label class="inline" style="margin-top: 0.5rem">
+            <input type="radio" name="wifiSource" value="file" />
+            Local zip — one path per line (optional <code>--version</code> for single file)
+          </label>
+        </div>
+        <div class="row" id="wifiVersionRow">
+          <label for="versions">Version(s), space-separated (e.g. <code>8.8.1</code> or <code>8.8.1 8.7.0</code>)</label>
+          <input type="text" id="versions" placeholder="8.8.1" autocomplete="off" />
+        </div>
+        <div class="row hidden" id="wifiFileRow">
+          <label for="wifiFiles">Paths to <code>ot3-system-X.Y.Z.zip</code> (one per line)</label>
+          <textarea id="wifiFiles" placeholder="/path/to/ot3-system-8.8.1.zip"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset id="usbFields" class="hidden">
+        <legend>USB</legend>
+        <div class="row">
+          <label for="usbFiles">Paths to <code>ot3-system-X.Y.Z.zip</code> (one per line; required for USB)</label>
+          <textarea id="usbFiles" placeholder="/path/to/ot3-system-8.8.1.zip"></textarea>
+        </div>
+        <div class="row inline">
+          <label><input type="checkbox" id="debugUsb" /> <code>--debug-usb</code></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Options</legend>
+        <div class="row inline">
+          <label><input type="checkbox" id="yesFlag" checked /> <code>-y</code> / <code>--yes</code> (skip prompt)</label>
+        </div>
+        <div class="row">
+          <label for="timeout"><code>--timeout</code> (seconds)</label>
+          <input type="text" id="timeout" value="30" />
+        </div>
+        <div class="row">
+          <label for="stable"><code>--stable-state-timeout</code> (seconds, optional)</label>
+          <input type="text" id="stable" placeholder="leave empty for default" />
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" id="build">Build command</button>
+        <button type="button" class="btn-secondary" id="copy">Copy command</button>
+      </div>
+
+      <pre id="out" aria-live="polite">Click “Build command”.</pre>
+      <p class="okhint hidden" id="copied">Copied to clipboard.</p>
+      <p class="sub" style="margin-top: 0.5rem">
+        If copy fails (some browsers block clipboard on <code>file://</code>), select the command in the box above and copy manually.
+      </p>
+
+      <div class="note">
+        <strong>Why not “Run” in the browser?</strong> USB updates use serial HTTP at a fixed baud rate; Wi‑Fi calls
+        hit the robot without CORS headers, so a plain web page cannot safely drive the update. This page only prepares
+        the shell command — run it in Terminal from the <code>scripts</code> directory (or adjust the script path above).
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var scriptInput = document.getElementById("scriptPath");
+        var connRadios = document.querySelectorAll('input[name="conn"]');
+        var wifiFields = document.getElementById("wifiFields");
+        var usbFields = document.getElementById("usbFields");
+        var wifiSourceRadios = document.querySelectorAll('input[name="wifiSource"]');
+        var wifiVersionRow = document.getElementById("wifiVersionRow");
+        var wifiFileRow = document.getElementById("wifiFileRow");
+        var out = document.getElementById("out");
+        var copied = document.getElementById("copied");
+
+        function shellQuote(s) {
+          if (!s) return "''";
+          if (!/[\s'"\\$`!]/.test(s)) return s;
+          return "'" + String(s).replace(/'/g, "'\\''") + "'";
+        }
+
+        function linesNonEmpty(text) {
+          return text
+            .split(/\r?\n/)
+            .map(function (l) {
+              return l.trim();
+            })
+            .filter(Boolean);
+        }
+
+        function syncConnUI() {
+          var usb = document.querySelector('input[name="conn"]:checked').value === "usb";
+          wifiFields.classList.toggle("hidden", usb);
+          usbFields.classList.toggle("hidden", !usb);
+        }
+
+        function syncWifiSourceUI() {
+          var fileMode = document.querySelector('input[name="wifiSource"]:checked').value === "file";
+          wifiVersionRow.classList.toggle("hidden", fileMode);
+          wifiFileRow.classList.toggle("hidden", !fileMode);
+        }
+
+        connRadios.forEach(function (r) {
+          r.addEventListener("change", syncConnUI);
+        });
+        wifiSourceRadios.forEach(function (r) {
+          r.addEventListener("change", syncWifiSourceUI);
+        });
+        syncConnUI();
+        syncWifiSourceUI();
+
+        function buildCommand() {
+          var base = (scriptInput.value || "python3 update_robot.py").trim();
+          /** Split like shell: tokens separated by spaces; respect "double quotes". */
+          var parts = [];
+          var cur = "";
+          var inQ = false;
+          for (var i = 0; i < base.length; i++) {
+            var c = base[i];
+            if (c === '"') {
+              inQ = !inQ;
+              continue;
+            }
+            if (!inQ && /\s/.test(c)) {
+              if (cur) {
+                parts.push(cur);
+                cur = "";
+              }
+              continue;
+            }
+            cur += c;
+          }
+          if (cur) parts.push(cur);
+          if (!parts.length) parts = ["python3", "update_robot.py"];
+          var cmd = parts.slice();
+
+          var usb = document.querySelector('input[name="conn"]:checked').value === "usb";
+          var timeout = document.getElementById("timeout").value.trim();
+          var stable = document.getElementById("stable").value.trim();
+          var yes = document.getElementById("yesFlag").checked;
+
+          if (timeout) {
+            cmd.push("--timeout", shellQuote(timeout));
+          }
+          if (stable) {
+            cmd.push("--stable-state-timeout", shellQuote(stable));
+          }
+          if (yes) {
+            cmd.push("-y");
+          }
+
+          if (usb) {
+            cmd.push("--usb");
+            var usbLines = linesNonEmpty(document.getElementById("usbFiles").value);
+            if (!usbLines.length) {
+              return { error: "USB mode needs at least one zip path (one per line)." };
+            }
+            usbLines.forEach(function (p) {
+              cmd.push("--file", shellQuote(p));
+            });
+            if (document.getElementById("debugUsb").checked) {
+              cmd.push("--debug-usb");
+            }
+            return { line: cmd.join(" ") };
+          }
+
+          var ip = document.getElementById("ip").value.trim();
+          if (!ip) {
+            return { error: "Enter the robot IP or hostname for Wi‑Fi mode." };
+          }
+          cmd.push(shellQuote(ip));
+
+          var port = document.getElementById("port").value.trim();
+          if (port && port !== "31950") {
+            cmd.push("--port", shellQuote(port));
+          }
+
+          var fileMode = document.querySelector('input[name="wifiSource"]:checked').value === "file";
+          if (fileMode) {
+            var wlines = linesNonEmpty(document.getElementById("wifiFiles").value);
+            if (!wlines.length) {
+              return { error: "Add at least one path to a local ot3-system-*.zip (one per line)." };
+            }
+            wlines.forEach(function (p) {
+              cmd.push("--file", shellQuote(p));
+            });
+          } else {
+            var ver = document.getElementById("versions").value.trim();
+            if (!ver) {
+              return { error: "Enter at least one version (e.g. 8.8.1)." };
+            }
+            cmd.push("--version");
+            ver.split(/\s+/).forEach(function (v) {
+              if (v) cmd.push(shellQuote(v));
+            });
+          }
+
+          return { line: cmd.join(" ") };
+        }
+
+        document.getElementById("build").addEventListener("click", function () {
+          copied.classList.add("hidden");
+          var r = buildCommand();
+          if (r.error) {
+            out.textContent = r.error;
+            return;
+          }
+          out.textContent = r.line;
+        });
+
+        document.getElementById("copy").addEventListener("click", function () {
+          var t = out.textContent;
+          if (!t || t.indexOf("Click") === 0) return;
+          navigator.clipboard.writeText(t).then(
+            function () {
+              copied.classList.remove("hidden");
+              setTimeout(function () {
+                copied.classList.add("hidden");
+              }, 2000);
+            },
+            function () {
+              out.textContent = t + "\n\n(copy failed — select text manually)";
+            }
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>

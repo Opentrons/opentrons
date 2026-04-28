@@ -48,11 +48,28 @@ curl -s -H "Opentrons-Version: *" "http://10.14.19.233:31950/server/update/healt
 | Script | Purpose |
 |--------|---------|
 | `scripts/check_health.py` | GET `/health` (and optionally `/server/update/health`), print JSON. By IP or `--usb` (Flex/OT-3 on macOS/Linux). |
-| `scripts/update_robot.py` | System update: **connection** USB (`--usb`) or network (IP); **source** local `--file` or GitHub `--version`. Same flow and state tables for both. |
+| `scripts/update_robot.py` | CLI + USB serial transport + `main()`. System update: **connection** USB (`--usb`) or network (IP); **source** local `--file` or GitHub `--version`. |
+| `scripts/update_robot_session.py` | Network path only: GitHub download, `POST /server/update/begin`…`commit`, `POST /server/restart` (used by `update_robot.py`). |
+| `scripts/update_robot_verifications.py` | Post-restart checks: `/health`, `/subsystems/updates/current`, stable Flex snapshot (`/runs`, `/instruments`, `/modules`). |
+| `scripts/update_robot_phases.py` | Shared stderr labels for the post-restart **readiness state machine** (numbered phases + ✓ / ◌). |
+| `scripts/update_robot_errors.py` | Shared stderr helpers and state tables on failure. |
+
+### Python deps (macOS / multiple interpreters)
+
+Install packages into the **same** interpreter you use to run the script:
+
+```bash
+cd .cursor/skills/robot-ip-health/scripts
+python3 -m pip install httpx
+# USB updates also need:
+python3 -m pip install pyserial
+```
+
+If `pip install httpx` reports “already satisfied” but `python3 update_robot.py` still fails with `No module named 'httpx'`, your `pip` and `python3` point at different Pythons (common with Apple CommandLineTools `python3` vs pyenv/Homebrew). Using **`python3 -m pip`** fixes that.
 
 ### check_health.py
 
-Requires `httpx`. For `--usb`: `pyserial` (`pip install pyserial`). From monorepo root:
+Requires `httpx`. For `--usb`: `pyserial` (`python3 -m pip install pyserial`). From monorepo root:
 
 ```bash
 # By IP (robot on network)
@@ -74,9 +91,10 @@ Defaults and messaging assume **Opentrons Flex**; non-Flex behavior is a compati
 | `--usb` | Use USB serial connection (Flex/OT-3). **No network needed** — works with Wi‑Fi off. Requires `--file`. Script prints `Connection: USB (serial port ...) — no network` so you can confirm. |
 | `--version` | One or more target versions, applied in order. Optional when using `--file` (version is derived from filename, e.g. `ot3-system-8.8.1.zip`). |
 | `--port` | Default 31950 (robot server). Use 34000 for local dev server. Ignored when using `--usb`. |
-| `--wait-after-restart` | Seconds to wait for robot to come back between consecutive updates (default 300). For USB, script polls /health over serial until robot responds before printing success. **Caveat:** Over Wi‑Fi the connection drops when the robot restarts, so the script depends on the robot coming back on the network; over USB the link is maintained across restarts. |
+| `--wait-after-restart` | Max seconds to poll **GET `/health` until HTTP 200** after `POST /server/restart` (default **900**, ~15 min). Flex can be unreachable **~10+ minutes** during reboot; refused connections and timeouts in this window are **normal** and do **not** mean the update failed once commit succeeded. USB: same cap while reopening the serial port for `/health`. |
 | `--timeout` | Request timeout in seconds (default 30). |
-| `--stable-state-timeout` | **Opentrons Flex (default workflow):** max seconds for a **stable** post-restart snapshot — HTTP 200 on `/runs`, `/instruments`, `/modules`, real serials, **two matching polls**. Default **600** (10 min). |
+| `--stable-state-timeout` | **Opentrons Flex (default workflow):** max seconds for the **stable snapshot** phase only — HTTP 200 on `/runs`, `/instruments`, `/modules`, real serials, **two matching polls**. Default **1000** (~17 min). Timer starts **after** subsystem firmware jobs finish (see `--subsystem-fw-idle-max`). |
+| `--subsystem-fw-idle-max` | **Flex:** max seconds to poll **GET `/subsystems/updates/current`** until no `queued` / `updating` entries (gripper, extension mount, etc.). Default **1800** (~30 min). This wait does **not** count toward `--stable-state-timeout`. |
 | `--stable-state-nag-after` | **Flex:** after this many seconds (default **420** ≈ 7 min), one “check the robot” reminder if still waiting. |
 | `--stable-state-poll-interval` | Seconds between snapshot polls while waiting (default **5**). |
 | `--http-api-ready-timeout` | Only for **non-Flex** robots: cap for a simpler single-snapshot wait (default 600s). **Flex updates ignore this** in favor of `--stable-state-*`. |
@@ -98,9 +116,9 @@ The same **user-facing usage** is supported; internally the script uses a single
 | **Source** | **Local file** | `--file /path/to/ot3-system-8.8.1.zip` | Version derived from filename. Required for USB. Supported for network (one or more files for consecutive updates). |
 | **Source** | **GitHub** | `--version 8.8.1` (or multiple versions) | Script downloads from GitHub releases. Network only (USB requires `--file`). |
 
-**Ready for next update (both paths):** After each restart the script waits for GET `/health` (USB: over serial; network: HTTP; retries are **quiet**), then GET `/server/update/health` (network only). Then:
+**Ready for next update (both paths):** After each restart the script waits for GET `/health` (USB: over serial; network: HTTP; **progress every ~60s** while the robot may still be down), then GET `/server/update/health` (network only; up to several minutes after `/health` is 200). Then:
 
-- **Opentrons Flex (the usual case):** **Stable snapshot** — poll `/runs`, `/instruments`, `/modules` until HTTP 200, populated serials (`ok: false` bad-instrument entries allowed), and **two consecutive polls** match on instrument/module identity. Default max **10 minutes** (`--stable-state-timeout`); at **7 minutes** (`--stable-state-nag-after`) one reminder to check the robot. Clean, high-level logging only (no per-endpoint 502 spam).
+- **Opentrons Flex (the usual case):** First wait for **GET `/subsystems/updates/current`** until no subsystem firmware job is `queued` or `updating` (so extension mount / gripper updates after a system image do not consume the stable-state timer). Then **stable snapshot** — poll `/runs`, `/instruments`, `/modules` until HTTP 200, populated serials (`ok: false` bad-instrument entries allowed), and **two consecutive polls** match. Caps: `--subsystem-fw-idle-max` (pre-phase), `--stable-state-timeout` (matching polls); at **7 minutes** into the stable phase (`--stable-state-nag-after`) one reminder to check the robot. Clean, high-level logging only (no per-endpoint 502 spam).
 
 Then it prints *"Ready for next update (health, update server, state snapshot OK)."* and the state table. Non-Flex robots use a simpler single-snapshot wait capped by `--http-api-ready-timeout`. 502 on begin/upload is still retried separately.
 
@@ -194,7 +212,7 @@ What happens:
 1. Script GETs `/health`, shows robot and **Target versions: 9.0.0-alpha.11 → 8.8.1 → 8.7.1 (consecutive)**.
 2. You’re prompted once (or skipped with `--yes`).
 3. **Update 1/3**: Download `ot3-system-9.0.0-alpha.11.zip`, begin session, upload, poll until done, commit, restart. Robot goes down.
-4. Script waits for the robot to respond on `/health` again (default up to 300s, every 10s). Over network it then waits for **GET /server/update/health** to return 200 and a short delay. **Ready for next update** means both health and update server are OK. The script prints "Ready for next update (health + update server OK)." then a **per-update state table**: runs (last 4) with LPC counts (labwareOffsets), pipettes (mount + serial), modules (serial) in aligned tables for comparison. Adjust with `--wait-after-restart`.
+4. Script waits for the robot to respond on `/health` again (default up to **900s**, poll every 10s, stderr progress every 60s). Over network it then waits for **GET /server/update/health** to return 200. **Ready for next update** means both health and update server are OK. The script prints "Ready for next update (health + update server OK)." then a **per-update state table**: runs (last 4) with LPC counts (labwareOffsets), pipettes (mount + serial), modules (serial) in aligned tables for comparison. Adjust with `--wait-after-restart` if your robot is consistently slower to boot.
 5. **Update 2/3**: Same flow for 8.8.1; then wait again.
 6. **Update 3/3**: Same flow for 8.7.1.
 7. Prints **All updates completed successfully!**
