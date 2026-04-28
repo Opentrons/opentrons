@@ -55,7 +55,7 @@ describe('getOffDeckRenderGroups', () => {
     ).toEqual(['Reservoir 1', 'Reservoir 2'])
   })
 
-  it('groups off-deck labware when display name and liquid layout match', () => {
+  it('keeps off-deck labware separate when liquid layouts match and are not empty', () => {
     const protocolAnalysis = {
       liquids: [{ id: 'water', displayName: 'water', displayColor: '#0000ff' }],
       commands: [],
@@ -67,6 +67,30 @@ describe('getOffDeckRenderGroups', () => {
         { labwareId: 'labwareB', volumeByWell: { A1: 300, A2: 300 } },
       ],
     } as unknown as LabwareByLiquidId
+
+    const offDeckGroups = getOffDeckRenderGroups(
+      {
+        offDeck: [
+          makeOffDeckItem('labwareA', 'Reservoir'),
+          makeOffDeckItem('labwareB', 'Reservoir'),
+        ],
+      },
+      protocolAnalysis,
+      labwareByLiquidId
+    )
+
+    expect(offDeckGroups).toHaveLength(2)
+    expect(offDeckGroups[0].quantity).toBe(1)
+    expect(offDeckGroups[1].quantity).toBe(1)
+  })
+
+  it('groups off-deck labware when display name and liquid layouts are empty', () => {
+    const protocolAnalysis = {
+      liquids: [],
+      commands: [],
+    } as unknown as CompletedProtocolAnalysis
+
+    const labwareByLiquidId = {} as LabwareByLiquidId
 
     const offDeckGroups = getOffDeckRenderGroups(
       {

@@ -14,23 +14,30 @@ export interface OffDeckRenderGroup {
   stackedItems: LabwareInStack[]
 }
 
-const getWellFillSignature = (
+interface WellFillInfo {
+  hasLiquid: boolean
+  signature: string
+}
+
+const getWellFillInfo = (
   labwareId: string,
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   labwareByLiquidId: LabwareByLiquidId
-): string => {
+): WellFillInfo => {
   const wellFill = getWellFillFromLabwareId(
     labwareId,
     protocolAnalysis.liquids,
     labwareByLiquidId,
     protocolAnalysis.commands
   )
-
-  return JSON.stringify(
-    Object.entries(wellFill)
-      .sort(([wellNameA], [wellNameB]) => wellNameA.localeCompare(wellNameB))
-      .map(([wellName, fill]) => [wellName, fill])
+  const sortedWellFill = Object.entries(wellFill).sort(
+    ([wellNameA], [wellNameB]) => wellNameA.localeCompare(wellNameB)
   )
+
+  return {
+    hasLiquid: sortedWellFill.length > 0,
+    signature: JSON.stringify(sortedWellFill),
+  }
 }
 
 export function getOffDeckRenderGroups(
@@ -45,21 +52,22 @@ export function getOffDeckRenderGroups(
     : []
 
   return offDeckItems.reduce<OffDeckRenderGroup[]>((acc, stackItem) => {
-    const wellFillSignature = getWellFillSignature(
+    const wellFillInfo = getWellFillInfo(
       stackItem.labwareId,
       protocolAnalysis,
       labwareByLiquidId
     )
     const matchingLabwareIndex = acc.findIndex(
       group =>
+        !wellFillInfo.hasLiquid &&
         group.representativeItem.definitionUri === stackItem.definitionUri &&
         group.representativeItem.displayName === stackItem.displayName &&
         group.representativeItem.lidDisplayName === stackItem.lidDisplayName &&
-        getWellFillSignature(
+        getWellFillInfo(
           group.representativeItem.labwareId,
           protocolAnalysis,
           labwareByLiquidId
-        ) === wellFillSignature
+        ).signature === wellFillInfo.signature
     )
 
     if (matchingLabwareIndex !== -1) {
