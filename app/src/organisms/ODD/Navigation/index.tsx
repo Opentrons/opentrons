@@ -4,19 +4,7 @@ import { useSelector } from 'react-redux'
 import { NavLink, useLocation } from 'react-router-dom'
 import clsx from 'clsx'
 
-import {
-  ALIGN_CENTER,
-  COLORS,
-  DIRECTION_ROW,
-  Flex,
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  POSITION_ABSOLUTE,
-  POSITION_STATIC,
-  POSITION_STICKY,
-  SPACING,
-  truncateString,
-} from '@opentrons/components'
+import { COLORS, Icon, truncateString } from '@opentrons/components'
 
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -78,6 +66,8 @@ export function Navigation(props: NavigationProps): JSX.Element {
     })
   }, [])
 
+  const navMenuOrModalIsOpened = showNavMenu || Boolean(longPressModalIsOpened)
+
   function getPathDisplayName(path: (typeof NAV_LINKS)[number]): string {
     switch (path) {
       case '/instruments':
@@ -94,34 +84,21 @@ export function Navigation(props: NavigationProps): JSX.Element {
   return (
     <>
       {/* Empty box to detect scrolling */}
-      <Flex ref={scrollRef} />
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        height="7.75rem"
-        zIndex={showNavMenu || Boolean(longPressModalIsOpened) ? 0 : 3}
-        position={
-          showNavMenu || Boolean(longPressModalIsOpened)
-            ? POSITION_STATIC
-            : POSITION_STICKY
-        }
-        paddingX={SPACING.spacing40}
-        top="0"
-        width="100%"
-        backgroundColor={COLORS.white}
-        className={clsx(isScrolled && styles.nav_bar_scrolled)}
-        gridGap={SPACING.spacing24}
+      <div ref={scrollRef} />
+      <div
+        className={clsx(
+          styles.nav_bar,
+          navMenuOrModalIsOpened
+            ? styles.nav_bar_static
+            : styles.nav_bar_sticky,
+          isScrolled && styles.nav_bar_scrolled
+        )}
         aria-label="Navigation_container"
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing32}>
+        <div className={styles.nav_content_row}>
           <div className={styles.carousel_wrapper}>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing32}
-              marginRight={SPACING.spacing24}
-            >
-              <Flex
+            <div className={styles.carousel_inner}>
+              <div
                 ref={
                   location.pathname === '/dashboard' ? navBarScrollRef : null
                 }
@@ -133,7 +110,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
                     iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
                   )}
                 />
-              </Flex>
+              </div>
               {iconName != null ? (
                 <Icon
                   aria-label="network icon"
@@ -143,21 +120,17 @@ export function Navigation(props: NavigationProps): JSX.Element {
                 />
               ) : null}
               {NAV_LINKS.map(path => (
-                <Flex
+                <div
                   ref={path === location.pathname ? navBarScrollRef : null}
                   key={path}
                 >
                   <NavigationLink to={path} name={getPathDisplayName(path)} />
-                </Flex>
+                </div>
               ))}
-            </Flex>
+            </div>
           </div>
-        </Flex>
-        <Flex
-          marginTop={`-${SPACING.spacing12}`}
-          position={POSITION_ABSOLUTE}
-          right={SPACING.spacing16}
-        >
+        </div>
+        <div className={styles.overflow_button_wrap}>
           <button
             type="button"
             className={styles.icon_button}
@@ -173,8 +146,8 @@ export function Navigation(props: NavigationProps): JSX.Element {
               color={COLORS.grey60}
             />
           </button>
-        </Flex>
-      </Flex>
+        </div>
+      </div>
       {showNavMenu && (
         <NavigationMenu
           onClick={() => {
