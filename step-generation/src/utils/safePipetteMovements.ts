@@ -2,6 +2,7 @@ import {
   A1_NOZZLE,
   A12_NOZZLE,
   ALL,
+  B1_ADDRESSABLE_AREA,
   COLUMN,
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
@@ -344,7 +345,6 @@ export const getIsSafePipetteMovement = (args: {
   const isFlexPipette = displayCategory === 'FLEX'
   const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckDefinition = getDeckDefFromRobotType(robotType)
-
   //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided
   if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
@@ -361,17 +361,19 @@ export const getIsSafePipetteMovement = (args: {
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? (tiprackTipLength ?? 0) : 0
   const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
-  const addressableAreaOffset = getPositionFromSlotId(
-    labwareSlot,
-    deckDefinition
-  ) ?? [0, 0, 0]
-  const isOnFlexThermocycler =
-    robotType === FLEX_ROBOT_TYPE &&
-    labwareState[labwareId].stack.some(
-      item => moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
-    )
-  const thermocyclerOffset = isOnFlexThermocycler
-    ? (deckDefinition.locations.addressableAreas.find(
+
+  const hasThermocycler = labwareState[labwareId].stack.some(item => {
+    return moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
+  })
+
+  // special logic for thermocycler addressable area offset for the OT-2
+  const flexDeckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const addressableAreaOffset = (hasThermocycler
+    ? getPositionFromSlotId(B1_ADDRESSABLE_AREA, flexDeckDefinition)
+    : getPositionFromSlotId(labwareSlot, deckDefinition)) ?? [0, 0, 0]
+
+  const thermocyclerOffset = hasThermocycler
+    ? (flexDeckDefinition.locations.addressableAreas.find(
         addressableArea => addressableArea.id === THERMOCYCLER_MODULE_V2
       )?.offsetFromCutoutFixture ?? [0, 0, 0])
     : [0, 0, 0]
