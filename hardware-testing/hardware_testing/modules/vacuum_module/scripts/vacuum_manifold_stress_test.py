@@ -8,9 +8,9 @@ from opentrons.protocol_api import ParameterContext
 import serial.tools.list_ports  # type: ignore[import]
 from opentrons.drivers import vacuum_module
 from opentrons.drivers.vacuum_module.types import VentState
+from opentrons.hardware_control.ot3api import OT3API  # type: ignore[import]
 import dataclasses
 import time
-import logging
 import traceback
 import csv
 from typing import Dict
@@ -111,25 +111,25 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "perstaltic_flow_rate",
         "perstaltic_flow_rate",
-        default=76,
+        default=89,
         minimum=1,
         maximum=400,
         description="Reservoir water fill time.",
     )
 
 
-async def find_port_by_id(vendorId: int, productId: int) -> str:
+def find_port_by_id(vendorId: int, productId: int) -> str:
     """Find a serial port by USB vendor and product ID."""
     ports = serial.tools.list_ports.comports()
     for port in ports:
-        logging.info(f"port_vid: {port.vid}, port_pid: {port.pid}")
+        # ctx.comment(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
-            logging.info(f"port: {port.device}")
+            # ctx.comment(f"port: {port.device}")
             return port.device
     return ""
 
 
-async def _write_to_csv(
+def _write_to_csv(
     f_name: str, header_write: bool, timestamp: float, data: Dict
 ) -> None:
     """Append a data line to the CSV file (offloaded to a thread).
@@ -138,39 +138,38 @@ async def _write_to_csv(
     Adds the current `pressure_set` as the last column (may be None).
     """
 
-    def _append() -> None:
-        with open(f_name, "a", newline="") as f:
-            writer = csv.writer(f)
-            if header_write:
-                writer.writerow(
-                    [
-                        "Time(s)",
-                        "target_gauge_pressure",
-                        "current_gauge_pressure",
-                        "pressure_abs_a",
-                        "pressure_abs_b",
-                        "pressure_atm",
-                        "vacuum_enabled",
-                        "vent_state",
-                    ]
-                )
+    with open(f_name, "a", newline="") as f:
+        writer = csv.writer(f)
+        if header_write:
             writer.writerow(
                 [
-                    f"{timestamp:.2f}",
-                    f"{data['target_gauge_pressure']}",
-                    f"{data['current_gauge_pressure']}",
-                    f"{data['pressure_abs_a']}",
-                    f"{data['pressure_abs_b']}",
-                    f"{data['pressure_atm']}",
-                    f"{data['vacuum_enabled']}",
-                    f"{data['vent_state']}",
+                    "Time(s)",
+                    "target_gauge_pressure",
+                    "current_gauge_pressure",
+                    "pressure_abs_a",
+                    "pressure_abs_b",
+                    "pressure_atm",
+                    "vacuum_enabled",
+                    "vent_state",
                 ]
             )
+        writer.writerow(
+            [
+                f"{timestamp:.2f}",
+                f"{data['target_gauge_pressure']}",
+                f"{data['current_gauge_pressure']}",
+                f"{data['pressure_abs_a']}",
+                f"{data['pressure_abs_b']}",
+                f"{data['pressure_atm']}",
+                f"{data['vacuum_enabled']}",
+                f"{data['vent_state']}",
+            ]
+        )
+        f.close()
 
-    await asyncio.to_thread(_append)
 
-
-async def read_continuous_data(
+async def _read_continuous_data(
+    self,
     f_name: str,
     pump: vacuum_module.VacuumModuleDriver,
     start_time: float,
@@ -187,15 +186,16 @@ async def read_continuous_data(
             pressure_dict = dataclasses.asdict(line)
             # Timestamp
             ts = time.perf_counter() - start_time
-            ctx.comment(f"Pump time: {time.perf_counter() - loop_st}")
+            # ctx.comment(f"Pump time: {time.perf_counter() - loop_st}")
             # Record Pressure Data
-            await _write_to_csv(f_name, head_writer, ts, pressure_dict)
+            _write_to_csv(f_name, head_writer, ts, pressure_dict)
             head_writer = False
     except Exception as e:
         raise (e)
 
 
-async def read_data(
+async def _read_data(
+    self,
     f_name: str,
     pump: vacuum_module.VacuumModuleDriver,
     start_time: float,
@@ -204,7 +204,7 @@ async def read_data(
 ) -> None:
     """Run continuous data read and handle expected timeout and errors."""
     try:
-        await read_continuous_data(f_name, pump, start_time, duration, ctx)
+        await self.read_continuous_data(f_name, pump, start_time, duration, ctx)
     except asyncio.TimeoutError:
         # Expected: we stop after RUN_SEC
         ctx.comment(f"continuous read duration reached ({duration}s)")
@@ -213,16 +213,16 @@ async def read_data(
         raise
 
 
-async def _setup_devices() -> tuple[vacuum_module.VacuumModuleDriver, Any]:  # type: ignore[type-arg]
+async def _setup_devices(self) -> tuple[vacuum_module.VacuumModuleDriver, Any]:  # type: ignore[type-arg]
     from hardware_testing.drivers import vacuum_pump
 
     loop = asyncio.get_event_loop()
     # Vacuum Manifold Driver
-    port = await find_port_by_id(VM_idVendor, VM_idProduct)
-    pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
+    port = find_port_by_id(VM_idVendor, VM_idProduct)
+    pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=self._loop)
     await pump.set_waste_configs(False)
     # Arduino Water pump Driver
-    m_port = await find_port_by_id(Ard_idVendor, Ard_idProduct)
+    m_port = find_port_by_id(Ard_idVendor, Ard_idProduct)
 
     pump_fixture = await vacuum_pump.WaterPump.create(
         port=m_port, baudrate=115200, loop=loop
@@ -232,6 +232,7 @@ async def _setup_devices() -> tuple[vacuum_module.VacuumModuleDriver, Any]:  # t
 
 
 async def _run_single_pump_api_cycle(
+    self,
     pump: vacuum_module.VacuumModuleDriver,
     water_pump_fixture: Any,
     target_pressure: int,
@@ -261,7 +262,7 @@ async def _run_single_pump_api_cycle(
     # Dynamic CSV naming per trial (date + trial index + pressure)
     date_str = datetime.utcnow().strftime("%y-%m-%d_%H:%M:%S")
     output_dir.mkdir(parents=True, exist_ok=True)
-    ctx.comment(f"output_dir: {output_dir}")
+    # ctx.comment(f"output_dir: {output_dir}")
     trial_csv = (
         output_dir / f"{date_str}_trial_{cycle_index:02d}_{target_pressure}mbar.csv"
     )
@@ -269,7 +270,7 @@ async def _run_single_pump_api_cycle(
     # Run the continuous data reader for RUN_SEC seconds.
     start_time = time.perf_counter()
     try:
-        await read_data(str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx)
+        await self.read_data(str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx)
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
@@ -289,7 +290,7 @@ async def _run_single_pump_api_cycle(
     await pump.set_vent_state(VentState.OPENED)
     await asyncio.sleep(VENT_SEC)
     try:
-        await read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)
+        await self.read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({DECAY_SEC}s)"
@@ -303,8 +304,20 @@ async def _run_single_pump_api_cycle(
     await pump.set_vent_state(VentState.CLOSED)
 
 
+async def _pump_disconnect(self, pump) -> None:
+    await pump.disconnect()
+
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
+
+    if not ctx.is_simulating():
+        OT3API.read_continuous_data = _read_continuous_data
+        OT3API.read_data = _read_data
+        OT3API.run_single_pump_api_cycle = _run_single_pump_api_cycle
+        OT3API.setup_devices = _setup_devices
+        OT3API.pump_disconnect = _pump_disconnect
+
     z_offset = ctx.params.z_offset  # type: ignore[attr-defined]
     volume = ctx.params.volume  # type: ignore[attr-defined]
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
@@ -315,7 +328,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
     perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
     perstaltic_pump_flow_rate = ctx.params.perstaltic_flow_rate  # mL/min
-    conversion = ((perstaltic_volume_target / 1000) / perstaltic_pump_flow_rate) * 60  # Convert uL volume to pump fill time (seconds)
+    conversion = (
+        (perstaltic_volume_target / 1000) / perstaltic_pump_flow_rate
+    ) * 60  # Convert uL volume to pump fill time (seconds)
     perstaltic_time = int(conversion)
 
     ctx.load_trash_bin("A3")
@@ -332,12 +347,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     pump = None
     pump_fixture = None
-    loop = None
     if not ctx.is_simulating():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        ot3api = ctx._core.get_hardware()
         try:
-            pump, pump_fixture = loop.run_until_complete(_setup_devices())
+            pump, pump_fixture = ot3api.setup_devices()
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
             raise
@@ -346,7 +359,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     output_dir = Path(OUTPUT_DIR)
     if not ctx.is_simulating():
-        assert loop is not None
         assert pump is not None
         for cycle in range(1, cycles + 1):
             ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
@@ -354,34 +366,31 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
             # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
             pip.move_to(filter_plate["A1"].top(10))  # Move away again
-            
+            ot3api = ctx._core.get_hardware()
             try:
-                loop.run_until_complete(
-                    _run_single_pump_api_cycle(
-                        pump,
-                        pump_fixture,
-                        pressure,
-                        perstaltic_time,
-                        cycle,
-                        output_dir,
-                        SETTLE_SEC,
-                        RUN_SEC,
-                        DECAY_SEC,
-                        VENT_SEC,
-                        ctx,
-                    )
+                ot3api.run_single_pump_api_cycle(
+                    pump,
+                    pump_fixture,
+                    pressure,
+                    perstaltic_time,
+                    cycle,
+                    output_dir,
+                    SETTLE_SEC,
+                    RUN_SEC,
+                    DECAY_SEC,
+                    VENT_SEC,
+                    ctx,
                 )
             except Exception as e:
                 tb = traceback.format_exc()
                 ctx.comment(f"[cycle {cycle}] failed ({type(e).__name__}: {e})\n{tb}")
                 raise
         pip.return_tip()
-    if not ctx.is_simulating() and loop is not None:
+    if not ctx.is_simulating():
         try:
             if pump is not None:
-                loop.run_until_complete(pump.disconnect())
+                ot3api.pump_disconnect(pump)
             if pump_fixture is not None:
-                loop.run_until_complete(pump_fixture.disconnect())
+                ot3api.pump_disconnect(pump_fixture)
         except Exception:
             raise
-        loop.close()
