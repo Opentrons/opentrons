@@ -6,21 +6,19 @@ import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { TouchTextAreaField } from '/app/molecules/TouchTextAreaField'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './externalkeyboardtest.module.css'
+import styles from './documentationrequired.module.css'
 
-import type { SetSettingOption } from '../types'
+import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard/types'
 
-interface ExternalKeyboardTestProps {
+interface DocumentationRequiredProps {
   robotName: string
   setCurrentOption: SetSettingOption
 }
-// Note
-// this component is to test TouchTextAreaField with FullKeyboard and external keyboard
-// + AccordionKeyboard
-export function ExternalKeyboardTest({
+
+export function DocumentationRequired({
   robotName,
   setCurrentOption,
-}: ExternalKeyboardTestProps): JSX.Element {
+}: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const [inputText, setInputText] = useState<string>('')
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
