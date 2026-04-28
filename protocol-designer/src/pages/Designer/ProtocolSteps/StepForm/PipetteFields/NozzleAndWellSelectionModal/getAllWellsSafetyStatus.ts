@@ -15,6 +15,7 @@ interface GetWellSafetyArgs {
   invariantContext: InvariantContext
   pipetteId: string
   labwareId: string
+  tiprackId?: string
   primaryNozzle: PrimaryNozzleConfigurationStyle
   nozzleConfiguration: NozzleConfigurationStyle
 }
@@ -28,6 +29,7 @@ export function getAllWellsSafetyStatus(
     invariantContext,
     pipetteId,
     labwareId,
+    tiprackId,
     primaryNozzle,
     nozzleConfiguration,
   } = args
@@ -62,6 +64,7 @@ export function getAllWellsSafetyStatus(
             wellTargetName: firstWell,
             primaryNozzle,
             nozzleConfiguration,
+            tiprackId,
           })
         : true
 
@@ -87,6 +90,7 @@ export function getAllWellsSafetyStatus(
             wellTargetName: firstWell,
             primaryNozzle,
             nozzleConfiguration,
+            tiprackId,
           })
         : true
 
@@ -105,6 +109,7 @@ export function getAllWellsSafetyStatus(
           wellTargetName: allWells[0][0],
           primaryNozzle,
           nozzleConfiguration,
+          tiprackId,
         })
       : true
     allWells.flat().forEach(wellName => {
@@ -122,6 +127,7 @@ export function getAllWellsSafetyStatus(
             wellTargetName: wellName,
             primaryNozzle,
             nozzleConfiguration,
+            tiprackId,
           })
         : true
       allWellsWithStatus[wellName] = safe ? 0 : 1

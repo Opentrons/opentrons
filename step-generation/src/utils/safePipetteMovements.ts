@@ -315,6 +315,7 @@ export const getIsSafePipetteMovement = (args: {
   labwareId: string
   wellLocationOffset?: Point
   wellTargetName?: string
+  tiprackId?: string
   primaryNozzle: PrimaryNozzleConfigurationStyle
   nozzleConfiguration: NozzleConfigurationStyle
 }): boolean => {
@@ -327,6 +328,7 @@ export const getIsSafePipetteMovement = (args: {
     wellTargetName,
     primaryNozzle,
     nozzleConfiguration,
+    tiprackId,
   } = args
   const {
     pipetteEntities,
@@ -339,7 +341,6 @@ export const getIsSafePipetteMovement = (args: {
   const pipetteEntity = pipetteEntities[pipetteId]
 
   const { spec: pipetteSpecs } = pipetteEntity
-
   // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
   const displayCategory = pipetteSpecs?.displayCategory
   const isFlexPipette = displayCategory === 'FLEX'
@@ -349,15 +350,25 @@ export const getIsSafePipetteMovement = (args: {
   if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
   }
+  // If tiprackId is explicitly provided, assume the pipette currently has a tip attached.
+  // This is used in WellSelector.ts / getAllWellsSafetyStatus to force "tip present"
+  // during collision detection scenarios.
+  const pipetteHasTip = tiprackId
+    ? true
+    : (tipState.pipettes[pipetteId]?.hasTip ?? false)
 
-  const tiprackId = tipState.pipettes[pipetteId]?.tiprackURI
-  const tiprackEntity = tiprackId != null ? labwareEntities[tiprackId] : null
+  // Use the provided tiprackId if available; otherwise fall back to the
+  // tiprack recorded in tipState for this pipette.
+  const confirmedTiprackId =
+    tiprackId ?? tipState.pipettes[pipetteId]?.tiprackURI
+  const tiprackEntity =
+    confirmedTiprackId != null ? labwareEntities[confirmedTiprackId] : null
   const tiprackTipLength =
     tiprackEntity != null ? tiprackEntity.def.parameters.tipLength : 0
   const stagingAreaSlots = Object.values(stagingAreaEntities).map(
     stagingArea => stagingArea.location as string
   )
-  const pipetteHasTip = tipState.pipettes[pipetteId]?.hasTip ?? false
+
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? (tiprackTipLength ?? 0) : 0
   const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
