@@ -82,7 +82,7 @@ export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
   return null
 }
 
-// return pipette bounds at a sepcific position
+// return pipette bounds at a specific position
 // note that this calculation is pessimistic to mirror behavior on protocol engine
 // the returned plane is defined by the z-height of the empty nozzles (lowest case scenario)
 // and the x-y bounds defined by the outer-most bounds of the pipette
