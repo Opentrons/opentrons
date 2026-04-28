@@ -348,10 +348,7 @@ export const getIsSafePipetteMovement = (args: {
   const pipetteEntity = pipetteEntities[pipetteId]
 
   const { spec: pipetteSpecs } = pipetteEntity
-<<<<<<< Updated upstream
-=======
   const { channels } = pipetteSpecs
->>>>>>> Stashed changes
 
   // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
   const displayCategory = pipetteSpecs?.displayCategory
