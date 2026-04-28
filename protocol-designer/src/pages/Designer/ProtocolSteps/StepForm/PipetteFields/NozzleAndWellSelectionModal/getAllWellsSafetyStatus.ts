@@ -111,7 +111,7 @@ export function getAllWellsSafetyStatus(
       allWellsWithStatus[wellName] = safe ? 0 : 1
     })
   } else if (nozzleConfiguration === SINGLE) {
-    // SINGLE nozzle configuration: check every well individually
+    // SINGLE nozzle for 8ch and 96ch: check every well individually
     allWells.flat().forEach(wellName => {
       const safe = robotState
         ? getIsSafePipetteMovement({
