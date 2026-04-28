@@ -61,12 +61,8 @@ export function OnDeviceLoginOverlayProvider({
     setLoginModalOpen(false)
   }, [])
 
-  const accessControlEnabledQuery = useAccessControlEnabledQuery()
-  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
   const shouldShowLoggedOutOverlay =
-    accessControlEnabledQuery.data != null &&
-    accessControlEnabledQuery.data.data.accessControlEnabled &&
-    !isLoggedIn
+    useShouldShowLoggedOutOverlay(loginModalOpen)
 
   const value = useMemo(
     (): OnDeviceLoginModalContextValue => ({
@@ -85,7 +81,7 @@ export function OnDeviceLoginOverlayProvider({
             getTopPortalEl()
           )
         : null}
-      {shouldShowLoggedOutOverlay && !loginModalOpen && (
+      {shouldShowLoggedOutOverlay && (
         <LoggedOutOverlay onClick={openLoginModal} />
       )}
     </OnDeviceLoginContext.Provider>
@@ -105,44 +101,11 @@ function LoginOverlay(props: LoginOverlayProps): JSX.Element {
 }
 
 function LoginOverlayBody({ onDismiss }: LoginOverlayProps): JSX.Element {
-  const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
 
-  const localRobotName = useSelector(
-    (state: State) => getLocalRobot(state)?.name ?? null
-  )
-
-  const storeLoginState = (
-    username: string,
-    tokenResponse: OAuth2TokenResponse
-  ): void => {
-    if (localRobotName == null) {
-      console.warn("Couldn't identify the local robot.")
-      return
-    }
-    if (tokenResponse.token_type !== 'Bearer') {
-      console.warn(
-        'The server gave us an unrecognized token type:',
-        tokenResponse.token_type
-      )
-      return
-    }
-
-    dispatch(
-      logInOrRefresh({
-        username,
-        robotName: localRobotName,
-        accessToken: tokenResponse.access_token,
-        refreshToken: tokenResponse.refresh_token ?? null,
-        expiresAt:
-          tokenResponse.expires_in == null
-            ? null
-            : Date.now() + tokenResponse.expires_in * 1000,
-      })
-    )
-  }
+  const storeLoginState = useStoreLoginState()
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (username, response) => {
@@ -178,4 +141,60 @@ export function useOnDeviceLoginModal(): OnDeviceLoginModalContextValue {
     )
   }
   return ctx
+}
+
+/** Returns whether the logged-out overlay should be shown. */
+function useShouldShowLoggedOutOverlay(isShowingLoginPage: boolean): boolean {
+  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
+  const shouldShowLoggedOutOverlay =
+    accessControlEnabledQuery.data != null &&
+    accessControlEnabledQuery.data.data.accessControlEnabled &&
+    !isLoggedIn &&
+    !isShowingLoginPage
+  return shouldShowLoggedOutOverlay
+}
+
+/** Returns a function that updates client-side state to reflect a successful login. */
+function useStoreLoginState(): (
+  username: string,
+  successfulLoginResponse: OAuth2TokenResponse
+) => void {
+  const dispatch = useDispatch()
+
+  const localRobotName = useSelector(
+    (state: State) => getLocalRobot(state)?.name ?? null
+  )
+
+  const storeLoginState = useCallback(
+    (username: string, successfulLoginResponse: OAuth2TokenResponse): void => {
+      if (localRobotName == null) {
+        console.warn("Couldn't identify the local robot.")
+        return
+      }
+      if (successfulLoginResponse.token_type !== 'Bearer') {
+        console.warn(
+          'The server gave us an unrecognized token type:',
+          successfulLoginResponse.token_type
+        )
+        return
+      }
+
+      dispatch(
+        logInOrRefresh({
+          username,
+          robotName: localRobotName,
+          accessToken: successfulLoginResponse.access_token,
+          refreshToken: successfulLoginResponse.refresh_token ?? null,
+          expiresAt:
+            successfulLoginResponse.expires_in == null
+              ? null
+              : Date.now() + successfulLoginResponse.expires_in * 1000,
+        })
+      )
+    },
+    [dispatch, localRobotName]
+  )
+
+  return storeLoginState
 }
