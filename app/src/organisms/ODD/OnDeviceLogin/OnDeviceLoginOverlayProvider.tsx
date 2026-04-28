@@ -7,26 +7,17 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { LoggedOutOverlay } from '/app/molecules/LoggedOutOverlay'
-import { getLocalRobot } from '/app/redux/discovery'
-import {
-  getIsLoggedInToLocalRobot,
-  logInOrRefresh,
-} from '/app/redux/robot-auth'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLoginOverlayProvider.module.css'
 
 import type { ReactNode } from 'react'
-import type { OAuth2TokenResponse } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
+import { useShouldShowLoggedOutOverlay, useStoreLoginState } from './hooks'
 
 export interface OnDeviceLoginModalContextValue {
   openLoginModal: () => void
@@ -141,60 +132,4 @@ export function useOnDeviceLoginModal(): OnDeviceLoginModalContextValue {
     )
   }
   return ctx
-}
-
-/** Returns whether the logged-out overlay should be shown. */
-function useShouldShowLoggedOutOverlay(isShowingLoginPage: boolean): boolean {
-  const accessControlEnabledQuery = useAccessControlEnabledQuery()
-  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
-  const shouldShowLoggedOutOverlay =
-    accessControlEnabledQuery.data != null &&
-    accessControlEnabledQuery.data.data.accessControlEnabled &&
-    !isLoggedIn &&
-    !isShowingLoginPage
-  return shouldShowLoggedOutOverlay
-}
-
-/** Returns a function that updates client-side state to reflect a successful login. */
-function useStoreLoginState(): (
-  username: string,
-  successfulLoginResponse: OAuth2TokenResponse
-) => void {
-  const dispatch = useDispatch()
-
-  const localRobotName = useSelector(
-    (state: State) => getLocalRobot(state)?.name ?? null
-  )
-
-  const storeLoginState = useCallback(
-    (username: string, successfulLoginResponse: OAuth2TokenResponse): void => {
-      if (localRobotName == null) {
-        console.warn("Couldn't identify the local robot.")
-        return
-      }
-      if (successfulLoginResponse.token_type !== 'Bearer') {
-        console.warn(
-          'The server gave us an unrecognized token type:',
-          successfulLoginResponse.token_type
-        )
-        return
-      }
-
-      dispatch(
-        logInOrRefresh({
-          username,
-          robotName: localRobotName,
-          accessToken: successfulLoginResponse.access_token,
-          refreshToken: successfulLoginResponse.refresh_token ?? null,
-          expiresAt:
-            successfulLoginResponse.expires_in == null
-              ? null
-              : Date.now() + successfulLoginResponse.expires_in * 1000,
-        })
-      )
-    },
-    [dispatch, localRobotName]
-  )
-
-  return storeLoginState
 }
