@@ -290,42 +290,6 @@ function findInsertionPoints(
       if (found != null) {
         return found
       }
-    } else if (topLevelItem.type === 'vacuumProfileGroup') {
-      if (topLevelItem.vacuumProfileStepId === stepIdToInsertAfter) {
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-          insertionPointInsideGroup: {
-            parentArray: topLevelItem.concurrentSteps,
-            insertionIndex: 0,
-          },
-        }
-      } else if (
-        topLevelItem.waitForVacuumProfileStepId === stepIdToInsertAfter
-      ) {
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-        }
-      }
-    } else if (isConcurrentGroup(topLevelItem)) {
-      const found = tryInsertionPointsForConcurrentGroup(
-        topLevelItems,
-        topLevelItemIndex,
-        stepIdToInsertAfter,
-        {
-          startStepId: topLevelItem.startStepId,
-          waitStepId: topLevelItem.waitStepId,
-          concurrentSteps: topLevelItem.concurrentSteps,
-        }
-      )
-      if (found != null) {
-        return found
-      }
     } else {
       topLevelItem satisfies never
     }
