@@ -9,6 +9,7 @@
   height: 100%;
   flex-direction: column;
   padding: 7.75rem var(--spacing-40) var(--spacing-40);
+  gap: var(--spacing-8);
 }
 
 .devices_table_header_container {

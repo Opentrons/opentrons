@@ -11,7 +11,7 @@ from automation.pd_pages import (
     TransferPage,
 )
 from eyes import Eyes
-from utility import _import_protocol_and_open_editor
+from utility import import_protocol_and_open_editor
 
 SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
 DESTINATION_LABWARE = "Greiner 384 Well Plate 240 µL"
@@ -20,7 +20,7 @@ DESTINATION_LABWARE = "Greiner 384 Well Plate 240 µL"
 @pytest.mark.pdE2E
 @pytest.mark.slow
 def test_96_channel_workflow(page: Page, eyes: Eyes | None) -> None:
-    _import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py", migration=True)
+    import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py", migration=True)
     editor = ProtocolEditorPage(page)
     editor.open_add_step_menu()
     editor.add_step()

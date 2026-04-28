@@ -157,6 +157,9 @@ exclude = ["docs/v2/example_protocols/*", "src/opentrons/_version.py"]
 known-first-party = ["opentrons_shared_data", "opentrons_hardware"]
 known-local-folder = ["opentrons"]
 
+[tool.uv]
+exclude-newer = "1 week"
+
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
 # For local development: UV will use these editable local paths instead of PyPI,

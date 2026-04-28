@@ -273,8 +273,8 @@ export function getDefaultsForStepType(
         pumpDurationCheckbox: null,
         pumpDurationTime: null,
         endingHoldVentCheckbox: null,
-        orderedProfileIds: [],
-        profileItemsById: {},
+        vacuumOrderedProfileIds: [],
+        vacuumProfileItemsById: {},
       }
     default:
       return {}

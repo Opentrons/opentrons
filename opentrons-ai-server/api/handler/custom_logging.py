@@ -27,6 +27,20 @@ def drop_color_message_key(_, __, event_dict: EventDict) -> EventDict:  # type: 
     return event_dict
 
 
+def flatten_extra_into_event(_, __, event_dict: EventDict) -> EventDict:  # type: ignore[no-untyped-def]
+    """
+    Merge the nested "extra" dict into the top-level event so all fields appear
+    in the same log line (e.g. user_id, request_id) for easier filtering.
+    """
+    extra = event_dict.get("extra")
+    if isinstance(extra, dict):
+        for key, value in extra.items():
+            if key not in event_dict:
+                event_dict[key] = value
+        del event_dict["extra"]
+    return event_dict
+
+
 def setup_logging(json_logs: bool = False, log_level: str = "INFO") -> None:
     timestamper = structlog.processors.TimeStamper(fmt="iso")
 
@@ -36,6 +50,7 @@ def setup_logging(json_logs: bool = False, log_level: str = "INFO") -> None:
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.stdlib.ExtraAdder(),
+        flatten_extra_into_event,
         drop_color_message_key,
         timestamper,
         structlog.processors.StackInfoRenderer(),

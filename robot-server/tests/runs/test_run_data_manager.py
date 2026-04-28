@@ -284,7 +284,7 @@ async def test_create(
         config=sentinel.config,
         metadata={"protocolName": "test_protocol"},
     )
-    protocol = ProtocolResource(
+    protocol = ProtocolResource.model_construct(
         protocol_id=sentinel.protocol_id,
         created_at=datetime(year=2022, month=2, day=2),
         source=protocol_source,

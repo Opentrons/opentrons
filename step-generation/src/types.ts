@@ -8,6 +8,7 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
+  LoadedLabwareLocation,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   ModuleModel,
@@ -35,6 +36,9 @@ import type {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
+  VACUUM_APPROACHING_TARGET,
+  VACUUM_AT_TARGET,
+  VACUUM_DEACTIVATED,
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
   VACUUM_VENT_CLOSED,
@@ -51,6 +55,10 @@ export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
 export interface LabwareTemporalProperties {
   // a stack of ids from top to bottom
   stack: string[]
+  // The single entity this labware is stacked on (labware, module, slot, hopper, etc.).
+  stackedOnNode?: LoadedLabwareLocation
+  // The single labware ID this labware contains when that applies.
+  contains?: string
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
@@ -90,6 +98,12 @@ export interface TemperatureModuleState {
   type: typeof TEMPERATURE_MODULE_TYPE
   status: TemperatureStatus
   targetTemperature: number | null
+}
+
+export interface Point {
+  x: number
+  y: number
+  z?: number
 }
 
 export interface ThermocyclerModuleState {
@@ -173,16 +187,21 @@ export interface FlexStackerModuleState {
   fillCount?: number
 }
 
+export type VacuumPumpStatus =
+  | typeof VACUUM_DEACTIVATED
+  | typeof VACUUM_AT_TARGET
+  | typeof VACUUM_APPROACHING_TARGET
+
 interface VacuumModulePressureState {
   modeType: typeof VACUUM_MODE_PRESSURE
-  currentPressure: number | null
   targetPressure: number | null
+  status: VacuumPumpStatus
 }
 
 interface VacuumModulePowerState {
   modeType: typeof VACUUM_MODE_POWER
-  currentPower: number | null
   targetPower: number | null
+  status: VacuumPumpStatus
 }
 
 export type VentStatus = typeof VACUUM_VENT_OPEN | typeof VACUUM_VENT_CLOSED
@@ -654,6 +673,20 @@ interface ProfileCycleItem {
   repetitions: string
 }
 
+interface VacuumProfileStepItem {
+  type: typeof PROFILE_STEP
+  id: string
+  durationSeconds: number
+  pumpData: VacuumPumpData
+}
+
+interface VacuumProfileCycleItem {
+  type: typeof PROFILE_CYCLE
+  id: string
+  steps: VacuumProfileStepItem[]
+  repetitions: number
+}
+
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
@@ -758,6 +791,78 @@ export interface FlexStackerRetrieveArgs extends CommonArgs {
   commandCreatorFnName: 'flexStackerRetrieve'
 }
 
+export interface VacuumPumpAdvancedArgs {
+  duration?: number
+  ventAfter?: boolean
+}
+
+export interface VacuumPumpPressureArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpPressure'
+  gaugePressure: number
+}
+
+export interface VacuumPumpPowerArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpPower'
+  powerPercent: number
+}
+
+export interface VacuumOpenVentArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumOpenVent'
+}
+
+export interface VacuumCloseVentArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVent'
+}
+
+export interface VacuumStopPumpArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumStopPump'
+}
+
+export interface VacuumPressureData {
+  mode: typeof VACUUM_MODE_PRESSURE
+  pressureMbar: string | null
+}
+
+export interface VacuumPowerData {
+  mode: typeof VACUUM_MODE_POWER
+  powerPercent: number
+}
+
+type VacuumPumpData = VacuumPressureData | VacuumPowerData
+interface ProfileStepItemBase {
+  type: typeof PROFILE_STEP
+  id: string
+  title: string
+}
+export interface VacuumProfileStep extends ProfileStepItemBase {
+  durationSeconds: number
+  pumpData: VacuumPumpData
+}
+
+export type VacuumProfileItem = VacuumProfileStepItem | VacuumProfileCycleItem
+
+export type VacuumPumpArgs = VacuumPumpPressureArgs | VacuumPumpPowerArgs
+
+export interface VacuumProfileArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpProfile'
+  profileElements: VacuumProfileItem[]
+}
+
+export type VacuumArgs =
+  | VacuumPumpArgs
+  | VacuumProfileArgs
+  | VacuumOpenVentArgs
+  | VacuumCloseVentArgs
+  | VacuumStopPumpArgs
+
 export type FlexStackerArgs =
   | FlexStackerEmptyArgs
   | FlexStackerFillItemsArgs
@@ -786,6 +891,7 @@ export type CommandCreatorArgs =
   | MoveLabwareArgs
   | CommentArgs
   | FlexStackerArgs
+  | VacuumArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -903,6 +1009,7 @@ export type ErrorType =
   | 'MISSING_PROFILE_STEP'
   | 'MISSING_STACKER_LABWARE_TYPE'
   | 'MISSING_TEMPERATURE_STEP'
+  | 'MOVE_LOCATION_NOT_SPECIFIED'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
   | 'MULTI_DISPENSE_VOLUME_TOO_HIGH'

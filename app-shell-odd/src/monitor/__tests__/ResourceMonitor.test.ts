@@ -1,7 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck -- Get around private method access warnings.
 
-import { exec } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
@@ -18,15 +17,44 @@ import {
 import { UI_INITIALIZED } from '../../constants'
 import { PARENT_PROCESSES, ResourceMonitor } from '../ResourceMonitor'
 
-vi.mock('child_process')
-vi.mock('../../log', async importOriginal => {
-  const actual = await importOriginal<typeof createLogger>()
+const { execMock, fakeLogger } = vi.hoisted(() => ({
+  execMock: vi.fn(),
+  fakeLogger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}))
+
+type ChildProcessModulePartialForMock = Record<string, unknown> & {
+  default?: Record<string, unknown>
+}
+
+function assertChildProcessModulePartialForMock(
+  value: unknown
+): asserts value is ChildProcessModulePartialForMock {
+  if (typeof value !== 'object' || value === null) {
+    throw new Error('importOriginal(child_process) expected an object')
+  }
+}
+
+vi.mock('child_process', async importOriginal => {
+  const actual = await importOriginal()
+  assertChildProcessModulePartialForMock(actual)
+  const previousDefault: Record<string, unknown> = actual.default ?? {}
   return {
     ...actual,
-    createLogger: () => ({
-      debug: vi.fn(),
-      error: vi.fn(),
-    }),
+    exec: execMock,
+    default: {
+      ...previousDefault,
+      exec: execMock,
+    },
+  }
+})
+vi.mock('../../log', () => {
+  return {
+    createLogger: () => fakeLogger,
   }
 })
 
@@ -39,7 +67,7 @@ describe('ResourceMonitor', () => {
     procDir = tempy.directory()
     tempDirs.push(procDir)
 
-    vi.mocked(exec).mockImplementation((cmd, callback) => {
+    execMock.mockImplementation((cmd, callback) => {
       if (cmd.startsWith('systemctl')) {
         callback(null, 'MainPID=1234\n')
       } else if (cmd.startsWith('pgrep')) {
@@ -125,7 +153,7 @@ describe('ResourceMonitor', () => {
 
     it('handles missing process', () => {
       // Mock exec to return non-existent PID
-      vi.mocked(exec).mockImplementation((cmd, callback) => {
+      execMock.mockImplementation((cmd, callback) => {
         if (cmd.startsWith('systemctl')) {
           callback(null, 'MainPID=9999\n')
         } else {

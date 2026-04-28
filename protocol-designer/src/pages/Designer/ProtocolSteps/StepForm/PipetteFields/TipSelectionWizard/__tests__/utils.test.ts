@@ -10,6 +10,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 import { getIsTiprackSelectable, getViewboxFromSelectedLabware } from '../utils'
 
 import type { PipetteV2Specs } from '@opentrons/shared-data'
+import type { RobotState } from '@opentrons/step-generation'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
 vi.mock(import('@opentrons/step-generation'), async importOriginal => {
@@ -38,7 +39,15 @@ const activeDeckSetup = {
 const mockTiprackId = 'mockTiprackId'
 const MOCK_ADAPTER_ID = 'mockAdapterId'
 const MOCK_ADAPTER_URI = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
-
+const mockRobotState: RobotState = {
+  labware: {
+    [MOCK_TIPRACK_URI]: { stack: ['mockTiprackId', 'mockHsId', 'D1'] },
+  },
+  pipettes: {},
+  modules: {},
+  tipState: {} as any,
+  liquidState: {} as any,
+}
 const labware = {
   id: mockTiprackId,
   labwareDefURI: MOCK_TIPRACK_URI,
@@ -202,6 +211,7 @@ describe('getViewboxFromSelectedLabware', () => {
     expect(
       getViewboxFromSelectedLabware(
         MOCK_TIPRACK_URI,
+        mockRobotState,
         activeDeckSetup,
         MOCK_DECK_DEF
       )
@@ -212,6 +222,7 @@ describe('getViewboxFromSelectedLabware', () => {
     expect(
       getViewboxFromSelectedLabware(
         BAD_LABWARE_URI,
+        mockRobotState,
         activeDeckSetup,
         MOCK_DECK_DEF
       )
@@ -223,6 +234,7 @@ describe('getViewboxFromSelectedLabware', () => {
     expect(
       getViewboxFromSelectedLabware(
         MOCK_TIPRACK_URI,
+        mockRobotState,
         activeDeckSetup,
         MOCK_DECK_DEF
       )

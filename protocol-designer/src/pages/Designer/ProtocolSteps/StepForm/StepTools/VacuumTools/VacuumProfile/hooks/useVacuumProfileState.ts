@@ -15,8 +15,8 @@ import type {
 import type { VacuumMode } from '../utils'
 
 export interface UseVacuumProfileStateArgs {
-  orderedProfileIds: string[]
-  profileItemsById: Record<string, VacuumProfileItem>
+  vacuumOrderedProfileIds: string[]
+  vacuumProfileItemsById: Record<string, VacuumProfileItem>
   mode: VacuumMode
 }
 
@@ -37,11 +37,13 @@ export function useVacuumProfileState(args: UseVacuumProfileStateArgs): {
   ) => void
   hasUnsavedPresavedItems: boolean
 } {
-  const { orderedProfileIds, profileItemsById, mode } = args
-  const [orderedProfileItemIds, setOrderedProfileItemIds] =
-    useState<string[]>(orderedProfileIds)
-  const [itemsById, setItemsById] =
-    useState<Record<string, VacuumProfileItem>>(profileItemsById)
+  const { vacuumOrderedProfileIds, vacuumProfileItemsById, mode } = args
+  const [orderedProfileItemIds, setOrderedProfileItemIds] = useState<string[]>(
+    vacuumOrderedProfileIds
+  )
+  const [itemsById, setItemsById] = useState<Record<string, VacuumProfileItem>>(
+    vacuumProfileItemsById
+  )
 
   const defaultStepData = getDefaultStepData(mode)
 

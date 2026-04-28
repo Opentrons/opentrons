@@ -27,8 +27,8 @@ const updatePatchOnVacuumProgramType = (
         'pumpDurationCheckbox',
         'pumpDurationTime',
         'endingHoldVentCheckbox',
-        'orderedProfileIds',
-        'profileItemsById'
+        'vacuumOrderedProfileIds',
+        'vacuumProfileItemsById'
       ),
     }
   }
@@ -76,6 +76,22 @@ const updatePatchOnVacuumModeType = (
   return patch
 }
 
+const updatePatchOnVacuumEndingHoldVentCheckbox = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (
+    fieldHasChanged(rawForm, patch, 'pumpDurationCheckbox') &&
+    patch.pumpDurationCheckbox === true
+  ) {
+    return {
+      ...patch,
+      endingHoldVentCheckbox: true,
+    }
+  }
+  return patch
+}
+
 export const dependentFieldsUpdateVacuum = (
   originalPatch: FormPatch,
   rawForm: FormData
@@ -84,5 +100,7 @@ export const dependentFieldsUpdateVacuum = (
     chainPatch => updatePatchOnVacuumProgramType(chainPatch, rawForm),
     chainPatch => updatePatchOnVacuumStateType(chainPatch, rawForm),
     chainPatch => updatePatchOnVacuumModeType(chainPatch, rawForm),
+    chainPatch =>
+      updatePatchOnVacuumEndingHoldVentCheckbox(chainPatch, rawForm),
   ])
 }

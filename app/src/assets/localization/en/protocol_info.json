@@ -73,7 +73,6 @@
   "required_type_title": "Type",
   "requires_csv": "Requires CSV",
   "robot_name_last_run": "{{robot_name}}’s last run",
-  "robot_type_first": "{{robotType}} protocols first",
   "run_again": "Run again",
   "run_protocol": "Run protocol",
   "run_timestamp_title": "Run timestamp",

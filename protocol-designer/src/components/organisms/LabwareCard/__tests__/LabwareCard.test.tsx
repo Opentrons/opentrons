@@ -110,19 +110,24 @@ describe('LabwareCard', () => {
     fireEvent.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalledWith('/liquids')
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
-    fireEvent.click(screen.getByTestId('LabwareCard_overflowBtn'))
+    fireEvent.click(
+      screen.getByLabelText('ANSI 96 Standard Microplate options')
+    )
     screen.getByText('mock LabwareCardOverflowMenu')
   })
+
   it('renders a labware card with 2 liquids added', () => {
     vi.mocked(getLiquidIdsOnLabwareStack).mockReturnValue(['0', '1'])
     render(props)
     screen.getByText('Multiple liquid layouts')
   })
+
   it('renders a labware card with 1 liquid added', () => {
     vi.mocked(getLiquidIdsOnLabwareStack).mockReturnValue(['0'])
     render(props)
     screen.getByText('1 liquid')
   })
+
   it('renders a labware card with edit quantity copy and pressing button renders modal', () => {
     props.labware = {
       ...props.labware,

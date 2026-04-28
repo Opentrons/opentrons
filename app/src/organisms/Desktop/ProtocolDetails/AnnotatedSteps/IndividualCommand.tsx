@@ -79,13 +79,14 @@ export function IndividualCommand({
   }, [isHighlighted, scrollTargetId, command, listElement])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
+    [styles.individual_command_wrap_from_group]: fromGroup && !isHighlighted,
     [styles.individual_command_wrap_highlighted]: isHighlighted,
   })
 
   const individualCommandContainerStyle = clsx(
     styles.individual_command_container,
     {
-      [styles.rogue_individual_command_container]: fromGroup,
+      [styles.individual_command_container_group]: fromGroup,
     }
   )
 

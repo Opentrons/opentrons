@@ -4,16 +4,16 @@ from typing import Any, Generator
 import pytest
 
 from auth_server.persistence.database import create_schema, sql_engine_ctx
-from auth_server.settings.models import PatchSettingsRequestData, SettingsResponseData
+from auth_server.settings.models import (
+    PatchAccessControlRequestData,
+    PatchSettingsRequestData,
+    SettingsResponseData,
+)
 from auth_server.settings.store import SettingsStore
 
-_DEFAULTS: dict[str, Any] = {
-    k: v
-    for k, v in SettingsResponseData()
-    .model_dump(mode="json", exclude_none=True)
-    .items()
-    if k != "accessControlEnabled"
-}
+_DEFAULTS: dict[str, Any] = SettingsResponseData().model_dump(
+    mode="json", exclude_none=True
+)
 
 
 @pytest.fixture()
@@ -44,12 +44,10 @@ def test_reset_settings(settings_store: SettingsStore) -> None:
         ),
         pytest.param(
             PatchSettingsRequestData(
-                accessControlEnabled=True,
                 idleLogout=1800.0,
                 passwordResetTime=7776000.0,
             ),
             SettingsResponseData(
-                accessControlEnabled=True,
                 idleLogout=1800.0,
                 passwordResetTime=7776000.0,
             ),
@@ -74,13 +72,11 @@ def test_patch_settings_transfers_data(settings_store: SettingsStore) -> None:
     settings_store.patch_settings(PatchSettingsRequestData(**_DEFAULTS))
     settings_store.patch_settings(
         PatchSettingsRequestData(
-            accessControlEnabled=True,
             idleLogout=1800.0,
             passwordResetTime=7776000.0,
         )
     )
     fetched = settings_store.get_settings()
-    assert fetched.accessControlEnabled is True
     assert fetched.idleLogout == 1800.0
     assert fetched.passwordResetTime == 7776000.0
 
@@ -94,5 +90,15 @@ def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> No
         )
     )
     fetched = settings_store.get_settings()
+    assert fetched == SettingsResponseData(idleLogout=1800.0)
+
+
+def test_get_access_control_settings(settings_store: SettingsStore) -> None:
+    """get_access_control_settings should return the current access control settings."""
+    fetched = settings_store.get_access_control_settings()
     assert fetched.accessControlEnabled is False
-    assert fetched.idleLogout == 1800.0
+    settings_store.patch_access_control(
+        PatchAccessControlRequestData(accessControlEnabled=True)
+    )
+    fetched = settings_store.get_access_control_settings()
+    assert fetched.accessControlEnabled is True

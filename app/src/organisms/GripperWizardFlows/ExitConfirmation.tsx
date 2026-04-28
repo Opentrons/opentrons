@@ -40,12 +40,13 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   const flowTitle: string = titleFlowType[flowType]
   const isOnDevice = useSelector(getIsOnDevice)
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
+  }
 
   return (
     <SimpleWizardBody

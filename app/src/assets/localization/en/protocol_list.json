@@ -9,6 +9,8 @@
   "loading_data": "Loading data...",
   "modules": "modules",
   "no_data": "No data",
+  "ot2_protocol_detected": "OT-2 protocol detected",
+  "ot2_protocol_detected_description": "OT-2 now has its own app. Run OT-2 protocols there.",
   "peripherals": "Peripherals",
   "protocol_analysis_failure": "Protocol analysis failure.",
   "protocol_analysis_outdated": "Protocol analysis is out of date.",

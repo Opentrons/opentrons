@@ -18,24 +18,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup pnpm
+        uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
+        with:
+          version: 10.32.1
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      # ensure yarn version is 1.x
-      - name: Show Yarn version
+      - name: Show pnpm version
         run: |
-          corepack disable || true
-          yarn --version
+          pnpm --version
 
-      # 1) Run yarn audit (JSONL)
-      - name: Run yarn audit (JSON)
+      # 1) Run pnpm audit (JSON)
+      - name: Run pnpm audit (JSON)
         run: |
-          yarn audit --json > yarn-audit.json || true
+          pnpm audit --json > pnpm-audit.json || true
 
       # 2) Run OSV-Scanner via Docker and save JSON results
       - name: Run OSV-Scanner (JSON)
@@ -61,17 +64,17 @@ jobs:
 
       # Upload SARIF to GitHub Code Scanning
       - name: Upload OSV SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@5c8a8a642e79153f5d047b10ec1cba1d1cc65699 # v3.35.1
         with:
           sarif_file: osv-results.sarif
 
       # Upload results so the next job can access them
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: security-results
           path: |
-            yarn-audit.json
+            pnpm-audit.json
             osv-results.json
 
   # JOB 2: Download results and notify Slack (summary only)
@@ -82,7 +85,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: security-results
 
@@ -91,27 +94,31 @@ jobs:
         run: |
           set -euo pipefail
 
-          # --- yarn audit summary (severity counts) ---
+          # --- pnpm audit summary (severity counts) ---
           # count by severity: critical, high, moderate, low, info
-          if [ -s yarn-audit.json ]; then
-            YARN_COUNTS=$(jq -s -r '
-              map(select(.type=="auditAdvisory") | .data.advisory.severity)
+          if [ -s pnpm-audit.json ]; then
+            PNPM_COUNTS=$(jq -r '
+              .advisories // {}
+              | to_entries
+              | map(.value.severity)
               | reduce .[] as $s ({"info":0,"low":0,"moderate":0,"high":0,"critical":0}; .[$s] += 1)
-              | "yarn audit: critical=\(.critical) high=\(.high) moderate=\(.moderate) low=\(.low) info=\(.info)"
-            ' yarn-audit.json 2>/dev/null || true)
+              | "pnpm audit: critical=\(.critical) high=\(.high) moderate=\(.moderate) low=\(.low) info=\(.info)"
+            ' pnpm-audit.json 2>/dev/null || true)
 
-            read -r YARN_CRIT YARN_HIGH < <(jq -s -r '
-              map(select(.type=="auditAdvisory") | .data.advisory.severity)
+            read -r PNPM_CRIT PNPM_HIGH < <(jq -r '
+              .advisories // {}
+              | to_entries
+              | map(.value.severity)
               | reduce .[] as $s ({"high":0,"critical":0};
                   if $s=="high" then .high+=1
                   elif $s=="critical" then .critical+=1
                   else . end)
               | "\(.critical) \(.high)"
-            ' yarn-audit.json 2>/dev/null || echo "0 0")
+            ' pnpm-audit.json 2>/dev/null || echo "0 0")
           else
-            YARN_COUNTS="yarn audit: (no data)"
-            YARN_CRIT=0
-            YARN_HIGH=0
+            PNPM_COUNTS="pnpm audit: (no data)"
+            PNPM_CRIT=0
+            PNPM_HIGH=0
           fi
 
           # --- OSV summary ---
@@ -137,7 +144,7 @@ jobs:
           fi
 
           # --- Overall status ---
-          if [ "${YARN_CRIT:-0}" -eq 0 ] && [ "${YARN_HIGH:-0}" -eq 0 ] && [ "${OSV_VULN_COUNT:-0}" -eq 0 ]; then
+          if [ "${PNPM_CRIT:-0}" -eq 0 ] && [ "${PNPM_HIGH:-0}" -eq 0 ] && [ "${OSV_VULN_COUNT:-0}" -eq 0 ]; then
             HEADER="✅ Weekly Security Audit: OK"
           else
             HEADER="🚨 Weekly Security Audit: Findings"
@@ -146,7 +153,7 @@ jobs:
           RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
           MESSAGE="$HEADER
-          $YARN_COUNTS
+          $PNPM_COUNTS
           $OSV_SUMMARY
           run: $RUN_URL"
 

@@ -67,11 +67,10 @@ class _SelfClient(Client):
     @override
     async def get_auth_settings(self) -> AuthSettingsResponse:
         # Mimic an HTTP response body from our own /auth/settings endpoint.
-        response_body = {
-            "data": self._settings_store.get_settings().model_dump(
-                mode="json", by_alias=True
-            )
-        }
+        access_control_enabled = (
+            self._settings_store.get_access_control_settings().accessControlEnabled
+        )
+        response_body = {"data": {"accessControlEnabled": access_control_enabled}}
         converted_response_body = AuthSettingsResponse.model_validate(response_body)
         return converted_response_body
 

@@ -13,6 +13,7 @@
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
   "all_nozzles": "All nozzles (recommended)",
+  "all_nozzles_are_preselected": "All nozzles are preselected",
   "and": "and",
   "aspirate": "Aspirate",
   "aspirate_labware": "Source labware",
@@ -344,7 +345,10 @@
       "state": {
         "label": "Select the state to change",
         "options": {
-          "pump": "Turn on Vacuum pump",
+          "pump": {
+            "off": "Turn off Vacuum pump",
+            "on": "Turn on Vacuum pump"
+          },
           "vent": {
             "closed": "Close vent",
             "open": "Open vent"
@@ -375,6 +379,7 @@
         "closed": "Closed",
         "open": "Open",
         "pump": {
+          "off": "Stop pump",
           "power": "<text>Set pump power to</text><tag/>",
           "pressure": "<text>Set gauge pressure to</text><tag/>"
         },
@@ -391,7 +396,8 @@
   "volume_per_well": {
     "multiAspirate": "Aspirate volume per well",
     "multiDispense": "Dispense volume per well",
-    "single": "Volume per well"
+    "single": "Volume per well",
+    "mix": "Mix volume"
   },
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",

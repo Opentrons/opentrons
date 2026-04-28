@@ -29,12 +29,19 @@ import {
 } from './secondary-windows'
 import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
-import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
+import {
+  createUi,
+  registerOT2AppOpen,
+  registerReloadUi,
+  registerSystemLanguage,
+} from './ui'
 import { registerUpdate } from './update'
 import { registerUsb } from './usb'
 
 import type { LogEntry } from 'winston'
 import type { Action, Dispatch, Logger } from './types'
+
+const PROTOCOL_NAME = 'com-opentrons-flex-app'
 
 /**
  * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail
@@ -73,6 +80,7 @@ const handlerSets = new Map<string, HandlerSet>()
 app
   .whenReady()
   .then(async () => {
+    app.setAsDefaultProtocolClient(PROTOCOL_NAME)
     startUp()
 
     if (config.devtools) {
@@ -123,6 +131,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerReloadUi(window),
           registerSystemLanguage(dispatch),
           registerCameraStream(dispatch),
+          registerOT2AppOpen(),
         ]
       : // Only register necessary subset for secondary windows.
         [
@@ -134,6 +143,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerReloadUi(window),
           registerSystemLanguage(dispatch),
           registerCameraStream(dispatch),
+          registerOT2AppOpen(),
         ]
 
     handlerSets.set(windowId, { handlers, dispatch })

@@ -2,13 +2,7 @@
 
 import asyncio
 import logging
-import os
-import subprocess
-import sys
-import time
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union, cast
-
-import Pyro5.api
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -67,8 +61,8 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
-from . import run_process_entry_point
-from .run_process import DirectedRunProcess, register_process_types
+from .run_process import DirectedRunProcess
+from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
@@ -131,7 +125,9 @@ async def handle_hardware_event(
 ) -> None:
     """Handle an E-stop event from the hardware API.
 
-    This is meant to run in the engine's thread and asyncio event loop.
+    When in subprocess mode this executes in the RobotServerPyroResource's event loop.
+
+    Otherwise, this is meant to run in the engine's thread and asyncio event loop.
 
     This is a public function for unit-testing purposes, but it's an implementation
     detail of the store.
@@ -173,6 +169,7 @@ class RunOrchestratorStore:
         hardware_api: HardwareControlAPI,
         robot_type: RobotType,
         deck_type: DeckType,
+        run_process_pyro_provider: RunProcessPyroProvider,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -181,6 +178,8 @@ class RunOrchestratorStore:
                 construction.
             robot_type: Passed along to `opentrons.protocol_engine.Config`.
             deck_type: Passed along to `opentrons.protocol_engine.Config`.
+            run_process_pyro_provider: If in protocol subprocess mode, provides
+                the run process proxy when running a protocol.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
@@ -190,10 +189,9 @@ class RunOrchestratorStore:
             None
         )
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
-        self._run_process: Optional[subprocess.Popen[bytes]] = None
-        if feature_flags.protocol_subprocess_enabled():
-            register_process_types()
-        hardware_api.register_callback(_get_hardware_listener(self))
+        self._run_process_pyro_provider = run_process_pyro_provider
+        if not feature_flags.hardware_subprocess_enabled():
+            hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
     def run_orchestrator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -280,7 +278,14 @@ class RunOrchestratorStore:
             a new one may not be created.
         """
         if feature_flags.protocol_subprocess_enabled():
-            return await self.create_pyro(run_id=run_id)
+            return await self.create_pyro(
+                run_id=run_id,
+                labware_offsets=labware_offsets,
+                deck_configuration=deck_configuration,
+                protocol=protocol,
+                run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
+            )
 
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
@@ -375,35 +380,31 @@ class RunOrchestratorStore:
     async def create_pyro(
         self,
         run_id: str,
+        labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
+        protocol: Optional[ProtocolResource],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
     ) -> StateSummary:
         """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
-        if self._run_process is not None:
+        if self._run_orchestrator is not None:
             raise RunConflictError("Another run is currently active.")
 
-        self._run_process = subprocess.Popen(
-            args=[sys.executable, "-m", run_process_entry_point.__name__],
-            env={k: v for k, v in os.environ.items()},
-            # user="ot-protocol"  # TODO how do we make sure this works locally?
+        # "Run orchestrator" here is a proxy of a directed run process
+        run_orchestrator = await self._run_process_pyro_provider.wait_for_run_proxy()
+        await run_orchestrator.create(
+            run_id=run_id,
+            labware_offsets=labware_offsets,
+            deck_configuration=deck_configuration,
+            protocol=protocol,
+            run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
+            proxy_of_callback_for_handling_door_events=run_orchestrator.register_hardware_door_event(),
         )
 
-        # TODO This timeout sucks
-        start_time = time.monotonic()
-        with Pyro5.api.locate_ns() as ns:
-            while time.monotonic() - start_time < 60:
-                if "ot-protocol" in ns.list():
-                    proxy = Pyro5.api.Proxy(ns.list()["ot-protocol"])  # type: ignore[no-untyped-call]
-                    self._run_orchestrator = cast(
-                        DirectedRunProcess, cast(object, proxy)
-                    )
-                    break
-            else:
-                self._run_process.terminate()
-                self._run_process = None
-                ns.remove("ot-protocol")
-                raise ValueError("Can't find process")
-
-        proxy.create(run_id)
-        return self._run_orchestrator.get_state_summary()
+        summary = run_orchestrator.get_state_summary()
+        self._run_orchestrator = run_orchestrator
+        return summary
 
     async def clear_pyro(self) -> RunResult:
         """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
@@ -418,12 +419,9 @@ class RunOrchestratorStore:
 
         run_data = self.run_orchestrator.get_state_summary()
 
-        assert self._run_process is not None
-        self._run_process.terminate()
-        self._run_process = None
+        await self._run_process_pyro_provider.refresh()
+
         self._run_orchestrator = None
-        with Pyro5.api.locate_ns() as ns:
-            ns.remove("ot-protocol")
 
         return RunResult(
             state_summary=run_data,
