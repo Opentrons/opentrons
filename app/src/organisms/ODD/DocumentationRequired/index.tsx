@@ -19,6 +19,7 @@ export function DocumentationRequired({
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>('')
+
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
