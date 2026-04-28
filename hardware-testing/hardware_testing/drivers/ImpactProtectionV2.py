@@ -95,6 +95,10 @@ class ImpactProtectionSerial(ImpactProtectionBase):
         self, autosearch: bool = True, port: str = "", skip_port: str = ""
     ) -> bool:
         """Find and connect to device."""
+    def connect(
+        self, autosearch: bool = True, port: str = "", skip_port: str = ""
+    ) -> bool:
+        del autosearch
         ports = comports()
         if not ports:
             raise ImpactProtectionError("No serial ports found")
@@ -106,6 +110,8 @@ class ImpactProtectionSerial(ImpactProtectionBase):
             elif skip_port and skip_port in p.device:
                 continue
 
+            if self.ctx:
+                self.ctx.delay(seconds=1, msg=f"p {p}")
             try:
                 ser = serial.Serial(
                     port=p.device,
@@ -137,6 +143,12 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                     # self.ctx.delay(seconds= 0.1,msg=f"resp {resp} {type(resp)}")
                     # print(resp)
                 if "VersionImpact" in resp1:
+
+                    #self.ctx.delay(seconds=1,msg=f"reesp {resp1}")
+                    #resp = ser.readline().decode(errors="ignore").strip()
+                    #self.ctx.delay(seconds= 0.1,msg=f"resp {resp} {type(resp)}")
+                    #print(resp)
+                if "VersionImpact 0.0.1" in resp1:
                     self._ser = ser
                     self._port = p.device
                     return True
