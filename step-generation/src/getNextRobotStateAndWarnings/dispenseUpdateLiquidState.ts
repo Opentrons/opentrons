@@ -92,17 +92,20 @@ export function dispenseUpdateLiquidState(
   const splitLiquidStates: Record<string, SourceAndDest> = mapValues(
     prevLiquidState.pipettes[pipetteId],
     (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
+      const { ...liquidOnlyState } = prevTipLiquidState
+
       if (useFullVolume) {
-        const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
+        const totalTipVolume = getLocationTotalVolume(liquidOnlyState)
+
         return totalTipVolume > 0
-          ? splitLiquid(totalTipVolume, prevTipLiquidState)
+          ? splitLiquid(totalTipVolume, liquidOnlyState)
           : {
               source: {},
               dest: {},
             }
       }
 
-      return splitLiquid(volume || 0, prevTipLiquidState)
+      return splitLiquid(volume || 0, liquidOnlyState)
     }
   )
   let mergeLiquidtoSingleWell = null
@@ -132,6 +135,7 @@ export function dispenseUpdateLiquidState(
 
   if (mergeLiquidtoSingleWell == null && liquidTrash == null) {
     console.assert(
+      false,
       `expected to merge liquid to a single well with sourceId ${entityId}`
     )
   }

@@ -18,7 +18,8 @@ import type {
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_OFF,
+  VACUUM_STATE_PUMP_ON,
   VACUUM_VENT_SET_CLOSED,
   VACUUM_VENT_SET_OPEN,
   WasteChuteEntity,
@@ -37,6 +38,8 @@ import type {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
 } from './constants'
 
 export type StepIdType = string
@@ -233,6 +236,8 @@ export type HydratedPauseFormData = AnnotationFields & {
     | typeof PAUSE_UNTIL_TIME
     | typeof PAUSE_UNTIL_TEMP
     | typeof PAUSE_UNTIL_TC_PROFILE_COMPLETE
+    | typeof PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE
+    | typeof PAUSE_UNTIL_VACUUM_STATE_COMPLETE
   pauseMessage?: string
   /** If `PAUSE_UNTIL_TEMP`, the temperature to wait for. */
   pauseTemperature?: string
@@ -291,7 +296,7 @@ export interface VacuumProfileStep extends ProfileStepItemBase {
   pumpData: VacuumPumpData
 }
 
-export type VacuumProfileCycle = ProfileCycleItemBase & {
+export interface VacuumProfileCycle extends ProfileCycleItemBase {
   profileStepItemsById: Record<string, VacuumProfileStep>
   orderedProfileStepIds: string[]
 }
@@ -588,15 +593,16 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   moduleId: string
   endingHoldVentCheckbox: boolean
   modeType: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER | null
-  orderedProfileIds: string[]
+  vacuumOrderedProfileIds: string[]
   powerPercent: number | null
   pressureMbar: number | null
-  profileItemsById: Record<string, ProfileItem>
+  vacuumProfileItemsById: Record<string, VacuumProfileItem>
   programType: typeof VACUUM_PROGRAM_STATE | typeof VACUUM_PROGRAM_PROFILE
   pumpDurationCheckbox: boolean | null
   pumpDurationTime: string | null
   stateType:
-    | typeof VACUUM_STATE_PUMP
+    | typeof VACUUM_STATE_PUMP_ON
+    | typeof VACUUM_STATE_PUMP_OFF
     | typeof VACUUM_VENT_SET_OPEN
     | typeof VACUUM_VENT_SET_CLOSED
     | null

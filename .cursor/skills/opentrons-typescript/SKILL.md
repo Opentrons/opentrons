@@ -1,34 +1,35 @@
 ---
 name: opentrons-typescript
-description: TypeScript conventions, React patterns, testing, styling, and import rules for the Opentrons monorepo JS/TS packages. Use when working with TypeScript or React files in app/, components/, shared-data/, step-generation/, protocol-designer/, opentrons-ai-client/, or other JS/TS packages.
+description: TypeScript conventions, React patterns, testing, styling, and import rules for the Opentrons monorepo JS/TS packages. Use when working with TypeScript or React files in app/, components/, shared-data/, step-generation/, protocol-designer/, protocol-visualization/, opentrons-ai-client/, or other JS/TS packages.
 ---
 
 # Opentrons Monorepo — TypeScript Conventions
 
-Node.js, Yarn, Python setup, teardown, and troubleshooting are in the always-apply `monorepo-setup` rule.
+Node.js, Pnpm, Python setup, teardown, and troubleshooting are in the always-apply `monorepo-setup` rule.
 
 ## Monorepo Structure
 
-Yarn workspaces monorepo with 14 TypeScript packages. No Lerna/Nx/Turbo — uses Yarn Classic workspaces + TypeScript project references.
+Pnpm workspaces monorepo with 15 TypeScript packages. No Lerna/Nx/Turbo — uses Pnpm workspaces + TypeScript project references.
 
 ### Packages
 
-| Package                        | Directory                 | Type                        |
-| ------------------------------ | ------------------------- | --------------------------- |
-| `@opentrons/app`               | `app/`                    | React app                   |
-| `@opentrons/app-shell`         | `app-shell/`              | Electron shell              |
-| `@opentrons/app-shell-odd`     | `app-shell-odd/`          | Electron shell (ODD)        |
-| `@opentrons/components`        | `components/`             | React UI components library |
-| `@opentrons/api-client`        | `api-client/`             | Pure TS library             |
-| `@opentrons/react-api-client`  | `react-api-client/`       | React hooks library         |
-| `@opentrons/discovery-client`  | `discovery-client/`       | Pure TS (Node)              |
-| `@opentrons/shared-data`       | `shared-data/`            | Pure TS/JS data library     |
-| `@opentrons/step-generation`   | `step-generation/`        | Pure TS library             |
-| `@opentrons/labware-library`   | `labware-library/`        | React app                   |
-| `@opentrons/labware-designer`  | `labware-designer/`       | React app                   |
-| `opentrons-ai-client`          | `opentrons-ai-client/`    | React app                   |
-| `protocol-designer`            | `protocol-designer/`      | React app                   |
-| `@opentrons/usb-bridge-client` | `usb-bridge/node-client/` | Pure TS (Node)              |
+| Package                             | Directory                 | Type                              |
+| ----------------------------------- | ------------------------- | --------------------------------- |
+| `@opentrons/app`                    | `app/`                    | React app                         |
+| `@opentrons/app-shell`              | `app-shell/`              | Electron shell                    |
+| `@opentrons/app-shell-odd`          | `app-shell-odd/`          | Electron shell (ODD)              |
+| `@opentrons/components`             | `components/`             | React UI components library       |
+| `@opentrons/api-client`             | `api-client/`             | Pure TS library                   |
+| `@opentrons/react-api-client`       | `react-api-client/`       | React hooks library               |
+| `@opentrons/discovery-client`       | `discovery-client/`       | Pure TS (Node)                    |
+| `@opentrons/shared-data`            | `shared-data/`            | Pure TS/JS data library           |
+| `@opentrons/step-generation`        | `step-generation/`        | Pure TS library                   |
+| `@opentrons/labware-library`        | `labware-library/`        | React app                         |
+| `@opentrons/labware-designer`       | `labware-designer/`       | React app                         |
+| `opentrons-ai-client`               | `opentrons-ai-client/`    | React app                         |
+| `protocol-designer`                 | `protocol-designer/`      | React app                         |
+| `@opentrons/protocol-visualization` | `protocol-visualization/` | React library (protocol viz, WIP) |
+| `@opentrons/usb-bridge-client`      | `usb-bridge/node-client/` | Pure TS (Node)                    |
 
 ### Dependency Graph
 
@@ -40,6 +41,8 @@ shared-data
 ├── components
 ├── api-client → react-api-client
 └── discovery-client
+↓
+protocol-visualization (scaffold; depends on components + shared-data + step-generation)
 ↓
 app, protocol-designer, labware-library, opentrons-ai-client (leaf apps)
 ```
@@ -116,11 +119,13 @@ ESLint enforces `import/no-default-export`. Always use named exports. Exceptions
 Import individual functions only:
 
 ```typescript
-// Good
+// Good — imports a specific function
+import mapValues from 'lodash/mapValues'
+```
 
+```typescript
 // Bad — imports entire library
 import { mapValues } from 'lodash'
-import mapValues from 'lodash/mapValues'
 ```
 
 ### Type Imports
@@ -164,7 +169,9 @@ The `app` package separates Desktop and ODD (On-Device Display) UIs. ESLint rule
 
 ### Component Library (`@opentrons/components`)
 
-Use primitives from the shared component library for layout and common UI:
+**Do not use primitives from the shared component library when you create a new component from zero.**
+Primitives are located in `components/src/primitives`.
+Use primitives if you update an existing component or fix an existing component for layout and common UI:
 
 ```typescript
 import {
@@ -246,6 +253,12 @@ React component tests MUST use `renderWithProviders` (wraps Redux Provider + Que
 
 ```typescript
 import { renderWithProviders } from '/app/__testing-utils__'  // or /protocol-designer/__testing-utils__
+import { i18n } from '/app/i18n'
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof MyComponent>) => {
+  return renderWithProviders(<MyComponent {...props} />)[0]
+}
 
 describe('MyComponent', () => {
   let props: ComponentProps<typeof MyComponent>
@@ -258,9 +271,14 @@ describe('MyComponent', () => {
     vi.clearAllMocks()
   })
 
-  it('renders', () => {
-    renderWithProviders(<MyComponent {...props} />)
+  it('renders the button', () => {
+    render(props)
     expect(screen.getByRole('button')).toBeInTheDocument()
+  })
+
+  it('renders the text', () => {
+    render(props)
+    screen.getByText('Opentrons Flex')
   })
 })
 ```
@@ -295,7 +313,7 @@ Each package has a `Makefile` with some or all of:
 
 | Target                            | Description                                                        |
 | --------------------------------- | ------------------------------------------------------------------ |
-| `make setup-js`                   | Install all JS deps (`yarn`)                                       |
+| `make setup-js`                   | Install all JS deps (`pnpm`)                                       |
 | `make test-js`                    | Run ALL JS tests                                                   |
 | `make test-js-<project>`          | Run tests for one project (e.g., `make test-js-protocol-designer`) |
 | `make lint-js`                    | ESLint + Prettier check                                            |
@@ -312,13 +330,13 @@ Each package has a `Makefile` with some or all of:
 
 ```bash
 # Single file
-yarn vitest app/src/organisms/__tests__/MyComponent.test.tsx
+pnpm vitest app/src/organisms/__tests__/MyComponent.test.tsx
 
 # Entire package
-yarn vitest protocol-designer/
+pnpm vitest protocol-designer/
 
 # Watch mode
-yarn vitest --watch app/src/
+pnpm vitest --watch app/src/
 
 # Specific project via Make
 make test-js-app tests="src/organisms/__tests__/MyComponent.test.tsx"
@@ -327,17 +345,19 @@ make test-js-app tests="src/organisms/__tests__/MyComponent.test.tsx"
 ### Linting Specific Files
 
 ```bash
-yarn eslint path/to/file.tsx
-yarn stylelint path/to/file.module.css
-yarn prettier --check path/to/file.tsx
-yarn prettier --write path/to/file.tsx   # auto-fix
+pnpm eslint path/to/file.tsx
+pnpm stylelint path/to/file.module.css
+pnpm prettier --check path/to/file.tsx
+pnpm prettier --write path/to/file.tsx   # auto-fix
 ```
 
 ## Event Handlers
 
 ```typescript
+import type { MouseEvent } from 'react'
+
 // Named handlers for complex logic
-const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+const handleClick = (e: MouseEvent<HTMLButtonElement>): void => {
   e.preventDefault()
   onClick()
 }
@@ -409,3 +429,8 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT skip `afterEach(() => vi.clearAllMocks())` in test suites
 - Do NOT use semicolons (Prettier removes them)
 - Do NOT use `console.log` or `debugger` in committed code
+- Do NOT omit curly braces for control statements — ESLint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
+- Do NOT use primitives (primitives are located in `components/src/primitives`) for new component - use HTML 5 tags and CSS Modules
+- Do NOT use margins to create a layout in a component - use padding and gap
+- Do NOT use a conditional statement for `aria-label`
+- Do NOT use a nested ternary in non-component render code

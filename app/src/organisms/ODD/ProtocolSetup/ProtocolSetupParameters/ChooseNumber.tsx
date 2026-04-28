@@ -145,12 +145,11 @@ export function ChooseNumber({
               e.target.focus()
             }}
             onChange={e => {
-              const updatedValue =
-                parameter.type === 'int'
-                  ? Math.round(e.target.valueAsNumber)
-                  : e.target.valueAsNumber
+              const inputValue = Number(e.target.value as string)
+              const modifiedValue =
+                parameter.type === 'int' ? Math.round(inputValue) : inputValue
               setParamValue(
-                Number.isNaN(updatedValue) ? '' : String(updatedValue)
+                Number.isNaN(modifiedValue) ? '' : String(modifiedValue)
               )
             }}
           />

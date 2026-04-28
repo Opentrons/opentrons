@@ -38,7 +38,7 @@ export function VacuumProfileModal(
   props: VacuumProfileModalProps
 ): JSX.Element {
   const { formData, propsForFields, mode, onClose } = props
-  const { orderedProfileIds, profileItemsById } = formData
+  const { vacuumOrderedProfileIds, vacuumProfileItemsById } = formData
   const { t } = useTranslation('protocol_steps')
   const { makeSnackbar } = useKitchen()
 
@@ -55,8 +55,8 @@ export function VacuumProfileModal(
     saveCycle: handleSaveCycle,
     hasUnsavedPresavedItems,
   } = useVacuumProfileState({
-    orderedProfileIds,
-    profileItemsById,
+    vacuumOrderedProfileIds,
+    vacuumProfileItemsById,
     mode,
   })
 
@@ -69,8 +69,10 @@ export function VacuumProfileModal(
       makeSnackbar(t('vacuum.controls.profile.unsaved_changes') as string)
       return
     }
-    propsForFields.profileItemsById.updateValue(localProfileItemsById)
-    propsForFields.orderedProfileIds.updateValue(localOrderedProfileItemIds)
+    propsForFields.vacuumProfileItemsById.updateValue(localProfileItemsById)
+    propsForFields.vacuumOrderedProfileIds.updateValue(
+      localOrderedProfileItemIds
+    )
     onClose()
   }
 

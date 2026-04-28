@@ -39,11 +39,17 @@ class Settings(BaseSettings):
     auth0_issuer: str = "https://identity.auth-dev.opentrons.com/"
     auth0_algorithms: str = "RS256"
     service_version: str = "hardcoded_default_from_settings"
-    allowed_origins: str = "*"
+    # Comma-separated origins for CORS. With allow_credentials=True, "*" is invalid; use explicit origins.
+    # Default allows local Vite dev server so the UI at http://localhost:5173 can call the API.
+    allowed_origins: str = "http://localhost:5173,http://localhost:3000"
     cpu: str = "1028"
     memory: str = "2048"
     google_sheet_id: str = "harcoded_default_from_settings"
     google_sheet_worksheet: str = "Sheet1"
+
+    # Request timeout for non-streaming handlers (seconds). Keep below CloudFront/ALB (e.g. 180s)
+    # so the API returns a clear 504 and message instead of the proxy timeout.
+    request_timeout_seconds: str = "178"
 
     # Secrets
     # These come from environment variables in the local and deployed execution environments
@@ -62,6 +68,17 @@ class Settings(BaseSettings):
     @property
     def logger_name(self) -> str:
         return "app.logger"
+
+
+_settings: Settings | None = None
+
+
+def get_settings() -> Settings:
+    """Return the singleton Settings instance. Parses .env only on first call."""
+    global _settings
+    if _settings is None:
+        _settings = Settings()
+    return _settings
 
 
 def get_settings_from_json(json_str: str) -> Settings:
@@ -86,5 +103,4 @@ def generate_env_file(settings: Settings) -> None:
 
 # Example usage
 if __name__ == "__main__":
-    config: Settings = Settings()
-    generate_env_file(config)
+    generate_env_file(get_settings())

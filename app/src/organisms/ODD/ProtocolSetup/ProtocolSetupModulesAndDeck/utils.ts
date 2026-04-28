@@ -29,8 +29,9 @@ export function getUnmatchedModulesForProtocol(
       (acc, module) => {
         const { model, compatibleWith } = module.moduleDef
         // Skip matching any modules that don't require an electronic robot connection
-        if (NON_CONNECTING_MODULE_TYPES.includes(getModuleType(model)))
+        if (NON_CONNECTING_MODULE_TYPES.includes(getModuleType(model))) {
           return acc
+        }
         // for this required module, find a remaining (unmatched) attached module of the requested model
         const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
           attachedModule => {

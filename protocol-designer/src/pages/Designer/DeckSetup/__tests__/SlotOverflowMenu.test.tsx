@@ -11,6 +11,7 @@ import { i18n } from '/protocol-designer/assets/localization'
 import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
+  getAllLabwareWithoutLids,
 } from '/protocol-designer/components/organisms'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import {
@@ -40,6 +41,7 @@ vi.mock('/protocol-designer/components/organisms')
 vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('/protocol-designer/labware-ingred/utils')
 vi.mock('/protocol-designer/components/organisms/Kitchen/useKitchen')
+
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -103,6 +105,7 @@ describe('SlotOverflowMenu', () => {
         },
       },
     })
+    vi.mocked(getAllLabwareWithoutLids).mockReturnValue(['labId'])
     vi.mocked(EditNickNameModal).mockReturnValue(
       <div>mock EditNickNameModal</div>
     )

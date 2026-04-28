@@ -151,14 +151,13 @@ Run from the `protocol-designer/` directory:
 | `make test`            | Run PD tests (delegates to root `make test-js-protocol-designer`) |
 | `make test-cov`        | Tests with coverage                                               |
 | `make bundle-analyzer` | Analyze production bundle size                                    |
-| `make benchmarks`      | Run performance benchmarks (output in `benchmarks/output/`)       |
 
 ```bash
 # Run a specific test file
 make test tests="src/components/organisms/__tests__/MyComponent.test.tsx"
 
 # Run vitest directly from monorepo root
-yarn vitest protocol-designer/src/step-forms/
+pnpm vitest protocol-designer/src/step-forms/
 ```
 
 ### Environment Variables

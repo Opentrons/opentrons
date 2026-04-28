@@ -133,16 +133,17 @@ async def test_set_vacuum_state(
     connection.send_command.assert_any_call(set_pressure)
     connection.reset_mock()
 
-    # With duration and rate
+    # With duration, timeout, and rate
     connection.send_command.return_value = "M120"
 
-    await subject.set_vacuum_state(True, -600, 500, rate=-10)
+    await subject.set_vacuum_state(True, -600, 500, 30, rate=-10)
 
     set_pressure = (
         types.GCODE.SET_PRESSURE_STATE.build_command()
         .add_int("S", 1)
         .add_float("P", -600)
         .add_int("D", 500)
+        .add_int("T", 30)
         .add_float("R", -10)
     )
 
@@ -313,7 +314,9 @@ async def test_get_pressure_control_tunings(
     subject: VacuumModuleDriver, connection: AsyncMock
 ) -> None:
     """It should send a get pressure pid command"""
-    connection.send_command.return_value = "M126 P:1.0 I:0.0 D:0.0 O:-2.0 V:20.0 H:43.0"
+    connection.send_command.return_value = (
+        "M126 P:1.0 I:0.0 D:0.0 O:-2.0 V:20.0 H:43.0 T:0.2"
+    )
 
     pressure_state = await subject.get_pressure_control_tunings()
 
@@ -321,4 +324,4 @@ async def test_get_pressure_control_tunings(
     connection.send_command.assert_any_call(get_pressure)
     connection.reset_mock()
 
-    assert pressure_state == types.PressureControlTunings(1, 0, 0, -2, 20, 43)
+    assert pressure_state == types.PressureControlTunings(1, 0, 0, -2, 20, 43, 0.2)
