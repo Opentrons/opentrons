@@ -2839,9 +2839,20 @@ def test_ensure_location_not_occupied_raises(
     """It should raise error when labware is present in given location."""
     slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     # Shouldn't raise if neither labware nor module in location
+    decoy.when(mock_labware_view.get_all()).then_return([])
     assert subject.ensure_location_not_occupied(location=slot_location) == slot_location
 
     # Raise if labware in location
+    decoy.when(mock_labware_view.get_all()).then_return(
+        [
+            LoadedLabware(
+                id="some-id",
+                loadName="some-name",
+                definitionUri="1234",
+                location=slot_location,
+            )
+        ]
+    )
     decoy.when(
         mock_labware_view.raise_if_labware_in_location(slot_location)
     ).then_raise(errors.LocationIsOccupiedError("Woops!"))

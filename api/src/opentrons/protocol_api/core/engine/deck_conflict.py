@@ -246,14 +246,20 @@ def _map_labware(
 ]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
     if isinstance(location_from_engine, AddressableAreaLocation):
+        area_name = location_from_engine.addressableAreaName
+        # If this is our custom module dock, it's not a standard deck slot.
+        # We skip standard conflict mapping because the geometry engine
+        # handles this 1:n space.
+        if "VACUUMMODULE" in area_name.upper() and "DOCK" in area_name.upper():
+            area_name = area_name[:-2]
+            return None
+
         # This will be guaranteed to be either deck slot name or staging slot name
         slot: Union[DeckSlotName, StagingSlotName]
         try:
-            slot = DeckSlotName.from_primitive(location_from_engine.addressableAreaName)
+            slot = DeckSlotName.from_primitive(area_name)
         except ValueError:
-            slot = StagingSlotName.from_primitive(
-                location_from_engine.addressableAreaName
-            )
+            slot = StagingSlotName.from_primitive(area_name)
         return (
             slot,
             wrapped_deck_conflict.Labware(

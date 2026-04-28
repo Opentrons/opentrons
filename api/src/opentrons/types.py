@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+from dataclasses import dataclass
 from math import isclose, sqrt
 from typing import (
     TYPE_CHECKING,
@@ -521,6 +522,21 @@ class StagingSlotName(enum.Enum):
         For explicitness, prefer using `.id` instead.
         """
         return self.id
+
+
+@dataclass(frozen=True)
+class ModuleFixtureLocation:
+    """A special location (dock, fixture, collar, holder, etc.) that is paired
+    with a specific module.
+
+    Used when a module has associated positions in the staging area or elsewhere
+    that are not standard deck slots.
+    """
+
+    addressable_area_name: str
+
+    def __str__(self) -> str:
+        return self.addressable_area_name
 
 
 class TransferTipPolicy(enum.Enum):
