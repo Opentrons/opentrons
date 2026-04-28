@@ -1,4 +1,3 @@
-import { createElement } from 'react'
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
@@ -19,9 +18,9 @@ vi.mock('@opentrons/react-api-client', () => ({
 }))
 
 vi.mock('/app/redux/robot-auth', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/robot-auth')>()
+  const actual = await importOriginal()
   return {
-    ...actual,
+    ...(actual as any),
     getIsLoggedInToLocalRobot: vi.fn(),
   }
 })
@@ -32,7 +31,7 @@ describe('useShouldShowLoggedOutOverlay', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>
 
   beforeEach(() => {
-    wrapper = ({ children }) => createElement(Provider, { store, children })
+    wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
   })
 
   afterEach(() => {

@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
+import { beforeEach, describe, expect, it, test, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

@@ -12,12 +12,12 @@ import { getTopPortalEl } from '/app/App/portal'
 import { LoggedOutOverlay } from '/app/molecules/LoggedOutOverlay'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
+import { useShouldShowLoggedOutOverlay, useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLoginOverlayProvider.module.css'
 
 import type { ReactNode } from 'react'
 import type { LoginStep } from './index'
-import { useShouldShowLoggedOutOverlay, useStoreLoginState } from './hooks'
 
 export interface OnDeviceLoginModalContextValue {
   openLoginModal: () => void
