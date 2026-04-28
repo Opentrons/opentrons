@@ -4,7 +4,7 @@ import asyncio
 import inspect
 import socket
 import threading
-from typing import cast, Any
+from typing import Any, cast
 
 import pytest
 from decoy import Decoy
@@ -87,6 +87,7 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
     except ImportError:
         return None  # type: ignore[return-value]
 
+
 async def _setup_namerserver(name_server_ready: threading.Event) -> None:
     """Set up a thread running the Pyro Nameserver."""
     sock = socket.socket()
@@ -104,17 +105,15 @@ async def _setup_namerserver(name_server_ready: threading.Event) -> None:
         # Run until the test process exits; thread is marked daemon=True.
         ns_daemon.requestLoop()
 
-    
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     ns_thread.start()
 
 
 async def _setup_OT3API_pyro_resource(
-    hw_api: OT3API,
-    name_server_ready: threading.Event  
+    hw_api: OT3API, name_server_ready: threading.Event
 ) -> OT3API:
     """Set up a thread running an OT3API pyro resource and publish it on the nameserver."""
-    
+
     def _ot3api_pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=PYRO_TIMEOUT)
@@ -124,15 +123,20 @@ async def _setup_OT3API_pyro_resource(
     ot3api_thread.start()
 
     ns = pyro.locate_ns()
-
     retries_counter = 0
-    while ns.count() < 3:
+    uri = None
+    while retries_counter <= 10:
         # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+        try:
+            uri = ns.lookup("OT3API")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
+
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER IN OT3API SETUP.")
 
     uri = pyro.resolve(uri="PYRONAME:OT3API")
     ot3_proxy = pyro.Proxy(uri)  # type: ignore
@@ -171,7 +175,7 @@ async def _setup_robot_server_pyro_resource(
     resource_utilities.register_camera_provider_to_pyro_resource(
         mock_app_state, empty_cam_provider
     )
-    resource_utilities.register_deck_configuraiton_store_to_pyro_resource(
+    resource_utilities.register_deck_configuration_store_to_pyro_resource(
         mock_app_state, deck_configuration_store
     )
     resource_utilities.register_notify_publishers_to_pyro_resource(
@@ -179,44 +183,58 @@ async def _setup_robot_server_pyro_resource(
         lambda: [],  # type: ignore
     )
 
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
     ns = pyro.locate_ns()
     retries_counter = 0
-    while ns.count() < 3:
+    uri = None
+    while retries_counter <= 10:
         # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+        try:
+            ns.lookup("OT3API")
+            uri = ns.lookup("robot-server-resource")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
+
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER IN ROBOT SERVER SETUP.")
+
     rs_async = resource_utilities.get_pyro_resource()
     return rs_async
 
 
 async def _setup_directed_run_process_pyro_resource(
-    name_server_ready: threading.Event
+    name_server_ready: threading.Event,
 ) -> DirectedRunProcess:
     """Set up a thread running a Directed run process pyro resource and publish it on the Nameserver."""
     pyro_thread = initialize_run_process()
     pyro_thread.start()
 
     ns = pyro.locate_ns()
-
     retries_counter = 0
-    while ns.count() < 3:
+    uri = None
+    while retries_counter <= 10:
         # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+        try:
+            ns.lookup("OT3API")
+            ns.lookup("robot-server-resource")
+            uri = ns.lookup("ot-protocol")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
 
-    uri = pyro.resolve(uri="PYRONAME:ot-protocol")
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError(
+            "TEST FAILURE ON PYRO NAMESERVER IN DIRECTED RUN PROCESS SETUP."
+        )
     protocol_proxy = pyro.Proxy(uri)  # type: ignore
     protocol_async = AsyncClientPyroObject(protocol_proxy)
     run_process = cast(DirectedRunProcess, cast(object, protocol_async))
     return run_process
-    
+
 
 async def test_serialization_coverage(
     decoy: Decoy,
@@ -227,8 +245,8 @@ async def test_serialization_coverage(
     mock_feature_flags: None,
 ) -> None:
     """Test to ensure no serialization errors are raised when calling for results from any exposed opentrons process.
-    
-    This test works by mocking out the processes and then calling all of their ACPO client side equivalents to ensure 
+
+    This test works by mocking out the processes and then calling all of their ACPO client side equivalents to ensure
     all methods and attributes exposed through pyro are callable and do not raise a Pyro5.errors.SerializeError as a result.
     """
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
@@ -239,15 +257,19 @@ async def test_serialization_coverage(
     # NOTE: the order is important, always go: Nameserver -> OT3API -> Robot Server -> Directed Run Process
     # This is the same order as the boot process on the robot
     await _setup_namerserver(name_server_ready=name_server_ready)
-    ot3api = await _setup_OT3API_pyro_resource(hw_api=ot3_hardware_api, name_server_ready=name_server_ready)
+    ot3api = await _setup_OT3API_pyro_resource(
+        hw_api=ot3_hardware_api, name_server_ready=name_server_ready
+    )
     robot_server = await _setup_robot_server_pyro_resource(
         app_state=mock_app_state,
         name_server_ready=name_server_ready,
         ot3_api_async_proxy=ot3api,
         run_process_provider=mock_run_process_pyro_provider,
-        deck_configuration_store=mock_deck_configuration_store
+        deck_configuration_store=mock_deck_configuration_store,
     )
-    run_process = await _setup_directed_run_process_pyro_resource(name_server_ready=name_server_ready)
+    run_process = await _setup_directed_run_process_pyro_resource(
+        name_server_ready=name_server_ready
+    )
 
     # Grab the inner proxies for all these safely wrapped results, we'll use these to troll through the metadata
     ot3api_proxy: pyro.Proxy = ot3api._proxy  # type: ignore
@@ -259,10 +281,10 @@ async def test_serialization_coverage(
     ot3api_proxy._pyroBind()  # type: ignore
     robot_server_proxy._pyroBind()  # type: ignore
     run_process_proxy._pyroBind()  # type: ignore
-    
-    # CASEY TODO: troll through all the 
-    #_pyroMethods
-    #_pyroAttrs
+
+    # CASEY TODO: troll through all the
+    # _pyroMethods
+    # _pyroAttrs
 
     # Clean up client resources.
     run_process_proxy._pyroRelease()  # type: ignore
