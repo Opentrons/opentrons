@@ -2,6 +2,7 @@ import {
   A1_NOZZLE,
   A12_NOZZLE,
   ALL,
+  B1_ADDRESSABLE_AREA,
   COLUMN,
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
@@ -22,7 +23,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { EMPTY, OT2_TC_SLOTS } from '../constants'
+import { EMPTY } from '../constants'
 import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
@@ -81,7 +82,7 @@ export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
   return null
 }
 
-// return pipette bounds at a sepcific position
+// return pipette bounds at a specific position
 // note that this calculation is pessimistic to mirror behavior on protocol engine
 // the returned plane is defined by the z-height of the empty nozzles (lowest case scenario)
 // and the x-y bounds defined by the outer-most bounds of the pipette
@@ -224,24 +225,9 @@ const getSlotHasPotentialCollidingObject = (
   invariantContext: InvariantContext,
   robotType: RobotType
 ): boolean => {
-  const isThermocyclerOnDeck = Object.values(
-    invariantContext.moduleEntities
-  ).some(({ type }) => type === THERMOCYCLER_MODULE_TYPE)
-
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
-    // explicit OT-2 check for if the pipette will enter the space above a thermocycler-occupied slot
-    const willCollideWithThermocycler =
-      isThermocyclerOnDeck &&
-      robotType === OT2_ROBOT_TYPE &&
-      slot.addressableArea?.id != null &&
-      OT2_TC_SLOTS.includes(slot.addressableArea.id as OT2AddressableAreaName)
-
-    if (willCollideWithThermocycler) {
-      return true
-    }
-
     // If slotPosition or slotBounds is null, continue to the next iteration
     if (slotPosition == null || slotBounds == null) {
       continue
@@ -359,7 +345,6 @@ export const getIsSafePipetteMovement = (args: {
   const isFlexPipette = displayCategory === 'FLEX'
   const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckDefinition = getDeckDefFromRobotType(robotType)
-
   //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided
   if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
@@ -376,17 +361,19 @@ export const getIsSafePipetteMovement = (args: {
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? (tiprackTipLength ?? 0) : 0
   const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
-  const addressableAreaOffset = getPositionFromSlotId(
-    labwareSlot,
-    deckDefinition
-  ) ?? [0, 0, 0]
-  const isOnFlexThermocycler =
-    robotType === FLEX_ROBOT_TYPE &&
-    labwareState[labwareId].stack.some(
-      item => moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
-    )
-  const thermocyclerOffset = isOnFlexThermocycler
-    ? (deckDefinition.locations.addressableAreas.find(
+
+  const hasThermocycler = labwareState[labwareId].stack.some(item => {
+    return moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
+  })
+
+  // special logic for thermocycler addressable area offset for the OT-2
+  const flexDeckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const addressableAreaOffset = (hasThermocycler
+    ? getPositionFromSlotId(B1_ADDRESSABLE_AREA, flexDeckDefinition)
+    : getPositionFromSlotId(labwareSlot, deckDefinition)) ?? [0, 0, 0]
+
+  const thermocyclerOffset = hasThermocycler
+    ? (flexDeckDefinition.locations.addressableAreas.find(
         addressableArea => addressableArea.id === THERMOCYCLER_MODULE_V2
       )?.offsetFromCutoutFixture ?? [0, 0, 0])
     : [0, 0, 0]
@@ -419,8 +406,7 @@ export const getIsSafePipetteMovement = (args: {
     tipLength,
     wellTargetPoint,
     labwareDefinition,
-    primaryNozzle ??
-      getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels }),
+    primaryNozzle,
     nozzleConfiguration,
     tipOverlapOnNozzle
   )
