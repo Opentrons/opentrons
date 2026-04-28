@@ -259,14 +259,6 @@ const getSlotHasPotentialCollidingObject = (
       )
 
       if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
-        console.log(
-          '🚀 ~ getSlotHasPotentialCollidingObject ~ highestZInSurroundingSlot:',
-          highestZInSurroundingSlot
-        )
-        console.log(
-          '🚀 ~ getSlotHasPotentialCollidingObject ~ pipetteBounds:',
-          pipetteBounds
-        )
         return true
       }
     }
