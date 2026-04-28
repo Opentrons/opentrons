@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
-  Icon,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
   setRefs,
@@ -13,6 +12,7 @@ import {
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './OnDeviceLoginOverlayProvider.module.css'
@@ -178,14 +178,12 @@ function LoginFieldInput({
   onClearLoginError,
   onFocus,
 }: LoginFieldInputProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = step === 'password' && !showPassword
   const inputType = isPasswordHidden ? LEGACY_INPUT_TYPE_PASSWORD : 'text'
-  const toggleLabel = t('toggle_password_visibility')
 
-  return (
+  const input = (
     <InputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={step === 'password'}
@@ -201,24 +199,31 @@ function LoginFieldInput({
         onClearLoginError?.()
       }}
       onFocus={onFocus}
-      rightElement={
-        step === 'password' ? (
-          <div>
-            <button
-              aria-label={toggleLabel}
-              type="button"
-              title={toggleLabel}
-              onClick={() => {
-                setShowPassword(current => !current)
-                inputRef.current?.focus()
-              }}
-            >
-              <Icon name={showPassword ? 'eye-slash' : 'eye'} size="1.5rem" />
-            </button>
-          </div>
-        ) : null
-      }
     />
+  )
+
+  if (step !== 'password') return input
+
+  return (
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        gap: '0.75rem',
+      }}
+    >
+      <div style={{ flex: 1 }}>{input}</div>
+      <PasswordVisibilityToggle
+        isVisible={showPassword}
+        onToggle={() => {
+          setShowPassword(current => !current)
+          inputRef.current?.focus()
+        }}
+      />
+    </div>
   )
 }
 
