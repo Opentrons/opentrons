@@ -350,11 +350,15 @@ export const getIsSafePipetteMovement = (args: {
   if (labwareEntities[labwareId] == null || wellTargetName == null) {
     return true
   }
-  // if tiprackId is passed in, assume a tip is on the pipette
+  // If tiprackId is explicitly provided, assume the pipette currently has a tip attached.
+  // This is used in WellSelector.ts / getAllWellsSafetyStatus to force "tip present"
+  // during collision detection scenarios.
   const pipetteHasTip = tiprackId
     ? true
     : (tipState.pipettes[pipetteId]?.hasTip ?? false)
-  // if a specific tip rack id is passed in, use that instead
+
+  // Use the provided tiprackId if available; otherwise fall back to the
+  // tiprack recorded in tipState for this pipette.
   const confirmedTiprackId =
     tiprackId ?? tipState.pipettes[pipetteId]?.tiprackURI
   const tiprackEntity =
