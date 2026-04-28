@@ -257,7 +257,16 @@ const getSlotHasPotentialCollidingObject = (
         slot,
         robotType
       )
+
       if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
+        console.log(
+          '🚀 ~ getSlotHasPotentialCollidingObject ~ highestZInSurroundingSlot:',
+          highestZInSurroundingSlot
+        )
+        console.log(
+          '🚀 ~ getSlotHasPotentialCollidingObject ~ pipetteBounds:',
+          pipetteBounds
+        )
         return true
       }
     }
@@ -339,14 +348,23 @@ export const getIsSafePipetteMovement = (args: {
   const pipetteEntity = pipetteEntities[pipetteId]
 
   const { spec: pipetteSpecs } = pipetteEntity
+<<<<<<< Updated upstream
+=======
+  const { channels } = pipetteSpecs
+>>>>>>> Stashed changes
 
   // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
   const displayCategory = pipetteSpecs?.displayCategory
   const isFlexPipette = displayCategory === 'FLEX'
   const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+
   const deckDefinition = getDeckDefFromRobotType(robotType)
-  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided
-  if (labwareEntities[labwareId] == null || wellTargetName == null) {
+  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided or if 1ch pipette
+  if (
+    labwareEntities[labwareId] == null ||
+    wellTargetName == null ||
+    channels === 1
+  ) {
     return true
   }
 
@@ -389,8 +407,6 @@ export const getIsSafePipetteMovement = (args: {
     fullOffset as CoordinateTuple,
     pipetteHasTip
   )
-
-  const { channels } = pipetteSpecs
 
   const tipOverlapOnNozzle =
     tiprackEntity != null
