@@ -16,7 +16,7 @@ test_opts ?=
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: setup
 setup:
@@ -62,4 +62,4 @@ test-cov:
 # analyze bundle
 .PHONY: bundle-analyzer
 bundle-analyzer:
-	ANALYZE_DEBUG=true make build
+	ANALYZE_DEBUG=true make dist
