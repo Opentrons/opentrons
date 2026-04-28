@@ -85,7 +85,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
     <>
       {/* Empty box to detect scrolling */}
       <div ref={scrollRef} />
-      <div
+      <nav
         className={clsx(
           styles.nav_bar,
           navMenuOrModalIsOpened
@@ -93,7 +93,6 @@ export function Navigation(props: NavigationProps): JSX.Element {
             : styles.nav_bar_sticky,
           isScrolled && styles.nav_bar_scrolled
         )}
-        aria-label="Navigation_container"
       >
         <div className={styles.nav_content_row}>
           <div className={styles.carousel_wrapper}>
@@ -147,7 +146,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
             />
           </button>
         </div>
-      </div>
+      </nav>
       {showNavMenu && (
         <NavigationMenu
           onClick={() => {
