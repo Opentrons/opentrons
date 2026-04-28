@@ -33,7 +33,6 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
-  getOffDeckRenderInfo,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
@@ -43,6 +42,7 @@ import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
@@ -108,7 +108,17 @@ export function ProtocolSetupLabware({
   const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key, value]) => key !== 'offDeck')
-  const offDeckItems = getOffDeckRenderInfo(stacksWithLaware)
+  const offDeckItems = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getOffDeckRenderGroups(
+            startingDeck,
+            mostRecentAnalysis,
+            labwareByLiquidId
+          )
+        : [],
+    [startingDeck, mostRecentAnalysis, labwareByLiquidId]
+  )
 
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
@@ -211,7 +221,7 @@ export function ProtocolSetupLabware({
                     refetchModules={moduleQuery.refetch}
                     slotName={'offDeck'}
                     offDeckQuantity={item.quantity}
-                    stackedItems={[item]}
+                    stackedItems={item.stackedItems}
                     labwareByLiquidId={labwareByLiquidId}
                     onClick={setSelectedLabwareStack}
                   />
