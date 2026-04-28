@@ -12,8 +12,10 @@ instructions() {
     echo "gather = Gathers and SCPs all the data, state, and logs from the given robots"
     echo "create = Creates a Tarball on the robot with the data, state, logs, etc."
     echo "set-ntp = Sets the ntp server to the value specified or default."
-    echo "migrate backup <source-ip = Creates a migration tarball."
+    echo "migrate backup <source-ip> = Creates a migration tarball."
     echo "migrate restore <target-ip> <migration-tarball.tar.gz> = Transfers tarball to target, inflates it, and rebots the robot."
+    echo "migrate backup-local <created_by> = Creates a migration tarball on a Flex."
+    echo "migrate restore-local <migration-tarball.tar.gz> = Takes a tarball on the Flex, inflates it, and rebots the robot."
     echo "migrate analyze <migration-tarball.tar.gz> = Print the metadata of a migration tarball."
     echo "robot-ip = list of robot ip addresses to perform action on."
     echo ""
@@ -219,13 +221,21 @@ EOF
     done
 }
 
+is_opentrons_flex() {
+    [[ -f "/etc/VERSION.json" ]] || return 1
+    [[ -d "/data" && -d "/userfs" ]] || return 1
+    return 0
+}
+
 migrate_main() {
-    if [[ "$#" -lt 2 ]]; then
+    if [[ "$#" -lt 1 ]]; then
         echo ""
         echo "Error: migrate requires a sub-action"
         echo "Usage:"
         echo "  ./flex_diagnostics migrate backup <source-ip> <created_by> [note]"
         echo "  ./flex_diagnostics migrate restore <target-ip> <migration-tarball.tar.gz>"
+        echo "  ./flex_diagnostics migrate backup-local <created_by> [note]"
+        echo "  ./flex_diagnostics migrate restore-local <migration-tarball.tar.gz>"
         echo "  ./flex_diagnostics migrate analyze <migration-tarball.tar.gz>"
         echo ""
         instructions
@@ -241,14 +251,28 @@ migrate_main() {
                 echo "Error: 'backup' requires <source-ip> and <created_by>"
                 exit 1
             fi
-            migrate_backup "$1" "$2" "${3:-}"
+            migrate_backup false "$1" "$2" "${3:-}"
+            ;;
+        backup-local)
+            if [[ -z "$1" ]]; then
+                echo "Error: 'backup-local' requires <created_by>"
+                exit 1
+            fi
+            migrate_backup true "$1" "$2" "${3:-}"
             ;;
         restore)
             if [[ -z "$2" ]]; then
                 echo "Error: restore requires the path to a migration tarball"
                 exit 1
             fi
-            migrate_restore "$1" "$2"
+            migrate_restore false "$1" "$2"
+            ;;
+        restore-local)
+            if [[ -z "$1" ]]; then
+                echo "Error: restore-local requires the path to a migration tarball"
+                exit 1
+            fi
+            migrate_restore true "${1:-}"
             ;;
         analyze)
             if [[ -z "$1" ]]; then
@@ -266,9 +290,23 @@ migrate_main() {
 }
 
 migrate_backup() {
-    local ip=$1
-    local created_by=$2
-    local note="${3:-}"
+    local is_local=$1
+    local ip=$2
+    local created_by=$3
+    local note="${4:-}"
+    local output_dir="/tmp"
+    if $is_local; then
+        if ! is_opentrons_flex; then
+            instructions
+            echo "⚠️  Can't use local commands when not on the Flex."
+            exit 1
+        fi
+
+        ip="localhost"
+        created_by=$2
+        note="${3:-}"
+        output_dir=$(pwd)
+    fi
 
     echo "=== Creating migration backup from $ip ==="
     echo "Created By : $created_by"
@@ -291,16 +329,25 @@ migrate_backup() {
         declare -a INCLUDES=(
             "/data"
             "/var/lib"
-            "/var/serial"
             "/userfs/etc"
         )
+
+        # Add serial if it exists
+        [ -f "/var/serial" ] && INCLUDES+=("/var/serial")
 
         # ==================== EXCLUDE LIST ====================
         # Paths to exclude (relative to /)
         declare -a EXCLUDES=(
-            "/data/ODD/__ot_system_update__"
-            "/var/log"
-            "/var/lib/otupdate/downloads/"
+            "data/ODD/__ot_system_update__"
+            "*/Local Extension Settings"
+            "*/Local Extension Settings/*"
+            "data/ODD/Local*"
+            "data/ODD/*.ldb"
+            "data/ODD/Cache"
+            "var/log"
+            "var/lib/otupdate/downloads"
+            "var/lib/opkg"
+            "var/lib/opkg/*"
         )
         # =====================================================
 
@@ -322,55 +369,61 @@ METADATA
         jq . /tmp/migrate_metadata/metadata_compact.json > /tmp/migrate_metadata/metadata.json
         cat /tmp/migrate_metadata/metadata.json
 
-        echo "Creating migration tarball..."
-
         # Build tar arguments
-        tar_include_args=""
-        for inc in "\${INCLUDES[@]}"; do
-            tar_include_args+=" \${inc}"
-        done
-
-        tar_exclude_args=""
+        declare -a tar_args=()
         for excl in "\${EXCLUDES[@]}"; do
-            tar_exclude_args+=" --exclude=\${excl}"
+            tar_args+=( --exclude="\${excl}" )
+        done
+        for inc in "\${INCLUDES[@]}"; do
+            tar_args+=( "\${inc}" )
         done
 
-        eval "tar --checkpoint=100 --checkpoint-action=echo \
-            -zcvf \"/tmp/\${tarfile}\" \
-            \$tar_exclude_args \
-            -C / \
-            \$tar_include_args \
-            -C /tmp/migrate_metadata metadata.json" 2>&1 | tail -n 40
+        echo "Creating migration tarball..."
+        tar -zcvf "$output_dir/\${tarfile}" \
+            "\${tar_args[@]}" \
+            -C /tmp/migrate_metadata metadata.json 2>&1
 
         echo "----------------------------------------"
-        echo "Migration backup created: /tmp/\$tarfile"
-        ls -lh "/tmp/\$tarfile"
+        echo "Migration backup created: ${output_dir}/\$tarfile"
+        ls -lh "${output_dir}/\$tarfile"
 
         rm -rf /tmp/migrate_metadata
 EOF
 
-    echo "Downloading migration tarball to host..."
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-        root@$ip:/tmp/*_migrate.tar.gz ./
+    if ! $is_local; then
+        echo "Downloading migration tarball to host..."
+        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            root@$ip:${output_dir}/*_migrate.tar.gz ./
 
-    ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-        root@$ip 'rm -f /tmp/*_migrate.tar.gz'
+        ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            root@$ip 'rm -f /tmp/*_migrate.tar.gz'
+    fi
 
     echo "✅ Backup completed. Tarball saved locally."
 }
 
 migrate_restore() {
-    local ip=$1
-    local tarball=$2
+    local is_local=$1
+    local ip=$2
+    local tarball=$3
+    if $is_local; then
+        if ! is_opentrons_flex; then
+            instructions
+            echo "⚠️  Can't use local commands when not on the Flex."
+            exit 1
+        fi
+
+        ip="localhost"
+        tarball=$(realpath $2)
+    fi
 
     if [[ ! -f "$tarball" ]]; then
-        echo "Error: Tarball '$tarball' not found on host!"
+        echo "Error: Tarball '$tarball' not found!"
         exit 1
     fi
 
     echo "=== Restoring migration data to $ip from $tarball ==="
 
-    echo "=== METADATA FROM SOURCE DEVICE ==="
     if tar -xOf "$tarball" metadata.json > /tmp/restore_metadata.json 2>/dev/null; then
         jq . /tmp/restore_metadata.json 2>/dev/null || cat /tmp/restore_metadata.json
         echo ""
@@ -394,21 +447,28 @@ migrate_restore() {
         exit 1
     fi
 
-    echo "Uploading tarball to robot..."
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-        "$tarball" root@$ip:/tmp/
+    if ! $is_local; then
+        echo "Uploading tarball to robot..."
+        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            "$tarball" root@$ip:/tmp/
+    fi
 
     echo "Running restore on robot..."
 
     ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-        root@$ip 'bash -s' <<-'EOR'
+        root@$ip 'bash -s' <<-EOF
 
         set -eE -o pipefail
         trap 'echo "Restore failed on robot!"' ERR
 
-        tarball=$(ls /tmp/*_migrate.tar.gz 2>/dev/null | head -n1)
-        if [[ -z "$tarball" ]]; then
-            echo "Error: No migration tarball found in /tmp"
+        if $is_local; then
+            tarball=${tarball}
+        else
+            tarball=\$(ls /tmp/*_migrate.tar.gz 2>/dev/null)
+        fi
+
+        if [[ -z "\$tarball" ]]; then
+            echo "Error: No migration tarball found: \$tarball"
             exit 1
         fi
 
@@ -419,17 +479,21 @@ migrate_restore() {
         mount -o remount,rw / || true
 
         echo "Extracting migration data..."
-        tar -xzf "$tarball" -C /
+        tar -zxvf "\$tarball" \
+        --exclude="metadata.json" \
+        -C /
 
         echo "Migration data restored successfully."
 
-        echo "Cleaning up..."
-        rm -f /tmp/*_migrate.tar.gz
+        if [ "$is_local" = false ]; then
+            echo "Cleaning up..."
+            rm -f \$tarball
+        fi
 
         echo ""
         echo "=== RESTARTING ROBOT ==="
         reboot
-EOR
+EOF
 
     rm -f /tmp/restore_metadata.json
     echo "✅ Restore completed on $ip"

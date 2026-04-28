@@ -56,16 +56,24 @@ The `migrate` takes one of the following sub-actions
 
 - `backup` : Creates a migration tarball of user data like /var/lib, /data, and other important dirs + metadata.json
 - `restore` : Takes in a migration tarball created with the `backup` command, inflates it on the target, and rebots it.
+- `backup-local` : Same as `backup` but runs locally on the Flex from a usb thumbdrive.
+- `restore-local` : Same as `restore` but runs locally on the Flex from a usb thumbdrive.
 - `analyze`: Print the metadata of a migration tarball created with the `backup` command
 
 ### backup
 The `backup` sub-action takes in `created_by` and an optional `note` argument in the following format
 These are both strings and can be whatever you want, but the created_by is intended to have the name of the person creating the backup; the note argument can have whatever. Note that the double quotes are required for both arguments.
 
-Example:
+Remote Example:
 ```bash
 ./flex_diagnostics migrate backup <source-ip> "<created_by>" "[note]"
 ./flex_diagnostics migrate backup 192.168.1.1 "Opentrons Support" "Case #: 12345, Replaced on April 1, 2026"
+```
+
+Local Example:
+```bash
+./flex_diagnostics migrate backup-local "<created_by>" "[note]"
+./flex_diagnostics migrate backup-local "Opentrons Support Local" "Case #: 12345, Replaced on April 1, 2026"
 ```
 
 This generates a tarball in the following format `<robot_name>_<datetime>_migrate.tar.gz`, i.e., `TESTROBOT_2026_04_25_19_49_39_migrate.tar.gz`.
@@ -73,10 +81,16 @@ This generates a tarball in the following format `<robot_name>_<datetime>_migrat
 ### restore
 The `restore` sub-action takes in a migration-tarball argument, which is the tarfile created by the `backup` sub-action.
 
-Example:
+Remote Example:
 ```bash
 ./flex_diagnostics migrate restore <target-ip> <migration-tarball.tar.gz>
 ./flex_diagnostics migrate restore 192.168.1.1 TESTROBOT_2026_04_25_19_49_39_migrate.tar.gz
+```
+
+Local Example:
+```bash
+./flex_diagnostics migrate restore-local <migration-tarball.tar.gz>
+./flex_diagnostics migrate restore-local TESTROBOT_2026_04_25_19_49_39_migrate.tar.gz
 ```
 
 Note: You will be asked to confirm your actions before continuing.
