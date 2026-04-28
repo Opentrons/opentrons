@@ -80,7 +80,10 @@ class ImpactProtectionSerial(ImpactProtectionBase):
         
 
     # ---------- connection ----------
-    def connect(self, autosearch: bool = True, port: str = "",skip_port:str = "") -> None:
+    def connect(
+        self, autosearch: bool = True, port: str = "", skip_port: str = ""
+    ) -> bool:
+        del autosearch
         ports = comports()
         if not ports:
             raise ImpactProtectionError("No serial ports found")
@@ -91,7 +94,8 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                 continue
             elif skip_port and skip_port in p.device:
                 continue
-            self.ctx.delay(seconds=1,msg=f"p {p}")
+            if self.ctx:
+                self.ctx.delay(seconds=1, msg=f"p {p}")
             try:
                 ser = serial.Serial(
                     port=p.device,
@@ -123,7 +127,7 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                     #resp = ser.readline().decode(errors="ignore").strip()
                     #self.ctx.delay(seconds= 0.1,msg=f"resp {resp} {type(resp)}")
                     #print(resp)
-                if "VersionImpact" in resp1:
+                if "VersionImpact 0.0.1" in resp1:
                     self._ser = ser
                     self.port = p.device
                     return True
@@ -244,12 +248,6 @@ class ImpactProtectionSimulate(ImpactProtectionBase):
         pass
 
 
-def _is_protocol_environment() -> bool:
-    try:
-        import opentrons.protocol_api  # noqa
-        return True
-    except Exception:
-        return False
 
 def BuildImpactProtection(
     simulate: bool = False,
@@ -267,6 +265,24 @@ def BuildImpactProtection(
         return dev
     else:
         return False
+
+
+def BuildImpactProtectionWithPort(
+    simulate: bool = False,
+    autosearch: bool = True,
+    port: str = "",
+    skip_port: str = "",
+    ctx=None,
+) -> Tuple[ImpactProtectionBase, Optional[str]]:
+    """Build an ImpactProtection device and return its connected port."""
+    if simulate:
+        return ImpactProtectionSimulate(), None
+
+    dev = ImpactProtectionSerial(ctx=ctx)
+    conret = dev.connect(autosearch=autosearch, port=port, skip_port=skip_port)
+    if conret:
+        return dev, dev.port
+    raise ImpactProtectionError("Failed to connect ImpactProtection device")
 
 
 

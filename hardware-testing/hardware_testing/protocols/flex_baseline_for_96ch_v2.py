@@ -24,7 +24,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 
 # FIXME: make these variables configurable through RUNTIME-VARIABLES
 
-metadata = {"protocolName": "Flex: Baseline for 96ch v2"}
+metadata = {"protocolName": "Flex: Baseline for 96ch v3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 RETURN_TIP = True
@@ -231,10 +231,24 @@ def _probe_source_volume(
         pipette.pick_up_tip(probe_tips.wells_by_name()["A1"])
     try:
         if not ctx.is_simulating():
-            if pipette.detect_liquid_presence(source_well):
-                measured_volume_ul = assumed_volume_ul
-            else:
+            hwapi = ctx._core.get_hardware()
+            pipette.move_to(
+                source_well.top(z=SAFE_MOVE_CLEARANCE_MM),
+                minimum_z_height=source_well.top().point.z + SAFE_MOVE_CLEARANCE_MM,
+                publish=False,
+            )
+            pipette.move_to(source_well.top(), publish=False)
+            probed_z = hwapi.liquid_probe(pipette._core.get_mount(), source_well.depth)
+            liquid_height_mm = max(
+                min(probed_z - source_well.bottom().point.z, source_well.depth),
+                0.0,
+            )
+            if abs(liquid_height_mm - source_well.depth) < 0.01:
                 measured_volume_ul = 0.0
+            else:
+                measured_volume_ul = _convert_height_in_well_to_ul_in_well(
+                    reservoir.load_name, liquid_height_mm
+                )
         else:
             measured_volume_ul = assumed_volume_ul
     finally:
@@ -243,7 +257,7 @@ def _probe_source_volume(
     if measured_volume_ul > 0:
         ctx.comment(
             f"Detected liquid in {source_well.display_name}. "
-            f"Using assumed volume {_format_ml(measured_volume_ul)} for this run."
+            f"Measured {_format_ml(measured_volume_ul)} from liquid probing."
         )
     else:
         ctx.comment(f"No liquid detected in {source_well.display_name}.")
@@ -407,8 +421,6 @@ def _transfer(
     volume_already_in_plate: float = 0,
 ) -> None:
     del source_remaining_ul
-    del push_out
-    del volume_already_in_plate
     transfer_type = tx_comps_executor.TransferType.ONE_TO_ONE
     for dst_name in destinations:
         pipette.move_to(
@@ -427,17 +439,20 @@ def _transfer(
             reservoir[source],
         )
         ctx.delay(seconds=DELAY_ASPIRATE)
-        _dispense_with_liquid_class(
-            pipette,
-            volume,
-            transfer_properties,
-            transfer_type,
-            plate[dst_name],
-            contents,
+        volume_in_plate = volume + volume_already_in_plate
+        dst_height = _convert_ul_in_well_to_height_in_well(plate.load_name, volume_in_plate)
+        dispense_pos = plate[dst_name].bottom(
+            max(dst_height - SUBMERGE_MM["dispense"], MIN_MM_FROM_BOTTOM)
         )
+        blow_out_pos = plate[dst_name].bottom(
+            max(dst_height + RETRACT_MM, MIN_MM_FROM_BOTTOM)
+        )
+        pipette.dispense(volume, dispense_pos)
         ctx.delay(seconds=DELAY_DISPENSE)
+        pipette.blow_out(blow_out_pos)
         if touch_tip:
             pipette.touch_tip(speed=TOUCH_TIP_SPEED, v_offset=TOUCH_TIP_DEPTH)
+        pipette.aspirate(1, blow_out_pos)  # trailing air-gap to avoid droplets
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -469,7 +484,7 @@ def run(ctx: ProtocolContext) -> None:
         MIN_REQUIRED_BASELINE_UL,
     )
     ctx.comment(
-        "Liquid-height probe will be used first. "
+        "Liquid-height probe will be used first to measure the source volume. "
         "Recommended starting volume: "
         f"{_format_ml(recommended_starting_volume_ul)} of {LIQUID_NAME} in reservoir {SOURCE_WELL}. "
         f"Minimum required to run {plate_count} plates: {_format_ml(minimum_required_volume_ul)}."
@@ -518,7 +533,7 @@ def run(ctx: ProtocolContext) -> None:
             [DESTINATION_WELL],
             source_remaining_ul=source_remaining_ul,
             push_out=TARGET_PUSH_OUT,
-            touch_tip=False,
+            touch_tip=True,
             volume_already_in_plate=0,
         )
         if RETURN_TIP:
