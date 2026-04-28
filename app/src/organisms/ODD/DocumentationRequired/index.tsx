@@ -8,57 +8,65 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './documentationrequired.module.css'
 
+import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard/types'
+
 interface DocumentationRequiredProps {
-  userName: string
-  onBack: () => void
+  robotName: string
+  setCurrentOption: SetSettingOption
 }
 
 export function DocumentationRequired({
-  userName,
-  onBack,
+  robotName,
+  setCurrentOption,
 }: DocumentationRequiredProps): JSX.Element {
-  const { t } = useTranslation(['access_control', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared'])
   const [inputText, setInputText] = useState<string>('')
-
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   return (
-    <>
-      <div className={styles.container}>
-        <ChildNavigation
-          header={t('documentation_required')}
-          buttonText={t('shared:confirm')}
-          onClickButton={() => {}}
-          buttonIsDisabled={inputText.trim() === ''}
-          secondaryButtonProps={{
-            buttonText: 'View actions',
-            buttonType: 'tertiaryHighLight',
-            iconName: 'information',
-            iconPlacement: 'startIcon',
-            onClick: () => {},
-          }}
-          onClickBack={onBack}
-        />
-        <div className={styles.content_container}>
-          <div className={styles.text_area_container}>
-            <TouchTextAreaField
-              autoFocus
-              value={inputText}
-              ref={textAreaRef}
-              label={t('access_control_note', { user: userName })}
-              onChange={e => {
-                setInputText(e.target.value)
-              }}
-              onBlur={e => {
-                e.target.focus()
-              }}
-            />
-          </div>
+    <div className={styles.container}>
+      <ChildNavigation
+        header={t('documentation_required')}
+        buttonText={t('shared:confirm')}
+        onClickButton={() => {}}
+        buttonIsDisabled={inputText.trim() === ''}
+        secondaryButtonProps={{
+          buttonText: 'View actions',
+          buttonType: 'tertiaryHighLight',
+          iconName: 'information',
+          iconPlacement: 'startIcon',
+          onClick: () => {},
+        }}
+        onClickBack={() => {
+          setCurrentOption(null)
+        }}
+      />
+      <div className={styles.content_container}>
+        <div className={styles.text_area_container}>
+          <TouchTextAreaField
+            autoFocus
+            value={inputText}
+            ref={textAreaRef}
+            label="Note for robot audit log by '<user>'"
+            onChange={e => {
+              setInputText(e.target.value)
+            }}
+            onBlur={e => {
+              e.target.focus()
+            }}
+            height={isKeyboardOpen ? '11.3rem' : '22.5rem'}
+          />
         </div>
       </div>
       <div className={styles.keyboard_container}>
-        <AccordionKeyboard isOpen onToggle={() => {}}>
+        <AccordionKeyboard
+          isOpen={isKeyboardOpen}
+          onToggle={() => {
+            setIsKeyboardOpen(prev => !prev)
+          }}
+        >
           <FullKeyboard
             onChange={(input: string) => {
               setInputText(input)
@@ -68,6 +76,6 @@ export function DocumentationRequired({
           />
         </AccordionKeyboard>
       </div>
-    </>
+    </div>
   )
 }

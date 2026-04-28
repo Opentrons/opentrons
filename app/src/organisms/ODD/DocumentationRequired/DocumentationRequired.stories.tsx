@@ -1,6 +1,5 @@
 import { Provider } from 'react-redux'
 import { legacy_createStore } from 'redux'
-import { action } from 'storybook/actions'
 
 import { VIEWPORT } from '@opentrons/components'
 
@@ -36,6 +35,9 @@ const meta: Meta<typeof DocumentationRequiredComponent> = {
       </Provider>
     ),
   ],
+  argTypes: {
+    setCurrentOption: { action: 'setCurrentOption' },
+  },
 }
 export default meta
 
@@ -43,7 +45,6 @@ type Story = StoryObj<typeof DocumentationRequiredComponent>
 
 export const DocumentationRequired: Story = {
   args: {
-    userName: 'John Doe',
-    onBack: action('onBack'),
+    robotName: 'otie',
   },
 }
