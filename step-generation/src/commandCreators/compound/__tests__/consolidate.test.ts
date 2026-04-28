@@ -262,7 +262,15 @@ mock_pipette.consolidate_with_liquid_class(
                     "delay": {"enabled": False},
                     "end_position": {"offset": {}},
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
-                    "blowout": {"enabled": True, "location": "destination", "flow_rate": 2.3},
+                    "blowout": {
+                        "enabled": True,
+                        "location": "destination",
+                        "flow_rate": 2.3,
+                        "blowout_position": {
+                            "offset": {"x": 0, "y": 0, "z": 3.3},
+                            "position_reference": "well-top",
+                        },
+                    },
                 },
                 "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],
