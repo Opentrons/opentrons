@@ -142,10 +142,42 @@ async def _setup_OT3API_pyro_resource(
 
 async def _setup_robot_server_pyro_resource(
     app_state: AppState,
-    name_server_ready: threading.Event
+    ot3_api_async_proxy: OT3API,
+    name_server_ready: threading.Event,
+    run_process_provider: RunProcessPyroProvider,
+    deck_configuration_store: DeckConfigurationStore,
 ) -> pyro_resource.RobotServerPyroResource:
     """Set up a thread running a Pyro resource, register all the needed things to it, and publish it on the Nameserver."""
     pyro_resource.start_initializing_pyro_resource(app_state)
+
+    # Set up all the registered "things" on the robot-server
+
+    run_store = RunOrchestratorStore(
+        hardware_api=ot3_api_async_proxy,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType("ot3_standard"),
+        run_process_pyro_provider=run_process_provider,
+    )
+    resource_utilities.register_run_orchestrator_store_to_pyro_resource(
+        mock_app_state, run_store
+    )
+
+    # Get the necessary things registered with the "robot server"
+    empty_file_provider = FileProvider()
+    resource_utilities.register_file_provider_to_pyro_resource(
+        mock_app_state, empty_file_provider
+    )
+    empty_cam_provider = CameraProvider()
+    resource_utilities.register_camera_provider_to_pyro_resource(
+        mock_app_state, empty_cam_provider
+    )
+    resource_utilities.register_deck_configuraiton_store_to_pyro_resource(
+        mock_app_state, deck_configuration_store
+    )
+    resource_utilities.register_notify_publishers_to_pyro_resource(
+        mock_app_state,
+        lambda: [],  # type: ignore
+    )
 
     name_server_ready.wait(timeout=PYRO_TIMEOUT)
     ns = pyro.locate_ns()
@@ -159,6 +191,7 @@ async def _setup_robot_server_pyro_resource(
             raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
     rs_async = resource_utilities.get_pyro_resource()
     return rs_async
+
 
 async def _setup_directed_run_process_pyro_resource(
     name_server_ready: threading.Event
@@ -207,7 +240,13 @@ async def test_serialization_coverage(
     # This is the same order as the boot process on the robot
     await _setup_namerserver(name_server_ready=name_server_ready)
     ot3api = await _setup_OT3API_pyro_resource(hw_api=ot3_hardware_api, name_server_ready=name_server_ready)
-    robot_server = await _setup_robot_server_pyro_resource(app_state=mock_app_state, name_server_ready=name_server_ready)
+    robot_server = await _setup_robot_server_pyro_resource(
+        app_state=mock_app_state,
+        name_server_ready=name_server_ready,
+        ot3_api_async_proxy=ot3api,
+        run_process_provider=mock_run_process_pyro_provider,
+        deck_configuration_store=mock_deck_configuration_store
+    )
     run_process = await _setup_directed_run_process_pyro_resource(name_server_ready=name_server_ready)
 
     # Grab the inner proxies for all these safely wrapped results, we'll use these to troll through the metadata
@@ -215,10 +254,15 @@ async def test_serialization_coverage(
     robot_server_proxy: pyro.Proxy = robot_server._proxy  # type: ignore
     run_process_proxy: pyro.Proxy = run_process._proxy  # type: ignore
 
-    # Client-side requests below
+    # Prep for trolling through proxy metadata
     register_all_needed_types()
+    ot3api_proxy._pyroBind()  # type: ignore
+    robot_server_proxy._pyroBind()  # type: ignore
+    run_process_proxy._pyroBind()  # type: ignore
     
-    
+    # CASEY TODO: troll through all the 
+    #_pyroMethods
+    #_pyroAttrs
 
     # Clean up client resources.
     run_process_proxy._pyroRelease()  # type: ignore
