@@ -160,7 +160,7 @@ async def test_run_process_proxy(
         ot3_hardware_api, mock_app_state
     )
 
-    pyro_thread = initialize_run_process()
+    pyro_thread = initialize_run_process("ot-protocol")
     pyro_thread.start()
 
     # Client-side requests below
