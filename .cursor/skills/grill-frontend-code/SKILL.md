@@ -20,7 +20,7 @@ git status --short
 
 ## Review perspectives
 
-1. **New component** - New components are written using CSS Modules and not missing tests
+1. **New component** - New components are written using CSS Modules and include tests
 2. **Bugs and logic errors** — Unintended behavior, overlooked edge cases, off‑by‑one errors, optional undefined cases
 3. **Readability and maintainability** — Unclear naming, unnecessary complexity, excessive abstraction, nested ternary
 4. **Consistency** — Alignment with existing codebase styles and patterns
