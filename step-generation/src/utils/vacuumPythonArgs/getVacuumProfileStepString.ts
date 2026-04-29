@@ -1,4 +1,4 @@
-import { formatPyDict, formatPyValue, indentPyLines } from './pythonFormat'
+import { formatPyDict, formatPyValue, indentPyLines } from '../pythonFormat'
 
 import type {
   AtomicVacuumProfileStep,
@@ -6,17 +6,7 @@ import type {
   VacuumProfileCycle,
 } from '@opentrons/shared-data'
 
-export const getVacuumPumpHoldArgsPython = (
-  duration: number,
-  ventAfter?: boolean
-): string[] => {
-  return [
-    `duration=${formatPyValue(duration)}`,
-    ...(ventAfter != null ? [`vent_after=${formatPyValue(ventAfter)}`] : []),
-  ]
-}
-
-const getAtomicVacuumStepsFromCycleStep = (
+const _getAtomicVacuumStepsFromCycleStep = (
   step: VacuumProfileCycle
 ): AtomicVacuumProfileStep[] => {
   const { steps, repetitions } = step
@@ -25,20 +15,20 @@ const getAtomicVacuumStepsFromCycleStep = (
   })
 }
 
-const getAtomicVacuumProfileSteps = (
+const _etAtomicVacuumProfileSteps = (
   profile: VacuumProfile
 ): AtomicVacuumProfileStep[] => {
   return profile.reduce<AtomicVacuumProfileStep[]>((acc, step) => {
     // cycle step
     if ('repetitions' in step) {
-      const flattenedCycleSteps = getAtomicVacuumStepsFromCycleStep(step)
+      const flattenedCycleSteps = _getAtomicVacuumStepsFromCycleStep(step)
       return [...acc, ...flattenedCycleSteps]
     }
     return [...acc, step]
   }, [])
 }
 
-const getVacuumProfileAtomicStepString = (
+const _getVacuumProfileAtomicStepString = (
   step: AtomicVacuumProfileStep
 ): string => {
   if ('pressureMbar' in step) {
@@ -63,13 +53,13 @@ export const getVacuumProfileStepString = (
   let repetitionsArg: string
   if (profile.length === 1 && 'repetitions' in profile[0]) {
     const { steps, repetitions } = profile[0]
-    profileArg = `profile=[\n${indentPyLines(steps.map(getVacuumProfileAtomicStepString).join(',\n'))}\n]`
+    profileArg = `profile=[\n${indentPyLines(steps.map(_getVacuumProfileAtomicStepString).join(',\n'))}\n]`
     repetitionsArg = `repetitions=${formatPyValue(repetitions)}`
     return [profileArg, repetitionsArg]
   } else {
     // either a single atomic step or multiple steps
-    const atomicProfileSteps = getAtomicVacuumProfileSteps(profile)
-    profileArg = `profile=[\n${indentPyLines(atomicProfileSteps.map(getVacuumProfileAtomicStepString).join(',\n'))}\n]`
+    const atomicProfileSteps = _etAtomicVacuumProfileSteps(profile)
+    profileArg = `profile=[\n${indentPyLines(atomicProfileSteps.map(_getVacuumProfileAtomicStepString).join(',\n'))}\n]`
     // hard-coded to 1 repetition if we flatten all steps
     repetitionsArg = `repetitions=${formatPyValue(1)}`
   }

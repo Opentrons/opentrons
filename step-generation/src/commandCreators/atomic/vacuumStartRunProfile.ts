@@ -6,7 +6,7 @@ import {
   indentPyLines,
   uuid,
 } from '../../utils'
-import { getVacuumProfileStepString } from '../../utils/vacuumPythonArgs'
+import { getVacuumProfileStepString } from '../../utils/vacuumPythonArgs/getVacuumProfileStepString'
 
 import type { VacuumModuleStartRunProfileCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'

@@ -6,7 +6,7 @@ import {
   indentPyLines,
   uuid,
 } from '../../utils'
-import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs'
+import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
 
 import type { CommandCreator, VacuumPumpPowerArgs } from '../../types'
 
