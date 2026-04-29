@@ -35,7 +35,7 @@ async def subject(
     ee_dir: Path, ca_cert_dir: Path, ca_key_dir: Path
 ) -> AsyncIterator[TLSManager]:
     """A TLSManager instance."""
-    manager = await TLSManager.create(ca_cert_dir, ca_key_dir, ee_dir)
+    manager = await TLSManager.create(ca_cert_dir, ca_key_dir, ee_dir, "dev-none")
     try:
         yield manager
     finally:
@@ -90,7 +90,7 @@ async def test_tears_down_ee_manager(subject: TLSManager, ee_dir: Path) -> None:
 
 
 async def test_expiry_task_lifetime(subject: TLSManager) -> None:
-    """Its task control methods should work."""
+    """Its expiry task control methods should work."""
     assert subject.expiry_task_running()
     await subject.cancel_expiry_task()
     assert not subject.expiry_task_running()
@@ -108,6 +108,25 @@ async def test_expiry_task_lifetime(subject: TLSManager) -> None:
     assert not subject.expiry_task_running()
 
 
+async def test_robot_details_task_lifetime(subject: TLSManager) -> None:
+    """Its robot details task control methods should work."""
+    assert subject.robot_details_task_running()
+    await subject.cancel_robot_details_task()
+    assert not subject.robot_details_task_running()
+    await subject.schedule_robot_details_task()
+    assert subject.robot_details_task_running()
+    await subject.schedule_robot_details_task()
+    assert subject.robot_details_task_running()
+    await subject.cancel_robot_details_task()
+    assert not subject.robot_details_task_running()
+    await subject.cancel_robot_details_task()
+    assert not subject.robot_details_task_running()
+    await subject.schedule_robot_details_task()
+    assert subject.robot_details_task_running()
+    await subject.teardown()
+    assert not subject.robot_details_task_running()
+
+
 async def test_rotates_ca_while_live(
     ca_cert_dir: Path, ca_key_dir: Path, ee_dir: Path
 ) -> None:
@@ -120,7 +139,10 @@ async def test_rotates_ca_while_live(
         timedelta(days=365, hours=1),
     )
     subject = await TLSManager.create(
-        ca_cert_dir=ca_cert_dir, ca_key_dir=ca_key_dir, tls_ee_dir=ee_dir
+        ca_cert_dir=ca_cert_dir,
+        ca_key_dir=ca_key_dir,
+        tls_ee_dir=ee_dir,
+        terminator_reload="dev-none",
     )
     await subject.cancel_expiry_task()
 
@@ -138,11 +160,14 @@ async def test_rotates_tls_while_live(
 ) -> None:
     """It should rotate TLS EE certs when they expire."""
     subject = await TLSManager.create(
-        ca_cert_dir=ca_cert_dir, ca_key_dir=ca_key_dir, tls_ee_dir=ee_dir
+        ca_cert_dir=ca_cert_dir,
+        ca_key_dir=ca_key_dir,
+        tls_ee_dir=ee_dir,
+        terminator_reload="dev-none",
     )
     await subject.cancel_expiry_task()
     subject._ee_manager.EE_EXPIRY_DURATION = timedelta(seconds=3)  # type: ignore[misc]
-    subject.refresh_ee()
+    await subject.refresh_ee()
     assert subject._ee_manager._ee_pair
     old_ee = subject._ee_manager._ee_pair.cert
     await subject.schedule_expiry_task(timedelta(seconds=2))
@@ -165,11 +190,14 @@ async def test_rotates_tls_after_ca(
         timedelta(days=365, hours=1),
     )
     subject = await TLSManager.create(
-        ca_cert_dir=ca_cert_dir, ca_key_dir=ca_key_dir, tls_ee_dir=ee_dir
+        ca_cert_dir=ca_cert_dir,
+        ca_key_dir=ca_key_dir,
+        tls_ee_dir=ee_dir,
+        terminator_reload="dev-none",
     )
     await subject.cancel_expiry_task()
     subject._ee_manager.EE_EXPIRY_DURATION = timedelta(seconds=5)  # type: ignore[misc]
-    subject.refresh_ee()
+    await subject.refresh_ee()
     old_ee = subject._ee_manager._ee_pair
     assert old_ee
     # now, the CA expires in less than the expiry check and so does the ee

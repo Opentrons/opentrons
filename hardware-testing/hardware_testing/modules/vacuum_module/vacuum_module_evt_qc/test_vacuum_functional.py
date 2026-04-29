@@ -94,7 +94,7 @@ async def test_vacuum_regulation(
 
     for i in range(PRESSURE_SAMPLES):
         await vacuum._reader.update_vacuum_state()
-        current = vacuum.vacuum_state.current_guage_pressure
+        current = vacuum.vacuum_state.current_gauge_pressure
         pressures.append(current)
         print(f"Sample {i:3d}: {current:6.1f} mbar")
 
@@ -127,7 +127,7 @@ async def test_vacuum_regulation(
 
     # Final reading
     await vacuum._reader.update_vacuum_state()
-    final_pressure = vacuum.vacuum_state.current_guage_pressure
+    final_pressure = vacuum.vacuum_state.current_gauge_pressure
 
     # Use last stable window for metrics
     reached_time = reached_time or -1.0

@@ -988,7 +988,6 @@ export const replaceCutoutFixtureWithComboFixture = (
     cutoutId,
     getDeckDefFromRobotType('OT-3 Standard')
   )
-  console.log('addressableAreasById', addressableAreasById)
 
   return addedCutoutConfigs.map(aaCutoutItem => {
     // Handle waste chute combo fixtures

@@ -13,6 +13,7 @@ import {
   get96Channel384WellPlateWells,
   H1_NOZZLE,
   H12_NOZZLE,
+  INTERACTIVE_WELL_DATA_ATTRIBUTE,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
@@ -289,4 +290,20 @@ export function getWellGroupLength(
     default:
       return totalSelected / 1
   }
+}
+
+export const getWellNameAtClientPoint = (
+  clientX: number,
+  clientY: number
+): string | null => {
+  const top = document.elementFromPoint(clientX, clientY)
+  if (top instanceof HTMLElement) {
+    const well = top.closest(
+      INTERACTIVE_WELL_DATA_ATTRIBUTE
+    ) as HTMLElement | null
+    if (well?.dataset.wellname != null) {
+      return well.dataset.wellname
+    }
+  }
+  return null
 }

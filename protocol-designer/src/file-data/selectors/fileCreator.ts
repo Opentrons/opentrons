@@ -36,8 +36,9 @@ import type {
 import type { PDPythonFile, PythonDesignerApplication } from '../../file-types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 
-if (isEmpty(_OT_PD_VERSION_))
+if (isEmpty(_OT_PD_VERSION_)) {
   console.warn('Could not find application version!')
+}
 const applicationVersion: string = _OT_PD_VERSION_ || ''
 // Internal release date: this should never be read programatically,
 // it just helps us humans quickly identify what build a user was using

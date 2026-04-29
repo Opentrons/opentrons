@@ -68,6 +68,7 @@ class UserDataManager:
                 scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]
             ),
             locked=is_currently_locked,
+            resetPassword=user.reset_password,
         )
 
     def seed_initial_users(self) -> None:
@@ -134,6 +135,7 @@ class UserDataManager:
         new_full_name: str | None = None,
         new_account_type: str | None = None,
         new_locked: Literal[False] | None = None,
+        reset_password: bool = False,
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
@@ -154,6 +156,7 @@ class UserDataManager:
                 else None,
                 full_name=new_full_name,
                 account_type=new_account_type,
+                reset_password=reset_password,
             )
             return self._to_response(updated_user)
         except ValueError as e:

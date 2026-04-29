@@ -56,8 +56,9 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       getLabwareDefinitionsByURIForProtocol(protocolAnalysis?.commands ?? []),
     [protocolAnalysis]
   )
-  if (protocolAnalysis == null || (protocolAnalysis?.errors ?? []).length > 0)
+  if (protocolAnalysis == null || (protocolAnalysis?.errors ?? []).length > 0) {
     return null
+  }
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)

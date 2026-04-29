@@ -90,6 +90,10 @@ def _normalize_statement(statement: str) -> str:
     """
     # Replace runs of any whitespace with a single literal space.
     statement = re.sub(r"\s+", " ", statement)
+    # Strip double-quotes around identifiers (e.g. "user" vs user).
+    # Alembic's batch_alter_table may quote identifiers differently than
+    # SQLAlchemy's create_all.
+    statement = statement.replace('"', "")
     # Remove whitespace at the beginning and end of the statement.
     statement = statement.strip()
     return statement

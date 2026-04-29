@@ -37,6 +37,7 @@ from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
     handle_hardware_event,
 )
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
 
 def mock_notify_publishers() -> None:
@@ -45,8 +46,16 @@ def mock_notify_publishers() -> None:
 
 
 @pytest.fixture
+def mock_run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
+    """A mock RunProcessPyroProvider."""
+    return decoy.mock(cls=RunProcessPyroProvider)
+
+
+@pytest.fixture
 async def subject(
-    decoy: Decoy, hardware_api: HardwareControlAPI
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
 ) -> RunOrchestratorStore:
     """Get a EngineStore test subject."""
     return RunOrchestratorStore(
@@ -55,6 +64,7 @@ async def subject(
         # construct their own EngineStore.
         robot_type="OT-2 Standard",
         deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
 
@@ -108,14 +118,20 @@ async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> Non
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_create_engine_uses_robot_type(
-    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
+    decoy: Decoy,
+    robot_type: RobotType,
+    deck_type: pe_types.DeckType,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
 ) -> None:
     """It should create ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
     hardware_api = decoy.mock(cls=API)
     subject = RunOrchestratorStore(
-        hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+        hardware_api=hardware_api,
+        robot_type=robot_type,
+        deck_type=deck_type,
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
     await subject.create(
@@ -297,7 +313,10 @@ async def test_get_default_orchestrator_idempotent(
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_get_default_orchestrator_robot_type(
-    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
+    decoy: Decoy,
+    robot_type: RobotType,
+    deck_type: pe_types.DeckType,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
 ) -> None:
     """It should create default ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
@@ -307,6 +326,7 @@ async def test_get_default_orchestrator_robot_type(
         hardware_api=hardware_api,
         robot_type=robot_type,
         deck_type=deck_type,
+        run_process_pyro_provider=mock_run_process_pyro_provider,
     )
 
     result = await subject.get_default_orchestrator()

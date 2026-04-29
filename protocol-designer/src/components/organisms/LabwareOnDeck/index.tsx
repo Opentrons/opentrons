@@ -12,6 +12,7 @@ import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-con
 import type { CSSProperties } from 'react'
 import type {
   TipType,
+  WellGroup,
   WellLabelOption,
   WellMouseEvent,
   WellType,
@@ -32,7 +33,6 @@ interface LabwareOnDeckProps {
   fill?: CSSProperties['fill']
   borderStroke?: CSSProperties['stroke']
   ignoreMissingTips?: boolean
-  inWellSelectionModal?: boolean
   wellLabelOptions?: WellLabelOption
 }
 
@@ -51,7 +51,6 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     fill,
     borderStroke,
     ignoreMissingTips = false,
-    inWellSelectionModal = false,
     wellLabelOptions,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
@@ -67,19 +66,25 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const wellContents = allWellContentsForActiveItem
     ? allWellContentsForActiveItem[labwareOnDeck.id]
     : null
-  const highlightedWells = allHighlightedWells[labwareOnDeck.id]
+  const selectedWells: WellGroup = Object.entries(statusByWellName ?? {})
+    .filter(([, status]) => status === 'selected')
+    .reduce<WellGroup>((acc, [wellName]) => {
+      acc[wellName] = null
+      return acc
+    }, {})
+  const highlightedWells = statusByWellName
+    ? selectedWells
+    : allHighlightedWells[labwareOnDeck.id]
   const labwareTipInfo =
     missingAndUsedTipsByLabwareId != null
       ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
       : null
   const { missingTips } = labwareTipInfo ?? {}
   const isLid = getIsLid(labwareOnDeck.def)
-  const wellFill = inWellSelectionModal
-    ? undefined
-    : wellContentsSelectors.wellFillFromWellContents(
-        wellContents,
-        liquidDisplayColors
-      )
+  const wellFill = wellContentsSelectors.wellFillFromWellContents(
+    wellContents,
+    liquidDisplayColors
+  )
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}

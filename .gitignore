@@ -58,6 +58,7 @@ pip-delete-this-directory.txt
 
 # node packages
 node_modules
+.pnpm-store/
 package-lock.json
 
 # Unit test / coverage reports
@@ -159,3 +160,4 @@ api/docs/dist/v2/
 package-testing/results
 all_analysis_results/
 auth-server/.env
+key-server/.key-server-storage

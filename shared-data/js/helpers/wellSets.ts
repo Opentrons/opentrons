@@ -32,18 +32,16 @@ function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition
 ): WellSetByPrimaryWell {
   const allWells: string[] = Object.keys(labwareDef.wells)
+  const wellSets: WellSetByPrimaryWell = []
 
-  return allWells.reduce(
-    (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
-      const wellSet = getWellNamePerMultiTip(labwareDef, well, 8)
-      if (wellSet === null) {
-        return acc
-      } else {
-        return [...acc, wellSet]
-      }
-    },
-    []
-  )
+  for (const well of allWells) {
+    const wellSet = getWellNamePerMultiTip(labwareDef, well, 8)
+    if (wellSet != null) {
+      wellSets.push(wellSet)
+    }
+  }
+
+  return wellSets
 }
 
 export interface NozzleLayoutDetails {
