@@ -4,8 +4,8 @@
 
 ### type safe
 
-- Check the changes do not use any.
-- Use the strict check if type isn't optional
+- Check that the changes do not use the TypeScript `any` type.
+- Use strict equality/inequality checks for non-optional nullable types.
 
 ```ts
 const myConst: string | null = getValue()
