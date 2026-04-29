@@ -330,6 +330,14 @@ def test_update_user_password_is_hashed(
     )
 
 
+def test_update_user_rename_to_existing_username_raises(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    decoy.when(mock_store.get("alice")).then_return(_make_orm_user(username="alice"))
+    with pytest.raises(UserAlreadyExistsError):
+        manager.update_user("bob", new_username="alice", reset_password=False)
+
+
 def test_update_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
