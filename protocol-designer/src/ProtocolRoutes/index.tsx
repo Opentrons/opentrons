@@ -1,8 +1,6 @@
 import { ErrorBoundary } from 'react-error-boundary'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 
-import { Box } from '@opentrons/components'
-
 import {
   FileUploadMessagesModal,
   GateModal,
@@ -10,7 +8,7 @@ import {
   Kitchen,
   LabwareUploadModal,
   Navigation,
-} from './components/organisms'
+} from '../components/organisms'
 import {
   Designer,
   Hardware,
@@ -19,10 +17,11 @@ import {
   Onboarding,
   ProtocolOverview,
   Settings,
-} from './pages'
-import { ProtocolDesignerAppFallback } from './resources/ProtocolDesignerAppFallback'
+} from '../pages'
+import { ProtocolDesignerAppFallback } from '../resources/ProtocolDesignerAppFallback'
+import styles from './protocolroutes.module.css'
 
-import type { RouteProps } from './types'
+import type { RouteProps } from '../types'
 
 const pdRoutes: RouteProps[] = [
   {
@@ -83,7 +82,7 @@ export function ProtocolRoutes(): JSX.Element {
     >
       <Navigation />
       <Kitchen>
-        <Box width="100%" height="100%">
+        <main className={styles.main_contaienr}>
           <GateModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
@@ -94,7 +93,7 @@ export function ProtocolRoutes(): JSX.Element {
             })}
             <Route path="*" element={<Navigate to={landingPage.path} />} />
           </Routes>
-        </Box>
+        </main>
       </Kitchen>
     </ErrorBoundary>
   )
