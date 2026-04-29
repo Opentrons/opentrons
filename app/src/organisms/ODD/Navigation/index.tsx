@@ -125,23 +125,21 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ))}
           </div>
         </div>
-        <div className={styles.overflow_button_wrap}>
-          <button
-            type="button"
-            className={clsx(styles.icon_button, styles.cursor_default)}
-            aria-label="overflow menu button"
-            onClick={() => {
-              handleMenu(true)
-            }}
-          >
-            <Icon
-              name="overflow-btn-touchscreen"
-              height="3.75rem"
-              width="3rem"
-              color={COLORS.grey60}
-            />
-          </button>
-        </div>
+        <button
+          type="button"
+          className={clsx(styles.icon_button, styles.cursor_default)}
+          aria-label="overflow menu button"
+          onClick={() => {
+            handleMenu(true)
+          }}
+        >
+          <Icon
+            name="overflow-btn-touchscreen"
+            height="3.75rem"
+            width="3rem"
+            color={COLORS.grey60}
+          />
+        </button>
       </nav>
       {showNavMenu && (
         <NavigationMenu

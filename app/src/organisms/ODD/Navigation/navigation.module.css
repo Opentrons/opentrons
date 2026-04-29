@@ -29,14 +29,8 @@
   gap: var(--spacing-32);
 }
 
-.overflow_button_wrap {
-  position: absolute;
-  right: var(--spacing-16);
-}
-
 .carousel_scroll_container {
   display: flex;
-  width: 56.75rem;
   flex-direction: row;
   align-items: flex-start;
   mask-image: linear-gradient(
@@ -81,6 +75,7 @@
 
 .icon_button {
   max-height: 100%;
+  flex: none;
   border-radius: var(--border-radius-8);
   background-color: var(--white);
 
