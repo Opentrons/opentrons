@@ -5,8 +5,9 @@ import inspect
 import socket
 import threading
 import inspect
-from pydantic import BaseModel
-from typing import Any, Callable, Dict, List, Literal, Mapping, Optional, Sequence, Set, Union, cast
+from pathlib import Path
+from pydantic import BaseModel, Strict, Discriminator
+from typing import Any, Callable, Dict, List, Literal, Mapping, Optional, Sequence, Set, Tuple, Union, cast, Annotated
 
 from datetime import datetime
 import pytest
@@ -24,9 +25,16 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.camera_provider import (
+    CameraSettings,
     CameraProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.types.execution import PostRunHardwareState
+from opentrons.protocol_engine.types.labware import (
+    LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+)
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons_shared_data.robot.types import RobotTypeEnum
@@ -39,8 +47,10 @@ from robot_server.runs.run_orchestrator_store import (
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.run_process import (
     DirectedRunProcess,
+    ParseMode,
     register_all_needed_types,
     register_process_types,
 )
@@ -49,6 +59,7 @@ from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.pyro_utils import pyro_resource, resource_utilities
 import opentrons.hardware_control.types as hw_types
 import opentrons.hardware_control.dev_types as dev_types
+import opentrons.hardware_control.modules.mod_abc as mod_abc
 import opentrons.hardware_control.modules.types as module_types
 import opentrons.hardware_control.peripherals.types as peripheral_types
 import opentrons.types as ot_types
@@ -64,6 +75,8 @@ from opentrons.config.robot_configs import build_config_ot3
 from opentrons.hardware_control.robot_calibration import DeckCalibration
 import opentrons.calibration_storage.types as calibration_types
 from opentrons.config import robot_configs
+from opentrons.protocol_reader.protocol_source import ProtocolSource
+import opentrons_shared_data.labware.labware_definition as labware_definition
 
 
 
@@ -509,13 +522,103 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "end_critical_point": {Optional[hw_types.CriticalPoint]: hw_types.CriticalPoint.MOUNT},
     "tip_volume": {float: 50.0},
     "notify_publishers": {Callable[[], None]: SKIP_CALLABLE_PROXY},
-    "run_orchestrator_store": {"RunOrchestratorStore": cast(RunOrchestratorStore, object())},
+    "run_orchestrator_store": {"RunOrchestratorStore": cast(RunOrchestratorStore, object())}, # CASEY NOTE: TBD
     "camera_provider": {CameraProvider: CameraProvider()},
     "maintenance_run_orchestrator_store": {
-        "MaintenanceRunOrchestratorStore": cast(MaintenanceRunOrchestratorStore, object())
+        "MaintenanceRunOrchestratorStore": cast(MaintenanceRunOrchestratorStore, object()) # CASEY NOTE: TBD
     },
     "file_provider": {FileProvider: FileProvider()},
-    "deck_configuration_store": {"DeckConfigurationStore": mock_deck_configuration_store},
+    "deck_configuration_store": {"DeckConfigurationStore": mock_deck_configuration_store}, # CASEY NOTE: TBD
+    "cursor": {int: 0, Optional[int]: 0},
+    "length": {int: 1},
+    "include_fixit_commands": {bool: False},
+    "policy": {ErrorRecoveryPolicy: SKIP_CALLABLE_PROXY},
+    "annotation_id": {str: "annotation-id"},
+    "command_id": {str: "command-id"},
+    "protocol_source": {ProtocolSource: cast(ProtocolSource, object()), Optional[ProtocolSource]: None}, # CASEY NOTE: TBD
+    "run_time_param_values": {
+        Optional[
+            Mapping[
+                Annotated[str, Strict(strict=True)], 
+                Union[Annotated[int, Strict(strict=True)], Annotated[float, Strict(strict=True)], Annotated[bool, Strict(strict=True)], Annotated[str, Strict(strict=True)]]
+            ]
+        ]: None
+    }, # CASEY NOTE: TBD - IS THIS SAFE AS NONE?
+    "run_time_param_paths": {Optional[Dict[str, Path]]: None}, # CASEY NOTE: TBD
+    "parse_mode": {ParseMode: ParseMode.NORMAL},
+    "request": {LabwareOffsetCreate | LegacyLabwareOffsetCreate: cast(LabwareOffsetCreate, object())},
+    "camera_id": {Optional[str]: "camera-1"},
+    "resolution": {Optional[Tuple[int, int]]: (640, 480)},
+    "zoom": {Optional[float]: 1.0},
+    "pan": {Optional[Tuple[int, int]]: (0, 0)},
+    "contrast": {Optional[float]: 1.0},
+    "brightness": {Optional[float]: 1.0},
+    "saturation": {Optional[float]: 1.0},
+    "error": {Optional[Exception]: None}, # CASEY NOTE: TBD
+    "drop_tips_after_run": {bool: False},
+    "set_run_status": {bool: True},
+    "post_run_hardware_state": {
+        PostRunHardwareState: PostRunHardwareState.STAY_ENGAGED_IN_PLACE
+    },
+    "enablement_settings": {
+        CameraSettings: CameraSettings(
+            cameraEnabled=True,
+            liveStreamEnabled=True,
+            errorRecoveryCameraEnabled=True,
+        )
+    },
+    "protocol_resource": {ProtocolResource: cast(ProtocolResource, object())},
+    "module_model": {
+        Union[
+            module_types.MagneticModuleModel,
+            module_types.TemperatureModuleModel,
+            module_types.ThermocyclerModuleModel,
+            module_types.HeaterShakerModuleModel,
+            module_types.MagneticBlockModel,
+            module_types.AbsorbanceReaderModel,
+            module_types.FlexStackerModuleModel,
+            module_types.VacuumModuleModel,
+        ]: module_types.ThermocyclerModuleModel.THERMOCYCLER_V2
+    },
+    "module_serial": {str | None: None}, # CASEY NOTE: TBD
+    "wait_until_complete": {bool: False},
+    "timeout": {Optional[int]: 30},
+    "failed_command_id": {Optional[str]: None}, # CASEY NOTE: TBD
+    "modules_by_id": {Dict[str, mod_abc.AbstractModule]: {}}, # CASEY NOTE: TBD
+    "deck_configuration": {
+        List[Tuple[str, str, Optional[str]]]: [("D1", "fixture", None)],
+        Optional[List[Tuple[str, str, Optional[str]]]]: [("D1", "fixture", None)],
+    },
+    "definition": {
+        Annotated[
+            labware_definition.LabwareDefinition2 | labware_definition.LabwareDefinition3,
+            Discriminator(discriminator='schemaVersion', custom_error_type=None, custom_error_message=None, custom_error_context=None)
+        ]: cast(Any, {})
+    }, # CASEY NOTE: TBD
+    "reconcile_false_positive": {bool: False},
+    "run_id": {str: "run-id"},
+    "labware_offsets": {
+        Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate]: [
+            cast(LabwareOffsetCreate, object())
+        ]
+    }, # CASEY NOTE: TBD
+    "protocol": {Optional[ProtocolResource]: None}, # CASEY NOTE: TBD
+    "proxy_of_callback_for_handling_door_events": {
+        Optional[
+            Callable[
+                [
+                    Union[
+                        hw_types.DoorStateNotification, 
+                        hw_types.ErrorMessageNotification, 
+                        hw_types.EstopStateNotification, 
+                        hw_types.AsynchronousModuleErrorNotification, 
+                        hw_types.ModuleDisconnectedNotification
+                        ]
+                ],
+                type(None)
+            ]
+        ]: SKIP_CALLABLE_PROXY
+    },
 }
 
  # ERROR COLLECTION LISTS
