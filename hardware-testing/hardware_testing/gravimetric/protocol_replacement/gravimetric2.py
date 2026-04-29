@@ -1,7 +1,7 @@
 """Gravimetric QC protocol."""
 
 from typing import List, Dict, Tuple, Optional, cast
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 import os
 import sys
 from time import time
@@ -37,7 +37,7 @@ from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
 metadata = {"protocolName": "Gravimetric QC V3"}
-requirements = {"robotType": "Flex", "apiLevel": "2.28"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
@@ -65,12 +65,9 @@ def _download_and_extract(version_str: str, base_dir: str) -> None:
         ver_file.write(version_str)
 
 
-base_dir = str(infer_config_base_dir())
-if base_dir not in sys.path:
-    sys.path.append(base_dir)
-
-if not IS_ROBOT and importlib.util.find_spec("hardware_testing") is None:
-    # In local analysis/simulation we can bootstrap hardware_testing if needed.
+if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
+    # we're simulating or there is not a vaild hardware-testing yet
+    base_dir = str(infer_config_base_dir())
     release = f"{version.replace('a', '-alpha.').replace('b', '-beta.')}"
     version_file_path = os.path.join(base_dir, "hardware_testing", "VERSION.txt")
     if os.path.exists(version_file_path):
@@ -79,6 +76,8 @@ if not IS_ROBOT and importlib.util.find_spec("hardware_testing") is None:
                 _download_and_extract(release, base_dir)
     else:
         _download_and_extract(release, base_dir)
+    sys.path.append(base_dir)
+
 from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
 from hardware_testing.data.ui import (  # noqa: F401, E402
     set_output_file,
@@ -107,10 +106,14 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorderConfig,
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.drivers import ImpactProtectionV2  # noqa: E402
-from hardware_testing.drivers import ImpactProtection_96ch as ImpactProtection96chDriver  # noqa: E402
-
+from hardware_testing.drivers import ImpactProtectionV2
+from hardware_testing.drivers import ImpactProtection_96ch as ImpactProtection96chDriver
+  
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
+from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
+    clear_pipette_ul_per_mm,
+)  # noqa: E402
+
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 fast_simulate_measurement = MeasurementData(
@@ -129,87 +132,16 @@ fast_simulate_measurement = MeasurementData(
     celsius_liquid=25,
 )
 
-QC_TEST_MIN_REQUIREMENTS: Dict[
-    int, Dict[int, Dict[int, Dict[float, Tuple[float, float]]]]
-] = {
-    # Published specs with 0.8 safety factor
-    # channels: [Pipette: [tip: [Volume: (%d, Cv)]]]
-    1: {
-        50: {  # P50
-            50: {  # T50
-                1.0: (6.4, 5.6),
-                10.0: (1.2, 0.4),
-                50.0: (1.0, 0.32),
-            },
-        },
-        1000: {  # P1000
-            50: {  # T50
-                5.0: (4.0, 2.0),
-                50.0: (0.4, 0.24),
-            },
-            200: {  # T200
-                200.0: (0.4, 0.12),
-            },
-            1000: {  # T1000
-                1000.0: (0.4, 0.12),
-            },
-        },
-    },
-    8: {
-        50: {  # P50
-            50: {  # T50
-                1.0: (8.0, 6.4),
-                10.0: (2.0, 0.8),
-                50.0: (1.0, 0.48),
-            },
-        },
-        1000: {  # P1000
-            50: {  # T50
-                5.0: (6.4, 3.2),
-                50.0: (2.0, 0.48),
-            },
-            200: {  # T200
-                200.0: (0.8, 0.2),
-            },
-            1000: {  # T1000
-                1000.0: (0.56, 0.12),
-            },
-        },
-    },
-    96: {
-        200: {
-            50: {  # T50
-                1.0: (8.0, 4.8),
-                5.0: (3.2, 1.6),
-                50.0: (1.2, 0.8),
-            },
-            200: {  # T200
-                200.0: (0.8, 0.8),
-            },
-        },
-        1000: {  # P1000
-            50: {  # T50
-                5.0: (8.0, 4.0),
-                50.0: (2.0, 1.0),
-            },
-            200: {  # T200
-                200.0: (1.2, 1.0),
-            },
-            1000: {  # T1000
-                1000.0: (1.2, 1.2),
-            },
-        },
-    },
-}
+@dataclass
+class FixtureSettings:
+    """Dataclass to hold all the options for a gravimetric script."""
 
-
-@dataclass(kw_only=True)
-class CSVSettings:
-    """All of the settings that are loaded from the CSV runtime parameter."""
-
+    ctx: ProtocolContext
     name: str
     increment: bool
+    run_id: str
     mount: str
+    pipette: InstrumentContext
     pipette_volume: int
     pipette_channels: int
     tip_sizes: List[int]
@@ -218,34 +150,43 @@ class CSVSettings:
     return_tip: bool
     touch_tip: bool
     liquid_name: str
-    liquid_desc: str
-    liquid_col: str
-    liquid_vol_estimate: float
+    liquid: Liquid
+    liquid_class: LiquidClass
     tips: Dict[int, List[str]]
+    liquid_source: Well
     volumes: Dict[int, List[float]]
     extra_volumes: Dict[int, List[float]]
-    volumes_flat: List[float]
+    scale: Scale
+    recorder: GravimetricRecorder
+    env_sensor: AsairDriver.AsairSensorBase
+    robot_serial: str
+    scale_serial: str
+    env_serial: str
+    pipette_tag: str
+    test_report: report.CSVReport
     scale_delay: int
     blank_trials: int
     submerge_depth: float
+    retracted_offset: float
+    isolate_volumes: bool
     extra: bool
     labware_on_scale: str
-    labware_on_scale_well_name: str
     slot_scale: str
+    fast_simulate: bool
     retract_discontinuity: float
     disc_ver_cuttoff: int
     lld_every_tip: bool
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
-    retracted_offset: float
-    gantry_speed: float
+    use_impact_protection: bool
+    ImpactSerial_U: Optional[ImpactProtectionV2.ImpactProtectionBase]
+    ImpactSerial_96: Optional[ImpactProtection96chDriver.ImpactProtection96chBase]
     liquid_class_test: bool
-    fail_early: bool
 
     @classmethod
-    def parse_csv(cls, csv_params: List[List[str]], simulating: bool) -> "CSVSettings":
-        """Extract all of the data from the CSV runtime param."""
+    def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
+        """Parse the CSV file and build the fixture settings."""
 
         def lookup_key(key: str, csv: List[List[str]]) -> List[str]:
             for line in csv:
@@ -253,18 +194,17 @@ class CSVSettings:
                     return [e for e in line[1:] if e != ""]
             raise ValueError(f"{key} is not defined in the csv params.")
 
-        retracted_offset = 5.0
-        # TODO maybe make this a CSV option
-        # retracted_offset = float(lookup_key("retracted_offset", csv_params)[0])
-
+        csv_params = (
+            ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
+        )
         name = lookup_key("name", csv_params)[0]
-        if simulating:
+        if ctx.is_simulating():
             name = f"{name}-simulate"
         increment = bool(lookup_key("increment", csv_params)[0] == "TRUE")
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
-        if pipette_channels == 8 and not increment:
+        if pipette_channels == 8:
             channels = [
                 int(ch) for ch in lookup_key("multi_channels_to_test", csv_params)
             ]
@@ -288,6 +228,9 @@ class CSVSettings:
         scale_delay = int(lookup_key("scale_delay", csv_params)[0])
         blank_trials = int(lookup_key("blank_trials", csv_params)[0])
         submerge_depth = float(lookup_key("submerge_depth", csv_params)[0])
+        retracted_offset = 5.0
+        # TODO maybe make this a CSV option
+        # retracted_offset = float(lookup_key("retracted_offset", csv_params)[0])
         volumes_to_test_20ul = [
             float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
         ]
@@ -330,25 +273,13 @@ class CSVSettings:
         liquid_class_test = bool(
             lookup_key("liquid_class_test", csv_params)[0] == "TRUE"
         )
-        fail_early = bool(lookup_key("fail_early", csv_params)[0] == "TRUE")
+        use_impact_protection = ctx.params.use_impact_protection
 
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
             200: volumes_to_test_200ul,
             1000: volumes_to_test_1000ul,
-        }
-        extra_volumes = {
-            20: extra_volumes_to_test_20ul,
-            50: extra_volumes_to_test_50ul,
-            200: extra_volumes_to_test_200ul,
-            1000: extra_volumes_to_test_1000ul,
-        }
-        tips = {
-            20: tipracks_20ul,
-            50: tipracks_50ul,
-            200: tipracks_200ul,
-            1000: tipracks_1000ul,
         }
         volumes_flat = (
             volumes_to_test_20ul
@@ -360,91 +291,32 @@ class CSVSettings:
             + extra_volumes_to_test_200ul
             + extra_volumes_to_test_1000ul
         )
-        return CSVSettings(
-            name=name,
-            increment=increment,
-            mount=mount,
-            pipette_volume=pipette_volume,
-            pipette_channels=pipette_channels,
-            tip_sizes=tip_sizes,
-            trials=trials,
-            channels=channels,
-            return_tip=return_tip,
-            touch_tip=touch_tip,
-            liquid_name=liquid_name,
-            liquid_desc=liquid_desc,
-            liquid_col=liquid_col,
-            liquid_vol_estimate=liquid_vol_estimate,
-            tips=tips,
-            volumes=volumes,
-            extra_volumes=extra_volumes,
-            volumes_flat=volumes_flat,
-            scale_delay=scale_delay,
-            blank_trials=blank_trials,
-            submerge_depth=submerge_depth,
-            extra=extra,
-            labware_on_scale=labware_on_scale,
-            labware_on_scale_well_name=labware_on_scale_well_name,
-            slot_scale=slot_scale,
-            retract_discontinuity=retract_discontinuity,
-            disc_ver_cuttoff=disc_ver_cuttoff,
-            lld_every_tip=lld_every_tip,
-            single_tip_96=single_tip_96,
-            cavity_test=cavity_test,
-            touch_blank=touch_blank,
-            retracted_offset=retracted_offset,
-            gantry_speed=gantry_speed,
-            liquid_class_test=liquid_class_test,
-            fail_early=fail_early,
-        )
 
+        extra_volumes = {
+            20: extra_volumes_to_test_20ul,
+            50: extra_volumes_to_test_50ul,
+            200: extra_volumes_to_test_200ul,
+            1000: extra_volumes_to_test_1000ul,
+        }
 
-@dataclass
-class FixtureSettings(CSVSettings):
-    """Dataclass to hold all the options for a gravimetric script."""
+        tips = {
+            20: tipracks_20ul,
+            50: tipracks_50ul,
+            200: tipracks_200ul,
+            1000: tipracks_1000ul,
+        }
 
-    ctx: ProtocolContext
-    run_id: str
-    pipette: InstrumentContext
-    liquid: Liquid
-    liquid_class: LiquidClass
-    liquid_source: Well
-    scale: Scale
-    recorder: GravimetricRecorder
-    env_sensor: AsairDriver.AsairSensorBase
-    robot_serial: str
-    scale_serial: str
-    env_serial: str
-    pipette_tag: str
-    test_report: report.CSVReport
-    isolate_volumes: bool
-    fast_simulate: bool
-    use_impact_protection: bool
-    ImpactSerial_U: Optional[ImpactProtectionV2.ImpactProtectionBase]
-    ImpactSerial_96: Optional[ImpactProtection96chDriver.ImpactProtection96chBase]
-
-    @classmethod
-    def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
-        """Parse the CSV file and build the fixture settings."""
-        csv_params = (
-            ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
-        )
-        csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
-
-        source_well = ctx.load_labware(
-            csv_settings.labware_on_scale, csv_settings.slot_scale
-        )[csv_settings.labware_on_scale_well_name]
-        liquid_class = ctx.get_liquid_class(csv_settings.liquid_name)
-        liquid = ctx.define_liquid(
-            csv_settings.liquid_name, csv_settings.liquid_desc, csv_settings.liquid_col
-        )
-        source_well.load_liquid(liquid, csv_settings.liquid_vol_estimate)
+        source_well = ctx.load_labware(labware_on_scale, slot_scale)[
+            labware_on_scale_well_name
+        ]
+        liquid_class = ctx.get_liquid_class(liquid_name)
+        liquid = ctx.define_liquid(liquid_name, liquid_desc, liquid_col)
+        source_well.load_liquid(liquid, liquid_vol_estimate)
 
         pipette = ctx.load_instrument(
-            f"flex_{csv_settings.pipette_channels}channel_{csv_settings.pipette_volume}",
-            csv_settings.mount,
+            f"flex_{pipette_channels}channel_{pipette_volume}", mount
         )
-        pipette.default_speed = csv_settings.gantry_speed
+        pipette.default_speed = gantry_speed
         simulating = ctx.is_simulating()
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             helpers._override_check_safe_for_pipette_movement
@@ -452,17 +324,15 @@ class FixtureSettings(CSVSettings):
         if simulating:
             pipette_tag = "pipette"
         else:
-            pipette_tag = helpers._get_tag_from_pipette(
-                pipette, csv_settings.increment, False
-            )
+            pipette_tag = helpers._get_tag_from_pipette(pipette, increment, False)
         run_id = create_run_id()
         fast_simulate = IS_ROBOT and simulating
 
         test_report = report.create_csv_test_report(
-            volumes=csv_settings.volumes_flat,
-            pipette_channels=csv_settings.channels,
-            trials=csv_settings.trials,
-            name=csv_settings.name,
+            volumes=volumes_flat,
+            pipette_channels=channels,
+            trials=trials,
+            name=name,
             run_id=run_id,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
@@ -470,11 +340,11 @@ class FixtureSettings(CSVSettings):
         os.makedirs(f"{test_report.parent}", exist_ok=True)
         set_output_file(f"{test_report.parent}/run_output.txt")
 
-        print_info(f"volumes flat {csv_settings.volumes_flat}")
-        print_info(f"channels {csv_settings.pipette_channels}")
-        print_info(f"increment {csv_settings.increment}")
-        print_info(f"trials {csv_settings.trials}")
-        print_info(f"name {csv_settings.name}")
+        print_info(f"volumes flat {volumes_flat}")
+        print_info(f"channels {pipette_channels}")
+        print_info(f"increment {increment}")
+        print_info(f"trials {trials}")
+        print_info(f"name {name}")
 
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
@@ -482,7 +352,7 @@ class FixtureSettings(CSVSettings):
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
-                test_name=csv_settings.name,
+                test_name=name,
                 run_id=run_id,
                 tag=pipette_tag,
                 start_time=time(),
@@ -498,14 +368,13 @@ class FixtureSettings(CSVSettings):
         if simulating:
             recorder.set_simulation_mass(10)
         recorder.record(in_thread=True)
-        env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
+        env_sensor,link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
         env_serial = env_sensor.get_serial()
-        use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
-        # 链接防撞工装
+        #链接防撞工装
         ImpactSerial = None
         ImpactSerial96 = None
         if use_impact_protection:
-            if csv_settings.pipette_channels == 96:
+            if pipette_channels == 96:
                 skip_port = link_port if link_port is not None else ""
                 ImpactSerial, impact_1ch_8ch_port = (
                     ImpactProtectionV2.BuildImpactProtectionWithPort(
@@ -524,23 +393,16 @@ class FixtureSettings(CSVSettings):
                         skip_port=skip_ports,
                     )
                 )
-                print_info(
-                    "96ch impact connected: "
-                    f"V2={impact_1ch_8ch_port}, 96ch={impact_96ch_port}, "
-                    f"env_skip={link_port}"
-                )
             else:
+                # 确保skip_port是字符串，即使link_port为None
                 skip_port = link_port if link_port is not None else ""
                 ImpactSerial, impact_1ch_8ch_port = (
                     ImpactProtectionV2.BuildImpactProtectionWithPort(
                         simulate=simulating, ctx=ctx, skip_port=skip_port
                     )
                 )
-                print_info(
-                    f"Impact V2 connected: port={impact_1ch_8ch_port}, env_skip={link_port}"
-                )
-
-        ctx.delay(seconds=3, msg=f"simulating {simulating} {type(simulating)}")
+            
+        ctx.delay(seconds= 3,msg=f"simulating {simulating} {type(simulating)}")
 
         ot3api = ctx._core.get_hardware()
         robot_serial = str(ot3api.get_serial_number())
@@ -584,19 +446,42 @@ class FixtureSettings(CSVSettings):
             },
             scale=recorder.serial_number,
             environment=env_serial,
-            liquid=csv_settings.liquid_name,
+            liquid=liquid_name,
         )
         # todo fix set serial to take robot name and serial separate
         # do this after the set serial to overwrite where the name.
         test_report.set_robot_id(robot_serial)
         ctx.load_trash_bin("A3")
+        # do LPC when it is simulating
+        if ctx.is_simulating():
+            for volume, slot_list in tips.items():
+                for slot in slot_list:
+                    _labware = ctx.load_labware(f"opentrons_flex_96_tiprack_{volume}uL", slot)
+                    pipette.pick_up_tip(_labware.wells()[0])
+                    pipette.aspirate(volume, source_well)
+                    pipette.dispense(volume, source_well)
+                    pipette.drop_tip()
         return cls(
             ctx=ctx,
+            name=name,
+            increment=increment,
             run_id=run_id,
+            mount=mount,
             pipette=pipette,
+            pipette_volume=pipette_volume,
+            pipette_channels=pipette_channels,
+            tip_sizes=tip_sizes,
+            trials=trials,
+            channels=channels,
+            return_tip=return_tip,
+            touch_tip=touch_tip,
+            liquid_name=liquid_name,
             liquid=liquid,
             liquid_class=liquid_class,
+            tips=tips,
             liquid_source=source_well,
+            volumes=volumes,
+            extra_volumes=extra_volumes,
             scale=scale,
             recorder=recorder,
             env_sensor=env_sensor,
@@ -605,8 +490,22 @@ class FixtureSettings(CSVSettings):
             env_serial=env_serial,
             pipette_tag=pipette_tag,
             test_report=test_report,
+            scale_delay=scale_delay,
+            blank_trials=blank_trials,
+            submerge_depth=submerge_depth,
+            retracted_offset=retracted_offset,
             isolate_volumes=False,
+            extra=extra,
+            labware_on_scale=labware_on_scale,
+            slot_scale=slot_scale,
             fast_simulate=fast_simulate,
+            retract_discontinuity=retract_discontinuity,
+            disc_ver_cuttoff=disc_ver_cuttoff,
+            lld_every_tip=lld_every_tip,
+            single_tip_96=single_tip_96,
+            cavity_test=cavity_test,
+            touch_blank=touch_blank,
+            liquid_class_test=liquid_class_test,
             use_impact_protection=use_impact_protection,
             ImpactSerial_U=cast(
                 Optional[ImpactProtectionV2.ImpactProtectionBase], ImpactSerial
@@ -615,7 +514,6 @@ class FixtureSettings(CSVSettings):
                 Optional[ImpactProtection96chDriver.ImpactProtection96chBase],
                 ImpactSerial96,
             ),
-            **asdict(csv_settings),
         )
 
     def validate_settings(self) -> bool:
@@ -643,7 +541,7 @@ def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
         return_tip=fixture_settings.return_tip,
         mix=False,
         user_volumes=False,
-        kind=f"ConfigType.gravimetric.{fixture_settings.ctx.params.test_type}.{fixture_settings.ctx.params.production_type}",  # type: ignore[attr-defined]
+        kind=f"{config.ConfigType.gravimetric}.{fixture_settings.ctx.params.test_type}.{fixture_settings.ctx.params.production_type}",
         extra=fixture_settings.extra,
         jog=False,
         same_tip=False,
@@ -678,10 +576,13 @@ def _get_tips_for_test_single_multi(
     ]
     if fixture_settings.pipette_channels == 8:
         if fixture_settings.increment:
-            a_row_tips = tips.get_tips_for_all_channels_on_multi(
-                fixture_settings.ctx, tip
-            )
-            return [t for t in a_row_tips if t.has_tip]
+            if len(fixture_settings.channels) == 8:
+                a_row_tips = tips.get_tips_for_all_channels_on_multi(
+                    fixture_settings.ctx, tip
+                )
+                return [t for t in a_row_tips if t.has_tip]
+            else:
+                return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         elif fixture_settings.cavity_test:
             # This should only ever be called once so hopefully this doesn't break anything
             # consume tips bottom to top, left to right
@@ -864,19 +765,12 @@ def add_parameters(parameters: ParameterContext) -> None:
         ],
         description="Distinguish OEM productions",
     )
-
+    
     parameters.add_bool(
         display_name="Use Impact Protection",
         variable_name="use_impact_protection",
         default=True,
         description="Whether to use impact protection device during testing.",
-    )
-
-    parameters.add_bool(
-        display_name="Upload CSV Automatically",
-        variable_name="upload_csv_automatically",
-        default=False,
-        description="Whether to upload the CSV file automatically after testing.",
     )
 
     parameters.add_str(
@@ -994,29 +888,31 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
+def remove_tip(fixture_settings: FixtureSettings) -> None:
+    """Either return or drop tip(s)."""
+    _close_impact_protection(fixture_settings)
+    if fixture_settings.return_tip:
+        fixture_settings.pipette.return_tip()
+    else:
+        fixture_settings.pipette.drop_tip()
+
+
 def _configure_impact_protection_96ch(
     ctx: ProtocolContext,
     impact_serial: ImpactProtection96chDriver.ImpactProtection96chBase,
     tip_volume: int,
 ) -> None:
-    cmd_name = ""
     if tip_volume == 1000:
-        cmd_name = "set_left_p1000"
         state = impact_serial.set_left_p1000()
     elif tip_volume in (50, 200):
-        cmd_name = "set_left_p200"
         state = impact_serial.set_left_p200()
     elif tip_volume == 20:
-        cmd_name = "set_left_p20"
         state = impact_serial.set_left_p20()
     else:
         raise RuntimeError(
             f"Unsupported 96ch tip volume for impact protection: {tip_volume}"
         )
 
-    print_info(
-        f"96ch impact command: tip={tip_volume}, cmd={cmd_name}, response={state.raw_response}"
-    )
     ctx.delay(seconds=0.1, msg=f"96ch impact set state: {state.raw_response}")
     if "OK" not in state.raw_response:
         raise RuntimeError(
@@ -1030,22 +926,18 @@ def _switch_impact_protection_v2(
     if not fixture_settings.ImpactSerial_U:
         return
 
-    swichvaldict = {
+    switch_values = {
         20: "SET_LEFT_T50",
         50: "SET_LEFT_T50",
         200: "SET_LEFT_T50",
         1000: "SET_LEFT_T1000",
     }
-    print_info(
-        f"Impact V2 command: tip={tip}, cmd={swichvaldict[tip]}, "
-        f"pipette_channels={fixture_settings.pipette_channels}"
-    )
-    impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
+    state = fixture_settings.ImpactSerial_U.switch_mode(switch_values[tip])
     fixture_settings.ctx.delay(
         seconds=0.1,
-        msg=f"switch_mode state :{impp.raw_response}",
+        msg=f"switch_mode state :{state.raw_response}",
     )
-    if "OK" not in impp.raw_response:
+    if "OK" not in state.raw_response:
         raise RuntimeError("Collision avoidance switch failed to activate.")
 
 
@@ -1053,62 +945,46 @@ def _close_impact_protection_v2(fixture_settings: FixtureSettings) -> None:
     if not fixture_settings.ImpactSerial_U:
         return
 
-    print_info(
-        f"Impact V2 close_all_gratings: pipette_channels={fixture_settings.pipette_channels}"
-    )
-    impp = fixture_settings.ImpactSerial_U.close_all_gratings()
+    ret = fixture_settings.ImpactSerial_U.close_all_gratings()
     fixture_settings.ctx.delay(
         seconds=0.1,
-        msg=f"close_all_gratings state :{impp.raw_response}",
+        msg=f"close_all_gratings state :{ret.raw_response}",
     )
-    if "OK" not in impp.raw_response:
+    if "OK" not in ret.raw_response:
         raise RuntimeError(
             "close all gratings Collision avoidance switch failed to activate. "
-            f"{impp.raw_response}"
+            f"{ret.raw_response}"
         )
 
 
-def maybe_close_all_gratings(fixture_settings: FixtureSettings) -> None:
-    """Close all impact protection gratings if the use_impact_protection param is set."""
+def _close_impact_protection(fixture_settings: FixtureSettings) -> None:
     if (
-        not fixture_settings.ctx.is_simulating()
-        and fixture_settings.use_impact_protection
+        fixture_settings.ctx.is_simulating()
+        or not fixture_settings.use_impact_protection
     ):
-        if fixture_settings.pipette_channels == 96:
-            print_info(
-                "96ch impact close sequence: closing V2 gratings; "
-                "96ch fixture keeps last selected pipette mode"
+        return
+
+    _close_impact_protection_v2(fixture_settings)
+
+
+def _switch_impact_protection(fixture_settings: FixtureSettings, tip: int) -> None:
+    if (
+        fixture_settings.ctx.is_simulating()
+        or not fixture_settings.use_impact_protection
+    ):
+        return
+
+    if fixture_settings.pipette_channels == 96:
+        _switch_impact_protection_v2(fixture_settings, tip)
+        if fixture_settings.ImpactSerial_96:
+            _configure_impact_protection_96ch(
+                fixture_settings.ctx,
+                fixture_settings.ImpactSerial_96,
+                tip,
             )
-        _close_impact_protection_v2(fixture_settings)
+        return
 
-
-def maybe_switch_mode(fixture_settings: FixtureSettings, tip: int) -> None:
-    """Switch gratings mode if the use_impact_protection param is set."""
-    if (
-        not fixture_settings.ctx.is_simulating()
-        and fixture_settings.use_impact_protection
-    ):
-        if fixture_settings.pipette_channels == 96:
-            print_info(f"96ch impact switch sequence start: tip={tip}")
-            _switch_impact_protection_v2(fixture_settings, tip)
-            if fixture_settings.ImpactSerial_96:
-                _configure_impact_protection_96ch(
-                    fixture_settings.ctx,
-                    fixture_settings.ImpactSerial_96,
-                    tip,
-                )
-            print_info(f"96ch impact switch sequence done: tip={tip}")
-        else:
-            _switch_impact_protection_v2(fixture_settings, tip)
-
-
-def remove_tip(fixture_settings: FixtureSettings) -> None:
-    """Either return or drop tip(s)."""
-    maybe_close_all_gratings(fixture_settings)
-    if fixture_settings.return_tip:
-        fixture_settings.pipette.return_tip()
-    else:
-        fixture_settings.pipette.drop_tip()
+    _switch_impact_protection_v2(fixture_settings, tip)
 
 
 def _get_offset_for_channel(
@@ -1135,10 +1011,6 @@ def pick_up_tip_for_channel(
     fixture_settings.pipette.pick_up_tip(tip.top().move(point_offset))
     if fixture_settings.increment and not fixture_settings.ctx.is_simulating():
         print_info("clearing pipette ul-per-mm table to be linear")
-        from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: WPS433
-            clear_pipette_ul_per_mm,
-        )
-
         clear_pipette_ul_per_mm(
             fixture_settings.ctx._core.get_hardware()._obj_to_adapt,  # type: ignore[arg-type]
             OT3Mount.LEFT if fixture_settings.mount == "left" else OT3Mount.RIGHT,
@@ -1174,7 +1046,7 @@ def retract_and_wait(
         # just simulate the physical movement and return to speed up the analysis
         fixture_settings.pipette._retract()
         # Z轴离开秤的上方后，关闭所有光栅
-        maybe_close_all_gratings(fixture_settings)
+        _close_impact_protection(fixture_settings)
         return_val = copy.deepcopy(fast_simulate_measurement)
         if not blank:
             if mode == MeasurementType.ASPIRATE:
@@ -1209,7 +1081,7 @@ def retract_and_wait(
     )
     _update_environment_first_last_min_max(fixture_settings.test_report)
     # Z轴离开秤的上方后，关闭所有光栅
-    maybe_close_all_gratings(fixture_settings)
+    _close_impact_protection(fixture_settings)
     return m_data
 
 
@@ -1273,8 +1145,8 @@ def aspirate_with_liquid_class(
     """Aspirate with liquid class."""
     print_info(f"transfer props {transfer_properties}")
     # open ImpactSerial
-    maybe_switch_mode(fixture_settings, tip)
-
+    _switch_impact_protection(fixture_settings, tip)
+        
     fixture_settings.recorder.set_sample_tag(
         create_measurement_tag("aspirate", volume, channel, trial)
     )
@@ -1355,7 +1227,7 @@ def run_blank_test(
     else:
         liquid_height = fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
     # 移动到垃圾桶前，关闭所有光栅
-    maybe_close_all_gratings(fixture_settings)
+    _close_impact_protection(fixture_settings)
     fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)  # type: ignore[arg-type]
     fixture_settings.pipette.move_to(
         fixture_settings.pipette._last_tip_picked_up_from.top(10)  # type: ignore[union-attr]
@@ -1376,7 +1248,7 @@ def run_blank_test(
         blank_move_to_height = liquid_height - fixture_settings.submerge_depth
     fixture_settings.pipette.move_to(Location(above_scale, None))
     # Z轴在秤的上方，调用switch_mode
-    maybe_switch_mode(fixture_settings, tip)
+    _switch_impact_protection(fixture_settings, tip)
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
     transfer_properties.aspirate.aspirate_position.position_reference = (
@@ -1532,7 +1404,7 @@ def run_one_test(
     )
     fixture_settings.pipette.move_to(Location(above_scale, None))
     # Z轴在秤的上方，调用switch_mode
-    maybe_switch_mode(fixture_settings, tip)
+    _switch_impact_protection(fixture_settings, tip)
     print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
@@ -1612,7 +1484,7 @@ def calculate_evaporation(
 
     # Z轴在秤的上方，调用switch_mode
     fixture_settings.pipette._retract()
-    maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
+    _switch_impact_protection(fixture_settings, fixture_settings.tip_sizes[0])
 
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     print_info(
@@ -1664,25 +1536,11 @@ def calculate_evaporation(
     return blank_measurments, avg_asp_evap, avg_disp_evap
 
 
-def _get_passing_requirements(
-    fixture_settings: FixtureSettings, tip: int, volume: float
-) -> Optional[Tuple[float, float]]:
-    if fixture_settings.fail_early:
-        try:
-            return QC_TEST_MIN_REQUIREMENTS[fixture_settings.pipette_channels][
-                fixture_settings.pipette_volume
-            ][tip][volume]
-        except KeyError:
-            print_error(
-                f"No minimum requirements for the P{fixture_settings.pipette_volume} {fixture_settings.pipette_channels}channel with tip {tip} at {volume}"
-            )
-    return None
-
-
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
-    # close all gratings
-    maybe_close_all_gratings(fixture_settings)
+
+    #close all gratings
+    _close_impact_protection(fixture_settings)
 
     first_tip = _get_tips_for_test(
         fixture_settings, fixture_settings.tip_sizes[0], True
@@ -1873,20 +1731,6 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
 
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
-                requirements: Optional[Tuple[float, float]] = _get_passing_requirements(
-                    fixture_settings, tip, volume
-                )
-                if requirements:
-                    if (
-                        abs(dispense_d) > requirements[0]
-                        or abs(dispense_cv) > requirements[1]
-                    ):
-                        print_error(
-                            f"Pipette failed QC on channel {channel} tip {tip} volume {volume}"
-                        )
-                        raise RuntimeError(
-                            f"Pipette failed on QC channel {channel} tip {tip} volume {volume}"
-                        )
             for trial in range(fixture_settings.trials):
                 aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
                     trial_asp_dict[trial], volume
@@ -1939,8 +1783,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 flag="",
             )
         tip_sizes_done.append(tip)
-        maybe_close_all_gratings(fixture_settings)
-
+        _close_impact_protection(fixture_settings)
 
 def _override_check(
     aspirate_volume: float,
@@ -1959,13 +1802,7 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
 def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
-    if fixture_settings.fast_simulate:
-        # do LPC when it is simulating
-        for tip in fixture_settings.tip_sizes:
-            for channel in fixture_settings.channels:
-                tips = _get_tips_for_test(fixture_settings, tip, False, channel)
-                pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
-                remove_tip(fixture_settings)
+    if fixture_settings.ctx.is_simulating():
         print_info("Simulating. Not running actual tests and stopping analysis.")
         return
     try:
@@ -1975,17 +1812,6 @@ def run(ctx: ProtocolContext) -> None:
         if fixture_settings.increment:
             _adjust_settings_for_increment(fixture_settings)
         _run(ctx, fixture_settings)
-        if fixture_settings.ctx.params.upload_csv_automatically:  # type: ignore [attr-defined]
-            print_info("Uploading CSV to Google Drive...")
-            from hardware_testing.scripts.data_center_client import (  # noqa: WPS433
-                upload_data_to_google_drive,
-            )
-
-            result = upload_data_to_google_drive(
-                csv_file_path=fixture_settings.test_report.file_path
-            )
-            if not result:
-                print_error("Failed to upload CSV to Google Drive.")
     except Exception as e:
         print_error(f"Captured traceback:\n{traceback.format_exc()}")
         raise e
