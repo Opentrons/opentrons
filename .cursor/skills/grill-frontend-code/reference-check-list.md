@@ -1,4 +1,4 @@
-# Code Review check list for Frontend
+# Code Review checklist for Frontend
 
 ## TypeScript
 
