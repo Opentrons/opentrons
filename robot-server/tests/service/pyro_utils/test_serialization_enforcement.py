@@ -4,6 +4,8 @@ import asyncio
 import inspect
 import socket
 import threading
+import inspect
+from pydantic import BaseModel
 from typing import Any, Callable, Dict, List, Literal, Mapping, Optional, Sequence, Set, Union, cast
 
 from datetime import datetime
@@ -270,7 +272,8 @@ async def _setup_directed_run_process_pyro_resource(
 
 
 ### Parameters mocked out resource
-SKIP_METHOD = Literal['SKIP_THIS']
+SKIP_CALLABLE_PROXY = Literal['SKIP_THIS']  # NOTE: We skip these in the initial pass because they are going to be proxy instances
+
 PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "axes": {
         Sequence[hw_types.Axis]: [hw_types.Axis.X, hw_types.Axis.Y, hw_types.Axis.Z],
@@ -453,7 +456,7 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "turn_on": {bool: True},
     "duty_cycle": {int: 50},
     "refresh_state": {bool: True},
-    "listener": {Callable[[hw_types.StatusBarUpdateEvent], None]: SKIP_METHOD}, # CASEY NOTE: might be able to ignore because this will go to the proxy ones
+    "listener": {Callable[[hw_types.StatusBarUpdateEvent], None]: SKIP_CALLABLE_PROXY}, # CASEY NOTE: might be able to ignore because this will go to the proxy ones
     "cp_override": {Optional[hw_types.CriticalPoint]: hw_types.CriticalPoint.MOUNT},
     "robot_calibration": {
         "OT3Transforms": OT3Transforms(
@@ -503,6 +506,105 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "tip_volume": {float: 50.0},
 }
 
+ # ERROR COLLECTION LISTS
+class ErrorCollections(BaseModel):
+    missing_serialization_list: list[Any] # NOTE: If errors are collected in this it means we haven't serialized a datatype for Pyro5/Serpent
+    missing_params_list: list[Any] # NOTE: If errors are collected in this it means we are missing mocks/dummy data for a given param/type pairing in the PARAMETERS_MOCK_TABLE
+    alternative_errors_list: list[Any] # NOTE: If errors are collected in this it means some unknown alternative issue occurred during a request.
+                                 # Cases that result in alternative errors include a type being serialized incorrected (such as an Enum turing into a string),
+                                 # or a body not being fully mocked (no backend on OT3API for example).
+
+async def _collect_proxy_attribute_information(original_class: type, acpo_instance: Any) -> ErrorCollections:
+    """Scrape over the provided proxy to gather as much information on parameters, mock errors and serialization as possible."""
+    missing_serialization_list = []
+    missing_params_list = []
+    alternative_errors_list = []
+    # Grab the inner proxies for all these safely wrapped results, we'll use these to troll through the metadata
+    proxy: pyro.Proxy = acpo_instance._proxy  # type: ignore
+    proxy._pyroBind()  # type: ignore
+
+    # COLLECT INFORMATION FROM ALL THE EXPOSED METHODS
+    proxy_methods: list[str] = getattr(proxy, "get_pyro_attributes_with_proxy_result")
+    async_methods: dict[str, dict[str, Any]] = getattr(proxy, "get_pyro_async_methods")
+
+    for method in proxy._pyroMethods:
+        if method not in proxy_methods:
+            ot3_async_wrapped_method = getattr(acpo_instance, method)
+            original_class_method = getattr(original_class, method)
+            kwargs: Dict[str, Any] = {}
+            return_type: type = None
+            for key, value in original_class_method.__annotations__.items():
+                if key is not "return":
+                    try:
+                        kwargs[key] = PARAMETERS_MOCK_TABLE[key][value]
+                    except KeyError as e:
+                        missing_params_list.append("key: " + str(key) + " - type: " + str(value))
+                else:
+                    return_type = type(value)
+            try:
+                if SKIP_CALLABLE_PROXY not in kwargs.values():
+                    if method in async_methods.keys():
+                        result = await ot3_async_wrapped_method(**kwargs)
+                        assert isinstance(result, return_type)
+                    else:
+                        result = ot3_async_wrapped_method(**kwargs)
+                        assert isinstance(result, return_type)
+            except Exception as e:
+                if "serialize" in str(e):
+                    missing_serialization_list.append(str(e))
+                else:
+                    alternative_errors_list.append(str(e))
+    
+    # COLLECT ALL THE INFORMATION ON THE EXPOSED PROPERTIES
+    for attribute in proxy._pyroAttrs:
+        if attribute not in proxy_methods:
+            try:
+                ot3_async_wrapped_attribute_result = getattr(acpo_instance, attribute)
+                # other logic in here?
+                try:
+                    original_class_attribute = getattr(original_class, attribute)
+                    return_type = inspect.signature(original_class_attribute.fget).return_annotation
+                    if not isinstance(ot3_async_wrapped_attribute_result, return_type):
+                        alternative_errors_list.append(f"ERROR: Result of property {attribute} is type: {type(ot3_async_wrapped_attribute_result)} when expected: {return_type}")
+
+                except AttributeError:
+                    # Some of the attributes are Pyro-object only metadata so this may fail. This is fine so long as the wrapped async getattr doesn't throw.
+                    pass
+                
+            except Exception as e:
+                if "serialize" in str(e):
+                    missing_serialization_list.append(str(e))
+                else:
+                    alternative_errors_list.append(str(e))
+    
+    # CASEY NOTE --- right here we should scrape any proxy result that returns a wrapped class like modules and then troll through those like above - maybe move the above to be in generic callers
+    # THAT GENERIC CALLERS THING WILL NEED TO HAPPEN
+    # CASEY NOTE: try the inner proxies that come from get_pyro_attributes_with_proxy_result for each of these APIs as well! <-- THIS WILL BE REALLY IMPORTANT TO DO
+    return ErrorCollections(
+        missing_serialization_list=missing_serialization_list,
+        missing_params_list=missing_params_list,
+        alternative_errors_list=alternative_errors_list,
+    )
+
+def _raise_if_errors(process: str, error_collection: ErrorCollections) -> None:
+    """Raise when errors found in a given process interface.
+
+    NOTE: The raise in order of priority. The goal is to identify anything that hasn't been serialized, but in order to do that we need to be sure that:
+        1. All expected parameters are full mocked out or filled with valid dummy data
+        2. All callable methods/attributes are capable of being called successfully
+    """
+    if len(error_collection.missing_params_list) > 0:
+        raise AttributeError(f"PROCESS: {process} - MISSING PARAMS IN MOCK TABLE:\n{''.join(str(param) + "\n" for param in error_collection.missing_params_list)}")
+    
+    if len(error_collection.alternative_errors_list) > 0:
+        raise ValueError(f"PROCESS: {process} - ERRORS DURING INTERPROCESS COVERAGE TESTS:\n{''.join(str(error) + "\n" for error in error_collection.alternative_errors_list)}")
+    
+    # NOTE: If this raises, its time to add some new serializations to an appropriate process library! Get to it!
+    if len(error_collection.missing_serialization_list) > 0:
+        raise ValueError(f"PROCESS: {process} - MISSING PYRO/SERPENT SERIALIZATIONS - TOTAL UNSERIALIZED: {len(error_collection.missing_serialization_list)}\n{''.join(str(serializaiton) + "\n" for serializaiton in error_collection.missing_serialization_list)}")
+    
+
+
 async def test_serialization_coverage(
     decoy: Decoy,
     mock_app_state: AppState,
@@ -518,13 +620,6 @@ async def test_serialization_coverage(
     """
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
-
-    # ERROR COLLECTION LISTS
-    missing_serialization_list = [] # NOTE: If errors are collected in this it means we haven't serialized a datatype for Pyro5/Serpent
-    missing_params_list = [] # NOTE: If errors are collected in this it means we are missing mocks/dummy data for a given param/type pairing in the PARAMETERS_MOCK_TABLE
-    alternative_errors_list = [] # NOTE: If errors are collected in this it means some unknown alternative issue occurred during a request.
-                                 # Cases that result in alternative errors include a type being serialized incorrected (such as an Enum turing into a string),
-                                 # or a body not being fully mocked (no backend on OT3API for example).
 
     name_server_ready = threading.Event()
 
@@ -545,96 +640,17 @@ async def test_serialization_coverage(
         name_server_ready=name_server_ready
     )
 
-    # Grab the inner proxies for all these safely wrapped results, we'll use these to troll through the metadata
-    ot3api_proxy: pyro.Proxy = ot3api._proxy  # type: ignore
-    robot_server_proxy: pyro.Proxy = robot_server._proxy  # type: ignore
-    run_process_proxy: pyro.Proxy = run_process._proxy  # type: ignore
+    # Check the OT3API process for serialization, parameter or alternative errors
+    ot3_error_collection = await _collect_proxy_attribute_information(original_class=OT3API, acpo_instance=ot3api)
+    _raise_if_errors(process="OT3API", error_collection=ot3_error_collection)
 
-    # Prep for trolling through proxy metadata
-    register_all_needed_types()
-    ot3api_proxy._pyroBind()  # type: ignore
-    robot_server_proxy._pyroBind()  # type: ignore
-    run_process_proxy._pyroBind()  # type: ignore
+    # Check the ROBOT-SERVER process for serialization, parameter or alternative errors
+    robot_server_error_collection = await _collect_proxy_attribute_information(original_class=pyro_resource.RobotServerPyroResource, acpo_instance=robot_server)
+    _raise_if_errors(process="ROBOT-SERVER", error_collection=robot_server_error_collection)
 
-    # CASEY TODO: troll through all the
-    # _pyroMethods
-    # _pyroAttrs
-    # Test the ot3api methods and attributes
-    # if attribute or method is in get_pyro_attributes_with_proxy_result ignore for now
-    ot3_proxy_methods: list[str] = getattr(ot3api_proxy, "get_pyro_attributes_with_proxy_result")
-    ot3_async_methods: dict[str, dict[str, Any]] = getattr(ot3api_proxy, "get_pyro_async_methods")
-
-    for method in ot3api_proxy._pyroMethods:
-        if method not in ot3_proxy_methods:
-            ot3_async_wrapped_method = getattr(ot3api, method)
-            original_class_method = getattr(OT3API, method)
-            kwargs: Dict[str, Any] = {}
-            return_type: type = None
-            for key, value in original_class_method.__annotations__.items():
-                if key is not "return":
-                    try:
-                        kwargs[key] = PARAMETERS_MOCK_TABLE[key][value]
-                    except KeyError as e:
-                        missing_params_list.append("key: " + str(key) + " - type: " + str(value))
-                else:
-                    return_type = type(value)
-            try:
-                if SKIP_METHOD not in kwargs.values():
-                    if method in ot3_async_methods.keys():
-                        print(f"CALLING ASYNC METHOD: {method} WITH ARGS: {kwargs}")
-                        result = await ot3_async_wrapped_method(**kwargs)
-                        print(f"async result = {result} return type: {return_type}")
-                        assert isinstance(result, return_type)
-                    else:
-                        print(f"CALLING METHOD: {method} WITH ARGS: {kwargs}")
-                        result = ot3_async_wrapped_method(**kwargs)
-                        print(f"result = {result} return type: {result}")
-                        assert isinstance(result, return_type)
-            except Exception as e:
-                if "don't know how to serialize" in str(e):
-                    missing_serialization_list.append(str(e))
-                else:
-                    alternative_errors_list.append(str(e))
-    
-    # CASEY NOTE: move these to the bottom
-    # NOTE: The raise in order of priority. The goal is to identify anything that hasn't been serialized, but in order to do that we need to be sure that:
-    # 1. All expected parameters are full mocked out or filled with valid dummy data
-    # 2. All callable methods/attributes are capable of being called successfully
-    if len(missing_params_list) > 0:
-        raise AttributeError(f"MISSING PARAMS IN MOCK TABLE:\n{''.join(str(param) + "\n" for param in missing_params_list)}")
-    
-    if len(alternative_errors_list) > 0:
-        raise ValueError(f"ERRORS DURING INTERPROCESS COVERAGE TESTS:\n{''.join(str(error) + "\n" for error in alternative_errors_list)}")
-    
-    # NOTE: If this raises, its time to add some new serializations to an appropriate process library! Get to it!
-    if len(missing_serialization_list) > 0:
-        raise ValueError(f"MISSING PYRO/SERPENT SERIALIZATIONS:\n{''.join(str(serializaiton) + "\n" for serializaiton in missing_serialization_list)}")
-    
-
-    for attribute in ot3api_proxy._pyroAttrs:
-        if attribute not in ot3_proxy_methods:
-            print(f"TRYING ON ATTR: {attribute}")
-            ot3_async_wrapped_attribute_result = getattr(ot3api, attribute)
-            # CASEY NOTE will this just get a result? YES ---
-            # we need to mock out a bunch of stuff inside the OT3API
-            original_class_attribute = getattr(OT3API, attribute)
-            if "engaged_axes" in attribute: # CASEY NOTE remove and indent the following:
-                print("IN ENGAGED AXES")
-                print(f"ANNOTATIONS: {original_class_attribute.__annotations__}")
-                return_type: type = None
-                for key, value in original_class_attribute.__annotations__.items():
-                    if key is "return":
-                        return_type = type(value)
-
-                try:
-                    print(f"result = {ot3_async_wrapped_attribute_result} return type: {return_type}")
-                    assert isinstance(result, return_type)
-                except Exception as e:
-                    raise ValueError(f"{e} --- attribute {attribute}")
-    # CASEY NOTE TODO ---------- DO THE _pyroAttrs NEXT!!!!!!!!!!!!!!!
-    raise ValueError("DONE")
-
-    # CASEY NOTE: try the inner proxies that come from get_pyro_attributes_with_proxy_result for each of these APIs as well!
+    # Check the DIRECTED-RUN process for serialization, parameter or alternative errors
+    directed_run_error_collection = await _collect_proxy_attribute_information(original_class=DirectedRunProcess, acpo_instance=run_process)
+    _raise_if_errors(process="DIRECTED-RUN", error_collection=robot_server_error_collection)
 
     # Clean up client resources.
     run_process_proxy._pyroRelease()  # type: ignore
