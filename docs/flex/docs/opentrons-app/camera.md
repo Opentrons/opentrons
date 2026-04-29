@@ -28,7 +28,7 @@ You can also turn the camera on and off from the **Peripherals** section of the 
 <figure class="screenshot side-by-side" markdown>
 ![Camera off](../images/camera_disabled.png)
 ![Camera on](../images/camera_enabled.png)
-<figcaption>Enable or disable the camera and adjust image settings</figcaption>
+<figcaption>Enable or disable the camera and adjust image settings.</figcaption>
 </figure>
 
 ## Other camera settings
@@ -55,17 +55,17 @@ These controls allow you to zoom in on the deck and provide image correction fea
 ![Image brightness, saturation, contrast, and zoom settings](../images/camera_controls.png){ width="80%" }
 </figure>
 
-## Watching real-time video
+## Viewing the live camera feed
 
-Live video streaming is available in the Opentrons App when the camera is enabled and the robot is running a protocol. To watch the feed, start your protocol run and click the **Live camera** button. This opens a small window that streams live video as the robot works through the protocol steps. The video stream stops automatically when the protocol ends.
+Live video streaming is available in the Opentrons App when the camera is enabled and the robot is running a protocol. To watch the feed, run your protocol and click the **Live camera** button. This opens a small window that streams live video as the robot works through the protocol steps. The video stream stops automatically when the protocol ends.
 
 <figure class="screenshot" markdown>
 ![Enable live camera video feed](../images/camera_live_stream.png){ width="80%" }
 </figure>
 
 !!! note
-    Flex is unable to save live video streamed during a protocol run. It can, however, save still images if you [add a camera step](../../protocol-designer/steps/camera.md) to your protocol.
+    Flex cannot save live video streamed during a protocol run.
 
-## Downloading images
+## Saving images
 
-All protocol images are available for download in the **Recent Protocol Runs** section of the robot details page.
+To capture still images during a run, [add a camera step](../../protocol-designer/steps/camera.md) in Protocol Designer or use the [`capture_image()` method](../../python-api/building-block-commands/utilities.md#capturing-images) in the Python API. All protocol images are available for download in the **Recent Protocol Runs** section of the robot details page.
