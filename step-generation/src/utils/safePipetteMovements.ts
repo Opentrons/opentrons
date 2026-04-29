@@ -350,11 +350,11 @@ export const getIsSafePipetteMovement = (args: {
   const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
 
   const deckDefinition = getDeckDefFromRobotType(robotType)
-  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided or if 1ch OT-2 pipette
+  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided or if 1ch pipette
   if (
     labwareEntities[labwareId] == null ||
     wellTargetName == null ||
-    (channels === 1 && robotType === OT2_ROBOT_TYPE)
+    (channels === 1)
   ) {
     return true
   }
