@@ -4,7 +4,10 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { VACUUM_MODULE_TYPE, VACUUM_MODULE_V1 } from '@opentrons/shared-data'
 
-import { VACUUM_MODE_PRESSURE, VACUUM_MODULE_INITIAL_STATE } from '../../../constants'
+import {
+  VACUUM_MODE_PRESSURE,
+  VACUUM_MODULE_INITIAL_STATE,
+} from '../../../constants'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
