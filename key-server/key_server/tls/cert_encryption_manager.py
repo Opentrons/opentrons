@@ -29,7 +29,55 @@ class UsedEncryptionKey:
 
 
 class CertEncryptionManager:
-    """Class for handling key rotation and encryption for TLS cert export."""
+    """Class for handling key rotation and encryption for TLS cert export.
+
+    This class handles doing the actual encryption (through some utilities) and managing the
+    rotation of keys. We want keys to rotate every 30 seconds, and we want that to happen
+    regardless of whether anybody's looking or not. This works similarly to a time-based one
+    time password like in authenticator apps. Unlike there, it's not a key piece of the
+    security design (TOTPs rotate based on total duration since an epoch encoded in the TOTP
+    secret so that two independent computers that are time-synced can agree on whether a
+    specific TOTP code is valid at a given point in time; here, one computer is presenting an
+    encryption key and a cert through independent channels at the same time, so all you need
+    is to have a cert and the key with which it was encrypted, however you got it) but it's
+    important for user expectations.
+
+    The way this works is that there's an epoch timestamp (self._t0) that captures when the
+    instance was created. Then, time can be discretized to 30-second (or another value,
+    configured through password_timestep_s) periods that start at t0.
+
+    Rather than considering a point in time as a point in time, we can figure out which 30
+    second period that point belongs to.
+
+    Any given generated key is only valid for exactly one period. When someone asks us
+    for a key at some point in time, we can check if we have a key for this period and if so
+    return it; we need to return the same key every time someone asks for a key in the same
+    period. If we don't have a key, we can generate one and store it. If _nobody_ asks for a
+    key during a given period, then the key never gets generated.
+
+    In addition to caring about the key for the period a caller asks for (which is going to
+    be the current period) we also care about the key for the immediately previous period. A
+    user is going to have to read this key off the ODD and type it into their app; they
+    might take long enough that the period ends and another period begins while they're doing
+    so - it's easier than it sounds; since periods are always changing and you look in on them
+    at some arbitrary point in time, you might ask for a password 1 second before the end of
+    a period.
+
+    We therefore present up to two versions of the encrypted cert. One that's always present
+    is encrypted with the key from the current period. Since encrypting a cert needs a key,
+    getting an encrypted cert involves asking for the key for the current period. Therefore,
+    when encrypting a cert, the key exists whether or not someone has viewed it. The second
+    version, which may or may not be present, is encrypted with the key from the previous
+    period. If someone asked for that key, then we'll have one, since they might have asked
+    for it because they were viewing it, and then asked for the certs soon after the keys
+    rolled. If nobody asked for that key, then we won't have a cert encrypted with it, since
+    nobody could possibly have the key to decrypt that cert anyway.
+
+    Key generation itself is done by first generating a human-readable (and -typable) password
+    and then generating key material using a key derivation function. This takes a long time,
+    on purpose because that's how you make it hard to brute-force the key, so we have some
+    optimizations to generate a key in the background all the time.
+    """
 
     def __init__(
         self,
@@ -96,7 +144,7 @@ class CertEncryptionManager:
     def _key_period_previous(
         self, key: UsedEncryptionKey | UnusedEncryptionKey | None, now: datetime
     ) -> UsedEncryptionKey | None:
-        """Is this key for the immediately preceding discretization period?"""
+        """Is this key for the immediately-preceding discretization period?"""
         if not key:
             return None
         if isinstance(key, UnusedEncryptionKey):
@@ -155,6 +203,7 @@ class CertEncryptionManager:
             )
 
     def _discretize_now(self, now: datetime) -> datetime:
+        """Get the time point that begun the key period containing the argument time point."""
         assert now >= self._t0, "Time before t0 passed"
         difference = now - self._t0
         quotient = difference.total_seconds() // self._password_timestep_s
