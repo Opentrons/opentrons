@@ -38,7 +38,7 @@ export function ViewOnlyParameters({
   const parameters = mostRecentAnalysis?.runTimeParameters ?? []
 
   return (
-    <>
+    <div className={styles.screen}>
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => {
@@ -94,6 +94,6 @@ export function ViewOnlyParameters({
           )
         })}
       </div>
-    </>
+    </div>
   )
 }

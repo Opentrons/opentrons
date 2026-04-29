@@ -1,8 +1,11 @@
+.screen {
+  padding-top: 7.75rem;
+}
+
 .content_container {
   display: flex;
   flex-direction: column;
   padding: 0 var(--spacing-8) 0;
-  margin-top: 7.75rem;
   gap: var(--spacing-8);
 }
 
