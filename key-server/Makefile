@@ -106,6 +106,7 @@ dev:
 # front of all the servers. don't run it unless you're going to run mitmproxy
 .PHONY: dev-mitmproxy
 dev-mitmproxy:
+	$(if $(OT_KEY_SERVER_preserve_certs),,rm -rf .key-server-storage)
 	OT_KEY_SERVER_dot_env_path=dev-mitmproxy.env $(python) -m key_server --port $(dev_port) --reload --log-level=debug
 
 # Note: No `push` target, since this project only runs on Flex (OT-3), not OT-2.

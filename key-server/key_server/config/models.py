@@ -67,6 +67,8 @@ class KeyServerConfig(BaseSettings):
         default=None,
         description="File to touch to notify mitmproxy it needs to rotate. Ignored if tls_server_integration is not dev-mitmproxy.",
     )
+    cert_password_length_words: int = 3
+    cert_password_rotation_time_s: int = 30
 
 
 class ResolvedConfig(BaseModel):
@@ -79,3 +81,5 @@ class ResolvedConfig(BaseModel):
     tls_directory: Path
     tls_server_integration: Literal["systemd-nginx", "dev-none", "dev-mitmproxy"]
     mitmproxy_touch_path: Path | None
+    cert_password_length_words: int
+    cert_password_rotation_time_s: int
