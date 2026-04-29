@@ -4,8 +4,9 @@ import asyncio
 import inspect
 import socket
 import threading
-from typing import Any, cast, Dict, Sequence, Union
+from typing import Any, Callable, Dict, List, Literal, Mapping, Optional, Sequence, Set, Union, cast
 
+from datetime import datetime
 import pytest
 from decoy import Decoy
 from Pyro5 import api as pyro
@@ -42,7 +43,23 @@ from robot_server.runs.run_process_entry_point import initialize_run_process
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.pyro_utils import pyro_resource, resource_utilities
 import opentrons.hardware_control.types as hw_types
+import opentrons.hardware_control.dev_types as dev_types
+import opentrons.hardware_control.modules.types as module_types
+import opentrons.hardware_control.peripherals.types as peripheral_types
 import opentrons.types as ot_types
+import opentrons.config.types as config_types
+from opentrons.hardware_control.ot3_calibration import OT3Transforms
+from opentrons.config import gripper_config as gc
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
+import opentrons_shared_data.pipette.types as pipette_types
+from opentrons_shared_data.pipette import (
+    load_data as load_pipette_data,
+)
+from opentrons.config.robot_configs import build_config_ot3
+from opentrons.hardware_control.robot_calibration import DeckCalibration
+import opentrons.calibration_storage.types as calibration_types
+from opentrons.config import robot_configs
+
 
 
 @pytest.fixture
@@ -100,6 +117,9 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
     except ImportError:
         return None  # type: ignore[return-value]
 
+@pytest.fixture
+def mock_config() -> config_types.OT3Config:
+    return build_config_ot3({})
 
 async def _setup_namerserver(name_server_ready: threading.Event) -> None:
     """Set up a thread running the Pyro Nameserver."""
@@ -250,13 +270,237 @@ async def _setup_directed_run_process_pyro_resource(
 
 
 ### Parameters mocked out resource
+SKIP_METHOD = Literal['SKIP_THIS']
 PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
-    "axes": {Sequence[hw_types.Axis]: [hw_types.Axis.X, hw_types.Axis.Y, hw_types.Axis.Z]},
+    "axes": {
+        Sequence[hw_types.Axis]: [hw_types.Axis.X, hw_types.Axis.Y, hw_types.Axis.Z],
+        Optional[List[hw_types.Axis]]: [hw_types.Axis.X, hw_types.Axis.Y, hw_types.Axis.Z],
+    },
     "mount": {
         hw_types.OT3Mount: hw_types.OT3Mount.LEFT,
-        Union[ot_types.Mount, hw_types.OT3Mount]: hw_types.OT3Mount.LEFT,
-        Union[ot_types.Mount, hw_types.OT3Mount, type(None)]: hw_types.OT3Mount.LEFT,
+        Union[ot_types.Mount, hw_types.OT3Mount]: ot_types.Mount.LEFT,
+        Union[ot_types.Mount, hw_types.OT3Mount, type(None)]: None,
     },
+    "duration_s": {float: 1.0, int: 1},
+    "primary": {bool: True},
+    "critical_point": {Optional[hw_types.CriticalPoint]: hw_types.CriticalPoint.MOUNT},
+    "refresh": {bool: True},
+    "fail_on_not_homed": {bool: False},
+    "axis": {hw_types.Axis: hw_types.Axis.X},
+    "module_id": {str: "module-id"},
+    "slot": {str: "D1"},
+    "offset": {ot_types.Point: ot_types.Point(0, 0, 0)},
+    "rate": {float: 1.0},
+    "follow_singular_sensor": {Optional[hw_types.InstrumentProbeType]: hw_types.InstrumentProbeType.PRIMARY},
+    "skip": {Optional[List[hw_types.Axis]]: [hw_types.Axis.X]},
+    "top": {Optional[float]: 1.0},
+    "bottom": {Optional[float]: 0.0},
+    "blow_out": {Optional[float]: 1.0},
+    "drop_tip": {Optional[float]: 1.0},
+    "abs_position": {ot_types.Point: ot_types.Point(1, 2, 3)},
+    "speed": {Optional[float]: 10.0, float: 10.0},
+    "max_speeds": {Optional[Dict[hw_types.Axis, float]]: {hw_types.Axis.X: 100.0}},
+    "expect_stalls": {bool: False},
+    "which": {List[hw_types.Axis]: [hw_types.Axis.X, hw_types.Axis.Y]},
+    "expected_grip_width": {float: 5.0},
+    "grip_width_uncertainty_wider": {float: 0.5},
+    "grip_width_uncertainty_narrower": {float: 0.5},
+    "disable_geometry_grip_check": {bool: False},
+    "volume": {Optional[float]: 50.0, float: 50.0},
+    "correction_volume": {float: 1.0},
+    "kwargs": {Any: {}},
+    "machine_pos": {Dict[hw_types.Axis, float]: {hw_types.Axis.X: 0.0}},
+    "button": {Optional[bool]: True},
+    "rails": {Optional[bool]: True},
+    "taskify": {bool: False},
+    "instrument_data": {
+        dev_types.AttachedGripper: dev_types.AttachedGripper(config=gc.load(GripperModel.v1), id="test"),
+        dev_types.AttachedPipette: dev_types.AttachedPipette(
+            config=load_pipette_data.load_definition(
+                pipette_types.PipetteModelType("p1000"),
+                pipette_types.PipetteChannelType(1),
+                pipette_types.PipetteVersionType(major=3, minor=3),
+                pipette_types.PipetteOEMType(pipette_types.PipetteOEMType.OT),
+            ),
+            id="fakepip",
+        ),
+    },
+    "position": {Mapping[hw_types.Axis, float]: {hw_types.Axis.X: 0.0}},
+    "message": {str: "message"},
+    "acceleration": {float: 10.0},
+    "subsystems": {Optional[Set[hw_types.SubSystem]]: [hw_types.SubSystem.gantry_x]},
+    "force": {bool: False},
+    "aspirate": {Optional[float]: 1.0},
+    "dispense": {Optional[float]: 1.0},
+    "state": {hw_types.StatusBarState: hw_types.StatusBarState.IDLE},
+    "home_after": {bool: False},
+    "ignore_plunger": {bool: False},
+    "scrape_type": {hw_types.TipScrapeType: hw_types.TipScrapeType.NONE},
+    "push_out": {Optional[float]: 1.0},
+    "is_full_dispense": {bool: False},
+    "enabled": {bool: True},
+    "expected": {hw_types.TipStateType: hw_types.TipStateType.ABSENT},
+    "presses": {Optional[int]: 1},
+    "increment": {Optional[float]: 1.0},
+    "tip_length": {float: 10.0},
+    "allow_home_other": {bool: False},
+    "require": {
+        Optional[
+            Dict[
+                ot_types.Mount,
+                Literal[
+                    "p10_single",
+                    "p10_multi",
+                    "p20_single_gen2",
+                    "p20_multi_gen2",
+                    "p50_single",
+                    "p50_multi",
+                    "p50_single_flex",
+                    "p50_multi_flex",
+                    "p300_single",
+                    "p300_multi",
+                    "p300_single_gen2",
+                    "p300_multi_gen2",
+                    "p1000_single",
+                    "p1000_single_gen2",
+                    "p1000_single_flex",
+                    "p1000_multi_flex",
+                    "p1000_multi_em_flex",
+                    "p1000_96",
+                    "p200_96",
+                ],
+            ]
+        ]: {ot_types.Mount.LEFT: "p1000_single"}
+    },
+    "skip_if_would_block": {bool: False},
+    "model": {
+        Union[
+            module_types.MagneticModuleModel,
+            module_types.TemperatureModuleModel,
+            module_types.ThermocyclerModuleModel,
+            module_types.HeaterShakerModuleModel,
+            module_types.MagneticBlockModel,
+            module_types.AbsorbanceReaderModel,
+            module_types.FlexStackerModuleModel,
+            module_types.VacuumModuleModel,
+        ]: module_types.ThermocyclerModuleModel.THERMOCYCLER_V2,
+        peripheral_types.BarcodeScannerModel: peripheral_types.BarcodeScannerModel.BARCODE_SCANNER_V1,
+    },
+    "sim_serial": {Optional[str]: "SIM123"},
+    "distance": {float: 5.0},
+    "margin": {float: 1.0},
+    "probe": {
+        hw_types.GripperProbe: hw_types.GripperProbe.FRONT,
+        Optional[hw_types.InstrumentProbeType]: None,
+    },
+    "tiprack_diameter": {float: 5.0},
+    "force_newtons": {Optional[float]: 1.0},
+    "stay_engaged": {bool: False},
+    "to_default": {bool: False},
+    "pause_type": {hw_types.PauseType: hw_types.PauseType.PAUSE},
+    "req_instr": {
+        Optional[
+            Literal[
+                "p10_single",
+                "p10_multi",
+                "p20_single_gen2",
+                "p20_multi_gen2",
+                "p50_single",
+                "p50_multi",
+                "p50_single_flex",
+                "p50_multi_flex",
+                "p300_single",
+                "p300_multi",
+                "p300_single_gen2",
+                "p300_multi_gen2",
+                "p1000_single",
+                "p1000_single_gen2",
+                "p1000_single_flex",
+                "p1000_multi_flex",
+                "p1000_multi_em_flex",
+                "p1000_96",
+                "p200_96",
+            ]
+        ]: "p1000_single_flex"
+    },
+    "config": {Union[config_types.OT3Config, config_types.RobotConfig]: None},  # CASEY NOTE: we know were serializing these right now, but we need to add them to this test eventually - make a todo?
+    "z_speed": {float: 10.0},
+    "samples_for_baselining": {int: 1},
+    "sample_time_sec": {float: 0.1},
+    "liquid_class": {str: "water"},
+    "acquire_lock": {bool: False},
+    "delta": {ot_types.Point: ot_types.Point(0, 0, 1)},
+    "gantry_load": {config_types.GantryLoad: config_types.GantryLoad.HIGH_THROUGHPUT_1000},
+    "serial_number": {str: "SERIAL123"},
+    "disengage_before_stopping": {bool: False},
+    "moving_axis": {hw_types.Axis: hw_types.Axis.Z_L},
+    "target_pos": {float: 1.0},
+    "pass_settings": {config_types.CapacitivePassSettings: config_types.CapacitivePassSettings(
+            prep_distance_mm=1.0,
+            max_overrun_distance_mm=2.0,
+            speed_mm_per_s=3.0,
+            sensor_threshold_pf=5.0
+        )
+    },
+    "retract_after": {bool: False},
+    "back_left_nozzle": {Optional[str]: "A1"},
+    "front_right_nozzle": {Optional[str]: "H12"},
+    "starting_nozzle": {Optional[str]: "A1"},
+    "jaw_width_mm": {int: 10},
+    "begin": {ot_types.Point: ot_types.Point(0, 0, 0)},
+    "end": {ot_types.Point: ot_types.Point(1, 1, 1)},
+    "speed_mm_s": {float: 5.0},
+    "turn_on": {bool: True},
+    "duty_cycle": {int: 50},
+    "refresh_state": {bool: True},
+    "listener": {Callable[[hw_types.StatusBarUpdateEvent], None]: SKIP_METHOD}, # CASEY NOTE: might be able to ignore because this will go to the proxy ones
+    "cp_override": {Optional[hw_types.CriticalPoint]: hw_types.CriticalPoint.MOUNT},
+    "robot_calibration": {
+        OT3Transforms: OT3Transforms(
+            deck_calibration=DeckCalibration(
+                attitude= [[0.0, 1.0]],
+                source= calibration_types.SourceType.default,
+                status= calibration_types.CalibrationStatus(
+                    markedBad=False,
+                    source=calibration_types.SourceType.default,
+                    markedAt=datetime.now(),
+                ),
+                belt_attitude = None,
+                last_modified = datetime.now(),
+                pipette_calibrated_with = None,
+                tiprack = None,
+            ),
+            carriage_offset=ot_types.Point(1,1,1),
+            left_mount_offset=ot_types.Point(1,1,1),
+            right_mount_offset=ot_types.Point(1,1,1),
+            gripper_mount_offset=ot_types.Point(1,1,1),
+        )
+    },
+    "prep_after": {bool: False},
+    "recalibrate_jaw_width": {bool: False},
+    "uv_duration_s": {int: 1},
+    "max_z_dist": {float: 1.0},
+    "probe_settings": {Optional[config_types.LiquidProbeSettings]: config_types.LiquidProbeSettings(
+            mount_speed=1.0,
+            plunger_speed=2.0,
+            plunger_impulse_time=3.0,
+            sensor_threshold_pascals=4.0,
+            aspirate_while_sensing=False,
+            z_overlap_between_passes_mm=5.0,
+            plunger_reset_offset=6.0,
+            samples_for_baselining=1,
+            sample_time_sec=7.0,
+        )
+    },
+    "force_both_sensors": {bool: False},
+    "response_queue": {
+        Optional[asyncio.Queue[Dict[hw_types.PipetteSensorId, List[hw_types.PipetteSensorData]]]]: None # CASEY NOTE may have to come back to this one
+    },
+    "check_bounds": {hw_types.MotionChecks: hw_types.MotionChecks.NONE},
+    "end_point": {ot_types.Point: ot_types.Point(1, 1, 1)},
+    "movement_delay": {Optional[float]: 0.0},
+    "end_critical_point": {Optional[hw_types.CriticalPoint]: hw_types.CriticalPoint.MOUNT},
+    "tip_volume": {float: 50.0},
 }
 
 async def test_serialization_coverage(
@@ -327,29 +571,40 @@ async def test_serialization_coverage(
                     try:
                         print(f"TRYING KEY: {key} with expected Value: {value}")
                         kwargs[key] = PARAMETERS_MOCK_TABLE[key][value]
+                        # param_entry = PARAMETERS_MOCK_TABLE[key]
+                        # kwargs[key] = param_entry.get(value, param_entry.get(Any))
+                        # if kwargs[key] is None and value not in param_entry and Any not in param_entry:
+                        #     raise KeyError
                         print(f"method: {method} === using KWARGS: {kwargs}")
                     except KeyError:
-                        missing_params_list.append(str(key) + " - " + str(value))
+                        missing_params_list.append("key: " + str(key) + " - type: " + str(value))
                         #raise KeyError(f"Params for key {key} with expected value {value} are missing from the PARAMETERS_MOCK_TABLE.")
                 else:
                     return_type = type(value)
             try:
-                if method in ot3_async_methods.keys():
-                    print(f"CALLING ASYNC METHOD: {method} WITH ARGS: {kwargs}")
-                    result = await ot3_async_wrapped_method(**kwargs)
-                    print(f"async result = {result} return type: {return_type}")
-                    assert isinstance(result, return_type)
-                else:
-                    print(f"CALLING METHOD: {method} WITH ARGS: {kwargs}")
-                    result = ot3_async_wrapped_method(**kwargs)
-                    print(f"result = {result} return type: {result}")
-                    assert isinstance(result, return_type)
+                if SKIP_METHOD not in kwargs.values():
+                    if method in ot3_async_methods.keys():
+                        print(f"CALLING ASYNC METHOD: {method} WITH ARGS: {kwargs}")
+                        result = await ot3_async_wrapped_method(**kwargs)
+                        print(f"async result = {result} return type: {return_type}")
+                        assert isinstance(result, return_type)
+                    else:
+                        print(f"CALLING METHOD: {method} WITH ARGS: {kwargs}")
+                        result = ot3_async_wrapped_method(**kwargs)
+                        print(f"result = {result} return type: {result}")
+                        assert isinstance(result, return_type)
             except Exception as e:
-                if e is errors.SerializeError:
-                    print("IN HERE")
-                    missing_serialization_list.append(e)
+                if "don't know how to serialize" in str(e):
+                    missing_serialization_list.append(str(e))
+                else:
+                    raise ValueError(f"ON METHOD CALL: {method} ERROR: {e}")
     
-    raise ValueError(f"MISSING SERIALIZATIONS: {missing_serialization_list} ----    MISSING PARAMS: {''.join(str(param) + "\n" for param in missing_params_list)}")
+    # CASEY NOTE: move these to the bottom
+    if len(missing_params_list) > 0:
+        raise AttributeError(f"MISSING PARAMS IN MOCK TABLE:\n{''.join(str(param) + "\n" for param in missing_params_list)}")
+    
+    if len(missing_serialization_list) > 0:
+        raise ValueError(f"MISSING SERIALIZATIONS:\n{''.join(str(serializaiton) + "\n" for serializaiton in missing_serialization_list)}")
 
     for attribute in ot3api_proxy._pyroAttrs:
         if attribute not in ot3_proxy_methods:
