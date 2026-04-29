@@ -10,6 +10,7 @@ theme:
 
 extra_css:
   - stylesheets/style.css
+  - ../shared/print-pdf.css
 
 markdown_extensions:
   - toc:
@@ -26,7 +27,15 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
-  - glightbox 
+  - search
+  - autorefs
+  - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: false
+      include_css: false
+      enumerate_headings: false
 
 nav:
   

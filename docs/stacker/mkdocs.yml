@@ -33,3 +33,18 @@ nav:
   - Loading Labware: loading-labware.md
   - Maintenance and Cleaning: maintenance.md
   - Additional Product Information: additional-info.md
+
+plugins:
+  - search
+  - autorefs
+  - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: false
+      include_css: false
+      enumerate_headings: false
+
+extra_css:
+  - ../shared/opentrons-theme.css
+  - ../shared/print-pdf.css

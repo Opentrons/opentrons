@@ -89,6 +89,12 @@ plugins:
   - search
   - autorefs
   - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: false
+      include_css: false
+      enumerate_headings: false
 
 markdown_extensions:
   - admonition
@@ -110,3 +116,4 @@ markdown_extensions:
 extra_css:
   - ../opentrons-theme.css
   - ../python-api.css
+  - ../shared/print-pdf.css
