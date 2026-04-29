@@ -697,6 +697,9 @@ importers:
       ajv:
         specifier: 6.12.3
         version: 6.12.3
+      axios:
+        specifier: ^0.21.1
+        version: 0.21.4
       dateformat:
         specifier: 3.0.3
         version: 3.0.3

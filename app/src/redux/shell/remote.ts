@@ -48,7 +48,8 @@ async function proxyFormData(formData: FormData): Promise<IPCSafeFormData> {
   return result
 }
 
-export async function appShellRequestor<Data>(
+async function doAppShellRequest<Data>(
+  target: 'usb:request' | 'internal-api:request',
   config: AxiosRequestConfig
 ): Promise<AxiosResponse<Data>> {
   const { data } = config
@@ -58,7 +59,7 @@ export async function appShellRequestor<Data>(
       : data
   const configProxy = { ...config, data: formDataProxy }
 
-  const result = await remote.ipcRenderer.invoke('usb:request', configProxy)
+  const result = await remote.ipcRenderer.invoke(target, configProxy)
   if (result?.error != null) {
     throw result.error
   }
@@ -79,6 +80,18 @@ export async function appShellRequestor<Data>(
   }
 
   return result
+}
+
+export async function appShellInternalApiRequestor<Data>(
+  config: AxiosRequestConfig
+): Promise<AxiosResponse<Data>> {
+  return await doAppShellRequest('internal-api:request', config)
+}
+
+export async function appShellUSBRequestor<Data>(
+  config: AxiosRequestConfig
+): Promise<AxiosResponse<Data>> {
+  return await doAppShellRequest('usb:request', config)
 }
 
 interface CallbackStore {
