@@ -1,4 +1,10 @@
-import { ALL, COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  PARTIAL_COLUMN,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 import { getIsSafePipetteMovement } from '@opentrons/step-generation'
 
 import { canPipetteUseLabware } from '../../../../../../utils'
@@ -115,7 +121,11 @@ export function getAllWellsSafetyStatus(
     allWells.flat().forEach(wellName => {
       allWellsWithStatus[wellName] = safe ? 0 : 1
     })
-  } else if (nozzleConfiguration === SINGLE && channels !== 1) {
+  } else if (
+    (nozzleConfiguration === SINGLE ||
+      nozzleConfiguration === PARTIAL_COLUMN) &&
+    channels !== 1
+  ) {
     // SINGLE nozzle for 8ch and 96ch: check every well individually
     allWells.flat().forEach(wellName => {
       const safe = robotState
