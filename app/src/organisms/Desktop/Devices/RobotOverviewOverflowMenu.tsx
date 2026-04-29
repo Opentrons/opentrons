@@ -40,7 +40,6 @@ import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
 import type { MouseEvent, MouseEventHandler } from 'react'
-import type { DevInternalFlag } from '/app/redux/config/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
 
