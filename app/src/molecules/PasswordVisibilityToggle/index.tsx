@@ -24,11 +24,7 @@ export function PasswordVisibilityToggle({
   const { t } = useTranslation('device_settings')
   return (
     <button type="button" onClick={onToggle} className={styles.toggle_button}>
-      <Icon
-        name={isVisible ? 'eye-slash' : 'eye'}
-        size="3rem"
-        data-testid={isVisible ? 'icon_eye-slash' : 'icon_eye'}
-      />
+      <Icon name={isVisible ? 'eye-slash' : 'eye'} size="3rem" />
       <StyledText oddStyle="bodyTextSemiBold">
         {isVisible ? t('hide') : t('show')}
       </StyledText>

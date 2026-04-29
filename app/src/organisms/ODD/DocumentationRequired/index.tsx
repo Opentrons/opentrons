@@ -8,7 +8,15 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './documentationrequired.module.css'
 
-export function DocumentationRequired(): JSX.Element {
+interface DocumentationRequiredProps {
+  userName: string
+  onBack: () => void
+}
+
+export function DocumentationRequired({
+  userName,
+  onBack,
+}: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>('')
   const keyboardRef = useRef(null)
@@ -29,7 +37,7 @@ export function DocumentationRequired(): JSX.Element {
             iconPlacement: 'startIcon',
             onClick: () => {},
           }}
-          onClickBack={() => {}}
+          onClickBack={onBack}
         />
         <div className={styles.content_container}>
           <div className={styles.text_area_container}>
@@ -37,7 +45,7 @@ export function DocumentationRequired(): JSX.Element {
               autoFocus
               value={inputText}
               ref={textAreaRef}
-              label={t('access_control_note', { user: 'John Doe' })}
+              label={t('access_control_note', { user: userName })}
               onChange={e => {
                 setInputText(e.target.value)
               }}

@@ -22,8 +22,3 @@
   bottom: 0;
   left: 0;
 }
-
-.keyboard_container > * {
-  width: 100%;
-  max-width: none;
-}

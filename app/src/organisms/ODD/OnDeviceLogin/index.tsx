@@ -183,7 +183,12 @@ function LoginFieldInput({
   const isPasswordHidden = step === 'password' && !showPassword
   const inputType = isPasswordHidden ? LEGACY_INPUT_TYPE_PASSWORD : 'text'
 
-  const input = (
+  const togglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+    inputRef.current?.focus()
+  }
+
+  const inputField = (
     <InputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={step === 'password'}
@@ -202,17 +207,14 @@ function LoginFieldInput({
     />
   )
 
-  if (step !== 'password') return input
+  if (step !== 'password') return inputField
 
   return (
     <div className={styles.password_field_row}>
-      <div className={styles.password_field_input}>{input}</div>
+      <div className={styles.password_field_input}>{inputField}</div>
       <PasswordVisibilityToggle
         isVisible={showPassword}
-        onToggle={() => {
-          setShowPassword(current => !current)
-          inputRef.current?.focus()
-        }}
+        onToggle={togglePasswordVisibility}
       />
     </div>
   )

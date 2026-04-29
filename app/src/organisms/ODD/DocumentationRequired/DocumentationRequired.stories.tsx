@@ -1,5 +1,6 @@
 import { Provider } from 'react-redux'
 import { legacy_createStore } from 'redux'
+import { action } from 'storybook/actions'
 
 import { VIEWPORT } from '@opentrons/components'
 
@@ -42,6 +43,7 @@ type Story = StoryObj<typeof DocumentationRequiredComponent>
 
 export const DocumentationRequired: Story = {
   args: {
-    robotName: 'otie',
+    userName: 'John Doe',
+    onBack: action('onBack'),
   },
 }
