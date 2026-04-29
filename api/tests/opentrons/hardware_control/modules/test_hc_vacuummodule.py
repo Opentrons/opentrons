@@ -196,7 +196,7 @@ async def test_set_vent_state(
 @pytest.mark.parametrize(
     (
         "enable_vacuum",
-        "guage_pressure_mbar",
+        "gauge_pressure_mbar",
         "duration",
         "timeout",
         "rate",
@@ -211,7 +211,7 @@ async def test_set_vacuum_state(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
     enable_vacuum: bool,
-    guage_pressure_mbar: Optional[float],
+    gauge_pressure_mbar: Optional[float],
     duration: Optional[int],
     timeout: Optional[int],
     rate: Optional[float],
@@ -221,7 +221,7 @@ async def test_set_vacuum_state(
     """Ensure that the hardware controller calls the driver method w the correct arguments."""
     await subject.set_vacuum_state(
         enable_vacuum=enable_vacuum,
-        guage_pressure_mbar=guage_pressure_mbar,
+        gauge_pressure_mbar=gauge_pressure_mbar,
         duration_s=duration,
         timeout_s=timeout,
         rate=rate,
@@ -230,7 +230,7 @@ async def test_set_vacuum_state(
     decoy.verify(
         await mock_driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
-            guage_pressure_mbar=guage_pressure_mbar,
+            gauge_pressure_mbar=gauge_pressure_mbar,
             duration_s=duration,
             timeout_s=timeout,
             rate=rate,
@@ -291,8 +291,8 @@ async def test_update_pump_state(
     "vacuum_state",
     [
         VacuumState(
-            target_guage_pressure=0,
-            current_guage_pressure=0,
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
             pressure_abs_a=0,
             pressure_abs_b=0,
             pressure_atm=0,

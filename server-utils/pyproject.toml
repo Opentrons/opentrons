@@ -16,6 +16,7 @@ dependencies = [
     "python-dotenv==1.0.1",
     "python-multipart==0.0.6",
     "pydantic>2.0.0,<3",
+    "pydantic-settings>=2.0.0,<3",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
@@ -76,6 +77,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/server-utils"

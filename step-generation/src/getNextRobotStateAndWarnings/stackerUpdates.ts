@@ -5,6 +5,7 @@ import {
   HOPPER_STACKER_LOCATION,
 } from '../constants'
 import { flexStackerStateGetter } from '../robotStateSelectors'
+import { getFlexStackerShuttleAddressableArea } from '../utils/misc'
 
 import type {
   FlexStackerEmptyCreateCommand,
@@ -274,6 +275,25 @@ export const forFlexStackerFillItems = (
         ...robotState.labware[group.lidLabwareId],
         stack: bottomUpStack.slice(bottomUpStack.indexOf(group.lidLabwareId)),
       }
+    }
+    let prevLabwareId: string | null = null
+    for (const id of bottomUpStack) {
+      // skip non-labware ids
+      const isLabware = labwareEntities[id] != null
+      if (!isLabware) {
+        continue
+      }
+      if (prevLabwareId == null) {
+        robotState.labware[id].stackedOnNode = {
+          kind: 'inStackerHopper',
+          moduleId,
+        }
+      } else {
+        robotState.labware[id].stackedOnNode = {
+          labwareId: prevLabwareId,
+        }
+      }
+      prevLabwareId = id
     }
   }
 
@@ -557,16 +577,34 @@ export const forFlexStackerRetrieve = (
       // remove the shuttle group from the hopper
       labwareInHopper.shift()
 
-      // build labware stacks on the deck
+      // build labware stacks on the deck (bottom-up pool order: adapter → primary → lid)
       const runningStack = [moduleSlot]
+      let prevLabwareInShuttleStack: string | null = null
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
-        const labwareId =
+        const pieceId =
           labwareGroupOnShuttle[
             labwarePoolKey as keyof FlexStackerStoredLabwareGroup
           ]
-        if (labwareId != null) {
-          runningStack.unshift(labwareId)
-          robotState.labware[labwareId].stack = [...runningStack]
+        if (pieceId != null) {
+          runningStack.unshift(pieceId)
+          robotState.labware[pieceId].stack = [...runningStack]
+          if (prevLabwareInShuttleStack == null) {
+            const shuttleAA = getFlexStackerShuttleAddressableArea(moduleSlot)
+            if (shuttleAA != null) {
+              robotState.labware[pieceId].stackedOnNode = {
+                addressableAreaName: shuttleAA,
+              }
+            } else {
+              console.warn(
+                `Could not find an addressable area for retrieved labware in stacker module ${moduleId} at slot ${moduleSlot}`
+              )
+            }
+          } else {
+            robotState.labware[pieceId].stackedOnNode = {
+              labwareId: prevLabwareInShuttleStack,
+            }
+          }
+          prevLabwareInShuttleStack = pieceId
         }
       }
     }
@@ -592,6 +630,7 @@ export const forFlexStackerStore = (
       moduleState.labwareOnShuttle = null
 
       // build trivial stacks for stored labware group elements
+      let prevLabwareId: string | null = null
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareOnShuttle[
@@ -605,6 +644,17 @@ export const forFlexStackerStore = (
             moduleId,
             moduleSlot,
           ]
+          if (prevLabwareId == null) {
+            robotState.labware[labwareId].stackedOnNode = {
+              kind: 'inStackerHopper',
+              moduleId,
+            }
+            prevLabwareId = labwareId
+          } else {
+            robotState.labware[labwareId].stackedOnNode = {
+              labwareId: prevLabwareId,
+            }
+          }
         }
       }
       // if there are no stored labware details, set them now

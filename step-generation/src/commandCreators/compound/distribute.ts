@@ -405,10 +405,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
       })
     )
   }
-  if (errors.length > 0)
+  if (errors.length > 0) {
     return {
       errors,
     }
+  }
   const { tipracks } = getNextTiprack(
     pipette,
     tiprackURI,

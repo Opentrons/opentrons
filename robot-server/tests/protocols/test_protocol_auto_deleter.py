@@ -41,7 +41,7 @@ def test_make_room_for_new_protocol(
     deletion_plan = set(["protocol-id-4", "protocol-id-5"])
 
     stored_protocol_resources = [
-        ProtocolResource(
+        ProtocolResource.model_construct(
             protocol_id=p.protocol_id,
             created_at=datetime(year=2020, month=1, day=1),
             source=mock_protocol_source,
@@ -91,7 +91,7 @@ def test_make_room_for_new_quick_transfer_protocol(
     ]
 
     stored_protocol_resources = [
-        ProtocolResource(
+        ProtocolResource.model_construct(
             protocol_id=p.protocol_id,
             created_at=datetime(year=2020, month=1, day=1),
             source=mock_protocol_source,
