@@ -144,6 +144,12 @@ class UserDataManager:
             full_name=new_full_name,
             account_type=new_account_type,
         )
+        if (
+            new_username is not None
+            and new_username != username_to_update
+            and self._user_store.get(new_username) is not None
+        ):
+            raise UserAlreadyExistsError(f"User {new_username!r} already exists")
         try:
             if new_locked is not None and not new_locked:
                 # Note: do this BEFORE the username is potentially changed
