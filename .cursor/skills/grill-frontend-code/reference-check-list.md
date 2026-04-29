@@ -2,7 +2,7 @@
 
 ## TypeScript
 
-### type safe
+### Type safety
 
 - Check that the changes do not use the TypeScript `any` type.
 - Use strict equality/inequality checks for non-optional nullable types.
