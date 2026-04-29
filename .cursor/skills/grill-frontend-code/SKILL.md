@@ -1,6 +1,6 @@
 ---
 name: grill-frontend-code
-description:
+description: Review frontend code changes for component quality, test coverage, bugs, maintainability, and consistency with project patterns.
 ---
 
 ## Review target
