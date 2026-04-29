@@ -668,7 +668,7 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
                 if "serialize" in str(e):
                     missing_serialization_list.append(str(e))
                 else:
-                    alternative_errors_list.append(f" Method {method} encountered: "+str(e))
+                    alternative_errors_list.append(f"Method {method} encountered: "+str(e))
     
     # COLLECT ALL THE INFORMATION ON THE EXPOSED PROPERTIES
     for attribute in proxy._pyroAttrs:
@@ -756,12 +756,12 @@ async def test_serialization_coverage(
     )
 
     # Check the OT3API process for serialization, parameter or alternative errors
-    #ot3_error_collection = await _collect_proxy_attribute_information(original_class=OT3API, acpo_instance=ot3api)
-    #_raise_if_errors(process="OT3API", error_collection=ot3_error_collection)
+    ot3_error_collection = await _collect_proxy_attribute_information(original_class=OT3API, acpo_instance=ot3api)
+    _raise_if_errors(process="OT3API", error_collection=ot3_error_collection)
 
     # Check the ROBOT-SERVER process for serialization, parameter or alternative errors
-    # robot_server_error_collection = await _collect_proxy_attribute_information(original_class=pyro_resource.RobotServerPyroResource, acpo_instance=robot_server)
-    # _raise_if_errors(process="ROBOT-SERVER", error_collection=robot_server_error_collection)
+    robot_server_error_collection = await _collect_proxy_attribute_information(original_class=pyro_resource.RobotServerPyroResource, acpo_instance=robot_server)
+    _raise_if_errors(process="ROBOT-SERVER", error_collection=robot_server_error_collection)
 
     # Check the DIRECTED-RUN process for serialization, parameter or alternative errors
     directed_run_error_collection = await _collect_proxy_attribute_information(original_class=DirectedRunProcess, acpo_instance=run_process)
