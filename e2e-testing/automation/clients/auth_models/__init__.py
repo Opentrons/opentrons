@@ -6,6 +6,7 @@ from automation.clients.auth_models.introspection import TokenIntrospectionRespo
 from automation.clients.auth_models.oauth import TokenResponse
 from automation.clients.auth_models.openapi import OpenApiDocument, OpenApiInfo
 from automation.clients.auth_models.settings import (
+    AccessControlInvalidPatchRequestEnvelope,
     AccessControlPatchData,
     AccessControlPatchRequestEnvelope,
     AccessControlResponseData,
@@ -27,6 +28,7 @@ from automation.clients.auth_models.user import (
 )
 
 __all__ = [
+    "AccessControlInvalidPatchRequestEnvelope",
     "AccessControlPatchData",
     "AccessControlPatchRequestEnvelope",
     "AccessControlResponseData",

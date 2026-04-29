@@ -65,7 +65,7 @@ class SettingsPatchRequestEnvelope(TypedDict):
 
 
 class AccessControlPatchData(TypedDict):
-    """Inner ``data`` for PATCH ``/auth/settings/accessControlEnabled``."""
+    """Inner ``data`` for PATCH ``/auth/settings/accessControlEnabled`` (valid body)."""
 
     accessControlEnabled: Literal[True]
 
@@ -74,6 +74,18 @@ class AccessControlPatchRequestEnvelope(TypedDict):
     """Top-level **request** JSON for PATCH ``/auth/settings/accessControlEnabled``."""
 
     data: AccessControlPatchData
+
+
+class AccessControlInvalidPatchData(TypedDict):
+    """Inner ``data`` the API rejects (only ``true`` is accepted); for negative tests."""
+
+    accessControlEnabled: Literal[False]
+
+
+class AccessControlInvalidPatchRequestEnvelope(TypedDict):
+    """Envelope for an invalid PATCH ``/auth/settings/accessControlEnabled`` body."""
+
+    data: AccessControlInvalidPatchData
 
 
 class AccessControlResponseData(BaseModel):

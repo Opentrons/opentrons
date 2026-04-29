@@ -18,6 +18,7 @@ import httpx
 from pydantic import TypeAdapter, ValidationError
 
 from automation.clients.auth_models import (
+    AccessControlInvalidPatchRequestEnvelope,
     AccessControlPatchRequestEnvelope,
     AccessControlResponseData,
     AccessControlResponseEnvelope,
@@ -233,7 +234,7 @@ class AuthClient:
         token: TokenResponse,
     ) -> httpx.Response:
         """PATCH /auth/settings/accessControlEnabled without raising (for asserting error status codes)."""
-        body: AccessControlPatchRequestEnvelope = {
+        body: AccessControlInvalidPatchRequestEnvelope = {
             "data": {"accessControlEnabled": False},
         }
         return await self._client.patch(
