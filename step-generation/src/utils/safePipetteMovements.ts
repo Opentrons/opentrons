@@ -72,9 +72,9 @@ interface SlotInfo {
   position: CoordinateTuple | null
 }
 
-export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
+export const getCutoutFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
   if (slotInfo.addressableArea?.areaType === 'slot') {
-    const testCutoutId = `cutoutId${slotInfo.addressableArea?.id}`
+    const testCutoutId = `cutout${slotInfo.addressableArea?.id}`
     if (testCutoutId as CutoutId) {
       return testCutoutId as CutoutId
     }
@@ -186,7 +186,7 @@ const getHighestZInSlot = (
       moduleId => modules[moduleId].slot === slotId
     )
     const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
-      wasteChute => wasteChute.location === getCutoutIdFromSlot(slotInfo)
+      wasteChute => wasteChute.location === getCutoutFromSlot(slotInfo)
     )
     // if slot has waste chute
     if (wasteChuteInSlot) {
@@ -243,12 +243,14 @@ const getSlotHasPotentialCollidingObject = (
       y: slotPosition[1],
       z: slotPosition[2],
     }
-    // Check for overlapping rectangles and pipette z-coordinate if slot overlaps with pipette bounds
-    if (
-      getHasOverlappingRectangles(
+    const willCollide =  getHasOverlappingRectangles(
         [pipetteBounds[0], pipetteBounds[1]],
         [backLeftCoords, frontRightCoords]
-      ) &&
+      )
+    console.log("🚀 ~ getSlotHasPotentialCollidingObject ~ willCollide:", willCollide)
+    // Check for overlapping rectangles and pipette z-coordinate if slot overlaps with pipette bounds
+    if (
+      willCollide &&
       pipetteBounds[0].z != null
     ) {
       const highestZInSurroundingSlot = getHighestZInSlot(
@@ -257,6 +259,7 @@ const getSlotHasPotentialCollidingObject = (
         slot,
         robotType
       )
+      console.log("🚀 ~ getSlotHasPotentialCollidingObject ~ highestZInSurroundingSlot:", highestZInSurroundingSlot)
 
       if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
         return true
