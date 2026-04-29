@@ -72,9 +72,9 @@ interface SlotInfo {
   position: CoordinateTuple | null
 }
 
-export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
+export const getCutoutFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
   if (slotInfo.addressableArea?.areaType === 'slot') {
-    const testCutoutId = `cutoutId${slotInfo.addressableArea?.id}`
+    const testCutoutId = `cutout${slotInfo.addressableArea?.id}`
     if (testCutoutId as CutoutId) {
       return testCutoutId as CutoutId
     }
@@ -186,7 +186,7 @@ const getHighestZInSlot = (
       moduleId => modules[moduleId].slot === slotId
     )
     const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
-      wasteChute => wasteChute.location === getCutoutIdFromSlot(slotInfo)
+      wasteChute => wasteChute.location === getCutoutFromSlot(slotInfo)
     )
     // if slot has waste chute
     if (wasteChuteInSlot) {
