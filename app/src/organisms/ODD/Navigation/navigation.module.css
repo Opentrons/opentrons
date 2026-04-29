@@ -34,13 +34,7 @@
   flex: 1;
   flex-direction: row;
   align-items: flex-start;
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 0%,
-    black 96.5%,
-    transparent 100%
-  );
+  mask-image: linear-gradient(to left, transparent 0%, black 100px, black 100%);
   overflow-x: scroll;
 }
 
