@@ -243,13 +243,12 @@ const getSlotHasPotentialCollidingObject = (
       y: slotPosition[1],
       z: slotPosition[2],
     }
-    const willCollide =  getHasOverlappingRectangles(
-        [pipetteBounds[0], pipetteBounds[1]],
-        [backLeftCoords, frontRightCoords]
-      )
     // Check for overlapping rectangles and pipette z-coordinate if slot overlaps with pipette bounds
     if (
-      willCollide &&
+      getHasOverlappingRectangles(
+        [pipetteBounds[0], pipetteBounds[1]],
+        [backLeftCoords, frontRightCoords]
+      ) &&
       pipetteBounds[0].z != null
     ) {
       const highestZInSurroundingSlot = getHighestZInSlot(
