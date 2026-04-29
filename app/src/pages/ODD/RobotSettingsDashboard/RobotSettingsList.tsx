@@ -197,7 +197,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="privacy"
         />
-        {devInternalFlags.accessControlMode ? (
+        {devInternalFlags?.accessControlMode ? (
           <RobotSettingButton
             settingName={t('robot_encryption_key')}
             dataTestId="RobotSettingButton_encryption"
