@@ -49,11 +49,16 @@ const handleFormData = (
   return { data, formHeaders: {} }
 }
 
-const INTERNAL_HOSTS = {
+interface Hosts {
+  'key-server': string
+}
+type InternalHost = keyof Hosts
+
+const internalHosts: () => Hosts = () => ({
   'key-server':
     env.ODD_key_server_host ?? 'socket:///run/opentrons-key-server.sock',
-} as const
-type InternalHost = keyof typeof INTERNAL_HOSTS
+})
+
 const INTERNAL_ROUTES: Array<[RegExp, InternalHost]> = [
   [/^\/keys\/internal\/.*$/, 'key-server'],
 ]
@@ -66,9 +71,9 @@ const mapUrlToInternalRoute = (url: string): InternalHost | null =>
   )
 
 const mapInternalRouteToAxiosDetails = (
-  host: keyof typeof INTERNAL_HOSTS
+  host: InternalHost
 ): { socketPath?: string; baseURL?: string; port?: string } => {
-  const internalRoute = new URL(INTERNAL_HOSTS[host])
+  const internalRoute = new URL(internalHosts()[host])
   if (internalRoute.protocol === 'socket:') {
     internalApiLog.silly(
       `mapped internal route for ${host} to socket path ${internalRoute}`
@@ -81,7 +86,7 @@ const mapInternalRouteToAxiosDetails = (
   return { port: internalRoute.port, baseURL: 'http://' + internalRoute.host }
 }
 
-const mapRequestToInternalConfig = (
+export const mapRequestToInternalConfig = (
   config: AxiosRequestConfig
 ): AxiosRequestConfig => {
   if (config.url == null) {
