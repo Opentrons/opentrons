@@ -33,7 +33,7 @@ import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
-import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
+import { HighlightOffDeckSlot } from './HighlightOffDeckSlot'
 import { OffDeckControls } from './OffDeckControls'
 
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
@@ -143,7 +143,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                       </>
                     )}
                   </RobotWorkSpace>
-                  <HighlightOffdeckSlot
+                  <HighlightOffDeckSlot
                     labwareOnDeck={lw}
                     position={ZERO_SLOT_POSITION}
                   />
@@ -167,7 +167,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                 </Flex>
               )
             })}
-            <HighlightOffdeckSlot position={ZERO_SLOT_POSITION} />
+            <HighlightOffDeckSlot position={ZERO_SLOT_POSITION} />
           </LabwareWrapper>
         </Flex>
       </Flex>

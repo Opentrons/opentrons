@@ -235,7 +235,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     prepImage,
     inProgressImage,
   } = infoByMovement[movement]
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={
@@ -253,6 +253,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         }
       />
     )
+  }
 
   return errorMessage != null ? (
     <SimpleWizardBody

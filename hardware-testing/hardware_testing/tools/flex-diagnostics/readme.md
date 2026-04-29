@@ -49,6 +49,110 @@ set-ntp = Sets the ntp server to the value specified or default.<br>
 
   ```
 
+## The `migrate` command:
+    Tools to migrate user information like protocols, data, etc from one Flex to another.
+
+The `migrate` takes one of the following sub-actions
+
+- `backup` : Creates a migration tarball of user data like /var/lib, /data, and other important dirs + metadata.json
+- `restore` : Takes in a migration tarball created with the `backup` command, inflates it on the target, and rebots it.
+- `backup-local` : Same as `backup` but runs locally on the Flex from a usb thumbdrive.
+- `restore-local` : Same as `restore` but runs locally on the Flex from a usb thumbdrive.
+- `analyze`: Print the metadata of a migration tarball created with the `backup` command
+
+### backup
+The `backup` sub-action takes in `created_by` and an optional `note` argument in the following format
+These are both strings and can be whatever you want, but the created_by is intended to have the name of the person creating the backup; the note argument can have whatever. Note that the double quotes are required for both arguments.
+
+Remote Example:
+```bash
+./flex_diagnostics migrate backup <source-ip> "<created_by>" "[note]"
+./flex_diagnostics migrate backup 192.168.1.1 "Opentrons Support" "Case #: 12345, Replaced on April 1, 2026"
+```
+
+Local Example:
+```bash
+./flex_diagnostics migrate backup-local "<created_by>" "[note]"
+./flex_diagnostics migrate backup-local "Opentrons Support Local" "Case #: 12345, Replaced on April 1, 2026"
+```
+
+This generates a tarball in the following format `<robot_name>_<datetime>_migrate.tar.gz`, i.e., `TESTROBOT_2026_04_25_19_49_39_migrate.tar.gz`.
+
+### restore
+The `restore` sub-action takes in a migration-tarball argument, which is the tarfile created by the `backup` sub-action.
+
+Remote Example:
+```bash
+./flex_diagnostics migrate restore <target-ip> <migration-tarball.tar.gz>
+./flex_diagnostics migrate restore 192.168.1.1 TESTROBOT_2026_04_25_19_49_39_migrate.tar.gz
+```
+
+Local Example:
+```bash
+./flex_diagnostics migrate restore-local <migration-tarball.tar.gz>
+./flex_diagnostics migrate restore-local TESTROBOT_2026_04_25_19_49_39_migrate.tar.gz
+```
+
+Note: You will be asked to confirm your actions before continuing.
+```bash
+⚠️  WARNING: This will OVERWRITE the following on the target robot:
+   • /data
+   • /userfs
+   • /var/lib/opentrons-robot-server
+   • /var/lib/opentrons-system-server
+
+Continue with restore? (y/N)
+```
+
+### analyze
+The `analyze` sub-action prints the contents of the metadata in the migration tarball created by the `backup` sub-action.
+
+Example:
+```bash
+./flex_diagnostics migrate analyze <migration-tarball.tar.gz>"
+./flex_diagnostics migrate analyze TESTROBOT_2026_04_25_19_49_39_migrate.tar.gz"
+```
+
+The metadata.json file contains information about the migration, including the robot it was created from.
+```
+{
+  "created_by": "brayan almonte",
+  "backup_date": "2026-04-25 19:49:39 UTC",
+  "note": "TEST NOTES",
+  "robot_serial": "TESTROBOT",
+  "robot_name": "TESTROBOT",
+  "version_file": {
+    "robot_type": "OT-3 Standard",
+    "build_type": "develop",
+    "openembedded_version": "v0.9.14-27-g2bc6ea52",
+    "openembedded_sha": "2bc6ea52ce6d45081cbcc19b8ccb0acbc1338537",
+    "openembedded_branch": "main",
+    "opentrons_api_version": "9.0.0",
+    "opentrons_api_sha": "cec17768757679758f07f28cd9295417b4a90878",
+    "opentrons_api_branch": "edge",
+    "auth_server_version": "9.0.0",
+    "auth_server_sha": "cec17768757679758f07f28cd9295417b4a90878",
+    "auth_server_branch": "edge",
+    "firmware_version": "v68-3-g5aa35919",
+    "firmware_sha": "5aa35919ae63a90d52c53258d6b5258f5fdcf02f",
+    "firmware_branch": "main",
+    "robot_server_version": "9.0.0",
+    "robot_server_sha": "cec17768757679758f07f28cd9295417b4a90878",
+    "robot_server_branch": "edge",
+    "system_server_version": "9.0.0",
+    "system_server_sha": "cec17768757679758f07f28cd9295417b4a90878",
+    "system_server_branch": "edge",
+    "update_server_version": "9.0.0",
+    "update_server_sha": "cec17768757679758f07f28cd9295417b4a90878",
+    "update_server_branch": "edge",
+    "usb_bridge_version": "9.0.0",
+    "usb_bridge_sha": "cec17768757679758f07f28cd9295417b4a90878",
+    "usb_bridge_branch": "edge"
+  }
+}
+```
+
+
 ## Manually copy a tarball to a thumbdrive
   1. ssh to the robot
     `ssh root@10.14.10.57`<br>

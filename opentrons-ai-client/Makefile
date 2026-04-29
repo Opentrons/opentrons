@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm exec bin):$(PATH)
 
 # dev server port
 PORT ?= 5173
@@ -26,11 +26,11 @@ all: clean build-$(target)
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm install
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # artifacts
 #####################################################################
@@ -38,18 +38,18 @@ clean:
 .PHONY: build-production
 build-production: export NODE_ENV := production
 build-production:
-	vite build
+	pnpm exec vite build
 	git rev-parse HEAD > dist/.commit
 
 .PHONY: build-staging
 build-staging: export NODE_ENV := staging
 build-staging:
-	vite build
+	pnpm exec vite build
 	git rev-parse HEAD > dist/.commit
 
 .PHONY: build
 build:
-	vite build
+	pnpm exec vite build
 
 # development
 #####################################################################
@@ -58,12 +58,12 @@ build:
 dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
 dev:
-	vite serve
+	pnpm exec vite serve
 
 # production assets server
 .PHONY: serve
 serve: all
-	vite preview
+	pnpm exec vite preview
 
 .PHONY: test
 test:
@@ -83,4 +83,4 @@ prod-deploy:
 
 .PHONY: format-md-json
 format-md-json:
-	yarn prettier --ignore-path .eslintignore --write **/*.md **/*.json
+	pnpm exec prettier --ignore-path .eslintignore --write **/*.md **/*.json

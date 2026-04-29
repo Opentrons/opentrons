@@ -1,11 +1,32 @@
 """Command models for Vacuum Module commands."""
 
-from .start_set_vacuum import (
-    StartSetVacuum,
-    StartSetVacuumCommandType,
-    StartSetVacuumCreate,
-    StartSetVacuumParams,
-    StartSetVacuumResult,
+from .close_vent import (
+    CloseVent,
+    CloseVentCommandType,
+    CloseVentCreate,
+    CloseVentParams,
+    CloseVentResult,
+)
+from .open_vent import (
+    OpenVent,
+    OpenVentCommandType,
+    OpenVentCreate,
+    OpenVentParams,
+    OpenVentResult,
+)
+from .start_set_vacuum_power import (
+    StartSetVacuumPower,
+    StartSetVacuumPowerCommandType,
+    StartSetVacuumPowerCreate,
+    StartSetVacuumPowerParams,
+    StartSetVacuumPowerResult,
+)
+from .start_set_vacuum_pressure import (
+    StartSetVacuumPressure,
+    StartSetVacuumPressureCommandType,
+    StartSetVacuumPressureCreate,
+    StartSetVacuumPressureParams,
+    StartSetVacuumPressureResult,
 )
 from .stop_vacuum import (
     StopVacuum,
@@ -22,10 +43,28 @@ __all__ = [
     "StopVacuumCreate",
     "StopVacuumParams",
     "StopVacuumResult",
-    # start set vacuum command models
-    "StartSetVacuum",
-    "StartSetVacuumCommandType",
-    "StartSetVacuumCreate",
-    "StartSetVacuumParams",
-    "StartSetVacuumResult",
+    # start set vacuum pressure command models
+    "StartSetVacuumPressure",
+    "StartSetVacuumPressureCommandType",
+    "StartSetVacuumPressureCreate",
+    "StartSetVacuumPressureParams",
+    "StartSetVacuumPressureResult",
+    # start set vacuum power command models
+    "StartSetVacuumPower",
+    "StartSetVacuumPowerCommandType",
+    "StartSetVacuumPowerCreate",
+    "StartSetVacuumPowerParams",
+    "StartSetVacuumPowerResult",
+    # open vent command models
+    "OpenVent",
+    "OpenVentCommandType",
+    "OpenVentCreate",
+    "OpenVentParams",
+    "OpenVentResult",
+    # close vent command models
+    "CloseVent",
+    "CloseVentCommandType",
+    "CloseVentCreate",
+    "CloseVentParams",
+    "CloseVentResult",
 ]

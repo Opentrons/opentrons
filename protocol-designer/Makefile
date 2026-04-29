@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overridden when make is invoked to customize the
 # behavior of jest
@@ -16,23 +16,23 @@ test_opts ?=
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm install
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # artifacts
 #####################################################################
 
-.PHONY: build
-build: export NODE_ENV := production
-build: export NODE_OPTIONS := --max-old-space-size=8192
-build:
+.PHONY: dist
+dist: export NODE_ENV := production
+dist: export NODE_OPTIONS := --max-old-space-size=5120
+dist:
 	vite build
 	git rev-parse HEAD > dist/.commit
 
@@ -62,4 +62,4 @@ test-cov:
 # analyze bundle
 .PHONY: bundle-analyzer
 bundle-analyzer:
-	ANALYZE_DEBUG=true make build
+	ANALYZE_DEBUG=true make dist

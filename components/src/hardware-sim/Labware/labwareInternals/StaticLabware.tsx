@@ -160,6 +160,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                           type={statusByWellName[wellName] as WellType}
                           parentType={LABWARE}
                           wellName={wellName}
+                          size={wellWidth.toString()}
                         />
                       )}
                     </svg>

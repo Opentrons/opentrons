@@ -1,26 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
 
+import { useActivityListener } from './useActivityListener'
+
 const USER_EVENTS: Array<keyof DocumentEventMap> = [
-  'click',
-  'dblclick',
-  'keypress',
-  'mousemove',
-  'pointerover',
-  'pointerenter',
-  'pointerdown',
-  'pointermove',
-  'pointerout',
-  'pointerleave',
-  'scroll',
-  'touchmove',
-  'touchstart',
   'mousedown',
+  'click',
+  'scroll',
 ]
 
 const DEFAULT_OPTIONS = {
-  events: USER_EVENTS,
   initialState: true,
 }
 
@@ -28,46 +18,48 @@ const DEFAULT_OPTIONS = {
  * React hook to check user events
  *
  * @param {number} idleTime (idle time)
- * @param {object} options (events that the app need to check, initialState: initial state true => idle)
+ * @param {object} options (initialState: initial state true => idle)
  * @returns {boolean}
  */
 export function useScreenIdle(
   idleTime: number,
   options?: Partial<{
-    events: Array<keyof DocumentEventMap>
     initialState: boolean
   }>
 ): boolean {
-  const { events, initialState } = { ...DEFAULT_OPTIONS, ...options }
+  const { initialState } = { ...DEFAULT_OPTIONS, ...options }
   const [idle, setIdle] = useState<boolean>(initialState)
   const idleTimer = useRef<number>()
 
-  useEffect(() => {
-    const handleEvents = (): void => {
-      setIdle(false)
+  const startOrResetTimer = useCallback(() => {
+    if (idleTimer.current != null) {
+      window.clearTimeout(idleTimer.current)
+    }
+    // See RQA-3813 and associated PR.
+    if (idleTime !== SLEEP_NEVER_MS) {
+      idleTimer.current = window.setTimeout(() => {
+        setIdle(true)
+      }, idleTime)
+    }
+  }, [idleTime])
 
+  // Start the initial timer when we mount.
+  // Clear any ongoing timer when we unmount.
+  useEffect(() => {
+    startOrResetTimer()
+    return () => {
       if (idleTimer.current != null) {
         window.clearTimeout(idleTimer.current)
       }
-
-      // See RQA-3813 and associated PR.
-      if (idleTime !== SLEEP_NEVER_MS) {
-        idleTimer.current = window.setTimeout(() => {
-          setIdle(true)
-        }, idleTime)
-      }
     }
+  }, [startOrResetTimer])
 
-    events.forEach(event => {
-      document.addEventListener(event, handleEvents)
-    })
-
-    return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, handleEvents)
-      })
-    }
-  }, [events, idleTime])
+  // Reset the timer whenever there's user activity.
+  const handleActivity = useCallback(() => {
+    setIdle(false)
+    startOrResetTimer()
+  }, [startOrResetTimer])
+  useActivityListener(handleActivity, USER_EVENTS)
 
   return idle
 }

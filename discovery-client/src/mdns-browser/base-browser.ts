@@ -1,9 +1,11 @@
-import { createBrowser, ServiceType, tcp } from 'mdns-js'
+import * as mdns from 'mdns-js'
 
 import type {
   Browser as BaseBrowser,
   BrowserService as BaseBrowserService,
 } from 'mdns-js'
+
+const { createBrowser, ServiceType, tcp } = mdns
 
 export type { BaseBrowser, BaseBrowserService }
 

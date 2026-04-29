@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-03-30T18:51:23.928817Z"
+exclude-newer = "2026-04-03T21:12:31.645921Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -1639,6 +1639,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "idna" },
     { name = "pydantic" },
+    { name = "pydantic-settings" },
     { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "sqlalchemy" },
@@ -1655,6 +1656,7 @@ requires-dist = [
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "idna", specifier = "==3.3" },
     { name = "pydantic", specifier = ">2.0.0,<3" },
+    { name = "pydantic-settings", specifier = ">=2.0.0,<3" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "python-multipart", specifier = "==0.0.6" },
     { name = "sqlalchemy", specifier = ">=1.4.51,<3" },

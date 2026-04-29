@@ -1,8 +1,6 @@
 """Tests for OT3 calibration."""
 
-import copy
 import json
-from dataclasses import replace
 from math import isclose
 from typing import Any, AsyncIterator, Iterator, Literal, Tuple
 
@@ -136,14 +134,15 @@ def mock_data_analysis() -> Iterator[Mock]:
 def _update_edge_sense_config(
     old: OT3CalibrationSettings, **new_edge_sense_settings: Any
 ) -> OT3CalibrationSettings:
-    return replace(old, edge_sense=replace(old.edge_sense, **new_edge_sense_settings))
+    edge_sense = old.edge_sense.model_copy(update=new_edge_sense_settings)
+    return old.model_copy(update={"edge_sense": edge_sense})
 
 
 @pytest.fixture
 async def override_cal_config(
     ot3_hardware: ThreadManager[OT3API],
 ) -> AsyncIterator[None]:
-    old_calibration = copy.deepcopy(ot3_hardware.config.calibration)
+    old_calibration = ot3_hardware.config.calibration
     await ot3_hardware.update_config(
         calibration=_update_edge_sense_config(
             old_calibration,
