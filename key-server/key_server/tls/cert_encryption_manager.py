@@ -34,7 +34,7 @@ class CertEncryptionManager:
     def __init__(
         self,
         keygen_task: "asyncio.Task[cryptography_utils.FernetKey]",
-        password_size: int,
+        password_size_words: int,
         password_timestep_s: int,
         t0: datetime,
     ) -> None:
@@ -47,22 +47,24 @@ class CertEncryptionManager:
         )
         self._current_key: UnusedEncryptionKey | UsedEncryptionKey | None = None
         self._previous_key: UsedEncryptionKey | None = None
-        self._password_size = password_size
+        self._password_size_words = password_size_words
         self._password_timestep_s = password_timestep_s
         self._t0 = t0
 
     @classmethod
     async def create(
         cls: Type[Self],
-        password_size: int,
+        password_size_words: int,
         password_timestep_s: int,
         now: datetime | None = None,
     ) -> Self:
         """Create a cert encryption manager with an initial key generation task."""
-        keygen_task = asyncio.create_task(cls._create_key(password_size), name="keygen")
+        keygen_task = asyncio.create_task(
+            cls._create_key(password_size_words), name="keygen"
+        )
         return cls(
             keygen_task,
-            password_size,
+            password_size_words,
             password_timestep_s,
             now or datetime.now(timezone.utc),
         )
@@ -129,7 +131,7 @@ class CertEncryptionManager:
         # if we don't have a new key cooking, start one
         if not self._keygen_task:
             self._keygen_task = asyncio.create_task(
-                self._create_key(self._password_size), name="keygen"
+                self._create_key(self._password_size_words), name="keygen"
             )
 
         # if we don't have a current key, get one
@@ -140,7 +142,7 @@ class CertEncryptionManager:
         if not self._keygen_task:
             LOG.info("CA cert encryption key background generation miss")
             self._keygen_task = asyncio.create_task(
-                self._create_key(self._password_size), name="keygen"
+                self._create_key(self._password_size_words), name="keygen"
             )
         try:
             return await self._keygen_task
@@ -149,7 +151,7 @@ class CertEncryptionManager:
             raise
         finally:
             self._keygen_task = asyncio.create_task(
-                self._create_key(self._password_size), name="keygen"
+                self._create_key(self._password_size_words), name="keygen"
             )
 
     def _discretize_now(self, now: datetime) -> datetime:

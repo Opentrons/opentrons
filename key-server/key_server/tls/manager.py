@@ -79,7 +79,7 @@ class TLSManager:
             rotate_fn=rotators[terminator_reload],
         )
         cert_encryptor = await CertEncryptionManager.create(
-            password_size=cert_password_length_words,
+            password_size_words=cert_password_length_words,
             password_timestep_s=cert_password_rotation_time_s,
         )
 

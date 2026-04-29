@@ -15,7 +15,7 @@ from key_server.tls.cert_encryption_manager import CertEncryptionManager
 
 
 @pytest.fixture
-def password_size() -> int:
+def password_size_words() -> int:
     """The number of words for a password."""
     return 3
 
@@ -34,12 +34,14 @@ def t0() -> datetime:
 
 @pytest.fixture
 async def subject(
-    password_size: int,
+    password_size_words: int,
     password_timestep_s: int,
     t0: datetime,
 ) -> CertEncryptionManager:
     """A CertEncryptionManager set up with a keygen task."""
-    return await CertEncryptionManager.create(password_size, password_timestep_s, t0)
+    return await CertEncryptionManager.create(
+        password_size_words, password_timestep_s, t0
+    )
 
 
 async def test_current_pass_refreshes(
