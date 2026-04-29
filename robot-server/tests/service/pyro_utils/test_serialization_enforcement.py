@@ -650,7 +650,7 @@ async def test_serialization_coverage(
 
     # Check the DIRECTED-RUN process for serialization, parameter or alternative errors
     directed_run_error_collection = await _collect_proxy_attribute_information(original_class=DirectedRunProcess, acpo_instance=run_process)
-    _raise_if_errors(process="DIRECTED-RUN", error_collection=robot_server_error_collection)
+    _raise_if_errors(process="DIRECTED-RUN", error_collection=directed_run_error_collection)
 
     # Clean up client resources.
     run_process_proxy._pyroRelease()  # type: ignore
