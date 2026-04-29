@@ -18,12 +18,12 @@
 
 .keyboard_container {
   position: fixed;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
 }
 
 .keyboard_container > * {
-  max-width: none;
   width: 100%;
+  max-width: none;
 }
