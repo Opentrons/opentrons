@@ -11,52 +11,10 @@ const promisifiedPBKDF = promisify(pbkdf2)
 
 const knownCertificates = new Map<string, X509Certificate>()
 
-function encodeFingerprint(
-  fingerprint: string,
-  algorithm: 'sha1' | 'sha256' | 'sha512'
-): string {
-  const fingerprintBuffer = Buffer.from(fingerprint.replaceAll(':', ''), 'hex')
-  const encoded = `${algorithm}/${fingerprintBuffer.toString('base64')}`
-  log.silly(
-    `${algorithm} fingerprint encoding: original string ${fingerprint} bytes ${fingerprintBuffer.toString('hex')} encoded ${encoded}`
-  )
-  return encoded
-}
-
-function certificateFingerprintForAlgorithm(
-  certificate: X509Certificate,
-  algorithm: 'sha1' | 'sha256' | 'sha512'
-): string {
-  if (algorithm === 'sha1') {
-    return certificate.fingerprint
-  }
-  if (algorithm === 'sha256') {
-    return certificate.fingerprint256
-  }
-  if (algorithm === 'sha512') {
-    return certificate.fingerprint512
-  }
-  throw new Error(`unhandled fingerprint algoritm ${algorithm}`)
-}
-
-function certificateFingerprintEncoded(
-  certificate: X509Certificate,
-  algorithm: 'sha1' | 'sha256' | 'sha512'
-): string {
-  const fingerprint = certificateFingerprintForAlgorithm(certificate, algorithm)
-  return encodeFingerprint(fingerprint, algorithm)
-}
-
 function addCertificateToMap(certificate: X509Certificate): void {
-  const sha1Fingerprint = certificateFingerprintEncoded(certificate, 'sha1')
-  knownCertificates.set(sha1Fingerprint, certificate)
-  log.silly(`added certificate at ${sha1Fingerprint}`)
-  const sha256Fingerprint = certificateFingerprintEncoded(certificate, 'sha256')
+  const sha256Fingerprint = certificate.fingerprint256
   knownCertificates.set(sha256Fingerprint, certificate)
   log.silly(`added certificate at ${sha256Fingerprint}`)
-  const sha512Fingerprint = certificateFingerprintEncoded(certificate, 'sha512')
-  knownCertificates.set(sha512Fingerprint, certificate)
-  log.silly(`added certificate at ${sha512Fingerprint}`)
 }
 
 const log = createLogger('certs')
@@ -170,23 +128,20 @@ export function registerCertIPC(): void {
   app.on(
     'certificate-error',
     (event, _webContents, _url, _error, certificate, allowRequest) => {
-      const incomingFingerprintEncoded = certificate.issuerCert?.fingerprint
-      if (incomingFingerprintEncoded == null) {
-        log.warn('unsigned or self signed EE cert from robot, denying')
-        allowRequest(false)
-        return
+      const incomingAsBuffer = Buffer.from(certificate.data)
+      const incomingAsNJSCert = new X509Certificate(incomingAsBuffer)
+      for (const knownCert of knownCertificates.values()) {
+        if (incomingAsNJSCert.checkIssued(knownCert)) {
+          if (incomingAsNJSCert.verify(knownCert.publicKey)) {
+            log.silly('good sign match for cert, allowing')
+            event.preventDefault()
+            allowRequest(true)
+            return
+          }
+        }
       }
-
-      if (knownCertificates.has(incomingFingerprintEncoded)) {
-        log.silly(`good fingerprint match for ${incomingFingerprintEncoded}`)
-        event.preventDefault()
-        allowRequest(true)
-      } else {
-        log.info(
-          `no fingerprint match for ${incomingFingerprintEncoded}, need certificate, denying`
-        )
-        allowRequest(false)
-      }
+      log.info('no sign match for cert, denying')
+      allowRequest(false)
     }
   )
 }
