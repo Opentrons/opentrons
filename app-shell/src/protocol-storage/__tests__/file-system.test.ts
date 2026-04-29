@@ -19,9 +19,8 @@ import {
   shouldMigrateToNotOt2Directory,
 } from '../file-system'
 
-vi.mock('uuid/v4', () => ({
-  __esModule: true,
-  default: vi.fn(),
+vi.mock('uuid', () => ({
+  v4: vi.fn(),
 }))
 vi.mock('electron')
 vi.mock('electron-store')
@@ -228,8 +227,8 @@ describe('protocol storage directory utilities', () => {
 
   describe('addProtocolFile', () => {
     it('writes a protocol file to a new directory', async () => {
-      const { default: uuid } = await import('uuid/v4')
-      vi.mocked(uuid).mockReturnValue('0abc123')
+      const { v4: uuid } = await import('uuid')
+      vi.mocked(uuid).mockImplementation((() => '0abc123') as typeof uuid)
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.py')

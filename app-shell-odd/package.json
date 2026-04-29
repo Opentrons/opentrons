@@ -44,8 +44,8 @@
     "@types/fs-extra": "9.0.13",
     "@types/lodash": "4.17.24",
     "@types/pump": "^1.1.0",
-    "@types/uuid": "^3.4.7",
     "ajv": "6.12.3",
+    "axios": "^0.21.1",
     "dateformat": "3.0.3",
     "electron-devtools-installer": "4.0.0",
     "electron-store": "5.1.1",
@@ -62,7 +62,7 @@
     "pump": "3.0.0",
     "semver": "5.7.2",
     "tempy": "1.0.1",
-    "uuid": "3.2.1",
+    "uuid": "14.0.0",
     "winston": "3.15.0",
     "winston-transport": "^4.9.0",
     "yargs-parser": "13.1.2"

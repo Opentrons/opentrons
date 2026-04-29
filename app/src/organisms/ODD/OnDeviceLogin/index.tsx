@@ -220,12 +220,8 @@ function LoginFieldInput({
   )
 }
 
-export * from './getSafePostLoginPath'
 export {
   OnDeviceLoginOverlayProvider,
   useOnDeviceLoginModal,
 } from './OnDeviceLoginOverlayProvider'
-export type {
-  OnDeviceLoginModalContextValue,
-  OpenOnDeviceLoginOptions,
-} from './OnDeviceLoginOverlayProvider'
+export type { OnDeviceLoginModalContextValue } from './OnDeviceLoginOverlayProvider'

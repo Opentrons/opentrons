@@ -1,29 +1,20 @@
-import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, test, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { OnDeviceLoginOverlayProvider, useOnDeviceLoginModal } from '..'
+import { useShouldShowLoggedOutOverlay, useStoreLoginState } from '../hooks'
 
-import type { NavigateFunction } from 'react-router-dom'
-
-const mockNavigate = vi.fn()
 const mockSubmitPassword = vi.fn()
+const mockStoreLoginState = vi.fn()
 
 vi.mock('/app/resources/auth', () => ({
   useOAuth2PasswordLogin: vi.fn(),
 }))
-
-vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal<NavigateFunction>()
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  }
-})
+vi.mock('../hooks')
 
 vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   FullKeyboard: ({
@@ -44,13 +35,13 @@ vi.mock('/app/atoms/SoftwareKeyboard', () => ({
   ),
 }))
 
-function OpenOnMount({ from }: { from?: string }): JSX.Element {
+function OpenOnMount(): JSX.Element {
   const { openLoginModal } = useOnDeviceLoginModal()
   return (
     <button
       type="button"
       onClick={() => {
-        openLoginModal(from != null ? { from } : undefined)
+        openLoginModal()
       }}
     >
       open
@@ -58,27 +49,27 @@ function OpenOnMount({ from }: { from?: string }): JSX.Element {
   )
 }
 
-function renderLoginModal(options?: { returnToPath?: string }) {
-  const result = renderWithProviders(
-    <MemoryRouter>
-      <OnDeviceLoginOverlayProvider>
-        <OpenOnMount from={options?.returnToPath} />
-      </OnDeviceLoginOverlayProvider>
-    </MemoryRouter>,
+function renderLoginModal(): ReturnType<typeof renderWithProviders> {
+  const [view, reduxStore] = renderWithProviders(
+    <OnDeviceLoginOverlayProvider>
+      <OpenOnMount />
+    </OnDeviceLoginOverlayProvider>,
     { i18nInstance: i18n }
-  )[0]
+  )
   fireEvent.click(screen.getByRole('button', { name: 'open' }))
-  return result
+  return [view, reduxStore]
 }
 
 function getLoginInput(): HTMLInputElement {
-  return screen.getByLabelText(/^(Username|Password)$/) as HTMLInputElement
+  return screen.getByLabelText(/^(Username|Password)$/)
 }
 
 describe('Login', () => {
   beforeEach(() => {
-    mockNavigate.mockReset()
     mockSubmitPassword.mockReset()
+    mockStoreLoginState.mockReset()
+    vi.mocked(useShouldShowLoggedOutOverlay).mockReturnValue(false)
+    vi.mocked(useStoreLoginState).mockReturnValue(mockStoreLoginState)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: mockSubmitPassword,
       isAuthLoading: false,
@@ -198,24 +189,36 @@ describe('Login', () => {
     expect(mockSubmitPassword).toHaveBeenCalledWith('user1', 'secret')
   })
 
-  it('navigates to returnToPath and closes overlay after successful login when returnToPath is set', () => {
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
-      submitPassword: () => {
-        onSuccess()
-      },
-      isAuthLoading: false,
-    }))
-    renderLoginModal({ returnToPath: '/protocols' })
-    fireEvent.change(getLoginInput(), {
-      target: { value: 'user1' },
+  describe('after successful password login', () => {
+    test('after a successful login, it stores login state and closes the modal', () => {
+      vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+        submitPassword: () => {
+          onSuccess('test-username', {
+            token_type: 'Bearer',
+            access_token: 'access-token',
+            refresh_token: 'refresh-token',
+            expires_in: 3600,
+          })
+        },
+        isAuthLoading: false,
+      }))
+      renderLoginModal()
+      fireEvent.change(getLoginInput(), {
+        target: { value: 'test-username' },
+      })
+      fireEvent.click(screen.getByText('Next'))
+      fireEvent.change(getLoginInput(), {
+        target: { value: 'secret' },
+      })
+      fireEvent.click(screen.getByText('Confirm'))
+      expect(screen.queryByText('Password')).not.toBeInTheDocument()
+      expect(mockStoreLoginState).toHaveBeenCalledWith('test-username', {
+        token_type: 'Bearer',
+        access_token: 'access-token',
+        refresh_token: 'refresh-token',
+        expires_in: 3600,
+      })
     })
-    fireEvent.click(screen.getByText('Next'))
-    fireEvent.change(getLoginInput(), {
-      target: { value: 'secret' },
-    })
-    fireEvent.click(screen.getByText('Confirm'))
-    expect(mockNavigate).toHaveBeenCalledWith('/protocols', { replace: true })
-    expect(screen.queryByText('Password')).not.toBeInTheDocument()
   })
 
   it('shows login failure under the password field instead of a snackbar', () => {
@@ -235,5 +238,54 @@ describe('Login', () => {
     })
     fireEvent.click(screen.getByText('Confirm'))
     screen.getByText('Incorrect username or password.')
+  })
+})
+
+describe('logged-out overlay', () => {
+  beforeEach(() => {
+    vi.mocked(useShouldShowLoggedOutOverlay).mockReturnValue(true)
+    vi.mocked(useStoreLoginState).mockReturnValue(mockStoreLoginState)
+    vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
+      submitPassword: mockSubmitPassword,
+      isAuthLoading: false,
+    })
+  })
+
+  it('renders the logged-out overlay when visibility hook returns true', () => {
+    vi.mocked(useShouldShowLoggedOutOverlay).mockReturnValue(true)
+    renderWithProviders(
+      <OnDeviceLoginOverlayProvider>
+        <span>child</span>
+      </OnDeviceLoginOverlayProvider>,
+      { i18nInstance: i18n }
+    )
+    expect(
+      screen.getByRole('dialog', { name: 'Logged out' })
+    ).toBeInTheDocument()
+  })
+
+  it('does not render the logged-out overlay when visibility hook returns false', () => {
+    vi.mocked(useShouldShowLoggedOutOverlay).mockReturnValue(false)
+    renderWithProviders(
+      <OnDeviceLoginOverlayProvider>
+        <span>child</span>
+      </OnDeviceLoginOverlayProvider>,
+      { i18nInstance: i18n }
+    )
+    expect(
+      screen.queryByRole('dialog', { name: 'Logged out' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('opens the login modal when the logged-out overlay is clicked', () => {
+    renderWithProviders(
+      <OnDeviceLoginOverlayProvider>
+        <span>child</span>
+      </OnDeviceLoginOverlayProvider>,
+      { i18nInstance: i18n }
+    )
+    expect(screen.queryByText('Username')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('dialog', { name: 'Logged out' }))
+    expect(screen.getByText('Username')).toBeInTheDocument()
   })
 })

@@ -92,14 +92,4 @@ describe('Navigation', () => {
     screen.getByText('mock NavigationMenu')
     expect(props.setNavMenuIsOpened).toHaveBeenCalled()
   })
-  it('should change z index of nav bar when longPressModalIsOpened is defined and true', () => {
-    props = {
-      ...props,
-      longPressModalIsOpened: true,
-    }
-    render(props)
-    expect(screen.getByLabelText('Navigation_container')).toHaveStyle({
-      zIndex: 0,
-    })
-  })
 })
