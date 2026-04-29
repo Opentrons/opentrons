@@ -1,5 +1,8 @@
 # e2e-testing makefile
 
+# Pin the interpreter for all `uv sync` / `uv run` in this file (matches robot stack 3.12 / CI).
+export UV_PYTHON := 3.12
+
 # Environment selection (local, sandbox, staging, prod)
 TEST_ENV ?= local
 
@@ -91,6 +94,13 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
+.PHONY: test-api-integration
+test-api-integration:
+	TEST_ENV=$(TEST_ENV) uv run pytest tests/auth -m auth_api $(PYTEST_ARGS)
+
+.PHONY: test-auth
+test-auth: test-api-integration
 
 .PHONY: test-ll-local
 test-ll-local:

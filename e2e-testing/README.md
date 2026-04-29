@@ -67,6 +67,8 @@ make test-ll-prod                                # Against production
 
 ```bash
 make test-unit               # Unit tests only
+make test-api-integration    # HTTP API integration tests only (`@pytest.mark.auth_api`, `tests/auth/`)
+make test-auth               # Alias for ``test-api-integration``
 make troubleshoot            # Re-run last failures in headed mode
 make codegen                 # Playwright Inspector/recorder (localhost:4173)
 make codegen URL=<url>       # Record against a custom URL
@@ -102,9 +104,13 @@ make test-ll TEST_ENV=prod      # Equivalent to make test-ll-prod
   - `pd_pages/` — Protocol Designer page objects (import from `automation.pd_pages`)
   - `ll_pages/` — Labware Library page objects (import from `automation.ll_pages`)
   - `clients/` — httpx-based API clients (see [HTTP API clients](#http-api-clients) below)
+  - `auth_helpers.py` — Multi-step auth flows for tests (login, provision users)
+  - `auth_server_runner.py` — Start or reuse the auth-server process for `auth_api` tests
 - `tests/` — Test files organized by application
   - `pd/` — PD tests (marked `@pytest.mark.pdE2E`)
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)
+  - `auth/` — Auth-server HTTP tests (marked `@pytest.mark.auth_api`; fixtures in `tests/auth/conftest.py`)
+- `compose/` — Notes for running backing services (see `compose/README.md`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 - `conftest.py` — Pytest fixtures for server lifecycle, page creation, video recording, and Applitools
 - `eyes.py` — Applitools Eyes wrapper and pytest fixture
@@ -160,6 +166,8 @@ async with AuthClient(base_url="http://localhost:33950") as client:
     settings = await client.get_settings()
 ```
 
+For pytest, use **`automation.auth_helpers`** (admin login, provision users) and fixtures in **`tests/auth/conftest.py`** (`auth_client`, `builtin_admin_session`, `provisioned_test_user`). The session fixture starts the server with **`make -C ../auth-server dev-no-reload`** unless one is already up or **`SKIP_AUTH_SERVER_START=true`**. See **`compose/README.md`**.
+
 ### Key Fixtures (conftest.py)
 
 | Fixture       | Scope    | Purpose                                                                                        |
@@ -180,6 +188,8 @@ async with AuthClient(base_url="http://localhost:33950") as client:
 | `LL_SERVER_URL`      | auto    | Override LL URL                       |
 | `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
 | `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
+| `E2E_AUTH_SERVER_PORT` | `33950` | Port for `auth_api` tests (`make test-api-integration`) |
+| `SKIP_AUTH_SERVER_START` | `false` | If `true`, pytest expects auth-server already listening |
 
 ## Development Workflow
 

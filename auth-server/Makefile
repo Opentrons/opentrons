@@ -43,6 +43,8 @@ clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
 dev_port ?= "33950"
+dev_host ?= 127.0.0.1
+dev_log_level ?= warning
 
 .PHONY: all
 all: clean wheel
@@ -100,6 +102,11 @@ format:
 .PHONY: dev
 dev:
 	$(python) -m auth_server --port $(dev_port) --reload --log-level=debug
+
+# Same entrypoint as ``dev`` but without uvicorn reload (stable PID tree for subprocess harnesses).
+.PHONY: dev-no-reload
+dev-no-reload:
+	exec $(python) -m auth_server --port $(dev_port) --host $(dev_host) --log-level $(dev_log_level)
 
 # Note: No `push` target, since this project only runs on Flex (OT-3), not OT-2.
 

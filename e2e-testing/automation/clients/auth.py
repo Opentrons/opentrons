@@ -18,6 +18,7 @@ import httpx
 from pydantic import TypeAdapter, ValidationError
 
 from automation.clients.auth_models import (
+    AccessControlPatchRequestEnvelope,
     AccessControlResponseData,
     AccessControlResponseEnvelope,
     AccountType,
@@ -30,6 +31,7 @@ from automation.clients.auth_models import (
     TokenResponse,
     UserCreateData,
     UserCreateRequestEnvelope,
+    UserPatchLocked,
     UserPatchRequestEnvelope,
     UserResourceResponse,
     UserResponse,
@@ -194,6 +196,52 @@ class AuthClient:
         envelope = AccessControlResponseEnvelope.model_validate(response.json())
         return envelope.data
 
+    async def patch_access_control_enabled_response(
+        self,
+        token: TokenResponse,
+    ) -> httpx.Response:
+        """PATCH ``/auth/settings/accessControlEnabled`` without ``raise_for_status``.
+
+        Same body as :meth:`patch_access_control_enabled` (enable only). Use when
+        asserting non-2xx responses (for example 422 after access control is already on).
+        """
+        body: AccessControlPatchRequestEnvelope = {
+            "data": {"accessControlEnabled": True},
+        }
+        return await self._client.patch(
+            "/auth/settings/accessControlEnabled",
+            json=body,
+            headers=AuthClient.auth_header(token),
+        )
+
+    async def patch_access_control_enabled(
+        self,
+        token: TokenResponse,
+    ) -> AccessControlResponseData:
+        """PATCH /auth/settings/accessControlEnabled to enable access control.
+
+        The API only accepts ``accessControlEnabled: true``; enabling is one-way
+        until reset by other means. Requires ``AUTH_SETTINGS_WRITE`` scope.
+        """
+        response = await self.patch_access_control_enabled_response(token)
+        response.raise_for_status()
+        envelope = AccessControlResponseEnvelope.model_validate(response.json())
+        return envelope.data
+
+    async def patch_access_control_disabled_response(
+        self,
+        token: TokenResponse,
+    ) -> httpx.Response:
+        """PATCH /auth/settings/accessControlEnabled without raising (for asserting error status codes)."""
+        body: AccessControlPatchRequestEnvelope = {
+            "data": {"accessControlEnabled": False},
+        }
+        return await self._client.patch(
+            "/auth/settings/accessControlEnabled",
+            json=body,
+            headers=AuthClient.auth_header(token),
+        )
+
     async def patch_settings(
         self,
         data: SettingsPatchData,
@@ -274,7 +322,7 @@ class AuthClient:
         response.raise_for_status()
         return UserResourceResponse.model_validate(response.json()).data
 
-    async def update_user(
+    async def update_user_response(
         self,
         token: TokenResponse,
         user_name: str,
@@ -283,12 +331,14 @@ class AuthClient:
         password: str | None | _UnsetType = _UNSET,
         full_name: str | None | _UnsetType = _UNSET,
         account_type: AccountType | None | _UnsetType = _UNSET,
-    ) -> UserResponse:
-        """PATCH /auth/users/{user_name} (requires USERS_WRITE scope).
+        locked: UserPatchLocked | _UnsetType = _UNSET,
+        reset_password: bool | _UnsetType = _UNSET,
+    ) -> httpx.Response:
+        """PATCH /auth/users/{user_name} without calling ``raise_for_status``.
 
-        Keyword arguments default to "not sent". Pass ``None`` only when you
-        intend JSON null for a nullable field; omit the argument to leave the
-        field unchanged.
+        Use this when the test expects a non-2xx response and needs to inspect
+        ``status_code``, ``.json()``, or ``.text`` (same keyword semantics as
+        :meth:`update_user`).
         """
         raw: dict[str, Any] = {}
         if user_name_new is not _UNSET:
@@ -299,11 +349,47 @@ class AuthClient:
             raw["fullName"] = full_name
         if account_type is not _UNSET:
             raw["accountType"] = account_type
+        if locked is not _UNSET:
+            raw["locked"] = locked
+        if reset_password is not _UNSET:
+            raw["resetPassword"] = reset_password
         body = _USER_PATCH_REQUEST.validate_python({"data": raw})
-        response = await self._client.patch(
+        return await self._client.patch(
             f"/auth/users/{user_name}",
             json=body,
             headers=AuthClient.auth_header(token),
+        )
+
+    async def update_user(
+        self,
+        token: TokenResponse,
+        user_name: str,
+        *,
+        user_name_new: str | None | _UnsetType = _UNSET,
+        password: str | None | _UnsetType = _UNSET,
+        full_name: str | None | _UnsetType = _UNSET,
+        account_type: AccountType | None | _UnsetType = _UNSET,
+        locked: UserPatchLocked | _UnsetType = _UNSET,
+        reset_password: bool | _UnsetType = _UNSET,
+    ) -> UserResponse:
+        """PATCH /auth/users/{user_name} (requires USERS_WRITE scope).
+
+        Keyword arguments default to "not sent". Pass ``None`` only when you
+        intend JSON null for a nullable field; omit the argument to leave the
+        field unchanged.
+
+        ``locked`` may be ``False`` (clear failed-login lockout) or ``None``
+        (JSON null). ``reset_password`` maps to ``resetPassword`` in the JSON body.
+        """
+        response = await self.update_user_response(
+            token,
+            user_name,
+            user_name_new=user_name_new,
+            password=password,
+            full_name=full_name,
+            account_type=account_type,
+            locked=locked,
+            reset_password=reset_password,
         )
         response.raise_for_status()
         return UserResourceResponse.model_validate(response.json()).data

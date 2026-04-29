@@ -6,6 +6,8 @@ from automation.clients.auth_models.introspection import TokenIntrospectionRespo
 from automation.clients.auth_models.oauth import TokenResponse
 from automation.clients.auth_models.openapi import OpenApiDocument, OpenApiInfo
 from automation.clients.auth_models.settings import (
+    AccessControlPatchData,
+    AccessControlPatchRequestEnvelope,
     AccessControlResponseData,
     AccessControlResponseEnvelope,
     SettingsPatchData,
@@ -18,12 +20,15 @@ from automation.clients.auth_models.user import (
     UserCreateData,
     UserCreateRequestEnvelope,
     UserPatchData,
+    UserPatchLocked,
     UserPatchRequestEnvelope,
     UserResourceResponse,
     UserResponse,
 )
 
 __all__ = [
+    "AccessControlPatchData",
+    "AccessControlPatchRequestEnvelope",
     "AccessControlResponseData",
     "AccessControlResponseEnvelope",
     "AccountType",
@@ -38,6 +43,7 @@ __all__ = [
     "UserCreateData",
     "UserCreateRequestEnvelope",
     "UserPatchData",
+    "UserPatchLocked",
     "UserPatchRequestEnvelope",
     "UserResourceResponse",
     "UserResponse",

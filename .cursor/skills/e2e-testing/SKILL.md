@@ -22,6 +22,7 @@ The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (P
 - `automation/ll_pages/` — LL page objects (import from `automation.ll_pages`)
 - `tests/pd/` — PD E2E tests (marked `@pytest.mark.pdE2E`)
 - `tests/ll/` — LL E2E tests (marked `@pytest.mark.llE2E`)
+- `tests/auth/` — Flex auth-server HTTP tests (marked `@pytest.mark.auth_api`; `automation.auth_server_runner` + `automation.auth_helpers`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 - `automation/clients/` — **HTTP API clients** (httpx, async). Not Playwright; see below.
 

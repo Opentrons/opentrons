@@ -9,6 +9,9 @@ from pydantic import BaseModel, ConfigDict, Field
 # Mirrors auth_server/users (and settings account types).
 AccountType = Literal["admin", "user", "auditor", "service"]
 
+# PATCH ``locked`` only accepts JSON false or null (clear lockout), never true.
+UserPatchLocked = Literal[False] | None
+
 
 class UserCreateData(TypedDict):
     """Inner ``data`` for POST **requests** to ``/auth/users``.
@@ -39,6 +42,8 @@ class UserPatchData(TypedDict, total=False):
     password: str | None
     fullName: str | None
     accountType: AccountType | None
+    locked: UserPatchLocked
+    resetPassword: bool
 
 
 class UserPatchRequestEnvelope(TypedDict):
@@ -56,6 +61,8 @@ class UserResponse(BaseModel):
     full_name: str = Field(alias="fullName")
     account_type: AccountType = Field(alias="accountType")
     scopes: list[str] = Field(default_factory=list)
+    locked: bool
+    reset_password: bool = Field(alias="resetPassword")
 
 
 class UserResourceResponse(BaseModel):
