@@ -1160,7 +1160,7 @@ class LabwareView:
             ):
                 raise errors.LabwareIsNotAllowedInLocationError(
                     f'Labware "{labware_definition.parameters.loadName}" is not compatible with '
-                    f"the vacuum module dock ({location.addressableAreaName})."
+                    f"the vacuum module dock {location.addressableAreaName}."
                 )
 
         return True
