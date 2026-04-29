@@ -8,11 +8,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './documentationrequired.module.css'
 
-import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard/types'
-
-interface DocumentationRequiredProps {}
-
-export function DocumentationRequired({}: DocumentationRequiredProps): JSX.Element {
+export function DocumentationRequired(): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>('')
   const keyboardRef = useRef(null)
