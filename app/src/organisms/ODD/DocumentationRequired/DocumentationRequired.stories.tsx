@@ -35,9 +35,6 @@ const meta: Meta<typeof DocumentationRequiredComponent> = {
       </Provider>
     ),
   ],
-  argTypes: {
-    setCurrentOption: { action: 'setCurrentOption' },
-  },
 }
 export default meta
 
