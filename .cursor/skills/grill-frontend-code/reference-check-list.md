@@ -7,14 +7,14 @@
 - Check the changes do not use any.
 - Use the strict check if type isn't optional
 
-```
-const myConst: string | null
+```ts
+const myConst: string | null = getValue()
 
-# good
-if(myConst !== null) return myConst
+// good
+if (myConst !== null) return myConst
 
-# bad
-if(myConst != null) return myConst
+// bad
+if (myConst != null) return myConst
 ```
 
 ## Opentrons UI components
