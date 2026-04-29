@@ -247,7 +247,6 @@ const getSlotHasPotentialCollidingObject = (
         [pipetteBounds[0], pipetteBounds[1]],
         [backLeftCoords, frontRightCoords]
       )
-    console.log("🚀 ~ getSlotHasPotentialCollidingObject ~ willCollide:", willCollide)
     // Check for overlapping rectangles and pipette z-coordinate if slot overlaps with pipette bounds
     if (
       willCollide &&
@@ -259,7 +258,6 @@ const getSlotHasPotentialCollidingObject = (
         slot,
         robotType
       )
-      console.log("🚀 ~ getSlotHasPotentialCollidingObject ~ highestZInSurroundingSlot:", highestZInSurroundingSlot)
 
       if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
         return true
