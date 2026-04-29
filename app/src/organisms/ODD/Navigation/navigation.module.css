@@ -39,7 +39,6 @@
 .overflow_button_wrap {
   position: absolute;
   right: var(--spacing-16);
-  margin-top: calc(-1 * var(--spacing-12));
 }
 
 .carousel_wrapper {
