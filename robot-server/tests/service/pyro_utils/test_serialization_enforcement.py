@@ -4,12 +4,13 @@ import asyncio
 import inspect
 import socket
 import threading
-from typing import Any, cast
+from typing import Any, cast, Dict, Sequence, Union
 
 import pytest
 from decoy import Decoy
 from Pyro5 import api as pyro
 from Pyro5 import nameserver
+import Pyro5.errors as errors
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control.ot3api import OT3API
@@ -40,6 +41,8 @@ from robot_server.runs.run_process import (
 from robot_server.runs.run_process_entry_point import initialize_run_process
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.pyro_utils import pyro_resource, resource_utilities
+import opentrons.hardware_control.types as hw_types
+import opentrons.types as ot_types
 
 
 @pytest.fixture
@@ -83,6 +86,16 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
         mock = decoy.mock(cls=OT3API)
         mock._door_state = DoorState.CLOSED
         decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
+
+        loop = asyncio.new_event_loop()
+        def _event_loop() -> None:
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
+
+        loop_thread = threading.Thread(target=_event_loop, daemon=True)
+        loop_thread.start()
+        mock._loop = loop
+
         return mock
     except ImportError:
         return None  # type: ignore[return-value]
@@ -163,23 +176,23 @@ async def _setup_robot_server_pyro_resource(
         run_process_pyro_provider=run_process_provider,
     )
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
-        mock_app_state, run_store
+        app_state, run_store
     )
 
     # Get the necessary things registered with the "robot server"
     empty_file_provider = FileProvider()
     resource_utilities.register_file_provider_to_pyro_resource(
-        mock_app_state, empty_file_provider
+        app_state, empty_file_provider
     )
     empty_cam_provider = CameraProvider()
     resource_utilities.register_camera_provider_to_pyro_resource(
-        mock_app_state, empty_cam_provider
+        app_state, empty_cam_provider
     )
     resource_utilities.register_deck_configuration_store_to_pyro_resource(
-        mock_app_state, deck_configuration_store
+        app_state, deck_configuration_store
     )
     resource_utilities.register_notify_publishers_to_pyro_resource(
-        mock_app_state,
+        app_state,
         lambda: [],  # type: ignore
     )
 
@@ -208,7 +221,7 @@ async def _setup_directed_run_process_pyro_resource(
     name_server_ready: threading.Event,
 ) -> DirectedRunProcess:
     """Set up a thread running a Directed run process pyro resource and publish it on the Nameserver."""
-    pyro_thread = initialize_run_process()
+    pyro_thread = initialize_run_process("ot-protocol")
     pyro_thread.start()
 
     ns = pyro.locate_ns()
@@ -236,6 +249,16 @@ async def _setup_directed_run_process_pyro_resource(
     return run_process
 
 
+### Parameters mocked out resource
+PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
+    "axes": {Sequence[hw_types.Axis]: [hw_types.Axis.X, hw_types.Axis.Y, hw_types.Axis.Z]},
+    "mount": {
+        hw_types.OT3Mount: hw_types.OT3Mount.LEFT,
+        Union[ot_types.Mount, hw_types.OT3Mount]: hw_types.OT3Mount.LEFT,
+        Union[ot_types.Mount, hw_types.OT3Mount, type(None)]: hw_types.OT3Mount.LEFT,
+    },
+}
+
 async def test_serialization_coverage(
     decoy: Decoy,
     mock_app_state: AppState,
@@ -251,6 +274,8 @@ async def test_serialization_coverage(
     """
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
+    missing_serialization_list = []
+    missing_params_list = []
 
     name_server_ready = threading.Event()
 
@@ -285,6 +310,71 @@ async def test_serialization_coverage(
     # CASEY TODO: troll through all the
     # _pyroMethods
     # _pyroAttrs
+    # Test the ot3api methods and attributes
+    # if attribute or method is in get_pyro_attributes_with_proxy_result ignore for now
+    ot3_proxy_methods: list[str] = getattr(ot3api_proxy, "get_pyro_attributes_with_proxy_result")
+    ot3_async_methods: dict[str, dict[str, Any]] = getattr(ot3api_proxy, "get_pyro_async_methods")
+
+    for method in ot3api_proxy._pyroMethods:
+        if method not in ot3_proxy_methods:
+            ot3_async_wrapped_method = getattr(ot3api, method)
+            original_class_method = getattr(OT3API, method)
+            kwargs: Dict[str, Any] = {}
+            return_type: type = None
+            for key, value in original_class_method.__annotations__.items():
+                print(f"KEY: {key}  VALUE: {value}")
+                if key is not "return":
+                    try:
+                        print(f"TRYING KEY: {key} with expected Value: {value}")
+                        kwargs[key] = PARAMETERS_MOCK_TABLE[key][value]
+                        print(f"method: {method} === using KWARGS: {kwargs}")
+                    except KeyError:
+                        missing_params_list.append(str(key) + " - " + str(value))
+                        #raise KeyError(f"Params for key {key} with expected value {value} are missing from the PARAMETERS_MOCK_TABLE.")
+                else:
+                    return_type = type(value)
+            try:
+                if method in ot3_async_methods.keys():
+                    print(f"CALLING ASYNC METHOD: {method} WITH ARGS: {kwargs}")
+                    result = await ot3_async_wrapped_method(**kwargs)
+                    print(f"async result = {result} return type: {return_type}")
+                    assert isinstance(result, return_type)
+                else:
+                    print(f"CALLING METHOD: {method} WITH ARGS: {kwargs}")
+                    result = ot3_async_wrapped_method(**kwargs)
+                    print(f"result = {result} return type: {result}")
+                    assert isinstance(result, return_type)
+            except Exception as e:
+                if e is errors.SerializeError:
+                    print("IN HERE")
+                    missing_serialization_list.append(e)
+    
+    raise ValueError(f"MISSING SERIALIZATIONS: {missing_serialization_list} ----    MISSING PARAMS: {''.join(str(param) + "\n" for param in missing_params_list)}")
+
+    for attribute in ot3api_proxy._pyroAttrs:
+        if attribute not in ot3_proxy_methods:
+            print(f"TRYING ON ATTR: {attribute}")
+            ot3_async_wrapped_attribute_result = getattr(ot3api, attribute)
+            # CASEY NOTE will this just get a result? YES ---
+            # we need to mock out a bunch of stuff inside the OT3API
+            original_class_attribute = getattr(OT3API, attribute)
+            if "engaged_axes" in attribute: # CASEY NOTE remove and indent the following:
+                print("IN ENGAGED AXES")
+                print(f"ANNOTATIONS: {original_class_attribute.__annotations__}")
+                return_type: type = None
+                for key, value in original_class_attribute.__annotations__.items():
+                    if key is "return":
+                        return_type = type(value)
+
+                try:
+                    print(f"result = {ot3_async_wrapped_attribute_result} return type: {return_type}")
+                    assert isinstance(result, return_type)
+                except Exception as e:
+                    raise ValueError(f"{e} --- attribute {attribute}")
+    # CASEY NOTE TODO ---------- DO THE _pyroAttrs NEXT!!!!!!!!!!!!!!!
+    raise ValueError("DONE")
+
+    # CASEY NOTE: try the inner proxies that come from get_pyro_attributes_with_proxy_result for each of these APIs as well!
 
     # Clean up client resources.
     run_process_proxy._pyroRelease()  # type: ignore
