@@ -21,6 +21,8 @@ interface RobotEncryptionKeyProps {
   setCurrentOption: SetSettingOption
 }
 
+const BACKUP_REFETCH_TIME_MS = 1000
+
 export function RobotEncryptionKey({
   setCurrentOption,
 }: RobotEncryptionKeyProps): JSX.Element {
@@ -63,7 +65,7 @@ function ViewPasswordModalElement(): JSX.Element {
             new Date(),
             new Date(query.data.valid_until_utc)
           )
-        : 1000,
+        : BACKUP_REFETCH_TIME_MS,
   }).data?.data ?? { password: '' }
   const header = {
     title: t('device_settings:robot_encryption_key'),
