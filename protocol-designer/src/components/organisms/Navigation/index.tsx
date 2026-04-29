@@ -3,11 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import {
-  BasicButton,
-  COLORS,
-  StyledText,
-} from '@opentrons/components'
+import { BasicButton, COLORS, StyledText } from '@opentrons/components'
 
 import { ACCEPTED_PROTOCOL_FILE_TYPES } from '/protocol-designer/constants'
 import { actions as loadFileActions } from '/protocol-designer/load-file'
