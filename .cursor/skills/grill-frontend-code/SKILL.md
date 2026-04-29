@@ -32,7 +32,7 @@ see [reference-check-list.md](reference-check-list.md).
 ## Output format
 
 Only report when there are issues. If there are no issues, report “No issues”.
-Keep each comment concise and in the following
+Keep each comment concise and use the following structure:
 
 ```
 format:[Severity: high/medium/low] file-path:line-number
