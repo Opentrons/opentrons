@@ -132,7 +132,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
         <div className={styles.overflow_button_wrap}>
           <button
             type="button"
-            className={styles.icon_button}
+            className={clsx(styles.icon_button, styles.cursor_default)}
             aria-label="overflow menu button"
             onClick={() => {
               handleMenu(true)
@@ -164,7 +164,11 @@ const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
   <NavLink
     to={props.to}
     className={({ isActive }) =>
-      clsx(styles.touch_nav_link, isActive && styles.touch_nav_link_active)
+      clsx(
+        styles.touch_nav_link,
+        isActive && styles.touch_nav_link_active,
+        styles.cursor_default
+      )
     }
   >
     {props.name}

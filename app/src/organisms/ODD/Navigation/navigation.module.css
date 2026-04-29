@@ -75,10 +75,6 @@
   &.touch_nav_link_active {
     color: var(--black-90);
   }
-
-  @media (height = 600px) and (width = 1024px) {
-    cursor: default;
-  }
 }
 
 .nav_link_indicator {
@@ -113,12 +109,12 @@
   &:disabled {
     background-color: transparent;
   }
-
-  @media (height = 600px) and (width = 1024px) {
-    cursor: default;
-  }
 }
 
 .nav_bar_scrolled {
   box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
+}
+
+.cursor_default {
+  cursor: default;
 }
