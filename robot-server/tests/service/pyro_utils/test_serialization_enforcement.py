@@ -474,7 +474,7 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
             left_mount_offset=ot_types.Point(1,1,1),
             right_mount_offset=ot_types.Point(1,1,1),
             gripper_mount_offset=ot_types.Point(1,1,1),
-        )
+        ),
     },
     "prep_after": {bool: False},
     "recalibrate_jaw_width": {bool: False},
@@ -518,8 +518,13 @@ async def test_serialization_coverage(
     """
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
-    missing_serialization_list = []
-    missing_params_list = []
+
+    # ERROR COLLECTION LISTS
+    missing_serialization_list = [] # NOTE: If errors are collected in this it means we haven't serialized a datatype for Pyro5/Serpent
+    missing_params_list = [] # NOTE: If errors are collected in this it means we are missing mocks/dummy data for a given param/type pairing in the PARAMETERS_MOCK_TABLE
+    alternative_errors_list = [] # NOTE: If errors are collected in this it means some unknown alternative issue occurred during a request.
+                                 # Cases that result in alternative errors include a type being serialized incorrected (such as an Enum turing into a string),
+                                 # or a body not being fully mocked (no backend on OT3API for example).
 
     name_server_ready = threading.Event()
 
@@ -570,6 +575,8 @@ async def test_serialization_coverage(
                 if key is not "return":
                     try:
                         print(f"TRYING KEY: {key} with expected Value: {value}")
+                        if "robot_calibration" in key:
+                            print(f"key: {key} value: {type(value)} isinstance: {isinstance(value, OT3Transforms)} params table: {PARAMETERS_MOCK_TABLE["robot_calibration"]}")
                         kwargs[key] = PARAMETERS_MOCK_TABLE[key][value]
                         # param_entry = PARAMETERS_MOCK_TABLE[key]
                         # kwargs[key] = param_entry.get(value, param_entry.get(Any))
@@ -597,14 +604,22 @@ async def test_serialization_coverage(
                 if "don't know how to serialize" in str(e):
                     missing_serialization_list.append(str(e))
                 else:
-                    raise ValueError(f"ON METHOD CALL: {method} ERROR: {e}")
+                    alternative_errors_list.append(str(e))
     
     # CASEY NOTE: move these to the bottom
+    # NOTE: The raise in order of priority. The goal is to identify anything that hasn't been serialized, but in order to do that we need to be sure that:
+    # 1. All expected parameters are full mocked out or filled with valid dummy data
+    # 2. All callable methods/attributes are capable of being called successfully
     if len(missing_params_list) > 0:
         raise AttributeError(f"MISSING PARAMS IN MOCK TABLE:\n{''.join(str(param) + "\n" for param in missing_params_list)}")
     
+    if len(alternative_errors_list) > 0:
+        raise ValueError(f"ERRORS DURING INTERPROCESS COVERAGE TESTS:\n{''.join(str(error) + "\n" for error in alternative_errors_list)}")
+    
+    # NOTE: If this raises, its time to add some new serializations to an appropriate process library! Get to it!
     if len(missing_serialization_list) > 0:
-        raise ValueError(f"MISSING SERIALIZATIONS:\n{''.join(str(serializaiton) + "\n" for serializaiton in missing_serialization_list)}")
+        raise ValueError(f"MISSING PYRO/SERPENT SERIALIZATIONS:\n{''.join(str(serializaiton) + "\n" for serializaiton in missing_serialization_list)}")
+    
 
     for attribute in ot3api_proxy._pyroAttrs:
         if attribute not in ot3_proxy_methods:
