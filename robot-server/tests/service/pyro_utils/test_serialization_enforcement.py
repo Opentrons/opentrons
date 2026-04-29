@@ -456,7 +456,7 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "listener": {Callable[[hw_types.StatusBarUpdateEvent], None]: SKIP_METHOD}, # CASEY NOTE: might be able to ignore because this will go to the proxy ones
     "cp_override": {Optional[hw_types.CriticalPoint]: hw_types.CriticalPoint.MOUNT},
     "robot_calibration": {
-        OT3Transforms: OT3Transforms(
+        "OT3Transforms": OT3Transforms(
             deck_calibration=DeckCalibration(
                 attitude= [[0.0, 1.0]],
                 source= calibration_types.SourceType.default,
@@ -571,21 +571,11 @@ async def test_serialization_coverage(
             kwargs: Dict[str, Any] = {}
             return_type: type = None
             for key, value in original_class_method.__annotations__.items():
-                print(f"KEY: {key}  VALUE: {value}")
                 if key is not "return":
                     try:
-                        print(f"TRYING KEY: {key} with expected Value: {value}")
-                        if "robot_calibration" in key:
-                            print(f"key: {key} value: {type(value)} isinstance: {isinstance(value, OT3Transforms)} params table: {PARAMETERS_MOCK_TABLE["robot_calibration"]}")
                         kwargs[key] = PARAMETERS_MOCK_TABLE[key][value]
-                        # param_entry = PARAMETERS_MOCK_TABLE[key]
-                        # kwargs[key] = param_entry.get(value, param_entry.get(Any))
-                        # if kwargs[key] is None and value not in param_entry and Any not in param_entry:
-                        #     raise KeyError
-                        print(f"method: {method} === using KWARGS: {kwargs}")
-                    except KeyError:
+                    except KeyError as e:
                         missing_params_list.append("key: " + str(key) + " - type: " + str(value))
-                        #raise KeyError(f"Params for key {key} with expected value {value} are missing from the PARAMETERS_MOCK_TABLE.")
                 else:
                     return_type = type(value)
             try:
