@@ -22,14 +22,7 @@
   z-index: 0;
 }
 
-.nav_content_row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--spacing-32);
-}
-
-.carousel_inner {
+.carousel_contents {
   display: flex;
   flex-direction: row;
   margin-right: var(--spacing-24);
@@ -41,7 +34,7 @@
   right: var(--spacing-16);
 }
 
-.carousel_wrapper {
+.carousel_scroll_container {
   display: flex;
   width: 56.75rem;
   flex-direction: row;
@@ -56,7 +49,7 @@
   overflow-x: scroll;
 }
 
-.carousel_wrapper::-webkit-scrollbar {
+.carousel_scroll_container::-webkit-scrollbar {
   display: none;
 }
 
