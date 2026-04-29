@@ -4,7 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { LabwareSlotContainer } from '../../LabwareSlotContainer'
 import { PipetteContainer } from '../../PipetteContainer'
-import { TipDisposalContainer } from '../../TipDisposalContainer'
 import { TipPickupContainer } from '../../TipPickupContainer'
 import { StepDetailContainer } from '../index'
 
@@ -96,9 +95,10 @@ describe('StepDetailContainer', () => {
     vi.mocked(LabwareSlotContainer).mockReturnValue(
       <div>mock LabwareSlotContainer </div>
     )
-    vi.mocked(TipDisposalContainer).mockReturnValue(
-      <div>mock Tip Disposal Container</div>
-    )
+    // temporary filtering out the disposal card for RS 9.0.0
+    // vi.mocked(TipDisposalContainer).mockReturnValue(
+    //   <div>mock Tip Disposal Container</div>
+    // )
 
     vi.mocked(TipPickupContainer).mockReturnValue(
       <div>mock Tip Pickup Container</div>
@@ -112,6 +112,6 @@ describe('StepDetailContainer', () => {
   it('renders the pipette containers and tip container', () => {
     render(props)
     expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
-    expect(screen.queryByText('mock Tip Disposal Container')).toBeNull()
+    // expect(screen.queryByText('mock Tip Disposal Container')).toBeNull()
   })
 })
