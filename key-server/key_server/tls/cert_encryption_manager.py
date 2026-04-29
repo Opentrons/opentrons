@@ -160,7 +160,7 @@ class CertEncryptionManager:
         quotient = difference.total_seconds() // self._password_timestep_s
         return self._t0 + timedelta(seconds=quotient * self._password_timestep_s)
 
-    async def current_pass(self, now: datetime) -> UsedEncryptionKey:
+    async def current_key(self, now: datetime) -> UsedEncryptionKey:
         """The current key, including generating it if not already present."""
         await self._ensure_keys(now)
         if not self._current_key:
@@ -174,7 +174,7 @@ class CertEncryptionManager:
         else:
             return self._current_key
 
-    async def previous_pass(self, now: datetime) -> UsedEncryptionKey | None:
+    async def previous_key(self, now: datetime) -> UsedEncryptionKey | None:
         """The last-used key."""
         await self._ensure_keys(now)
         return self._previous_key
@@ -192,8 +192,8 @@ class CertEncryptionManager:
         self, now: datetime, encoded_cert: bytes
     ) -> OldAndNewEncryptedCert:
         """Encrypt some bytes (which should be a DER-encoded cert) using the current and previous keys."""
-        current_key = await self.current_pass(now)
-        previous_key = await self.previous_pass(now)
+        current_key = await self.current_key(now)
+        previous_key = await self.previous_key(now)
         current_encrypted = self._encrypt(encoded_cert, current_key)
         if isinstance(previous_key, UsedEncryptionKey):
             previous_encrypted: EncryptedCert | None = self._encrypt(

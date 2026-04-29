@@ -98,7 +98,7 @@ class TLSManager:
 
     async def get_current_cert_password(self) -> CertPassword:
         """Get the currently-valid password for an encrypted certificate."""
-        key = await self._cert_encryption_manager.current_pass(
+        key = await self._cert_encryption_manager.current_key(
             datetime.now(timezone.utc)
         )
         return CertPassword(
