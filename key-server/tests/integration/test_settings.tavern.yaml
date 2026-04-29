@@ -5,10 +5,10 @@ marks:
       - run_server
 
 stages:
-  - name: GET /auth/settings returns default settings
+  - name: GET /keys/external/settings returns default settings
     request:
       method: GET
-      url: '{run_server.base_url}/settings'
+      url: '{run_server.base_url}/keys/external/settings'
     response:
       status_code: 200
       json:

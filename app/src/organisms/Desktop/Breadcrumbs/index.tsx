@@ -20,7 +20,7 @@ import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
@@ -180,7 +180,7 @@ export function Breadcrumbs(): JSX.Element | null {
   return (
     <ApiHostProvider
       hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
       <BreadcrumbsComponent />
     </ApiHostProvider>

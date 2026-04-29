@@ -143,7 +143,7 @@ export function Landing(): JSX.Element {
             gridGap={SPACING.spacing8}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText desktopStyle="headingLargeBold">
+            <StyledText desktopStyle="headingLargeBold" as="h1">
               {t('welcome')}
             </StyledText>
             <StyledText
