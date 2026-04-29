@@ -354,7 +354,7 @@ export const getIsSafePipetteMovement = (args: {
   if (
     labwareEntities[labwareId] == null ||
     wellTargetName == null ||
-    (channels === 1)
+    channels === 1
   ) {
     return true
   }
