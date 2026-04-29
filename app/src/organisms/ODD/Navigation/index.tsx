@@ -94,58 +94,52 @@ export function Navigation(props: NavigationProps): JSX.Element {
           isScrolled && styles.nav_bar_scrolled
         )}
       >
-        <div className={styles.nav_content_row}>
-          <div className={styles.carousel_wrapper}>
-            <div className={styles.carousel_inner}>
-              <div
-                ref={
-                  location.pathname === '/dashboard' ? navBarScrollRef : null
-                }
-              >
-                <NavigationLink
-                  to="/dashboard"
-                  name={truncateString(
-                    robotName,
-                    iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
-                  )}
-                />
-              </div>
-              {iconName != null ? (
-                <Icon
-                  aria-label="network icon"
-                  name={iconName}
-                  size="2.5rem"
-                  color={COLORS.grey60}
-                />
-              ) : null}
-              {NAV_LINKS.map(path => (
-                <div
-                  ref={path === location.pathname ? navBarScrollRef : null}
-                  key={path}
-                >
-                  <NavigationLink to={path} name={getPathDisplayName(path)} />
-                </div>
-              ))}
+        <div className={styles.carousel_scroll_container}>
+          <div className={styles.carousel_contents}>
+            <div
+              ref={location.pathname === '/dashboard' ? navBarScrollRef : null}
+            >
+              <NavigationLink
+                to="/dashboard"
+                name={truncateString(
+                  robotName,
+                  iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
+                )}
+              />
             </div>
+            {iconName != null ? (
+              <Icon
+                aria-label="network icon"
+                name={iconName}
+                size="2.5rem"
+                color={COLORS.grey60}
+              />
+            ) : null}
+            {NAV_LINKS.map(path => (
+              <div
+                ref={path === location.pathname ? navBarScrollRef : null}
+                key={path}
+              >
+                <NavigationLink to={path} name={getPathDisplayName(path)} />
+              </div>
+            ))}
           </div>
         </div>
-        <div className={styles.overflow_button_wrap}>
-          <button
-            type="button"
-            className={clsx(styles.icon_button, styles.cursor_default)}
-            aria-label="overflow menu button"
-            onClick={() => {
-              handleMenu(true)
-            }}
-          >
-            <Icon
-              name="overflow-btn-touchscreen"
-              height="3.75rem"
-              width="3rem"
-              color={COLORS.grey60}
-            />
-          </button>
-        </div>
+        <button
+          type="button"
+          className={clsx(styles.icon_button, styles.cursor_default)}
+          aria-label="overflow menu button"
+          onClick={() => {
+            handleMenu(true)
+          }}
+        >
+          <Icon
+            name="overflow-btn-touchscreen"
+            height="3.75rem"
+            width="3rem"
+            color={COLORS.grey60}
+          />
+        </button>
       </nav>
       {showNavMenu && (
         <NavigationMenu
