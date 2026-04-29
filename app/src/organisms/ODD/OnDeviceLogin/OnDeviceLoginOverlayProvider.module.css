@@ -27,6 +27,19 @@
   align-self: flex-start;
 }
 
+.password_field_row {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-12);
+}
+
+.password_field_input {
+  flex: 1;
+}
+
 .keyboard_container {
   position: fixed;
   bottom: 0;

@@ -205,17 +205,8 @@ function LoginFieldInput({
   if (step !== 'password') return input
 
   return (
-    <div
-      style={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        gap: '0.75rem',
-      }}
-    >
-      <div style={{ flex: 1 }}>{input}</div>
+    <div className={styles.password_field_row}>
+      <div className={styles.password_field_input}>{input}</div>
       <PasswordVisibilityToggle
         isVisible={showPassword}
         onToggle={() => {
