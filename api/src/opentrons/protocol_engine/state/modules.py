@@ -1507,17 +1507,6 @@ class ModuleView:
         )
         return lid_dock_area
 
-    def vacuum_module_dock_location(self, module_id: str) -> AddressableAreaLocation:
-        """Get the addressable area for the vacuum module dock."""
-        reader_slot = self.get_location(module_id)
-        lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)
-        self.get_provided_addressable_area(module_id)
-        assert lid_doc_slot is not None
-        lid_dock_area = AddressableAreaLocation(
-            addressableAreaName="VacuumModuleV1LidDock" + lid_doc_slot.value
-        )
-        return lid_dock_area
-
     def get_stacker_max_fill_height(self, module_id: str) -> float:
         """Get the maximum fill height for the Flex Stacker."""
         definition = self.get_definition(module_id)
