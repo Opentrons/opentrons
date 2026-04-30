@@ -25,17 +25,17 @@ When your aspirate volume falls in between, like 100 µL, a linear interpolation
 ## Aqueous
 The Opentrons-verified aqueous liquid class is based on deionized water.
 
-{% include 'python-api/liquid-class-tables/aqueous.md' %}
+{% include 'liquid-class-tables/aqueous.md' %}
 
 ## Viscous
 
 The Opentrons-verified viscous liquid class is based on 50% glycerol.
 
-{% include 'python-api/liquid-class-tables/viscous.md' %}
+{% include 'liquid-class-tables/viscous.md' %}
 
 ## Volatile
 
 The Opentrons-verified volatile liquid class is based on 80% ethanol.
 
-{% include 'python-api/liquid-class-tables/volatile.md' %}
+{% include 'liquid-class-tables/volatile.md' %}
  

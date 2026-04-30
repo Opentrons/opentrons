@@ -2,7 +2,7 @@
 site_name: python-api
 
 nav:
-  - Welcome: index.md
+  - Python Protocol API: index.md
   - Tutorial: tutorial.md
   - Versioning: versioning.md
   - Labware: labware.md

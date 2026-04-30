@@ -10,7 +10,7 @@ div.cover {
 </style>
 
 <div class="cover" markdown>
-![Opentrons Flex](images/opentrons-flex-logo.svg "Opentrons Flex logo"){ width="75%" }
+![Opentrons Flex](../images/opentrons-flex-logo.svg "Opentrons Flex logo"){ width="75%" }
 
 # Instruction Manual
 

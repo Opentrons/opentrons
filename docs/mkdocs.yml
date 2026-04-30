@@ -55,7 +55,9 @@ plugins:
             extensions:
               - python-api/griffe_version_required.py:RequiresVersionExtension
   - autorefs
-  - macros
+  - macros:
+      # Same partials as standalone python-api site (liquid-class-tables/*.md).
+      include_dir: python-api/docs
 
 theme:
   name: material

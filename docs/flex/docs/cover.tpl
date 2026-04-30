@@ -9,7 +9,7 @@ p.title {
 </style>
 
 <div class="cover" markdown>
-<img src="../images/opentrons-flex-logo.svg" alt="Opentrons Flex" title="Opentrons Flex logo" style="width: 75%;" />
+<img src="../../../shared/images/opentrons-flex-logo.svg" alt="Opentrons Flex" title="Opentrons Flex logo" style="width: 75%;" />
 
 <p class="title">Instruction Manual</p>
 
