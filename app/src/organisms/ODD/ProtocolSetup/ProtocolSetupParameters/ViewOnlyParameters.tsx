@@ -1,10 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  Chip,
-  COLORS,
-  StyledText,
-} from '@opentrons/components'
+import { Chip, COLORS, StyledText } from '@opentrons/components'
 import {
   formatRunTimeParameterValue,
   sortRuntimeParameters,
