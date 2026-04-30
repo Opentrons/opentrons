@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -6,14 +6,9 @@ import { COLORS, ListButton, StyledText } from '@opentrons/components'
 import { ALL, COLUMN, PARTIAL_NOZZLE_MAP, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
-import {
-  getInitialDeckSetup,
-  getInvariantContext,
-} from '/protocol-designer/step-forms/selectors'
-import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
-import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'
@@ -39,8 +34,6 @@ export function ExtendedPartialTipField(
   const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
-  const invariantContext = useSelector(getInvariantContext)
-  const robotState = useSelector(getRobotStateAtActiveItem)
   const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
@@ -71,69 +64,6 @@ export function ExtendedPartialTipField(
 
       break
   }
-  // if deck setup changes and selected wells are now inaccessible - unselect them so that an error is raised
-  interface WellCheckConfig {
-    wells: string[]
-    labwareId: string | null
-    fieldKey: keyof FieldPropsByName
-  }
-
-  const wellConfigs: WellCheckConfig[] = []
-
-  if (stepType === 'mix') {
-    wellConfigs.push({
-      wells: (propsForFields.wells?.value as string[]) ?? [],
-      labwareId: propsForFields.labware.value as string,
-      fieldKey: 'wells',
-    })
-  }
-
-  if (stepType === 'transfer') {
-    wellConfigs.push({
-      wells: (propsForFields.aspirate_wells?.value as string[]) ?? [],
-      labwareId: propsForFields.aspirate_labware.value as string,
-      fieldKey: 'aspirate_wells',
-    })
-
-    wellConfigs.push({
-      wells: (propsForFields.dispense_wells?.value as string[]) ?? [],
-      labwareId: propsForFields.dispense_labware.value as string,
-      fieldKey: 'dispense_wells',
-    })
-  }
-  const tiprackLabwareDefURI = propsForFields.tipRack.value as string
-
-  const tiprackId = Object.values(deckSetup.labware).find(
-    labware => labware.labwareDefURI === tiprackLabwareDefURI
-  )?.id
-  const inaccessibleFields = wellConfigs
-    .map(config => {
-      if (!config.labwareId || config.wells.length === 0) {
-        return null
-      }
-
-      const status = getAllWellsSafetyStatus({
-        allWells: [config.wells],
-        robotState,
-        invariantContext,
-        pipetteId: propsForFields.pipette.value as string,
-        labwareId: config.labwareId,
-        primaryNozzle: primaryNozzle,
-        nozzleConfiguration: nozzleConfiguration,
-        tiprackId,
-      })
-
-      const hasInaccessibleWell = config.wells.some(well => status[well] !== 0)
-
-      return hasInaccessibleWell ? config.fieldKey : null
-    })
-    .filter(Boolean) as Array<keyof FieldPropsByName>
-  useEffect(() => {
-    inaccessibleFields.forEach(fieldKey => {
-      propsForFields[fieldKey]?.updateValue([])
-    })
-  }, [inaccessibleFields, propsForFields])
-
   const dspWells = propsForFields.dispense_wells
     ? (propsForFields.dispense_wells.value as [])
     : []
@@ -177,11 +107,7 @@ export function ExtendedPartialTipField(
       (channels === 8 && nozzleConfiguration === ALL) ||
       nozzleConfiguration === COLUMN
     const isRow = nozzleConfiguration === ROW
-    if (
-      !nozzleText ||
-      aspWellsLength === 0 ||
-      (isTransfer && dspWellsLength === 0)
-    ) {
+    if (!nozzleText || aspWellsLength === 0) {
       return t('no_nozzles_and_wells_selected')
     }
     let positionType: string = 'wells'
