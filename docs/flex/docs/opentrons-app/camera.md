@@ -26,8 +26,8 @@ The camera is off by default. To turn the camera on and access its features:
 You can also turn the camera on and off from the **Peripherals** section of the robot's details page.
 
 <figure class="screenshot side-by-side" markdown>
-![Camera off](../images/camera_disabled.png)
 ![Camera on](../images/camera_enabled.png)
+![Camera off](../images/camera_disabled.png)
 <figcaption>Enable or disable the camera and adjust image settings.</figcaption>
 </figure>
 
