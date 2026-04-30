@@ -1,5 +1,5 @@
 ---
-title: "Vacuum Module: G-Codes"
+title: "Vacuum Module: G-Code"
 description: "Vacuum Module G-code commands and responses."
 ---
 

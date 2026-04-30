@@ -67,7 +67,7 @@ Every Opentrons module returns a response after executing a command. A response 
     </tr>
     <tr>
       <td>Error</td>
-      <td>An error indicates a command failed and does not echo the command code.<br><br>Error responses are strings formatted as <code>ERRNNN:error</code>, where <code>N</code> is an integer followed by a plain text description. For example, sending too many commands to a module too quickly might result in the response <code>ERR004:G-code cache full</code>.<br><br>See the <font color="red">RESPONSE TBD</font> for a complete list.</td>
+      <td>An error indicates a command failed and does not echo the command code.<br><br>Error responses are strings formatted as <code>ERRNNN:error</code>, where <code>N</code> is an integer followed by a plain text description. For example, sending too many commands to a module too quickly might result in the response <code>ERR004:G-code cache full</code>.<br><br>See <a href="error-codes.md">Vacuum Module Errors</a> for a complete list.</td>
     </tr>
   </tbody>
 </table>
@@ -77,8 +77,8 @@ Every Opentrons module returns a response after executing a command. A response 
 To establish a serial USB connection, your application must specify the baud rate and identify the module using its Vendor ID (VID) and Product ID (PID).
 
 - **Baud rate:** `115200`
-- **VID:** <font color="red">TBD</font>
-- **PID:** <font color="red">TBD</font>
+- **VID:** `0x0483`
+- **PID:** `0xEF40`
 
 !!! tip "Making Good G-code Connections"
     Identifying modules by their VID and PID helps you write resilient, cross-platform code. Hard coding for a specific port (e.g., `COM3` for Windows or `/dev/ttyUSB0` for macOS) makes code brittle. By using a library like [pyserial](https://pythonhosted.org/pyserial/) to scan for specific VID/PID combinations, your application can dynamically find and connect to the correct Opentrons module regardless of its physical connection point.
