@@ -6,10 +6,12 @@
 
 .content_container {
   display: flex;
-  height: 100%;
+  width: 824px;
+  height:218px;
   flex-direction: column;
   padding: 7.75rem var(--spacing-40) var(--spacing-120);
   gap: var(--spacing-24);
+  margin: 0 auto;
 }
 
 .text_area_container {

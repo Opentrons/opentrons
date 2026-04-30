@@ -57,13 +57,15 @@ export function DocumentationRequired({
         </div>
       </div>
       <div className={styles.keyboard_container}>
-        <FullKeyboard
-          onChange={(input: string) => {
-            setInputText(input)
-            textAreaRef.current?.focus()
-          }}
-          keyboardRef={keyboardRef}
-        />
+        <AccordionKeyboard isOpen onToggle={() => {}}>
+          <FullKeyboard
+            onChange={(input: string) => {
+              setInputText(input)
+              textAreaRef.current?.focus()
+            }}
+            keyboardRef={keyboardRef}
+          />
+        </AccordionKeyboard>
       </div>
     </>
   )
