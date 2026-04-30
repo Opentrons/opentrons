@@ -37,13 +37,6 @@ async def test_admin_session_and_provisioned_user_round_trip(
 
 
 @pytest.mark.auth_api
-@pytest.mark.xfail(
-    reason=(
-        "auth-server fix is on branch fix/auth-reject-duplicate-username-on-patch "
-        "(from edge); stock server returns 500 until that merges."
-    ),
-    strict=False,
-)
 async def test_patch_second_user_username_to_first_users_name_returns_400(
     auth_client: AuthClient,
     builtin_admin_session: BuiltinAdminSession,
