@@ -3,14 +3,14 @@ title: "Opentrons Flex: Using the Camera"
 description: "Live monitoring, automatic image capture, and downloading protocol images."
 ---
 
-Every Flex comes equipped with a built-in 2-megapixel camera that captures high-resolution still images and provides a live video feed of the deck during a protocol run. Starting with robot software version 8.8, you can control the camera via the Opentrons App or the touchscreen.
+Every Flex comes equipped with a built-in high-resolution camera. Starting with robot software version 8.8, you can control the camera via the Opentrons App or the touchscreen.
 
 When enabled, the camera provides:
 
-- viewing during protocol runs.
-- Automatic image capture as a protocol step.
-- Automatic image capture in response to a crash or error.
-- Still images bundled in the compressed protocol run files.
+- **Live streaming:** watch a real-time video feed of the deck during a protocol run.
+- **Step-based image capture:** add still photography a step in your protocol.
+- **Troubleshooting assistance:** automatically record the deck state in response to a crash or error.
+- **Image downloads:** access still images saved in the protocol run files.
 
 ## Turning the camera on and off
 
