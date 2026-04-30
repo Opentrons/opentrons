@@ -82,23 +82,19 @@ export function getWellRange(
 
   const channelCount = usedChannels(pipetteId, commands, pipetteChannels)
 
-  switch (true) {
-    case channelCount === 96:
-      return 'A1 - H12'
-    case channelCount === 8: {
-      const column = wellName.substring(1)
-      return `A${column} - H${column}`
-    }
-    case channelCount === 12: {
-      const row = wellName.charAt(0)
-      return `${row}1 - ${row}12`
-    }
-    case channelCount >= 2 && channelCount <= 7: {
-      const column = wellName.substring(1)
-      const endRow = String.fromCharCode(64 + channelCount)
-      return `A${column} - ${endRow}${column}`
-    }
-    default:
-      return wellName
+  if (channelCount === 96) {
+    return 'A1 - H12'
+  } else if (channelCount === 8) {
+    const column = wellName.substring(1)
+    return `A${column} - H${column}`
+  } else if (channelCount === 12) {
+    const row = wellName.charAt(0)
+    return `${row}1 - ${row}12`
+  } else if (channelCount >= 2 && channelCount <= 7) {
+    const column = wellName.substring(1)
+    const endRow = String.fromCharCode(64 + channelCount)
+    return `A${column} - ${endRow}${column}`
+  } else {
+    return wellName
   }
 }
