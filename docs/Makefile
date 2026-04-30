@@ -60,7 +60,7 @@ pdf-file-temperature-module := Opentrons-Temperature-Module-Instruction-Manual.p
 pdf-title-thermocycler := Thermocycler GEN2 Instruction Manual
 pdf-file-thermocycler := Opentrons-Thermocycler-Instruction-Manual.pdf
 
-.PHONY: pdf pdf-all pdf-flex pdf-ot2
+.PHONY: pdf pdf-all
 pdf:
 	@if [ -z "$(PROJECT)" ]; then \
 		echo 'Usage: make pdf PROJECT=<dir>'; \
@@ -78,13 +78,6 @@ pdf:
 
 pdf-all:
 	@for p in $(PDF_PROJECTS); do $(MAKE) pdf PROJECT=$$p; done
-
-# Convenience aliases for CI/scripts that already call these targets
-pdf-flex:
-	@$(MAKE) pdf PROJECT=flex
-
-pdf-ot2:
-	@$(MAKE) pdf PROJECT=ot-2
 
 .PHONY: lock
 lock:
