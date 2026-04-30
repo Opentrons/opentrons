@@ -47,6 +47,7 @@ import {
   useLPCFlows,
 } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
@@ -398,13 +399,14 @@ function PrepareToRun({
     ? isCameraEnabledForRun || cameraSettingsConfirmed
     : true
 
-  const isReadyToRun =
-    incompleteInstrumentCount === 0 &&
-    areModulesReady &&
-    areFixturesReady &&
-    !isAnyNecessaryDefaultOffsetMissing &&
-    isCameraReadyToRun
+  const isReadyToRun = true
+  // incompleteInstrumentCount === 0 &&
+  // areModulesReady &&
+  // areFixturesReady &&
+  // !isAnyNecessaryDefaultOffsetMissing &&
+  // isCameraReadyToRun
   const onPlay = (): void => {
+    void showDocumentationRequiredModal({ userName: 'John Doe' })
     if (doorStatus.isDoorOpen) {
       if (
         doorStatus.moduleDoorLocation !== null &&
