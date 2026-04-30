@@ -31,6 +31,7 @@
 
 .carousel_scroll_container {
   display: flex;
+  flex: 1;
   flex-direction: row;
   align-items: flex-start;
   mask-image: linear-gradient(
@@ -45,6 +46,21 @@
 
 .carousel_scroll_container::-webkit-scrollbar {
   display: none;
+}
+
+.account_icon {
+  width: 3.75rem;
+  height: 3.75rem;
+  flex: none;
+  align-content: center;
+  border-radius: var(--border-radius-200);
+  background-color: var(--black-90);
+  color: var(--white);
+  font-size: var(--font-size-28);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-36);
+  text-align: center;
+  text-decoration: none;
 }
 
 .touch_nav_link {

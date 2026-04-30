@@ -10,6 +10,7 @@ import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 
+import { useAccountIconInitial } from './hooks/useAccountIconInitial'
 import styles from './navigation.module.css'
 import { NavigationMenu } from './NavigationMenu'
 
@@ -33,11 +34,15 @@ interface NavigationProps {
 }
 export function Navigation(props: NavigationProps): JSX.Element {
   const { setNavMenuIsOpened, longPressModalIsOpened } = props
+
   const { t } = useTranslation('top_navigation')
+
   const location = useLocation()
+  const accountIconInitial = useAccountIconInitial()
   const localRobot = useSelector(getLocalRobot)
-  const [showNavMenu, setShowNavMenu] = useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+
+  const [showNavMenu, setShowNavMenu] = useState<boolean>(false)
 
   // We need to display an icon for what type of network connection (if any)
   // is active next to the robot's name. The designs call for it to change color
@@ -125,6 +130,15 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ))}
           </div>
         </div>
+        {accountIconInitial && (
+          <NavLink
+            to="/robot-settings"
+            className={clsx(styles.account_icon, styles.cursor_default)}
+            aria-label={t('account')}
+          >
+            {accountIconInitial}
+          </NavLink>
+        )}
         <button
           type="button"
           className={clsx(styles.icon_button, styles.cursor_default)}
