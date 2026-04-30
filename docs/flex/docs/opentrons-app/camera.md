@@ -3,12 +3,14 @@ title: "Opentrons Flex: Using the Camera"
 description: "Live monitoring, automatic image capture, and downloading protocol images."
 ---
 
-Every Flex comes equipped with a built-in 2-megapixel camera that can capture full HD still images and provide a live video feed of the deck during a protocol run. Beginning with robot software version 8.8, you can control the camera via the Opentrons App or the touchscreen. When enabled, the camera provides:
+Every Flex comes equipped with a built-in 2-megapixel camera that captures high-resolution still images and provides a live video feed of the deck during a protocol run. Starting with robot software version 8.8, you can control the camera via the Opentrons App or the touchscreen.
 
-- Live, in-app viewing during protocol runs.
-- Automatic image capture at protocol-defined intervals.
-- Automatic image capture in response to a crash or runtime error.
-- Consolidated image downloads in a single, compressed (`.zip`) file after a protocol run.
+When enabled, the camera provides:
+
+- viewing during protocol runs.
+- Automatic image capture as a protocol step.
+- Automatic image capture in response to a crash or error.
+- Still images bundled in the compressed protocol run files.
 
 ## Turning the camera on and off
 
@@ -66,6 +68,8 @@ Live video streaming is available in the Opentrons App when the camera is enable
 !!! note
     Flex cannot save live video streamed during a protocol run.
 
-## Saving images
+## Capturing and downloading still images
 
-To capture still images during a run, [add a camera step](../../protocol-designer/steps/camera.md) in Protocol Designer or use the [`capture_image()` method](../../python-api/building-block-commands/utilities.md#capturing-images) in the Python API. All protocol images are available for download in the **Recent Protocol Runs** section of the robot details page.
+To capture still images from a Flex, [add a camera step](../../protocol-designer/steps/camera.md) to your protocol in Protocol Designer or use the [`capture_image()` method](../../python-api/building-block-commands/utilities.md#capturing-images) in the Python API.
+
+Still images taken during a protocol run are available for download from the [recent protocol run files](./protocol-transfer.md#recent-protocol-runs) in the Opentrons App.
