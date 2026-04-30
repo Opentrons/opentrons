@@ -21,7 +21,7 @@ The camera is off by default. To turn the camera on and access its features:
 1. From the Opentrons App, click **Devices** and locate your robot.
 2. For your selected robot, click the three-dot menu (⋮) and then click **Robot Settings**.
 3. Click the **Camera** tab to open the camera settings.
-4. Click the **Camera Status** slider to enable or disable the camera. Turning the camera on exposes other camera features and image controls.
+4. Click the **Camera Status** toggle to enable or disable the camera. Turning the camera on exposes other camera features and image controls.
 
 </div>
 
