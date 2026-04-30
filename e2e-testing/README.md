@@ -179,16 +179,16 @@ For pytest, use **`automation.auth_helpers`** (admin login, provision users) and
 
 ### Environment Variables
 
-| Variable             | Default | Notes                                 |
-| -------------------- | ------- | ------------------------------------- |
-| `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
-| `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
-| `SKIP_SERVER_START`  | `false` | Skip automatic server build+serve     |
-| `PD_SERVER_URL`      | auto    | Override PD URL                       |
-| `LL_SERVER_URL`      | auto    | Override LL URL                       |
-| `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
-| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
-| `E2E_AUTH_SERVER_PORT` | `33950` | Port for `auth_api` tests (`make test-api-integration`) |
+| Variable                 | Default | Notes                                                   |
+| ------------------------ | ------- | ------------------------------------------------------- |
+| `TEST_ENV`               | `local` | `local`, `staging`, `prod`, `sandbox`                   |
+| `HEADLESS`               | (unset) | `true` / `false`; overrides default                     |
+| `SKIP_SERVER_START`      | `false` | Skip automatic server build+serve                       |
+| `PD_SERVER_URL`          | auto    | Override PD URL                                         |
+| `LL_SERVER_URL`          | auto    | Override LL URL                                         |
+| `LL_SERVER_PORT`         | `4176`  | Preferred port for LL local server                      |
+| `APPLITOOLS_API_KEY`     | (unset) | Enable Applitools visual checks                         |
+| `E2E_AUTH_SERVER_PORT`   | `33950` | Port for `auth_api` tests (`make test-api-integration`) |
 | `SKIP_AUTH_SERVER_START` | `false` | If `true`, pytest expects auth-server already listening |
 
 ## Development Workflow
