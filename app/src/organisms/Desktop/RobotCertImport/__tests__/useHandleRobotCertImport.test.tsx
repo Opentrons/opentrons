@@ -306,7 +306,9 @@ describe('useHandleRobotCertImport', async () => {
     })
 
     expect(onSuccessfulImport).not.toHaveBeenCalled()
-    expect(result.current.passwordError).toEqual('still a bad password sucka')
+    expect(result.current.passwordError).toEqual(
+      'Certificate install failed, probably bad password'
+    )
   })
   it('should notify failure when installing certificate succeed but the plaintext fetch fails', async () => {
     when(vi.mocked(getEncryptedCACertificates))

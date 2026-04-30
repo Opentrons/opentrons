@@ -15,7 +15,7 @@ export interface UseHandleRobotCertImportProps {
 }
 
 export interface UseHandleRobotCertImportResult {
-  passwordError: string | undefined
+  passwordError: string | null
   setPasswordValue: (password: string) => unknown
   passwordValue: string
   importInProgress: boolean
@@ -26,13 +26,19 @@ export function useHandleRobotCertImport(
 ): UseHandleRobotCertImportResult {
   const { t } = useTranslation('device_settings')
   const [passwordValue, setPasswordValue] = useState<string>('')
-  const [passwordError, setPasswordError] = useState<string | undefined>(
-    undefined
-  )
+  const [passwordError, setPasswordError] = useState<string | null>(null)
   useEffect(() => {
-    setPasswordError(undefined)
+    setPasswordError(null)
   }, [passwordValue])
   const host = useHost()
+
+  const tryInstallWith: typeof tryInstallRobotCertificate = async props => {
+    try {
+      return await tryInstallRobotCertificate(props)
+    } catch (err: any) {
+      return false
+    }
+  }
 
   const { status, mutate } = useMutation<boolean>({
     mutationFn: async () => {
@@ -41,27 +47,25 @@ export function useHandleRobotCertImport(
       if (currentCert == null) {
         throw new Error('Failed to fetch CA certificates')
       }
-      let installed = false
-      try {
-        installed = await tryInstallRobotCertificate({
+      if (
+        !(await tryInstallWith({
           password: passwordValue,
           certificateData: currentCert.current.cert_data,
           salt: currentCert.current.key_salt,
           iterations: currentCert.current.kdf_iterations,
-        })
-      } catch (err: any) {
-        installed = false
-      }
-      if (!installed && currentCert.previous != null) {
-        installed = await tryInstallRobotCertificate({
-          password: passwordValue,
-          certificateData: currentCert.previous.cert_data,
-          salt: currentCert.previous.key_salt,
-          iterations: currentCert.previous.kdf_iterations,
-        })
-      }
-      if (!installed) {
-        throw new Error('Certificate install failed, probably bad password')
+        }))
+      ) {
+        if (
+          currentCert.previous == null ||
+          !(await tryInstallWith({
+            password: passwordValue,
+            certificateData: currentCert.previous.cert_data,
+            salt: currentCert.previous.key_salt,
+            iterations: currentCert.previous.kdf_iterations,
+          }))
+        ) {
+          throw new Error('Certificate install failed, probably bad password')
+        }
       }
 
       const plaintext = await getPlaintextCACertificates(host!)
