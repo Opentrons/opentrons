@@ -47,25 +47,23 @@ export function useHandleRobotCertImport(
       if (currentCert == null) {
         throw new Error('Failed to fetch CA certificates')
       }
-      if (
-        !(await tryInstallWith({
-          password: passwordValue,
-          certificateData: currentCert.current.cert_data,
-          salt: currentCert.current.key_salt,
-          iterations: currentCert.current.kdf_iterations,
-        }))
-      ) {
-        if (
-          currentCert.previous == null ||
-          !(await tryInstallWith({
+      const installedCurrent = await tryInstallWith({
+        password: passwordValue,
+        certificateData: currentCert.current.cert_data,
+        salt: currentCert.current.key_salt,
+        iterations: currentCert.current.kdf_iterations,
+      })
+      const installed =
+        installedCurrent ||
+        (currentCert.previous != null &&
+          (await tryInstallWith({
             password: passwordValue,
             certificateData: currentCert.previous.cert_data,
             salt: currentCert.previous.key_salt,
             iterations: currentCert.previous.kdf_iterations,
-          }))
-        ) {
-          throw new Error('Certificate install failed, probably bad password')
-        }
+          })))
+      if (!installed) {
+        throw new Error('Certificate install failed, probably bad password')
       }
 
       const plaintext = await getPlaintextCACertificates(host!)
