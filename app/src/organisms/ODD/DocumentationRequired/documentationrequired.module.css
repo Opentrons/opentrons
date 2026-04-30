@@ -10,8 +10,8 @@
   height:218px;
   flex-direction: column;
   padding: 7.75rem var(--spacing-40) var(--spacing-120);
-  gap: var(--spacing-24);
   margin: 0 auto;
+  gap: var(--spacing-24);
 }
 
 .text_area_container {
