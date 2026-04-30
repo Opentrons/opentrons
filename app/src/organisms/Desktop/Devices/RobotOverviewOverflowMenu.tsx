@@ -128,7 +128,6 @@ export const RobotOverviewOverflowMenu = (
               onClose={() => {
                 setShowRobotCertImportModal(false)
               }}
-              robotName={robot.name}
             />,
             getTopPortalEl()
           )

@@ -12,7 +12,6 @@ import { useHandleRobotCertImport } from './useHandleRobotCertImport'
 
 export interface RobotCertImportModalProps {
   onClose: () => unknown
-  robotName: string
 }
 
 export function RobotCertImportModal(
