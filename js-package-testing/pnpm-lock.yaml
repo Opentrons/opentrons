@@ -29,24 +29,6 @@ importers:
       '@opentrons/step-generation':
         specifier: link:pack/opentrons-step-generation
         version: link:pack/opentrons-step-generation
-      '@playwright/test':
-        specifier: ^1.58.2
-        version: 1.58.2
-      '@types/react':
-        specifier: 18.2.51
-        version: 18.2.51
-      '@types/react-dom':
-        specifier: 18.2.0
-        version: 18.2.0
-      '@vitejs/plugin-react':
-        specifier: 4.2.0
-        version: 4.2.0(vite@7.1.11(@types/node@18.19.130))
-      clsx:
-        specifier: 2.1.1
-        version: 2.1.1
-      dotenv:
-        specifier: ^16.6.1
-        version: 16.6.1
       i18next:
         specifier: ^19.8.3
         version: 19.9.2
@@ -59,9 +41,6 @@ importers:
       react-i18next:
         specifier: 14.0.0
         version: 14.0.0(i18next@19.9.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      styled-components:
-        specifier: 5.3.6
-        version: 5.3.6(@babel/core@7.28.5)(react-dom@18.2.0(react@18.2.0))(react-is@16.13.1)(react@18.2.0)
     devDependencies:
       '@applitools/eyes-playwright':
         specifier: 1.46.2
@@ -78,9 +57,15 @@ importers:
       '@vitejs/plugin-react':
         specifier: 4.2.0
         version: 4.2.0(vite@7.3.2(@types/node@18.19.130))
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
       dotenv:
         specifier: ^16.6.1
         version: 16.6.1
+      styled-components:
+        specifier: 5.3.6
+        version: 5.3.6(@babel/core@7.28.5)(react-dom@18.2.0(react@18.2.0))(react-is@16.13.1)(react@18.2.0)
       typescript:
         specifier: 5.3.3
         version: 5.3.3
