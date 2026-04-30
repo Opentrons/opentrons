@@ -86,7 +86,7 @@ lock:
 .PHONY: test
 test:
 # No tests in this project.
-#This target exists to support `make test-py` in the top-level Makefile.
+# This target exists to support `make test-py` in the top-level Makefile.
 
 .PHONY: lint
 lint:
