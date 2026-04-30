@@ -4,10 +4,9 @@ import { beforeEach, describe, it } from 'vitest'
 import { fixture96Plate } from '@opentrons/shared-data'
 import { CLEAN, EMPTY } from '@opentrons/step-generation'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-
 import { TipPickupContainer } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../i18n'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

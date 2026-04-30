@@ -14,7 +14,6 @@ import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 interface StepDetailContainerProps {
-  protocolKey: string
   commands: RunTimeCommand[]
   robotState: RobotState
   invariantContext: InvariantContext
@@ -23,7 +22,6 @@ interface StepDetailContainerProps {
 }
 
 export function StepDetailContainer({
-  protocolKey,
   commands,
   robotState,
   invariantContext,

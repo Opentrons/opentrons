@@ -8,6 +8,14 @@ import type { RenderResult } from '@testing-library/react'
 const testI18n = i18n.createInstance()
 testI18n.use(initReactI18next).init({ lng: 'en', resources: {} })
 
-export function renderWithProviders(ui: React.ReactElement): RenderResult {
-  return render(<I18nextProvider i18n={testI18n}>{ui}</I18nextProvider>)
+interface RenderOptions {
+  i18nInstance?: typeof i18n
+}
+
+export function renderWithProviders(
+  ui: React.ReactElement,
+  options?: RenderOptions
+): RenderResult {
+  const i18nInstance = options?.i18nInstance ?? testI18n
+  return render(<I18nextProvider i18n={i18nInstance}>{ui}</I18nextProvider>)
 }

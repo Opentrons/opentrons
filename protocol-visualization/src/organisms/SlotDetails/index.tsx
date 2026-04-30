@@ -6,7 +6,6 @@ import {
 } from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '../../molecules/SlotDetailsEmptyState'
-
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
 import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'

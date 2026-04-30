@@ -1,20 +1,18 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { LabwareSlotContainer } from '../../LabwareSlotContainer'
 import { PipetteContainer } from '../../PipetteContainer'
-import { StepDetailContainer } from '../../StepDetailContainer'
-// import { TipDisposalContainer } from '../../TipDisposalContainer'
 import { TipPickupContainer } from '../../TipPickupContainer'
+import { StepDetailContainer } from '../index'
 
 import type { ComponentProps } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 vi.mock('../../PipetteContainer')
-// vi.mock('../../TipDisposalContainer')
+vi.mock('../../TipDisposalContainer')
 vi.mock('../../TipPickupContainer')
 vi.mock('../../LabwareSlotContainer')
 
@@ -27,7 +25,6 @@ describe('StepDetailContainer', () => {
 
   beforeEach(() => {
     props = {
-      protocolKey: 'mockProtocolKey',
       liquids: [],
       currentCommand: {
         commandType: 'loadPipette',
@@ -98,6 +95,7 @@ describe('StepDetailContainer', () => {
     vi.mocked(LabwareSlotContainer).mockReturnValue(
       <div>mock LabwareSlotContainer </div>
     )
+    // temporary filtering out the disposal card for RS 9.0.0
     // vi.mocked(TipDisposalContainer).mockReturnValue(
     //   <div>mock Tip Disposal Container</div>
     // )
@@ -114,6 +112,6 @@ describe('StepDetailContainer', () => {
   it('renders the pipette containers and tip container', () => {
     render(props)
     expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
-    // screen.getByText('mock Tip Disposal Container')
+    // expect(screen.queryByText('mock Tip Disposal Container')).toBeNull()
   })
 })
