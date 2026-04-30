@@ -41,10 +41,12 @@ plugins:
   - print-site:
       exclude:
         - index.md
-      add_cover_page: false
+      add_cover_page: true
+      cover_page_template: "docs/cover.tpl"
       include_css: false
       enumerate_headings: false
 
 extra_css:
+  - ../shared/instruction-manuals.css
   - ../shared/opentrons-theme.css
   - ../shared/print-pdf.css
