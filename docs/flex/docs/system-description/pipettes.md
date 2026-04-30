@@ -122,8 +122,8 @@ Flex 8-channel pipettes meet the following accuracy and precision specifications
     <th>Pipette Type</th>
     <th>Tip Size</th>
     <th>Volume (µL)</th>
-    <th>Random Error<br>(%&nbsp;CV)</th>
-    <th>Systematic Error<br>(%&nbsp;D)</th>
+    <th>Random Error<br>(% CV)</th>
+    <th>Systematic Error<br>(% D)</th>
   </tr>
 </thead>
   <tbody>
@@ -196,8 +196,8 @@ Flex 96-channel pipettes meet the following accuracy and precision specification
     <th>Pipette Type</th>
     <th>Tip Size</th>
     <th>Volume (µL)</th>
-    <th>Random Error<br>(%&nbsp;CV)</th>
-    <th>Systematic Error<br>(%&nbsp;D)</th>
+    <th>Random Error<br>(% CV)</th>
+    <th>Systematic Error<br>(% D)</th>
   </tr>
 </thead>
   <tbody>
