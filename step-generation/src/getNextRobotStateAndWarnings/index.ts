@@ -17,6 +17,7 @@ import { forMoveLabware } from './forMoveLabware'
 import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
+import { forSetTipState } from './forSetTipState'
 import { forWaitForTasks } from './forWaitForTasks'
 import {
   forHeaterShakerCloseLatch,
@@ -118,6 +119,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'pickUpTip':
       forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'setTipState':
+      forSetTipState(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'magneticModule/engage':
