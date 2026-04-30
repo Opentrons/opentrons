@@ -17,6 +17,7 @@ import opentrons.hardware_control.instruments.ot3.instrument_calibration
 import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
+import opentrons.hardware_control.peripherals.types
 import opentrons.types
 from opentrons.hardware_control import modules
 from opentrons.util.pyro.pyro_serialization import (
@@ -553,6 +554,7 @@ def register_hardware_types() -> None:
             opentrons_shared_data.pipette.pipette_definition,
             opentrons_shared_data.pipette.types,
             opentrons_shared_data.errors.codes,
+            opentrons.hardware_control.peripherals.types,
         ]
     )
 
