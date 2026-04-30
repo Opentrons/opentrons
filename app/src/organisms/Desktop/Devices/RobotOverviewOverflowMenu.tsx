@@ -268,7 +268,6 @@ export const RobotOverviewOverflowMenu = (
           }}
         />
       ) : null}
-
       {menuOverlay}
     </Flex>
   )
