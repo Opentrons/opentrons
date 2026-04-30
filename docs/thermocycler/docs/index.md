@@ -9,7 +9,7 @@ hide: toc
 ![Thermocycler hero cover image](images/thermocycler-hero-cover.png){style="width: 60%"}
 
 **Opentrons Labworks Inc.**<br>
-August 2025
+March 2026
 
 </div>
 

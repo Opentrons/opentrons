@@ -8,7 +8,7 @@
 
 <p><strong>Opentrons Labworks Inc.</strong></p>
 
-<p>April 2026</p>
+<p>November 2025</p>
 </div>
 
 <h2>Product Description</h2>
