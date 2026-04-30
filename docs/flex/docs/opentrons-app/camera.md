@@ -39,7 +39,7 @@ These settings and controls are located under the **Camera** tab on the **Robot 
 
 ### Usage Settings
 
-These settings and image capture options allow you to:
+Starting with robot software version 9.0, these settings and image capture options allow you to:
 
 - Stream real-time video from the deck while running a protocol.
 - Automatically capture a deck image when an error occurs.
