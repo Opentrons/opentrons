@@ -180,7 +180,7 @@ export function ExtendedPartialTipField(
     if (
       !nozzleText ||
       aspWellsLength === 0 ||
-      (isTransfer && dspWellsLength === 0)
+      (isTransfer && isDispenseInLabware && dspWellsLength === 0)
     ) {
       return t('no_nozzles_and_wells_selected')
     }
