@@ -1,13 +1,3 @@
-<style>
-div.cover {
-  text-align: center;
-}
-
-p.title {
-  font-size: 2em;
-}
-</style>
-
 <div class="cover" markdown>
 
 <img src="../../../shared/images/opentrons-flex-logo.svg" alt="Opentrons Flex" title="Opentrons Flex logo" style="width: 75%;" />

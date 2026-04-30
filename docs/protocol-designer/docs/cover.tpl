@@ -1,13 +1,3 @@
-<style>
-div.cover {
-  text-align: center;
-}
-
-p.title {
-  font-size: 2em;
-}
-</style>
-
 <div class="cover" markdown>
 
 <p><img src="../../../shared/images/tm-opentrons-full-blackcolor.svg" alt="Opentrons" title="Opentrons" style="width: 350px; max-width: 90%; height: auto;" /></p>

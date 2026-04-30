@@ -16,7 +16,7 @@ extra_css:
 markdown_extensions:
   - toc:
       permalink: true 
-      title: Page Contents 
+      title: Table of Contents 
   - admonition 
   - abbr 
   - pymdownx.blocks.caption 

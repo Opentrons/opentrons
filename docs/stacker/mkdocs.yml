@@ -15,7 +15,7 @@ markdown_extensions:
   - md_in_html
   - toc:
       permalink: true
-      title: Page Contents
+      title: Table of Contents
       toc_depth: 3
   - admonition
   - abbr
