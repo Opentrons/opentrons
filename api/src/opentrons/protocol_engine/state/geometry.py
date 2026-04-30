@@ -1696,7 +1696,8 @@ class GeometryView:
         # If the labware is loaded on an AA that is a module, we want to respect the convention
         # of giving it an OnModuleLocation.
         possible_module = self._modules.get_by_addressable_area(
-            labware_location.addressableAreaName
+            labware_location.addressableAreaName,
+            self._addressable_areas.deck_definition,
         )
         if possible_module is not None:
             return building + [
