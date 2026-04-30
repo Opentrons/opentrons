@@ -49,7 +49,6 @@ Flex 1-channel pipettes meet the following accuracy and precision specifications
     <th>Tip Size</th>
     <th>Volume (µL)</th>
     <th>Random Error<br>(%&nbsp;CV)</th>
-    <th>Random Error<br>(% CV)</th>
     <th>Systematic Error<br>(% D)</th>
   </tr>
 </thead>
