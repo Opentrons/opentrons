@@ -11,7 +11,7 @@ import {
   VACUUM_MODE_PRESSURE,
   VACUUM_PROGRAM_PROFILE,
   VACUUM_PROGRAM_STATE,
-  VACUUM_STATE_PUMP,
+  VACUUM_STATE_PUMP_ON,
 } from '@opentrons/step-generation'
 
 import {
@@ -39,6 +39,8 @@ import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
@@ -647,7 +649,7 @@ const VACUUM_DURATION_REQUIRED: FormError = {
 }
 const VACUUM_PROFILE_REQUIRED: FormError = {
   title: 'Select vacuum profile',
-  dependentFields: ['orderedProfileIds', 'profileItemsById'],
+  dependentFields: ['vacuumOrderedProfileIds', 'vacuumProfileItemsById'],
   location: ['field'],
 }
 const VACUUM_MODULE_ID_REQUIRED: FormError = {
@@ -982,7 +984,9 @@ export const pauseModuleRequired = (
   const { moduleId, pauseAction } = fields
   const expectingModuleId =
     pauseAction === PAUSE_UNTIL_TEMP ||
-    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE
+    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE
   return expectingModuleId && moduleId == null ? PAUSE_MODULE_REQUIRED : null
 }
 export const pauseTemperatureRequired = (
@@ -1599,16 +1603,20 @@ export const vacuumStateRequired = (
 export const vacuumModeRequired = (
   fields: HydratedVacuumFormData
 ): FormError | null => {
-  const { modeType } = fields
-  return modeType == null ? VACUUM_MODE_REQUIRED : null
+  const { programType, modeType, stateType } = fields
+  return modeType == null &&
+    programType === VACUUM_PROGRAM_STATE &&
+    stateType === VACUUM_STATE_PUMP_ON
+    ? VACUUM_MODE_REQUIRED
+    : null
 }
 
 export const vacuumProfileRequired = (
   fields: HydratedVacuumFormData
 ): FormError | null => {
-  const { programType, orderedProfileIds } = fields
+  const { programType, vacuumOrderedProfileIds } = fields
   return programType === VACUUM_PROGRAM_PROFILE &&
-    orderedProfileIds.length === 0
+    vacuumOrderedProfileIds.length === 0
     ? VACUUM_PROFILE_REQUIRED
     : null
 }
@@ -1618,7 +1626,7 @@ export const gaugePressureRequired = (
 ): FormError | null => {
   const { programType, stateType, modeType, pressureMbar } = fields
   return programType === VACUUM_PROGRAM_STATE &&
-    stateType === VACUUM_STATE_PUMP &&
+    stateType === VACUUM_STATE_PUMP_ON &&
     modeType === VACUUM_MODE_PRESSURE &&
     (pressureMbar == null ||
       pressureMbar < VACUUM_MIN_PRESSURE_MBAR ||
@@ -1632,7 +1640,7 @@ export const vacuumDurationRequired = (
   const { programType, stateType, pumpDurationCheckbox, pumpDurationTime } =
     fields
   return programType === VACUUM_PROGRAM_STATE &&
-    stateType === VACUUM_STATE_PUMP &&
+    stateType === VACUUM_STATE_PUMP_ON &&
     pumpDurationCheckbox === true &&
     !pumpDurationTime
     ? VACUUM_DURATION_REQUIRED

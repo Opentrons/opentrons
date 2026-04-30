@@ -18,6 +18,7 @@ import {
 } from './config'
 import { registerDiscovery } from './discovery'
 import { setUserDataPath } from './early'
+import { registerInternalApiListener } from './internal-api'
 import { createLogger } from './log'
 import { registerResourceMonitor } from './monitor'
 import {
@@ -30,7 +31,7 @@ import { initializeSentry } from './sentry'
 import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
-import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
+import { createUi, waitForBackendAndShowMainWindow } from './ui'
 import { registerSystemInfo } from './usb'
 import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
@@ -138,6 +139,8 @@ function startUp(): void {
     })
   }
 
+  registerInternalApiListener()
+
   mainWindow = createUi(dispatch)
   rendererLogger = createRendererLogger()
   void establishBrokerConnection()
@@ -186,7 +189,7 @@ function startUp(): void {
     if (!!!mainWindow) {
       log.error('mainWindow went away before show')
     } else {
-      waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+      waitForBackendAndShowMainWindow(dispatch, mainWindow)
     }
   })
 }

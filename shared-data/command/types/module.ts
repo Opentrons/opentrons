@@ -88,7 +88,7 @@ export type ModuleCreateCommand =
   | IdentifyModuleCreateCommand
   | VacuumModuleSetTargetPressureCreateCommand
   | VacuumModuleSetTargetPowerCreateCommand
-  | VacuumModuleDeactivateCreateCommand
+  | VacuumModuleStopPumpCreateCommand
   | VacuumModuleOpenVentCreateCommand
   | VacuumModuleCloseVentCreateCommand
 export interface MagneticModuleEngageMagnetCreateCommand extends CommonCommandCreateInfo {
@@ -689,7 +689,7 @@ export interface VacuumModuleSetTargetPowerCreateCommand extends CommonCommandCr
   params: VacuumModuleSetTargetPowerParams
 }
 
-export interface VacuumModuleDeactivateCreateCommand extends CommonCommandCreateInfo {
+export interface VacuumModuleStopPumpCreateCommand extends CommonCommandCreateInfo {
   commandType: 'vacuumModule/stopVacuum'
   params: ModuleOnlyParams
 }

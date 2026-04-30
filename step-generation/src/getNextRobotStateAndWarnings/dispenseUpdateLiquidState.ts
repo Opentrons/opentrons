@@ -135,6 +135,7 @@ export function dispenseUpdateLiquidState(
 
   if (mergeLiquidtoSingleWell == null && liquidTrash == null) {
     console.assert(
+      false,
       `expected to merge liquid to a single well with sourceId ${entityId}`
     )
   }
