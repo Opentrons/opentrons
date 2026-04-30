@@ -701,7 +701,7 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
         alternative_errors_list=alternative_errors_list,
     )
 
-def _raise_if_errors(process: str, error_collection: ErrorCollections) -> None:
+def _raise_if_errors(processes: str, error_collection: ErrorCollections) -> None:
     """Raise when errors found in a given process interface.
 
     NOTE: The raise in order of priority. The goal is to identify anything that hasn't been serialized, but in order to do that we need to be sure that:
@@ -709,14 +709,14 @@ def _raise_if_errors(process: str, error_collection: ErrorCollections) -> None:
         2. All callable methods/attributes are capable of being called successfully
     """
     if len(error_collection.missing_params_list) > 0:
-        raise AttributeError(f"PROCESS: {process} - MISSING PARAMS IN MOCK TABLE:\n{''.join(str(param) + "\n" for param in error_collection.missing_params_list)}")
+        raise AttributeError(f"PROCESSES WITH ERRORS:{processes}- MISSING PARAMS IN MOCK TABLE:\n{''.join(str(param) + "\n" for param in error_collection.missing_params_list)}")
     
     if len(error_collection.alternative_errors_list) > 0:
-        raise ValueError(f"PROCESS: {process} - ERRORS DURING INTERPROCESS COVERAGE TESTS:\n{''.join(str(error) + "\n" for error in error_collection.alternative_errors_list)}")
+        raise ValueError(f"PROCESSES WITH ERRORS:{processes}- ERRORS DURING INTERPROCESS COVERAGE TESTS:\n{''.join(str(error) + "\n" for error in error_collection.alternative_errors_list)}")
     
-    # NOTE: If this raises, its time to add some new serializations to an appropriate process library! Get to it!
+    # NOTE: This is the actual true "test" we want to enforce. If this raises, its time to add some new serializations to an appropriate process library! Get to it!
     if len(error_collection.missing_serialization_list) > 0:
-        raise ValueError(f"PROCESS: {process} - MISSING PYRO/SERPENT SERIALIZATIONS - TOTAL UNSERIALIZED: {len(error_collection.missing_serialization_list)}\n{''.join(str(serializaiton) + "\n" for serializaiton in error_collection.missing_serialization_list)}")
+        raise errors.SerializeError(f"PROCESSES WITH ERRORS:{processes}- MISSING PYRO/SERPENT SERIALIZATIONS - TOTAL UNSERIALIZED: {len(error_collection.missing_serialization_list)}\n{''.join(str(serializaiton) + "\n" for serializaiton in error_collection.missing_serialization_list)}")
     
 
 
@@ -755,14 +755,35 @@ async def test_serialization_coverage(
         name_server_ready=name_server_ready
     )
 
+    errored_processes: str = ""
+    error_collections = ErrorCollections(
+        missing_params_list=[],
+        missing_serialization_list=[],
+        alternative_errors_list=[]
+    )
     # Check the OT3API process for serialization, parameter or alternative errors
     ot3_error_collection = await _collect_proxy_attribute_information(original_class=OT3API, acpo_instance=ot3api)
-    _raise_if_errors(process="OT3API", error_collection=ot3_error_collection)
+    if len(ot3_error_collection.alternative_errors_list) > 0 or len(ot3_error_collection.missing_params_list) > 0 or len(ot3_error_collection.missing_serialization_list) > 0:
+        errored_processes += " OT3API "
+        error_collections.alternative_errors_list.extend(ot3_error_collection.alternative_errors_list)
+        error_collections.missing_params_list.extend(ot3_error_collection.missing_params_list)
+        error_collections.missing_serialization_list.extend(ot3_error_collection.missing_serialization_list)
 
     # Check the ROBOT-SERVER process for serialization, parameter or alternative errors
     robot_server_error_collection = await _collect_proxy_attribute_information(original_class=pyro_resource.RobotServerPyroResource, acpo_instance=robot_server)
-    _raise_if_errors(process="ROBOT-SERVER", error_collection=robot_server_error_collection)
+    if len(robot_server_error_collection.alternative_errors_list) > 0 or len(robot_server_error_collection.missing_params_list) > 0 or len(robot_server_error_collection.missing_serialization_list) > 0:
+        errored_processes += " ROBOT-SERVER "
+        error_collections.alternative_errors_list.extend(robot_server_error_collection.alternative_errors_list)
+        error_collections.missing_params_list.extend(robot_server_error_collection.missing_params_list)
+        error_collections.missing_serialization_list.extend(robot_server_error_collection.missing_serialization_list)
 
     # Check the DIRECTED-RUN process for serialization, parameter or alternative errors
     directed_run_error_collection = await _collect_proxy_attribute_information(original_class=DirectedRunProcess, acpo_instance=run_process)
-    _raise_if_errors(process="DIRECTED-RUN", error_collection=directed_run_error_collection)
+    if len(directed_run_error_collection.alternative_errors_list) > 0 or len(directed_run_error_collection.missing_params_list) > 0 or len(directed_run_error_collection.missing_serialization_list) > 0:
+        errored_processes += " DIRECTED-RUN "
+        error_collections.alternative_errors_list.extend(directed_run_error_collection.alternative_errors_list)
+        error_collections.missing_params_list.extend(directed_run_error_collection.missing_params_list)
+        error_collections.missing_serialization_list.extend(directed_run_error_collection.missing_serialization_list)
+
+    # Raise any errors that occured across all processes
+    _raise_if_errors(processes=errored_processes, error_collection=error_collections)
