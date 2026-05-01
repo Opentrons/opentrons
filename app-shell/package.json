@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": ["**"]
+    "nohoist": [
+      "**"
+    ]
   },
   "devDependencies": {
     "@types/node-fetch": "2.6.11",
@@ -78,8 +80,5 @@
     "winston": "3.15.0",
     "winston-transport": "^4.9.0",
     "yargs-parser": "13.1.2"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": ["electron"]
   }
 }
