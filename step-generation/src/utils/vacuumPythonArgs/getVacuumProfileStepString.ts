@@ -15,7 +15,7 @@ const _getAtomicVacuumStepsFromCycleStep = (
   })
 }
 
-const _etAtomicVacuumProfileSteps = (
+const _getAtomicVacuumProfileSteps = (
   profile: VacuumProfile
 ): AtomicVacuumProfileStep[] => {
   return profile.reduce<AtomicVacuumProfileStep[]>((acc, step) => {
@@ -58,7 +58,7 @@ export const getVacuumProfileStepString = (
     return [profileArg, repetitionsArg]
   } else {
     // either a single atomic step or multiple steps
-    const atomicProfileSteps = _etAtomicVacuumProfileSteps(profile)
+    const atomicProfileSteps = _getAtomicVacuumProfileSteps(profile)
     profileArg = `profile=[\n${indentPyLines(atomicProfileSteps.map(_getVacuumProfileAtomicStepString).join(',\n'))}\n]`
     // hard-coded to 1 repetition if we flatten all steps
     repetitionsArg = `repetitions=${formatPyValue(1)}`

@@ -6,6 +6,8 @@ export const getVacuumPumpHoldArgsPython = (
 ): string[] => {
   return [
     `duration=${formatPyValue(duration)}`,
-    ...(ventAfter != null ? [`vent_after=${formatPyValue(ventAfter)}`] : []),
+    ...(typeof ventAfter === 'boolean'
+      ? [`vent_after=${formatPyValue(ventAfter)}`]
+      : []),
   ]
 }
