@@ -9,6 +9,7 @@ import {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer'
 
+import { registerCertIPC } from './certs'
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
   initializeDiscovery,
@@ -223,6 +224,7 @@ function startUp(): void {
       )
     }
   })
+  registerCertIPC()
 
   log.silly('Global references', { mainWindow, rendererLogger })
 }
