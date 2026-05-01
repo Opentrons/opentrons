@@ -4,10 +4,7 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import {
-  getLocalRobotAuthState,
-  logOutOrTimeOut,
-} from '/app/redux/robot-auth'
+import { getLocalRobotAuthState, logOutOrTimeOut } from '/app/redux/robot-auth'
 
 import { useAccountInfo, useLogOut } from '../hooks'
 
