@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.content_container {
+  display: flex;
+  width: 824px;
+  height:218px;
+  flex-direction: column;
+  padding: 7.75rem var(--spacing-40) var(--spacing-120);
+  margin: 0 auto;
+  gap: var(--spacing-24);
+}
+
+.text_area_container {
+  padding: 0 var(--spacing-60) 0;
+}
+
+.keyboard_container {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}

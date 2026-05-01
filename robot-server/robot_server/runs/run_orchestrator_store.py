@@ -281,7 +281,6 @@ class RunOrchestratorStore:
             return await self.create_pyro(
                 run_id=run_id,
                 labware_offsets=labware_offsets,
-                deck_configuration=deck_configuration,
                 protocol=protocol,
                 run_time_param_values=run_time_param_values,
                 run_time_param_paths=run_time_param_paths,
@@ -381,7 +380,6 @@ class RunOrchestratorStore:
         self,
         run_id: str,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
-        deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
@@ -395,7 +393,6 @@ class RunOrchestratorStore:
         await run_orchestrator.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
-            deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,

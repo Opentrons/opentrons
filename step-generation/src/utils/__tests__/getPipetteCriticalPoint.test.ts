@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ALL,
   COLUMN,
   fixture12Trough,
   fixture96Plate,
@@ -24,17 +25,23 @@ describe('getPipetteCriticalPoint', () => {
     H12: [70, 110, 0],
   }
 
-  const mockPipetteEntity = {
+  const mock96chPipetteEntity = {
     spec: {
       nozzleMap: mockNozzleMap,
     },
     channels: 96,
   } as unknown as PipetteEntity
+  const mock8chPipetteEntity = {
+    spec: {
+      nozzleMap: mockNozzleMap,
+    },
+    channels: 8,
+  } as unknown as PipetteEntity
 
   it('returns center point for COLUMN configuration when labware has one row', () => {
     const result = getPipetteCriticalPoint(
       COLUMN as NozzleConfigurationStyle,
-      mockPipetteEntity,
+      mock96chPipetteEntity,
       'A1' as PrimaryNozzleConfigurationStyle,
       fixture12Trough as LabwareDefinition
     )
@@ -46,7 +53,7 @@ describe('getPipetteCriticalPoint', () => {
   it('returns center point for ROW configuration when labware has one row', () => {
     const result = getPipetteCriticalPoint(
       ROW as NozzleConfigurationStyle,
-      mockPipetteEntity,
+      mock96chPipetteEntity,
       'A1' as PrimaryNozzleConfigurationStyle,
       fixture12Trough as LabwareDefinition
     )
@@ -58,7 +65,7 @@ describe('getPipetteCriticalPoint', () => {
   it('uses primary nozzle as backLeftPoint correctly for different nozzle', () => {
     const result = getPipetteCriticalPoint(
       COLUMN as NozzleConfigurationStyle,
-      mockPipetteEntity,
+      mock96chPipetteEntity,
       'A12' as PrimaryNozzleConfigurationStyle,
       fixture12Trough as LabwareDefinition
     )
@@ -70,7 +77,7 @@ describe('getPipetteCriticalPoint', () => {
   it('returns default position when labware has more than one column', () => {
     const result = getPipetteCriticalPoint(
       COLUMN as NozzleConfigurationStyle,
-      mockPipetteEntity,
+      mock96chPipetteEntity,
       'A1' as PrimaryNozzleConfigurationStyle,
       fixture96Plate as LabwareDefinition
     )
@@ -81,11 +88,21 @@ describe('getPipetteCriticalPoint', () => {
   it('returns default position when nozzle configuration is neither ROW nor COLUMN', () => {
     const result = getPipetteCriticalPoint(
       'SINGLE' as NozzleConfigurationStyle,
-      mockPipetteEntity,
+      mock96chPipetteEntity,
       'H12' as PrimaryNozzleConfigurationStyle,
       fixture12Trough as LabwareDefinition
     )
 
     expect(result).toEqual({ x: 70, y: 110, z: 0 })
+  })
+  it('returns the top point for 8ch ALL configuration when labware has one row', () => {
+    const result = getPipetteCriticalPoint(
+      ALL as NozzleConfigurationStyle,
+      mock8chPipetteEntity,
+      'A1' as PrimaryNozzleConfigurationStyle,
+      fixture12Trough as LabwareDefinition
+    )
+
+    expect(result).toEqual({ x: 0, y: 0, z: 0 })
   })
 })

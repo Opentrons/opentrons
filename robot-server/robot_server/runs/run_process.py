@@ -1,10 +1,12 @@
 """A wrapper for a protocol run that lives as a proxy in its own process."""
 
 import asyncio
+import logging
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, get_args
 
 from opentrons import identify_hardware_process
 from opentrons.config import feature_flags
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
 )
@@ -49,6 +51,9 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.types.execution import PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
@@ -71,6 +76,13 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.service.pyro_utils.pyro_resource import RobotServerPyroResource
+from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
+from robot_server.service.pyro_utils.serpent_type_registry import (
+    register_robot_server_types,
+)
+
+log = logging.getLogger(__name__)
 
 
 # register_process_types runs for both the robot server process and the run subprocess
@@ -120,6 +132,7 @@ def register_all_needed_types() -> None:
     """Register both hardware types and robot server types to serialize."""
     register_process_types()
     register_hardware_types()
+    register_robot_server_types()
 
 
 # DirectedRunProcess is created and run as a pyro daemon in its own subprocess
@@ -136,6 +149,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._run_id: Optional[str] = None
         self._run_orchestrator: Optional[RunOrchestrator] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
+        # Grab the Proxy resources for the Robot Server and OT3API - always expect the resources to be up before a run
+        self._robot_server_resource: RobotServerPyroResource = get_pyro_resource()
+        self._hardware_api: HardwareControlAPI = identify_hardware_process()
+        log.info(f"Directed Run Process initialized with Run ID: {self._run_id}")
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def register_hardware_door_event(self) -> HardwareEventHandler:
@@ -171,11 +188,6 @@ class DirectedRunProcess(AbstractRunCoordinator):
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         # TODO include this
         # initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
-        deck_configuration: DeckConfigurationType,
-        # TODO and these
-        # file_provider: FileProvider,
-        # camera_provider: CameraProvider,
-        # notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
@@ -191,9 +203,8 @@ class DirectedRunProcess(AbstractRunCoordinator):
         else:
             load_fixed_trash = False
 
-        hardware_api = identify_hardware_process()
         engine = await create_protocol_engine(
-            hardware_api=hardware_api,
+            hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,
@@ -204,17 +215,17 @@ class DirectedRunProcess(AbstractRunCoordinator):
             # TODO stop hardcoding this at some point
             error_recovery_policy=error_recovery_policy.never_recover,
             load_fixed_trash=load_fixed_trash,
-            deck_configuration=deck_configuration,
-            # file_provider=file_provider,
-            # camera_provider=camera_provider,
-            # notify_publishers=notify_publishers,
+            deck_configuration=await self._robot_server_resource.get_deck_configuration(),
+            file_provider=self._robot_server_resource.get_file_provider(),
+            camera_provider=self._robot_server_resource.get_camera_provider(),
+            notify_publishers=self._robot_server_resource.get_notify_publishers(),
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
             run_id=run_id,
             protocol_engine=engine,
-            hardware_api=hardware_api,
+            hardware_api=self._hardware_api,
             # camera_provider=camera_provider,
             protocol_config=protocol.source.config if protocol else None,
         )
@@ -237,6 +248,13 @@ class DirectedRunProcess(AbstractRunCoordinator):
             orchestrator.add_labware_offset(offset)
 
         self._run_orchestrator = orchestrator
+
+    async def create_simulating(self, protocol_resource: ProtocolResource) -> None:
+        """Create a simulating runner for use in analysis."""
+        self._run_orchestrator = await create_simulating_orchestrator(
+            robot_type=protocol_resource.source.robot_type,
+            protocol_config=protocol_resource.source.config,
+        )
 
     @property
     def run_id(self) -> Optional[str]:

@@ -8,6 +8,18 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.10.1
+
+**Welcome to Protocol Designer 8.10.1!**
+
+This hotfix release addresses the following bugs:
+
+- Protocol Designer no longer includes excess collision errors when you choose a safe well and nozzle combination to:
+  - transfer liquid to or from labware in the OT-2 Thermocycler Module.
+  - use partial tip pickup with an 8- or 1-channel pipette in a 384-well plate.
+  - transfer liquid with a 96-channel pipette.
+- Protocol Designer lets you customize a location within the source or destination well to blow out excess liquid.
+
 ## Opentrons Protocol Designer Changes in 8.10.0
 
 **Welcome to Protocol Designer 8.10.0!**

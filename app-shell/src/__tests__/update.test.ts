@@ -53,6 +53,7 @@ vi.mock('electron-updater', () => {
 vi.mock('../log', () => {
   const fakeLogger = {
     debug: vi.fn(),
+    silly: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),

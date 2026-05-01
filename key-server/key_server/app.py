@@ -18,6 +18,7 @@ from key_server.tls.dependency import (
     build_tls_manager,
     install_tls_manager,
 )
+from key_server.tls.router import router as tls_router
 
 
 @asynccontextmanager
@@ -47,3 +48,4 @@ app = FastAPI(
 )
 
 app.include_router(settings_router)
+app.include_router(tls_router)

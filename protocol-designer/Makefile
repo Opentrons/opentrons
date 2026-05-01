@@ -16,7 +16,7 @@ test_opts ?=
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: setup
 setup:
@@ -29,10 +29,10 @@ clean:
 # artifacts
 #####################################################################
 
-.PHONY: build
-build: export NODE_ENV := production
-build: export NODE_OPTIONS := --max-old-space-size=5120
-build:
+.PHONY: dist
+dist: export NODE_ENV := production
+dist: export NODE_OPTIONS := --max-old-space-size=5120
+dist:
 	vite build
 	git rev-parse HEAD > dist/.commit
 
@@ -62,4 +62,4 @@ test-cov:
 # analyze bundle
 .PHONY: bundle-analyzer
 bundle-analyzer:
-	ANALYZE_DEBUG=true make build
+	ANALYZE_DEBUG=true make dist

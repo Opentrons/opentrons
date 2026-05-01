@@ -240,6 +240,8 @@ def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) 
 
     if func_name in attributes_with_proxy_result:
         # Check if the result is a list of proxies or singular entity
+        if result is None:
+            return None
         try:
             if result.is_callable:
                 validated_result = AsyncPyroFunctionWrapper(result)
