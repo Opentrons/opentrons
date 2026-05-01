@@ -3,12 +3,12 @@
   width: 100%;
   flex-direction: row;
   justify-content: flex-end;
-  padding: 1rem 1.5rem 1.5rem;
+  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
 }
 
 .robot_cert_import_container {
   display: flex;
   width: 100%;
   flex-direction: column;
-  row-gap: 1.5rem;
+  row-gap: var(--spacing-24);
 }
