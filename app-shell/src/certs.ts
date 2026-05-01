@@ -242,7 +242,7 @@ async function doDecrypt(
   return Buffer.from(decryptedData)
 }
 
-async function certInstallListener(
+async function encryptedCertInstallListener(
   _event: IpcMainInvokeEvent,
   data: {
     certificateData: string
@@ -264,7 +264,7 @@ async function certInstallListener(
 }
 
 export async function registerCertIPC(): Promise<void> {
-  ipcMain.handle('robot-cert:install', certInstallListener)
+  ipcMain.handle('robot-cert:install-encrypted', encryptedCertInstallListener)
   app.on(
     'certificate-error',
     (event, _webContents, _url, _error, certificate, allowRequest) => {

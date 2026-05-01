@@ -11,7 +11,7 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { tryInstallRobotCertificate } from '/app/redux/shell/remote'
+import { tryInstallEncryptedRobotCertificate } from '/app/redux/shell/remote'
 
 import { useHandleRobotCertImport } from '../useHandleRobotCertImport'
 
@@ -20,7 +20,7 @@ import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('/app/redux/shell/remote', () => ({
-  tryInstallRobotCertificate: vi.fn(),
+  tryInstallEncryptedRobotCertificate: vi.fn(),
 }))
 vi.mock('@opentrons/react-api-client')
 
@@ -66,7 +66,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -131,7 +131,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -139,7 +139,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenReject(new Error('wrong password'))
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'oooooooo',
@@ -223,7 +223,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -276,7 +276,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -284,7 +284,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenReject(new Error('bad password sucka'))
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'iuiuiuiu',
@@ -337,7 +337,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
