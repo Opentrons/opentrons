@@ -17,7 +17,6 @@ import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import {
-  getEntireWellSelection,
   getNozzleText,
   getWellGroupLength,
 } from './utils'
@@ -87,7 +86,7 @@ export function ExtendedPartialTipField(
     labwareId: string,
     selectedWells: string[] | undefined,
     fieldKey: keyof FieldPropsByName
-  ) => {
+  ): void => {
     const wells =
       invariantContext.labwareEntities[labwareId]?.def.ordering ?? []
 
