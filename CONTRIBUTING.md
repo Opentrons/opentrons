@@ -65,7 +65,7 @@ After your Pull Request is merged (or otherwise closed), you’ll want to make s
 
 If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up.
 
-## PR etiquette
+## PR etiquette and conventions
 
 Following these practices helps reviewers focus on substance rather than cleanup and keeps our codebase healthy. A guiding principle: **Does this PR alleviate the burden of the reviewer as best as possible?** Please also read through the [LLM Usage Guidelines](#LLM-system-usage-guidelines)
 
