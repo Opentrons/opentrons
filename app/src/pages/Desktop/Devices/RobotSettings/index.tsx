@@ -48,7 +48,6 @@ export function RobotSettings(): JSX.Element {
   return (
     <ApiHostProvider
       hostname={robot?.ip ?? null}
-      port={robot?.port ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
       <RobotCertRotator>
