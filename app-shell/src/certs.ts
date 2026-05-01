@@ -53,23 +53,38 @@ async function getCertDir(): Promise<string> {
   return certDir
 }
 
+async function writeFile(path: string, contents: Buffer): Promise<void> {
+  const certFile = await open(path, 'w')
+  try {
+    await certFile.writeFile(contents)
+  } finally {
+    await certFile.close()
+  }
+}
+
 async function saveCertificateToDisk(
   certificate: X509Certificate
 ): Promise<void> {
   const certDir = await getCertDir()
-
   const certPath = join(certDir, `${certificate.fingerprint256}.cer`)
-  const certFile = await open(certPath, 'w')
-  await certFile.writeFile(certificate.raw)
+  await writeFile(certPath, certificate.raw)
   log.info(`Saved certificate to ${certPath}`)
   addCertificateToMap(certificate)
+}
+
+async function readFile(path: string): Promise<Buffer> {
+  const handle = await open(path, 'r')
+  try {
+    return await handle.readFile()
+  } finally {
+    await handle.close()
+  }
 }
 
 async function tryLoadCertificate(
   path: string
 ): Promise<X509Certificate | null> {
-  const handle = await open(path, 'r')
-  const contents = await handle.readFile()
+  const contents = await readFile(path)
   try {
     return new X509Certificate(contents)
   } catch (err: any) {
@@ -233,7 +248,7 @@ async function certInstallListener(
   )
   const certificate = new X509Certificate(certDER)
   log.silly(`got cert, ca: ${certificate.ca} signer: ${certificate.issuer}`)
-  saveCertificateToDisk(certificate)
+  await saveCertificateToDisk(certificate)
   return true
 }
 
