@@ -1,6 +1,9 @@
 import { useCallback } from 'react'
+import { useSelector } from 'react-redux'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+
+import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
 import { useRequireDocumentation } from './useRequireDocumentation'
 import { useRequireLogin } from './useRequireLogin'
@@ -36,7 +39,8 @@ export function useGuardedAction(
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
-  const requireLogin = useRequireLogin()
+  const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
+  const requireLogin = useRequireLogin(currentUsername)
   const requireDocumentation = useRequireDocumentation()
 
   return useCallback(async () => {
