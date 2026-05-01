@@ -247,12 +247,13 @@ def _map_labware(
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
     if isinstance(location_from_engine, AddressableAreaLocation):
         area_name = location_from_engine.addressableAreaName
-        # If this is our custom module dock, it's not a standard deck slot.
-        # We skip standard conflict mapping because the geometry engine
-        # handles this 1:n space.
-        if "VACUUMMODULE" in area_name.upper() and "DOCK" in area_name.upper():
-            area_name = area_name[:-2]
-            return None
+        # NOTE(ba, 2026-05-1): Some labware like the vacuum module collar
+        # are loaded onto custom addressable areas like `vacuumModuleV1DockV4`.
+        # Currently this does not map well to our convention of everything is
+        # either a DeckSlotName or StagingSlotName. So we need to take the
+        # last 2 characters to convert properly, we should find a better way
+        # of doing this like working with addressableAreaLocation directly.
+        area_name = area_name if len(area_name) == 2 else area_name[-2:]
 
         # This will be guaranteed to be either deck slot name or staging slot name
         slot: Union[DeckSlotName, StagingSlotName]
@@ -365,6 +366,14 @@ def _map_module(
         return (
             mapped_location,
             wrapped_deck_conflict.FlexStackerModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
+    elif module_type == ModuleType.VACUUM_MODULE:
+        return (
+            mapped_location,
+            wrapped_deck_conflict.VacuumModule(
                 name_for_errors=name_for_errors,
                 highest_z_including_labware=highest_z_including_labware,
             ),
