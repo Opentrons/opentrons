@@ -72,74 +72,52 @@ Following these practices helps reviewers focus on substance rather than cleanup
 ### Before Marking a PR "Ready for Review"
 
 - **Proofread the code.** Present a best-effort, functional solution.
-- **Add appropriate tests.** Include tests as appropriate for the scope of the PR.
+- **Add appropriate tests and documentation.** Include tests and documentation as appropriate for the scope of the PR.
 - **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended.
 
 ### While Opening a PR
 
 - **Fill out the PR template thoughtfully.** A well-filled template lets reviewers focus on substance rather than chasing basic questions. It reduces back-and-forth, speeds up review, and helps future maintainers. You're welcome to bend the template when it helps you communicate better (e.g., for a bug fix, overview + details might serve readers better than overview + changelog). Just be thoughtful about what you change and why.
-- **Use semantic commit titling.** Use conventional prefixes such as `feat`, `fix`, `refactor`, `style`, `docs`, etc. See [Commit Guidelines](#commit-guidelines) for our [commitizen][] workflow.
 
-### After Receiving PR Approval
+- **Write a semantic PR title.** Following the [Conventional Commits][conventional-commits] specification, your PR title should have one of the following prefixes. For example: `fix(app): Fix spacing in the nav menu`
+  - `feat` - A new feature
+  - `fix` - A bug fix
+  - `docs` - Documentation only changes
+  - `style` - Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc
+  - `refactor` - A code change that neither fixes a bug nor adds a feature
+  - `perf` - A code change that improves performance
+  - `test` - Adding missing tests or correcting existing tests
+  - `build` - Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+  - `ci` - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+  - `chore` - Other changes that don't modify src or test files
 
+### After receiving PR approval
+
+- **Make sure all automated checks are passing.** See the [Testing](#Testing) and [Code quality](#Code-quality) sections for more details.
 - **Perform a final smoke test** before merging, to confirm nothing regressed after approval.
-- **Truncate the commit message before merging.** Keep only the ticket reference and a concise Overview snippet—avoid long, unwieldy merge messages.
 
-## Commit Guidelines
+### Writing the commit message and merging your PR
 
-### Before you commit
+Normally, you will squash all of your commits into one when you merge your PR. GitHub will ask you to enter a summary and description of the squashed commit.
 
-Before you're ready to make a commit, you should do you best to make sure that:
+The summary should be your PR title, followed by your PR number. GitHub will normally prepopulate it, but double-check it. It should look like this:
 
-- All tests are passing
-  - `make test`
-  - See [Testing](#Testing) section for more details
-- All code quality checks are passing
-  - `make format lint`
-  - See [Code quality](#Code-quality) section for more details
-  - Especially consider [setting up your code editor](#Editor-setup) to run formatting and quality checks automatically as you code
-
-### Making your commit
-
-Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Please read [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams and then come back here. These selected guidelines (copied and pasted from that article) are a very good starting point to think about when writing your commit message:
-
-1.  Separate subject from body with a blank line
-2.  Capitalize the subject line
-3.  Do not end the subject line with a period
-4.  Use the imperative mood in the subject line
-5.  Use the body to explain what and why vs. how
-
-When committing, we use [commitizen][] to format our commit messages according to the [Conventional Commits][conventional-commits] specification. This allows us to automatically generate CHANGELOGs based on commit messages. To commit files, first install `commitizen`, then:
-
-```shell
-git add path/to/files
-git cz
+```
+fix(app): Fix spacing in the nav menu (#12345)
 ```
 
-This will launch the commitizen wizard, which will ask you to:
+For the extended description, delete whatever GitHub prepopulates. In its place, write a concise overview, including ticket references. You might base it on the "Overview" and "Changelog" sections of your PR description. For instance:
 
-1.  Select a commit type, which will be one of:
-    1.  `feat` - A new feature
-    2.  `fix` - A bug fix
-    3.  `docs` - Documentation only changes
-    4.  `style` - Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc
-    5.  `refactor` - A code change that neither fixes a bug nor adds a feature
-    6.  `perf` - A code change that improves performance
-    7.  `test` - Adding missing tests or correcting existing tests
-    8.  `build` - Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-    9.  `ci` - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-    10. `chore` - Other changes that don't modify src or test files
-2.  Select a scope
-    - For `feat`, `fix`, `refactor`, and `perf`, this should a top-level project, e.g. `app` or `api`
-    - For other commit types, use your best judgement or omit
-3.  Write a short commit title
-    - Written according to the guidelines above
-4.  Write a longer description if necessary
-    - Also written according to the guidelines above
-5.  Mention any tickets addressed by the commit
-    - e.g. `Closes #xyz`
+```
+This fixes a few things in the top-level navigation menu that didn't match the designs.
+Closes TICKET-1234.
 
-![commitizen](https://user-images.githubusercontent.com/2963448/40452320-776de7e0-5eaf-11e8-9aa7-ad706713b197.gif)
+* Add more vertical space between the text and the underline.
+* Vertically center the overflow button.
+* Add more space to the right of the overflow button.
+```
+
+Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Further reading: [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams.
 
 ## LLM system usage guidelines
 
