@@ -16,7 +16,11 @@ import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
-import { getNozzleText, getWellGroupLength } from './utils'
+import {
+  getEntireWellSelection,
+  getNozzleText,
+  getWellGroupLength,
+} from './utils'
 
 import type {
   ActiveNozzleNumber,
@@ -78,44 +82,42 @@ export function ExtendedPartialTipField(
     labwareId: string | null
     fieldKey: keyof FieldPropsByName
   }
-
   const wellConfigs: WellCheckConfig[] = []
+  const addWellConfig = (
+    labwareId: string,
+    selectedWells: string[] | undefined,
+    fieldKey: keyof FieldPropsByName
+  ) => {
+    const wells =
+      invariantContext.labwareEntities[labwareId]?.def.ordering ?? []
 
-  if (stepType === 'mix') {
-    const mixLabwareId = propsForFields.labware.value as string
-    const allMixLabwareWells =
-      invariantContext.labwareEntities[mixLabwareId].def.ordering
     wellConfigs.push({
-      wells: allMixLabwareWells,
-      selectedWells: (propsForFields.wells?.value as string[]) ?? [],
-      labwareId: mixLabwareId,
-      fieldKey: 'wells',
+      wells,
+      selectedWells: selectedWells ?? [],
+      labwareId,
+      fieldKey,
     })
   }
-
+  if (stepType === 'mix') {
+    addWellConfig(
+      propsForFields.labware.value as string,
+      propsForFields.wells?.value as string[],
+      'wells'
+    )
+  }
   if (stepType === 'transfer') {
-    const aspLabwareId = propsForFields.aspirate_labware.value as string
-    const allAspLabwareWells =
-      invariantContext.labwareEntities[aspLabwareId].def.ordering
-    wellConfigs.push({
-      wells: allAspLabwareWells,
-      selectedWells: (propsForFields.aspirate_wells?.value as string[]) ?? [],
-      labwareId: aspLabwareId,
-      fieldKey: 'aspirate_wells',
-    })
-    const dspLabwareId = propsForFields.dispense_labware.value as string
-    const allDspLabwareWells =
-      invariantContext.labwareEntities[dspLabwareId].def.ordering
-
-    wellConfigs.push({
-      wells: allDspLabwareWells,
-      selectedWells: (propsForFields.dispense_wells?.value as string[]) ?? [],
-      labwareId: dspLabwareId,
-      fieldKey: 'dispense_wells',
-    })
+    addWellConfig(
+      propsForFields.aspirate_labware.value as string,
+      propsForFields.aspirate_wells?.value as string[],
+      'aspirate_wells'
+    )
+    addWellConfig(
+      propsForFields.dispense_labware.value as string,
+      propsForFields.dispense_wells?.value as string[],
+      'dispense_wells'
+    )
   }
   const tiprackLabwareDefURI = propsForFields.tipRack.value as string
-
   const tiprackId = Object.values(deckSetup.labware).find(
     labware => labware.labwareDefURI === tiprackLabwareDefURI
   )?.id
