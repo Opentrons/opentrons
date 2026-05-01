@@ -73,7 +73,8 @@ export function ExtendedPartialTipField(
   }
   // if deck setup changes and selected wells are now inaccessible - unselect them so that an error is raised
   interface WellCheckConfig {
-    wells: string[]
+    wells: string[][]
+    selectedWells: string[]
     labwareId: string | null
     fieldKey: keyof FieldPropsByName
   }
@@ -81,23 +82,35 @@ export function ExtendedPartialTipField(
   const wellConfigs: WellCheckConfig[] = []
 
   if (stepType === 'mix') {
+    const mixLabwareId = propsForFields.labware.value as string
+    const allMixLabwareWells =
+      invariantContext.labwareEntities[mixLabwareId].def.ordering
     wellConfigs.push({
-      wells: (propsForFields.wells?.value as string[]) ?? [],
-      labwareId: propsForFields.labware.value as string,
+      wells: allMixLabwareWells,
+      selectedWells: (propsForFields.wells?.value as string[]) ?? [],
+      labwareId: mixLabwareId,
       fieldKey: 'wells',
     })
   }
 
   if (stepType === 'transfer') {
+    const aspLabwareId = propsForFields.aspirate_labware.value as string
+    const allAspLabwareWells =
+      invariantContext.labwareEntities[aspLabwareId].def.ordering
     wellConfigs.push({
-      wells: (propsForFields.aspirate_wells?.value as string[]) ?? [],
-      labwareId: propsForFields.aspirate_labware.value as string,
+      wells: allAspLabwareWells,
+      selectedWells: (propsForFields.aspirate_wells?.value as string[]) ?? [],
+      labwareId: aspLabwareId,
       fieldKey: 'aspirate_wells',
     })
+    const dspLabwareId = propsForFields.dispense_labware.value as string
+    const allDspLabwareWells =
+      invariantContext.labwareEntities[dspLabwareId].def.ordering
 
     wellConfigs.push({
-      wells: (propsForFields.dispense_wells?.value as string[]) ?? [],
-      labwareId: propsForFields.dispense_labware.value as string,
+      wells: allDspLabwareWells,
+      selectedWells: (propsForFields.dispense_wells?.value as string[]) ?? [],
+      labwareId: dspLabwareId,
       fieldKey: 'dispense_wells',
     })
   }
@@ -113,7 +126,7 @@ export function ExtendedPartialTipField(
       }
 
       const status = getAllWellsSafetyStatus({
-        allWells: [config.wells],
+        allWells: config.wells,
         robotState,
         invariantContext,
         pipetteId: propsForFields.pipette.value as string,
@@ -123,7 +136,9 @@ export function ExtendedPartialTipField(
         tiprackId,
       })
 
-      const hasInaccessibleWell = config.wells.some(well => status[well] !== 0)
+      const hasInaccessibleWell = config.selectedWells.some(
+        well => status[well] !== 0
+      )
 
       return hasInaccessibleWell ? config.fieldKey : null
     })

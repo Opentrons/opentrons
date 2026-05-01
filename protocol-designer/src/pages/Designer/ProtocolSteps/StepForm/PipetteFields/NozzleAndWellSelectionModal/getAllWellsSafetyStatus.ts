@@ -2,6 +2,7 @@ import {
   ALL,
   COLUMN,
   PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
@@ -11,6 +12,7 @@ import { canPipetteUseLabware } from '../../../../../../utils'
 
 import type {
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
@@ -121,11 +123,7 @@ export function getAllWellsSafetyStatus(
     allWells.flat().forEach(wellName => {
       allWellsWithStatus[wellName] = safe ? 0 : 1
     })
-  } else if (
-    (nozzleConfiguration === SINGLE ||
-      nozzleConfiguration === PARTIAL_COLUMN) &&
-    channels !== 1
-  ) {
+  } else if (nozzleConfiguration === SINGLE && channels !== 1) {
     // SINGLE nozzle for 8ch and 96ch: check every well individually
     allWells.flat().forEach(wellName => {
       const safe = robotState
@@ -142,12 +140,63 @@ export function getAllWellsSafetyStatus(
         : true
       allWellsWithStatus[wellName] = safe ? 0 : 1
     })
+  } else if (nozzleConfiguration === PARTIAL_COLUMN) {
+    const totalSelectionLength =
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+    for (let colIndex = 0; colIndex < allWells.length; colIndex++) {
+      const column = allWells[colIndex]
+      for (let i = 0; i < column.length; i++) {
+        const wellToTest = column[i]
+        const safe = robotState
+          ? getIsSafePipetteMovement({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId,
+              wellTargetName: wellToTest,
+              primaryNozzle,
+              nozzleConfiguration,
+              tiprackId,
+            })
+          : true
+
+        const canFitBlock = i <= column.length - totalSelectionLength
+        if (safe && canFitBlock) {
+          // 1. Mark the valid block (e.g., A1–E1)
+          for (let j = 0; j < totalSelectionLength; j++) {
+            const well = column[i + j]
+            allWellsWithStatus[well] = 0
+          }
+          // 2. Continue checking the remaining wells (e.g., F1–H1)
+          for (let k = i + totalSelectionLength; k < column.length; k++) {
+            const remainingWell = column[k]
+            const remainingSafe = robotState
+              ? getIsSafePipetteMovement({
+                  robotState,
+                  invariantContext,
+                  pipetteId,
+                  labwareId,
+                  wellTargetName: remainingWell,
+                  primaryNozzle,
+                  nozzleConfiguration,
+                  tiprackId,
+                })
+              : true
+
+            allWellsWithStatus[remainingWell] = remainingSafe ? 0 : 1
+          }
+          // Done with this column
+          break
+        }
+        // Mark unsafe if not usable as a starting point
+        allWellsWithStatus[wellToTest] = 1
+      }
+    }
   } else {
     // remaining case - single channel pipettes - assume all wells can be safely accessed
     allWells.flat().forEach(wellName => {
       allWellsWithStatus[wellName] = 0
     })
   }
-
   return allWellsWithStatus
 }
