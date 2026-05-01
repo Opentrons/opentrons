@@ -318,7 +318,21 @@ async def _setup_directed_run_process_pyro_resource(
 ### Parameters mocked out resource
 SKIP_CALLABLE_PROXY = Literal['SKIP_THIS']  # NOTE: We skip these in the initial pass because they are going to be proxy instances
 SKIP_KEYS = ["command"] # NOTE: List of keys to skip checks for
-SKIP_METHODS = ["touch_probe"]   # NOTE: List of methods to skip across our process checks - try to keep this short and reserved to once we individually validate elsewhere or cannot simulate
+SKIP_METHODS = [    # NOTE: List of methods to skip across our process checks - try to keep this short and reserved to once we individually validate elsewhere or cannot simulate
+                    # ALWAYS LEAVE A REASON FOR EXCLUSION
+    "set_notify_publishers",    # Robot server resource setters are not to be used exernally
+    "set_file_provider",    # Robot server resource setters are not to be used exernally
+    "set_camera_provider",     # Robot server resource setters are not to be used exernally
+    "set_deck_configuration_store",    # Robot server resource setters are not to be used exernally
+    "set_maintenance_run_orchestorator_store",    # Robot server resource setters are not to be used exernally
+    "set_run_orchestrator_store",    # Robot server resource setters are not to be used exernally
+    "create_simulating_module",     # Simulating modules are only called during simulation/analysis and not in subprocess operation
+    "create_simulating_peripheral",     # Simulating peripherals are only called during simulation/analysis and not in subprocess operation
+    "update_config_item",   # Not an implemented Flex method, OT-2 only
+    "get_pressure_sensor_available",    # Skipped for simulation constraints
+    "touch_probe",  # Skipped for simulation constraints
+    "loop",     # Not used outside of it's relevant process
+    ]   
 
 PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "axes": {
@@ -351,7 +365,7 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "max_speeds": {Optional[Dict[hw_types.Axis, float]]: {hw_types.Axis.X: 100.0}},
     "expect_stalls": {bool: False},
     "which": {List[hw_types.Axis]: [hw_types.Axis.X, hw_types.Axis.Y]},
-    "expected_grip_width": {float: 5.0},
+    "expected_grip_width": {float: 15.0},
     "grip_width_uncertainty_wider": {float: 0.5},
     "grip_width_uncertainty_narrower": {float: 0.5},
     "disable_geometry_grip_check": {bool: False},
@@ -473,7 +487,7 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
         ]: "p1000_single_flex"
     },
     "config": {Union[config_types.OT3Config, config_types.RobotConfig]: mock_config},  # CASEY NOTE: we know were serializing these right now, but we need to add them to this test eventually - make a todo?
-    "z_speed": {float: 10.0},
+    "z_speed": {float: 1.0},
     "samples_for_baselining": {int: 1},
     "sample_time_sec": {float: 0.1},
     "liquid_class": {str: "water"},
@@ -550,14 +564,6 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "movement_delay": {Optional[float]: 0.0},
     "end_critical_point": {Optional[hw_types.CriticalPoint]: hw_types.CriticalPoint.MOUNT},
     "tip_volume": {float: 50.0},
-    "notify_publishers": {Callable[[], None]: SKIP_CALLABLE_PROXY},
-    "run_orchestrator_store": {"RunOrchestratorStore": cast(RunOrchestratorStore, object())}, # CASEY NOTE: TBD
-    "camera_provider": {CameraProvider: CameraProvider()},
-    "maintenance_run_orchestrator_store": {
-        "MaintenanceRunOrchestratorStore": cast(MaintenanceRunOrchestratorStore, object()) # CASEY NOTE: TBD
-    },
-    "file_provider": {FileProvider: FileProvider()},
-    "deck_configuration_store": {"DeckConfigurationStore": mock_deck_configuration_store}, # CASEY NOTE: TBD
     "cursor": {int: 0, Optional[int]: 0},
     "length": {int: 1},
     "include_fixit_commands": {bool: False},
@@ -656,7 +662,7 @@ class ErrorCollections(BaseModel):
     missing_params_list: list[Any] # NOTE: If errors are collected in this it means we are missing mocks/dummy data for a given param/type pairing in the PARAMETERS_MOCK_TABLE
     alternative_errors_list: list[Any] # NOTE: If errors are collected in this it means some unknown alternative issue occurred during a request.
                                  # Cases that result in alternative errors include a type being serialized incorrected (such as an Enum turing into a string),
-                                 # or a body not being fully mocked (no backend on OT3API for example).
+                                 # they could also be of a class being partially serialized but not deserialized, or a body not being fully mocked (no backend on OT3API for example).
 
 
 def _is_typed_dict_annotation(annotation: Any) -> bool:
@@ -771,7 +777,6 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
         if attribute not in proxy_methods and attribute not in SKIP_METHODS:
             try:
                 ot3_async_wrapped_attribute_result = getattr(acpo_instance, attribute)
-                # other logic in here?
                 try:
                     original_class_attribute = getattr(original_class, attribute)
                     return_annotation = inspect.signature(
@@ -783,6 +788,7 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
                         alternative_errors_list.append(
                             f"ERROR: Result of property {attribute} is type: {type(ot3_async_wrapped_attribute_result)} when expected: {return_annotation}"
                         )
+                    print(f"return data: {ot3_async_wrapped_attribute_result}")
 
                 except AttributeError:
                     # Some of the attributes are Pyro-object only metadata so this may fail. This is fine so long as the wrapped async getattr doesn't throw.
@@ -792,7 +798,7 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
                 if "serialize" in str(e):
                     missing_serialization_list.append(str(e))
                 else:
-                    alternative_errors_list.append(str(e))
+                    alternative_errors_list.append(f"Attribute {attribute} encountered:"+str(e))
     
     # CASEY NOTE --- right here we should scrape any proxy result that returns a wrapped class like modules and then troll through those like above - maybe move the above to be in generic callers
     # THAT GENERIC CALLERS THING WILL NEED TO HAPPEN
@@ -889,3 +895,12 @@ async def test_serialization_coverage(
 
     # Raise any errors that occured across all processes
     _raise_if_errors(processes=errored_processes, error_collection=error_collections)
+
+    raise ValueError("DONE")
+
+
+# CASEY NOTE FOR THE INDIVIDUALIZED TESTS:
+# some functions must be ran in a specific order or theyll fail
+# like we need to load a pipette before we can get good results off hardware_pipettes
+# we'll make a queue of "good order functions" to run first, then run the rest of the random tests after
+

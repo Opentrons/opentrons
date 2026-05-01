@@ -9,6 +9,7 @@ from numpy import float64
 import opentrons_shared_data.errors.codes
 import opentrons_shared_data.pipette.pipette_definition
 import opentrons_shared_data.pipette.types
+import opentrons_shared_data.gripper.gripper_definition
 
 import opentrons.calibration_storage.types
 import opentrons.config.types
@@ -555,6 +556,8 @@ def register_hardware_types() -> None:
             opentrons_shared_data.pipette.types,
             opentrons_shared_data.errors.codes,
             opentrons.hardware_control.peripherals.types,
+            opentrons_shared_data.gripper.gripper_definition,
+            opentrons.calibration_storage.types,
         ]
     )
 
@@ -570,6 +573,7 @@ def register_hardware_types() -> None:
             opentrons.hardware_control.protocols.types,
             opentrons_shared_data.pipette.pipette_definition,
             opentrons.hardware_control.nozzle_manager,
+            opentrons_shared_data.gripper.gripper_definition,
         ]
     )
     for pydantic_type in opentrons_pydantic_types:

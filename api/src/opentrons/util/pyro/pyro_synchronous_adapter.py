@@ -17,6 +17,7 @@ from opentrons.util.pyro.pyro_client_async_adapter import (
 from opentrons.util.pyro.pyro_serialization import (
     NonBuiltinKeyDictWrapper,
     TypedDictWrapper,
+    PYRO_PROXY,
 )
 
 T = TypeVar("T")
@@ -359,7 +360,7 @@ def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
 
 def _determine_attribute_result_metadata(specialty_func: Any) -> _ResultMeta:
     # Determines the result metadata for an attribute wrapped in a speciality function
-    if specialty_func.__name__ == "convert_result_to_proxy":
+    if specialty_func.__name__ == "convert_result_to_proxy" or specialty_func.__name__ == "convert_result_to_dict_of_proxies":
         return _ResultMeta.PROXY
     # NOTE: extend this further as needed in the future for other custom return types
     return _ResultMeta.UNKNOWN
@@ -495,6 +496,88 @@ def convert_result_to_proxy(  # noqa: C901
                 pyro_synchronous_obj = PyroSynchronousObject(result, utility)
                 utility.add_PSO(pyro_synchronous_obj)
             return utility.proxy_for(pyro_synchronous_obj)
+
+    if isinstance(attr, property):
+        # If the original attribute was a property, ensure the wrapped attribute is
+        return property(wrapper)
+    return wrapper  # type: ignore
+
+
+def convert_result_to_dict_of_proxies(  # noqa: C901
+    utility: DaemonUtility, core_obj: Any, name: str, attr: Callable[P, T]
+) -> Callable[P, T]:
+    """Wrapper to change the output of a function to a Dictionary of PyroSynchronousObjects.
+
+    This function is intended for use with `pyro_behavior` and is executed when called through a Pyro Proxy.
+    The result(s) will be newly instanced Proxy object(s) on the Daemon. This is particularly useful for instances
+    that return a dictionary of contained instances, such as an OT3API with internal Dictionary of Pipettes.
+    """
+
+    @functools.wraps(attr)
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
+        # Of note, the wrapper passes self to terminate the self instance passed by the PSO
+        args, kwargs = _validated_parameters(*args, **kwargs)  # type: ignore
+        if inspect.iscoroutinefunction(attr):
+            sync_func = synchronous(attr)
+            bound_method = MethodType(sync_func, core_obj)
+            result = bound_method(*args, **kwargs)
+            return_types = attr.__annotations__["return"]
+        elif isinstance(attr, FunctionType):
+            bound_method = MethodType(attr, core_obj)
+            result = bound_method(*args, **kwargs)
+            return_types = attr.__annotations__["return"]
+        elif isinstance(attr, property):
+            result = getattr(core_obj, name)
+            return_types = attr.fget.__annotations__["return"]
+        else:
+            raise ValueError(
+                "Provided base attribute must be a Property, a Method or an Async method."
+            )
+        # Convert the instance result to PSO(s) and return the Proxy objects
+        if result is None:
+            return None
+
+        if isinstance(result, dict):
+            proxy_dict = {}
+            try:
+                for key, value in result.items():
+                    if value is not None:
+                        pyro_synchronous_obj = utility.find_PSO(value)
+                        if pyro_synchronous_obj is None:
+                            if not hasattr(value, "_loop"):
+                                # Append the parents event loop to the child object for PSO forwarding
+                                setattr(value, "_loop", core_obj._loop)
+                            pyro_synchronous_obj = PyroSynchronousObject(value, utility)
+                            utility.add_PSO(pyro_synchronous_obj)
+                        proxy_dict[key] = utility.proxy_for(pyro_synchronous_obj)
+                    else:
+                        proxy_dict[key] = None
+                        
+                # Format Proxy Dictionary into a safe-for-transport NonBuiltinKeyDictWrapper
+                if hasattr(return_types, "__args__"):
+                    key_type, value_type = return_types.__args__
+                    # Filter out `typing.Optional`` typings to the inner type, only works for non-tuples
+                    # todo(chb: 2025-04-01): Catch and error on cases where we have optional tuples, does that even happen?
+                    try:
+                        key_type = next(a for a in key_type.__args__ if a is not type(None))
+                    except AttributeError:
+                        pass
+                    wrapped_proxy_dict = NonBuiltinKeyDictWrapper(
+                        dictionary=proxy_dict,
+                        key_type=".".join((key_type.__module__, key_type.__qualname__)),
+                        value_type=PYRO_PROXY,
+                    )
+                    return wrapped_proxy_dict
+                else:
+                    raise ValueError(
+                        "Pyro behavior for proxy dictionary wrapping requires function return types."
+                    )
+            except Exception as e:
+                raise ValueError(f"err: {e} result is: {result}")
+        else:
+            raise ValueError(
+                "Pyro behavior for proxy dictionary wrapping is only available for use with dictionaries of instances."
+            )
 
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is
