@@ -130,9 +130,9 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ))}
           </div>
         </div>
-        {accountIconInitial && (
+        {accountIconInitial != null && (
           <NavLink
-            to="/robot-settings"
+            to="/account"
             className={clsx(styles.account_icon, styles.cursor_default)}
             aria-label={t('account')}
           >

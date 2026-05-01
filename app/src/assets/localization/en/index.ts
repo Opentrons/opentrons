@@ -33,6 +33,7 @@ import shared from './shared.json'
 import top_navigation from './top_navigation.json'
 
 export const en = {
+  access_control,
   anonymous,
   access_control,
   app_settings,

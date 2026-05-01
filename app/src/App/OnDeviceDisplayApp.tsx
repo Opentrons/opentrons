@@ -28,6 +28,7 @@ import { OnDeviceLoginOverlayProvider } from '/app/organisms/ODD/OnDeviceLogin'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
+import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -78,6 +79,7 @@ import type { Dispatch } from '/app/redux/types'
 hackWindowNavigatorOnLine()
 
 export const ON_DEVICE_DISPLAY_PATHS = [
+  '/account',
   '/choose-language',
   '/dashboard',
   '/deck-configuration',
@@ -106,6 +108,8 @@ function getPathComponent(
   path: (typeof ON_DEVICE_DISPLAY_PATHS)[number]
 ): JSX.Element {
   switch (path) {
+    case '/account':
+      return <Account />
     case '/choose-language':
       return <ChooseLanguage />
     case '/dashboard':

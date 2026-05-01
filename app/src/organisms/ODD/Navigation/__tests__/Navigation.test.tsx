@@ -104,11 +104,11 @@ describe('Navigation', () => {
         screen.queryByRole('link', { name: linkName })
       ).not.toBeInTheDocument()
     })
-    it('should render the account initial and link to settings when logged in', () => {
+    it('should render the account initial and link to the account page when logged in', () => {
       vi.mocked(useAccountIconInitial).mockReturnValue('T')
       render(props)
       const accountLink = screen.getByRole('link', { name: linkName })
-      expect(accountLink).toHaveAttribute('href', '/robot-settings')
+      expect(accountLink).toHaveAttribute('href', '/account')
       expect(accountLink).toHaveTextContent('T')
     })
   })
