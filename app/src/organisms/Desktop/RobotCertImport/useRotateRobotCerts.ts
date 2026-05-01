@@ -1,0 +1,49 @@
+import { useQuery } from 'react-query'
+
+import { getPlaintextCACertificates } from '@opentrons/api-client'
+import { useHost } from '@opentrons/react-api-client'
+
+import { tryInstallPlaintextRobotCertificate } from '/app/redux/shell/remote'
+
+import type { UseQueryResult } from 'react-query'
+import type { UnencryptedCert } from '@opentrons/api-client'
+
+async function getNextCACert(
+  host: ReturnType<typeof useHost>
+): Promise<UnencryptedCert | null> {
+  if (host == null) {
+    return null
+  }
+  try {
+    const queryResult = await getPlaintextCACertificates(host)
+    return queryResult?.data?.data?.next ?? null
+  } catch (err: any) {
+    // this could be anything but most likely is an SSL error;
+    // if this fails it's fine, it just means we won't rotate the
+    // certs and react-query will retry eventually
+    return null
+  }
+}
+
+export function useRotateRobotCerts(): UseQueryResult<void> {
+  const host = useHost()
+  return useQuery<void>({
+    queryFn: async () => {
+      if (host == null) {
+        return
+      }
+      const maybeCert = await getNextCACert(host)
+      if (maybeCert == null) {
+        return
+      }
+
+      await tryInstallPlaintextRobotCertificate({
+        certificateData: maybeCert.cert_data,
+      })
+    },
+    queryKey: [host, 'rotate-robot-certs'],
+    refetchInterval: 24 * 60 * 60 * 1000,
+    staleTime: 24 * 60 * 60 * 1000,
+    enabled: host != null,
+  })
+}
