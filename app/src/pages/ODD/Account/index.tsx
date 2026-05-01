@@ -71,7 +71,7 @@ export function Account(): JSX.Element {
       </div>
       <p className={styles.footer}>
         <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-          {t('access_control:account_page_footer')}
+          {t('branded:account_page_footer')}
         </StyledText>
       </p>
     </div>
