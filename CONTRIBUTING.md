@@ -1,4 +1,4 @@
-# Contributing Guide
+# Contributing guide
 
 Thanks for your interest in contributing to the Opentrons platform! This Contributing Guide is intended to ensure best practices for both internal Opentrons contributors as well as any external contributors. We want to make sure you’re set up to contribute effectively, no matter if you’re helping us out with bug reports, code, documentation, feature suggestions, or anything else. This guide covers:
 
@@ -27,11 +27,11 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 [node-contributing]: https://github.com/nodejs/node/blob/master/CONTRIBUTING.md
 [kibana-contributing]: https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md
 
-## Opening Issues
+## Opening issues
 
 Please note that the issues tab on this repo is disabled. This doesn't mean we don't want to hear from you; it just means that our [support page][support] is a much better way to do so.
 
-## Opening Pull Requests
+## Opening pull requests
 
 If you’d like to contribute code to the Opentrons platform, pull requests (PRs) are the way to do it. Any code contributions are greatly appreciated! If you’re an external contributor, we’re going to assume you are familiar with the fork and pull request flow. If not, this [blog post by Scott Lowe][fork-and-pull] is a good introduction.
 
@@ -61,21 +61,21 @@ To ensure your code is reviewed quickly and thoroughly, please fill out the sect
 
 After your Pull Request is merged (or otherwise closed), you’ll want to make sure to delete the branch in GitHub. You probably want to delete your local branch, too, depending on your own personal organizational strategies / general paranoia.
 
-### Deciding What to Work On
+### Deciding what to work on
 
 If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up.
 
-## PR Etiquette
+## PR etiquette
 
 Following these practices helps reviewers focus on substance rather than cleanup and keeps our codebase healthy. A guiding principle: **Does this PR alleviate the burden of the reviewer as best as possible?** Please also read through the [LLM Usage Guidelines](#LLM-system-usage-guidelines)
 
-### Before Marking a PR "Ready for Review"
+### Before marking a PR "ready for review"
 
 - **Proofread the code.** Present a best-effort, functional solution.
 - **Add appropriate tests and documentation.** Include tests and documentation as appropriate for the scope of the PR.
 - **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended.
 
-### While Opening a PR
+### While opening a PR
 
 - **Fill out the PR template thoughtfully.** A well-filled template lets reviewers focus on substance rather than chasing basic questions. It reduces back-and-forth, speeds up review, and helps future maintainers. You're welcome to bend the template when it helps you communicate better (e.g., for a bug fix, overview + details might serve readers better than overview + changelog). Just be thoughtful about what you change and why.
 
@@ -136,7 +136,7 @@ That doesn't mean:
 
 Maintainers of the repo follow the same rules, and will never ask you to respond to their LLM outputs.
 
-## Project and Repository Structure
+## Project and repository structure
 
 Most of Opentrons’ projects live in the [Opentrons/opentrons][repo] repository. Having multiple projects in one repository (also known as a monorepo) is convenient for keeping various inter-project dependencies in sync, but does require workflow considerations to keep everything organized and trackable.
 
@@ -152,13 +152,13 @@ Generally, the directory / file structure of our monorepo looks something like t
 
 Our projects use a mix of languages, but mostly Python (backend + robotics) and JavaScript (frontend). Each project has its own `README` + `Makefile` + dependency management.
 
-## Development Setup
+## Development setup
 
 If you'd like to contribute (or maybe just run the very latest and greatest version), this section details what you need to do to get your computer and local repository set up.
 
 Individual projects may have additional instructions, so be sure to check out the various project `README`s, too.
 
-### System and Repository Setup
+### System and repository setup
 
 You will need the following tools installed to develop on the Opentrons platform.
 
@@ -389,9 +389,9 @@ make term ssh_key=/path/to/privkey
 
 If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `make term` and `make install-key` will work without arguments.
 
-## Robot Environment
+## Robot environment
 
-### Log Locations
+### Log locations
 
 OT-2 robots use [systemd-journald][] for log management. This is a single log manager for everything on the system. It is administrated using the [journalctl][] utility. You can view logs by just doing `journalctl` (it may be better to do `journalctl --no-pager | less` to get a better log viewer), or stream them by doing `journalctl -f`. Any command that displays logs can be narrowed down by using a syslog identifier: `journalctl -f SYSLOG_IDENTIFIER=opentrons-api` will only print logs from the api server's loggers, for instance. Our syslog identifiers are:
 
@@ -399,7 +399,7 @@ OT-2 robots use [systemd-journald][] for log management. This is a single log ma
 - `opentrons-update-server`: Anything sent to `logging` logs from the update server package
 - `opentrons-api-serial`: The serial logs
 
-### State Management
+### State management
 
 OT-2 robots use `systemd` as their init system. Every process that we run has an associated systemd unit, which defines and configures its behavior when the robot starts. You can use the [systemctl][] utility to mess around with or inspect the system state. For instance, if you do `systemctl status opentrons-api-server` you will see whether the api server is running or not, and a dump of its logs. You can restart units with `systemctl restart (unitname)`, start and stop them with `systemctl start` and `systemctl stop`, and so on. Note that if you make changes to unit files, you have to run `systemctl daemon-reload` (no further arguments) for the init daemon to see the changes.
 
@@ -408,7 +408,7 @@ Our systemd units are:
 - `opentrons-api-server`: The API server
 - `opentrons-update-server`: The update server
 
-### Other System Admin Notes
+### Other system admin notes
 
 An OT-2's filesystem is mounted from two separate locations. `/data`, `/var`, and `/home` are from the "data" partition, and everything else is from the root partition (or generated by the system). The root partition is what gets updated, by being overwritten. To make this work, the root partition is mounted readonly, which causes writes to files in that partition to fail with the error "readonly filesystem". To prevent this, you can remount the partition:
 `mount -o remount,rw /`
