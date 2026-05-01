@@ -1,6 +1,12 @@
 import * as errorCreators from '../../errorCreators'
 import { vacuumModuleStateGetter } from '../../robotStateSelectors'
-import { getModuleHasLiveTask, uuid } from '../../utils'
+import {
+  formatPyValue,
+  getModuleHasLiveTask,
+  indentPyLines,
+  uuid,
+} from '../../utils'
+import { getVacuumProfileStepString } from '../../utils/vacuumPythonArgs/getVacuumProfileStepString'
 
 import type { VacuumModuleStartRunProfileCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
@@ -9,7 +15,7 @@ import type { CommandCreator } from '../../types'
 export const vacuumStartRunProfile: CommandCreator<
   VacuumModuleStartRunProfileCreateCommand['params']
 > = (args, invariantContext, prevRobotState) => {
-  const { moduleId, profile } = args
+  const { moduleId, profile, ventAfter } = args
 
   // TODO: (nd, 2026-04-23) implement Python
   const vacuumState = vacuumModuleStateGetter(prevRobotState, moduleId)
@@ -30,8 +36,16 @@ export const vacuumStartRunProfile: CommandCreator<
 
   // 1-indexed profile task ID
   const taskId = `${vacuumPythonName}_task_${vacuumState.numPumpActivitiesStarted + 1}`
+  const profileArgs = getVacuumProfileStepString(profile)
+  const ventAfterArg = ventAfter
+    ? `vent_after=${formatPyValue(ventAfter)}`
+    : null
+  const allArgs = [
+    ...profileArgs,
+    ...(ventAfterArg != null ? [ventAfterArg] : []),
+  ]
 
-  const dummyPython = `${taskId} = ${vacuumPythonName}.start_profile(...)`
+  const dummyPython = `${taskId} = ${vacuumPythonName}.start_execute_profile(\n${indentPyLines(allArgs.join(',\n'))}\n)`
 
   return {
     commands: [
@@ -41,6 +55,7 @@ export const vacuumStartRunProfile: CommandCreator<
         params: {
           moduleId,
           profile,
+          ventAfter,
           taskId,
         },
       },

@@ -1,6 +1,12 @@
 import * as errorCreators from '../../errorCreators'
 import { vacuumModuleStateGetter } from '../../robotStateSelectors'
-import { getModuleHasLiveTask, uuid } from '../../utils'
+import {
+  formatPyValue,
+  getModuleHasLiveTask,
+  indentPyLines,
+  uuid,
+} from '../../utils'
+import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
 
 import type { CommandCreator, VacuumPumpPressureArgs } from '../../types'
 
@@ -41,7 +47,14 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
     : null
 
   const taskPython = taskId == null ? '' : `${taskId} = `
-  const dummyPython = `${taskPython}${module.pythonName}.set_pressure(${gaugePressure})`
+
+  const gaugePressureArg = `gauge_pressure=${formatPyValue(gaugePressure)}`
+  const holdArgsPython = isTimedHold
+    ? getVacuumPumpHoldArgsPython(duration, ventAfter)
+    : []
+  const allArgsPython = [gaugePressureArg, ...holdArgsPython]
+  const python = `${taskPython}${module.pythonName}.set_pressure(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
+
   return {
     commands: [
       {
@@ -54,6 +67,6 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
         },
       },
     ],
-    python: dummyPython,
+    python,
   }
 }

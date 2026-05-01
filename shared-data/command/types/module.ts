@@ -392,9 +392,11 @@ export interface VacuumProfileCycle {
   steps: AtomicVacuumProfileStep[]
   repetitions: number
 }
+
+export type VacuumProfile = Array<VacuumProfileCycle | AtomicVacuumProfileStep>
 export interface VacuumRunProfileParams {
   moduleId: string
-  profile: Array<VacuumProfileCycle | AtomicVacuumProfileStep>
+  profile: VacuumProfile
   taskId?: string | null
   ventAfter?: boolean
 }
