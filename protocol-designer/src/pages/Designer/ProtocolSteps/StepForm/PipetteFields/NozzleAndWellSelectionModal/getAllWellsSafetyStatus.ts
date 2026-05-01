@@ -159,9 +159,9 @@ export function getAllWellsSafetyStatus(
               tiprackId,
             })
           : true
-
         const canFitBlock = i <= column.length - totalSelectionLength
-        if (safe && canFitBlock) {
+        const labwareHasOneRow = labwareDef.ordering[0].length === 1
+        if (safe && (canFitBlock || labwareHasOneRow)) {
           // 1. Mark the valid block (e.g., A1–E1)
           for (let j = 0; j < totalSelectionLength; j++) {
             const well = column[i + j]
