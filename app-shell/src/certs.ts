@@ -111,9 +111,6 @@ async function loadCertificatesFromDisk(): Promise<void> {
     if (loaded == null) {
       continue
     }
-    if (!loaded.ca || loaded.issuer === 'Opentrons') {
-      continue
-    }
     addCertificateToMap(loaded)
   }
 }
