@@ -258,13 +258,29 @@ async function encryptedCertInstallListener(
     data.certificateData
   )
   const certificate = new X509Certificate(certDER)
-  log.silly(`got cert, ca: ${certificate.ca} signer: ${certificate.issuer}`)
+  log.silly(
+    `got encrypted cert, ca: ${certificate.ca} signer: ${certificate.issuer} notAfter: ${certificate.validToDate}`
+  )
+  await saveCertificateToDisk(certificate)
+  return true
+}
+
+async function plaintextCertInstallListener(
+  _event: IpcMainInvokeEvent,
+  data: { certificateData: string }
+): Promise<boolean> {
+  const certDER = Buffer.from(data.certificateData, 'base64url')
+  const certificate = new X509Certificate(certDER)
+  log.silly(
+    `got plaintext cert, ca: ${certificate.ca} signer: ${certificate.issuer} notAfter: ${certificate.validToDate}`
+  )
   await saveCertificateToDisk(certificate)
   return true
 }
 
 export async function registerCertIPC(): Promise<void> {
   ipcMain.handle('robot-cert:install-encrypted', encryptedCertInstallListener)
+  ipcMain.handle('robot-cert:install-plaintext', plaintextCertInstallListener)
   app.on(
     'certificate-error',
     (event, _webContents, _url, _error, certificate, allowRequest) => {
