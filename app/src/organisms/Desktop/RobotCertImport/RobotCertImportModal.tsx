@@ -58,6 +58,7 @@ export function RobotCertImportModal(
                 : null
             }
             value={handleImport.passwordValue}
+            autoFocus={true}
           />
         </div>
       </div>
