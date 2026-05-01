@@ -6,7 +6,6 @@ import last from 'lodash/last'
 import {
   DeviceReset,
   Devices,
-  ExternalKeyboardTest,
   LanguageSetting,
   NetworkSettings,
   Privacy,
@@ -220,14 +219,6 @@ export function RobotSettingsDashboard(): JSX.Element {
     case 'Devices':
       return (
         <Devices robotName={robotName} setCurrentOption={setCurrentOption} />
-      )
-
-    case 'ExternalKeyboardTest':
-      return (
-        <ExternalKeyboardTest
-          robotName={robotName}
-          setCurrentOption={setCurrentOption}
-        />
       )
 
     case 'RobotEncryptionKey':
