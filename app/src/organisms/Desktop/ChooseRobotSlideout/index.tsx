@@ -1,4 +1,11 @@
-import { Fragment, useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -213,12 +220,17 @@ export function ChooseRobotSlideout(
       if (query === '') {
         return robots
       } else {
-        return robots.filter(
-          robot =>
-            robot.displayName.toLowerCase().includes(query) ||
-            robot.name.toLowerCase().includes(query) ||
-            robot.robotModel.toLowerCase().includes(query)
-        )
+        return robots.filter(robot => {
+          const displayName = robot.displayName.toLowerCase()
+          const name = robot.name.toLowerCase()
+          const model = robot.robotModel.toLowerCase()
+
+          return (
+            displayName.includes(query) ||
+            name.includes(query) ||
+            model.includes(query)
+          )
+        })
       }
     },
     [searchQuery]
@@ -274,9 +286,7 @@ export function ChooseRobotSlideout(
           onChange={e => {
             setSearchQuery(e.target.value)
           }}
-          leftElement={
-            <Icon name="search" size="1rem" color={COLORS.grey50} />
-          }
+          leftElement={<Icon name="search" size="1rem" color={COLORS.grey50} />}
           size="small"
         />
       ) : null}

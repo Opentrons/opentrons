@@ -73,12 +73,17 @@ export function DevicesLanding(): JSX.Element {
       if (query === '') {
         return robots
       } else {
-        return robots.filter(
-          robot =>
-            robot.displayName.toLowerCase().includes(query) ||
-            robot.name.toLowerCase().includes(query) ||
-            robot.robotModel.toLowerCase().includes(query)
-        )
+        return robots.filter(robot => {
+          const displayName = robot.displayName.toLowerCase()
+          const name = robot.name.toLowerCase()
+          const model = robot.robotModel.toLowerCase()
+
+          return (
+            displayName.includes(query) ||
+            name.includes(query) ||
+            model.includes(query)
+          )
+        })
       }
     },
     [searchQuery]
