@@ -110,7 +110,8 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
         title={t('vacuum.controls.state.label')}
         options={[
           ...[
-            vacuumModuleState?.vacuumState == null
+            vacuumModuleState?.currentPumpActivity == null ||
+            vacuumModuleState.currentPumpActivity.type === 'pumpDeactivated'
               ? {
                   label: t('vacuum.controls.state.options.pump.on'),
                   value: VACUUM_STATE_PUMP_ON,

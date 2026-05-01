@@ -230,35 +230,15 @@ describe('vacuumFormToArgs', () => {
       },
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpProfile',
+      commandCreatorFnName: 'vacuumStartRunProfile',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
-      profileElements: [
+      profile: [
+        { holdSeconds: 45, pressureMbar: 12.5 },
         {
-          type: PROFILE_STEP,
-          id: stepAId,
-          durationSeconds: 45,
-          pumpData: {
-            mode: VACUUM_MODE_PRESSURE,
-            pressureMbar: '12.5',
-          },
-        },
-        {
-          type: PROFILE_CYCLE,
-          id: cycleId,
           repetitions: 3,
-          steps: [
-            {
-              type: PROFILE_STEP,
-              id: stepBId,
-              durationSeconds: 90,
-              pumpData: {
-                mode: VACUUM_MODE_POWER,
-                powerPercent: 88,
-              },
-            },
-          ],
+          steps: [{ holdSeconds: 90, powerPercent: 88 }],
         },
       ],
     }
