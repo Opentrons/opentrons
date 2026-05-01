@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 
 import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired'
-import { usePostDocumentationMutation } from '/app/resources/access-control'
+import { postDocumentation } from '/app/resources/access-control'
 
 import type {
   DocumentedAction,
@@ -18,42 +18,29 @@ export type RequireDocumentationGuard = (
  * Guard hook that captures a documentation note for an action and posts it
  * to the audit log.
  *
- * Trusts the upstream login guard for the access-control state: if
- * `loginResult.username` is null, access control is disabled.
+ * Assumes access control is enabled and the user is authenticated.
  *
- * Returns `null` if the user backs out of the documentation modal.
+ * Resolves with `DocumentationResult` after the user confirms with a
+ * non-empty note. Resolves to `null` if the user backs out of the modal.
  */
 export function useRequireDocumentation(): RequireDocumentationGuard {
-  const postDocumentation = usePostDocumentationMutation()
+  return useCallback(async (action, loginResult) => {
+    const modalResult = await showDocumentationRequiredModal({
+      userName: loginResult.username,
+    })
+    if (modalResult == null) return null
 
-  return useCallback(
-    async (action, loginResult) => {
-      if (loginResult.username == null) {
-        return {
-          note: '',
-          confirmedAt: new Date().toISOString(),
-          documentedBy: '',
-        }
-      }
+    await postDocumentation({
+      action,
+      note: modalResult.note,
+      username: loginResult.username,
+      confirmedAt: modalResult.confirmedAt,
+    })
 
-      const modalResult = await showDocumentationRequiredModal({
-        userName: loginResult.username,
-      })
-      if (modalResult == null) return null
-
-      await postDocumentation.mutateAsync({
-        action,
-        note: modalResult.note,
-        username: loginResult.username,
-        confirmedAt: modalResult.confirmedAt,
-      })
-
-      return {
-        note: modalResult.note,
-        confirmedAt: modalResult.confirmedAt,
-        documentedBy: loginResult.username,
-      }
-    },
-    [postDocumentation]
-  )
+    return {
+      note: modalResult.note,
+      confirmedAt: modalResult.confirmedAt,
+      documentedBy: loginResult.username,
+    }
+  }, [])
 }
