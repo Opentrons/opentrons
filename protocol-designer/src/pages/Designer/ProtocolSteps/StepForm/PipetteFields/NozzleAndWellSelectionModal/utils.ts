@@ -172,7 +172,7 @@ export const getEntireWellSelection = (
     return []
   }
   if (nozzleConfiguration === SINGLE) return [wellName]
-  const columnIndex = wellOrdering.findIndex(column =>
+  const columnIndex = wellOrdering?.findIndex(column =>
     column.includes(wellName)
   )
   const indexInColumn = wellOrdering[columnIndex].findIndex(
