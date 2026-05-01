@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   COLORS,
@@ -19,16 +20,18 @@ export function Account(): JSX.Element {
   const { isLoggedIn, username, legalName } = useAccountInfo()
   const logOut = useLogOut()
 
-  if (!isLoggedIn) {
-    return <Navigate to="/dashboard" replace />
-  }
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate(-1)
+    }
+  }, [isLoggedIn, navigate])
 
   return (
     <div className={styles.page}>
       <ChildNavigation
         header={t('top_navigation:account')}
         onClickBack={() => {
-          navigate('/robot-settings')
+          navigate(-1)
         }}
         buttonText={t('access_control:log_out')}
         onClickButton={logOut}
