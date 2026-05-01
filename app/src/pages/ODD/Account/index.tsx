@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import {
@@ -10,37 +9,18 @@ import {
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { getLocalRobot } from '/app/redux/discovery'
-import {
-  getIsLoggedInToLocalRobot,
-  getLocalRobotAuthState,
-  logOutOrTimeOut,
-} from '/app/redux/robot-auth'
 
 import styles from './account.module.css'
-
-import type { Dispatch, State } from '/app/redux/types'
+import { useAccountInfo, useLogOut } from './hooks'
 
 export function Account(): JSX.Element {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const dispatch = useDispatch<Dispatch>()
-  const localRobot = useSelector(getLocalRobot)
-  const isLoggedIn = useSelector((state: State) =>
-    getIsLoggedInToLocalRobot(state)
-  )
-  const auth = useSelector(getLocalRobotAuthState)
-  const username = auth?.username ?? ''
+  const { isLoggedIn, username, legalName } = useAccountInfo()
+  const logOut = useLogOut()
 
   if (!isLoggedIn) {
     return <Navigate to="/dashboard" replace />
-  }
-
-  const handleLogout = (): void => {
-    if (localRobot?.name != null) {
-      dispatch(logOutOrTimeOut({ robotName: localRobot.name }))
-    }
-    navigate('/dashboard')
   }
 
   return (
@@ -51,7 +31,7 @@ export function Account(): JSX.Element {
           navigate('/robot-settings')
         }}
         buttonText={t('access_control:log_out')}
-        onClickButton={handleLogout}
+        onClickButton={logOut}
         buttonType="tertiaryHighLight"
       />
       <div className={styles.rows}>
@@ -80,7 +60,7 @@ export function Account(): JSX.Element {
             }
             content={
               <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-                {username}
+                {legalName}
               </StyledText>
             }
           />
