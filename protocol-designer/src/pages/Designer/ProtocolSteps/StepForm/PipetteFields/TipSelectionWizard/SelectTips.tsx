@@ -39,7 +39,10 @@ import {
   INACCESSIBLE_PARTIAL_TIP,
   INACCESSIBLE_WELL_SPACING_MISMATCH,
 } from '../NozzleAndWellSelectionModal/constants'
-import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
+import {
+  getEntireWellSelection,
+  getWellNameAtClientPoint,
+} from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
   INACCESSIBLE_COLLISION,
@@ -106,7 +109,7 @@ export function SelectTips(
   } = props
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
   const robotState = useSelector(getRobotStateAtActiveItem)
-
+  const [wellShadow, setWellShadow] = useState<string | null>(null)
   const viewBox =
     selectedTiprackId != null
       ? getViewboxFromSelectedLabware(
@@ -283,7 +286,7 @@ export function SelectTips(
       leaveTimeoutRef.current = null
     }
     setHoveredWells(allHoveredWells)
-    currentHoveredWellRef.current = allHoveredWells
+    setWellShadow(allHoveredWells[0])
   }
 
   const handleLeaveWell = (_: WellMouseEvent): void => {
@@ -312,6 +315,10 @@ export function SelectTips(
       const wellsUnderRect = _getWellsFromRect(rect)
       const flat = [...new Set(wellsUnderRect.flat())]
       setHoveredWells(flat)
+      const wellUnderMouse = getWellNameAtClientPoint(e.clientX, e.clientY)
+      if (wellUnderMouse) {
+        setWellShadow(wellUnderMouse)
+      }
     }
   }
   const handleSelectionDone = (e: MouseEvent, rect: GenericRect): void => {
@@ -420,17 +427,17 @@ export function SelectTips(
           borderStroke={COLORS.yellow40}
           ignoreMissingTips
         />
-        {hoveredWells != null ? (
+        {wellShadow ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
-            hoveredWell={hoveredWells[0]}
+            hoveredWell={wellShadow ?? ''}
             selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
             isHoveredWellSelected={selectedTips
               .flat()
-              .some(tip => tip === hoveredWells[0])}
+              .some(tip => tip === wellShadow)}
             hasPickupsRemaining={hasPickupsRemaining}
             isAccessible={hoveredWellsInaccessibilityStatus == null}
             inaccessibleReason={hoveredWellsInaccessibilityStatus ?? null}
