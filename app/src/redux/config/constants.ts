@@ -11,6 +11,7 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'quickTransferProtocolContentsLog',
   'ignoreOT2App',
   'accessControlMode',
+  'robotSearchBar',
 ]
 
 // action type constants
