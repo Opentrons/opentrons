@@ -298,12 +298,20 @@ def _build_classdict(  # noqa: C901
                 async_metadata = _build_metadata_dictionary(attr)
                 async_methods[name] = async_metadata
 
-                bound_method = MethodType(exposed, core_obj)
+                # Bound methods to the original instance unless they are staticmethods
+                if isinstance(inspect.getattr_static(core_obj.__class__, name), staticmethod):
+                    bound_method = exposed
+                else:
+                    bound_method = MethodType(exposed, core_obj)
                 yield (name, parameter_validation_wrapper(bound_method))
             elif isinstance(attr, FunctionType):
                 # Expose standard functions and bound the exposed function to the original instance
                 exposed = pyro.expose(attr)
-                bound_method = MethodType(exposed, core_obj)
+                # Bound methods to the original instance unless they are staticmethods
+                if isinstance(inspect.getattr_static(core_obj.__class__, name), staticmethod):
+                    bound_method = exposed
+                else:
+                    bound_method = MethodType(exposed, core_obj)
                 yield (name, parameter_validation_wrapper(bound_method))
             elif isinstance(attr, property):
                 # Bound property to the original instance and expose the bounded property

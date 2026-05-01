@@ -489,7 +489,7 @@ PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
     "config": {Union[config_types.OT3Config, config_types.RobotConfig]: mock_config},  # CASEY NOTE: we know were serializing these right now, but we need to add them to this test eventually - make a todo?
     "z_speed": {float: 1.0},
     "samples_for_baselining": {int: 1},
-    "sample_time_sec": {float: 0.1},
+    "sample_time_sec": {float: 7.0},
     "liquid_class": {str: "water"},
     "acquire_lock": {bool: False},
     "delta": {ot_types.Point: ot_types.Point(0, 0, 1)},
