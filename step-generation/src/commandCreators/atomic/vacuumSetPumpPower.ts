@@ -1,6 +1,12 @@
 import * as errorCreators from '../../errorCreators'
 import { vacuumModuleStateGetter } from '../../robotStateSelectors'
-import { getModuleHasLiveTask, uuid } from '../../utils'
+import {
+  formatPyValue,
+  getModuleHasLiveTask,
+  indentPyLines,
+  uuid,
+} from '../../utils'
+import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
 
 import type { CommandCreator, VacuumPumpPowerArgs } from '../../types'
 
@@ -28,19 +34,26 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
   }
   const isTimedHold = duration != null
 
-  const holdArgs = isTimedHold
-    ? {
-        duration,
-        // defaults to true per PE command
-        ventAfter: ventAfter ?? true,
-      }
-    : null
-
   const taskId = isTimedHold
     ? `${module.pythonName}_task_${moduleState.numPumpActivitiesStarted + 1}`
     : null
+
+  const holdArgs = isTimedHold
+    ? {
+        duration,
+        ventAfter,
+        taskId,
+      }
+    : null
+
   const taskPython = taskId == null ? '' : `${taskId} = `
-  const dummyPython = `${taskPython}${module.pythonName}.set_power(${powerPercent})`
+
+  const powerPercentArg = `power_percent=${formatPyValue(powerPercent)}`
+  const holdArgsPython = isTimedHold
+    ? getVacuumPumpHoldArgsPython(duration, ventAfter)
+    : []
+  const allArgsPython = [powerPercentArg, ...holdArgsPython]
+  const python = `${taskPython}${module.pythonName}.set_power(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
   return {
     commands: [
       {
@@ -53,6 +66,6 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
         },
       },
     ],
-    python: dummyPython,
+    python,
   }
 }
