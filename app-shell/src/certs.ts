@@ -129,10 +129,10 @@ export function registerCertIPC(): void {
     'certificate-error',
     (event, _webContents, _url, _error, certificate, allowRequest) => {
       const incomingAsBuffer = Buffer.from(certificate.data)
-      const incomingAsNJSCert = new X509Certificate(incomingAsBuffer)
+      const incomingAsNodeJSCert = new X509Certificate(incomingAsBuffer)
       for (const knownCert of knownCertificates.values()) {
-        if (incomingAsNJSCert.checkIssued(knownCert)) {
-          if (incomingAsNJSCert.verify(knownCert.publicKey)) {
+        if (incomingAsNodeJSCert.checkIssued(knownCert)) {
+          if (incomingAsNodeJSCert.verify(knownCert.publicKey)) {
             log.silly('good sign match for cert, allowing')
             event.preventDefault()
             allowRequest(true)
