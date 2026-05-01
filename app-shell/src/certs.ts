@@ -141,13 +141,6 @@ export function registerCertIPC(): void {
         }
       }
       log.info('no sign match for cert, denying')
-      allowRequest(false)
     }
   )
-}
-
-export function registerCertHandlers(
-  dispatch: Dispatch
-): (action: Action) => unknown {
-  return function handleIncomingAction(action: Action): void {}
 }
