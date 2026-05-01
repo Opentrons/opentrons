@@ -5,7 +5,6 @@ import { app, ipcMain } from 'electron'
 import { createLogger } from './log'
 
 import type { IpcMainInvokeEvent } from 'electron'
-import type { Action, Dispatch } from './types'
 
 const promisifiedPBKDF = promisify(pbkdf2)
 
