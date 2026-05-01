@@ -32,15 +32,16 @@ export const handleWaitForTaskForModules = (
       if (moduleType && module.moduleState.type !== moduleType) {
         return false
       }
-      return (
-        (module.moduleState.type === 'thermocyclerModuleType' &&
-          module.moduleState.currentBlockActivity.type === 'profile' &&
-          module.moduleState.currentBlockActivity.taskId === taskId) ||
-        (module.moduleState.type === 'vacuumModuleType' &&
-          (module.moduleState.currentPumpActivity.type === 'timedHold' ||
-            module.moduleState.currentPumpActivity.type === 'profile') &&
-          module.moduleState.currentPumpActivity.taskId === taskId)
-      )
+      const isThermocyclerTask =
+        module.moduleState.type === 'thermocyclerModuleType' &&
+        module.moduleState.currentBlockActivity.type === 'profile' &&
+        module.moduleState.currentBlockActivity.taskId === taskId
+      const isVacuumTask =
+        module.moduleState.type === 'vacuumModuleType' &&
+        (module.moduleState.currentPumpActivity.type === 'timedHold' ||
+          module.moduleState.currentPumpActivity.type === 'profile') &&
+        module.moduleState.currentPumpActivity.taskId === taskId
+      return isThermocyclerTask || isVacuumTask
     }
   )
   if (temporalModuleThatOwnsTask == null) {
