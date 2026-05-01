@@ -1,3 +1,9 @@
 export { getCACertPassword } from './getCACertPassword'
+export { getEncryptedCACertificates } from './getEncryptedCACertificates'
+export { getPlaintextCACertificates } from './getPlaintextCACertificates'
 
-export type { CACertPassword } from './types'
+export type {
+  CACertPassword,
+  EncryptedCACertificates,
+  PlaintextCACertificates,
+} from './types'

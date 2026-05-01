@@ -62,6 +62,7 @@ import {
   forVacuumOpenVent,
   forVacuumSetPumpPower,
   forVacuumSetPumpPressure,
+  forVacuumStartRunProfile,
   forVacuumStopPump,
 } from './vacuumUpdates'
 
@@ -481,6 +482,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'vacuumModule/stopVacuum':
       forVacuumStopPump(command.params, invariantContext, robotStateAndWarnings)
+      break
+    case 'vacuumModule/startRunProfile':
+      forVacuumStartRunProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
     default:
       console.error(

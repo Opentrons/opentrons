@@ -1,5 +1,6 @@
 import { shared_en_resources } from '@opentrons/components'
 
+import access_control from './access_control.json'
 import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
 import branded from './branded.json'
@@ -33,6 +34,7 @@ import top_navigation from './top_navigation.json'
 
 export const en = {
   anonymous,
+  access_control,
   app_settings,
   branded,
   change_pipette,

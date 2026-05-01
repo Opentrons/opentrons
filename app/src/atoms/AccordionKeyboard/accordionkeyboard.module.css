@@ -1,7 +1,6 @@
 .accordion_container {
   display: flex;
   width: 100%;
-  max-width: 64rem;
   flex-direction: column;
   background-color: var(--transparent);
 }

@@ -10,6 +10,7 @@ import {
   ModuleIcon,
   RobotInfoLabel,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -44,11 +45,10 @@ const Table = styled('table')`
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing8};
-  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
-  padding: ${SPACING.spacing4};
+  padding: 0 ${SPACING.spacing24} 0 ${SPACING.spacing24};
 `
 
 const TableRow = styled('tr')`
@@ -193,24 +193,22 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <LegacyStyledText
-              fontSize={TYPOGRAPHY.fontSize20}
+            <StyledText
               color={COLORS.grey60}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
+              oddStyle="smallBodyTextSemiBold"
             >
               {i18n.format(t('location'), 'capitalize')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
           <TableHeader>
-            <LegacyStyledText
-              fontSize={TYPOGRAPHY.fontSize20}
+            <StyledText
               color={COLORS.grey60}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
+              oddStyle="smallBodyTextSemiBold"
             >
               {i18n.format(t('hardware'), 'capitalize')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
         </tr>
       </thead>
