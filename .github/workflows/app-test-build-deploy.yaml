@@ -57,7 +57,7 @@ permissions:
 jobs:
   js-unit-test-shards:
     # unit tests for the app's view layer (not the node layer)
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-22.04'
     name: 'opentrons app frontend unit tests'
     # these tests take > 30 minutes with a single runner, so split into multiple shards
     # https://vitest.dev/guide/improving-performance.html#sharding
@@ -88,7 +88,7 @@ jobs:
 
   js-unit-test:
     needs: [js-unit-test-shards]
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-22.04'
     name: 'opentrons app frontend unit test merge shard results'
     steps:
       - uses: 'actions/checkout@v4'
@@ -112,7 +112,7 @@ jobs:
   backend-unit-test:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         shell: ['app-shell', 'app-shell-odd', 'discovery-client']
         exclude:
           - os: 'windows-2022'
@@ -217,7 +217,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
 
     runs-on: ${{ matrix.os }}
@@ -292,7 +292,7 @@ jobs:
 
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-22.04'
     needs:
       ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     permissions:
