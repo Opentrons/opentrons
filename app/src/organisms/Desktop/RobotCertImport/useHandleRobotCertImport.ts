@@ -42,7 +42,10 @@ export function useHandleRobotCertImport(
 
   const { status, mutate } = useMutation<boolean>({
     mutationFn: async () => {
-      const response = await getEncryptedCACertificates(host!)
+      if (host == null) {
+        throw new Error('Robot is not connected')
+      }
+      const response = await getEncryptedCACertificates(host)
       const currentCert = response?.data?.data.current
       if (currentCert == null) {
         throw new Error('Failed to fetch CA certificates')
