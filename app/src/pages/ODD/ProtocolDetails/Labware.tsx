@@ -57,7 +57,7 @@ const TableDatum = styled('td')`
   }
   &:last-child {
     padding-right: ${SPACING.spacing24};
-    text-align: ${TYPOGRAPHY.textAlignRight};
+    text-align: ${TYPOGRAPHY.textAlignCenter};
     border-top-right-radius: ${BORDERS.borderRadius16};
     border-bottom-right-radius: ${BORDERS.borderRadius16};
   }
@@ -131,10 +131,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                 </Flex>
               </TableDatum>
               <TableDatum>
-                <StyledText
-                  oddStyle="bodyTextSemiBold"
-                  textAlign={TYPOGRAPHY.textAlignCenter}
-                >
+                <StyledText oddStyle="bodyTextSemiBold">
                   {labware.quantity}
                 </StyledText>
               </TableDatum>
