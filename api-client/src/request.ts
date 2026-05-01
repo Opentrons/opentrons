@@ -52,8 +52,8 @@ export function request<ResData, ReqData = null>(
   const tokenHeader = token != null ? { authenticationBearer: token } : {}
   const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
 
-  const protocol = !!secure ? 'https' : 'http'
-  const defaultPort = !!secure ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
+  const protocol = (secure ?? false) ? 'https' : 'http'
+  const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
   const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
 
