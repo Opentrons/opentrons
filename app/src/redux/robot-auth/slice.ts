@@ -93,3 +93,17 @@ export const getIsLoggedInToLocalRobot = createSelector(
     localRobotName != null &&
     getAuthStateForRobot(state, localRobotName) != null
 )
+
+/**
+ * On the on-device display, this returns the username of the user currently
+ * logged in to the local robot, or null if not logged in. On the desktop app,
+ * this is not meaningful.
+ */
+export const getCurrentUsernameForLocalRobot = createSelector(
+  (state: State) => state,
+  (state: State) => getLocalRobot(state)?.name ?? null,
+  (state: State, localRobotName: string | null): string | null => {
+    if (localRobotName == null) return null
+    return getAuthStateForRobot(state, localRobotName)?.username ?? null
+  }
+)
