@@ -788,8 +788,6 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
                         alternative_errors_list.append(
                             f"ERROR: Result of property {attribute} is type: {type(ot3_async_wrapped_attribute_result)} when expected: {return_annotation}"
                         )
-                    print(f"return data: {ot3_async_wrapped_attribute_result}")
-
                 except AttributeError:
                     # Some of the attributes are Pyro-object only metadata so this may fail. This is fine so long as the wrapped async getattr doesn't throw.
                     pass
