@@ -425,7 +425,6 @@ An OT-2's filesystem is mounted from two separate locations. `/data`, `/var`, an
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
 [pnpm]: https://pnpm.io/
-[commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
 [lerna]: https://github.com/lerna/lerna
 [lerna-version]: https://github.com/lerna/lerna/tree/v3.16.4/commands/version
