@@ -23,6 +23,7 @@ import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSetti
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useIsRobotBusy, useRobot } from '/app/redux-resources/robots'
 import { getDevtoolsEnabled } from '/app/redux/config'
@@ -50,7 +51,9 @@ export function RobotSettings(): JSX.Element {
       port={robot?.port ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
-      <RobotSettingsComponent robot={robot} />
+      <RobotCertRotator>
+        <RobotSettingsComponent robot={robot} />
+      </RobotCertRotator>
     </ApiHostProvider>
   )
 }
