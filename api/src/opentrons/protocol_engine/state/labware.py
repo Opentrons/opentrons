@@ -424,6 +424,17 @@ class LabwareView:
             "There is no labware loaded on this Module"
         )
 
+    def get_labware_on_module(self, module_id: str) -> List[str]:
+        """Return all ID's of labware loaded directly on the given module."""
+        on_module: List[str] = []
+        for labware in self._state.labware_by_id.values():
+            if (
+                isinstance(labware.location, ModuleLocation)
+                and labware.location.moduleId == module_id
+            ):
+                on_module.append(labware.id)
+        return on_module
+
     def get_id_by_labware(self, labware_id: str) -> str:
         """Return the ID of the labware loaded on the given labware."""
         for labware in self._state.labware_by_id.values():
