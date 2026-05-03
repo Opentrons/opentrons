@@ -668,7 +668,9 @@ async def test_load_black_plate_contained_inside_collar_on_same_vacuum_module(
 
     assert result.public.labwareId == "plate-id"
     assert result.public.locationSequence is not None
-    assert isinstance(result.public.locationSequence, OnModuleLocationSequenceComponent)
+    assert isinstance(
+        result.public.locationSequence[0], OnModuleLocationSequenceComponent
+    )
     assert result.public.locationSequence[0].moduleId == "module-id"
 
 
@@ -746,7 +748,7 @@ async def test_load_filter_plate_contained_inside_collar_on_vacuum_module(
     assert sequence is not None
     assert isinstance(sequence[0], OnLabwareLocationSequenceComponent)
     assert sequence[0].labwareId == "collar-id"  # plate is on collar
-    assert isinstance(sequence[1], ModuleLocation)
+    assert isinstance(sequence[1], OnModuleLocationSequenceComponent)
     assert sequence[1].moduleId == "module-id"  # collar and plate are on module
     assert isinstance(sequence[2], OnCutoutFixtureLocationSequenceComponent)
     assert sequence[2].cutoutId == "cutoutA4"  # module on cutout
