@@ -1,4 +1,5 @@
 {
+  "__dev_internal__accessControlMode": "Enable frontend for access control mode",
   "__dev_internal__enableLabwareCreator": "Enable App Labware Creator",
   "__dev_internal__enableRunNotes": "Display Notes During a Protocol Run",
   "__dev_internal__externalKeyboardTest": "Enable External Keyboard Test screen",

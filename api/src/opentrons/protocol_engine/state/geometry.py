@@ -910,6 +910,37 @@ class GeometryView:
                 details={"eventual-location": repr(labware.location)},
             )
 
+    def get_parent_from_location(self, location: LabwareLocation) -> str:
+        """Resolves a LabwareLocation down to its root Addressable Area Name."""
+        current_loc = location
+        seen: Set[str] = set()
+
+        while isinstance(current_loc, OnLabwareLocation):
+            parent_id = current_loc.labwareId
+            if parent_id in seen:
+                raise InvalidLabwarePositionError(
+                    f"Cycle detected in labware positioning at location: {location}"
+                )
+
+            seen.add(parent_id)
+            parent_labware = self._labware.get(parent_id)
+            current_loc = parent_labware.location
+
+        if isinstance(current_loc, DeckSlotLocation):
+            return current_loc.slotName.id
+        elif isinstance(current_loc, AddressableAreaLocation):
+            return current_loc.addressableAreaName
+        elif isinstance(current_loc, ModuleFixtureLocation):
+            return current_loc.addressable_area_name
+        elif isinstance(current_loc, ModuleLocation):
+            return self._modules.get_provided_addressable_area(current_loc.moduleId)
+
+        else:
+            raise LabwareNotOnDeckError(
+                "Provided location is not linked to an addressable area on the deck.",
+                details={"terminal-location": repr(current_loc)},
+            )
+
     def ensure_location_not_occupied(  # noqa: C901
         self,
         location: _LabwareLocation,
@@ -965,7 +996,9 @@ class GeometryView:
                 # in their definition to do a containment occupancy check.
                 # This lets us determine if the empty space (containedSpace) of
                 # a labware is able to fit other labware inside of it.
-                if labware_definition is not None:
+                if labware_definition is not None and isinstance(
+                    labware_definition, LabwareDefinition2
+                ):
                     children = []
                     for lw in self._labware.get_all():
                         if lw.location == location:
@@ -977,6 +1010,8 @@ class GeometryView:
                     # if we have children check if either siblings have 'containedSpace'
                     for child in children:
                         child_def = self._labware.get_definition(child.id)
+                        if not isinstance(child_def, LabwareDefinition2):
+                            continue
                         existing_contained = child_def.containedSpace
 
                         # Standard Nesting: Loading a resident into an existing container
@@ -1661,7 +1696,8 @@ class GeometryView:
         # If the labware is loaded on an AA that is a module, we want to respect the convention
         # of giving it an OnModuleLocation.
         possible_module = self._modules.get_by_addressable_area(
-            labware_location.addressableAreaName
+            labware_location.addressableAreaName,
+            self._addressable_areas.deck_definition,
         )
         if possible_module is not None:
             return building + [

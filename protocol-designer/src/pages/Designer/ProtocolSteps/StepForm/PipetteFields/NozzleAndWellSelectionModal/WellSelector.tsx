@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
   COLORS,
-  DEFAULT_TIP_SIZE,
   INACCESSIBLE,
+  Module,
   SELECTED,
   SELECTED_ERROR,
   StyledText,
@@ -14,7 +14,9 @@ import {
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
+  getModuleDef,
   getPositionFromSlotId,
+  inferModuleOrientationFromXCoordinate,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
@@ -26,17 +28,22 @@ import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getCollidingWells } from '/protocol-designer/utils/index'
 
+import { canPipetteUseLabware } from '../../../../../../utils'
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
 import { INACCESSIBLE_COLLISION } from '../TipSelectionWizard/constants'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
-import { INACCESSIBLE_PARTIAL_TIP } from './constants'
+import {
+  INACCESSIBLE_PARTIAL_TIP,
+  INACCESSIBLE_WELL_SPACING_MISMATCH,
+} from './constants'
 import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import styles from './nozzleandwellwizard.module.css'
 import {
   getEntireWellSelection,
   getInaccessibleWellsForPartialNozzleRowMap,
+  getWellNameAtClientPoint,
 } from './utils'
 
 import type { WellMouseEvent, WellType } from '@opentrons/components'
@@ -50,6 +57,7 @@ import type {
 import type { GenericRect } from '/protocol-designer/collision-types'
 import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
+import type { InaccessibleReason } from '../../PipetteFields/TipSelectionWizard/types'
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectorProps {
@@ -95,10 +103,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
   const allWells = labwareDef.ordering
-  const hasMoreThanOneWell = allWells.length > 1
+  const hasMoreThanOneWell = allWells.flat().length > 1
   const displayName = labwareDef.metadata.displayName
 
-  const getWellsField = (): FieldProps | null => {
+  const wellsField = ((): FieldProps | null => {
     switch (stepType) {
       case 'mix':
         return propsForFields.wells
@@ -109,14 +117,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       default:
         return null
     }
-  }
+  })()
 
-  const getSelectedWells = (): string[][] => {
-    const wellsField = getWellsField()
+  const computedSelectedWells = useMemo((): string[][] => {
     const wells = (wellsField?.value as string[]) || []
+
     if (!hasMoreThanOneWell) {
       return allWells
     }
+
     return wells.map(well =>
       getEntireWellSelection(
         well,
@@ -126,22 +135,46 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         channels
       )
     )
-  }
+  }, [
+    wellsField,
+    hasMoreThanOneWell,
+    allWells,
+    labwareDef.ordering,
+    nozzleConfiguration,
+    primaryNozzle,
+    channels,
+  ])
 
-  const [selectedWells, setSelectedWells] =
-    useState<string[][]>(getSelectedWells())
-
-  const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
-  useEffect(
-    () => {
-      setSelectedWells(getSelectedWells())
-      setHoveredWells(null)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stepType]
+  const [selectedWells, setSelectedWells] = useState<string[][]>(
+    computedSelectedWells
   )
+  const [hoveredWells, setHoveredWells] = useState<string[] | null>(null)
+  const currentHoveredWellRef = useRef<string[] | null>(null)
 
+  useEffect(() => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+      leaveTimeoutRef.current = null
+    }
+
+    currentHoveredWellRef.current = null
+    setSelectedWells(computedSelectedWells)
+    setHoveredWells(null)
+  }, [stepType, computedSelectedWells])
+
+  const handleLeaveWell = (): void => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+    }
+
+    leaveTimeoutRef.current = setTimeout(() => {
+      setHoveredWells(null)
+      setWellShadow(null)
+      currentHoveredWellRef.current = null
+      leaveTimeoutRef.current = null
+    }, 350)
+  }
+  const [wellShadow, setWellShadow] = useState<string | null>(null)
   const handleHoverWell = (e: WellMouseEvent): void => {
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
@@ -157,6 +190,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     )
 
     setHoveredWells(hovered)
+    setWellShadow(hovered[0])
   }
 
   const allWellsWithStatus = useMemo(
@@ -216,69 +250,13 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   )
 
   const deckDef = getDeckDefFromRobotType(robotType)
-  const slot = getSlotInLocationStack(labware.stack)
-  const slotPosition = getPositionFromSlotId(slot, deckDef)
+  const viewBox = getViewboxFromSelectedLabware(
+    labwareId,
+    robotState,
+    deckSetup,
+    deckDef
+  )
 
-  const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
-
-  const handleClickWell = (wellName: string): void => {
-    const wellsField = getWellsField()
-
-    const wellIsSelected = selectedWells.flat().includes(wellName)
-    let wellsToToggle: string[] = []
-    if (wellIsSelected) {
-      const primaryWells = wellsField?.value as string[]
-      for (const primaryWell of primaryWells) {
-        const group = getEntireWellSelection(
-          primaryWell,
-          labwareDef.ordering,
-          nozzleConfiguration,
-          primaryNozzle,
-          channels
-        )
-        if (group.includes(wellName)) {
-          wellsToToggle = group
-          break
-        }
-      }
-    } else {
-      wellsToToggle = getEntireWellSelection(
-        wellName,
-        labwareDef.ordering,
-        nozzleConfiguration,
-        primaryNozzle,
-        channels
-      )
-    }
-    const allWellsWithStatus = getAllWellsSafetyStatus({
-      allWells,
-      robotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      primaryNozzle,
-      nozzleConfiguration,
-    })
-
-    if (allWellsWithStatus[wellName] === 1) {
-      return
-    }
-
-    setSelectedWells(prev => {
-      const next = prev.filter(group => group[0] !== wellsToToggle[0])
-      const hadOverlap = next.length !== prev.length
-
-      if (!hadOverlap) {
-        next.push(wellsToToggle)
-      }
-
-      if (wellsField != null) {
-        wellsField.updateValue(next.map(group => group[0]))
-      }
-
-      return next
-    })
-  }
   const _getWellsFromRect: (rect: GenericRect) => string[][] = rect => {
     const wellsInRect = getCollidingWells(rect)
     const highlightedWells: string[][] = []
@@ -290,10 +268,13 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         primaryNozzle,
         channels
       )
-      const noOverlapInList = highlightedWells
+      const noOverlapInInaccessibleWells = inaccessiblePartialWells
         .flat()
         .some(well => wellSelection.includes(well))
-      if (!noOverlapInList) {
+      const noOverlapInAlreadySelected = highlightedWells
+        .flat()
+        .some(well => wellSelection.includes(well))
+      if (!noOverlapInAlreadySelected && !noOverlapInInaccessibleWells) {
         highlightedWells.push(wellSelection)
       }
     }
@@ -308,6 +289,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       const wellsUnderRect = _getWellsFromRect(rect)
       const flatWellList = wellsUnderRect.flat()
       setHoveredWells(flatWellList)
+      const wellUnderMouse = getWellNameAtClientPoint(e.clientX, e.clientY)
+      if (wellUnderMouse) {
+        setWellShadow(wellUnderMouse)
+      }
     }
   }
 
@@ -340,7 +325,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             }
           })
         }
-        const wellsField = getWellsField()
         if (wellsField != null) {
           wellsField.updateValue(updated.map(wellGroup => wellGroup[0]))
         }
@@ -385,8 +369,21 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
 
   let controls: JSX.Element = <></>
+  const modulesOnDeck = deckSetup.modules
+  const moduleIds = new Set(Object.keys(modulesOnDeck))
+  const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
 
-  if (slotPosition && labware && robotState) {
+  const moduleDef = moduleLocation
+    ? getModuleDef(modulesOnDeck[moduleLocation].model)
+    : null
+  const isLabwareOnModule = moduleDef !== null
+  const defaultSlotPosition: [number, number, number] = [0, 0, 0]
+
+  if (labware && robotState) {
+    const activeLabware = robotState.labware[labwareId]
+    const slot = getSlotInLocationStack(activeLabware.stack)
+    const slotPosition =
+      getPositionFromSlotId(slot, deckDef) ?? defaultSlotPosition
     inaccessiblePartialWells.forEach(well => {
       if (!selectedWells.flat().includes(well)) {
         if (hoveredWells?.includes(well)) {
@@ -404,34 +401,52 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           return allWellsWithState[w] !== SELECTED_ERROR
         })
       : true
-
-    const inaccessibleReason =
+    let inaccessibleReason: InaccessibleReason
+    if (
       inaccessiblePartialWells.filter(well => hoveredWells?.includes(well))
         .length > 0
-        ? INACCESSIBLE_PARTIAL_TIP
-        : INACCESSIBLE_COLLISION
+    ) {
+      inaccessibleReason = INACCESSIBLE_PARTIAL_TIP
+    } else if (
+      !canPipetteUseLabware(pipetteSpecs, nozzleConfiguration, labwareDef)
+    ) {
+      inaccessibleReason = INACCESSIBLE_WELL_SPACING_MISMATCH
+    } else {
+      inaccessibleReason = INACCESSIBLE_COLLISION
+    }
+
     const is96Channel = channels === 96
-    controls = (
+
+    const labwarePositionProps = isLabwareOnModule
+      ? {
+          x: 0,
+          y: 0,
+        }
+      : {
+          x: slotPosition[0],
+          y: slotPosition[1],
+        }
+    const labwarePipetteContent = (
       <>
         <LabwareOnDeck
           labwareOnDeck={labware}
-          x={slotPosition[0]}
-          y={slotPosition[1]}
-          handleClickWell={handleClickWell}
+          {...labwarePositionProps}
           onMouseEnterWell={handleHoverWell}
+          onMouseLeaveWell={handleLeaveWell}
           selectedTipsByIndex={allWellsWithStatus}
           statusByWellName={allWellsWithState}
           fill={COLORS.white}
-          inWellSelectionModal
           ignoreMissingTips
           wellLabelOptions="SHOW_LABEL_INSIDE"
         />
-        {hoveredWells?.[0] && hasMoreThanOneWell ? (
+        {hasMoreThanOneWell && wellShadow !== null ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
-            slotPosition={slotPosition}
-            hoveredWell={hoveredWells[0]}
+            slotPosition={
+              isLabwareOnModule ? defaultSlotPosition : slotPosition
+            }
+            hoveredWell={wellShadow}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
             hasPickupsRemaining={null}
@@ -446,6 +461,27 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         ) : null}
       </>
     )
+    controls = (
+      <Fragment>
+        {moduleDef ? (
+          <Module
+            key={slot}
+            x={slotPosition[0]}
+            y={slotPosition[1]}
+            def={moduleDef}
+            orientation={inferModuleOrientationFromXCoordinate(slotPosition[0])}
+            innerProps={{ lidMotorState: 'open' }}
+            targetSlotId={slot}
+            targetDeckId={deckDef.otId}
+            childrenPositioningMode={'offsetToSlot'}
+          >
+            {labwarePipetteContent}
+          </Module>
+        ) : (
+          <>{labwarePipetteContent}</>
+        )}
+      </Fragment>
+    )
   }
   return (
     <>
@@ -456,10 +492,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           onSelectionDone={handleSelectionDone}
           customWidth={45}
         >
-          <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
+          <div className={styles.base_deck_tip_selection}>
+            <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
+          </div>
         </SelectionRect>
         <div className={styles.well_legend_box}>
-          <SelectionLegend selectionType={WELL} size={DEFAULT_TIP_SIZE} />
+          <SelectionLegend selectionType={WELL} />
         </div>
       </div>
     </>

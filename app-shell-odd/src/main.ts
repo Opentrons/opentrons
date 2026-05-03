@@ -2,6 +2,11 @@
 import dns from 'dns'
 import path from 'path'
 import { app, ipcMain } from 'electron'
+import {
+  installExtension,
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer'
 import fse from 'fs-extra'
 
 import {
@@ -25,7 +30,7 @@ import { initializeSentry } from './sentry'
 import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
-import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
+import { createUi, waitForBackendAndShowMainWindow } from './ui'
 import { registerSystemInfo } from './usb'
 import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
@@ -181,7 +186,7 @@ function startUp(): void {
     if (!!!mainWindow) {
       log.error('mainWindow went away before show')
     } else {
-      waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+      waitForBackendAndShowMainWindow(dispatch, mainWindow)
     }
   })
 }
@@ -196,16 +201,13 @@ function createRendererLogger(): OTLogger {
 }
 
 function installDevtools(): void {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const devtools = require('electron-devtools-installer')
-  const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
-  const install = devtools.installExtensions
+  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]
   const forceReinstall = config.reinstallDevtools
 
   log.debug('Installing devtools')
 
   try {
-    install(extensions, {
+    installExtension(extensions, {
       loadExtensionOptions: { allowFileAccess: true },
       forceDownload: forceReinstall,
     })

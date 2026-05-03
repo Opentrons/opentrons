@@ -278,7 +278,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
 
         # Only allow moving if the labware has nothing on top, unless it's a movable adapter.
         # Movable adapters (e.g. manifold collar) are permitted to carry labware.
-        if current_labware_definition is not None and not current_labware_definition.parameters.isMovableAdapter:
+        if (
+            current_labware_definition is not None
+            and not current_labware_definition.parameters.isMovableAdapter
+        ):
             self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
                 labware_id=params.labwareId
             )

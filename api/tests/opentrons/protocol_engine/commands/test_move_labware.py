@@ -93,6 +93,7 @@ def subject(
 )
 async def test_manual_move_labware_implementation(
     decoy: Decoy,
+    well_plate_def: LabwareDefinition,
     subject: MoveLabwareImplementation,
     equipment: EquipmentHandler,
     state_view: StateView,
@@ -120,7 +121,8 @@ async def test_manual_move_labware_implementation(
 
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(lw_def)
@@ -202,15 +204,14 @@ async def test_move_labware_implementation_on_labware(
     )
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(lw_def)
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            OnLabwareLocation(labwareId="new-labware-id"),
-            None,
-            lw_def
+            OnLabwareLocation(labwareId="new-labware-id"), None, lw_def
         )
     ).then_return(OnLabwareLocation(labwareId="my-even-cooler-labware-id"))
     decoy.when(
@@ -238,9 +239,7 @@ async def test_move_labware_implementation_on_labware(
         state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
             "my-cool-labware-id"
         ),
-        state_view.labware.raise_if_labware_is_contained(
-            "my-cool-labware-id"
-        ),
+        state_view.labware.raise_if_labware_is_contained("my-cool-labware-id"),
         state_view.labware.raise_if_labware_has_labware_on_top(
             "my-even-cooler-labware-id"
         ),
@@ -300,7 +299,8 @@ async def test_gripper_move_labware_implementation(
 
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(lw_def)
@@ -331,9 +331,7 @@ async def test_gripper_move_labware_implementation(
             sentinel.new_location_validated_unoccupied
         )
     ).then_return(sentinel.new_location_validated_for_gripper)
-    decoy.when(
-        labware_validation.validate_gripper_compatible(lw_def)
-    ).then_return(True)
+    decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
     decoy.when(
         state_view.geometry.get_location_sequence("my-cool-labware-id")
     ).then_return(
@@ -410,7 +408,6 @@ async def test_gripper_error(
 ) -> None:
     """Test the handling of errors during a gripper movement."""
     labware_id = "labware-id"
-    labware_namespace = "labware-namespace"
     labware_load_name = "load-name"
     labware_definition_uri = "opentrons-test/load-name/1"
     origin_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A1)
@@ -421,8 +418,11 @@ async def test_gripper_error(
     # Common MoveLabwareImplementation boilerplate:
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
-    decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(lw_def)
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+    decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(
+        lw_def
+    )
     decoy.when(state_view.labware.get(labware_id=labware_id)).then_return(
         LoadedLabware(
             id=labware_id,
@@ -439,13 +439,9 @@ async def test_gripper_error(
         state_view.geometry.ensure_valid_gripper_location(new_location)
     ).then_return(new_location)
     decoy.when(
-        state_view.geometry.ensure_location_not_occupied(
-            new_location, None, lw_def
-        )
+        state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
     ).then_return(new_location)
-    decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(
-        True
-    )
+    decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
     params = MoveLabwareParams(
         labwareId=labware_id,
         newLocation=new_location,
@@ -589,12 +585,12 @@ async def test_gripper_move_to_waste_chute_implementation(
         pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
         dropOffset=None,
     )
-    labware_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+    labware_def = LabwareDefinition2.model_construct(
         namespace="my-cool-namespace",
         dimensions=Dimensions(
             yDimension=labware_width, zDimension=labware_width, xDimension=labware_width
         ),
-        parameters=Parameters2.model_construct()
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
     )
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
@@ -705,16 +701,15 @@ async def test_move_labware_raises_for_labware_or_module_not_found(
     )
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
 
     decoy.when(
         state_view.labware.get_definition(labware_id="real-labware-id")
     ).then_return(lw_def)
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            ModuleLocation(moduleId="imaginary-module-id-1"),
-            None,
-            lw_def
+            ModuleLocation(moduleId="imaginary-module-id-1"), None, lw_def
         )
     ).then_return(ModuleLocation(moduleId="imaginary-module-id-2"))
 
@@ -754,16 +749,15 @@ async def test_move_labware_raises_if_movement_obstructed(
 
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
 
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(lw_def)
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            None,
-            lw_def
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5), None, lw_def
         )
     ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_6))
     decoy.when(
@@ -806,16 +800,15 @@ async def test_move_labware_raises_when_location_occupied(
     )
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
 
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(lw_def)
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            None,
-            lw_def
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5), None, lw_def
         )
     ).then_raise(errors.LocationIsOccupiedError("Woops!"))
 
@@ -929,7 +922,8 @@ async def test_move_labware_with_gripper_raises_on_ot2(
     ).then_return(
         LabwareDefinition2.model_construct(
             namespace="spacename",
-            parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+            parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+        )
     )
 
     decoy.when(state_view.config).then_return(
@@ -1005,16 +999,15 @@ async def test_labware_raises_when_moved_onto_itself(
 
     lw_def = LabwareDefinition2.model_construct(
         namespace="opentrons-test",
-        parameters=Parameters2.model_construct())  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
     decoy.when(
         state_view.labware.get_definition(labware_id="the-same-labware-id")
     ).then_return(lw_def)
 
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            OnLabwareLocation(labwareId="a-cool-labware-id"),
-            None,
-            lw_def
+            OnLabwareLocation(labwareId="a-cool-labware-id"), None, lw_def
         )
     ).then_return(OnLabwareLocation(labwareId="the-same-labware-id"))
 

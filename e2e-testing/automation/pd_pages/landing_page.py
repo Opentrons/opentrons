@@ -42,5 +42,5 @@ class LandingPage(BasePage):
         self.page.get_by_label("Import_from_landing").set_input_files(file_path)
 
     def edit_protocol(self) -> None:
-        """Click the 'Edit protocol' button."""
+        """Click the 'Edit' button for a specific protocol."""
         self.page.get_by_role("button", name="Edit protocol").click()

@@ -88,7 +88,7 @@ export type ModuleCreateCommand =
   | IdentifyModuleCreateCommand
   | VacuumModuleSetTargetPressureCreateCommand
   | VacuumModuleSetTargetPowerCreateCommand
-  | VacuumModuleDeactivateCreateCommand
+  | VacuumModuleStopPumpCreateCommand
   | VacuumModuleOpenVentCreateCommand
   | VacuumModuleCloseVentCreateCommand
 export interface MagneticModuleEngageMagnetCreateCommand extends CommonCommandCreateInfo {
@@ -659,28 +659,38 @@ export interface IdentifyModuleRunTimeCommand
   result?: any
 }
 
-interface VacuumModuleSetTargetPressureParams {
-  moduleId: string
-  pressure: number
+interface BaseVacuumModulePumpParams extends ModuleOnlyParams {
+  // in seconds
+  duration?: number
+  // in mbar/s
+  rate?: number
+  // in seconds
+  timeout?: number
+  ventAfter?: boolean
 }
 
-interface VacuumModuleSetTargetPowerParams {
-  moduleId: string
-  power: number
+interface VacuumModuleSetTargetPressureParams extends BaseVacuumModulePumpParams {
+  // in mbar
+  gaugePressure: number
+}
+
+interface VacuumModuleSetTargetPowerParams extends BaseVacuumModulePumpParams {
+  // in % between 0 and 100
+  percentPower: number
 }
 
 export interface VacuumModuleSetTargetPressureCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'vacuumModule/setTargetPressure'
+  commandType: 'vacuumModule/startSetVacuumPressure'
   params: VacuumModuleSetTargetPressureParams
 }
 
 export interface VacuumModuleSetTargetPowerCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'vacuumModule/setTargetPower'
+  commandType: 'vacuumModule/startSetVacuumPower'
   params: VacuumModuleSetTargetPowerParams
 }
 
-export interface VacuumModuleDeactivateCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'vacuumModule/deactivate'
+export interface VacuumModuleStopPumpCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/stopVacuum'
   params: ModuleOnlyParams
 }
 

@@ -38,7 +38,7 @@ import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisual
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
-import { PortalRoot as ModalPortalRoot } from './portal'
+import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
 
 import type { RouteProps } from './types'
@@ -178,8 +178,9 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
-  if (deviceRouteMatch == null || robot == null || robotName == null)
+  if (deviceRouteMatch == null || robot == null || robotName == null) {
     return null
+  }
 
   return (
     <ApiHostProvider

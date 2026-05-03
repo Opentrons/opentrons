@@ -160,3 +160,4 @@ api/docs/dist/v2/
 package-testing/results
 all_analysis_results/
 auth-server/.env
+key-server/.key-server-storage

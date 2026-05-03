@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { produce } from 'immer'
 
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
@@ -57,6 +56,13 @@ import {
   forThermocyclerSetTargetLidTemperature,
   forThermocyclerStartRunExtendedProfile,
 } from './thermocyclerUpdates'
+import {
+  forVacuumCloseVent,
+  forVacuumOpenVent,
+  forVacuumSetPumpPower,
+  forVacuumSetPumpPressure,
+  forVacuumStopPump,
+} from './vacuumUpdates'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
@@ -71,7 +77,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  assert(command, 'undefined command passed to getNextRobotStateAndWarning')
+  if (!command) {
+    throw new Error('undefined command passed to getNextRobotStateAndWarning')
+  }
   switch (command.commandType) {
     case 'aspirateWhileTracking':
     case 'aspirate':
@@ -441,6 +449,33 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'absorbanceReader/read':
+      break
+    case 'vacuumModule/startSetVacuumPressure':
+      forVacuumSetPumpPressure(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'vacuumModule/startSetVacuumPower':
+      forVacuumSetPumpPower(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'vacuumModule/openVent':
+      forVacuumOpenVent(command.params, invariantContext, robotStateAndWarnings)
+      break
+    case 'vacuumModule/closeVent':
+      forVacuumCloseVent(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'vacuumModule/stopVacuum':
+      forVacuumStopPump(command.params, invariantContext, robotStateAndWarnings)
       break
     default:
       console.error(

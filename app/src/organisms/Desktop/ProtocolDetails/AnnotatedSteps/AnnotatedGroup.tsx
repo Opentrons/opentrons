@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { COLORS, Icon, StyledText } from '@opentrons/components'
+import { StepGroup } from '@opentrons/components'
 
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
@@ -21,6 +21,7 @@ interface AnnotatedGroupProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   allRunDefs: LabwareDefinition[]
   commandStartNumber: number
+  annotationDescription: string
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
   handlePause?: () => void
 }
@@ -35,6 +36,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     commandStartNumber,
     scrollTargetId,
     listElement,
+    annotationDescription,
   } = props
   const [isExpanded, setIsExpanded] = useState(() =>
     subCommands.some(command => command.isHighlighted)
@@ -50,36 +52,32 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
 
   return (
     <div className={styles.annotated_group_container}>
-      <div onClick={handleClick} className={styles.annotated_group_header}>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {annotationType}
-        </StyledText>
-        <Icon
-          data-testid={isExpanded ? 'chevron-up' : 'chevron-down'}
-          name={isExpanded ? 'chevron-up' : 'chevron-down'}
-          size="2rem"
-          color={COLORS.black90}
-        />
-      </div>
-
-      {isExpanded ? (
-        <div className={styles.annotated_group_expanded}>
-          {subCommands.map((subCommand, index) => (
-            <IndividualCommand
-              scrollTargetId={scrollTargetId}
-              listElement={listElement}
-              fromGroup={false}
-              key={`${subCommand.command.id}_${index}`}
-              command={subCommand.command}
-              commandNumber={commandStartNumber + index}
-              analysis={analysis}
-              isHighlighted={subCommand.isHighlighted}
-              allRunDefs={allRunDefs}
-              setSelectedCommand={setSelectedCommand}
-            />
-          ))}
-        </div>
-      ) : null}
+      <StepGroup
+        title={annotationType}
+        isExpand={isExpanded}
+        handleClick={handleClick}
+        isActive={subCommands.some(command => command.isHighlighted)}
+        subtitle={annotationDescription}
+      >
+        {isExpanded ? (
+          <div className={styles.annotated_group_expanded}>
+            {subCommands.map((subCommand, index) => (
+              <IndividualCommand
+                scrollTargetId={scrollTargetId}
+                listElement={listElement}
+                fromGroup={true}
+                key={`${subCommand.command.id}_${index}`}
+                command={subCommand.command}
+                commandNumber={commandStartNumber + index}
+                analysis={analysis}
+                isHighlighted={subCommand.isHighlighted}
+                allRunDefs={allRunDefs}
+                setSelectedCommand={setSelectedCommand}
+              />
+            ))}
+          </div>
+        ) : null}
+      </StepGroup>
     </div>
   )
 }

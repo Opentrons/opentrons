@@ -1,3 +1,5 @@
+"""Utilities for labware containment math."""
+
 from opentrons_shared_data.labware.labware_definition import (
     ContainedSpace,
     LabwareDefinition,
@@ -8,19 +10,19 @@ from opentrons_shared_data.labware.labware_definition import (
 def is_fully_contained(
     resident_def: LabwareDefinition, boundary_space: ContainedSpace
 ) -> bool:
-    """Validates that the resident fits entirely within the boundary_space box.
-
-    All coordinates are relative to the parent's (0,0,0).
-    """
+    """Return True if the resident labware fits entirely inside the contained space."""
     # TODO: Add LabwareSchemaV3 support
     if not isinstance(resident_def, LabwareDefinition2):
         return True
-    # Resident Extents (Standard labware starts at 0,0,0 relative to parent)
-    res_min_x, res_max_x = 0.0, resident_def.dimensions.xDimension
-    res_min_y, res_max_y = 0.0, resident_def.dimensions.yDimension
-    res_min_z, res_max_z = 0.0, resident_def.dimensions.zDimension
 
-    # Boundary Extents (The 'hole' defined in the JSON)
+    resident = resident_def.dimensions
+
+    # Resident occupies [0, resident.xDimension] etc. in its own frame
+    res_max_x = resident.xDimension
+    res_max_y = resident.yDimension
+    res_max_z = resident.zDimension
+
+    # Boundary (the "hole") extents
     bound_min_x = boundary_space.origin.x
     bound_max_x = bound_min_x + boundary_space.dimensions.xDimension
 
@@ -30,12 +32,12 @@ def is_fully_contained(
     bound_min_z = boundary_space.origin.z
     bound_max_z = bound_min_z + boundary_space.dimensions.zDimension
 
-    # Logical Check: Resident must be bounded by the boundary planes
+    # Resident must be completely inside the boundary box
     return (
-        res_min_x >= bound_min_x
-        and res_max_x <= bound_max_x
-        and res_min_y >= bound_min_y
+        res_max_x <= bound_max_x
         and res_max_y <= bound_max_y
-        and res_min_z >= bound_min_z
         and res_max_z <= bound_max_z
+        and res_max_x > 0
+        and res_max_y > 0
+        and res_max_z > 0
     )

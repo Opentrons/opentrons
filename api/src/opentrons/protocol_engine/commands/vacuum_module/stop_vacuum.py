@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
     from opentrons.protocol_engine.state.state import StateView
 
-StopVacuumCommandType = Literal["vacuum_module/stopVacuum"]
+StopVacuumCommandType = Literal["vacuumModule/stopVacuum"]
 
 
 class StopVacuumParams(BaseModel):
@@ -59,7 +59,7 @@ class StopVacuumImpl(
 class StopVacuum(BaseCommand[StopVacuumParams, StopVacuumResult, ErrorOccurrence]):
     """A command to stop the vacuum pump."""
 
-    commandType: StopVacuumCommandType = "vacuum_module/stopVacuum"
+    commandType: StopVacuumCommandType = "vacuumModule/stopVacuum"
     params: StopVacuumParams
     result: Optional[StopVacuumResult] = None
 
@@ -69,7 +69,7 @@ class StopVacuum(BaseCommand[StopVacuumParams, StopVacuumResult, ErrorOccurrence
 class StopVacuumCreate(BaseCommandCreate[StopVacuumParams]):
     """A request to stop the vacuum pump."""
 
-    commandType: StopVacuumCommandType = "vacuum_module/stopVacuum"
+    commandType: StopVacuumCommandType = "vacuumModule/stopVacuum"
     params: StopVacuumParams
 
     _CommandCls: Type[StopVacuum] = StopVacuum
