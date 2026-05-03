@@ -826,6 +826,7 @@ class ProtocolContext(CommandPublisher):
             DeckLocation,
             Labware,
             ModuleTypes,
+            ModuleFixtureLocation,
             OffDeckType,
             WasteChute,
             TrashBin,
