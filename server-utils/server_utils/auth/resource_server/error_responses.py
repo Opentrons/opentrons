@@ -31,13 +31,14 @@ class AuthorizationErrorResponse(BaseModel):
         ),
     ]
     requiredScopes: Annotated[
-        list[str], Field(description="The authorization scopes carried by the request.")
-    ]
-    providedScopes: Annotated[
         list[str],
         Field(
             description="The authorization scopes required to access the requested resource."
         ),
+    ]
+    providedScopes: Annotated[
+        list[str],
+        Field(description="The authorization scopes carried by the request."),
     ]
 
 
