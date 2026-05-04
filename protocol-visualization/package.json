@@ -38,6 +38,7 @@
     "@opentrons/shared-data": "link:../shared-data",
     "@opentrons/step-generation": "link:../step-generation",
     "clsx": "2.1.1",
-    "react-window": "2.2.4"
+    "react-window": "2.2.4",
+    "lodash": "4.17.21"
   }
 }
