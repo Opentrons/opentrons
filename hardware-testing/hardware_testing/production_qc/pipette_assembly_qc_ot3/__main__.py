@@ -237,6 +237,7 @@ def _save_logging_print(pipette_sn: str) -> None:
         file_handler.setFormatter(formatter)
 
         # 创建一个终端处理器
+        # Create a terminal handler.
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
         formatterconsole = logging.Formatter("%(asctime)s-%(levelname)s- %(message)s")
@@ -383,6 +384,7 @@ async def _pick_up_tip(
     except Exception as err:
         # print(f"Error picking up tip: {err}")
         LOGGING.critical(f"Error picking up tip: {err}")
+        # 07-02 Photoelectric Sensor Fault: "Needle Tube Retrieval Status Incorrect"
         prinval = "07-02光电传感器故障: 取针管状态不正确"
         LOGGING.error(prinval)
         FINAL_TEST_FAIL_INFOR.append(prinval)
@@ -418,6 +420,7 @@ async def _pick_up_tip_newfixture(
     except Exception as err:
         # print(f"Error picking up tip: {err}")
         LOGGING.critical(f"Error picking up tip: {err}")
+        # 07-02 Photoelectric Sensor Fault: Needle Tube Retrieval Status Incorrect
         prinval = "07-02光电传感器故障: 取针管状态不正确"
         LOGGING.error(prinval)
         FINAL_TEST_FAIL_INFOR.append(prinval)
@@ -671,7 +674,15 @@ async def _read_pressure_and_check_results(
                 f"ERROR: channel {c + 1} samples are too far apart, "
                 f"max={round(_c_max, 2)} and min={round(_c_min, 2)}"
             )
-            printsig = f"05-01-fixture-pressure:测试工装气压,状态{tag.value},ch{c + 1}气压差变动最大值{round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}"
+            printsig = f"05-01-fixture-pressure:测试工装气压,状态{tag.value},"  # Test Fixture Air Pressure and Status
+            printsig += f"ch{c + 1}气压差变动最大值{round(_c_max, 2)}"  # Maximum pressure difference variation
+            printsig += (
+                f"与最小值 {round(_c_min, 2)} "  # Maximum Variation in Pressure Difference
+            )
+            printsig += (
+                f"差值{abs(round(_c_max, 2)-round(_c_min, 2))} "  # and Minimum Value
+            )
+            printsig += f"超过阈值{pressure_event_config.stability_threshold}"  # difference
             # print(f"05-01:状态:{tag.value},channel {c + 1} 气压差变动最大值 {round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}")
             ui.print_fail(printsig)
             FINAL_TEST_FAIL_INFOR.append(printsig)
@@ -700,7 +711,10 @@ async def _read_pressure_and_check_results(
             f"ERROR: samples are out of range, "
             f"max={round(_samples_max, 2)} and min={round(_samples_min, 2)}"
         )
-        printsig = f"05-02-fixture-pressure:测试工装气压,状态{tag.value},读取fixture的所有气压最大值{round(_samples_max, 2)}~最小值{round(_samples_min, 2)}超出阈值范围{pressure_event_config.min}~{pressure_event_config.max}"
+        printsig = f"05-02-fixture-pressure:测试工装气压,状态{tag.value},"  # Test fixture air pressure, status
+        printsig += f"读取fixture的所有气压最大值{round(_samples_max, 2)}"
+        printsig += f"~最小值{round(_samples_min, 2)}"
+        printsig += f"超出阈值范围{pressure_event_config.min}~{pressure_event_config.max}"
         # print(f"05-02:状态{tag.value},读取的气压最大值 {round(_samples_max, 2)} 最小值 {round(_samples_min, 2)} 超出阈值范围, 阈值:{pressure_event_config.min}~{pressure_event_config.max}")
         ui.print_fail(printsig)
         FINAL_TEST_FAIL_INFOR.append(printsig)
