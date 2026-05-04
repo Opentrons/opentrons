@@ -9,6 +9,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -57,6 +58,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('../../LocalizationProvider')
+vi.mock('/app/pages/ODD/Account')
 vi.mock('/app/pages/ODD/Welcome')
 vi.mock('/app/pages/ODD/NetworkSetupMenu')
 vi.mock('/app/pages/ODD/ChooseLanguage')
@@ -164,6 +166,10 @@ describe('OnDeviceDisplayApp', () => {
   it('renders RobotDashboard component from /dashboard', () => {
     render('/dashboard')
     expect(vi.mocked(RobotDashboard)).toHaveBeenCalled()
+  })
+  it('renders Account component from /account', () => {
+    render('/account')
+    expect(vi.mocked(Account)).toHaveBeenCalled()
   })
   it('renders ProtocolDashboard component from /protocols', () => {
     render('/protocols')
