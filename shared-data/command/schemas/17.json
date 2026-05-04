@@ -1199,54 +1199,6 @@
       "title": "ColumnNozzleLayoutConfiguration",
       "type": "object"
     },
-    "RunProfileCreate": {
-      "description": "A request to run a vacuum module profile.",
-      "properties": {
-        "commandAnnotationIds": {
-          "description": "A list of command annotation IDs (if any) that apply to this command.",
-          "items": {
-            "type": "string"
-          },
-          "title": "Commandannotationids",
-          "type": "array"
-        },
-        "commandType": {
-          "const": "vacuumModule/runProfile",
-          "default": "vacuumModule/runProfile",
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/RunProfileParams"
-        }
-      },
-      "required": ["params"],
-      "title": "RunProfileCreate",
-      "type": "object"
-    },
-    "RunProfileParams": {
-      "description": "Input parameters to run a vacuum profile.",
-      "properties": {
-        "moduleId": {
-          "description": "Unique ID of the vacuum module.",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "RunProfileParams",
-      "type": "object"
-    },    
     "CommandIntent": {
       "description": "Run intent for a given command.\n\nProps:\n    PROTOCOL: the command is part of the protocol run itself.\n    SETUP: the command is part of the setup phase of a run.",
       "enum": ["protocol", "setup", "fixit"],
@@ -5631,67 +5583,6 @@
       "title": "RunExtendedProfileParams",
       "type": "object"
     },
-    "RunProfileCreate": {
-      "description": "A request to execute a Thermocycler profile run.",
-      "properties": {
-        "commandAnnotationIds": {
-          "description": "A list of command annotation IDs (if any) that apply to this command.",
-          "items": {
-            "type": "string"
-          },
-          "title": "Commandannotationids",
-          "type": "array"
-        },
-        "commandType": {
-          "const": "thermocycler/runProfile",
-          "default": "thermocycler/runProfile",
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/RunProfileParams"
-        }
-      },
-      "required": ["params"],
-      "title": "RunProfileCreate",
-      "type": "object"
-    },
-    "RunProfileParams": {
-      "description": "Input parameters to run a Thermocycler profile.",
-      "properties": {
-        "blockMaxVolumeUl": {
-          "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
-          "title": "Blockmaxvolumeul",
-          "type": "number"
-        },
-        "moduleId": {
-          "description": "Unique ID of the Thermocycler.",
-          "title": "Moduleid",
-          "type": "string"
-        },
-        "profile": {
-          "description": "Array of profile steps with target temperature and temperature hold time.",
-          "items": {
-            "$ref": "#/$defs/RunProfileStepParams"
-          },
-          "title": "Profile",
-          "type": "array"
-        }
-      },
-      "required": ["moduleId", "profile"],
-      "title": "RunProfileParams",
-      "type": "object"
-    },
     "RunProfileStepParams": {
       "description": "Input parameters for an individual Thermocycler profile step.",
       "properties": {
@@ -7761,6 +7652,120 @@
       "title": "UpdatePositionEstimatorsParams",
       "type": "object"
     },
+    "VacuumModuleProfileCycle": {
+      "description": "Input parameters for a vacuum module cycle.",
+      "properties": {
+        "repetitions": {
+          "title": "Repetitions",
+          "type": "integer"
+        },
+        "steps": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePowerStep"
+              },
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePressureStep"
+              }
+            ]
+          },
+          "title": "Steps",
+          "type": "array"
+        }
+      },
+      "required": ["steps", "repetitions"],
+      "title": "VacuumModuleProfileCycle",
+      "type": "object"
+    },
+    "VacuumModuleProfilePowerStep": {
+      "description": "Input parameters for a vacuum module Power Step.",
+      "properties": {
+        "enablePump": {
+          "title": "Enablepump",
+          "type": "boolean"
+        },
+        "holdTimeMinutes": {
+          "title": "Holdtimeminutes",
+          "type": "integer"
+        },
+        "holdTimeSeconds": {
+          "title": "Holdtimeseconds",
+          "type": "integer"
+        },
+        "percentPower": {
+          "title": "Percentpower",
+          "type": "integer"
+        },
+        "rampRate": {
+          "title": "Ramprate",
+          "type": "number"
+        },
+        "timeoutSeconds": {
+          "title": "Timeoutseconds",
+          "type": "integer"
+        },
+        "ventAfter": {
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enablePump",
+        "holdTimeSeconds",
+        "holdTimeMinutes",
+        "rampRate",
+        "timeoutSeconds",
+        "ventAfter",
+        "percentPower"
+      ],
+      "title": "VacuumModuleProfilePowerStep",
+      "type": "object"
+    },
+    "VacuumModuleProfilePressureStep": {
+      "description": "Input parameters for a vacuum module Pressure Step.",
+      "properties": {
+        "enablePump": {
+          "title": "Enablepump",
+          "type": "boolean"
+        },
+        "gaugePressureMbar": {
+          "title": "Gaugepressurembar",
+          "type": "integer"
+        },
+        "holdTimeMinutes": {
+          "title": "Holdtimeminutes",
+          "type": "integer"
+        },
+        "holdTimeSeconds": {
+          "title": "Holdtimeseconds",
+          "type": "integer"
+        },
+        "rampRate": {
+          "title": "Ramprate",
+          "type": "number"
+        },
+        "timeoutSeconds": {
+          "title": "Timeoutseconds",
+          "type": "integer"
+        },
+        "ventAfter": {
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enablePump",
+        "holdTimeSeconds",
+        "holdTimeMinutes",
+        "rampRate",
+        "timeoutSeconds",
+        "ventAfter",
+        "gaugePressureMbar"
+      ],
+      "title": "VacuumModuleProfilePressureStep",
+      "type": "object"
+    },
     "Vec3f": {
       "description": "A 3D vector of floats.",
       "properties": {
@@ -8546,6 +8551,133 @@
       "required": ["moduleId"],
       "title": "OpenLidParams",
       "type": "object"
+    },
+    "opentrons__protocol_engine__commands__thermocycler__run_profile__RunProfileCreate": {
+      "description": "A request to execute a Thermocycler profile run.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "thermocycler/runProfile",
+          "default": "thermocycler/runProfile",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/opentrons__protocol_engine__commands__thermocycler__run_profile__RunProfileParams"
+        }
+      },
+      "required": ["params"],
+      "title": "RunProfileCreate",
+      "type": "object"
+    },
+    "opentrons__protocol_engine__commands__thermocycler__run_profile__RunProfileParams": {
+      "description": "Input parameters to run a Thermocycler profile.",
+      "properties": {
+        "blockMaxVolumeUl": {
+          "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
+          "title": "Blockmaxvolumeul",
+          "type": "number"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Thermocycler.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "profile": {
+          "description": "Array of profile steps with target temperature and temperature hold time.",
+          "items": {
+            "$ref": "#/$defs/RunProfileStepParams"
+          },
+          "title": "Profile",
+          "type": "array"
+        }
+      },
+      "required": ["moduleId", "profile"],
+      "title": "RunProfileParams",
+      "type": "object"
+    },
+    "opentrons__protocol_engine__commands__vacuum_module__run_profile__RunProfileCreate": {
+      "description": "A request to run a vacuum module profile.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/runProfile",
+          "default": "vacuumModule/runProfile",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/opentrons__protocol_engine__commands__vacuum_module__run_profile__RunProfileParams"
+        }
+      },
+      "required": ["params"],
+      "title": "RunProfileCreate",
+      "type": "object"
+    },
+    "opentrons__protocol_engine__commands__vacuum_module__run_profile__RunProfileParams": {
+      "description": "Input parameters to run a vacuum profile.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "profile": {
+          "description": "List of Vacuum Module profile steps.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePowerStep"
+              },
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePressureStep"
+              },
+              {
+                "$ref": "#/$defs/VacuumModuleProfileCycle"
+              }
+            ]
+          },
+          "title": "Profile",
+          "type": "array"
+        }
+      },
+      "required": ["moduleId", "profile"],
+      "title": "RunProfileParams",
+      "type": "object"
     }
   },
   "$id": "opentronsCommandSchemaV17",
@@ -8636,7 +8768,7 @@
       "thermocycler/deactivateLid": "#/$defs/DeactivateLidCreate",
       "thermocycler/openLid": "#/$defs/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidCreate",
       "thermocycler/runExtendedProfile": "#/$defs/RunExtendedProfileCreate",
-      "thermocycler/runProfile": "#/$defs/RunProfileCreate",
+      "thermocycler/runProfile": "#/$defs/opentrons__protocol_engine__commands__thermocycler__run_profile__RunProfileCreate",
       "thermocycler/setTargetBlockTemperature": "#/$defs/SetTargetBlockTemperatureCreate",
       "thermocycler/setTargetLidTemperature": "#/$defs/SetTargetLidTemperatureCreate",
       "thermocycler/startRunExtendedProfile": "#/$defs/StartRunExtendedProfileCreate",
@@ -8657,10 +8789,10 @@
       "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
       "vacuumModule/closeVent": "#/$defs/CloseVentCreate",
       "vacuumModule/openVent": "#/$defs/OpenVentCreate",
+      "vacuumModule/runProfile": "#/$defs/opentrons__protocol_engine__commands__vacuum_module__run_profile__RunProfileCreate",
       "vacuumModule/startSetVacuumPower": "#/$defs/StartSetVacuumPowerCreate",
       "vacuumModule/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
       "vacuumModule/stopVacuum": "#/$defs/StopVacuumCreate",
-      "vacuumModule/runProfile": "#/$defs/RunProfileCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
       "waitForResume": "#/$defs/WaitForResumeCreate",
@@ -8895,7 +9027,7 @@
       "$ref": "#/$defs/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidCreate"
     },
     {
-      "$ref": "#/$defs/RunProfileCreate"
+      "$ref": "#/$defs/opentrons__protocol_engine__commands__thermocycler__run_profile__RunProfileCreate"
     },
     {
       "$ref": "#/$defs/StartRunExtendedProfileCreate"
@@ -8946,7 +9078,7 @@
       "$ref": "#/$defs/CloseVentCreate"
     },
     {
-      "$ref": "#/$defs/RunProfileCreate"
+      "$ref": "#/$defs/opentrons__protocol_engine__commands__vacuum_module__run_profile__RunProfileCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
