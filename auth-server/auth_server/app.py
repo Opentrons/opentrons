@@ -9,7 +9,7 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from server_utils import systemd_utils
-from server_utils.auth.resource_server.fastapi_dependencies import (
+from server_utils.auth.resource_server.fastapi import (
     install_authorization_checker,
 )
 

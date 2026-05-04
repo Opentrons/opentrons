@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
-from server_utils.auth.resource_server.fastapi_dependencies import (
+from server_utils.auth.resource_server.fastapi import (
     build_authorization_checker,
     install_authorization_checker,
 )

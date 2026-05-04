@@ -1,4 +1,4 @@
-"""FastAPI dependencies to enforce authorization."""
+"""FastAPI-specific helpers for enforcing authorization."""
 
 # NOTE: Don't do `from __future__ import annotations` in this file.
 # See comments in `require_scopes()`.
