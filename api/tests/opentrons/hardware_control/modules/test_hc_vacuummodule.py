@@ -240,7 +240,16 @@ async def test_set_vacuum_state(
 
 
 @pytest.mark.parametrize(
-    ("start_pump", "target_rpm", "duty_cycle"), [(True, 60, 75), (False, 0, 90)]
+    (
+        "start_pump",
+        "target_rpm",
+        "duty_cycle",
+        "duration_s",
+        "timeout_s",
+        "rate",
+        "vent_after",
+    ),
+    [(True, 60, 75, 99, 89, None, False), (False, 0, 90, None, None, 22.2, None)],
 )
 async def test_set_pump_state(
     subject: modules.VacuumModule,
@@ -249,14 +258,30 @@ async def test_set_pump_state(
     start_pump: bool,
     target_rpm: int,
     duty_cycle: int,
+    timeout_s: Optional[int],
+    duration_s: Optional[int],
+    rate: Optional[float],
+    vent_after: Optional[bool],
 ) -> None:
     """Ensure that the hardware controller calls the driver method w the correct arguments."""
     await subject.set_pump_state(
-        start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+        start_pump=start_pump,
+        target_rpm=target_rpm,
+        duty_cycle=duty_cycle,
+        duration_s=duration_s,
+        timeout_s=timeout_s,
+        rate=rate,
+        vent_after=vent_after,
     )
     decoy.verify(
         await mock_driver.set_pump_state(
-            start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+            start_pump=start_pump,
+            target_rpm=target_rpm,
+            duty_cycle=duty_cycle,
+            duration_s=duration_s,
+            timeout_s=timeout_s,
+            rate=rate,
+            vent_after=vent_after,
         )
     )
 

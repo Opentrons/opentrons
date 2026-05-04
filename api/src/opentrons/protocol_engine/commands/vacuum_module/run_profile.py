@@ -49,6 +49,7 @@ class VacuumModuleProfilePowerStep(VacuumModuleProfileStepBase):
             hold_time_minutes=self.holdTimeMinutes if self.holdTimeMinutes else None,
             ramp_rate=self.rampRate if self.rampRate else None,
             timeout_seconds=self.timeoutSeconds if self.timeoutSeconds else None,
+            vent_after=self.ventAfter if self.ventAfter is not None else None,
             percent_power=self.percentPower if self.percentPower else None,
         )
 
@@ -66,6 +67,7 @@ class VacuumModuleProfilePressureStep(VacuumModuleProfileStepBase):
             hold_time_minutes=self.holdTimeMinutes if self.holdTimeMinutes else None,
             ramp_rate=self.rampRate if self.rampRate else None,
             timeout_seconds=self.timeoutSeconds if self.timeoutSeconds else None,
+            vent_after=self.ventAfter if self.ventAfter is not None else None,
             gauge_pressure_mbar=self.gaugePressureMbar
             if self.gaugePressureMbar
             else None,

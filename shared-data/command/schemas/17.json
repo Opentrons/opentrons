@@ -1199,6 +1199,54 @@
       "title": "ColumnNozzleLayoutConfiguration",
       "type": "object"
     },
+    "RunProfileCreate": {
+      "description": "A request to run a vacuum module profile.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/runProfile",
+          "default": "vacuumModule/runProfile",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/RunProfileParams"
+        }
+      },
+      "required": ["params"],
+      "title": "RunProfileCreate",
+      "type": "object"
+    },
+    "RunProfileParams": {
+      "description": "Input parameters to run a vacuum profile.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "RunProfileParams",
+      "type": "object"
+    },    
     "CommandIntent": {
       "description": "Run intent for a given command.\n\nProps:\n    PROTOCOL: the command is part of the protocol run itself.\n    SETUP: the command is part of the setup phase of a run.",
       "enum": ["protocol", "setup", "fixit"],
@@ -8612,6 +8660,7 @@
       "vacuumModule/startSetVacuumPower": "#/$defs/StartSetVacuumPowerCreate",
       "vacuumModule/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
       "vacuumModule/stopVacuum": "#/$defs/StopVacuumCreate",
+      "vacuumModule/runProfile": "#/$defs/RunProfileCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
       "waitForResume": "#/$defs/WaitForResumeCreate",
@@ -8895,6 +8944,9 @@
     },
     {
       "$ref": "#/$defs/CloseVentCreate"
+    },
+    {
+      "$ref": "#/$defs/RunProfileCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
