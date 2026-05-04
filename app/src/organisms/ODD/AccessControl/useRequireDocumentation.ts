@@ -4,8 +4,8 @@ import { showDocumentationRequiredModal } from '/app/organisms/ODD/Documentation
 import { postDocumentation } from '/app/resources/access-control'
 
 import type {
-  DocumentedAction,
   DocumentationResult,
+  DocumentedAction,
 } from '/app/resources/access-control'
 import type { RequireLoginResult } from './useRequireLogin'
 

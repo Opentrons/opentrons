@@ -43,6 +43,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 export const showDocumentationRequiredModal = (
   args: DocumentationRequiredModalArgs
 ): Promise<DocumentationRequiredModalResult | null> =>
-  NiceModal.show(DocumentationRequiredModalImpl, args) as Promise<
-    DocumentationRequiredModalResult | null
-  >
+  NiceModal.show(
+    DocumentationRequiredModalImpl,
+    args
+  ) as Promise<DocumentationRequiredModalResult | null>

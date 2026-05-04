@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux'
-import { legacy_createStore } from 'redux'
 import { act, renderHook } from '@testing-library/react'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
@@ -11,8 +11,8 @@ import { useRequireLogin } from '../useRequireLogin'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
-import type { DocumentedAction } from '/app/resources/access-control'
 import type { State } from '/app/redux/types'
+import type { DocumentedAction } from '/app/resources/access-control'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
