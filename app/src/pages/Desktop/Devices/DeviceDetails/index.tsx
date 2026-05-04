@@ -6,7 +6,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { useRobot } from '/app/redux-resources/robots'
 import { getScanning, OPENTRONS_USB } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { DeviceDetailsComponent } from './DeviceDetailsComponent'
 
@@ -27,7 +27,7 @@ export function DeviceDetails(): JSX.Element | null {
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
       <DeviceDetailsComponent robotName={robotName} />
     </ApiHostProvider>

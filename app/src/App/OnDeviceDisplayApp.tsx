@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   ApiHostProvider,
+  useAccessControlEnabledQuery,
   useRobotSettingsQuery,
 } from '@opentrons/react-api-client'
 
@@ -23,6 +24,7 @@ import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { OnDeviceLoginOverlayProvider } from '/app/organisms/ODD/OnDeviceLogin'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
@@ -151,13 +153,9 @@ function getPathComponent(
   }
 }
 
-const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
-  'mousedown',
-  'click',
-  'scroll',
-]
-
 const TURN_OFF_BACKLIGHT = '7'
+
+const RETRY_DELAY_MS = 1000
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
   const dispatch = useDispatch<Dispatch>()
@@ -181,11 +179,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     getOnDeviceDisplaySettings
   )
   const sleepTime = sleepMs ?? SLEEP_NEVER_MS
-  const options = {
-    events: onDeviceDisplayEvents,
-    initialState: false,
-  }
-  const isIdle = useScreenIdle(sleepTime, options)
+  const isIdle = useScreenIdle(sleepTime, { initialState: false })
   useEffect(() => {
     if (isIdle) {
       dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
@@ -199,13 +193,32 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   }, [dispatch, isIdle, userSetBrightness])
 
-  // ensure robot-server api, etc. is up and running
   const isShellReady = useSelector(getIsShellReady)
-  // ensure settings query data is available for localization provider
-  const { settings } =
-    useRobotSettingsQuery({ retry: true, retryDelay: 1000 }, hostConfig).data ??
-    {}
-  const isReady = isShellReady && settings != null
+
+  const robotSettingsQuery = useRobotSettingsQuery(
+    {
+      retry: true,
+      retryDelay: RETRY_DELAY_MS,
+    },
+    hostConfig
+  )
+
+  const accessControlEnabledQuery = useAccessControlEnabledQuery(
+    {
+      retry: true,
+      retryDelay: RETRY_DELAY_MS,
+    },
+    hostConfig
+  )
+
+  const isReady =
+    // ensure robot-server api, etc. is up and running
+    isShellReady &&
+    // ensure settings query data is available for localization provider
+    robotSettingsQuery.isSuccess &&
+    // ensure we know whether access control is enabled or not,
+    // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
+    accessControlEnabledQuery.isSuccess
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
@@ -242,9 +255,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             }}
                           />
                         ) : null}
-                        <SharedScrollRefProvider>
-                          <OnDeviceDisplayAppRoutes />
-                        </SharedScrollRefProvider>
+
+                        <OnDeviceLoginOverlayProvider>
+                          <SharedScrollRefProvider>
+                            <OnDeviceDisplayAppRoutes />
+                          </SharedScrollRefProvider>
+                        </OnDeviceLoginOverlayProvider>
                       </ToasterOven>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>

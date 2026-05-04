@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import (
     DoorState,
     DoorStateNotification,
     HardwareEvent,
+    HardwareEventHandler,
     PauseType,
 )
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
@@ -26,6 +27,9 @@ class DoorWatcher:
         state_store: StateStore,
         hardware_api: HardwareControlAPI,
         action_dispatcher: ActionDispatcher,
+        proxy_of_callback_for_handling_door_events: Optional[
+            HardwareEventHandler
+        ] = None,
     ) -> None:
         """Initialize the DoorWatcher.
 
@@ -36,19 +40,29 @@ class DoorWatcher:
             action_dispatcher: The ActionDispatcher to dispatch actions into.
                 Assumed to be owned by the same event loop that this
                 DoorWatcher was constructed in.
+            proxy_of_callback_for_handling_door_events: The Optional remote proxy of
+                the callback to used when handling door events, subprocess mode only.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
         self._action_dispatcher = action_dispatcher
         self._loop = get_running_loop()
         self._unsubscribe_callback: Optional[_UnsubscribeCallback] = None
+        self._proxy_of_callback_for_handling_door_events = (
+            proxy_of_callback_for_handling_door_events
+        )
 
     def start(self) -> None:
         """Subscribe to hardware events and start forwarding them as PE actions."""
         if self._unsubscribe_callback is None:
-            self._unsubscribe_callback = self._hardware_api.register_callback(
-                self._handle_hardware_door_event
-            )
+            if self._proxy_of_callback_for_handling_door_events is not None:
+                self._unsubscribe_callback = self._hardware_api.register_callback(
+                    self._proxy_of_callback_for_handling_door_events
+                )
+            else:
+                self._unsubscribe_callback = self._hardware_api.register_callback(
+                    self._handle_hardware_door_event
+                )
 
     def stop(self) -> None:
         """Unsubscribe from hardware events.

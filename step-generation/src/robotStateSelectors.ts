@@ -23,7 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { CLEAN, COLUMN_4_SLOTS } from './constants'
-import { getDefaultPrimaryNozzle, getSlotInLocationStack } from './utils'
+import { getSlotInLocationStack } from './utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -85,9 +85,6 @@ export function _getNextTip(args: {
   } = args
   const pipetteChannels =
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
-  const confirmedPrimaryNozzle =
-    primaryNozzle ??
-    getDefaultPrimaryNozzle({ nozzles, channels: pipetteChannels })
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   if (!pipetteChannels || !tiprackDef || !tiprackWellsState) {
@@ -116,18 +113,14 @@ export function _getNextTip(args: {
   const firstFullGroupReversed = (groups: string[][]): string[] | null =>
     [...groups].reverse().find(group => group.every(hasCleanTip)) ?? null
   const is8ch1Nozzle = pipetteChannels === 8 && nozzles === SINGLE
-  const is8ch1NozzleFront = is8ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
-  const is8ch1NozzleBack = is8ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
+  const is8ch1NozzleFront = is8ch1Nozzle && primaryNozzle === H1_NOZZLE
+  const is8ch1NozzleBack = is8ch1Nozzle && primaryNozzle === A1_NOZZLE
 
   const is96ch1Nozzle = pipetteChannels === 96 && nozzles === SINGLE
-  const is96ch1NozzleFrontRight =
-    is96ch1Nozzle && confirmedPrimaryNozzle === H12_NOZZLE
-  const is96ch1NozzleBackRight =
-    is96ch1Nozzle && confirmedPrimaryNozzle === A12_NOZZLE
-  const is96ch1NozzleFrontLeft =
-    is96ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
-  const is96ch1NozzleBackLeft =
-    is96ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
+  const is96ch1NozzleFrontRight = is96ch1Nozzle && primaryNozzle === H12_NOZZLE
+  const is96ch1NozzleBackRight = is96ch1Nozzle && primaryNozzle === A12_NOZZLE
+  const is96ch1NozzleFrontLeft = is96ch1Nozzle && primaryNozzle === H1_NOZZLE
+  const is96ch1NozzleBackLeft = is96ch1Nozzle && primaryNozzle === A1_NOZZLE
 
   if (pipetteChannels === 1 || is8ch1NozzleFront || is96ch1NozzleFrontRight) {
     return firstClean(orderedWellsT2B)
@@ -162,7 +155,7 @@ export function _getNextTip(args: {
   if (nozzles === COLUMN) {
     const columns = tiprackDef.ordering
     const column =
-      confirmedPrimaryNozzle === A1_NOZZLE
+      primaryNozzle === A1_NOZZLE
         ? firstFullGroupReversed(columns)
         : firstFullGroup(columns)
     return column?.[0] ?? null
@@ -173,7 +166,7 @@ export function _getNextTip(args: {
     const rows = columns[0].map((_, i) => columns.map(col => col[i]))
 
     const row =
-      confirmedPrimaryNozzle === A1_NOZZLE
+      primaryNozzle === A1_NOZZLE
         ? firstFullGroupReversed(rows)
         : firstFullGroup(rows)
 
@@ -222,7 +215,7 @@ export function getNextTiprack(
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
       console.assert(
-        invariantContext.labwareEntities[labwareId]?.labwareDefURI,
+        invariantContext.labwareEntities[labwareId]?.labwareDefURI != null,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck =

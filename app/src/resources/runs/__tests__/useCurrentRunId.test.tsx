@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useCurrentRunId } from '../useCurrentRunId'
 import { useNotifyAllRunsQuery } from '../useNotifyAllRunsQuery'
@@ -13,21 +12,24 @@ describe('useCurrentRunId hook', () => {
   })
 
   it('should return the run id specified in the current link', async () => {
-    when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith({ pageLength: 0 }, {})
-      .thenReturn({
-        data: { links: { current: { href: '/runs/run_id' } } },
-      } as any)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+      data: { links: { current: { href: '/runs/run_id' } } },
+    } as any)
 
     const { result } = renderHook(useCurrentRunId)
 
     expect(result.current).toBe('run_id')
+    expect(useNotifyAllRunsQuery).toHaveBeenCalledWith(
+      { pageLength: 0 },
+      {},
+      undefined
+    )
   })
 
   it('should return null if no current run link', async () => {
-    when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith({ pageLength: 0 }, {})
-      .thenReturn({ data: { links: {} } } as any)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+      data: { links: {} },
+    } as any)
 
     const { result } = renderHook(useCurrentRunId)
 
@@ -35,16 +37,19 @@ describe('useCurrentRunId hook', () => {
   })
 
   it('should pass through runs query options', async () => {
-    when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith({ pageLength: 0 }, { enabled: true })
-      .thenReturn({
-        data: {
-          links: { current: { href: '/runs/run_id' } },
-        },
-      } as any)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+      data: {
+        links: { current: { href: '/runs/run_id' } },
+      },
+    } as any)
 
     const { result } = renderHook(() => useCurrentRunId({ enabled: true }))
 
     expect(result.current).toBe('run_id')
+    expect(useNotifyAllRunsQuery).toHaveBeenCalledWith(
+      { pageLength: 0 },
+      { enabled: true },
+      undefined
+    )
   })
 })

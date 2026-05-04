@@ -84,13 +84,16 @@ function getPipetteCapacityLegacy(
     )
   }
 
-  console.assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
   console.assert(
-    tiprackDef,
+    specs != null,
+    `Expected spec for pipette ${JSON.stringify(pipette)}`
+  )
+  console.assert(
+    tiprackDef != null,
     `expected tiprack def for pipette ${JSON.stringify(pipette)}`
   )
   console.assert(
-    tiprackDef?.metadata?.tipVolume,
+    tiprackDef?.metadata?.tipVolume != null,
     `expected tiprack volume for tiprack def ${JSON.stringify(
       tiprackDef?.metadata || 'undefined'
     )}`
@@ -338,8 +341,9 @@ export function replaceTCDStepsWithMoveLiquidStep(
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, formData => {
     const { stepType } = formData
-    if (!['transfer', 'consolidate', 'distribute'].includes(stepType))
+    if (!['transfer', 'consolidate', 'distribute'].includes(stepType)) {
       return formData
+    }
     const pathMap = {
       transfer: 'single',
       consolidate: 'multiAspirate',

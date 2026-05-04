@@ -27,8 +27,7 @@ import type {
   NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 export interface DispenseAtomicCommandParams extends DispenseParams {
   tipRack: string

@@ -16,11 +16,11 @@ dist: lib
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	yarn vite build
+	pnpm exec vite build
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build --emitDeclarationOnly
+	pnpm exec tsc --build --emitDeclarationOnly
 
 .PHONY: test
 test:
@@ -34,4 +34,4 @@ test-cov:
 
 .PHONY: pack
 pack: build-ts lib
-	yarn pack
+	pnpm pack

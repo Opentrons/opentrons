@@ -1,5 +1,5 @@
 import intersection from 'lodash/intersection'
-import uuidv1 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   ALL,
@@ -45,7 +45,7 @@ export type MoveLiquidStepArgs =
   | TransferArgs
   | null
 
-const uuid: () => string = uuidv1
+const uuid: () => string = uuidv4
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 function getOrderedWells(

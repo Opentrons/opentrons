@@ -1,5 +1,6 @@
 """This file is run directly in its own process and encapsulates a run."""
 
+import argparse
 import asyncio
 import threading
 from typing import Any
@@ -7,10 +8,10 @@ from typing import Any
 from opentrons.protocol_engine import DeckType
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 
-from robot_server.runs.run_process import DirectedRunProcess, register_process_types
+from robot_server.runs.run_process import DirectedRunProcess, register_all_needed_types
 
 
-def initialize_run_process() -> threading.Thread:
+def initialize_run_process(process_name: str) -> threading.Thread:
     """Build an instance of the DirectedRunProcess, create a thread to run it, and return a pyro daemon thread."""
 
     def _start_and_run_process(process: DirectedRunProcess) -> None:
@@ -45,9 +46,9 @@ def initialize_run_process() -> threading.Thread:
         name="RunProcessThread",
         args=(),
         kwargs={
-            "pyroname": "ot-protocol",
+            "pyroname": process_name,
             "process": run_process,
-            "registry": register_process_types,
+            "registry": register_all_needed_types,
         },
         daemon=True,
     )
@@ -55,6 +56,13 @@ def initialize_run_process() -> threading.Thread:
 
 
 if __name__ == "__main__":
-    pyro_thread = initialize_run_process()
+    parser = argparse.ArgumentParser(
+        description="Starts and runs a pyro daemon for the protocol subprocess."
+        " Requires a nameserver to be running."
+    )
+    parser.add_argument(
+        "--pyroname", required=True, help="The name of the pyro daemon."
+    )
+    pyro_thread = initialize_run_process(parser.parse_args().pyroname)
     pyro_thread.start()
     pyro_thread.join()

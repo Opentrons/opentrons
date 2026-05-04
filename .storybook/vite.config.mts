@@ -4,7 +4,7 @@
 import path from 'path'
 import react from '@vitejs/plugin-react'
 import lostCss from 'lost'
-import postCssApply from 'postcss-apply'
+import postcssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
@@ -34,7 +34,7 @@ export default defineConfig({
     postcss: {
       plugins: [
         postCssImport({ root: 'src/' }),
-        postCssApply(),
+        postcssApply(),
         postColorModFunction(),
         postCssPresetEnv({ stage: 0 }),
         lostCss(),

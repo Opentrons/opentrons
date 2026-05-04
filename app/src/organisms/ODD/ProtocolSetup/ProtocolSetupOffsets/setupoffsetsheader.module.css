@@ -1,0 +1,5 @@
+.header_container {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-32) var(--spacing-40);
+}

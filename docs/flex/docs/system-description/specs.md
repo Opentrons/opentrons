@@ -23,7 +23,7 @@ description: "Dimensions, weight, deck slots, connectivity, and power specificat
 | **Frame composition**    | Rigid steel and CNC aluminum design |
 | **Window composition**   | Removable polycarbonate side windows and front door |
 | **Ventilation requirements** | At least 20 cm / 8 in between the unit and a wall |
-| **Connected PC requirements** | The latest version of the Opentrons App runs on: <ul><li>Windows 10 or later</li><li>macOS 11 or later</li><li>Ubuntu 20.04 or later</li></ul> |
+| **Connected PC requirements** | The latest version of the Opentrons App runs on: <ul><li>Windows 10 or later</li><li>macOS 11 or later</li><li>Ubuntu 22.04 or later</li></ul> |
 
 ## Environmental specifications
 

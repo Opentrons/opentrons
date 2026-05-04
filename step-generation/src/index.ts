@@ -35,6 +35,12 @@ export {
   thermocyclerStateStep,
   touchTip,
   transfer,
+  vacuumCloseVent,
+  vacuumOpenVent,
+  vacuumSetPumpPower,
+  vacuumSetPumpPressure,
+  vacuumStartRunProfile,
+  vacuumStopPump,
   waitForTemperature,
   waitForModuleTask,
 } from './commandCreators'

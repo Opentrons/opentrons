@@ -88,8 +88,9 @@ export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
 
 export const VACUUM_MODULE_INITIAL_STATE: VacuumModuleState = {
   type: VACUUM_MODULE_TYPE,
-  vacuumState: null,
   ventStatus: null,
+  numPumpActivitiesStarted: 0,
+  currentPumpActivity: { type: 'pumpDeactivated' },
 }
 
 export const MODULE_INITIAL_STATE_BY_TYPE: {
@@ -170,7 +171,8 @@ export const VACUUM_MODE_PRESSURE: 'pressure' = 'pressure'
 
 export const VACUUM_PROGRAM_STATE: 'state' = 'state'
 export const VACUUM_PROGRAM_PROFILE: 'profile' = 'profile'
-export const VACUUM_STATE_PUMP: 'pump' = 'pump'
+export const VACUUM_STATE_PUMP_OFF: 'pumpOff' = 'pumpOff'
+export const VACUUM_STATE_PUMP_ON: 'pumpOn' = 'pumpOn'
 export const VACUUM_STATE_VENT: 'vent' = 'vent'
 export const VACUUM_VENT_SET_OPEN: 'open' = 'open'
 export const VACUUM_VENT_SET_CLOSED: 'closed' = 'closed'
@@ -178,3 +180,6 @@ export const VACUUM_VENT_SET_CLOSED: 'closed' = 'closed'
 // TODO (nd:2026-03-09) These should match physical min/max when defined
 export const VACUUM_MIN_PRESSURE_MBAR = 0.1
 export const VACUUM_MAX_PRESSURE_MBAR = 1000
+
+export const VACUUM_DEACTIVATED: 'VACUUM_DEACTIVATED' = 'VACUUM_DEACTIVATED'
+export const VACUUM_AT_TARGET: 'VACUUM_AT_TARGET' = 'VACUUM_AT_TARGET'
