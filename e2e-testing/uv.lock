@@ -3,6 +3,15 @@ revision = 3
 requires-python = ">=3.12"
 
 [[package]]
+name = "astpretty"
+version = "3.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2d/b6/ffec7edce2a8315ef1acd4ae2e334ba428db2b2e8d7577a9aaf1e434034d/astpretty-3.0.0.tar.gz", hash = "sha256:b08c95f32e5994454ea99882ff3c4a0afc8254c38998a0ed4b479dba448dc581", size = 4675, upload-time = "2022-05-16T23:41:24.712Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9f/0a/79fff71a08bc0cc427f0dfbd4cca62b60f7f277aae81b89b79e9b04d526d/astpretty-3.0.0-py2.py3-none-any.whl", hash = "sha256:15bfd47593667169485a1fa7938b8de9445b11057d6f2b6e214b2f70667f94b6", size = 4928, upload-time = "2022-05-16T23:41:23.422Z" },
+]
+
+[[package]]
 name = "attrs"
 version = "25.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -105,6 +114,7 @@ name = "e2e-testing"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "astpretty" },
     { name = "eyes-playwright" },
     { name = "mypy" },
     { name = "playwright" },
@@ -118,6 +128,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "astpretty", specifier = ">=2.0.0" },
     { name = "eyes-playwright", specifier = ">=6.4.20" },
     { name = "mypy", specifier = ">=1.13.0" },
     { name = "playwright", specifier = ">=1.55.0" },
