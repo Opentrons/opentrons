@@ -19,6 +19,12 @@
   text-decoration: none;
 }
 
+.button_container {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-8);
+}
+
 .hidden_input {
   display: none;
 }
