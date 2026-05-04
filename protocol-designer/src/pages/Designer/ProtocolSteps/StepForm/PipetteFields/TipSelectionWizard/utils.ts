@@ -137,7 +137,11 @@ export const getHoveredOffsetFromWell = (args: {
 
   return {
     x: wellX,
-    y: isSingleChannelPipette && wellIsRectangular ? wellY / 2 : wellY,
+    y:
+      getIsOnlyRectangularWellInColumn(wellName, labware.def) &&
+      isSingleChannelPipette
+        ? wellY / 2
+        : wellY,
   }
 }
 
@@ -424,4 +428,18 @@ export const getLabelOffsetByPlacement = (args: {
     x: labelOffsetX,
     y: labelOffsetY,
   }
+}
+
+const getIsOnlyRectangularWellInColumn = (
+  wellName: string,
+  def: LabwareDefinition
+): boolean => {
+  const columns = def.ordering
+  const wellColumn = columns.find(column => column.includes(wellName))
+  if (wellColumn == null) {
+    return false
+  }
+  const isWellRectangular = def.wells[wellName].shape === 'rectangular'
+  const isOnlyWellInColumn = wellColumn.length === 1
+  return isWellRectangular && isOnlyWellInColumn
 }
