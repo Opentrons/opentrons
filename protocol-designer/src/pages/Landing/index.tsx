@@ -42,9 +42,10 @@ import type { ThunkDispatch } from '../../types'
 import welcomeImage from '../../assets/images/welcome_page.png'
 
 const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
-/**　ToDo activate this when the sandbox is ready. */
-const OT2_APP_STAGE_URL = 'sandbox url'
+//ToDo activate this when the sandbox is ready.
+// const OT2_APP_STAGE_URL = 'sandbox url'
 
+// The type will be changed only string when the sandbox is ready
 const getOt2DesignerCreateUrl = (): string | null => {
   if (getIsProduction()) {
     return OT2_APP_PROD_URL
