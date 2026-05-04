@@ -42,18 +42,6 @@ from robot_server.versioning import (
 log = getLogger(__name__)
 
 
-def _code_or_default(exc: BaseException) -> str:
-    if isinstance(exc, EnumeratedError):
-        # For a reason I cannot fathom, mypy thinks this is an Any.
-        # reveal_type(exc) # -> opentrons_shared_data.errors.exceptions.EnumeratedError
-        # reveal_type(exc.code) # -> opentrons_shared_data.errors.codes.ErrorCodes
-        # reveal_type(exc.code.value) # Any (????????????)
-        # This doesn't happen anywhere else or indeed in the else side of this clause.
-        return exc.code.value.code  # type: ignore [no-any-return]
-    else:
-        return ErrorCodes.GENERAL_ERROR.value.code
-
-
 def _route_is_legacy(request: Request) -> bool:
     """Check if router handling the request is a legacy v1 endpoint."""
     router = request.scope.get("router")
