@@ -64,7 +64,13 @@ export default defineConfig({
   },
   css: {
     modules: {
-      generateScopedName: '[local]',
+      // Use a per-module hashed scoped name so unscoped local names
+      // (e.g. `.container`, `.header`, `.footer`) cannot collide across
+      // modules in the bundled `lib/style.css`. Each `*.module.css` gets its
+      // own unique class names, and the compiled JS references the same
+      // hashed strings, so consumers of the packed library get isolated
+      // styles per component.
+      generateScopedName: '[name]__[local]__[hash:base64:5]',
     },
     postcss: {
       plugins: [

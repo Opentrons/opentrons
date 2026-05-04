@@ -26,12 +26,13 @@ export function AnnotatedStepsRowItem(
             allRunDefs={data.allRunDefs}
             setSelectedCommand={data.setSelectedCommand}
             handlePause={data.handlePause}
+            annotationDescription={row.annotationDescription}
           />
         ) : row.type === 'command' ? (
           <IndividualCommand
             scrollTargetId={data.scrollTargetId}
             listElement={data.listElement}
-            fromGroup={row.fromGroup}
+            fromGroup={false}
             command={row.command}
             isHighlighted={row.isHighlighted}
             analysis={data.analysis}
