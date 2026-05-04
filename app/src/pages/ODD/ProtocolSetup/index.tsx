@@ -47,7 +47,7 @@ import {
   useLPCFlows,
 } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
-import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired'
+import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
@@ -405,8 +405,15 @@ function PrepareToRun({
   // areFixturesReady &&
   // !isAnyNecessaryDefaultOffsetMissing &&
   // isCameraReadyToRun
-  const onPlay = (): void => {
-    void showDocumentationRequiredModal({ userName: 'John Doe' })
+  const checkAccessControl = useGuardedAction({
+    kind: 'PROTOCOL_PLAY',
+    runId,
+    protocolName,
+  })
+
+  const onPlay = async (): Promise<void> => {
+    if (!(await checkAccessControl())) return
+
     if (doorStatus.isDoorOpen) {
       if (
         doorStatus.moduleDoorLocation !== null &&
