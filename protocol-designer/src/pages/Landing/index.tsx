@@ -17,6 +17,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
+
 import { getHasOptedIn } from '../../analytics/selectors'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../components/organisms'
@@ -26,6 +28,7 @@ import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
 import { getFileMetadata } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
+import { getIsProduction } from '../../networking/opentronsWebApi'
 import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
@@ -37,6 +40,18 @@ import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
+
+const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
+// ToDo activate this when the sandbox is ready.
+// const OT2_APP_STAGE_URL = 'sandbox url'
+
+// The type will be changed only string when the sandbox is ready
+const getOt2DesignerCreateUrl = (): string | null => {
+  if (getIsProduction()) {
+    return OT2_APP_PROD_URL
+  }
+  return null
+}
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
@@ -57,6 +72,8 @@ export function Landing(): JSX.Element {
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
     hasOptedIn != null
+
+  const enableFork = useSelector(getEnableFork)
 
   useEffect(
     () => {
@@ -104,6 +121,13 @@ export function Landing(): JSX.Element {
   const handleImportClick = (): void => {
     if (fileInputRef.current != null) {
       fileInputRef.current.click()
+    }
+  }
+
+  const openOt2DesignerInNewTab = (): void => {
+    const redirectTarget = getOt2DesignerCreateUrl()
+    if (redirectTarget !== null) {
+      window.open(redirectTarget, '_blank', 'noopener,noreferrer')
     }
   }
 
@@ -156,18 +180,31 @@ export function Landing(): JSX.Element {
             </StyledText>
           </Flex>
         </Flex>
-        <NavLink to="/createNew" className={styles.nav_link}>
-          <LargeButton
-            onClick={() => {
-              dispatch(toggleNewProtocolModal(true))
-            }}
-            buttonText={
-              <span className={styles.button_text}>
-                {t('create_a_protocol')}
-              </span>
-            }
-          />
-        </NavLink>
+        <div className={styles.button_container}>
+          <NavLink to="/createNew" className={styles.nav_link}>
+            <LargeButton
+              onClick={() => {
+                dispatch(toggleNewProtocolModal(true))
+              }}
+              buttonText={
+                <span className={styles.button_text}>
+                  {t('create_a_flex_protocol')}
+                </span>
+              }
+            />
+          </NavLink>
+          {enableFork ? (
+            <LargeButton
+              buttonType="blueStroke"
+              onClick={openOt2DesignerInNewTab}
+              buttonText={
+                <span className={styles.button_text}>
+                  {t('create_a_ot2_protocol')}
+                </span>
+              }
+            />
+          ) : null}
+        </div>
         <label className={styles.label}>
           <BasicButton onClick={handleImportClick} underLine>
             {t('import_existing_protocol')}
