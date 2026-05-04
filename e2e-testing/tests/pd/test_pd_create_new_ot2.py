@@ -27,7 +27,7 @@ def test_ot2_robot_selection_and_96_channel_visibility(page: Page, pd_base_url: 
     expect(page.get_by_text("Create new")).to_be_visible()
 
     # Click "Create new" button
-    page.get_by_role("button", name="Create a protocol").click()
+    page.get_by_role("button", name="Create a Flex protocol").click()
 
     # Select OT-2
     page.locator("label", has_text="Opentrons OT-2").click()
