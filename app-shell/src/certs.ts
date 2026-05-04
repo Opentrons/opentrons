@@ -40,6 +40,20 @@ export async function decryptFromOTDetails(
   kdfIterations: number,
   token: string
 ): Promise<Buffer> {
+  try {
+    return await doDecrypt(password, saltBase64, kdfIterations, token)
+  } catch (err: any) {
+    log.info(`Failed to decrypt: ${err?.message ?? JSON.stringify(err)} `)
+    throw new Error('Incorrect password')
+  }
+}
+
+async function doDecrypt(
+  password: string,
+  saltBase64: string,
+  kdfIterations: number,
+  token: string
+): Promise<Buffer> {
   log.info(
     `decrypting with password ${password} salt ${saltBase64} kdf iterations ${kdfIterations} token ${token}`
   )
@@ -125,7 +139,7 @@ export async function decryptFromOTDetails(
     unsigned_token
   )
   if (!verification) {
-    throw new Error('Invalid or tampered with internal data!')
+    throw new Error('Verification failed')
   }
   // where we differ from the example above - this is not an encoded UTF-8 string but an encoded
   // byte sequence

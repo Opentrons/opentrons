@@ -51,7 +51,7 @@ describe('fernet decryption', () => {
       )
     ).rejects.toThrow(
       expect.objectContaining({
-        message: 'The operation failed for an operation-specific reason',
+        message: 'Incorrect password',
       })
     )
   })
@@ -69,7 +69,7 @@ describe('fernet decryption', () => {
       decryptFromOTDetails(pw, badSaltEncoded, 10, encrypted)
     ).rejects.toThrow(
       expect.objectContaining({
-        message: 'The operation failed for an operation-specific reason',
+        message: 'Incorrect password',
       })
     )
   })
@@ -87,7 +87,7 @@ describe('fernet decryption', () => {
       decryptFromOTDetails(pw, saltEncoded, 11, encrypted)
     ).rejects.toThrow(
       expect.objectContaining({
-        message: 'The operation failed for an operation-specific reason',
+        message: 'Incorrect password',
       })
     )
   })
@@ -106,7 +106,7 @@ describe('fernet decryption', () => {
       decryptFromOTDetails(pw, saltEncoded, 10, encrypted)
     ).rejects.toThrow(
       expect.objectContaining({
-        message: 'Encrypted certificate is too old',
+        message: 'Incorrect password',
       })
     )
   })
@@ -140,7 +140,7 @@ describe('fernet decryption', () => {
       decryptFromOTDetails(pw, saltEncoded, 10, encrypted)
     ).rejects.toThrow(
       expect.objectContaining({
-        message: 'Encrypted certificate is from the future',
+        message: 'Incorrect password',
       })
     )
   })
