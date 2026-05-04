@@ -332,6 +332,8 @@ SKIP_METHODS = [    # NOTE: List of methods to skip across our process checks - 
     "get_pressure_sensor_available",    # Skipped for simulation constraints
     "touch_probe",  # Skipped for simulation constraints
     "loop",     # Not used outside of it's relevant process
+    "home_gear_motors",     # Nothing to serialize here
+    "calibrate_plunger",    # Skipped for simulation constraints, all elements are used in other functions giving serialization redundancy
     ]   
 
 PARAMETERS_MOCK_TABLE: Dict[str, Dict[type, Any]] = {
@@ -743,7 +745,37 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
     proxy_methods: list[str] = getattr(proxy, "get_pyro_attributes_with_proxy_result")
     async_methods: dict[str, dict[str, Any]] = getattr(proxy, "get_pyro_async_methods")
 
-    for method in proxy._pyroMethods:
+    # NOTE: Some tests must be done in a specific order, such as picking up a tip before aspirating
+    preliminary_ot3api_ordered_tests = [
+        "cache_instruments",
+        "get_attached_pipette",
+        "get_attached_instrument",
+        "hardware_instruments",
+        "reset_instrument_offset",
+        "capacitive_sweep",
+        "calibrate_plunger",
+        "move_to",
+        "move_axes",
+        "home",
+        "hold_jaw_width",
+        "grip",
+        "ungrip",
+        "gripper_jaw_can_home",
+        "pick_up_tip",
+        "prepare_for_aspirate",
+        "aspirate",
+        "dispense",
+        "prepare_for_aspirate",
+        "aspirate_while_tracking",
+        "drop_tip",
+        "tip_pickup_moves",
+        "tip_drop_moves"
+    ]
+    
+    for pyro_method in proxy._pyroMethods:
+        if pyro_method not in preliminary_ot3api_ordered_tests:
+            preliminary_ot3api_ordered_tests.append(pyro_method)
+    for method in preliminary_ot3api_ordered_tests:#proxy._pyroMethods:
         if method not in proxy_methods and method not in SKIP_METHODS:
             ot3_async_wrapped_method = getattr(acpo_instance, method)
             original_class_method = getattr(original_class, method)
@@ -768,11 +800,13 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
                         assert _result_matches_annotation(result, return_annotation)
             except Exception as e:
                 if "serialize" in str(e):
-                    missing_serialization_list.append(str(e))
+                    missing_serialization_list.append(f"Method {method} triggered: "+str(e))
                 else:
                     alternative_errors_list.append(f"Method {method} encountered: "+str(e))
     
     # COLLECT ALL THE INFORMATION ON THE EXPOSED PROPERTIES
+    await acpo_instance.cache_instruments()# NOTE THIS IS ONLY FOR OT3API - THIS MUST BE DONE BEFORE ATTRIBUTES
+
     for attribute in proxy._pyroAttrs:
         if attribute not in proxy_methods and attribute not in SKIP_METHODS:
             try:
@@ -794,7 +828,7 @@ async def _collect_proxy_attribute_information(original_class: type, acpo_instan
                 
             except Exception as e:
                 if "serialize" in str(e):
-                    missing_serialization_list.append(str(e))
+                    missing_serialization_list.append(f"Attribute {attribute} triggered: "+str(e))
                 else:
                     alternative_errors_list.append(f"Attribute {attribute} encountered:"+str(e))
     
