@@ -8,6 +8,7 @@ export interface HostConfig {
   port?: number | null
   robotName?: string | null
   token?: string
+  secure?: boolean
 }
 
 export interface ResourceLink {

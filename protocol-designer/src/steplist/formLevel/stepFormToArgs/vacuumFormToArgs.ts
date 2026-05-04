@@ -11,6 +11,10 @@ import {
 import { PROFILE_CYCLE, PROFILE_STEP } from '/protocol-designer/form-types'
 
 import type {
+  AtomicVacuumProfileStep,
+  VacuumProfileCycle as PeVacuumProfileCycle,
+} from '@opentrons/shared-data'
+import type {
   VacuumArgs,
   VacuumProfileItem,
   VacuumProfileStep,
@@ -58,10 +62,10 @@ const formVacuumProfileStepToItem = (
 })
 
 /** Builds step-generation profile elements from `vacuumOrderedProfileIds` and `vacuumProfileItemsById`. */
-const getProfileElementsFromForm = (
+function getProfileElementsFromForm(
   vacuumOrderedProfileIds: HydratedVacuumFormData['vacuumOrderedProfileIds'],
   vacuumProfileItemsById: HydratedVacuumFormData['vacuumProfileItemsById']
-): VacuumProfileItem[] => {
+): VacuumProfileItem[] {
   return vacuumOrderedProfileIds.map(profileItemId => {
     const profileItem = vacuumProfileItemsById[profileItemId]
     if (profileItem.type === PROFILE_STEP) {
@@ -80,6 +84,35 @@ const getProfileElementsFromForm = (
       steps: cycleSteps,
     }
   })
+}
+
+const vacuumProfileStepToAtomic = (
+  step: StepGenVacuumProfileStep
+): AtomicVacuumProfileStep => {
+  const { durationSeconds, pumpData } = step
+  if (pumpData.mode === VACUUM_MODE_PRESSURE) {
+    const mbar = pumpData.pressureMbar
+    return {
+      holdSeconds: durationSeconds,
+      pressureMbar: mbar != null && mbar !== '' ? Number.parseFloat(mbar) : 0,
+    }
+  }
+  return {
+    holdSeconds: durationSeconds,
+    powerPercent: pumpData.powerPercent,
+  }
+}
+
+const vacuumProfileItemToPeProfileElement = (
+  item: VacuumProfileItem
+): PeVacuumProfileCycle | AtomicVacuumProfileStep => {
+  if (item.type === PROFILE_CYCLE) {
+    return {
+      repetitions: item.repetitions,
+      steps: item.steps.map(vacuumProfileStepToAtomic),
+    }
+  }
+  return vacuumProfileStepToAtomic(item)
 }
 
 /** Optional timed pump end: duration in seconds and whether to vent after, when the form enables them. */
@@ -164,15 +197,17 @@ export const vacuumFormToArgs = (
         default:
           return null
       }
-    case VACUUM_PROGRAM_PROFILE:
+    case VACUUM_PROGRAM_PROFILE: {
+      const profileElements = getProfileElementsFromForm(
+        vacuumOrderedProfileIds,
+        vacuumProfileItemsById
+      )
       return {
-        commandCreatorFnName: 'vacuumSetPumpProfile',
-        profileElements: getProfileElementsFromForm(
-          vacuumOrderedProfileIds,
-          vacuumProfileItemsById
-        ),
+        commandCreatorFnName: 'vacuumStartRunProfile',
+        profile: profileElements.map(vacuumProfileItemToPeProfileElement),
         ...baseValues,
       }
+    }
 
     // should never hit
     default:

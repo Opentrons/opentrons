@@ -2,23 +2,19 @@ import { memo, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  ALIGN_CENTER,
   Box,
-  Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  DISPLAY_FLEX,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   POSITION_FIXED,
   SPACING,
   TouchInputField,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
 interface SetWifiCredProps {
@@ -74,29 +70,13 @@ export function SetWifiCred({
                 autoFocus
               />
             </Box>
-            <Btn
-              onClick={() => {
+            <PasswordVisibilityToggle
+              isVisible={showPassword}
+              onToggle={() => {
                 setShowPassword(currentState => !currentState)
                 inputRef?.current?.focus()
               }}
-              display={DISPLAY_FLEX}
-              flexDirection={DIRECTION_ROW}
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing12}
-              width="7.375rem"
-            >
-              <Icon
-                name={showPassword ? 'eye-slash' : 'eye'}
-                size="3rem"
-                data-testid={showPassword ? 'icon_eye-slash' : 'icon_eye'}
-              />
-              <LegacyStyledText
-                forwardedAs="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {showPassword ? t('hide') : t('show')}
-              </LegacyStyledText>
-            </Btn>
+            />
           </Flex>
         </Flex>
       </Flex>

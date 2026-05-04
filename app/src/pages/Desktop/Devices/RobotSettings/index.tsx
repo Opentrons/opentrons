@@ -33,7 +33,7 @@ import {
   UNREACHABLE,
 } from '/app/redux/discovery'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
@@ -48,7 +48,7 @@ export function RobotSettings(): JSX.Element {
     <ApiHostProvider
       hostname={robot?.ip ?? null}
       port={robot?.port ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
       <RobotSettingsComponent robot={robot} />
     </ApiHostProvider>

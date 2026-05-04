@@ -39,6 +39,8 @@ import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
@@ -771,6 +773,13 @@ export const pauseForTimeOrUntilTold = (
   ) {
     // This is a system-created pause step that's paired with a TC profile step.
     return null
+  } else if (
+    'pauseAction' in fields &&
+    (fields.pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE ||
+      fields.pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE)
+  ) {
+    // System-created pause steps paired with a Vacuum profile or timed pump step.
+    return null
   } else {
     // user did not select a pause type
     return PAUSE_TYPE_REQUIRED
@@ -982,7 +991,9 @@ export const pauseModuleRequired = (
   const { moduleId, pauseAction } = fields
   const expectingModuleId =
     pauseAction === PAUSE_UNTIL_TEMP ||
-    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE
+    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE
   return expectingModuleId && moduleId == null ? PAUSE_MODULE_REQUIRED : null
 }
 export const pauseTemperatureRequired = (

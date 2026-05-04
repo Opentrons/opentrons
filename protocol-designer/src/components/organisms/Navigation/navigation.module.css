@@ -1,0 +1,25 @@
+.nav_container {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-12) var(--spacing-40);
+}
+
+.nav_title_container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.nav_button_container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-40);
+}
+
+.import_label {
+  cursor: pointer;
+}
+
+.hidden_input {
+  display: none;
+}

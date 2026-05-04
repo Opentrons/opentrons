@@ -278,6 +278,14 @@
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
   "vacuum": {
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
+    },
+    "state_timeline": {
+      "start": "Start vacuum",
+      "wait_for_complete": "Wait for vacuum to complete"
+    },
     "controls": {
       "duration": {
         "label": "Time at pressure",
@@ -363,7 +371,8 @@
         "label": "Pump",
         "off": "Off",
         "power": "{{power}}%",
-        "pressure": "{{pressure}} mbar"
+        "pressure": "{{pressure}} mbar",
+        "profile": "Running profile"
       },
       "vent": {
         "closed": "Closed",
