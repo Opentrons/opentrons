@@ -297,6 +297,8 @@ async def test_create(
             run_id=run_id,
             labware_offsets=sentinel.labware_offsets,
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
+            error_recovery_rules=[],
+            error_recovery_is_enabled=sentinel.error_recovery_enabled,
             protocol=protocol,
             deck_configuration=sentinel.deck_configuration,
             file_provider=mock_file_provider,
@@ -419,6 +421,8 @@ async def test_create_engine_error(
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
             initial_error_recovery_policy=matchers.Anything(),
+            error_recovery_rules=[],
+            error_recovery_is_enabled=sentinel.error_recovery_enabled,
         )
     ).then_raise(RunConflictError("oh no"))
 
@@ -937,6 +941,8 @@ async def test_create_archives_existing(
             labware_offsets=[],
             protocol=None,
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
+            error_recovery_rules=[],
+            error_recovery_is_enabled=sentinel.error_recovery_enabled,
             deck_configuration=[],
             file_provider=mock_file_provider,
             camera_provider=mock_camera_provider,

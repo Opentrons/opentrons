@@ -260,6 +260,8 @@ class RunDataManager:
             run_id=run_id,
             labware_offsets=labware_offsets,
             initial_error_recovery_policy=initial_error_recovery_policy,
+            error_recovery_rules=self._current_run_error_recovery_rules,
+            error_recovery_is_enabled=error_recovery_is_enabled,
             deck_configuration=deck_configuration,
             file_provider=self._file_provider,
             camera_provider=camera_provider,

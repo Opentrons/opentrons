@@ -27,7 +27,6 @@ from opentrons.protocol_engine import (
     DeckType,
     ErrorOccurrence,
     StateSummary,
-    error_recovery_policy,
 )
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
@@ -76,6 +75,10 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs.error_recovery_mapping import (
+    create_error_recovery_policy_from_rules,
+)
+from robot_server.runs.error_recovery_models import ErrorRecoveryRule
 from robot_server.service.pyro_utils.pyro_resource import RobotServerPyroResource
 from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 from robot_server.service.pyro_utils.serpent_type_registry import (
@@ -107,6 +110,7 @@ def register_process_types() -> None:
         CommandErrorSlice,
         CommandPointer,
         CommandAnnotationsSlice,
+        ErrorRecoveryRule,
         LabwareDefinition2,
         LabwareDefinition3,
         LabwareOffset,
@@ -186,8 +190,8 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self,
         run_id: str,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
-        # TODO include this
-        # initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
+        error_recovery_rules: List[ErrorRecoveryRule],
+        error_recovery_is_enabled: bool,
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
@@ -203,6 +207,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
         else:
             load_fixed_trash = False
 
+        error_recovery_policy = create_error_recovery_policy_from_rules(
+            error_recovery_rules, error_recovery_is_enabled
+        )
+
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -212,8 +220,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            # TODO stop hardcoding this at some point
-            error_recovery_policy=error_recovery_policy.never_recover,
+            error_recovery_policy=error_recovery_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=await self._robot_server_resource.get_deck_configuration(),
             file_provider=self._robot_server_resource.get_file_provider(),

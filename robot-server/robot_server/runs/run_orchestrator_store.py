@@ -61,6 +61,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
+from .error_recovery_models import ErrorRecoveryRule
 from .run_process import DirectedRunProcess
 from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -247,6 +248,8 @@ class RunOrchestratorStore:
         run_id: str,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
+        error_recovery_rules: List[ErrorRecoveryRule],
+        error_recovery_is_enabled: bool,
         deck_configuration: DeckConfigurationType,
         file_provider: FileProvider,
         camera_provider: CameraProvider,
@@ -262,6 +265,10 @@ class RunOrchestratorStore:
             run_id: The run resource the run orchestrator is assigned to.
             labware_offsets: Labware offsets to create the run with.
             initial_error_recovery_policy: How to recover from errors.
+            error_recovery_rules: The list of rules the error recovery policy is built for.
+                Used instead of initial_error_recovery_policy for Pyro proxy.
+            error_recovery_is_enabled: If error recovery is enabled or not.
+                Used instead of initial_error_recovery_policy for Pyro proxy.
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             file_provider: Wrapper to let the engine read/write data files.
             camera_provider: Wrapper to let the engine use the camera.
@@ -282,6 +289,8 @@ class RunOrchestratorStore:
                 run_id=run_id,
                 labware_offsets=labware_offsets,
                 protocol=protocol,
+                error_recovery_rules=error_recovery_rules,
+                error_recovery_is_enabled=error_recovery_is_enabled,
                 run_time_param_values=run_time_param_values,
                 run_time_param_paths=run_time_param_paths,
             )
@@ -381,6 +390,8 @@ class RunOrchestratorStore:
         run_id: str,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         protocol: Optional[ProtocolResource],
+        error_recovery_rules: List[ErrorRecoveryRule],
+        error_recovery_is_enabled: bool,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
     ) -> StateSummary:
@@ -394,6 +405,8 @@ class RunOrchestratorStore:
             run_id=run_id,
             labware_offsets=labware_offsets,
             protocol=protocol,
+            error_recovery_rules=error_recovery_rules,
+            error_recovery_is_enabled=error_recovery_is_enabled,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,
             proxy_of_callback_for_handling_door_events=run_orchestrator.register_hardware_door_event(),
