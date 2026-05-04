@@ -108,6 +108,7 @@ class OpentronsPyroSerializer:
     _pydantic_class_name_to_model: dict[str, type[BaseModel]] = {}
     _enum_class_name_to_model: dict[str, type[enum.Enum]] = {}
     _typed_dict_class_name_to_model: dict[str, type[TypedDict]] = {}  # type: ignore
+    _generic_error_class_name_to_error: dict[str, type[BaseException]] = {}
 
     @classmethod
     def register_enum(cls, enum_type: type[enum.Enum]) -> None:
@@ -162,6 +163,35 @@ class OpentronsPyroSerializer:
                 f"Could not convert {class_name} to an object, unregistered with pyro."
             )
         return model.model_validate(d)
+
+    @classmethod
+    def register_basic_error(cls, error_type: type[BaseException]) -> None:
+        """Registers a basic error with no specially handled args to be handled via pyro proxies."""
+        class_name = register_type_to_serpent(
+            error_type,
+            cls._generic_error_dict_to_class,
+            cls._generic_error_class_to_dict,
+        )
+        cls._generic_error_class_name_to_error[class_name] = error_type
+
+    @classmethod
+    def _generic_error_class_to_dict(cls, obj: BaseException) -> dict[str, Any]:
+        return {
+            "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
+            "args": obj.args,
+        }
+
+    @classmethod
+    def _generic_error_dict_to_class(
+        cls, class_name: str, d: dict[str, Any]
+    ) -> BaseException:
+        try:
+            error_type = cls._generic_error_class_name_to_error[class_name]
+        except KeyError:
+            raise TypeError(
+                f"Could not convert {class_name} to an error, unregistered with pyro."
+            )
+        return error_type(*d["args"])
 
     @classmethod
     def register_typed_dict(cls, typed_dict: type) -> None:
