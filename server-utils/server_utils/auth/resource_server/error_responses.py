@@ -1,4 +1,7 @@
-"""HTTP responses for authorization failures."""
+"""HTTP responses for authorization failures.
+
+This module should be framework-agnostic, not tied to FastAPI or whatever.
+"""
 
 from typing import Annotated
 
@@ -16,8 +19,8 @@ from server_utils.auth.scopes import Scope
 # todo(mm, 2026-02-10): Follow the server's existing error response conventions,
 # such as returning an error code.
 #
-# Note: The shape of this error response is just an Opentrons API design decision.
-# The OAuth 2 specs don't care.
+# Note: The shape of this response body is just an Opentrons API design decision.
+# The specs only care about response headers and status codes.
 class AuthorizationErrorResponse(BaseModel):
     """Returned when the client lacks authorization to access a protected resource."""
 
