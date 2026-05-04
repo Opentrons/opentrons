@@ -646,7 +646,11 @@ class RunDataManager:
         mapped_policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
             self._current_run_error_recovery_rules, is_enabled
         )
-        self._run_orchestrator_store.set_error_recovery_policy(policy=mapped_policy)
+        self._run_orchestrator_store.set_error_recovery_policy(
+            policy=mapped_policy,
+            error_recovery_rules=self._current_run_error_recovery_rules,
+            error_recovery_is_enabled=is_enabled,
+        )
 
     def get_error_recovery_rules(self, run_id: str) -> List[ErrorRecoveryRule]:
         """Get the run's error recovery policy."""

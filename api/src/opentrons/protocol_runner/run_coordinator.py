@@ -379,11 +379,6 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
-        """Create error recovery policy for the run."""
-        ...
-
-    @abstractmethod
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get current (if any) Flex Stacker Substates keyed by module id."""
         ...

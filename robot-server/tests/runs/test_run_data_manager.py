@@ -1507,7 +1507,9 @@ async def test_set_error_recovery_rules_translates_and_calls_orchestrator(
         run_id=sentinel.current_run_id, rules=sentinel.input_rules
     )
     decoy.verify(
-        mock_run_orchestrator_store.set_error_recovery_policy(sentinel.expected_output)
+        mock_run_orchestrator_store.set_error_recovery_policy(
+            sentinel.expected_output, sentinel.input_rules, sentinel.is_enabled
+        )
     )
 
 

@@ -32,7 +32,6 @@ from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
@@ -557,9 +556,15 @@ class DirectedRunProcess(AbstractRunCoordinator):
         """Get current tip state keyed by pipette id."""
         return self._guaranteed_run_orchestrator.get_tip_attached()
 
-    # TODO figure out how to serialize this
-    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+    def set_error_recovery_policy(
+        self,
+        error_recovery_rules: List[ErrorRecoveryRule],
+        error_recovery_is_enabled: bool,
+    ) -> None:
         """Create error recovery policy for the run."""
+        policy = create_error_recovery_policy_from_rules(
+            error_recovery_rules, error_recovery_is_enabled
+        )
         self._guaranteed_run_orchestrator.set_error_recovery_policy(policy)
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:

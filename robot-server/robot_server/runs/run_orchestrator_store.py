@@ -604,10 +604,18 @@ class RunOrchestratorStore:
         return self.run_orchestrator.add_labware_definition(definition)
 
     def set_error_recovery_policy(
-        self, policy: error_recovery_policy.ErrorRecoveryPolicy
+        self,
+        policy: error_recovery_policy.ErrorRecoveryPolicy,
+        error_recovery_rules: List[ErrorRecoveryRule],
+        error_recovery_is_enabled: bool,
     ) -> None:
         """Create run policy rules for error recovery."""
-        self.run_orchestrator.set_error_recovery_policy(policy)
+        if isinstance(self.run_orchestrator, RunOrchestrator):
+            self.run_orchestrator.set_error_recovery_policy(policy)
+        else:
+            self.run_orchestrator.set_error_recovery_policy(
+                error_recovery_rules, error_recovery_is_enabled
+            )
 
     def add_camera_enablement_settings(
         self, enablement_settings: CameraSettings
