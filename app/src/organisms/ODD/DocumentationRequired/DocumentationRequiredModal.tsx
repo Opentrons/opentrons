@@ -24,12 +24,12 @@ const DocumentationRequiredModalImpl = NiceModal.create(
               note,
               confirmedAt: new Date().toISOString(),
             }
-            void modal.hide()
             modal.resolve(result)
+            modal.remove()
           }}
           onBack={() => {
-            void modal.hide()
             modal.resolve(null)
+            modal.remove()
           }}
         />
       </div>

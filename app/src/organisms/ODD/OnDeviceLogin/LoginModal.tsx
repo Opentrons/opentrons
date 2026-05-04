@@ -26,8 +26,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       setLoginError(null)
       storeLoginState(username, response)
       const result: LoginModalResult = { username }
-      void modal.hide()
       modal.resolve(result)
+      modal.remove()
     },
     onError: () => {
       setLoginError(t('on_device_login_error_incorrect') as string)
@@ -46,8 +46,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
           setLoginError(null)
         }}
         onCancel={() => {
-          void modal.hide()
           modal.resolve(null)
+          modal.remove()
         }}
       />
     </div>
