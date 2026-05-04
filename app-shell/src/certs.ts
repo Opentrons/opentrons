@@ -1,4 +1,6 @@
 import { pbkdf2, subtle, X509Certificate } from 'crypto'
+import { mkdir, open, readdir, rm, stat } from 'fs/promises'
+import { join } from 'path'
 import { promisify } from 'util'
 import { app, ipcMain } from 'electron'
 
@@ -18,13 +20,107 @@ const CERT_DECRYPTION_TTL_NOT_RECENT_S = 10 * 365 * 24 * 60 * 60
 const CERT_DECRYPTION_FORWARD_CLOCK_SKEW_NEAR_S = 24 * 60 * 60
 const CERT_DECRYPTION_FORWARD_CLOCK_SKEW_FAR_S = 10 * 365 * 24 * 60 * 60
 
+const CERT_SUBDIR = 'robot-certificates'
+
+const log = createLogger('certs')
+
+async function wrappedStat(
+  path: string
+): Promise<Awaited<ReturnType<typeof stat>> | null> {
+  try {
+    return await stat(path)
+  } catch (_: any) {
+    return null
+  }
+}
+
+async function ensureDir(path: string): Promise<void> {
+  const dirstat = await wrappedStat(path)
+  if (dirstat == null) {
+    log.info(`${path} does not exist, making directory`)
+    await mkdir(path, { recursive: true })
+  } else if (!dirstat.isDirectory()) {
+    log.warn(`${path} exists as a non-directory, removing`)
+    await rm(path)
+    await mkdir(path, { recursive: true })
+  }
+}
+
+async function getCertDir(): Promise<string> {
+  const basePath = app.getPath('userData')
+  const certDir = join(basePath, CERT_SUBDIR)
+  await ensureDir(certDir)
+  return certDir
+}
+
+async function writeFile(path: string, contents: Buffer): Promise<void> {
+  const certFile = await open(path, 'w')
+  try {
+    await certFile.writeFile(contents)
+  } finally {
+    await certFile.close()
+  }
+}
+
+async function saveCertificateToDisk(
+  certificate: X509Certificate
+): Promise<void> {
+  const certDir = await getCertDir()
+  const certPath = join(certDir, `${certificate.fingerprint256}.cer`)
+  await writeFile(certPath, certificate.raw)
+  log.info(`Saved certificate to ${certPath}`)
+  addCertificateToMap(certificate)
+}
+
+async function readFile(path: string): Promise<Buffer> {
+  const handle = await open(path, 'r')
+  try {
+    return await handle.readFile()
+  } finally {
+    await handle.close()
+  }
+}
+
+async function tryLoadCertificate(
+  path: string
+): Promise<X509Certificate | null> {
+  const contents = await readFile(path)
+  try {
+    return new X509Certificate(contents)
+  } catch (err: any) {
+    log.warning(`Invalid certificate: ${err}`)
+    return null
+  }
+}
+
+async function loadCertificatesFromDisk(): Promise<void> {
+  const certDir = await getCertDir()
+  log.info(`Reading robot certificates from ${certDir}`)
+  const certs = await readdir(certDir, {
+    withFileTypes: true,
+    encoding: 'utf8',
+  })
+  for (const possibleCert of certs) {
+    if (!possibleCert.isFile()) {
+      continue
+    }
+    if (!possibleCert.name.endsWith('.cer')) {
+      continue
+    }
+    const loaded = await tryLoadCertificate(join(certDir, possibleCert.name))
+    if (loaded == null) {
+      continue
+    }
+    addCertificateToMap(loaded)
+  }
+}
+
 function addCertificateToMap(certificate: X509Certificate): void {
   const sha256Fingerprint = certificate.fingerprint256
   knownCertificates.set(sha256Fingerprint, certificate)
-  log.silly(`added certificate at ${sha256Fingerprint}`)
+  log.info(`added certificate at ${sha256Fingerprint}`)
 }
 
-const log = createLogger('certs')
 /**
  * An implementation of the Fernet cryptosystem (https://github.com/fernet/spec)
  * decode side only tuned to our requirements.
@@ -163,12 +259,11 @@ async function certInstallListener(
   )
   const certificate = new X509Certificate(certDER)
   log.silly(`got cert, ca: ${certificate.ca} signer: ${certificate.issuer}`)
-  addCertificateToMap(certificate)
-  log.info(`added cert to known certificates, have ${knownCertificates.size}`)
+  await saveCertificateToDisk(certificate)
   return true
 }
 
-export function registerCertIPC(): void {
+export async function registerCertIPC(): Promise<void> {
   ipcMain.handle('robot-cert:install', certInstallListener)
   app.on(
     'certificate-error',
@@ -188,4 +283,5 @@ export function registerCertIPC(): void {
       log.info('no sign match for cert, denying')
     }
   )
+  await loadCertificatesFromDisk()
 }
