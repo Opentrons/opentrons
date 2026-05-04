@@ -773,6 +773,13 @@ export const pauseForTimeOrUntilTold = (
   ) {
     // This is a system-created pause step that's paired with a TC profile step.
     return null
+  } else if (
+    'pauseAction' in fields &&
+    (fields.pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE ||
+      fields.pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE)
+  ) {
+    // System-created pause steps paired with a Vacuum profile or timed pump step.
+    return null
   } else {
     // user did not select a pause type
     return PAUSE_TYPE_REQUIRED

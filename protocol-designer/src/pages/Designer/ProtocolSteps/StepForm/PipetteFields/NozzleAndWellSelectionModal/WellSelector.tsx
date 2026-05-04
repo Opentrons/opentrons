@@ -78,7 +78,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     .value as PrimaryNozzleConfigurationStyle
   const pipetteId = propsForFields.pipette.value as string
   const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
-
+  const tiprackLabwareDefURI = propsForFields.tipRack.value as string
+  const tiprackId = Object.values(deckSetup.labware).find(
+    labware => labware.labwareDefURI === tiprackLabwareDefURI
+  )?.id
   const robotState = useSelector(getRobotStateAtActiveItem)
   const invariantContext = useSelector(getInvariantContext)
 
@@ -193,27 +196,27 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     setWellShadow(hovered[0])
   }
 
-  const allWellsWithStatus = useMemo(
-    () =>
-      getAllWellsSafetyStatus({
-        allWells,
-        robotState,
-        invariantContext,
-        pipetteId,
-        labwareId,
-        primaryNozzle,
-        nozzleConfiguration,
-      }),
-    [
+  const allWellsWithStatus = useMemo(() => {
+    return getAllWellsSafetyStatus({
       allWells,
-      primaryNozzle,
-      nozzleConfiguration,
-      pipetteId,
-      labwareId,
       robotState,
       invariantContext,
-    ]
-  )
+      pipetteId,
+      labwareId,
+      primaryNozzle,
+      nozzleConfiguration,
+      tiprackId,
+    })
+  }, [
+    allWells,
+    primaryNozzle,
+    nozzleConfiguration,
+    pipetteId,
+    labwareId,
+    robotState,
+    invariantContext,
+    tiprackId,
+  ])
   const allWellsWithState = allWells
     .flat()
     .reduce<Record<string, WellType>>((acc, wellName) => {
@@ -371,16 +374,17 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   let controls: JSX.Element = <></>
   const modulesOnDeck = deckSetup.modules
   const moduleIds = new Set(Object.keys(modulesOnDeck))
-  const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
 
-  const moduleDef = moduleLocation
-    ? getModuleDef(modulesOnDeck[moduleLocation].model)
-    : null
-  const isLabwareOnModule = moduleDef !== null
   const defaultSlotPosition: [number, number, number] = [0, 0, 0]
 
   if (labware && robotState) {
     const activeLabware = robotState.labware[labwareId]
+    const moduleLocation =
+      activeLabware.stack.find(loc => moduleIds.has(loc)) ?? null
+    const isLabwareOnModule = moduleLocation !== null
+    const moduleDef = moduleLocation
+      ? getModuleDef(modulesOnDeck[moduleLocation].model)
+      : null
     const slot = getSlotInLocationStack(activeLabware.stack)
     const slotPosition =
       getPositionFromSlotId(slot, deckDef) ?? defaultSlotPosition

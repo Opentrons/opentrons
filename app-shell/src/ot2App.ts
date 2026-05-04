@@ -5,7 +5,7 @@ import { createLogger } from './log'
 const PROTOCOL_NAME = 'com-opentrons-ot2-app'
 
 // ToDo update the link later
-export const OT2_APP_DOWNLOAD_PAGE = 'https://opentrons.com/ot-app'
+export const OT2_APP_DOWNLOAD_PAGE = 'https://opentrons.com/app'
 
 const log = createLogger('ot2-app')
 

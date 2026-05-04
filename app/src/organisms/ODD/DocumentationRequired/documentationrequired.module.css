@@ -6,9 +6,11 @@
 
 .content_container {
   display: flex;
-  height: 100%;
+  width: 824px;
+  height:218px;
   flex-direction: column;
-  padding: 7.75rem var(--spacing-40) var(--spacing-40);
+  padding: 7.75rem var(--spacing-40) var(--spacing-120);
+  margin: 0 auto;
   gap: var(--spacing-24);
 }
 
@@ -17,6 +19,8 @@
 }
 
 .keyboard_container {
-  width: 100%;
-  margin-top: -3rem;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }

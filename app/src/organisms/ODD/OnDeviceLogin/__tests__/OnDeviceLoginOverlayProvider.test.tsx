@@ -170,10 +170,9 @@ describe('Login', () => {
     fireEvent.click(screen.getByText('Next'))
     const input = getLoginInput()
     expect(input).toHaveAttribute('type', 'password')
-    const toggleBtn = screen.getByTitle('Toggle password visibility')
-    fireEvent.click(toggleBtn)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(input).toHaveAttribute('type', 'text')
-    fireEvent.click(toggleBtn)
+    fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
     expect(input).toHaveAttribute('type', 'password')
   })
 
