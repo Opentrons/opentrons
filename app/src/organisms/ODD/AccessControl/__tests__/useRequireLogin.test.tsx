@@ -1,12 +1,12 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { showLoginNiceModal } from '/app/organisms/ODD/OnDeviceLogin'
+import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin'
 
 import { useRequireLogin } from '../useRequireLogin'
 
 vi.mock('/app/organisms/ODD/OnDeviceLogin', () => ({
-  showLoginNiceModal: vi.fn(),
+  showLoginModal: vi.fn(),
 }))
 
 describe('useRequireLogin', () => {
@@ -19,21 +19,21 @@ describe('useRequireLogin', () => {
 
     const guarded = await act(async () => await result.current())
     expect(guarded).toEqual({ username: 'alice' })
-    expect(showLoginNiceModal).not.toHaveBeenCalled()
+    expect(showLoginModal).not.toHaveBeenCalled()
   })
 
   it('opens the login modal when logged out, and resolves with the new username on success', async () => {
-    vi.mocked(showLoginNiceModal).mockResolvedValue({ username: 'bob' })
+    vi.mocked(showLoginModal).mockResolvedValue({ username: 'bob' })
 
     const { result } = renderHook(() => useRequireLogin(null))
 
     const guarded = await act(async () => await result.current())
     expect(guarded).toEqual({ username: 'bob' })
-    expect(showLoginNiceModal).toHaveBeenCalledOnce()
+    expect(showLoginModal).toHaveBeenCalledOnce()
   })
 
   it('returns null when the user dismisses the login modal', async () => {
-    vi.mocked(showLoginNiceModal).mockResolvedValue(null)
+    vi.mocked(showLoginModal).mockResolvedValue(null)
 
     const { result } = renderHook(() => useRequireLogin(null))
 

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 
-import { showLoginNiceModal } from '/app/organisms/ODD/OnDeviceLogin'
+import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin'
 
 export interface RequireLoginResult {
   username: string
@@ -27,7 +27,7 @@ export function useRequireLogin(
     if (currentUsername != null) {
       return { username: currentUsername }
     }
-    const result = await showLoginNiceModal()
+    const result = await showLoginModal()
     if (result == null) return null
     return { username: result.username }
   }, [currentUsername])

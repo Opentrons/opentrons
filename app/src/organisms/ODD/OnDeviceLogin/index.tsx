@@ -226,5 +226,5 @@ export {
 } from './OnDeviceLoginOverlayProvider'
 export type { OnDeviceLoginModalContextValue } from './OnDeviceLoginOverlayProvider'
 
-export { showLoginNiceModal } from './LoginNiceModal'
-export type { LoginNiceModalResult } from './LoginNiceModal'
+export { showLoginModal } from './LoginModal'
+export type { LoginModalResult } from './LoginModal'
