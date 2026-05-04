@@ -79,7 +79,7 @@ async def post_users(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ))],
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ_OTHERS))],
 )
 async def get_user(
     request: fastapi.Request,
