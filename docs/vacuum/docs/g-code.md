@@ -21,7 +21,7 @@ The Vacuum Module accepts the G-code commands listed below.
       <td>
         <strong>Command:</strong> get reset reason<br>
         <strong>Arguments:</strong> none <br>
-        <strong>Response elements:</strong> <code>R:</code>, last reset reason <font color="red">Is there a list of reasons?</font><br>
+        <strong>Response elements:</strong> <code>R:</code> and a code number between 1–14. Response codes are used by Opentrons engineers and do not provide actionable information for normal operations.<br>
         <strong>Example: </strong> <code>M114</code><br>
         <strong>Response:</strong> <code>M114 R:1 OK</code>
       </td>
