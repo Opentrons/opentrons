@@ -1,7 +1,6 @@
 """Class wrapper that ingests a PyroSynchronousObject and maps 'synchronized' async functions to awaitable methods."""
 
 import asyncio
-import threading
 from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
@@ -29,9 +28,6 @@ class AsyncPyroFunctionWrapper:
 
 class _ACPO:
     pass
-
-
-_thread_local = threading.local()
 
 
 def AsyncClientPyroObject(pyro_synchronous_object: Pyro5.api.Proxy) -> _ACPO:
@@ -99,18 +95,12 @@ def _get_async_methods(proxy: Pyro5.api.Proxy) -> dict[str, dict[str, Any]]:
 
 
 def _get_thread_proxy(proxy: Pyro5.api.Proxy) -> Pyro5.api.Proxy:
-    """Get or create a thread-local proxy for the given URI, reconnecting if needed."""
-    existing: Pyro5.api.Proxy | None = getattr(_thread_local, "proxy", None)
+    """Get or create a thread-local proxy for the given URI, to prevent request lockout.
 
-    if existing is not None and existing._pyroUri == proxy._pyroUri:
-        if existing._pyroConnection is not None:
-            return existing
-        else:  # Connection was lost, proxy needs reconnect
-            existing._pyroReconnect()  # type: ignore[no-untyped-call]
-            return existing
-
+    Pyro server daemon's handle multiple requests based on proxy connections, so to prevent a
+    deadlock we create a proxy per request, which is then closed by the requesting caller.
+    """
     new_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore[no-untyped-call]
-    _thread_local.proxy = new_proxy
 
     return new_proxy
 
@@ -147,10 +137,18 @@ def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
 
     This will take the provided Proxy instance and ensure a thread-safe version is executed upon.
     """
+
+    def _property_result(proxy: Pyro5.api.Proxy, current_attr: str) -> Any:
+        threadsafe_proxy = _get_thread_proxy(proxy)
+        result = getattr(threadsafe_proxy, current_attr)
+        # Ensure the proxy connection is gracefully released
+        threadsafe_proxy._pyroRelease()  # type: ignore[no-untyped-call]
+        return result
+
     return lambda self, current_attr=attr: wrap_result_validation(
         proxy,
         attr,
-        getattr(_get_thread_proxy(proxy), current_attr),
+        _property_result(proxy, current_attr),
     )
 
 
@@ -177,6 +175,8 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str) -> Any:
         threadsafe_proxy = _get_thread_proxy(proxy)
         threadsafe_attr = getattr(threadsafe_proxy, func_name)
         result = threadsafe_attr(*validated_args, **kwargs)
+        # Ensure the proxy connection is gracefully released
+        threadsafe_proxy._pyroRelease()  # type: ignore[no-untyped-call]
         return wrap_result_validation(proxy, func_name, result)
 
     return wrapper
@@ -233,10 +233,12 @@ def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) 
     as AsyncClientPyroObjects.
     """
     validated_result = result
-    threadsafe_proxy = Pyro5.api.Proxy(proxy._pyroUri)  # type: ignore
+    threadsafe_proxy = _get_thread_proxy(proxy)
     attributes_with_proxy_result: list[str] = getattr(
         threadsafe_proxy, "get_pyro_attributes_with_proxy_result", []
     )
+    # Ensure the proxy connection is gracefully released
+    threadsafe_proxy._pyroRelease()  # type: ignore[no-untyped-call]
 
     if func_name in attributes_with_proxy_result:
         # Check if the result is a list of proxies or singular entity
