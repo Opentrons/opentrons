@@ -25,19 +25,19 @@ async function getNextCACert(
   }
 }
 
-export function useRotateRobotCerts(): UseQueryResult<void> {
+export function useRotateRobotCerts(): UseQueryResult<boolean> {
   const host = useHost()
-  return useQuery<void>({
+  return useQuery<boolean>({
     queryFn: async () => {
       if (host == null) {
-        return
+        return false
       }
       const maybeCert = await getNextCACert(host)
       if (maybeCert == null) {
-        return
+        return false
       }
 
-      await tryInstallPlaintextRobotCertificate({
+      return await tryInstallPlaintextRobotCertificate({
         certificateData: maybeCert.cert_data,
       })
     },
