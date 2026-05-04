@@ -23,7 +23,7 @@ on:
       - '**'
     tags:
       - 'v*'
-      - 'ot3@*'
+      - 'internal@*'
   pull_request:
     paths:
       - 'Makefile'
@@ -152,8 +152,8 @@ jobs:
             echo "No builds for pull requests"
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ] ; then
-            echo "internal-release release builds for ot3 tags"
+          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/internal')) }}" = "true" ] ; then
+            echo "internal-release release builds for internal@* tags"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=release' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/v')) }}" = "true" ] ; then
@@ -446,7 +446,7 @@ jobs:
         deploy-release-app,
         determine-build-type,
       ]
-    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/internal')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -469,7 +469,7 @@ jobs:
         deploy-release-app,
         determine-build-type,
       ]
-    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/internal')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -514,7 +514,7 @@ jobs:
         deploy-release-app,
         determine-build-type,
       ]
-    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/internal')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5

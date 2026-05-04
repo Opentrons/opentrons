@@ -24,8 +24,22 @@ export function monorepoGit() {
   return git({ baseDir: REPO_BASE })
 }
 
-export const detailsFromTag = tag =>
-  tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
+export const detailsFromTag = tag => {
+  if (tag.startsWith('v')) {
+    return ['robot-stack', tag.slice(1)]
+  }
+  if (tag.startsWith('internal@')) {
+    return ['ot3', tag.slice('internal@'.length)]
+  }
+  if (tag.startsWith('ot3@')) {
+    return ['ot3', tag.slice('ot3@'.length)]
+  }
+  if (tag.includes('@')) {
+    const at = tag.indexOf('@')
+    return [tag.slice(0, at), tag.slice(at + 1)]
+  }
+  return ['robot-stack', tag.substring(1)]
+}
 
 export function tagFromDetails(project, version) {
   const prefix = prefixForProject(project)
@@ -35,18 +49,42 @@ export function tagFromDetails(project, version) {
 export function prefixForProject(project) {
   if (project === 'robot-stack') {
     return 'v'
-  } else {
-    return `${project}@`
   }
+  if (project === 'ot3') {
+    return 'internal@'
+  }
+  return `${project}@`
+}
+
+/** Glob passed to `git describe --match` for this project (single pattern). */
+export function matchGlobForProject(project) {
+  if (project === 'robot-stack') {
+    return 'v*'
+  }
+  if (project === 'ot3') {
+    // YY.MM.DD calendar tags only (not internal@v*, internal@*.*.*-alpha*, etc.)
+    return 'internal@??.??.??*'
+  }
+  return `${project}@*`
 }
 
 export async function latestTagForProject(project) {
+  if (project === 'ot3') {
+    return (
+      await monorepoGit().raw([
+        'describe',
+        '--tags',
+        '--abbrev=0',
+        '--match=internal@??.??.??*',
+      ])
+    ).trim()
+  }
   return (
     await monorepoGit().raw([
       'describe',
       '--tags',
       '--abbrev=0',
-      `--match=${prefixForProject(project)}*`,
+      `--match=${matchGlobForProject(project)}`,
     ])
   ).trim()
 }

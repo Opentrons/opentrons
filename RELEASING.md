@@ -48,7 +48,7 @@ These are all versioned and released together. These assets are produced in 2 po
 
 ### Steps to release the changes in `edge`
 
-1. Checkout `edge` and make a chore release branch, without any new changes. The branch name should match `chore_release-${version}`.
+1. Checkout `edge` and make a chore release branch, without any new changes. The branch name should match `chore_release-${version}` where `${version}` is the calendar release train (for example `26.04` for April 2026).
 
    ```shell
    git switch edge
@@ -61,7 +61,7 @@ These are all versioned and released together. These assets are produced in 2 po
 
 3. Evaluate changes on our dependent repositories. If there have been changes to `opentrons-modules`, `oe-core`, `ot3-firmware`, or `buildroot`, ensure that the changes are in the correct branches. Tags will need to be pushed to repositories with changes. Further exact tagging instructions for each of the repositories are TODO.
 
-4. Check out and pull `chore_release-${version}` locally. Create a tag for a new alpha version. The alpha versions end with an `-alpha.N` prerelease tag, where `N` increments by 1 from 0 over the course of the QA process. You don't need a PR or a commit to create a new version. Pushing tags in the formats prescribed here are the triggers of the release process. Let's call the alpha version you're about to create `${alphaVersion}`:
+4. Check out and pull `chore_release-${version}` locally. Create a tag for a new alpha build on that train. Alpha tags use the form `vYY.MM@alpha.N` where `YY.MM` is the calendar version (two-digit year, two-digit month) and `N` increments from 0 over the course of QA. You don't need a PR or a commit to create a new version. Pushing tags in the formats prescribed here are the triggers of the release process. Let's call the alpha tag you're about to create `${alphaTag}` (for example `v26.04@alpha.0`).
 
 > [!IMPORTANT]
 > Use annotated tag (`-a`) with a message (`-m`) for all tags.
@@ -69,13 +69,13 @@ These are all versioned and released together. These assets are produced in 2 po
 ```shell
 git switch chore_release-${version}
 git pull
-git tag -a v${alphaVersion} -m 'chore(release): ${alphaVersion}
+git tag -a ${alphaTag} -m 'chore(release): ${alphaTag}'
 ```
 
-5. Review the tag with `git log v${alphaVersion} --oneline -n10`. Double check that the commit displayed is the one you want - it should probably be the latest commit in your release branch, and you should double check that with the Github web UI. If the tag looks good, push it - this starts the build process. This is a release candidate that will undergo QA. Changelogs for the release are automatically generated when the tag is pushed and sent to the release page in github.
+5. Review the tag with `git log ${alphaTag} --oneline -n10`. Double check that the commit displayed is the one you want - it should probably be the latest commit in your release branch, and you should double check that with the Github web UI. If the tag looks good, push it - this starts the build process. This is a release candidate that will undergo QA. Changelogs for the release are automatically generated when the tag is pushed and sent to the release page in github.
 
    ```shell
-   git push origin v${alphaVersion}
+   git push origin ${alphaTag}
    ```
 
 6. Run QA on this release. If issues are found, create PRs targeting `chore_release-${version}`. To create a new alpha releases, repeat steps 4-6.
@@ -100,10 +100,10 @@ git merge --ff-only chore_release-${version}
 git push origin release
 ```
 
-9. Make a tag for the release. This tag will have the actual target release version, no alpha prerelease tags involved. It should be the same as the `${version}` part of your release branch:
+9. Make a tag for the release. This tag uses the calendar production form `vYY.MM` (no `@alpha` suffix). It should match the `${version}` part of your release branch (for example branch `chore_release-26.04` and tag `v26.04`).
 
    ```shell
-   git tag -a v${version} -m 'chore(release): ${version}'
+   git tag -a v${version} -m 'chore(release): v${version}'
    git log v${version} --oneline -n10
    ```
 
@@ -161,11 +161,12 @@ ${projectPrefix}${projectVersion}
 
 ##### Examples
 
-- the tag for 6.2.1-alpha.3 of the robot stack is `v6.2.1-alpha.3`
-- the tag for 0.1.2-beta.1 of an internal release or robot stack is `ot3@0.1.2-beta.1`
+- the tag for April 2026 alpha build 3 of the robot stack is `v26.04@alpha.3`
+- the tag for April 2026 production of the robot stack is `v26.04`
+- the tag for an internal (Flex / internal channel) build on 23 April 2026 is `internal@26.04.23` (UTC `yy.mm.dd`; same-day extra builds use `internal@26.04.23.1`, `internal@26.04.23.2`, …). Older tags may still use a `-dev` / `-prod` / `-stage` suffix; new tags omit that.
 - the tag for 4.0.0 of protocol designer is `protocol-designer@4.0.0`
 
-Versions follow [semver.inc][semver-inc]. QA is done on alpha builds, and only alpha tags should be pushed until you're ready to release the project.
+Robot stack calendar tags use `YY.MM` with optional `@alpha.N` for QA candidates. Internal monorepo tags for the internal app channel use `internal@yy.mm.dd` (GitHub and tooling match `internal@*`). Protocol Designer and Labware Library still use semver in their own tag namespaces. QA is done on alpha builds, and only alpha tags should be pushed until you're ready to release the project.
 
 ## Releasing Web Projects
 

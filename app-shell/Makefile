@@ -43,14 +43,14 @@ ssh_opts ?= $(default_ssh_opts)
 # if tagged build (tag ~= ^v.+) -> b$(BUILD_NUMBER)
 # if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
 # only copy update files publish directory on tagged builds that match the provided OPENTRONS_PROJECT
-# environment variable (i.e. if OT_TAG is vxxx and OPENTRONS_PROJECT is robot-stack, or OT_TAG is ot3@xxx
-# and OPENTRONS_PROJECT is ot3)
+# environment variable (i.e. if OT_TAG is vxxx and OPENTRONS_PROJECT is robot-stack, or OT_TAG is
+# internal@* calendar / internal tags and OPENTRONS_PROJECT is ot3)
 _publish_ot2 := $(and $(filter v%,$(OT_TAG)), $(filter robot-stack,$(OPENTRONS_PROJECT)))
-_publish_ot3 := $(and $(filter ot3@%,$(OT_TAG)), $(filter ot3,$(OPENTRONS_PROJECT)))
+_publish_ot3 := $(and $(filter internal@%,$(OT_TAG)),$(filter ot3,$(OPENTRONS_PROJECT)))
 publish_update := $(or $(_publish_ot2),$(_publish_ot3))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
-OPENTRONS_PROJECT ?= $(if $(filter ot3@%,$(publish_update)),ot3,robot-stack)
+OPENTRONS_PROJECT ?= $(if $(_publish_ot3),ot3,robot-stack)
 
 # set this to anything on command-line invocations of this makefile to skip bundling
 # standalone python, as is necessary for on-device app builds:

@@ -36,8 +36,8 @@ The action automatically routes notifications to different Slack channels based 
 
 ### Main Releases → `#release-cycle`
 
-- `v*` - Version releases (v7.2.0, v8.0.0, etc.)
-- `ot3@*` - OT3 releases (ot3@7.2.0, ot3@8.0.0, etc.)
+- `v*` - Robot stack releases (for example `v26.04`, `v26.04@alpha.0`)
+- `internal@*` - Internal channel releases (for example `internal@26.04.23` or `internal@26.05.04.1`)
 
 ### Component Releases → `#builds`
 
@@ -71,7 +71,7 @@ You need to set up these repository secrets:
 
 - **Secret Name**: `OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL`
 - **Channel**: `#release-cycle`
-- **Used for**: Main releases (v*, ot3@*)
+- **Used for**: Main releases (v*, internal@*)
 
 ### 2. Builds Channel Webhook
 

@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-const { versionPrevious } = require('../create-release')
+const {
+  versionPrevious,
+  compareVersions,
+  releaseKind,
+} = require('../create-release')
 
 const HISTORICAL_VERSIONS = [
   '1.2.3-alpha.0',
@@ -88,5 +92,33 @@ describe('create-release script', () => {
     return expect(
       versionPrevious('1.1.9-alpha.0', HISTORICAL_VERSIONS)
     ).toBeNull()
+  })
+})
+
+describe('calendar robot tags (vYY.MM / vYY.MM@alpha.N)', () => {
+  it('orders per semver on comparable strings (prerelease < release)', () => {
+    expect(compareVersions('26.04@alpha.0', '26.04')).toBeLessThan(0)
+    expect(compareVersions('26.04@alpha.0', '26.04@alpha.1')).toBeLessThan(0)
+  })
+  it('versionPrevious for calendar alpha uses prior stable', () => {
+    const prev = ['26.04@alpha.0', '26.04', '26.03@alpha.2', '26.03']
+    expect(versionPrevious('26.04@alpha.0', prev)).toBe('26.04')
+  })
+})
+
+describe('internal calendar version strings (tag suffix after internal@)', () => {
+  it('sorts YY.MM.DD and same-day .N bumps (mapped alpha < bare day)', () => {
+    expect(compareVersions('26.04.23.1', '26.04.23')).toBeLessThan(0)
+    expect(compareVersions('26.04.22', '26.04.23')).toBeLessThan(0)
+  })
+  it('treats calendar internal and legacy channel as alpha for changelog window', () => {
+    expect(releaseKind('26.04.23')).toBe('alpha')
+    expect(releaseKind('26.04.23.2')).toBe('alpha')
+    expect(releaseKind('26.04.23-dev')).toBe('alpha')
+    expect(releaseKind('26.04.23-prod.1')).toBe('alpha')
+  })
+  it('versionPrevious for internal alpha picks newest older than current', () => {
+    const prev = ['26.04.24.1', '26.04.24', '26.04.23.2', '26.04.22']
+    expect(versionPrevious('26.04.24.1', prev)).toBe('26.04.24')
   })
 })

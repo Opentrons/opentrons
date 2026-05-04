@@ -19,21 +19,16 @@ Behavior:
     - buildroot: opentrons-develop
     - oe-core: main
     - opentrons: edge
-- Determines the alpha version from the opentrons repo's last tag for this version.
-- Uses that alpha version + 1 for all repos (buildroot, oe-core, opentrons).
-- For each repo, in this order:
-    1. ot3-firmware
-    2. buildroot
-    3. oe-core
-    4. opentrons
-  - Creates/increments tags if there are new commits.
+- Determines the alpha version from the buildroot repo's last tag for this version.
+- Uses that alpha version + 1 for buildroot and oe-core.
+- Tags opentrons with internal@yy.mm.dd (UTC), or internal@yy.mm.dd.N for extra same-day builds.
 
 Tag logic:
 - ot3-firmware: internal@v23 → internal@v24 (always increments, ignores version arg)
-- If opentrons last tag is ot3@2.8.0-alpha.5, then all repos get alpha.6:
+- If buildroot last tag is internal@2.8.0-alpha.5, buildroot and oe-core get alpha.6:
   - buildroot:  internal@2.8.0-alpha.6
   - oe-core:    internal@2.8.0-alpha.6
-  - opentrons:  ot3@2.8.0-alpha.6
+  - opentrons:  internal@26.04.23 or internal@26.04.23.1 (calendar; see allocate_next_opentrons_internal_tag)
 """
 
 import argparse
@@ -41,12 +36,18 @@ import re
 import shutil
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, List, Tuple
 
 
 # Root directory where clean clones will live
 CLEAN_ROOT = Path("./clean-repos")
+
+# Calendar internal tags on opentrons (excludes internal@v*, internal@*.*.*-alpha*, etc.)
+OPENTRONS_CALENDAR_TAG_RE = re.compile(
+    r'^internal@\d{2}\.\d{2}\.\d{2}(?:(\.(\d+))|(-(dev|prod|stage)(?:\.(\d+))?))?$'
+)
 
 # Configuration: repo info, tag patterns, clone URLs, and branches
 REPOS = [
@@ -79,8 +80,8 @@ REPOS = [
         "dir_name": "opentrons",
         "clone_url": "git@github.com:opentrons/opentrons.git",
         "branch": "edge",
-        "tag_pattern": "ot3@*",
-        "tag_type": "ot3_alpha",  # ot3@2.8.0-alpha.6
+        "tag_pattern": "internal@*",
+        "tag_type": "opentrons_internal",
     },
 ]
 
@@ -162,8 +163,6 @@ def get_last_tag_from_list(tags: List[str], tag_type: str, internal_version: str
     # For alpha tags, filter to matching version and sort by alpha number
     if tag_type == "internal_alpha":
         prefix = f"internal@{internal_version}-alpha."
-    elif tag_type == "ot3_alpha":
-        prefix = f"ot3@{internal_version}-alpha."
     else:
         return None
     
@@ -186,30 +185,38 @@ def get_last_tag_from_list(tags: List[str], tag_type: str, internal_version: str
 def get_last_tag_for_version(repo_path: Path, tag_pattern: str, tag_type: str, internal_version: str) -> Optional[str]:
     """Get the most recent tag matching the pattern for the given internal version."""
     try:
+        if tag_type == "opentrons_internal":
+            all_tags = run_command(
+                ["git", "tag", "-l", tag_pattern, "--merged", "HEAD", "--sort=-creatordate"],
+                cwd=repo_path,
+            )
+            if not all_tags:
+                return None
+            for tag in all_tags.split("\n"):
+                if tag and OPENTRONS_CALENDAR_TAG_RE.match(tag):
+                    return tag
+            return None
+
         all_tags = run_command(
             ["git", "tag", "-l", tag_pattern, "--sort=-version:refname"],
             cwd=repo_path,
         )
         if not all_tags:
             return None
-        
+
         tags = all_tags.split("\n")
-        
+
         # For internal_numeric (ot3-firmware), just return the latest
         if tag_type == "internal_numeric":
             return tags[0] if tags else None
-        
+
         # For alpha tags, find the latest tag matching this specific version
         for tag in tags:
             if tag_type == "internal_alpha":
                 # internal@2.8.0-alpha.X
                 if tag.startswith(f"internal@{internal_version}-alpha."):
                     return tag
-            elif tag_type == "ot3_alpha":
-                # ot3@2.8.0-alpha.X
-                if tag.startswith(f"ot3@{internal_version}-alpha."):
-                    return tag
-        
+
         return None
     except subprocess.CalledProcessError:
         return None
@@ -221,33 +228,29 @@ def extract_alpha_number(tag: str, tag_type: str) -> Optional[int]:
         m = re.match(r"^internal@\d+\.\d+\.\d+-alpha\.(\d+)$", tag)
         if m:
             return int(m.group(1))
-    elif tag_type == "ot3_alpha":
-        m = re.match(r"^ot3@\d+\.\d+\.\d+-alpha\.(\d+)$", tag)
-        if m:
-            return int(m.group(1))
     return None
 
 
 def determine_next_alpha_number_remote(internal_version: str) -> int:
     """
-    Determine the next alpha number by fetching tags from the opentrons repo remotely.
-    Returns the next alpha number to use for all repos.
+    Determine the next alpha number by fetching tags from the buildroot repo remotely.
+    Returns the next alpha number to use for buildroot and oe-core.
     """
-    opentrons_repo = next(r for r in REPOS if r["name"] == "opentrons")
-    
-    print("Determining next alpha number from opentrons repo (remote)...")
-    
-    tags = get_remote_tags(opentrons_repo["clone_url"], opentrons_repo["tag_pattern"])
-    last_tag = get_last_tag_from_list(tags, opentrons_repo["tag_type"], internal_version)
+    buildroot_repo = next(r for r in REPOS if r["name"] == "buildroot")
+
+    print("Determining next alpha number from buildroot repo (remote)...")
+
+    tags = get_remote_tags(buildroot_repo["clone_url"], buildroot_repo["tag_pattern"])
+    last_tag = get_last_tag_from_list(tags, buildroot_repo["tag_type"], internal_version)
     
     if last_tag:
-        alpha_num = extract_alpha_number(last_tag, opentrons_repo["tag_type"])
+        alpha_num = extract_alpha_number(last_tag, buildroot_repo["tag_type"])
         if alpha_num is not None:
             next_alpha = alpha_num + 1
-            print(f"Found opentrons tag: {last_tag} (alpha.{alpha_num})")
+            print(f"Found buildroot tag: {last_tag} (alpha.{alpha_num})")
             print(f"Next alpha number will be: {next_alpha}")
             return next_alpha
-    
+
     print(f"No previous alpha tag found for version {internal_version}")
     print("Starting with alpha.0")
     return 0
@@ -255,29 +258,29 @@ def determine_next_alpha_number_remote(internal_version: str) -> int:
 
 def determine_next_alpha_number_local(internal_version: str) -> int:
     """
-    Determine the next alpha number by checking the opentrons repo locally.
-    Returns the next alpha number to use for all repos.
+    Determine the next alpha number by checking the buildroot repo locally.
+    Returns the next alpha number to use for buildroot and oe-core.
     """
-    opentrons_repo = next(r for r in REPOS if r["name"] == "opentrons")
-    opentrons_path = CLEAN_ROOT / opentrons_repo["dir_name"]
-    
-    print("Determining next alpha number from opentrons repo...")
-    
+    buildroot_repo = next(r for r in REPOS if r["name"] == "buildroot")
+    buildroot_path = CLEAN_ROOT / buildroot_repo["dir_name"]
+
+    print("Determining next alpha number from buildroot repo...")
+
     last_tag = get_last_tag_for_version(
-        opentrons_path,
-        opentrons_repo["tag_pattern"],
-        opentrons_repo["tag_type"],
-        internal_version
+        buildroot_path,
+        buildroot_repo["tag_pattern"],
+        buildroot_repo["tag_type"],
+        internal_version,
     )
-    
+
     if last_tag:
-        alpha_num = extract_alpha_number(last_tag, opentrons_repo["tag_type"])
+        alpha_num = extract_alpha_number(last_tag, buildroot_repo["tag_type"])
         if alpha_num is not None:
             next_alpha = alpha_num + 1
-            print(f"Found opentrons tag: {last_tag} (alpha.{alpha_num})")
+            print(f"Found buildroot tag: {last_tag} (alpha.{alpha_num})")
             print(f"Next alpha number will be: {next_alpha}")
             return next_alpha
-    
+
     print(f"No previous alpha tag found for version {internal_version}")
     print("Starting with alpha.0")
     return 0
@@ -295,13 +298,50 @@ def count_commits_since_tag(repo_path: Path, tag: str) -> int:
         return 0
 
 
+def _utc_date_parts() -> Tuple[int, int, int]:
+    t = datetime.now(timezone.utc)
+    return t.year % 100, t.month, t.day
+
+
+def allocate_next_opentrons_internal_tag(repo_path: Path) -> str:
+    """Pick internal@yy.mm.dd or internal@yy.mm.dd.N (UTC) not already present in this clone."""
+    yy, mm, dd = _utc_date_parts()
+    root = f"internal@{yy:02d}.{mm:02d}.{dd:02d}"
+    n = 0
+    while True:
+        candidate = root if n == 0 else f"{root}.{n}"
+        check = subprocess.run(
+            ["git", "-C", str(repo_path), "rev-parse", candidate],
+            capture_output=True,
+        )
+        if check.returncode != 0:
+            return candidate
+        n += 1
+
+
+def allocate_next_opentrons_internal_tag_remote(clone_url: str) -> str:
+    """Pick next internal@yy.mm.dd[.N] from remote tag names (UTC)."""
+    tags = {
+        t
+        for t in get_remote_tags(clone_url, "internal@*")
+        if OPENTRONS_CALENDAR_TAG_RE.match(t)
+    }
+    yy, mm, dd = _utc_date_parts()
+    root = f"internal@{yy:02d}.{mm:02d}.{dd:02d}"
+    n = 0
+    while True:
+        candidate = root if n == 0 else f"{root}.{n}"
+        if candidate not in tags:
+            return candidate
+        n += 1
+
+
 def get_next_tag(last_tag: Optional[str], tag_type: str, internal_version: str, alpha_number: int) -> str:
     """
     Get the next tag based on the tag type and alpha number.
     
     - internal_numeric: internal@v23 → internal@v24
     - internal_alpha:   internal@2.8.0-alpha.{alpha_number}
-    - ot3_alpha:        ot3@2.8.0-alpha.{alpha_number}
     """
     if tag_type == "internal_numeric":
         # internal@v23 → internal@v24
@@ -315,9 +355,6 @@ def get_next_tag(last_tag: Optional[str], tag_type: str, internal_version: str, 
 
     elif tag_type == "internal_alpha":
         return f"internal@{internal_version}-alpha.{alpha_number}"
-
-    elif tag_type == "ot3_alpha":
-        return f"ot3@{internal_version}-alpha.{alpha_number}"
 
     else:
         raise ValueError(f"Unknown tag_type: {tag_type}")
@@ -369,20 +406,23 @@ def show_dry_run_info(
     print(f"Internal version: {internal_version}")
     print("=" * 60)
 
-    print("Fetching remote tags...")
-    tags = get_remote_tags(clone_url, tag_pattern)
-    last_tag = get_last_tag_from_list(tags, tag_type, internal_version)
-
-    try:
-        new_tag = get_next_tag(last_tag, tag_type, internal_version, alpha_number)
-    except ValueError as e:
-        print(f"❌ Error determining next tag: {e}")
-        print()
-        return
+    if tag_type == "opentrons_internal":
+        new_tag = allocate_next_opentrons_internal_tag_remote(clone_url)
+        last_tag = None
+    else:
+        print("Fetching remote tags...")
+        tags = get_remote_tags(clone_url, tag_pattern)
+        last_tag = get_last_tag_from_list(tags, tag_type, internal_version)
+        try:
+            new_tag = get_next_tag(last_tag, tag_type, internal_version, alpha_number)
+        except ValueError as e:
+            print(f"❌ Error determining next tag: {e}")
+            print()
+            return
 
     if last_tag:
         print(f"Last tag for this version: {last_tag}")
-    else:
+    elif tag_type != "opentrons_internal":
         print(f"No previous tag found for version {internal_version}.")
 
     print(f"[DRY RUN] Would create tag: {new_tag}")
@@ -416,13 +456,16 @@ def tag_repo_if_updated(
     print("Fetching tags...")
     run_command(["git", "fetch", "--tags", "origin"], cwd=repo_path)
 
-    last_tag = get_last_tag_for_version(repo_path, tag_pattern, tag_type, internal_version)
-
-    try:
-        new_tag = get_next_tag(last_tag, tag_type, internal_version, alpha_number)
-    except ValueError as e:
-        print(f"❌ Error determining next tag: {e}")
-        sys.exit(1)
+    if tag_type == "opentrons_internal":
+        last_tag = get_last_tag_for_version(repo_path, tag_pattern, tag_type, internal_version)
+        new_tag = allocate_next_opentrons_internal_tag(repo_path)
+    else:
+        last_tag = get_last_tag_for_version(repo_path, tag_pattern, tag_type, internal_version)
+        try:
+            new_tag = get_next_tag(last_tag, tag_type, internal_version, alpha_number)
+        except ValueError as e:
+            print(f"❌ Error determining next tag: {e}")
+            sys.exit(1)
 
     # Check if we need to create this tag
     if last_tag:

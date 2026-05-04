@@ -1,0 +1,44 @@
+# Unit tests for calendar / internal@ tag helpers (chore-release, internal-release,
+# python_build_utils). Fast, no repo dependencies beyond the Python stdlib.
+
+name: 'Scripts release tag tests'
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/app-release/**'
+      - 'scripts/python_build_utils.py'
+      - 'scripts/test_release_tag_mapping.py'
+      - '.github/workflows/scripts-release-tag-tests.yaml'
+  push:
+    paths:
+      - 'scripts/app-release/**'
+      - 'scripts/python_build_utils.py'
+      - 'scripts/test_release_tag_mapping.py'
+      - '.github/workflows/scripts-release-tag-tests.yaml'
+    branches:
+      - 'edge'
+      - 'release'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id }}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release-tag-mapping:
+    name: 'release tag mapping (unittest)'
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 5
+    steps:
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-python@v5'
+        with:
+          python-version: '3.12'
+      - name: 'Run scripts/test_release_tag_mapping.py'
+        run: |
+          python3 -m unittest discover -s scripts -p test_release_tag_mapping.py -v

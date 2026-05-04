@@ -5,6 +5,7 @@
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 from collections import namedtuple
@@ -36,14 +37,41 @@ package_entries = {
 }
 
 project_entries = {
-    'ot3': ProjectEntry('ot3@'),
+    # Internal Flex/monorepo builds: internal@yy.mm.dd[.N] (optional legacy -dev|-prod|-stage)
+    'ot3': ProjectEntry('internal@'),
     'robot-stack': ProjectEntry('v'),
     'docs': ProjectEntry('docs@'),
 }
 
 
+def _pep440_from_git_version(project, raw):
+    """Map git tag version strings to PEP 440 for wheel metadata."""
+    if project == 'robot-stack':
+        m = re.match(r'^(\d+\.\d+)@alpha\.(\d+)$', raw)
+        if m:
+            return f'{m.group(1)}a{m.group(2)}'
+        return raw
+    if project == 'ot3':
+        m_new = re.match(r'^(\d{2})\.(\d{2})\.(\d{2})(\.(\d+))?$', raw)
+        if m_new:
+            yy, mo, dd, _, c = m_new.groups()
+            base = f'{int(yy)}.{int(mo)}.{int(dd)}'
+            return f'{base}.dev{c}' if c else base
+        m_old = re.match(
+            r'^(\d{2})\.(\d{2})\.(\d{2})-(dev|prod|stage)(?:\.(\d+))?$', raw
+        )
+        if m_old:
+            yy, mo, dd, _suf, extra = m_old.groups()
+            base = f'{int(yy)}.{int(mo)}.{int(dd)}'
+            return f'{base}.dev{extra}' if extra else base
+        return raw
+    return raw
+
+
 def get_version(package, project, extra_tag='', git_dir=None):
-    builtin_ver = _latest_version_for_project(project, git_dir)
+    builtin_ver = _pep440_from_git_version(
+        project, _latest_version_for_project(project, git_dir)
+    )
     if extra_tag:
         version = builtin_ver + '.dev{}'.format(extra_tag)
     else:
@@ -93,10 +121,51 @@ def _latest_tag_for_prefix(prefix, git_dir):
     tags_matching = tags_result.strip().split(b'\n')
     return tags_matching[-1].decode('utf-8')
 
+
+# Opentrons calendar internal tags: internal@YY.MM.DD, optional .N same-day, optional legacy -dev|-prod|-stage
+_OT3_CAL_TAG = re.compile(
+    r'^internal@\d{2}\.\d{2}\.\d{2}(?:(\.(\d+))|(-(dev|prod|stage)(?:\.(\d+))?))?$'
+)
+
+
+def _latest_ot3_internal_release_tag(git_dir):
+    """Latest merged calendar internal@ tag (by creator date; excludes internal@v*, etc.)."""
+    check_dir = git_dir or CWD
+    try:
+        tags_result = subprocess.check_output(
+            [
+                'git',
+                'tag',
+                '-l',
+                'internal@??.??.??*',
+                '--merged',
+                'HEAD',
+                '--sort=-creatordate',
+            ],
+            cwd=check_dir,
+        )
+    except subprocess.CalledProcessError:
+        tags_result = b''
+
+    lines = [ln for ln in tags_result.strip().split(b'\n') if ln]
+    for raw in lines:
+        t = raw.decode('utf-8')
+        if _OT3_CAL_TAG.match(t):
+            return t
+    sys.stderr.write(
+        'Could not find tag in {check_dir} matching calendar internal@YY.MM.DD* '.format(
+            check_dir=check_dir)
+        + '- build before release or no tags. Using internal@00.00.00\n')
+    return 'internal@00.00.00'
+
+
 def _latest_version_for_project(project, git_dir):
     prefix = project_entries[project].tag_prefix
-    tag = _latest_tag_for_prefix(prefix, git_dir)
-    return prefix.join(tag.split(prefix)[1:])
+    if project == 'ot3':
+        tag = _latest_ot3_internal_release_tag(git_dir)
+    else:
+        tag = _latest_tag_for_prefix(prefix, git_dir)
+    return prefix.join(tag.split(prefix, 1)[1:])
 
 def _ref_from_sha(sha):
     # codebuild leaves us in detached HEAD, so we need to pull some

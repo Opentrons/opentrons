@@ -305,7 +305,7 @@ push-photometric-ot2:
 
 .PHONY: get-latest-tag
 get-latest-tag:
-	git tag -l --sort=-v:refname "ot3@*" --merged | (head -n 1 || Select -First 1)
+	git tag -l --sort=-creatordate "internal@??.??.??*" --merged | (head -n 1 || Select -First 1)
 
 
 .PHONY:	create-ssh-key

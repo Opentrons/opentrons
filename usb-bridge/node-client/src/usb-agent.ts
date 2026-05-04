@@ -197,7 +197,9 @@ function socketEmulatorFromPort(port: SerialPort): Socket {
     socket.emit('close')
   })
   socket.on('close', () => {
-    currentTimeout && clearTimeout(currentTimeout)
+    if (currentTimeout != null) {
+      clearTimeout(currentTimeout)
+    }
   })
   return socket
 }
