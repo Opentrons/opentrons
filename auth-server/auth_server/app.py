@@ -10,6 +10,8 @@ from fastapi.responses import HTMLResponse
 
 from server_utils import systemd_utils
 from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    handle_authorization_error,
     install_authorization_checker,
 )
 
@@ -85,6 +87,10 @@ app = FastAPI(
     redoc_url=None,
     lifespan=_lifespan,
 )
+
+
+app.exception_handler(AuthorizationError)(handle_authorization_error)
+
 
 app.include_router(oauth2_router)
 app.include_router(settings_router)

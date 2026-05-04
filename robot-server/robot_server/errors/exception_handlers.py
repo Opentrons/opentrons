@@ -13,6 +13,10 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 from opentrons_shared_data.errors.exceptions import (
     FirmwareUpdateRequiredError as HWFirmwareUpdateRequired,
 )
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    handle_authorization_error,
+)
 
 from .error_responses import (
     ApiError,
@@ -181,6 +185,13 @@ async def handle_firmware_upgrade_required_error(
     )
 
 
+# Normalize to async to appease FastAPI's `exception_handlers` arg.
+async def _handle_authorization_error_async(
+    request: Request, error: AuthorizationError
+) -> Response:
+    return handle_authorization_error(request, error)
+
+
 exception_handlers: Dict[
     Union[int, Type[Exception]],
     Callable[[Request, Any], Coroutine[Any, Any, Response]],
@@ -189,5 +200,6 @@ exception_handlers: Dict[
     StarletteHTTPException: handle_framework_error,
     RequestValidationError: handle_validation_error,
     HWFirmwareUpdateRequired: handle_firmware_upgrade_required_error,
+    AuthorizationError: _handle_authorization_error_async,
     Exception: handle_unexpected_error,
 }
