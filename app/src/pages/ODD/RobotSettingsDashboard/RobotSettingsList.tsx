@@ -21,7 +21,6 @@ import {
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
-  useFeatureFlag,
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'

@@ -1,13 +1,7 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
-import {
-  ALL,
-  COLUMN,
-  PARTIAL_COLUMN,
-  ROW,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 import {
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
@@ -25,6 +19,7 @@ import {
 } from '../constants'
 
 import type {
+  ActiveNozzleNumber,
   NozzleConfigurationStyle,
   PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
@@ -33,19 +28,18 @@ import type { AccessibilityStatus, InaccessibleReason } from '../types'
 
 export const getWellsToCheck = (
   nozzles: NozzleConfigurationStyle,
-  wellOrdering: string[][]
+  wellOrdering: string[][],
+  channels: ActiveNozzleNumber
 ): string[] => {
-  switch (nozzles) {
-    case ROW:
-      return wellOrdering[0]
-    case COLUMN:
-      return wellOrdering.map(row => row[0])
-    case ALL:
-    case SINGLE:
-    case PARTIAL_COLUMN:
-      return wellOrdering.flat()
+  if (channels === 96 && nozzles === ALL) {
+    return [wellOrdering.flat()[0]]
+  } else if (nozzles === ROW) {
+    return wellOrdering[0]
+  } else if (nozzles === COLUMN || (channels === 8 && nozzles === ALL)) {
+    return wellOrdering.map(row => row[0])
+  } else {
+    return wellOrdering.flat()
   }
-  return []
 }
 
 /**
@@ -102,7 +96,11 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
           return acc
         }
         const pipetteChannels = pipetteSpecs.channels
-        const wellNamesToCheck = getWellsToCheck(nozzles, def.ordering)
+        const wellNamesToCheck = getWellsToCheck(
+          nozzles,
+          def.ordering,
+          pipetteChannels
+        )
         return {
           ...acc,
           [id]: wellNamesToCheck.reduce((acc, wellName) => {

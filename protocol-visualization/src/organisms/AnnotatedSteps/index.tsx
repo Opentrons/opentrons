@@ -22,9 +22,9 @@ interface AnnotatedStepsProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   groupedCommands: GroupedCommands | null
   currentCommandIndex?: number
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
   handlePause?: () => void
-  setIsAtBottom?: Dispatch<SetStateAction<boolean>>
+  setIsAtBottom?: Dispatch<SetStateAction<boolean>> // remove redux dependency
 }
 
 type GroupNode = Extract<GroupedCommands[number], { annotationId: string }>
@@ -34,6 +34,7 @@ interface GroupRow {
   group: GroupNode
   annotationType: string
   commandStartNumber: number
+  annotationDescription: string
 }
 
 interface CommandRow {
@@ -55,7 +56,7 @@ export interface ItemData {
   rows: AnnotatedStepsRow[]
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   allRunDefs: LabwareDefinition[]
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
   handlePause?: () => void
   scrollTargetId: string | null
   listElement: HTMLElement | null
@@ -184,6 +185,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             group,
             annotationType: group.annotation?.name ?? '',
             commandStartNumber: subCommandStartNumber,
+            annotationDescription: group.annotation?.description ?? '',
           })
           group.subCommands.forEach(subCommand => {
             nextRowIndexByCommandId.set(subCommand.command.id, rowIndex)

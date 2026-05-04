@@ -19,6 +19,7 @@ export type DevInternalFlag =
   | 'quickTransferProtocolContentsLog'
   | 'ignoreOT2App'
   | 'accessControlMode'
+  | 'robotSearchBar'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

@@ -13,6 +13,7 @@ export type ResponsePromise<Data> = AxiosPromise<Data>
 export type Response<Data> = AxiosResponse<Data>
 
 export const DEFAULT_PORT = 31950
+export const DEFAULT_HTTPS_PORT = 32313
 
 export const DEFAULT_HEADERS = {
   'Opentrons-Version': '3',
@@ -45,12 +46,16 @@ export function request<ResData, ReqData = null>(
     port,
     requestor = (...args) => Axios.request(...args),
     token,
+    secure,
   } = config
 
   const tokenHeader = token != null ? { authenticationBearer: token } : {}
   const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
 
-  const baseURL = `http://${hostname}:${port ?? DEFAULT_PORT}`
+  const protocol = (secure ?? false) ? 'https' : 'http'
+  const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
+
+  const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
 
   return requestor<ResData>({
     headers,

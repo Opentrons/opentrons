@@ -371,7 +371,8 @@
         "label": "Pump",
         "off": "Off",
         "power": "{{power}}%",
-        "pressure": "{{pressure}} mbar"
+        "pressure": "{{pressure}} mbar",
+        "profile": "Running profile"
       },
       "vent": {
         "closed": "Closed",
