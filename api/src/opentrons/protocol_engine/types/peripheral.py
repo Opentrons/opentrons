@@ -17,9 +17,7 @@ from opentrons_shared_data.util import StrEnum
 from opentrons.hardware_control.peripherals import (
     PeripheralModel as HardwarePeripheralModel,
 )
-from opentrons.hardware_control.peripherals import (
-    PeripheralType as PeripheralType,
-)
+from opentrons.hardware_control.peripherals import PeripheralType
 
 
 class PeripheralModel(StrEnum):
@@ -60,17 +58,13 @@ class PeripheralDefinition(BaseModel):
         "peripheral/schemas/1", description="The current schema."
     )
 
-    moduleType: PeripheralType = Field(...)
+    peripheralType: PeripheralType = Field(...)
 
     model: PeripheralModel = Field(...)
 
     displayName: str = Field(...)
 
     quirks: List[str] = Field(...)
-
-    orientation: Dict[str, str] = Field(
-        ...,
-    )
 
 
 class LoadedPeripheral(BaseModel):

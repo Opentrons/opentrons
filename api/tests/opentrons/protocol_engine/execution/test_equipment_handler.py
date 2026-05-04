@@ -30,6 +30,7 @@ from opentrons.hardware_control.modules import (
 )
 from opentrons.hardware_control.peripherals import (
     AbstractPeripheral,
+    BarcodeScanner,
 )
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.execution.equipment import (
@@ -144,6 +145,16 @@ async def temp_module_v1(decoy: Decoy) -> TempDeck:
     decoy.when(temp_mod.model()).then_return("temperatureModuleV1")
 
     return temp_mod
+
+
+@pytest.fixture
+async def barcode_scanner_v1(decoy: Decoy) -> BarcodeScanner:
+    """Get a mocked out module fixture."""
+    bs_peripheral = decoy.mock(cls=BarcodeScanner)
+    decoy.when(bs_peripheral.device_info).then_return({"serial": "serial-1"})
+    decoy.when(bs_peripheral.model()).then_return("barcodeScannerV1")
+
+    return bs_peripheral
 
 
 @pytest.fixture

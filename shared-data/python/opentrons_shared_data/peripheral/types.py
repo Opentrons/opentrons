@@ -5,14 +5,15 @@ from typing import List, Literal, TypedDict, Union
 SchemaV1 = Literal["1"]
 SchemaVersions = Union[SchemaV1]
 
-BarcodeScannerPeripheralModel = Literal["BarcodeScannerV1"]
+BarcodeScannerModel = Literal["barcodeScannerV1"]
 
-PeripheralModel = Union[BarcodeScannerPeripheralModel]
+PeripheralModel = Union[BarcodeScannerModel]
 
 
 PeripheralDefinitionV1 = TypedDict(
     "PeripheralDefinitionV1",
     {
+        "peripheralType": PeripheralModel,
         "displayName": str,
         "loadName": str,
         "quirks": List[str],
