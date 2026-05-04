@@ -16,10 +16,7 @@ import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
 import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
-import {
-  getNozzleText,
-  getWellGroupLength,
-} from './utils'
+import { getNozzleText, getWellGroupLength } from './utils'
 
 import type {
   ActiveNozzleNumber,
