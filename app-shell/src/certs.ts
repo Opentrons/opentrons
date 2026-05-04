@@ -93,6 +93,17 @@ async function tryLoadCertificate(
   }
 }
 
+export function validateCertShouldLoad(
+  certificate: X509Certificate
+): X509Certificate | null {
+  const now = Date.now()
+  if (certificate.validToDate.valueOf() < now) {
+    log.info(`Certificate ${certificate.fingerprint256} invalid (expired)`)
+    return null
+  }
+  return certificate
+}
+
 async function loadCertificatesFromDisk(): Promise<void> {
   const certDir = await getCertDir()
   log.info(`Reading robot certificates from ${certDir}`)
@@ -100,6 +111,7 @@ async function loadCertificatesFromDisk(): Promise<void> {
     withFileTypes: true,
     encoding: 'utf8',
   })
+
   for (const possibleCert of certs) {
     if (!possibleCert.isFile()) {
       continue
@@ -107,11 +119,19 @@ async function loadCertificatesFromDisk(): Promise<void> {
     if (!possibleCert.name.endsWith('.cer')) {
       continue
     }
-    const loaded = await tryLoadCertificate(join(certDir, possibleCert.name))
+    const certPath = join(certDir, possibleCert.name)
+    const loaded = await tryLoadCertificate(certPath)
     if (loaded == null) {
+      log.info(`Removing invalid certificate (can't be loaded) at ${certPath}`)
+      await rm(certPath)
       continue
     }
-    addCertificateToMap(loaded)
+    const validated = validateCertShouldLoad(loaded)
+    if (validated == null) {
+      await rm(certPath)
+      continue
+    }
+    addCertificateToMap(validated)
   }
 }
 
@@ -278,6 +298,55 @@ async function plaintextCertInstallListener(
   return true
 }
 
+export function validateCertShouldVerify(
+  certificate: X509Certificate
+): X509Certificate | null {
+  const now = Date.now()
+  if (certificate.validToDate.valueOf() < now) {
+    log.silly(
+      `Certificate ${certificate.fingerprint256} invalid for verification (expired)`
+    )
+    return null
+  }
+  if (certificate.validFromDate.valueOf() > now) {
+    log.silly(
+      `Certificate ${certificate.fingerprint256} invalid for verification (not yet valid)`
+    )
+    return null
+  }
+  return certificate
+}
+
+export function validateCert(
+  incomingCert: X509Certificate,
+  certsToVerifyAgainst: { values: () => IterableIterator<X509Certificate> }
+): boolean {
+  const now = Date.now()
+  const validatedIncoming = validateCertShouldVerify(incomingCert)
+  if (validatedIncoming == null) {
+    log.warning('Invalid certificate from request, denying')
+    return false
+  }
+  for (const knownCert of certsToVerifyAgainst.values()) {
+    if (knownCert.validFromDate.valueOf() > now) {
+      log.silly(`Ignoring cert ${knownCert.fingerprint256}, not yet valid`)
+      continue
+    }
+    const validated = validateCertShouldVerify(knownCert)
+    if (validated == null) {
+      continue
+    }
+    if (incomingCert.checkIssued(knownCert)) {
+      if (incomingCert.verify(knownCert.publicKey)) {
+        log.silly('good sign match for cert, allowing')
+        return true
+      }
+    }
+  }
+  log.info('no sign match for cert, denying')
+  return false
+}
+
 export async function registerCertIPC(): Promise<void> {
   ipcMain.handle('robot-cert:install-encrypted', encryptedCertInstallListener)
   ipcMain.handle('robot-cert:install-plaintext', plaintextCertInstallListener)
@@ -286,17 +355,10 @@ export async function registerCertIPC(): Promise<void> {
     (event, _webContents, _url, _error, certificate, allowRequest) => {
       const incomingAsBuffer = Buffer.from(certificate.data)
       const incomingAsNodeJSCert = new X509Certificate(incomingAsBuffer)
-      for (const knownCert of knownCertificates.values()) {
-        if (incomingAsNodeJSCert.checkIssued(knownCert)) {
-          if (incomingAsNodeJSCert.verify(knownCert.publicKey)) {
-            log.silly('good sign match for cert, allowing')
-            event.preventDefault()
-            allowRequest(true)
-            return
-          }
-        }
+      if (validateCert(incomingAsNodeJSCert, knownCertificates)) {
+        allowRequest(true)
+        event.preventDefault()
       }
-      log.info('no sign match for cert, denying')
     }
   )
   await loadCertificatesFromDisk()
