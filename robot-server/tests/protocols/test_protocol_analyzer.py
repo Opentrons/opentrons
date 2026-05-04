@@ -231,6 +231,7 @@ async def test_analyze(
                 labware=[analysis_labware],
                 pipettes=[analysis_pipette],
                 modules=[],
+                peripherals=[],
                 labwareOffsets=[offset],
                 liquids=[],
                 liquidClasses=[],

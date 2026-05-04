@@ -36,6 +36,7 @@ def _build_run(
         labwareOffsets=[],
         pipettes=[],
         modules=[],
+        peripherals=[],
         liquids=[],
         wells=[],
         files=[],

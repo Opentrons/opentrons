@@ -330,6 +330,7 @@ async def test_delete_run_by_id_with_external_run(
             labware=[],
             pipettes=[],
             modules=[],
+            peripherals=[],
             labwareOffsets=[],
             liquids=[],
             wells=[],
