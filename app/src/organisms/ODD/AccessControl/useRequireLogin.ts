@@ -10,7 +10,6 @@ export type RequireLoginGuard = () => Promise<RequireLoginResult | null>
 
 /**
  * Guard hook that ensures a user is authenticated.
- *
  */
 export function useRequireLogin(
   currentUsername: string | null
