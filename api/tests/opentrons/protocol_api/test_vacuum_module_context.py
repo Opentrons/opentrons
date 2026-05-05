@@ -143,3 +143,73 @@ def test_vacuum_module_load_adapter_to_dock(
             version=None,
         )
     )
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+)
+def test_vacuum_module_move_to_dock(
+    decoy: Decoy,
+    subject: VacuumModuleContext,
+    mock_protocol_core: ProtocolCore,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should move labware to the manifold dock."""
+    mock_labware = Labware(
+        core=mock_labware_core,
+        api_version=APIVersion(2, 28),
+        protocol_core=mock_protocol_core,
+        core_map=decoy.mock(cls=LoadedCoreMap),
+    )
+
+    subject.move_to_dock(mock_labware)
+
+    decoy.verify(
+        mock_protocol_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=subject.manifold_dock,
+            use_gripper=False,
+            pause_for_manual_move=True,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+)
+def test_vacuum_module_move_to_dock_with_options(
+    decoy: Decoy,
+    subject: VacuumModuleContext,
+    mock_protocol_core: ProtocolCore,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should pass through use_gripper and offsets correctly."""
+    mock_labware = Labware(
+        core=mock_labware_core,
+        api_version=APIVersion(2, 28),
+        protocol_core=mock_protocol_core,
+        core_map=decoy.mock(cls=LoadedCoreMap),
+    )
+
+    pick_up_offset = {"x": 1.0, "y": 2.0, "z": 3.0}
+    drop_offset = {"x": -1.0, "y": -2.0, "z": -3.0}
+
+    subject.move_to_dock(
+        mock_labware,
+        use_gripper=True,
+        pick_up_offset=pick_up_offset,
+        drop_offset=drop_offset,
+    )
+
+    decoy.verify(
+        mock_protocol_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=subject.manifold_dock,
+            use_gripper=True,
+            pause_for_manual_move=True,
+            pick_up_offset=(1, 2, 3),
+            drop_offset=(-1, -2, -3),
+        )
+    )

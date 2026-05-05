@@ -1166,7 +1166,8 @@ class LabwareView:
             # a compatible adapter into its designated staging dock,
             # do NOT raise.
             if not (
-                location.addressableAreaName[-1] == "4"
+                fixture_validation.is_vac_dock(location.addressableAreaName)
+                and location.addressableAreaName[-1] == "4"
                 and labware_definition.parameters.quirks is not None
                 and "vacuumModuleDock" in labware_definition.parameters.quirks
             ):
@@ -1177,7 +1178,7 @@ class LabwareView:
 
         return True
 
-    def raise_if_labware_is_contained(self, labware_id: str) -> None:
+    def raise_if_labware_is_contained(self, labware_id: str) -> bool:
         """Raise an error if this labware is currently contained inside another labware.
 
         This prevents moving an inner labware (e.g. collection_plate inside collar)
@@ -1185,7 +1186,7 @@ class LabwareView:
         """
         labware = self.get(labware_id)
         if not labware:
-            return
+            return False
 
         labware_definition = self.get_definition(labware_id)
         # Check every other loaded labware to see if any contains this one
@@ -1213,6 +1214,7 @@ class LabwareView:
                     f'inside "{container.loadName}".\n'
                     f'Move the outer container ("{container.loadName}") first.'
                 )
+        return True
 
     def raise_if_stacker_labware_pool_is_not_valid(
         self,

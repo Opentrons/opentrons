@@ -54,6 +54,7 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     OnLabwareLocationSequenceComponent,
 )
+from opentrons.protocol_engine.types.module import LoadedModule, ModuleModel
 from opentrons.types import DeckSlotName, Point
 
 
@@ -997,7 +998,7 @@ async def test_labware_raises_when_moved_onto_itself(
         )
     )
 
-    lw_def = LabwareDefinition2.model_construct(
+    lw_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         namespace="opentrons-test",
         parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
     )
@@ -1015,4 +1016,192 @@ async def test_labware_raises_when_moved_onto_itself(
         errors.LabwareMovementNotAllowedError,
         match="Cannot move a labware onto itself.",
     ):
+        await subject.execute(data)
+
+
+async def test_move_labware_calls_raise_if_labware_is_contained(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    state_view: StateView,
+) -> None:
+    """It should always call raise_if_labware_is_contained before moving."""
+    data = MoveLabwareParams(
+        labwareId="labware-id",
+        newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+
+    decoy.when(state_view.labware.get(labware_id="labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="load-name",
+            definitionUri="test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offsetId=None,
+        )
+    )
+    lw_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="test",
+        parameters=Parameters2.model_construct(isMovableAdapter=False),  # type: ignore[call-arg]
+    )
+    decoy.when(state_view.labware.get_definition("labware-id")).then_return(lw_def)
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(data.newLocation, None, lw_def)
+    ).then_return(data.newLocation)
+    decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
+
+    await subject.execute(data)
+
+    decoy.verify(
+        state_view.labware.raise_if_labware_is_contained("labware-id"),
+    )
+
+
+async def test_move_labware_raises_when_labware_is_contained(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    state_view: StateView,
+) -> None:
+    """It should raise LabwareIsContainedError when trying to move contained labware."""
+    data = MoveLabwareParams(
+        labwareId="inner-labware-id",
+        newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+
+    decoy.when(state_view.labware.get(labware_id="inner-labware-id")).then_return(
+        LoadedLabware(
+            id="inner-labware-id",
+            loadName="filter-plate",
+            definitionUri="test/filter-plate/1",
+            location=OnLabwareLocation(labwareId="collar-id"),
+            offsetId=None,
+        )
+    )
+    lw_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="test",
+        parameters=Parameters2.model_construct(isMovableAdapter=False),  # type: ignore[call-arg]
+    )
+    decoy.when(state_view.labware.get_definition("inner-labware-id")).then_return(
+        lw_def
+    )
+    decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
+
+    decoy.when(
+        state_view.labware.raise_if_labware_is_contained("inner-labware-id")
+    ).then_raise(errors.LabwareIsContainedError("Cannot move contained labware"))
+
+    with pytest.raises(errors.LabwareIsContainedError):
+        await subject.execute(data)
+
+
+async def test_movable_adapter_can_move_with_labware_on_top(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    state_view: StateView,
+) -> None:
+    """Movable adapters (like the vacuum collar) are allowed to move with gripper even with labware on top."""
+    new_location = AddressableAreaLocation(addressableAreaName="vacuumModuleV1DockA4")
+    data = MoveLabwareParams(
+        labwareId="movable-adapter-id",
+        newLocation=new_location,
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+
+    decoy.when(state_view.labware.get("movable-adapter-id")).then_return(
+        LoadedLabware(
+            id="movable-adapter-id",
+            loadName="collar",
+            definitionUri="test/collar/1",
+            location=ModuleLocation(moduleId="vacuum-module-id"),
+            offsetId=None,
+        )
+    )
+    movable_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="test",
+        parameters=Parameters2.model_construct(isMovableAdapter=True),  # type: ignore[call-arg]
+    )
+    decoy.when(state_view.labware.get_definition("movable-adapter-id")).then_return(
+        movable_def
+    )
+    decoy.when(labware_validation.validate_gripper_compatible(movable_def)).then_return(
+        True
+    )
+
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(
+            data.newLocation, None, movable_def
+        )
+    ).then_return(data.newLocation)
+
+    await subject.execute(data)
+
+    # Should skip the "has non-lid labware on top" check for movable adapters
+    decoy.verify(
+        state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+            "movable-adapter-id"
+        ),
+        times=0,
+    )
+    # Containment check still runs
+    decoy.verify(state_view.labware.raise_if_labware_is_contained("movable-adapter-id"))
+
+
+async def test_vacuum_module_dock_incompatibility_raises(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    state_view: StateView,
+) -> None:
+    """It should raise when moving incompatible labware onto the vacuum module dock using gripper."""
+    area_name = "vacuumModuleV1DockA4"
+    data = MoveLabwareParams(
+        labwareId="incompatible-labware-id",
+        newLocation=AddressableAreaLocation(addressableAreaName=area_name),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+
+    decoy.when(state_view.labware.get("incompatible-labware-id")).then_return(
+        LoadedLabware(
+            id="incompatible-labware-id",
+            loadName="bad-plate",
+            definitionUri="test/bad-plate/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offsetId=None,
+        )
+    )
+
+    expected_module = LoadedModule.model_construct(
+        id=matchers.IsA(str),
+        model=ModuleModel.VACUUM_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName("A3")),
+        serialNumber=matchers.IsA(str),
+    )
+    decoy.when(
+        state_view.modules.get_by_addressable_area(
+            area_name, state_view.addressable_areas.deck_definition
+        )
+    ).then_return(expected_module)
+
+    lw_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="test",
+        parameters=Parameters2.model_construct(isMovableAdapter=False),  # type: ignore[call-arg]
+    )
+    decoy.when(
+        state_view.labware.get_definition("incompatible-labware-id")
+    ).then_return(lw_def)
+    decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
+
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(data.newLocation, None, lw_def)
+    ).then_return(data.newLocation)
+
+    decoy.when(
+        state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
+            data.newLocation, lw_def
+        )
+    ).then_raise(
+        errors.LabwareIsNotAllowedInLocationError("Labware not compatible with dock")
+    )
+
+    with pytest.raises(errors.LabwareIsNotAllowedInLocationError):
         await subject.execute(data)

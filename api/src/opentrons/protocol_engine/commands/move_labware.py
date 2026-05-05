@@ -213,6 +213,17 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
                 area_name
             )
+
+            # If this is an addressable area check if this is a modulefixture
+            module = self._state_view.modules.get_by_addressable_area(
+                area_name, self._state_view.addressable_areas.deck_definition
+            )
+            # If this is the vacuum module dock, check labware compatability
+            if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
+                    params.newLocation, current_labware_definition
+                )
+
             state_update.set_addressable_area_used(addressable_area_name=area_name)
 
             if fixture_validation.is_gripper_waste_chute(area_name):
@@ -319,10 +330,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             if module is not None and module.model == ModuleModel.ABSORBANCE_READER_V1:
                 self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
                     current_labware_definition
-                )
-            elif module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
-                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
-                    available_new_location, current_labware_definition
                 )
 
         # Allow propagation of ModuleNotLoadedError.
