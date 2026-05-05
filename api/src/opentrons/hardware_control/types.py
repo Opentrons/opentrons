@@ -743,14 +743,6 @@ class EarlyLiquidSenseTrigger(RuntimeError):
 class FailedTipStateCheck(RuntimeError):
     """Error raised if the tip ejector state does not match the expected value."""
 
-    def __init__(
-        self, expected_state: TipStateType, actual_state: TipStateType
-    ) -> None:
-        """Initialize FailedTipStateCheck error."""
-        super().__init__(
-            f"Expected tip state {expected_state}, but received {actual_state}."
-        )
-
 
 @enum.unique
 class PipetteSensorId(int, enum.Enum):

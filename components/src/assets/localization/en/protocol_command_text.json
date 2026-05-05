@@ -88,6 +88,7 @@
   "on_location": "on {{location}}",
   "opening_tc_lid": "Opening Thermocycler lid",
   "partial_layout": "partial layout",
+  "partial_nozzles": "partial column",
   "pause": "Pause",
   "pause_on": "Pause on {{robot_name}}",
   "pickup_tip": "Picking up tip(s) from {{well_range}} of {{labware}} in {{labware_location}}",
