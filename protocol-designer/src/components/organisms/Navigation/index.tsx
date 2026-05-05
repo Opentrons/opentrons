@@ -3,20 +3,21 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { BasicButton, COLORS, StyledText } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { ACCEPTED_PROTOCOL_FILE_TYPES } from '/protocol-designer/constants'
-import { getFileMetadata, getRobotType } from '/protocol-designer/file-data/selectors'
 import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
+import {
+  getFileMetadata,
+  getRobotType,
+} from '/protocol-designer/file-data/selectors'
 import { actions as loadFileActions } from '/protocol-designer/load-file'
 import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
 import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
-
 import { getIsProduction } from '/protocol-designer/networking/opentronsWebApi'
 
 import { Ot2ProtocolModal } from '../Ot2ProtocolModal'
-
 import { SettingsIcon } from '../SettingsIcon'
 import styles from './navigation.module.css'
 
@@ -95,32 +96,37 @@ export function Navigation(): JSX.Element | null {
         />
       ) : null}
       <nav>
-      <div className={styles.nav_container}>
-        <div className={styles.nav_title_container}>
-          <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('opentrons')}
-          </StyledText>
-          <StyledText desktopStyle="bodyLargeSemiBold" color={COLORS.purple50}>
-            {t('protocol_designer')}
-          </StyledText>
+        <div className={styles.nav_container}>
+          <div className={styles.nav_title_container}>
+            <StyledText desktopStyle="bodyLargeSemiBold">
+              {t('opentrons')}
+            </StyledText>
+            <StyledText
+              desktopStyle="bodyLargeSemiBold"
+              color={COLORS.purple50}
+            >
+              {t('protocol_designer')}
+            </StyledText>
+          </div>
+          <div className={styles.nav_button_container}>
+            <BasicButton onClick={handleCreateNew}>
+              {t('create_new')}
+            </BasicButton>
+            <label className={styles.import_label}>
+              <BasicButton onClick={handleImport}>{t('import')}</BasicButton>
+              <input
+                className={styles.hidden_input}
+                type="file"
+                onChange={loadFile}
+                aria-label={`${t('import')}_from_navigation`}
+                ref={fileInputRef}
+                accept={ACCEPTED_PROTOCOL_FILE_TYPES}
+              />
+            </label>
+            {location.pathname === '/createNew' ? null : <SettingsIcon />}
+          </div>
         </div>
-        <div className={styles.nav_button_container}>
-          <BasicButton onClick={handleCreateNew}>{t('create_new')}</BasicButton>
-          <label className={styles.import_label}>
-            <BasicButton onClick={handleImport}>{t('import')}</BasicButton>
-            <input
-              className={styles.hidden_input}
-              type="file"
-              onChange={loadFile}
-              aria-label={`${t('import')}_from_navigation`}
-              ref={fileInputRef}
-              accept={ACCEPTED_PROTOCOL_FILE_TYPES}
-            />
-          </label>
-          {location.pathname === '/createNew' ? null : <SettingsIcon />}
-        </div>
-      </div>
-    </nav>
+      </nav>
     </>
   )
 }
