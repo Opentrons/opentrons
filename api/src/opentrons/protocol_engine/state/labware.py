@@ -1197,7 +1197,10 @@ class LabwareView:
                 continue
 
             container_definition = self.get_definition(container.id)
-            if container_definition.containedSpace is None:
+            if (
+                not isinstance(container_definition, LabwareDefinition2)
+                or container_definition.containedSpace is None
+            ):
                 continue
 
             # If this labware fits inside the container's containedSpace, block the move

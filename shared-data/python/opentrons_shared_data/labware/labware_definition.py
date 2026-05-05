@@ -630,7 +630,6 @@ class LabwareDefinition3(BaseModel):
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
-    containedSpace: ContainedSpace | None = None
 
 
 LabwareDefinition = Annotated[
