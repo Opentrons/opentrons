@@ -10,10 +10,6 @@
   line-height: 0;
 }
 
-.group_play_button:hover {
-  background-color: var(--grey-30);
-}
-
 .annotated_group_container {
   display: flex;
   overflow: hidden;
