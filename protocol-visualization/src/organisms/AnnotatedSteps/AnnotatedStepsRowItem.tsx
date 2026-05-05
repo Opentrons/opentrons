@@ -129,8 +129,7 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
               toggleGroupPlay()
             }}
             aria-label={
-              isGroupPlaying ? t('stop_step_group') : t('play_step_group')
-            }
+              isGroupPlaying ? 'stop step group' : 'play step group'            }
           >
             <Icon
               name={isGroupPlaying ? 'pause-circle' : 'play-circle'}
