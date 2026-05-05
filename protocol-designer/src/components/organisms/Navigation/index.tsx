@@ -1,14 +1,21 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { BasicButton, COLORS, StyledText } from '@opentrons/components'
 
 import { ACCEPTED_PROTOCOL_FILE_TYPES } from '/protocol-designer/constants'
+import { getFileMetadata, getRobotType } from '/protocol-designer/file-data/selectors'
+import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
 import { actions as loadFileActions } from '/protocol-designer/load-file'
 import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
 import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
+
+import { getIsProduction } from '/protocol-designer/networking/opentronsWebApi'
+
+import { Ot2ProtocolModal } from '../Ot2ProtocolModal'
 
 import { SettingsIcon } from '../SettingsIcon'
 import styles from './navigation.module.css'
@@ -22,12 +29,31 @@ export function Navigation(): JSX.Element | null {
   const navigate = useNavigate()
   const dispatch: ThunkDispatch<any> = useDispatch()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const pendingNav = useRef(false)
+  const metadata = useSelector(getFileMetadata)
+  const robotType = useSelector(getRobotType)
+  const enableFork = useSelector(getEnableFork)
+  const [showOt2Modal, setShowOt2Modal] = useState(false)
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     dispatch(toggleNewProtocolModal(false))
-    navigate('/overview')
+    if (location.pathname !== '/') {
+      pendingNav.current = true
+    }
   }
   const hasUnsavedChanges = useSelector(getHasUnsavedChanges)
+
+  useEffect(() => {
+    if (pendingNav.current && metadata?.created != null) {
+      pendingNav.current = false
+      if (enableFork && robotType === OT2_ROBOT_TYPE) {
+        dispatch(loadFileActions.undoLoadFile())
+        setShowOt2Modal(true)
+      } else {
+        navigate('/overview')
+      }
+    }
+  }, [metadata, navigate, enableFork, robotType, dispatch])
 
   const handleCreateNew = (): void => {
     if (
@@ -47,8 +73,28 @@ export function Navigation(): JSX.Element | null {
     }
   }
 
+  const ot2DesignerUrl = getIsProduction()
+    ? 'https://ot2.designer.opentrons.com/#/createNew'
+    : null
+
   return (
-    <nav>
+    <>
+      {showOt2Modal ? (
+        <Ot2ProtocolModal
+          onClose={() => {
+            setShowOt2Modal(false)
+          }}
+          onOpenOt2Designer={
+            ot2DesignerUrl != null
+              ? () => {
+                  window.open(ot2DesignerUrl, '_blank', 'noopener,noreferrer')
+                  setShowOt2Modal(false)
+                }
+              : null
+          }
+        />
+      ) : null}
+      <nav>
       <div className={styles.nav_container}>
         <div className={styles.nav_title_container}>
           <StyledText desktopStyle="bodyLargeSemiBold">
@@ -75,5 +121,6 @@ export function Navigation(): JSX.Element | null {
         </div>
       </div>
     </nav>
+    </>
   )
 }
