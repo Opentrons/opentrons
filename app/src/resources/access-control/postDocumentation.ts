@@ -11,13 +11,9 @@ export interface PostDocumentationInput {
 /**
  * Posts a documented-action audit-log entry to the robot server.
  *
- * No-op stub for now. Centralized here so the access-control gate has a
- * single place to evolve (endpoint URL, request shape, retries, error
- * mapping) without touching call sites or guards.
+ * No-op stub for now.
  *
- * TODO(access-control): wire to the real `/access-control/audit` endpoint
- * once it ships. Flip the implementation here and every gated action will
- * start emitting.
+ * TODO(TZ, 5-5-26): wire to the real `/access-control/audit` endpoint.
  */
 export const postDocumentation = async (
   _input: PostDocumentationInput
