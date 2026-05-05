@@ -26,6 +26,12 @@ module.exports = async () => ({
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
   electronVersion: '39.1.2',
   npmRebuild: false,
+  protocols: [
+    {
+      name: 'Flex App',
+      schemes: ['com-opentrons-flex-app'],
+    },
+  ],
   releaseInfo: {
     releaseNotesFile:
       project === 'robot-stack'
@@ -68,6 +74,11 @@ module.exports = async () => ({
   },
   dmg: {
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
+    // The final universal Flex app exceeds 1 GiB once the bundled Python
+    // runtime is copied in. Use a fixed DMG image size with extra headroom
+    // instead of relying on auto-sizing, which has been too small in CI.
+    size: '3g',
+    shrink: false,
   },
   win: {
     target: ['nsis'],

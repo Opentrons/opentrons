@@ -6,6 +6,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Awaitable, Callable, Final
 
+from cryptography import x509
+
 from . import cryptography_utils
 from key_server.util import subproc_wait_timeout
 
@@ -86,6 +88,19 @@ class TLSEEManager:
         self._robot_ips = robot_ips
         self._tls_terminator_rotate = rotate_fn
 
+    def set_robot_details(
+        self, now: datetime, robot_hostname: str | None, robot_ips: list[str] | None
+    ) -> bool:
+        """Alter the robot details stored by the end entity certs.
+
+        Returns a built-in call to ready(), so if it returns false the caller should rotate the certs.
+        """
+        if robot_hostname is not None:
+            self._robot_hostname = robot_hostname
+        if robot_ips is not None:
+            self._robot_ips = robot_ips
+        return self.ready(now)
+
     def generate_precert(self) -> cryptography_utils.PartialCertWithSigningRequired:
         """Generate a new precertificate for signing."""
         LOG.info("Generating precertificate")
@@ -114,6 +129,8 @@ class TLSEEManager:
                 (as_of + self.EE_EXPIRY_GRACE_DURATION)
                 < self._ee_pair.cert.not_valid_after_utc
             )
+            and self._robot_hostname == self._current_hostname()
+            and self._robot_ips == self._current_ips()
         )
 
     async def install_cert(self, cert: cryptography_utils.SignedCert) -> None:
@@ -135,3 +152,26 @@ class TLSEEManager:
         pair = self._ee_pair
         self._ee_pair = None
         cryptography_utils.delete_certpair(pair, reason)
+
+    def _current_hostname(self) -> str | None:
+        if not self._ee_pair:
+            return None
+        san = self._ee_pair.cert.extensions.get_extension_for_class(
+            x509.SubjectAlternativeName
+        )
+        for altname in san.value:
+            if isinstance(altname, x509.DNSName):
+                return altname.value.split(".local")[0]
+        return None
+
+    def _current_ips(self) -> list[str] | None:
+        if not self._ee_pair:
+            return None
+        ips: list[str] = []
+        san = self._ee_pair.cert.extensions.get_extension_for_class(
+            x509.SubjectAlternativeName
+        )
+        for name in san.value:
+            if isinstance(name, x509.IPAddress):
+                ips.append(str(name.value))
+        return ips

@@ -57,10 +57,18 @@ class KeyServerConfig(BaseSettings):
         default="automatically_make_temporary",
         description="The location in which to store tls keys and certs for tls termination",
     )
-    tls_server_integration: Literal["systemd-nginx", "dev-none"] = Field(
-        description="How the server should notify a TLS termination layer a certificate has rotated.",
-        default="systemd-nginx",
+    tls_server_integration: Literal["systemd-nginx", "dev-none", "dev-mitmproxy"] = (
+        Field(
+            description="How the server should notify a TLS termination layer a certificate has rotated.",
+            default="systemd-nginx",
+        )
     )
+    mitmproxy_touch_path: Path | None = Field(
+        default=None,
+        description="File to touch to notify mitmproxy it needs to rotate. Ignored if tls_server_integration is not dev-mitmproxy.",
+    )
+    cert_password_length_words: int = 3
+    cert_password_rotation_time_s: int = 30
 
 
 class ResolvedConfig(BaseModel):
@@ -71,4 +79,7 @@ class ResolvedConfig(BaseModel):
     image_mount_point: Path
     secure_volume_size_mb: int
     tls_directory: Path
-    tls_server_integration: Literal["systemd-nginx", "dev-none"]
+    tls_server_integration: Literal["systemd-nginx", "dev-none", "dev-mitmproxy"]
+    mitmproxy_touch_path: Path | None
+    cert_password_length_words: int
+    cert_password_rotation_time_s: int

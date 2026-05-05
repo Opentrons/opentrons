@@ -76,7 +76,7 @@ describe('app-shell/discovery', () => {
     mockDelete = vi.fn()
     mockOnDidChange = vi.fn()
     mockSet = vi.fn()
-    vi.mocked(Store).mockImplementation(() => {
+    vi.mocked(Store).mockImplementation(function MockStore() {
       return {
         get: mockGet,
         set: mockSet,

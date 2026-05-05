@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
@@ -11,7 +11,11 @@ import {
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import {
+  ApiHostProvider,
+  useAccessControlEnabledQuery,
+  useRobotSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { ReactQueryDevtools } from '/app/App/tools'
 import { SleepScreen } from '/app/atoms/SleepScreen'
@@ -20,9 +24,11 @@ import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { OnDeviceLoginOverlayProvider } from '/app/organisms/ODD/OnDeviceLogin'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
+import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -50,7 +56,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
-import { updateBrightness } from '/app/redux/shell'
+import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
 import { hackWindowNavigatorOnLine } from './hacks'
@@ -63,8 +69,9 @@ import {
 import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
-import { PortalRoot as ModalPortalRoot } from './portal'
+import { ModalPortalRoot } from './portal'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
 // forces electron to think we're online which means axios won't elide
@@ -72,6 +79,7 @@ import type { Dispatch } from '/app/redux/types'
 hackWindowNavigatorOnLine()
 
 export const ON_DEVICE_DISPLAY_PATHS = [
+  '/account',
   '/choose-language',
   '/dashboard',
   '/deck-configuration',
@@ -100,6 +108,8 @@ function getPathComponent(
   path: (typeof ON_DEVICE_DISPLAY_PATHS)[number]
 ): JSX.Element {
   switch (path) {
+    case '/account':
+      return <Account />
     case '/choose-language':
       return <ChooseLanguage />
     case '/dashboard':
@@ -147,30 +157,33 @@ function getPathComponent(
   }
 }
 
-const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
-  'mousedown',
-  'click',
-  'scroll',
-]
-
 const TURN_OFF_BACKLIGHT = '7'
 
+const RETRY_DELAY_MS = 1000
+
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const dispatch = useDispatch<Dispatch>()
+
+  const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
+
   useSoftwareUpdatePoll()
-  const { brightness: userSetBrightness, sleepMs } = useSelector(
-    getOnDeviceDisplaySettings
+
+  // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
+  // But here at the app root, that doesn't exist. So we need to make sure we pass this
+  // override into all the hooks in this component that will try to use the robot API.
+  const hostConfig = useMemo<HostConfig>(
+    () => ({
+      hostname: '127.0.0.1',
+    }),
+    []
   )
   const localRobot = useSelector(getLocalRobot)
 
+  const { brightness: userSetBrightness, sleepMs } = useSelector(
+    getOnDeviceDisplaySettings
+  )
   const sleepTime = sleepMs ?? SLEEP_NEVER_MS
-  const options = {
-    events: onDeviceDisplayEvents,
-    initialState: false,
-  }
-  const dispatch = useDispatch<Dispatch>()
-  const isIdle = useScreenIdle(sleepTime, options)
-  const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
-
+  const isIdle = useScreenIdle(sleepTime, { initialState: false })
   useEffect(() => {
     if (isIdle) {
       dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
@@ -184,11 +197,38 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   }, [dispatch, isIdle, userSetBrightness])
 
+  const isShellReady = useSelector(getIsShellReady)
+
+  const robotSettingsQuery = useRobotSettingsQuery(
+    {
+      retry: true,
+      retryDelay: RETRY_DELAY_MS,
+    },
+    hostConfig
+  )
+
+  const accessControlEnabledQuery = useAccessControlEnabledQuery(
+    {
+      retry: true,
+      retryDelay: RETRY_DELAY_MS,
+    },
+    hostConfig
+  )
+
+  const isReady =
+    // ensure robot-server api, etc. is up and running
+    isShellReady &&
+    // ensure settings query data is available for localization provider
+    robotSettingsQuery.isSuccess &&
+    // ensure we know whether access control is enabled or not,
+    // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
+    accessControlEnabledQuery.isSuccess
+
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="127.0.0.1">
+    <ApiHostProvider hostname={hostConfig.hostname}>
       <ReactQueryDevtools />
-      <InitialLoadingScreen>
+      {isReady ? (
         <LocalizationProvider>
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
@@ -219,9 +259,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             }}
                           />
                         ) : null}
-                        <SharedScrollRefProvider>
-                          <OnDeviceDisplayAppRoutes />
-                        </SharedScrollRefProvider>
+
+                        <OnDeviceLoginOverlayProvider>
+                          <SharedScrollRefProvider>
+                            <OnDeviceDisplayAppRoutes />
+                          </SharedScrollRefProvider>
+                        </OnDeviceLoginOverlayProvider>
                       </ToasterOven>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
@@ -231,7 +274,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
             <ODDTopLevelRedirects />
           </ErrorBoundary>
         </LocalizationProvider>
-      </InitialLoadingScreen>
+      ) : (
+        <InitialLoadingScreen />
+      )}
     </ApiHostProvider>
   )
 }

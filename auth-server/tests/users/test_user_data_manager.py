@@ -40,6 +40,7 @@ def _make_orm_user(
     hashed_password: str = "h",
     full_name: str = "Full Name",
     account_type: AccountType = AccountType.USER,
+    reset_password: bool = False,
 ) -> User:
     """Helper to build an ORM User for mock return values."""
     return User(
@@ -47,6 +48,7 @@ def _make_orm_user(
         hashed_password=hashed_password,
         full_name=full_name,
         account_type=account_type,
+        reset_password=reset_password,
     )
 
 
@@ -99,6 +101,7 @@ def test_create_user_success(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -129,6 +132,7 @@ def test_create_user_hashes_password(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -208,6 +212,7 @@ def test_get_user_returns_existing(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -234,6 +239,7 @@ def test_get_user_locked_when_failed_logins_reach_limit(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=True,
+        resetPassword=False,
     )
 
 
@@ -286,10 +292,13 @@ def test_update_user_username(
             hashed_password=None,
             full_name=None,
             account_type=None,
+            reset_password=False,
         )
     ).then_return(expected)
 
-    result = manager.update_user("old_name", new_username="new_name")
+    result = manager.update_user(
+        "old_name", new_username="new_name", reset_password=False
+    )
     assert result == UserResponse(
         userName="new_name",
         fullName="Name Test",
@@ -298,6 +307,7 @@ def test_update_user_username(
             scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
         ),
         locked=False,
+        resetPassword=False,
     )
 
 
@@ -312,28 +322,30 @@ def test_update_user_password_is_hashed(
     decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     updated = _make_orm_user(username="pw_user", full_name="X")
     decoy.when(
-        mock_store.update("pw_user", None, matchers.IsA(str), None, None)
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None, True)
     ).then_return(updated)
-    result = manager.update_user("pw_user", new_password="newpassword2")
-    assert result == UserResponse(
-        userName="pw_user",
-        fullName="X",
-        accountType=AccountType.USER,
-        scopes=sorted(
-            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
-        ),
-        locked=False,
+    manager.update_user("pw_user", new_password="newpassword2", reset_password=True)
+    decoy.verify(
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None, True)
     )
+
+
+def test_update_user_rename_to_existing_username_raises(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    decoy.when(mock_store.get("alice")).then_return(_make_orm_user(username="alice"))
+    with pytest.raises(UserAlreadyExistsError):
+        manager.update_user("bob", new_username="alice", reset_password=False)
 
 
 def test_update_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    decoy.when(mock_store.update("ghost", None, None, "Nope", None)).then_raise(
+    decoy.when(mock_store.update("ghost", None, None, "Nope", None, False)).then_raise(
         ValueError("User 'ghost' not found")
     )
     with pytest.raises(UserNotFoundError):
-        manager.update_user("ghost", new_full_name="Nope")
+        manager.update_user("ghost", new_full_name="Nope", reset_password=False)
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:

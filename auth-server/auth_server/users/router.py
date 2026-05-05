@@ -166,11 +166,17 @@ async def update_user(
             new_full_name=update_data.fullName,
             new_account_type=update_data.accountType,
             new_locked=update_data.locked,
+            reset_password=update_data.resetPassword,
         )
     except UserNotFoundError:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="User not found",
+        )
+    except UserAlreadyExistsError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="User already exists",
         )
     except InvalidInputError as e:
         raise fastapi.HTTPException(

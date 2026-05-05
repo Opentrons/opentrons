@@ -16,6 +16,8 @@ def test_drag_drop_steps(page: Page, pd_base_url: str) -> None:
 
     import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
 
+    editor = ProtocolEditorPage(page)
+
     ## Drag Transfer Step down the Step Form, from step 3 (index 2) to step 7 (becomes index 6)
     editor.drag_and_drop(2, 7)
 

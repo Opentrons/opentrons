@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   Chip,
   COLORS,
-  DEFAULT_TIP_SIZE,
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
@@ -36,8 +35,14 @@ import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labw
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import { getCollidingWells } from '/protocol-designer/utils/index'
 
-import { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
-import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
+import {
+  INACCESSIBLE_PARTIAL_TIP,
+  INACCESSIBLE_WELL_SPACING_MISMATCH,
+} from '../NozzleAndWellSelectionModal/constants'
+import {
+  getEntireWellSelection,
+  getWellNameAtClientPoint,
+} from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
   INACCESSIBLE_COLLISION,
@@ -103,10 +108,13 @@ export function SelectTips(
     primaryNozzle,
   } = props
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
+  const robotState = useSelector(getRobotStateAtActiveItem)
+  const [wellShadow, setWellShadow] = useState<string | null>(null)
   const viewBox =
     selectedTiprackId != null
       ? getViewboxFromSelectedLabware(
           selectedTiprackId,
+          robotState,
           activeDeckSetup,
           deckDef
         )
@@ -116,7 +124,6 @@ export function SelectTips(
     console.warn(`no viewbox for selected tiprack ${selectedTiprackId}`)
   }
 
-  const robotState = useSelector(getRobotStateAtActiveItem)
   const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
 
   const labwareDef = activeDeckSetup.labware[selectedTiprackId ?? '']?.def
@@ -141,6 +148,7 @@ export function SelectTips(
     INACCESSIBLE_INCOMPLETE,
     INACCESSIBLE_TOO_MANY_PICKUPS,
     INACCESSIBLE_PARTIAL_TIP,
+    INACCESSIBLE_WELL_SPACING_MISMATCH,
   ]
 
   const hoveredWellsInaccessibilityStatus =
@@ -278,7 +286,7 @@ export function SelectTips(
       leaveTimeoutRef.current = null
     }
     setHoveredWells(allHoveredWells)
-    currentHoveredWellRef.current = allHoveredWells
+    setWellShadow(allHoveredWells[0])
   }
 
   const handleLeaveWell = (_: WellMouseEvent): void => {
@@ -307,6 +315,10 @@ export function SelectTips(
       const wellsUnderRect = _getWellsFromRect(rect)
       const flat = [...new Set(wellsUnderRect.flat())]
       setHoveredWells(flat)
+      const wellUnderMouse = getWellNameAtClientPoint(e.clientX, e.clientY)
+      if (wellUnderMouse) {
+        setWellShadow(wellUnderMouse)
+      }
     }
   }
   const handleSelectionDone = (e: MouseEvent, rect: GenericRect): void => {
@@ -415,17 +427,17 @@ export function SelectTips(
           borderStroke={COLORS.yellow40}
           ignoreMissingTips
         />
-        {hoveredWells != null ? (
+        {wellShadow ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
-            hoveredWell={hoveredWells[0]}
+            hoveredWell={wellShadow ?? ''}
             selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
             isHoveredWellSelected={selectedTips
               .flat()
-              .some(tip => tip === hoveredWells[0])}
+              .some(tip => tip === wellShadow)}
             hasPickupsRemaining={hasPickupsRemaining}
             isAccessible={hoveredWellsInaccessibilityStatus == null}
             inaccessibleReason={hoveredWellsInaccessibilityStatus ?? null}
@@ -470,7 +482,7 @@ export function SelectTips(
           </SelectionRect>
         </div>
         <div className={styles.legend_box}>
-          <SelectionLegend selectionType={TIP} size={DEFAULT_TIP_SIZE} />
+          <SelectionLegend selectionType={TIP} />
         </div>
       </div>
     </div>

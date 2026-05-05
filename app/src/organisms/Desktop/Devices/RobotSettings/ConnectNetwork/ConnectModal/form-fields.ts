@@ -280,8 +280,9 @@ export const connectFormToConfigureRequest = (
     }
 
     if (formPsk != null) options.psk = formPsk
-    if (eapConfig != null)
+    if (eapConfig != null) {
       options.eapConfig = { ...eapConfig, ...formEapConfig }
+    }
     return options
   }
 

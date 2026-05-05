@@ -78,6 +78,8 @@ export function ChildNavigation({
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
         {onClickBack != null ? (
           <IconButton
+            type="button"
+            aria-label="Back to previous page"
             onClick={onClickBack}
             data-testid="ChildNavigation_Back_Button"
           >

@@ -10,12 +10,6 @@ export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'
 export const BUTTON_TYPE_BUTTON: 'button' = 'button'
 
-/**
- * Button primitive
- *
- * @component
- */
-
 const BtnComponent = forwardRef<
   HTMLButtonElement,
   ComponentProps<'button'> & StyleProps
@@ -29,6 +23,17 @@ const BtnComponent = forwardRef<
 
 BtnComponent.displayName = 'BtnComponent'
 
+/**
+ * Button primitive
+ *
+ * @component
+ *
+ * @deprecated Layout/style primitives are deprecated. If there is a preexisting
+ *   higher-level component that does what you want (e.g. from the Helix design system,
+ *   or from your project's shared components), use that instead. If not, implement your
+ *   own layout+styling with CSS modules and the semantically appropriate native HTML
+ *   element (`<li>`, `<menu>`, `<p>`, `<div>`, etc).
+ */
 export const Btn: FC<ComponentProps<'button'> & StyleProps> = withStyleProps(
   BtnComponent
 ) as FC<ComponentProps<'button'> & StyleProps>

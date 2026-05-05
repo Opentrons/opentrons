@@ -7,10 +7,10 @@
 
 # Directory for packed .tgz files and extracted packages
 PACK_DIR := pack
-SHARED_DATA_PACK := $(PACK_DIR)/opentrons-shared-data-v0.0.0-dev.tgz
-STEP_GENERATION_PACK := $(PACK_DIR)/opentrons-step-generation-v0.0.0-dev.tgz
-COMPONENTS_PACK := $(PACK_DIR)/opentrons-components-v0.0.0-dev.tgz
-PROTOCOL_VISUALIZATION_PACK := $(PACK_DIR)/opentrons-protocol-visualization-v0.0.0-dev.tgz
+SHARED_DATA_PACK := $(PACK_DIR)/opentrons-shared-data-0.0.0-dev.tgz
+STEP_GENERATION_PACK := $(PACK_DIR)/opentrons-step-generation-0.0.0-dev.tgz
+COMPONENTS_PACK := $(PACK_DIR)/opentrons-components-0.0.0-dev.tgz
+PROTOCOL_VISUALIZATION_PACK := $(PACK_DIR)/opentrons-protocol-visualization-0.0.0-dev.tgz
 SHARED_DATA_DIR := $(PACK_DIR)/opentrons-shared-data
 STEP_GENERATION_DIR := $(PACK_DIR)/opentrons-step-generation
 COMPONENTS_DIR := $(PACK_DIR)/opentrons-components
@@ -40,19 +40,19 @@ build-local-packages:
 	@echo "Building shared-data package..."
 	make -C ../shared-data pack
 	@echo "Moving shared-data package to pack directory..."
-	@mv ../shared-data/opentrons-shared-data-v0.0.0-dev.tgz $(SHARED_DATA_PACK)
+	@mv ../shared-data/opentrons-shared-data-0.0.0-dev.tgz $(SHARED_DATA_PACK)
 	@echo "Building step-generation package..."
 	make -C ../step-generation pack
 	@echo "Moving step-generation package to pack directory..."
-	@mv ../step-generation/opentrons-step-generation-v0.0.0-dev.tgz $(STEP_GENERATION_PACK)
+	@mv ../step-generation/opentrons-step-generation-0.0.0-dev.tgz $(STEP_GENERATION_PACK)
 	@echo "Building components package..."
 	make -C ../components pack
 	@echo "Moving components package to pack directory..."
-	@mv ../components/opentrons-components-v0.0.0-dev.tgz $(COMPONENTS_PACK)
+	@mv ../components/opentrons-components-0.0.0-dev.tgz $(COMPONENTS_PACK)
 	@echo "Building protocol-visualization package..."
 	make -C ../protocol-visualization pack
 	@echo "Moving protocol-visualization package to pack directory..."
-	@mv ../protocol-visualization/opentrons-protocol-visualization-v0.0.0-dev.tgz $(PROTOCOL_VISUALIZATION_PACK)
+	@mv ../protocol-visualization/opentrons-protocol-visualization-0.0.0-dev.tgz $(PROTOCOL_VISUALIZATION_PACK)
 	@echo "Extracting packages..."
 	@rm -rf $(SHARED_DATA_DIR) $(STEP_GENERATION_DIR) $(COMPONENTS_DIR) $(PROTOCOL_VISUALIZATION_DIR)
 	@mkdir -p $(SHARED_DATA_DIR) $(STEP_GENERATION_DIR) $(COMPONENTS_DIR) $(PROTOCOL_VISUALIZATION_DIR)

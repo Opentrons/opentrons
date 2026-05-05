@@ -16,6 +16,7 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 from opentrons_shared_data.labware.labware_definition import (
     Dimensions,
+    LabwareDefinition,
     LabwareDefinition2,
     Parameters2,
 )
@@ -92,6 +93,7 @@ def subject(
 )
 async def test_manual_move_labware_implementation(
     decoy: Decoy,
+    well_plate_def: LabwareDefinition,
     subject: MoveLabwareImplementation,
     equipment: EquipmentHandler,
     state_view: StateView,
@@ -116,9 +118,13 @@ async def test_manual_move_labware_implementation(
             offsetId=None,
         )
     )
+    lw_def = LabwareDefinition2.model_construct(namespace="opentrons-test")  # type: ignore[call-arg]
+    decoy.when(
+        state_view.labware.get_definition(labware_id="my-cool-labware-id")
+    ).then_return(lw_def)
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         )
     ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
     decoy.when(

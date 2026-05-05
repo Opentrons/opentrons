@@ -19,7 +19,7 @@ export const OnlyCheckpoints: Story = {
   },
   render: args => (
     <div style={{ width: '300px' }}>
-      <ConcurrentGroup {...args}>
+      <ConcurrentGroup active={args.active}>
         <ConcurrentGroupChild type="checkpoint">
           <ConcurrentGroupCheckpoint text="Start profile" />
         </ConcurrentGroupChild>
@@ -55,7 +55,7 @@ export const CheckpointsAndStepContainers: Story = {
         error={false}
         semiTransparent={false}
       />
-      <ConcurrentGroup {...args}>
+      <ConcurrentGroup active={args.active}>
         <ConcurrentGroupChild type="checkpoint">
           <ConcurrentGroupCheckpoint text="Start profile" />
         </ConcurrentGroupChild>
@@ -122,7 +122,7 @@ export const LongTextWrapping: Story = {
   },
   render: args => (
     <div style={{ width: '300px' }}>
-      <ConcurrentGroup {...args}>
+      <ConcurrentGroup active={args.active}>
         <ConcurrentGroupChild type="checkpoint">
           <ConcurrentGroupCheckpoint text="Start profile" />
         </ConcurrentGroupChild>

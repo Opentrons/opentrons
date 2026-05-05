@@ -122,6 +122,12 @@ class FlexStackerData(TypedDict):
 class VacuumModuleData(TypedDict):
     errorDetails: str | None
     pumpEngaged: bool | None
+    currentPressure: float | None
+    targetPressure: float | None
+    currentPower: float | None
+    targetPower: float | None
+    ventStatus: str
+    modeType: str
 
 
 ModuleData = Union[
@@ -456,8 +462,9 @@ class VacuumModuleStatus(StrEnum):
     VENTING = "venting"  # Opening valve to atmosphere
     COMPLETE = "complete"  # Finished cycle
     ERROR = "error"  # An error has occured
+    RUNNING = "running"  # General use- the pump is turned on
 
 
-class VentState(StrEnum):
-    CLOSED = "closed"
-    OPENED = "opened"
+class VacuumModuleOperationMode(StrEnum):
+    POWER = "power"
+    PRESSURE = "pressure"

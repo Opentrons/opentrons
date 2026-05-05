@@ -1,7 +1,7 @@
 import path from 'path'
 import { app, shell } from 'electron'
 import fs from 'fs-extra'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 

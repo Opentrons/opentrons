@@ -68,6 +68,7 @@ class UserDataManager:
                 scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]
             ),
             locked=is_currently_locked,
+            resetPassword=user.reset_password,
         )
 
     def seed_initial_users(self) -> None:
@@ -134,6 +135,7 @@ class UserDataManager:
         new_full_name: str | None = None,
         new_account_type: str | None = None,
         new_locked: Literal[False] | None = None,
+        reset_password: bool = False,
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
@@ -142,6 +144,12 @@ class UserDataManager:
             full_name=new_full_name,
             account_type=new_account_type,
         )
+        if (
+            new_username is not None
+            and new_username != username_to_update
+            and self._user_store.get(new_username) is not None
+        ):
+            raise UserAlreadyExistsError(f"User {new_username!r} already exists")
         try:
             if new_locked is not None and not new_locked:
                 # Note: do this BEFORE the username is potentially changed
@@ -154,6 +162,7 @@ class UserDataManager:
                 else None,
                 full_name=new_full_name,
                 account_type=new_account_type,
+                reset_password=reset_password,
             )
             return self._to_response(updated_user)
         except ValueError as e:

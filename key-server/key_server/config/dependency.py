@@ -57,6 +57,13 @@ def resolve_config() -> ResolvedConfig:
         secure_volume_size_mb=base_config.secure_volume_size_mb,
         tls_directory=tls_base_dir,
         tls_server_integration=base_config.tls_server_integration,
+        mitmproxy_touch_path=(
+            base_config.mitmproxy_touch_path
+            if base_config.tls_server_integration == "dev-mitmproxy"
+            else None
+        ),
+        cert_password_length_words=base_config.cert_password_length_words,
+        cert_password_rotation_time_s=base_config.cert_password_rotation_time_s,
     )
 
 

@@ -32,7 +32,7 @@ import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
@@ -63,7 +63,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
       robotName={robot.name}
     >
       <Box
@@ -347,8 +347,9 @@ const ModuleControlsTab = (
   )}`
 
   useEffect(() => {
-    if (disabled && protocolRunDetailsTab === 'module-controls')
+    if (disabled && protocolRunDetailsTab === 'module-controls') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+    }
   }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])
 
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (

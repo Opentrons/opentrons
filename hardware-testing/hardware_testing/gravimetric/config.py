@@ -2,15 +2,8 @@
 from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from typing_extensions import Final
-from enum import Enum
 from opentrons.config.types import LiquidProbeSettings
 from opentrons.protocol_api.labware import Well
-
-
-class ConfigType(Enum):
-    """Substitute for Literal which isn't available until 3.8.0."""
-
-    gravimetric = 1
 
 
 @dataclass
@@ -28,7 +21,7 @@ class VolumetricConfig:
     return_tip: bool
     mix: bool
     user_volumes: bool
-    kind: ConfigType
+    kind: str
     extra: bool
     jog: bool
     same_tip: bool
@@ -255,14 +248,6 @@ QC_VOLUMES_EXTRA_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
             (200, []),  # T200
             (1000, []),  # T1000
         ],
-    },
-}
-
-QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
-    ConfigType.gravimetric: {
-        1: 10,
-        8: 10,
-        96: 9,
     },
 }
 

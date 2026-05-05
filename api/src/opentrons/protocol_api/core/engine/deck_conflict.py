@@ -11,6 +11,7 @@ from typing import (
     Optional,
     Tuple,
     Union,
+    cast,
     overload,
 )
 
@@ -246,16 +247,8 @@ def _map_labware(
 ]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
     if isinstance(location_from_engine, AddressableAreaLocation):
-        # This will be guaranteed to be either deck slot name or staging slot name
-        slot: Union[DeckSlotName, StagingSlotName]
-        try:
-            slot = DeckSlotName.from_primitive(location_from_engine.addressableAreaName)
-        except ValueError:
-            slot = StagingSlotName.from_primitive(
-                location_from_engine.addressableAreaName
-            )
         return (
-            slot,
+            _addressable_area_to_slot(location_from_engine),
             wrapped_deck_conflict.Labware(
                 name_for_errors=engine_state.labware.get_load_name(
                     labware_id=labware_id
@@ -363,6 +356,14 @@ def _map_module(
                 highest_z_including_labware=highest_z_including_labware,
             ),
         )
+    elif module_type == ModuleType.VACUUM_MODULE:
+        return (
+            mapped_location,
+            wrapped_deck_conflict.VacuumModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
     else:
         return (
             mapped_location,
@@ -389,6 +390,35 @@ def _map_disposal_location(
 
 def _deck_slot_to_int(deck_slot_location: DeckSlotLocation) -> int:
     return deck_slot_location.slotName.as_int()
+
+
+def _addressable_area_to_slot(
+    location: AddressableAreaLocation,
+) -> Union[DeckSlotName, StagingSlotName]:
+    """Takes an AddressableAreaLocation and converts to DeckSlotName or StagingSlotName.
+
+    Tries the full name first, then falls back to the last two characters
+    for special areas (e.g. vacuumModuleV1DockA4 -> A4).
+    """
+    # NOTE(ba, 2026-05-1): Some labware like the vacuum module collar
+    # are loaded onto custom addressable areas like `vacuumModuleV1DockV4`.
+    # Currently this does not map well to our convention of everything is
+    # either a DeckSlotName or StagingSlotName. So we need to take the
+    # last 2 characters to convert properly, we should find a better way
+    # of doing this like working with addressableAreaLocation directly.
+    area_name = location.addressableAreaName
+    names = (area_name, area_name[-2:].upper())
+    for name, slot_type in itertools.product(names, (DeckSlotName, StagingSlotName)):
+        try:
+            return cast(Union[DeckSlotName, StagingSlotName], slot_type).from_primitive(
+                name
+            )
+        except ValueError:
+            continue
+
+    raise ValueError(
+        f"Cannot convert area name '{area_name}' to DeckSlotName or StagingSlotName."
+    )
 
 
 def _get_module_highest_z_including_labware(
