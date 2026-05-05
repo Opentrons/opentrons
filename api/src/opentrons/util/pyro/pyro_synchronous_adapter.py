@@ -444,12 +444,10 @@ def execute_inbound_call_on_event_loop(
     ) -> Any:
         async def method_wrapper(*args, **kwargs) -> Any:
             return method(*args, **kwargs)
+        future = asyncio.run_coroutine_threadsafe(coro=method_wrapper(*args, **kwargs), loop=loop)
+        return future.result()
 
-        return asyncio.run_coroutine_threadsafe(
-            method_wrapper(*args, **kwargs), loop
-        ).result()
-
-    def wrap_property_sync_safe(loop, attribute):
+    def wrap_property_sync_safe(loop, attribute) -> Any:
         async def property_wrapper(attribute) -> Any:
             return getattr(core_obj, attribute)
 
@@ -462,15 +460,31 @@ def execute_inbound_call_on_event_loop(
         # Grab the active event loop off the core object this was bound with
         loop: Optional[asyncio.AbstractEventLoop] = getattr(core_obj, "_loop", None)
 
-        if isinstance(attr, MethodType):
-            result = wrap_sync_safe(loop, attr, *args, **kwargs)
-        elif isinstance(attr, property):
-            result = wrap_property_sync_safe(loop, attr.fget.__name__)
+        try:
+            running_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # There is no running loop
+            running_loop = None
+
+        # If the loop is running and is not the current running loop, we can execute synchronously
+        if loop.is_running():
+            if running_loop is loop:
+                # We're in the same thread and the loop is running, cannot block synchronously.
+                raise RuntimeError(
+                    "Cannot execute call from the same event loop."
+                )
+            
+            if isinstance(attr, MethodType):
+                result = wrap_sync_safe(loop, attr, *args, **kwargs)
+            elif isinstance(attr, property):
+                result = wrap_property_sync_safe(loop, attr.fget.__name__)
+            else:
+                raise ValueError(
+                    f"Provided base attribute must be a Property or a Method."
+                )
+            return result
         else:
-            raise ValueError(
-                f"Provided base attribute must be a Property or a Method."
-            )
-        return result
+            raise RuntimeError(f"Instance event loop is not running inside inbound call executor.")
 
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is
