@@ -73,7 +73,10 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
               </div>
               {subtitle != null ? (
                 <div className={styles.step_group_subtitle_line}>
-                  <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
                     {subtitle}
                   </StyledText>
                 </div>
@@ -81,10 +84,7 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
             </>
           ) : (
             <div className={styles.step_group_title_content}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={titleColor}
-              >
+              <StyledText desktopStyle="bodyDefaultRegular" color={titleColor}>
                 {title}
               </StyledText>
               {subtitle != null ? (
@@ -107,7 +107,10 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
             </div>
           ) : null}
           <div className={styles.step_group_chevron_wrap}>
-            <Icon name={isExpand ? 'chevron-up' : 'chevron-down'} size="1.2rem" />
+            <Icon
+              name={isExpand ? 'chevron-up' : 'chevron-down'}
+              size="1.2rem"
+            />
           </div>
         </div>
       </div>

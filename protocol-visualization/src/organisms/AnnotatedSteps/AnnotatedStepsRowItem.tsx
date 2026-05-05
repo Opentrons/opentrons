@@ -96,22 +96,12 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
       }
       setIsGroupPlaying(true)
     }
-  }, [
-    setSelectedCommand,
-    commandIds,
-    isGroupPlaying,
-    handlePause,
-  ])
+  }, [setSelectedCommand, commandIds, isGroupPlaying, handlePause])
 
-  const showPlayControl =
-    setSelectedCommand != null && commandIds.length > 0
+  const showPlayControl = setSelectedCommand != null && commandIds.length > 0
 
-  const isAnyStepHighlighted = subCommands.some(
-    sub => sub.isHighlighted
-  )
-  const iconColor = isAnyStepHighlighted
-    ? COLORS.purple50
-    : COLORS.grey60
+  const isAnyStepHighlighted = subCommands.some(sub => sub.isHighlighted)
+  const iconColor = isAnyStepHighlighted ? COLORS.purple50 : COLORS.grey60
 
   return (
     <AnnotatedGroup
@@ -128,8 +118,7 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
               event.stopPropagation()
               toggleGroupPlay()
             }}
-            aria-label={
-              isGroupPlaying ? 'stop step group' : 'play step group'            }
+            aria-label={isGroupPlaying ? 'stop step group' : 'play step group'}
           >
             <Icon
               name={isGroupPlaying ? 'pause-circle' : 'play-circle'}
