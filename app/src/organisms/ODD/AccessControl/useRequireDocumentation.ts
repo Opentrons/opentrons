@@ -5,12 +5,12 @@ import { postDocumentation } from '/app/resources/access-control'
 
 import type {
   DocumentationResult,
-  DocumentedAction,
+  DocumentedActionKind,
 } from '/app/resources/access-control'
 import type { RequireLoginResult } from './useRequireLogin'
 
 export type RequireDocumentationGuard = (
-  action: DocumentedAction,
+  action: DocumentedActionKind,
   loginResult: RequireLoginResult
 ) => Promise<DocumentationResult | null>
 

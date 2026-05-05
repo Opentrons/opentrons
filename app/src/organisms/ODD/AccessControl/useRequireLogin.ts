@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 
-import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin'
+import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 
 export interface RequireLoginResult {
   username: string
@@ -11,11 +11,6 @@ export type RequireLoginGuard = () => Promise<RequireLoginResult | null>
 /**
  * Guard hook that ensures a user is authenticated.
  *
- * The current username is passed in by the caller — this hook does not read
- * Redux directly so it stays focused on the login UX (modal + result).
- *
- * Assumes access control is enabled — the caller (`useGuardedAction`) is
- * responsible for short-circuiting when access control is off.
  */
 export function useRequireLogin(
   currentUsername: string | null

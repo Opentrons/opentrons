@@ -399,16 +399,15 @@ function PrepareToRun({
     ? isCameraEnabledForRun || cameraSettingsConfirmed
     : true
 
-  const isReadyToRun = true
-  // incompleteInstrumentCount === 0 &&
-  // areModulesReady &&
-  // areFixturesReady &&
-  // !isAnyNecessaryDefaultOffsetMissing &&
-  // isCameraReadyToRun
+  const isReadyToRun =
+    incompleteInstrumentCount === 0 &&
+    areModulesReady &&
+    areFixturesReady &&
+    !isAnyNecessaryDefaultOffsetMissing &&
+    isCameraReadyToRun
+
   const checkAccessControl = useGuardedAction({
     kind: 'PROTOCOL_PLAY',
-    runId,
-    protocolName,
   })
 
   const onPlay = async (): Promise<void> => {

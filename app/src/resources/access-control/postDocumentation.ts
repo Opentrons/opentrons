@@ -1,7 +1,7 @@
-import type { DocumentedAction } from './DocumentedAction'
+import type { DocumentedActionKind } from './DocumentedAction'
 
 export interface PostDocumentationInput {
-  action: DocumentedAction
+  action: DocumentedActionKind
   note: string
   username: string
   /** ISO timestamp of when the user confirmed. */

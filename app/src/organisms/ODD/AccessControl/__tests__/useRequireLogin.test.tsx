@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin'
+import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 
 import { useRequireLogin } from '../useRequireLogin'
 

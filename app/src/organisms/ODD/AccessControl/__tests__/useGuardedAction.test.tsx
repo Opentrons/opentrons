@@ -12,7 +12,7 @@ import { useRequireLogin } from '../useRequireLogin'
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
-import type { DocumentedAction } from '/app/resources/access-control'
+import type { DocumentedActionKind } from '/app/resources/access-control'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
@@ -39,10 +39,8 @@ const wrapper: FunctionComponent<{ children: ReactNode }> = ({ children }) => (
   <Provider store={store}>{children}</Provider>
 )
 
-const ACTION: DocumentedAction = {
+const ACTION: DocumentedActionKind = {
   kind: 'PROTOCOL_PLAY',
-  runId: 'run-1',
-  protocolName: 'My Protocol',
 }
 
 describe('useGuardedAction', () => {

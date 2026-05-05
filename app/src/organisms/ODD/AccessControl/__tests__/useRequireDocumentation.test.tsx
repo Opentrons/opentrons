@@ -6,7 +6,7 @@ import { postDocumentation } from '/app/resources/access-control'
 
 import { useRequireDocumentation } from '../useRequireDocumentation'
 
-import type { DocumentedAction } from '/app/resources/access-control'
+import type { DocumentedActionKind } from '/app/resources/access-control'
 
 vi.mock('/app/organisms/ODD/DocumentationRequired', () => ({
   showDocumentationRequiredModal: vi.fn(),
@@ -15,12 +15,6 @@ vi.mock('/app/organisms/ODD/DocumentationRequired', () => ({
 vi.mock('/app/resources/access-control', () => ({
   postDocumentation: vi.fn(),
 }))
-
-const ACTION: DocumentedAction = {
-  kind: 'PROTOCOL_PLAY',
-  runId: 'run-1',
-  protocolName: 'My Protocol',
-}
 
 describe('useRequireDocumentation', () => {
   beforeEach(() => {
@@ -40,7 +34,8 @@ describe('useRequireDocumentation', () => {
     const { result } = renderHook(() => useRequireDocumentation())
 
     const got = await act(
-      async () => await result.current(ACTION, { username: 'alice' })
+      async () =>
+        await result.current({ kind: 'PROTOCOL_PLAY' }, { username: 'alice' })
     )
     expect(got).toEqual({
       note: 'starting run for QC',
@@ -51,7 +46,7 @@ describe('useRequireDocumentation', () => {
       userName: 'alice',
     })
     expect(postDocumentation).toHaveBeenCalledWith({
-      action: ACTION,
+      action: { kind: 'PROTOCOL_PLAY' },
       note: 'starting run for QC',
       username: 'alice',
       confirmedAt: '2026-05-01T16:00:00.000Z',
@@ -64,7 +59,8 @@ describe('useRequireDocumentation', () => {
     const { result } = renderHook(() => useRequireDocumentation())
 
     const got = await act(
-      async () => await result.current(ACTION, { username: 'alice' })
+      async () =>
+        await result.current({ kind: 'PROTOCOL_PLAY' }, { username: 'alice' })
     )
     expect(got).toBeNull()
     expect(postDocumentation).not.toHaveBeenCalled()
