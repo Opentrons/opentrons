@@ -14,6 +14,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
+import { getOt2DesignerCreateUrl } from '/protocol-designer/utils/getOt2DesignerCreateUrl'
 
 import { getHasOptedIn } from '../../analytics/selectors'
 import { EndUserAgreementFooter } from '../../components/molecules'
@@ -24,7 +25,6 @@ import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
 import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
-import { getIsProduction } from '../../networking/opentronsWebApi'
 import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
@@ -36,18 +36,6 @@ import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
-
-const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
-// ToDo activate this when the sandbox is ready.
-// const OT2_APP_STAGE_URL = 'sandbox url'
-
-// The type will be changed only string when the sandbox is ready
-const getOt2DesignerCreateUrl = (): string | null => {
-  if (getIsProduction()) {
-    return OT2_APP_PROD_URL
-  }
-  return null
-}
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
