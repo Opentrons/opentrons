@@ -21,14 +21,14 @@ Behavior:
     - opentrons: edge
 - Determines the alpha version from the buildroot repo's last tag for this version.
 - Uses that alpha version + 1 for buildroot and oe-core.
-- Tags opentrons with internal@yy.mm.dd (UTC), or internal@yy.mm.dd.N for extra same-day builds.
+- Tags opentrons with internal@yy.m.d (UTC), or internal@yy.m.d.N for extra same-day builds.
 
 Tag logic:
 - ot3-firmware: internal@v23 → internal@v24 (always increments, ignores version arg)
 - If buildroot last tag is internal@2.8.0-alpha.5, buildroot and oe-core get alpha.6:
   - buildroot:  internal@2.8.0-alpha.6
   - oe-core:    internal@2.8.0-alpha.6
-  - opentrons:  internal@26.04.23 or internal@26.04.23.1 (calendar; see allocate_next_opentrons_internal_tag)
+  - opentrons:  internal@26.4.23 or internal@26.4.23.1 (calendar; see allocate_next_opentrons_internal_tag)
 """
 
 import argparse
@@ -46,7 +46,7 @@ CLEAN_ROOT = Path("./clean-repos")
 
 # Calendar internal tags on opentrons (excludes internal@v*, internal@*.*.*-alpha*, etc.)
 OPENTRONS_CALENDAR_TAG_RE = re.compile(
-    r'^internal@\d{2}\.\d{2}\.\d{2}(?:(\.(\d+))|(-(dev|prod|stage)(?:\.(\d+))?))?$'
+    r'^internal@\d{2}\.[1-9]\d?\.[1-9]\d?(?:\.(\d+))?$'
 )
 
 # Configuration: repo info, tag patterns, clone URLs, and branches
@@ -304,9 +304,9 @@ def _utc_date_parts() -> Tuple[int, int, int]:
 
 
 def allocate_next_opentrons_internal_tag(repo_path: Path) -> str:
-    """Pick internal@yy.mm.dd or internal@yy.mm.dd.N (UTC) not already present in this clone."""
+    """Pick internal@yy.m.d or internal@yy.m.d.N (UTC) not already present in this clone."""
     yy, mm, dd = _utc_date_parts()
-    root = f"internal@{yy:02d}.{mm:02d}.{dd:02d}"
+    root = f"internal@{yy:02d}.{mm}.{dd}"
     n = 0
     while True:
         candidate = root if n == 0 else f"{root}.{n}"
@@ -320,14 +320,14 @@ def allocate_next_opentrons_internal_tag(repo_path: Path) -> str:
 
 
 def allocate_next_opentrons_internal_tag_remote(clone_url: str) -> str:
-    """Pick next internal@yy.mm.dd[.N] from remote tag names (UTC)."""
+    """Pick next internal@yy.m.d[.N] from remote tag names (UTC)."""
     tags = {
         t
         for t in get_remote_tags(clone_url, "internal@*")
         if OPENTRONS_CALENDAR_TAG_RE.match(t)
     }
     yy, mm, dd = _utc_date_parts()
-    root = f"internal@{yy:02d}.{mm:02d}.{dd:02d}"
+    root = f"internal@{yy:02d}.{mm}.{dd}"
     n = 0
     while True:
         candidate = root if n == 0 else f"{root}.{n}"

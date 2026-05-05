@@ -29,8 +29,8 @@ Tag increment logic:
 - buildroot:    v1.19.6   → v1.19.7   (patch bump)
 - oe-core:      v0.9.7    → v0.9.8    (patch bump)
 - opentrons:
-    - v26.04@alpha.6 → v26.04@alpha.7
-    - v26.04         → v26.05@alpha.0
+    - v26.4@alpha.6 → v26.4@alpha.7
+    - v26.4         → v26.5@alpha.0
 """
 
 import argparse
@@ -157,8 +157,8 @@ def increment_tag(last_tag: str, tag_type: str) -> str:
             major, minor = map(int, cal_stable.groups())
             new_minor = minor + 1
             if new_minor > 12:
-                return f"v{major + 1}.01@alpha.0"
-            return f"v{major}.{new_minor:02d}@alpha.0"
+                return f"v{major + 1}.1@alpha.0"
+            return f"v{major}.{new_minor}@alpha.0"
 
         semver_match = re.match(r"^v(\d+)\.(\d+)\.(\d+)$", last_tag)
         if semver_match:
@@ -180,7 +180,7 @@ def increment_tag(last_tag: str, tag_type: str) -> str:
 
 
 def parse_chore_release_branch(name: str) -> Optional[Tuple[int, int, int]]:
-    """Parse chore_release-X.Y.Z or chore_release-YY.MM → (X, Y, Z) as ints, or None."""
+    """Parse chore_release-X.Y.Z or chore_release-YY.M → (X, Y, Z) as ints, or None."""
     m = re.match(r"^chore_release-(\d+)\.(\d+)\.(\d+)$", name)
     if m:
         major, minor, patch = map(int, m.groups())

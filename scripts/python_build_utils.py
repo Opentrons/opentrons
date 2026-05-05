@@ -37,7 +37,7 @@ package_entries = {
 }
 
 project_entries = {
-    # Internal Flex/monorepo builds: internal@yy.mm.dd[.N] (optional legacy -dev|-prod|-stage)
+    # Internal Flex/monorepo builds: internal@yy.m.d[.N]
     'ot3': ProjectEntry('internal@'),
     'robot-stack': ProjectEntry('v'),
     'docs': ProjectEntry('docs@'),
@@ -52,18 +52,11 @@ def _pep440_from_git_version(project, raw):
             return f'{m.group(1)}a{m.group(2)}'
         return raw
     if project == 'ot3':
-        m_new = re.match(r'^(\d{2})\.(\d{2})\.(\d{2})(\.(\d+))?$', raw)
+        m_new = re.match(r'^(\d{2})\.([1-9]\d?)\.([1-9]\d?)(\.(\d+))?$', raw)
         if m_new:
             yy, mo, dd, _, c = m_new.groups()
             base = f'{int(yy)}.{int(mo)}.{int(dd)}'
             return f'{base}.dev{c}' if c else base
-        m_old = re.match(
-            r'^(\d{2})\.(\d{2})\.(\d{2})-(dev|prod|stage)(?:\.(\d+))?$', raw
-        )
-        if m_old:
-            yy, mo, dd, _suf, extra = m_old.groups()
-            base = f'{int(yy)}.{int(mo)}.{int(dd)}'
-            return f'{base}.dev{extra}' if extra else base
         return raw
     return raw
 
@@ -122,9 +115,9 @@ def _latest_tag_for_prefix(prefix, git_dir):
     return tags_matching[-1].decode('utf-8')
 
 
-# Opentrons calendar internal tags: internal@YY.MM.DD, optional .N same-day, optional legacy -dev|-prod|-stage
+# Opentrons calendar internal tags: internal@YY.M.D with optional .N same-day bump.
 _OT3_CAL_TAG = re.compile(
-    r'^internal@\d{2}\.\d{2}\.\d{2}(?:(\.(\d+))|(-(dev|prod|stage)(?:\.(\d+))?))?$'
+    r'^internal@\d{2}\.[1-9]\d?\.[1-9]\d?(?:\.(\d+))?$'
 )
 
 
@@ -137,7 +130,7 @@ def _latest_ot3_internal_release_tag(git_dir):
                 'git',
                 'tag',
                 '-l',
-                'internal@??.??.??*',
+                'internal@*',
                 '--merged',
                 'HEAD',
                 '--sort=-creatordate',
@@ -153,10 +146,10 @@ def _latest_ot3_internal_release_tag(git_dir):
         if _OT3_CAL_TAG.match(t):
             return t
     sys.stderr.write(
-        'Could not find tag in {check_dir} matching calendar internal@YY.MM.DD* '.format(
+        'Could not find tag in {check_dir} matching calendar internal@YY.M.D* '.format(
             check_dir=check_dir)
-        + '- build before release or no tags. Using internal@00.00.00\n')
-    return 'internal@00.00.00'
+        + '- build before release or no tags. Using internal@00.1.1\n')
+    return 'internal@00.1.1'
 
 
 def _latest_version_for_project(project, git_dir):

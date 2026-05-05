@@ -41,20 +41,20 @@ import python_build_utils as python_build_utils  # noqa: E402
 class TestChoreReleaseIncrementTag(unittest.TestCase):
     def test_calendar_alpha_bump(self):
         self.assertEqual(
-            chore_release.increment_tag("v26.04@alpha.6", "alpha"),
-            "v26.04@alpha.7",
+            chore_release.increment_tag("v26.4@alpha.6", "alpha"),
+            "v26.4@alpha.7",
         )
 
     def test_calendar_stable_to_next_alpha(self):
         self.assertEqual(
-            chore_release.increment_tag("v26.04", "alpha"),
-            "v26.05@alpha.0",
+            chore_release.increment_tag("v26.4", "alpha"),
+            "v26.5@alpha.0",
         )
 
     def test_calendar_year_rollover(self):
         self.assertEqual(
             chore_release.increment_tag("v26.12", "alpha"),
-            "v27.01@alpha.0",
+            "v27.1@alpha.0",
         )
 
     def test_parse_chore_release_branch_semver(self):
@@ -65,7 +65,7 @@ class TestChoreReleaseIncrementTag(unittest.TestCase):
 
     def test_parse_chore_release_branch_calendar(self):
         self.assertEqual(
-            chore_release.parse_chore_release_branch("chore_release-26.04"),
+            chore_release.parse_chore_release_branch("chore_release-26.4"),
             (26, 4, 0),
         )
 
@@ -74,10 +74,9 @@ class TestInternalReleaseHelpers(unittest.TestCase):
     def test_opentrons_calendar_tag_regex_accepts(self):
         cal = internal_release.OPENTRONS_CALENDAR_TAG_RE
         for t in (
-            "internal@26.04.23",
-            "internal@26.04.23.1",
-            "internal@26.04.23-dev",
-            "internal@26.04.23-prod.2",
+            "internal@26.4.23",
+            "internal@26.4.23.1",
+            "internal@26.11.9",
         ):
             with self.subTest(tag=t):
                 self.assertIsNotNone(cal.match(t), t)
@@ -85,6 +84,9 @@ class TestInternalReleaseHelpers(unittest.TestCase):
     def test_opentrons_calendar_tag_regex_rejects(self):
         cal = internal_release.OPENTRONS_CALENDAR_TAG_RE
         for t in (
+            "internal@26.04.23",
+            "internal@26.4.03",
+            "internal@26.4.23-dev",
             "internal@v23",
             "internal@2.8.0-alpha.5",
             "v26.04",
@@ -112,28 +114,28 @@ class TestInternalReleaseHelpers(unittest.TestCase):
 class TestPythonBuildUtilsOt3(unittest.TestCase):
     def test_pep440_from_git_calendar(self):
         self.assertEqual(
-            python_build_utils._pep440_from_git_version("ot3", "26.04.23"),
+            python_build_utils._pep440_from_git_version("ot3", "26.4.23"),
             "26.4.23",
         )
 
     def test_pep440_from_git_same_day_bump(self):
         self.assertEqual(
-            python_build_utils._pep440_from_git_version("ot3", "26.04.23.2"),
+            python_build_utils._pep440_from_git_version("ot3", "26.4.23.2"),
             "26.4.23.dev2",
         )
 
-    def test_pep440_from_git_legacy_channel(self):
+    def test_pep440_from_git_legacy_channel_rejected(self):
         self.assertEqual(
-            python_build_utils._pep440_from_git_version("ot3", "26.04.23-dev.1"),
-            "26.4.23.dev1",
+            python_build_utils._pep440_from_git_version("ot3", "26.4.23-dev.1"),
+            "26.4.23-dev.1",
         )
 
     def test_pep440_robot_stack_calendar_alpha(self):
         self.assertEqual(
             python_build_utils._pep440_from_git_version(
-                "robot-stack", "26.04@alpha.3"
+                "robot-stack", "26.4@alpha.3"
             ),
-            "26.04a3",
+            "26.4a3",
         )
 
 

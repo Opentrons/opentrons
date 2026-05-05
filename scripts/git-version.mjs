@@ -1,5 +1,12 @@
 'use strict'
 
+/* eslint-disable @typescript-eslint/explicit-function-return-type --
+ * Plain JS module; explicit return types are enforced for TS sources only.
+ */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions --
+ * Untyped `tag` parameters in plain JS trip this rule for `string.startsWith`.
+ */
+
 // Determines versions for projects from git tags.
 //
 // A "project" is a coherent built application or applications that serve a purpose, that are versioned together.
@@ -19,6 +26,7 @@ import { fileURLToPath } from 'url'
 import git from 'simple-git'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
+const OT3_CALENDAR_TAG_RE = /^internal@\d{2}\.[1-9]\d?\.[1-9]\d?(?:\.(\d+))?$/
 
 export function monorepoGit() {
   return git({ baseDir: REPO_BASE })
@@ -62,22 +70,28 @@ export function matchGlobForProject(project) {
     return 'v*'
   }
   if (project === 'ot3') {
-    // YY.MM.DD calendar tags only (not internal@v*, internal@*.*.*-alpha*, etc.)
-    return 'internal@??.??.??*'
+    return 'internal@*'
   }
   return `${project}@*`
 }
 
 export async function latestTagForProject(project) {
   if (project === 'ot3') {
-    return (
-      await monorepoGit().raw([
-        'describe',
-        '--tags',
-        '--abbrev=0',
-        '--match=internal@??.??.??*',
-      ])
-    ).trim()
+    const tags = await monorepoGit().raw([
+      'tag',
+      '-l',
+      'internal@*',
+      '--merged',
+      'HEAD',
+      '--sort=-creatordate',
+    ])
+    const latestCalendarTag = tags
+      .split('\n')
+      .find(tag => OT3_CALENDAR_TAG_RE.test(tag))
+    if (latestCalendarTag == null) {
+      throw new Error('No OT3 calendar tag found')
+    }
+    return latestCalendarTag
   }
   return (
     await monorepoGit().raw([
@@ -90,14 +104,16 @@ export async function latestTagForProject(project) {
 }
 
 export async function versionForProject(project) {
-  return latestTagForProject(project)
-    .then(tag => detailsFromTag(tag)[1])
-    .catch(error => {
-      console.error(
-        `Could not find a version for project ${project} (${error}) - no tags yet or no tags fetched? Using 0.0.0-dev`
-      )
-      return '0.0.0-dev'
-    })
+  try {
+    const tag = await latestTagForProject(project)
+    return detailsFromTag(tag)[1]
+  } catch (error) {
+    const errDetail = error instanceof Error ? error.message : String(error)
+    console.error(
+      `Could not find a version for project ${project} (${errDetail}) - no tags yet or no tags fetched? Using 0.0.0-dev`
+    )
+    return '0.0.0-dev'
+  }
 }
 
 export async function latestLabwareVersions(appVersion) {
@@ -116,12 +132,8 @@ export async function latestLabwareVersions(appVersion) {
   const labwareFiles = (
     await monorepoGit()
       .raw([...lstreeCmd, releaseTag, labwareDir])
-      .catch(error =>
-        monorepoGit().raw([...lstreeCmd, choreBranch, labwareDir])
-      )
-      .catch(error =>
-        monorepoGit().raw([...lstreeCmd, 'origin/edge', labwareDir])
-      )
+      .catch(() => monorepoGit().raw([...lstreeCmd, choreBranch, labwareDir]))
+      .catch(() => monorepoGit().raw([...lstreeCmd, 'origin/edge', labwareDir]))
   )
     .split('\0')
     .slice(0, -1) // git puts an extra '\0' at the end, remove it
@@ -132,7 +144,7 @@ export async function latestLabwareVersions(appVersion) {
   return labwareFiles.reduce((acc, filename) => {
     const [loadName, jsonFilename] = filename.split('/')
     const labwareVersion = Number(jsonFilename.replace('.json', ''))
-    if (!acc[loadName] || labwareVersion > acc[loadName]) {
+    if (acc[loadName] == null || labwareVersion > acc[loadName]) {
       acc[loadName] = labwareVersion
     }
     return acc
