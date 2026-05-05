@@ -1,4 +1,7 @@
-"""Logic to check whether an HTTP client is authorized to do something."""
+"""Logic to check whether an HTTP client is authorized to do something.
+
+This module should be framework-agnostic, not tied to FastAPI or whatever.
+"""
 
 from __future__ import annotations
 
