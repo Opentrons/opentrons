@@ -85,7 +85,9 @@ describe('Landing', () => {
   })
 
   it('calls window.open with the OT-2 redirect URL when Create an OT-2 protocol is clicked', () => {
-    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+    const windowOpenSpy = vi
+      .spyOn(window, 'open')
+      .mockImplementation(() => null)
     vi.mocked(getEnableFork).mockReturnValue(true)
     vi.mocked(getIsProduction).mockReturnValue(false)
     render()
@@ -103,7 +105,9 @@ describe('Landing', () => {
   })
 
   it('calls window.open with the production OT-2 URL when getIsProduction is true', () => {
-    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+    const windowOpenSpy = vi
+      .spyOn(window, 'open')
+      .mockImplementation(() => null)
     vi.mocked(getEnableFork).mockReturnValue(true)
     vi.mocked(getIsProduction).mockReturnValue(true)
     render()
