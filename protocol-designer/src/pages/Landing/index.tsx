@@ -3,20 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
 
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  ALIGN_CENTER,
   BasicButton,
   COLORS,
-  DIRECTION_COLUMN,
-  Flex,
   INFO_TOAST,
   JUSTIFY_CENTER,
   LargeButton,
-  SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
 
@@ -155,6 +150,7 @@ export function Landing(): JSX.Element {
             setShowOt2Modal(false)
           }}
           onOpenOt2Designer={
+            // ToDo update this, when merge EXEC-2281
             getOt2DesignerCreateUrl() != null
               ? () => {
                   openOt2DesignerInNewTab()
@@ -164,32 +160,15 @@ export function Landing(): JSX.Element {
           }
         />
       ) : null}
-      <Flex
-        data-cy="landing-page"
-        backgroundColor={COLORS.grey10}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-        height="calc(100vh - 9rem)"
-        width="100%"
-        gridGap={SPACING.spacing32}
-      >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          alignItems={ALIGN_CENTER}
-        >
+      <div data-cy="landing-page" className={styles.content_container}>
+        <div className={styles.image_container}>
           <img
             src={welcomeImage}
             height="132px"
             width="548px"
             aria-label="welcome image"
           />
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            alignItems={ALIGN_CENTER}
-          >
+          <div className={styles.text_container}>
             <StyledText desktopStyle="headingLargeBold" as="h1">
               {t('welcome')}
             </StyledText>
@@ -197,12 +176,11 @@ export function Landing(): JSX.Element {
               desktopStyle="headingSmallRegular"
               color={COLORS.grey60}
               maxWidth="34.25rem"
-              textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {t('no-code-required')}
             </StyledText>
-          </Flex>
-        </Flex>
+          </div>
+        </div>
         <div className={styles.button_container}>
           <NavLink to="/createNew" className={styles.nav_link}>
             <LargeButton
@@ -241,7 +219,7 @@ export function Landing(): JSX.Element {
             accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />
         </label>
-      </Flex>
+      </div>
       <EndUserAgreementFooter />
     </>
   )

@@ -8,22 +8,19 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getOt2DesignerCreateUrl } from '/protocol-designer/utils/getOt2DesignerCreateUrl'
-
 import { getMainPagePortalEl } from '../Portal'
 import styles from './ot2protocolmodal.module.css'
 
 interface Props {
   onClose: () => void
+  onOpenOt2Designer: (() => void) | null
 }
 
-export function Ot2ProtocolModal({ onClose }: Props): JSX.Element {
+export function Ot2ProtocolModal({
+  onClose,
+  onOpenOt2Designer,
+}: Props): JSX.Element {
   const { t } = useTranslation('modal')
-
-  const handleOpenOt2Designer = (): void => {
-    const redirectTarget = getOt2DesignerCreateUrl()
-    window.open(redirectTarget, '_blank', 'noopener,noreferrer')
-  }
 
   return createPortal(
     <Modal
@@ -38,7 +35,7 @@ export function Ot2ProtocolModal({ onClose }: Props): JSX.Element {
               {t('redirect_to_ot2_pd.cancel')}
             </StyledText>
           </SecondaryButton>
-          <PrimaryButton onClick={handleOpenOt2Designer}>
+          <PrimaryButton onClick={onOpenOt2Designer}>
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {t('redirect_to_ot2_pd.open_ot2_pd')}
             </StyledText>
