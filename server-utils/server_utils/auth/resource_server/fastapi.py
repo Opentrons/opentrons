@@ -1,7 +1,7 @@
 """FastAPI-specific helpers for enforcing authorization."""
 
 # NOTE: Don't do `from __future__ import annotations` in this file.
-# See comments in `require_scopes()`.
+# See comments in `get_authorization()`.
 
 import logging
 from contextlib import asynccontextmanager
@@ -11,6 +11,7 @@ from typing import (
     Awaitable,
     Callable,
     Final,
+    NamedTuple,
 )
 
 import fastapi
@@ -53,9 +54,9 @@ _authorization_checker_accessor = AppStateAccessor[AuthorizationChecker](
 
 
 def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
-    """A FastAPI dependency to make sure the client is authorized with the given scopes.
+    """The main, high-level way for a FastAPI endpoint to enforce access control.
 
-    Usage example:
+    Use this as a FastAPI dependency, like so:
 
     ```
     @router.post(
@@ -67,14 +68,58 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
         ...
     ```
 
-    If the client lacks authorization, this will return an HTTP error response,
-    and the endpoint function will not run.
+    If access control is enabled on this robot, and the client lacks authorization,
+    this rejects the request with an appropriate HTTP error response.
+    The endpoint function will not run.
 
-    This also documents the list of required scopes in the OpenAPI spec.
+    This also automatically adds documentation to the OpenAPI document to say
+    that the endpoint requires these scopes.
     """
     required_scopes_set = set(required_scopes)
 
     async def dependency(
+        request_authorization: Annotated[
+            RequestAuthorization,
+            fastapi.Depends(get_authorization(scopes_for_openapi=required_scopes_set)),
+        ],
+    ) -> None:
+        unvalidated_token, authorization_checker = request_authorization
+        authorization_result = await authorization_checker.check(
+            token=unvalidated_token, required_scopes=required_scopes_set
+        )
+        if isinstance(authorization_result, AuthorizedResult):
+            pass  # The request is authorized, yay.
+        else:
+            raise AuthorizationError(authorization_result, required_scopes_set)
+
+    return dependency
+
+
+class RequestAuthorization(NamedTuple):  # noqa: D101
+    unvalidated_token: str | None
+    """The OAuth 2 access token carried by the request, if any.
+
+    The token has not been validated at this point! It may be forged, expired, etc.
+    Pass it to `authorization_checker` to check.
+    """
+
+    authorization_checker: AuthorizationChecker
+
+
+def get_authorization(
+    *, scopes_for_openapi: set[Scope]
+) -> Callable[..., RequestAuthorization]:
+    """Return lower-level information about how a request was authorized.
+
+    This is for endpoints that need custom authorization logic. Most endpoints do not
+    need this and should use `require_scopes()`, which is higher-level, instead.
+
+    Params:
+        scopes_for_openapi: In the OpenAPI document, the endpoint will be documented
+            as requiring these scopes. This has no effect other than documentation.
+    """
+
+    def dependency(
         # This retrieves the request's bearer token, by depending on `_oauth_2_scheme`;
         # and it adds OpenAPI docs to list which scopes the endpoint requires,
         # by supplying the `scopes` argument.
@@ -88,21 +133,14 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
             str | None,
             fastapi.Security(
                 _oauth_2_scheme,
-                scopes=sorted(scope.api_name for scope in required_scopes_set),
+                scopes=sorted(scope.api_name for scope in scopes_for_openapi),
             ),
         ],
         authorization_checker: Annotated[
             AuthorizationChecker, fastapi.Depends(get_authorization_checker)
         ],
-    ) -> None:
-        authorization_result = await authorization_checker.check(
-            token=bearer_token, required_scopes=required_scopes_set
-        )
-        if isinstance(authorization_result, AuthorizedResult):
-            # The request is authorized, yay.
-            pass
-        else:
-            raise AuthorizationError(authorization_result, required_scopes_set)
+    ) -> RequestAuthorization:
+        return RequestAuthorization(bearer_token, authorization_checker)
 
     return dependency
 

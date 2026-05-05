@@ -1,4 +1,4 @@
-"""Logic to check whether an HTTP client is authorized to do something.
+"""Interfaces that endpoints can use to check whether an HTTP client is authorized to do something.
 
 This module should be framework-agnostic, not tied to FastAPI or whatever.
 """
@@ -29,13 +29,33 @@ class AuthorizationChecker(ABC):
         """
         pass
 
+    @abstractmethod
+    async def get_username(self, token: str | None) -> str | None:
+        """Return the user who issued a request, if known.
+
+        This is intended for the rare cases where an endpoint needs to apply different
+        access control depending on who issued the request. Most endpoints should not
+        do this--they should pass a hard-coded list of scopes to `check()` instead.
+
+        Params:
+            token: The OAuth 2 access token carried by the request,
+                or `None` if it didn't carry such a token.
+        """
+        pass
+
 
 class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that always allows access."""
 
     @override
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
+        """See base class for documentation."""
         return AuthorizedResult()
+
+    @override
+    async def get_username(self, token: str | None) -> str | None:
+        """See base class for documentation."""
+        return None
 
 
 class AuthServerAuthorizationChecker(AuthorizationChecker):
@@ -46,6 +66,7 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
 
     @override
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
+        """See base class for documentation."""
         if token is None:
             # The client is trying to access a protected resource without providing a token.
             # We allow this if and only if access control is disabled.
@@ -69,6 +90,15 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                 return InsufficientScopeResult(provided_scopes)
             else:
                 return AuthorizedResult()
+
+    @override
+    async def get_username(self, token: str | None) -> str | None:
+        """See base class for documentation."""
+        if token is None:
+            return None
+        else:
+            token_info = await self._client.introspect_token(token)
+            return token_info.username
 
 
 @dataclass
