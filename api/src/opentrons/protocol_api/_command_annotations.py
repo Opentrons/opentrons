@@ -3,7 +3,12 @@ from opentrons.protocols.api_support.types import APIVersion
 
 
 class GroupedSteps:
-    """Represents a created grouping of steps."""
+    """Represents a created grouping of steps.
+
+    *Available for use from API version 2.29 onwards*
+
+    Note: Any new methods added should have API version gating
+    """
 
     def __init__(
         self, annotation_id: str, protocol_core: ProtocolCore, api_version: APIVersion
@@ -13,7 +18,6 @@ class GroupedSteps:
         self._api_version = api_version
         self._annotation_closed = False
 
-    # TODO(jbl, 2026-02-12) when feature flag is removed add a version check decorator
     def end_group(self) -> None:
         if not self._annotation_closed:
             self._protocol_core.end_step_grouping(annotation_id=self._annotation_id)
