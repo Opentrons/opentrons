@@ -25,7 +25,6 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     StateSummary,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
