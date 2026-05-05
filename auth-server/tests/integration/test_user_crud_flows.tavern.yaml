@@ -105,7 +105,7 @@ stages:
           userName: test_new_user_updated
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
-          resetPassword: false  
+          resetPassword: false
 
   - name: Update the reset password flag
     request:
@@ -177,3 +177,112 @@ stages:
         Authorization: '{admin_access_token}'
     response:
       status_code: 404
+
+---
+test_name: Permissions for a user to read their own info, vs. the info of other users
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Enable access control mode
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: true
+      strict:
+        - json:off
+
+  - name: Create regular user 1
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: regular_user_1
+          password: securepassword123
+          fullName: Regular User 1
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+
+  - name: Create regular user 2
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          userName: regular_user_2
+          password: securepassword123
+          fullName: Regular User 2
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+
+  - name: Log in as regular user 1 and get an access token
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: regular_user_1
+        password: securepassword123
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+      strict:
+        - json:off
+      save:
+        json:
+          regular_user_1_access_token: access_token
+
+  - name: Unauthorized requests should be rejected
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/regular_user_1'
+    response:
+      status_code: 401
+
+  - name: A regular user should be allowed to fetch their own info
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/regular_user_1'
+      headers:
+        authorization: 'Bearer {regular_user_1_access_token}'
+    response:
+      status_code: 200
+
+  - name: A regular user should not be allowed to fetch other users' info
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/regular_user_2'
+      headers:
+        authorization: 'Bearer {regular_user_1_access_token}'
+    response:
+      status_code: 403
+
+  - name: An admin should be allowed to fetch other users' info
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/regular_user_2'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200

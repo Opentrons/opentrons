@@ -2,7 +2,13 @@ from typing import Annotated
 
 import fastapi
 
-from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.resource_server.authorization_checker import AuthorizedResult
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    RequestAuthorization,
+    get_authorization,
+    require_scopes,
+)
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -79,7 +85,6 @@ async def post_users(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ_OTHERS))],
 )
 async def get_user(
     request: fastapi.Request,
@@ -88,8 +93,29 @@ async def get_user(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
+    request_authorization: Annotated[
+        RequestAuthorization,
+        fastapi.Depends(
+            get_authorization(
+                # OpenAPI doesn't have a machine-readable way to describe how
+                # these scopes work conditionally, so we'll just list them all.
+                scopes_for_openapi={Scope.USERS_READ_SELF, Scope.USERS_READ_OTHERS}
+            )
+        ),
+    ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
+    token, authorization_checker = request_authorization
+    authorized_as_username = await authorization_checker.get_username(token)
+    required_scopes = (
+        {Scope.USERS_READ_SELF}
+        if userName == authorized_as_username
+        else {Scope.USERS_READ_OTHERS}
+    )
+    authorization_result = await authorization_checker.check(token, required_scopes)
+    if not isinstance(authorization_result, AuthorizedResult):
+        raise AuthorizationError(authorization_result, required_scopes)
+
     try:
         user = user_data_manager.get_user(userName)
     except UserNotFoundError:
