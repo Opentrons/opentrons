@@ -128,8 +128,8 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
             }
           >
             <Icon
-              name={isGroupPlaying ? 'stop' : 'play-circle'}
-              size="20px"
+              name={isGroupPlaying ? 'pause-circle' : 'play-circle'}
+              size="1.25rem"
               color={iconColor}
             />
           </button>
