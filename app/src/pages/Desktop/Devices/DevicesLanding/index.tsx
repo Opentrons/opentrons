@@ -27,6 +27,7 @@ import { Divider } from '/app/atoms/structure'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
 import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useFeatureFlag } from '/app/redux/config'
 import {
   getConnectableRobots,
@@ -154,7 +155,9 @@ export function DevicesLanding(): JSX.Element {
                   robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
                 }
               >
-                <RobotCard robot={robot} />
+                <RobotCertRotator>
+                  <RobotCard robot={robot} />
+                </RobotCertRotator>
               </ApiHostProvider>
             ))}
             {filteredUnhealthy.map(robot => (

@@ -8,7 +8,10 @@ import {
 } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
-import { tryInstallRobotCertificate } from '/app/redux/shell/remote'
+import {
+  tryInstallEncryptedRobotCertificate,
+  tryInstallPlaintextRobotCertificate,
+} from '/app/redux/shell/remote'
 
 export interface UseHandleRobotCertImportProps {
   onSuccessfulImport: () => unknown
@@ -32,13 +35,14 @@ export function useHandleRobotCertImport(
   }, [passwordValue])
   const host = useHost()
 
-  const tryInstallWith: typeof tryInstallRobotCertificate = async props => {
-    try {
-      return await tryInstallRobotCertificate(props)
-    } catch (err: any) {
-      return false
+  const tryInstallWith: typeof tryInstallEncryptedRobotCertificate =
+    async props => {
+      try {
+        return await tryInstallEncryptedRobotCertificate(props)
+      } catch (err: any) {
+        return false
+      }
     }
-  }
 
   const { status, mutate } = useMutation<boolean>({
     mutationFn: async () => {
@@ -70,13 +74,17 @@ export function useHandleRobotCertImport(
       }
 
       const plaintext = await getPlaintextCACertificates(host!)
-      if (plaintext.status === 200) {
-        return true
-      } else {
+      if (plaintext.status !== 200) {
         throw new Error(
           `Could not fetch CA certificates: ${plaintext.status} ${plaintext.statusText}`
         )
       }
+      if (plaintext.data.data.next != null) {
+        await tryInstallPlaintextRobotCertificate({
+          certificateData: plaintext.data.data.next.cert_data,
+        })
+      }
+      return true
     },
     mutationKey: [host!, 'encrypted_ca_certs'],
     onError: (err: any) => {
