@@ -1,11 +1,148 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
 import { COLORS, Icon, StyledText } from '@opentrons/components'
 
 import { AnnotatedGroup } from './AnnotatedGroup'
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { RowComponentProps } from 'react-window'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
+import type { LeafNode } from '../../types'
 import type { ItemData } from './index'
+
+interface GroupAnnotatedStepRowProps {
+  scrollTargetId: string | null
+  listElement: HTMLElement | null
+  annotationType: string
+  subCommands: LeafNode[]
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
+  allRunDefs: LabwareDefinition[]
+  commandStartNumber: number
+  annotationDescription: string
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  handlePause?: () => void
+  milliSecondsPerFrame: number
+  isGlobalPlaying: boolean
+  t: (key: string) => string
+}
+
+function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
+  const {
+    subCommands,
+    milliSecondsPerFrame,
+    isGlobalPlaying,
+    setSelectedCommand,
+    handlePause,
+    t,
+    ...annotatedGroupProps
+  } = props
+
+  const [isGroupPlaying, setIsGroupPlaying] = useState(false)
+
+  const commandIds = useMemo(
+    () => subCommands.map(sub => sub.command.id),
+    [subCommands]
+  )
+
+  useEffect(() => {
+    if (isGlobalPlaying) {
+      setIsGroupPlaying(false)
+    }
+  }, [isGlobalPlaying])
+
+  useEffect(() => {
+    if (
+      !isGroupPlaying ||
+      setSelectedCommand == null ||
+      commandIds.length === 0
+    ) {
+      return
+    }
+
+    const intervalId = globalThis.setInterval(() => {
+      setSelectedCommand(prevId => {
+        const idx = commandIds.indexOf(prevId ?? '')
+        if (idx === -1) {
+          return commandIds[0] ?? null
+        }
+        const nextIdx = (idx + 1) % commandIds.length
+        return commandIds[nextIdx] ?? null
+      })
+    }, milliSecondsPerFrame)
+
+    return () => {
+      globalThis.clearInterval(intervalId)
+    }
+  }, [isGroupPlaying, commandIds, milliSecondsPerFrame, setSelectedCommand])
+
+  const toggleGroupPlay = useCallback((): void => {
+    if (setSelectedCommand == null || commandIds.length === 0) {
+      return
+    }
+
+    if (isGroupPlaying) {
+      setIsGroupPlaying(false)
+    } else {
+      handlePause?.()
+      const firstId = commandIds[0]
+      if (firstId != null) {
+        setSelectedCommand(firstId)
+      }
+      setIsGroupPlaying(true)
+    }
+  }, [
+    setSelectedCommand,
+    commandIds,
+    isGroupPlaying,
+    handlePause,
+  ])
+
+  const showPlayControl =
+    setSelectedCommand != null && commandIds.length > 0
+
+  const isAnyStepHighlighted = subCommands.some(
+    sub => sub.isHighlighted
+  )
+  const iconColor = isAnyStepHighlighted
+    ? COLORS.purple50
+    : COLORS.grey60
+
+  return (
+    <AnnotatedGroup
+      {...annotatedGroupProps}
+      subCommands={subCommands}
+      setSelectedCommand={setSelectedCommand}
+      handlePause={handlePause}
+      headerLeading={
+        showPlayControl ? (
+          <button
+            type="button"
+            className={styles.group_play_button}
+            onClick={event => {
+              event.stopPropagation()
+              toggleGroupPlay()
+            }}
+            aria-label={
+              isGroupPlaying ? t('stop_step_group') : t('play_step_group')
+            }
+          >
+            <Icon
+              name={isGroupPlaying ? 'stop' : 'play-circle'}
+              size="20px"
+              color={iconColor}
+            />
+          </button>
+        ) : undefined
+      }
+    />
+  )
+}
 
 export function AnnotatedStepsRowItem(
   props: RowComponentProps<ItemData>
@@ -16,7 +153,7 @@ export function AnnotatedStepsRowItem(
     <div style={style} {...ariaAttributes}>
       <div className={styles.annotated_steps_row}>
         {row.type === 'group' ? (
-          <AnnotatedGroup
+          <GroupAnnotatedStepRow
             scrollTargetId={data.scrollTargetId}
             listElement={data.listElement}
             analysis={data.analysis}
@@ -27,6 +164,9 @@ export function AnnotatedStepsRowItem(
             setSelectedCommand={data.setSelectedCommand}
             handlePause={data.handlePause}
             annotationDescription={row.annotationDescription}
+            milliSecondsPerFrame={data.milliSecondsPerFrame}
+            isGlobalPlaying={data.isGlobalPlaying}
+            t={data.t}
           />
         ) : row.type === 'command' ? (
           <IndividualCommand

@@ -25,6 +25,8 @@ interface AnnotatedStepsProps {
   setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
   handlePause?: () => void
   setIsAtBottom?: Dispatch<SetStateAction<boolean>> // remove redux dependency
+  milliSecondsPerFrame?: number
+  isGlobalPlaying?: boolean
 }
 
 type GroupNode = Extract<GroupedCommands[number], { annotationId: string }>
@@ -62,6 +64,8 @@ export interface ItemData {
   listElement: HTMLElement | null
   onShowErrorDetails: () => void
   t: (key: string) => string
+  milliSecondsPerFrame: number
+  isGlobalPlaying: boolean
 }
 
 // Note: Since we're using the height value that appears most frequently in the design,
@@ -76,6 +80,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
     setIsAtBottom,
+    milliSecondsPerFrame = 2000,
+    isGlobalPlaying = false,
   } = props
   const { t } = useTranslation('protocol_visualization')
   const [showErrorDetailsModal, setShowErrorDetailsModal] =
@@ -279,6 +285,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
         setShowErrorDetailsModal(true)
       },
       t,
+      milliSecondsPerFrame,
+      isGlobalPlaying,
     }),
     [
       rows,
@@ -289,6 +297,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       scrollTargetId,
       listElement,
       t,
+      milliSecondsPerFrame,
+      isGlobalPlaying,
     ]
   )
 

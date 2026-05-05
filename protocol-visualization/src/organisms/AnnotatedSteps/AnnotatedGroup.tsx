@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import { StepGroup } from '@opentrons/components'
+import { COLORS, StepGroup } from '@opentrons/components'
 
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
@@ -24,6 +24,7 @@ interface AnnotatedGroupProps {
   annotationDescription: string
   setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
   handlePause?: () => void
+  headerLeading?: ReactNode
 }
 export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const {
@@ -37,6 +38,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     scrollTargetId,
     listElement,
     annotationDescription,
+    headerLeading,
   } = props
   const [isExpanded, setIsExpanded] = useState(() =>
     subCommands.some(command => command.isHighlighted)
@@ -50,14 +52,22 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     handlePause?.()
   }
 
+  const isAnyStepHighlighted = subCommands.some(
+    command => command.isHighlighted
+  )
+
   return (
     <div className={styles.annotated_group_container}>
       <StepGroup
         title={annotationType}
         isExpand={isExpanded}
         handleClick={handleClick}
-        isActive={subCommands.some(command => command.isHighlighted)}
+        isActive={isAnyStepHighlighted}
         subtitle={annotationDescription}
+        headerLeading={headerLeading}
+        titleColor={
+          isAnyStepHighlighted ? COLORS.purple50 : undefined
+        }
       >
         {isExpanded ? (
           <div className={styles.annotated_group_expanded}>
