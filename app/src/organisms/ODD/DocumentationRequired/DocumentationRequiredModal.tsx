@@ -37,9 +37,6 @@ const DocumentationRequiredModalImpl = NiceModal.create(
   }
 )
 
-/**
- * Open the documentation-required overlay and await the result.
- */
 export const showDocumentationRequiredModal = (
   args: DocumentationRequiredModalArgs
 ): Promise<DocumentationRequiredModalResult | null> =>

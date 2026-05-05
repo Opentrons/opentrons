@@ -6,7 +6,7 @@ import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
-import styles from './OnDeviceLoginOverlayProvider.module.css'
+import styles from './OnDeviceLogin.module.css'
 
 import type { LoginStep } from './index'
 
@@ -59,11 +59,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
  *
  * Resolves with `{ username }` once the user logs in, or `null` if the user
  * cancels. Used by the access-control gate (`useGuardedAction`) when an action
- * requires login but the current robot session is logged out.
- *
- * Distinct from `OnDeviceLoginOverlayProvider`, which renders the persistent
- * logged-out overlay. This NiceModal is for ad-hoc, one-shot login prompts
- * triggered by a user action.
+ * requires login, and by the persistent logged-out overlay rendered at the app
+ * root when access control is enabled.
  */
 export const showLoginModal = (): Promise<LoginModalResult | null> =>
   NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>

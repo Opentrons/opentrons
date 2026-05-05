@@ -15,7 +15,7 @@ import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './OnDeviceLoginOverlayProvider.module.css'
+import styles from './OnDeviceLogin.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
@@ -220,11 +220,7 @@ function LoginFieldInput({
   )
 }
 
-export {
-  OnDeviceLoginOverlayProvider,
-  useOnDeviceLoginModal,
-} from './OnDeviceLoginOverlayProvider'
-export type { OnDeviceLoginModalContextValue } from './OnDeviceLoginOverlayProvider'
-
 export { showLoginModal } from './LoginModal'
 export type { LoginModalResult } from './LoginModal'
+
+export { useShouldShowLoggedOutOverlay } from './hooks'

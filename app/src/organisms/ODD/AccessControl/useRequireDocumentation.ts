@@ -19,9 +19,6 @@ export type RequireDocumentationGuard = (
  * to the audit log.
  *
  * Assumes access control is enabled and the user is authenticated.
- *
- * Resolves with `DocumentationResult` after the user confirms with a
- * non-empty note. Resolves to `null` if the user backs out of the modal.
  */
 export function useRequireDocumentation(): RequireDocumentationGuard {
   return useCallback(async (action, loginResult) => {

@@ -16,9 +16,6 @@ export type RequireLoginGuard = () => Promise<RequireLoginResult | null>
  *
  * Assumes access control is enabled — the caller (`useGuardedAction`) is
  * responsible for short-circuiting when access control is off.
- *
- * Resolves with `{ username }` if the user is logged in (already or via the
- * modal). Resolves to `null` if the user dismisses the login modal.
  */
 export function useRequireLogin(
   currentUsername: string | null
