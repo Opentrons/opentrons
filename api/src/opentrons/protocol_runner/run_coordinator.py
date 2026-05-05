@@ -25,7 +25,6 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     StateSummary,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
@@ -376,11 +375,6 @@ class AbstractRunCoordinator(ABC):
     @abstractmethod
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        ...
-
-    @abstractmethod
-    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
-        """Create error recovery policy for the run."""
         ...
 
     @abstractmethod
