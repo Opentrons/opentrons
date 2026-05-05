@@ -219,8 +219,3 @@ function LoginFieldInput({
     </div>
   )
 }
-
-export { showLoginModal } from './LoginModal'
-export type { LoginModalResult } from './LoginModal'
-
-export { useShouldShowLoggedOutOverlay } from './hooks'

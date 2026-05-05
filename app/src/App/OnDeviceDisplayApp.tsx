@@ -20,15 +20,11 @@ import {
 import { ReactQueryDevtools } from '/app/App/tools'
 import { SleepScreen } from '/app/atoms/SleepScreen'
 import { SLEEP_NEVER_MS, useScreenIdle } from '/app/local-resources/dom-utils'
-import { LoggedOutOverlay } from '/app/molecules/LoggedOutOverlay'
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import {
-  showLoginModal,
-  useShouldShowLoggedOutOverlay,
-} from '/app/organisms/ODD/OnDeviceLogin'
+import { LoggedOutOverlayMount } from '/app/organisms/ODD/OnDeviceLogin/LoggedOutOverlayMount'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
@@ -364,20 +360,4 @@ function ModuleAttachedToasts({
 }): null {
   useModuleAttachedToast(openFlow)
   return null
-}
-
-/**
- * Renders the persistent "logged out" overlay when access
- * control is enabled and the local robot session is logged out. Tapping the
- */
-function LoggedOutOverlayMount(): JSX.Element | null {
-  const shouldShow = useShouldShowLoggedOutOverlay()
-  if (!shouldShow) return null
-  return (
-    <LoggedOutOverlay
-      onClick={() => {
-        void showLoginModal()
-      }}
-    />
-  )
 }

@@ -55,12 +55,14 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 })
 
 /**
- * Imperatively open the login overlay and await the result.
- *
- * Resolves with `{ username }` once the user logs in, or `null` if the user
- * cancels. Used by the access-control gate (`useGuardedAction`) when an action
- * requires login, and by the persistent logged-out overlay rendered at the app
- * root when access control is enabled.
+ * Open the login modal and await the result.
  */
 export const showLoginModal = (): Promise<LoginModalResult | null> =>
   NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
+
+/**
+ * Returns whether the login modal is currently visible.
+ */
+export function useIsLoginModalOpen(): boolean {
+  return useModal(LoginModalImpl).visible
+}

@@ -42,11 +42,11 @@ describe('useShouldShowLoggedOutOverlay', () => {
     vi.resetAllMocks()
   })
 
-  it('returns true when access control is enabled and the user is logged out', () => {
+  it('returns true when access control is enabled, the user is logged out, and the login modal is closed', () => {
     mockAccessControlEnabled(true)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
 
-    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(), {
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
       wrapper,
     })
     expect(result.current).toBe(true)
@@ -56,7 +56,7 @@ describe('useShouldShowLoggedOutOverlay', () => {
     mockAccessControlEnabled(false)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
 
-    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(), {
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
       wrapper,
     })
     expect(result.current).toBe(false)
@@ -66,7 +66,17 @@ describe('useShouldShowLoggedOutOverlay', () => {
     mockAccessControlEnabled(true)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(true)
 
-    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(), {
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
+      wrapper,
+    })
+    expect(result.current).toBe(false)
+  })
+
+  it('returns false when the login modal is open', () => {
+    mockAccessControlEnabled(true)
+    vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
+
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(true), {
       wrapper,
     })
     expect(result.current).toBe(false)
@@ -79,7 +89,7 @@ describe('useShouldShowLoggedOutOverlay', () => {
     } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
 
-    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(), {
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
       wrapper,
     })
     expect(result.current).toBe(false)
