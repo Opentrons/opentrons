@@ -23,9 +23,7 @@ import type { DocumentedActionKind } from '/app/resources/access-control'
  *
  * @example
  *   const checkAccessControl = useGuardedAction({
- *     kind: 'PROTOCOL_PLAY',
- *     runId,
- *     protocolName,
+ *     kind: 'PROTOCOL_PLAY'
  *   })
  *
  *   const onPlay = async (): Promise<void> => {
