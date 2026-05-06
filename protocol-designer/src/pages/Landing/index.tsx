@@ -4,31 +4,27 @@ import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
-  ALIGN_CENTER,
   BasicButton,
   COLORS,
-  DIRECTION_COLUMN,
-  Flex,
   INFO_TOAST,
   JUSTIFY_CENTER,
   LargeButton,
-  SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
+import { getOt2DesignerCreateUrl } from '/protocol-designer/utils/getOt2DesignerCreateUrl'
 
 import { getHasOptedIn } from '../../analytics/selectors'
 import { EndUserAgreementFooter } from '../../components/molecules'
-import { AnnouncementModal } from '../../components/organisms'
+import { AnnouncementModal, Ot2ProtocolModal } from '../../components/organisms'
 import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
 import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
-import { getFileMetadata } from '../../file-data/selectors'
+import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
-import { getIsProduction } from '../../networking/opentronsWebApi'
 import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
@@ -41,23 +37,15 @@ import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
 
-const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
-const OT2_APP_STAGE_URL = 'https://ot2.staging.designer.opentrons.com'
-
-const getOt2DesignerCreateUrl = (): string => {
-  if (getIsProduction()) {
-    return OT2_APP_PROD_URL
-  }
-  return OT2_APP_STAGE_URL
-}
-
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
   const metadata = useSelector(getFileMetadata)
+  const robotType = useSelector(getRobotType)
   const navigate = useNavigate()
   const [showAnnouncementModal, setShowAnnouncementModal] =
     useState<boolean>(false)
+  const [showOt2Modal, setShowOt2Modal] = useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { hasOptedIn, appVersion } = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()
@@ -107,10 +95,15 @@ export function Landing(): JSX.Element {
 
   useEffect(() => {
     if (metadata?.created != null) {
-      console.warn('protocol already exists, navigating to overview')
-      navigate('/overview')
+      if (enableFork && robotType === OT2_ROBOT_TYPE) {
+        setShowOt2Modal(true)
+        dispatch(loadFileActions.undoLoadFile())
+      } else {
+        console.warn('protocol already exists, navigating to overview')
+        navigate('/overview')
+      }
     }
-  }, [metadata, navigate])
+  }, [metadata, navigate, enableFork, robotType, dispatch])
 
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
@@ -127,6 +120,11 @@ export function Landing(): JSX.Element {
     window.open(redirectTarget, '_blank', 'noopener,noreferrer')
   }
 
+  const handleOpenOt2Designer = (): void => {
+    openOt2DesignerInNewTab()
+    setShowOt2Modal(false)
+  }
+
   return (
     <>
       {showAnnouncementModal ? (
@@ -137,32 +135,23 @@ export function Landing(): JSX.Element {
           }}
         />
       ) : null}
-      <Flex
-        data-cy="landing-page"
-        backgroundColor={COLORS.grey10}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_CENTER}
-        height="calc(100vh - 9rem)"
-        width="100%"
-        gridGap={SPACING.spacing32}
-      >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          alignItems={ALIGN_CENTER}
-        >
+      {showOt2Modal ? (
+        <Ot2ProtocolModal
+          onClose={() => {
+            setShowOt2Modal(false)
+          }}
+          onOpenOt2Designer={handleOpenOt2Designer}
+        />
+      ) : null}
+      <div data-cy="landing-page" className={styles.content_container}>
+        <div className={styles.image_container}>
           <img
             src={welcomeImage}
             height="132px"
             width="548px"
             aria-label="welcome image"
           />
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            alignItems={ALIGN_CENTER}
-          >
+          <div className={styles.text_container}>
             <StyledText desktopStyle="headingLargeBold" as="h1">
               {t('welcome')}
             </StyledText>
@@ -170,12 +159,11 @@ export function Landing(): JSX.Element {
               desktopStyle="headingSmallRegular"
               color={COLORS.grey60}
               maxWidth="34.25rem"
-              textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {t('no-code-required')}
             </StyledText>
-          </Flex>
-        </Flex>
+          </div>
+        </div>
         <div className={styles.button_container}>
           <NavLink to="/createNew" className={styles.nav_link}>
             <LargeButton
@@ -214,7 +202,7 @@ export function Landing(): JSX.Element {
             accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />
         </label>
-      </Flex>
+      </div>
       <EndUserAgreementFooter />
     </>
   )
