@@ -27,11 +27,17 @@ export function useRequireDocumentation(): RequireDocumentationGuard {
     })
     if (modalResult == null) return null
 
+    const {
+  note,
+  confirmedAt,
+  loginResult: { username },
+} = modalResult
+
     await postDocumentation({
       action,
-      note: modalResult.note,
-      username: loginResult.username,
-      confirmedAt: modalResult.confirmedAt,
+      note:.note,
+      username,
+      confirmedAt,
     })
 
     return {
