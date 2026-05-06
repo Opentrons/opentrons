@@ -15,7 +15,7 @@ import {
 import { actions as loadFileActions } from '/protocol-designer/load-file'
 import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
 import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
-import { getIsProduction } from '/protocol-designer/networking/opentronsWebApi'
+import { getOt2DesignerCreateUrl } from '/protocol-designer/utils/getOt2DesignerCreateUrl'
 
 import { Ot2ProtocolModal } from '../Ot2ProtocolModal'
 import { SettingsIcon } from '../SettingsIcon'
@@ -74,9 +74,15 @@ export function Navigation(): JSX.Element | null {
     }
   }
 
-  const ot2DesignerUrl = getIsProduction()
-    ? 'https://ot2.designer.opentrons.com/#/createNew'
-    : null
+  const openOt2DesignerInNewTab = (): void => {
+    const redirectTarget = getOt2DesignerCreateUrl()
+    window.open(redirectTarget, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleOpenOt2Designer = (): void => {
+    openOt2DesignerInNewTab()
+    setShowOt2Modal(false)
+  }
 
   return (
     <>
@@ -85,14 +91,7 @@ export function Navigation(): JSX.Element | null {
           onClose={() => {
             setShowOt2Modal(false)
           }}
-          onOpenOt2Designer={
-            ot2DesignerUrl != null
-              ? () => {
-                  window.open(ot2DesignerUrl, '_blank', 'noopener,noreferrer')
-                  setShowOt2Modal(false)
-                }
-              : null
-          }
+          onOpenOt2Designer={handleOpenOt2Designer}
         />
       ) : null}
       <nav>

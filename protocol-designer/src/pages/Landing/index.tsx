@@ -37,16 +37,6 @@ import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
 
-const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
-const OT2_APP_STAGE_URL = 'https://ot2.staging.designer.opentrons.com'
-
-const getOt2DesignerCreateUrl = (): string => {
-  if (getIsProduction()) {
-    return OT2_APP_PROD_URL
-  }
-  return OT2_APP_STAGE_URL
-}
-
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()

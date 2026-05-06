@@ -13,7 +13,7 @@ import styles from './ot2protocolmodal.module.css'
 
 interface Props {
   onClose: () => void
-  onOpenOt2Designer: (() => void) | null
+  onOpenOt2Designer: () => void
 }
 
 export function Ot2ProtocolModal({
