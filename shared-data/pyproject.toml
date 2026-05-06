@@ -94,6 +94,8 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["opentrons_shared_data"]
 
+[tool.ruff.format]
+exclude = ["python/opentrons_shared_data/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="python/opentrons_shared_data/_version.py"
@@ -198,3 +200,7 @@ warn_return_any = false
 [[tool.mypy.overrides]]
 module = ["PIL", "PIL.*"]
 ignore_missing_imports = true
+
+[tool.uv]
+# cooldown time for security
+exclude-newer = "1 week"

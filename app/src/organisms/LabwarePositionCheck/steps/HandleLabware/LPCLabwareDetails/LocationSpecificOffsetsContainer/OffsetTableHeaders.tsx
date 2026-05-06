@@ -16,7 +16,7 @@ export function OffsetTableHeaders(): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
   return (
-    <Flex css={LIST_HEADERS_CONTAINER_STYLE}>
+    <Flex css={LIST_HEADERS_CONTAINER_STYLE} display={DISPLAY_GRID}>
       <Flex css={HEADER_COLUMN_ONE_STYLE}>
         <StyledText
           oddStyle="bodyTextSemiBold"

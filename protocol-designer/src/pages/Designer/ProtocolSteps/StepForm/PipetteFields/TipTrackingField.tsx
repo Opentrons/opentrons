@@ -14,6 +14,7 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
+  getDefaultPrimaryNozzle,
   getTransferPlanAndReferenceVolumes,
   MANUAL,
 } from '@opentrons/step-generation'
@@ -65,6 +66,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const pipette = pipetteEntities[pipetteId]
   const { spec: pipetteSpecs } = pipette
   const { channels } = pipetteSpecs
+  const primaryNozzle =
+    (propsForFields.primaryNozzle.value as PrimaryNozzleConfigurationStyle) ??
+    getDefaultPrimaryNozzle({ nozzles, channels })
   const tiprackDefinition = Object.values(labwareEntities).find(
     tiprackEntity => tiprackEntity.labwareDefURI === formData.tipRack
   )?.def
@@ -126,9 +130,6 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     },
   ]
 
-  const primaryNozzle = propsForFields.primaryNozzle
-    .value as PrimaryNozzleConfigurationStyle
-
   const tipAccessibilityStatus =
     useMemoizedTipAccessibilityByTiprackIdByWellName({
       nozzles,
@@ -159,9 +160,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           {t('step_edit_form.field.tip_tracking.label')}
         </StyledText>
         <Flex className={styles.radio_buttons_container}>
-          {tipTrackingOptions.map(({ title, description, value }, i) => (
+          {tipTrackingOptions.map(({ title, description, value }) => (
             <RadioButton
-              key={i}
+              key={value}
               buttonLabel={title}
               buttonSubLabel={{
                 label: description,
@@ -209,7 +210,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           </ListButton>
         </Flex>
       ) : null}
-      {formData.tip_tracking === MANUAL && !hasValidTiprackForPickup ? (
+      {!hasValidTiprackForPickup ? (
         <InlineNotification
           type="error"
           heading={t('tip_selection:no_valid_tips_available.title')}

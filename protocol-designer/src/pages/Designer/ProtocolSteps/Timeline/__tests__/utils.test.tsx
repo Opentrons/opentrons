@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   capitalizeFirstLetterAfterNumber,
+  getConsolidatedStacks,
   getFillLabwareToDeleteData,
   getShiftSelectedSteps,
 } from '../utils'
@@ -42,12 +43,12 @@ describe('getShiftSelectedSteps', () => {
         { type: 'standaloneStep', stepId: 'step1' },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'step2',
+          startStepId: 'step2',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'step3' },
             { type: 'standaloneStep', stepId: 'step4' },
           ],
-          waitForThermocyclerProfileStepId: 'step5',
+          waitStepId: 'step5',
         },
         { type: 'standaloneStep', stepId: 'step6' },
         { type: 'standaloneStep', stepId: 'step7' },
@@ -69,12 +70,12 @@ describe('getShiftSelectedSteps', () => {
         { type: 'standaloneStep', stepId: 'step1' },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'step2',
+          startStepId: 'step2',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'step3' },
             { type: 'standaloneStep', stepId: 'step4' },
           ],
-          waitForThermocyclerProfileStepId: 'step5',
+          waitStepId: 'step5',
         },
         { type: 'standaloneStep', stepId: 'step6' },
         { type: 'standaloneStep', stepId: 'step7' },
@@ -98,7 +99,18 @@ describe('getShiftSelectedSteps', () => {
     ])
   })
 })
-
+describe('getConsolidatedStacks', () => {
+  it('should return an array of stacks with no duplicates', () => {
+    const labwareAtLastState = {
+      labware1: { stack: ['labware1', 'C1'] },
+      labware2: { stack: ['labware2', 'labware1', 'C1'] },
+      labware3: { stack: ['labware3', 'labware2', 'labware1', 'C1'] },
+    }
+    expect(getConsolidatedStacks(labwareAtLastState)).toStrictEqual([
+      ['labware3', 'labware2', 'labware1', 'C1'],
+    ])
+  })
+})
 describe('getFillLabwareToDeleteData', () => {
   const mockModule = {
     id: 'moduleId1',

@@ -13,6 +13,16 @@ export interface SecondOrderCommandAnnotation extends SharedCommandAnnotationPro
   userSpecifiedName?: string
   userSpecifiedDescription?: string
 }
-export type CommandAnnotation =
+export type CommandAnnotationV1 =
   | SecondOrderCommandAnnotation
   | CustomCommandAnnotation
+
+export interface UserCommandAnnotation {
+  annotationType: 'userCommand'
+  id: string
+  params: { [key: string]: any }
+  name: string
+  description?: string
+}
+
+export type CommandAnnotationV2 = UserCommandAnnotation

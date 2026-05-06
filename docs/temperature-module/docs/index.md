@@ -1,5 +1,6 @@
 ---
 title: "Temperature Module GEN2 Instruction Manual"
+description: "Hot and cold plate module (4–95 °C) for Flex and OT-2."
 hide: toc
 ---
 
@@ -10,7 +11,7 @@ hide: toc
 ![Module cover image](images/temp-mod-hero.png){style="width: 60%"}
 
 **Opentrons Labworks Inc.**<br>
-December 2024
+April 2026
 
 </div>
 

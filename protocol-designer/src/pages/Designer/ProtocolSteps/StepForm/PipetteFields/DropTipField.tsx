@@ -2,8 +2,6 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ALL, SINGLE } from '@opentrons/shared-data'
-
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import {
   getAdditionalEquipmentEntities,
@@ -24,13 +22,7 @@ interface DropTipFieldProps extends FieldProps {
 }
 
 export function DropTipField(props: DropTipFieldProps): JSX.Element {
-  const {
-    value: dropdownItem,
-    updateValue,
-    nozzles,
-    tiprackDefUri,
-    channels,
-  } = props
+  const { value: dropdownItem, updateValue, tiprackDefUri } = props
   const { t, i18n } = useTranslation(['form', 'shared'])
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const labwareEntities = useSelector(getLabwareEntities)
@@ -59,28 +51,30 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     value: tiprackDefUri,
   }
 
-  const isReturnTipValid =
-    nozzles === ALL || nozzles == null || (channels === 1 && nozzles === SINGLE)
-
   const isTipDropLocationReturnTip = Object.values(labwareEntities).some(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
   )
 
-  useEffect(() => {
-    if (
-      additionalEquipment[String(dropdownItem)] == null &&
-      labwareEntities[String(dropdownItem)] == null &&
-      !isTipDropLocationReturnTip
-    ) {
-      updateValue(null)
-    }
-  }, [dropdownItem])
+  useEffect(
+    () => {
+      if (
+        additionalEquipment[String(dropdownItem)] == null &&
+        labwareEntities[String(dropdownItem)] == null &&
+        !isTipDropLocationReturnTip
+      ) {
+        updateValue(null)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dropdownItem]
+  )
 
   return (
     <DropdownStepFormField
       {...props}
       updateValue={updateValue}
-      options={isReturnTipValid ? [...options, returnOption] : options}
+      options={[...options, returnOption]}
       value={dropdownItem ? String(dropdownItem) : null}
       title={i18n.format(
         t('step_edit_form.field.location.dropTip'),

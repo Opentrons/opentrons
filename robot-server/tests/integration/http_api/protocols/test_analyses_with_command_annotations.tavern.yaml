@@ -1,0 +1,170 @@
+test_name: Test the protocol analysis endpoints with step groups created via command annotations
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Set allowStepGrouping to True
+    request:
+      method: POST
+      url: '{ot3_server_base_url}/settings'
+      json:
+        id: 'allowStepGrouping'
+        value: true
+    response:
+      status_code: 200
+  - name: Upload a protocol
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_step_grouping.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+              runTimeParameters: []
+
+  - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          protocolKind: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Get protocol analysis by ID
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        meta:
+          cursor: 0
+          totalLength: 1
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
+            robotType: OT-3 Standard
+            runTimeParameters: []
+            commandAnnotations:
+              - source: userCommand
+                id: !anystr
+                name: My step group
+                description: It's a comment, that's it.
+                params: {}
+              - source: userCommand
+                id: !anystr
+                name: My step group 2
+                description: Another comment!
+                params: {}
+            commandPreconditions: { isCameraUsed: false }
+            pipettes: []
+            labware: []
+            modules: []
+            commands:
+              # Initial home
+              - id: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandType: home
+                key: !anystr
+                status: succeeded
+                params: {}
+                result: {}
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandAnnotationIds: []
+              - id: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandType: comment
+                key: !anystr
+                status: succeeded
+                params:
+                  message: This is not in a step group.
+                result: {}
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandAnnotationIds: []
+              - id: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandType: comment
+                key: !anystr
+                status: succeeded
+                params:
+                  message: This will have a command annotation ID.
+                result: {}
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandAnnotationIds:
+                  - !anystr
+              - id: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandType: comment
+                key: !anystr
+                status: succeeded
+                params:
+                  message: This is also not in a step group.
+                result: {}
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandAnnotationIds: []
+              - id: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandType: comment
+                key: !anystr
+                status: succeeded
+                params:
+                  message: This will have a command annotation ID as well.
+                result: {}
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandAnnotationIds:
+                  - !anystr
+              - id: !anystr
+                createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandType: comment
+                key: !anystr
+                status: succeeded
+                params:
+                  message: This is also also not in a step group.
+                result: {}
+                notes: []
+                startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+                commandAnnotationIds: []
+            errors: []
+            liquids: []
+            liquidClasses: []
+            labwareOffsets: []

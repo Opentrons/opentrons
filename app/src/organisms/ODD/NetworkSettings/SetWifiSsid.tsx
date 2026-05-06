@@ -5,10 +5,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   LegacyStyledText,
   POSITION_FIXED,
   SPACING,
+  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -47,7 +47,8 @@ export function SetWifiSsid({
         >
           {t('enter_network_name')}
         </LegacyStyledText>
-        <InputField
+        <TouchInputField
+          autoFocus
           aria-label="wifi_ssid"
           value={inputSsid}
           id="wifiSsid"
@@ -59,7 +60,6 @@ export function SetWifiSsid({
           onBlur={e => {
             e.target.focus()
           }}
-          autoFocus
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">

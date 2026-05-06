@@ -1,5 +1,6 @@
 ---
 title: "Heater-Shaker Module GEN1 Instruction Manual"
+description: "On-deck heating and orbital shaking for Flex and OT-2; 37–95 °C, 200–3000 rpm."
 hide: toc
 ---
 
@@ -10,7 +11,7 @@ hide: toc
 ![Heater-Shaker hero image](images/heater-shaker-hero.png)
 
 **Opentrons Labworks Inc.**<br>
-May 2024
+April 2026
 
 </div>
 

@@ -15,8 +15,10 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
-    "sqlalchemy==1.4.51",
+    "sqlalchemy==2.0.48",
     "oauthlib>=3.3.1,<4",
+    "pwdlib[argon2,bcrypt]==0.3.0",
+    "alembic==1.18.4",
 ]
 
 [tool.uv.dependency-groups]
@@ -30,8 +32,9 @@ robot = [
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "uvicorn==0.27.0.post1",
-    "sqlalchemy==1.4.51",
+    "sqlalchemy==2.0.48",
     "oauthlib==3.3.1",
+    "alembic==1.18.4",
 ]
 dev = [
     "ruff==0.14.10",
@@ -47,7 +50,6 @@ dev = [
     "pytest-xdist~=2.5.0",
     "requests==2.27.1",
     "types-requests==2.27.1",
-    "sqlalchemy2-stubs==0.0.2a21",
     "tavern>=3.0.2",
     "types-oauthlib==3.3.0.20250822",
 ]
@@ -70,6 +72,9 @@ convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
 
+[tool.ruff.format]
+exclude = ["auth_server/_version.py"]
+
 # uv: global settings and dependency tweaks
 [tool.uv]
 # Provide static metadata so uv can resolve systemd-python without building its sdist on
@@ -78,6 +83,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
@@ -129,12 +136,11 @@ packages = ["auth_server"]
 addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
-    "error::sqlalchemy.exc.RemovedIn20Warning",
     "error::pydantic.PydanticDeprecatedSince20",
 ]
 
 [tool.mypy]
-plugins = ["pydantic.mypy", "decoy.mypy", "sqlalchemy.ext.mypy.plugin"]
+plugins = ["pydantic.mypy", "decoy.mypy"]
 show_error_codes = true
 strict = true
 

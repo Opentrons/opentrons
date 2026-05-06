@@ -8,7 +8,13 @@ from typing import TYPE_CHECKING, Callable, List, Optional, Union
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
-from . import modules
+from . import modules, peripherals
+from .abstract_device import AbstractDevice
+from .device import (
+    DEVICE_TYPE_BY_NAME,
+    DeviceType,
+    build_attached_device,
+)
 from .types import (
     AionotifyEvent,
     AsynchronousModuleErrorNotification,
@@ -51,6 +57,19 @@ MODULE_PORT_REGEX = re.compile(
     + r"\d+(?!\.tmp-c\d+:\d+)",
     re.I,
 )
+PERIPHERAL_PORT_REGEX = re.compile(
+    # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
+    r"(?<!\.#ot_module_)"
+    # capture all modules by name using alternation
+    + "("
+    + "|".join(peripherals.PERIPHERAL_TYPE_BY_NAME.keys())
+    + ")"
+    # add a negative lookahead to suppress matches on Flex tempfiles udev creates
+    + r"\d+(?!\.tmp-c\d+:\d+)",
+    re.I,
+)
+
+PERIPHERALS = ["barcodescanner"]
 
 
 class AttachedModulesControl:
@@ -66,19 +85,20 @@ class AttachedModulesControl:
         event_callback: Callable[[HardwareEvent], None],
     ) -> None:
         self._available_modules: List[modules.AbstractModule] = []
+        self._available_peripherals: List[peripherals.AbstractPeripheral] = []
         self._api = api
         self._usb = usb
         self._event_callback = event_callback
         if not IS_ROBOT and not api.is_simulator:
             # Start task that registers emulated modules.
             self._emulation_listen_task: asyncio.Task[None] | None = (
-                api.loop.create_task(listen_module_connection(self.register_modules))
+                api.loop.create_task(listen_module_connection(self.register_devices))
             )
         else:
             self._emulation_listen_task = None
 
-    def subscribe_to_api_event(self, module: modules.AbstractModule) -> None:
-        self._api.add_status_bar_listener(module.event_listener)
+    def subscribe_to_api_event(self, device: AbstractDevice) -> None:
+        self._api.add_status_bar_listener(device.event_listener)
 
     @classmethod
     async def build(
@@ -97,14 +117,18 @@ class AttachedModulesControl:
         )
 
         if not api_instance.is_simulator:
-            # Do an initial scan of modules.
-            await mc_instance.register_modules(mc_instance.scan())
+            # Do an initial scan of devices.
+            await mc_instance.register_devices(mc_instance.scan())
 
         return mc_instance
 
     @property
     def available_modules(self) -> List[modules.AbstractModule]:
         return self._available_modules
+
+    @property
+    def available_peripherals(self) -> List[peripherals.AbstractPeripheral]:
+        return self._available_peripherals
 
     async def clean_up(self) -> None:
         """Clean up all registered modules and emulator scanning tasks (if any)."""
@@ -121,35 +145,43 @@ class AttachedModulesControl:
             finally:
                 self._emulation_listen_task = None
 
-    async def register_simulated_module(
+    async def register_simulated_device(
         self,
         simulated_usb_port: types.USBPort,
-        type: modules.ModuleType,
+        type: DeviceType,
         sim_model: str,
-    ) -> modules.AbstractModule:
-        """Register a simulated module."""
-        module = await self.build_module(
-            "", simulated_usb_port, type, sim_model, sim_serial_number=None
+        sim_serial: Optional[str] = None,
+    ) -> AbstractDevice:
+        device = await self.build_device(
+            "", simulated_usb_port, type, sim_model, sim_serial_number=sim_serial
         )
-        self._available_modules.append(module)
-        self._available_modules = sorted(
-            self._available_modules, key=modules.AbstractModule.sort_key
-        )
-        return module
+        if isinstance(type, modules.ModuleType):
+            assert isinstance(device, modules.AbstractModule)
+            self._available_modules.append(device)
+            self._available_modules = sorted(
+                self._available_modules, key=modules.AbstractModule.sort_key
+            )
+        else:
+            assert isinstance(device, peripherals.AbstractPeripheral)
+            self._available_peripherals.append(device)
+            self._available_peripherals = sorted(
+                self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
+            )
+        return device
 
-    async def build_module(
+    async def build_device(
         self,
         port: str,
         usb_port: types.USBPort,
-        type: modules.ModuleType,
+        type: DeviceType,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-    ) -> modules.AbstractModule:
-        mod = await modules.build(
+    ) -> AbstractDevice:
+        device = await build_attached_device(
             port=port,
             usb_port=usb_port,
             type=type,
-            simulating=self._api.is_simulator,
+            simulating=self._api.is_simulator or sim_model is not None,
             hw_control_loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
@@ -160,9 +192,9 @@ class AttachedModulesControl:
         last_event = StatusBarUpdateEvent(
             self._api.get_status_bar_state(), self._api.get_status_bar_enabled()
         )
-        mod.event_listener(last_event)
-        self.subscribe_to_api_event(mod)
-        return mod
+        device.event_listener(last_event)
+        self.subscribe_to_api_event(device)
+        return device
 
     def _disconnected_callback(
         self, model: str, port: str, serial: Optional[str]
@@ -170,7 +202,7 @@ class AttachedModulesControl:
         """Used by the module to indicate that it was disconnected and should be deleted."""
         mod = ModuleAtPort(port=port, serial=serial, name="")
         asyncio.run_coroutine_threadsafe(
-            self.unregister_modules([mod]),
+            self.unregister_devices([mod]),
             self._api.loop,
         )
         try:
@@ -210,96 +242,106 @@ class AttachedModulesControl:
                 f"Async error callback for module {model} {serial} at {port} for exc {exc} failed"
             )
 
-    async def unregister_modules(
+    async def unregister_devices(
         self,
-        mods_at_ports: Union[
+        devices_at_ports: Union[
             List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]
         ],
     ) -> None:
         """
-        De-register Modules.
+        De-register Devices.
 
         Remove any modules that are no longer found by aionotify.
         """
-        removed_modules = []
-        for mod in mods_at_ports:
-            for attached_mod in self.available_modules:
+        removed_devices = []
+        for dev in devices_at_ports:
+            for attached_dev in self.available_modules + self.available_peripherals:
                 if (
-                    attached_mod.serial_number == mod.serial
-                    or attached_mod.port == mod.port
+                    attached_dev.serial_number == dev.serial
+                    or attached_dev.port == dev.port
                 ):
-                    removed_modules.append(attached_mod)
-
-        for removed_mod in removed_modules:
+                    removed_devices.append(attached_dev)
+        for removed_dev in removed_devices:
             try:
-                self._available_modules.remove(removed_mod)
+                if removed_dev in self._available_modules and isinstance(
+                    removed_dev, modules.AbstractModule
+                ):
+                    self._available_modules.remove(removed_dev)
+                if removed_dev in self._available_peripherals and isinstance(
+                    removed_dev, peripherals.AbstractPeripheral
+                ):
+                    self._available_peripherals.remove(removed_dev)
                 # Important: this wants to be after the remove because this may trigger
                 # recursion back to here; we therefore want the module to already be
                 # removed so that the recursion terminates next loop
-                removed_mod.disconnected_callback()
+                removed_dev.disconnected_callback()
             except ValueError:
                 log.warning(
-                    f"Removed Module {removed_mod} not found in attached modules"
+                    f"Removed Device {removed_dev} not found in attached device"
                 )
-
-        for removed_mod in removed_modules:
+        for removed_dev in removed_devices:
             log.info(
-                f"Module {removed_mod.name()} detached from port {removed_mod.port}"
+                f"Device {removed_dev.name()} detached from port {removed_dev.port}"
             )
-            await removed_mod.cleanup()
+            await removed_dev.cleanup()
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
         )
+        self._available_peripherals = sorted(
+            self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
+        )
 
-    async def register_modules(
+    async def register_devices(
         self,
-        new_mods_at_ports: Optional[
+        new_devices_at_ports: Optional[
             Union[List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]]
         ] = None,
-        removed_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
+        removed_devices_at_ports: Optional[List[modules.ModuleAtPort]] = None,
     ) -> None:
-        """
-        Register Modules.
-
-        Upon system recognition of a module being plugged in, we should
-        register that module and de-register any modules that are
-        no longer found on the system.
-        """
-        if new_mods_at_ports is None:
-            new_mods_at_ports = []
-        if removed_mods_at_ports is None:
-            removed_mods_at_ports = []
-
+        if new_devices_at_ports is None:
+            new_devices_at_ports = []
+        if removed_devices_at_ports is None:
+            removed_devices_at_ports = []
         # destroy removed mods
-        await self.unregister_modules(removed_mods_at_ports)
-        self._new_mods_at_ports = new_mods_at_ports
-        unsorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
-
-        # build new mods
-        for mod in unsorted_mods_at_port:
+        await self.unregister_devices(removed_devices_at_ports)
+        unsorted_device_at_port = self._usb.match_virtual_ports(new_devices_at_ports)
+        for device in unsorted_device_at_port:
             try:
-                new_instance = await self.build_module(
-                    port=mod.port,
-                    usb_port=mod.usb_port,
-                    type=modules.MODULE_TYPE_BY_NAME[mod.name],
+                new_instance = await self.build_device(
+                    port=device.port,
+                    usb_port=device.usb_port,
+                    type=DEVICE_TYPE_BY_NAME[device.name],
                     sim_serial_number=(
-                        mod.serial_number
-                        if isinstance(mod, SimulatingModuleAtPort)
+                        device.serial_number
+                        if isinstance(device, SimulatingModuleAtPort)
                         else None
                     ),
                     sim_model=(
-                        mod.model if isinstance(mod, SimulatingModuleAtPort) else None
+                        device.model
+                        if isinstance(device, SimulatingModuleAtPort)
+                        else None
                     ),
                 )
-                self._available_modules.append(new_instance)
-                log.info(
-                    f"Module {mod.name} discovered and attached"
-                    f" at port {mod.port}, new_instance: {new_instance}"
-                )
+                if isinstance(new_instance, peripherals.AbstractPeripheral):
+                    self._available_peripherals.append(new_instance)
+                    log.info(
+                        f"Peripheral {device.name} discovered and attached"
+                        f" at port {device.port}, new_instance: {new_instance}"
+                    )
+                else:
+                    assert isinstance(new_instance, modules.AbstractModule)
+                    self._available_modules.append(new_instance)
+                    log.info(
+                        f"Module {device.name} discovered and attached"
+                        f" at port {device.port}, new_instance: {new_instance}"
+                    )
             except Exception as e:
                 log.exception(
-                    f"Failed to build module {mod.name} at port {mod.port}: {e}"
+                    f"Failed to build device {device.name} at port {device.port}: {e}"
                 )
+        self._available_peripherals = sorted(
+            self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
+        )
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
         )
@@ -317,11 +359,14 @@ class AttachedModulesControl:
 
         for port in devices:
             symlink_port = port.split("dev/")[1]
+            peripheral_at_port = self.get_peripheral_at_port(symlink_port)
             module_at_port = self.get_module_at_port(symlink_port)
             if module_at_port:
                 discovered_modules.append(module_at_port)
+            if peripheral_at_port:
+                discovered_modules.append(peripheral_at_port)
 
-        log.debug("Discovered modules: {}".format(discovered_modules))
+        log.debug("Discovered devices: {}".format(discovered_modules))
         return discovered_modules
 
     @staticmethod
@@ -338,9 +383,23 @@ class AttachedModulesControl:
             return modules.ModuleAtPort(port=f"/dev/{port}", name=name)
         return None
 
-    async def handle_module_appearance(self, event: AionotifyEvent) -> None:
+    @staticmethod
+    def get_peripheral_at_port(port: str) -> Optional[modules.ModuleAtPort]:
+        """Given a port, returns either a ModuleAtPort
+        if it is a recognized peripheral, or None if not recognized.
+        """
+        match = PERIPHERAL_PORT_REGEX.search(port)
+        if match:
+            name = match.group(1).lower()
+            if name not in peripherals.PERIPHERAL_TYPE_BY_NAME:
+                log.warning(f"Unexpected peripheral connected: {name} on {port}")
+                return None
+            return modules.ModuleAtPort(port=f"/dev/{port}", name=name)
+        return None
+
+    async def handle_device_appearance(self, event: AionotifyEvent) -> None:
         """Only called upon availability of aionotify. Check that
-        the file system has changed and either remove or add modules
+        the file system has changed and either remove or add devices
         depending on the result.
 
         Args:
@@ -350,9 +409,11 @@ class AttachedModulesControl:
             None
         """
         maybe_module_at_port = self.get_module_at_port(event.name)
-        new_modules = None
-        removed_modules = None
-        if maybe_module_at_port is not None:
+        maybe_peripheral_at_port = self.get_peripheral_at_port(event.name)
+        maybe_device_at_port = maybe_module_at_port or maybe_peripheral_at_port or None
+        new_devices = None
+        removed_devices = None
+        if maybe_device_at_port is not None:
             if hasattr(event.flags, "DELETE") or hasattr(event.flags, "MOVED_FROM"):
                 # NOTE: The absorbance reader is a hidraw device, when we first
                 # plug it into the Flex, udev rules create a
@@ -368,30 +429,30 @@ class AttachedModulesControl:
                 # This DELETE action would normally delete the device, but in this case
                 # Lets ignore these events for the absorbance reader and handle
                 # cleanup when the poller attempts to read data and fails.
-                if maybe_module_at_port.name == "absorbancereader":
+                if maybe_device_at_port.name == "absorbancereader":
                     return
-                removed_modules = [maybe_module_at_port]
-                log.info(f"Module Removed: {maybe_module_at_port}")
+                removed_devices = [maybe_device_at_port]
+                log.info(f"Device Removed: {maybe_device_at_port}")
             elif hasattr(event.flags, "CREATE") or hasattr(event.flags, "MOVED_TO"):
                 # NOTE: Absorbance reader gets disonnected when updating, so
                 # if the device is updating, dont create a new instance.
                 for module in self._available_modules:
                     if (
-                        maybe_module_at_port.name == "absorbancereader"
+                        maybe_device_at_port.name == "absorbancereader"
                         and isinstance(module, AbsorbanceReader)
                         and module.updating
                     ):
                         return
 
-                new_modules = [maybe_module_at_port]
-                log.info(f"Module Added: {maybe_module_at_port}")
+                new_devices = [maybe_device_at_port]
+                log.info(f"Device Added: {maybe_device_at_port}")
             try:
-                await self.register_modules(
-                    removed_mods_at_ports=removed_modules,
-                    new_mods_at_ports=new_modules,
+                await self.register_devices(
+                    removed_devices_at_ports=removed_devices,
+                    new_devices_at_ports=new_devices,
                 )
             except Exception:
-                log.exception("Exception in Module registration")
+                log.exception("Exception in Device registration")
 
     def get_module_by_module_id(
         self, module_id: str

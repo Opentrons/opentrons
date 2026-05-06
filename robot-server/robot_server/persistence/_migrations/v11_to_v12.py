@@ -13,7 +13,8 @@ that expects this field to be present.
 
 from pathlib import Path
 
-from .._folder_migrator import Migration
+from server_utils.persistence.folder_migrator import Migration
+
 from ._util import copy_contents
 
 

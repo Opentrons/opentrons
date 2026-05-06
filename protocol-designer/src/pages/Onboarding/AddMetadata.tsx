@@ -62,6 +62,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
               {t('name')}
             </StyledText>
             <InputField
+              aria-label={t('name')}
               {...register('fields.name')}
               type="text"
               value={watch('fields.name')}
@@ -72,9 +73,9 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('description')}
+              label={t('description')}
               {...register('fields.description')}
-              value={watch('fields.description')}
+              value={watch('fields.description') ?? ''}
               height="6.8125rem"
             />
           </Flex>
@@ -83,6 +84,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
               {t('author_org')}
             </StyledText>
             <InputField
+              aria-label={t('author_org')}
               {...register('fields.organizationOrAuthor')}
               type="text"
               value={watch('fields.organizationOrAuthor')}

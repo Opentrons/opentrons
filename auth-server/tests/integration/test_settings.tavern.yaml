@@ -1,0 +1,307 @@
+test_name: Default settings
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET /auth/settings returns default settings
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings'
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 5
+          passwordResetTime: null
+          idleLogout: 180.0
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null
+          passwordComplexitySpecialCharacters: null
+          passwordComplexityMinimumLength: null
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+
+
+---
+test_name: PATCH updates and returns new settings
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: GET initial settings
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings'
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 5
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: 180.0
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+  - name: PATCH more settings
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          idleLogout: 60.0
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          requireReasonForInteraction: false
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: 60.0
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+  - name: GET settings after PATCH returns updated value
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings'
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: 60.0
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+  - name: GET settings unchanged after rejected PATCH
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings'
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: 60.0
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+---
+test_name: DELETE resets to defaults
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: PATCH to change some settings
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: 60.0
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 10
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: 2592000.0
+          passwordComplexityMinimumLength: 8
+          passwordComplexitySpecialCharacters: true
+          idleLogout: 60.0
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 10
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+
+  - name: DELETE resets everything except accessControlEnabled to its default
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 5
+          passwordResetTime: null
+          minLengthOfReasonForInteraction: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: 180.0
+          requireReasonForInteraction: true
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+
+test_name: DELETE resets to defaults except including accessControlEnabled when not in db
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: PATCH to enable maxNumberOfLoginAttempts
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          maxNumberOfLoginAttempts: 10
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 10
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: 180.0
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null          
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+
+  - name: DELETE returns the newly reset settings
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          maxNumberOfLoginAttempts: 5
+          passwordResetTime: null
+          passwordComplexityMinimumLength: null
+          passwordComplexitySpecialCharacters: null
+          idleLogout: 180.0
+          requireReasonForInteraction: true
+          minLengthOfReasonForInteraction: null
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+          requireAdminCredsWhenSendingProtocolToRobot: true
+          requireAdminCredsForSignoffProtocol: false
+---
+test_name: enable access control enabled
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: GET access control enabled default
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: false
+
+  - name: PATCH to enable access control enabled to false fails
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: false
+    response:
+      status_code: 422
+
+  - name: PATCH to enable access control enabled
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+
+  - name: GET access control enabled after PATCH
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          accessControlEnabled: true
+
+  - name: PATCH to enable access control enabled again raises an error
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 422

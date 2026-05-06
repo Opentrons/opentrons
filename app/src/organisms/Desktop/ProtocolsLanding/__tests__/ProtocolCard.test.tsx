@@ -42,17 +42,17 @@ vi.mock('../ProtocolOverflowMenu', () => ({
   ProtocolOverflowMenu: vi.fn(() => <div>mock protocol overflow menu</div>),
 }))
 
-vi.mock('../ProtocolAnalysisFailure', () => ({
+vi.mock('../../ProtocolAnalysisFailure', () => ({
   ProtocolAnalysisFailure: vi.fn(({ errors }: { errors: string[] }) => (
     <div>{errors.join(', ')}</div>
   )),
 }))
 
-vi.mock('../ProtocolAnalysisFailure/ProtocolAnalysisStale', () => ({
+vi.mock('../../ProtocolAnalysisFailure/ProtocolAnalysisStale', () => ({
   ProtocolAnalysisStale: vi.fn(() => <div>mock protocol analysis stale</div>),
 }))
 
-vi.mock('../ProtocolStatusBanner', () => ({
+vi.mock('../../ProtocolStatusBanner', () => ({
   ProtocolStatusBanner: vi.fn(() => <div>mock protocol status banner</div>),
 }))
 
@@ -127,7 +127,7 @@ describe('ProtocolCard', () => {
     })
 
     screen.getByTestId('InlineNotification_alert')
-    screen.getByText('Flex protocol detected.')
+    screen.getByText('Flex protocol detected')
     screen.getByText('Get the app')
 
     fireEvent.click(screen.getByText('Mock Protocol'))

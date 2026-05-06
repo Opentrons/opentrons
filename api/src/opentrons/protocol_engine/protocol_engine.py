@@ -2,7 +2,7 @@
 
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import AsyncGenerator, Callable, Dict, Optional, Tuple, Union
+from typing import Any, AsyncGenerator, Callable, Dict, Optional, Tuple, Union
 
 from opentrons_shared_data.errors import (
     EnumeratedError,
@@ -769,6 +769,7 @@ class ProtocolEngine:
         annotation_name: str,
         description: Optional[str],
         annotation_id: Optional[str],
+        params: Optional[Dict[str, Any]] = None,
     ) -> str:
         """Creates a new user generated command annotation."""
         if annotation_id is None:
@@ -776,9 +777,9 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(
             CreateUserCommandAnnotation(
                 annotation_id=annotation_id,
-                user_defined_name=annotation_name,
-                user_description=description,
-                params={},
+                name=annotation_name,
+                description=description,
+                params=params or {},
             )
         )
         return annotation_id

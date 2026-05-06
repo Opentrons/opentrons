@@ -34,7 +34,7 @@ describe('SettingsIcon', () => {
   })
   it('renders the SettingsIcon', () => {
     render()
-    fireEvent.click(screen.getByTestId('SettingsIconButton'))
+    fireEvent.click(screen.getByLabelText('Settings Icon Button'))
     expect(mockNavigate).toHaveBeenCalled()
   })
 })

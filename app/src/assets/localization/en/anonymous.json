@@ -73,6 +73,8 @@
   "opentrons_labware_def": "Verified labware definition",
   "opentrons_tip_rack_name": "opentrons",
   "opentrons_tip_racks_recommended": "Opentrons tip racks are highly recommended. Accuracy cannot be guaranteed with other tip racks.",
+  "ot2_protocol_detected": "Incorrect protocol type detected",
+  "ot2_protocol_detected_description": "This protocol requires a robot not supported by this app.",
   "previous_releases": "View previous releases",
   "receive_alert": "Receive an alert when a software update is available.",
   "restore_description": "Reverting to previous software versions is not recommended, but you can access previous releases below. For best results, uninstall the existing app and remove its configuration files before installing the previous version.",

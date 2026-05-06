@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import Callable, Dict, List, Mapping, Optional, Sequence
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -38,8 +38,10 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraSettings,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     EngineStatus,
@@ -51,7 +53,7 @@ from opentrons.protocol_runner import (
     RunOrchestrator,
     RunResult,
 )
-from opentrons.protocol_runner.run_orchestrator import ParseMode
+from opentrons.protocol_runner.run_coordinator import ParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.types import NozzleMapInterface
 from opentrons_shared_data.errors.exceptions import ModuleNotPresent
@@ -59,6 +61,8 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
+from .run_process import DirectedRunProcess
+from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
@@ -121,7 +125,9 @@ async def handle_hardware_event(
 ) -> None:
     """Handle an E-stop event from the hardware API.
 
-    This is meant to run in the engine's thread and asyncio event loop.
+    When in subprocess mode this executes in the RobotServerPyroResource's event loop.
+
+    Otherwise, this is meant to run in the engine's thread and asyncio event loop.
 
     This is a public function for unit-testing purposes, but it's an implementation
     detail of the store.
@@ -163,6 +169,7 @@ class RunOrchestratorStore:
         hardware_api: HardwareControlAPI,
         robot_type: RobotType,
         deck_type: DeckType,
+        run_process_pyro_provider: RunProcessPyroProvider,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -171,16 +178,23 @@ class RunOrchestratorStore:
                 construction.
             robot_type: Passed along to `opentrons.protocol_engine.Config`.
             deck_type: Passed along to `opentrons.protocol_engine.Config`.
+            run_process_pyro_provider: If in protocol subprocess mode, provides
+                the run process proxy when running a protocol.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        self._run_orchestrator: Optional[RunOrchestrator] = None
+        # TODO come up with a better name for this.
+        self._run_orchestrator: Optional[Union[RunOrchestrator, DirectedRunProcess]] = (
+            None
+        )
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
-        hardware_api.register_callback(_get_hardware_listener(self))
+        self._run_process_pyro_provider = run_process_pyro_provider
+        if not feature_flags.hardware_subprocess_enabled():
+            hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
-    def run_orchestrator(self) -> RunOrchestrator:
+    def run_orchestrator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
         """Get the "current" RunOrchestrator."""
         if self._run_orchestrator is None:
             raise NoRunOrchestrator()
@@ -263,6 +277,15 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             a new one may not be created.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.create_pyro(
+                run_id=run_id,
+                labware_offsets=labware_offsets,
+                protocol=protocol,
+                run_time_param_values=run_time_param_values,
+                run_time_param_paths=run_time_param_paths,
+            )
+
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
         else:
@@ -323,6 +346,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
+        if feature_flags.protocol_subprocess_enabled():
+            return await self.clear_pyro()
+
         if self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
@@ -335,7 +361,7 @@ class RunOrchestratorStore:
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
-        command_annotations = self.run_orchestrator.get_command_annotations()
+        command_annotations = self.run_orchestrator.get_all_command_annotations()
         preconditions = self.run_orchestrator.get_preconditions()
 
         if self._run_orchestrator is not None:
@@ -348,6 +374,58 @@ class RunOrchestratorStore:
             parameters=run_time_parameters,
             command_annotations=command_annotations,
             command_preconditions=preconditions,
+        )
+
+    async def create_pyro(
+        self,
+        run_id: str,
+        labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
+        protocol: Optional[ProtocolResource],
+        run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
+        run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
+    ) -> StateSummary:
+        """Eventually this will replace create and make a run process that does the whole run, right now it's a stub."""
+        if self._run_orchestrator is not None:
+            raise RunConflictError("Another run is currently active.")
+
+        # "Run orchestrator" here is a proxy of a directed run process
+        run_orchestrator = await self._run_process_pyro_provider.wait_for_run_proxy()
+        await run_orchestrator.create(
+            run_id=run_id,
+            labware_offsets=labware_offsets,
+            protocol=protocol,
+            run_time_param_values=run_time_param_values,
+            run_time_param_paths=run_time_param_paths,
+            proxy_of_callback_for_handling_door_events=run_orchestrator.register_hardware_door_event(),
+        )
+
+        summary = run_orchestrator.get_state_summary()
+        self._run_orchestrator = run_orchestrator
+        return summary
+
+    async def clear_pyro(self) -> RunResult:
+        """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
+        if self.run_orchestrator.get_is_okay_to_clear():
+            await self.run_orchestrator.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
+        else:
+            raise RunConflictError("Current run is not idle or stopped.")
+
+        run_data = self.run_orchestrator.get_state_summary()
+
+        await self._run_process_pyro_provider.refresh()
+
+        self._run_orchestrator = None
+
+        return RunResult(
+            state_summary=run_data,
+            commands=[],
+            parameters=[],
+            command_annotations=[],
+            command_preconditions=None,
         )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?
@@ -449,6 +527,24 @@ class RunOrchestratorStore:
     def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
         return self.run_orchestrator.get_command(command_id=command_id)
+
+    def get_total_command_annotations_count(self) -> int:
+        """Get the total number of command annotations in the run."""
+        return self.run_orchestrator.get_total_command_annotations_count()
+
+    def get_command_annotations_slice(
+        self,
+        cursor: int,
+        length: int,
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of run commands."""
+        return self.run_orchestrator.get_command_annotations_slice(
+            cursor=cursor, length=length
+        )
+
+    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+        """Get the specified command annotation."""
+        return self.run_orchestrator.get_command_annotation(annotation_id)
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the run."""

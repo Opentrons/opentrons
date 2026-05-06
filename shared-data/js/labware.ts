@@ -1,5 +1,3 @@
-import { basename, extname } from 'path-browserify'
-
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
 import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
@@ -7,6 +5,7 @@ import fixture384Plate from '../labware/fixtures/2/fixture_384_plate.json'
 import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_block.json'
 import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
 import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
+import fixtureLid from '../labware/fixtures/2/fixture_lid.json'
 import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
@@ -22,6 +21,18 @@ import type {
   LabwareDefinition3,
   LegacyLabwareDefByName,
 } from './types'
+
+const basename = (p: string): string => {
+  const s = p.replace(/\\/g, '/').replace(/\/+$/g, '')
+  const i = s.lastIndexOf('/')
+  return i === -1 ? s : s.slice(i + 1)
+}
+
+// const extname = (p: string): string => {
+//   const b = basename(p)
+//   const i = b.lastIndexOf('.')
+//   return i <= 0 ? '' : b.slice(i)
+// }
 
 // todo(mm, 2025-03-04): This duplicates getLabwareDefUri() in ./helpers. We should use
 // that instead, but using it gives me obscure "TypeError: getLabwareDefURI is not a function"
@@ -95,8 +106,7 @@ function getAllImages(): Record<string, string> {
   const imageKeyToUrl: Record<string, string> = {}
   for (const imgPath in imageModules) {
     const filename = basename(imgPath)
-    const ext = extname(filename)
-    const base = basename(filename, ext)
+    const base = filename.replace(/\.[^.]+$/, '')
     const varName = base.replace(/\./g, '_').replace(/-/g, '_')
     imageKeyToUrl[varName] = imageModules[imgPath] as string
   }
@@ -208,6 +218,7 @@ export {
   labwareImages,
   labwareSchemaV2,
   labwareSchemaV3,
+  fixtureLid,
   fixture96Plate,
   fixture12Trough,
   fixture24Tuberack,

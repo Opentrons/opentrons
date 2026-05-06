@@ -15,11 +15,9 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  getModuleDisplayName,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, getModuleDisplayName } from '@opentrons/shared-data'
+
+import { getModuleDisplayLocation } from '/protocol-designer/ui/modules/utils'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
@@ -41,7 +39,6 @@ export function HardwareInfo({
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const navigate = useNavigate()
   const isFlex = robotType === FLEX_ROBOT_TYPE
-  const tCSlot = isFlex ? 'A1+B1' : '7,8,10,11'
   const additionalEquipmentLength = Object.keys(additionalEquipment).length
 
   return (
@@ -76,9 +73,7 @@ export function HardwareInfo({
                       desktopStyle="bodyDefaultRegular"
                       color={COLORS.grey60}
                     >
-                      {module.type === THERMOCYCLER_MODULE_TYPE
-                        ? tCSlot
-                        : module.slot}
+                      {getModuleDisplayLocation(module, robotType)}
                     </StyledText>
                   </Flex>
                 }

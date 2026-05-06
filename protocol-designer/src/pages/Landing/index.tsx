@@ -17,6 +17,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
+
 import { getHasOptedIn } from '../../analytics/selectors'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../components/organisms'
@@ -26,6 +28,7 @@ import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
 import { getFileMetadata } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
+import { getIsProduction } from '../../networking/opentronsWebApi'
 import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
@@ -37,6 +40,18 @@ import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
+
+const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
+// ToDo activate this when the sandbox is ready.
+// const OT2_APP_STAGE_URL = 'sandbox url'
+
+// The type will be changed only string when the sandbox is ready
+const getOt2DesignerCreateUrl = (): string | null => {
+  if (getIsProduction()) {
+    return OT2_APP_PROD_URL
+  }
+  return null
+}
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
@@ -58,32 +73,39 @@ export function Landing(): JSX.Element {
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
     hasOptedIn != null
 
-  useEffect(() => {
-    if (
-      userHasNotSeenAnnouncement &&
-      appVersion != null &&
-      hasOptedIn != null
-    ) {
-      const toastId = bakeToast(
-        t('learn_more', { version: _OT_PD_VERSION_ }) as string,
-        INFO_TOAST,
-        {
-          heading: t('updated_protocol_designer'),
-          closeButton: true,
-          linkText: t('view_release_notes'),
-          onClose: () => {
-            setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
-          },
-          onLinkClick: () => {
-            eatToast(toastId)
-            setShowAnnouncementModal(true)
-          },
-          disableTimeout: true,
-          justifyContent: JUSTIFY_CENTER,
-        }
-      )
-    }
-  }, [userHasNotSeenAnnouncement, appVersion, hasOptedIn])
+  const enableFork = useSelector(getEnableFork)
+
+  useEffect(
+    () => {
+      if (
+        userHasNotSeenAnnouncement &&
+        appVersion != null &&
+        hasOptedIn != null
+      ) {
+        const toastId = bakeToast(
+          t('learn_more', { version: _OT_PD_VERSION_ }) as string,
+          INFO_TOAST,
+          {
+            heading: t('updated_protocol_designer'),
+            closeButton: true,
+            linkText: t('view_release_notes'),
+            onClose: () => {
+              setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
+            },
+            onLinkClick: () => {
+              eatToast(toastId)
+              setShowAnnouncementModal(true)
+            },
+            disableTimeout: true,
+            justifyContent: JUSTIFY_CENTER,
+          }
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [userHasNotSeenAnnouncement, appVersion, hasOptedIn]
+  )
 
   useEffect(() => {
     if (metadata?.created != null) {
@@ -99,6 +121,13 @@ export function Landing(): JSX.Element {
   const handleImportClick = (): void => {
     if (fileInputRef.current != null) {
       fileInputRef.current.click()
+    }
+  }
+
+  const openOt2DesignerInNewTab = (): void => {
+    const redirectTarget = getOt2DesignerCreateUrl()
+    if (redirectTarget !== null) {
+      window.open(redirectTarget, '_blank', 'noopener,noreferrer')
     }
   }
 
@@ -138,7 +167,7 @@ export function Landing(): JSX.Element {
             gridGap={SPACING.spacing8}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText desktopStyle="headingLargeBold">
+            <StyledText desktopStyle="headingLargeBold" as="h1">
               {t('welcome')}
             </StyledText>
             <StyledText
@@ -151,18 +180,31 @@ export function Landing(): JSX.Element {
             </StyledText>
           </Flex>
         </Flex>
-        <NavLink to="/createNew" className={styles.nav_link}>
-          <LargeButton
-            onClick={() => {
-              dispatch(toggleNewProtocolModal(true))
-            }}
-            buttonText={
-              <span className={styles.button_text}>
-                {t('create_a_protocol')}
-              </span>
-            }
-          />
-        </NavLink>
+        <div className={styles.button_container}>
+          <NavLink to="/createNew" className={styles.nav_link}>
+            <LargeButton
+              onClick={() => {
+                dispatch(toggleNewProtocolModal(true))
+              }}
+              buttonText={
+                <span className={styles.button_text}>
+                  {t('create_a_flex_protocol')}
+                </span>
+              }
+            />
+          </NavLink>
+          {enableFork ? (
+            <LargeButton
+              buttonType="blueStroke"
+              onClick={openOt2DesignerInNewTab}
+              buttonText={
+                <span className={styles.button_text}>
+                  {t('create_a_ot2_protocol')}
+                </span>
+              }
+            />
+          ) : null}
+        </div>
         <label className={styles.label}>
           <BasicButton onClick={handleImportClick} underLine>
             {t('import_existing_protocol')}

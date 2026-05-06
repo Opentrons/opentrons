@@ -148,6 +148,13 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "black_96_well_microtiter_plate_lid": 2,
         "corning_96_wellplate_360ul_lid": 2,
         "corning_falcon_384_wellplate_130ul_flat_lid": 2,
+        "ibidi_96_square_well_plate_300ul_lid": 2,
+        "agilent_1_reservoir_290ml": 5,
+        "nest_1_reservoir_195ml": 5,
+        "nest_1_reservoir_290ml": 5,
+        "opentrons_tough_12_reservoir_22ml": 2,
+        "opentrons_tough_1_reservoir_300ml": 2,
+        "usascientific_12_reservoir_22ml": 5,
     },
 }
 

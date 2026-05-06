@@ -395,11 +395,14 @@ export function parseLiquidsInLoadOrder(
 
     // Track well-to-liquid mapping for mixed liquids
     const labwareId = cmd.params.labwareId
-    if (!wellToLiquids[labwareId]) wellToLiquids[labwareId] = {}
+    if (!wellToLiquids[labwareId]) {
+      wellToLiquids[labwareId] = {}
+    }
 
     for (const well of Object.keys(cmd.params.volumeByWell)) {
-      if (!wellToLiquids[labwareId][well])
+      if (!wellToLiquids[labwareId][well]) {
         wellToLiquids[labwareId][well] = new Set()
+      }
       wellToLiquids[labwareId][well].add(liquidId)
     }
   })

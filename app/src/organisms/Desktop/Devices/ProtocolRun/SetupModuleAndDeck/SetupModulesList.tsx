@@ -391,6 +391,11 @@ export function ModulesListItem({
   const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
   const portDisplay = parseModuleUSBPort(attachedModuleMatch)
 
+  const fixtureDisplayName =
+    comboFixtureId != null
+      ? getFixtureDisplayName(t as TFunction, comboFixtureId)
+      : displayName
+
   return (
     <>
       {showLocationConflictModal && cutoutIdForSlotName != null ? (
@@ -437,15 +442,14 @@ export function ModulesListItem({
                   ? getFixtureImage(comboFixtureId)
                   : getModuleImage(moduleModel)
               }
+              alt={`Image of a ${fixtureDisplayName}`}
             />
             <Flex flexDirection={DIRECTION_COLUMN}>
               <LegacyStyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {comboFixtureId != null
-                  ? getFixtureDisplayName(t as TFunction, comboFixtureId)
-                  : displayName}
+                {fixtureDisplayName}
               </LegacyStyledText>
               {subText}
             </Flex>

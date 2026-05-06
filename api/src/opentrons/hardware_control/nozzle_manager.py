@@ -1,7 +1,8 @@
 from collections import OrderedDict
-from dataclasses import dataclass
 from itertools import chain
 from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, cast
+
+from pydantic import BaseModel
 
 from opentrons_shared_data.errors import ErrorCodes, GeneralError, PythonException
 from opentrons_shared_data.pipette.pipette_definition import (
@@ -44,8 +45,7 @@ def _row_col_indices_for_nozzle(
     )
 
 
-@dataclass
-class NozzleMap:
+class NozzleMap(BaseModel):
     """
     A NozzleMap instance represents a specific configuration of active nozzles on a pipette.
 

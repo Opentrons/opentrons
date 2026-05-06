@@ -9,12 +9,14 @@ theme:
   logo: images/logo.png
 
 extra_css:
-  - stylesheets/style.css
+  - ../shared/instruction-manuals.css
+  - ../shared/opentrons-theme.css
+  - ../shared/print-pdf.css
 
 markdown_extensions:
   - toc:
       permalink: true 
-      title: Page Contents 
+      title: Table of Contents 
   - admonition 
   - abbr 
   - pymdownx.blocks.caption 
@@ -26,7 +28,16 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
-  - glightbox 
+  - search
+  - autorefs
+  - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: true
+      cover_page_template: "docs/cover.tpl"
+      include_css: false
+      enumerate_headings: false
 
 nav:
   
@@ -45,6 +56,7 @@ nav:
       - Magnet steps: steps/magnet.md
       - Pause steps: steps/pause.md
       - Camera steps: steps/camera.md
+      - Parallel steps: steps/parallel.md
   - Editing steps: edit-steps.md
   - Warnings and errors: warnings-errors.md
   - Export a protocol: export-protocol.md

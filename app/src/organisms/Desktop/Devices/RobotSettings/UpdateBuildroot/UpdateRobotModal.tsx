@@ -89,13 +89,20 @@ export function UpdateRobotModal({
   const updateDisabled = updateFromFileDisabledReason !== null || isRobotBusy
 
   let disabledReason: string = ''
-  if (updateFromFileDisabledReason)
+  if (updateFromFileDisabledReason) {
     disabledReason = t(updateFromFileDisabledReason)
-  else if (isRobotBusy) disabledReason = t('robot_busy_protocol')
+  } else if (isRobotBusy) {
+    disabledReason = t('robot_busy_protocol')
+  }
 
-  useEffect(() => {
-    dispatch(robotUpdateChangelogSeen(robotName))
-  }, [robotName])
+  useEffect(
+    () => {
+      dispatch(robotUpdateChangelogSeen(robotName))
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [robotName]
+  )
 
   let heading = ''
   if (updateType === UPGRADE || updateType === DOWNGRADE) {

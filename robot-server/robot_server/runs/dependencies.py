@@ -1,10 +1,12 @@
 """Run router dependency-injection wire-up."""
 
-from typing import Annotated
+import contextlib
+from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends, status
 from sqlalchemy.engine import Engine as SQLEngine
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.file_provider import FileProvider
@@ -19,6 +21,7 @@ from .light_control_task import LightController, run_light_task
 from .run_auto_deleter import RunAutoDeleter
 from .run_data_manager import RunDataManager
 from .run_orchestrator_store import NoRunOrchestrator, RunOrchestratorStore
+from .run_process_pyro_provider import RunProcessPyroProvider
 from .run_store import RunStore
 from robot_server.camera.settings.store import (
     CameraSettingStore,
@@ -45,6 +48,10 @@ from robot_server.service.notifications import (
     RunsPublisher,
     get_runs_publisher,
 )
+from robot_server.service.pyro_utils.resource_utilities import (
+    get_pyro_resource,
+    register_run_orchestrator_store_to_pyro_resource,
+)
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.settings import get_settings
 
@@ -54,6 +61,9 @@ _run_orchestrator_store_accessor = AppStateAccessor[RunOrchestratorStore](
 )
 _run_data_manager_accessor = AppStateAccessor[RunDataManager]("run_data_manager")
 _light_control_accessor = AppStateAccessor[LightController]("light_controller")
+_run_process_pyro_provider_accessor = AppStateAccessor[RunProcessPyroProvider](
+    "run_process_pyro_provider"
+)
 
 
 async def get_run_store(
@@ -122,21 +132,66 @@ async def get_light_controller(
     return controller
 
 
+@contextlib.asynccontextmanager
+async def set_up_run_process_pyro_provider(
+    app_state: Annotated[AppState, Depends(get_app_state)],
+) -> AsyncGenerator[None, None]:
+    """Set up the server's singleton `RunProcessPyroProvider`."""
+    run_process_pyro_provider = RunProcessPyroProvider()
+    _run_process_pyro_provider_accessor.set_on(app_state, run_process_pyro_provider)
+    # TODO(2026-04-21) We might want to wrap this into a try/except if this causes local issues
+    run_process_pyro_provider.initialize()
+
+    try:
+        yield
+    finally:
+        await run_process_pyro_provider.teardown()
+
+
+async def get_run_process_pyro_provider(
+    app_state: Annotated[AppState, Depends(get_app_state)],
+) -> RunProcessPyroProvider:
+    """Get a run process pyro provider as a dependency."""
+    run_process_pyro_provider = _run_process_pyro_provider_accessor.get_from(
+        app_state=app_state
+    )
+    assert run_process_pyro_provider is not None, (
+        "Forgot to initialize run process pyro provider as part of server startup?"
+    )
+    return run_process_pyro_provider
+
+
 async def get_run_orchestrator_store(
     app_state: Annotated[AppState, Depends(get_app_state)],
     hardware_api: Annotated[HardwareControlAPI, Depends(get_hardware)],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
     deck_type: Annotated[DeckType, Depends(get_deck_type)],
     light_controller: Annotated[LightController, Depends(get_light_controller)],
+    run_process_pyro_provider: Annotated[
+        RunProcessPyroProvider, Depends(get_run_process_pyro_provider)
+    ],
 ) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
 
     if run_orchestrator_store is None:
         run_orchestrator_store = RunOrchestratorStore(
-            hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+            hardware_api=hardware_api,
+            robot_type=robot_type,
+            deck_type=deck_type,
+            run_process_pyro_provider=run_process_pyro_provider,
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
+        # Handle remote hardware registry, if needed
+        if feature_flags.hardware_subprocess_enabled():
+            register_run_orchestrator_store_to_pyro_resource(
+                app_state=app_state, run_orchestrator_store=run_orchestrator_store
+            )
+            pyro_resource = get_pyro_resource()
+            hardware_api.register_callback(
+                pyro_resource.create_run_hardware_event_callback()
+            )
+
         # Provide the engine store to the light controller
         light_controller.update_run_orchestrator_store(
             run_orchestrator_store=run_orchestrator_store

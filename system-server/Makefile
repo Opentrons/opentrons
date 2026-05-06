@@ -6,11 +6,11 @@ include ../scripts/python-uv.mk
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 SHX := npx shx
 
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-PATH := $(shell cd .. && yarn bin):$(PATH)
+# add pnpm CLI dev deps to PATH (for cross platform POSIX commands via shx)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -26,6 +26,9 @@ version_file = $(call python_get_git_version,system-server,$(project_rs_default)
 # specified test
 tests ?= tests
 test_opts ?=
+
+files_to_check := system_server tests
+
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
 # Other SSH args for robot
@@ -66,13 +69,14 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy system_server tests
-	$(ruff) check system_server tests
+	$(python) -m mypy $(files_to_check)
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format:
-	$(ruff) format system_server tests
-	$(ruff) check --select I --fix system_server tests
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -99,8 +103,3 @@ dev: export OT_SYSTEM_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
 	$(python) -m system_server --reload --log-level=debug
 
-.PHONY: docs
-docs: settings_schema.json
-
-settings_schema.json: system_server/settings/settings.py
-	$(python) -m scripts.settings_schema $@

@@ -88,6 +88,7 @@ export function BlowoutOffsetField(
           isIndeterminate={isIndeterminate}
           units={t('units.millimeter')}
           id={`TipPositionField_${name}`}
+          testId={`tip-position-field-${name}`}
         />
       </Flex>
     </>

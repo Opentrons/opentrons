@@ -8,6 +8,7 @@ import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
 import { latestLabwareVersions } from '../scripts/git-version.mjs'
@@ -15,7 +16,7 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
-const REQUIRED_APP_VERSION = '8.8.0' // PD requires this robot stack version or higher
+const REQUIRED_APP_VERSION = '9.0.0' // PD requires this robot stack version or higher
 const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'protocol-designer',
 })
@@ -42,7 +43,6 @@ const enableSentryCiSourcemapUpload =
 const enableSentrySourcemapUpload =
   enableSentryLocalSourcemapUpload || enableSentryCiSourcemapUpload
 
-// eslint-disable-next-line import/no-default-export
 export default defineConfig(async (): Promise<UserConfig> => {
   const OT_PD_VERSION = await getVersion()
   const OT_PD_BUILD_DATE = new Date().toUTCString()
@@ -55,17 +55,13 @@ export default defineConfig(async (): Promise<UserConfig> => {
     build: {
       // Relative to the root
       outDir: 'dist',
-      // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
-      // Emit in CI (so action-release can upload) and in local builds.
       sourcemap: true,
       rollupOptions: {
         external: ['react/compiler-runtime'],
         output: {
-          // Manually split out vendor chunks
+          // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
           manualChunks(id) {
-            if (id.includes('node_modules')) {
-              return 'vendor'
-            }
+            if (id.includes('node_modules')) return 'vendor'
           },
         },
       },
@@ -90,21 +86,21 @@ export default defineConfig(async (): Promise<UserConfig> => {
       ],
     },
     plugins: [
+      nodePolyfills({
+        include: ['assert', 'buffer', 'process', 'util'],
+        globals: { Buffer: true, global: true, process: true },
+      }),
       react({
         include: '**/*.tsx',
-        babel: {
-          // Use babel.config.js files 1Code has comments. Press enter to view.
-          configFile: true,
-        },
+        babel: { configFile: true },
         jsxRuntime: 'automatic',
       }),
       cssModuleSideEffect(),
       {
         name: 'markdown-loader',
         transform(code, id) {
-          if (id.endsWith('.md')) {
+          if (id.endsWith('.md'))
             return `export default ${JSON.stringify(code)}`
-          }
         },
       },
 
@@ -116,6 +112,10 @@ export default defineConfig(async (): Promise<UserConfig> => {
       sentryVitePlugin({
         telemetry: false,
         reactComponentAnnotation: { enabled: true },
+        // Local opt-in behavior:
+        // - Upload sourcemaps via the plugin (requires SENTRY_* env vars)
+        // - Use the `local-dev` release name
+        // CI continues to upload via getsentry/action-release.
         release: {
           name: enableSentryLocalSourcemapUpload
             ? 'local-dev'
@@ -150,12 +150,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
       ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
     ],
     optimizeDeps: {
-      esbuildOptions: {
-        target: 'es2020',
-      },
-      // For unknown reasons, PD whitescreens on launch unless we have this.
-      include: ['tslib'],
+      esbuildOptions: { target: 'es2020' },
     },
+    // For unknown reasons, PD whitescreens on launch unless we have this.
     css: {
       postcss: {
         plugins: [
@@ -194,10 +191,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
-        // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
-        // files being processed with the wrong config (the config from the
-        // consuming project vs. the config from the source project).
-        // Can these be replaced with regular package.json dependencies?
+        tslib: path.resolve('node_modules/tslib'),
         '@opentrons/components/styles/global': path.resolve(
           '../components/src/styles/global.css'
         ),
@@ -209,15 +203,13 @@ export default defineConfig(async (): Promise<UserConfig> => {
         '/protocol-designer/': path.resolve('./src/') + '/',
       },
     },
-    server: {
-      port: 5178,
-    },
+    server: { port: 5178 },
   }
 })
 
 function getFeatureFlagEnvVars(): Record<string, string | undefined> {
   // If we change the prefix to something like "OT_PD_FF_...", we could automatically
-  // scrape process.env instead of having this explicit list. We don't want to scrape
+  //   // scrape process.env instead of having this explicit list. We don't want to scrape
   // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
   // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
   const envVarNames = new Set([
@@ -237,6 +229,6 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_CAMERA_SUPPORT',
   ])
   return Object.fromEntries(
-    Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
+    Object.entries(process.env).filter(([key]) => envVarNames.has(key))
   )
 }

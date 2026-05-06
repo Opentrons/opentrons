@@ -177,6 +177,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="camera"
         />
         <RobotSettingButton
+          settingName={t('devices')}
+          dataTestId="RobotSettingButton_devices"
+          onClick={() => {
+            setCurrentOption('Devices')
+          }}
+          iconName="device"
+        />
+        <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"
           settingInfo={t('branded:choose_what_data_to_share')}

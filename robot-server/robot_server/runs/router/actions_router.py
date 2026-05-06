@@ -7,6 +7,8 @@ from typing import Annotated, Literal, Union
 from fastapi import Depends, status
 
 from opentrons.protocol_engine.types import DeckConfigurationType
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -104,6 +106,7 @@ async def get_run_controller(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run_action(
     runId: str,

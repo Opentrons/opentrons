@@ -18,6 +18,7 @@ import {
   StyledText,
   Tooltip,
   truncateString,
+  TYPOGRAPHY,
   useHoverTooltip,
   useInterval,
 } from '@opentrons/components'
@@ -162,11 +163,12 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         <StyledText
           desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
         </StyledText>
-        <Flex alignItems={ALIGN_CENTER} gap={SPACING.spacing8}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <RobotNameContainer isGoToRun={isGoToRun}>
             <StyledText
               desktopStyle="bodyLargeSemiBold"

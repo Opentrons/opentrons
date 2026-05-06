@@ -132,6 +132,7 @@ export function ProtocolOverflowMenu(
               {t('start_setup')}
             </MenuItem>
           ) : null}
+
           <MenuItem
             onClick={handleClickReanalyze}
             data-testid="ProtocolOverflowMenu_reanalyze"

@@ -54,6 +54,7 @@ from robot_server.protocols.analysis_store import (
     AnalysisNotFoundError,
     AnalysisStore,
 )
+from robot_server.protocols.completed_analysis_store import UnreadableAnalysisError
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
 from robot_server.protocols.protocol_models import (
@@ -1602,6 +1603,28 @@ async def test_get_protocol_analysis_by_id_analysis_not_found(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "AnalysisNotFound"
+
+
+async def test_get_protocol_analysis_by_id_for_unreadable_analysis(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should return 422 error if analysis is not readable."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get("analysis-id")).then_raise(
+        UnreadableAnalysisError("analysis-id", "oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_by_id(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+    assert exc_info.value.status_code == 422
+    assert exc_info.value.content["errors"][0]["id"] == "UnreadableProtocolAnalysis"
 
 
 async def test_get_protocol_analysis_as_document(

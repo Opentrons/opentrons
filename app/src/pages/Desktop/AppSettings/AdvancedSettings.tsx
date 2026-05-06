@@ -1,4 +1,4 @@
-import { Box, SPACING } from '@opentrons/components'
+import { SPACING } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
 import {
@@ -14,30 +14,30 @@ import {
   UpdatedChannel,
 } from '/app/organisms/Desktop/AdvancedSettings'
 
+import styles from './advancedsettings.module.css'
+
 export function AdvancedSettings(): JSX.Element {
   return (
-    <>
-      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing24}>
-        <UpdatedChannel />
-        <Divider marginY={SPACING.spacing24} />
-        <AdditionalCustomLabwareSourceFolder />
-        <Divider marginY={SPACING.spacing24} />
-        <PreventRobotCaching />
-        <Divider marginY={SPACING.spacing24} />
-        <ClearUnavailableRobots />
-        <Divider marginY={SPACING.spacing24} />
-        <ShowHeaterShakerAttachmentModal />
-        <Divider marginY={SPACING.spacing24} />
-        <ShowLabwareOffsetSnippets />
-        <Divider marginY={SPACING.spacing24} />
-        <OverridePathToPython />
-        <Divider marginY={SPACING.spacing24} />
-        <EnableDevTools />
-        <Divider marginY={SPACING.spacing24} />
-        <OT2AdvancedSettings />
-        <Divider marginY={SPACING.spacing24} />
-        <U2EInformation />
-      </Box>
-    </>
+    <div className={styles.container}>
+      <UpdatedChannel />
+      <Divider marginY={SPACING.spacing24} />
+      <AdditionalCustomLabwareSourceFolder />
+      <Divider marginY={SPACING.spacing24} />
+      <PreventRobotCaching />
+      <Divider marginY={SPACING.spacing24} />
+      <ClearUnavailableRobots />
+      <Divider marginY={SPACING.spacing24} />
+      <ShowHeaterShakerAttachmentModal />
+      <Divider marginY={SPACING.spacing24} />
+      <ShowLabwareOffsetSnippets />
+      <Divider marginY={SPACING.spacing24} />
+      <OverridePathToPython />
+      <Divider marginY={SPACING.spacing24} />
+      <EnableDevTools />
+      <Divider marginY={SPACING.spacing24} />
+      <OT2AdvancedSettings />
+      <Divider marginY={SPACING.spacing24} />
+      <U2EInformation />
+    </div>
   )
 }

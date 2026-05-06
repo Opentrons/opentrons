@@ -38,5 +38,13 @@
   "OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION": {
     "title": "Enable additional partial tip selection",
     "description": "Enables use of other pipette nozzles and return"
+  },
+  "OT_PD_ENABLE_VACUUM_MODULE": {
+    "title": "Enable vacuum module use",
+    "description": "Enables use of vacuum modules in Protocol Designer protocols"
+  },
+  "OT_PD_ENABLE_FORK": {
+    "title": "Enable pd fork mode",
+    "description": "Enables the fork mode in Protocol Designer protocols"
   }
 }

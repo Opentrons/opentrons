@@ -69,75 +69,85 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
       enabled: requestStatus === SUCCESS && inProgress,
     })?.data?.data ?? []
 
-  useEffect(() => {
-    const matchingModule = attachedModules.find(
-      module => module.serialNumber === moduleSerialNumber
-    )
-    if (matchingModule != null && requestStatus === SUCCESS) {
-      if (moduleRequestTimeoutId != null) {
-        clearTimeout(moduleRequestTimeoutId)
+  useEffect(
+    () => {
+      const matchingModule = attachedModules.find(
+        module => module.serialNumber === moduleSerialNumber
+      )
+      if (matchingModule != null && requestStatus === SUCCESS) {
+        if (moduleRequestTimeoutId != null) {
+          clearTimeout(moduleRequestTimeoutId)
+        }
+        // Update failed
+        if (matchingModule.hasAvailableUpdate) {
+          setIsModuleUpdating(false)
+          setInProgress(false)
+          setErrorMessage(t('firmware_update_failed') as string)
+          if (latestRequestId != null) {
+            dispatch(dismissRequest(latestRequestId))
+          }
+          return
+        }
+        // Update passed
+        setShouldProceed(true)
+        setIsModuleUpdating(false)
+        setInProgress(false)
+        sendIdentifyStacker(matchingModule, true, 'blue')
+        patchModuleAfterUpdate(matchingModule)
+        setTimeout(() => {
+          proceed()
+        }, NO_UPDATE_FOUND_TIMEOUT_MS)
       }
-      // Update failed
-      if (matchingModule.hasAvailableUpdate) {
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [attachedModules, requestStatus, moduleRequestTimeoutId, moduleSerialNumber]
+  )
+
+  useEffect(
+    () => {
+      setCheckingFirmware(true)
+      setTimeout(() => {
+        setCheckingFirmware(false)
+        if (!attachedModule.hasAvailableUpdate) {
+          setIsModuleUpdating(false)
+          setShouldProceed(true)
+          setTimeout(() => {
+            proceed()
+          }, NO_UPDATE_FOUND_TIMEOUT_MS)
+        }
+      }, CHECKING_UPDATE_TIMEOUT_MS)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+
+  useEffect(
+    () => {
+      if (requestStatus === PENDING) {
+        setInProgress(true)
+      } else if (requestStatus === FAILURE) {
         setIsModuleUpdating(false)
         setInProgress(false)
         setErrorMessage(t('firmware_update_failed') as string)
         if (latestRequestId != null) {
           dispatch(dismissRequest(latestRequestId))
         }
-        return
+      } else if (requestStatus === SUCCESS) {
+        // if the request succeeds but the module doesn't come back online within 60 seconds
+        // we should display an error message
+        const timeoutId = setTimeout(() => {
+          setIsModuleUpdating(false)
+          setErrorMessage(t('firmware_update_failed') as string)
+        }, MODULE_TIMEOUT_MS)
+        setModuleRequestTimeoutId(timeoutId)
       }
-      // Update passed
-      setShouldProceed(true)
-      setIsModuleUpdating(false)
-      setInProgress(false)
-      sendIdentifyStacker(matchingModule, true, 'blue')
-      patchModuleAfterUpdate(matchingModule)
-      setTimeout(() => {
-        proceed()
-      }, NO_UPDATE_FOUND_TIMEOUT_MS)
-    }
-  }, [
-    attachedModules,
-    requestStatus,
-    moduleRequestTimeoutId,
-    moduleSerialNumber,
-  ])
-
-  useEffect(() => {
-    setCheckingFirmware(true)
-    setTimeout(() => {
-      setCheckingFirmware(false)
-      if (!attachedModule.hasAvailableUpdate) {
-        setIsModuleUpdating(false)
-        setShouldProceed(true)
-        setTimeout(() => {
-          proceed()
-        }, NO_UPDATE_FOUND_TIMEOUT_MS)
-      }
-    }, CHECKING_UPDATE_TIMEOUT_MS)
-  }, [])
-
-  useEffect(() => {
-    if (requestStatus === PENDING) {
-      setInProgress(true)
-    } else if (requestStatus === FAILURE) {
-      setIsModuleUpdating(false)
-      setInProgress(false)
-      setErrorMessage(t('firmware_update_failed') as string)
-      if (latestRequestId != null) {
-        dispatch(dismissRequest(latestRequestId))
-      }
-    } else if (requestStatus === SUCCESS) {
-      // if the request succeeds but the module doesn't come back online within 60 seconds
-      // we should display an error message
-      const timeoutId = setTimeout(() => {
-        setIsModuleUpdating(false)
-        setErrorMessage(t('firmware_update_failed') as string)
-      }, MODULE_TIMEOUT_MS)
-      setModuleRequestTimeoutId(timeoutId)
-    }
-  }, [requestStatus, setInProgress])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [requestStatus, setInProgress]
+  )
 
   const handleUpdateFirmware = (): void => {
     setIsModuleUpdating(true)

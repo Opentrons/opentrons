@@ -1,4 +1,5 @@
 import pytest
+from api.integration.auth import EMAIL_NOT_VERIFIED_DETAIL
 from api.models.chat_response import ChatResponse
 from api.models.error_response import ErrorResponse
 from api.models.feedback_response import FeedbackResponse
@@ -26,6 +27,42 @@ def test_get_chat_completion_bad_auth(client: Client) -> None:
     """Test the chat completion endpoint with bad authentication."""
     response = client.get_chat_completion("How do I load a pipette?", bad_auth=True)
     assert response.status_code == 401, "Chat completion with bad auth should return HTTP 401"
+
+
+@pytest.mark.live
+def test_get_chat_completion_unverified_email(client: Client) -> None:
+    """Tokens for a user with an unverified email must be rejected with a descriptive 401.
+
+    This test uses the Resource Owner Password grant to obtain a real user token for an
+    Auth0 account whose email has not been verified.  The API must return 401 with the
+    exact detail string defined in EMAIL_NOT_VERIFIED_DETAIL so the frontend can show the
+    email-verification prompt instead of a generic error.
+
+    Prerequisites (all must be true for this test to run instead of being skipped):
+    - Password grant is enabled on the Auth0 application (CLIENT_ID).
+    - A test user exists in the Auth0 tenant with email_verified: false.
+    - The Auth0 Post-Login Action is deployed and injects
+      https://opentrons.com/email_verified into user tokens.
+    - <ENV>_UNVERIFIED_USERNAME and <ENV>_UNVERIFIED_PASSWORD are set in test.env.
+
+    Note: M2M (client_credentials) tokens bypass the email-verification check because
+    they represent trusted backend services, not human users.  Only user tokens obtained
+    via the password grant will exercise this code path.
+    """
+    if client.unverified_auth_headers is None:
+        if getattr(client, "unverified_auth_fetch_failed", False):
+            pytest.skip(
+                "Unverified email token could not be obtained (e.g. Password grant disabled on "
+                "Auth0 application or invalid credentials). Enable the Resource Owner Password "
+                "grant for the app and ensure the test user exists."
+            )
+        pytest.skip("Unverified email credentials not configured — set <ENV>_UNVERIFIED_USERNAME and <ENV>_UNVERIFIED_PASSWORD in test.env")
+
+    response = client.get_chat_completion("How do I load a pipette?", unverified_auth=True)
+
+    assert response.status_code == 401, "Unverified email token should return HTTP 401"
+    body = response.json()
+    assert body.get("detail") == EMAIL_NOT_VERIFIED_DETAIL, f"Expected detail '{EMAIL_NOT_VERIFIED_DETAIL}', got: {body.get('detail')}"
 
 
 @pytest.mark.live

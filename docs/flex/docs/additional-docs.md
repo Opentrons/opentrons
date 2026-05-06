@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Additional Documentation"
+description: "Links to Knowledge Hub, Python API docs, and other Opentrons resources."
 ---
 
 Opentrons maintains additional online documentation for our hardware and software products. You may find these resources valuable as you use Opentrons Flex.

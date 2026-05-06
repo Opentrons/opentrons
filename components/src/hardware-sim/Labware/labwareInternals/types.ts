@@ -18,12 +18,16 @@ export type TipType =
   | typeof SELECTED_USED
   | typeof SELECTED_ERROR
 
-export const WELL: 'well' = 'well'
-export const TIP: 'tip' = 'tip'
-
 export type WellType =
   | typeof SELECTED
   | typeof INACCESSIBLE
   | typeof UNSELECTED
   | typeof SELECTED_ERROR
+
+export const WELL: 'well' = 'well'
+export const TIP: 'tip' = 'tip'
 export type SelectionType = typeof WELL | typeof TIP
+
+export const LABWARE: 'labware' = 'labware'
+export const PIPETTE: 'pipette' = 'pipette'
+export type ParentType = typeof LABWARE | typeof PIPETTE

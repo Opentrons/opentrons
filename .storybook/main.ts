@@ -1,3 +1,5 @@
+import { dirname, join } from 'path'
+
 import type { StorybookConfig } from '@storybook/react-vite'
 
 const config: StorybookConfig = {
@@ -14,27 +16,34 @@ const config: StorybookConfig = {
   ],
 
   addons: [
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    'storybook-addon-pseudo-states',
+    getAbsolutePath('@storybook/addon-links'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('storybook-addon-pseudo-states'),
+    '@chromatic-com/storybook',
   ],
 
   framework: {
-    name: '@storybook/react-vite',
+    name: getAbsolutePath('@storybook/react-vite'),
     options: {
       builder: {
         // Storybook would normally find the Vite config automatically.
         // That doesn't work for us because we have one monorepo-wide Storybook
         // installation, while each project has its own local Vite config.
         // So we treat Storybook as its own Vite project with its own config.
-        viteConfigPath: '.storybook/vite.config.mjs',
+        viteConfigPath: '.storybook/vite.config.mts',
       },
     },
   },
 
-  docs: {
-    autodocs: true,
+  docs: {},
+
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
   },
 }
 
 export default config
+
+function getAbsolutePath(value: string): any {
+  return dirname(require.resolve(join(value, 'package.json')))
+}

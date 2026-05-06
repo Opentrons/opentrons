@@ -14,14 +14,12 @@ import {
   Icon,
   InlineNotification,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   ModuleIcon,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_ABSOLUTE,
   ProtocolDeck,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
@@ -245,6 +243,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {analysisStatus === 'stale' ? (
             <ProtocolAnalysisStale protocolKey={protocolKey} />
           ) : null}
+
           {invalidRobotType && analysisStatus === 'error' ? (
             <Box paddingRight={SPACING.spacing24}>
               <InlineNotification
@@ -257,21 +256,24 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             </Box>
           ) : null}
           <Flex paddingRight={SPACING.spacing24}>
-            <LegacyStyledText
-              forwardedAs="h3"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
               data-testid={`ProtocolCard_${protocolDisplayName}`}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {protocolDisplayName}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </Flex>
         {/* data section */}
         {analysisStatus === 'loading' ? (
-          <LegacyStyledText forwardedAs="p" flex="1" color={COLORS.grey60}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            flex="1"
+            color={COLORS.grey60}
+          >
             {t('loading_data')}
-          </LegacyStyledText>
+          </StyledText>
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Flex gridGap={SPACING.spacing16}>
@@ -290,29 +292,29 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 {
                   {
                     missing: (
-                      <LegacyStyledText forwardedAs="p">
+                      <StyledText desktopStyle="bodyDefaultRegular">
                         {t('no_data')}
-                      </LegacyStyledText>
+                      </StyledText>
                     ),
                     loading: (
-                      <LegacyStyledText forwardedAs="p">
+                      <StyledText desktopStyle="bodyDefaultRegular">
                         {t('no_data')}
-                      </LegacyStyledText>
+                      </StyledText>
                     ),
                     error: (
-                      <LegacyStyledText forwardedAs="p">
+                      <StyledText desktopStyle="bodyDefaultRegular">
                         {t('no_data')}
-                      </LegacyStyledText>
+                      </StyledText>
                     ),
                     parameterRequired: (
-                      <LegacyStyledText forwardedAs="p">
+                      <StyledText desktopStyle="bodyDefaultRegular">
                         {t('no_data')}
-                      </LegacyStyledText>
+                      </StyledText>
                     ),
                     stale: (
-                      <LegacyStyledText forwardedAs="p">
+                      <StyledText desktopStyle="bodyDefaultRegular">
                         {t('no_data')}
-                      </LegacyStyledText>
+                      </StyledText>
                     ),
                     complete: (
                       <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
@@ -397,12 +399,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               justifyContent={JUSTIFY_FLEX_END}
               data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             >
-              <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
+              <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
                 {`${t('updated')} ${format(
                   new Date(modified),
                   'M/d/yy HH:mm'
                 )}`}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           </Flex>
         )}

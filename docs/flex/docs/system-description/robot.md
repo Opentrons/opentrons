@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Robot Components"
+description: "Frame, gantry, deck, working area, and visual indicators of the Flex."
 ---
 
 <figure markdown>
@@ -13,7 +14,7 @@ The *frame* of the Opentrons Flex robot provides rigidity and structural support
 
 The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
 
-White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can [photograph the deck](../opentrons-app/camera.md#camera-features-and-controls) and working area for recording and tracking protocol execution.
+White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can [photograph the deck](../opentrons-app/camera.md) and working area for recording and tracking protocol execution.
 
 ## Deck and working area
 
@@ -74,7 +75,7 @@ This fixed location gives you a wide-angle field of view of attached instruments
 
 ![Default camera view](../images/camera-default.png)
 
-For information about using the camera, see [Camera features and controls](../opentrons-app/camera.md#camera-features-and-controls).
+For information about using the camera, see [Using the Camera](../opentrons-app/camera.md).
 
 ## Waste chute
 

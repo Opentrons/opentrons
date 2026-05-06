@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: System Description"
+description: "Hardware systems, robot components, and specifications of the Flex."
 ---
 
 This chapter describes the hardware systems of Opentrons Flex, which underlie its core lab automation features. 

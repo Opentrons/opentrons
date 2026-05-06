@@ -29,6 +29,7 @@ from . import (
     load_labware_params,
     overlap_versions,
 )
+from .csv import CSVCore
 from .exceptions import InvalidModuleLocationError
 from .instrument import InstrumentCore
 from .labware import LabwareCore
@@ -86,6 +87,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
+    ModuleFixtureLocation,
     Mount,
     MountType,
     Point,
@@ -226,6 +228,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
         ],
@@ -301,6 +304,7 @@ class ProtocolCore(
             StagingSlotName,
             ModuleCore,
             NonConnectedModuleCore,
+            ModuleFixtureLocation,
             OffDeckType,
         ],
         namespace: Optional[str],
@@ -308,7 +312,6 @@ class ProtocolCore(
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
         load_location = self._get_non_stacked_location(location=location)
-
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
@@ -324,6 +327,7 @@ class ProtocolCore(
             ),
             command_annotations=self._annotation_ids,
         )
+
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_adapter(load_result.definition)
 
@@ -1290,6 +1294,19 @@ class ProtocolCore(
                 f"Could not find command annotation with ID: '{annotation_id}'"
             )
 
+    def create_csv(self, filename: str, columns: int) -> CSVCore:
+        """Create a new csv file"""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.CreateCSVParams(fileName=filename, columns=columns),
+            command_annotations=self._annotation_ids,
+        )
+        return CSVCore(
+            file_id=result.fileId,
+            columns=result.columns,
+            engine_client=self._engine_client,
+            protocol_core=self,
+        )
+
     def _convert_labware_location(
         self,
         location: Union[
@@ -1297,6 +1314,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -1314,6 +1332,7 @@ class ProtocolCore(
             DeckSlotName,
             StagingSlotName,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -1335,3 +1354,7 @@ class ProtocolCore(
             return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, TrashBin):
             return AddressableAreaLocation(addressableAreaName=location.area_name)
+        elif isinstance(location, ModuleFixtureLocation):
+            return AddressableAreaLocation(
+                addressableAreaName=location.addressable_area_name
+            )

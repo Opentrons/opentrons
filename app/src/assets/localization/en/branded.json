@@ -73,6 +73,8 @@
   "opentrons_labware_def": "Opentrons labware definition",
   "opentrons_tip_rack_name": "opentrons",
   "opentrons_tip_racks_recommended": "Opentrons tip racks are highly recommended. Accuracy cannot be guaranteed with other tip racks.",
+  "ot2_protocol_detected": "OT-2 protocol detected",
+  "ot2_protocol_detected_description": "OT-2 now has its own app. Run OT-2 protocols there.",
   "previous_releases": "View previous Opentrons releases",
   "receive_alert": "Receive an alert when an Opentrons software update is available.",
   "restore_description": "Opentrons does not recommend reverting to previous software versions, but you can access previous releases below. For best results, uninstall the existing app and remove its configuration files before installing the previous version.",

@@ -1,4 +1,8 @@
+import { useSelector } from 'react-redux'
+
 import { DeckConfigurator } from '@opentrons/components'
+
+import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 
 import { useDeckConfigurationEditing } from './utils'
 
@@ -31,12 +35,14 @@ export function HardwareConfiguratorContainer(
     updateInitialDeckState,
   } = props
 
+  const enableVacuumModule = useSelector(getEnableVacuumModule)
   const { addFixtureModal, addFixtureToCutout, removeFixtureFromCutout } =
     useDeckConfigurationEditing(
       deckConfig,
       modules,
       fixtures,
       hasGripper,
+      enableVacuumModule,
       setValue,
       updateInitialDeckState
     )

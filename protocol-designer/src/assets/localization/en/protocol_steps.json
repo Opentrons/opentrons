@@ -13,6 +13,7 @@
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
   "all_nozzles": "All nozzles (recommended)",
+  "all_nozzles_are_preselected": "All nozzles are preselected",
   "and": "and",
   "aspirate": "Aspirate",
   "aspirate_labware": "Source labware",
@@ -167,7 +168,6 @@
   "partial_nozzles": "Partial nozzles",
   "pipette": "Pipette",
   "pipette_nozzles_and_wells": "Pipette nozzles and wells",
-
   "pipette_path": "Pipette path",
   "place_hardware": "Place the modules and fixtures that you are using for this protocol onto the deck.",
   "place_modules": "Place the modules that you are using for this protocol onto the deck.",
@@ -274,14 +274,139 @@
   "touch_tip_position": "Touch tip position from top",
   "transfer": "Transfer",
   "transfer_nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
+  "transfer_nozzles_selected_no_dispense": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected",
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
+  "vacuum": {
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
+    },
+    "state_timeline": {
+      "start": "Start vacuum",
+      "wait_for_complete": "Wait for vacuum to complete"
+    },
+    "controls": {
+      "duration": {
+        "label": "Time at pressure",
+        "title": "Duration"
+      },
+      "ending_hold_vent": { "title": "Ending hold", "label": "Vent" },
+      "label": "Module controls",
+      "mode": {
+        "label": "Select mode type",
+        "options": {
+          "power": {
+            "description": "Set vacuum pressure based on a percentage of total pump power",
+            "label": "Pump power (%)"
+          },
+          "pressure": {
+            "description": "Set a specific vacuum pressure value",
+            "label": "Gauge pressure (mbar)"
+          }
+        },
+        "power": "Pump power",
+        "pressure": {
+          "caption": "Valid range between {{min}}-{{max}}",
+          "label": "Gauge pressure"
+        },
+        "tooltip": "Specifies the method used to apply vacuum."
+      },
+      "options": {
+        "profile": "Program a Vacuum profile",
+        "state": "Change Vacuum state"
+      },
+      "profile": {
+        "add_cycle": "Add cycle",
+        "add_cycle_step": "Add a cycle step",
+        "add_step": "Add step",
+        "cancel": "Cancel",
+        "cycle": "Cycle",
+        "delete": "Delete",
+        "edit": "Edit",
+        "errors": {
+          "pumpData": "Enter a valid pressure value",
+          "repetitions": "Enter a valid number of cycles",
+          "time": "Enter a valid time",
+          "title": "Enter a valid step title"
+        },
+        "gauge_pressure": "Gauge pressure",
+        "no_profile_defined": "No profile defined",
+        "no_steps_defined": "No steps defined",
+        "number_of_cycles": "Number of cycles",
+        "profile_steps": "Profile steps",
+        "profile_defined_single": "{{numSteps}} profile step defined",
+        "profile_defined_multiple": "{{numSteps}} profile steps defined",
+        "pump_power": "Pump power",
+        "repetitions": "Number of cycles",
+        "save": "Save",
+        "step": "Step",
+        "step_detail": {
+          "power": "{{power}}% power",
+          "pressure": "{{pressure}} mbar"
+        },
+        "step_title": "Name",
+        "time": "Time",
+        "title": "Edit Vacuum profile steps",
+        "unsaved_changes": "You have unsaved changes to the profile. Please save or discard them before closing."
+      },
+      "state": {
+        "label": "Select the state to change",
+        "options": {
+          "pump": {
+            "off": "Turn off Vacuum pump",
+            "on": "Turn on Vacuum pump"
+          },
+          "vent": {
+            "closed": "Close vent",
+            "open": "Open vent"
+          }
+        }
+      },
+      "vacuum_pump_settings": "Vacuum pump settings"
+    },
+    "previous_state": {
+      "last_module_state": "Last module state",
+      "pump": {
+        "label": "Pump",
+        "off": "Off",
+        "power": "{{power}}%",
+        "pressure": "{{pressure}} mbar",
+        "profile": "Running profile"
+      },
+      "vent": {
+        "closed": "Closed",
+        "label": "Vent",
+        "open": "Open"
+      }
+    },
+    "step_summary": {
+      "num_steps_multiple": "{{numSteps}} steps",
+      "num_steps_one": "{{numSteps}} step",
+      "profile": "<text>Run vacuum profile with</text><tag/><text>Ending vent</text><tag2/>",
+      "state": {
+        "closed": "Closed",
+        "open": "Open",
+        "pump": {
+          "off": "Stop pump",
+          "power": "<text>Set pump power to</text><tag/>",
+          "pressure": "<text>Set gauge pressure to</text><tag/>"
+        },
+        "pump_with_end_hold": {
+          "power": "<text>Set pump power to</text><tag/>for<tag2/><text>Ending vent</text><tag3/>",
+          "pressure": "<text>Set gauge pressure to</text><tag/>for<tag2/><text>Ending vent</text><tag3/>"
+        },
+        "vent": "<text>Vent</text><tag/>"
+      }
+    }
+  },
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
   "volume_per_well": {
     "multiAspirate": "Aspirate volume per well",
     "multiDispense": "Dispense volume per well",
-    "single": "Volume per well"
+    "single": "Volume per well",
+    "mix": "Mix volume"
   },
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",
@@ -290,6 +415,7 @@
   "well_position_with_reference_nested": "Well position (x,y,z): {{x}}mm, {{y}}mm, {{z}}mm from {{reference}}",
   "well_position_xyz": "Well position (x,y,z): {{x}}mm, {{y}}mm, {{z}}mm",
   "well_position_z_only": "Well position: Z {{z}} (mm)",
+  "well_selection_error": "Well selection ratio must be 1 to many, many to 1, or N to N",
   "wells_in_labware": "{{well}} of {{labware}}",
   "wells_of": "{{wells}} of"
 }

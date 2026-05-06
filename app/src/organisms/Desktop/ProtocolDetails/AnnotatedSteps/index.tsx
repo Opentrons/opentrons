@@ -27,13 +27,14 @@ interface AnnotatedStepsProps {
   setIsAtBottom?: Dispatch<SetStateAction<boolean>>
 }
 
-type GroupNode = Extract<GroupedCommands[number], { annotationIndex: number }>
+type GroupNode = Extract<GroupedCommands[number], { annotationId: string }>
 
 interface GroupRow {
   type: 'group'
   group: GroupNode
   annotationType: string
   commandStartNumber: number
+  annotationDescription: string
 }
 
 interface CommandRow {
@@ -87,82 +88,71 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       analysis != null
         ? getLabwareDefinitionsFromCommands(analysis.commands)
         : [],
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isValidRobotSideAnalysis]
-  )
-  const annotations = analysis?.commandAnnotations ?? []
-  const annotationNames = useMemo(
-    () => annotations.map(annotation => annotation?.machineReadableName ?? ''),
-    [annotations]
-  )
-  const commandIndexById = useMemo(
-    () =>
-      new Map(analysis.commands.map((command, index) => [command.id, index])),
-    [analysis.commands]
-  )
-  const groupedCommandsHighlightedInfo = useMemo(
-    () =>
-      groupedCommands?.map(node => {
-        if ('annotationIndex' in node) {
-          return {
-            ...node,
-            isHighlighted: node.subCommands.some(
-              subNode => subNode.isHighlighted
-            ),
-            subCommands: node.subCommands.map(subNode => ({
-              ...subNode,
-              isHighlighted:
-                currentCommandIndex ===
-                commandIndexById.get(subNode.command.id),
-            })),
-          }
-        } else {
-          return {
-            ...node,
-            isHighlighted:
-              currentCommandIndex === commandIndexById.get(node.command.id),
-          }
-        }
-      }),
-    [groupedCommands, currentCommandIndex, commandIndexById]
   )
   const filteredCommands = useMemo(
     () =>
       analysis.commands.filter(
+        // ToDo: the following condition will be updated for phase 2
         command =>
           !command.commandType.includes('load') &&
           command.commandType !== 'home'
       ),
     [analysis.commands]
   )
+  const currentCommandId =
+    currentCommandIndex != null
+      ? (filteredCommands[currentCommandIndex]?.id ?? null)
+      : null
+  const groupedCommandsHighlightedInfo = useMemo(
+    () =>
+      groupedCommands?.map(node => {
+        if ('annotationId' in node) {
+          const updatedSubCommands = node.subCommands.map(subNode => ({
+            ...subNode,
+            isHighlighted: currentCommandId === subNode.command.id,
+          }))
+
+          return {
+            ...node,
+            subCommands: updatedSubCommands,
+            isHighlighted: updatedSubCommands.some(
+              subNode => subNode.isHighlighted
+            ),
+          }
+        }
+        return {
+          ...node,
+          isHighlighted: currentCommandId === node.command.id,
+        }
+      }),
+    [groupedCommands, currentCommandId]
+  )
 
   useEffect(() => {
-    if (currentCommandIndex == null) return
-    if (groupedCommands != null) {
+    if (currentCommandId == null) return
+    if (groupedCommands != null && groupedCommands.length > 0) {
       const flatCommands = groupedCommands.flatMap(node =>
         'subCommands' in node ? node.subCommands : [node]
       )
 
       const targetNode = flatCommands.find(
-        node => commandIndexById.get(node.command.id) === currentCommandIndex
+        node => node.command.id === currentCommandId
       )
+      const targetCommandId = targetNode?.command.id ?? null
 
-      if (targetNode?.command.id && scrollTargetId !== targetNode.command.id) {
-        setScrollTargetId(targetNode.command.id)
+      if (targetCommandId != null && scrollTargetId !== targetCommandId) {
+        setScrollTargetId(targetCommandId)
       }
       return
     }
 
-    const targetCommand = filteredCommands[currentCommandIndex]
-    if (targetCommand?.id && scrollTargetId !== targetCommand.id) {
-      setScrollTargetId(targetCommand.id)
+    if (scrollTargetId !== currentCommandId) {
+      setScrollTargetId(currentCommandId)
     }
-  }, [
-    groupedCommands,
-    currentCommandIndex,
-    scrollTargetId,
-    commandIndexById,
-    filteredCommands,
-  ])
+  }, [groupedCommands, currentCommandId, scrollTargetId])
 
   const { rows, rowIndexByCommandId } = useMemo(() => {
     const nextRows: AnnotatedStepsRow[] = []
@@ -175,10 +165,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     ) {
       groupedCommandsHighlightedInfo.forEach((group, index) => {
         const nextIndex = groupedCommandsHighlightedInfo[index + 1]
-        const nextIsGrouped =
-          nextIndex != null && 'annotationIndex' in nextIndex
+        const nextIsGrouped = nextIndex != null && 'annotationId' in nextIndex
 
-        if ('annotationIndex' in group) {
+        if ('annotationId' in group) {
           const subCommandStartNumber = commandNumber + 1
           commandNumber += group.subCommands.length
 
@@ -186,8 +175,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
           nextRows.push({
             type: 'group',
             group,
-            annotationType: annotationNames[group.annotationIndex] ?? '',
+            annotationType: group.annotation?.name ?? '',
             commandStartNumber: subCommandStartNumber,
+            annotationDescription: group.annotation?.description ?? '',
           })
           group.subCommands.forEach(subCommand => {
             nextRowIndexByCommandId.set(subCommand.command.id, rowIndex)
@@ -238,7 +228,6 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     filteredCommands,
     currentCommandIndex,
     analysis.errors,
-    annotationNames,
   ])
 
   const [listRef, listRefCallback] = useListCallbackRef()

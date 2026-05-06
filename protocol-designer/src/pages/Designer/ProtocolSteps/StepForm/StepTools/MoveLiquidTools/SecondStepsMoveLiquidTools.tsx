@@ -22,8 +22,10 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
+  DEST_WELL_BLOWOUT_DESTINATION,
   getPipetteWithTipMaxVol,
   getTrashOrLabware,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
 import {
@@ -111,8 +113,9 @@ export const SecondStepsMoveLiquidTools = ({
         ? formData.liquidClass
         : WATER_LIQUID_CLASS_NAME
     ]
-  if (!liquidClassDef)
+  if (!liquidClassDef) {
     throw new Error(`Liquid class '${formData.liquidClass}' does not exist`)
+  }
   const stubbedByTipValues = liquidClassDef.byPipette
     .find(
       ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
@@ -164,7 +167,16 @@ export const SecondStepsMoveLiquidTools = ({
       isDestinationTrash ? 'dispense_mix_checkbox' : 'dispense_mix_checkbox_2'
     }`
   )
-
+  const blowoutLocation = propsForFields.blowout_location.value ?? null
+  const isBlowoutLocationSource =
+    blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
+  const isBlowoutLocationDestination =
+    blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
+  const isBlowoutLocationLabware =
+    isBlowoutLocationSource || isBlowoutLocationDestination
+  const blowOutLabwareId = isBlowoutLocationSource
+    ? (propsForFields.aspirate_labware.value as string)
+    : ((propsForFields.dispense_labware.value as string) ?? null)
   const aspirateTab = {
     text: t('aspirate'),
     isActive: tab === 'aspirate',
@@ -215,6 +227,8 @@ export const SecondStepsMoveLiquidTools = ({
         pipetteSpecs: pipetteSpec,
         tiprackDef: tiprackDef,
       }),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       formData.transferVolume,
       formData.disposalVolume_volume,
@@ -569,6 +583,20 @@ export const SecondStepsMoveLiquidTools = ({
                       padding="0"
                       formData={formData}
                     />
+                    {isBlowoutLocationLabware && blowOutLabwareId ? (
+                      <PositionField
+                        formData={formData}
+                        padding="0"
+                        prefix="blowout"
+                        propsForFields={propsForFields}
+                        zField="blowout_mmFromBottom"
+                        xField="blowout_x_position"
+                        yField="blowout_y_position"
+                        labwareId={blowOutLabwareId}
+                        referenceField="blowout_position_reference"
+                        isNested={true}
+                      />
+                    ) : null}
                   </Flex>
                 ) : null}
               </CheckboxExpandStepFormField>

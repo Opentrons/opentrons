@@ -61,7 +61,6 @@ describe('SetWifiCred', () => {
     expect(inputBox).toHaveAttribute('type', 'password')
     fireEvent.click(button)
     screen.getByRole('button', { name: 'Hide' })
-    screen.getByTestId('icon_eye-slash')
     expect(screen.getByLabelText('wifi_password')).toHaveAttribute(
       'type',
       'text'

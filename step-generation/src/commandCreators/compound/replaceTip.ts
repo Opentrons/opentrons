@@ -11,7 +11,6 @@ import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
-  getDefaultPrimaryNozzle,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getLabwareSlot,
@@ -37,8 +36,8 @@ interface ReplaceTipArgs {
   dropTipLocation: string
   // tipRack URI with which to automatically find next tip
   tipRack: string | null
-  nozzles?: NozzleConfigurationStyle
-  primaryNozzle?: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 
   //  we need to emit atomic commands for python
   //  if this replaceTip is for the mix compound command
@@ -64,6 +63,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     pipette,
     dropTipLocation,
     nozzles,
+    primaryNozzle,
     tipRack,
     isFromMixCommand = false,
     tipSelectionArgs,
@@ -87,6 +87,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       tipRack,
       invariantContext,
       prevRobotState,
+      primaryNozzle,
       nozzles
     )
 
@@ -131,7 +132,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
 
-  if (!pipetteSpec)
+  if (!pipetteSpec) {
     return {
       errors: [
         errorCreators.pipetteDoesNotExist({
@@ -139,6 +140,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         }),
       ],
     }
+  }
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
@@ -221,13 +223,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     args.nozzles != null &&
     (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)
   ) {
-    const primaryNozzle =
-      args.primaryNozzle ??
-      getDefaultPrimaryNozzle({
-        nozzles: args.nozzles,
-        channels,
-      })
-
     configureNozzleLayoutCommand.push(
       curryCommandCreator(configureNozzleLayout, {
         configurationParams: {
@@ -240,7 +235,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
 
   const tipTrackingOption = tipSelectionArgs ? MANUAL : AUTOMATIC
-
   let commandCreators: CurriedCommandCreator[] = [
     curryCommand(dropTip, {
       pipette,
@@ -253,6 +247,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       wellName: nextTiprack.well,
       nozzles: args.nozzles,
       tipTrackingOption,
+      primaryNozzle,
     }),
   ]
   if (isWasteChute) {
@@ -269,6 +264,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         wellName: nextTiprack.well,
         nozzles: args.nozzles,
         tipTrackingOption,
+        primaryNozzle,
       }),
     ]
   }
@@ -286,6 +282,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         wellName: nextTiprack.well,
         nozzles: args.nozzles,
         tipTrackingOption,
+        primaryNozzle,
       }),
     ]
   }

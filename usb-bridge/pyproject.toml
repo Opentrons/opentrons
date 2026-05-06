@@ -33,7 +33,6 @@ dev = [
     "pytest-asyncio<2,>=1",
     "pytest-watch~=4.2.0",
     "pytest-cov==4.1.0",
-    "pytest-aiohttp==1.0.5",
     "pytest-xdist~=2.5.0",
     "coverage==7.4.1",
     "mypy==1.19.1",
@@ -63,6 +62,9 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-first-party = ["opentrons", "opentrons_hardware", "opentrons_shared_data", "robot_server" ]
 known-local-folder = ["usb_bridge"]
+
+[tool.ruff.format]
+exclude = ["ot3usb/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "ot3usb/_version.py"
@@ -108,3 +110,7 @@ init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
+
+[tool.uv]
+# cooldown time for security
+exclude-newer = "1 week"

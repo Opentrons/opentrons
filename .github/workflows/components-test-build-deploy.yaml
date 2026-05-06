@@ -41,12 +41,12 @@ jobs:
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
       - name: 'run components unit tests'
         run: make -C components test-cov
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
         with:
           files: ./coverage/lcov.info
           flags: components
@@ -56,12 +56,12 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs: ['js-unit-test']
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
       - name: 'build components'
         run: make -C components
       - name: 'upload github artifact'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: 'components-artifact'
           path: storybook-static

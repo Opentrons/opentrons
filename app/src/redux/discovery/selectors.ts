@@ -1,10 +1,10 @@
-import isIp from 'is-ip'
+import { isIPv6 } from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import orderBy from 'lodash/orderBy'
-import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
+import { createSelector, lruMemoize } from 'reselect'
 import semver from 'semver'
 
 import {
@@ -42,9 +42,6 @@ type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
-// from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
-
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
 const isLocal = (ip: string): boolean => {
@@ -57,7 +54,7 @@ const isLocal = (ip: string): boolean => {
   )
 }
 
-const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
+const ipToHostname = (ip: string): string => (isIPv6(ip) ? `[${ip}]` : ip)
 
 const makeRobotModel = (
   healthModel: string | null,
@@ -91,7 +88,7 @@ const isOT2Robot = (robot: DiscoveredRobot): boolean => {
 
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
-    state => state.discovery.robotsByName,
+    (state: State) => state.discovery.robotsByName,
     robotsMap => {
       const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
@@ -211,6 +208,7 @@ export const getViewableRobots: GetViewableRobots = createSelector(
     )
 )
 
+// todo(mm, 2026-04-15): This looks fragile--ip might be 127.0.0.1 or ::1?
 export const getLocalRobot: GetLocalRobot = createSelector(
   getAllRobots,
   robots => find(robots, { ip: 'localhost' }) ?? null
@@ -226,10 +224,16 @@ export const getRobotByName = (
 export const getDiscoverableRobotByName: (
   state: State,
   robotName: string | null
-) => DiscoveredRobot | null = createDeepEqualSelector(
+) => DiscoveredRobot | null = createSelector(
   getAllRobots,
   (state: State, robotName: string | null) => robotName,
-  (robots, robotName) => robots.find(r => r.name === robotName) ?? null
+  (robots, robotName) => robots.find(r => r.name === robotName) ?? null,
+  {
+    memoize: lruMemoize,
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
+  }
 )
 
 export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>

@@ -4,14 +4,17 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { CommandAnnotationV2 } from '@opentrons/shared-data/commandAnnotation/types'
 
 export type ProtocolSort = 'alphabetical' | 'reverse' | 'recent' | 'oldest'
 
 interface ParentNode {
-  annotationIndex: number
+  annotationId: string
   subCommands: LeafNode[]
   isHighlighted: boolean
+  annotation?: CommandAnnotationV2
 }
+
 export interface LeafNode {
   command: RunTimeCommand
   isHighlighted: boolean

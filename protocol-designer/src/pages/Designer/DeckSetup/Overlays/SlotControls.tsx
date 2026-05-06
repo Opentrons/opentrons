@@ -103,7 +103,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       canDrop: (item: DroppedItem) => {
         const draggedDef = item?.labwareOnDeck?.def
         console.assert(
-          draggedDef,
+          draggedDef != null,
           'no labware def of dragged def, expected it on drop'
         )
         if (moduleType != null && draggedDef != null) {
@@ -137,6 +137,8 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
         draggedItem: monitor.getItem() as DroppedItem,
       }),
     }),
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [moduleType, hasTrashAndNotD4, customLabwareDefs]
   )
 
@@ -145,8 +147,9 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     slotPosition == null ||
     terminalItemId !== START_TERMINAL_ITEM_ID ||
     isSelected
-  )
+  ) {
     return null
+  }
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
   // when dragging labware over a slot many times quickly

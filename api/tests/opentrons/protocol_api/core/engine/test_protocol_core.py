@@ -43,6 +43,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK, validation
 from opentrons.protocol_api._liquid import Liquid, LiquidClass
 from opentrons.protocol_api.core.engine import (
+    CSVCore,
     InstrumentCore,
     LabwareCore,
     ModuleCore,
@@ -2175,3 +2176,19 @@ def test_end_step_grouping_raises(subject: ProtocolCore) -> None:
     """It should raise if the annotation ID does not exist."""
     with pytest.raises(ValueError):
         subject.end_step_grouping("annotation-id")
+
+
+def test_create_csv(
+    decoy: Decoy, subject: ProtocolCore, mock_engine_client: EngineClient
+) -> None:
+    """Test creating a csv core."""
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.CreateCSVParams(fileName="Filename", columns=10),
+            command_annotations=[],
+        )
+    ).then_return(commands.CreateCSVResult(fileId="1234", columns=10))
+
+    result = subject.create_csv("Filename", 10)
+
+    assert isinstance(result, CSVCore)

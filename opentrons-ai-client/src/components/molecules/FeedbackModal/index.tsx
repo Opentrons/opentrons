@@ -16,16 +16,32 @@ import {
 } from '@opentrons/components'
 
 import { ANALYTICS } from '/ai-client/analytics/constants'
-import { feedbackModalAtom, tokenAtom } from '/ai-client/resources/atoms'
+import { feedbackModalAtom } from '/ai-client/resources/atoms'
 import {
   LOCAL_FEEDBACK_END_POINT,
   PROD_FEEDBACK_END_POINT,
   STAGING_FEEDBACK_END_POINT,
 } from '/ai-client/resources/constants'
 import { useApiCall } from '/ai-client/resources/hooks'
+import { useGetAccessToken } from '/ai-client/resources/hooks/useGetAccessToken'
 import { useTrackEvent } from '/ai-client/resources/hooks/useTrackEvent'
 
 import type { AxiosRequestConfig } from 'axios'
+
+type Env = 'production' | 'development' | 'staging'
+
+const getEnv = (): Env =>
+  _NODE_ENV_ === 'production'
+    ? 'production'
+    : _NODE_ENV_ === 'development'
+      ? 'development'
+      : 'staging'
+
+const pickEndpoint = (endpoints: {
+  production: string
+  development: string
+  staging: string
+}): string => endpoints[getEnv()]
 
 export function FeedbackModal(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -33,28 +49,28 @@ export function FeedbackModal(): JSX.Element {
 
   const [feedbackValue, setFeedbackValue] = useState<string>('')
   const [, setShowFeedbackModal] = useAtom(feedbackModalAtom)
-  const [token] = useAtom(tokenAtom)
+  const { getAccessToken } = useGetAccessToken()
   const { callApi, error, isLoading, data } = useApiCall()
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const handleSendFeedback = async (): Promise<void> => {
+    let token: string
+    try {
+      token = await getAccessToken()
+    } catch {
+      return
+    }
+
     const headers = {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     }
 
-    const getEndpoint = (): string => {
-      switch (_NODE_ENV_) {
-        case 'production':
-          return PROD_FEEDBACK_END_POINT
-        case 'development':
-          return LOCAL_FEEDBACK_END_POINT
-        default:
-          return STAGING_FEEDBACK_END_POINT
-      }
-    }
-
-    const url = getEndpoint()
+    const url = pickEndpoint({
+      production: PROD_FEEDBACK_END_POINT,
+      development: LOCAL_FEEDBACK_END_POINT,
+      staging: STAGING_FEEDBACK_END_POINT,
+    })
 
     const config = {
       url,
@@ -69,21 +85,26 @@ export function FeedbackModal(): JSX.Element {
     await callApi(config as AxiosRequestConfig)
   }
 
-  useEffect(() => {
-    if (isSubmitting && !isLoading) {
-      if (!error && data) {
-        // Success - track event and close modal
-        trackEvent({
-          name: ANALYTICS.FEEDBACK_SENT,
-          properties: {
-            feedback: feedbackValue,
-          },
-        })
-        setShowFeedbackModal(false)
+  useEffect(
+    () => {
+      if (isSubmitting && !isLoading) {
+        if (!error && data) {
+          // Success - track event and close modal
+          trackEvent({
+            name: ANALYTICS.FEEDBACK_SENT,
+            properties: {
+              feedback: feedbackValue,
+            },
+          })
+          setShowFeedbackModal(false)
+        }
+        setIsSubmitting(false)
       }
-      setIsSubmitting(false)
-    }
-  }, [isSubmitting, isLoading, error, data, feedbackValue])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSubmitting, isLoading, error, data, feedbackValue]
+  )
 
   return (
     <Modal
@@ -120,9 +141,9 @@ export function FeedbackModal(): JSX.Element {
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        {error && (
+        {error != null && (
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
-            {error}
+            {error.message}
           </StyledText>
         )}
         <InputField

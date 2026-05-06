@@ -1,0 +1,15 @@
+test_name: Default settings
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET /keys/external/settings returns default settings
+    request:
+      method: GET
+      url: '{run_server.base_url}/keys/external/settings'
+    response:
+      status_code: 200
+      json:
+        data: {}

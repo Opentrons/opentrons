@@ -86,7 +86,12 @@ export type ModuleCreateCommand =
   | FlexStackerSetStoredLabwareItemsCreateCommand
   | FlexStackerStoreCreateCommand
   | IdentifyModuleCreateCommand
-
+  | VacuumModuleSetTargetPressureCreateCommand
+  | VacuumModuleSetTargetPowerCreateCommand
+  | VacuumModuleStopPumpCreateCommand
+  | VacuumModuleOpenVentCreateCommand
+  | VacuumModuleCloseVentCreateCommand
+  | VacuumModuleStartRunProfileCreateCommand
 export interface MagneticModuleEngageMagnetCreateCommand extends CommonCommandCreateInfo {
   commandType: 'magneticModule/engage'
   params: EngageMagnetParams
@@ -364,6 +369,36 @@ export interface TCProfileParams {
   moduleId: string
   profile: AtomicProfileStep[]
   blockMaxVolumeUl?: number
+}
+
+// Vacuum Profile params (not finalized) (nd, 2026-04-23)
+export interface AtomicVacuumProfileStepBase {
+  holdSeconds: number
+}
+
+export interface AtomicVacuumProfileStepPressure extends AtomicVacuumProfileStepBase {
+  pressureMbar: number
+}
+
+export interface AtomicVacuumProfileStepPower extends AtomicVacuumProfileStepBase {
+  powerPercent: number
+}
+
+export type AtomicVacuumProfileStep =
+  | AtomicVacuumProfileStepPressure
+  | AtomicVacuumProfileStepPower
+
+export interface VacuumProfileCycle {
+  steps: AtomicVacuumProfileStep[]
+  repetitions: number
+}
+
+export type VacuumProfile = Array<VacuumProfileCycle | AtomicVacuumProfileStep>
+export interface VacuumRunProfileParams {
+  moduleId: string
+  profile: VacuumProfile
+  taskId?: string | null
+  ventAfter?: boolean
 }
 
 export interface ModuleOnlyParams {
@@ -653,4 +688,55 @@ export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
 export interface IdentifyModuleRunTimeCommand
   extends CommonCommandRunTimeInfo, IdentifyModuleCreateCommand {
   result?: any
+}
+
+interface BaseVacuumModulePumpParams extends ModuleOnlyParams {
+  // in seconds
+  duration?: number
+  // in mbar/s
+  rate?: number
+  // in seconds
+  timeout?: number
+  ventAfter?: boolean
+  taskId?: string | null
+}
+
+interface VacuumModuleSetTargetPressureParams extends BaseVacuumModulePumpParams {
+  // in mbar
+  gaugePressure: number
+}
+
+interface VacuumModuleSetTargetPowerParams extends BaseVacuumModulePumpParams {
+  // in % between 0 and 100
+  percentPower: number
+}
+
+export interface VacuumModuleSetTargetPressureCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/startSetVacuumPressure'
+  params: VacuumModuleSetTargetPressureParams
+}
+
+export interface VacuumModuleSetTargetPowerCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/startSetVacuumPower'
+  params: VacuumModuleSetTargetPowerParams
+}
+
+export interface VacuumModuleStopPumpCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/stopVacuum'
+  params: ModuleOnlyParams
+}
+
+export interface VacuumModuleOpenVentCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/openVent'
+  params: ModuleOnlyParams
+}
+
+export interface VacuumModuleCloseVentCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/closeVent'
+  params: ModuleOnlyParams
+}
+
+export interface VacuumModuleStartRunProfileCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'vacuumModule/startRunProfile'
+  params: VacuumRunProfileParams
 }

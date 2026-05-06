@@ -26,6 +26,79 @@ PR_SPECIAL_BRANCH_PREFIXES: tuple[str, ...] = ("chore_release",)
 PR_SPECIAL_BRANCH_NAMES: tuple[str, ...] = ("edge", "release")
 PR_SANDBOX_SUFFIX = "-pr"
 
+# Application ids (used as dict keys in this module).
+APP_LABWARE_LIBRARY: Application = "labware_library"
+APP_PROTOCOL_DESIGNER: Application = "protocol_designer"
+APP_DOCS: Application = "docs"
+APP_MKDOCS: Application = "mkdocs"
+APP_COMPONENTS: Application = "components"
+
+# Substrings matched against GITHUB_WORKFLOW (each app's workflow `name:` in GitHub Actions).
+WORKFLOW_NAME_MKDOCS = "Docs build and deploy"
+WORKFLOW_NAME_PROTOCOL_DESIGNER = "PD test, build, and deploy"
+WORKFLOW_NAME_LABWARE_LIBRARY = "Labware Library test, build, and deploy"
+WORKFLOW_NAME_COMPONENTS = "Components test, build, and deploy"
+WORKFLOW_NAME_DOCS = "API docs build"
+
+# GitHub Actions event names (GITHUB_EVENT_NAME).
+GITHUB_EVENT_PULL_REQUEST = "pull_request"
+GITHUB_EVENT_PUSH = "push"
+
+# Deployment target environment (match deploy_types.Environment).
+ENV_SANDBOX: Environment = "sandbox"
+ENV_STAGING: Environment = "staging"
+ENV_PRODUCTION: Environment = "production"
+
+# Git ref types inferred from GITHUB_REF.
+REF_TYPE_TAG = "tag"
+REF_TYPE_BRANCH = "branch"
+
+# Fallback sandbox path when PR head ref is missing.
+SANDBOX_PREFIX_UNKNOWN = "unknown"
+
+# Tag ref names (compared lowercase) for push.tag environment routing.
+TAG_STAGING_ENV_PREFIX = "staging-"
+
+# Staging and production tag name prefixes per app (single source for tuples below).
+TAG_LABWARE_LIBRARY_STAGING_PREFIX = "staging-labware-library"
+TAG_LABWARE_LIBRARY_PRODUCTION_PREFIX = "labware-library"
+
+TAG_MKDOCS_STAGING_PREFIX = "staging-mkdocs"
+TAG_MKDOCS_PRODUCTION_PREFIX = "mkdocs"
+
+TAG_DOCS_STAGING_PREFIX = "staging-docs"
+TAG_DOCS_PRODUCTION_PREFIX = "docs"
+
+TAG_PROTOCOL_DESIGNER_STAGING_PREFIX = "staging-protocol-designer"
+TAG_PROTOCOL_DESIGNER_PRODUCTION_PREFIX = "protocol-designer"
+# Protocol Designer alpha tags: full name is the sandbox URL path (see protocol-designer/RELEASE.md).
+TAG_PD_TEST_SANDBOX_PREFIX = "pd-test"
+
+TAG_LABWARE_LIBRARY_TAG_REF_PREFIXES: tuple[str, ...] = (
+    TAG_LABWARE_LIBRARY_STAGING_PREFIX,
+    TAG_LABWARE_LIBRARY_PRODUCTION_PREFIX,
+)
+TAG_MKDOCS_TAG_REF_PREFIXES: tuple[str, ...] = (
+    TAG_MKDOCS_STAGING_PREFIX,
+    TAG_MKDOCS_PRODUCTION_PREFIX,
+)
+TAG_DOCS_TAG_REF_PREFIXES: tuple[str, ...] = (
+    TAG_DOCS_STAGING_PREFIX,
+    TAG_DOCS_PRODUCTION_PREFIX,
+)
+TAG_PROTOCOL_DESIGNER_TAG_REF_PREFIXES: tuple[str, ...] = (
+    TAG_PROTOCOL_DESIGNER_STAGING_PREFIX,
+    TAG_PROTOCOL_DESIGNER_PRODUCTION_PREFIX,
+    TAG_PD_TEST_SANDBOX_PREFIX,
+)
+
+TAG_PRODUCTION_REF_PREFIXES: tuple[str, ...] = (
+    TAG_LABWARE_LIBRARY_PRODUCTION_PREFIX,
+    TAG_PROTOCOL_DESIGNER_PRODUCTION_PREFIX,
+    TAG_MKDOCS_PRODUCTION_PREFIX,
+    TAG_DOCS_PRODUCTION_PREFIX,
+)
+
 
 @dataclass(frozen=True)
 class CIConfig:
@@ -41,11 +114,11 @@ def _determine_application_from_tag(ref_name: str) -> str | None:
     """Determine application from tag name patterns."""
     ref_name_lower = ref_name.lower()
 
-    tag_patterns = {
-        "labware_library": ["staging-labware-library", "labware-library"],
-        "mkdocs": ["staging-mkdocs", "mkdocs"],
-        "docs": ["staging-docs", "docs"],
-        "protocol_designer": ["staging-protocol-designer", "protocol-designer"],
+    tag_patterns: dict[str, tuple[str, ...]] = {
+        APP_LABWARE_LIBRARY: TAG_LABWARE_LIBRARY_TAG_REF_PREFIXES,
+        APP_MKDOCS: TAG_MKDOCS_TAG_REF_PREFIXES,
+        APP_DOCS: TAG_DOCS_TAG_REF_PREFIXES,
+        APP_PROTOCOL_DESIGNER: TAG_PROTOCOL_DESIGNER_TAG_REF_PREFIXES,
     }
 
     for app_name, prefixes in tag_patterns.items():
@@ -60,11 +133,11 @@ def _determine_application_from_workflow() -> str | None:
     workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
 
     workflow_patterns = {
-        "mkdocs": "Docs build and deploy",
-        "protocol_designer": "PD test, build, and deploy",
-        "labware_library": "Labware Library test, build, and deploy",
-        "components": "Components test, build, and deploy",
-        "docs": "API docs build",
+        APP_MKDOCS: WORKFLOW_NAME_MKDOCS,
+        APP_PROTOCOL_DESIGNER: WORKFLOW_NAME_PROTOCOL_DESIGNER,
+        APP_LABWARE_LIBRARY: WORKFLOW_NAME_LABWARE_LIBRARY,
+        APP_COMPONENTS: WORKFLOW_NAME_COMPONENTS,
+        APP_DOCS: WORKFLOW_NAME_DOCS,
     }
 
     for app_name, pattern in workflow_patterns.items():
@@ -77,7 +150,7 @@ def _determine_application_from_workflow() -> str | None:
 def _determine_application(ref_type: str, ref_name: str) -> str:
     """Determine application from ref type and name."""
     # Try tag-based detection first
-    if ref_type == "tag":
+    if ref_type == REF_TYPE_TAG:
         app_from_tag = _determine_application_from_tag(ref_name)
         if app_from_tag:
             return app_from_tag
@@ -95,35 +168,38 @@ def _determine_application(ref_type: str, ref_name: str) -> str:
     )
 
 
-def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: str, head_ref: Optional[str]) -> tuple[str, str]:
+def _determine_environment_and_prefix(
+    event_name: str, ref_type: str, ref_name: str, head_ref: Optional[str]
+) -> tuple[str, str]:
     """Determine environment and sandbox prefix from event context."""
-    if event_name == "pull_request":
-        environment = "sandbox"
+    if event_name == GITHUB_EVENT_PULL_REQUEST:
+        environment = ENV_SANDBOX
         # Handle empty or null head_ref values
         if head_ref and head_ref.lower() not in ["", "null", "none"]:
             sandbox_prefix = head_ref
             if _is_special_pr_branch(head_ref):
                 sandbox_prefix = _alternate_pr_sandbox_prefix(head_ref)
         else:
-            sandbox_prefix = "unknown"
+            sandbox_prefix = SANDBOX_PREFIX_UNKNOWN
         return environment, sandbox_prefix
 
-    if event_name in ["push", 'workflow_dispatch'] and ref_type == "branch":
+    if event_name in ["push", "workflow_dispatch"] and ref_type == "branch":
         return "sandbox", ref_name
 
-    if event_name in ["push", 'workflow_dispatch'] and ref_type == "tag":
+    if event_name in ["push", "workflow_dispatch"] and ref_type == "tag":
         # Tag-based environment detection - normalize to lowercase for comparison
         ref_name_lower = ref_name.lower()
-        if ref_name_lower.startswith("staging-"):
-            return "staging", ref_name
-        elif ref_name_lower.startswith(("labware-library", "protocol-designer", "mkdocs", "docs")):
-            # Production tag patterns
-            return "production", ref_name
-        else:
-            # Default to sandbox for unrecognized tags
-            return "sandbox", ref_name
+        if ref_name_lower.startswith(TAG_STAGING_ENV_PREFIX):
+            return ENV_STAGING, ref_name
+        if ref_name_lower.startswith(TAG_PD_TEST_SANDBOX_PREFIX):
+            return ENV_SANDBOX, ref_name
+        if ref_name_lower.startswith(TAG_PRODUCTION_REF_PREFIXES):
+            return ENV_PRODUCTION, ref_name
+        return ENV_SANDBOX, ref_name
 
-    raise ValueError(f"No deployment configuration found for event: {event_name}, ref_type: {ref_type}")
+    raise ValueError(
+        f"No deployment configuration found for event: {event_name}, ref_type: {ref_type}"
+    )
 
 
 def _is_special_pr_branch(branch_name: str) -> bool:
@@ -164,7 +240,9 @@ def parse_github_event_context(
         Tuple of (application, environment, sandbox_prefix)
     """
     application = _determine_application(ref_type, ref_name)
-    environment, sandbox_prefix = _determine_environment_and_prefix(event_name, ref_type, ref_name, head_ref)
+    environment, sandbox_prefix = _determine_environment_and_prefix(
+        event_name, ref_type, ref_name, head_ref
+    )
     return application, environment, sandbox_prefix
 
 
@@ -188,15 +266,17 @@ def parse_github_env() -> tuple[str, str, str, str, Optional[str]]:
 
     # Infer ref_type
     if ref.startswith("refs/tags/"):
-        ref_type = "tag"
+        ref_type = REF_TYPE_TAG
     elif ref.startswith("refs/heads/") or ref.startswith("refs/pull/"):
-        ref_type = "branch"
+        ref_type = REF_TYPE_BRANCH
     else:
         # Default to branch if unknown
-        ref_type = "branch"
+        ref_type = REF_TYPE_BRANCH
 
     if not event_name or not ref:
-        raise ValueError("Missing required GitHub environment variables for event parsing")
+        raise ValueError(
+            "Missing required GitHub environment variables for event parsing"
+        )
 
     return event_name, ref, ref_name, ref_type, head_ref
 
@@ -214,12 +294,16 @@ def resolve_ci_config() -> CIConfig:
     event_name, ref, ref_name, ref_type, head_ref = parse_github_env()
 
     # Resolve deployment configuration
-    application, environment, sandbox_prefix = parse_github_event_context(event_name, ref, ref_name, ref_type, head_ref)
+    application, environment, sandbox_prefix = parse_github_event_context(
+        event_name, ref, ref_name, ref_type, head_ref
+    )
 
     # Get artifact root from environment
     relative_artifact_dir = os.environ.get("RELATIVE_ARTIFACT_DIR")
     if not relative_artifact_dir:
-        raise ValueError("CI mode requires RELATIVE_ARTIFACT_DIR environment variable for artifact path")
+        raise ValueError(
+            "CI mode requires RELATIVE_ARTIFACT_DIR environment variable for artifact path"
+        )
 
     return CIConfig(
         application=application,
@@ -240,7 +324,7 @@ def write_github_output(config: CIConfig) -> None:
         console.print("⚠️  GITHUB_OUTPUT not set, printing to stdout", style="yellow")
         console.print(f"APPLICATION={config.application}")
         console.print(f"ENVIRONMENT={config.environment}")
-        if config.environment == "sandbox" and config.sandbox_prefix:
+        if config.environment == ENV_SANDBOX and config.sandbox_prefix:
             console.print(f"SANDBOX_PREFIX={config.sandbox_prefix}")
         console.print(f"RELATIVE_ARTIFACT_DIR={config.relative_artifact_dir}")
         return
@@ -249,14 +333,14 @@ def write_github_output(config: CIConfig) -> None:
         with open(github_output, "a") as f:
             f.write(f"APPLICATION={config.application}\n")
             f.write(f"ENVIRONMENT={config.environment}\n")
-            if config.environment == "sandbox" and config.sandbox_prefix:
+            if config.environment == ENV_SANDBOX and config.sandbox_prefix:
                 f.write(f"SANDBOX_PREFIX={config.sandbox_prefix}\n")
             f.write(f"RELATIVE_ARTIFACT_DIR={config.relative_artifact_dir}\n")
 
         console.print(f"✅ Wrote CI configuration to {github_output}", style="green")
         console.print(f"  APPLICATION={config.application}")
         console.print(f"  ENVIRONMENT={config.environment}")
-        if config.environment == "sandbox" and config.sandbox_prefix:
+        if config.environment == ENV_SANDBOX and config.sandbox_prefix:
             console.print(f"  SANDBOX_PREFIX={config.sandbox_prefix}")
         console.print(f"  RELATIVE_ARTIFACT_DIR={config.relative_artifact_dir}")
 
@@ -273,22 +357,24 @@ def write_github_summary(config: CIConfig) -> None:
     """
     github_step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if not github_step_summary:
-        console.print("⚠️  GITHUB_STEP_SUMMARY not set, skipping summary", style="yellow")
+        console.print(
+            "⚠️  GITHUB_STEP_SUMMARY not set, skipping summary", style="yellow"
+        )
         return
 
     # Environment emoji mapping
     env_emoji = {
-        "sandbox": "🏗️",
-        "staging": "🧪",
-        "production": "🌟",
+        ENV_SANDBOX: "🏗️",
+        ENV_STAGING: "🧪",
+        ENV_PRODUCTION: "🌟",
     }
 
     # Application display name mapping
     app_display = {
-        "labware_library": "Labware Library",
-        "protocol_designer": "Protocol Designer",
-        "docs": "Docs",
-        "mkdocs": "MkDocs",
+        APP_LABWARE_LIBRARY: "Labware Library",
+        APP_PROTOCOL_DESIGNER: "Protocol Designer",
+        APP_DOCS: "Docs",
+        APP_MKDOCS: "MkDocs",
     }
 
     markdown_summary = f"""## 🚀 Deployment Configuration Resolved
@@ -298,7 +384,7 @@ def write_github_summary(config: CIConfig) -> None:
 | 📦 **Application** | {app_display.get(config.application, config.application)} |
 | {env_emoji.get(config.environment, "🔧")} **Environment** | {config.environment.title()} |"""
 
-    if config.environment == "sandbox" and config.sandbox_prefix:
+    if config.environment == ENV_SANDBOX and config.sandbox_prefix:
         markdown_summary += f"""
 | 🌿 **Sandbox Prefix** | `{config.sandbox_prefix}` |"""
 

@@ -315,8 +315,8 @@ class CreateUserCommandAnnotation:
     """Creates a user command annotation."""
 
     annotation_id: str
-    user_defined_name: str
-    user_description: Optional[str]
+    name: str
+    description: Optional[str]
     params: Dict[str, Union[str, float, int]]
 
 

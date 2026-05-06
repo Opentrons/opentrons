@@ -12,7 +12,7 @@ ssh_opts ?= $(default_ssh_opts)
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd ../ && yarn bin):$(PATH)
+PATH := $(shell cd ../ && pnpm bin):$(PATH)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -40,6 +40,8 @@ protocol_sources = $(wildcard protocol/schemas/*.json)
 gripper_sources = $(wildcard gripper/definitions/*.json) $(wildcard gripper/schemas/*.json)
 
 json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
+
+files_to_check := python/opentrons_shared_data python_tests tools
 
 tests ?= python_tests
 
@@ -99,13 +101,14 @@ sdist: $(py_sources) $(json_sources)
 
 .PHONY: lint
 lint: $(py_sources)
-	$(python) -m mypy python/opentrons_shared_data python_tests tools
-	$(ruff) check python/opentrons_shared_data python_tests tools
+	$(python) -m mypy $(files_to_check)
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format:
-	$(ruff) format python/opentrons_shared_data python_tests tools
-	$(ruff) check --select I --fix python/opentrons_shared_data python_tests tools
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 .PHONY: push-no-restart
 push-no-restart: wheel
