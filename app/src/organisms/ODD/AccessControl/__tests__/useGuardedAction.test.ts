@@ -1,6 +1,4 @@
-import { Provider } from 'react-redux'
 import { act, renderHook } from '@testing-library/react'
-import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
@@ -9,14 +7,19 @@ import { useGuardedAction } from '../useGuardedAction'
 import { useRequireDocumentation } from '../useRequireDocumentation'
 import { useRequireLogin } from '../useRequireLogin'
 
-import type { Store } from 'redux'
-import type { FunctionComponent, ReactNode } from 'react'
-import type { State } from '/app/redux/types'
 import type { DocumentedActionKind } from '/app/resources/access-control'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
 }))
+
+vi.mock('react-redux', async importOriginal => {
+  const actual = await importOriginal<typeof import('react-redux')>()
+  return {
+    ...actual,
+    useSelector: (selector: (state: unknown) => unknown) => selector({}),
+  }
+})
 
 vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
@@ -33,11 +36,6 @@ vi.mock('../useRequireLogin', () => ({
 vi.mock('../useRequireDocumentation', () => ({
   useRequireDocumentation: vi.fn(),
 }))
-
-const store: Store<State> = legacy_createStore(state => state, {} as State)
-const wrapper: FunctionComponent<{ children: ReactNode }> = ({ children }) => (
-  <Provider store={store}>{children}</Provider>
-)
 
 const ACTION: DocumentedActionKind = {
   kind: 'PROTOCOL_PLAY',
@@ -64,7 +62,7 @@ describe('useGuardedAction', () => {
       data: { data: { accessControlEnabled: false } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
 
-    const { result } = renderHook(() => useGuardedAction(ACTION), { wrapper })
+    const { result } = renderHook(() => useGuardedAction(ACTION))
 
     const got = await act(async () => await result.current())
     expect(got).toBe(true)
@@ -80,7 +78,7 @@ describe('useGuardedAction', () => {
       documentedBy: 'alice',
     })
 
-    const { result } = renderHook(() => useGuardedAction(ACTION), { wrapper })
+    const { result } = renderHook(() => useGuardedAction(ACTION))
 
     const got = await act(async () => await result.current())
     expect(got).toBe(true)
@@ -93,7 +91,7 @@ describe('useGuardedAction', () => {
   it('returns false and skips documentation when login is dismissed', async () => {
     requireLogin.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useGuardedAction(ACTION), { wrapper })
+    const { result } = renderHook(() => useGuardedAction(ACTION))
 
     const got = await act(async () => await result.current())
     expect(got).toBe(false)
@@ -104,7 +102,7 @@ describe('useGuardedAction', () => {
     requireLogin.mockResolvedValue({ username: 'alice' })
     requireDocumentation.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useGuardedAction(ACTION), { wrapper })
+    const { result } = renderHook(() => useGuardedAction(ACTION))
 
     const got = await act(async () => await result.current())
     expect(got).toBe(false)
@@ -119,7 +117,7 @@ describe('useGuardedAction', () => {
       documentedBy: 'alice',
     })
 
-    const { result } = renderHook(() => useGuardedAction(ACTION), { wrapper })
+    const { result } = renderHook(() => useGuardedAction(ACTION))
 
     await act(async () => await result.current())
     expect(requireDocumentation).toHaveBeenCalledWith(ACTION, loginResult)

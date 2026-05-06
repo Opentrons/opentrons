@@ -5,7 +5,7 @@ import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 
 import { useRequireLogin } from '../useRequireLogin'
 
-vi.mock('/app/organisms/ODD/OnDeviceLogin', () => ({
+vi.mock('/app/organisms/ODD/OnDeviceLogin/LoginModal', () => ({
   showLoginModal: vi.fn(),
 }))
 
