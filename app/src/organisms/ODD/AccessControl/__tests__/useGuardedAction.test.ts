@@ -7,7 +7,7 @@ import { useGuardedAction } from '../useGuardedAction'
 import { useRequireDocumentation } from '../useRequireDocumentation'
 import { useRequireLogin } from '../useRequireLogin'
 
-import type { DocumentedActionKind } from '/app/resources/access-control'
+import type { DocumentedActionKind } from '/app/resources/access-control/DocumentedAction'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
@@ -64,8 +64,8 @@ describe('useGuardedAction', () => {
 
     const { result } = renderHook(() => useGuardedAction(ACTION))
 
-    const got = await act(async () => await result.current())
-    expect(got).toBe(true)
+    const currentResult = await act(async () => await result.current())
+    expect(currentResult).toBe(true)
     expect(requireLogin).not.toHaveBeenCalled()
     expect(requireDocumentation).not.toHaveBeenCalled()
   })
@@ -80,8 +80,8 @@ describe('useGuardedAction', () => {
 
     const { result } = renderHook(() => useGuardedAction(ACTION))
 
-    const got = await act(async () => await result.current())
-    expect(got).toBe(true)
+    const currentResult = await act(async () => await result.current())
+    expect(currentResult).toBe(true)
 
     const loginOrder = requireLogin.mock.invocationCallOrder[0]
     const docOrder = requireDocumentation.mock.invocationCallOrder[0]
@@ -93,8 +93,8 @@ describe('useGuardedAction', () => {
 
     const { result } = renderHook(() => useGuardedAction(ACTION))
 
-    const got = await act(async () => await result.current())
-    expect(got).toBe(false)
+    const currentResult = await act(async () => await result.current())
+    expect(currentResult).toBe(false)
     expect(requireDocumentation).not.toHaveBeenCalled()
   })
 
@@ -104,8 +104,8 @@ describe('useGuardedAction', () => {
 
     const { result } = renderHook(() => useGuardedAction(ACTION))
 
-    const got = await act(async () => await result.current())
-    expect(got).toBe(false)
+    const currentResult = await act(async () => await result.current())
+    expect(currentResult).toBe(false)
   })
 
   it('passes the login result to the documentation guard alongside the action', async () => {

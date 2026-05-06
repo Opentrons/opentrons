@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
 
 import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired'
-import { postDocumentation } from '/app/resources/access-control'
+import { postDocumentation } from '/app/resources/access-control/postDocumentation'
 
 import type {
   DocumentationResult,
   DocumentedActionKind,
-} from '/app/resources/access-control'
+} from '/app/resources/access-control/DocumentedAction'
 import type { RequireLoginResult } from './useRequireLogin'
 
 export type RequireDocumentationGuard = (
@@ -27,22 +27,18 @@ export function useRequireDocumentation(): RequireDocumentationGuard {
     })
     if (modalResult == null) return null
 
-    const {
-  note,
-  confirmedAt,
-  loginResult: { username },
-} = modalResult
+    const { note, confirmedAt } = modalResult
 
     await postDocumentation({
       action,
-      note:.note,
-      username,
+      note: note,
+      username: loginResult.username,
       confirmedAt,
     })
 
     return {
-      note: modalResult.note,
-      confirmedAt: modalResult.confirmedAt,
+      note: note,
+      confirmedAt: confirmedAt,
       documentedBy: loginResult.username,
     }
   }, [])

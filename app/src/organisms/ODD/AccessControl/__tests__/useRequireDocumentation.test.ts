@@ -2,11 +2,9 @@ import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired'
-import { postDocumentation } from '/app/resources/access-control'
+import { postDocumentation } from '/app/resources/access-control/postDocumentation'
 
 import { useRequireDocumentation } from '../useRequireDocumentation'
-
-import type { DocumentedActionKind } from '/app/resources/access-control'
 
 vi.mock('/app/organisms/ODD/DocumentationRequired', () => ({
   showDocumentationRequiredModal: vi.fn(),

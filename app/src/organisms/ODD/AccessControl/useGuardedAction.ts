@@ -8,7 +8,7 @@ import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 import { useRequireDocumentation } from './useRequireDocumentation'
 import { useRequireLogin } from './useRequireLogin'
 
-import type { DocumentedActionKind } from '/app/resources/access-control'
+import type { DocumentedActionKind } from '/app/resources/access-control/DocumentedAction'
 
 /**
  * API for the access-control gate.
@@ -42,7 +42,9 @@ export function useGuardedAction(
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
 
   return useCallback(async () => {
-    if (!accessControlEnabled) { return true }
+    if (!accessControlEnabled) {
+      return true
+    }
 
     const loginResult = await requireLogin()
     if (loginResult == null) return false
