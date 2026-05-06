@@ -24,7 +24,7 @@ interface AnnotatedGroupProps {
   annotationDescription: string
   setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
   handlePause?: () => void
-  headerLeading?: ReactNode
+  headerLeading?: ReactNode | null
 }
 export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const {

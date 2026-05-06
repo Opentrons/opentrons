@@ -23,13 +23,14 @@ interface GroupAnnotatedStepRowProps {
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   allRunDefs: LabwareDefinition[]
+  // this is the command index at the start of the group
   commandStartNumber: number
   annotationDescription: string
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
-  handlePause?: () => void
   milliSecondsPerFrame: number
   isGlobalPlaying: boolean
-  t: (key: string) => string
+  tI18n: (key: string) => string
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  handlePause?: () => void
 }
 
 function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
@@ -39,7 +40,7 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
     isGlobalPlaying,
     setSelectedCommand,
     handlePause,
-    t,
+    tI18n,
     ...annotatedGroupProps
   } = props
 
@@ -67,12 +68,12 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
 
     const intervalId = globalThis.setInterval(() => {
       setSelectedCommand(prevId => {
-        const idx = commandIds.indexOf(prevId ?? '')
-        if (idx === -1) {
+        const commandIndex = commandIds.indexOf(prevId ?? '')
+        if (commandIndex === -1) {
           return commandIds[0] ?? null
         }
-        const nextIdx = (idx + 1) % commandIds.length
-        return commandIds[nextIdx] ?? null
+        const nextCommandIndex = (commandIndex + 1) % commandIds.length
+        return commandIds[nextCommandIndex] ?? null
       })
     }, milliSecondsPerFrame)
 
@@ -103,6 +104,13 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
   const isAnyStepHighlighted = subCommands.some(sub => sub.isHighlighted)
   const iconColor = isAnyStepHighlighted ? COLORS.purple50 : COLORS.grey60
 
+  const handlePlayButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation()
+    toggleGroupPlay()
+  }
+
   return (
     <AnnotatedGroup
       {...annotatedGroupProps}
@@ -114,10 +122,7 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
           <button
             type="button"
             className={styles.group_play_button}
-            onClick={event => {
-              event.stopPropagation()
-              toggleGroupPlay()
-            }}
+            onClick={handlePlayButtonClick}
             aria-label={isGroupPlaying ? 'stop step group' : 'play step group'}
           >
             <Icon
@@ -126,7 +131,7 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
               color={iconColor}
             />
           </button>
-        ) : undefined
+        ) : null
       }
     />
   )
@@ -154,7 +159,7 @@ export function AnnotatedStepsRowItem(
             annotationDescription={row.annotationDescription}
             milliSecondsPerFrame={data.milliSecondsPerFrame}
             isGlobalPlaying={data.isGlobalPlaying}
-            t={data.t}
+            tI18n={data.t}
           />
         ) : row.type === 'command' ? (
           <IndividualCommand

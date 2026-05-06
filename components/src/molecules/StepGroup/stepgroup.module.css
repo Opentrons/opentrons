@@ -23,7 +23,7 @@
   min-width: 0;
   flex: 1;
   align-items: center;
-  gap: 2px;
+  gap: var(--spacing-2);
   grid-template-columns: auto 1fr;
 }
 
@@ -68,8 +68,8 @@
 
 .step_group_chevron_wrap {
   display: flex;
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   align-items: center;
   justify-content: center;
   border-radius: var(--border-radius-4);
