@@ -26,11 +26,11 @@ interface GroupAnnotatedStepRowProps {
   // this is the command index at the start of the group
   commandStartNumber: number
   annotationDescription: string
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
-  handlePause?: () => void
   milliSecondsPerFrame: number
   isGlobalPlaying: boolean
   tI18n: (key: string) => string
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  handlePause?: () => void
 }
 
 function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {

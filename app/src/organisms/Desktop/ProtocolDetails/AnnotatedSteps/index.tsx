@@ -59,19 +59,20 @@ export interface ItemData {
   rows: AnnotatedStepsRow[]
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   allRunDefs: LabwareDefinition[]
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
-  handlePause?: () => void
   scrollTargetId: string | null
   listElement: HTMLElement | null
   onShowErrorDetails: () => void
   t: (key: string) => string
   milliSecondsPerFrame: number
   isGlobalPlaying: boolean
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  handlePause?: () => void
 }
 
 // Note: Since we're using the height value that appears most frequently in the design,
 // we may need to adjust it later.
 const DEFAULT_ROW_HEIGHT_PX = 64
+const DEFAULT_STEP_GROUP_SECONDS = 2000
 
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const {
@@ -81,7 +82,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
     setIsAtBottom,
-    milliSecondsPerFrame = 2000,
+    milliSecondsPerFrame = DEFAULT_STEP_GROUP_SECONDS,
     isGlobalPlaying = false,
   } = props
   const { t } = useTranslation('protocol_visualization')
@@ -110,7 +111,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     [analysis.commands]
   )
   const filteredGroupedCommands = useMemo(() => {
-    if (groupedCommands == null) return null
+    if (groupedCommands == null) {
+      return null
+    }
     const next: GroupedCommands = []
     for (const node of groupedCommands) {
       if ('annotationId' in node) {

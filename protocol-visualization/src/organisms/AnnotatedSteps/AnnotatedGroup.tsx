@@ -65,7 +65,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
         isActive={isAnyStepHighlighted}
         subtitle={annotationDescription}
         headerLeading={headerLeading}
-        titleColor={isAnyStepHighlighted ? COLORS.purple50 : undefined}
+        {...(isAnyStepHighlighted ? { titleColor: COLORS.purple50 } : {})}
       >
         {isExpanded ? (
           <div className={styles.annotated_group_expanded}>
