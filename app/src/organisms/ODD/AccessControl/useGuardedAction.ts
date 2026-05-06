@@ -42,7 +42,7 @@ export function useGuardedAction(
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
 
   return useCallback(async () => {
-    if (!accessControlEnabled) return true
+    if (!accessControlEnabled) { return true }
 
     const loginResult = await requireLogin()
     if (loginResult == null) return false
