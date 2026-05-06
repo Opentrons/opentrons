@@ -207,6 +207,7 @@ async def test_returned_in_order_added(
             liquids=[],
             liquidClasses=[],
             command_annotations=[],
+            labware_offsets=[],
         )
 
     subject.add_pending(
@@ -255,8 +256,11 @@ async def test_update_adds_details_and_completes_analysis(
         value=2.0,
         default=3.0,
     )
-    command_annotation = pe_types.CustomCommandAnnotationLegacy(
-        commandKeys=["abc", "xyz"]
+    command_annotation = pe_types.CommandAnnotation(
+        id="annotation-id",
+        source="userCommand",
+        name="My command annotation",
+        params={},
     )
     subject.add_pending(
         protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
@@ -275,6 +279,7 @@ async def test_update_adds_details_and_completes_analysis(
         liquids=[],
         liquidClasses=[],
         command_annotations=[command_annotation],
+        labware_offsets=[],
     )
 
     result = await subject.get("analysis-id")
@@ -329,8 +334,14 @@ async def test_update_adds_details_and_completes_analysis(
         "liquidClasses": [],
         "modules": [],
         "commandAnnotations": [
-            {"annotationType": "custom", "commandKeys": ["abc", "xyz"]}
+            {
+                "source": "userCommand",
+                "id": "annotation-id",
+                "name": "My command annotation",
+                "params": {},
+            }
         ],
+        "labwareOffsets": [],
     }
 
 
@@ -402,6 +413,7 @@ async def test_update_adds_rtp_values_to_completed_store(
         liquids=[],
         liquidClasses=[],
         command_annotations=[],
+        labware_offsets=[],
     )
     decoy.verify(
         await mock_completed_store.make_room_and_add(
@@ -507,6 +519,7 @@ async def test_update_infers_status_from_errors(
         liquids=[],
         liquidClasses=[],
         command_annotations=[],
+        labware_offsets=[],
     )
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)

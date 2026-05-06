@@ -21,10 +21,11 @@ const getSlotFromPipetteLocation = (
     return trashBinEntities[entityUnderPipette].location.split('cutout')[1]
   } else if (wasteChuteEntities[entityUnderPipette] != null) {
     return wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
-  } else
+  } else {
     console.warn(
       `expected to find slot assosciated with piette location ${entityUnderPipette} but could not`
     )
+  }
   return null
 }
 
@@ -41,19 +42,19 @@ export const getActiveSlotForLabwareDetails = (
   )?.entityId
   let slot = null
 
-  if (entityUnderPipette != null) {
+  if ('labwareId' in currentCommand.params) {
+    const isTiprack =
+      labwareEntities[currentCommand.params.labwareId].def.parameters.isTiprack
+    if (!isTiprack) {
+      slot = currentCommand.params.labwareId
+    }
+  } else if (entityUnderPipette != null) {
     slot = getSlotFromPipetteLocation(
       entityUnderPipette,
       labware,
       trashBinEntities,
       wasteChuteEntities
     )
-  } else if ('labwareId' in currentCommand.params) {
-    const isTiprack =
-      labwareEntities[currentCommand.params.labwareId].def.parameters.isTiprack
-    if (!isTiprack) {
-      slot = currentCommand.params.labwareId
-    }
   }
 
   return slot

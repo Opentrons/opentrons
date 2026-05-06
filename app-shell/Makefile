@@ -6,7 +6,7 @@ include ../scripts/push.mk
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 3000
@@ -22,7 +22,7 @@ SRC_PATH = app-shell
 noop := cd .
 
 # build and publish options
-dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-OT2-*","dist/**/Opentrons-Internal-OT2-*")
+dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-*","dist/**/Opentrons-OT3-*")
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
@@ -43,21 +43,21 @@ ssh_opts ?= $(default_ssh_opts)
 # if tagged build (tag ~= ^v.+) -> b$(BUILD_NUMBER)
 # if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
 # only copy update files publish directory on tagged builds that match the provided OPENTRONS_PROJECT
-# environment variable (i.e. if OT_TAG is vxxx and OPENTRONS_PROJECT is robot-stack, or OT_TAG is
-# internal@* calendar / internal tags and OPENTRONS_PROJECT is ot3)
+# environment variable (i.e. if OT_TAG is vxxx and OPENTRONS_PROJECT is robot-stack, or OT_TAG is ot3@xxx
+# and OPENTRONS_PROJECT is ot3)
 _publish_ot2 := $(and $(filter v%,$(OT_TAG)), $(filter robot-stack,$(OPENTRONS_PROJECT)))
-_publish_ot3 := $(and $(filter internal@%,$(OT_TAG)),$(filter ot3,$(OPENTRONS_PROJECT)))
+_publish_ot3 := $(and $(filter ot3@%,$(OT_TAG)), $(filter ot3,$(OPENTRONS_PROJECT)))
 publish_update := $(or $(_publish_ot2),$(_publish_ot3))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
-OPENTRONS_PROJECT ?= $(if $(_publish_ot3),ot3,robot-stack)
+OPENTRONS_PROJECT ?= $(if $(filter ot3@%,$(publish_update)),ot3,robot-stack)
 
 # set this to anything on command-line invocations of this makefile to skip bundling
 # standalone python, as is necessary for on-device app builds:
 # make dist no_python_bundle=true or =1 or whatever
 no_python_bundle ?=
 
-builder := yarn electron-builder \
+builder := pnpm electron-builder \
 	--config electron-builder.config.js \
 	--config.electronVersion=39.1.2 \
 	--publish never
@@ -67,7 +67,7 @@ builder := yarn electron-builder \
 # parse time. The $$() command substitution runs when the recipe executes.
 PYTHON_OVERRIDE_COMMAND = cd ../api && uv run --python 3.12 python -c "import sys, pathlib; print(pathlib.Path(sys.executable))"
 
-electron = yarn electron . \
+electron = pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -75,7 +75,7 @@ electron = yarn electron . \
 	--ui.url.path="localhost:$(PORT)" \
 	--python.pathToPythonOverride=$$($(PYTHON_OVERRIDE_COMMAND))
 
-electron-dist = yarn electron . \
+electron-dist = pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -95,18 +95,18 @@ branch-suffix:
 all: package
 
 .PHONY: setup
-# must be wrapped in yarn run otherwise `prebuild-install` will fail silently
+# must be wrapped in pnpm run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn rebuild
+	pnpm rebuild
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf lib dist python/install
+	pnpm shx rm -rf lib dist python/install
 
 .PHONY: cleanall
 cleanall: clean
-	yarn shx rm -rf python
+	pnpm shx rm -rf python
 
 # artifacts
 #####################################################################

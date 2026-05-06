@@ -10,14 +10,16 @@ import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 
 import { Navigation } from '..'
+import { useAccountIconInitial } from '../hooks/useAccountIconInitial'
 import { NavigationMenu } from '../NavigationMenu'
 
 import type { ComponentProps } from 'react'
 
+vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/resources/networking/hooks/useNetworkConnection')
 vi.mock('/app/redux/discovery')
+vi.mock('../hooks/useAccountIconInitial')
 vi.mock('../NavigationMenu')
-vi.mock('/app/local-resources/dom-utils')
 
 mockConnectedRobot.name = '12345678901234567'
 
@@ -35,6 +37,7 @@ describe('Navigation', () => {
   beforeEach(() => {
     props = {}
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useAccountIconInitial).mockReturnValue(null)
     vi.mocked(NavigationMenu).mockReturnValue(<div>mock NavigationMenu</div>)
     vi.mocked(useNetworkConnection).mockReturnValue({
       isEthernetConnected: false,
@@ -92,14 +95,21 @@ describe('Navigation', () => {
     screen.getByText('mock NavigationMenu')
     expect(props.setNavMenuIsOpened).toHaveBeenCalled()
   })
-  it('should change z index of nav bar when longPressModalIsOpened is defined and true', () => {
-    props = {
-      ...props,
-      longPressModalIsOpened: true,
-    }
-    render(props)
-    expect(screen.getByLabelText('Navigation_container')).toHaveStyle({
-      zIndex: 0,
+  describe('account icon', () => {
+    const linkName = 'Account'
+    it('should not render the account control when logged out', () => {
+      vi.mocked(useAccountIconInitial).mockReturnValue(null)
+      render(props)
+      expect(
+        screen.queryByRole('link', { name: linkName })
+      ).not.toBeInTheDocument()
+    })
+    it('should render the account initial and link to settings when logged in', () => {
+      vi.mocked(useAccountIconInitial).mockReturnValue('T')
+      render(props)
+      const accountLink = screen.getByRole('link', { name: linkName })
+      expect(accountLink).toHaveAttribute('href', '/robot-settings')
+      expect(accountLink).toHaveTextContent('T')
     })
   })
 })

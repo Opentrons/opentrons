@@ -38,27 +38,33 @@ export function Chat(): JSX.Element | null {
   const [updateProtocolChat] = useAtom(updateProtocolChatAtom)
   const [createProtocolChat] = useAtom(createProtocolChatAtom)
   const isDirectChatAccess =
-    updateProtocolChat.update_details === 'direct_chat_access'
+    updateProtocolChat.updateDetails === 'direct_chat_access'
 
   // Redirect to home page if there is no prompt (user has refreshed the page)
   // Exception: Allow direct chat access
-  useEffect(() => {
-    if (
-      updateProtocolChat.prompt === '' &&
-      createProtocolChat.prompt === '' &&
-      !isDirectChatAccess
-    ) {
-      navigate('/')
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (
+        updateProtocolChat.prompt === '' &&
+        createProtocolChat.prompt === '' &&
+        !isDirectChatAccess
+      ) {
+        navigate('/')
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   useEffect(() => {
-    if (scrollRef.current != null)
+    if (scrollRef.current != null) {
       scrollRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
         inline: 'nearest',
       })
+    }
   }, [chatData.length, scrollToBottom])
 
   return (

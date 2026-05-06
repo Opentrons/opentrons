@@ -1,81 +1,90 @@
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
+
+import { COLORS } from '../../../../helix-design-system'
+import { LABWARE } from '../types'
 import { getWidthAndHeightOfWellSVG } from './utils'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellMap } from '@opentrons/shared-data'
+import type { ParentType } from '../types'
 
-export function EmptyWell(props: {
-  size?: string
-  labwareDefinition: LabwareDefinition
-}): JSX.Element {
-  const { size, labwareDefinition } = props
+interface EmptyWellProps {
+  wellMap: LabwareWellMap
+  parentType: ParentType
+  wellName: string
+  size: string
+}
 
-  const firstWell = labwareDefinition.wells.A1
-  const isCircular = firstWell.shape === 'circular'
-  const [width, height] = getWidthAndHeightOfWellSVG(labwareDefinition)
-  const circularDimension = 20
-  const viewBox = isCircular
-    ? size || `0 0 ${circularDimension} ${circularDimension}`
-    : size || `0 0 ${width} ${height}`
+export function EmptyWell({
+  size,
+  wellMap,
+  wellName,
+  parentType,
+}: EmptyWellProps): JSX.Element {
+  const commonProps = {
+    [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
+  }
+  const { shape } = wellMap.A1
+  const isCircular = shape === 'circular'
+  const [width, height] = getWidthAndHeightOfWellSVG(wellMap)
+  const isLabware = parentType === LABWARE
+  const outlineColor = isLabware ? COLORS.grey50 : COLORS.black90
+  const circularSize = 20
+  const viewBoxWidth = isCircular ? circularSize : width
+  const viewBoxHeight = isCircular ? circularSize : height
+  const viewBox = `0 0 ${viewBoxWidth} ${viewBoxHeight}`
+  const lineStrokeWidth = isCircular ? 2 : 1
+
+  const cx = 10
+  const cy = 10
+  const r = 9
+  const angle = Math.PI / 4
+  const dx = r * Math.cos(angle)
+  const dy = r * Math.sin(angle)
+  const lineProps = isCircular
+    ? {
+        x1: cx - dx,
+        y1: cy - dy,
+        x2: cx + dx,
+        y2: cy + dy,
+      }
+    : { x1: 0, y1: 0, x2: viewBoxWidth, y2: viewBoxHeight }
+
+  const maskId = 'emptyWellMask'
 
   return (
     <svg
-      width={size ?? width}
-      height={size ?? height}
+      width={isCircular ? size : width}
+      height={isCircular ? size : height}
       viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <mask
-        id="emptyWellMask"
-        maskUnits="userSpaceOnUse"
-        x="0"
-        y="0"
-        width={isCircular ? circularDimension : width}
-        height={isCircular ? circularDimension : height}
-      >
-        {isCircular ? (
-          <circle cx="10" cy="10" r="9.5" fill="white" />
-        ) : (
-          <rect
-            x="0.5"
-            y="0.5"
-            width={width}
-            height={height}
-            rx="2"
-            fill="white"
-          />
-        )}
-      </mask>
-
-      <g mask="url(#emptyWellMask)">
+      <g mask={`url(#${maskId})`}>
         {isCircular ? (
           <circle
             cx="10"
             cy="10"
             r="9"
             fill="#CBCCCC"
-            stroke="#737578"
+            stroke={outlineColor}
             strokeWidth="2"
+            {...commonProps}
           />
         ) : (
           <rect
-            x="1"
-            y="1"
             width={width}
             height={height}
-            rx="2"
             fill="#CBCCCC"
-            stroke="#737578"
+            stroke={outlineColor}
             strokeWidth="2"
+            {...commonProps}
           />
         )}
 
         <line
-          x1={isCircular ? 24.7071 : width + 4.7071}
-          y1={isCircular ? -4.29289 : -4.29289}
-          x2={isCircular ? -3.29289 : -3.29289}
-          y2={isCircular ? 23.7071 : height + 3.7071}
-          stroke="#737578"
-          strokeWidth="2"
+          {...lineProps}
+          stroke={outlineColor}
+          strokeWidth={lineStrokeWidth}
         />
       </g>
     </svg>

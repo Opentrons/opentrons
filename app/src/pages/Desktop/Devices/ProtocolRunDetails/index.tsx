@@ -32,7 +32,7 @@ import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
@@ -63,7 +63,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
       robotName={robot.name}
     >
       <Box
@@ -259,23 +259,28 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     'not_available_for_a_completed_run'
   )}`
 
-  useEffect(() => {
-    // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
-    if (
-      currentRunStatus !== RUN_STATUS_IDLE &&
-      protocolRunDetailsTab !== 'run-preview' &&
-      protocolRunDetailsTab !== 'camera'
-    ) {
-      navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
-    }
-    // On initial render or on a clone run, navigate to "run setup" if the run hasn't started.
-    else if (
-      currentRunStatus === RUN_STATUS_IDLE &&
-      protocolRunDetailsTab !== 'setup'
-    ) {
-      navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`)
-    }
-  }, [currentRunStatus])
+  useEffect(
+    () => {
+      // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
+      if (
+        currentRunStatus !== RUN_STATUS_IDLE &&
+        protocolRunDetailsTab !== 'run-preview' &&
+        protocolRunDetailsTab !== 'camera'
+      ) {
+        navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+      }
+      // On initial render or on a clone run, navigate to "run setup" if the run hasn't started.
+      else if (
+        currentRunStatus === RUN_STATUS_IDLE &&
+        protocolRunDetailsTab !== 'setup'
+      ) {
+        navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentRunStatus]
+  )
 
   return (
     <RoundTab
@@ -342,8 +347,9 @@ const ModuleControlsTab = (
   )}`
 
   useEffect(() => {
-    if (disabled && protocolRunDetailsTab === 'module-controls')
+    if (disabled && protocolRunDetailsTab === 'module-controls') {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
+    }
   }, [disabled, navigate, protocolRunDetailsTab, robotName, runId])
 
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (

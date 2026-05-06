@@ -2,6 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 
+[options]
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer-span = "P1W"
+
 [[package]]
 name = "aionotify"
 version = "0.3.1"
@@ -760,9 +764,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "anyio", specifier = "==4.9.0" },
-    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "build", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "coverage", specifier = "==7.4.1" },
     { name = "decoy", specifier = ">=2.2.0,<3" },
     { name = "hypothesis", specifier = ">=6.96.1,<7" },
@@ -831,9 +833,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "build", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "jsonschema", specifier = "==4.17.3" },
     { name = "mypy", specifier = "==1.19.1" },
     { name = "numpy", specifier = "==1.26.4" },

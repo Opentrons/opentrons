@@ -6,11 +6,11 @@ include ../scripts/python-uv.mk
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 SHX := npx shx
 
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-PATH := $(shell cd .. && yarn bin):$(PATH)
+# add pnpm CLI dev deps to PATH (for cross platform POSIX commands via shx)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -18,6 +18,9 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # specified test
 tests ?= tests
 test_opts ?=
+
+files_to_check := ot3usb tests
+
 wheel_file = $(call python_get_wheelname,usb-bridge,$(project_rs_default),ot3usb)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
@@ -62,13 +65,14 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy ot3usb tests
-	$(ruff) check ot3usb tests
+	$(python) -m mypy $(files_to_check)
+	$(ruff) check $(files_to_check)
+	$(ruff) format --check $(files_to_check)
 
 .PHONY: format
 format:
-	$(ruff) format ot3usb tests
-	$(ruff) check --select I --fix ot3usb tests
+	$(ruff) format $(files_to_check)
+	$(ruff) check --select I --fix $(files_to_check)
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)

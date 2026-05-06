@@ -6,6 +6,10 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[options]
+exclude-newer = "2026-03-30T18:42:12.002798Z"
+exclude-newer-span = "P1W"
+
 [[package]]
 name = "aionotify"
 version = "0.3.1"
@@ -1470,12 +1474,14 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyserial" },
     { name = "python-can" },
+    { name = "setuptools" },
     { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
 flex = [
     { name = "python-can" },
+    { name = "setuptools" },
 ]
 
 [package.metadata]
@@ -1487,6 +1493,8 @@ requires-dist = [
     { name = "pyserial", specifier = "==3.5" },
     { name = "python-can", specifier = "==4.2.2" },
     { name = "python-can", marker = "extra == 'flex'", specifier = "==4.2.2" },
+    { name = "setuptools", specifier = ">=69.1.1,<82.0.0" },
+    { name = "setuptools", marker = "extra == 'flex'", specifier = ">=69.1.1,<82.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
 ]
 provides-extras = ["flex"]

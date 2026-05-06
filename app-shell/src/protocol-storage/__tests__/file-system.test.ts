@@ -4,7 +4,6 @@ import path from 'path'
 import Electron from 'electron'
 import fs from 'fs-extra'
 import tempy from 'tempy'
-import { v4 as uuidv4 } from 'uuid'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { analyzeProtocolSource } from '../../protocol-analysis'
@@ -18,7 +17,6 @@ import {
   removeProtocolByKey,
 } from '../file-system'
 
-// vi.mock('uuid')
 vi.mock('uuid', () => ({
   v4: vi.fn(),
 }))
@@ -176,36 +174,34 @@ describe('protocol storage directory utilities', () => {
     })
   })
 
-  describe('addProtocolFile', () => {
-    it('writes a protocol file to a new directory', () => {
+  describe('addProtocolFile', async () => {
+    it('writes a protocol file to a new directory', async () => {
+      const { v4: uuid } = await import('uuid')
       let count = 0
-      vi.mocked(uuidv4).mockImplementation(() => {
+      vi.mocked(uuid).mockImplementation((() => {
         const nextId = `${count}abc123`
         count = count + 1
         return nextId
-      })
+      }) as typeof uuid)
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.py')
       const expectedProtocolDirPath = path.join(destDir, '0abc123')
 
-      return fs
-        .writeFile(sourceName, 'file contents')
-        .then(() => addProtocolFile(sourceName, destDir))
-        .then(() => readDirectoriesWithinDirectory(destDir))
-        .then(dirPaths => parseProtocolDirs(dirPaths))
-        .then(dirs => {
-          expect(dirs).toEqual([
-            {
-              dirPath: expectedProtocolDirPath,
-              srcFilePaths: [
-                path.join(expectedProtocolDirPath, 'src', 'source.py'),
-              ],
-              analysisFilePaths: [],
-              modified: expect.any(Number),
-            },
-          ])
-        })
+      await fs.writeFile(sourceName, 'file contents')
+      await addProtocolFile(sourceName, destDir)
+      const dirPaths = await readDirectoriesWithinDirectory(destDir)
+      const dirs = await parseProtocolDirs(dirPaths)
+      expect(dirs).toEqual([
+        {
+          dirPath: expectedProtocolDirPath,
+          srcFilePaths: [
+            path.join(expectedProtocolDirPath, 'src', 'source.py'),
+          ],
+          analysisFilePaths: [],
+          modified: expect.any(Number),
+        },
+      ])
     })
   })
 

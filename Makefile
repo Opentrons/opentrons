@@ -3,15 +3,17 @@
 
 # make OT_PYTHON available
 include ./scripts/python.mk
+# make UV available
+include ./scripts/python-uv.mk
 
 API_CLIENT_DIR := api-client
 API_DIR := api
 APP_DIR := app
 APP_SHELL_DIR := app-shell
 APP_SHELL_ODD_DIR := app-shell-odd
-AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
+DOCS_DIR := docs
 G_CODE_TESTING_DIR := g-code-testing
 HARDWARE_DIR := hardware
 LABWARE_LIBRARY_DIR := labware-library
@@ -26,7 +28,7 @@ SYSTEM_SERVER_DIR := system-server
 UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
 
-PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -48,25 +50,25 @@ endif
 
 # run at usage (=), not on makefile parse (:=)
 # todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
-usb_host=$(shell yarn -s discovery find -i 169.254)
+usb_host=$(shell pnpm -s discovery find -i 169.254)
 
 # install all project dependencies
 .PHONY: setup
 setup: setup-js setup-py
 
-# front-end dependencies handled by yarn
+# front-end dependencies handled by pnpm
 .PHONY: setup-js
 setup-js:
-	yarn config set network-timeout 60000
-	yarn
+	pnpm config set network-timeout 60000
+	pnpm install
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
 # front-end dependencies install for CI
 .PHONY: setup-js-ci
 setup-js-ci:
-	yarn config set network-timeout 60000
-	yarn install --frozen-lockfile
+	pnpm config set network-timeout 60000
+	pnpm install --frozen-lockfile
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
@@ -91,7 +93,7 @@ teardown:
 
 .PHONY: teardown-js
 teardown-js: clean-js
-	yarn shx rm -rf "**/node_modules"
+	pnpm exec shx rm -rf "**/node_modules"
 
 PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_DIRS))
 
@@ -187,7 +189,6 @@ push-ot3:
 	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
-	$(MAKE) -C $(AUTH_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
@@ -246,20 +247,24 @@ lint-js: lint-js-eslint lint-js-prettier
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	pnpm exec eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 
 .PHONY: lint-json
 lint-json:
-	yarn eslint --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
+# when the file supports it (upgrade eslint and/or move away from legacy config format)
+	pnpm exec eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
-	yarn stylelint "**/*.css" "**/*.js"
+	pnpm stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
 format: format-js format-py format-css
@@ -277,22 +282,22 @@ $(SHARED_DATA_DIR)-py-format:
 
 .PHONY: format-js
 format-js:
-	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:
-	yarn stylelint "**/*.css" --fix
+	pnpm exec stylelint "**/*.css" --fix
 
 .PHONY: check-js
 check-js: build-ts
 
 .PHONY: build-ts
 build-ts:
-	yarn tsc --build
+	pnpm tsc --build
 
 .PHONY: clean-ts
 clean-ts:
-	yarn tsc --build --clean
+	pnpm tsc --build --clean
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 JS_CIRCULAR_DEPENDENCIES_ROOTS := \
@@ -308,11 +313,12 @@ JS_CIRCULAR_DEPENDENCIES_TARGETS := $(addsuffix -circular-dependencies-js, $(JS_
 circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
 
 %-circular-dependencies-js:
-	yarn madge $(and $(CI),--no-spinner --no-color) --circular $*
+	pnpm madge $(and $(CI),--no-spinner --no-color) --circular $*
 
 .PHONY: test-js-internal
 test-js-internal:
-	yarn vitest $(tests) $(test_opts) $(cov_opts)
+	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
+
 
 .PHONY: test-js-%
 test-js-%:
@@ -321,3 +327,33 @@ test-js-%:
 .PHONY: validate-codecov-yml
 validate-codecov-yml:
 	curl --data-binary @.codecov.yml https://codecov.io/validate
+
+# Convenience commands for running all of our servers in dev mode, together,
+# behind a reverse proxy listening on port 31950.
+#
+# This naively amalgamates all of the logs into a single stdout stream.
+# If that's a bit much, you can also just manually run these commands in separate terminals.
+.PHONY: dev-backend
+dev-backend:
+	$(python) scripts/run_concurrently.py \
+		$(MAKE) -C robot-server dev BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev ';' \
+		$(MAKE) dev-proxy
+
+
+# Assuming our dev servers are running separately (make -C robot-server dev, etc.),
+# this sets up a reverse proxy that listens on localhost:31950 and forwards each request
+# to the appropriate dev server.
+.PHONY: dev-proxy
+dev-proxy:
+# In this command, the first port (:2) is a placeholder for the origin server's port.
+# dev_proxy.py *should* overwrite it in all cases, but in case something goes wrong
+# with that, we choose port 2 because it's probably not assigned to anything.
+# `connection_strategy=lazy` gives dev_proxy.py a chance to overwrite the port before
+# mitmproxy tries use port 2.
+#
+# The second port (@31950) is where the reverse proxy should listen.
+	$(UV) tool run --python $(UV_PYTHON) --from mitmproxy==12.2.1  mitmdump \
+	    --mode reverse:http://localhost:2@31950 \
+	    --set connection_strategy=lazy \
+	    --script scripts/dev_proxy.py

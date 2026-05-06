@@ -25,6 +25,9 @@ import * as discovery from '../selectors'
 import type { State } from '../../types'
 
 const MOCK_STATE: State = {
+  config: {
+    devInternal: {},
+  },
   discovery: {
     robotsByName: {
       foo: {
@@ -281,6 +284,7 @@ describe('discovery selectors', () => {
       name: 'display name removes opentrons- from connectable robot names',
       selector: discovery.getDiscoveredRobots,
       state: {
+        config: { devInternal: {} },
         discovery: {
           robotsByName: {
             'opentrons-foo': {
@@ -301,6 +305,7 @@ describe('discovery selectors', () => {
       name: 'handles legacy IPv6 robots by wrapping IP in [] and setting as local',
       selector: discovery.getDiscoveredRobots,
       state: {
+        config: { devInternal: {} },
         discovery: {
           robotsByName: {
             'opentrons-foo': {
@@ -336,6 +341,7 @@ describe('discovery selectors', () => {
       name: 'handles opentrons-usb robots by setting as local',
       selector: discovery.getDiscoveredRobots,
       state: {
+        config: { devInternal: {} },
         discovery: {
           robotsByName: {
             'opentrons-foo': {

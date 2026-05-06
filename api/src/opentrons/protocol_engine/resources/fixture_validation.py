@@ -66,3 +66,8 @@ def is_stacker_shuttle(addressable_area_name: str) -> bool:
         "flexStackerModuleV1C4",
         "flexStackerModuleV1D4",
     ]
+
+
+def is_vac_dock(addressable_area_name: str) -> bool:
+    """Check if an addressable area is an vacuum module dock area."""
+    return "vacuumModuleV1Dock" in addressable_area_name

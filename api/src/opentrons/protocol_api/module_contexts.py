@@ -1,3 +1,4 @@
+# ruff: noqa: I001
 from __future__ import annotations
 
 import logging
@@ -41,8 +42,11 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
     requires_version,
 )
+from opentrons.types import ModuleFixtureLocation
 
-from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
+from . import (
+    validation,
+)  # isort: skip  # noqa: I001  # Imported after other protocol_api imports to avoid circular import
 from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -709,8 +713,8 @@ class ThermocyclerContext(ModuleContext):
                 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
                 liquid information.
 
-                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
-                the block heats or cools.
+        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
+        the block heats or cools.
 
         !!! note
             If `hold_time_minutes` and `hold_time_seconds` are not specified,
@@ -759,8 +763,7 @@ class ThermocyclerContext(ModuleContext):
                 to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
                 the block will heat or cool as quickly as possible to reach the set temperature.
 
-        *Changed in version 2.27:* In API version
-        2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+        *Changed in version 2.27:* In API version 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
         liquid information.
 
         *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly
@@ -1862,3 +1865,42 @@ class VacuumModuleContext(ModuleContext):
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
+
+    @property
+    @requires_version(2, 28)
+    def manifold_dock(self) -> ModuleFixtureLocation:
+        base_slot = self._core.get_deck_slot().id
+        area_name = f"{self.model}Dock{base_slot[0]}4"
+        return ModuleFixtureLocation(addressable_area_name=area_name)
+
+    @requires_version(2, 28)
+    def load_adapter_to_dock(
+        self,
+        name: str,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load a collar adapter to the vacuum module dock."""
+
+        labware_core = self._protocol_core.load_adapter(
+            load_name=name,
+            namespace=namespace,
+            version=version,
+            location=self.manifold_dock,
+        )
+
+        if isinstance(self._core, LegacyModuleCore) and isinstance(
+            labware_core, LegacyLabwareCore
+        ):
+            adapter = self._core.add_labware_core(labware_core)
+        else:
+            adapter = Labware(
+                core=labware_core,
+                api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
+            )
+
+        self._core_map.add(labware_core, adapter)
+
+        return adapter

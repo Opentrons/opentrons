@@ -29,10 +29,10 @@ import {
   getProtocolsDesktopSortKey,
   updateConfigValue,
 } from '/app/redux/config'
+import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { useSortedProtocols } from './hooks'
 import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
@@ -55,6 +55,14 @@ const SORT_BY_BUTTON_STYLE = css`
   }
 `
 
+const DEFAULT_PROTOCOL_SORT: ProtocolSort = 'alphabetical'
+
+const isProtocolSort = (sortKey: unknown): sortKey is ProtocolSort =>
+  sortKey === 'alphabetical' ||
+  sortKey === 'reverse' ||
+  sortKey === 'recent' ||
+  sortKey === 'oldest'
+
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
@@ -67,7 +75,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   ] = useState<boolean>(false)
   const [showSendProtocolToFlexSlideout, setShowSendProtocolToFlexSlideout] =
     useState<boolean>(false)
-  const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
+  const configuredSortBy = useSelector(getProtocolsDesktopSortKey)
+  const sortBy = isProtocolSort(configuredSortBy)
+    ? configuredSortBy
+    : DEFAULT_PROTOCOL_SORT
   const [showSortByMenu, setShowSortByMenu] = useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => {
     setShowSortByMenu(!showSortByMenu)
@@ -244,14 +255,13 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         gridGap={SPACING.spacing8}
         marginBottom={SPACING.spacing40}
       >
-        {sortedStoredProtocols != null &&
-          sortedStoredProtocols.map(storedProtocol => (
-            <ProtocolCard
-              key={storedProtocol.protocolKey}
-              handleRunProtocol={handleRunProtocol}
-              storedProtocolData={storedProtocol}
-            />
-          ))}
+        {sortedStoredProtocols?.map(storedProtocol => (
+          <ProtocolCard
+            key={storedProtocol.protocolKey}
+            handleRunProtocol={handleRunProtocol}
+            storedProtocolData={storedProtocol}
+          />
+        ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout

@@ -9,11 +9,13 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { RunFailedModal } from '..'
+import { ErrorContent } from '../ErrorContent'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../ErrorContent')
 
 const RUN_ID = 'mock_runID'
 const mockFn = vi.fn()
@@ -108,13 +110,13 @@ describe('RunFailedModal', () => {
     vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
     } as any)
+    vi.mocked(ErrorContent).mockReturnValue(<div>mock ErrorContent</div>)
   })
 
-  it('should render the highest priority error', () => {
+  it('should pass highest priority error to ErrorContent', () => {
     render(props)
     screen.getByText('Run failed')
-    screen.getByText('Error 1000: hardwareCommunicationError')
-    screen.getByText('Error with code 1000 (highest priority)')
+    screen.getByText('mock ErrorContent')
     screen.getByText(
       'Download the robot logs from the Opentrons OT-2 App and send it to support@opentrons.com for assistance.'
     )
@@ -126,6 +128,7 @@ describe('RunFailedModal', () => {
     const button = screen.getByText('Close')
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
+    expect(props.setShowRunFailedModal).toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith('/dashboard')
   })
 })

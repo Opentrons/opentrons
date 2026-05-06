@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
     CommandStatus,
     Liquid,
     ProtocolEngine,
+    StateSummary,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -342,6 +343,11 @@ async def test_run_json_runner(
         False, True
     )
 
+    decoy.when(protocol_engine.state_view.commands.get_all()).then_return([])
+    decoy.when(protocol_engine.state_view.get_summary()).then_return(
+        StateSummary.model_construct()  # type: ignore[call-arg]
+    )
+
     assert json_runner_subject.was_started() is False
     await json_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert json_runner_subject.was_started() is True
@@ -398,8 +404,13 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
     decoy.when(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
     ).then_return([labware_definition])
+    decoy.when(
+        json_translator.translate_legacy_command_annotations(json_protocol)
+    ).then_return([])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(json_translator.translate_commands(json_protocol, {})).then_return(
+        commands
+    )
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
     decoy.when(
         await protocol_engine.add_and_execute_command_wait_for_recovery(
@@ -506,7 +517,12 @@ async def test_load_json_runner(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
     ).then_return([labware_definition])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(
+        json_translator.translate_legacy_command_annotations(json_protocol)
+    ).then_return([])
+    decoy.when(json_translator.translate_commands(json_protocol, {})).then_return(
+        commands
+    )
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
     await json_runner_subject.load(json_protocol_source)
@@ -841,6 +857,14 @@ async def test_run_python_runner(
         False, True
     )
 
+    decoy.when(protocol_engine.state_view.commands.get_all()).then_return([])
+    decoy.when(protocol_engine.state_view.get_summary()).then_return(
+        StateSummary.model_construct()  # type: ignore[call-arg]
+    )
+    decoy.when(
+        protocol_engine.state_view.commands.get_all_command_annotations()
+    ).then_return([])
+
     assert python_runner_subject.was_started() is False
     await python_runner_subject.run(deck_configuration=sentinel.deck_configuration)
     assert python_runner_subject.was_started() is True
@@ -863,6 +887,11 @@ async def test_run_live_runner(
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
+    )
+
+    decoy.when(protocol_engine.state_view.commands.get_all()).then_return([])
+    decoy.when(protocol_engine.state_view.get_summary()).then_return(
+        StateSummary.model_construct()  # type: ignore[call-arg]
     )
 
     assert live_runner_subject.was_started() is False

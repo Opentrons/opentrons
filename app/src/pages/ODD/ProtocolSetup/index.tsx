@@ -198,14 +198,19 @@ function PrepareToRun({
       source: SOURCE_RUN_RECORD,
       robotType: robotType,
     })
-  useEffect(() => {
-    if (storageInfo.isImageStorageLow) {
-      reportPhotoAccessUsage({
-        action: 'storageWarning',
-        transactionId: runId,
-      })
-    }
-  }, [storageInfo.isImageStorageLow != null])
+  useEffect(
+    () => {
+      if (storageInfo.isImageStorageLow) {
+        reportPhotoAccessUsage({
+          action: 'storageWarning',
+          transactionId: runId,
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [storageInfo.isImageStorageLow != null]
+  )
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
@@ -853,19 +858,24 @@ export function ProtocolSetup(): JSX.Element {
   })
 
   // The initial app-internal camera state should match the server state.
-  useEffect(() => {
-    if (initialRobotCameraSettings != null) {
-      dispatch(
-        updateCameraUsageSettings({
-          runId,
-          cameraEnabled: initialRobotCameraSettings.cameraEnabled,
-          recoveryEnabled:
-            initialRobotCameraSettings.errorRecoveryCameraEnabled,
-          liveStreamEnabled: initialRobotCameraSettings.liveStreamEnabled,
-        })
-      )
-    }
-  }, [initialRobotCameraSettings])
+  useEffect(
+    () => {
+      if (initialRobotCameraSettings != null) {
+        dispatch(
+          updateCameraUsageSettings({
+            runId,
+            cameraEnabled: initialRobotCameraSettings.cameraEnabled,
+            recoveryEnabled:
+              initialRobotCameraSettings.errorRecoveryCameraEnabled,
+            liveStreamEnabled: initialRobotCameraSettings.liveStreamEnabled,
+          })
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [initialRobotCameraSettings]
+  )
 
   const appCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
@@ -1067,6 +1077,8 @@ const buildSetupScreenStyle = (
     switch (setupScreen) {
       case 'prepare to run':
         return `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+      case 'view only parameters':
+        return `0 ${SPACING.spacing40} ${SPACING.spacing40}`
       case 'offsets':
       case 'camera':
         return ''

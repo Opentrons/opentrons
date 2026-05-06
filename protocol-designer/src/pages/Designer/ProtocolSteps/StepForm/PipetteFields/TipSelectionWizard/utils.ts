@@ -1,9 +1,8 @@
 import {
   ALL,
-  COLUMN,
   getIsTiprack,
+  getModuleDef,
   getPositionFromSlotId,
-  SINGLE,
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
@@ -12,6 +11,7 @@ import {
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
+import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
 import {
   LABEL_BORDER_WIDTH_PX,
   LABEL_PLACEMENT_BOTTOM,
@@ -51,21 +51,41 @@ const OFFSET_OT2_8_CHANNEL = 10
 
 export const getViewboxFromSelectedLabware = (
   selectedLabwareId: string,
+  robotState: TimelineFrame | null,
   activeDeckSetup: AllTemporalPropertiesForTimelineFrame,
   deckDef: DeckDefinition
 ): string | null => {
-  const { labware } = activeDeckSetup
+  if (robotState == null) {
+    return null
+  }
+  const { labware, modules } = activeDeckSetup
+
+  const { labware: labwareState } = robotState
   const selectedLabware = labware[selectedLabwareId]
   if (selectedLabware == null) {
     return null
   }
+
+  const moduleIds = new Set(Object.keys(modules || {}))
+
+  // find the first module location
+  const moduleLocation = labwareState[selectedLabwareId].stack.find(loc =>
+    moduleIds.has(loc)
+  )
+  const moduleDef = moduleLocation
+    ? getModuleDef(modules[moduleLocation].model)
+    : null
+
   const [deckXDimension, deckYDimension] = deckDef.dimensions
   const ratio = deckYDimension / deckXDimension
 
   // preserve aspect ratio
   const paddingMmY = PADDING_MM_X * ratio
-  const { xDimension, yDimension } = selectedLabware.def.dimensions
-  const slot = getSlotInLocationStack(selectedLabware.stack)
+
+  const { xDimension, yDimension } = moduleDef
+    ? moduleDef.dimensions
+    : selectedLabware.def.dimensions
+  const slot = getSlotInLocationStack(labwareState[selectedLabwareId].stack)
   const slotPosition = getPositionFromSlotId(slot, deckDef)
   if (slotPosition == null) {
     return null
@@ -97,24 +117,51 @@ export const getHoveredOffsetFromWell = (args: {
 
   const xOffset = leftBound - xNozzleOffset
   const yOffset = frontBound - yNozzleOffset
+  const labware = labwareState[selectedLabwareId ?? '']
 
-  if (wellName == null) {
+  if (wellName == null || labware.def.wells[wellName] == null) {
     return {
       x: 0,
       y: 0,
     }
   }
-  const labware = labwareState[selectedLabwareId ?? '']
-
   const well = labware.def.wells[wellName]
+  const wellIsRectangular = well.shape === 'rectangular'
+
+  const labwareHasOneRowAndIsRectangular =
+    labware.def.ordering[0].length === 1 && wellIsRectangular
+  const wellHeight = labwareHasOneRowAndIsRectangular ? well.yDimension : well.y
+  const wellX = well.x + xOffset
+  const wellY = wellHeight + yOffset
+  const isSingleChannelPipette = pipetteSpec.channels === 1
+
   return {
-    x: well.x + xOffset,
-    y: well.y + yOffset,
+    x: wellX,
+    y:
+      getIsOnlyRectangularWellInColumn(wellName, labware.def) &&
+      isSingleChannelPipette
+        ? wellY / 2
+        : wellY,
   }
 }
 
-export const getColumnFromWellName = (wellName: string): string =>
-  wellName.slice(-2, -1)
+export const getColumnFromWellName = (wellName: string): string => {
+  const match = wellName.match(/^[A-Za-z]+(\d+)/)
+  if (match && match.length > 1) {
+    return match[1]
+  }
+  console.error('No column found for well name', wellName)
+  return ''
+}
+
+export const getRowFromWellName = (wellName: string): string => {
+  const rowLetter = wellName.match(/^[A-Za-z]+/)?.[0]
+  if (rowLetter) {
+    return rowLetter
+  }
+  console.error('No row found for well name', wellName)
+  return ''
+}
 
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],
@@ -178,24 +225,23 @@ export const getAllWellsInColumn = (
   )
 }
 
-export const getAffectedWells = (args: {
-  wellName: string | null
+export const getAllWellsInRow = (
+  wellName: string,
   labwareDef: LabwareDefinition
-  channels: number
-  nozzles: NozzleConfigurationStyle
-}): string[] => {
-  const { wellName, labwareDef, channels, nozzles } = args
-  if (wellName == null) {
+): string[] => {
+  const rowLetter = getRowFromWellName(wellName)
+  const wellOrdering = labwareDef.ordering
+  if (rowLetter === null) {
     return []
   }
-  if (channels === 1 || nozzles === SINGLE) {
-    return [wellName]
-  } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
-    return getAllWellsInColumn(wellName, labwareDef)
-  } else if (channels === 96) {
-    return Object.keys(labwareDef.wells)
+  const firstRow = wellOrdering[0]
+  const colIndex = firstRow.findIndex(well => well.startsWith(rowLetter))
+
+  if (colIndex === -1) {
+    return []
   }
-  return []
+
+  return wellOrdering.map(row => row[colIndex])
 }
 
 export const getValidTiprackIds = (args: {
@@ -266,12 +312,13 @@ export const getValidTiprackIds = (args: {
                 })
               : true
           if (isSafeWithinTiprack && isSafeMoveConsideringDeck && isComplete) {
-            const allAffectedWells = getAffectedWells({
+            const allAffectedWells = getEntireWellSelection(
               wellName,
-              labwareDef: tiprackDef,
-              channels,
+              tiprackDef.ordering,
               nozzles,
-            })
+              primaryNozzle,
+              channels
+            )
             addedWells.push(...allAffectedWells)
             foundSafePickup = true
             break // Found a safe pickup for this iteration, move to next pickup
@@ -381,4 +428,18 @@ export const getLabelOffsetByPlacement = (args: {
     x: labelOffsetX,
     y: labelOffsetY,
   }
+}
+
+const getIsOnlyRectangularWellInColumn = (
+  wellName: string,
+  def: LabwareDefinition
+): boolean => {
+  const columns = def.ordering
+  const wellColumn = columns.find(column => column.includes(wellName))
+  if (wellColumn == null) {
+    return false
+  }
+  const isWellRectangular = def.wells[wellName].shape === 'rectangular'
+  const isOnlyWellInColumn = wellColumn.length === 1
+  return isWellRectangular && isOnlyWellInColumn
 }

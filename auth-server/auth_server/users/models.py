@@ -1,0 +1,94 @@
+from __future__ import annotations
+
+from enum import StrEnum
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, Field, SecretStr
+
+from server_utils.auth.scopes import Scope
+
+
+# leave this outside of the db. this will not change.
+class AccountType(StrEnum):
+    """The type of account."""
+
+    ADMIN = "admin"
+    USER = "user"
+    AUDITOR = "auditor"
+    SERVICE = "service"
+
+
+# move this to db if we need to support updating scopes.
+ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
+    AccountType.ADMIN: set(Scope),  # all scopes
+    AccountType.SERVICE: set(Scope),  # all scopes
+    AccountType.USER: {
+        Scope.RESTART_WRITE,
+        Scope.ROBOT_CONTROL_WRITE,
+        Scope.ROBOT_SETTINGS_WRITE,
+        # todo(mm, 2026-03-17): Updates should be togglable to admin-only by an auth setting.
+        Scope.UPDATES_WRITE,
+        # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
+        Scope.PROTOCOLS_WRITE,
+    },
+    # Auditors should have read-only access to everything. Our read-only endpoints are
+    # mostly accessible without authentication, but there are some exceptions. This
+    # just needs to have the scopes to cover those exceptions.
+    AccountType.AUDITOR: {Scope.USERS_READ},
+}
+
+
+class UserCreate(BaseModel):
+    """Request body for creating a user."""
+
+    userName: Annotated[str, Field(..., description="The username of the user.")]
+    password: Annotated[SecretStr, Field(..., description="The password for the user.")]
+    fullName: Annotated[str, Field(..., description="The full name of the user.")]
+    accountType: Annotated[
+        AccountType, Field(..., description="The type of account for the user.")
+    ]
+
+
+class UpdateUser(BaseModel):
+    """Request body for updating a user."""
+
+    userName: Annotated[
+        str | None,
+        Field(description="The username of the user."),
+    ] = None
+    password: Annotated[
+        SecretStr | None,
+        Field(description="The password for the user."),
+    ] = None
+    fullName: Annotated[
+        str | None,
+        Field(description="The full name of the user."),
+    ] = None
+    accountType: Annotated[
+        AccountType | None,
+        Field(description="The type of account for the user."),
+    ] = None
+    locked: Annotated[
+        Literal[False] | None,
+        Field(
+            description="Set to false to clear a failed-login lockout for this user.",
+        ),
+    ] = None
+    resetPassword: Annotated[
+        bool,
+        Field(
+            description="Set to true to reset the password for this user.",
+            default=False,
+        ),
+    ] = False
+
+
+class UserResponse(BaseModel):
+    """Response body for a user (no password)."""
+
+    userName: str
+    fullName: str
+    accountType: AccountType
+    scopes: list[str]
+    locked: bool
+    resetPassword: bool

@@ -27,6 +27,7 @@ vi.mock('/protocol-designer/ui/modules/selectors', async importOriginal => {
     getMagneticLabwareOptions: vi.fn(),
   }
 })
+
 const render = (props: ComponentProps<typeof MagnetTools>) => {
   return renderWithProviders(<MagnetTools {...props} />, {
     i18nInstance: i18n,

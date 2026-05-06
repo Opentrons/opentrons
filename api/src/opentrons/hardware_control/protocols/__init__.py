@@ -81,9 +81,6 @@ class FlexHardwareControlInterface(
     with some additional functionality and parameterization not supported on the OT-2.
     """
 
-    def get_robot_type(self) -> Type[FlexRobotType]:
-        return FlexRobotType
-
 
 __all__ = [
     "HardwareControlInterface",

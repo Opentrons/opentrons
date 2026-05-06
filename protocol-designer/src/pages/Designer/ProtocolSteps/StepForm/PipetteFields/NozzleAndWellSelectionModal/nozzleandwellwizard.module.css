@@ -9,13 +9,13 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  padding: var(--spacing-24) var(--spacing-24) var(--spacing-24);
+  padding: var(--spacing-24);
   gap: var(--spacing-8);
 }
 
 .header_text_wrapper{
   display: flex;
-  padding: var(--spacing-16) var(--spacing-16) var(--spacing-16);
+  padding: var(--spacing-16);
 }
 
 .row_wrapper{
@@ -23,9 +23,20 @@
   flex-direction: row;
 }
 
+.column_wrapper_fixed_width{
+  display: flex;
+  width: 11.5625rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--spacing-8)
+}
+
 .column_wrapper{
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8)
 }
 
 .nozzle_selection_text {
@@ -36,12 +47,21 @@
 }
 
 .nozzle_background_square {
-  width: 558px;
-  height: 497px;
-  padding:  var(--spacing-16) var(--spacing-16)  var(--spacing-16);
+  display: flex;
+  width: 34.875rem;
+  height: 31.063rem;
+  flex-direction: column; 
+  align-items: center;  
+  justify-content: center;           
+  padding: var(--spacing-16);
   border-radius: var(--border-radius-12);
   background-color: var(--grey-20);
-  gap: var(--spacing-16);
+}
+
+.nozzle_render {
+  height: 18.5625rem;
+  padding: var(--spacing-24);
+  gap: var(--spacing-8);
 }
 
 .select_well_alignment {
@@ -53,5 +73,10 @@
 
 .well_legend_box {
   display: flex;
-  width: 160px;
+  width: 10rem;
+}
+
+.base_deck_tip_selection {
+  width: auto;
+  height: 31.063rem;
 }

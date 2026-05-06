@@ -149,9 +149,9 @@ describe('step list actions', () => {
             { type: 'standaloneStep', stepId: '1' },
             {
               type: 'thermocyclerProfileGroup',
-              thermocyclerProfileStepId: '2',
+              startStepId: '2',
               concurrentSteps: [{ type: 'standaloneStep', stepId: '3' }],
-              waitForThermocyclerProfileStepId: '4',
+              waitStepId: '4',
             },
             { type: 'standaloneStep', stepId: '5' },
           ],

@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -82,11 +82,6 @@ describe('AdvancedSettings', () => {
     screen.getByText('mock AdditionalCustomLabwareSourceFolder')
   })
 
-  it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
-    render()
-    screen.getByText('mock OT2AdvancedSettings')
-  })
-
   it('should render mock robot caching section', () => {
     render()
     screen.getByText('mock PreventRobotCaching')
@@ -94,7 +89,7 @@ describe('AdvancedSettings', () => {
 
   it('should render mock U2EInformation', () => {
     render()
-    expect(screen.getByText('mock U2EInformation'))
+    screen.getByText('mock U2EInformation')
   })
 
   it('should render mock show link to get labware offset data section', () => {

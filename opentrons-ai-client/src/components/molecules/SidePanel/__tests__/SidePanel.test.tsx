@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
@@ -21,10 +21,12 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 }
 
 describe('SidePanel', () => {
+  const mockSetValue = vi.fn()
+
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    mockSetValue.mockClear()
     vi.mocked(useFormContext).mockReturnValue({
-      setValue: vi.fn(),
+      setValue: mockSetValue,
     } as any)
   })
   it('should render logo and text', () => {
@@ -52,5 +54,11 @@ describe('SidePanel', () => {
     screen.getByRole('button', { name: 'Reagent Transfer' })
     screen.getByRole('button', { name: 'Reagent Transfer (Flex)' })
   })
-  it.todo('should call a mock function when clicking a button')
+
+  it('should call setValue with userPrompt when a prompt button is clicked', () => {
+    render()
+    const pcrButton = screen.getByRole('button', { name: 'PCR' })
+    fireEvent.click(pcrButton)
+    expect(mockSetValue).toHaveBeenCalledWith('userPrompt', expect.any(String))
+  })
 })

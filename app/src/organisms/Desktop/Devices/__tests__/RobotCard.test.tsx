@@ -114,8 +114,8 @@ describe('RobotCard', () => {
       updateFromFileDisabledReason: null,
     })
     when(getRobotModelByName)
-      .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .thenReturn('OT-2')
+      .calledWith(MOCK_STATE, 'buzz')
+      .thenReturn('Opentrons Flex')
     vi.mocked(ErrorRecoveryBanner).mockReturnValue(
       <div>MOCK_RECOVERY_BANNER</div>
     )

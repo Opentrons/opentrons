@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import reduce from 'lodash/reduce'
 
 import { COLORS } from '@opentrons/components'
-import { COLUMN, SINGLE } from '@opentrons/shared-data'
+import { COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
 
 import {
   arrayToWellGroup,
@@ -39,11 +39,14 @@ export interface SelectableLabwareProps {
   showBorder: boolean
 }
 
-type ChannelType = 8 | 96
+type ChannelType = 8 | 12 | 96
 
 const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
   if (nozzleType === '8-channel' || nozzleType === COLUMN) {
     return 8
+  }
+  if (nozzleType === ROW) {
+    return 12
   } else {
     return 96
   }
@@ -198,9 +201,14 @@ export const SelectableLabware = (
     })
   }
 
-  useEffect(() => {
-    updateHighlightedWells({})
-  }, [])
+  useEffect(
+    () => {
+      updateHighlightedWells({})
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return (
     <SelectionRect

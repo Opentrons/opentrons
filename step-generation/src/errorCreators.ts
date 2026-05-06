@@ -135,6 +135,13 @@ export function pipetteVolumeExceeded(args: {
   }
 }
 
+export const moveLocationNotSpecified = (): CommandCreatorError => {
+  return {
+    type: 'MOVE_LOCATION_NOT_SPECIFIED',
+    message: 'This step is missing a move location.',
+  }
+}
+
 export const modulePipetteCollisionDanger = (): CommandCreatorError => {
   return {
     type: 'MODULE_PIPETTE_COLLISION_DANGER',
@@ -471,5 +478,29 @@ export const labwareOnHopper = (): CommandCreatorError => {
   return {
     type: 'LABWARE_ON_HOPPER',
     message: 'Labware cannot be moved from the Flex Stacker Hopper',
+  }
+}
+
+export const missingPumpActivity = (): CommandCreatorError => {
+  return {
+    type: 'MISSING_PUMP_ACTIVITY',
+    message: 'This module is not currently running a pump activity.',
+  }
+}
+
+export const invalidWaitCondition = (
+  waitCondition: string
+): CommandCreatorError => {
+  return {
+    type: 'INVALID_WAIT_CONDITION',
+    message: `Invalid wait condition: ${waitCondition}`,
+  }
+}
+
+export const liveTaskError = (): CommandCreatorError => {
+  return {
+    type: 'LIVE_TASK_ERROR',
+    message:
+      'This module is currently running a live task. Please wait for it to complete before performing this action.',
   }
 }

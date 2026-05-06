@@ -70,10 +70,9 @@ export function EditProtocolMetadataModal(
             {t('shared:cancel')}
           </SecondaryButton>
           <PrimaryButton
-            data-testid="EditProtocolMetadataModal_saveButton"
             disabled={!isDirty}
             onClick={() => {
-              handleSubmit(saveFileMetadata)()
+              void handleSubmit(saveFileMetadata)()
             }}
           >
             {t('shared:save')}
@@ -81,7 +80,11 @@ export function EditProtocolMetadataModal(
         </Flex>
       }
     >
-      <form onSubmit={handleSubmit(saveFileMetadata)}>
+      <form
+        onSubmit={() => {
+          void handleSubmit(saveFileMetadata)
+        }}
+      >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
@@ -96,7 +99,7 @@ export function EditProtocolMetadataModal(
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('description')}
+              label={t('description')}
               value={description ?? ''}
               {...register('description')}
               height="6rem"

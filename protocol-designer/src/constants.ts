@@ -59,6 +59,10 @@ export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'
 export const PAUSE_UNTIL_TC_PROFILE_COMPLETE: 'untilThermocyclerProfileComplete' =
   'untilThermocyclerProfileComplete'
+export const PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE: 'untilVacuumProfileComplete' =
+  'untilVacuumProfileComplete'
+export const PAUSE_UNTIL_VACUUM_STATE_COMPLETE: 'untilVacuumStateComplete' =
+  'untilVacuumStateComplete'
 
 export const DND_TYPES = {
   LABWARE: 'LABWARE',

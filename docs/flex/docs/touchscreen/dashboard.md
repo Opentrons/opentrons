@@ -1,9 +1,10 @@
 ---
 title: "Opentrons Flex: Touchscreen Dashboard"
+description: "Home screen, status, and quick access to protocols and settings."
 ---
 
 <figure class="screenshot" markdown>
-![The robot dashboard, showing main navigation and recently run protocols.  ](../images/touchscreen-dashboard.png "Robot dashboard")
+![The robot dashboard, showing main navigation and recently run protocols.  ](../images/touchscreen_dashboard.png "Robot dashboard")
 </figure>
 
 The dashboard is the main screen for the robot, accessible by tapping the robot's name in the top left corner of the touchscreen.
@@ -20,4 +21,4 @@ From the dashboard you can also perform actions that apply to the robot as a who
 
 - **Lights on/off:** Toggle the LED lights that illuminate the working area.
 
-The top navigation on the dashboard provides access to the other main screens: [All Protocols](protocol-management.md), [Quick Transfer](quick-transfer.md), [Instruments](instruments.md), and [Settings](settings.md).
+The top navigation on the dashboard provides access to the other main screens: [All Protocols](protocol-management.md), [Instruments](instruments.md), and [Settings](settings.md).

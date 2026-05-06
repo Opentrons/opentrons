@@ -5,8 +5,8 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   SPACING,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -50,6 +50,10 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   }
 
   const volumeAsNumber = Number(volume)
+
+  const handleVolumeChange = (input: string): void => {
+    setVolume(input)
+  }
 
   const handleClickNext = (): void => {
     // the button will be disabled if this values is null
@@ -104,12 +108,18 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing68}
         >
-          <InputField
+          <TouchInputField
+            autoFocus
             type="text"
             value={volume}
-            title={textEntryCopy}
+            label={textEntryCopy}
             error={error}
-            readOnly
+            onBlur={e => {
+              e.target.focus()
+            }}
+            onChange={e => {
+              setVolume(e.target.value as string)
+            }}
           />
         </Flex>
         <Flex
@@ -120,9 +130,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            onChange={e => {
-              setVolume(e)
-            }}
+            onChange={handleVolumeChange}
           />
         </Flex>
       </Flex>

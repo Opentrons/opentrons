@@ -21,6 +21,7 @@ import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  VACUUM_MODULE_V1_FIXTURE,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -165,6 +166,17 @@ export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
           cutoutFixtureId: cutoutFixtureReplacment,
         })
       }
+    } else if (obj.cutoutFixtureId === VACUUM_MODULE_V1_FIXTURE) {
+      const vacuumModuleAA = aaPerCutoutFixture?.find(
+        aa => getAAByAAId(aa, deckDef).areaType === 'vacuumModule'
+      )
+      if (vacuumModuleAA != null) {
+        acc.push({
+          ...obj,
+          addressableAreaId: vacuumModuleAA,
+          cutoutFixtureId: cutoutFixtureReplacment,
+        })
+      }
     } else {
       aaPerCutoutFixture?.forEach(item => {
         acc.push({
@@ -216,6 +228,10 @@ export const replaceCutoutFixtureForFixtureRemoval = (
       return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }
   } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (cutoutFixtureRemoved === VACUUM_MODULE_V1_FIXTURE) {
+    // Vacuum spans two AAs on one cutout; the generic matcher below cannot
+    // resolve to singleRightSlot (only provides A3), so removal must be explicit.
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (cutoutFixtureRemoved === FLEX_STACKER_V1_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE

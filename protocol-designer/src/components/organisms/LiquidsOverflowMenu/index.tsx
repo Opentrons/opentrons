@@ -90,7 +90,6 @@ export function LiquidsOverflowMenu({
         ({ displayName, displayColor, liquidGroupId }) => {
           return (
             <MenuItem
-              data-testid={`${displayName}_${liquidGroupId}`}
               onClick={() => {
                 onClose()
                 showLiquidsModal()
@@ -125,7 +124,6 @@ export function LiquidsOverflowMenu({
         <Divider color={COLORS.grey20} marginY="0" />
       ) : null}
       <MenuItem
-        data-testid="defineLiquid"
         onClick={() => {
           onClose()
           showLiquidsModal()

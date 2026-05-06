@@ -28,7 +28,8 @@
   },
   "devDependencies": {
     "electron-notarize": "^1.2.1",
-    "electron-publisher-s3": "^20.17.2"
+    "electron-publisher-s3": "^20.17.2",
+    "@opentrons/step-generation": "link:../step-generation"
   },
   "dependencies": {
     "@opentrons/app": "link:../app",
@@ -58,6 +59,7 @@
     "get-stream": "5.1.0",
     "lodash": "4.17.21",
     "merge-options": "1.0.1",
+    "mdns-js": "1.0.1",
     "mqtt": "4.3.8",
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",

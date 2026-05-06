@@ -28,6 +28,10 @@ from opentrons.hardware_control.modules.types import (
     UploadFunction,
 )
 from opentrons.hardware_control.poller import Poller, Reader
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    pyro_behavior,
+    remove_pyro_synchronous_object,
+)
 
 log = logging.getLogger(__name__)
 
@@ -330,6 +334,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
 
         return _update_function
 
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
         """Clean up the module instance.
 

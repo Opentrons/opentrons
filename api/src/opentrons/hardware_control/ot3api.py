@@ -4,7 +4,6 @@ import logging
 from collections import OrderedDict
 from concurrent.futures import Future
 from copy import deepcopy
-from dataclasses import replace
 from functools import lru_cache, partial, wraps
 from typing import (
     Any,
@@ -18,6 +17,7 @@ from typing import (
     Sequence,
     Set,
     Tuple,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -41,7 +41,7 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.pipette.types import PipetteModelType, PipetteName
 
-from . import modules
+from . import modules, peripherals
 from .backends.errors import SubsystemUpdating
 from .backends.flex_protocol import FlexBackend
 from .backends.ot3simulator import OT3Simulator
@@ -92,6 +92,7 @@ from .motion_utilities import (
 from .ot3_calibration import OT3RobotCalibrationProvider, OT3Transforms
 from .pause_manager import PauseManager
 from .protocols import FlexHardwareControlInterface
+from .protocols.types import FlexRobotType
 from .types import (
     AsynchronousModuleErrorNotification,
     Axis,
@@ -140,6 +141,13 @@ from opentrons.config.types import (
 from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
+)
+from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
+    convert_result_to_wrapped_dict,
+    convert_result_to_wrapped_typed_dict,
+    convert_type_to_instance,
+    pyro_behavior,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -250,6 +258,10 @@ class OT3API(
         self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
+
+    @pyro_behavior(specialty_func=convert_type_to_instance, apply_local=False)
+    def get_robot_type(self) -> Type[FlexRobotType]:
+        return FlexRobotType
 
     def is_idle_mount(self, mount: Union[top_types.Mount, OT3Mount]) -> bool:
         """Only the gripper mount or the 96-channel pipette mount would be idle
@@ -383,6 +395,7 @@ class OT3API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_deck_from_machine(
         self, machine_pos: Dict[Axis, float]
     ) -> Dict[Axis, float]:
@@ -521,12 +534,14 @@ class OT3API(
         """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, OT3Simulator)
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """
         self._callbacks.add(cb)
 
+        # todo(chb: 04-08-2026): Do we need to add a LOCAL @pyro_behavior to this, which will destroy the proxy object when the time comes?
         def unregister() -> None:
             self._callbacks.remove(cb)
 
@@ -632,25 +647,51 @@ class OT3API(
             self.resume(PauseType.DELAY)
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
+
+    @property
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def attached_peripherals(self) -> List[peripherals.AbstractPeripheral]:
+        return self._backend.module_controls.available_peripherals
 
     async def create_simulating_module(
         self,
         model: modules.types.ModuleModel,
+        sim_serial: Optional[str] = None,
     ) -> modules.AbstractModule:
         """Create a simulating module hardware interface."""
-        assert self.is_simulator, (
-            "Cannot build simulating module from non-simulating hardware control API"
-        )
 
-        return await self._backend.module_controls.register_simulated_module(
+        module = await self._backend.module_controls.register_simulated_device(
             simulated_usb_port=USBPort(
                 name="", port_number=1, port_group=PortGroup.LEFT
             ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
+            sim_serial=sim_serial,
         )
+        assert isinstance(module, modules.AbstractModule)
+        return module
+
+    async def create_simulating_peripheral(
+        self,
+        model: peripherals.types.PeripheralModel,
+    ) -> peripherals.AbstractPeripheral:
+        """Create a simulating peripheral hardware interface."""
+        assert self.is_simulator, (
+            "Cannot build simulating peripheral from non-simulating hardware control API"
+        )
+
+        peripheral = await self._backend.module_controls.register_simulated_device(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.LEFT
+            ),
+            type=peripherals.PeripheralType.from_model(model),
+            sim_model=model.value,
+        )
+        assert isinstance(peripheral, peripherals.AbstractPeripheral)
+        return peripheral
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
@@ -720,6 +761,7 @@ class OT3API(
         self._gripper_handler.gripper = g
         return skipped
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_all_attached_instr(self) -> Dict[OT3Mount, Optional[InstrumentDict]]:
         # NOTE (spp, 2023-03-07): The return type of this method indicates that
         #  if a particular mount has no attached instrument then it will provide a
@@ -1042,6 +1084,7 @@ class OT3API(
     def _carriage_offset(self) -> top_types.Point:
         return top_types.Point(*self._config.carriage_offset)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1050,9 +1093,12 @@ class OT3API(
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         realmount = OT3Mount.from_mount(mount)
-        ot3_pos = await self.current_position_ot3(realmount, critical_point, refresh)
+        ot3_pos: Dict[Axis, float] = await self.current_position_ot3(
+            realmount, critical_point, refresh
+        )
         return ot3_pos
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def current_position_ot3(
         self,
         mount: OT3Mount,
@@ -1139,6 +1185,7 @@ class OT3API(
     def encoder_status_ok(self, axis: Axis) -> bool:
         return self._backend.check_encoder_status([axis])
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1148,8 +1195,12 @@ class OT3API(
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        return await self.encoder_current_position_ot3(mount, critical_point, refresh)
+        ot3_encoder_position: Dict[
+            Axis, float
+        ] = await self.encoder_current_position_ot3(mount, critical_point, refresh)
+        return ot3_encoder_position
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def encoder_current_position_ot3(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1738,13 +1789,16 @@ class OT3API(
         async with self._motion_lock:
             await self._home(home_seq)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
         return self._backend.engaged_axes()
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def engaged_axes(self) -> Dict[Axis, bool]:
-        return self.get_engaged_axes()
+        axes: Dict[Axis, bool] = self.get_engaged_axes()
+        return axes
 
     async def disengage_axes(self, which: List[Axis]) -> None:
         await self._backend.disengage_axes(which)
@@ -1757,6 +1811,7 @@ class OT3API(
     def axis_is_present(self, axis: Axis) -> bool:
         return self._backend.axis_is_present(axis)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     async def get_limit_switches(self) -> Dict[Axis, bool]:
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
@@ -1838,7 +1893,7 @@ class OT3API(
 
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
-        self._config = replace(self._config, **kwargs)
+        self._config = self._config.model_copy(update=kwargs)
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
@@ -2516,6 +2571,7 @@ class OT3API(
         # Warning: don't use this in new code, used `hardware_pipettes` instead
         return self.hardware_pipettes
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): pd
@@ -2523,9 +2579,11 @@ class OT3API(
             if m != OT3Mount.GRIPPER
         }
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         # Warning: don't use this in new code, used `get_attached_pipettes` instead
-        return self.get_attached_pipettes()
+        pipettes: Dict[top_types.Mount, PipetteDict] = self.get_attached_pipettes()
+        return pipettes
 
     async def get_instrument_state(
         self,
@@ -2632,23 +2690,32 @@ class OT3API(
             module_type, serial_number
         )
 
+    @pyro_behavior(
+        specialty_func=convert_result_to_wrapped_typed_dict, apply_local=False
+    )
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
         return self._pipette_handler.get_attached_instrument(OT3Mount.from_mount(mount))
 
+    @pyro_behavior(
+        specialty_func=convert_result_to_wrapped_typed_dict, apply_local=False
+    )
     def get_attached_instrument(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
         # Warning: don't use this in new code, used `get_attached_pipette` instead
-        return self.get_attached_pipette(mount)
+        pipette_dict: PipetteDict = self.get_attached_pipette(mount)
+        return pipette_dict
 
     @property
-    def attached_instruments(self) -> Any:
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    def attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         # Warning: don't use this in new code, used `attached_pipettes` instead
         return self.attached_pipettes
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): d
@@ -2804,7 +2871,8 @@ class OT3API(
         )
         machine_pos = await self._backend.update_position()
         machine_pos[Axis.by_mount(mount)] = end_z
-        deck_end_z = self.get_deck_from_machine(machine_pos)[Axis.by_mount(mount)]
+        deck_from_machine: Dict[Axis, float] = self.get_deck_from_machine(machine_pos)
+        deck_end_z = deck_from_machine[Axis.by_mount(mount)]
         offset = offset_for_mount(
             mount,
             top_types.Point(*self._config.left_mount_offset),
@@ -3219,6 +3287,7 @@ class OT3API(
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         """Get a view of the state of the currently-attached subsystems."""
         return self._backend.subsystems

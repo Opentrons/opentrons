@@ -5,6 +5,8 @@ from typing import Annotated
 
 from fastapi import Depends, status
 
+from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -38,6 +40,7 @@ error_recovery_policy_router = LightRouter()
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def put_error_recovery_policy(
     runId: str,

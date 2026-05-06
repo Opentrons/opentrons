@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -8,27 +9,24 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-  PARTIAL,
+  A1_NOZZLE,
+  ALL,
+  G1_NOZZLE,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { EightChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/EightChannelFlexShadow'
-import { EightChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/EightChannelOT2Shadow'
-import { NinetySixChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/NinetySixChannelFlexShadow'
-import { SingleChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelOT2Shadow'
-import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelShadow'
 import styles from './nozzleandwellwizard.module.css'
+import { NozzleRender } from './NozzleRender'
 import {
   getAvailableNozzleConfigurations,
-  getAvailablePrimaryNozzles,
-  partialNozzleMap,
+  getEntireWellSelection,
 } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { Channels, DropdownOption } from '@opentrons/components'
+import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
@@ -37,26 +35,6 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { FieldPropsByName } from '../../types'
-import type { PipetteShadowProps } from '../TipSelectionWizard/types'
-
-const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
-  RobotType,
-  Record<Channels, (props: PipetteShadowProps) => JSX.Element>
-> = {
-  [OT2_ROBOT_TYPE]: {
-    1: SingleChannelOT2Shadow,
-    8: EightChannelOT2Shadow,
-    96: () => {
-      console.warn('96-channel not supported on OT-2')
-      return <></>
-    },
-  },
-  [FLEX_ROBOT_TYPE]: {
-    1: SingleChannelFlexShadow,
-    8: EightChannelFlexShadow,
-    96: NinetySixChannelFlexShadow,
-  },
-}
 
 interface PipetteNozzleSelectorProps {
   pipetteSpecs: PipetteV2Specs
@@ -67,28 +45,15 @@ interface PipetteNozzleSelectorProps {
 export function PipetteNozzleSelector(
   props: PipetteNozzleSelectorProps
 ): JSX.Element {
-  const { pipetteSpecs, robotType, propsForFields } = props
-  const { channels, pipetteBoundingBoxOffsets, displayName } = pipetteSpecs
-  const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
+  const { pipetteSpecs, propsForFields, robotType } = props
+  const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')
-
-  const nozzleConfiguration = propsForFields.nozzles
-    .value as NozzleConfigurationStyle
-  const primaryNozzle = propsForFields.primaryNozzle
-    .value as PrimaryNozzleConfigurationStyle
-  const width = frontRightCorner[0] - backLeftCorner[0]
-  const height = backLeftCorner[1] - frontRightCorner[1]
-  const outlineProps = {
-    fill: COLORS.white,
-    stroke: COLORS.grey50,
-    width: width,
-    height: height,
-    rotate: false,
-    x: 0,
-    y: 0,
-  }
+  const nozzleConfiguration =
+    (propsForFields.nozzles?.value as NozzleConfigurationStyle) ?? ALL
+  const primaryNozzle =
+    (propsForFields.primaryNozzle?.value as PrimaryNozzleConfigurationStyle) ??
+    A1_NOZZLE
   const deckSetup = useSelector(getInitialDeckSetup)
-
   const is96Channel = channels === 96
 
   const nozzleConfigurationOptions = getAvailableNozzleConfigurations(
@@ -97,69 +62,127 @@ export function PipetteNozzleSelector(
     t as TFunction
   )
 
-  const partialOptions: DropdownOption[] = Object.entries(partialNozzleMap).map(
-    ([nozzle, num]) => ({
-      name: t('num_nozzles', { num }),
-      value: nozzle as PartialPrimaryNozzles,
-    })
+  const partialOptions: DropdownOption[] = Object.entries(
+    PARTIAL_NOZZLE_MAP
+  ).map(([nozzle, num]) => ({
+    name: t('num_nozzles', { num }),
+    value: nozzle as PartialPrimaryNozzles,
+  }))
+
+  const wellOrdering = Object.values(pipetteSpecs.orderedColumns).map(
+    column => column.orderedNozzles
   )
 
-  const placeholderPrimaryNozzles = getAvailablePrimaryNozzles(
+  const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
+
+  const [selectedNozzle, setSelectedNozzle] = useState<string[]>([])
+
+  // Recompute selected nozzles whenever nozzle config or primary nozzle changes
+  useEffect(() => {
+    let updatedNozzles: string[]
+    if (!isPartialNozzle) {
+      updatedNozzles = getEntireWellSelection(
+        primaryNozzle,
+        wellOrdering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+    } else {
+      const numNozzles =
+        PARTIAL_NOZZLE_MAP[
+          propsForFields.primaryNozzle.value as PartialPrimaryNozzles
+        ]
+      const col = wellOrdering[0]
+      updatedNozzles = col.slice(col.length - numNozzles, col.length)
+    }
+    setSelectedNozzle(updatedNozzles)
+  }, [
+    primaryNozzle,
+    nozzleConfiguration,
     channels,
-    nozzleConfiguration
-  )
-  const OutlineComponent =
-    SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
-  const isPartialNozzle = nozzleConfiguration === PARTIAL
+    wellOrdering,
+    isPartialNozzle,
+    propsForFields.primaryNozzle.value,
+  ])
+
+  let subText = ''
+
+  if (isPartialNozzle) {
+    subText = t('number_of_nozzles_used')
+  } else if (nozzleConfiguration === ALL) {
+    subText = t('all_nozzles_are_preselected')
+  } else {
+    subText = t('click_on_highlighted_nozzles')
+  }
   return (
     <>
       <div className={styles.header_text_wrapper}>
-        <StyledText desktopStyle="headingMediumBold">
+        <StyledText desktopStyle="headingSmallBold">
           {t('select_pipette_nozzles_to_use')}
         </StyledText>
       </div>
-
       <div className={styles.row_wrapper}>
         <div className={styles.nozzle_selection_text}>
-          {nozzleConfigurationOptions.map(({ value, name }) => {
-            return (
-              <RadioButton
-                key={`${name}_${value}`}
-                buttonLabel={name}
-                buttonValue={value}
-                isSelected={nozzleConfiguration === value}
-                onChange={() => {
-                  propsForFields.nozzles.updateValue(value)
-                }}
-                largeDesktopBorderRadius
-              />
-            )
-          })}
+          {nozzleConfigurationOptions.map(({ value, name }) => (
+            <RadioButton
+              key={`${name}_${value}`}
+              buttonLabel={name}
+              buttonValue={value}
+              isSelected={nozzleConfiguration === value}
+              onChange={() => {
+                propsForFields.nozzles.updateValue(value)
+                propsForFields.primaryNozzle.updateValue(
+                  value === PARTIAL_COLUMN ? G1_NOZZLE : A1_NOZZLE
+                )
+                setSelectedNozzle([])
+              }}
+              largeDesktopBorderRadius
+            />
+          ))}
         </div>
-
         <div className={styles.nozzle_background_square}>
           <div
             className={is96Channel ? styles.column_wrapper : styles.row_wrapper}
           >
-            <div style={{ height: '100%' }}>
-              {!is96Channel && <OutlineComponent {...outlineProps} />}
-            </div>
+            {!is96Channel && (
+              <NozzleRender
+                setSelectedNozzle={setSelectedNozzle}
+                selectedNozzle={selectedNozzle}
+                robotType={robotType}
+                pipetteSpecs={pipetteSpecs}
+                propsForFields={propsForFields}
+              />
+            )}
 
-            <div className={styles.column_wrapper}>
-              <StyledText desktopStyle="bodyLargeSemiBold">
+            <div
+              className={
+                is96Channel
+                  ? styles.column_wrapper
+                  : styles.column_wrapper_fixed_width
+              }
+            >
+              <StyledText
+                desktopStyle="bodyLargeSemiBold"
+                color={COLORS.black90}
+              >
                 {displayName}
               </StyledText>
-
-              {is96Channel && <OutlineComponent {...outlineProps} />}
+              {is96Channel && (
+                <NozzleRender
+                  setSelectedNozzle={setSelectedNozzle}
+                  selectedNozzle={selectedNozzle}
+                  robotType={robotType}
+                  pipetteSpecs={pipetteSpecs}
+                  propsForFields={propsForFields}
+                />
+              )}
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={isPartialNozzle ? COLORS.grey60 : COLORS.black90}
               >
-                {isPartialNozzle
-                  ? t('number_of_nozzles_used')
-                  : t('click_on_highlighted_nozzles')}
+                {subText}
               </StyledText>
-
               {isPartialNozzle && (
                 <DropdownMenu
                   key="partialTipDropDown"
@@ -175,26 +198,6 @@ export function PipetteNozzleSelector(
                   }
                 />
               )}
-              {nozzleConfiguration !== PARTIAL ? (
-                <>
-                  <StyledText>
-                    {'Placeholder primary nozzle selector'}
-                  </StyledText>
-
-                  <DropdownMenu
-                    dropdownType="neutral"
-                    filterOptions={placeholderPrimaryNozzles}
-                    onClick={value => {
-                      propsForFields.primaryNozzle.updateValue(value)
-                    }}
-                    currentOption={
-                      placeholderPrimaryNozzles.find(
-                        option => option.value === primaryNozzle
-                      ) ?? placeholderPrimaryNozzles[0]
-                    }
-                  />
-                </>
-              ) : null}
             </div>
           </div>
         </div>

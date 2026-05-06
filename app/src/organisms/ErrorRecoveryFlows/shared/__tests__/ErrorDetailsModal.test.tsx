@@ -140,6 +140,32 @@ describe('ErrorDetailsModal', () => {
       screen.getByText('MOCK_INLINE_NOTIFICATION')
     })
 
+    it('renders an inline banner when the error kind is a vacuum carboy full error', () => {
+      props.failedCommand = {
+        ...props.failedCommand,
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'vacuumCarboyFull',
+        },
+      } as any
+      render({ ...props, isOnDevice })
+
+      screen.getByText('MOCK_INLINE_NOTIFICATION')
+    })
+
+    it('renders an inline banner when the error kind is a vacuum pressure not reached error', () => {
+      props.failedCommand = {
+        ...props.failedCommand,
+        byRunRecord: {
+          ...props.failedCommand?.byRunRecord,
+          commandType: 'vacuumPressureNotReached',
+        },
+      } as any
+      render({ ...props, isOnDevice })
+
+      screen.getByText('MOCK_INLINE_NOTIFICATION')
+    })
+
     it('does not render a banner when the error kind is not explicitly handled', () => {
       render({ ...props, isOnDevice, failedCommand: {} as any })
 

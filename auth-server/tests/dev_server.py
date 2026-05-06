@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 import signal
 import subprocess
 import sys
@@ -11,11 +10,9 @@ from typing import Optional
 class DevServer:
     """An instance of the server, running as a background process."""
 
-    def __init__(self, port: int | None = None) -> None:
+    def __init__(self, port: int) -> None:
         """Initialize a dev server."""
-        self.port: int = (
-            port if port is not None else random.randrange(2**15 + 2**14, 2**16 - 1)
-        )
+        self.port: int = port
 
     def __enter__(self) -> DevServer:
         return self
@@ -65,4 +62,3 @@ class DevServer:
     @property
     def base_url(self) -> str:
         return f"http://localhost:{self.port}"
-

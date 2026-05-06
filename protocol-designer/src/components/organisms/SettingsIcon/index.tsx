@@ -12,7 +12,7 @@ import {
 
 import styles from './settingsicon.module.css'
 
-const BUTTON_NAME = 'SettingsIconButton'
+const BUTTON_NAME = 'Settings Icon Button'
 
 export const SettingsIcon = (): JSX.Element => {
   const location = useLocation()
@@ -30,7 +30,6 @@ export const SettingsIcon = (): JSX.Element => {
 
   return (
     <Flex
-      data-testid="SettingsIcon"
       borderRadius={BORDERS.borderRadiusFull}
       backgroundColor={
         location.pathname === '/settings' ? COLORS.grey35 : COLORS.transparent
@@ -41,7 +40,6 @@ export const SettingsIcon = (): JSX.Element => {
       <Btn
         onClick={handleNavigate}
         className={styles.gear_icon_button}
-        data-testid={BUTTON_NAME}
         aria-label={BUTTON_NAME}
       >
         <Icon size="1rem" name="gear" />

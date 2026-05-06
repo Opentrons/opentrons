@@ -16,7 +16,8 @@ classifiers = [
 ]
 dependencies = [
     "typing-extensions>=4.0.0,<5",
-    "aiohttp==3.12.14",
+    "aiohttp>=3.12.14,<4",
+    "server-utils==0.0.0",
 ]
 dynamic = ['version']
 
@@ -24,13 +25,15 @@ dynamic = ['version']
 # Robot dependencies - exact versions for robot deployment
 robot = [
     "aiohttp==3.12.14",
+    "pydantic==2.11.7",
+    "server-utils==0.0.0",
 ]
 dev = [
     "ruff==0.14.10",
     "pytest>=9.0.2",
     "pytest-watch~=4.2.0",
     "pytest-cov==4.1.0",
-    "pytest-aiohttp==1.0.5",
+    "pytest-aiohttp>=1.0.5,<2",
     "coverage==7.4.1",
     "mypy==1.19.1",
     "decoy<3,>=2.2.0",
@@ -40,6 +43,17 @@ dev = [
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/update-server"
+
+[tool.uv]
+# Stub for systemd-python so uv can resolve on macOS (no libsystemd).
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [] },
+]
+# cooldown time for security
+exclude-newer = "1 week"
+
+[tool.uv.sources]
+server-utils = { path = "../server-utils", editable = true }
 
 [tool.ruff.lint]
 # TODO(sfoster, 2025-12-24) since 2012, we have ignored annotation and doc string lints.
@@ -51,10 +65,14 @@ convention = "google"
 max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["otupdate"]
+known-first-party = ["server_utils"]
 [tool.ruff.lint.per-file-ignores]
 "otupdate/_version.py" = ["I"]
 "buildroot_upload.py" = ["T201"]
 "oe_upload.py" = ["T201"]
+
+[tool.ruff.format]
+exclude = ["otupdate/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="otupdate/_version.py"
@@ -156,4 +174,3 @@ module = [
     "tests.openembedded.test_updater",
 ]
 ignore_errors = true
-

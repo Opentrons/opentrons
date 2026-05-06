@@ -1,4 +1,3 @@
-import assert from 'assert'
 import * as React from 'react'
 import Ajv from 'ajv'
 import { saveAs } from 'file-saver'
@@ -75,6 +74,12 @@ import type { LabwareCreatorErrors } from './formLevelValidation'
 // better type-guarding.
 const ajv = new Ajv()
 const validateLabwareSchema2 = ajv.compile(labwareSchemaV2)
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message)
+  }
+}
 
 type WizardStep =
   | 'intro'
@@ -290,7 +295,6 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
               messages: validateLabwareSchema2.errors.map(
                 ajvError =>
                   `${ajvError.schemaPath}: ${
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     ajvError.message
                   }. (${JSON.stringify(ajvError.params)})`
               ),
@@ -325,6 +329,8 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
         reader.readAsText(file)
       }
     },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [scrollToForm, proceed, setLastUploaded, setImportError]
   )
 

@@ -10,6 +10,10 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from opentrons import __version__
+from server_utils.auth.resource_server.fastapi_dependencies import (
+    build_authorization_checker,
+    install_authorization_checker,
+)
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from .errors.exception_handlers import exception_handlers
@@ -26,6 +30,7 @@ from .persistence.fastapi_dependencies import (
 from .router import router
 from .runs.dependencies import (
     mark_light_control_startup_finished,
+    set_up_run_process_pyro_provider,
     start_light_control_task,
 )
 from .service.logging import initialize_logging
@@ -33,6 +38,7 @@ from .service.notifications import (
     initialize_pe_publisher_notifier,
     set_up_notification_client,
 )
+from .service.pyro_utils.pyro_resource import start_initializing_pyro_resource
 from .service.task_runner import set_up_task_runner
 from .settings import RobotServerSettings, get_settings
 
@@ -91,8 +97,24 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         exit_stack.push_async_callback(clean_up_persistence, app.state)
 
+        authorization_checker = await exit_stack.enter_async_context(
+            build_authorization_checker(
+                auth_server_uds=settings.auth_server_uds,
+                auth_server_url=settings.auth_server_url,
+            )
+        )
+        install_authorization_checker(app.state, authorization_checker)
+
         exit_stack.enter_context(set_up_notification_client(app.state))
         initialize_pe_publisher_notifier(app.state)
+
+        # Always make an empty Robot Server Pyro Resource, and populate if appropriate
+        start_initializing_pyro_resource(app_state=app.state)
+
+        # Start the run process pyro provider so a process is ready when a run starts
+        await exit_stack.enter_async_context(
+            set_up_run_process_pyro_provider(app.state)
+        )
 
         yield  # Start handling HTTP requests.
 

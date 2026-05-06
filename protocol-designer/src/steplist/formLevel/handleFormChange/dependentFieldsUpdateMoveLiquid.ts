@@ -163,6 +163,7 @@ const updatePatchOnLabwareChange = (
           pipetteId,
           labwareEntities,
           pipetteEntities,
+          nozzleConfiguration: ALL,
         }),
       }
     : {}
@@ -179,6 +180,7 @@ const updatePatchOnLabwareChange = (
           pipetteId,
           labwareEntities,
           pipetteEntities,
+          nozzleConfiguration: ALL,
         }),
       }
     : {}
@@ -298,8 +300,9 @@ const clampAspirateAirGapVolume = (
       minAirGapVolume,
       maxAirGapVolume
     )
-    if (clampedAirGapVolume === Number(patchedAspirateAirgapVolume))
+    if (clampedAirGapVolume === Number(patchedAspirateAirgapVolume)) {
       return patch
+    }
     return { ...patch, aspirate_airGap_volume: String(clampedAirGapVolume) }
   }
 
@@ -540,6 +543,7 @@ const updatePatchOnPipetteChannelChange = (
                 pipetteId,
                 labwareEntities,
                 pipetteEntities,
+                nozzleConfiguration: ALL,
               })
             : getAllWellsFromPrimaryWells(
                 appliedPatch.dispense_wells as string[],

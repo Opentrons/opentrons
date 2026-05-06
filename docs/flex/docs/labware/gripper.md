@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Labware and the Gripper"
+description: "Gripper-compatible labware and how the gripper moves plates and lids."
 ---
 
 Although Opentrons Flex works with all items in the Labware Library, the Opentrons Flex Gripper is compatible only with labware whose definitions provide information about how they should be picked up and moved around the deck. Currently, the gripper is compatible with the following Opentrons-verified labware: 

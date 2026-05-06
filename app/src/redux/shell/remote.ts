@@ -12,6 +12,7 @@ const emptyRemote: Remote = {} as any
 export const remote: Remote = new Proxy(emptyRemote, {
   get(_target, propName: string): unknown {
     console.assert(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       (global as any).APP_SHELL_REMOTE,
       'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.ts properly configured?'
     )
@@ -47,7 +48,8 @@ async function proxyFormData(formData: FormData): Promise<IPCSafeFormData> {
   return result
 }
 
-export async function appShellRequestor<Data>(
+async function doAppShellRequest<Data>(
+  target: 'usb:request' | 'internal-api:request',
   config: AxiosRequestConfig
 ): Promise<AxiosResponse<Data>> {
   const { data } = config
@@ -57,20 +59,39 @@ export async function appShellRequestor<Data>(
       : data
   const configProxy = { ...config, data: formDataProxy }
 
-  const result = await remote.ipcRenderer.invoke('usb:request', configProxy)
+  const result = await remote.ipcRenderer.invoke(target, configProxy)
   if (result?.error != null) {
     throw result.error
   }
 
+  // TODO(jh, 2026-02-26): The below is a hack to get around the fact that Blob data
+  // doesn't (de)serialize properly somewhere in the IPC chain, seemingly only on Windows. Investigate
+  // a more robust solution.
+
   // Blob data doesn't serialize properly across the IPC, so we parse it from
-  // an Array type sent from the shell layer.
-  if (config.responseType === 'blob' && Array.isArray(result.data)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const uint8Array = new Uint8Array(result.data)
-    result.data = new Blob([uint8Array]) as Data
+  // an Array type sent from the shell layer. On Windows, large arrays may be
+  // serialized as objects with numeric string keys (e.g., {"0":80,"1":75,...}).
+  if (config.responseType === 'blob' && result.data != null) {
+    const arrayData = Array.isArray(result.data)
+      ? result.data
+      : Object.values(result.data as Record<string, number>)
+
+    result.data = new Blob([new Uint8Array(arrayData as number[])]) as Data
   }
 
   return result
+}
+
+export async function appShellInternalApiRequestor<Data>(
+  config: AxiosRequestConfig
+): Promise<AxiosResponse<Data>> {
+  return await doAppShellRequest('internal-api:request', config)
+}
+
+export async function appShellUSBRequestor<Data>(
+  config: AxiosRequestConfig
+): Promise<AxiosResponse<Data>> {
+  return await doAppShellRequest('usb:request', config)
 }
 
 interface CallbackStore {
@@ -127,3 +148,12 @@ remote.ipcRenderer.on(
     })
   }
 )
+
+export async function tryInstallRobotCertificate(props: {
+  certificateData: string
+  password: string
+  salt: string
+  iterations: number
+}): Promise<boolean> {
+  return await remote.ipcRenderer.invoke('robot-cert:install', props)
+}

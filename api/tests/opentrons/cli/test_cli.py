@@ -209,9 +209,9 @@ def test_non_ot2_protocol_rejected(tmp_path: Path, output: str) -> None:
         """
     )
 
-    assert (
-        RobotTypeEnum.robot_literal_to_enum("OT-3 Standard") != RobotTypeEnum.OT2
-    ), "Precondition: OT-3 Standard is not OT-2"
+    assert RobotTypeEnum.robot_literal_to_enum("OT-3 Standard") != RobotTypeEnum.OT2, (
+        "Precondition: OT-3 Standard is not OT-2"
+    )
 
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(protocol_source, encoding="utf-8")

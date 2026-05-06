@@ -10,16 +10,19 @@ classifiers = [
 description = "Common utilities for various Opentrons Python servers."
 
 dependencies = [
+    "aiohttp>=3.12.14,<4",
     "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
     "python-multipart==0.0.6",
     "pydantic>2.0.0,<3",
+    "pydantic-settings>=2.0.0,<3",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
     "systemd-python==234; sys_platform=='linux'",
-    "sqlalchemy==1.4.51",
+    # todo(mm, 2026-03-24): Set sqlalchemy to >=2,<3 when robot-server and system-server are no longer on 1.4.
+    "sqlalchemy>=1.4.51,<3",
     "idna==3.3",
 ]
 
@@ -39,7 +42,11 @@ dev = [
     "httpx==0.26.0",
     "types-requests~=2.31.0",
     "types-mock~=5.1.0",
-    "sqlalchemy2-stubs==0.0.2a21",
+    # Theoretically, this package supports both SQLAlchemy 1.4 and 2.x.
+    # Ideally, we'd run all our dev checks on both versions, but we don't currently have a pattern to do that.
+    # So let's treat 1.4 as the lowest common denominator and run all the dev checks on that.
+    "sqlalchemy==1.4.51",
+    "sqlalchemy2-stubs==0.0.2a38",
     "build~=1.2.0",
     "setuptools==80.9.0",
 ]
@@ -59,6 +66,9 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["server_utils"]
 
+[tool.ruff.format]
+exclude = ["server_utils/_version.py"]
+
 # uv: global settings and dependency tweaks
 [tool.uv]
 # Provide static metadata so uv can resolve systemd-python without building its sdist on
@@ -67,6 +77,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/server-utils"

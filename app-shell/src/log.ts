@@ -8,7 +8,6 @@ import winston from 'winston'
 
 import { getConfig } from './config'
 
-import type Transport from 'winston-transport'
 import type { ConfigV0 } from '@opentrons/app/src/redux/config/schema-types'
 
 export const LOG_DIR = path.join(app.getPath('userData'), 'logs')
@@ -26,7 +25,7 @@ const FILE_OPTIONS = {
 }
 
 let config: ConfigV0['log']
-let transports: Transport[]
+let transports: winston.transport[]
 let log: winston.Logger
 
 export function createLogger(filename: string): winston.Logger {
@@ -58,7 +57,7 @@ function initializeTransports(): void {
   log.info(`Level "${config.level.console}" and higher logging to console`)
 }
 
-function createTransports(): Transport[] {
+function createTransports(): winston.transport[] {
   const timeFromStamp = (ts: string): string =>
     dateFormat(new Date(ts), 'HH:MM:ss.l')
 

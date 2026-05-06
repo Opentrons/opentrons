@@ -157,8 +157,8 @@
       "title": "Pause until Thermocycler Lid reaches {{temperature}}\u00a0°C"
     },
     "wait_for_thermocycler_profile": {
-      "body": "<p>The protocol will wait for the Thermocycler profile to complete before continuing to the next step.</p><p>You can insert steps between the start profile and wait for profile to complete check points to run them in-parallel while the profile executes.</p>",
-      "title": "Wait until Thermocycler profile completes"
+      "body": "<p>This Thermocycler profile can run in parallel with other steps. Click and drag to move steps between \"Start profile\" and \"Wait for profile for complete\".</p><p>If you don't move any steps, the robot will not perform any other actions during the Thermocycler profile.</p>",
+      "title": "Run a Thermocycler profile in parallel with other steps"
     },
     "waste_chute_warning": {
       "body1": "Moving labware to the Waste Chute permanently discards it. You can’t use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable.",
@@ -264,6 +264,10 @@
         "body": "This step uses labware that has previously been discarded into a trash.",
         "title": "Labware not available"
       },
+      "MOVE_LOCATION_NOT_SPECIFIED": {
+        "body": "This step is missing a move location.",
+        "title": "Move location not defined."
+      },
       "LABWARE_OFF_DECK": {
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step.",
         "title": "Labware not on deck"
@@ -322,7 +326,7 @@
         "title": "Gripper movement with tips attached"
       },
       "POSSIBLE_PIPETTE_COLLISION": {
-        "body": "There is a possibility that the pipette will collide with the adjacent labware or module for partial tip pick up.",
+        "body": "There is a possibility that the pipette will collide with the adjacent labware, modules, or trash fixtures for partial tip pick up.",
         "title": "Pipette collisions likely"
       },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {

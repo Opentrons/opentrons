@@ -856,9 +856,9 @@ def _create_live_context_pe(
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
 
     @contextmanager
-    def _cleanup_hardware_with_engine() -> (
-        Iterator[tuple["ProtocolEngine", asyncio.AbstractEventLoop]]
-    ):
+    def _cleanup_hardware_with_engine() -> Iterator[
+        tuple["ProtocolEngine", asyncio.AbstractEventLoop]
+    ]:
         try:
             with create_protocol_engine_in_thread(
                 hardware_api=hardware_api_wrapped,

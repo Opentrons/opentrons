@@ -2,7 +2,28 @@
 
 ## Overview
 
-The Opentrons AI server is a FastAPI server that handles complex tasks like running generative AI models and integrating with the OpenAI API. One challenge we faced was the long processing time for chat completion, which can take 1-3 minutes. This ruled out serverless options like Lambda, as they typically have strict time limits. Ultimately, we opted for a robust architecture using CloudFront, a load balancer, and an ECS Fargate container running our FastAPI server. This robust architecture ensures reliable performance and scalability, allowing users to seamlessly interact with our AI-powered tools and automate their lab workflows.
+The Opentrons AI server is a FastAPI server that runs generative AI models (Anthropic Claude) and returns JSON responses to the frontend. Because protocol generation can take 1-3 minutes, serverless options like Lambda are impractical; instead, the service runs in an ECS Fargate container behind CloudFront and an ALB.
+
+### API endpoints
+
+The server exposes four chat endpoints:
+
+| Endpoint                              | Purpose                                                |
+| ------------------------------------- | ------------------------------------------------------ |
+| `POST /api/chat/update-protocol`      | Update an existing protocol (no file attachments)      |
+| `POST /api/chat/create-protocol`      | Generate a new protocol (no file attachments)          |
+| `POST /api/chat/completion`           | General chat completion (no file attachments)          |
+| `POST /api/chat/completion-multipart` | Chat completion with file attachments (multipart form) |
+
+### Fake responses
+
+Every endpoint accepts `"fake": true` in the request body to bypass the LLM. The optional `"fake_key"` field selects a canned response from `api/domain/fake_responses.py`:
+
+| `fake_key`                          | Description                    |
+| ----------------------------------- | ------------------------------ |
+| `"reagent transfer"`, `"pcr"`, etc. | Static protocol fake responses |
+
+Fake response logic lives in `api/domain/fake_responses.py`; the public entry point is `_handle_fake_response` in `api/handler/fast.py`.
 
 ## Deployed Environments
 
@@ -27,7 +48,7 @@ The opentrons-ai-server/api/settings.py file manages environment variables and s
 1. `cd opentrons/opentrons-ai-server`
 1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md).
 1. Use pyenv to install python `pyenv install 3.12.6` or latest 3.12.\*.
-1. Have nodejs and yarn installed per [DEV_SETUP.md](../DEV_SETUP.md).
+1. Have nodejs and pnpm installed per [DEV_SETUP.md](../DEV_SETUP.md).
    1. This allows formatting of of `.md` and `.json` files.
 1. select the python version `pyenv local 3.12.6`.
    1. This will create a `.python-version` file in this directory.
@@ -69,24 +90,27 @@ Now you are in the docker container and can inspect the environment and such.
 
 #### Direct API Interaction and Authentication
 
-> There is only 1 endpoint with the potential to call the Anthropic API. This is the `/api/chat/completion` endpoint. This endpoint requires authentication and the steps are outlined below. In the POST request body setting `"fake": true` will short circuit the handling of the call. The Anthropic API will not be hit. Instead, a hard coded response is returned. We plan to extend this capability to allow for live local testing of the UI without calling the Anthropic API.
+All endpoints require a Bearer token in the `Authorization` header: `"Authorization": "Bearer YOUR_TOKEN"`.
 
-To access the `/api/chat/completion` API endpoint, you will need to provide an Authorization header in your API calls.
-`"Authorization": "Bearer YOUR_TOKEN"`
+Setting `"fake": true` (and optionally `"fake_key"`) in the request body bypasses the LLM entirely and returns a canned fake response — useful for local UI development without Anthropic API calls.
+
+To get a token for direct API interaction:
 
 1. get the file `test.env` from a team member
 1. put the `test.env` file in the `opentrons-ai-server/tests/helpers` directory
-1. run `make live-client` and select local for the environment
-1. a token will now be cached `opentrons-ai-server/tests/helpers/cached_token.txt` directory
-1. use this token in the Authorization header of your favorite API client
+1. run `make live-client` and select local for the environment — this fetches a token and caches it at `tests/helpers/cached_token.txt`
+1. use the cached token in the `Authorization` header of your favorite API client
 
 #### Live Tests
 
-The live-test target will run tests against any environment. The default is local. The environment can be set by setting the ENV variable.
+Live tests hit a running server (default: local). Run them with:
 
-1. have the server running locally
-1. run `make live-test`
-1. You should see the tests run and pass against the local environment
+```shell
+make live-test          # against local (default)
+ENV=staging make live-test
+```
+
+Live tests use the `Client` helper in `tests/helpers/client.py` which wraps `httpx` with Auth0 token handling and a configurable timeout.
 
 #### API Access from the UI
 

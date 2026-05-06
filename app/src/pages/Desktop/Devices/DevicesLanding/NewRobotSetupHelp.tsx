@@ -4,19 +4,18 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_FLEX_END,
-  DIRECTION_COLUMN,
-  Flex,
   FLEX_MAX_CONTENT,
   Link,
   Modal,
   PrimaryButton,
-  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+
+import styles from './newrobotsetuphelp.module.css'
 
 const NEW_OT2_SETUP_SUPPORT_ARTICLE_HREF =
   'https://insights.opentrons.com/hubfs/Products/OT-2/OT-2%20Quick%20Start%20Guide.pdf'
@@ -44,8 +43,8 @@ export function NewRobotSetupHelp(): JSX.Element {
                 setShowNewRobotHelpModal(false)
               }}
             >
-              <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing24}>
-                <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+              <div className={styles.container}>
+                <div className={styles.content}>
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('branded:new_robot_instructions')}
                   </StyledText>
@@ -55,7 +54,7 @@ export function NewRobotSetupHelp(): JSX.Element {
                   >
                     {t('branded:opentrons_ot2_quickstart_guide')}
                   </ExternalLink>
-                </Flex>
+                </div>
                 <PrimaryButton
                   onClick={() => {
                     setShowNewRobotHelpModal(false)
@@ -65,7 +64,7 @@ export function NewRobotSetupHelp(): JSX.Element {
                 >
                   {t('shared:close')}
                 </PrimaryButton>
-              </Flex>
+              </div>
             </Modal>,
             getTopPortalEl()
           )

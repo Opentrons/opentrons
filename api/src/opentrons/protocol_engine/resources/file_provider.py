@@ -1,12 +1,11 @@
 """File interaction resource provider."""
 
 import csv
-from dataclasses import dataclass
 from datetime import datetime
 from io import StringIO
 from typing import Awaitable, Callable, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from opentrons_shared_data.data_files import (
     DataFileInfo,
@@ -39,32 +38,48 @@ SPECIAL_CHARACTERS = {
 }
 
 
-@dataclass(frozen=True)
-class FileNameCmdMetadata:
+class FileNameCmdMetadata(BaseModel):
     """Command metadata associated with a specific data file."""
+
+    model_config = ConfigDict(frozen=True)
 
     command_id: str
     prev_command_id: str
+    file_id: Optional[str]
 
 
-@dataclass(frozen=True)
 class ReadCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a plate reader `read` command used to build the finalized file name."""
+
+    model_config = ConfigDict(frozen=True)
 
     base_filename: str
     wavelength: int
 
 
-@dataclass(frozen=True)
 class ImageCaptureCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a camera capture command used to build the finalized file name."""
+
+    model_config = ConfigDict(frozen=True)
 
     step_number: int
     command_timestamp: datetime
     base_filename: Optional[str]
 
 
-CommandFileNameMetadata = ReadCmdFileNameMetadata | ImageCaptureCmdFileNameMetadata
+class UserDefinedCSVCmdFileNameMetadata(FileNameCmdMetadata):
+    """Data for a user-defined csv file."""
+
+    model_config = ConfigDict(frozen=True)
+
+    filename: str
+
+
+CommandFileNameMetadata = (
+    ReadCmdFileNameMetadata
+    | ImageCaptureCmdFileNameMetadata
+    | UserDefinedCSVCmdFileNameMetadata
+)
 
 
 class FileData:
@@ -191,6 +206,9 @@ class FileProvider:
         Params:
             data_files_write_file_callback: Callback to write a file to the data files directory and add it to the database.
             data_files_filecount: Callback to check the amount of data files already present in the data files directory.
+
+        During run time data_files_write_file_callback is defined in robot-server/robot_server/file_provider/provider.py
+        during simulation on the robot/app it is None
         """
         self._data_files_write_file_cb = data_files_write_file_cb
         self._run_metadata: RunFileNameMetadata | None = None

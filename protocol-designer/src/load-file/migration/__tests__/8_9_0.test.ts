@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { migrateFile } from '../8_9_0'
+import { isBroken890Export, migrateFile } from '../8_9_0'
 
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { PDMetadata } from '/protocol-designer/file-types'
@@ -125,6 +125,7 @@ describe('v8.9.0 migration', () => {
           setStateStep,
         ].map(step => [step.id, step])
       ),
+      version: '8.8.0',
     })
 
     const result = migrateFile(input)
@@ -233,20 +234,118 @@ describe('v8.9.0 migration', () => {
   })
 })
 
-/** Create a mock protocol file with the given commands. */
+describe('isBroken890Export', () => {
+  const v880TCProfile: LegacyFormData = {
+    id: 'v880-tc-profile',
+    stepType: 'thermocycler',
+    stepName: 'profile step name',
+    stepDetails: 'profile step details',
+
+    thermocyclerFormType: 'thermocyclerProfile',
+
+    moduleId: 'thermocycler-module-id',
+
+    blockIsActive: false,
+    blockTargetTemp: null,
+    lidIsActive: false,
+    lidTargetTemp: null,
+    lidOpen: false,
+
+    orderedProfileItems: [],
+    profileItemsById: {},
+    profileTargetLidTemp: '40',
+    profileVolume: '10',
+
+    blockIsActiveHold: true,
+    blockTargetTempHold: '123',
+    lidIsActiveHold: true,
+    lidTargetTempHold: '456',
+    lidOpenHold: true,
+  }
+
+  const v890TCProfileStart: FormData = {
+    id: 'v890-tc-profile',
+    stepType: 'thermocycler',
+    stepName: 'profile step name',
+    stepDetails: 'profile step details',
+
+    thermocyclerFormType: 'thermocyclerProfile',
+
+    moduleId: 'thermocycler-module-id',
+
+    blockIsActive: false,
+    blockTargetTemp: null,
+    lidIsActive: false,
+    lidTargetTemp: null,
+    lidOpen: false,
+
+    orderedProfileItems: [],
+    profileItemsById: {},
+    profileTargetLidTemp: '40',
+    profileVolume: '10',
+  }
+
+  const v890TCProfilePause: FormData = {
+    id: 'v890-tc-profile-pause',
+    stepType: 'pause',
+    stepName: 'pause',
+    stepDetails: '',
+
+    pauseAction: 'untilThermocyclerProfileComplete',
+    moduleId: 'thermocycler-module-id',
+  }
+
+  it('should return false for v8.8.0-labeled files with v8.8.0 contents', () => {
+    const file = createFile({
+      version: '8.8.0',
+      orderedStepIds: [v880TCProfile.id],
+      savedStepForms: { [v880TCProfile.id]: v880TCProfile },
+    })
+    expect(isBroken890Export(file)).toStrictEqual(false)
+  })
+
+  it('should return true for v8.8.0-labeled files with v8.9.0 contents', () => {
+    const file = createFile({
+      version: '8.8.0',
+      orderedStepIds: [v890TCProfileStart.id, v890TCProfilePause.id],
+      savedStepForms: {
+        [v890TCProfileStart.id]: v890TCProfileStart,
+        [v890TCProfilePause.id]: v890TCProfilePause,
+      },
+    })
+    expect(isBroken890Export(file)).toStrictEqual(true)
+  })
+
+  it('should return false for v8.9.0-labeled files with v8.9.0 contents', () => {
+    const file = createFile({
+      version: '8.9.0',
+      orderedStepIds: [v890TCProfileStart.id, v890TCProfilePause.id],
+      savedStepForms: {
+        [v890TCProfileStart.id]: v890TCProfileStart,
+        [v890TCProfilePause.id]: v890TCProfilePause,
+      },
+    })
+    expect(isBroken890Export(file)).toStrictEqual(false)
+  })
+})
+
+/** Create a mock protocol file with the given commands and version. */
 function createFile({
   orderedStepIds,
   savedStepForms,
-}: Pick<
-  PDMetadata,
-  'orderedStepIds' | 'savedStepForms'
->): ProtocolFile<PDMetadata> {
+  version,
+}: {
+  orderedStepIds: PDMetadata['orderedStepIds']
+  savedStepForms: PDMetadata['savedStepForms']
+  version: NonNullable<ProtocolFile['designerApplication']>['version']
+}): ProtocolFile<PDMetadata> {
   return {
     designerApplication: {
       data: {
         orderedStepIds,
         savedStepForms,
       },
+      ...(version != null && { version }),
     },
   } as any
 }

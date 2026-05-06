@@ -10,15 +10,15 @@ import {
   storedProtocolData,
   storedProtocolDataTwo,
 } from '/app/redux/protocol-storage/__fixtures__'
+import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { EmptyStateLinks } from '../EmptyStateLinks'
-import { useSortedProtocols } from '../hooks'
 import { ProtocolCard } from '../ProtocolCard'
 import { ProtocolList } from '../ProtocolList'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../hooks')
+vi.mock('/app/resources/protocols/hooks')
 vi.mock('/app/redux/protocol-storage')
 vi.mock('/app/redux/config')
 vi.mock('../EmptyStateLinks')
@@ -146,5 +146,17 @@ describe('ProtocolList', () => {
     vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('oldest')
     render(props)
     screen.getByText('Oldest updates')
+  })
+
+  it('falls back to alphabetical when the stored sort key is invalid', () => {
+    vi.mocked(getProtocolsDesktopSortKey).mockReturnValue('newest' as any)
+
+    render(props)
+
+    expect(vi.mocked(useSortedProtocols)).toHaveBeenCalledWith('alphabetical', [
+      storedProtocolData,
+      storedProtocolDataTwo,
+    ])
+    screen.getByText('Alphabetical')
   })
 })

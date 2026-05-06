@@ -79,22 +79,27 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
   }
   const pipetteMount = pipette?.mount
 
-  useEffect(() => {
-    // move into correct position for probe detach on mount
-    chainRunCommands(
-      [
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: pipetteMount ?? 'left',
+  useEffect(
+    () => {
+      // move into correct position for probe detach on mount
+      chainRunCommands(
+        [
+          {
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: {
+              mount: pipetteMount ?? 'left',
+            },
           },
-        },
-      ],
-      false
-    ).catch(error => {
-      setFatalError(error.message as string)
-    })
-  }, [])
+        ],
+        false
+      ).catch(error => {
+        setFatalError(error.message as string)
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   if (pipetteName == null || pipetteMount == null) return null
 
@@ -131,10 +136,11 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
+  }
 
   return (
     <GenericWizardTile

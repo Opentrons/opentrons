@@ -2,9 +2,10 @@
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import List, NamedTuple, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import anyio
+from pydantic import BaseModel
 
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
@@ -41,7 +42,12 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.commands.command import CommandStatus
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
-from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
+from opentrons.protocol_engine.types import (
+    CommandAnnotation,
+    CommandPreconditions,
+    CustomCommandAnnotationLegacy,
+    LegacyCommandAnnotation,
+)
 from opentrons.protocol_reader import (
     JsonProtocolConfig,
     ProtocolSource,
@@ -52,13 +58,15 @@ from opentrons.util.async_helpers import asyncio_yield
 from opentrons.util.broker import Broker
 
 
-class RunResult(NamedTuple):
+class RunResult(BaseModel):
     """Result data from a run, pulled from the ProtocolEngine."""
 
     commands: List[Command]
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
-    command_annotations: List[CommandAnnotation]
+    command_annotations: List[
+        CommandAnnotation
+    ]  # TODO: can we remove this since annotations are now fetched from state summary?
     command_preconditions: Optional[CommandPreconditions]
 
 
@@ -286,6 +294,9 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
+        command_annotations = (
+            self._protocol_engine.state_view.commands.get_all_command_annotations()
+        )
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
@@ -293,7 +304,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             commands=commands,
             state_summary=run_data,
             parameters=parameters,
-            command_annotations=[],
+            command_annotations=command_annotations,
             command_preconditions=preconditions,
         )
 
@@ -351,9 +362,44 @@ class JsonRunner(AbstractRunner):
             protocol_source,
         )
 
+        # In JSON V8 protocols, command annotations were external to commands.
+        # Now that annotations are embedded in commands, we need to insert them into the engine,
+        # and add them to the relevant commands.
+        _legacy_command_annotations: List[
+            LegacyCommandAnnotation
+        ] = await anyio.to_thread.run_sync(
+            self._json_translator.translate_legacy_command_annotations,
+            protocol,
+        )
+        # The legacy annotations were linked to commands using command keys.
+        # So we create a mapping from command keys to the newly generated annotation IDs
+        # and then insert the annotations into the corresponding commands during the command translation process.
+        command_keys_to_annotation_ids: Dict[str, List[str]] = {}
+        for annotation in _legacy_command_annotations:
+            if isinstance(annotation, CustomCommandAnnotationLegacy):
+                annotation_name = "Legacy custom command annotation"
+                params = {}
+            else:
+                annotation_name = annotation.machineReadableName
+                params = annotation.params
+            annotation_id = self._protocol_engine.create_user_command_annotation(
+                annotation_name=annotation_name,
+                annotation_id=None,
+                description="Legacy command annotation",
+                params=params,
+            )
+            for cmd_key in annotation.commandKeys:
+                if command_keys_to_annotation_ids.get(cmd_key) is None:
+                    command_keys_to_annotation_ids[cmd_key] = [annotation_id]
+                else:
+                    command_keys_to_annotation_ids[cmd_key].append(annotation_id)
+        self._command_annotations = (
+            self._protocol_engine.state_view.commands.get_all_command_annotations()
+        )
         commands = await anyio.to_thread.run_sync(
             self._json_translator.translate_commands,
             protocol,
+            command_keys_to_annotation_ids,
         )
 
         # Add commands and liquids to the ProtocolEngine.
@@ -376,11 +422,6 @@ class JsonRunner(AbstractRunner):
                 color=liquid.displayColor,
             )
             await asyncio_yield()
-
-        self._command_annotations = await anyio.to_thread.run_sync(
-            self._json_translator.translate_command_annotations,
-            protocol,
-        )
 
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)

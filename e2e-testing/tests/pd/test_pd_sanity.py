@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page
 
+from eyes import Eyes
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from automation.pd_pages import (
@@ -17,6 +19,7 @@ from automation.pd_pages import (
     ProtocolEditorPage,
     TransferPage,
 )
+from automation.pd_pages.plate_reader_page import PlateReaderPage
 
 
 @pytest.mark.pdE2E
@@ -30,7 +33,7 @@ def test_protocol_designer_loads(page: Page, pd_base_url: str) -> None:
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
+def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
     """Full onboarding flow test using page objects."""
     print(f"Running full onboarding test against: {pd_base_url}")
 
@@ -42,7 +45,8 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
 
     landing_page.confirm_welcome_modal()
     landing_page.click_create_protocol()
-
+    if eyes is not None:
+        eyes.check_window("Flex landing page after create protocol")
     # Pipette Configuration
     pipette_modal = PipetteModal(page)
     pipette_modal.open_pipette_selector()
@@ -51,7 +55,11 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
     pipette_modal.select_pipette_type("1-Channel", "1000 µL")
     pipette_modal.select_tip_racks(["Filter Tip Rack 1000 µL", "Filter Tip Rack 200 µL", "Filter Tip Rack 50 µL"])
     pipette_modal.save_pipette_selection()
-
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Pipette Configuration Saved",
+            target=eyes.Target.window().fully(),
+        )
     # Module Configuration
     module_config = ModuleConfigPage(page)
     module_config.select_gripper(True)
@@ -71,8 +79,11 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
     # Add Temperature Module to D1
     deck_config.select_slot("D1")
     deck_config.select_module("Temperature Module GEN2")
+    # Add Plate Reader to B3
+    plate_reader_page = PlateReaderPage(page)
+    plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
 
-    # Add Staging Area to C3/fakeD4
+    # Add Staging Area on D3 cutout (fakeD4)
     if deck_config.is_sandbox:
         deck_config.select_slot("cutoutC3")
     else:
@@ -82,6 +93,11 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
 
     deck_config.confirm_deck_configuration()
     deck_config.name_protocol("Protocol Onboarding Demonstration")
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Deck Configuration Complete with HS, TD, Stacker, Plate Reader",
+            target=eyes.Target.window().fully(),
+        )
     deck_config.enter_edit_mode()
     print("✓ Protocol named and entered edit mode")
 
@@ -91,7 +107,6 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
     editor.select_labware_category(2)
     labware_on_deck = "Axygen 96 Well Plate 500 µL"
     editor.select_labware_by_name(labware_on_deck)
-
     editor.edit_liquid()
     editor.select_first_well()
     editor.define_liquid("Water")
@@ -103,10 +118,11 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
     editor.confirm_liquid_setup()  # Close labware setup
     editor.add_step("Transfer")
     transfer_page = TransferPage(page)
-    # Source labware is selected by default so we proceed to selecting the well
-    transfer_page.wells_select(location="Source", wells=["A1"], rect=False)
     transfer_page.destination_labware_select(labware_on_deck)
-    transfer_page.wells_select(location="Destination", wells=["A1"], rect=False)
+    transfer_page.open_nozzle_and_well_selector()
+    transfer_page.select_nozzles()
+    transfer_page.wells_select(location="Source", labwareName=labware_on_deck, wells=["A1"], finalStep=False)
+    transfer_page.wells_select(location="Destination", labwareName=labware_on_deck, wells=["A2"], finalStep=True)
+    transfer_page.pipette_path_select("Single transfer")
     transfer_page.input_volume("100")
     print("✓ Transfer step configured")
-    print("\n✅ Full onboarding flow completed successfully!")

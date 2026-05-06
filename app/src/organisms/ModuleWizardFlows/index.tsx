@@ -82,19 +82,32 @@ export function ModuleWizardFlows(
     })?.data?.data ?? []
 
   // build out flow if there is a module passed in at launch
-  useEffect(() => {
-    if (attachedModuleOnLaunch != null) {
-      buildFlowForSelectedModule(attachedModuleOnLaunch)
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (attachedModuleOnLaunch != null) {
+        buildFlowForSelectedModule(attachedModuleOnLaunch)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   // Close the modal if no new modules are attached
   const newModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
-  useEffect(() => {
-    if (newModules.length === 0 && wizardFlowBaseProps.attachedModule == null) {
-      handleCleanUpAndClose()
-    }
-  }, [newModules, wizardFlowBaseProps])
+  useEffect(
+    () => {
+      if (
+        newModules.length === 0 &&
+        wizardFlowBaseProps.attachedModule == null
+      ) {
+        handleCleanUpAndClose()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [newModules, wizardFlowBaseProps]
+  )
 
   const doorStatus = useIsDoorOpen(robotName).isDoorOpen
 

@@ -26,7 +26,7 @@ dependencies = [
     "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
-    "aiohttp==3.12.14",
+    "aiohttp>=3.12.14,<4",
     "Pyro5>=5.16,<6",
 ]
 [tool.uv.dependency-groups]
@@ -54,7 +54,6 @@ robot = [
     "Pyro5==5.16",
 ]
 dev = [
-    "aiohttp==3.12.14",
     "ruff==0.14.10",
     "build~=1.2.0",
     "click==8.1.2",
@@ -74,7 +73,7 @@ dev = [
     "python-box==6.1.0",
     "requests==2.27.1",
     "rpds-py==0.18.1",
-    "sqlalchemy2-stubs==0.0.2a21",
+    "sqlalchemy2-stubs==0.0.2a38",
     "tavern>=3.0.2",
     "types-mock~=5.1.0",
     "types-paho-mqtt==1.6.0.20240106",
@@ -106,7 +105,7 @@ convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
 [tool.ruff.format]
-exclude = ["tests/integration/persistence_snapshots"]
+exclude = ["tests/integration/persistence_snapshots", "robot_server/_version.py"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]
@@ -116,6 +115,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
@@ -224,3 +225,10 @@ disallow_incomplete_defs = false
 [[tool.mypy.overrides]]
 module = "tests.service.test_logging"
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "Pyro5.*",
+    "serpent"
+]
+follow_untyped_imports = true

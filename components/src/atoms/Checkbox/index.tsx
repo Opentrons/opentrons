@@ -1,30 +1,24 @@
-import { css } from 'styled-components'
+import clsx from 'clsx'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
+import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn, Flex } from '../../primitives'
-import {
-  ALIGN_CENTER,
-  CURSOR_AUTO,
-  CURSOR_DEFAULT,
-  CURSOR_POINTER,
-  DIRECTION_ROW,
-  DISPLAY_FLEX,
-  FLEX_MAX_CONTENT,
-  JUSTIFY_SPACE_BETWEEN,
-} from '../../styles'
-import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { FLEX_MAX_CONTENT } from '../../styles'
 import { StyledText } from '../StyledText'
+import styles from './checkbox.module.css'
 
-import type { MouseEventHandler } from 'react'
+import type { ChangeEventHandler, CSSProperties } from 'react'
+
+type CheckboxStyle = CSSProperties & {
+  '--checkbox-width'?: string
+}
 
 export interface CheckboxProps {
   /** checkbox is checked if value is true */
   isChecked: boolean
   /** label text that describes the option */
   labelText: string
-  /** callback click/tap handler */
-  onClick: MouseEventHandler
+  /** callback change handler */
+  onChange: ChangeEventHandler<HTMLInputElement>
   /** html tabindex property */
   tabIndex?: number
   /** if disabled is true, mouse events will not trigger onClick callback */
@@ -34,75 +28,48 @@ export interface CheckboxProps {
   /** optional width for helix */
   width?: string
 }
+
 export function Checkbox(props: CheckboxProps): JSX.Element {
   const {
     isChecked,
     labelText,
-    onClick,
+    onChange,
     tabIndex = 0,
     disabled = false,
     width = FLEX_MAX_CONTENT,
     type = 'round',
   } = props
 
-  const CHECKBOX_STYLE = css`
-    width: ${width};
-    grid-gap: ${SPACING.spacing12};
-    border: none;
-    align-items: ${ALIGN_CENTER};
-    flex-direction: ${DIRECTION_ROW};
-    color: ${isChecked ? COLORS.white : COLORS.black90};
-    background-color: ${isChecked ? COLORS.blue50 : COLORS.blue30};
-    border-radius: ${type === 'round'
-      ? BORDERS.borderRadiusFull
-      : BORDERS.borderRadius8};
-    padding: ${SPACING.spacing12} ${SPACING.spacing16};
-    justify-content: ${JUSTIFY_SPACE_BETWEEN};
-    cursor: ${CURSOR_POINTER};
-
-    &:active {
-      background-color: ${isChecked ? COLORS.blue55 : COLORS.blue40};
-    }
-    &:focus-visible {
-      background-color: ${isChecked ? COLORS.blue50 : COLORS.blue35};
-      outline: 3px ${BORDERS.styleSolid} ${COLORS.blue50};
-      outline-offset: 2px;
-    }
-    &:disabled {
-      background-color: ${COLORS.grey30};
-      color: ${COLORS.grey40};
-      cursor: ${CURSOR_DEFAULT};
-    }
-    &:disabled:hover {
-      background-color: ${COLORS.grey30}; /* Prevent hover from overriding */
-    }
-    &:hover {
-      background-color: ${isChecked ? COLORS.blue55 : COLORS.blue35};
-    }
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: ${SPACING.spacing20};
-      border-radius: ${BORDERS.borderRadius16};
-      width: 100%;
-      cursor: ${CURSOR_AUTO};
-    }
-  `
+  const checkboxStyle: CheckboxStyle = {
+    '--checkbox-width': width,
+  }
 
   return (
-    <Btn
-      display={DISPLAY_FLEX}
-      alignItems={ALIGN_CENTER}
-      role="checkbox"
-      onClick={onClick}
-      tabIndex={tabIndex}
-      disabled={disabled}
-      css={CHECKBOX_STYLE}
+    <label
+      className={clsx(styles.checkbox_label, {
+        [styles.checkbox_label_checked]: isChecked,
+        [styles.checkbox_label_unchecked]: !isChecked,
+        [styles.checkbox_label_round]: type === 'round',
+        [styles.checkbox_label_neutral]: type !== 'round',
+        [styles.checkbox_label_disabled]: disabled,
+        [styles.checkbox_label_enabled]: !disabled,
+      })}
+      // eslint-disable-next-line react/forbid-dom-props -- width is a runtime prop and cannot be represented with static classes.
+      style={checkboxStyle}
     >
+      <input
+        type="checkbox"
+        className={styles.checkbox_input_hidden}
+        checked={isChecked}
+        onChange={onChange}
+        disabled={disabled}
+        tabIndex={tabIndex}
+      />
       <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextSemiBold">
         {labelText}
       </StyledText>
       <Check isChecked={isChecked} disabled={disabled} />
-    </Btn>
+    </label>
   )
 }
 
@@ -111,28 +78,23 @@ interface CheckProps {
   color?: string
   disabled?: boolean
 }
+
 export function Check(props: CheckProps): JSX.Element {
   const { isChecked, color = COLORS.white, disabled = false } = props
-  // todo(mm, 2025-09-30): For accessibility, keyboard usability, etc., can this be
-  // a real <input type="checkbox"> instead of a div?
+
   return isChecked ? (
-    <Flex css={CHECK_STYLE}>
+    <div className={styles.checkbox_wrapper}>
       <Icon name="ot-checkbox" color={color} />
-    </Flex>
+    </div>
   ) : (
-    <Flex
-      css={CHECK_STYLE}
-      border={`2px solid ${disabled ? COLORS.grey40 : COLORS.black90}`}
-      borderRadius={BORDERS.borderRadius4}
+    <div
+      className={clsx(
+        styles.checkbox_wrapper,
+        styles.checkbox_wrapper_unchecked,
+        {
+          [styles.checkbox_wrapper_unchecked_disabled]: disabled,
+        }
+      )}
     />
   )
 }
-
-const CHECK_STYLE = css`
-  width: 1rem;
-  height: 1rem;
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    width: 1.75rem;
-    height: 1.75rem;
-  }
-`

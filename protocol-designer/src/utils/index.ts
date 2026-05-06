@@ -1,5 +1,5 @@
 import snakeCase from 'lodash/snakeCase'
-import uuidv1 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -45,7 +45,7 @@ import type {
   ModuleEntities,
 } from '../step-forms'
 
-export const uuid: () => string = uuidv1
+export const uuid: () => string = uuidv4
 // Collision detection for SelectionRect / SelectableLabware
 export const rectCollision = (
   rect1: BoundingRect,
@@ -196,7 +196,7 @@ export function getMatchingTipLiquidSpecs(
   const tipLength = tiprackDef?.parameters?.tipLength ?? 0
 
   console.assert(
-    tipLength,
+    tipLength > 0,
     `expected to find a tiplength for tiprack ${tiprackDef && getLabwareDefURI(tiprackDef)} but could not`
   )
 
@@ -218,7 +218,7 @@ export function getMatchingTipLiquidSpecs(
     return differenceA - differenceB
   })[0]
   console.assert(
-    matchingTipLiquidSpecs,
+    matchingTipLiquidSpecs != null,
     `expected to find the tip liquid specs but could not for tiprack ${getLabwareDefURI(tiprackDef)}`
   )
 

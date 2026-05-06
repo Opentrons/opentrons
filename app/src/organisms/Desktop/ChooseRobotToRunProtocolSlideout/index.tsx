@@ -28,7 +28,7 @@ import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistor
 import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -88,9 +88,14 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [hasMissingFileParam, setHasMissingFileParam] = useState<boolean>(
     runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
   )
-  useEffect(() => {
-    setRunTimeParametersOverrides(runTimeParameters)
-  }, [protocolKey])
+  useEffect(
+    () => {
+      setRunTimeParametersOverrides(runTimeParameters)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [protocolKey]
+  )
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -360,7 +365,7 @@ export function ChooseRobotToRunProtocolSlideout(
       hostname={selectedRobot?.ip ?? null}
       port={selectedRobot?.port ?? null}
       requestor={
-        selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+        selectedRobot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
       }
     >
       <ChooseRobotToRunProtocolSlideoutComponent

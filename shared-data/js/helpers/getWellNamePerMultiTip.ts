@@ -3,7 +3,7 @@ import range from 'lodash/range'
 import { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
 import { getLabwareHasQuirk, orderWells, sortWells } from './index'
 
-import type { LabwareDefinition } from '../types'
+import type { ActiveNozzleNumber, LabwareDefinition } from '../types'
 
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
 const OFFSET_8_CHANNEL = 9 // offset in mm between tips
@@ -40,21 +40,34 @@ export function findWellAt(
 export function getWellNamePerMultiTip(
   labwareDef: LabwareDefinition,
   topWellName: string,
-  channels: 8 | 96
+  channels: ActiveNozzleNumber
 ): string[] | null {
   const topWell = labwareDef.wells[topWellName]
+  const wellOrdering = labwareDef.ordering
+  const orderedWells = orderWells(labwareDef.ordering, 't2b', 'l2r')
+
   if (!topWell) {
     console.warn(
       `well "${topWellName}" does not exist in labware ${labwareDef?.namespace}/${labwareDef?.parameters?.loadName}, cannot getWellNamePerMultiTip`
     )
     return null
   }
-
+  const is384Plate = orderedWells.length === 384
+  if (channels !== 8 && channels !== 1 && channels !== 96 && channels !== 12) {
+    const indexOfTopWell = orderedWells.indexOf(topWellName)
+    const test = orderedWells.slice(indexOfTopWell, indexOfTopWell + channels)
+    if (is384Plate) {
+      return skipEveryOtherWell(
+        topWellName,
+        orderedWells.slice(indexOfTopWell, indexOfTopWell + channels * 2)
+      )
+    }
+    return test
+  }
   const { x, y } = topWell
   let offsetYTipPositions: number[] = range(0, 8).map(
     tipNo => y - tipNo * OFFSET_8_CHANNEL
   )
-  const orderedWells = orderWells(labwareDef.ordering, 't2b', 'l2r')
 
   if (getLabwareHasQuirk(labwareDef, 'centerMultichannelOnWells')) {
     // move multichannel up in Y by half the pipette's tip span to center it in the well
@@ -77,12 +90,39 @@ export function getWellNamePerMultiTip(
   let ninetySixChannelWells = orderedWells
   //  special casing 384 well plates to be every other well
   //  both on the x and y ases.
-  if (orderedWells.length === 384) {
+  if (is384Plate) {
     ninetySixChannelWells = get96Channel384WellPlateWells(
       orderedWells,
       topWellName
     )
   }
+  // get row
+  if (channels === 12) {
+    const columnIndex = wellOrdering.findIndex(column => {
+      return column.includes(topWellName)
+    })
+    const rowIndex = wellOrdering[columnIndex].indexOf(topWellName)
+    if (!is384Plate) {
+      return wellOrdering.map(column => column[rowIndex])
+    } else {
+      return skipEveryOtherWell(
+        topWellName,
+        wellOrdering.map(column => column[rowIndex])
+      )
+    }
+  }
 
   return channels === 8 ? wellsAccessed : ninetySixChannelWells
+}
+
+export const skipEveryOtherWell = (
+  hoveredWell: string,
+  wells: string[]
+): string[] => {
+  const startIndex = wells.indexOf(hoveredWell)
+  const firstWell = startIndex % 2 === 0 ? 0 : 1
+  const filteredWells = wells.filter(
+    (_, index) => index >= firstWell && (index - firstWell) % 2 === 0
+  )
+  return filteredWells
 }

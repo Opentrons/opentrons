@@ -33,6 +33,7 @@ from robot_server.protocols.analysis_models import (
 from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisResource,
     CompletedAnalysisStore,
+    UnreadableAnalysisError,
 )
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
@@ -220,6 +221,7 @@ async def test_get_by_analysis_id_as_document(
         "modules": [],
         "pipettes": [],
         "commandAnnotations": [],
+        "labwareOffsets": [],
     }
 
 
@@ -571,3 +573,39 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
     assert subject.get_csv_rtps_by_analysis_id("analysis-id-0") == {}
     assert subject.get_csv_rtps_by_analysis_id("analysis-id-1") == {"bar": None}
     assert subject.get_csv_rtps_by_analysis_id("new-analysis-id") == {"bar": "file-id"}
+
+
+async def test_raise_error_on_analysis_parsing_error(
+    subject: CompletedAnalysisStore,
+    memcache: MemoryCache[str, CompletedAnalysisResource],
+    protocol_store: ProtocolStore,
+    decoy: Decoy,
+    sql_engine: Engine,
+) -> None:
+    """It should raise a ValueError when parsing a bad analysis from db."""
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+    unparseable_analysis = '{"id": "analysis-id", "result": "ok", \
+        "status": "completed", \
+        "runTimeParameters": [], \
+        "commands": [], \
+        "errors": [], \
+        "labware": [], \
+        "liquids": [], \
+        "liquidClasses": [], \
+        "modules": [], \
+        "pipettes": [], \
+        "commandAnnotations": [{"commandKeys": ["1abc123", "2abc123"], "annotationType": "custom"}]}'
+
+    analysis_resource_blob = {
+        "id": "analysis-id",
+        "protocol_id": "protocol-id",
+        "analyzer_version": "123",
+        "completed_analysis": unparseable_analysis,
+    }
+    # Set up the database with an unparseable analysis
+    statement = analysis_table.insert().values(analysis_resource_blob)
+    with sql_engine.begin() as transaction:
+        transaction.execute(statement)
+    decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
+    with pytest.raises(UnreadableAnalysisError):
+        await subject.get_by_id("analysis-id")
