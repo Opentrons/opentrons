@@ -3,7 +3,7 @@ title: "Opentrons OT-2: Software Downgrade"
 description: "Roll back OT-2 software to an earlier version for troubleshooting or compliance."
 ---
 
-These instructions take you through the OT-2 robot software downgrade process. Downgrading your robot's software version should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes. For Flex instructions, see [Downgrading Flex Software](../../flex/opentrons-app/flex-downgrade.md).
+These instructions take you through the OT-2 robot software downgrade process. Downgrading your robot's software version should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes. For Flex, see [Downgrading Flex Software](../../flex/opentrons-app/flex-downgrade.md).
 
 ## Operating system versions
 
