@@ -7,6 +7,7 @@ import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import styles from './annotatedsteps.module.css'
 import { AnnotatedStepsRowItem } from './AnnotatedStepsRowItem'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
+import { getIsVisibleProtocolStep } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -72,10 +73,6 @@ export interface ItemData {
 // we may need to adjust it later.
 const DEFAULT_ROW_HEIGHT_PX = 64
 
-function isVisibleProtocolStep(command: RunTimeCommand): boolean {
-  return !command.commandType.includes('load') && command.commandType !== 'home'
-}
-
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const {
     analysis,
@@ -113,12 +110,12 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     for (const node of groupedCommands) {
       if ('annotationId' in node) {
         const subCommands = node.subCommands.filter(leaf =>
-          isVisibleProtocolStep(leaf.command)
+          getIsVisibleProtocolStep(leaf.command)
         )
         if (subCommands.length > 0) {
           next.push({ ...node, subCommands })
         }
-      } else if (isVisibleProtocolStep(node.command)) {
+      } else if (getIsVisibleProtocolStep(node.command)) {
         next.push(node)
       }
     }
