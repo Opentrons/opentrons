@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired'
+import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
 import { postDocumentation } from '/app/resources/access-control/postDocumentation'
 
 import { useRequireDocumentation } from '../useRequireDocumentation'

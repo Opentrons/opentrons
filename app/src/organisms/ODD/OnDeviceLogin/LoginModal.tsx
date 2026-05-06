@@ -34,6 +34,11 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     },
   })
 
+  const handleCancel = (): void => {
+    modal.resolve(null)
+    modal.remove()
+  }
+
   return (
     <div className={styles.overlay}>
       <OnDeviceLogin
@@ -45,10 +50,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         onClearLoginError={() => {
           setLoginError(null)
         }}
-        onCancel={() => {
-          modal.resolve(null)
-          modal.remove()
-        }}
+        onCancel={handleCancel}
       />
     </div>
   )

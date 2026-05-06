@@ -1,6 +1,6 @@
-import type { DocumentedActionKind } from './DocumentedAction'
+import type { DocumentedActionKind } from './types'
 
-export interface PostDocumentationInput {
+interface PostDocumentationInput {
   action: DocumentedActionKind
   note: string
   username: string

@@ -7,7 +7,7 @@ import { useGuardedAction } from '../useGuardedAction'
 import { useRequireDocumentation } from '../useRequireDocumentation'
 import { useRequireLogin } from '../useRequireLogin'
 
-import type { DocumentedActionKind } from '/app/resources/access-control/DocumentedAction'
+import type { DocumentedActionKind } from '../../../../resources/access-control/types'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),

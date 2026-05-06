@@ -15,22 +15,27 @@ export interface DocumentationRequiredModalResult {
 const DocumentationRequiredModalImpl = NiceModal.create(
   ({ username }: DocumentationRequiredModalArgs): JSX.Element => {
     const modal = useModal()
+
+    const handleConfirm = (note: string): void => {
+      const result: DocumentationRequiredModalResult = {
+        note,
+        confirmedAt: new Date().toISOString(),
+      }
+      modal.resolve(result)
+      modal.remove()
+    }
+
+    const handleBack = (): void => {
+      modal.resolve(null)
+      modal.remove()
+    }
+
     return (
       <div className={styles.overlay}>
         <DocumentationRequired
           username={username}
-          onConfirm={note => {
-            const result: DocumentationRequiredModalResult = {
-              note,
-              confirmedAt: new Date().toISOString(),
-            }
-            modal.resolve(result)
-            modal.remove()
-          }}
-          onBack={() => {
-            modal.resolve(null)
-            modal.remove()
-          }}
+          onConfirm={handleConfirm}
+          onBack={handleBack}
         />
       </div>
     )
