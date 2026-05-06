@@ -106,7 +106,7 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
 
   const handlePlayButtonClick = (
     event: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  ): void => {
     event.stopPropagation()
     toggleGroupPlay()
   }
