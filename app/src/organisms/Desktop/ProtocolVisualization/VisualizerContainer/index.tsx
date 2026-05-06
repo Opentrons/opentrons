@@ -346,6 +346,8 @@ export function VisualizerContainer(
           handlePause={() => {
             setIsPlaying(false)
           }}
+          milliSecondsPerFrame={milliSecondsPerFrame}
+          isGlobalPlaying={isPlaying}
         />
       </div>
       {/* Gutter between left & center */}

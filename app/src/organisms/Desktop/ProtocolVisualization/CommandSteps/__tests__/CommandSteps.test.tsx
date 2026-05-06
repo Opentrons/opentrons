@@ -29,6 +29,8 @@ describe('CommandSteps', () => {
       percentComplete: 50,
       handlePause: vi.fn(),
       currentCommandIndex: 1,
+      milliSecondsPerFrame: 2000,
+      isGlobalPlaying: false,
     }
     vi.mocked(AnnotatedSteps).mockReturnValue(<div>mock AnnotatedSteps</div>)
     mockIntersectionObserver.mockReturnValue({

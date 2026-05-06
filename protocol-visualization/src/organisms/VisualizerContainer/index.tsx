@@ -326,6 +326,8 @@ export function ProtocolVisualization(
             handlePause={() => {
               setIsPlaying(false)
             }}
+            milliSecondsPerFrame={milliSecondsPerFrame}
+            isGlobalPlaying={isPlaying}
           />
         </div>
         {/* Gutter between left & center */}
