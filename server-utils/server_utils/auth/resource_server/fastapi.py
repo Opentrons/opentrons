@@ -201,8 +201,10 @@ def get_authorization_checker(
 class AuthorizationError(Exception):
     """Raised to signal that an HTTP authorization failure should be returned to the client.
 
-    Endpoints should not deal with this directly. Instead, they should use the
-    higher-level `require_scopes()` function.
+    Most endpoints should not deal with this directly. This is automatically raised by
+    `require_scopes()` and caught by `handle_authorization_error()`. An endpoint should
+    only raise this manually if it's implementing custom authorization logic--see
+    `get_authorization()`.
     """
 
     def __init__(
