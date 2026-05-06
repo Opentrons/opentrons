@@ -1,20 +1,25 @@
 ---
 title: "Opentrons OT-2: Software Downgrade"
-description: "Roll back OT-2 software to an earlier version for troubleshooting or compliance."
+description: "Roll back OT-2 robot and app software to an earlier version for troubleshooting or compliance."
 ---
 
-These instructions take you through the OT-2 robot software downgrade process. Downgrading your robot's software version should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes. For Flex, see [Downgrading Flex Software](../../flex/opentrons-app/flex-downgrade.md).
+These instructions explain how to downgrade OT-2 robots running software version 9.0 or earlier. If your robot is running version 26.06 or later, see <font color="red">PLACEHOLDER TO TBD</font> to roll back to version 9.0 or earlier.
+
+For Flex, see [Downgrading Flex Software](../../flex/opentrons-app/flex-downgrade.md).
+
+!!! note
+    Downgrading your robot's software version should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes.
 
 ## Operating system versions
 
 Previous versions of the OT-2 robot operating system (and Opentrons App) are available on Github at <https://github.com/Opentrons/opentrons/releases>.
 
-## Downgrade instructions
+## Robot downgrade instructions
 
 !!! tip
     Make sure your OT-2 is idle before downgrading. Some required App features are not available while the robot is running a protocol.
 
-### Part 1: Downloading an earlier software version
+### Download robot software
 
 <div class="instruction-list" markdown>
 
@@ -26,27 +31,27 @@ Previous versions of the OT-2 robot operating system (and Opentrons App) are ava
 
 3. Click the compressed file named `ot2-system-<version number>.zip` to download and save it to your computer. For example, to get OT-2 software version 8.7, you'd click the file `ot2-system-8.7.0.zip`.
 
-### Part 2: Installing the earlier version
+### Install robot software
 
-4. From the **Devices** tab in the App, find the robot you want to work with.
+1. From the **Devices** tab in the App, find the robot you want to work with.
 
-5. Click the three-dot menu (⋮) and then click **Robot Settings**.
+2. Click the three-dot menu (⋮) and then click **Robot Settings**.
 
-6. Click the **Advanced** tab.
+3. Click the **Advanced** tab.
 
-7. In the Advanced settings, find the section labeled "Update robot software manually with a local file."
+4. In the Advanced settings, find the section labeled "Update robot software manually with a local file."
 
 <font color="red">PLACEHOLDER FOR IMAGE</font>
 
-8. Click **Browse file system** and navigate to the location where you saved the downloaded robot software.
+5. Click **Browse file system** and navigate to the location where you saved the downloaded robot software.
 
-9. Select the `.zip` file containing the robot software and click **Open**.
+6. Select the `.zip` file containing the robot software and click **Open**.
 
     !!! note "Software installation and reboot"
         The robot automatically installs the software and reboots, which takes about 15 minutes. When the restart is complete, the robot will be running the earlier version of the operating system.
 
 </div>
 
-### Part 3: After downgrading
+## App downgrade instructions
 
 TBD instructions here. Match App software to robot software version.
