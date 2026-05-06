@@ -11,7 +11,10 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { tryInstallRobotCertificate } from '/app/redux/shell/remote'
+import {
+  tryInstallEncryptedRobotCertificate,
+  tryInstallPlaintextRobotCertificate,
+} from '/app/redux/shell/remote'
 
 import { useHandleRobotCertImport } from '../useHandleRobotCertImport'
 
@@ -20,7 +23,8 @@ import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('/app/redux/shell/remote', () => ({
-  tryInstallRobotCertificate: vi.fn(),
+  tryInstallEncryptedRobotCertificate: vi.fn(),
+  tryInstallPlaintextRobotCertificate: vi.fn(),
 }))
 vi.mock('@opentrons/react-api-client')
 
@@ -66,7 +70,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -80,6 +84,9 @@ describe('useHandleRobotCertImport', async () => {
         data: {
           data: {
             current: {
+              cert_data: 'ffffffff',
+            },
+            next: {
               cert_data: 'asdfasdf',
             },
           },
@@ -89,6 +96,9 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
+    when(vi.mocked(tryInstallPlaintextRobotCertificate))
+      .calledWith({ certificateData: 'asdfasdf' })
+      .thenResolve(true)
     const onSuccessfulImport = vi.fn()
     const { result } = renderHook(
       () => useHandleRobotCertImport({ onSuccessfulImport }),
@@ -131,7 +141,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -139,7 +149,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenReject(new Error('wrong password'))
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'oooooooo',
@@ -153,6 +163,9 @@ describe('useHandleRobotCertImport', async () => {
         data: {
           data: {
             current: {
+              cert_data: 'ffffffff',
+            },
+            next: {
               cert_data: 'asdfasdf',
             },
           },
@@ -162,6 +175,9 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
+    when(vi.mocked(tryInstallPlaintextRobotCertificate))
+      .calledWith({ certificateData: 'asdfasdf' })
+      .thenResolve(true)
     const onSuccessfulImport = vi.fn()
     const { result } = renderHook(
       () => useHandleRobotCertImport({ onSuccessfulImport }),
@@ -223,7 +239,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -276,7 +292,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -284,7 +300,7 @@ describe('useHandleRobotCertImport', async () => {
         iterations: 10,
       })
       .thenReject(new Error('bad password sucka'))
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'iuiuiuiu',
@@ -337,7 +353,7 @@ describe('useHandleRobotCertImport', async () => {
         headers: {},
         config: {},
       })
-    when(vi.mocked(tryInstallRobotCertificate))
+    when(vi.mocked(tryInstallEncryptedRobotCertificate))
       .calledWith({
         password: 'password',
         certificateData: 'asdfasdf',
@@ -365,4 +381,65 @@ describe('useHandleRobotCertImport', async () => {
     expect(onSuccessfulImport).not.toHaveBeenCalled()
     expect(result.current.passwordError).toEqual('Bad SSL connection')
   })
+  it('should not install next certificate if it does not exist', async () =>
+    async () => {
+      when(vi.mocked(getEncryptedCACertificates))
+        .calledWith(HOST_CONFIG)
+        .thenResolve({
+          data: {
+            data: {
+              current: {
+                current: {
+                  cert_data: 'asdfasdf',
+                  key_salt: 'fdsafdsa',
+                  kdf_iterations: 10,
+                  key_expires_at: new Date().toISOString(),
+                },
+              },
+            },
+          },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {},
+        })
+      when(vi.mocked(tryInstallEncryptedRobotCertificate))
+        .calledWith({
+          password: 'password',
+          certificateData: 'asdfasdf',
+          salt: 'fdsafdsa',
+          iterations: 10,
+        })
+        .thenResolve(true)
+      when(vi.mocked(getPlaintextCACertificates))
+        .calledWith(HOST_CONFIG)
+        .thenResolve({
+          data: {
+            data: {
+              current: {
+                cert_data: 'ffffffff',
+              },
+            },
+          },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {},
+        })
+      const onSuccessfulImport = vi.fn()
+      const { result } = renderHook(
+        () => useHandleRobotCertImport({ onSuccessfulImport }),
+        {
+          wrapper,
+        }
+      )
+      act(() => {
+        result.current.setPasswordValue('password')
+      })
+      act(() => {
+        result.current.tryImport()
+      })
+      await waitFor(() => expect(onSuccessfulImport).toHaveBeenCalled())
+      expect(tryInstallPlaintextRobotCertificate).not.toHaveBeenCalled()
+    })
 })

@@ -1,4 +1,4 @@
-"""FastAPI dependencies to enforce authorization."""
+"""FastAPI-specific helpers for enforcing authorization."""
 
 # NOTE: Don't do `from __future__ import annotations` in this file.
 # See comments in `require_scopes()`.
@@ -10,9 +10,11 @@ from typing import (
     AsyncGenerator,
     Awaitable,
     Callable,
+    Final,
 )
 
 import fastapi
+import fastapi.responses
 import fastapi.security
 
 from .auth_server import TOKEN_ENDPOINT_PATH, LocalHTTPClient
@@ -21,6 +23,9 @@ from .authorization_checker import (
     AuthorizationChecker,
     AuthorizedResult,
     AuthServerAuthorizationChecker,
+    InsufficientScopeResult,
+    MissingTokenResult,
+    NotAnActiveTokenResult,
 )
 from .error_responses import build_response_for_error
 from server_utils.auth.scopes import Scope
@@ -97,25 +102,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
             # The request is authorized, yay.
             pass
         else:
-            # The request is not authorized.
-            error_status_code, error_headers, error_body = build_response_for_error(
-                authorization_result, required_scopes_set
-            )
-            # todo(mm, 2026-02-11): This currently stringifies the response body and
-            # stuffs it inside the "detail" string field. We should instead return the
-            # response body *as the response body.* To do that, need to raise some kind
-            # of structured exception, and translate it to a response in a global
-            # FastAPI exception handler.
-            stringified_error_body = (
-                f"{error_body.debugMessage}"
-                f" Required scopes: {error_body.requiredScopes}."
-                f" Provided scopes: {error_body.providedScopes}."
-            )
-            raise fastapi.HTTPException(
-                status_code=error_status_code,
-                headers=error_headers,
-                detail=stringified_error_body,
-            )
+            raise AuthorizationError(authorization_result, required_scopes_set)
 
     return dependency
 
@@ -171,3 +158,39 @@ def get_authorization_checker(
         "Forgot to initialize authorization checker as part of server startup?"
     )
     return authorization_checker
+
+
+class AuthorizationError(Exception):
+    """Raised to signal that an HTTP authorization failure should be returned to the client.
+
+    Endpoints should not deal with this directly. Instead, they should use the
+    higher-level `require_scopes()` function.
+    """
+
+    def __init__(
+        self,
+        authorization_error: InsufficientScopeResult
+        | MissingTokenResult
+        | NotAnActiveTokenResult,
+        required_scopes: set[Scope],
+    ) -> None:
+        self.authorization_error: Final = authorization_error
+        self.required_scopes: Final = required_scopes
+
+
+def handle_authorization_error(
+    request: fastapi.Request, exc: AuthorizationError
+) -> fastapi.responses.Response:
+    """Turn `AuthorizationError` exceptions into HTTP responses.
+
+    This should be installed as a global FastAPI exception handler.
+    """
+    status_code, headers, body = build_response_for_error(
+        exc.authorization_error, exc.required_scopes
+    )
+    return fastapi.responses.Response(
+        status_code=status_code,
+        headers=headers,
+        content=body.model_dump_json(by_alias=True),
+        media_type="application/json",
+    )

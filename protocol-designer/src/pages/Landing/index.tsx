@@ -37,6 +37,16 @@ import type { ThunkDispatch } from '../../types'
 
 import welcomeImage from '../../assets/images/welcome_page.png'
 
+const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
+const OT2_APP_STAGE_URL = 'https://ot2.staging.designer.opentrons.com'
+
+const getOt2DesignerCreateUrl = (): string => {
+  if (getIsProduction()) {
+    return OT2_APP_PROD_URL
+  }
+  return OT2_APP_STAGE_URL
+}
+
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
@@ -117,9 +127,12 @@ export function Landing(): JSX.Element {
 
   const openOt2DesignerInNewTab = (): void => {
     const redirectTarget = getOt2DesignerCreateUrl()
-    if (redirectTarget !== null) {
-      window.open(redirectTarget, '_blank', 'noopener,noreferrer')
-    }
+    window.open(redirectTarget, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleOpenOt2Designer = (): void => {
+    openOt2DesignerInNewTab()
+    setShowOt2Modal(false)
   }
 
   return (
@@ -137,15 +150,7 @@ export function Landing(): JSX.Element {
           onClose={() => {
             setShowOt2Modal(false)
           }}
-          onOpenOt2Designer={
-            // ToDo update this, when merge EXEC-2281
-            getOt2DesignerCreateUrl() != null
-              ? () => {
-                  openOt2DesignerInNewTab()
-                  setShowOt2Modal(false)
-                }
-              : null
-          }
+          onOpenOt2Designer={handleOpenOt2Designer}
         />
       ) : null}
       <div data-cy="landing-page" className={styles.content_container}>

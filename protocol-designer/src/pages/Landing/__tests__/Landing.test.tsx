@@ -12,11 +12,13 @@ import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '../../../file-data/selectors'
 import { loadProtocolFile } from '../../../load-file/actions'
 import { toggleNewProtocolModal } from '../../../navigation/actions'
+import { getIsProduction } from '../../../networking/opentronsWebApi'
 import { Landing } from '../index'
 
 vi.mock('../../../load-file/actions')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../navigation/actions')
+vi.mock('../../../networking/opentronsWebApi')
 vi.mock('../../../components/organisms/AnnouncementModal/announcements')
 vi.mock('../../../components/organisms/Kitchen/useKitchen')
 vi.mock('../../../analytics/selectors')
@@ -52,6 +54,7 @@ describe('Landing', () => {
       eatToast: mockEatToast,
     })
     vi.mocked(getEnableFork).mockReturnValue(false)
+    vi.mocked(getIsProduction).mockReturnValue(false)
   })
 
   it('renders the landing page image and text', () => {
@@ -79,5 +82,45 @@ describe('Landing', () => {
     render()
     screen.getByRole('button', { name: 'Create a Flex protocol' })
     screen.getByRole('button', { name: 'Create an OT-2 protocol' })
+  })
+
+  it('calls window.open with the OT-2 redirect URL when Create an OT-2 protocol is clicked', () => {
+    const windowOpenSpy = vi
+      .spyOn(window, 'open')
+      .mockImplementation(() => null)
+    vi.mocked(getEnableFork).mockReturnValue(true)
+    vi.mocked(getIsProduction).mockReturnValue(false)
+    render()
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Create an OT-2 protocol' })
+    )
+
+    expect(windowOpenSpy).toHaveBeenCalledWith(
+      'https://ot2.staging.designer.opentrons.com',
+      '_blank',
+      'noopener,noreferrer'
+    )
+    windowOpenSpy.mockRestore()
+  })
+
+  it('calls window.open with the production OT-2 URL when getIsProduction is true', () => {
+    const windowOpenSpy = vi
+      .spyOn(window, 'open')
+      .mockImplementation(() => null)
+    vi.mocked(getEnableFork).mockReturnValue(true)
+    vi.mocked(getIsProduction).mockReturnValue(true)
+    render()
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Create an OT-2 protocol' })
+    )
+
+    expect(windowOpenSpy).toHaveBeenCalledWith(
+      'https://ot2.designer.opentrons.com/#/createNew',
+      '_blank',
+      'noopener,noreferrer'
+    )
+    windowOpenSpy.mockRestore()
   })
 })
