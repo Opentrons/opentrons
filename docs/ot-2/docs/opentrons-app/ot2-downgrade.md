@@ -45,10 +45,7 @@ Previous versions of the OT-2 robot operating system (and Opentrons App) are ava
 
 5. Click **Browse file system** and navigate to the location where you saved the downloaded robot software.
 
-6. Select the `.zip` file containing the robot software and click **Open**.
-
-    !!! note "Software installation and reboot"
-        The robot automatically installs the software and reboots, which takes about 15 minutes. When the restart is complete, the robot will be running the earlier version of the operating system.
+6. Select the `.zip` file containing the robot software and click **Open**. The robot automatically installs the software and reboots, which takes about 15 minutes. After restarting, the robot will be running the earlier operating system version.
 
 </div>
 
