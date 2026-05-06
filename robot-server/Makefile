@@ -48,7 +48,7 @@ clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
 
 # When the env has BEHIND_DEV_PROXY=1 (or any non-empty string), switch the `make dev` port
-# from 31950 to 31951, to support coexisting with other dev servers (auth-server, etc.)
+# from 31950 to 31951, to support coexisting with other dev servers.
 # behind a reverse proxy on 31950. See `make dev-proxy` in the top-level Makefile.
 BEHIND_DEV_PROXY ?=
 dev_port_when_running_alone ?= "31950"

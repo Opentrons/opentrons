@@ -47,24 +47,6 @@ class RobotServerSettings(BaseSettings):
         description="The endpoint to subscribe to notification server topics.",
     )
 
-    auth_server_uds: str | None = Field(
-        default=None,
-        description=(
-            "The path to the Unix domain socket where auth-server is listening."
-            " This is mutually exclusive with auth_server_url."
-            " If both are unset, access control is not enforced."
-        ),
-    )
-
-    auth_server_url: str | None = Field(
-        default=None,
-        description=(
-            "The base URL (e.g. `http://localhost:1234`) where auth-server is listening."
-            " This is mutually exclusive with auth_server_uds."
-            " If both are unset, access control is not enforced."
-        ),
-    )
-
     # Literal must come first to avoid Pydantic parsing it as a relative Path
     # with the filename "automatically_make_temporary".
     persistence_directory: (

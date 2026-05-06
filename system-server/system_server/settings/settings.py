@@ -40,25 +40,3 @@ class SystemServerSettings(BaseSettings):
             )
         ),
     ] = None
-
-    auth_server_uds: Annotated[
-        str | None,
-        Field(
-            description=(
-                "The path to the Unix domain socket where auth-server is listening."
-                " This is mutually exclusive with auth_server_url."
-                " If both are unset, access control is not enforced."
-            ),
-        ),
-    ] = None
-
-    auth_server_url: Annotated[
-        str | None,
-        Field(
-            description=(
-                "The base URL (e.g. `http://localhost:1234`) where auth-server is listening."
-                " This is mutually exclusive with auth_server_uds."
-                " If both are unset, access control is not enforced."
-            ),
-        ),
-    ] = None
