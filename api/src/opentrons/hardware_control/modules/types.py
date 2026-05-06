@@ -43,7 +43,7 @@ class VacuumModulePowerStep(VacuumModuleStepBase):
 
 
 class VacuumModulePressureStep(VacuumModuleStepBase):
-    gauge_pressure_mbar: float | None
+    gauge_pressure_mbar: int | None
 
 
 class VacuumModuleCycle(TypedDict):

@@ -3,6 +3,7 @@ from typing import AsyncGenerator, Optional
 
 import pytest
 from decoy import Decoy
+import mock
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
@@ -42,6 +43,15 @@ def mock_driver(decoy: Decoy) -> SimulatingDriver:
     """Mocked simulating driver."""
     return decoy.mock(cls=SimulatingDriver)
 
+@pytest.fixture
+def set_vacuum_state_spy(mock_driver: SimulatingDriver) -> mock.AsyncMock:
+    """Build a spy for set vacuum state."""
+    return mock.AsyncMock(wraps=mock_driver.set_vacuum_state)
+
+@pytest.fixture
+def set_pump_state_spy(mock_driver: SimulatingDriver) -> mock.AsyncMock:
+    """Build a spy for set pump state."""
+    return mock.AsyncMock(wraps=mock_driver.set_pump_state)
 
 @pytest.fixture
 async def subject(
@@ -50,11 +60,15 @@ async def subject(
     mock_execution_manager: ExecutionManager,
     module_error_callback: ModuleErrorCallback,
     module_disconnected_callback: ModuleDisconnectedCallback,
+    set_vacuum_state_spy: mock.AsyncMock,
+    set_pump_state_spy: mock.AsyncMock,
     decoy: Decoy,
 ) -> AsyncGenerator[modules.VacuumModule, None]:
     """Test subject with mocked driver."""
     reader = VacuumModuleReader(driver=mock_driver)
     poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
+    mock_driver.set_vacuum_state = set_vacuum_state_spy
+    mock_driver.set_pump_state = set_pump_state_spy
     vacuum = modules.VacuumModule(
         port="/dev/ot_module_sim_vacuummodule0",
         usb_port=usb_port,
@@ -337,3 +351,178 @@ async def test_update_vacuum_state(
 
     await subject._reader.update_vacuum_state()
     assert subject._reader.vacuum_state == vacuum_state
+
+
+async def test_execute_profile(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    set_vacuum_state_spy: mock.AsyncMock,
+    set_pump_state_spy: mock.AsyncMock,
+) -> None:
+    """Ensure that execute_profile calls down to the correct hardware control functions in the right quantity."""
+    profile = [
+        {
+            'enable_pump': True,
+            'hold_time_seconds': 43,
+            'hold_time_minutes': 5,
+            'ramp_rate': 1.3,
+            'timeout_seconds': 1101,
+            'vent_after': True,
+            'gauge_pressure_mbar': -300.0
+        }, 
+        {
+            'enable_pump': True,
+            'hold_time_seconds': 50,
+            'hold_time_minutes': 1,
+            'ramp_rate': 1.4,
+            'timeout_seconds': 1101,
+            'vent_after': False,
+            'percent_power': 61
+        },
+        {
+            'steps': [
+                {
+                    'enable_pump': True,
+                    'hold_time_seconds': 9,
+                    'hold_time_minutes': 2,
+                    'ramp_rate': 0.9,
+                    'timeout_seconds': 1101,
+                    'vent_after': False,
+                    'percent_power': 99
+                }, 
+                {
+                    'enable_pump': True,
+                    'hold_time_seconds': 99,
+                    'hold_time_minutes': 9,
+                    'ramp_rate': 1.8,
+                    'timeout_seconds': 1101,
+                    'vent_after': True,
+                    'gauge_pressure_mbar': -99.0
+                },
+                {
+                    'enable_pump': True,
+                    'hold_time_seconds': 9,
+                    'hold_time_minutes': 2,
+                    'ramp_rate': 0.9,
+                    'timeout_seconds': 1101,
+                    'vent_after': False,
+                    'percent_power': 11
+                },
+            ],
+            'repetitions': 9
+        },
+        {
+            'enable_pump': False,
+            'hold_time_seconds': None, 
+            'hold_time_minutes': 12, 
+            'ramp_rate': 5.5,
+            'timeout_seconds': 1101,
+            'vent_after': False,
+            'gauge_pressure_mbar': -111.2
+        }
+    ] 
+    def _break(
+        enable_vacuum: bool,
+        gauge_pressure_mbar: Optional[float] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
+        **kwargs
+    ) -> None:
+        if enable_vacuum== False:
+            breakpoint()
+    #set_vacuum_state_spy.side_effect = _break
+    await subject.execute_profile(profile)
+
+    set_vacuum_state_expected_call_list = [
+        mock.call(
+            enable_vacuum=True,
+            gauge_pressure_mbar=-300.0,
+            duration_s=343,
+            timeout_s=1101,
+            rate=1.3,
+            vent_after=True,
+        ),
+        mock.call(
+            enable_vacuum=False
+        ) # there should be a call to disable pressure control for every set_pump_state call
+    ]
+    set_pump_state_expected_call_list = [
+        mock.call(
+            start_pump=True,
+            target_rpm=None,
+            duty_cycle=61,
+            duration_s=110,
+            timeout_s=1101,
+            rate=1.4,
+            vent_after=False,
+        )
+    ] 
+    #breakpoint()
+    for i in range(9):
+       
+        set_pump_state_expected_call_list.append(
+            mock.call(
+                start_pump=True,
+                target_rpm=None,
+                duty_cycle=99,
+                duration_s=129,
+                timeout_s=1101,
+                rate=0.9,
+                vent_after=False,
+            )
+        )
+        set_vacuum_state_expected_call_list.append(
+            mock.call(
+                enable_vacuum=False
+            )
+        )
+        set_vacuum_state_expected_call_list.append(
+                mock.call(
+                enable_vacuum=True,
+                gauge_pressure_mbar=-99.0,
+                duration_s=639,
+                timeout_s=1101,
+                rate=1.8,
+                vent_after=True,
+            )
+        )
+        #breakpoint()
+        
+        set_pump_state_expected_call_list.append(
+            mock.call(
+                start_pump=True,
+                target_rpm=None,
+                duty_cycle=11,
+                duration_s=129,
+                timeout_s=1101,
+                rate=0.9,
+                vent_after=False,
+            )
+        )
+        set_vacuum_state_expected_call_list.append(
+            mock.call(
+                enable_vacuum=False
+            )
+        )
+
+    set_vacuum_state_expected_call_list.append(
+            mock.call(
+                enable_vacuum=False,
+                gauge_pressure_mbar=-111.2,
+                duration_s=720,
+                timeout_s=1101,
+                rate=5.5,
+                vent_after=False,
+            )
+        )
+    a = set_vacuum_state_spy.call_args_list
+    p = set_pump_state_spy.call_args_list
+    v = set_vacuum_state_expected_call_list
+    for i in range(len(v)):
+        if v[i] != a[i]:
+            breakpoint()
+    assert set_vacuum_state_spy.call_args_list == set_vacuum_state_expected_call_list
+    assert set_pump_state_spy.call_args_list == set_pump_state_expected_call_list
+
