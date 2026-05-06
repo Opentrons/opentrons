@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -26,6 +27,8 @@ import {
 } from '@opentrons/shared-data'
 import { uuid } from '@opentrons/step-generation'
 
+import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
+
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { BasicsButtons } from '../../components/molecules'
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
@@ -48,6 +51,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
   const ref = useRef<HTMLDivElement | null>(null)
 
+  const enableFork = useSelector(getEnableFork)
+
   const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
   const fixtures = watch('fixtures')
@@ -56,7 +61,11 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const hasThermocycer = watch('hasThermocycler')
   const hasWasteChute = watch('hasWasteChute')
 
-  const robotType = fields?.robotType
+  const formRobotType = fields?.robotType
+  let robotType = formRobotType
+  if (enableFork) {
+    robotType = FLEX_ROBOT_TYPE
+  }
   const has96Channel =
     pipettesByMount.left.pipetteName != null &&
     FLEX_96_CHANNEL_PIPETTES.includes(pipettesByMount.left.pipetteName)
@@ -144,6 +153,27 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       cutoutFixtureId: 'fixedTrashSlot',
     },
   }
+
+  const handleSelectFlexRobot = (): void => {
+    setValue('fields.robotType', FLEX_ROBOT_TYPE)
+    resetPipettes()
+    setValue('hasGripper', null)
+    setValue('hasThermocycler', null)
+    setValue('hasWasteChute', null)
+    setValue('modules', {})
+    setValue('fixtures', flexTrashFixture)
+  }
+
+  useEffect(
+    () => {
+      if (enableFork && formRobotType !== FLEX_ROBOT_TYPE) {
+        handleSelectFlexRobot()
+      }
+    },
+    // TODO: Remove this effect with OT_PD_ENABLE_FORK.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [enableFork, formRobotType]
+  )
 
   const handlSelectWasteChute = (value: boolean): void => {
     if (value) {
@@ -257,36 +287,33 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
             proceed(1)
           }}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-            <StyledText desktopStyle="headingSmallBold">
-              {t('robot_type')}
-            </StyledText>
-            <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
-              <RadioButton
-                onChange={() => {
-                  setValue('fields.robotType', FLEX_ROBOT_TYPE)
-                  resetPipettes()
-                  setValue('modules', {})
-                  setValue('fixtures', flexTrashFixture)
-                }}
-                buttonLabel={t('shared:opentrons_flex')}
-                buttonValue={FLEX_ROBOT_TYPE}
-                isSelected={robotType === FLEX_ROBOT_TYPE}
-              />
-              <RadioButton
-                onChange={() => {
-                  setValue('fields.robotType', OT2_ROBOT_TYPE)
-                  resetPipettes()
-                  setValue('hasGripper', false)
-                  setValue('modules', {})
-                  setValue('fixtures', ot2TrashFixture)
-                }}
-                buttonLabel={t('shared:ot2')}
-                buttonValue={OT2_ROBOT_TYPE}
-                isSelected={robotType === OT2_ROBOT_TYPE}
-              />
+          {!enableFork && (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('robot_type')}
+              </StyledText>
+              <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
+                <RadioButton
+                  onChange={handleSelectFlexRobot}
+                  buttonLabel={t('shared:opentrons_flex')}
+                  buttonValue={FLEX_ROBOT_TYPE}
+                  isSelected={robotType === FLEX_ROBOT_TYPE}
+                />
+                <RadioButton
+                  onChange={() => {
+                    setValue('fields.robotType', OT2_ROBOT_TYPE)
+                    resetPipettes()
+                    setValue('hasGripper', false)
+                    setValue('modules', {})
+                    setValue('fixtures', ot2TrashFixture)
+                  }}
+                  buttonLabel={t('shared:ot2')}
+                  buttonValue={OT2_ROBOT_TYPE}
+                  isSelected={robotType === OT2_ROBOT_TYPE}
+                />
+              </Flex>
             </Flex>
-          </Flex>
+          )}
           {robotType != null ? (
             <>
               <Flex
