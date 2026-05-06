@@ -55,6 +55,9 @@ class RobotServerPyroResource:
     """
 
     def __init__(self, loop: asyncio.AbstractEventLoop) -> None:
+        # Specialty private member for daemon execution overloading - Relevant to PyroSynchronousObjects only
+        self._execute_on_daemon_overload = True
+
         self._loop = loop
 
         # Default the resource variables to None - these will be set as services spin up

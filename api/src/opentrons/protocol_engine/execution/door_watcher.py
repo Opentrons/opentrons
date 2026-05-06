@@ -54,6 +54,8 @@ class DoorWatcher:
 
     def start(self) -> None:
         """Subscribe to hardware events and start forwarding them as PE actions."""
+        # CASEY NOTE UNDO THIS TO REENABLE DOOR WATCHER
+        return None
         if self._unsubscribe_callback is None:
             if self._proxy_of_callback_for_handling_door_events is not None:
                 self._unsubscribe_callback = self._hardware_api.register_callback(
