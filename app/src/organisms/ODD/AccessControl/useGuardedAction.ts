@@ -35,11 +35,11 @@ export function useGuardedAction(
   action: DocumentedActionKind
 ): () => Promise<boolean> {
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
-  const accessControlEnabled =
-    accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
   const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
   const requireLogin = useRequireLogin(currentUsername)
   const requireDocumentation = useRequireDocumentation()
+  const accessControlEnabled =
+    accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
 
   return useCallback(async () => {
     if (!accessControlEnabled) return true
