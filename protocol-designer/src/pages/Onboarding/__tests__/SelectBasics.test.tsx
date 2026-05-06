@@ -17,6 +17,7 @@ import { getTiprackOptions } from '../utils'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { WizardFormState } from '/protocol-designer/components/organisms'
+import type * as FeatureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import type { BaseState } from '/protocol-designer/types'
 import type { WizardTileProps } from '../types'
 
@@ -24,9 +25,7 @@ vi.mock('/protocol-designer/labware-defs/selectors')
 vi.mock('/protocol-designer/components/organisms')
 vi.mock('/protocol-designer/labware-defs/actions')
 vi.mock('/protocol-designer/feature-flags/selectors', async importOriginal => {
-  const actual = await importOriginal<
-    typeof import('/protocol-designer/feature-flags/selectors')
-  >()
+  const actual = await importOriginal<typeof FeatureFlagSelectors>()
 
   return {
     ...actual,
