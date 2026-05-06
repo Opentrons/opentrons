@@ -22,7 +22,7 @@ describe('DocumentationRequired', () => {
 
   beforeEach(() => {
     props = {
-      userName: 'alice',
+      username: 'alice',
       onConfirm: vi.fn(),
       onBack: vi.fn(),
     }

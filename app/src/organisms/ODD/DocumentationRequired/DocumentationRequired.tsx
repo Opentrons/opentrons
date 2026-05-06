@@ -9,13 +9,13 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import styles from './documentationrequired.module.css'
 
 interface DocumentationRequiredProps {
-  userName: string
+  username: string
   onConfirm: (note: string) => void
   onBack: () => void
 }
 
 export function DocumentationRequired({
-  userName,
+  username,
   onConfirm,
   onBack,
 }: DocumentationRequiredProps): JSX.Element {
@@ -53,7 +53,7 @@ export function DocumentationRequired({
               autoFocus
               value={inputText}
               ref={textAreaRef}
-              label={t('access_control_note', { user: userName })}
+              label={t('access_control_note', { user: username })}
               onChange={e => {
                 setInputText(e.target.value)
               }}

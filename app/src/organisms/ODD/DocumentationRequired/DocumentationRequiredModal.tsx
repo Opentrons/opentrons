@@ -4,7 +4,7 @@ import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
 export interface DocumentationRequiredModalArgs {
-  userName: string
+  username: string
 }
 
 export interface DocumentationRequiredModalResult {
@@ -13,12 +13,12 @@ export interface DocumentationRequiredModalResult {
 }
 
 const DocumentationRequiredModalImpl = NiceModal.create(
-  ({ userName }: DocumentationRequiredModalArgs): JSX.Element => {
+  ({ username }: DocumentationRequiredModalArgs): JSX.Element => {
     const modal = useModal()
     return (
       <div className={styles.overlay}>
         <DocumentationRequired
-          userName={userName}
+          username={username}
           onConfirm={note => {
             const result: DocumentationRequiredModalResult = {
               note,

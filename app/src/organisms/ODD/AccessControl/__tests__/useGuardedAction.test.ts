@@ -74,7 +74,7 @@ describe('useGuardedAction', () => {
     requireLogin.mockResolvedValue({ username: 'alice' })
     requireDocumentation.mockResolvedValue({
       note: 'note',
-      confirmedAt: 'now',
+      confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
     })
 
@@ -113,7 +113,7 @@ describe('useGuardedAction', () => {
     requireLogin.mockResolvedValue(loginResult)
     requireDocumentation.mockResolvedValue({
       note: 'note',
-      confirmedAt: 'now',
+      confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
     })
 

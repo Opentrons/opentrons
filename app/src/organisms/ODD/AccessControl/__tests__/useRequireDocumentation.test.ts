@@ -31,17 +31,17 @@ describe('useRequireDocumentation', () => {
 
     const { result } = renderHook(() => useRequireDocumentation())
 
-    const got = await act(
+    const currentResult = await act(
       async () =>
         await result.current({ kind: 'PROTOCOL_PLAY' }, { username: 'alice' })
     )
-    expect(got).toEqual({
+    expect(currentResult).toEqual({
       note: 'starting run for QC',
       confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
     })
     expect(showDocumentationRequiredModal).toHaveBeenCalledWith({
-      userName: 'alice',
+      username: 'alice',
     })
     expect(postDocumentation).toHaveBeenCalledWith({
       action: { kind: 'PROTOCOL_PLAY' },
@@ -56,11 +56,11 @@ describe('useRequireDocumentation', () => {
 
     const { result } = renderHook(() => useRequireDocumentation())
 
-    const got = await act(
+    const currentResult = await act(
       async () =>
         await result.current({ kind: 'PROTOCOL_PLAY' }, { username: 'alice' })
     )
-    expect(got).toBeNull()
+    expect(currentResult).toBeNull()
     expect(postDocumentation).not.toHaveBeenCalled()
   })
 })

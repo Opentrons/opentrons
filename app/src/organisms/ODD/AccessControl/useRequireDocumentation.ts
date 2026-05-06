@@ -23,9 +23,9 @@ export type RequireDocumentationGuard = (
 export function useRequireDocumentation(): RequireDocumentationGuard {
   return useCallback(async (action, loginResult) => {
     const modalResult = await showDocumentationRequiredModal({
-      userName: loginResult.username,
+      username: loginResult.username,
     })
-    if (modalResult == null) return null
+    if (modalResult == null) {return null}
 
     const { note, confirmedAt } = modalResult
 
