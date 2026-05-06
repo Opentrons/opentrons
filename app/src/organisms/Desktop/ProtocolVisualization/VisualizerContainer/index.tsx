@@ -33,7 +33,7 @@ import type { MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
-const INITIAL_MILLISECONDS_PER_FRAME = 2000
+const INITIAL_MILLISECONDS_PER_FRAME = 1000
 const INITIAL_WIDTH_PX = 230
 const MIN_CENTER_WIDTH_PX = 148
 const MIN_LEFT_COLUMN_WIDTH_PX = 148
