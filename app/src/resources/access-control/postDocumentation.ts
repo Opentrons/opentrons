@@ -1,7 +1,7 @@
 import type { DocumentedActionKind } from './types'
 
 interface PostDocumentationInput {
-  action: DocumentedActionKind
+  actionsToDocument: DocumentedActionKind[]
   note: string
   username: string
   /** ISO timestamp of when the user confirmed. */
@@ -15,8 +15,11 @@ interface PostDocumentationInput {
  *
  * TODO(TZ, 5-5-26): wire to the real `/access-control/audit` endpoint.
  */
-export const postDocumentation = async (
-  _input: PostDocumentationInput
-): Promise<void> => {
+export const postDocumentation = async ({
+  actionsToDocument,
+  note,
+  username,
+  confirmedAt,
+}: PostDocumentationInput): Promise<void> => {
   // no-op
 }

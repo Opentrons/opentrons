@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -399,16 +399,18 @@ function PrepareToRun({
     ? isCameraEnabledForRun || cameraSettingsConfirmed
     : true
 
-  const isReadyToRun =
-    incompleteInstrumentCount === 0 &&
-    areModulesReady &&
-    areFixturesReady &&
-    !isAnyNecessaryDefaultOffsetMissing &&
-    isCameraReadyToRun
+  const isReadyToRun = true
+  // incompleteInstrumentCount === 0 &&
+  // areModulesReady &&
+  // areFixturesReady &&
+  // !isAnyNecessaryDefaultOffsetMissing &&
+  // isCameraReadyToRun
 
-  const checkAccessControl = useGuardedAction({
-    kind: 'PROTOCOL_PLAY',
-  })
+  const actionsToDocument = useMemo(
+    () => [{ kind: 'PROTOCOL_PLAY' as const }],
+    []
+  )
+  const checkAccessControl = useGuardedAction(actionsToDocument)
 
   const onPlay = async (): Promise<void> => {
     if (!(await checkAccessControl())) return

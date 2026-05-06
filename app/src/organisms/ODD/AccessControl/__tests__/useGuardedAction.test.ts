@@ -37,9 +37,11 @@ vi.mock('../useRequireDocumentation', () => ({
   useRequireDocumentation: vi.fn(),
 }))
 
-const ACTION: DocumentedActionKind = {
-  kind: 'PROTOCOL_PLAY',
-}
+const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [
+  {
+    kind: 'PROTOCOL_PLAY',
+  },
+]
 
 describe('useGuardedAction', () => {
   const requireLogin = vi.fn()
@@ -62,7 +64,7 @@ describe('useGuardedAction', () => {
       data: { data: { accessControlEnabled: false } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
 
-    const { result } = renderHook(() => useGuardedAction(ACTION))
+    const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
     const currentResult = await act(async () => await result.current())
     expect(currentResult).toBe(true)
@@ -78,7 +80,7 @@ describe('useGuardedAction', () => {
       documentedBy: 'alice',
     })
 
-    const { result } = renderHook(() => useGuardedAction(ACTION))
+    const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
     const currentResult = await act(async () => await result.current())
     expect(currentResult).toBe(true)
@@ -91,7 +93,7 @@ describe('useGuardedAction', () => {
   it('returns false and skips documentation when login is dismissed', async () => {
     requireLogin.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useGuardedAction(ACTION))
+    const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
     const currentResult = await act(async () => await result.current())
     expect(currentResult).toBe(false)
@@ -102,7 +104,7 @@ describe('useGuardedAction', () => {
     requireLogin.mockResolvedValue({ username: 'alice' })
     requireDocumentation.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useGuardedAction(ACTION))
+    const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
     const currentResult = await act(async () => await result.current())
     expect(currentResult).toBe(false)
@@ -117,9 +119,12 @@ describe('useGuardedAction', () => {
       documentedBy: 'alice',
     })
 
-    const { result } = renderHook(() => useGuardedAction(ACTION))
+    const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
     await act(async () => await result.current())
-    expect(requireDocumentation).toHaveBeenCalledWith(ACTION, loginResult)
+    expect(requireDocumentation).toHaveBeenCalledWith(
+      ACTIONS_TO_DOCUMENT,
+      loginResult
+    )
   })
 })

@@ -36,7 +36,7 @@ describe('useRequireDocumentation', () => {
 
     const currentResult = await act(
       async () =>
-        await result.current({ kind: 'PROTOCOL_PLAY' }, { username: 'alice' })
+        await result.current([{ kind: 'PROTOCOL_PLAY' }], { username: 'alice' })
     )
     expect(currentResult).toEqual({
       note: 'starting run for QC',
@@ -61,7 +61,7 @@ describe('useRequireDocumentation', () => {
 
     const currentResult = await act(
       async () =>
-        await result.current({ kind: 'PROTOCOL_PLAY' }, { username: 'alice' })
+        await result.current([{ kind: 'PROTOCOL_PLAY' }], { username: 'alice' })
     )
     expect(currentResult).toBeNull()
     expect(postDocumentation).not.toHaveBeenCalled()

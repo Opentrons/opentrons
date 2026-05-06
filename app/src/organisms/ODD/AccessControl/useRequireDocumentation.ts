@@ -10,7 +10,7 @@ import type {
 import type { RequireLoginResult } from './useRequireLogin'
 
 export type RequireDocumentationGuard = (
-  action: DocumentedActionKind,
+  actionsToDocument: DocumentedActionKind[],
   loginResult: RequireLoginResult
 ) => Promise<DocumentationResult | null>
 
@@ -21,7 +21,7 @@ export type RequireDocumentationGuard = (
  * Assumes access control is enabled and the user is authenticated.
  */
 export function useRequireDocumentation(): RequireDocumentationGuard {
-  return useCallback(async (action, loginResult) => {
+  return useCallback(async (actionsToDocument, loginResult) => {
     const modalResult = await showDocumentationRequiredModal({
       username: loginResult.username,
     })
@@ -32,7 +32,7 @@ export function useRequireDocumentation(): RequireDocumentationGuard {
     const { note, confirmedAt } = modalResult
 
     await postDocumentation({
-      action,
+      actionsToDocument,
       note: note,
       username: loginResult.username,
       confirmedAt,

@@ -32,7 +32,7 @@ import type { DocumentedActionKind } from '../../../resources/access-control/typ
  *   }
  */
 export function useGuardedAction(
-  action: DocumentedActionKind
+  actionsToDocument: DocumentedActionKind[]
 ): () => Promise<boolean> {
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
   const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
@@ -51,7 +51,7 @@ export function useGuardedAction(
       return false
     }
 
-    const docResult = await requireDocumentation(action, loginResult)
+    const docResult = await requireDocumentation(actionsToDocument, loginResult)
     if (docResult == null) {
       return false
     }
@@ -59,5 +59,10 @@ export function useGuardedAction(
     {
       return true
     }
-  }, [accessControlEnabled, action, requireLogin, requireDocumentation])
+  }, [
+    accessControlEnabled,
+    actionsToDocument,
+    requireLogin,
+    requireDocumentation,
+  ])
 }
