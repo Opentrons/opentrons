@@ -1,10 +1,11 @@
-import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
 import { postDocumentation } from '/app/resources/access-control/postDocumentation'
 
-import { useRequireDocumentation } from '../useRequireDocumentation'
+import { requireDocumentation } from '../requireDocumentation'
+
+import type { DocumentedActionKind } from '../../../../resources/access-control/types'
 
 vi.mock(
   '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal',
@@ -17,7 +18,9 @@ vi.mock('/app/resources/access-control/postDocumentation', () => ({
   postDocumentation: vi.fn(),
 }))
 
-describe('useRequireDocumentation', () => {
+const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [{ kind: 'PROTOCOL_PLAY' }]
+
+describe('requireDocumentation', () => {
   beforeEach(() => {
     vi.mocked(postDocumentation).mockImplementation(() => Promise.resolve())
   })
@@ -32,13 +35,11 @@ describe('useRequireDocumentation', () => {
       confirmedAt: '2026-05-01T16:00:00.000Z',
     })
 
-    const { result } = renderHook(() => useRequireDocumentation())
+    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, {
+      username: 'alice',
+    })
 
-    const currentResult = await act(
-      async () =>
-        await result.current([{ kind: 'PROTOCOL_PLAY' }], { username: 'alice' })
-    )
-    expect(currentResult).toEqual({
+    expect(result).toEqual({
       note: 'starting run for QC',
       confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
@@ -47,7 +48,7 @@ describe('useRequireDocumentation', () => {
       username: 'alice',
     })
     expect(postDocumentation).toHaveBeenCalledWith({
-      action: { kind: 'PROTOCOL_PLAY' },
+      actionsToDocument: ACTIONS_TO_DOCUMENT,
       note: 'starting run for QC',
       username: 'alice',
       confirmedAt: '2026-05-01T16:00:00.000Z',
@@ -57,13 +58,11 @@ describe('useRequireDocumentation', () => {
   it('returns null when the user backs out of the modal', async () => {
     vi.mocked(showDocumentationRequiredModal).mockResolvedValue(null)
 
-    const { result } = renderHook(() => useRequireDocumentation())
+    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, {
+      username: 'alice',
+    })
 
-    const currentResult = await act(
-      async () =>
-        await result.current([{ kind: 'PROTOCOL_PLAY' }], { username: 'alice' })
-    )
-    expect(currentResult).toBeNull()
+    expect(result).toBeNull()
     expect(postDocumentation).not.toHaveBeenCalled()
   })
 })

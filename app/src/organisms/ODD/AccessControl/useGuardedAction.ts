@@ -5,8 +5,8 @@ import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
-import { useRequireDocumentation } from './useRequireDocumentation'
-import { useRequireLogin } from './useRequireLogin'
+import { requireDocumentation } from './requireDocumentation'
+import { requireLogin } from './requireLogin'
 
 import type { DocumentedActionKind } from '../../../resources/access-control/types'
 
@@ -36,8 +36,6 @@ export function useGuardedAction(
 ): () => Promise<boolean> {
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
   const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
-  const requireLogin = useRequireLogin(currentUsername)
-  const requireDocumentation = useRequireDocumentation()
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
 
@@ -46,23 +44,15 @@ export function useGuardedAction(
       return true
     }
 
-    const loginResult = await requireLogin()
+    const loginResult = await requireLogin(currentUsername)
     if (loginResult == null) {
       return false
     }
 
-    const docResult = await requireDocumentation(actionsToDocument, loginResult)
-    if (docResult == null) {
-      return false
-    }
-
-    {
-      return true
-    }
-  }, [
-    accessControlEnabled,
-    actionsToDocument,
-    requireLogin,
-    requireDocumentation,
-  ])
+    const docResult = await requireDocumentation(
+      actionsToDocument,
+      loginResult
+    )
+    return docResult != null
+  }, [accessControlEnabled, currentUsername, actionsToDocument])
 }

@@ -3,9 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
+import { requireDocumentation } from '../requireDocumentation'
+import { requireLogin } from '../requireLogin'
 import { useGuardedAction } from '../useGuardedAction'
-import { useRequireDocumentation } from '../useRequireDocumentation'
-import { useRequireLogin } from '../useRequireLogin'
 
 import type { DocumentedActionKind } from '../../../../resources/access-control/types'
 
@@ -29,12 +29,12 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   }
 })
 
-vi.mock('../useRequireLogin', () => ({
-  useRequireLogin: vi.fn(),
+vi.mock('../requireLogin', () => ({
+  requireLogin: vi.fn(),
 }))
 
-vi.mock('../useRequireDocumentation', () => ({
-  useRequireDocumentation: vi.fn(),
+vi.mock('../requireDocumentation', () => ({
+  requireDocumentation: vi.fn(),
 }))
 
 const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [
@@ -44,12 +44,7 @@ const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [
 ]
 
 describe('useGuardedAction', () => {
-  const requireLogin = vi.fn()
-  const requireDocumentation = vi.fn()
-
   beforeEach(() => {
-    vi.mocked(useRequireLogin).mockReturnValue(requireLogin)
-    vi.mocked(useRequireDocumentation).mockReturnValue(requireDocumentation)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: true } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
@@ -73,8 +68,8 @@ describe('useGuardedAction', () => {
   })
 
   it('returns true and runs login then documentation when both guards pass', async () => {
-    requireLogin.mockResolvedValue({ username: 'alice' })
-    requireDocumentation.mockResolvedValue({
+    vi.mocked(requireLogin).mockResolvedValue({ username: 'alice' })
+    vi.mocked(requireDocumentation).mockResolvedValue({
       note: 'note',
       confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
@@ -85,13 +80,13 @@ describe('useGuardedAction', () => {
     const currentResult = await act(async () => await result.current())
     expect(currentResult).toBe(true)
 
-    const loginOrder = requireLogin.mock.invocationCallOrder[0]
-    const docOrder = requireDocumentation.mock.invocationCallOrder[0]
+    const loginOrder = vi.mocked(requireLogin).mock.invocationCallOrder[0]
+    const docOrder = vi.mocked(requireDocumentation).mock.invocationCallOrder[0]
     expect(loginOrder).toBeLessThan(docOrder)
   })
 
   it('returns false and skips documentation when login is dismissed', async () => {
-    requireLogin.mockResolvedValue(null)
+    vi.mocked(requireLogin).mockResolvedValue(null)
 
     const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
@@ -101,8 +96,8 @@ describe('useGuardedAction', () => {
   })
 
   it('returns false when documentation is dismissed', async () => {
-    requireLogin.mockResolvedValue({ username: 'alice' })
-    requireDocumentation.mockResolvedValue(null)
+    vi.mocked(requireLogin).mockResolvedValue({ username: 'alice' })
+    vi.mocked(requireDocumentation).mockResolvedValue(null)
 
     const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
@@ -112,8 +107,8 @@ describe('useGuardedAction', () => {
 
   it('passes the login result to the documentation guard alongside the action', async () => {
     const loginResult = { username: 'alice' }
-    requireLogin.mockResolvedValue(loginResult)
-    requireDocumentation.mockResolvedValue({
+    vi.mocked(requireLogin).mockResolvedValue(loginResult)
+    vi.mocked(requireDocumentation).mockResolvedValue({
       note: 'note',
       confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
