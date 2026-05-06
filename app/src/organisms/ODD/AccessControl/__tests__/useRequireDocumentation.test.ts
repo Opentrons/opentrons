@@ -6,17 +6,20 @@ import { postDocumentation } from '/app/resources/access-control/postDocumentati
 
 import { useRequireDocumentation } from '../useRequireDocumentation'
 
-vi.mock('/app/organisms/ODD/DocumentationRequired', () => ({
-  showDocumentationRequiredModal: vi.fn(),
-}))
+vi.mock(
+  '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal',
+  () => ({
+    showDocumentationRequiredModal: vi.fn(),
+  })
+)
 
-vi.mock('/app/resources/access-control', () => ({
+vi.mock('/app/resources/access-control/postDocumentation', () => ({
   postDocumentation: vi.fn(),
 }))
 
 describe('useRequireDocumentation', () => {
   beforeEach(() => {
-    vi.mocked(postDocumentation).mockResolvedValue(undefined)
+    vi.mocked(postDocumentation).mockImplementation(() => Promise.resolve())
   })
 
   afterEach(() => {
