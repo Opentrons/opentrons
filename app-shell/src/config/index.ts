@@ -62,7 +62,8 @@ export function mergeImportedConfig(
     language: importedConfig.language,
     protocols: {
       ...currentConfig.protocols,
-      protocolsStoredSortKey: importedConfig.protocols.protocolsStoredSortKey,
+      // Set to null to ensure that the sort key is a valid value upon first app initialization.
+      protocolsStoredSortKey: null,
     },
     python: {
       ...currentConfig.python,
