@@ -72,6 +72,10 @@ export interface ItemData {
 // we may need to adjust it later.
 const DEFAULT_ROW_HEIGHT_PX = 64
 
+function isVisibleProtocolStep(command: RunTimeCommand): boolean {
+  return !command.commandType.includes('load') && command.commandType !== 'home'
+}
+
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const {
     analysis,
@@ -103,9 +107,26 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       new Map(analysis.commands.map((command, index) => [command.id, index])),
     [analysis.commands]
   )
+  const filteredGroupedCommands = useMemo(() => {
+    if (groupedCommands == null) return null
+    const next: GroupedCommands = []
+    for (const node of groupedCommands) {
+      if ('annotationId' in node) {
+        const subCommands = node.subCommands.filter(leaf =>
+          isVisibleProtocolStep(leaf.command)
+        )
+        if (subCommands.length > 0) {
+          next.push({ ...node, subCommands })
+        }
+      } else if (isVisibleProtocolStep(node.command)) {
+        next.push(node)
+      }
+    }
+    return next
+  }, [groupedCommands])
   const groupedCommandsHighlightedInfo = useMemo(
     () =>
-      groupedCommands?.map(node => {
+      filteredGroupedCommands?.map(node => {
         if ('annotationId' in node) {
           const updatedSubCommands = node.subCommands.map(subNode => ({
             ...subNode,
@@ -127,7 +148,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             currentCommandIndex === commandIndexById.get(node.command.id),
         }
       }),
-    [groupedCommands, currentCommandIndex, commandIndexById]
+    [filteredGroupedCommands, currentCommandIndex, commandIndexById]
   )
   const filteredCommands = useMemo(
     () =>
@@ -141,8 +162,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
   useEffect(() => {
     if (currentCommandIndex == null) return
-    if (groupedCommands != null) {
-      const flatCommands = groupedCommands.flatMap(node =>
+    if (filteredGroupedCommands != null) {
+      const flatCommands = filteredGroupedCommands.flatMap(node =>
         'subCommands' in node ? node.subCommands : [node]
       )
 
@@ -161,7 +182,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       setScrollTargetId(targetCommand.id)
     }
   }, [
-    groupedCommands,
+    filteredGroupedCommands,
     currentCommandIndex,
     scrollTargetId,
     commandIndexById,
