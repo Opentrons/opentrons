@@ -7,10 +7,13 @@ Downgrading Flex software should only be done at the direction of Opentrons Supp
 
 Previous versions of the Flex operating system (and App software) are available on Github at <https://github.com/Opentrons/opentrons/releases>.
 
-!!! tip
-    Make sure your Flex is idle before downgrading. Some required App features are not available while the robot is running a protocol.
+!!! note
+    - Make sure your Flex is idle before downgrading. Some required App features are not available while the robot is running a protocol.
+    - For OT-2 instructions, see [Downgrading OT-2 Software](../../ot-2/opentrons-app/ot2-downgrade.md).
 
-### Part 1: Downloading an earlier software version
+<!-- Reviewer note: changed to H2 (from H3). Not sure why I used H3 originally, maybe looked to large? Silly. -->
+
+## Part 1: Downloading an earlier software version
 
 <div class="instruction-list" markdown>
 
@@ -24,7 +27,7 @@ Previous versions of the Flex operating system (and App software) are available 
 
 3. Click the compressed file named `ot3-system-<version number>.zip` to download and save it to your computer. For example, to get Flex software version 8.7, you'd click the file `ot3-system-8.7.0.zip`. In the file name, `ot3` refers to Flex.
 
-### Part 2: Installing the earlier version
+## Part 2: Installing the earlier version
 
 4. From the **Devices** tab in the App, find the robot you want to work with.
 
@@ -38,12 +41,12 @@ Previous versions of the Flex operating system (and App software) are available 
     ![Update software settings under the Advanced tab](../images/robot-software-downgrade.png)
     </figure>
 
-8. Click **Browse file system** and navigate to the location where you saved the previously downloaded version of the Flex software.
+8. Click **Browse file system** and navigate to the location where you saved the downloaded robot software.
 
 9. Select the downloaded `.zip` file that contains the Flex software and then click **Open**. This starts the automatic software installation process, which can take about 15 minutes to complete.
 
 </div>
 
-### Part 3: After downgrading
+## Part 3: After downgrading
 
 The App will notify you when the downgrade installation is complete. You should also check the touchscreen on your Flex before using it. The touchscreen might show the robot going through additional firmware checks and updates that are not reflected in the App. Flex will restart after these firmware checks finish. After restarting, your Flex will be running on an earlier version of the robot operating system.
