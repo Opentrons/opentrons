@@ -97,7 +97,7 @@ describe('Landing', () => {
     )
 
     expect(windowOpenSpy).toHaveBeenCalledWith(
-      'https://ot2.staging.designer.opentrons.com',
+      'https://ot2.staging.designer.opentrons.com/#/createNew',
       '_blank',
       'noopener,noreferrer'
     )
