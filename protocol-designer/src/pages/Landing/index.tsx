@@ -42,15 +42,13 @@ import type { ThunkDispatch } from '../../types'
 import welcomeImage from '../../assets/images/welcome_page.png'
 
 const OT2_APP_PROD_URL = 'https://ot2.designer.opentrons.com/#/createNew'
-// ToDo activate this when the sandbox is ready.
-// const OT2_APP_STAGE_URL = 'sandbox url'
+const OT2_APP_STAGE_URL = 'https://ot2.staging.designer.opentrons.com'
 
-// The type will be changed only string when the sandbox is ready
-const getOt2DesignerCreateUrl = (): string | null => {
+const getOt2DesignerCreateUrl = (): string => {
   if (getIsProduction()) {
     return OT2_APP_PROD_URL
   }
-  return null
+  return OT2_APP_STAGE_URL
 }
 
 export function Landing(): JSX.Element {
@@ -126,9 +124,7 @@ export function Landing(): JSX.Element {
 
   const openOt2DesignerInNewTab = (): void => {
     const redirectTarget = getOt2DesignerCreateUrl()
-    if (redirectTarget !== null) {
-      window.open(redirectTarget, '_blank', 'noopener,noreferrer')
-    }
+    window.open(redirectTarget, '_blank', 'noopener,noreferrer')
   }
 
   return (
