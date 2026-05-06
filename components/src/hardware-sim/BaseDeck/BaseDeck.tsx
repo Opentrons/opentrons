@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
-import partition from 'lodash/partition'
 
 import {
+  ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDef,
@@ -19,6 +19,7 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES,
@@ -29,6 +30,7 @@ import {
   AlignToModuleChildSlot,
   CenterLabwareInModuleChildSlot,
   CenterLabwareInSlot,
+  CURSOR_POINTER,
   FixedTrashText,
 } from '../..'
 import { COLORS } from '../../helix-design-system'
@@ -193,17 +195,36 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       fixture.cutoutId === WASTE_CHUTE_CUTOUT
   )
 
-  const [singleLocationModules, stackerModules] = partition(
-    modulesOnDeck,
-    module => getModuleType(module.moduleModel) !== FLEX_STACKER_MODULE_TYPE
-  )
+  const { singleLocationModules, stackerModules, vacuumModules } =
+    modulesOnDeck.reduce<{
+      singleLocationModules: ModuleOnDeck[]
+      stackerModules: ModuleOnDeck[]
+      vacuumModules: ModuleOnDeck[]
+    }>(
+      (acc, module) => {
+        const moduleType = getModuleType(module.moduleModel)
+        if (moduleType === FLEX_STACKER_MODULE_TYPE) {
+          acc.stackerModules.push(module)
+        } else if (moduleType === VACUUM_MODULE_TYPE) {
+          acc.vacuumModules.push(module)
+        } else {
+          acc.singleLocationModules.push(module)
+        }
+        return acc
+      },
+      {
+        singleLocationModules: [],
+        stackerModules: [],
+        vacuumModules: [],
+      }
+    )
 
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
         deckDef.cornerOffsetFromOrigin[1]
       } ${
-        stackerModules.length > 0
+        [...stackerModules, ...vacuumModules].length > 0
           ? deckDef.dimensions[0] + STACKER_DECK_VIEW_BOX_EXPANSION
           : deckDef.dimensions[0]
       } ${deckDef.dimensions[1]}`}
@@ -227,11 +248,14 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               show4thColumn={
                 stagingAreaFixtures.length > 0 ||
                 wasteChuteStagingAreaFixtures.length > 0 ||
-                modulesOnDeck.findIndex(
-                  module =>
-                    module.moduleModel === 'absorbanceReaderV1' ||
-                    module.moduleModel === 'flexStackerModuleV1'
-                ) >= 0
+                modulesOnDeck.some(module => {
+                  const moduleType = getModuleType(module.moduleModel)
+                  return (
+                    moduleType === ABSORBANCE_READER_TYPE ||
+                    moduleType === FLEX_STACKER_MODULE_TYPE ||
+                    moduleType === VACUUM_MODULE_TYPE
+                  )
+                })
               }
             />
           ) : null}
@@ -316,7 +340,11 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             highlightLabware,
             highlightShadowLabware,
           }) => {
-            const stackerSlotName = getStackerLocationFromSlot(
+            // enforce that module is a stacker
+            if (getModuleType(moduleModel) !== FLEX_STACKER_MODULE_TYPE) {
+              return null
+            }
+            const stackerSlotName = getStagingColumnSlotName(
               moduleLocation.slotName
             )
             const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
@@ -384,6 +412,93 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                             ) === 'left' &&
                             moduleModel === HEATERSHAKER_MODULE_V1
                           }
+                          highlight={highlightLabware}
+                          highlightShadow={highlightShadowLabware}
+                        />
+                      </g>
+                    </CenterLabwareInModuleChildSlot>
+                  ) : null}
+                  {moduleChildren}
+                </Module>
+              </Fragment>
+            ) : null
+          }
+        )}
+        {vacuumModules.map(
+          ({
+            moduleModel,
+            moduleLocation,
+            nestedLabwareDefsBottomToTop,
+            nestedLabwareWellFill,
+            innerProps,
+            moduleChildren,
+            onLabwareClick,
+            highlightLabware,
+            highlightShadowLabware,
+          }) => {
+            // enforce that module is a vacuum
+            if (getModuleType(moduleModel) !== VACUUM_MODULE_TYPE) {
+              return null
+            }
+            const slotPosition = getPositionFromSlotId(
+              moduleLocation.slotName,
+              deckDef
+            )
+            const moduleDef = getModuleDef(moduleModel)
+            return slotPosition != null ? (
+              <Fragment
+                key={`vacuum_${moduleModel}_${moduleLocation.slotName}`}
+              >
+                <StagingAreaFixture
+                  cutoutId={
+                    `cutout${moduleLocation.slotName}` as StagingAreaLocation
+                  }
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
+                />
+                {wasteChuteStackerFixtures.map(fixture => {
+                  if (
+                    fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+                    moduleLocation.slotName === 'D3'
+                  ) {
+                    return (
+                      <WasteChuteFixture
+                        key={fixture.cutoutId}
+                        cutoutId={fixture.cutoutId}
+                        deckDefinition={deckDef}
+                        fixtureBaseColor={lightFill}
+                        wasteChuteColor={mediumFill}
+                      />
+                    )
+                  }
+                })}
+                <Module
+                  key={`${moduleModel} ${moduleLocation.slotName}`}
+                  def={moduleDef}
+                  x={slotPosition[0]}
+                  y={slotPosition[1]}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slotPosition[0]
+                  )}
+                  innerProps={innerProps}
+                  targetDeckId={deckDef.otId}
+                  targetSlotId={moduleLocation.slotName}
+                  childrenPositioningMode="passThrough"
+                >
+                  {nestedLabwareDefsBottomToTop.length > 0 ? (
+                    <CenterLabwareInModuleChildSlot
+                      deckId={deckDef.otId}
+                      slotId={moduleLocation.slotName}
+                      moduleDefinition={moduleDef}
+                      labwareDefinition={nestedLabwareDefsBottomToTop[0]}
+                    >
+                      <g cursor={onLabwareClick != null ? CURSOR_POINTER : ''}>
+                        <LabwareRender
+                          definition={nestedLabwareDefsBottomToTop[0]}
+                          positioningMode="passThrough"
+                          onLabwareClick={onLabwareClick}
+                          wellFill={nestedLabwareWellFill}
                           highlight={highlightLabware}
                           highlightShadow={highlightShadowLabware}
                         />
@@ -517,8 +632,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ({ moduleModel, moduleLocation, stacked = false }) => {
             const moduleDef = getModuleDef(moduleModel)
             const parentSlotName =
-              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
-                ? getStackerLocationFromSlot(moduleLocation.slotName)
+              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE ||
+              moduleDef.moduleType === VACUUM_MODULE_TYPE
+                ? getStagingColumnSlotName(moduleLocation.slotName)
                 : moduleLocation.slotName
             const parentSlotPosition = getPositionFromSlotId(
               parentSlotName,
@@ -582,6 +698,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   )
 }
 
-function getStackerLocationFromSlot(slotName: string): string {
+/** Slot used as the deck SVG anchor for modules that span the right slot + column 4. */
+function getStagingColumnSlotName(slotName: string): string {
   return `${slotName.charAt(0)}4`
 }

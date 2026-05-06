@@ -20,7 +20,7 @@ from server_utils.fastapi_utils.app_state import (
 from .light_control_task import LightController, run_light_task
 from .run_auto_deleter import RunAutoDeleter
 from .run_data_manager import RunDataManager
-from .run_orchestrator_store import NoRunOrchestrator, RunOrchestratorStore
+from .run_orchestrator_store import NoRunCoordinator, RunOrchestratorStore
 from .run_process_pyro_provider import RunProcessPyroProvider
 from .run_store import RunStore
 from robot_server.camera.settings.store import (
@@ -207,8 +207,8 @@ async def get_is_okay_to_create_maintenance_run(
 ) -> bool:
     """Whether a maintenance run can be created if a protocol run already exists."""
     try:
-        orchestrator = run_orchestrator_store.run_orchestrator
-    except NoRunOrchestrator:
+        orchestrator = run_orchestrator_store.run_coordinator
+    except NoRunCoordinator:
         return True
     return not orchestrator.run_has_started() or orchestrator.get_is_run_terminal()
 

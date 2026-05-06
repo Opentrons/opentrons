@@ -291,6 +291,8 @@ async def test_run_process_create(
     await run_process.create(
         run_id="cool-proxy-run",
         labware_offsets=[],
+        error_recovery_rules=[],
+        error_recovery_is_enabled=False,
         protocol=None,
         run_time_param_values=None,
         run_time_param_paths=None,

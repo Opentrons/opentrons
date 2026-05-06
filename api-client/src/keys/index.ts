@@ -6,4 +6,5 @@ export type {
   CACertPassword,
   EncryptedCACertificates,
   PlaintextCACertificates,
+  UnencryptedCert,
 } from './types'

@@ -310,6 +310,11 @@ def test_maps_different_module_models(
                 name_for_errors=expected_name_for_errors,
                 highest_z_including_labware=3.14159,
             )
+        elif module_model is ModuleModel.VACUUM_MODULE_V1:
+            return wrapped_deck_conflict.VacuumModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
+            )
         else:
             return wrapped_deck_conflict.OtherModule(
                 name_for_errors=expected_name_for_errors,
