@@ -42,9 +42,5 @@
   "OT_PD_ENABLE_VACUUM_MODULE": {
     "title": "Enable vacuum module use",
     "description": "Enables use of vacuum modules in Protocol Designer protocols"
-  },
-  "OT_PD_ENABLE_FORK": {
-    "title": "Enable pd fork mode",
-    "description": "Enables the fork mode in Protocol Designer protocols"
   }
 }
