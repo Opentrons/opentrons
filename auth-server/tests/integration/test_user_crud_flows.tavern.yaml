@@ -51,7 +51,7 @@ stages:
   - name: Get a user information
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/test_new_user'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -68,7 +68,7 @@ stages:
   - name: Update the user
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/test_new_user'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
           fullName: Test New User Updated
@@ -89,7 +89,7 @@ stages:
   - name: Update the username and password
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/test_new_user'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
           userName: test_new_user_updated
@@ -110,7 +110,7 @@ stages:
   - name: Update the reset password flag
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
       json:
         data:
           resetPassword: true
@@ -130,7 +130,7 @@ stages:
   - name: Get the user information
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -163,7 +163,7 @@ stages:
   - name: Delete the user
     request:
       method: DELETE
-      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -172,7 +172,7 @@ stages:
   - name: Try to get the deleted user
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -256,14 +256,14 @@ stages:
   - name: Unauthorized requests should be rejected
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/regular_user_1'
+      url: '{run_server.base_url}/auth/users/byUsername/regular_user_1'
     response:
       status_code: 401
 
   - name: A regular user should be allowed to fetch their own info
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/regular_user_1'
+      url: '{run_server.base_url}/auth/users/byUsername/regular_user_1'
       headers:
         authorization: 'Bearer {regular_user_1_access_token}'
     response:
@@ -272,7 +272,7 @@ stages:
   - name: A regular user should not be allowed to fetch other users' info
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/regular_user_2'
+      url: '{run_server.base_url}/auth/users/byUsername/regular_user_2'
       headers:
         authorization: 'Bearer {regular_user_1_access_token}'
     response:
@@ -281,7 +281,7 @@ stages:
   - name: An admin should be allowed to fetch other users' info
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/regular_user_2'
+      url: '{run_server.base_url}/auth/users/byUsername/regular_user_2'
       headers:
         Authorization: '{admin_access_token}'
     response:

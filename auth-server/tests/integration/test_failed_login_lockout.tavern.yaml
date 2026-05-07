@@ -120,7 +120,7 @@ stages:
   - name: Use admin credentials to see the lockout
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/test_user'
+      url: '{run_server.base_url}/auth/users/byUsername/test_user'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -134,7 +134,7 @@ stages:
   - name: Use admin credentials to clear the lockout
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/test_user'
+      url: '{run_server.base_url}/auth/users/byUsername/test_user'
       headers:
         Authorization: '{admin_access_token}'
       json:

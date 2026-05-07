@@ -78,9 +78,9 @@ async def post_users(
 
 @PydanticResponse.wrap_route(
     router.get,
-    path="/auth/users/{userName}",
-    summary="Get a user information",
-    description="Get a specific user by its unique identifier.",
+    path="/auth/users/byUsername/{userName}",
+    summary="Get a user",
+    description="Get a specific user, identified by their unique username.",
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
@@ -131,9 +131,9 @@ async def get_user(
 
 @PydanticResponse.wrap_route(
     router.delete,
-    path="/auth/users/{userName}",
+    path="/auth/users/byUsername/{userName}",
     summary="Delete a user",
-    description="Delete a specific user by its unique identifier.",
+    description="Delete a specific user, identified by their unique username.",
     responses={
         fastapi.status.HTTP_204_NO_CONTENT: {"description": "User deleted"},
     },
@@ -163,9 +163,9 @@ async def delete_user(
 
 @PydanticResponse.wrap_route(
     router.patch,
-    path="/auth/users/{userName}",
+    path="/auth/users/byUsername/{userName}",
     summary="Update a user",
-    description="Update a specific user by its unique identifier.",
+    description="Update a specific user, identified by their unique username.",
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
     },
