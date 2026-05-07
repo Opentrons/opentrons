@@ -31,7 +31,7 @@ export const vacuumStartRunProfile: CommandCreator<
 
   // 1-indexed profile task ID
   const taskId = `${vacuumPythonName}_task_${vacuumState.numPumpActivitiesStarted + 1}`
-  const profileArgs = getVacuumProfileStepString(profile)
+  const profileArgs = getVacuumProfileStepString(profile, ventAfter)
 
   // explicitly attach the ventAfter param to the final step of the profile in accordance with PE command shape
   // there is no direct ventAfter param at the startRunProfile command params top level

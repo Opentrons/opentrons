@@ -87,7 +87,11 @@ describe('vacuumStartRunProfile', () => {
       python: `
 mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     profile=[
-        {"gauge_pressure": 55, "hold_time_seconds": 12}
+        {
+            "gauge_pressure": 55,
+            "hold_time_seconds": 12,
+            "vent_after": True,
+        }
     ],
     repetitions=1
 )`.trim(),
@@ -122,7 +126,11 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
       python: `
 mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     profile=[
-        {"power_percent": 30, "hold_time_seconds": 5}
+        {
+            "power_percent": 30,
+            "hold_time_seconds": 5,
+            "vent_after": False,
+        }
     ],
     repetitions=2
 )`.trim(),
