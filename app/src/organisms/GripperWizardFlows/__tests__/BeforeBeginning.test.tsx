@@ -41,10 +41,13 @@ describe('BeforeBeginning', () => {
     render(props)
     screen.getByText('Before you begin')
     expect(
-      screen.getByText('remove all labware from the deck').closest('p')
-    ).toHaveTextContent(
-      'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-    )
+      screen.getByText(
+        (_, element) =>
+          element?.tagName === 'P' &&
+          element?.textContent ===
+            'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+    ).toBeInTheDocument()
     screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )
@@ -81,10 +84,13 @@ describe('BeforeBeginning', () => {
     render(props)
     screen.getByText('Before you begin')
     expect(
-      screen.getByText('remove all labware from the deck').closest('p')
-    ).toHaveTextContent(
-      'To get started, remove all labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
-    )
+      screen.getByText(
+        (_, element) =>
+          element?.tagName === 'P' &&
+          element?.textContent ===
+            'To get started, remove all labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+      )
+    ).toBeInTheDocument()
     screen.getByText('You will need:')
     screen.getByText('2.5 mm Hex Screwdriver')
     screen.getByText(
@@ -113,10 +119,13 @@ describe('BeforeBeginning', () => {
     render(props)
     screen.getByText('Before you begin')
     expect(
-      screen.getByText('remove all labware from the deck').closest('p')
-    ).toHaveTextContent(
-      'To get started, remove all labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
-    )
+      screen.getByText(
+        (_, element) =>
+          element?.tagName === 'P' &&
+          element?.textContent ===
+            'To get started, remove all labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+      )
+    ).toBeInTheDocument()
     screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )
