@@ -5,7 +5,6 @@ import type {
   DocumentationResult,
   DocumentedActionKind,
 } from '../../../resources/access-control/types'
-import type { RequireLoginResult } from './requireLogin'
 
 /**
  * Guard that captures a documentation note for an action and posts it
