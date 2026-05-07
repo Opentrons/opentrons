@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.10.2
+
+**Welcome to Protocol Designer 8.10.2!**
+
+This hotfix release addresses a bug to allow manual tip tracking with a partial column pickup (for 5 or more pipette tips).
+
 ## Opentrons Protocol Designer Changes in 8.10.1
 
 **Welcome to Protocol Designer 8.10.1!**
