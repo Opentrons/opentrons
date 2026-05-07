@@ -10,11 +10,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import {
-  getModuleDisplayName,
-  getModuleType,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { getModuleDisplayName, getModuleType } from '@opentrons/shared-data'
 
 import { HandleEnter } from '../../components/atoms'
 import { ModuleEmptySelectorButtons } from '../../components/organisms'
@@ -64,7 +60,6 @@ export function SelectOt2Modules(props: WizardTileProps): JSX.Element | null {
   return (
     <HandleEnter onEnter={proceed}>
       <WizardBody
-        robotType={OT2_ROBOT_TYPE}
         stepNumber={2}
         subStepNumber={4}
         header={t('add_modules')}

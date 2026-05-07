@@ -38,7 +38,6 @@ import { actions as steplistActions } from '../../steplist'
 import { uuid } from '../../utils'
 import { AddMetadata } from './AddMetadata'
 import { SelectBasics } from './SelectBasics'
-import { SelectHardware } from './SelectFlexHardware'
 import { SelectOt2Modules } from './SelectOt2Modules'
 
 import type { ThunkDispatch } from 'redux-thunk'
@@ -78,7 +77,7 @@ const initialFormState: WizardFormState = {
     name: undefined,
     description: undefined,
     organizationOrAuthor: undefined,
-    robotType: FLEX_ROBOT_TYPE,
+    robotType: OT2_ROBOT_TYPE,
   },
   pipettesByMount: {
     left: { pipetteName: undefined, tiprackDefURI: undefined },
@@ -86,7 +85,13 @@ const initialFormState: WizardFormState = {
   },
   modules: {},
   hasGripper: null,
-  fixtures: {},
+  fixtures: {
+    [uuid()]: {
+      cutoutId: 'cutout12',
+      name: 'trashBin',
+      cutoutFixtureId: 'fixedTrashSlot',
+    },
+  },
   hasThermocycler: null,
   hasWasteChute: null,
 }
@@ -365,7 +370,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     resolver: yupResolver(validationSchema),
   })
   const dispatch = useDispatch()
-  const robotType = formProps.watch('fields').robotType
 
   // for resetting the onboarding page back to empty and page 1 when you hit "create new"
   //  from the nav bar
@@ -389,11 +393,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
           case 'basics':
             return <SelectBasics {...{ ...formProps, proceed, goBack }} />
           case 'modules':
-            return robotType === OT2_ROBOT_TYPE ? (
-              <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />
-            ) : (
-              <SelectHardware {...{ ...formProps, proceed, goBack }} />
-            )
+            return <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />
           case 'metadata':
             return (
               <AddMetadata
