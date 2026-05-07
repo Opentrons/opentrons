@@ -28,17 +28,17 @@ class VacuumModuleProfileStepBase(BaseModel):
     """The parameters shared between a pressure step and a power step."""
 
     enablePump: bool
-    holdTimeSeconds: int | SkipJsonSchema[None]
-    holdTimeMinutes: int | SkipJsonSchema[None]
-    rampRate: float | SkipJsonSchema[None]
-    timeoutSeconds: int | SkipJsonSchema[None]
-    ventAfter: bool | SkipJsonSchema[None]
+    holdTimeSeconds: int | SkipJsonSchema[None] = None
+    holdTimeMinutes: int | SkipJsonSchema[None] = None
+    rampRate: float | SkipJsonSchema[None] = None
+    timeoutSeconds: int | SkipJsonSchema[None] = None
+    ventAfter: bool | SkipJsonSchema[None] = None
 
 
 class VacuumModuleProfilePowerStep(VacuumModuleProfileStepBase):
     """Input parameters for a vacuum module Power Step."""
 
-    percentPower: int | SkipJsonSchema[None]
+    percentPower: int | SkipJsonSchema[None] = None
 
     def convert_element(self) -> VacuumModulePowerStep:
         """Convert a VacuumModulePower step into a hardware controller type."""
@@ -56,7 +56,7 @@ class VacuumModuleProfilePowerStep(VacuumModuleProfileStepBase):
 class VacuumModuleProfilePressureStep(VacuumModuleProfileStepBase):
     """Input parameters for a vacuum module Pressure Step."""
 
-    gaugePressureMbar: int | SkipJsonSchema[None]
+    gaugePressureMbar: int | SkipJsonSchema[None] = None
 
     def convert_element(self) -> VacuumModulePressureStep:
         """Convert a VacuumModulePressure step into a hardware controller type."""
