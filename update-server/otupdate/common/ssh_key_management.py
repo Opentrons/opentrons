@@ -13,9 +13,6 @@ from typing import IO, Any, Generator, List, Tuple
 
 from aiohttp import web
 
-from server_utils.auth.scopes import Scope
-
-from . import auth
 from .handler_type import Handler
 
 LOG = logging.getLogger(__name__)
@@ -128,7 +125,6 @@ async def list_keys(request: web.Request) -> web.Response:
     )
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 @require_linklocal
 async def add(request: web.Request) -> web.Response:
     """Add a public key to the authorized_keys file.
@@ -177,7 +173,6 @@ async def add(request: web.Request) -> web.Response:
     )
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 @require_linklocal
 async def clear(request: web.Request) -> web.Response:
     """Clear all public keys from authorized_keys
@@ -199,7 +194,6 @@ async def clear(request: web.Request) -> web.Response:
     )
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 @require_linklocal
 async def remove(request: web.Request) -> web.Response:
     """Remove a public key from authorized_keys
@@ -238,7 +232,6 @@ async def remove(request: web.Request) -> web.Response:
     )
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
 async def add_from_local(request: web.Request) -> web.Response:
     """Add a public keys from usb device to the authorized_keys file.
 

@@ -15,9 +15,7 @@ from typing import Optional
 from aiohttp import BodyPartReader, MultipartReader, web
 from typing_extensions import Protocol
 
-from server_utils.auth.scopes import Scope
-
-from . import auth, config, update_actions
+from . import config, update_actions
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from .handler_type import Handler
 from .session import Stages, UpdateSession
@@ -66,7 +64,6 @@ def require_session(handler: _HandlerWithSession) -> Handler:
     return decorated
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
 async def begin(request: web.Request) -> web.Response:
     """Begin a session"""
     if None is not session_from_request(request):
@@ -84,7 +81,6 @@ async def begin(request: web.Request) -> web.Response:
     return web.json_response(data={"token": session.token}, status=201)
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
 async def cancel(request: web.Request) -> web.Response:
     request.app.pop(SESSION_VARNAME, None)
     return web.json_response(data={"message": "Session cancelled"}, status=200)
@@ -194,7 +190,6 @@ async def _read_parts_and_find_update(
     return found
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
 @require_session
 async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/file
@@ -243,7 +238,6 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     return web.json_response(data=session.state, status=201)
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
 @require_session
 async def commit(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/commit"""

@@ -13,9 +13,6 @@ from typing import Any, Callable, Coroutine, Mapping
 
 from aiohttp import web
 
-from server_utils.auth.scopes import Scope
-
-from . import auth
 from .constants import DEVICE_BOOT_ID_NAME, RESTART_LOCK_NAME
 from .name_management import get_name_synchronizer
 
@@ -26,7 +23,6 @@ def _do_restart():
     subprocess.check_call(["reboot"])
 
 
-@auth.require_scopes(Scope.RESTART_WRITE)
 async def restart(request: web.Request) -> web.Response:
     """Restart the robot.
 
