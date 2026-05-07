@@ -52,8 +52,8 @@ Paste tickets, pick repos, click **Analyze Risk**. Optional **Bug epic mode** co
 | `cached.py` | Streamlit-cached wrappers around GitHub + metrics |
 | `metrics.py` | Cyclomatic complexity + line count from fetched source |
 | `domains.py` | File extension → stack label; table “Kind” icons |
-| `coverage.py` | Pull a coverage % hint from PR comments (Codecov-style) |
-| `pr_discovery.py` | Search merged PRs by ticket text → expand with `gh pr view` → file rows |
+| `coverage.py` | Pull a coverage % hint from PR **issue comments + reviews** (Codecov-style text); **Cov n/a** if nothing parsed |
+| `pr_discovery.py` | Search merged PRs by ticket text → expand with `gh pr view` → file rows (**Jira tickets** parsed from PR title/body/comments) |
 | `import_graph.py` | Epic-scoped **Fan-out** / **Fan-in** (Python `ast` + TS import regex heuristics) |
 | `risk.py` | **Risk Score** math + **Risk Reasoning** prose |
 | `aggregation.py` | Group PR rows → one row per file; sort keys; display column order |
@@ -72,7 +72,7 @@ Caching / UI deps: `from epic_risk import cached` (loads Streamlit).
 
 ## The maths (Risk Score)
 
-All terms are non-negative; result is **rounded to 2 decimals**.
+All terms are non-negative; result is **rounded to 2 decimals**. There is **no fixed maximum** — large PR counts or hub-like import graphs can push scores well past 100 (e.g. 200+); use scores to **rank rows within an epic**, not as an absolute pass/fail scale.
 
 Let:
 

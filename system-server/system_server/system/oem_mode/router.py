@@ -17,7 +17,7 @@ from fastapi import (
     status,
 )
 
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from .models import EnableOEMMode

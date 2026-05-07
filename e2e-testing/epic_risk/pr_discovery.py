@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from collections.abc import Callable
 from datetime import datetime
@@ -12,6 +13,40 @@ from epic_risk.constants import PR_QUERY_CHUNK_SIZE
 from epic_risk.coverage import attempt_coverage_extraction
 from epic_risk.domains import categorize_domain
 from epic_risk.github import parse_github_datetime
+
+
+def _tickets_mentioned_in_text(haystack: str, tickets: list[str]) -> str:
+    """Return comma-separated epic tickets whose keys appear in PR title/body/comments (word-safe match)."""
+    if not haystack.strip() or not tickets:
+        return ""
+    matched: list[str] = []
+    seen: set[str] = set()
+    for raw in tickets:
+        t = raw.strip()
+        if not t:
+            continue
+        pat = r"(?<![A-Z0-9])" + re.escape(t.upper()) + r"(?![A-Z0-9])"
+        if re.search(pat, haystack, flags=re.IGNORECASE) and t not in seen:
+            seen.add(t)
+            matched.append(t)
+    matched.sort(key=lambda x: x.upper())
+    return ", ".join(matched)
+
+
+def _pr_text_for_ticket_scan(pr_data: dict[str, Any]) -> str:
+    parts: list[str] = []
+    title = pr_data.get("title")
+    if title:
+        parts.append(str(title))
+    body = pr_data.get("body")
+    if body:
+        parts.append(str(body))
+    for c in pr_data.get("comments") or []:
+        if isinstance(c, dict):
+            b = c.get("body")
+            if b:
+                parts.append(str(b))
+    return "\n".join(parts)
 
 
 def _iter_ticket_chunks(tickets: list[str], chunk_size: int) -> list[list[str]]:
@@ -76,7 +111,16 @@ def scan_merged_prs_for_epic_files(
                 if pr_id in processed_prs:
                     continue
 
-                view_cmd = ["gh", "pr", "view", pr_num, "--repo", repo, "--json", "files,comments,mergedAt"]
+                view_cmd = [
+                    "gh",
+                    "pr",
+                    "view",
+                    pr_num,
+                    "--repo",
+                    repo,
+                    "--json",
+                    "files,comments,reviews,mergedAt,title,body,author",
+                ]
                 try:
                     view_result = subprocess.run(view_cmd, stdout=subprocess.PIPE, text=True, check=True)
                     pr_data = json.loads(view_result.stdout)
@@ -85,9 +129,10 @@ def scan_merged_prs_for_epic_files(
                             pr_merge_datetimes.append(parse_github_datetime(pr_data["mergedAt"]))
                         except ValueError:
                             pass
-                    cov_status = attempt_coverage_extraction(pr_data.get("comments", []))
+                    cov_status = attempt_coverage_extraction(pr_data)
                     processed_prs[pr_id] = f"#{pr_num} ({cov_status})"
                     pr_author = (pr_data.get("author") or {}).get("login") or ""
+                    jira_tickets = _tickets_mentioned_in_text(_pr_text_for_ticket_scan(pr_data), tickets)
 
                     for file_info in pr_data.get("files", []):
                         status = file_info.get("status") or file_info.get("changeType") or "modified"
@@ -103,6 +148,7 @@ def scan_merged_prs_for_epic_files(
                                 "Adds": file_info.get("additions", 0),
                                 "Dels": file_info.get("deletions", 0),
                                 "File_Status": status,
+                                "Jira tickets": jira_tickets,
                             }
                         )
                 except Exception:

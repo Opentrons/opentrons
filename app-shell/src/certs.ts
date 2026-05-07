@@ -1,4 +1,6 @@
 import { pbkdf2, subtle, X509Certificate } from 'crypto'
+import { mkdir, open, readdir, rm, stat } from 'fs/promises'
+import { join } from 'path'
 import { promisify } from 'util'
 import { app, ipcMain } from 'electron'
 
@@ -18,13 +20,127 @@ const CERT_DECRYPTION_TTL_NOT_RECENT_S = 10 * 365 * 24 * 60 * 60
 const CERT_DECRYPTION_FORWARD_CLOCK_SKEW_NEAR_S = 24 * 60 * 60
 const CERT_DECRYPTION_FORWARD_CLOCK_SKEW_FAR_S = 10 * 365 * 24 * 60 * 60
 
+const CERT_SUBDIR = 'robot-certificates'
+
+const log = createLogger('certs')
+
+async function wrappedStat(
+  path: string
+): Promise<Awaited<ReturnType<typeof stat>> | null> {
+  try {
+    return await stat(path)
+  } catch (_: any) {
+    return null
+  }
+}
+
+async function ensureDir(path: string): Promise<void> {
+  const dirstat = await wrappedStat(path)
+  if (dirstat == null) {
+    log.info(`${path} does not exist, making directory`)
+    await mkdir(path, { recursive: true })
+  } else if (!dirstat.isDirectory()) {
+    log.warn(`${path} exists as a non-directory, removing`)
+    await rm(path)
+    await mkdir(path, { recursive: true })
+  }
+}
+
+async function getCertDir(): Promise<string> {
+  const basePath = app.getPath('userData')
+  const certDir = join(basePath, CERT_SUBDIR)
+  await ensureDir(certDir)
+  return certDir
+}
+
+async function writeFile(path: string, contents: Buffer): Promise<void> {
+  const certFile = await open(path, 'w')
+  try {
+    await certFile.writeFile(contents)
+  } finally {
+    await certFile.close()
+  }
+}
+
+async function saveCertificateToDisk(
+  certificate: X509Certificate
+): Promise<void> {
+  const certDir = await getCertDir()
+  const certPath = join(certDir, `${certificate.fingerprint256}.cer`)
+  await writeFile(certPath, certificate.raw)
+  log.info(`Saved certificate to ${certPath}`)
+  addCertificateToMap(certificate)
+}
+
+async function readFile(path: string): Promise<Buffer> {
+  const handle = await open(path, 'r')
+  try {
+    return await handle.readFile()
+  } finally {
+    await handle.close()
+  }
+}
+
+async function tryLoadCertificate(
+  path: string
+): Promise<X509Certificate | null> {
+  const contents = await readFile(path)
+  try {
+    return new X509Certificate(contents)
+  } catch (err: any) {
+    log.warning(`Invalid certificate: ${err}`)
+    return null
+  }
+}
+
+export function validateCertShouldLoad(
+  certificate: X509Certificate
+): X509Certificate | null {
+  const now = Date.now()
+  if (certificate.validToDate.valueOf() < now) {
+    log.info(`Certificate ${certificate.fingerprint256} invalid (expired)`)
+    return null
+  }
+  return certificate
+}
+
+async function loadCertificatesFromDisk(): Promise<void> {
+  const certDir = await getCertDir()
+  log.info(`Reading robot certificates from ${certDir}`)
+  const certs = await readdir(certDir, {
+    withFileTypes: true,
+    encoding: 'utf8',
+  })
+
+  for (const possibleCert of certs) {
+    if (!possibleCert.isFile()) {
+      continue
+    }
+    if (!possibleCert.name.endsWith('.cer')) {
+      continue
+    }
+    const certPath = join(certDir, possibleCert.name)
+    const loaded = await tryLoadCertificate(certPath)
+    if (loaded == null) {
+      log.info(`Removing invalid certificate (can't be loaded) at ${certPath}`)
+      await rm(certPath)
+      continue
+    }
+    const validated = validateCertShouldLoad(loaded)
+    if (validated == null) {
+      await rm(certPath)
+      continue
+    }
+    addCertificateToMap(validated)
+  }
+}
+
 function addCertificateToMap(certificate: X509Certificate): void {
   const sha256Fingerprint = certificate.fingerprint256
   knownCertificates.set(sha256Fingerprint, certificate)
-  log.silly(`added certificate at ${sha256Fingerprint}`)
+  log.info(`added certificate at ${sha256Fingerprint}`)
 }
 
-const log = createLogger('certs')
 /**
  * An implementation of the Fernet cryptosystem (https://github.com/fernet/spec)
  * decode side only tuned to our requirements.
@@ -35,6 +151,20 @@ const log = createLogger('certs')
  * this is exported for test purposes only; it shouldn't be used outside this file.
  */
 export async function decryptFromOTDetails(
+  password: string,
+  saltBase64: string,
+  kdfIterations: number,
+  token: string
+): Promise<Buffer> {
+  try {
+    return await doDecrypt(password, saltBase64, kdfIterations, token)
+  } catch (err: any) {
+    log.info(`Failed to decrypt: ${err?.message ?? JSON.stringify(err)} `)
+    throw new Error('Incorrect password')
+  }
+}
+
+async function doDecrypt(
   password: string,
   saltBase64: string,
   kdfIterations: number,
@@ -125,14 +255,14 @@ export async function decryptFromOTDetails(
     unsigned_token
   )
   if (!verification) {
-    throw new Error('Invalid or tampered with internal data!')
+    throw new Error('Verification failed')
   }
   // where we differ from the example above - this is not an encoded UTF-8 string but an encoded
   // byte sequence
   return Buffer.from(decryptedData)
 }
 
-async function certInstallListener(
+async function encryptedCertInstallListener(
   _event: IpcMainInvokeEvent,
   data: {
     certificateData: string
@@ -148,30 +278,88 @@ async function certInstallListener(
     data.certificateData
   )
   const certificate = new X509Certificate(certDER)
-  log.silly(`got cert, ca: ${certificate.ca} signer: ${certificate.issuer}`)
-  addCertificateToMap(certificate)
-  log.info(`added cert to known certificates, have ${knownCertificates.size}`)
+  log.silly(
+    `got encrypted cert, ca: ${certificate.ca} signer: ${certificate.issuer} notAfter: ${certificate.validToDate}`
+  )
+  await saveCertificateToDisk(certificate)
   return true
 }
 
-export function registerCertIPC(): void {
-  ipcMain.handle('robot-cert:install', certInstallListener)
+async function plaintextCertInstallListener(
+  _event: IpcMainInvokeEvent,
+  data: { certificateData: string }
+): Promise<boolean> {
+  const certDER = Buffer.from(data.certificateData, 'base64url')
+  const certificate = new X509Certificate(certDER)
+  log.silly(
+    `got plaintext cert, ca: ${certificate.ca} signer: ${certificate.issuer} notAfter: ${certificate.validToDate}`
+  )
+  await saveCertificateToDisk(certificate)
+  return true
+}
+
+export function validateCertShouldVerify(
+  certificate: X509Certificate
+): X509Certificate | null {
+  const now = Date.now()
+  if (certificate.validToDate.valueOf() < now) {
+    log.silly(
+      `Certificate ${certificate.fingerprint256} invalid for verification (expired)`
+    )
+    return null
+  }
+  if (certificate.validFromDate.valueOf() > now) {
+    log.silly(
+      `Certificate ${certificate.fingerprint256} invalid for verification (not yet valid)`
+    )
+    return null
+  }
+  return certificate
+}
+
+export function validateCert(
+  incomingCert: X509Certificate,
+  certsToVerifyAgainst: { values: () => IterableIterator<X509Certificate> }
+): boolean {
+  const now = Date.now()
+  const validatedIncoming = validateCertShouldVerify(incomingCert)
+  if (validatedIncoming == null) {
+    log.warning('Invalid certificate from request, denying')
+    return false
+  }
+  for (const knownCert of certsToVerifyAgainst.values()) {
+    if (knownCert.validFromDate.valueOf() > now) {
+      log.silly(`Ignoring cert ${knownCert.fingerprint256}, not yet valid`)
+      continue
+    }
+    const validated = validateCertShouldVerify(knownCert)
+    if (validated == null) {
+      continue
+    }
+    if (incomingCert.checkIssued(knownCert)) {
+      if (incomingCert.verify(knownCert.publicKey)) {
+        log.silly('good sign match for cert, allowing')
+        return true
+      }
+    }
+  }
+  log.info('no sign match for cert, denying')
+  return false
+}
+
+export async function registerCertIPC(): Promise<void> {
+  ipcMain.handle('robot-cert:install-encrypted', encryptedCertInstallListener)
+  ipcMain.handle('robot-cert:install-plaintext', plaintextCertInstallListener)
   app.on(
     'certificate-error',
     (event, _webContents, _url, _error, certificate, allowRequest) => {
       const incomingAsBuffer = Buffer.from(certificate.data)
       const incomingAsNodeJSCert = new X509Certificate(incomingAsBuffer)
-      for (const knownCert of knownCertificates.values()) {
-        if (incomingAsNodeJSCert.checkIssued(knownCert)) {
-          if (incomingAsNodeJSCert.verify(knownCert.publicKey)) {
-            log.silly('good sign match for cert, allowing')
-            event.preventDefault()
-            allowRequest(true)
-            return
-          }
-        }
+      if (validateCert(incomingAsNodeJSCert, knownCertificates)) {
+        allowRequest(true)
+        event.preventDefault()
       }
-      log.info('no sign match for cert, denying')
     }
   )
+  await loadCertificatesFromDisk()
 }

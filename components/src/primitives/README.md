@@ -1,5 +1,13 @@
 Primitive components are base-level components that apply very little inherent styling (usually CSS resets) and expose simple props to customize styling or behavior at a low level.
 
+> [!WARNING]
+> Primitive components are no longer our preferred approach.
+>
+> If there is a preexisting higher-level component that does what you want
+> (e.g. from the Helix design system, or from your project's shared components),
+> use that instead. If not, implement your own layout+styling with CSS modules and the
+> semantically appropriate native HTML element (`<li>`, `<menu>`, `<p>`, `<div>`, etc).
+
 ## style props
 
 Style props will pass their value directly into CSS, but for safety, try to use the value constants defined in `components/src/styles`.

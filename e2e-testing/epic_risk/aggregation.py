@@ -7,8 +7,26 @@ import pandas as pd
 from epic_risk.constants import IGNORED_DOMAINS
 
 
+def _merge_jira_ticket_cells(series: pd.Series) -> str:
+    """Union ticket keys from comma-separated cells; stable sort by key."""
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for cell in series.dropna():
+        for part in str(cell).split(","):
+            t = part.strip()
+            if t and t not in seen:
+                seen.add(t)
+                ordered.append(t)
+    ordered.sort(key=lambda x: x.upper())
+    return ", ".join(ordered)
+
+
 def aggregate_epic_file_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Group PR file rows into one row per (repo, domain, file) with churn and contributor counts."""
+    if "Jira tickets" not in df.columns:
+        df = df.copy()
+        df["Jira tickets"] = ""
+
     summary_df = (
         df.groupby(["RepoFullName", "Repo", "Domain", "File"])
         .agg(
@@ -16,6 +34,7 @@ def aggregate_epic_file_rows(df: pd.DataFrame) -> pd.DataFrame:
             Dels=("Dels", "sum"),
             PR_Count=("PR", "nunique"),
             PR_Numbers=("PR_Display", lambda x: ", ".join(sorted(list(set(x))))),
+            Jira_tickets_merge=("Jira tickets", _merge_jira_ticket_cells),
             _any_added=("File_Status", lambda s: (s == "added").any()),
             Contributors_epic=(
                 "PR_Author",
@@ -24,6 +43,7 @@ def aggregate_epic_file_rows(df: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
+    summary_df = summary_df.rename(columns={"Jira_tickets_merge": "Jira tickets"})
     summary_df = summary_df.rename(columns={"Contributors_epic": "Contributors (epic)"})
 
     summary_df["New File"] = summary_df["_any_added"].map(lambda v: "🆕 New in epic" if v else "—")
@@ -67,6 +87,7 @@ def base_display_columns(*, bug_epic_mode: bool, has_commit_span: bool) -> list[
         "Risk Reasoning",
         "Syntax tree",
         "PR_Numbers",
+        "Jira tickets",
         "Adds",
         "Dels",
         "Total Churn",

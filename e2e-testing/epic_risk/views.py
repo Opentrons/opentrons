@@ -19,7 +19,14 @@ _TS_PARSER = _E2E_ROOT / "test_ast_parser.ts"
 
 def _column_config_for_table(epic_window: str, *, include_commit_col: bool) -> dict:
     col_cfg: dict = {
-        "Risk Score": st.column_config.NumberColumn(format="%.1f"),
+        "Risk Score": st.column_config.NumberColumn(
+            format="%.1f",
+            help=(
+                "Heuristic mix of PR overlap, churn, and import fan-out/in within this epic. "
+                "There is **no fixed ceiling** — scores in the hundreds can appear when many PRs "
+                "touch the same path or hub files; compare rows relatively, not to an absolute scale."
+            ),
+        ),
         "New File": st.column_config.TextColumn(width="small"),
         "Kind": st.column_config.TextColumn(
             " ",
@@ -61,7 +68,22 @@ def _column_config_for_table(epic_window: str, *, include_commit_col: bool) -> d
             width="small",
             help="Rows marked ↓ can be parsed in the panel directly under this table.",
         ),
-        "PR_Numbers": st.column_config.TextColumn("Linked PRs & Coverage", width="medium"),
+        "PR_Numbers": st.column_config.TextColumn(
+            "Linked PRs & Coverage",
+            width="medium",
+            help=(
+                "Merged PR numbers with a **Cov …** snippet when a percentage was found in issue comments "
+                "or submitted reviews (Codecov-style text). **Cov n/a** means nothing matched — coverage "
+                "may still exist under GitHub Checks only."
+            ),
+        ),
+        "Jira tickets": st.column_config.TextColumn(
+            width="medium",
+            help=(
+                "Epic ticket keys detected in each linked PR’s title, body, or comments "
+                "(from your pasted list). Union across all PRs that touched this file."
+            ),
+        ),
     }
     if include_commit_col and epic_window:
         col_cfg["Commits (PR span)"] = st.column_config.NumberColumn(
@@ -158,9 +180,7 @@ def render_epic_results_table(
                 "**Commits (PR span)** = default-branch commits on each path between these dates."
             )
         else:
-            st.caption(
-                f"**Matched PR merge span** (earliest → latest merged PR for your tickets): `{epic_window}`"
-            )
+            st.caption(f"**Matched PR merge span** (earliest → latest merged PR for your tickets): `{epic_window}`")
 
     has_commits = bug_epic_show and "Commits (PR span)" in display_df.columns
     col_cfg = _column_config_for_table(epic_window, include_commit_col=has_commits)

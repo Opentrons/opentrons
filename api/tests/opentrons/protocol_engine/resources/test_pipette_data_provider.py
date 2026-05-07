@@ -104,7 +104,7 @@ def test_configure_virtual_pipette_for_volume(
         PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette", "v0"
     )
     assert result1 == LoadedStaticPipetteData(
-        model="p50_single_v3.6",
+        model="p50_single_v3.7",
         display_name="Flex 1-Channel 50 µL",
         min_volume=5,
         max_volume=50.0,
@@ -146,7 +146,7 @@ def test_configure_virtual_pipette_for_volume(
         PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette", "v0"
     )
     assert result2 == LoadedStaticPipetteData(
-        model="p50_single_v3.6",
+        model="p50_single_v3.7",
         display_name="Flex 1-Channel 50 µL",
         min_volume=0.5,
         max_volume=30,
