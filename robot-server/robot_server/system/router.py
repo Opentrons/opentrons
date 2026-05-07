@@ -7,10 +7,6 @@ Endpoints include:
 
 from datetime import datetime
 
-from fastapi import Depends
-
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
-from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api.resource_links import (
     ResourceLink,
@@ -53,7 +49,6 @@ async def get_time() -> SystemTimeResponse:
     description="Update system time",
     summary="Set robot time",
     response_model=SystemTimeResponse,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def set_time(new_time: SystemTimeRequest) -> SystemTimeResponse:
     """Set the robot's system time."""

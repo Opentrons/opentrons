@@ -9,8 +9,6 @@ from opentrons.hardware_control.types import Axis
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons_shared_data.errors import ErrorCodes
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
-from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware
@@ -50,7 +48,6 @@ async def get_engaged_motors(
     "/motors/disengage",
     description="Disengage a motor or set of motors",
     response_model=V1BasicResponse,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def post_disengage_motors(
     axes: model.Axes, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]

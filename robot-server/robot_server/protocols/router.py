@@ -32,8 +32,6 @@ from opentrons.protocol_reader import (
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
-from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     Body,
@@ -209,7 +207,6 @@ protocols_router = LightRouter()
         },
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
-    dependencies=[Depends(require_scopes(Scope.PROTOCOLS_WRITE))],
 )
 async def create_protocol(  # noqa: C901
     protocol_directory: Annotated[Path, Depends(get_protocol_directory)],
@@ -684,7 +681,6 @@ async def get_protocol_by_id(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[ProtocolUsedByRun]},
     },
-    dependencies=[Depends(require_scopes(Scope.PROTOCOLS_WRITE))],
 )
 async def delete_protocol_by_id(
     protocolId: str,
