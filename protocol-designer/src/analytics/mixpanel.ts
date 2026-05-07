@@ -63,7 +63,7 @@ export function setMixpanelTracking(optedIn: boolean): void {
         mixpanel.opt_in_tracking()
         mixpanel.register({
           appVersion: _OT_PD_VERSION_,
-          appName: 'protocolDesigner',
+          appName: 'OT2protocolDesigner',
           viewportHeight: window.innerHeight,
           viewportWidth: window.innerWidth,
         })
