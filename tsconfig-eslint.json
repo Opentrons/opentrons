@@ -3,7 +3,6 @@
   "compilerOptions": {
     "paths": {
       "/app/*": ["./app/src/*"],
-      "/ai-client/*": ["./opentrons-ai-client/src/*"],
       "/protocol-designer/*": ["./protocol-designer/src/*"],
       "@opentrons/components": ["./components/src/index.ts"],
       "@opentrons/shared-data": ["./shared-data/js/index.ts"],
@@ -25,7 +24,6 @@
     "labware-designer/typings",
     "labware-library/src",
     "labware-library/typings",
-    "opentrons-ai-client/src",
     "shared-data/deck",
     "shared-data/js",
     "shared-data/protocol",

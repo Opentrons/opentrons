@@ -10,7 +10,6 @@
       "discovery-client",
       "labware-designer",
       "labware-library",
-      "opentrons-ai-client",
       "protocol-designer",
       "react-api-client",
       "shared-data",

@@ -173,10 +173,6 @@ export default defineConfig({
         find: /^\/protocol-designer\/(?!src\/)/,
         replacement: path.resolve('./protocol-designer/src/') + '/',
       },
-      {
-        find: /^\/ai-client\/(?!src\/)/,
-        replacement: path.resolve('./opentrons-ai-client/src/') + '/',
-      },
     ],
   },
 })

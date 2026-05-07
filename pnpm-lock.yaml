@@ -875,88 +875,6 @@ importers:
         specifier: 0.29.11
         version: 0.29.11
 
-  opentrons-ai-client:
-    dependencies:
-      '@auth0/auth0-react':
-        specifier: 2.2.4
-        version: 2.2.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@fontsource/public-sans':
-        specifier: 5.0.3
-        version: 5.0.3
-      '@opentrons/components':
-        specifier: link:../components
-        version: link:../components
-      '@opentrons/shared-data':
-        specifier: link:../shared-data
-        version: link:../shared-data
-      axios:
-        specifier: ^0.21.1
-        version: 0.21.4
-      jotai:
-        specifier: 2.8.0
-        version: 2.8.0(@types/react@18.2.51)(react@18.2.0)
-      lodash:
-        specifier: 4.18.1
-        version: 4.18.1
-      mixpanel-browser:
-        specifier: 2.22.1
-        version: 2.22.1
-      react:
-        specifier: 18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: 18.2.0
-        version: 18.2.0(react@18.2.0)
-      react-error-boundary:
-        specifier: ^4.0.10
-        version: 4.1.2(react@18.2.0)
-      react-hook-form:
-        specifier: 7.50.1
-        version: 7.50.1(react@18.2.0)
-      react-markdown:
-        specifier: 9.0.1
-        version: 9.0.1(@types/react@18.2.51)(react@18.2.0)
-      react-router-dom:
-        specifier: 6.24.1
-        version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      react-transition-group:
-        specifier: 4.4.5
-        version: 4.4.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      styled-components:
-        specifier: 5.3.6
-        version: 5.3.6(react-dom@18.2.0(react@18.2.0))(react-is@18.3.1)(react@18.2.0)
-      uuid:
-        specifier: 14.0.0
-        version: 14.0.0
-    devDependencies:
-      '@types/lodash':
-        specifier: 4.17.24
-        version: 4.17.24
-      '@types/mixpanel-browser':
-        specifier: 2.35.6
-        version: 2.35.6
-      '@types/styled-components':
-        specifier: ^5.1.26
-        version: 5.1.36
-      axios-mock-adapter:
-        specifier: 1.22.0
-        version: 1.22.0(axios@0.21.4)
-      lost:
-        specifier: 8.3.1
-        version: 8.3.1
-      postcss-apply:
-        specifier: 0.12.0
-        version: 0.12.0
-      postcss-color-mod-function:
-        specifier: 3.0.3
-        version: 3.0.3
-      postcss-import:
-        specifier: 16.0.0
-        version: 16.0.0(postcss@8.5.6)
-      postcss-preset-env:
-        specifier: 9.3.0
-        version: 9.3.0(postcss@8.5.6)
-
   protocol-designer:
     dependencies:
       '@fontsource/public-sans':
@@ -1216,15 +1134,6 @@ packages:
 
   '@asamuzakjp/css-color@3.2.0':
     resolution: {integrity: sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==}
-
-  '@auth0/auth0-react@2.2.4':
-    resolution: {integrity: sha512-l29PQC0WdgkCoOc6WeMAY26gsy/yXJICW0jHfj0nz8rZZphYKrLNqTRWFFCMJY+sagza9tSgB1kG/UvQYgGh9A==}
-    peerDependencies:
-      react: ^16.11.0 || ^17 || ^18
-      react-dom: ^16.11.0 || ^17 || ^18
-
-  '@auth0/auth0-spa-js@2.11.1':
-    resolution: {integrity: sha512-4wzCuiNKwQ6fNuWqY0LIaoLO/vZ8PJEu/68X1ZAgxZRiysU3VrXRjGqxfCb9u2Q02w2A4tvDGY5+mg29FA10FA==}
 
   '@aws-crypto/crc32@5.2.0':
     resolution: {integrity: sha512-nLbCWqQNgUiwwtFsen1AdzAtvuLRsQS8rYgMuxCrdKf9kOssamGLuPwyTY9wyYblNr9+1XM8v6zoDTPPSIeANg==}
@@ -4559,11 +4468,6 @@ packages:
     resolution: {integrity: sha512-BASOg+YwO2C+346x3LZOeoovTIoTrRqEsqMa6fmfAV0P+U9mFr9NsyOEpiYvFjbc64NMrSswhV50WdXzdb/Z5A==}
     engines: {node: '>=4'}
 
-  axios-mock-adapter@1.22.0:
-    resolution: {integrity: sha512-dmI0KbkyAhntUR05YY96qg2H6gg0XMl2+qTW0xmYg6Up+BFBAJYRLROMXRdDEL06/Wqwa0TJThAYvFtSFdRCZw==}
-    peerDependencies:
-      axios: '>= 0.17.0'
-
   axios@0.21.4:
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
 
@@ -4696,9 +4600,6 @@ packages:
 
   browser-resolve@2.0.0:
     resolution: {integrity: sha512-7sWsQlYL2rGLy2IWm8WL8DCTJvYLc/qlOnsakDac87SOoCd16WLsaAMdCiAqsTNHIe+SXfaqyxyo6THoWqs8WQ==}
-
-  browser-tabs-lock@1.3.0:
-    resolution: {integrity: sha512-g6nHaobTiT0eMZ7jh16YpD2kcjAp+PInbiVq3M1x6KKaEIVhT4v9oURNIpZLOZ3LQbQ3XYfNhMAb/9hzNLIWrw==}
 
   browserify-aes@1.2.0:
     resolution: {integrity: sha512-+7CHXqGuspUn/Sl5aO7Ea0xWGAtETPXNSAjHo48JfLdPWcMng33Xe4znFvQweqc/uzk5zSOI3H52CYnjCfb5hA==}
@@ -5717,9 +5618,6 @@ packages:
     resolution: {integrity: sha512-ASRY5QhDk7FK+XrQtQyvhpDKanLluEEQtWl/J7Lxuf/b+i8RYh997QeXvL85xitrmRKVlx9c7eTrcRdq2GS4eA==}
     engines: {node: '>=10'}
 
-  dpop@2.1.1:
-    resolution: {integrity: sha512-J0Of2JTiM4h5si0tlbPQ/lkqfZ5wAEVkKYBhkwyyANnPJfWH4VsR5uIkZ+T+OSPIwDYUg1fbd5Mmodd25HjY1w==}
-
   draw-svg-path@1.0.0:
     resolution: {integrity: sha512-P8j3IHxcgRMcY6sDzr0QvJDLzBnJJqpTG33UZ2Pvp8rw0apCHhJCWqYprqrXjrgHnJ6tuhP1iTJSAodPDHxwkg==}
 
@@ -5879,9 +5777,6 @@ packages:
   es-abstract@1.24.1:
     resolution: {integrity: sha512-zHXBLhP+QehSSbsS9Pt23Gg964240DPd6QCf8WpkqEXxQ7fhdZzYsocOr5u7apWonsS5EjZDmTF+/slGMyasvw==}
     engines: {node: '>= 0.4'}
-
-  es-cookie@1.3.2:
-    resolution: {integrity: sha512-UTlYYhXGLOy05P/vKVT2Ui7WtC7NiRzGtJyAKKn32g5Gvcjn7KAClLPWlipCtxIus934dFg9o9jXiBL0nP+t9Q==}
 
   es-define-property@1.0.1:
     resolution: {integrity: sha512-e3nRfgfUZ4rNGL232gUgX06QNyyez04KdjFrF+LTRoOXmrOgFKDg4BCdsjW8EnT69eqdYGmRpJwiPVYNrCaW3g==}
@@ -7517,18 +7412,6 @@ packages:
   joi@18.1.2:
     resolution: {integrity: sha512-rF5MAmps5esSlhCA+N1b6IYHDw9j/btzGaqfgie522jS02Ju/HXBxamlXVlKEHAxoMKQL77HWI8jlqWsFuekZA==}
     engines: {node: '>= 20'}
-
-  jotai@2.8.0:
-    resolution: {integrity: sha512-yZNMC36FdLOksOr8qga0yLf14miCJlEThlp5DeFJNnqzm2+ZG7wLcJzoOyij5K6U6Xlc5ljQqPDlJRgqW0Y18g==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=17.0.0'
-      react: '>=17.0.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
 
   js-sdsl@4.3.0:
     resolution: {integrity: sha512-mifzlm2+5nZ+lEcLJMoBK0/IH/bDg8XnJfd/Wq6IP+xoCjLZsTOnV2QpxlVbX9bMnkl5PdEjNtBJ9Cj1NjifhQ==}
@@ -9230,12 +9113,6 @@ packages:
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
-
-  react-markdown@9.0.1:
-    resolution: {integrity: sha512-186Gw/vF1uRkydbsOIkcGXw7aHq0sZOCRFFjGrr7b9+nVZg4UfA4enXCaxm4fUzecU38sWfrNDitGhshuU7rdg==}
-    peerDependencies:
-      '@types/react': '>=18'
-      react: '>=18'
 
   react-markdown@9.0.3:
     resolution: {integrity: sha512-Yk7Z94dbgYTOrdk41Z74GoKA7rThnsbbqBTRYuxoe08qvfQ9tJVhmAKw6BJS/ZORG7kTy/s1QvYzSuaoBA1qfw==}
@@ -11259,18 +11136,6 @@ snapshots:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
-
-  '@auth0/auth0-react@2.2.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
-    dependencies:
-      '@auth0/auth0-spa-js': 2.11.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-
-  '@auth0/auth0-spa-js@2.11.1':
-    dependencies:
-      browser-tabs-lock: 1.3.0
-      dpop: 2.1.1
-      es-cookie: 1.3.2
 
   '@aws-crypto/crc32@5.2.0':
     dependencies:
@@ -15603,12 +15468,6 @@ snapshots:
 
   axe-core@4.11.1: {}
 
-  axios-mock-adapter@1.22.0(axios@0.21.4):
-    dependencies:
-      axios: 0.21.4
-      fast-deep-equal: 3.1.3
-      is-buffer: 2.0.5
-
   axios@0.21.4:
     dependencies:
       follow-redirects: 1.15.11
@@ -15763,10 +15622,6 @@ snapshots:
   browser-resolve@2.0.0:
     dependencies:
       resolve: 1.22.11
-
-  browser-tabs-lock@1.3.0:
-    dependencies:
-      lodash: 4.18.1
 
   browserify-aes@1.2.0:
     dependencies:
@@ -17013,8 +16868,6 @@ snapshots:
       p-event: 2.3.1
       pify: 4.0.1
 
-  dpop@2.1.1: {}
-
   draw-svg-path@1.0.0:
     dependencies:
       abs-svg-path: 0.1.1
@@ -17315,8 +17168,6 @@ snapshots:
       typed-array-length: 1.0.7
       unbox-primitive: 1.1.0
       which-typed-array: 1.1.19
-
-  es-cookie@1.3.2: {}
 
   es-define-property@1.0.1: {}
 
@@ -19330,11 +19181,6 @@ snapshots:
       '@hapi/tlds': 1.1.6
       '@hapi/topo': 6.0.2
       '@standard-schema/spec': 1.1.0
-
-  jotai@2.8.0(@types/react@18.2.51)(react@18.2.0):
-    optionalDependencies:
-      '@types/react': 18.2.51
-      react: 18.2.0
 
   js-sdsl@4.3.0: {}
 
@@ -21411,23 +21257,6 @@ snapshots:
   react-is@17.0.2: {}
 
   react-is@18.3.1: {}
-
-  react-markdown@9.0.1(@types/react@18.2.51)(react@18.2.0):
-    dependencies:
-      '@types/hast': 3.0.4
-      '@types/react': 18.2.51
-      devlop: 1.1.0
-      hast-util-to-jsx-runtime: 2.3.6
-      html-url-attributes: 3.0.1
-      mdast-util-to-hast: 13.2.1
-      react: 18.2.0
-      remark-parse: 11.0.0
-      remark-rehype: 11.1.2
-      unified: 11.0.5
-      unist-util-visit: 5.0.0
-      vfile: 6.0.3
-    transitivePeerDependencies:
-      - supports-color
 
   react-markdown@9.0.3(@types/react@18.2.51)(react@18.2.0):
     dependencies:
