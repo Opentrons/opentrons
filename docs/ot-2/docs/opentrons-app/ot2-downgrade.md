@@ -12,7 +12,9 @@ For Flex, see [Downgrading Flex Software](../../flex/opentrons-app/flex-downgrad
 
 ## Operating system versions
 
-Previous versions of the OT-2 robot operating system (and Opentrons App) are available on Github at <https://github.com/Opentrons/opentrons/releases>.
+Following the release of robot software v9.0, Opentrons is forking its robot operating system and Opentrons App into separate repositories for the OT-2 and Flex robots. The software for the downgrade procedure described here is available on GitHub at <https://github.com/Opentrons/opentrons/releases>.
+
+This change also introduces a significant increment in operating system versions number for the OT-2. After v9.0, the robot software version for the OT-2 jumps to v26.06. Version 26.06 starts a dedicated OT-2 track to provide targeted updates and reduce unnecessary downtime associated with unnecessary upgrades associated with shared software.
 
 ## Robot downgrade instructions
 
