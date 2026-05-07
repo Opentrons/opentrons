@@ -12,6 +12,11 @@ interface StepGroupProps {
   handleClick: () => void
   children: ReactNode
   subtitle?: string
+  /**
+   * Leftmost column before headerLeading / title (e.g. status icon).
+   * Clicks do not toggle expand/collapse. 8px gap before the title block.
+   */
+  headerPrefixIcon?: ReactNode
   /** Rendered 4px left of the title; clicks do not toggle expand/collapse */
   headerLeading?: ReactNode
   /** Rendered before the expand chevron; clicks do not toggle expand/collapse */
@@ -28,6 +33,7 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
     isActive,
     handleClick,
     children,
+    headerPrefixIcon,
     headerLeading,
     headerTrailing,
     titleColor,
@@ -36,6 +42,57 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
   const handleChildrenClick: MouseEventHandler<HTMLDivElement> = event => {
     event.stopPropagation()
   }
+
+  const titleBlockClassName =
+    headerLeading != null
+      ? styles.step_group_title_block_grid
+      : styles.step_group_title_block_stacked
+
+  const titleArea = (
+    <div className={titleBlockClassName}>
+      {headerLeading != null ? (
+        <>
+          <div
+            className={styles.step_group_leading}
+            onClick={event => {
+              event.stopPropagation()
+            }}
+          >
+            {headerLeading}
+          </div>
+          <div className={styles.step_group_title_line}>
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              color={titleColor}
+            >
+              {title}
+            </StyledText>
+          </div>
+          {subtitle != null ? (
+            <div className={styles.step_group_subtitle_line}>
+              <StyledText
+                desktopStyle="captionRegular"
+                color={COLORS.grey60}
+              >
+                {subtitle}
+              </StyledText>
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <div className={styles.step_group_title_content}>
+          <StyledText desktopStyle="bodyDefaultRegular" color={titleColor}>
+            {title}
+          </StyledText>
+          {subtitle != null ? (
+            <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+              {subtitle}
+            </StyledText>
+          ) : null}
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <div
@@ -46,55 +103,21 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
       }}
     >
       <div className={styles.step_group_header} onClick={handleClick}>
-        <div
-          className={
-            headerLeading != null
-              ? styles.step_group_title_block_grid
-              : styles.step_group_title_block_stacked
-          }
-        >
-          {headerLeading != null ? (
-            <>
-              <div
-                className={styles.step_group_leading}
-                onClick={event => {
-                  event.stopPropagation()
-                }}
-              >
-                {headerLeading}
-              </div>
-              <div className={styles.step_group_title_line}>
-                <StyledText
-                  desktopStyle="bodyDefaultSemiBold"
-                  color={titleColor}
-                >
-                  {title}
-                </StyledText>
-              </div>
-              {subtitle != null ? (
-                <div className={styles.step_group_subtitle_line}>
-                  <StyledText
-                    desktopStyle="captionRegular"
-                    color={COLORS.grey60}
-                  >
-                    {subtitle}
-                  </StyledText>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <div className={styles.step_group_title_content}>
-              <StyledText desktopStyle="bodyDefaultRegular" color={titleColor}>
-                {title}
-              </StyledText>
-              {subtitle != null ? (
-                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                  {subtitle}
-                </StyledText>
-              ) : null}
+        {headerPrefixIcon != null ? (
+          <div className={styles.step_group_header_left}>
+            <div
+              className={styles.step_group_prefix}
+              onClick={event => {
+                event.stopPropagation()
+              }}
+            >
+              {headerPrefixIcon}
             </div>
-          )}
-        </div>
+            {titleArea}
+          </div>
+        ) : (
+          titleArea
+        )}
         <div className={styles.step_group_header_right}>
           {headerTrailing != null ? (
             <div

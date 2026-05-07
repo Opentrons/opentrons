@@ -42,41 +42,50 @@ export function IndividualCommand({
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
   useEffect(() => {
-    if (isHighlighted && commandRef.current && command.id === scrollTargetId) {
-      requestAnimationFrame(() => {
-        const container =
-          listElement ?? commandRef.current?.closest('[role="list"]')
-        if (container == null) {
-          commandRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest',
-          })
-          return
-        }
-        const containerRect = container.getBoundingClientRect()
-        const commandRect = commandRef.current?.getBoundingClientRect()
-        if (commandRect == null) return
-        const isBelow = commandRect.bottom >= containerRect.bottom - 8
-        const isAbove = commandRect.top <= containerRect.top + 1
-        if (!isBelow && !isAbove) return
-        if (container instanceof HTMLElement) {
-          const nextTop =
-            container.scrollTop + (commandRect.top - containerRect.top)
-          container.scrollTo({
-            behavior: 'smooth',
-            top: Math.max(0, nextTop),
-          })
-          return
-        }
-        commandRef.current?.scrollIntoView({
+    if (!isHighlighted || commandRef.current == null) return
+    if (command.id !== scrollTargetId) return
+
+    requestAnimationFrame(() => {
+      const commandEl = commandRef.current
+      if (commandEl == null) return
+
+      const groupExpandedEl =
+        fromGroup === true
+          ? commandEl.closest<HTMLElement>(
+              `.${styles.annotated_group_expanded}`
+            )
+          : null
+
+      const container: HTMLElement | undefined =
+        groupExpandedEl instanceof HTMLElement
+          ? groupExpandedEl
+          : listElement ??
+            commandEl.closest<HTMLElement>('[role="list"]') ??
+            undefined
+
+      if (container == null) {
+        commandEl.scrollIntoView({
           behavior: 'smooth',
-          block: isBelow ? 'start' : 'nearest',
+          block: 'nearest',
           inline: 'nearest',
         })
+        return
+      }
+
+      const containerRect = container.getBoundingClientRect()
+      const commandRect = commandEl.getBoundingClientRect()
+      const isBelow = commandRect.bottom >= containerRect.bottom - 8
+      const isAbove = commandRect.top <= containerRect.top + 1
+      if (!isBelow && !isAbove) return
+
+      const nextTop =
+        container.scrollTop + (commandRect.top - containerRect.top)
+      container.scrollTo({
+        behavior: 'smooth',
+        top: Math.max(0, nextTop),
       })
-    }
-  }, [isHighlighted, scrollTargetId, command, listElement])
+    })
+  }, [isHighlighted, scrollTargetId, command.id, listElement, fromGroup])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
     [styles.individual_command_wrap_from_group]: fromGroup && !isHighlighted,

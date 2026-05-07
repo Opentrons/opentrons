@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { COLORS, StepGroup } from '@opentrons/components'
+import { COLORS, Icon, StepGroup } from '@opentrons/components'
 
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
@@ -25,6 +25,8 @@ interface AnnotatedGroupProps {
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
   handlePause?: () => void
   headerLeading?: ReactNode | null
+  // rendered after sub-commands when analysis failed inside this annotation group
+  trailingErrorsFooter?: ReactNode | null
 }
 export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const {
@@ -39,13 +41,19 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     listElement,
     annotationDescription,
     headerLeading,
+    trailingErrorsFooter,
   } = props
-  const [isExpanded, setIsExpanded] = useState(() =>
-    subCommands.some(command => command.isHighlighted)
+  const hasTrailingErrors = trailingErrorsFooter != null
+
+  const [isExpanded, setIsExpanded] = useState(
+    () =>
+      subCommands.some(command => command.isHighlighted) || hasTrailingErrors
   )
   useEffect(() => {
-    setIsExpanded(subCommands.some(command => command.isHighlighted))
-  }, [subCommands])
+    setIsExpanded(
+      subCommands.some(command => command.isHighlighted) || hasTrailingErrors
+    )
+  }, [subCommands, hasTrailingErrors])
 
   const handleClick = (): void => {
     setIsExpanded(!isExpanded)
@@ -64,6 +72,15 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
         handleClick={handleClick}
         isActive={isAnyStepHighlighted}
         subtitle={annotationDescription}
+        headerPrefixIcon={
+          hasTrailingErrors ? (
+            <Icon
+              name="ot-alert"
+              size="1rem"
+              color={isAnyStepHighlighted ? COLORS.purple50 : COLORS.red60}
+            />
+          ) : undefined
+        }
         headerLeading={headerLeading}
         {...(isAnyStepHighlighted ? { titleColor: COLORS.purple50 } : {})}
       >
@@ -83,6 +100,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
                 setSelectedCommand={setSelectedCommand}
               />
             ))}
+            {trailingErrorsFooter}
           </div>
         ) : null}
       </StepGroup>
