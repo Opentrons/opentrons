@@ -40,8 +40,10 @@ describe('BeforeBeginning', () => {
   it('returns the correct information for attach flow', async () => {
     render(props)
     screen.getByText('Before you begin')
-    screen.getByText(
-      'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+    expect(
+      screen.getByText('remove all labware from the deck').closest('p')
+    ).toHaveTextContent(
+      'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
     )
     screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
@@ -78,8 +80,10 @@ describe('BeforeBeginning', () => {
     props = { ...props, flowType: GRIPPER_FLOW_TYPES.DETACH }
     render(props)
     screen.getByText('Before you begin')
-    screen.getByText(
-      'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+    expect(
+      screen.getByText('remove all labware from the deck').closest('p')
+    ).toHaveTextContent(
+      'To get started, remove all labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
     )
     screen.getByText('You will need:')
     screen.getByText('2.5 mm Hex Screwdriver')
@@ -108,8 +112,10 @@ describe('BeforeBeginning', () => {
     props = { ...props, flowType: GRIPPER_FLOW_TYPES.RECALIBRATE }
     render(props)
     screen.getByText('Before you begin')
-    screen.getByText(
-      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+    expect(
+      screen.getByText('remove all labware from the deck').closest('p')
+    ).toHaveTextContent(
+      'To get started, remove all labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
