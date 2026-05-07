@@ -3,7 +3,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
-  COLORS,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
   setRefs,
@@ -113,8 +112,9 @@ export function OnDeviceLogin({
               as="label"
               htmlFor={activeFieldName}
               oddStyle="bodyTextRegular"
-              className={styles.field_label}
-              color={passwordLabelHasError ? COLORS.red50 : COLORS.black90}
+              className={`${styles.field_label}${
+                passwordLabelHasError ? ` ${styles.field_label_error}` : ''
+              }`}
             >
               {step === 'username'
                 ? t('device_settings:username')

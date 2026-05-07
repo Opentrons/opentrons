@@ -27,6 +27,10 @@
   align-self: flex-start;
 }
 
+.field_label.field_label_error {
+  color: var(--red-50);
+}
+
 .password_field_row {
   display: flex;
   width: 100%;
