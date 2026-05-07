@@ -138,6 +138,9 @@ jobs:
   determine-build-type:
     runs-on: 'ubuntu-latest'
     name: 'Determine build variant and type'
+    permissions:
+      actions: read
+      contents: read
     outputs:
       variants: ${{steps.determine-build-type.outputs.variants}}
       type: ${{steps.determine-build-type.outputs.type}}
@@ -166,9 +169,37 @@ jobs:
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
-            echo "both develop builds for edge"
-            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
+            # Edge pushes: at most one full develop build (robot-stack + ot3) per UTC day.
+            # First push that day runs build+deploy; later pushes still run unit tests only.
+            # schedule / workflow_dispatch always run full develop builds.
+            if [ "${{ github.event_name }}" = "push" ] ; then
+              TODAY="$(date -u +%Y-%m-%d)"
+              RUN_ID="${{ github.run_id }}"
+              API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/app-test-build-deploy.yaml/runs?branch=edge&event=push&per_page=50"
+              if ! RESP="$(curl -fsS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "${API_URL}")"; then
+                echo "⚠️ Could not list workflow runs; allowing develop build (fail open)"
+                EARLIER=0
+              else
+                EARLIER="$(echo "${RESP}" | jq --arg today "${TODAY}" --argjson rid "${RUN_ID}" '[.workflow_runs[] | select(.created_at | startswith($today)) | select(.id < $rid)] | length')"
+              fi
+              if ! [[ "${EARLIER}" =~ ^[0-9]+$ ]]; then
+                echo "⚠️ Unexpected API response; allowing develop build (fail open)"
+                EARLIER=0
+              fi
+              if [ "${EARLIER}" -gt 0 ]; then
+                echo "edge push: another workflow run for this workflow on edge already started earlier today (UTC); skipping develop build"
+                echo 'variants=[]' >> $GITHUB_OUTPUT
+                echo 'type=develop' >> $GITHUB_OUTPUT
+              else
+                echo "edge push: develop build (first push today in UTC, or no earlier run detected)"
+                echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
+                echo 'type=develop' >> $GITHUB_OUTPUT
+              fi
+            else
+              echo "both develop builds for edge (${{ github.event_name }})"
+              echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
+              echo 'type=develop' >> $GITHUB_OUTPUT
+            fi
           elif [ "${{ format('{0}', contains(github.ref, 'app-build-internal')) }}" = "true" ] ; then
 
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
