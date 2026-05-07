@@ -1,6 +1,0 @@
-*.py[cod]
-*.egg
-build
-htmlcov
-
-abr_testing/_version.py

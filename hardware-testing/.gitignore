@@ -1,6 +1,0 @@
-.pulled-data/*
-*.tar.gz
-*.zip
-.hardware-testing-description
-ot3-firmware/
-hardware_testing/_version.py

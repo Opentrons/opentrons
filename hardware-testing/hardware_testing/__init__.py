@@ -1,1 +1,0 @@
-"""Hardware Testing support package."""

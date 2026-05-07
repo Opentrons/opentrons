@@ -173,11 +173,6 @@ push:
 	sleep 1
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 
-.PHONY: push-folder
-PUSH_HELPER := abr-testing/abr_testing/tools/make_push.py
-push-folder:
-	$(OT_PYTHON) $(PUSH_HELPER)
-
 .PHONY: push-ot3
 push-ot3:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
@@ -256,7 +251,7 @@ lint-js-prettier:
 lint-json:
 # todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
 # when the file supports it (upgrade eslint and/or move away from legacy config format)
-	pnpm exec eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+	pnpm exec eslint --report-unused-disable-directives-severity error --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
