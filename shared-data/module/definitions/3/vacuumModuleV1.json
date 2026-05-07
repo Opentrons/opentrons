@@ -3,56 +3,56 @@
   "moduleType": "vacuumModuleType",
   "model": "vacuumModuleV1",
   "labwareOffset": {
-    "x": 999999,
-    "y": 999999,
-    "z": 999999
+    "x": 10,
+    "y": 0,
+    "z": 0
   },
   "features": {},
   "dimensions": {
-    "bareOverallHeight": 999999,
-    "overLabwareHeight": 999999,
-    "xDimension": 999999,
-    "yDimension": 999999,
-    "footprintXDimension": 128,
-    "footprintYDimension": 86,
+    "bareOverallHeight": 95,
+    "overLabwareHeight": 12,
+    "xDimension": 450,
+    "yDimension": 107,
+    "footprintXDimension": 450,
+    "footprintYDimension": 107,
     "labwareInterfaceXDimension": 128,
     "labwareInterfaceYDimension": 86
   },
   "extents": {
     "total": {
       "backLeftBottom": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": -18,
+        "y": 1.8,
+        "z": 0
       },
       "frontRightTop": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": 274,
+        "y": -105.2,
+        "z": 95
       }
     }
   },
   "cornerOffsetFromSlot": {
-    "x": 999999,
-    "y": 999999,
-    "z": 999999
+    "x": -18,
+    "y": -1.8,
+    "z": 0
   },
   "calibrationPoint": {
-    "x": 999999,
-    "y": 999999,
-    "z": 999999
+    "x": 64,
+    "y": 43,
+    "z": 55
   },
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
       "dropOffset": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": 0,
+        "y": 0,
+        "z": 1
       }
     }
   },

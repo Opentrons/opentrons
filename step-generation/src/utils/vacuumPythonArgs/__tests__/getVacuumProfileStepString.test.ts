@@ -10,7 +10,9 @@ describe('getVacuumProfileStepString', () => {
   const indentedPowerStep = '    {"power_percent": 30, "hold_time_seconds": 5}'
 
   it('formats a single atomic pressure step with repetitions=1', () => {
-    const profile: VacuumProfile = [{ holdSeconds: 12, pressureMbar: 55 }]
+    const profile: VacuumProfile = [
+      { enablePump: true, holdSeconds: 12, gaugePressureMbar: 55 },
+    ]
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[\n${indentedPressureStep}\n]`,
       'repetitions=1',
@@ -18,7 +20,9 @@ describe('getVacuumProfileStepString', () => {
   })
 
   it('formats a single atomic power step with repetitions=1', () => {
-    const profile: VacuumProfile = [{ holdSeconds: 5, powerPercent: 30 }]
+    const profile: VacuumProfile = [
+      { enablePump: true, holdSeconds: 5, percentPower: 30 },
+    ]
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[\n${indentedPowerStep}\n]`,
       'repetitions=1',
@@ -29,7 +33,7 @@ describe('getVacuumProfileStepString', () => {
     const profile: VacuumProfile = [
       {
         repetitions: 2,
-        steps: [{ holdSeconds: 5, powerPercent: 30 }],
+        steps: [{ enablePump: true, holdSeconds: 5, percentPower: 30 }],
       },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
@@ -40,8 +44,8 @@ describe('getVacuumProfileStepString', () => {
 
   it('flattens multiple top-level atomic steps and sets repetitions=1', () => {
     const profile: VacuumProfile = [
-      { holdSeconds: 1, pressureMbar: 10 },
-      { holdSeconds: 2, pressureMbar: 20 },
+      { enablePump: true, holdSeconds: 1, gaugePressureMbar: 10 },
+      { enablePump: true, holdSeconds: 2, gaugePressureMbar: 20 },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[\n    {"gauge_pressure": 10, "hold_time_seconds": 1},\n    {"gauge_pressure": 20, "hold_time_seconds": 2}\n]`,
@@ -51,10 +55,10 @@ describe('getVacuumProfileStepString', () => {
 
   it('expands a cycle by repetitions when not sole top-level cycle', () => {
     const profile: VacuumProfile = [
-      { holdSeconds: 1, pressureMbar: 100 },
+      { enablePump: true, holdSeconds: 1, gaugePressureMbar: 100 },
       {
         repetitions: 2,
-        steps: [{ holdSeconds: 5, powerPercent: 30 }],
+        steps: [{ enablePump: true, holdSeconds: 5, percentPower: 30 }],
       },
     ]
     expect(getVacuumProfileStepString(profile)).toEqual([
@@ -68,8 +72,8 @@ describe('getVacuumProfileStepString', () => {
       {
         repetitions: 2,
         steps: [
-          { holdSeconds: 1, pressureMbar: 1 },
-          { holdSeconds: 2, powerPercent: 50 },
+          { enablePump: true, holdSeconds: 1, gaugePressureMbar: 1 },
+          { enablePump: true, holdSeconds: 2, percentPower: 50 },
         ],
       },
     ]

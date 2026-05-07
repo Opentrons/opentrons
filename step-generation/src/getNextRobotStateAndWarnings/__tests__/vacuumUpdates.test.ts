@@ -632,7 +632,7 @@ describe('forVacuumStopPump', () => {
 })
 
 const sampleVacuumProfile: VacuumModuleStartRunProfileCreateCommand['params']['profile'] =
-  [{ holdSeconds: 2, pressureMbar: 150 }]
+  [{ enablePump: true, holdSeconds: 2, gaugePressureMbar: 150 }]
 
 describe('forVacuumStartRunProfile', () => {
   it('sets profile activity and increments numPumpActivitiesStarted when module and taskId are present', () => {
@@ -648,7 +648,6 @@ describe('forVacuumStartRunProfile', () => {
         moduleId: vacuumModuleId,
         profile: sampleVacuumProfile,
         taskId: vacuumTaskId,
-        ventAfter: false,
       },
       invariantContext,
       robot
@@ -660,7 +659,7 @@ describe('forVacuumStartRunProfile', () => {
       type: 'profile',
       profileElements: sampleVacuumProfile,
       taskId: vacuumTaskId,
-      ventAfter: false,
+      ventAfter: true,
     })
     expect(updated.numPumpActivitiesStarted).toBe(1)
     expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
