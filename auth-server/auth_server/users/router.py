@@ -190,8 +190,8 @@ async def update_user(
     path="/auth/users/self",
     summary="Get the currently logged-in user",
     description=(
-        'The "currently logged-in user" is determined from the OAuth 2 authorization'
-        " token that you attach to your request to this endpoint."
+        'The "currently logged-in user" is determined from the OAuth 2 access token'
+        " that you attach to your request to this endpoint."
         " See the `/auth/oauth2` endpoints."
     ),
     responses={fastapi.status.HTTP_401_UNAUTHORIZED: {}},
