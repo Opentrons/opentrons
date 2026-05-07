@@ -59,9 +59,9 @@ export function IndividualCommand({
       const container: HTMLElement | undefined =
         groupExpandedEl instanceof HTMLElement
           ? groupExpandedEl
-          : listElement ??
+          : (listElement ??
             commandEl.closest<HTMLElement>('[role="list"]') ??
-            undefined
+            undefined)
 
       if (container == null) {
         commandEl.scrollIntoView({
