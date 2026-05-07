@@ -19,8 +19,8 @@ from opentrons.protocol_engine import (
     Liquid,
     LoadedLabware,
     LoadedModule,
-    LoadedPipette,
     LoadedPeripheral,
+    LoadedPipette,
     StateSummary,
     commands,
 )
