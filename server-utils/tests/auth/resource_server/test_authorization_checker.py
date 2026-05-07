@@ -9,6 +9,7 @@ from server_utils.auth.resource_server.auth_server import (
 )
 from server_utils.auth.resource_server.authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
+    AuthorizationNotRequiredResult,
     AuthorizedResult,
     AuthServerAuthorizationChecker,
     InsufficientScopeResult,
@@ -23,19 +24,14 @@ class TestAlwaysAllowedAuthorizationChecker:
         subject = AlwaysAllowedAuthorizationChecker()
         assert (
             await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
-            == AuthorizedResult()
+            == AuthorizationNotRequiredResult()
         )
         assert (
             await subject.check(
                 token="token-abc123", required_scopes={Scope.USERS_WRITE}
             )
-            == AuthorizedResult()
+            == AuthorizationNotRequiredResult()
         )
-
-    async def test_get_username(self) -> None:
-        subject = AlwaysAllowedAuthorizationChecker()
-        assert await subject.get_username(None) is None
-        assert await subject.get_username("test-username") is None
 
 
 class TestAuthServerAuthorizationChecker:
@@ -67,7 +63,7 @@ class TestAuthServerAuthorizationChecker:
         )
         assert (
             await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
-            == AuthorizedResult()
+            == AuthorizationNotRequiredResult()
         )
 
     async def test_check_given_a_token(self, mock_client: Client, decoy: Decoy) -> None:
@@ -79,14 +75,12 @@ class TestAuthServerAuthorizationChecker:
             TokenIntrospectionResponse(
                 active=True,
                 scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}),
+                username="test-username",
             )
         )
-        assert (
-            await subject.check(
-                "test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}
-            )
-            == AuthorizedResult()
-        )
+        assert await subject.check(
+            "test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}
+        ) == AuthorizedResult(username="test-username")
 
         # Inactive -> do not authorize
         decoy.when(await mock_client.introspect_token("test-token-abc123")).then_return(
@@ -111,22 +105,3 @@ class TestAuthServerAuthorizationChecker:
         assert await subject.check(
             "test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}
         ) == InsufficientScopeResult(provided_scopes={Scope.ROBOT_CONTROL_WRITE})
-
-    async def test_get_username_given_no_token(self, mock_client: Client) -> None:
-        """It should return "no username" if not given a token."""
-        subject = AuthServerAuthorizationChecker(mock_client)
-        assert await subject.get_username(token=None) is None
-
-    async def test_get_username_given_a_token(
-        self, mock_client: Client, decoy: Decoy
-    ) -> None:
-        """It should pass the token to the client and return the username it gets back."""
-        subject = AuthServerAuthorizationChecker(mock_client)
-        decoy.when(await mock_client.introspect_token("test-token-abc123")).then_return(
-            TokenIntrospectionResponse(active=False, username=None)
-        )
-        assert await subject.get_username(token="test-token-abc123") is None
-        decoy.when(await mock_client.introspect_token("test-token-abc123")).then_return(
-            TokenIntrospectionResponse(active=False, username="test-username")
-        )
-        assert await subject.get_username(token="test-token-abc123") == "test-username"

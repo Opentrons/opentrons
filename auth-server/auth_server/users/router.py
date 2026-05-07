@@ -2,11 +2,11 @@ from typing import Annotated
 
 import fastapi
 
-from server_utils.auth.resource_server.authorization_checker import AuthorizedResult
+from server_utils.auth.resource_server.authorization_checker import (
+    AuthorizationNotRequiredResult,
+)
 from server_utils.auth.resource_server.fastapi import (
-    AuthorizationError,
-    RequestAuthorization,
-    get_authorization,
+    RequireScopesResult,
     require_scopes,
 )
 from server_utils.auth.scopes import Scope
@@ -81,35 +81,15 @@ async def post_users(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ_OTHERS))],
 )
 async def get_user(
     userName: str,
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
-    request_authorization: Annotated[
-        RequestAuthorization,
-        fastapi.Depends(
-            get_authorization(
-                # OpenAPI doesn't have a machine-readable way to describe how
-                # these scopes work conditionally, so we'll just list them all.
-                scopes_for_openapi={Scope.USERS_READ_SELF, Scope.USERS_READ_OTHERS}
-            )
-        ),
-    ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
-    token, authorization_checker = request_authorization
-    authorized_as_username = await authorization_checker.get_username(token)
-    required_scopes = (
-        {Scope.USERS_READ_SELF}
-        if userName == authorized_as_username
-        else {Scope.USERS_READ_OTHERS}
-    )
-    authorization_result = await authorization_checker.check(token, required_scopes)
-    if not isinstance(authorization_result, AuthorizedResult):
-        raise AuthorizationError(authorization_result, required_scopes)
-
     try:
         user = user_data_manager.get_user(userName)
     except UserNotFoundError:
@@ -202,4 +182,40 @@ async def update_user(
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=updated_user),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/auth/users/self",
+    summary="Get the currently logged-in user",
+    description=(
+        'The "currently logged-in user" is determined from the OAuth 2 authorization'
+        " token that you attach to your request to this endpoint."
+        " See the `/auth/oauth2` endpoints."
+    ),
+    responses={fastapi.status.HTTP_401_UNAUTHORIZED: {}},
+)
+async def get_self(  # noqa: D103
+    authorization_details: Annotated[
+        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_READ_SELF))
+    ],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
+) -> PydanticResponse[SimpleBody[UserResponse]]:
+    if isinstance(authorization_details, AuthorizationNotRequiredResult):
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="This endpoint needs an access token to determine the current user.",
+        )
+
+    # Note: No try/except for UserNotFoundError. If the user passed `require_scopes()`,
+    # but we can't find them here, then that's some kind of server bug and we want to
+    # let it propagate with HTTP error code 500.
+    user = user_data_manager.get_user(authorization_details.username)
+
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(data=user),
     )

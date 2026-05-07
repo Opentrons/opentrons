@@ -1,7 +1,7 @@
 """FastAPI-specific helpers for enforcing authorization."""
 
 # NOTE: Don't do `from __future__ import annotations` in this file.
-# See comments in `get_authorization()`.
+# See comments in `require_scopes()`.
 
 import logging
 from contextlib import asynccontextmanager
@@ -11,7 +11,7 @@ from typing import (
     Awaitable,
     Callable,
     Final,
-    NamedTuple,
+    TypeAlias,
 )
 
 import fastapi
@@ -22,6 +22,7 @@ from .auth_server import TOKEN_ENDPOINT_PATH, LocalHTTPClient
 from .authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     AuthorizationChecker,
+    AuthorizationNotRequiredResult,
     AuthorizedResult,
     AuthServerAuthorizationChecker,
     InsufficientScopeResult,
@@ -53,24 +54,44 @@ _authorization_checker_accessor = AppStateAccessor[AuthorizationChecker](
 )
 
 
-def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
-    """The main, high-level way for a FastAPI endpoint to enforce access control.
+RequireScopesResult: TypeAlias = AuthorizationNotRequiredResult | AuthorizedResult
 
-    Use this as a FastAPI dependency, like so:
+
+def require_scopes(
+    *required_scopes: Scope,
+) -> Callable[..., Awaitable[RequireScopesResult]]:
+    """A FastAPI dependency to enforce access control.
+
+    Use like so:
 
     ```
     @router.post(
         "/foo",
         # The client must have READ_FOO and WRITE_FOO permissions.
-        dependencies=[require_scopes(Scope.READ_FOO, Scope.WRITE_FOO)],
+        dependencies=[Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO))],
     )
     def get_foo(...) -> None:
         ...
     ```
 
-    If access control is enabled on this robot, and the client lacks authorization,
-    this rejects the request with an appropriate HTTP error response.
-    The endpoint function will not run.
+    Or, for more advanced cases where you need more authorization details:
+
+    ```
+    @router.post("/foo")
+    def get_foo(
+        # The client must have READ_FOO and WRITE_FOO permissions.
+        authorization_details: Annotated[
+            RequireScopesResult,
+            Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO))
+        ]
+    ) -> None:
+        # Here you can check authorization_details.
+        ...
+    ```
+
+    In either case, this dependency checks to see if the request is authorized for
+    all of the `required_scopes`. If so, it lets your endpoint function run.
+    Otherwise, it rejects the request with an appropriate HTTP error.
 
     This also automatically adds documentation to the OpenAPI document to say
     that the endpoint requires these scopes.
@@ -78,48 +99,6 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
     required_scopes_set = set(required_scopes)
 
     async def dependency(
-        request_authorization: Annotated[
-            RequestAuthorization,
-            fastapi.Depends(get_authorization(scopes_for_openapi=required_scopes_set)),
-        ],
-    ) -> None:
-        unvalidated_token, authorization_checker = request_authorization
-        authorization_result = await authorization_checker.check(
-            token=unvalidated_token, required_scopes=required_scopes_set
-        )
-        if isinstance(authorization_result, AuthorizedResult):
-            pass  # The request is authorized, yay.
-        else:
-            raise AuthorizationError(authorization_result, required_scopes_set)
-
-    return dependency
-
-
-class RequestAuthorization(NamedTuple):  # noqa: D101
-    unvalidated_token: str | None
-    """The OAuth 2 access token carried by the request, if any.
-
-    The token has not been validated at this point! It may be forged, expired, etc.
-    Pass it to `authorization_checker` to check.
-    """
-
-    authorization_checker: AuthorizationChecker
-
-
-def get_authorization(
-    *, scopes_for_openapi: set[Scope]
-) -> Callable[..., RequestAuthorization]:
-    """Return lower-level information about how a request was authorized.
-
-    This is for endpoints that need custom authorization logic. Most endpoints do not
-    need this and should use `require_scopes()`, which is higher-level, instead.
-
-    Params:
-        scopes_for_openapi: In the OpenAPI document, the endpoint will be documented
-            as requiring these scopes. This has no effect other than documentation.
-    """
-
-    def dependency(
         # This retrieves the request's bearer token, by depending on `_oauth_2_scheme`;
         # and it adds OpenAPI docs to list which scopes the endpoint requires,
         # by supplying the `scopes` argument.
@@ -133,14 +112,24 @@ def get_authorization(
             str | None,
             fastapi.Security(
                 _oauth_2_scheme,
-                scopes=sorted(scope.api_name for scope in scopes_for_openapi),
+                scopes=sorted(scope.api_name for scope in required_scopes_set),
             ),
         ],
         authorization_checker: Annotated[
             AuthorizationChecker, fastapi.Depends(get_authorization_checker)
         ],
-    ) -> RequestAuthorization:
-        return RequestAuthorization(bearer_token, authorization_checker)
+    ) -> RequireScopesResult:
+        authorization_result = await authorization_checker.check(
+            token=bearer_token, required_scopes=required_scopes_set
+        )
+        if isinstance(
+            authorization_result, (AuthorizationNotRequiredResult, AuthorizedResult)
+        ):
+            # The request is authorized, yay.
+            return authorization_result
+        else:
+            # The request is not authorized.
+            raise AuthorizationError(authorization_result, required_scopes_set)
 
     return dependency
 
@@ -201,10 +190,8 @@ def get_authorization_checker(
 class AuthorizationError(Exception):
     """Raised to signal that an HTTP authorization failure should be returned to the client.
 
-    Most endpoints should not deal with this directly. This is automatically raised by
-    `require_scopes()` and caught by `handle_authorization_error()`. An endpoint should
-    only raise this manually if it's implementing custom authorization logic--see
-    `get_authorization()`.
+    Endpoints should not deal with this directly. Instead, they should use the
+    higher-level `require_scopes()` function.
     """
 
     def __init__(

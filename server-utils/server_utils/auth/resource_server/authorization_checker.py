@@ -29,20 +29,6 @@ class AuthorizationChecker(ABC):
         """
         pass
 
-    @abstractmethod
-    async def get_username(self, token: str | None) -> str | None:
-        """Return the user who issued a request, if known.
-
-        This is intended for the rare cases where an endpoint needs to apply different
-        access control depending on who issued the request. Most endpoints should not
-        do this--they should pass a hard-coded list of scopes to `check()` instead.
-
-        Params:
-            token: The OAuth 2 access token carried by the request,
-                or `None` if it didn't carry such a token.
-        """
-        pass
-
 
 class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that always allows access."""
@@ -50,12 +36,7 @@ class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     @override
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
         """See base class for documentation."""
-        return AuthorizedResult()
-
-    @override
-    async def get_username(self, token: str | None) -> str | None:
-        """See base class for documentation."""
-        return None
+        return AuthorizationNotRequiredResult()
 
 
 class AuthServerAuthorizationChecker(AuthorizationChecker):
@@ -76,36 +57,43 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
             if access_control_enabled:
                 return MissingTokenResult()
             else:
-                return AuthorizedResult()
+                return AuthorizationNotRequiredResult()
 
         else:
             token_info = await self._client.introspect_token(token)
-            provided_scopes = parse_scopes(token_info.scope)
 
+            provided_scopes = parse_scopes(token_info.scope)
             missing_scopes = required_scopes - provided_scopes
 
             if not token_info.active:
                 return NotAnActiveTokenResult()
             elif missing_scopes:
                 return InsufficientScopeResult(provided_scopes)
+            elif token_info.username is None:
+                # This should never happen in practice. Although token_info.username is
+                # optional according to the OAuth 2 specs, our implementation in
+                # auth-server should always return it.
+                raise RuntimeError(
+                    "Username not present in token introspection response."
+                    " This is a bug in auth-server."
+                )
             else:
-                return AuthorizedResult()
+                return AuthorizedResult(username=token_info.username)
 
-    @override
-    async def get_username(self, token: str | None) -> str | None:
-        """See base class for documentation."""
-        if token is None:
-            return None
-        else:
-            token_info = await self._client.introspect_token(token)
-            return token_info.username
+
+@dataclass
+class AuthorizationNotRequiredResult:
+    """Authorization was neither provided nor required--access control mode is disabled."""
+
+    pass
 
 
 @dataclass
 class AuthorizedResult:
-    """The request is authorized, or no authorization is required."""
+    """The request is authorized with a valid access token."""
 
-    pass
+    username: str
+    """The user who issued the request."""
 
 
 @dataclass
@@ -131,7 +119,8 @@ class NotAnActiveTokenResult:
 
 
 Result: TypeAlias = (
-    AuthorizedResult
+    AuthorizationNotRequiredResult
+    | AuthorizedResult
     | InsufficientScopeResult
     | MissingTokenResult
     | NotAnActiveTokenResult
