@@ -13,12 +13,12 @@ import {
 import type { Dispatch, SetStateAction } from 'react'
 import type { RowComponentProps } from 'react-window'
 import type {
+  AnalysisError,
   CompletedProtocolAnalysis,
   LabwareDefinition,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { LeafNode } from '../../types'
-import type { AnalysisError } from '@opentrons/shared-data'
 import type { ItemData } from './index'
 
 interface GroupAnnotatedStepRowProps {
@@ -34,10 +34,10 @@ interface GroupAnnotatedStepRowProps {
   milliSecondsPerFrame: number
   isGlobalPlaying: boolean
   tI18n: (key: string) => string
+  onShowErrorDetails: () => void
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
   handlePause?: () => void
   trailingErrors?: AnalysisError[]
-  onShowErrorDetails: () => void
 }
 
 function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {

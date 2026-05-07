@@ -144,7 +144,6 @@
   gap: var(--spacing-4);
 }
 
-/* Matches .individual_command_container_group horizontal inset inside .annotated_group_expanded */
 .annotated_steps_error_wrapper_in_group {
   display: flex;
   flex-direction: column;
@@ -184,7 +183,6 @@
   text-align: center;
 }
 
-/* Matches horizontal inset of .annotated_steps_error_wrapper for standalone error rows */
 .annotated_steps_past_steps_row {
   padding: var(--spacing-8) var(--spacing-12);
 }

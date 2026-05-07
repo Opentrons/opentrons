@@ -9,7 +9,6 @@
   gap: var(--spacing-4);
 }
 
-/* Prefix icon column + title block; 8px between prefix and title/play area */
 .step_group_header_left {
   display: flex;
   min-width: 0;

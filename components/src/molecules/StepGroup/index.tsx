@@ -12,11 +12,8 @@ interface StepGroupProps {
   handleClick: () => void
   children: ReactNode
   subtitle?: string
-  /**
-   * Leftmost column before headerLeading / title (e.g. status icon).
-   * Clicks do not toggle expand/collapse. 8px gap before the title block.
-   */
-  headerPrefixIcon?: ReactNode
+  // currently used as an error icon to display if the group has an error
+  headerPrefixIcon?: ReactNode | null
   /** Rendered 4px left of the title; clicks do not toggle expand/collapse */
   headerLeading?: ReactNode
   /** Rendered before the expand chevron; clicks do not toggle expand/collapse */
@@ -61,19 +58,13 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
             {headerLeading}
           </div>
           <div className={styles.step_group_title_line}>
-            <StyledText
-              desktopStyle="bodyDefaultSemiBold"
-              color={titleColor}
-            >
+            <StyledText desktopStyle="bodyDefaultSemiBold" color={titleColor}>
               {title}
             </StyledText>
           </div>
           {subtitle != null ? (
             <div className={styles.step_group_subtitle_line}>
-              <StyledText
-                desktopStyle="captionRegular"
-                color={COLORS.grey60}
-              >
+              <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
                 {subtitle}
               </StyledText>
             </div>

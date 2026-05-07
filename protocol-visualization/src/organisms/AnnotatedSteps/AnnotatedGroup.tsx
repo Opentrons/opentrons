@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 
 import { COLORS, Icon, StepGroup } from '@opentrons/components'
 
@@ -45,11 +45,9 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   } = props
   const hasTrailingErrors = trailingErrorsFooter != null
 
-  const [isExpanded, setIsExpanded] = useState(
-    () =>
-      subCommands.some(command => command.isHighlighted) || hasTrailingErrors
-  )
-  useEffect(() => {
+  // Inactive groups start collapsed; open before paint if this group is active or has errors.
+  const [isExpanded, setIsExpanded] = useState(false)
+  useLayoutEffect(() => {
     setIsExpanded(
       subCommands.some(command => command.isHighlighted) || hasTrailingErrors
     )
@@ -79,7 +77,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
               size="1rem"
               color={isAnyStepHighlighted ? COLORS.purple50 : COLORS.red60}
             />
-          ) : undefined
+          ) : null
         }
         headerLeading={headerLeading}
         {...(isAnyStepHighlighted ? { titleColor: COLORS.purple50 } : {})}
