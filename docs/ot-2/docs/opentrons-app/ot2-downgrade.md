@@ -12,9 +12,9 @@ For Flex, see [Downgrading Flex Software](../../flex/opentrons-app/flex-downgrad
 
 ## Operating system versions
 
-Following the release of robot software v9.0, Opentrons is forking its robot operating system and Opentrons App into separate repositories for the OT-2 and Flex robots. The software for the downgrade procedure described here is available on GitHub at <https://github.com/Opentrons/opentrons/releases>.
+After robot software v9.0, Opentrons forked its software into separate repositories for the OT-2 and Flex robots. This split helps us provide targeted updates and reduces downtime from shared releases that don't benefit the OT-2. Software for this downgrade procedure is available on GitHub at <https://github.com/Opentrons/opentrons/releases>.
 
-This change also introduces a significant increment in operating system versions number for the OT-2. After v9.0, the robot software version for the OT-2 jumps to v26.06. Version 26.06 starts a dedicated OT-2 track to provide targeted updates and reduce unnecessary downtime associated with unnecessary upgrades associated with shared software.
+Forking the robot software also significantly changes the OT-2 operating system version. After v9.0, OT-2 versioning restarts with v26.06. This newer OT-2 software is available on GitHub at <https://github.com/Opentrons/opentrons-ot2/releases>.
 
 ## Robot downgrade instructions
 
@@ -29,7 +29,9 @@ This change also introduces a significant increment in operating system versions
 
 2. In the Assets section of a release, click the small triangle (&rtrif;) to expand a list of compressed software files available for download.
 
-<font color="red">PLACEHOLDER FOR IMAGE</font>
+    <figure class="screenshot" markdown>
+    ![OT-2 software on GitHub](../images/ot2-robot-software-releases.png)
+    </figure>
 
 3. Click the compressed file named `ot2-system-<version number>.zip` to download and save it to your computer. For example, to get OT-2 software version 8.7, you'd click the file `ot2-system-8.7.0.zip`.
 
@@ -43,7 +45,9 @@ This change also introduces a significant increment in operating system versions
 
 4. In the Advanced settings, find the section labeled "Update robot software manually with a local file."
 
-<font color="red">PLACEHOLDER FOR IMAGE</font>
+    <figure class="screenshot" markdown>
+    ![App image showing browse button](../images/ot2-robot-software-downgrade.png)
+    </figure>
 
 5. Click **Browse file system** and navigate to the location where you saved the downloaded robot software.
 
