@@ -72,8 +72,14 @@ Following these practices helps reviewers focus on substance rather than cleanup
 ### Before marking a PR "ready for review"
 
 - **Proofread the code.** Present a best-effort, functional solution.
+
 - **Add appropriate tests and documentation.** Include tests and documentation as appropriate for the scope of the PR.
+
 - **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended.
+
+- **Keep your commit history reasonably tidy.** Use good commit messages. Ideally, confine each commit to one self-contained change. See [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams for general guidance.
+
+  Don't stress about this too much! When you merge your PR, all of your commits will get squashed down into one, and you'll have an opportunity to rewrite the final message. But it's nice to keep a tidy history, anyway. It helps others scan your changes. It also helps you in case you need to rework your PR with tools like `git revert`.
 
 ### While opening a PR
 
