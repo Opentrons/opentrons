@@ -391,7 +391,7 @@ class VacuumModule(mod_abc.AbstractModule):
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
         self._reader.set_operation_mode(VacuumModuleOperationMode.POWER)
-        
+
         await self._driver.set_vacuum_state(enable_vacuum=False)
         await self._driver.set_pump_state(
             start_pump=start_pump,
@@ -412,16 +412,14 @@ class VacuumModule(mod_abc.AbstractModule):
         ramp_rate = step["ramp_rate"]
         timeout_seconds = step["timeout_seconds"]
         vent_after = step["vent_after"]
-        #breakpoint()
         # this gives users the ability to not specify a duration at all if
-        # they want the pump to run indefinitely 
+        # they want the pump to run indefinitely
         if hold_time_minutes is not None and hold_time_seconds is not None:
-            hold_time_seconds += hold_time_minutes * 60 
+            hold_time_seconds += hold_time_minutes * 60
         elif hold_time_minutes is not None and hold_time_seconds is None:
-            hold_time_seconds = hold_time_minutes * 60 
+            hold_time_seconds = hold_time_minutes * 60
         if "percent_power" in step:
             percent_power = cast(VacuumModulePowerStep, step)["percent_power"]
-            #breakpoint()
             await self.set_pump_state(
                 start_pump=enable_pump,
                 duty_cycle=percent_power,
@@ -434,8 +432,6 @@ class VacuumModule(mod_abc.AbstractModule):
             gauge_pressure_mbar = cast(VacuumModulePressureStep, step)[
                 "gauge_pressure_mbar"
             ]
-            #if enable_pump == False:
-            #    breakpoint()
             await self.set_vacuum_state(
                 enable_vacuum=enable_pump,
                 gauge_pressure_mbar=gauge_pressure_mbar,
@@ -458,10 +454,8 @@ class VacuumModule(mod_abc.AbstractModule):
                 for rep in range(this_cycle["repetitions"]):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
-                        #breakpoint()
                         await self._execute_cycle_step(step)
             else:
-                #breakpoint()
                 await self._execute_cycle_step(step_or_cycle)
 
     async def execute_profile(
@@ -482,7 +476,6 @@ class VacuumModule(mod_abc.AbstractModule):
             else:
                 self._total_step_count += 1
                 self._total_cycle_count += 1
-        #breakpoint()
         task = self._loop.create_task(self._execute_profile(profile))
         self.make_cancellable(task)
         await task

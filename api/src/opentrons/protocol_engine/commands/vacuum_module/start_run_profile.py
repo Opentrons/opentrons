@@ -9,7 +9,6 @@ from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal, Type
 
 from ...errors.error_occurrence import ErrorOccurrence
-from ...state import update_types
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.hardware_control.modules.types import (
     VacuumModuleCycle,
@@ -19,10 +18,10 @@ from opentrons.hardware_control.modules.types import (
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
     from opentrons.protocol_engine.state.state import StateView
 
-RunProfileCommandType = Literal["vacuumModule/runProfile"]
+StartRunProfileCommandType = Literal["vacuumModule/startRunProfile"]
 
 
 class VacuumModuleProfileStepBase(BaseModel):
@@ -41,7 +40,7 @@ class VacuumModuleProfilePowerStep(VacuumModuleProfileStepBase):
 
     percentPower: int | SkipJsonSchema[None]
 
-    def convert_step(self) -> VacuumModulePowerStep:
+    def convert_element(self) -> VacuumModulePowerStep:
         """Convert a VacuumModulePower step into a hardware controller type."""
         return VacuumModulePowerStep(
             enable_pump=self.enablePump,
@@ -59,7 +58,7 @@ class VacuumModuleProfilePressureStep(VacuumModuleProfileStepBase):
 
     gaugePressureMbar: int | SkipJsonSchema[None]
 
-    def convert_step(self) -> VacuumModulePressureStep:
+    def convert_element(self) -> VacuumModulePressureStep:
         """Convert a VacuumModulePressure step into a hardware controller type."""
         return VacuumModulePressureStep(
             enable_pump=self.enablePump,
@@ -77,40 +76,43 @@ class VacuumModuleProfilePressureStep(VacuumModuleProfileStepBase):
 class VacuumModuleProfileCycle(BaseModel):
     """Input parameters for a vacuum module cycle."""
 
-    steps: List[RunProfileStepParams]
+    steps: List[StartRunProfileStepParams]
     repetitions: int
 
-    def convert_step(self) -> VacuumModuleCycle:
+    def convert_element(self) -> VacuumModuleCycle:
         """Convert a VacuumModuleCycle into a hardware controller type."""
         steps: List[VacuumModuleStep] = []
         for step in self.steps:
-            steps.append(step.convert_step())
+            steps.append(step.convert_element())
         return VacuumModuleCycle(steps=steps, repetitions=self.repetitions)
 
 
-RunProfileStepParams = Union[
+StartRunProfileStepParams = Union[
     VacuumModuleProfilePowerStep,
     VacuumModuleProfilePressureStep,
 ]
 
-ProfileType = List[Union[RunProfileStepParams, VacuumModuleProfileCycle]]
+ProfileType = List[Union[StartRunProfileStepParams, VacuumModuleProfileCycle]]
 
 
-class RunProfileParams(BaseModel):
+class StartRunProfileParams(BaseModel):
     """Input parameters to run a vacuum profile."""
 
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
     profile: ProfileType = Field(
         ..., description="List of Vacuum Module profile steps."
     )
+    taskId: str | None = Field(None, description="The id of the profile task")
 
 
-class RunProfileResult(BaseModel):
+class StartRunProfileResult(BaseModel):
     """Result data from running a vacuum profile."""
 
+    taskId: str = Field(..., description="The id of the profile task")
 
-class RunProfileImpl(
-    AbstractCommandImpl[RunProfileParams, SuccessData[RunProfileResult]]
+
+class StartRunProfileImpl(
+    AbstractCommandImpl[StartRunProfileParams, SuccessData[StartRunProfileResult]]
 ):
     """Execution implementation of a run vacuum profile command."""
 
@@ -118,43 +120,55 @@ class RunProfileImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        task_handler: TaskHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._task_handler = task_handler
 
-    async def execute(self, params: RunProfileParams) -> SuccessData[RunProfileResult]:
+    async def execute(
+        self, params: StartRunProfileParams
+    ) -> SuccessData[StartRunProfileResult]:
         """Run a vacuum module profile."""
-        state_update = update_types.StateUpdate()
         vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
-        if vm_hardware is not None:
-            steps: List[
-                Union[
-                    VacuumModulePressureStep, VacuumModulePowerStep, VacuumModuleCycle
-                ]
-            ] = []
-            for step in params.profile:
-                steps.append(step.convert_step())
-            await vm_hardware.execute_profile(profile=steps)
+        profile: List[
+            Union[VacuumModulePressureStep, VacuumModulePowerStep, VacuumModuleCycle]
+        ] = []
+        for step in params.profile:
+            profile.append(step.convert_element())
 
-        return SuccessData(public=RunProfileResult(), state_update=state_update)
+        async def start_run_profile(task_handler: TaskHandler) -> None:
+            if vm_hardware is not None:
+                async with task_handler.synchronize_cancel_latest(vm_state.module_id):
+                    await vm_hardware.execute_profile(profile=profile)
+
+        task = await self._task_handler.create_task(
+            task_function=start_run_profile, id=params.taskId
+        )
+
+        return SuccessData(
+            public=StartRunProfileResult(taskId=task.id),
+        )
 
 
-class RunProfile(BaseCommand[RunProfileParams, RunProfileResult, ErrorOccurrence]):
+class StartRunProfile(
+    BaseCommand[StartRunProfileParams, StartRunProfileResult, ErrorOccurrence]
+):
     """A command to run a vacuum module profile."""
 
-    commandType: RunProfileCommandType = "vacuumModule/runProfile"
-    params: RunProfileParams
-    result: Optional[RunProfileResult] = None
+    commandType: StartRunProfileCommandType = "vacuumModule/startRunProfile"
+    params: StartRunProfileParams
+    result: Optional[StartRunProfileResult] = None
 
-    _ImplementationCls: Type[RunProfileImpl] = RunProfileImpl
+    _ImplementationCls: Type[StartRunProfileImpl] = StartRunProfileImpl
 
 
-class RunProfileCreate(BaseCommandCreate[RunProfileParams]):
+class StartRunProfileCreate(BaseCommandCreate[StartRunProfileParams]):
     """A request to run a vacuum module profile."""
 
-    commandType: RunProfileCommandType = "vacuumModule/runProfile"
-    params: RunProfileParams
+    commandType: StartRunProfileCommandType = "vacuumModule/startRunProfile"
+    params: StartRunProfileParams
 
-    _CommandCls: Type[RunProfile] = RunProfile
+    _CommandCls: Type[StartRunProfile] = StartRunProfile
