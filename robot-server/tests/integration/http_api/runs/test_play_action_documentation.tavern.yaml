@@ -1,0 +1,75 @@
+test_name: Run action documentation is accepted on play and rejected on other actions
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload a JSONv6 protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/wait_for_resume_stop_v6.json'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+
+  - name: Non-play action rejects documentation in request body
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: pause
+          documentation:
+            note: documentation is only valid with play
+            confirmedAt: '2026-05-01T16:00:00.000Z'
+            username: tavern-test-user
+    response:
+      status_code: 422
+
+  - name: Play with access-control documentation succeeds
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+          documentation:
+            note: integration test documentation note
+            confirmedAt: '2026-05-01T16:00:00.000Z'
+            username: tavern-test-user
+    response:
+      status_code: 201
+      strict:
+        - json:off
+      json:
+        data:
+          id: !anystr
+          actionType: play
+
+  - name: Stop the run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: stop
+    response:
+      status_code: 201

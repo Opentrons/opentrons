@@ -140,7 +140,8 @@ async def create_run_action(
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
     """
-    action_type = request_body.data.actionType
+    body = request_body.data
+    action_type = body.actionType
     if (
         action_type == RunActionType.PLAY
         and maintenance_run_orchestrator_store.current_run_id is not None
@@ -156,6 +157,15 @@ async def create_run_action(
             created_at=created_at,
             action_payload=deck_configuration,
         )
+
+        if action_type == RunActionType.PLAY and body.documentation is not None:
+            log.info(
+                "Play action with access-control documentation "
+                "(persist audit entry TODO): run_id=%s username=%s note_len=%s",
+                runId,
+                body.documentation.username,
+                len(body.documentation.note),
+            )
 
     except RunActionNotAllowedError as e:
         raise RunActionNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e

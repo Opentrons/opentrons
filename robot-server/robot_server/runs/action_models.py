@@ -2,7 +2,8 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+from typing_extensions import Self
 
 from opentrons_shared_data.util import StrEnum
 from server_utils.fastapi_utils.models.json_api import ResourceModel
@@ -58,10 +59,33 @@ class RunActionType(StrEnum):
     )
 
 
+class DocumentationRequest(BaseModel):
+    """Access-control documentation supplied with a play action (audit persistence TODO)."""
+
+    note: str = Field(..., description="User-supplied justification note.")
+    confirmedAt: datetime = Field(..., description="When the user confirmed.")
+    username: str = Field(..., description="Username that confirmed.")
+
+
 class RunActionCreate(BaseModel):
     """Request model for new control action creation."""
 
     actionType: RunActionType
+    documentation: DocumentationRequest | None = Field(
+        None,
+        description=(
+            "When set, must accompany actionType play. Optional access-control "
+            "notes for the same request as starting or resuming the run."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def documentation_only_with_play(self) -> Self:
+        if self.documentation is not None and self.actionType != RunActionType.PLAY:
+            raise ValueError(
+                "`documentation` may only be set when actionType is play."
+            )
+        return self
 
 
 class RunAction(ResourceModel):

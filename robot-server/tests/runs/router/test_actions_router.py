@@ -1,8 +1,9 @@
 """Tests for the /runs router."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
+from pydantic import ValidationError
 from decoy import Decoy
 
 from server_utils.fastapi_utils.models.json_api.request import RequestModel
@@ -13,6 +14,7 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
 from robot_server.runs.action_models import (
+    DocumentationRequest,
     RunAction,
     RunActionCreate,
     RunActionType,
@@ -20,6 +22,19 @@ from robot_server.runs.action_models import (
 from robot_server.runs.router.actions_router import create_run_action
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
+
+
+def test_run_action_create_rejects_documentation_with_non_play() -> None:
+    """Documentation payload is only valid with actionType play."""
+    with pytest.raises(ValidationError):
+        RunActionCreate(
+            actionType=RunActionType.PAUSE,
+            documentation=DocumentationRequest(
+                note="x",
+                confirmedAt=datetime.now(timezone.utc),
+                username="alice",
+            ),
+        )
 
 
 @pytest.fixture
