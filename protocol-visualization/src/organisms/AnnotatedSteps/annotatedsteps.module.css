@@ -146,8 +146,8 @@
 
 .annotated_steps_error_wrapper_in_group {
   display: flex;
-  flex-direction: column;
   width: 100%;
+  flex-direction: column;
   padding: 0 var(--spacing-4);
   gap: var(--spacing-4);
 }
