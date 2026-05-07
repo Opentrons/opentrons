@@ -6,7 +6,6 @@ import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
 import { requireDocumentation } from './requireDocumentation'
-import { requireLogin } from './requireLogin'
 
 import type { DocumentedActionKind } from '../../../resources/access-control/types'
 
@@ -16,8 +15,7 @@ import type { DocumentedActionKind } from '../../../resources/access-control/typ
  * Returns a function that, when invoked, runs the access-control gate:
  *   1. If access control is disabled on the robot, the gate is a no-op and
  *      resolves `true`.
- *   2. Otherwise, the login guard runs (opens the login modal if needed),
- *      then the documentation guard runs (opens the doc modal + audits).
+ *   2. Otherwise, the documentation guard runs (opens the doc modal + audits).
  *
  * Resolves to `true` if the user passed the gate, `false` if they cancelled.
  *
@@ -44,12 +42,10 @@ export function useGuardedAction(
       return true
     }
 
-    const loginResult = await requireLogin(currentUsername)
-    if (loginResult == null) {
-      return false
-    }
-
-    const docResult = await requireDocumentation(actionsToDocument, loginResult)
+    const docResult = await requireDocumentation(
+      actionsToDocument,
+      currentUsername ?? ''
+    )
     return docResult != null
   }, [accessControlEnabled, currentUsername, actionsToDocument])
 }

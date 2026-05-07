@@ -35,18 +35,14 @@ describe('requireDocumentation', () => {
       confirmedAt: '2026-05-01T16:00:00.000Z',
     })
 
-    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, {
-      username: 'alice',
-    })
+    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
 
     expect(result).toEqual({
       note: 'starting run for QC',
       confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
     })
-    expect(showDocumentationRequiredModal).toHaveBeenCalledWith({
-      username: 'alice',
-    })
+    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice')
     expect(postDocumentation).toHaveBeenCalledWith({
       actionsToDocument: ACTIONS_TO_DOCUMENT,
       note: 'starting run for QC',
@@ -58,9 +54,7 @@ describe('requireDocumentation', () => {
   it('returns null when the user backs out of the modal', async () => {
     vi.mocked(showDocumentationRequiredModal).mockResolvedValue(null)
 
-    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, {
-      username: 'alice',
-    })
+    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
 
     expect(result).toBeNull()
     expect(postDocumentation).not.toHaveBeenCalled()

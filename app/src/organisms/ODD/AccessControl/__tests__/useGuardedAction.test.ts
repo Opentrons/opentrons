@@ -7,6 +7,7 @@ import { requireDocumentation } from '../requireDocumentation'
 import { requireLogin } from '../requireLogin'
 import { useGuardedAction } from '../useGuardedAction'
 
+import type ReactRedux from 'react-redux'
 import type { DocumentedActionKind } from '../../../../resources/access-control/types'
 
 vi.mock('@opentrons/react-api-client', () => ({

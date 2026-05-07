@@ -15,10 +15,10 @@ import type { RequireLoginResult } from './requireLogin'
  */
 export async function requireDocumentation(
   actionsToDocument: DocumentedActionKind[],
-  loginResult: RequireLoginResult
+  username: string
 ): Promise<DocumentationResult | null> {
   const modalResult = await showDocumentationRequiredModal({
-    username: loginResult.username,
+    username,
   })
   if (modalResult == null) {
     return null
@@ -29,13 +29,13 @@ export async function requireDocumentation(
   await postDocumentation({
     actionsToDocument,
     note,
-    username: loginResult.username,
+    username,
     confirmedAt,
   })
 
   return {
     note,
     confirmedAt,
-    documentedBy: loginResult.username,
+    documentedBy: username,
   }
 }
