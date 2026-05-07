@@ -14,7 +14,8 @@ vi.mock('@opentrons/react-api-client', () => ({
 }))
 
 vi.mock('react-redux', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-redux')>()
+  const actual = await importOriginal<typeof ReactRedux>()
+
   return {
     ...actual,
     useSelector: (selector: (state: unknown) => unknown) => selector({}),

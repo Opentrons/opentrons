@@ -49,10 +49,7 @@ export function useGuardedAction(
       return false
     }
 
-    const docResult = await requireDocumentation(
-      actionsToDocument,
-      loginResult
-    )
+    const docResult = await requireDocumentation(actionsToDocument, loginResult)
     return docResult != null
   }, [accessControlEnabled, currentUsername, actionsToDocument])
 }
