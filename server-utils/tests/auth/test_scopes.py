@@ -17,18 +17,14 @@ def test_no_invalid_characters_in_scope(scope: Scope) -> None:
     # https://datatracker.ietf.org/doc/html/rfc6749#section-3.3
     assert len(str(scope)) >= 1
     for c in str(scope):
-        assert ord(c) == 0x21 or 0x23 <= ord(c) <= 0x5B or 0x5D <= ord(c) <= 0x7E, (
-            f"Invalid character: {c}"
-        )
+        assert (
+            ord(c) == 0x21 or 0x23 <= ord(c) <= 0x5B or 0x5D <= ord(c) <= 0x7E
+        ), f"Invalid character: {c}"
 
 
 def test_parse() -> None:
     assert parse_scopes("") == set()
-
-    assert parse_scopes("runs.write users.write") == {
-        Scope.RUNS_WRITE,
-        Scope.USERS_WRITE,
-    }
+    assert parse_scopes("runs.write runs.read") == {Scope.RUNS_WRITE, Scope.RUNS_READ}
 
     with pytest.raises(UnrecognizedScopeError) as exception:
         parse_scopes("these are not valid scopes")
@@ -39,10 +35,5 @@ def test_serialize() -> None:
     assert serialize_scopes(set()) == ""
 
     assert (
-        serialize_scopes({Scope.RUNS_WRITE, Scope.USERS_WRITE})
-        == "runs.write users.write"
-    )
-    assert (
-        serialize_scopes({Scope.USERS_WRITE, Scope.RUNS_WRITE})
-        == "runs.write users.write"
+        serialize_scopes({Scope.RUNS_WRITE, Scope.RUNS_READ}) == "runs.read runs.write"
     )

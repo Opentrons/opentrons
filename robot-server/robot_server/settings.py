@@ -1,3 +1,4 @@
+import typing
 from functools import lru_cache
 from pathlib import Path
 
@@ -37,7 +38,7 @@ class RobotServerSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="OT_ROBOT_SERVER_")
 
-    simulator_configuration_file_path: str | None = Field(
+    simulator_configuration_file_path: typing.Optional[str] = Field(
         default=None,
         description="Path to a json file that describes the hardware simulator.",
     )
@@ -47,11 +48,12 @@ class RobotServerSettings(BaseSettings):
         description="The endpoint to subscribe to notification server topics.",
     )
 
-    # Literal must come first to avoid Pydantic parsing it as a relative Path
-    # with the filename "automatically_make_temporary".
-    persistence_directory: (
-        typing_extensions.Literal["automatically_make_temporary"] | Path
-    ) = Field(
+    persistence_directory: typing.Union[
+        # Literal must come first to avoid Pydantic parsing it as a relative Path
+        # with the filename "automatically_make_temporary".
+        typing_extensions.Literal["automatically_make_temporary"],
+        Path,
+    ] = Field(
         # TODO(mm, 2022-04-05): This should not have a default value.
         # It only does now because our code has some deep calls to get_settings(),
         # and it's difficult to override this settings object for our unit tests.
@@ -70,7 +72,7 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
-    images_directory: Path | None = Field(
+    images_directory: typing.Optional[Path] = Field(
         default=None,
         description=(
             "A directory for the server to store captured images."
