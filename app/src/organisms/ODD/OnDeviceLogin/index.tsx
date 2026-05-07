@@ -3,7 +3,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
-  COLORS,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
   setRefs,
@@ -15,7 +14,7 @@ import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './OnDeviceLoginOverlayProvider.module.css'
+import styles from './OnDeviceLogin.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
@@ -113,8 +112,9 @@ export function OnDeviceLogin({
               as="label"
               htmlFor={activeFieldName}
               oddStyle="bodyTextRegular"
-              className={styles.field_label}
-              color={passwordLabelHasError ? COLORS.red50 : COLORS.black90}
+              className={`${styles.field_label}${
+                passwordLabelHasError ? ` ${styles.field_label_error}` : ''
+              }`}
             >
               {step === 'username'
                 ? t('device_settings:username')
@@ -219,9 +219,3 @@ function LoginFieldInput({
     </div>
   )
 }
-
-export {
-  OnDeviceLoginOverlayProvider,
-  useOnDeviceLoginModal,
-} from './OnDeviceLoginOverlayProvider'
-export type { OnDeviceLoginModalContextValue } from './OnDeviceLoginOverlayProvider'

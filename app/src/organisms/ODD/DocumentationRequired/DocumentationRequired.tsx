@@ -9,19 +9,26 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import styles from './documentationrequired.module.css'
 
 interface DocumentationRequiredProps {
-  userName: string
+  username: string
+  onConfirm: (note: string) => void
   onBack: () => void
 }
 
 export function DocumentationRequired({
-  userName,
+  username,
+  onConfirm,
   onBack,
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>('')
-
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+
+  const trimmedNote = inputText.trim()
+  const handleConfirm = (): void => {
+    if (trimmedNote === '') return
+    onConfirm(trimmedNote)
+  }
 
   return (
     <>
@@ -29,8 +36,8 @@ export function DocumentationRequired({
         <ChildNavigation
           header={t('documentation_required')}
           buttonText={t('shared:confirm')}
-          onClickButton={() => {}}
-          buttonIsDisabled={inputText.trim() === ''}
+          onClickButton={handleConfirm}
+          buttonIsDisabled={trimmedNote === ''}
           secondaryButtonProps={{
             buttonText: 'View actions',
             buttonType: 'tertiaryHighLight',
@@ -46,7 +53,7 @@ export function DocumentationRequired({
               autoFocus
               value={inputText}
               ref={textAreaRef}
-              label={t('access_control_note', { user: userName })}
+              label={t('access_control_note', { user: username })}
               onChange={e => {
                 setInputText(e.target.value)
               }}

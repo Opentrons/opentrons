@@ -24,7 +24,7 @@ import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { OnDeviceLoginOverlayProvider } from '/app/organisms/ODD/OnDeviceLogin'
+import { LoggedOutOverlayMount } from '/app/organisms/ODD/OnDeviceLogin/LoggedOutOverlayMount'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
@@ -260,11 +260,10 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                           />
                         ) : null}
 
-                        <OnDeviceLoginOverlayProvider>
-                          <SharedScrollRefProvider>
-                            <OnDeviceDisplayAppRoutes />
-                          </SharedScrollRefProvider>
-                        </OnDeviceLoginOverlayProvider>
+                        <SharedScrollRefProvider>
+                          <OnDeviceDisplayAppRoutes />
+                        </SharedScrollRefProvider>
+                        <LoggedOutOverlayMount />
                       </ToasterOven>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
