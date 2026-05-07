@@ -244,17 +244,6 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
-    SettingDefinition(
-        _id="allowStepGrouping",
-        title="Allow creation of step groups via command annotations.",
-        description=(
-            "Do not enable."
-            " This is an Opentrons internal setting to allow using in-development"
-            " command annotations and step groups."
-        ),
-        robot_type=[RobotTypeEnum.FLEX],
-        internal_only=True,
-    ),
 ]
 
 
@@ -798,6 +787,14 @@ def _migrate39to40(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate40to41(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 41 of the feature flags file.
+
+    - Removes the allowStepGrouping config element.
+    """
+    return {k: v for k, v in previous.items() if "allowStepGrouping" != k}
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -839,6 +836,7 @@ _MIGRATIONS = [
     _migrate37to38,
     _migrate38to39,
     _migrate39to40,
+    _migrate40to41,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

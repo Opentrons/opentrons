@@ -7,6 +7,7 @@ import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import styles from './annotatedsteps.module.css'
 import { AnnotatedStepsRowItem } from './AnnotatedStepsRowItem'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
+import { getIsVisibleProtocolStep } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -22,9 +23,11 @@ interface AnnotatedStepsProps {
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   groupedCommands: GroupedCommands | null
   currentCommandIndex?: number
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
   handlePause?: () => void
-  setIsAtBottom?: Dispatch<SetStateAction<boolean>>
+  setIsAtBottom?: Dispatch<SetStateAction<boolean>> // remove redux dependency
+  milliSecondsPerFrame?: number
+  isGlobalPlaying?: boolean
 }
 
 type GroupNode = Extract<GroupedCommands[number], { annotationId: string }>
@@ -34,6 +37,7 @@ interface GroupRow {
   group: GroupNode
   annotationType: string
   commandStartNumber: number
+  annotationDescription: string
 }
 
 interface CommandRow {
@@ -55,17 +59,20 @@ export interface ItemData {
   rows: AnnotatedStepsRow[]
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   allRunDefs: LabwareDefinition[]
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
-  handlePause?: () => void
   scrollTargetId: string | null
   listElement: HTMLElement | null
   onShowErrorDetails: () => void
   t: (key: string) => string
+  milliSecondsPerFrame: number
+  isGlobalPlaying: boolean
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
+  handlePause?: () => void
 }
 
 // Note: Since we're using the height value that appears most frequently in the design,
 // we may need to adjust it later.
 const DEFAULT_ROW_HEIGHT_PX = 64
+const DEFAULT_STEP_GROUP_SECONDS = 2000
 
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const {
@@ -75,6 +82,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
     setIsAtBottom,
+    milliSecondsPerFrame = DEFAULT_STEP_GROUP_SECONDS,
+    isGlobalPlaying = false,
   } = props
   const { t } = useTranslation('protocol_visualization')
   const [showErrorDetailsModal, setShowErrorDetailsModal] =
@@ -96,9 +105,28 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       new Map(analysis.commands.map((command, index) => [command.id, index])),
     [analysis.commands]
   )
+  const filteredGroupedCommands = useMemo(() => {
+    if (groupedCommands == null) {
+      return null
+    }
+    const next: GroupedCommands = []
+    for (const node of groupedCommands) {
+      if ('annotationId' in node) {
+        const subCommands = node.subCommands.filter(leaf =>
+          getIsVisibleProtocolStep(leaf.command)
+        )
+        if (subCommands.length > 0) {
+          next.push({ ...node, subCommands })
+        }
+      } else if (getIsVisibleProtocolStep(node.command)) {
+        next.push(node)
+      }
+    }
+    return next
+  }, [groupedCommands])
   const groupedCommandsHighlightedInfo = useMemo(
     () =>
-      groupedCommands?.map(node => {
+      filteredGroupedCommands?.map(node => {
         if ('annotationId' in node) {
           const updatedSubCommands = node.subCommands.map(subNode => ({
             ...subNode,
@@ -120,7 +148,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             currentCommandIndex === commandIndexById.get(node.command.id),
         }
       }),
-    [groupedCommands, currentCommandIndex, commandIndexById]
+    [filteredGroupedCommands, currentCommandIndex, commandIndexById]
   )
   const filteredCommands = useMemo(
     () =>
@@ -134,8 +162,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
   useEffect(() => {
     if (currentCommandIndex == null) return
-    if (groupedCommands != null) {
-      const flatCommands = groupedCommands.flatMap(node =>
+    if (filteredGroupedCommands != null) {
+      const flatCommands = filteredGroupedCommands.flatMap(node =>
         'subCommands' in node ? node.subCommands : [node]
       )
 
@@ -154,7 +182,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       setScrollTargetId(targetCommand.id)
     }
   }, [
-    groupedCommands,
+    filteredGroupedCommands,
     currentCommandIndex,
     scrollTargetId,
     commandIndexById,
@@ -184,6 +212,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             group,
             annotationType: group.annotation?.name ?? '',
             commandStartNumber: subCommandStartNumber,
+            annotationDescription: group.annotation?.description ?? '',
           })
           group.subCommands.forEach(subCommand => {
             nextRowIndexByCommandId.set(subCommand.command.id, rowIndex)
@@ -277,6 +306,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
         setShowErrorDetailsModal(true)
       },
       t,
+      milliSecondsPerFrame,
+      isGlobalPlaying,
     }),
     [
       rows,
@@ -287,6 +318,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       scrollTargetId,
       listElement,
       t,
+      milliSecondsPerFrame,
+      isGlobalPlaying,
     ]
   )
 

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { CalibrationTaskList } from '/app/organisms/Desktop/CalibrationTaskList'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
@@ -33,16 +34,19 @@ export function CalibrationDashboard(): JSX.Element {
       hostname={robot?.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
-      <CalibrationTaskList
-        robotName={robotName}
-        deckCalLauncher={dashboardDeckCalLauncher}
-        tipLengthCalLauncher={dashboardTipLengthCalLauncher}
-        pipOffsetCalLauncher={dashboardOffsetCalLauncher}
-        exitBeforeDeckConfigCompletion={exitBeforeDeckConfigCompletion}
-      />
-      {DashboardDeckCalWizard}
-      {DashboardOffsetCalWizard}
-      {DashboardTipLengthCalWizard}
+      <RobotCertRotator>
+        <CalibrationTaskList
+          robotName={robotName}
+          deckCalLauncher={dashboardDeckCalLauncher}
+          tipLengthCalLauncher={dashboardTipLengthCalLauncher}
+          pipOffsetCalLauncher={dashboardOffsetCalLauncher}
+          exitBeforeDeckConfigCompletion={exitBeforeDeckConfigCompletion}
+        />
+
+        {DashboardDeckCalWizard}
+        {DashboardOffsetCalWizard}
+        {DashboardTipLengthCalWizard}
+      </RobotCertRotator>
     </ApiHostProvider>
   )
 }

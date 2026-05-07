@@ -4,6 +4,7 @@ import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -22,7 +23,8 @@ export function useModuleCalibrationStatus(
     useModuleRenderInfoForProtocolById(runId),
     moduleRenderInfo =>
       moduleRenderInfo.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE ||
-      moduleRenderInfo.moduleDef.moduleType === ABSORBANCE_READER_TYPE
+      moduleRenderInfo.moduleDef.moduleType === ABSORBANCE_READER_TYPE ||
+      moduleRenderInfo.moduleDef.moduleType === VACUUM_MODULE_TYPE
   )
 
   // only check module calibration for Flex

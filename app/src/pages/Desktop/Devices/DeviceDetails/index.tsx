@@ -4,6 +4,7 @@ import { Navigate, useParams } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useRobot } from '/app/redux-resources/robots'
 import { getScanning, OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
@@ -29,7 +30,9 @@ export function DeviceDetails(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
-      <DeviceDetailsComponent robotName={robotName} />
+      <RobotCertRotator>
+        <DeviceDetailsComponent robotName={robotName} />
+      </RobotCertRotator>
     </ApiHostProvider>
   ) : (
     <Navigate to="/devices" />

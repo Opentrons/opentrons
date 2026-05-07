@@ -82,7 +82,7 @@ app
   .whenReady()
   .then(async () => {
     app.setAsDefaultProtocolClient(PROTOCOL_NAME)
-    startUp()
+    await startUp()
 
     if (config.devtools) {
       await installDevtools()
@@ -168,7 +168,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
   return handlerSet ?? null
 }
 
-function startUp(): void {
+async function startUp(): Promise<void> {
   log.info('Starting App')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
@@ -224,7 +224,7 @@ function startUp(): void {
       )
     }
   })
-  registerCertIPC()
+  await registerCertIPC()
 
   log.silly('Global references', { mainWindow, rendererLogger })
 }
