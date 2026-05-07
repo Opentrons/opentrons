@@ -46,7 +46,6 @@ The following (non-exhaustive) list of directories, subdirectories, and files ca
 | [`/api/`](https://github.com/Opentrons/opentrons/tree/edge/api) | Source for the Python Protocol API, written in Python and distributed as the `opentrons` PyPI package. |
 | [`/api/docs/`](https://github.com/Opentrons/opentrons/tree/edge/api/docs) | Documentation for the Python Protocol API, written in ReStructuredText. |
 | [`/api/release-notes.md`](https://github.com/Opentrons/opentrons/blob/edge/api/release-notes.md) | Release notes for the robot system software (as a whole, including changes outside of the `/api/` directory). |
-| [`/app-shell-odd/`](https://github.com/Opentrons/opentrons/tree/edge/app-shell-odd) | Electron application wrapper for the touchscreen software — "odd" stands for *on-device display*. |
 | [`/app-shell/`](https://github.com/Opentrons/opentrons/tree/edge/app-shell) | Electron application wrapper for the Opentrons App. |
 | [`/app-shell/build/`<br>`release-notes.md`](https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md) | Release notes for the Opentrons App (as a whole, including changes outside of the `/app-shell/` directory). |
 | [`/app/`](https://github.com/Opentrons/opentrons/tree/edge/app) | Source for the Opentrons App. Use `make` commands in this directory to run the app from source. |

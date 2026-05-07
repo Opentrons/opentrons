@@ -8,7 +8,6 @@ on:
       - 'Makefile'
       - 'app/**'
       - 'app-shell/**'
-      - 'app-shell-odd/**'
       - 'components/**'
       - 'shared-data/**'
       - 'discovery-client/**'
@@ -29,7 +28,6 @@ on:
       - 'Makefile'
       - 'app/**'
       - 'app-shell/**'
-      - 'app-shell-odd/**'
       - 'components/**'
       - 'shared-data/**'
       - 'discovery-client/**'
@@ -113,10 +111,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
-        shell: ['app-shell', 'app-shell-odd', 'discovery-client']
-        exclude:
-          - os: 'windows-2022'
-            shell: 'app-shell-odd'
+        shell: ['app-shell', 'discovery-client']
     name: 'opentrons ${{matrix.shell}} unit tests on ${{matrix.os}}'
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}

@@ -16,7 +16,6 @@ OPENTRONS_PROJECT ?= robot-stack
 
 # dependency directories for dev
 shell_dir := ../app-shell
-shell_odd_dir := ../app-shell-odd
 discovery_client_dir := ../discovery-client
 
 # These variables can be overriden when make is invoked to customize the

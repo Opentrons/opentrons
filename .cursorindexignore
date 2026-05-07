@@ -87,7 +87,6 @@ api/docs/dist/v2/
 api-client/dist/
 app/dist/
 app-shell/dist/
-app-shell-odd/dist/
 components/lib
 discovery-client/lib
 labware-designer/dist/

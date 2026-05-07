@@ -19,7 +19,6 @@ module.exports = {
     'discovery-client/**',
     'usb-bridge/**',
     'app-shell/**',
-    'app-shell-odd/**',
     '__mocks__/**',
     'protocol-designer/fixtures/**',
     'components/src/__mocks__/**',

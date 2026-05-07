@@ -17,7 +17,6 @@ Pnpm workspaces monorepo with 15 TypeScript packages. No Lerna/Nx/Turbo — uses
 | ----------------------------------- | ------------------------- | --------------------------------- |
 | `@opentrons/app`                    | `app/`                    | React app                         |
 | `@opentrons/app-shell`              | `app-shell/`              | Electron shell                    |
-| `@opentrons/app-shell-odd`          | `app-shell-odd/`          | Electron shell (ODD)              |
 | `@opentrons/components`             | `components/`             | React UI components library       |
 | `@opentrons/api-client`             | `api-client/`             | Pure TS library                   |
 | `@opentrons/react-api-client`       | `react-api-client/`       | React hooks library               |
