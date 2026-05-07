@@ -55,6 +55,45 @@ Forking the robot software also significantly changes the OT-2 operating system 
 
 </div>
 
-## App downgrade instructions
+## App version requirements
 
-TBD instructions here. Match App software to robot software version.
+To run protocols on a downgraded OT-2, your version of the Opentrons App must match the robot software version. While you can interact with the robot using mismatched software, you cannot run protocols until the robot software and app software versions are identical.
+
+### App download and installation
+
+To install an earlier version of the Opentrons App:
+
+<div class="instruction-list" markdown>
+
+1. On the [Github releases page](https://github.com/Opentrons/opentrons/releases), find the Opentrons App version matching your downgraded OT-2. This software will be in the same location as the robot operating system software.
+
+    <figure class="screenshot" markdown>
+    ![App software on GitHub](../images/ot2-app-software-releases.png)
+    </figure>
+
+2. In the Assets section of a release, click the small triangle (&rtrif;) to expand a list of compressed software files available for download.
+
+3. Find the file with a name and extension that matches the operating system of your computer and click to download. Opentrons supports these operating systems and file types:
+
+    - **Linux:** `.AppImage`
+    - **MacOS:** `.dmg`
+    - **Windows:** `.exe`
+
+3. Browse to the download location of the downloaded software and double-click the file to install the App.
+
+<!-- Let's avoid explaining how to manage multiple versions, particularly on Windows -->
+### Managing multiple App versions
+
+Installing multiple versions of the Opentrons App may cause system conflicts, particularly on Windows.
+
+- **macOS and Linux:** Software for these systems is encapsulated. You can typically run different versions by renaming the previously installed application.
+
+- **Windows:** Software integrates deeply with the operating system. This means an installer will overwrite existing App versions or create conflicts with shared registry files.
+
+To avoid problems with multiple versions of the Opentrons App:
+
+- Uninstall the current App before installing a downgraded version.
+- Get help from your IT team or Opentrons Support if you must run multiple versions of Opentrons software.
+- Don't perform _any_ robot or App software downgrades unless directed by Opentrons Support.
+
+
