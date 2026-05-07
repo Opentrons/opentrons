@@ -39,6 +39,7 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_STACKING',
   'OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION',
   'OT_PD_ENABLE_REACT_SCAN',
+  'OT_PD_ENABLE_FORK',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
@@ -51,7 +52,6 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_BY_VOLUME_BUILDER'
   | 'OT_PD_ENABLE_CAMERA_SUPPORT'
   | 'OT_PD_ENABLE_VACUUM_MODULE'
-  | 'OT_PD_ENABLE_FORK'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',

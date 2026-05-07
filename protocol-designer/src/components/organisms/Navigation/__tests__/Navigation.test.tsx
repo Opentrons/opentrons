@@ -40,7 +40,7 @@ describe('Navigation', () => {
   })
   it('should render text and link button', () => {
     render()
-    screen.getByText('Opentrons')
+    screen.getByText('Opentrons OT-2')
     screen.getByText('Protocol Designer')
     screen.getByText('Create new')
     screen.getByText('Import')
@@ -52,6 +52,4 @@ describe('Navigation', () => {
     fireEvent.click(screen.getByText('Create new'))
     expect(mockNavigate).toHaveBeenCalled()
   })
-
-  it.todo('when clicking Import, mock function should be called', () => {})
 })

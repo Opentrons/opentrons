@@ -51,9 +51,7 @@ export function Navigation(): JSX.Element | null {
     <nav>
       <div className={styles.nav_container}>
         <div className={styles.nav_title_container}>
-          <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('opentrons')}
-          </StyledText>
+          <StyledText desktopStyle="bodyLargeSemiBold">{t('ot2')}</StyledText>
           <StyledText desktopStyle="bodyLargeSemiBold" color={COLORS.purple50}>
             {t('protocol_designer')}
           </StyledText>

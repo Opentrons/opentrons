@@ -2,7 +2,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
+import { getIsProduction } from '/protocol-designer/networking/opentronsWebApi'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getHasOptedIn } from '../../../analytics/selectors'
@@ -21,6 +21,7 @@ vi.mock('../../../components/organisms/AnnouncementModal/announcements')
 vi.mock('../../../components/organisms/Kitchen/useKitchen')
 vi.mock('../../../analytics/selectors')
 vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/networking/opentronsWebApi')
 
 const mockMakeSnackbar = vi.fn()
 const mockEatToast = vi.fn()
@@ -51,7 +52,7 @@ describe('Landing', () => {
       bakeToast: mockBakeToast,
       eatToast: mockEatToast,
     })
-    vi.mocked(getEnableFork).mockReturnValue(false)
+    vi.mocked(getIsProduction).mockReturnValue(true)
   })
 
   it('renders the landing page image and text', () => {
@@ -62,11 +63,12 @@ describe('Landing', () => {
       'The easiest way to automate liquid handling on your Opentrons robot. No code required.'
     )
     fireEvent.click(
-      screen.getByRole('button', { name: 'Create a Flex protocol' })
+      screen.getByRole('button', { name: 'Create an OT-2 protocol' })
     )
     expect(vi.mocked(toggleNewProtocolModal)).toHaveBeenCalled()
     screen.getByText('Import existing protocol')
     screen.getByRole('img', { name: 'welcome image' })
+    screen.getByRole('button', { name: 'Create a Flex protocol' })
   })
 
   it('render toast when there is an announcement', () => {
@@ -74,10 +76,19 @@ describe('Landing', () => {
     expect(mockBakeToast).toHaveBeenCalled()
   })
 
-  it('render the button to redirect to OT-2 app and Flex button', () => {
-    vi.mocked(getEnableFork).mockReturnValue(true)
+  it('should call mock function when clicking create a flex protocol', () => {
+    const windowOpenSpy = vi
+      .spyOn(window, 'open')
+      .mockImplementation(() => null)
     render()
-    screen.getByRole('button', { name: 'Create a Flex protocol' })
-    screen.getByRole('button', { name: 'Create an OT-2 protocol' })
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Create a Flex protocol' })
+    )
+    expect(windowOpenSpy).toHaveBeenCalledWith(
+      'https://designer.opentrons.com/#/createNew',
+      '_blank',
+      'noopener,noreferrer'
+    )
+    windowOpenSpy.mockRestore()
   })
 })
