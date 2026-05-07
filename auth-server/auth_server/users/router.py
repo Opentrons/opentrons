@@ -17,8 +17,6 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
-from auth_server.oauth2.backend import Backend
-from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.users.dependencies import get_user_data_manager
 from auth_server.users.models import UpdateUser, UserCreate, UserResponse
 from auth_server.users.user_data_manager import (
@@ -42,9 +40,7 @@ router = fastapi.APIRouter()
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def post_users(
-    request: fastapi.Request,
     request_body: RequestModel[UserCreate],
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -87,9 +83,7 @@ async def post_users(
     },
 )
 async def get_user(
-    request: fastapi.Request,
     userName: str,
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -140,9 +134,7 @@ async def get_user(
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def delete_user(
-    request: fastapi.Request,
     userName: str,
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -172,10 +164,8 @@ async def delete_user(
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def update_user(
-    request: fastapi.Request,
     request_body: RequestModel[UpdateUser],
     userName: str,
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
