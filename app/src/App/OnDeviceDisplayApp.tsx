@@ -173,7 +173,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   // override into all the hooks in this component that will try to use the robot API.
   const hostConfig = useMemo<HostConfig>(
     () => ({
-      hostname: '127.0.0.1',
+      hostname: '10.14.19.202',
     }),
     []
   )

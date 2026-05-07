@@ -183,7 +183,7 @@ describe('CheckLabware', () => {
     const primaryButton = screen.getByTestId('primary-button')
     expect(primaryButton).toHaveAttribute(
       'data-button-text',
-      'Confirm placement'
+      'Confirm offset'
     )
     expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
@@ -198,7 +198,7 @@ describe('CheckLabware', () => {
     const primaryButton = screen.getByTestId('primary-button')
     expect(primaryButton).toHaveAttribute(
       'data-button-text',
-      'Confirm placement'
+      'Confirm offset'
     )
     expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
