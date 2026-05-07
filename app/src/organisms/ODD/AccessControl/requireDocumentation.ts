@@ -16,9 +16,7 @@ export async function requireDocumentation(
   actionsToDocument: DocumentedActionKind[],
   username: string
 ): Promise<DocumentationResult | null> {
-  const modalResult = await showDocumentationRequiredModal({
-    username,
-  })
+  const modalResult = await showDocumentationRequiredModal(username)
   if (modalResult == null) {
     return null
   }

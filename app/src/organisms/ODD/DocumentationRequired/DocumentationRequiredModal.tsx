@@ -13,7 +13,7 @@ export interface DocumentationRequiredModalResult {
 }
 
 const DocumentationRequiredModalImpl = NiceModal.create(
-  ({ username }: DocumentationRequiredModalArgs): JSX.Element => {
+  (username: string): JSX.Element => {
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {
@@ -43,9 +43,9 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 )
 
 export const showDocumentationRequiredModal = (
-  args: DocumentationRequiredModalArgs
+  username: string
 ): Promise<DocumentationRequiredModalResult | null> =>
   NiceModal.show(
     DocumentationRequiredModalImpl,
-    args
+    username
   ) as Promise<DocumentationRequiredModalResult | null>

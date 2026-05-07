@@ -399,12 +399,12 @@ function PrepareToRun({
     ? isCameraEnabledForRun || cameraSettingsConfirmed
     : true
 
-  const isReadyToRun = true
-  // incompleteInstrumentCount === 0 &&
-  // areModulesReady &&
-  // areFixturesReady &&
-  // !isAnyNecessaryDefaultOffsetMissing &&
-  // isCameraReadyToRun
+  const isReadyToRun =
+    incompleteInstrumentCount === 0 &&
+    areModulesReady &&
+    areFixturesReady &&
+    !isAnyNecessaryDefaultOffsetMissing &&
+    isCameraReadyToRun
 
   const actionsToDocument = useMemo(
     () => [{ kind: 'PROTOCOL_PLAY' as const }],
