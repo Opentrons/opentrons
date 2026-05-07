@@ -5,16 +5,18 @@ import { getVacuumProfileStepString } from '../getVacuumProfileStepString'
 import type { VacuumProfile } from '@opentrons/shared-data'
 
 describe('getVacuumProfileStepString', () => {
-  const indentedPressureStep =
-    '    {"gauge_pressure": 55, "hold_time_seconds": 12}'
-  const indentedPowerStep = '    {"power_percent": 30, "hold_time_seconds": 5}'
-
   it('formats a single atomic pressure step with repetitions=1', () => {
     const profile: VacuumProfile = [
       { enablePump: true, holdSeconds: 12, gaugePressureMbar: 55 },
     ]
-    expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[\n${indentedPressureStep}\n]`,
+    expect(getVacuumProfileStepString(profile, true)).toEqual([
+      `profile=[
+    {
+        "gauge_pressure": 55,
+        "hold_time_seconds": 12,
+        "vent_after": True,
+    }
+]`,
       'repetitions=1',
     ])
   })
@@ -23,8 +25,14 @@ describe('getVacuumProfileStepString', () => {
     const profile: VacuumProfile = [
       { enablePump: true, holdSeconds: 5, percentPower: 30 },
     ]
-    expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[\n${indentedPowerStep}\n]`,
+    expect(getVacuumProfileStepString(profile, true)).toEqual([
+      `profile=[
+    {
+        "power_percent": 30,
+        "hold_time_seconds": 5,
+        "vent_after": True,
+    }
+]`,
       'repetitions=1',
     ])
   })
@@ -36,8 +44,14 @@ describe('getVacuumProfileStepString', () => {
         steps: [{ enablePump: true, holdSeconds: 5, percentPower: 30 }],
       },
     ]
-    expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[\n${indentedPowerStep}\n]`,
+    expect(getVacuumProfileStepString(profile, true)).toEqual([
+      `profile=[
+    {
+        "power_percent": 30,
+        "hold_time_seconds": 5,
+        "vent_after": True,
+    }
+]`,
       'repetitions=2',
     ])
   })
@@ -47,8 +61,15 @@ describe('getVacuumProfileStepString', () => {
       { enablePump: true, holdSeconds: 1, gaugePressureMbar: 10 },
       { enablePump: true, holdSeconds: 2, gaugePressureMbar: 20 },
     ]
-    expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[\n    {"gauge_pressure": 10, "hold_time_seconds": 1},\n    {"gauge_pressure": 20, "hold_time_seconds": 2}\n]`,
+    expect(getVacuumProfileStepString(profile, true)).toEqual([
+      `profile=[
+    {"gauge_pressure": 10, "hold_time_seconds": 1},
+    {
+        "gauge_pressure": 20,
+        "hold_time_seconds": 2,
+        "vent_after": True,
+    }
+]`,
       'repetitions=1',
     ])
   })
@@ -61,8 +82,16 @@ describe('getVacuumProfileStepString', () => {
         steps: [{ enablePump: true, holdSeconds: 5, percentPower: 30 }],
       },
     ]
-    expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[\n    {"gauge_pressure": 100, "hold_time_seconds": 1},\n    {"power_percent": 30, "hold_time_seconds": 5},\n    {"power_percent": 30, "hold_time_seconds": 5}\n]`,
+    expect(getVacuumProfileStepString(profile, true)).toEqual([
+      `profile=[
+    {"gauge_pressure": 100, "hold_time_seconds": 1},
+    {"power_percent": 30, "hold_time_seconds": 5},
+    {
+        "power_percent": 30,
+        "hold_time_seconds": 5,
+        "vent_after": True,
+    }
+]`,
       'repetitions=1',
     ])
   })
@@ -73,12 +102,24 @@ describe('getVacuumProfileStepString', () => {
         repetitions: 2,
         steps: [
           { enablePump: true, holdSeconds: 1, gaugePressureMbar: 1 },
-          { enablePump: true, holdSeconds: 2, percentPower: 50 },
+          {
+            enablePump: true,
+            holdSeconds: 2,
+            percentPower: 50,
+            ventAfter: true,
+          },
         ],
       },
     ]
-    expect(getVacuumProfileStepString(profile)).toEqual([
-      `profile=[\n    {"gauge_pressure": 1, "hold_time_seconds": 1},\n    {"power_percent": 50, "hold_time_seconds": 2}\n]`,
+    expect(getVacuumProfileStepString(profile, true)).toEqual([
+      `profile=[
+    {"gauge_pressure": 1, "hold_time_seconds": 1},
+    {
+        "power_percent": 50,
+        "hold_time_seconds": 2,
+        "vent_after": True,
+    }
+]`,
       'repetitions=2',
     ])
   })
