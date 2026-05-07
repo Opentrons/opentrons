@@ -13,7 +13,7 @@ Space that is on or above the level of the robot's deck area.
 
 ##### Aluminum block
 
-See *thermal block*.
+See [*thermal block*](#thermal-block).
 
 ##### Ambient lighting
 
@@ -33,7 +33,7 @@ The empty area below the robot's *deck slots*. This space provides clearance for
 
 ##### Caddy
 
-See *module caddy*.
+See [*module caddy*](#module-caddy).
 
 ##### Calibration pin
 
@@ -105,7 +105,7 @@ A feature that pauses a *protocol run* when certain errors occur and offers opti
 
 ##### Expansion slot
 
-See *A1 expansion slot*.
+See [*A1 expansion slot*](#a1-expansion-slot).
 
 ##### Extension mount
 
@@ -113,7 +113,7 @@ The attachment point on the *gantry* for the Flex Gripper. See the [Gantry secti
 
 ##### Finishing cap
 
-See *carrying handle cap*.
+See [*carrying handle cap*](#carrying-handle-cap).
 
 ##### Firmware
 
@@ -121,7 +121,7 @@ The low-level software that controls the Flex robot and all of its peripheral sy
 
 ##### Fixture
 
-See *deck fixture*.
+See [*deck fixture*](#deck-fixture).
 
 ##### Frame
 
@@ -185,11 +185,11 @@ A guided process to visually check and adjust pipette movement relative to a pie
 
 ##### Lift handles
 
-See *carrying handles*.
+See [*carrying handles*](#carrying-handle).
 
 ##### Lights
 
-See *ambient lighting* or *status light*.
+See [*ambient lighting*](#ambient-lighting) or [*status light*](#status-light).
 
 ##### Liquid class
 
@@ -221,7 +221,7 @@ An adapter that sits on top of a module and is used to automatically calibrate m
 
 ##### Mounting plate
 
-See *96-channel mounting plate*.
+See [*96-channel mounting plate*](#96-channel-mounting-plate).
 
 ##### Nozzle
 
@@ -257,7 +257,7 @@ The attachment point on the *gantry* for a pipette. See the [Gantry section](sys
 
 ##### Profile
 
-See *Thermocycler profile*.
+See [*Thermocycler profile*](#thermocycler-profile).
 
 ##### Protocol
 
@@ -293,11 +293,11 @@ A touchscreen-only feature that lets you create, save, and run a simple liquid t
 
 ##### Removable deck slot
 
-See *deck slot*.
+See [*deck slot*](#deck-slot).
 
 ##### Run
 
-See *protocol run*.
+See [*protocol run*](#protocol-run).
 
 ##### Runtime parameter
 
@@ -357,7 +357,7 @@ A box that contains tools, fasteners, and spare parts. Every Flex robot ships wi
 
 ##### Visualization
 
-See *protocol visualization*.
+See [*protocol visualization*](#protocol-visualization).
 
 ##### Waste chute
 
