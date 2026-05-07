@@ -1,17 +1,13 @@
 """Main FastAPI application."""
 
-from contextlib import AsyncExitStack, asynccontextmanager
-from typing import AsyncGenerator
+import logging
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
-from server_utils.auth.resource_server.fastapi_dependencies import (
-    build_authorization_checker,
-    install_authorization_checker,
-)
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from system_server._version import version
@@ -21,21 +17,7 @@ from system_server.settings import get_settings
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
 
-@asynccontextmanager
-async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    async with AsyncExitStack() as exit_stack:
-        settings = get_settings()
-
-        authorization_checker = await exit_stack.enter_async_context(
-            build_authorization_checker(
-                auth_server_uds=settings.auth_server_uds,
-                auth_server_url=settings.auth_server_url,
-            )
-        )
-        install_authorization_checker(app.state, authorization_checker)
-
-        # Start serving requests.
-        yield
+log = logging.getLogger(__name__)
 
 
 app = FastAPI(
@@ -48,7 +30,6 @@ app = FastAPI(
     docs_url=None,
     # redoc_url is replaced by our own /redoc router, below.
     redoc_url=None,
-    lifespan=_lifespan,
 )
 
 app.add_middleware(
@@ -63,6 +44,27 @@ app.middleware("http")(server_timing_middleware())
 
 # main router
 app.include_router(router=router)
+
+
+@app.on_event("startup")
+async def on_startup() -> None:
+    """Handle app startup."""
+    # Load settings and (throw away the result) so that we detect errors early
+    # on in startup, instead of the first time someone happens to use a setting.
+    get_settings()
+
+
+@app.on_event("shutdown")
+async def on_shutdown() -> None:
+    """Handle app shutdown."""
+    # Placeholder for actual shutdown processes
+    shutdown_results: list[Any] = []
+    log.info("shutdown")
+
+    shutdown_errors = [r for r in shutdown_results if isinstance(r, BaseException)]
+
+    for e in shutdown_errors:
+        log.warning("Error during shutdown", exc_info=e)
 
 
 # This is a workaround for a broken /redoc page in versions of FastAPI <0.115.3.

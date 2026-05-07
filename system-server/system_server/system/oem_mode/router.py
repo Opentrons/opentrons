@@ -3,7 +3,6 @@
 import os
 import re
 from pathlib import Path
-from textwrap import dedent
 from typing import Annotated
 
 import filetype  # type: ignore[import-untyped]
@@ -16,9 +15,6 @@ from fastapi import (
     UploadFile,
     status,
 )
-
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
-from server_utils.auth.scopes import Scope
 
 from .models import EnableOEMMode
 from .oem_settings_store import (
@@ -41,30 +37,14 @@ oem_mode_router = APIRouter()
 @oem_mode_router.put(
     "/system/oem_mode/enable",
     summary="Enable or disable OEM Mode",
-    description=dedent(
-        """\
-        Enable or disable OEM Mode.
-
-        Currently, this endpoint does not *completely* enable OEM mode, so it should not
-        be used directly. Use `POST /settings` instead. This may change in the future.
-        """
-        # To elaborate on the description above:
-        # The part of OEM mode that this endpoint doesn't do is telling the ODD to avoid
-        # branded language in its UX copy. That's currently done by the ODD querying
-        # the OEM mode status in robot-server's `GET /settings`, which in turn is set
-        # via robot-server's `POST /settings`. Ideally, system-server would have a pair
-        # of PUT+GET endpoints serving as the single source of truth, and either
-        # robot-server's `/settings` endpoints would proxy to them, or we'd outright
-        # delete OEM mode from `/settings`.
-    ),
+    description="Enable or disable OEM Mode",
     responses={
         status.HTTP_200_OK: {"message": "OEM Mode changed successfully."},
-        status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not change."},
+        status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode did not changed."},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "message": "OEM Mode unhandled exception."
         },
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def enable_oem_mode_endpoint(
     response: Response,
@@ -100,7 +80,6 @@ async def enable_oem_mode_endpoint(
             "message": "OEM Mode splash unhandled exception."
         },
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
 )
 async def upload_splash_image(
     response: Response,

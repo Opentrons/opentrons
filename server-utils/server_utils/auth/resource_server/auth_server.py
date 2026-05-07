@@ -69,13 +69,7 @@ class LocalHTTPClient(Client):
 
         if auth_server_uds is not None:
             connector = aiohttp.UnixConnector(path=auth_server_uds)
-            session = aiohttp.ClientSession(
-                connector=connector,
-                # We're connecting over a Unix socket, so this URL is nonsensical,
-                # but aiohttp seems to require it as a placeholder.
-                # https://github.com/aio-libs/aiohttp/issues/11324.
-                base_url="http://localhost",
-            )
+            session = aiohttp.ClientSession(connector=connector)
         elif auth_server_url is not None:
             session = aiohttp.ClientSession(base_url=auth_server_url)
         else:
