@@ -311,6 +311,7 @@ class LegacyProtocolCore(
             OffDeckType,
             WasteChute,
             TrashBin,
+            ModuleFixtureLocation,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,

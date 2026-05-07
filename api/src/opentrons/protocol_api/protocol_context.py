@@ -825,6 +825,7 @@ class ProtocolContext(CommandPublisher):
             DeckLocation,
             Labware,
             ModuleTypes,
+            ModuleFixtureLocation,
             OffDeckType,
             WasteChute,
             TrashBin,
@@ -895,7 +896,7 @@ class ProtocolContext(CommandPublisher):
         ]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
-        elif isinstance(new_location, (OffDeckType, WasteChute)):
+        elif isinstance(new_location, (OffDeckType, WasteChute, ModuleFixtureLocation)):
             location = new_location
         elif isinstance(new_location, TrashBin):
             if labware._core.is_lid():
