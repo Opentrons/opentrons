@@ -59,6 +59,10 @@ One of four aluminum handles that screw into the bottom corners of the robot. Th
 
 A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Robot Components section](system-description/robot.md) in the System Description chapter.
 
+##### Concurrent commands
+
+Module commands that run without waiting for the action to complete, allowing the protocol to continue with other tasks simultaneously—such as pipetting while a module heats or shakes. Concurrent commands are available for the Heater-Shaker, Temperature, and Thermocycler Modules. See the [Concurrent commands section](protocols/python-api.md#concurrent-commands) in the Protocol Development chapter.
+
 ##### Dashboard
 
 The main screen for the robot, accessible by tapping the robot's name in the top left corner of the *touchscreen*. The dashboard gives you quick access to recently run protocols. See the [Dashboard section](touchscreen/dashboard.md) in the Touchscreen chapter.
@@ -71,6 +75,10 @@ The machined aluminum surface on which automated science protocols are executed.
 
 The fixed portion of the deck around the four edges of the robot (outside of the area where *deck slot* panels fit). It contains the removable accessory covers.
 
+##### Deck configuration
+
+A record of which *deck fixtures* and modules are installed on the Flex and in which *deck slots*. Configuring the deck tells Flex what is physically attached to it, so the robot can detect conflicts between the hardware setup and protocol requirements. See the [Deck Configuration section](touchscreen/deck-config.md) in the Touchscreen chapter.
+
 ##### Deck fixture
 
 Hardware items that replace standard *deck slots*. They let you customize the deck layout and add functionality to your Flex. Deck fixtures include the *staging area slots*, *trash bin*, and *waste chute*.
@@ -79,6 +87,10 @@ Hardware items that replace standard *deck slots*. They let you customize the de
 
 A detachable panel on the deck area. Remove deck slots to install modules and for access to the space below the deck.
 
+##### Dynamic pipetting
+
+A *Python Protocol API* feature that controls where in a well the pipette moves during aspiration, dispense, and mix actions. Dynamic pipetting can continuously track the liquid meniscus as its level changes during a liquid transfer. See the [Dynamic pipetting section](protocols/python-api.md#dynamic-pipetting) in the Protocol Development chapter.
+
 ##### Ejector
 
 The mechanism that automatically pushes tips off the *nozzle* of a pipette. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
@@ -86,6 +98,14 @@ The mechanism that automatically pushes tips off the *nozzle* of a pipette. See 
 ##### Emergency Stop Pendant
 
 An external accessory that you press to stop the robot immediately. Also referred to as the E-stop. See the [Emergency Stop Pendant section](system-description/e-stop.md) in the System Description chapter.
+
+##### Error recovery
+
+A feature that pauses a *protocol run* when certain errors occur and offers options to correct the problem and resume the run, rather than canceling it. Error recovery is available from the *touchscreen* or the *Opentrons App*. See the [Error recovery section](touchscreen/protocol-run.md#error-recovery) in the Touchscreen chapter.
+
+##### Error recovery mode
+
+The interactive state Flex enters when you choose to respond to a run error. In error recovery mode, you can replace tips, fill empty wells, retry the failed step, skip to the next step, or cancel the run. See the [Error recovery section](touchscreen/protocol-run.md#error-recovery) in the Touchscreen chapter.
 
 ##### Expansion slot
 
@@ -175,6 +195,18 @@ See *carrying handles*.
 
 See *ambient lighting* or *status light*.
 
+##### Liquid class
+
+A set of pipetting parameters—such as flow rate, submerge depth, air gap, blowout, and touch tip—optimized for a particular type of liquid. Opentrons provides verified liquid classes for aqueous, viscous, and volatile liquids. You can also define custom liquid classes in the *Python Protocol API*. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter.
+
+##### Liquid level detection
+
+The ability of Flex pipette sensors to detect the presence or absence of liquid in a well, or to locate the liquid meniscus. You can use liquid level detection to target the meniscus during aspiration or to pause a run and enter *error recovery* when a well is unexpectedly empty. See the [Liquid level detection section](protocols/python-api.md#liquid-level-detection) in the Protocol Development chapter.
+
+##### Log files
+
+Records that Flex continuously writes during operation, capturing robot movements, system processes, communications among robot components, and software update activity. Opentrons Support may request log files when troubleshooting a malfunction. See the [Flex Log Files section](advanced-operation/log-files.md) in the Advanced Operations chapter.
+
 ##### Maintenance position
 
 A specific *gantry* position at the front left side of the *working area*. The gantry moves to this position to facilitate adding or removing *instruments*.
@@ -199,6 +231,10 @@ See *96-channel mounting plate*.
 
 The working end of a pipette. Flex pipettes pick up disposable tips by pressing the nozzles down into them. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
 
+##### OpentronsAI
+
+A web-based tool that uses the *Python Protocol API* to generate, modify, and optimize protocols through a form-based and chat interface. See the [Opentrons AI section](protocols/opentrons-ai.md) in the Protocol Development chapter and <https://ai.opentrons.com>.
+
 ##### Opentrons App
 
 Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](./opentrons-app/index.md).
@@ -206,6 +242,10 @@ Software used to control a Flex (or other Opentrons robots) from a laptop or des
 ##### Paddle
 
 Part of the *gripper* that grasps and holds labware. Paddles are replaceable wear items. See the [Gripper specifications section][gripper-specifications] in the System Description chapter.
+
+##### Partial tip pickup
+
+A pipette configuration in which only some nozzles of a multi-channel pipette pick up tips. For example, a 96-channel pipette can pick up a single row or column of tips, and 8-channel pipettes can pick up a partial column or a single tip. See the [Partial tip pickup section](system-description/pipettes.md#partial-tip-pickup) in the System Description chapter.
 
 ##### Pinned protocol
 
@@ -239,6 +279,10 @@ A public, searchable library that hosts protocols authored by Opentrons or by me
 
 A particular instance of Flex performing the actions specified in a protocol file. Only a single protocol run can be active at any given time. Flex stores historical data on the time and outcome of the 20 most recent protocol runs.
 
+##### Protocol visualization
+
+An *Opentrons App* feature that animates the steps of a Flex protocol, showing changes to the deck, labware, and liquids at each step, without running the protocol on the robot. See the [Protocol Visualization section](opentrons-app/protocol-viz.md) in the Opentrons App chapter.
+
 ##### Python protocol
 
 A protocol script written using the Opentrons *Python Protocol API*. See the [Writing and running scripts section][writing-and-running-scripts] in the Protocol Development chapter.
@@ -247,6 +291,10 @@ A protocol script written using the Opentrons *Python Protocol API*. See the [Wr
 
 A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the [Opentrons Python Protocol API documentation](../python-api/index.md).
 
+##### Quick transfer
+
+A *touchscreen*-only feature that lets you create, save, and run a simple liquid transfer without writing a protocol or connecting to a computer. Quick transfers support all attached pipettes, most labware in the *Labware Library*, and Opentrons-verified *liquid classes*. See the [Quick Transfer section](touchscreen/quick-transfer.md) in the Touchscreen chapter.
+
 ##### Removable deck slot
 
 See *deck slot*.
@@ -254,6 +302,10 @@ See *deck slot*.
 ##### Run
 
 See *protocol run*.
+
+##### Runtime parameter
+
+A user-defined variable in a *Python protocol* that can be set or changed at run setup without editing the protocol file. Runtime parameters can hold Boolean, numeric, string, or CSV file values. See the [Runtime parameters section](protocols/python-api.md#runtime-parameters) in the Protocol Development chapter and the [Runtime parameters section](touchscreen/protocol-setup.md#runtime-parameters) in the Touchscreen chapter.
 
 ##### Side covers
 
