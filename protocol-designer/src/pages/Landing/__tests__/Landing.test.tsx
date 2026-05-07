@@ -87,7 +87,7 @@ describe('Landing', () => {
     expect(windowOpenSpy).toHaveBeenCalledWith(
       'https://designer.opentrons.com/#/createNew',
       '_blank',
-      'noopener,noreferrer'
+      'noopener'
     )
     windowOpenSpy.mockRestore()
   })

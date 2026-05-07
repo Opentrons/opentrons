@@ -16,16 +16,20 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getFlexDesignerCreateUrl } from '/protocol-designer/utils/getFlexDesignerCreateUrl'
 
 import { getHasOptedIn } from '../../analytics/selectors'
 import { EndUserAgreementFooter } from '../../components/molecules'
-import { AnnouncementModal } from '../../components/organisms'
+import {
+  AnnouncementModal,
+  FlexProtocolModal,
+} from '../../components/organisms'
 import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
 import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
-import { getFileMetadata } from '../../file-data/selectors'
+import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { actions as loadFileActions } from '../../load-file'
 import { toggleNewProtocolModal } from '../../navigation/actions'
 import {
@@ -44,9 +48,11 @@ export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
   const metadata = useSelector(getFileMetadata)
+  const robotType = useSelector(getRobotType)
   const navigate = useNavigate()
   const [showAnnouncementModal, setShowAnnouncementModal] =
     useState<boolean>(false)
+  const [showFlexModal, setShowFlexModal] = useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { hasOptedIn, appVersion } = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()
@@ -94,10 +100,14 @@ export function Landing(): JSX.Element {
 
   useEffect(() => {
     if (metadata?.created != null) {
-      console.warn('protocol already exists, navigating to overview')
-      navigate('/overview')
+      if (robotType === FLEX_ROBOT_TYPE) {
+        dispatch(loadFileActions.undoLoadFile())
+        setShowFlexModal(true)
+      } else {
+        navigate('/overview')
+      }
     }
-  }, [metadata, navigate])
+  }, [metadata, navigate, robotType, dispatch])
 
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
@@ -111,11 +121,24 @@ export function Landing(): JSX.Element {
 
   const openFlexDesignerInNewTab = (): void => {
     const redirectTarget = getFlexDesignerCreateUrl()
-    window.open(redirectTarget, '_blank', 'noopener,noreferrer')
+    window.open(redirectTarget, '_blank', 'noopener')
+  }
+
+  const handleOpenFlexDesigner = (): void => {
+    openFlexDesignerInNewTab()
+    setShowFlexModal(false)
   }
 
   return (
     <>
+      {showFlexModal ? (
+        <FlexProtocolModal
+          onClose={() => {
+            setShowFlexModal(false)
+          }}
+          onOpenFlexDesigner={handleOpenFlexDesigner}
+        />
+      ) : null}
       {showAnnouncementModal ? (
         <AnnouncementModal
           isViewReleaseNotes={showAnnouncementModal}

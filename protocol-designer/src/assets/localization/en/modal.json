@@ -288,6 +288,12 @@
   "pipette_type": "Pipette Type",
   "protocol_name_and_description": "Protocol name and description",
   "protocol_name": "Protocol Name",
+  "redirect_to_flex_pd": {
+    "body": "This protocol is for Opentrons Flex. Import and edit it in Protocol Designer.",
+    "cancel": "Cancel",
+    "open_flex_pd": "Open Protocol Designer",
+    "title": "Flex protocol detected"
+  },
   "release_notes": "Release notes",
   "review_file_details": "Review file details",
   "robot_type": "Robot Type",
