@@ -7,9 +7,8 @@ Downgrading Flex software should only be done at the direction of Opentrons Supp
 
 Previous versions of the Flex operating system (and App software) are available on Github at <https://github.com/Opentrons/opentrons/releases>.
 
-!!! note
-    - Make sure your Flex is idle before downgrading. Some required App features are not available while the robot is running a protocol.
-    - For OT-2 instructions, see [Downgrading OT-2 Software](../../ot-2/opentrons-app/ot2-downgrade.md).
+!!! tip
+    Make sure your Flex is idle before downgrading. Some required App features are not available while the robot is running a protocol.
 
 <!-- Reviewer note: changed to H2 (from H3). Not sure why I used H3 originally, maybe looked to large? Silly. -->
 
