@@ -35,6 +35,7 @@ describe('RobotSystemVersion', () => {
     props = {
       currentVersion: 'mock7.0.0',
       isUpdateAvailable: false,
+      gitHash: 'mock123456',
       setCurrentOption: mockBack,
       robotUpdateInfo: null,
     }
@@ -51,6 +52,8 @@ describe('RobotSystemVersion', () => {
     )
     screen.getByText('Current Version')
     screen.getByText('mock7.0.0')
+    screen.getByText('Current Git Commit')
+    screen.getByText('mock123456')
   })
 
   it('should render text when there is available update', () => {
