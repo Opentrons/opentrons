@@ -15,6 +15,6 @@ def run_action_has_user_confirmation(body: CreateRunActionRequest) -> bool:
 def get_body_needs_user_confirmation(request_body: Any) -> bool:
     """FastAPI dependency; see implementation for ``CreateRunActionRequest`` handling."""
     # TODO(TZ, 5-8-26): validate access control enabled
-    if not isinstance(request_body, CreateRunActionRequest):
+    if isinstance(request_body, CreateRunActionRequest):
         return run_action_has_user_confirmation(request_body)
     return False

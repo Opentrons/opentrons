@@ -46,8 +46,8 @@ def test_run_action_has_user_confirmation(
     assert run_action_has_user_confirmation(body) is expected
 
 
-def test_get_body_needs_user_confirmation_create_run_action_always_false() -> None:
-    """Current logic returns ``False`` for real ``CreateRunActionRequest`` instances."""
+def test_get_body_needs_user_confirmation_create_run_action_delegates() -> None:
+    """``CreateRunActionRequest`` uses the same rules as ``run_action_has_user_confirmation``."""
     play_with_uc = CreateRunActionRequest(
         data=RunActionCreate(actionType=RunActionType.PLAY),
         userConfirmation=_UC,
@@ -60,34 +60,19 @@ def test_get_body_needs_user_confirmation_create_run_action_always_false() -> No
         data=RunActionCreate(actionType=RunActionType.PAUSE),
         userConfirmation=None,
     )
-    assert get_body_needs_user_confirmation(play_with_uc) is False
+    assert get_body_needs_user_confirmation(play_with_uc) is True
     assert get_body_needs_user_confirmation(play_without) is False
     assert get_body_needs_user_confirmation(pause) is False
 
 
-def test_get_body_needs_user_confirmation_non_create_uses_run_action_shape() -> None:
-    """Non-``CreateRunActionRequest`` bodies delegate to ``run_action_has_user_confirmation``."""
+def test_get_body_needs_user_confirmation_other_body_types_false() -> None:
+    """Only ``CreateRunActionRequest`` is inspected; everything else is ``False``."""
     play_ok = MagicMock()
     play_ok.data.actionType = RunActionType.PLAY
     play_ok.userConfirmation = _UC
-    assert get_body_needs_user_confirmation(play_ok) is True
-
-    play_missing_uc = MagicMock()
-    play_missing_uc.data.actionType = RunActionType.PLAY
-    play_missing_uc.userConfirmation = None
-    assert get_body_needs_user_confirmation(play_missing_uc) is False
-
-    not_play = MagicMock()
-    not_play.data.actionType = RunActionType.PAUSE
-    not_play.userConfirmation = _UC
-    assert get_body_needs_user_confirmation(not_play) is False
-
-
-def test_get_body_needs_user_confirmation_plain_model_attribute_error() -> None:
-    """Bodies without run-action shape blow up when the non-create branch runs."""
+    assert get_body_needs_user_confirmation(play_ok) is False
 
     class _OtherBody(BaseModel):
         foo: str
 
-    with pytest.raises(AttributeError):
-        get_body_needs_user_confirmation(_OtherBody(foo="x"))
+    assert get_body_needs_user_confirmation(_OtherBody(foo="x")) is False
