@@ -97,12 +97,30 @@ export async function latestLabwareVersions(appVersion) {
   }, {})
 }
 
-export async function gitCommitHash() {
-  return monorepoGit()
-    .raw(['rev-parse', '--short', 'HEAD'])
-    .then(hash => hash.trim())
-    .catch(error => {
-      console.error(`Could not get git commit hash (${error})`)
-      return 'xxxxxxx'
-    })
+async function gitRaw(args) {
+  try {
+    return (await monorepoGit().raw(args)).trim()
+  } catch (error) {
+    console.error(
+      `Could not get git build details: git ${args.join(' ')} failed:`,
+      error
+    )
+    return undefined
+  }
+}
+
+/** Short hash, branch, and author for tracking in the ODD */
+export async function getGitBuildDetails() {
+  const commitHash = (await gitRaw(['rev-parse', '--short', 'HEAD'])) ?? ''
+
+  // Backup environment variables set by CI
+  let branchName =
+    (await gitRaw(['branch', '--show-current'])) ??
+    process.env.GITHUB_HEAD_REF ??
+    process.env.GITHUB_REF_NAME ??
+    ''
+
+  const commitAuthor = (await gitRaw(['log', '-1', '--pretty=%an'])) ?? ''
+
+  return { commitHash, branchName, commitAuthor }
 }

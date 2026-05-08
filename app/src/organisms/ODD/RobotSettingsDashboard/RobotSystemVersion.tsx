@@ -26,7 +26,9 @@ const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 
 interface RobotSystemVersionProps {
   currentVersion: string
-  gitHash: string
+  gitCommitHash: string
+  gitBranchName: string
+  gitCommitAuthor: string
   isUpdateAvailable: boolean
   robotUpdateInfo: RobotUpdateInfo | null
   setCurrentOption: SetSettingOption
@@ -34,7 +36,9 @@ interface RobotSystemVersionProps {
 
 export function RobotSystemVersion({
   currentVersion,
-  gitHash,
+  gitCommitHash,
+  gitBranchName,
+  gitCommitAuthor,
   isUpdateAvailable,
   robotUpdateInfo,
   setCurrentOption,
@@ -103,19 +107,53 @@ export function RobotSystemVersion({
               </LegacyStyledText>
             </Flex>
             {showGitDetails && (
-              <Flex
-                backgroundColor={COLORS.grey35}
-                flexDirection={DIRECTION_ROW}
-                padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                borderRadius={BORDERS.borderRadius8}
-              >
-                <LegacyStyledText
-                  forwardedAs="p"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                >{`${t('device_details:current_git_commit')}`}</LegacyStyledText>
-                <LegacyStyledText forwardedAs="p">{gitHash}</LegacyStyledText>
-              </Flex>
+              <>
+                <Flex
+                  backgroundColor={COLORS.grey35}
+                  flexDirection={DIRECTION_ROW}
+                  padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  borderRadius={BORDERS.borderRadius8}
+                >
+                  <LegacyStyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >{`${t('device_details:current_git_commit')}`}</LegacyStyledText>
+                  <LegacyStyledText forwardedAs="p">
+                    {gitCommitHash}
+                  </LegacyStyledText>
+                </Flex>
+                <Flex
+                  backgroundColor={COLORS.grey35}
+                  flexDirection={DIRECTION_ROW}
+                  padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  borderRadius={BORDERS.borderRadius8}
+                >
+                  <LegacyStyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >{`${t('device_details:current_git_branch')}`}</LegacyStyledText>
+                  <LegacyStyledText forwardedAs="p">
+                    {gitBranchName}
+                  </LegacyStyledText>
+                </Flex>
+                <Flex
+                  backgroundColor={COLORS.grey35}
+                  flexDirection={DIRECTION_ROW}
+                  padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  borderRadius={BORDERS.borderRadius8}
+                >
+                  <LegacyStyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >{`${t('device_details:current_git_author')}`}</LegacyStyledText>
+                  <LegacyStyledText forwardedAs="p">
+                    {gitCommitAuthor}
+                  </LegacyStyledText>
+                </Flex>
+              </>
             )}
           </Flex>
           <Flex>
