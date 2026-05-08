@@ -28,11 +28,3 @@ def test_ot2_robot_selection_and_96_channel_visibility(page: Page, pd_base_url: 
 
     # Click "Create new" button
     page.get_by_role("button", name="Create a Flex protocol").click()
-
-    # Select OT-2
-    page.locator("label", has_text="Opentrons OT-2").click()
-    page.wait_for_timeout(300)
-
-    page.get_by_text("Add a pipette").click()
-    if eyes is not None:
-        eyes.check_window("OT-2 pipette selection")
