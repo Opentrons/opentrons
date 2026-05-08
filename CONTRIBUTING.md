@@ -205,7 +205,7 @@ We use:
 You can tests with:
 
 ```shell
-# run all tests (except e2e)
+# run all tests
 make test
 
 # run tests per language

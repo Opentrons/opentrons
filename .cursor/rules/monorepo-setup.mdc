@@ -32,7 +32,7 @@ If `node --version` already shows a valid version, skip sourcing. Always verify 
 
 Robot-stack Python projects use **Python 3.12** (`OT_VIRTUALENV_VERSION` in `scripts/python.mk`). The `OT_PYTHON` env var (default: `python`) selects the interpreter.
 
-Standalone Python projects (`opentrons-ai-server/`, `e2e-testing/`, `analyses-snapshot-testing/`, `scripts/static-deploy/`) use **uv** for dependency management instead of pipenv. See their dedicated rules for details.
+Standalone Python projects (`opentrons-ai-server/`, `analyses-snapshot-testing/`, `scripts/static-deploy/`) use **uv** for dependency management instead of pipenv. See their dedicated rules for details.
 
 ## Root Makefile — Quick Reference
 
@@ -134,7 +134,6 @@ These projects have their **own** `Makefile` and use **uv** (not pipenv). They a
 | Project | Directory | Setup Command |
 | --- | --- | --- |
 | AI Server | `opentrons-ai-server/` | `make setup` (runs `uv sync`) |
-| E2E Testing | `e2e-testing/` | `make setup` (runs `uv sync`) |
 | Analyses Snapshot Testing | `analyses-snapshot-testing/` | `make setup` (runs bootstrap script) |
 | Static Deploy | `scripts/static-deploy/` | `make setup` (runs `uv sync`) |
 

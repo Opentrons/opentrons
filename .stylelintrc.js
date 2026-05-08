@@ -15,7 +15,6 @@ module.exports = {
     'react-api-client/**',
     'step-generation/**',
     'scripts/**',
-    'hardware-testing/**',
     'discovery-client/**',
     'usb-bridge/**',
     'app-shell/**',
@@ -23,7 +22,6 @@ module.exports = {
     'protocol-designer/fixtures/**',
     'components/src/__mocks__/**',
     'app/scripts/**',
-    'e2e-testing/**',
   ],
 
   rules: {
