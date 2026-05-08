@@ -8,6 +8,8 @@ from typing_extensions import Self
 from opentrons_shared_data.util import StrEnum
 from server_utils.fastapi_utils.models.json_api import ResourceModel
 
+from .acm_models import DocumentationRequest
+
 
 class RunActionType(StrEnum):
     """The type of the run control action, which determines behavior.
@@ -57,14 +59,6 @@ class RunActionType(StrEnum):
     RESUME_FROM_RECOVERY_ASSUMING_FALSE_POSITIVE = (
         "resume-from-recovery-assuming-false-positive"
     )
-
-
-class DocumentationRequest(BaseModel):
-    """Access-control documentation supplied with a play action (audit persistence TODO)."""
-
-    note: str = Field(..., description="User-supplied justification note.")
-    confirmedAt: datetime = Field(..., description="When the user confirmed.")
-    username: str = Field(..., description="Username that confirmed.")
 
 
 class RunActionCreate(BaseModel):

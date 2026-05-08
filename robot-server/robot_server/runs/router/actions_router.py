@@ -151,14 +151,9 @@ async def create_run_action(
         deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
-        action = run_controller.create_action(
-            action_id=action_id,
-            action_type=action_type,
-            created_at=created_at,
-            action_payload=deck_configuration,
-        )
-
-        if action_type == RunActionType.PLAY and body.documentation is not None:
+            # TODO(TZ, 5-8-26): need to validate access control enabled as well and persist audit entry
+            if body.documentation is None:
+                raise ValueError("Documentation is required for play action.")
             log.info(
                 "Play action with access-control documentation "
                 "(persist audit entry TODO): run_id=%s username=%s note_len=%s",
@@ -166,6 +161,13 @@ async def create_run_action(
                 body.documentation.username,
                 len(body.documentation.note),
             )
+
+        action = run_controller.create_action(
+            action_id=action_id,
+            action_type=action_type,
+            created_at=created_at,
+            action_payload=deck_configuration,
+        )
 
     except RunActionNotAllowedError as e:
         raise RunActionNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e
