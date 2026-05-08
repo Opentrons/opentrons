@@ -76,13 +76,13 @@ To install an earlier version of the Opentrons App:
 3. Find the file with the name and extension that matches the operating system of your computer. Click the file to download it. The Opentrons App supports these operating systems and file types:
 
     - **Linux:** `.AppImage`
-    - **MacOS:** `.dmg`
+    - **macOS:** `.dmg`
     - **Windows:** `.exe`
 
 3. Browse to the download location of the downloaded software and double-click the file to install the App.
 
-<!-- Avoid overly detailed explanations of how to manage multiple versions, particularly on Windows. -->
-<!-- We can insist on a best practice. Let others get creative with hosting/switching versions. -->
+<!-- Avoid detailed explanations of how to manage multiple versions, particularly on Windows. -->
+<!-- Document a best practice only. Let others get creative with hosting/switching versions, particularly Windows. -->
 ### Managing multiple App versions
 
 Installing multiple versions of the Opentrons App may cause system conflicts, particularly on Windows.
