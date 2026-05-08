@@ -1,6 +1,6 @@
 ---
 title: "Opentrons OT-2: Software Downgrade"
-description: "Roll back OT-2 robot and app software to an earlier version for troubleshooting or compliance."
+description: "Roll back OT-2 robot and app software from v9.0 an earlier version. Not applicable for v26.06."
 ---
 
 These instructions explain how to downgrade OT-2 robots running software version 9.0 or earlier. If your robot is running version 26.06 or later, see <font color="red"><strong>PLACEHOLDER TO TBD</strong></font> to roll back to version 9.0 or earlier.
@@ -14,7 +14,7 @@ These instructions explain how to downgrade OT-2 robots running software version
 
 After robot software v9.0, Opentrons forked its software into separate repositories for the OT-2 and Flex robots. This split helps reduce inconvenient downtime from shared releases that don't benefit the OT-2. Software for this downgrade procedure is available on GitHub at <https://github.com/Opentrons/opentrons/releases>.
 
-Forking the robot software also significantly changes the OT-2 operating system version. After v9.0, OT-2 versioning restarts with v26.06. This newer software is available on GitHub at [opentrons-ot2 releases](https://github.com/Opentrons/opentrons-ot2/releases) and is not applicable to the downgrade procedure described here.
+Forking the robot software also significantly changes the OT-2 operating system version. After v9.0, OT-2 versioning restarts with v26.06. This newer software is available on GitHub at [opentrons-ot2 releases](https://github.com/Opentrons/opentrons-ot2/releases) and is not applicable to the downgrade procedures described here.
 
 ## Robot downgrade instructions
 
@@ -51,7 +51,7 @@ Forking the robot software also significantly changes the OT-2 operating system 
 
 5. Click **Browse file system** and navigate to the location where you saved the downloaded robot software.
 
-6. Select the `.zip` file containing the robot software and click **Open**. The robot automatically installs the software and reboots, which takes about 15 minutes. After restarting, the robot will be running the earlier operating system version.
+6. Select the `.zip` file containing the robot software and click **Open**. The software installs automatically and reboots the robot, which takes about 15 minutes. After restarting, the robot will be running the earlier operating system version.
 
 </div>
 
@@ -67,11 +67,11 @@ To install an earlier version of the Opentrons App:
 
 1. On the [Github releases page](https://github.com/Opentrons/opentrons/releases), find the Opentrons App version matching your downgraded OT-2. This software will be in the same location as the robot operating system software.
 
+2. In the Assets section of a release, click the small triangle (&rtrif;) to expand a list of compressed software files available for download.
+
     <figure class="screenshot" markdown>
     ![App software on GitHub](../images/ot2-app-software-releases.png)
     </figure>
-
-2. In the Assets section of a release, click the small triangle (&rtrif;) to expand a list of compressed software files available for download.
 
 3. Find the file with the name and extension that matches the operating system of your computer. Click the file to download it. The Opentrons App supports these operating systems and file types:
 
