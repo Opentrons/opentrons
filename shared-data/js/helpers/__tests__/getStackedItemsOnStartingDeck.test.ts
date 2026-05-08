@@ -442,12 +442,12 @@ describe('getStackedItemsOnStartingDeck', () => {
     const result = getStackedItemsOnStartingDeck(commands, [], [])
 
     expect(result).toEqual({
-      A1: [
-        {
+      [ADDRESSABLE_AREA]: [
+        expect.objectContaining({
           labwareId: LABWARE_ID,
           definitionUri: 'mock:labware/1',
           displayName: 'Mock Definition',
-        },
+        }),
       ],
     })
   })
