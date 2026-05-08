@@ -11,8 +11,17 @@ export type ApiHostProviderProps = Omit<HostConfig, 'hostname'> & {
 }
 
 export function ApiHostProvider(props: ApiHostProviderProps): JSX.Element {
-  const { hostname, port, secure, requestor, robotName, token, children } =
-    props
+  const {
+    hostname,
+    port,
+    secure,
+    requestor,
+    robotName,
+    token,
+    children,
+    ...rest
+  } = props
+  assertEmpty(rest) // Make sure we didn't forget to destructure anything.
 
   const hostConfig = React.useMemo<HostConfig | null>(
     () =>
@@ -28,3 +37,6 @@ export function ApiHostProvider(props: ApiHostProviderProps): JSX.Element {
     </ApiHostContext.Provider>
   )
 }
+
+/** Cause a type-checking error if anything other than an empty object ({}) is passed. */
+function assertEmpty(object: Record<string, never>): void {}
