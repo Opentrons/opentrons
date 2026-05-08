@@ -1,33 +1,35 @@
 import * as React from 'react'
 
-import type { HostConfig } from '@opentrons/api-client'
+import type { AxiosRequestConfig } from 'axios'
+import type { HostConfig, ResponsePromise } from '@opentrons/api-client'
 
 export const ApiHostContext = React.createContext<HostConfig | null>(null)
 
-export type ApiHostProviderProps = React.PropsWithChildren<HostConfig>
+export interface ApiHostProviderProps {
+  hostname: string | null
+  port?: number | null
+  requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
+  robotName?: string | null
+  token?: string
+  children?: React.ReactNode
+}
 
 export function ApiHostProvider(props: ApiHostProviderProps): JSX.Element {
-  // We want to create a HostConfig object straight from our props, just passing them
-  // straight through. Spiritually, we are doing `{children, ...hostConfig} = props`.
-  // But for memoization reasons, we destructure all the props individually.
   const {
-    children,
     hostname,
-    port,
-    secure,
+    port = null,
     requestor,
-    robotName,
+    robotName = null,
     token,
-    ...rest
+    children,
   } = props
-  assertEmpty(rest) // Make sure we didn't forget to destructure anything.
 
   const hostConfig = React.useMemo<HostConfig | null>(
     () =>
       hostname !== null
-        ? { hostname, port, secure, requestor, robotName, token }
+        ? { hostname, port, requestor, robotName, token }
         : null,
-    [hostname, port, secure, requestor, robotName, token]
+    [hostname, port, requestor, robotName, token]
   )
 
   return (
@@ -36,6 +38,3 @@ export function ApiHostProvider(props: ApiHostProviderProps): JSX.Element {
     </ApiHostContext.Provider>
   )
 }
-
-/** Cause a type-checking error if anything other than an empty object ({}) is passed. */
-function assertEmpty(object: Record<string, never>): void {}
