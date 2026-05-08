@@ -102,6 +102,8 @@ export default defineConfig({
     _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
     _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
     _OT_PD_VERSION_: JSON.stringify(process.env.OT_PD_VERSION),
+    _GIT_COMMIT_HASH_: JSON.stringify(''),
+    _GIT_BRANCH_NAME_: JSON.stringify(''),
     global: 'globalThis',
   },
   resolve: {
