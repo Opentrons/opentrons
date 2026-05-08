@@ -28,7 +28,6 @@ interface RobotSystemVersionProps {
   currentVersion: string
   gitCommitHash: string
   gitBranchName: string
-  gitCommitAuthor: string
   isUpdateAvailable: boolean
   robotUpdateInfo: RobotUpdateInfo | null
   setCurrentOption: SetSettingOption
@@ -38,7 +37,6 @@ export function RobotSystemVersion({
   currentVersion,
   gitCommitHash,
   gitBranchName,
-  gitCommitAuthor,
   isUpdateAvailable,
   robotUpdateInfo,
   setCurrentOption,
@@ -136,21 +134,6 @@ export function RobotSystemVersion({
                   >{`${t('device_details:current_git_branch')}`}</LegacyStyledText>
                   <LegacyStyledText forwardedAs="p">
                     {gitBranchName}
-                  </LegacyStyledText>
-                </Flex>
-                <Flex
-                  backgroundColor={COLORS.grey35}
-                  flexDirection={DIRECTION_ROW}
-                  padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  borderRadius={BORDERS.borderRadius8}
-                >
-                  <LegacyStyledText
-                    forwardedAs="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  >{`${t('device_details:current_git_author')}`}</LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p">
-                    {gitCommitAuthor}
                   </LegacyStyledText>
                 </Flex>
               </>

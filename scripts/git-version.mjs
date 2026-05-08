@@ -109,18 +109,16 @@ async function gitRaw(args) {
   }
 }
 
-/** Short hash, branch, and author for tracking in the ODD */
+/** Short hash and branch name for tracking in the ODD */
 export async function getGitBuildDetails() {
   const commitHash = (await gitRaw(['rev-parse', '--short', 'HEAD'])) ?? ''
 
   // Backup environment variables set by CI
-  let branchName =
+  const branchName =
     (await gitRaw(['branch', '--show-current'])) ??
     process.env.GITHUB_HEAD_REF ??
     process.env.GITHUB_REF_NAME ??
     ''
 
-  const commitAuthor = (await gitRaw(['log', '-1', '--pretty=%an'])) ?? ''
-
-  return { commitHash, branchName, commitAuthor }
+  return { commitHash, branchName }
 }

@@ -39,7 +39,6 @@
   "continue_editing": "Continue editing",
   "controls": "Controls",
   "csv_required_for_analysis": "CSV required for analysis. Add it during run setup.",
-  "current_git_author": "Commit Author",
   "current_git_branch": "Current Branch",
   "current_git_commit": "Current Git Commit",
   "current_pressure": "Current: {{pressure}} mbar",

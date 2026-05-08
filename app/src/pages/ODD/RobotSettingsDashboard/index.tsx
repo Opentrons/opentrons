@@ -34,11 +34,7 @@ import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
 } from '/app/redux/robot-update'
-import {
-  GIT_BRANCH_NAME,
-  GIT_COMMIT_AUTHOR,
-  GIT_COMMIT_HASH,
-} from '/app/redux/shell'
+import { GIT_BRANCH_NAME, GIT_COMMIT_HASH } from '/app/redux/shell'
 import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 
 import { RobotSettingsList } from './RobotSettingsList'
@@ -126,9 +122,6 @@ export function RobotSettingsDashboard(): JSX.Element {
           }
           gitBranchName={
             GIT_BRANCH_NAME ?? i18n.format(t('shared:unknown'), 'capitalize')
-          }
-          gitCommitAuthor={
-            GIT_COMMIT_AUTHOR ?? i18n.format(t('shared:unknown'), 'capitalize')
           }
         />
       )

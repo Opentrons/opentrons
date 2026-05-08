@@ -79,7 +79,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _PKG_VERSION_: JSON.stringify(version),
       _GIT_COMMIT_HASH_: JSON.stringify(gitDetails?.commitHash),
       _GIT_BRANCH_NAME_: JSON.stringify(gitDetails?.branchName),
-      _GIT_COMMIT_AUTHOR_: JSON.stringify(gitDetails?.commitAuthor),
       _OPENTRONS_PROJECT_: JSON.stringify(project),
       _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),

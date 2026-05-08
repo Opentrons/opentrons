@@ -36,7 +36,6 @@ describe('RobotSystemVersion', () => {
       currentVersion: 'mock7.0.0',
       gitCommitHash: 'mock123456',
       gitBranchName: 'mock-branch',
-      gitCommitAuthor: 'mock-author',
       isUpdateAvailable: false,
       setCurrentOption: mockBack,
       robotUpdateInfo: null,
