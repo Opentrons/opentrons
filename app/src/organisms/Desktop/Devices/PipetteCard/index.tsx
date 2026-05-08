@@ -97,6 +97,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.borderRadius8}
       width="100%"
+      height="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
     >
       {showChangePipette && (
