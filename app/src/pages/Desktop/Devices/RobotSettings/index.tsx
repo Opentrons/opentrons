@@ -33,6 +33,7 @@ import {
   REACHABLE,
   UNREACHABLE,
 } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
@@ -44,11 +45,14 @@ export function RobotSettings(): JSX.Element {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
 
   return (
     <ApiHostProvider
       hostname={robot?.ip ?? null}
+      port={robot?.port ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
     >
       <RobotCertRotator>
         <RobotSettingsComponent robot={robot} />
