@@ -157,7 +157,7 @@ The moving pincers of the *gripper*. See the [Gripper specifications section][gr
 
 ##### JSON protocol
 
-A standardized scientific procedure written as a [JavaScript object notation](https://en.wikipedia.org/wiki/JSON) file. The Opentrons *Protocol Designer* outputs JSON protocols.
+A standardized scientific procedure written as a [JavaScript object notation](https://en.wikipedia.org/wiki/JSON) file. Previous versions of the Opentrons *Protocol Designer* output JSON protocols.
 
 ##### JSON schema
 
@@ -223,13 +223,17 @@ An adapter that sits on top of a module and is used to automatically calibrate m
 
 See [*96-channel mounting plate*](#96-channel-mounting-plate).
 
+##### Movable trash
+
+See [*trash bin*](#trash-bin).
+
 ##### Nozzle
 
 The working end of a pipette. Flex pipettes pick up disposable tips by pressing the nozzles down into them. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
 
 ##### OpentronsAI
 
-A web-based tool that can generate, modify, and optimize protocols through a chat interface. See the [Opentrons AI section](protocols/opentrons-ai.md) in the Protocol Development chapter and <https://ai.opentrons.com>.
+A web-based tool that can generate, modify, and optimize protocols through a chat interface. See the [OpentronsAI section](protocols/opentrons-ai.md) in the Protocol Development chapter and <https://ai.opentrons.com>.
 
 ##### Opentrons App
 
@@ -265,7 +269,7 @@ An automated task or procedure you program to run on Opentrons robots, including
 
 ##### Protocol Designer
 
-A web-based, no-code tool for developing *JSON protocols* that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section](protocols/designer.md) in the Protocol Development chapter and <https://designer.opentrons.com>.
+A web-based, no-code tool for developing *protocols* that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section](protocols/designer.md) in the Protocol Development chapter and <https://designer.opentrons.com>.
 
 ##### Protocol Library
 
