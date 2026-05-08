@@ -3,15 +3,16 @@
 from datetime import datetime, timezone
 
 import pytest
-from pydantic import ValidationError
 from decoy import Decoy
+from pydantic import ValidationError
+
+from server_utils.fastapi_utils.models.json_api import UserConfirmation
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
-from server_utils.fastapi_utils.models.json_api import UserConfirmation
 from robot_server.runs.action_models import (
     CreateRunActionRequest,
     RunAction,
@@ -19,6 +20,9 @@ from robot_server.runs.action_models import (
     RunActionType,
 )
 from robot_server.runs.router.actions_router import create_run_action
+from robot_server.runs.router.run_action_dependencies import (
+    get_body_needs_user_confirmation,
+)
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
 
@@ -90,6 +94,7 @@ async def test_create_run_action(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
+        body_needs_user_confirmation=get_body_needs_user_confirmation(request_body),
     )
 
     assert result.content.data == expected_result
@@ -140,6 +145,7 @@ async def test_play_action_clears_maintenance_run(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
+        body_needs_user_confirmation=get_body_needs_user_confirmation(request_body),
     )
 
     decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
@@ -196,6 +202,7 @@ async def test_create_play_action_not_allowed(
             maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
+            body_needs_user_confirmation=get_body_needs_user_confirmation(request_body),
         )
 
     assert exc_info.value.status_code == expected_status_code

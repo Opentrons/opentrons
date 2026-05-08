@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal, Union, cast
 
 from fastapi import Depends, status
 
@@ -13,6 +13,7 @@ from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     SimpleBody,
+    UserConfirmation,
 )
 
 from ..action_models import (
@@ -26,6 +27,7 @@ from ..run_models import RunNotFoundError
 from ..run_orchestrator_store import RunOrchestratorStore
 from ..run_store import RunStore
 from .base_router import RunNotFound, RunStopped
+from .run_action_dependencies import get_body_needs_user_confirmation
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
@@ -124,6 +126,10 @@ async def create_run_action(
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
+    body_needs_user_confirmation: Annotated[
+        bool,
+        Depends(get_body_needs_user_confirmation),
+    ],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -134,18 +140,16 @@ async def create_run_action(
     Arguments:
         runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
-        run_orchestrator_store: Dependency to fetch the engine store.
         run_controller: Run controller bound to the given run ID.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
-        maintenance_run_orchestrator_store: The maintenance run's EngineStore
-        deck_configuration_store: The deck configuration store
+        maintenance_run_orchestrator_store: Maintenance run orchestrator store.
+        deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        deck_configuration_store: Dependency to fetch the deck configuration.
+        body_needs_user_confirmation: Whether this body type needs ``userConfirmation`` (ACM hook).
     """
     body = request_body.data
     action_type = body.actionType
-    user_confirmation = request_body.userConfirmation
     if (
         action_type == RunActionType.PLAY
         and maintenance_run_orchestrator_store.current_run_id is not None
@@ -155,14 +159,15 @@ async def create_run_action(
         deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
-            # TODO(TZ, 5-8-26): validate access control enabled and persist audit entry.
-            if user_confirmation is not None:
+            # TODO(TZ, 5-8-26): persist audit entry.
+            if body_needs_user_confirmation:
+                uc = cast(UserConfirmation, request_body.userConfirmation)
                 log.info(
                     "Play action with userConfirmation "
                     "(persist audit entry TODO): run_id=%s username=%s note_len=%s",
                     runId,
-                    user_confirmation.username,
-                    len(user_confirmation.note),
+                    uc.username,
+                    len(uc.note),
                 )
 
         action = run_controller.create_action(
