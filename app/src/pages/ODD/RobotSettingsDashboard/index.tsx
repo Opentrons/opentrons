@@ -34,6 +34,7 @@ import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
 } from '/app/redux/robot-update'
+import { GIT_COMMIT_HASH } from '/app/redux/shell'
 import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 
 import { RobotSettingsList } from './RobotSettingsList'
@@ -112,6 +113,9 @@ export function RobotSettingsDashboard(): JSX.Element {
         <RobotSystemVersion
           currentVersion={
             robotServerVersion ?? i18n.format(t('shared:unknown'), 'capitalize')
+          }
+          gitHash={
+            GIT_COMMIT_HASH ?? i18n.format(t('shared:unknown'), 'capitalize')
           }
           isUpdateAvailable={isUpdateAvailable}
           setCurrentOption={setCurrentOption}

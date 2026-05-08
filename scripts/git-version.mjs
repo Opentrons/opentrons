@@ -96,3 +96,13 @@ export async function latestLabwareVersions(appVersion) {
     return acc
   }, {})
 }
+
+export async function gitCommitHash() {
+  return monorepoGit()
+    .raw(['rev-parse', '--short', 'HEAD'])
+    .then(hash => hash.trim())
+    .catch(error => {
+      console.error(`Could not get git commit hash (${error})`)
+      return 'xxxxxxx'
+    })
+}

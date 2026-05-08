@@ -12,6 +12,7 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'ignoreOT2App',
   'accessControlMode',
   'robotSearchBar',
+  'showGitDetails',
 ]
 
 // action type constants
