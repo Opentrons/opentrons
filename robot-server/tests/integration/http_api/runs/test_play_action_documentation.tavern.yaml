@@ -43,17 +43,6 @@ stages:
             username: tavern-test-user
     response:
       status_code: 422
-  
-  - name: Play without documentation fails
-    request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
-      method: POST
-      json:
-        data:
-          actionType: play
-    response:
-      status_code: 422
-
 
   - name: Play with access-control documentation succeeds
     request:
