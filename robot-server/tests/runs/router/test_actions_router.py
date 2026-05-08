@@ -6,26 +6,35 @@ import pytest
 from pydantic import ValidationError
 from decoy import Decoy
 
-from server_utils.fastapi_utils.models.json_api.request import RequestModel
-
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
-from robot_server.runs.acm_models import DocumentationRequest
-from robot_server.runs.action_models import RunAction, RunActionCreate, RunActionType
+from server_utils.fastapi_utils.models.json_api import UserConfirmation
+from robot_server.runs.action_models import (
+    CreateRunActionRequest,
+    RunAction,
+    RunActionCreate,
+    RunActionType,
+)
 from robot_server.runs.router.actions_router import create_run_action
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
 
+_PLAY_USER_CONFIRMATION = UserConfirmation(
+    note="pytest play documentation",
+    confirmedAt=datetime(2026, 5, 1, 16, 0, 0, tzinfo=timezone.utc),
+    username="pytest-user",
+)
 
-def test_run_action_create_rejects_documentation_with_non_play() -> None:
-    """Documentation payload is only valid with actionType play."""
+
+def test_create_run_action_request_rejects_user_confirmation_with_non_play() -> None:
+    """userConfirmation is only valid with actionType play."""
     with pytest.raises(ValidationError):
-        RunActionCreate(
-            actionType=RunActionType.PAUSE,
-            documentation=DocumentationRequest(
+        CreateRunActionRequest(
+            data=RunActionCreate(actionType=RunActionType.PAUSE),
+            userConfirmation=UserConfirmation(
                 note="x",
                 confirmedAt=datetime.now(timezone.utc),
                 username="alice",
@@ -50,7 +59,10 @@ async def test_create_run_action(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = CreateRunActionRequest(
+        data=RunActionCreate(actionType=action_type),
+        userConfirmation=_PLAY_USER_CONFIRMATION,
+    )
     expected_result = RunAction(
         id="some-action-id",
         createdAt=created_at,
@@ -95,7 +107,10 @@ async def test_play_action_clears_maintenance_run(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = CreateRunActionRequest(
+        data=RunActionCreate(actionType=action_type),
+        userConfirmation=_PLAY_USER_CONFIRMATION,
+    )
     expected_result = RunAction(
         id="some-action-id",
         createdAt=created_at,
@@ -153,7 +168,10 @@ async def test_create_play_action_not_allowed(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = CreateRunActionRequest(
+        data=RunActionCreate(actionType=action_type),
+        userConfirmation=_PLAY_USER_CONFIRMATION,
+    )
 
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()

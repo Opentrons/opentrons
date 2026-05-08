@@ -2,21 +2,23 @@ import { POST, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { RunAction, RunActionType } from './types'
-
-export interface CreateRunActionData {
-  actionType: RunActionType
-}
+import type {
+  CreateRunActionData,
+  CreateRunActionRequestBody,
+  RunAction,
+} from './types'
 
 export function createRunAction(
   config: HostConfig,
   runId: string,
-  data: CreateRunActionData
+  body: CreateRunActionData | CreateRunActionRequestBody
 ): ResponsePromise<RunAction> {
-  return request<RunAction, { data: CreateRunActionData }>(
+  const payload: CreateRunActionRequestBody =
+    'data' in body ? body : { data: body }
+  return request<RunAction, CreateRunActionRequestBody>(
     POST,
     `/runs/${runId}/actions`,
-    { data },
+    payload,
     config
   )
 }

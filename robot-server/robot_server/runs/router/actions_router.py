@@ -12,11 +12,14 @@ from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
-    RequestModel,
     SimpleBody,
 )
 
-from ..action_models import RunAction, RunActionCreate, RunActionType
+from ..action_models import (
+    CreateRunActionRequest,
+    RunAction,
+    RunActionType,
+)
 from ..dependencies import get_run_orchestrator_store, get_run_store
 from ..run_controller import RunActionNotAllowedError, RunController
 from ..run_models import RunNotFoundError
@@ -110,7 +113,7 @@ async def get_run_controller(
 )
 async def create_run_action(
     runId: str,
-    request_body: RequestModel[RunActionCreate],
+    request_body: CreateRunActionRequest,
     run_controller: Annotated[RunController, Depends(get_run_controller)],
     action_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
@@ -142,6 +145,7 @@ async def create_run_action(
     """
     body = request_body.data
     action_type = body.actionType
+    user_confirmation = request_body.userConfirmation
     if (
         action_type == RunActionType.PLAY
         and maintenance_run_orchestrator_store.current_run_id is not None
@@ -151,16 +155,15 @@ async def create_run_action(
         deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
-            # TODO(TZ, 5-8-26): need to validate access control enabled as well and persist audit entry
-            if body.documentation is None:
-                raise ValueError("Documentation is required for play action.")
-            log.info(
-                "Play action with access-control documentation "
-                "(persist audit entry TODO): run_id=%s username=%s note_len=%s",
-                runId,
-                body.documentation.username,
-                len(body.documentation.note),
-            )
+            # TODO(TZ, 5-8-26): validate access control enabled and persist audit entry.
+            if user_confirmation is not None:
+                log.info(
+                    "Play action with userConfirmation "
+                    "(persist audit entry TODO): run_id=%s username=%s note_len=%s",
+                    runId,
+                    user_confirmation.username,
+                    len(user_confirmation.note),
+                )
 
         action = run_controller.create_action(
             action_id=action_id,

@@ -1,6 +1,6 @@
 """JSON API models for server request and response handling."""
 
-from .request import RequestDataT, RequestModel
+from .request import RequestDataT, RequestModel, UserConfirmation
 from .resource_links import ResourceLink, ResourceLinkKey, ResourceLinks
 from .response import (
     BaseResponseBody,
@@ -22,6 +22,7 @@ from .response import (
 
 __all__ = [
     # request models
+    "UserConfirmation",
     "RequestModel",
     "RequestDataT",
     # response models

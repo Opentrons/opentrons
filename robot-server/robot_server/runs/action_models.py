@@ -6,9 +6,7 @@ from pydantic import BaseModel, Field, model_validator
 from typing_extensions import Self
 
 from opentrons_shared_data.util import StrEnum
-from server_utils.fastapi_utils.models.json_api import ResourceModel
-
-from .acm_models import DocumentationRequest
+from server_utils.fastapi_utils.models.json_api import RequestModel, ResourceModel
 
 
 class RunActionType(StrEnum):
@@ -62,22 +60,22 @@ class RunActionType(StrEnum):
 
 
 class RunActionCreate(BaseModel):
-    """Request model for new control action creation."""
+    """Primary data for `POST /runs/:id/actions` (nested under `data`)."""
 
     actionType: RunActionType
-    documentation: DocumentationRequest | None = Field(
-        None,
-        description=(
-            "When set, must accompany actionType play. Optional access-control "
-            "notes for the same request as starting or resuming the run."
-        ),
-    )
+
+
+class CreateRunActionRequest(RequestModel[RunActionCreate]):
+    """Run action POST body; optional `userConfirmation` only valid for play."""
 
     @model_validator(mode="after")
-    def documentation_only_with_play(self) -> Self:
-        if self.documentation is not None and self.actionType != RunActionType.PLAY:
+    def user_confirmation_only_with_play(self) -> Self:
+        if (
+            self.userConfirmation is not None
+            and self.data.actionType != RunActionType.PLAY
+        ):
             raise ValueError(
-                "`documentation` may only be set when actionType is play."
+                "`userConfirmation` may only be set when actionType is play."
             )
         return self
 

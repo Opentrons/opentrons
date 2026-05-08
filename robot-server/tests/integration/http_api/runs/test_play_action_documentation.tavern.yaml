@@ -1,4 +1,4 @@
-test_name: Run action documentation is accepted on play and rejected on other actions
+test_name: Run action userConfirmation is accepted on play and rejected on other actions
 
 marks:
   - usefixtures:
@@ -30,31 +30,31 @@ stages:
         json:
           run_id: data.id
 
-  - name: Non-play action rejects documentation in request body
+  - name: Non-play action rejects userConfirmation in request body
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
           actionType: pause
-          documentation:
-            note: documentation is only valid with play
-            confirmedAt: '2026-05-01T16:00:00.000Z'
-            username: tavern-test-user
+        userConfirmation:
+          note: userConfirmation is only valid with play
+          confirmedAt: '2026-05-01T16:00:00.000Z'
+          username: tavern-test-user
     response:
       status_code: 422
 
-  - name: Play with access-control documentation succeeds
+  - name: Play with userConfirmation succeeds
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
           actionType: play
-          documentation:
-            note: integration test documentation note
-            confirmedAt: '2026-05-01T16:00:00.000Z'
-            username: tavern-test-user
+        userConfirmation:
+          note: integration test userConfirmation note
+          confirmedAt: '2026-05-01T16:00:00.000Z'
+          username: tavern-test-user
     response:
       status_code: 201
       strict:

@@ -163,6 +163,19 @@ export interface CreateRunActionData {
   actionType: RunActionType
 }
 
+/** Who acknowledged an action, when, and why (audit / access-control). */
+export interface UserConfirmation {
+  note: string
+  /** ISO-8601 timestamp */
+  confirmedAt: string
+  username: string
+}
+
+export interface CreateRunActionRequestBody {
+  data: CreateRunActionData
+  userConfirmation?: UserConfirmation
+}
+
 export type LabwareOffset = LabwareOffsetRecord
 
 export interface LegacyLabwareOffsetCreateData {
