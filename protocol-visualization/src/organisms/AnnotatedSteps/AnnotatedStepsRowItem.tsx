@@ -5,9 +5,7 @@ import { COLORS, Icon } from '@opentrons/components'
 import { AnnotatedGroup } from './AnnotatedGroup'
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
-import {
-  ProtocolAnalysisErrorsContent
-} from './ProtocolAnalysisErrorsContent'
+import { ProtocolAnalysisErrorsContent } from './ProtocolAnalysisErrorsContent'
 import { ProtocolAnalysisPastStepsMessage } from './ProtocolAnalysisPastStepsMessage'
 
 import type { Dispatch, SetStateAction } from 'react'

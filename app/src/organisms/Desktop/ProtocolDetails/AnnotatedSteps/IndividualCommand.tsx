@@ -52,8 +52,8 @@ export function IndividualCommand({
       const groupExpandedEl =
         fromGroup === true
           ? commandEl.closest<HTMLElement>(
-            `.${styles.annotated_group_expanded}`
-          )
+              `.${styles.annotated_group_expanded}`
+            )
           : null
 
       const container: HTMLElement | null =
