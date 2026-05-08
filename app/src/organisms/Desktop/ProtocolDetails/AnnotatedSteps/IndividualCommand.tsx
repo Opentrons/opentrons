@@ -52,16 +52,16 @@ export function IndividualCommand({
       const groupExpandedEl =
         fromGroup === true
           ? commandEl.closest<HTMLElement>(
-              `.${styles.annotated_group_expanded}`
-            )
+            `.${styles.annotated_group_expanded}`
+          )
           : null
 
-      const container: HTMLElement | undefined =
+      const container: HTMLElement | null =
         groupExpandedEl instanceof HTMLElement
           ? groupExpandedEl
           : (listElement ??
             commandEl.closest<HTMLElement>('[role="list"]') ??
-            undefined)
+            null)
 
       if (container == null) {
         commandEl.scrollIntoView({

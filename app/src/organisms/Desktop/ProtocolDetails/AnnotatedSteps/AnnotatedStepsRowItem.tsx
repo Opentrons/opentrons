@@ -7,8 +7,8 @@ import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
 import {
   ProtocolAnalysisErrorsContent,
-  ProtocolAnalysisPastStepsMessage,
 } from './ProtocolAnalysisErrorsContent'
+import { ProtocolAnalysisPastStepsMessage } from './ProtocolAnalysisPastStepsMessage'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { RowComponentProps } from 'react-window'
