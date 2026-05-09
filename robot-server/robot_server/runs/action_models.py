@@ -70,6 +70,7 @@ class CreateRunActionRequest(RequestModel[RunActionCreate]):
 
     @model_validator(mode="after")
     def user_confirmation_only_with_play(self) -> Self:
+        """``userConfirmation`` is only valid with actionType play."""
         if (
             self.userConfirmation is not None
             and self.data.actionType != RunActionType.PLAY

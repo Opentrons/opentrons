@@ -1,7 +1,6 @@
 """Tests for run-action FastAPI dependencies."""
 
 from datetime import datetime, timezone
-from unittest.mock import MagicMock
 
 import pytest
 from pydantic import BaseModel
@@ -14,8 +13,8 @@ from robot_server.runs.action_models import (
     RunActionType,
 )
 from robot_server.runs.router.run_action_dependencies import (
+    body_is_run_action_with_user_confirmation,
     get_body_needs_user_confirmation,
-    run_action_has_user_confirmation,
 )
 
 _UC = UserConfirmation(
@@ -34,20 +33,21 @@ _UC = UserConfirmation(
         (RunActionType.STOP, None, False),
     ],
 )
-def test_run_action_has_user_confirmation(
+def test_body_is_run_action_with_user_confirmation(
     action_type: RunActionType,
     user_confirmation: UserConfirmation | None,
     expected: bool,
 ) -> None:
+    """Play + ``userConfirmation`` on create body is True; otherwise False."""
     body = CreateRunActionRequest(
         data=RunActionCreate(actionType=action_type),
         userConfirmation=user_confirmation,
     )
-    assert run_action_has_user_confirmation(body) is expected
+    assert body_is_run_action_with_user_confirmation(body) is expected
 
 
-def test_get_body_needs_user_confirmation_create_run_action_delegates() -> None:
-    """``CreateRunActionRequest`` uses the same rules as ``run_action_has_user_confirmation``."""
+def test_get_body_needs_user_confirmation_matches_run_action_bodies() -> None:
+    """``RequestBodyUnion`` run-action instances mirror ``body_is_run_action_with_user_confirmation``."""
     play_with_uc = CreateRunActionRequest(
         data=RunActionCreate(actionType=RunActionType.PLAY),
         userConfirmation=_UC,
@@ -65,12 +65,8 @@ def test_get_body_needs_user_confirmation_create_run_action_delegates() -> None:
     assert get_body_needs_user_confirmation(pause) is False
 
 
-def test_get_body_needs_user_confirmation_other_body_types_false() -> None:
-    """Only ``CreateRunActionRequest`` is inspected; everything else is ``False``."""
-    play_ok = MagicMock()
-    play_ok.data.actionType = RunActionType.PLAY
-    play_ok.userConfirmation = _UC
-    assert get_body_needs_user_confirmation(play_ok) is False
+def test_get_body_needs_user_confirmation_other_base_models() -> None:
+    """Non-run-action ``BaseModel`` bodies yield ``False`` (extend ``RequestBodyUnion`` as needed)."""
 
     class _OtherBody(BaseModel):
         foo: str

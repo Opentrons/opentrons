@@ -34,7 +34,7 @@ _PLAY_USER_CONFIRMATION = UserConfirmation(
 
 
 def test_create_run_action_request_rejects_user_confirmation_with_non_play() -> None:
-    """userConfirmation is only valid with actionType play."""
+    """``userConfirmation`` is only valid with actionType play."""
     with pytest.raises(ValidationError):
         CreateRunActionRequest(
             data=RunActionCreate(actionType=RunActionType.PAUSE),

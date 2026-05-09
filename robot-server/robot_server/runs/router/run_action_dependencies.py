@@ -1,20 +1,25 @@
 """FastAPI dependencies for run-related routes (shared body-shape helpers)."""
 
-from typing import Any
+from typing import TypeAlias, Union
+
+from pydantic import BaseModel
 
 from ..action_models import CreateRunActionRequest, RunActionType
 
-
-def run_action_has_user_confirmation(body: CreateRunActionRequest) -> bool:
-    """True when ``body`` is a play action and ``userConfirmation`` is present."""
-    if body.data.actionType != RunActionType.PLAY:
-        return False
-    return body.userConfirmation is not None
+# POST bodies for routes that may share :func:`get_body_needs_user_confirmation`.
+RequestBodyUnion: TypeAlias = Union[CreateRunActionRequest, BaseModel]
 
 
-def get_body_needs_user_confirmation(request_body: Any) -> bool:
-    """FastAPI dependency; see implementation for ``CreateRunActionRequest`` handling."""
+def body_is_run_action_with_user_confirmation(body: CreateRunActionRequest) -> bool:
+    """True when the run-action create body is play and includes ``userConfirmation``."""
+    if body.data.actionType == RunActionType.PLAY and body.userConfirmation is not None:
+        return True
+    return False
+
+
+def get_body_needs_user_confirmation(request_body: RequestBodyUnion) -> bool:
+    """FastAPI dependency: play + ``userConfirmation`` only for run-action create bodies."""
     # TODO(TZ, 5-8-26): validate access control enabled
     if isinstance(request_body, CreateRunActionRequest):
-        return run_action_has_user_confirmation(request_body)
+        return body_is_run_action_with_user_confirmation(request_body)
     return False
