@@ -40,6 +40,7 @@ metadata = {"protocolName": "Gravimetric QC V3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
+IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
 
 
 def _download_and_extract(version_str: str, base_dir: str) -> None:
@@ -65,12 +66,9 @@ def _download_and_extract(version_str: str, base_dir: str) -> None:
         ver_file.write(version_str)
 
 
-base_dir = str(infer_config_base_dir())
-if base_dir not in sys.path:
-    sys.path.append(base_dir)
-
-if not IS_ROBOT and importlib.util.find_spec("hardware_testing") is None:
-    # In local analysis/simulation we can bootstrap hardware_testing if needed.
+if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
+    # we're simulating or there is not a vaild hardware-testing yet
+    base_dir = str(infer_config_base_dir())
     release = f"{version.replace('a', '-alpha.').replace('b', '-beta.')}"
     version_file_path = os.path.join(base_dir, "hardware_testing", "VERSION.txt")
     if os.path.exists(version_file_path):
@@ -79,6 +77,11 @@ if not IS_ROBOT and importlib.util.find_spec("hardware_testing") is None:
                 _download_and_extract(release, base_dir)
     else:
         _download_and_extract(release, base_dir)
+    sys.path.append(base_dir)
+
+from hardware_testing.scripts.data_center_client import (  # noqa: E402
+    upload_data_to_google_drive,
+)
 from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
 from hardware_testing.data.ui import (  # noqa: F401, E402
     set_output_file,
@@ -1021,6 +1024,14 @@ def _configure_impact_protection_96ch(
     if "OK" not in state.raw_response:
         raise RuntimeError(
             f"96ch impact protection pipette switch failed: {state.raw_response}"
+        )
+    if "OK_ALREADY" not in state.raw_response:
+        ctx.delay(
+            seconds=IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS,
+            msg=(
+                "Waiting for 96ch impact motor to reach position: "
+                f"tip={tip_volume}, cmd={cmd_name}"
+            ),
         )
 
 
@@ -1977,10 +1988,6 @@ def run(ctx: ProtocolContext) -> None:
         _run(ctx, fixture_settings)
         if fixture_settings.ctx.params.upload_csv_automatically:  # type: ignore [attr-defined]
             print_info("Uploading CSV to Google Drive...")
-            from hardware_testing.scripts.data_center_client import (  # noqa: WPS433
-                upload_data_to_google_drive,
-            )
-
             result = upload_data_to_google_drive(
                 csv_file_path=fixture_settings.test_report.file_path
             )
