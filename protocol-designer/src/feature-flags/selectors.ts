@@ -47,7 +47,3 @@ export const getEnableVacuumModule: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_VACUUM_MODULE ?? false
 )
-export const getEnableFork: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_FORK ?? false
-)
