@@ -8470,38 +8470,38 @@
           "type": "boolean"
         },
         "holdTimeMinutes": {
+          "default": null,
           "title": "Holdtimeminutes",
           "type": "integer"
         },
         "holdTimeSeconds": {
+          "default": null,
           "title": "Holdtimeseconds",
           "type": "integer"
         },
         "percentPower": {
+          "default": null,
           "title": "Percentpower",
           "type": "integer"
         },
         "rampRate": {
+          "default": null,
           "title": "Ramprate",
           "type": "number"
         },
         "timeoutSeconds": {
+          "default": null,
           "title": "Timeoutseconds",
           "type": "integer"
         },
         "ventAfter": {
+          "default": null,
           "title": "Ventafter",
           "type": "boolean"
         }
       },
       "required": [
-        "enablePump",
-        "holdTimeSeconds",
-        "holdTimeMinutes",
-        "rampRate",
-        "timeoutSeconds",
-        "ventAfter",
-        "percentPower"
+        "enablePump"
       ],
       "title": "VacuumModuleProfilePowerStep",
       "type": "object"
@@ -8514,38 +8514,38 @@
           "type": "boolean"
         },
         "gaugePressureMbar": {
+          "default": null,
           "title": "Gaugepressurembar",
           "type": "integer"
         },
         "holdTimeMinutes": {
+          "default": null,
           "title": "Holdtimeminutes",
           "type": "integer"
         },
         "holdTimeSeconds": {
+          "default": null,
           "title": "Holdtimeseconds",
           "type": "integer"
         },
         "rampRate": {
+          "default": null,
           "title": "Ramprate",
           "type": "number"
         },
         "timeoutSeconds": {
+          "default": null,
           "title": "Timeoutseconds",
           "type": "integer"
         },
         "ventAfter": {
+          "default": null,
           "title": "Ventafter",
           "type": "boolean"
         }
       },
       "required": [
-        "enablePump",
-        "holdTimeSeconds",
-        "holdTimeMinutes",
-        "rampRate",
-        "timeoutSeconds",
-        "ventAfter",
-        "gaugePressureMbar"
+        "enablePump"
       ],
       "title": "VacuumModuleProfilePressureStep",
       "type": "object"
