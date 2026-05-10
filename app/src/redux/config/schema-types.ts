@@ -20,6 +20,7 @@ export type DevInternalFlag =
   | 'ignoreOT2App'
   | 'accessControlMode'
   | 'robotSearchBar'
+  | 'showGitDetails'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
