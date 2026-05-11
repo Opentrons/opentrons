@@ -237,6 +237,26 @@ def check_force(
     )
     return qc_pass
 
+async def _life_time(api: OT3API, mount: OT3Mount, arguments: argparse.Namespace):
+    z_ax = Axis.by_mount(mount)
+    LOG.info(f"Home Axis: {z_ax}")
+    for cycles in arguments.lifetime_cycles:
+        await api.home([z_ax])
+        home_pos = await api.gantry_position(mount)
+        below_pos = home_pos._replace(z=pre_test_pos.z - 20)
+        test_current = 0.2
+        test_speed = 10
+        try:
+            async with api._backend.motor_current():
+                await api._backend.set_active_current({z_ax: test_current})
+                await api.move_to(
+                    mount=mount,
+                    abs_position=press_pos,
+                    speed=test_speed,
+                    expect_stalls=False,
+                )
+        finally:
+            pass
 
 async def _force_gauge(
     api: OT3API,
@@ -398,17 +418,21 @@ async def _main(arguments: argparse.Namespace) -> None:
         is_simulating=arguments.simulate
     )
     await api.set_gantry_load(api.gantry_load)
+    if arguments.lifetime_cycles == 0:
+        report = _build_csv_report()
+        dut = helpers_ot3.DeviceUnderTest.OTHER
+        helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
-    report = _build_csv_report()
-    dut = helpers_ot3.DeviceUnderTest.OTHER
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
-
-    # NOTE: We submit an automatic "PASS" result for these parameter lists.
-    # They do not test any logic but only add the list of parameters used to the CSV
-    for k, v in TEST_LEFT_PARAMETERS.items():
-        report("TEST_LEFT_PARAMETERS", k, [v, CSVResult.PASS])
-    for k, v in TEST_RIGHT_PARAMETERS.items():
-        report("TEST_RIGHT_PARAMETERS", k, [v, CSVResult.PASS])
+        # NOTE: We submit an automatic "PASS" result for these parameter lists.
+        # They do not test any logic but only add the list of parameters used to the CSV
+        for k, v in TEST_LEFT_PARAMETERS.items():
+            report("TEST_LEFT_PARAMETERS", k, [v, CSVResult.PASS])
+        for k, v in TEST_RIGHT_PARAMETERS.items():
+            report("TEST_RIGHT_PARAMETERS", k, [v, CSVResult.PASS])
+    else:
+        ui.print_title("We are going to run ZStage lifetime test")
+        ui.print_info("ensure it is empty below z stage , enter any key to continue !")
+        input()
 
     # Attempt to home if first homing fails because of OT-3 in box Y axis issue
     try:
@@ -429,6 +453,13 @@ async def _main(arguments: argparse.Namespace) -> None:
                 Axis.by_mount(OT3Mount.RIGHT),
             ]
         )
+    # add lifetime test
+    if arguments.lifetime_cycles > 0:
+    for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+        await _life_time(api, mount, arguments)
+    ui.print_info("Lifetime test done!")
+    return
+
 
     qc_pass = False
 
@@ -468,6 +499,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
     arg_parser.add_argument("--user_current", type=str, default="None")
+    arg_parser.add_argument("--liftime_cycles", type=int, default=0)
     old_stall_setting = get_adv_setting("disableStallDetection", RobotTypeEnum.FLEX)
     try:
         asyncio.run(set_adv_setting("disableStallDetection", True))
