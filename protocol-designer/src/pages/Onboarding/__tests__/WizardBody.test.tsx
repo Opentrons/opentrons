@@ -4,8 +4,6 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 
@@ -31,7 +29,6 @@ describe('WizardBody', () => {
       disabled: false,
       goBack: vi.fn(),
       subHeader: 'mockSubheader',
-      robotType: FLEX_ROBOT_TYPE,
     }
   })
 

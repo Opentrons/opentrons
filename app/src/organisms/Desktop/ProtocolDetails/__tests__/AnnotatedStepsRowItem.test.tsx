@@ -27,6 +27,8 @@ describe('AnnotatedStepsRowItem', () => {
     listElement: null,
     onShowErrorDetails: vi.fn(),
     t: (key: string) => key,
+    milliSecondsPerFrame: 2000,
+    isGlobalPlaying: false,
   }
 
   const buildProps = (

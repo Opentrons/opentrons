@@ -12,14 +12,78 @@ interface StepGroupProps {
   handleClick: () => void
   children: ReactNode
   subtitle?: string
+  // currently used as an error icon to display if the group has an error
+  headerPrefixIcon?: ReactNode | null
+  /** Rendered 4px left of the title; clicks do not toggle expand/collapse */
+  headerLeading?: ReactNode
+  /** Rendered before the expand chevron; clicks do not toggle expand/collapse */
+  headerTrailing?: ReactNode
+  /** Title text color (e.g. COLORS.purple50) */
+  titleColor?: string
 }
 
 export function StepGroup(props: StepGroupProps): JSX.Element {
-  const { title, isExpand, subtitle, isActive, handleClick, children } = props
+  const {
+    title,
+    isExpand,
+    subtitle,
+    isActive,
+    handleClick,
+    children,
+    headerPrefixIcon,
+    headerLeading,
+    headerTrailing,
+    titleColor,
+  } = props
 
   const handleChildrenClick: MouseEventHandler<HTMLDivElement> = event => {
     event.stopPropagation()
   }
+
+  const titleBlockClassName =
+    headerLeading != null
+      ? styles.step_group_title_block_grid
+      : styles.step_group_title_block_stacked
+
+  const titleArea = (
+    <div className={titleBlockClassName}>
+      {headerLeading != null ? (
+        <>
+          <div
+            className={styles.step_group_leading}
+            onClick={event => {
+              event.stopPropagation()
+            }}
+          >
+            {headerLeading}
+          </div>
+          <div className={styles.step_group_title_line}>
+            <StyledText desktopStyle="bodyDefaultSemiBold" color={titleColor}>
+              {title}
+            </StyledText>
+          </div>
+          {subtitle != null ? (
+            <div className={styles.step_group_subtitle_line}>
+              <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+                {subtitle}
+              </StyledText>
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <div className={styles.step_group_title_content}>
+          <StyledText desktopStyle="bodyDefaultRegular" color={titleColor}>
+            {title}
+          </StyledText>
+          {subtitle != null ? (
+            <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+              {subtitle}
+            </StyledText>
+          ) : null}
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <div
@@ -30,16 +94,38 @@ export function StepGroup(props: StepGroupProps): JSX.Element {
       }}
     >
       <div className={styles.step_group_header} onClick={handleClick}>
-        <div>
-          <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
-          {subtitle != null ? (
-            <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-              {subtitle}
-            </StyledText>
+        {headerPrefixIcon != null ? (
+          <div className={styles.step_group_header_left}>
+            <div
+              className={styles.step_group_prefix}
+              onClick={event => {
+                event.stopPropagation()
+              }}
+            >
+              {headerPrefixIcon}
+            </div>
+            {titleArea}
+          </div>
+        ) : (
+          titleArea
+        )}
+        <div className={styles.step_group_header_right}>
+          {headerTrailing != null ? (
+            <div
+              className={styles.step_group_trailing}
+              onClick={event => {
+                event.stopPropagation()
+              }}
+            >
+              {headerTrailing}
+            </div>
           ) : null}
-        </div>
-        <div className={styles.step_group_icon}>
-          <Icon name={isExpand ? 'chevron-up' : 'chevron-down'} size="1.2rem" />
+          <div className={styles.step_group_chevron_wrap}>
+            <Icon
+              name={isExpand ? 'chevron-up' : 'chevron-down'}
+              size="1.2rem"
+            />
+          </div>
         </div>
       </div>
       {isExpand ? <div onClick={handleChildrenClick}>{children}</div> : null}

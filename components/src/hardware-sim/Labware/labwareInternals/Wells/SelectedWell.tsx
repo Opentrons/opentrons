@@ -9,7 +9,7 @@ import type { LabwareWellMap } from '@opentrons/shared-data'
 interface SelectedWellProps {
   wellMap: LabwareWellMap
   wellName: string
-  size?: string
+  size: string
   textInsideTip?: string
   isUsed?: boolean
   isError?: boolean
@@ -50,16 +50,15 @@ export function SelectedWell(props: SelectedWellProps): JSX.Element {
 
   const shouldShowStroke = textInsideTip == null && showStroke
   // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
-  const viewBox =
-    size || isWellCircular ? '0 0 20 20' : `0 0 ${width} ${height}`
+  const viewBox = isWellCircular ? '0 0 20 20' : `0 0 ${width} ${height}`
   const commonProps = {
     [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
   }
 
   return (
     <svg
-      width={size ?? width}
-      height={size ?? height}
+      width={!isWellCircular ? width : size}
+      height={!isWellCircular ? height : size}
       viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

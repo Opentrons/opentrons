@@ -1,5 +1,7 @@
 """Tests for the free functions cryptography_utils."""
 
+import asyncio
+import base64
 import random
 import re
 from datetime import datetime, timedelta, timezone
@@ -8,9 +10,10 @@ from pathlib import Path
 from typing import Any, Callable
 
 import pytest
-from cryptography import x509
+from cryptography import fernet, x509
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.kdf import pbkdf2
 
 from key_server.tls import constants, cryptography_utils, file_utils
 
@@ -216,5 +219,75 @@ def test_tls_certs_verify_ip(tmp_path: Path) -> None:
     )
     ip_chain = ip_verifier.verify(tls_ee.cert, [])
     assert ip_chain[-1].fingerprint(hashes.SHA256()) == ca.cert.fingerprint(
+        hashes.SHA256()
+    )
+
+
+@pytest.mark.parametrize("length", [1, 4, 10])
+def test_make_password_makes_password(length: int) -> None:
+    """It should make a password of the specified length."""
+    password = cryptography_utils.make_password(length)
+    # one of the possible words is yo-yo
+    words = password.split("-")
+    deyoyoed: list[str] = []
+    word_iter = iter(words)
+    while True:
+        try:
+            word = next(word_iter)
+        except StopIteration:
+            break
+        if word == "yo":
+            try:
+                next_word = next(word_iter)
+            except StopIteration:
+                deyoyoed.append(word)
+                break
+            if next_word == "yo":
+                deyoyoed.append("yo-yo")
+            else:
+                deyoyoed.extend([word, next_word])
+        else:
+            deyoyoed.append(word)
+
+    assert len(deyoyoed) == length
+    wordlist = file_utils.load_wordlist()
+    for word in deyoyoed:
+        assert word in wordlist
+
+
+async def test_make_fernet_key_consistent() -> None:
+    """It should make a key that can be recreated with the provided salt."""
+    password = "gazpacho salad"
+    key = await cryptography_utils.make_fernet_key(password)
+
+    check_key_kdf = pbkdf2.PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=key.salt,
+        iterations=constants.KDF_ITERATIONS,
+    )
+    encoded_check_key = await asyncio.to_thread(
+        check_key_kdf.derive, password.encode("utf-8")
+    )
+    assert len(key.salt) == 16
+    assert base64.urlsafe_b64encode(encoded_check_key) == key.urlencoded_key
+
+
+async def test_fernet_roundtrip(tmp_path: Path) -> None:
+    """It should make a fernet key that can be used to decrypt certs encrypted with our functions."""
+    certpath = tmp_path / "certs"
+    certpath.mkdir()
+    password = "orange terrine with strawberry sauce"
+    key = await cryptography_utils.make_fernet_key(password)
+    cert = cryptography_utils.create_ca(
+        certpath, certpath, datetime.now(timezone.utc), timedelta(days=24)
+    )
+    encrypted = cryptography_utils.encrypt_cert(
+        cryptography_utils.get_cert_bytes_der(cert.cert), key
+    )
+
+    decrypted_bytes = fernet.Fernet(key.urlencoded_key).decrypt(encrypted)
+    decrypted_cert = x509.load_der_x509_certificate(decrypted_bytes)
+    assert cert.cert.fingerprint(hashes.SHA256()) == decrypted_cert.fingerprint(
         hashes.SHA256()
     )

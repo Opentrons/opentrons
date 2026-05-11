@@ -24,7 +24,7 @@ interface IndividualCommandProps {
   allRunDefs: LabwareDefinition[]
   fromGroup: boolean
   commandNumber: number
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
 }
 export function IndividualCommand({
   command,
@@ -41,50 +41,60 @@ export function IndividualCommand({
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
   useEffect(() => {
-    if (isHighlighted && commandRef.current && command.id === scrollTargetId) {
-      requestAnimationFrame(() => {
-        const container =
-          listElement ?? commandRef.current?.closest('[role="list"]')
-        if (container == null) {
-          commandRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest',
-          })
-          return
-        }
-        const containerRect = container.getBoundingClientRect()
-        const commandRect = commandRef.current?.getBoundingClientRect()
-        if (commandRect == null) return
-        const isBelow = commandRect.bottom >= containerRect.bottom - 8
-        const isAbove = commandRect.top <= containerRect.top + 1
-        if (!isBelow && !isAbove) return
-        if (container instanceof HTMLElement) {
-          const nextTop =
-            container.scrollTop + (commandRect.top - containerRect.top)
-          container.scrollTo({
-            behavior: 'smooth',
-            top: Math.max(0, nextTop),
-          })
-          return
-        }
-        commandRef.current?.scrollIntoView({
+    if (!isHighlighted || commandRef.current == null) return
+    if (command.id !== scrollTargetId) return
+
+    requestAnimationFrame(() => {
+      const commandEl = commandRef.current
+      if (commandEl == null) return
+
+      const groupExpandedEl =
+        fromGroup === true
+          ? commandEl.closest<HTMLElement>(
+              `.${styles.annotated_group_expanded}`
+            )
+          : null
+
+      const container: HTMLElement | null =
+        groupExpandedEl instanceof HTMLElement
+          ? groupExpandedEl
+          : (listElement ??
+            commandEl.closest<HTMLElement>('[role="list"]') ??
+            null)
+
+      if (container == null) {
+        commandEl.scrollIntoView({
           behavior: 'smooth',
-          block: isBelow ? 'start' : 'nearest',
+          block: 'nearest',
           inline: 'nearest',
         })
+        return
+      }
+
+      const containerRect = container.getBoundingClientRect()
+      const commandRect = commandEl.getBoundingClientRect()
+      const isBelow = commandRect.bottom >= containerRect.bottom - 8
+      const isAbove = commandRect.top <= containerRect.top + 1
+      if (!isBelow && !isAbove) return
+
+      const nextTop =
+        container.scrollTop + (commandRect.top - containerRect.top)
+      container.scrollTo({
+        behavior: 'smooth',
+        top: Math.max(0, nextTop),
       })
-    }
-  }, [isHighlighted, scrollTargetId, command, listElement])
+    })
+  }, [isHighlighted, scrollTargetId, command.id, listElement, fromGroup])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
+    [styles.individual_command_wrap_from_group]: fromGroup && !isHighlighted,
     [styles.individual_command_wrap_highlighted]: isHighlighted,
   })
 
   const individualCommandContainerStyle = clsx(
     styles.individual_command_container,
     {
-      [styles.rogue_individual_command_container]: fromGroup,
+      [styles.individual_command_container_group]: fromGroup,
     }
   )
 

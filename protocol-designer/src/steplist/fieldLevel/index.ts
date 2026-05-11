@@ -449,6 +449,7 @@ const stepFieldHelperMap = {
   }),
   pressureMbar: stepFieldHelpers({
     maskValue: composeMaskers(maskToSignedDecimal),
+    castValue: numberOrNull,
   }),
 }
 

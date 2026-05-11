@@ -4916,6 +4916,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [

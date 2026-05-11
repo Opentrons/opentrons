@@ -10,8 +10,9 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'reactScan',
   'quickTransferProtocolContentsLog',
   'ignoreOT2App',
-  'externalKeyboardTest',
   'accessControlMode',
+  'robotSearchBar',
+  'showGitDetails',
 ]
 
 // action type constants

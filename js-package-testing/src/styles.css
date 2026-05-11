@@ -2,12 +2,6 @@
 @import url('@fontsource/public-sans/600.css');
 @import url('@fontsource/public-sans/700.css');
 
-/* Design tokens (spacing, colors, radii) from components */
-@import url('@opentrons/components/styles/global');
-
-/* Import bundled styles from components package */
-@import url('@opentrons/components/styles');
-
 * {
   font-family: 'Public Sans', sans-serif;
 }
@@ -38,6 +32,7 @@
 }
 
 .demo_section {
+  max-width: 80rem;
   padding-bottom: var(--spacing-32);
   border-bottom: 0.0625rem solid var(--grey-30);
   margin-bottom: var(--spacing-48);
@@ -64,8 +59,6 @@
   border-radius: var(--border-radius-8);
   margin-top: var(--spacing-16);
   background-color: var(--white);
-
-  /* Fixed size for consistent screenshots */
 }
 
 .annotated_steps_demo {
@@ -75,4 +68,9 @@
   border-radius: var(--border-radius-8);
   margin-top: var(--spacing-16);
   background-color: var(--white);
+}
+
+.protocol_visualization_demo {
+  width: 100%;
+  height: 700px;
 }

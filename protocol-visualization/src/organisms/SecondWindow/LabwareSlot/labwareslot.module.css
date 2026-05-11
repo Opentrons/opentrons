@@ -1,0 +1,51 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16) var(--spacing-20) var(--spacing-20);
+  gap: var(--spacing-16);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.header_icons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.header_text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.body_container {
+  padding: var(--spacing-16) var(--spacing-24);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+}
+
+.header_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.labware_text_align {
+  width: 100%;
+  padding-top: var(--spacing-8);
+  text-align: center;
+}
+
+.tag_container {
+  height: 1.5rem;
+}
+
+.full_width_divider {
+  width: 100%;
+}

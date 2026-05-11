@@ -46,14 +46,16 @@ const getSelectedItem: Selector<SelectableItem> = createSelector(
       // (or the initial selected item, if there are no more saved steps).
       // Ideally this would happen in the selectedItem reducer itself,
       // but it's not easy to feed orderedStepIds into that reducer.
-      if (orderedStepIds.length > 0)
+      if (orderedStepIds.length > 0) {
         return {
           selectionType: SINGLE_STEP_SELECTION_TYPE,
           // This non-null assertion is safe because the length is checked above.
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           id: last(orderedStepIds)!,
         }
-      else return initialSelectedItemState
+      } else {
+        return initialSelectedItemState
+      }
     }
   }
 )

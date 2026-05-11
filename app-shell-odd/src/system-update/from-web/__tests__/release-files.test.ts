@@ -403,10 +403,16 @@ describe('downloadReleaseFiles', () => {
         .thenDo(
           (_url, dest, options) =>
             new Promise((resolve, reject) => {
-              const listener = () => {
-                reject(options.signal.reason)
+              if (options?.signal == null) {
+                throw new Error(
+                  'expected fetchToFile to receive an abort signal'
+                )
               }
-              options.signal.addEventListener('abort', listener, { once: true })
+              const { signal } = options
+              const listener = () => {
+                reject(signal.reason)
+              }
+              signal.addEventListener('abort', listener, { once: true })
               aborter.abort('oh no!')
               return fs
                 .writeFile(dest, 'this is the contents of the system.zip')
