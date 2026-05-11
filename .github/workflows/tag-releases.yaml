@@ -25,6 +25,10 @@ jobs:
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
+      # setup-node does not put pnpm on PATH; without this, setup-js fails with
+      # "pnpm: command not found" and the create-release step never runs (draft + prerelease never set).
+      - name: 'enable pnpm (corepack)'
+        run: corepack enable && corepack prepare pnpm@10.32.1 --activate
       - name: 'cache pnpm cache'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
