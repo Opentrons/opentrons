@@ -8,6 +8,7 @@ from aiohttp import web
 
 from server_utils.auth.resource_server.authorization_checker import (
     AuthorizationChecker,
+    AuthorizationNotRequiredResult,
     AuthorizedResult,
 )
 from server_utils.auth.resource_server.error_responses import build_response_for_error
@@ -56,7 +57,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
             result = await authorization_checker.check(
                 token=token, required_scopes=required_scopes_set
             )
-            if isinstance(result, AuthorizedResult):
+            if isinstance(result, (AuthorizationNotRequiredResult, AuthorizedResult)):
                 # The request is authorized.
                 return await handler(request)
             else:
