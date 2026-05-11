@@ -40,24 +40,30 @@
   --size-total-nav: calc(var(--size-subdomain-nav) + var(--size-main-nav));
 
   /* aspect ratios */
-  --aspect: {;
-
-    position: relative;;
-    position: absolute;;
-    inset: 0;;
-    width: 100%;;
+  --aspect: {
+    position: relative;
     height: 0;
-  };
-    height: 100%;
   }
-;
-    padding-bottom: 75%;
-  };
-    padding-bottom: 100%;
-  };
 
   --aspect-4-3: {
-    @apply --aspect;;
+    @apply --aspect;
+
+    padding-bottom: 75%;
+  }
+
   --aspect-1-1: {
-    @apply --aspect;;
-  --aspect-item: {}
+    @apply --aspect;
+
+    padding-bottom: 100%;
+  }
+
+  --aspect-item: {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
