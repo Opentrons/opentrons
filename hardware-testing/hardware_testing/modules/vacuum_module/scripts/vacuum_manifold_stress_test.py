@@ -174,7 +174,7 @@ async def _read_continuous_data(
     start_time: float,
     run_time: float,
     ctx: protocol_api.ProtocolContext,
-) -> None:  
+) -> None:
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
     loop_st = time.perf_counter()
     head_writer = True
@@ -200,7 +200,7 @@ async def _read_data(
     start_time: float,
     duration: int,
     ctx: protocol_api.ProtocolContext,
-) -> None: 
+) -> None:
     """Run continuous data read and handle expected timeout and errors."""
     try:
         await self.read_continuous_data(f_name, pump, start_time, duration, ctx)  # type: ignore[attr-defined]
@@ -245,7 +245,7 @@ async def _run_single_pump_api_cycle(
     DECAY_SEC: int,
     VENT_SEC: int,
     ctx: protocol_api.ProtocolContext,
-) -> None: 
+) -> None:
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1013.25
     await pump.set_vent_state(VentState.OPENED)
