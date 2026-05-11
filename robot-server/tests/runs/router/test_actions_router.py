@@ -66,6 +66,13 @@ async def test_create_run_action(
         )
     ).then_return(expected_result)
 
+    body_has_user_notes = get_run_action_body_has_user_notes(request_body)
+    log_run_action_play_user_notes(
+        run_id,
+        request_body,
+        created_at,
+        body_has_user_notes=body_has_user_notes,
+    )
     result = await create_run_action(
         runId=run_id,
         request_body=request_body,
@@ -75,13 +82,8 @@ async def test_create_run_action(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        body_has_user_notes=get_run_action_body_has_user_notes(request_body),
-        _user_notes_audit=log_run_action_play_user_notes(
-            run_id,
-            request_body,
-            created_at,
-            body_has_user_notes=get_run_action_body_has_user_notes(request_body),
-        ),
+        body_has_user_notes=body_has_user_notes,
+        _user_notes_audit=None,
     )
 
     assert result.content.data == expected_result
@@ -123,6 +125,13 @@ async def test_play_action_clears_maintenance_run(
         )
     ).then_return(expected_result)
 
+    body_has_user_notes = get_run_action_body_has_user_notes(request_body)
+    log_run_action_play_user_notes(
+        run_id,
+        request_body,
+        created_at,
+        body_has_user_notes=body_has_user_notes,
+    )
     result = await create_run_action(
         runId=run_id,
         request_body=request_body,
@@ -132,13 +141,8 @@ async def test_play_action_clears_maintenance_run(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        body_has_user_notes=get_run_action_body_has_user_notes(request_body),
-        _user_notes_audit=log_run_action_play_user_notes(
-            run_id,
-            request_body,
-            created_at,
-            body_has_user_notes=get_run_action_body_has_user_notes(request_body),
-        ),
+        body_has_user_notes=body_has_user_notes,
+        _user_notes_audit=None,
     )
 
     decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
@@ -185,6 +189,13 @@ async def test_create_play_action_not_allowed(
         )
     ).then_raise(exception)
 
+    body_has_user_notes = get_run_action_body_has_user_notes(request_body)
+    log_run_action_play_user_notes(
+        run_id,
+        request_body,
+        created_at,
+        body_has_user_notes=body_has_user_notes,
+    )
     with pytest.raises(ApiError) as exc_info:
         await create_run_action(
             runId=run_id,
@@ -195,13 +206,8 @@ async def test_create_play_action_not_allowed(
             maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
-            body_has_user_notes=get_run_action_body_has_user_notes(request_body),
-            _user_notes_audit=log_run_action_play_user_notes(
-                run_id,
-                request_body,
-                created_at,
-                body_has_user_notes=get_run_action_body_has_user_notes(request_body),
-            ),
+            body_has_user_notes=body_has_user_notes,
+            _user_notes_audit=None,
         )
 
     assert exc_info.value.status_code == expected_status_code
