@@ -37,7 +37,7 @@ describe('getVacuumProfileStepString', () => {
     ])
   })
 
-  it('formats sole cycle using inner steps once and cycle repetitions', () => {
+  it('flattens sole cycle into multiple atomic steps and sets repetitions to 1', () => {
     const profile: VacuumProfile = [
       {
         repetitions: 2,
@@ -46,13 +46,14 @@ describe('getVacuumProfileStepString', () => {
     ]
     expect(getVacuumProfileStepString(profile, true)).toEqual([
       `profile=[
+    {"power_percent": 30, "hold_time_seconds": 5},
     {
         "power_percent": 30,
         "hold_time_seconds": 5,
         "vent_after": True,
     }
 ]`,
-      'repetitions=2',
+      'repetitions=1',
     ])
   })
 
@@ -96,7 +97,7 @@ describe('getVacuumProfileStepString', () => {
     ])
   })
 
-  it('formats sole cycle with multiple inner steps and outer repetitions', () => {
+  it('flattens sole cycle with multiple inner steps and outer repetitions', () => {
     const profile: VacuumProfile = [
       {
         repetitions: 2,
@@ -114,13 +115,15 @@ describe('getVacuumProfileStepString', () => {
     expect(getVacuumProfileStepString(profile, true)).toEqual([
       `profile=[
     {"gauge_pressure": 1, "hold_time_seconds": 1},
+    {"power_percent": 50, "hold_time_seconds": 2},
+    {"gauge_pressure": 1, "hold_time_seconds": 1},
     {
         "power_percent": 50,
         "hold_time_seconds": 2,
         "vent_after": True,
     }
 ]`,
-      'repetitions=2',
+      'repetitions=1',
     ])
   })
 })
