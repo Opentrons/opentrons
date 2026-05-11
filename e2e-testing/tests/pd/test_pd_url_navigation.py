@@ -82,4 +82,4 @@ def test_navigate_to_overview_directly(page: Page, pd_base_url: str) -> None:
     expect(page.get_by_text("Welcome to Protocol Designer!")).to_be_visible()
     expect(page.locator('a[href="https://opentrons.com/privacy-policy"]').first).to_be_visible()
     expect(page.locator('a[href="https://opentrons.com/eula"]').first).to_be_visible()
-    expect(page.get_by_role("button", name="Create a protocol")).to_be_visible()
+    expect(page.get_by_role("button", name="Create a Flex protocol")).to_be_visible()

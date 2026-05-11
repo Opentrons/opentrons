@@ -23,6 +23,16 @@
 }
 
 @media print {
+  div.cover {
+    text-align: center;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  p.title {
+    font-size: 2em;
+  }
+
   tr {
     break-inside: avoid;
   }

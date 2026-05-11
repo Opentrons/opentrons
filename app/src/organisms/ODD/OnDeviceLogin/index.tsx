@@ -3,8 +3,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
-  COLORS,
-  Icon,
   InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
   setRefs,
@@ -13,9 +11,10 @@ import {
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './OnDeviceLoginOverlayProvider.module.css'
+import styles from './OnDeviceLogin.module.css'
 
 import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
@@ -113,8 +112,9 @@ export function OnDeviceLogin({
               as="label"
               htmlFor={activeFieldName}
               oddStyle="bodyTextRegular"
-              className={styles.field_label}
-              color={passwordLabelHasError ? COLORS.red50 : COLORS.black90}
+              className={`${styles.field_label}${
+                passwordLabelHasError ? ` ${styles.field_label_error}` : ''
+              }`}
             >
               {step === 'username'
                 ? t('device_settings:username')
@@ -178,14 +178,17 @@ function LoginFieldInput({
   onClearLoginError,
   onFocus,
 }: LoginFieldInputProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = step === 'password' && !showPassword
   const inputType = isPasswordHidden ? LEGACY_INPUT_TYPE_PASSWORD : 'text'
-  const toggleLabel = t('toggle_password_visibility')
 
-  return (
+  const togglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+    inputRef.current?.focus()
+  }
+
+  const inputField = (
     <InputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={step === 'password'}
@@ -201,29 +204,18 @@ function LoginFieldInput({
         onClearLoginError?.()
       }}
       onFocus={onFocus}
-      rightElement={
-        step === 'password' ? (
-          <div>
-            <button
-              aria-label={toggleLabel}
-              type="button"
-              title={toggleLabel}
-              onClick={() => {
-                setShowPassword(current => !current)
-                inputRef.current?.focus()
-              }}
-            >
-              <Icon name={showPassword ? 'eye-slash' : 'eye'} size="1.5rem" />
-            </button>
-          </div>
-        ) : null
-      }
     />
   )
-}
 
-export {
-  OnDeviceLoginOverlayProvider,
-  useOnDeviceLoginModal,
-} from './OnDeviceLoginOverlayProvider'
-export type { OnDeviceLoginModalContextValue } from './OnDeviceLoginOverlayProvider'
+  if (step !== 'password') return inputField
+
+  return (
+    <div className={styles.password_field_row}>
+      <div className={styles.password_field_input}>{inputField}</div>
+      <PasswordVisibilityToggle
+        isVisible={showPassword}
+        onToggle={togglePasswordVisibility}
+      />
+    </div>
+  )
+}

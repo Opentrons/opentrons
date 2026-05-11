@@ -37,7 +37,7 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import (
     AppState,

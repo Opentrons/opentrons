@@ -80,16 +80,47 @@ export function getAuthStateForRobot(
 }
 
 /**
+ * On the on-device display, this returns info for the current login, if the user
+ * is currently logged in. This should not be used in the desktop app.
+ *
+ * This only considers client-side state. Robot-side state, like whether access control
+ * is enabled at all, needs to be fetched separately.
+ */
+export const getLocalRobotAuthState = createSelector(
+  (state: State) => state,
+  (state: State) => getLocalRobot(state)?.name ?? null,
+  (state: State, localRobotName: string | null): PerRobotAuthState | null => {
+    if (localRobotName == null) {
+      return null
+    } else {
+      return getAuthStateForRobot(state, localRobotName)
+    }
+  }
+)
+
+/**
  * On the on-device display, this returns whether we're currently logged in to the
- * local robot. On the desktop app, this is not meaningful.
+ * local robot. This should not be used in the desktop app.
  *
  * This only considers client-side state. Robot-side state, like whether access control
  * is enabled at all, needs to be fetched separately.
  */
 export const getIsLoggedInToLocalRobot = createSelector(
+  getLocalRobotAuthState,
+  (localRobotAuthState: PerRobotAuthState | null): boolean =>
+    localRobotAuthState != null
+)
+
+/**
+ * On the on-device display, this returns the username of the user currently
+ * logged in to the local robot, or null if not logged in. On the desktop app,
+ * this is not meaningful.
+ */
+export const getCurrentUsernameForLocalRobot = createSelector(
   (state: State) => state,
   (state: State) => getLocalRobot(state)?.name ?? null,
-  (state: State, localRobotName: string | null): boolean =>
-    localRobotName != null &&
-    getAuthStateForRobot(state, localRobotName) != null
+  (state: State, localRobotName: string | null): string | null => {
+    if (localRobotName == null) return null
+    return getAuthStateForRobot(state, localRobotName)?.username ?? null
+  }
 )

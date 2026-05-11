@@ -39,7 +39,7 @@ describe('Controls', () => {
       isPlaying: false,
       commands: [],
       groupedCommands: null,
-      milliSecondsPerFrame: 2000,
+      milliSecondsPerFrame: 1000,
       setMilliSecondsPerFrame: vi.fn(),
     }
     vi.mocked(NewIconButton).mockReturnValue(<div>mock NewIconButton</div>)
@@ -56,7 +56,7 @@ describe('Controls', () => {
     render(props)
     screen.getByText('Test Protocol')
     screen.getByText('No errors')
-    screen.getByText('2s per step')
+    screen.getByText('1 s per step')
   })
 
   it('should render error chip', () => {

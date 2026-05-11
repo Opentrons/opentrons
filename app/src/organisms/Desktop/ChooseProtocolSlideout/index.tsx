@@ -56,7 +56,7 @@ import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistor
 import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -183,7 +183,7 @@ export function ChooseProtocolSlideoutComponent(
       ? {
           hostname: robot.ip,
           requestor:
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
         }
       : null
   )
@@ -676,7 +676,7 @@ export function ChooseProtocolSlideoutComponent(
         <ApiHostProvider
           hostname={robot.ip}
           requestor={
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
           }
         >
           {currentPage === 1

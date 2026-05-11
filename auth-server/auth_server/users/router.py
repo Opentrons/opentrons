@@ -2,7 +2,7 @@ from typing import Annotated
 
 import fastapi
 
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -172,6 +172,11 @@ async def update_user(
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="User not found",
+        )
+    except UserAlreadyExistsError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="User already exists",
         )
     except InvalidInputError as e:
         raise fastapi.HTTPException(

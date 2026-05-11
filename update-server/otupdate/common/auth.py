@@ -67,7 +67,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
                 return web.json_response(
                     status=status_code,
                     headers=headers,
-                    text=body.model_dump_json(),
+                    text=body.model_dump_json(by_alias=True),
                 )
 
         return wrapped

@@ -88,8 +88,9 @@ export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
 
 export const VACUUM_MODULE_INITIAL_STATE: VacuumModuleState = {
   type: VACUUM_MODULE_TYPE,
-  vacuumState: null,
   ventStatus: null,
+  numPumpActivitiesStarted: 0,
+  currentPumpActivity: { type: 'pumpDeactivated' },
 }
 
 export const MODULE_INITIAL_STATE_BY_TYPE: {
@@ -182,5 +183,3 @@ export const VACUUM_MAX_PRESSURE_MBAR = 1000
 
 export const VACUUM_DEACTIVATED: 'VACUUM_DEACTIVATED' = 'VACUUM_DEACTIVATED'
 export const VACUUM_AT_TARGET: 'VACUUM_AT_TARGET' = 'VACUUM_AT_TARGET'
-export const VACUUM_APPROACHING_TARGET: 'VACUUM_APPROACHING_TARGET' =
-  'VACUUM_APPROACHING_TARGET'

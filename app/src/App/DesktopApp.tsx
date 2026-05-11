@@ -32,7 +32,7 @@ import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
@@ -186,7 +186,7 @@ function RobotControlTakeover(): JSX.Element | null {
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
     >
       <FlexOnlyRobotControlTakeover robotName={robotName} />
       <AllRobotsRobotControlTakeover robotName={robotName} />

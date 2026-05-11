@@ -17,6 +17,7 @@ import { forMoveLabware } from './forMoveLabware'
 import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
+import { forSetTipState } from './forSetTipState'
 import { forWaitForTasks } from './forWaitForTasks'
 import {
   forHeaterShakerCloseLatch,
@@ -61,6 +62,7 @@ import {
   forVacuumOpenVent,
   forVacuumSetPumpPower,
   forVacuumSetPumpPressure,
+  forVacuumStartRunProfile,
   forVacuumStopPump,
 } from './vacuumUpdates'
 
@@ -118,6 +120,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'pickUpTip':
       forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'setTipState':
+      forSetTipState(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'magneticModule/engage':
@@ -476,6 +482,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'vacuumModule/stopVacuum':
       forVacuumStopPump(command.params, invariantContext, robotStateAndWarnings)
+      break
+    case 'vacuumModule/startRunProfile':
+      forVacuumStartRunProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
     default:
       console.error(
