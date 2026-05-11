@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 
 import pytest
 from decoy import Decoy
-from pydantic import ValidationError
 
 from server_utils.fastapi_utils.models.json_api import UserConfirmation
 
@@ -31,19 +30,6 @@ _PLAY_USER_CONFIRMATION = UserConfirmation(
     confirmedAt=datetime(2026, 5, 1, 16, 0, 0, tzinfo=timezone.utc),
     username="pytest-user",
 )
-
-
-def test_create_run_action_request_rejects_user_confirmation_with_non_play() -> None:
-    """``userConfirmation`` is only valid with actionType play."""
-    with pytest.raises(ValidationError):
-        CreateRunActionRequest(
-            data=RunActionCreate(actionType=RunActionType.PAUSE),
-            userConfirmation=UserConfirmation(
-                note="x",
-                confirmedAt=datetime.now(timezone.utc),
-                username="alice",
-            ),
-        )
 
 
 @pytest.fixture

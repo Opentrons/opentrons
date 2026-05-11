@@ -1,4 +1,4 @@
-test_name: Run action userConfirmation is accepted on play and rejected on other actions
+test_name: Run action userConfirmation on play; non-play body with userConfirmation parses
 
 marks:
   - usefixtures:
@@ -30,7 +30,7 @@ stages:
         json:
           run_id: data.id
 
-  - name: Non-play action rejects userConfirmation in request body
+  - name: Non-play with userConfirmation parses (pause before play is not allowed)
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
@@ -38,11 +38,11 @@ stages:
         data:
           actionType: pause
         userConfirmation:
-          note: userConfirmation is only valid with play
+          note: userConfirmation on pause before play
           confirmedAt: '2026-05-01T16:00:00.000Z'
           username: tavern-test-user
     response:
-      status_code: 422
+      status_code: 409
 
   - name: Play with userConfirmation succeeds
     request:
