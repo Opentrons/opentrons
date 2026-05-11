@@ -68,7 +68,7 @@ dev:
 dev-odd: export NODE_ENV := development
 dev-odd: export PORT := $(PORT)
 dev-odd: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
-dev-odd: export OT_APP_DEV_ODD_API_HOSTNAME := $(OT_APP_DEV_ODD_API_HOSTNAME)
+dev-odd: export ODD_IP := $(ODD_IP)
 dev-odd:
 	concurrently --no-color --kill-others --names "server,shell" \
 		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \
