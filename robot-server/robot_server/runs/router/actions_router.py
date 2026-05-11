@@ -12,11 +12,7 @@ from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import PydanticResponse, SimpleBody
 
-from ..action_models import (
-    CreateRunActionRequest,
-    RunAction,
-    RunActionType,
-)
+from ..action_models import CreateRunActionRequest, RunAction, RunActionType
 from ..dependencies import get_run_orchestrator_store, get_run_store
 from ..run_controller import RunActionNotAllowedError, RunController
 from ..run_models import RunNotFoundError
@@ -28,7 +24,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.fastapi_dependencies import get_body_has_user_notes
+from robot_server.fastapi_dependencies import get_run_action_body_has_user_notes
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
 )
@@ -122,7 +118,7 @@ async def create_run_action(
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    body_has_user_notes: Annotated[bool, Depends(get_body_has_user_notes)],
+    body_has_user_notes: Annotated[bool, Depends(get_run_action_body_has_user_notes)],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 

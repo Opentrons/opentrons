@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
-from robot_server.fastapi_dependencies import get_body_has_user_notes
+from robot_server.fastapi_dependencies import get_run_action_body_has_user_notes
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
@@ -72,7 +72,7 @@ async def test_create_run_action(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        body_has_user_notes=get_body_has_user_notes(request_body),
+        body_has_user_notes=get_run_action_body_has_user_notes(request_body),
     )
 
     assert result.content.data == expected_result
@@ -123,7 +123,7 @@ async def test_play_action_clears_maintenance_run(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        body_has_user_notes=get_body_has_user_notes(request_body),
+        body_has_user_notes=get_run_action_body_has_user_notes(request_body),
     )
 
     decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
@@ -180,7 +180,7 @@ async def test_create_play_action_not_allowed(
             maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
-            body_has_user_notes=get_body_has_user_notes(request_body),
+            body_has_user_notes=get_run_action_body_has_user_notes(request_body),
         )
 
     assert exc_info.value.status_code == expected_status_code
