@@ -240,18 +240,19 @@ def check_force(
 async def _life_time(api: OT3API, mount: OT3Mount, arguments: argparse.Namespace):
     z_ax = Axis.by_mount(mount)
     LOG.info(f"Home Axis: {z_ax}")
-    for cycles in arguments.lifetime_cycles:
+    for i in range(arguments.lifetime_cycles):
+        ui.print_info(f"Cycle {i+1}/{arguments.lifetime_cycles}")
         await api.home([z_ax])
         home_pos = await api.gantry_position(mount)
-        below_pos = home_pos._replace(z=pre_test_pos.z - 20)
+        below_pos = home_pos._replace(z=home_pos.z - arguments.lifetime_distance)
         test_current = 0.2
-        test_speed = 10
+        test_speed = 100
         try:
             async with api._backend.motor_current():
                 await api._backend.set_active_current({z_ax: test_current})
                 await api.move_to(
                     mount=mount,
-                    abs_position=press_pos,
+                    abs_position=below_pos,
                     speed=test_speed,
                     expect_stalls=False,
                 )
@@ -431,7 +432,7 @@ async def _main(arguments: argparse.Namespace) -> None:
             report("TEST_RIGHT_PARAMETERS", k, [v, CSVResult.PASS])
     else:
         ui.print_title("We are going to run ZStage lifetime test")
-        ui.print_info("ensure it is empty below z stage , enter any key to continue !")
+        ui.print_info("Ensure it is empty below z stage , enter any key to continue !")
         input()
 
     # Attempt to home if first homing fails because of OT-3 in box Y axis issue
@@ -455,10 +456,11 @@ async def _main(arguments: argparse.Namespace) -> None:
         )
     # add lifetime test
     if arguments.lifetime_cycles > 0:
-    for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
-        await _life_time(api, mount, arguments)
-    ui.print_info("Lifetime test done!")
-    return
+        for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            ui.print_title(f"Mount {mount.name}")
+            await _life_time(api, mount, arguments)
+        ui.print_info("Lifetime test done!")
+        return
 
 
     qc_pass = False
@@ -499,7 +501,8 @@ if __name__ == "__main__":
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
     arg_parser.add_argument("--user_current", type=str, default="None")
-    arg_parser.add_argument("--liftime_cycles", type=int, default=0)
+    arg_parser.add_argument("--lifetime_cycles", type=int, default=0)
+    arg_parser.add_argument("--lifetime_distance", type=int, default=10)
     old_stall_setting = get_adv_setting("disableStallDetection", RobotTypeEnum.FLEX)
     try:
         asyncio.run(set_adv_setting("disableStallDetection", True))
