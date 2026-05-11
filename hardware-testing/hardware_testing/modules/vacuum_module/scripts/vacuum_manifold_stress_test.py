@@ -203,7 +203,7 @@ async def _read_data(
 ) -> None: # noqa: ANN001
     """Run continuous data read and handle expected timeout and errors."""
     try:
-        await self.read_continuous_data(f_name, pump, start_time, duration, ctx)
+        await self.read_continuous_data(f_name, pump, start_time, duration, ctx) # type: ignore[attr-defined]
     except asyncio.TimeoutError:
         # Expected: we stop after RUN_SEC
         ctx.comment(f"continuous read duration reached ({duration}s)")
@@ -273,7 +273,7 @@ async def _run_single_pump_api_cycle(
     try:
         await self.read_data(
             str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx
-        )
+        ) # type: ignore[attr-defined]
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
@@ -293,7 +293,7 @@ async def _run_single_pump_api_cycle(
     await pump.set_vent_state(VentState.OPENED)
     await asyncio.sleep(VENT_SEC)
     try:
-        await self.read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)
+        await self.read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx) # type: ignore[attr-defined]
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({DECAY_SEC}s)"
