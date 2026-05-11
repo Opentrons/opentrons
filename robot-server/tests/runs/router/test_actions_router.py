@@ -7,7 +7,10 @@ from decoy import Decoy
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
-from robot_server.fastapi_dependencies import get_run_action_body_has_user_notes
+from robot_server.fastapi_dependencies import (
+    get_run_action_body_has_user_notes,
+    log_run_action_play_user_notes,
+)
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
@@ -73,6 +76,12 @@ async def test_create_run_action(
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
         body_has_user_notes=get_run_action_body_has_user_notes(request_body),
+        _user_notes_audit=log_run_action_play_user_notes(
+            run_id,
+            request_body,
+            created_at,
+            body_has_user_notes=get_run_action_body_has_user_notes(request_body),
+        ),
     )
 
     assert result.content.data == expected_result
@@ -124,6 +133,12 @@ async def test_play_action_clears_maintenance_run(
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
         body_has_user_notes=get_run_action_body_has_user_notes(request_body),
+        _user_notes_audit=log_run_action_play_user_notes(
+            run_id,
+            request_body,
+            created_at,
+            body_has_user_notes=get_run_action_body_has_user_notes(request_body),
+        ),
     )
 
     decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
@@ -181,6 +196,12 @@ async def test_create_play_action_not_allowed(
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
             body_has_user_notes=get_run_action_body_has_user_notes(request_body),
+            _user_notes_audit=log_run_action_play_user_notes(
+                run_id,
+                request_body,
+                created_at,
+                body_has_user_notes=get_run_action_body_has_user_notes(request_body),
+            ),
         )
 
     assert exc_info.value.status_code == expected_status_code

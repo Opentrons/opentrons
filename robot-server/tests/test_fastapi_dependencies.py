@@ -36,6 +36,7 @@ def test_get_run_action_body_has_user_notes() -> None:
 
 def test_get_run_action_body_has_user_notes_other_models() -> None:
     """Returns ``False`` for non-``CreateRunActionRequest`` bodies."""
+
     class _OtherBody(BaseModel):
         foo: str
 

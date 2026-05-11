@@ -1,8 +1,7 @@
 """Router for /runs actions endpoints."""
 
-import logging
 from datetime import datetime
-from typing import Annotated, Literal, Union, cast
+from typing import Annotated, Literal, Union
 
 from fastapi import Depends, status
 
@@ -24,7 +23,10 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.fastapi_dependencies import get_run_action_body_has_user_notes
+from robot_server.fastapi_dependencies import (
+    get_run_action_body_has_user_notes,
+    log_run_action_play_user_notes,
+)
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
 )
@@ -41,7 +43,6 @@ from robot_server.service.notifications import (
 )
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
-log = logging.getLogger(__name__)
 actions_router = LightRouter()
 
 
@@ -119,6 +120,7 @@ async def create_run_action(
     ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     body_has_user_notes: Annotated[bool, Depends(get_run_action_body_has_user_notes)],
+    _user_notes_audit: Annotated[None, Depends(log_run_action_play_user_notes)],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -135,7 +137,8 @@ async def create_run_action(
         maintenance_run_orchestrator_store: Maintenance run orchestrator store.
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        body_has_user_notes: Whether this body is play with ``userNotes`` (ACM hook).
+        body_has_user_notes: From :func:`get_run_action_body_has_user_notes` (play + notes).
+        _user_notes_audit: Logs / future audit when ``body_has_user_notes`` is true.
     """
     body = request_body.data
     action_type = body.actionType
@@ -148,16 +151,6 @@ async def create_run_action(
         deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
-            # TODO(TZ, 5-8-26): persist audit entry.
-            if body_has_user_notes:
-                text = cast(str, request_body.userNotes)
-                log.info(
-                    "Play action with userNotes "
-                    "(persist audit entry TODO): run_id=%s recorded_at=%s note_len=%s",
-                    runId,
-                    created_at.isoformat(),
-                    len(text),
-                )
 
         action = run_controller.create_action(
             action_id=action_id,
