@@ -45,7 +45,7 @@ describe('robot auth selectors', () => {
     const localRobot: DiscoveryClientRobot = {
       addresses: [
         {
-          ip: 'localhost',
+          ip: '127.0.0.1',
         } satisfies Partial<DiscoveryClientRobotAddress> as DiscoveryClientRobotAddress,
       ],
       health: {} as any,
