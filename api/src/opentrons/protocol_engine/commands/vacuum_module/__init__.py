@@ -14,6 +14,13 @@ from .open_vent import (
     OpenVentParams,
     OpenVentResult,
 )
+from .start_run_profile import (
+    StartRunProfile,
+    StartRunProfileCommandType,
+    StartRunProfileCreate,
+    StartRunProfileParams,
+    StartRunProfileResult,
+)
 from .start_set_vacuum_power import (
     StartSetVacuumPower,
     StartSetVacuumPowerCommandType,
@@ -67,4 +74,10 @@ __all__ = [
     "CloseVentCreate",
     "CloseVentParams",
     "CloseVentResult",
+    # run profile command models
+    "StartRunProfile",
+    "StartRunProfileCommandType",
+    "StartRunProfileCreate",
+    "StartRunProfileParams",
+    "StartRunProfileResult",
 ]
