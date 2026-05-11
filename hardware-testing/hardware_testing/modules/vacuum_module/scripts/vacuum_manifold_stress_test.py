@@ -270,7 +270,9 @@ async def _run_single_pump_api_cycle(
     # Run the continuous data reader for RUN_SEC seconds.
     start_time = time.perf_counter()
     try:
-        await self.read_data(str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx)
+        await self.read_data(
+            str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx
+        )
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
@@ -312,11 +314,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
 
     if not ctx.is_simulating():
-        OT3API.read_continuous_data = _read_continuous_data
-        OT3API.read_data = _read_data
-        OT3API.run_single_pump_api_cycle = _run_single_pump_api_cycle
-        OT3API.setup_devices = _setup_devices
-        OT3API.pump_disconnect = _pump_disconnect
+        OT3API.read_continuous_data = _read_continuous_data  # type: ignore[attr-defined]
+        OT3API.read_data = _read_data  # type: ignore[attr-defined]
+        OT3API.run_single_pump_api_cycle = _run_single_pump_api_cycle  # type: ignore[attr-defined]
+        OT3API.setup_devices = _setup_devices  # type: ignore[attr-defined]
+        OT3API.pump_disconnect = _pump_disconnect  # type: ignore[attr-defined]
 
     z_offset = ctx.params.z_offset  # type: ignore[attr-defined]
     volume = ctx.params.volume  # type: ignore[attr-defined]
@@ -327,7 +329,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
     perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
-    perstaltic_pump_flow_rate = ctx.params.perstaltic_flow_rate  # mL/min
+    perstaltic_pump_flow_rate = ctx.params.perstaltic_flow_rate  # type: ignore[attr-defined]
     conversion = (
         (perstaltic_volume_target / 1000) / perstaltic_pump_flow_rate
     ) * 60  # Convert uL volume to pump fill time (seconds)
