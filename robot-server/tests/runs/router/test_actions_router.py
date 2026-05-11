@@ -9,6 +9,7 @@ from server_utils.fastapi_utils.models.json_api import UserConfirmation
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
+from robot_server.fastapi_dependencies import get_body_needs_user_confirmation
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
@@ -19,9 +20,6 @@ from robot_server.runs.action_models import (
     RunActionType,
 )
 from robot_server.runs.router.actions_router import create_run_action
-from robot_server.runs.router.run_action_dependencies import (
-    get_body_needs_user_confirmation,
-)
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
 

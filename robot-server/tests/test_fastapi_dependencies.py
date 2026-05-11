@@ -1,4 +1,4 @@
-"""Tests for run-action FastAPI dependencies."""
+"""Tests for shared FastAPI dependencies (`robot_server.fastapi_dependencies`)."""
 
 from datetime import datetime, timezone
 
@@ -7,14 +7,14 @@ from pydantic import BaseModel
 
 from server_utils.fastapi_utils.models.json_api import UserConfirmation
 
+from robot_server.fastapi_dependencies import (
+    body_is_run_action_with_user_confirmation,
+    get_body_needs_user_confirmation,
+)
 from robot_server.runs.action_models import (
     CreateRunActionRequest,
     RunActionCreate,
     RunActionType,
-)
-from robot_server.runs.router.run_action_dependencies import (
-    body_is_run_action_with_user_confirmation,
-    get_body_needs_user_confirmation,
 )
 
 _UC = UserConfirmation(

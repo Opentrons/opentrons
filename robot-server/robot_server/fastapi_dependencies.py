@@ -1,12 +1,13 @@
-"""FastAPI dependencies for run-related routes (shared body-shape helpers)."""
+"""Shared FastAPI dependency functions used across routers."""
 
 from typing import TypeAlias, Union
 
 from pydantic import BaseModel
 
-from ..action_models import CreateRunActionRequest, RunActionType
+from robot_server.runs.action_models import CreateRunActionRequest, RunActionType
 
 # POST bodies for routes that may share :func:`get_body_needs_user_confirmation`.
+# Add concrete models when another endpoint reuses this helper.
 RequestBodyUnion: TypeAlias = Union[CreateRunActionRequest, BaseModel]
 
 
@@ -18,7 +19,7 @@ def body_is_run_action_with_user_confirmation(body: CreateRunActionRequest) -> b
 
 
 def get_body_needs_user_confirmation(request_body: RequestBodyUnion) -> bool:
-    """FastAPI dependency: play + ``userConfirmation`` only for run-action create bodies."""
+    """FastAPI dependency: play + ``userConfirmation`` for run-action create bodies."""
     # TODO(TZ, 5-8-26): validate access control enabled
     if isinstance(request_body, CreateRunActionRequest):
         return body_is_run_action_with_user_confirmation(request_body)
