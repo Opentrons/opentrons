@@ -1,4 +1,4 @@
-test_name: Run action userConfirmation on play; non-play body with userConfirmation parses
+test_name: Run action userNotes on play; non-play body with userNotes parses
 
 marks:
   - usefixtures:
@@ -30,31 +30,25 @@ stages:
         json:
           run_id: data.id
 
-  - name: Non-play with userConfirmation parses (pause before play is not allowed)
+  - name: Non-play with userNotes parses (pause before play is not allowed)
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
           actionType: pause
-        userConfirmation:
-          note: userConfirmation on pause before play
-          confirmedAt: '2026-05-01T16:00:00.000Z'
-          username: tavern-test-user
+        userNotes: userNotes on pause before play
     response:
       status_code: 409
 
-  - name: Play with userConfirmation succeeds
+  - name: Play with userNotes succeeds
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
           actionType: play
-        userConfirmation:
-          note: integration test userConfirmation note
-          confirmedAt: '2026-05-01T16:00:00.000Z'
-          username: tavern-test-user
+        userNotes: integration test userNotes note
     response:
       status_code: 201
       strict:

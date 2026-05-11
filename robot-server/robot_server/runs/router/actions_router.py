@@ -10,11 +10,7 @@ from opentrons.protocol_engine.types import DeckConfigurationType
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
-from server_utils.fastapi_utils.models.json_api import (
-    PydanticResponse,
-    SimpleBody,
-    UserConfirmation,
-)
+from server_utils.fastapi_utils.models.json_api import PydanticResponse, SimpleBody
 
 from ..action_models import (
     CreateRunActionRequest,
@@ -32,7 +28,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.fastapi_dependencies import get_body_needs_user_confirmation
+from robot_server.fastapi_dependencies import get_body_has_user_notes
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
 )
@@ -126,10 +122,7 @@ async def create_run_action(
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    body_needs_user_confirmation: Annotated[
-        bool,
-        Depends(get_body_needs_user_confirmation),
-    ],
+    body_has_user_notes: Annotated[bool, Depends(get_body_has_user_notes)],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -146,7 +139,7 @@ async def create_run_action(
         maintenance_run_orchestrator_store: Maintenance run orchestrator store.
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        body_needs_user_confirmation: Whether this body type needs ``userConfirmation`` (ACM hook).
+        body_has_user_notes: Whether this body is play with ``userNotes`` (ACM hook).
     """
     body = request_body.data
     action_type = body.actionType
@@ -160,14 +153,14 @@ async def create_run_action(
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
             # TODO(TZ, 5-8-26): persist audit entry.
-            if body_needs_user_confirmation:
-                uc = cast(UserConfirmation, request_body.userConfirmation)
+            if body_has_user_notes:
+                text = cast(str, request_body.userNotes)
                 log.info(
-                    "Play action with userConfirmation "
-                    "(persist audit entry TODO): run_id=%s username=%s note_len=%s",
+                    "Play action with userNotes "
+                    "(persist audit entry TODO): run_id=%s recorded_at=%s note_len=%s",
                     runId,
-                    uc.username,
-                    len(uc.note),
+                    created_at.isoformat(),
+                    len(text),
                 )
 
         action = run_controller.create_action(

@@ -65,7 +65,7 @@ class RunActionCreate(BaseModel):
 
 
 class CreateRunActionRequest(RequestModel[RunActionCreate]):
-    """Run action POST body; optional ``userConfirmation`` (e.g. play audit metadata)."""
+    """Run action POST body; optional ``userNotes`` (e.g. play audit metadata)."""
 
 
 class RunAction(ResourceModel):

@@ -1,12 +1,11 @@
 """Test the request models."""
 
-from datetime import datetime, timezone
 from typing import Any, Dict
 
 from pydantic import BaseModel, ValidationError
 from pytest import raises
 
-from server_utils.fastapi_utils.models.json_api import RequestModel, UserConfirmation
+from server_utils.fastapi_utils.models.json_api import RequestModel
 
 
 class ItemModel(BaseModel):
@@ -24,7 +23,7 @@ def test_attributes_as_dict() -> None:
     my_request_obj = DictRequest.model_validate(obj_to_validate)
     assert my_request_obj.model_dump() == {
         "data": {"some_data": 1},
-        "userConfirmation": None,
+        "userNotes": None,
     }
 
 
@@ -35,7 +34,7 @@ def test_attributes_as_item_model() -> None:
     my_request_obj = ItemRequest.model_validate(obj_to_validate)
     assert my_request_obj.model_dump() == {
         **obj_to_validate,
-        "userConfirmation": None,
+        "userNotes": None,
     }
 
 
@@ -116,55 +115,46 @@ def test_request_with_id() -> None:
     my_request_obj = MyRequest.model_validate(obj_to_validate)
     assert my_request_obj.model_dump() == {
         "data": {"type": "item", "attributes": {}, "id": "abc123"},
-        "userConfirmation": None,
+        "userNotes": None,
     }
 
 
-def test_user_confirmation_omitted_from_payload() -> None:
-    """`userConfirmation` is optional; payloads without it validate."""
+def test_user_notes_omitted_from_payload() -> None:
+    """`userNotes` is optional; payloads without it validate."""
     ItemRequest = RequestModel[ItemModel]
     payload = {"data": {"name": "apple", "quantity": 10, "price": 1.20}}
-    assert "userConfirmation" not in payload
+    assert "userNotes" not in payload
 
     obj = ItemRequest.model_validate(payload)
 
-    assert obj.userConfirmation is None
+    assert obj.userNotes is None
     assert obj.model_dump() == {
         **payload,
-        "userConfirmation": None,
+        "userNotes": None,
     }
 
 
-def test_user_confirmation_explicit_null_accepted() -> None:
-    """Explicit JSON null for `userConfirmation` is valid."""
+def test_user_notes_explicit_null_accepted() -> None:
+    """Explicit JSON null for `userNotes` is valid."""
     ItemRequest = RequestModel[ItemModel]
     payload: Dict[str, Any] = {
         "data": {"name": "apple", "quantity": 10, "price": 1.20},
-        "userConfirmation": None,
+        "userNotes": None,
     }
 
     obj = ItemRequest.model_validate(payload)
 
-    assert obj.userConfirmation is None
+    assert obj.userNotes is None
 
 
-def test_user_confirmation_passed_when_provided() -> None:
-    """When supplied, `userConfirmation` is parsed into `UserConfirmation`."""
+def test_user_notes_passed_when_provided() -> None:
+    """When supplied, `userNotes` is parsed as a string."""
     ItemRequest = RequestModel[ItemModel]
-    confirmed_at = datetime(2026, 5, 1, 16, 0, 0, tzinfo=timezone.utc)
     payload = {
         "data": {"name": "apple", "quantity": 10, "price": 1.20},
-        "userConfirmation": {
-            "note": "audit note",
-            "confirmedAt": confirmed_at.isoformat().replace("+00:00", "Z"),
-            "username": "tester",
-        },
+        "userNotes": "audit note",
     }
 
     obj = ItemRequest.model_validate(payload)
 
-    assert obj.userConfirmation == UserConfirmation(
-        note="audit note",
-        confirmedAt=confirmed_at,
-        username="tester",
-    )
+    assert obj.userNotes == "audit note"
