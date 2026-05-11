@@ -9,6 +9,10 @@ PATH := $(shell cd .. && pnpm bin):$(PATH)
 # dev server port
 PORT ?= 5173
 
+# Robot IP - Override on the CLI, e.g.:
+#   make dev-odd ODD_IP=10.14.19.236
+ODD_IP ?= 127.0.0.1
+
 # Path of source package
 SRC_PATH = app
 
@@ -64,6 +68,7 @@ dev:
 dev-odd: export NODE_ENV := development
 dev-odd: export PORT := $(PORT)
 dev-odd: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
+dev-odd: export OT_APP_DEV_ODD_API_HOSTNAME := $(OT_APP_DEV_ODD_API_HOSTNAME)
 dev-odd:
 	concurrently --no-color --kill-others --names "server,shell" \
 		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \

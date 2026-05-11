@@ -83,6 +83,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
       _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
+      _ODD_IP_: JSON.stringify(process.env.ODD_IP ?? '127.0.0.1'),
       // _OT_LL_ variables because app/ imports files directly from labware-library/,
       // causing them to be processed in the context of this Vite config instead of
       // labware-library's Vite config.
