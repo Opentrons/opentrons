@@ -137,7 +137,6 @@ def _write_to_csv(
     Expects `data` to have at least 4 numeric elements: [PA_FILTERED, PA_RAW, PB_FILTERED, PB_RAW].
     Adds the current `pressure_set` as the last column (may be None).
     """
-
     with open(f_name, "a", newline="") as f:
         writer = csv.writer(f)
         if header_write:
@@ -169,7 +168,7 @@ def _write_to_csv(
 
 
 async def _read_continuous_data(
-    self,
+    self: OT3API,
     f_name: str,
     pump: vacuum_module.VacuumModuleDriver,
     start_time: float,
@@ -195,7 +194,7 @@ async def _read_continuous_data(
 
 
 async def _read_data(
-    self,
+    self: OT3API,
     f_name: str,
     pump: vacuum_module.VacuumModuleDriver,
     start_time: float,
@@ -213,7 +212,9 @@ async def _read_data(
         raise
 
 
-async def _setup_devices(self) -> tuple[vacuum_module.VacuumModuleDriver, Any]:  # type: ignore[type-arg]
+async def _setup_devices(
+    self: OT3API,
+) -> tuple[vacuum_module.VacuumModuleDriver, Any]:  # type: ignore[type-arg]
     from hardware_testing.drivers import vacuum_pump
 
     loop = asyncio.get_event_loop()
@@ -232,7 +233,7 @@ async def _setup_devices(self) -> tuple[vacuum_module.VacuumModuleDriver, Any]: 
 
 
 async def _run_single_pump_api_cycle(
-    self,
+    self: OT3API,
     pump: vacuum_module.VacuumModuleDriver,
     water_pump_fixture: Any,
     target_pressure: int,
@@ -306,13 +307,12 @@ async def _run_single_pump_api_cycle(
     await pump.set_vent_state(VentState.CLOSED)
 
 
-async def _pump_disconnect(self, pump) -> None:
+async def _pump_disconnect(self: OT3API, pump: Any) -> None:
     await pump.disconnect()
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
-
     if not ctx.is_simulating():
         OT3API.read_continuous_data = _read_continuous_data  # type: ignore[attr-defined]
         OT3API.read_data = _read_data  # type: ignore[attr-defined]
