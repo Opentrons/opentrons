@@ -11,6 +11,7 @@ from typing import (
     Awaitable,
     Callable,
     Final,
+    TypeAlias,
 )
 
 import fastapi
@@ -21,6 +22,7 @@ from .auth_server import TOKEN_ENDPOINT_PATH, LocalHTTPClient
 from .authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     AuthorizationChecker,
+    AuthorizationNotRequiredResult,
     AuthorizedResult,
     AuthServerAuthorizationChecker,
     InsufficientScopeResult,
@@ -52,25 +54,47 @@ _authorization_checker_accessor = AppStateAccessor[AuthorizationChecker](
 )
 
 
-def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
-    """A FastAPI dependency to make sure the client is authorized with the given scopes.
+RequireScopesResult: TypeAlias = AuthorizationNotRequiredResult | AuthorizedResult
 
-    Usage example:
+
+def require_scopes(
+    *required_scopes: Scope,
+) -> Callable[..., Awaitable[RequireScopesResult]]:
+    """A FastAPI dependency to enforce access control.
+
+    Use like so:
 
     ```
     @router.post(
         "/foo",
         # The client must have READ_FOO and WRITE_FOO permissions.
-        dependencies=[require_scopes(Scope.READ_FOO, Scope.WRITE_FOO)],
+        dependencies=[Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO))],
     )
     def get_foo(...) -> None:
         ...
     ```
 
-    If the client lacks authorization, this will return an HTTP error response,
-    and the endpoint function will not run.
+    Or, for more advanced cases where you need more authorization details:
 
-    This also documents the list of required scopes in the OpenAPI spec.
+    ```
+    @router.post("/foo")
+    def get_foo(
+        # The client must have READ_FOO and WRITE_FOO permissions.
+        authorization_details: Annotated[
+            RequireScopesResult,
+            Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO))
+        ]
+    ) -> None:
+        # Here you can check authorization_details.
+        ...
+    ```
+
+    In either case, this dependency checks to see if the request is authorized for
+    all of the `required_scopes`. If so, it lets your endpoint function run.
+    Otherwise, it rejects the request with an appropriate HTTP error.
+
+    This also automatically adds documentation to the OpenAPI document to say
+    that the endpoint requires these scopes.
     """
     required_scopes_set = set(required_scopes)
 
@@ -94,14 +118,17 @@ def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
         authorization_checker: Annotated[
             AuthorizationChecker, fastapi.Depends(get_authorization_checker)
         ],
-    ) -> None:
+    ) -> RequireScopesResult:
         authorization_result = await authorization_checker.check(
             token=bearer_token, required_scopes=required_scopes_set
         )
-        if isinstance(authorization_result, AuthorizedResult):
+        if isinstance(
+            authorization_result, (AuthorizationNotRequiredResult, AuthorizedResult)
+        ):
             # The request is authorized, yay.
-            pass
+            return authorization_result
         else:
+            # The request is not authorized.
             raise AuthorizationError(authorization_result, required_scopes_set)
 
     return dependency
