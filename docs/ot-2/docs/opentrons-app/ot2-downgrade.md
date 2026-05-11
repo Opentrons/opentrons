@@ -1,9 +1,9 @@
 ---
-title: "Opentrons OT-2: Software Downgrade"
-description: "Roll back OT-2 robot and app software from v9.0 an earlier version. Not applicable for v26.06."
+title: "Opentrons OT-2: Downgrading Robot Software"
+description: "Roll back OT-2 robot and app software from v9.0 an earlier version."
 ---
 
-These instructions explain how to downgrade OT-2 robots running software version 9.0 or earlier. If your robot is running version 26.06 or later, see <font color="red"><strong>PLACEHOLDER TO TBD</strong></font> to roll back to version 9.0 or earlier.
+These instructions explain how to downgrade the Opentrons App and OT-2 robot software.
 
 !!! note
     Downgrading your robot's software version should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes.
@@ -12,9 +12,14 @@ These instructions explain how to downgrade OT-2 robots running software version
 
 ## Operating system versions
 
-After robot software v9.0, Opentrons forked its software into separate repositories for the OT-2 and Flex robots. This split helps reduce inconvenient downtime from shared releases that don't benefit the OT-2. Software for this downgrade procedure is available on GitHub at <https://github.com/Opentrons/opentrons/releases>.
+Opentrons has forked its software into different versions and repositories for the OT-2 and Flex robots. After v9.0, robot software and App versioning restart with v26.06. Separating our robot operating systems and App software reduces inconvenient downtime from previously shared releases that didn't benefit the OT-2.
 
-Forking the robot software also significantly changes the OT-2 operating system version. After v9.0, OT-2 versioning restarts with v26.06. This newer software is available on GitHub at [opentrons-ot2 releases](https://github.com/Opentrons/opentrons-ot2/releases) and is not applicable to the downgrade procedures described here.
+You can downgrade back to a pre-forked version of the OT-2 operating system and Opentrons App. For example, it is possible to revert to v9.0 (or earlier) from v26.06 (or later).
+
+Note, however, that protocols saved in a post-fork version of the Opentrons App will not automatically be moved to the pre-forked software after downgrading. You will have to manually move these files:
+
+* **From:** `.../Opentrons OT-2/protocols/`
+* **To:** `.../Opentrons/protocols/`
 
 ## Robot downgrade instructions
 
