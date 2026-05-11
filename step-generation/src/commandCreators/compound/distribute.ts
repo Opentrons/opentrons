@@ -31,7 +31,7 @@ import {
   formatChangeTipArg,
   formatPyStr,
   getIsRetractSafeForAirGap,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
   getTransferPlanAndReferenceVolumes,
@@ -323,7 +323,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
-    const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
+    const aspiratePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
@@ -333,7 +333,15 @@ export const distribute: CommandCreator<DistributeArgs> = (
       primaryNozzle,
       nozzleConfiguration: nozzles,
     })
-    const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
+    if (!aspiratePipetteMovementSafetyStatus.isSafe) {
+      errors.push(
+        errorCreators.possiblePipetteCollision({
+          unsafePipetteMovementReason:
+            aspiratePipetteMovementSafetyStatus.reason,
+        })
+      )
+    }
+    const dispensePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
@@ -343,8 +351,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
       primaryNozzle,
       nozzleConfiguration: nozzles,
     })
-    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
-      errors.push(errorCreators.possiblePipetteCollision())
+    if (!dispensePipetteMovementSafetyStatus.isSafe) {
+      errors.push(
+        errorCreators.possiblePipetteCollision({
+          unsafePipetteMovementReason:
+            dispensePipetteMovementSafetyStatus.reason,
+        })
+      )
     }
   }
 

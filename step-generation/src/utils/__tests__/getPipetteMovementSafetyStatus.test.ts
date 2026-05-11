@@ -14,7 +14,7 @@ import {
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { getIsSafePipetteMovement } from '..'
+import { getPipetteMovementSafetyStatus } from '..'
 import { CLEAN } from '../../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -29,7 +29,7 @@ const mockLabware2 = 'labwareId2'
 const mockAdapter = 'adapterId'
 const mockWellName = 'A1'
 
-describe('getIsSafePipetteMovement', () => {
+describe('getPipetteMovementSafetyStatus', () => {
   let mockInvariantProperties: InvariantContext
   let mockRobotState: RobotState
   beforeEach(() => {
@@ -98,7 +98,7 @@ describe('getIsSafePipetteMovement', () => {
   })
 
   it('returns true when the labware id is a trash bin', () => {
-    const result = getIsSafePipetteMovement({
+    const { isSafe } = getPipetteMovementSafetyStatus({
       pipetteId: mockPipId,
       robotState: {
         labware: {},
@@ -114,10 +114,10 @@ describe('getIsSafePipetteMovement', () => {
       primaryNozzle: A1_NOZZLE,
       nozzleConfiguration: ALL,
     })
-    expect(result).toEqual(true)
+    expect(isSafe).toEqual(true)
   })
   it('returns false when 96ch single tip pick up will overlap with waste chute', () => {
-    const result = getIsSafePipetteMovement({
+    const { isSafe } = getPipetteMovementSafetyStatus({
       robotState: {
         ...mockRobotState,
         pipettes: {
@@ -146,10 +146,10 @@ describe('getIsSafePipetteMovement', () => {
       primaryNozzle: A1_NOZZLE,
       nozzleConfiguration: SINGLE,
     })
-    expect(result).toEqual(false)
+    expect(isSafe).toEqual(false)
   })
   it('returns false when within pipette extents is false', () => {
-    const result = getIsSafePipetteMovement({
+    const { isSafe } = getPipetteMovementSafetyStatus({
       robotState: {
         ...mockRobotState,
         pipettes: {
@@ -168,7 +168,7 @@ describe('getIsSafePipetteMovement', () => {
       primaryNozzle: A1_NOZZLE,
       nozzleConfiguration: COLUMN,
     })
-    expect(result).toEqual(false)
+    expect(isSafe).toEqual(false)
   })
   it('returns true when there are no collisions and a module near it', () => {
     mockRobotState.modules = {
@@ -182,7 +182,7 @@ describe('getIsSafePipetteMovement', () => {
         pythonName: 'mockPythonName',
       },
     }
-    const result = getIsSafePipetteMovement({
+    const { isSafe } = getPipetteMovementSafetyStatus({
       robotState: mockRobotState,
       invariantContext: mockInvariantProperties,
       pipetteId: mockPipId,
@@ -192,7 +192,7 @@ describe('getIsSafePipetteMovement', () => {
       primaryNozzle: A1_NOZZLE,
       nozzleConfiguration: ALL,
     })
-    expect(result).toEqual(true)
+    expect(isSafe).toEqual(true)
   })
   it('returns false when there is a tip that collides', () => {
     mockRobotState.tipState.tipracks = {
@@ -202,7 +202,7 @@ describe('getIsSafePipetteMovement', () => {
       ...mockRobotState.labware,
       [mockAdapter]: { stack: [mockAdapter, 'D1'] },
     }
-    const result = getIsSafePipetteMovement({
+    const { isSafe } = getPipetteMovementSafetyStatus({
       robotState: {
         ...mockRobotState,
         pipettes: {
@@ -221,7 +221,7 @@ describe('getIsSafePipetteMovement', () => {
       primaryNozzle: A12_NOZZLE,
       nozzleConfiguration: COLUMN,
     })
-    expect(result).toEqual(false)
+    expect(isSafe).toEqual(false)
   })
   it('returns false when there is a tall module nearby in a diagonal slot with adapter and labware', () => {
     mockRobotState.modules = {
@@ -244,7 +244,7 @@ describe('getIsSafePipetteMovement', () => {
         pythonName: 'mockPythonName',
       },
     }
-    const result = getIsSafePipetteMovement({
+    const { isSafe } = getPipetteMovementSafetyStatus({
       robotState: {
         ...mockRobotState,
         pipettes: {
@@ -263,7 +263,7 @@ describe('getIsSafePipetteMovement', () => {
       primaryNozzle: A12_NOZZLE,
       nozzleConfiguration: COLUMN,
     })
-    expect(result).toEqual(false)
+    expect(isSafe).toEqual(false)
   })
   //    todo(jr, 4/23/24): add more test cases, test thermocycler collision - i'll do this in a follow up
 })

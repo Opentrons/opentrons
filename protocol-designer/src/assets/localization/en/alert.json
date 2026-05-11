@@ -325,8 +325,16 @@
         "body": "Picking up labware with the gripper while tips are on an adjacent pipette can cause collisions. Drop tips from all pipettes before this step.",
         "title": "Gripper movement with tips attached"
       },
-      "POSSIBLE_PIPETTE_COLLISION": {
-        "body": "There is a possibility that the pipette will collide with the adjacent labware, modules, or trash fixtures for partial tip pick up.",
+      "POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA": {
+        "body": "There is a possibility that the pipette will collide with adjacent items in {{addressableAreaCausingCollisionDisplayName}}.",
+        "title": "Pipette collisions likely"
+      },
+      "POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS": {
+        "body": "There is a possibility that the pipette will move outside the deck extents.",
+        "title": "Pipette collisions likely"
+      },
+      "POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID": {
+        "body": "There is a possibility that the pipette will collide with the Thermocycler lid.",
         "title": "Pipette collisions likely"
       },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
