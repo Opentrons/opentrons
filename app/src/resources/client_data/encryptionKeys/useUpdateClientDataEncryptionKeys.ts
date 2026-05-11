@@ -1,8 +1,10 @@
+import { omit } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
 import { useUpdateClientData } from '@opentrons/react-api-client'
 
 import { KEYS } from '../constants'
+import { useClientDataEncryptionKeys } from './useClientDataEncryptionKeys'
 
 import type {
   UseUpdateClientDataMutationOptions,
@@ -14,10 +16,10 @@ export type UseUpdateClientDataRecoveryResult = Omit<
   UseUpdateClientDataMutationResult<ClientDataEncryptionKeys>,
   'updateClientData'
 > & {
-  /* Add a new request (by altering a nonce) to display the robot key. */
-  requestKeyDisplay: () => void
+  /* Add a new request to display the robot key. Returns the requested string to be used with clearKeyDisplay.*/
+  requestKeyDisplay: () => string
   /* Clear the request (by nulling the nonce). */
-  clearKeyDisplay: () => void
+  clearKeyDisplay: (request: string) => void
   /* Clear the clientData store at the error recovery key. */
   clearClientData: () => void
 }
@@ -27,18 +29,27 @@ const uuid: () => string = uuidv4
 export function useUpdateClientDataEncryptionKeys(
   options: UseUpdateClientDataMutationOptions<ClientDataEncryptionKeys> = {}
 ): UseUpdateClientDataRecoveryResult {
+  const { keyDisplayRequestedNonces } = useClientDataEncryptionKeys()
   const { updateClientData, ...mutate } =
     useUpdateClientData<ClientDataEncryptionKeys>(KEYS.ERROR_RECOVERY, options)
 
-  const requestKeyDisplay = (): void => {
-    updateClientData({ keyDisplayRequestedNonce: uuid() })
+  const requestKeyDisplay = (): string => {
+    const newRequest = uuid()
+    updateClientData({
+      keyDisplayRequestedNonces: {
+        ...keyDisplayRequestedNonces,
+        [newRequest]: true,
+      },
+    })
+    return newRequest
   }
-  const clearKeyDisplay = (): void => {
-    updateClientData({ keyDisplayRequestedNonce: null })
+  const clearKeyDisplay = (request: string): void => {
+    const currentRequests = omit(keyDisplayRequestedNonces, request)
+    updateClientData({ keyDisplayRequestedNonces: currentRequests })
   }
 
   const clearClientData = (): void => {
-    updateClientData({ keyDisplayRequestedNonce: null })
+    updateClientData({ keyDisplayRequestedNonces: {} })
   }
 
   return {

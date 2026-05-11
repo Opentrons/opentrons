@@ -26,6 +26,7 @@ import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { LoggedOutOverlayMount } from '/app/organisms/ODD/OnDeviceLogin/LoggedOutOverlayMount'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
+import { RobotEncryptionKeyTakeover } from '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeyTakeover'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { Account } from '/app/pages/ODD/Account'
@@ -243,6 +244,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <MaintenanceRunTakeover>
                     <EstopTakeover />
                     <FirmwareUpdateTakeover />
+                    <RobotEncryptionKeyTakeover />
                     {showModuleSetupModal && localRobot?.name != null ? (
                       <ModuleWizardFlows
                         showSetupLauncher={true}

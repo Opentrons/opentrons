@@ -6,10 +6,14 @@ import { useCACertPasswordQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { RobotSettingButton } from '/app/organisms/ODD/RobotSettingsDashboard'
+import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
-import { refetchTimeForPassword, RobotEncryptionKey } from '..'
+import {
+  refetchTimeForPassword,
+  RobotEncryptionKeyModal,
+} from '../RobotEncryptionKeyModal'
 
-import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { CACertPassword } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
@@ -21,60 +25,31 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useCACertPasswordQuery: vi.fn(),
   }
 })
+vi.mock('/app/resources/client_data/encryptionKeys')
 
-const mockGoBack = vi.fn()
-
-const render = (props: ComponentProps<typeof RobotEncryptionKey>) => {
+const render = () => {
   return renderWithProviders(
     <NiceModal.Provider>
-      <RobotEncryptionKey {...props} />
+      <RobotSettingButton
+        settingName={'SHOWMODAL'}
+        onClick={() => {
+          NiceModal.show(RobotEncryptionKeyModal)
+        }}
+      />
     </NiceModal.Provider>,
     { i18nInstance: i18n }
   )
 }
 
-const renderWithModal = (props: ComponentProps<typeof RobotEncryptionKey>) => {
-  const view = render(props)
-  fireEvent.click(screen.getByText('View robot generated key'))
+const renderWithModal = () => {
+  const view = render()
+  fireEvent.click(screen.getByText('SHOWMODAL'))
   return view
 }
 
-describe('RobotEncryptionKey', () => {
-  let props: ComponentProps<typeof RobotEncryptionKey>
-
-  beforeEach(() => {
-    props = {
-      setCurrentOption: mockGoBack,
-    }
-    vi.mocked(useCACertPasswordQuery).mockReturnValue({
-      data: {
-        data: {
-          password: 'lions-tigers-bears',
-          valid_from_utc: '2026-04-21T21:45:01.535178Z',
-          valid_until_utc: '2026-04-21T21:45:31.535178Z',
-        },
-      },
-    } as UseQueryResult<CACertPassword>)
-  })
-  it('should render a button', () => {
-    render(props)
-    screen.getByText('View robot generated key')
-  })
-  it('should render the modal when clicking the button', () => {
-    render(props)
-    const viewButton = screen.getByText('View robot generated key')
-    fireEvent.click(viewButton)
-    screen.getByText(/enter this key into the opentrons app/i)
-  })
-})
-
 describe('RobotEncryptionKey modal', () => {
-  let props: ComponentProps<typeof RobotEncryptionKey>
-
+  const mockClearKeyDisplay = vi.fn()
   beforeEach(() => {
-    props = {
-      setCurrentOption: mockGoBack,
-    }
     vi.mocked(useCACertPasswordQuery).mockReturnValue({
       data: {
         data: {
@@ -84,17 +59,26 @@ describe('RobotEncryptionKey modal', () => {
         },
       },
     } as UseQueryResult<CACertPassword>)
+    vi.mocked(useUpdateClientDataEncryptionKeys).mockReturnValue({
+      clearKeyDisplay: mockClearKeyDisplay,
+    } as any as ReturnType<typeof useUpdateClientDataEncryptionKeys>)
   })
   it('should close the modal when clicking ok', () => {
-    renderWithModal(props)
+    renderWithModal()
     const okButton = screen.getByText('Ok')
     fireEvent.click(okButton)
     expect(
       screen.queryByText(/enter this key into the opentrons app/i)
     ).toBeNull()
   })
+  it('should clear client data when clicking ok', () => {
+    renderWithModal()
+    const okButton = screen.getByText('Ok')
+    fireEvent.click(okButton)
+    expect(mockClearKeyDisplay).toHaveBeenCalled()
+  })
   it('should render the password', () => {
-    renderWithModal(props)
+    renderWithModal()
     screen.getByText('lions-tigers-bears')
   })
 })

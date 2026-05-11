@@ -1,0 +1,13 @@
+.robot_encryption_key_setting_option_container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.robot_encryption_key_setting_option_content_container {
+  display: flex;
+  height: 100%;
+  min-height: 12rem;
+  flex-direction: column;
+  padding: 7.75rem var(--spacing-40) var(--spacing-40);
+}

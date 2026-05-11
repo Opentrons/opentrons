@@ -1,3 +1,3 @@
 export interface ClientDataEncryptionKeys {
-  keyDisplayRequestedNonce: string | null
+  keyDisplayRequestedNonces: Record<string, any>
 }
