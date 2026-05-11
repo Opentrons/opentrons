@@ -174,7 +174,7 @@ async def _read_continuous_data(
     start_time: float,
     run_time: float,
     ctx: protocol_api.ProtocolContext,
-) -> None: # noqa: ANN001
+) -> None:  # noqa: ANN001
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
     loop_st = time.perf_counter()
     head_writer = True
@@ -200,10 +200,10 @@ async def _read_data(
     start_time: float,
     duration: int,
     ctx: protocol_api.ProtocolContext,
-) -> None: # noqa: ANN001
+) -> None:  # noqa: ANN001
     """Run continuous data read and handle expected timeout and errors."""
     try:
-        await self.read_continuous_data(f_name, pump, start_time, duration, ctx) # type: ignore[attr-defined]
+        await self.read_continuous_data(f_name, pump, start_time, duration, ctx)  # type: ignore[attr-defined]
     except asyncio.TimeoutError:
         # Expected: we stop after RUN_SEC
         ctx.comment(f"continuous read duration reached ({duration}s)")
@@ -245,7 +245,7 @@ async def _run_single_pump_api_cycle(
     DECAY_SEC: int,
     VENT_SEC: int,
     ctx: protocol_api.ProtocolContext,
-) -> None: # noqa: ANN001
+) -> None:  # noqa: ANN001
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1013.25
     await pump.set_vent_state(VentState.OPENED)
@@ -271,9 +271,7 @@ async def _run_single_pump_api_cycle(
     # Run the continuous data reader for RUN_SEC seconds.
     start_time = time.perf_counter()
     try:
-        await self.read_data(
-            str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx
-        ) # type: ignore[attr-defined]
+        await self.read_data(str(trial_csv), pump, start_time, SETTLE_SEC + RUN_SEC, ctx)  # type: ignore[attr-defined]
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
@@ -293,7 +291,7 @@ async def _run_single_pump_api_cycle(
     await pump.set_vent_state(VentState.OPENED)
     await asyncio.sleep(VENT_SEC)
     try:
-        await self.read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx) # type: ignore[attr-defined]
+        await self.read_data(str(trial_csv), pump, start_time, DECAY_SEC, ctx)  # type: ignore[attr-defined]
     except asyncio.TimeoutError:
         ctx.comment(
             f"[cycle {cycle_index}] continuous read duration reached ({DECAY_SEC}s)"
@@ -352,7 +350,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     if not ctx.is_simulating():
         ot3api = ctx._core.get_hardware()
         try:
-            pump, pump_fixture = ot3api.setup_devices()
+            pump, pump_fixture = ot3api.setup_devices()  # type: ignore[attr-defined]
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
             raise
