@@ -10,16 +10,26 @@ These instructions explain how to downgrade the Opentrons App and OT-2 robot sof
 
 <!-- maybe too much? The jump from 9 to 26.06 might leave people wondering what happened between 10 and 25. An attempt at context. -->
 
-## Operating system versions
+## Software versions
 
-Opentrons has forked its software into different versions and repositories for the OT-2 and Flex robots. After v9.0, robot software and App versioning restart with v26.06. Separating our robot operating systems and App software reduces inconvenient downtime from previously shared releases that didn't benefit the OT-2.
+After the v9.0 release, Opentrons split its software into different branches for OT-2 and Flex. This change restarts OT-2 software versioning at 26.06, enables robot-specific software releases, and reduces downtime from shared releases that don't benefit the OT-2.
 
-You can downgrade back to a pre-forked version of the OT-2 operating system and Opentrons App. For example, it is possible to revert to v9.0 (or earlier) from v26.06 (or later).
+Forking the software gives us two downgrade paths:
 
-Note, however, that protocols saved in a post-fork version of the Opentrons App will not automatically be moved to the pre-forked software after downgrading. You will have to manually move these files:
+- **Latest to Legacy**: From v26.06 (or later) to v9.0 (or earlier).
+- **Legacy to Legacy**: From v9.0 to an earlier version.
 
-* **From:** `.../Opentrons OT-2/protocols/`
-* **To:** `.../Opentrons/protocols/`
+!!! note
+    Saved protocols are not migrated automatically during a "latest to legacy" downgrade. You have to move those files manually.
+
+The following table provides information about software versions, repositories, and App directories that store saved protocols.
+
+| Feature | Legacy software | Latest software |
+|----|----|----|
+| **Versions** | v9.0 and earlier | v26.06 and later |
+| **Software repository** | [Opentrons releases](https://github.com/Opentrons/opentrons/releases) | [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases) |
+| **Saved protocols location** | `.../Opentrons/protocols/` | `.../Opentrons OT-2/protocols/` |
+
 
 ## Robot downgrade instructions
 
