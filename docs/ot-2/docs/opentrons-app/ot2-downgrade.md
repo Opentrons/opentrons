@@ -12,15 +12,15 @@ These instructions explain how to downgrade the Opentrons App and OT-2 robot sof
 
 ## Software versions
 
-After the v9.0 release, Opentrons split its software into different branches for OT-2 and Flex. This change restarts OT-2 software versioning at 26.06, enables robot-specific software releases, and reduces downtime from shared releases that don't benefit the OT-2.
+After the v9.0 release, Opentrons split its software into separate branches for OT-2 and Flex. This change restarts OT-2 software versioning at 26.06, enables robot-specific software releases, and reduces downtime from shared releases that don't benefit the OT-2.
 
-Forking the software gives us two downgrade paths:
+Forking OT-2 software creates two downgrade paths:
 
 - **Latest to Legacy**: From v26.06 (or later) to v9.0 (or earlier).
 - **Legacy to Legacy**: From v9.0 to an earlier version.
 
 !!! note
-    Saved protocols are not migrated automatically during a "latest to legacy" downgrade. You have to move those files manually.
+    Saved protocols are not migrated automatically during a "latest to legacy" downgrade. You have to find move those files manually.
 
 The following table provides information about software versions, repositories, and App directories that store saved protocols.
 
@@ -29,7 +29,6 @@ The following table provides information about software versions, repositories, 
 | **Versions** | v9.0 and earlier | v26.06 and later |
 | **Software repository** | [Opentrons releases](https://github.com/Opentrons/opentrons/releases) | [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases) |
 | **Saved protocols location** | `.../Opentrons/protocols/` | `.../Opentrons OT-2/protocols/` |
-
 
 ## Robot downgrade instructions
 
