@@ -1,0 +1,21 @@
+metric,value
+run_id,788154de-c248-42ad-afd5-317c58adaa97
+status,stopped
+started_at,2025-05-29T18:49:54.405796Z
+completed_at,2025-05-30T12:44:43.067247Z
+configured_cycles,3000
+cycles_started,1038
+cycles_passed,1037
+cycles_failed,0
+last_cycle,1038
+total_retries,0
+total_reopens,0
+failed_command,
+failed_port,
+error_detail,
+dmesg -T | grep -iE "ttyACM|ttyUSB|disconnect|disabled by hub|emi|STM32"
+[Mon May 11 08:19:00 2026] usb 1-1.2: FTDI USB Serial Device converter now attached to ttyUSB0
+[Mon May 11 08:19:01 2026] usb 1-1.4.3: FTDI USB Serial Device converter now attached to ttyUSB1
+[Mon May 11 08:19:01 2026] cdc_acm 1-1.1:1.0: ttyACM0: USB ACM device
+[Mon May 11 08:19:01 2026] usb 1-1.4.2.4: Product: STM32 Virtual ComPort
+[Mon May 11 08:19:01 2026] cdc_acm 1-1.4.2.4:1.0: ttyACM1: USB ACM device 

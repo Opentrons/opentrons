@@ -1,0 +1,15 @@
+metric,value
+run_id,1867cfb9-fcc0-411f-b803-8a323d007cc3
+status,failed
+started_at,2025-05-29T18:51:08.121895Z
+completed_at,2025-05-29T19:03:09.544373Z
+configured_cycles,100
+cycles_started,5
+cycles_passed,4
+cycles_failed,1
+last_cycle,5
+total_retries,18
+total_reopens,18
+failed_command,SetLeftP20
+failed_port,/dev/ttyACM2
+error_detail,ImpactProtection96chError [line 40]: Failed to recover 96ch impact serial after command SetLeftP20 on port /dev/ttyACM2: Failed to reopen Impact 96ch serial port /dev/ttyACM2: [Errno 2] could not open port /dev/ttyACM2: [Errno 2] No such file or directory: '/dev/ttyACM2'; also failed to reconnect by scanning ports: Target ImpactProtection 96ch device not found
