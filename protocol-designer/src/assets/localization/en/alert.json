@@ -256,9 +256,9 @@
         "title": "Not enough tips arranged correctly to complete action"
       },
       "INSUFFICIENT_TIPS": {
-        "body": "Add another tip rack to your deck or change your tip management during transfer and mix steps.",
+        "body": "Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action.",
         "link": "Edit starting deck",
-        "title": "Not enough tips to complete action"
+        "title": "Not enough accessible tips"
       },
       "LABWARE_DISCARDED_IN_TRASH": {
         "body": "This step uses labware that has previously been discarded into a trash.",
