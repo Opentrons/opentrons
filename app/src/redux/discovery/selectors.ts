@@ -222,7 +222,7 @@ export const getViewableRobots: GetViewableRobots = createSelector(
 
 export const getLocalRobot: GetLocalRobot = createSelector(
   getAllRobots,
-  robots => find(robots, { ip: _ODD_IP_ ?? '127.0.0.1' }) ?? null
+  robots => find(robots, { ip: _ODD_IP_ ?? 'localhost' }) ?? null
 )
 
 export const getRobotByName = (

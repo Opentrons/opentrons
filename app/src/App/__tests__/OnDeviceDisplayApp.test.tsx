@@ -229,7 +229,7 @@ describe('OnDeviceDisplayApp', () => {
   })
   it('passes ODD ip to robot settings and access-control queries', () => {
     render('/')
-    const expectedHostConfig: HostConfig = { hostname: _ODD_IP_ ?? '127.0.0.1' }
+    const expectedHostConfig: HostConfig = { hostname: _ODD_IP_ ?? 'localhost' }
     expect(vi.mocked(useRobotSettingsQuery)).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining(expectedHostConfig)

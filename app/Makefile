@@ -11,7 +11,7 @@ PORT ?= 5173
 
 # Robot IP - Override on the CLI, e.g.:
 #   make dev-odd ODD_IP=10.14.19.236
-ODD_IP ?= 127.0.0.1
+ODD_IP ?= localhost
 
 # Path of source package
 SRC_PATH = app
@@ -96,7 +96,7 @@ dev-shell-odd: export OT_APP_UI__WIDTH := 1024
 dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd:
 	wait-on http-get://localhost:$(PORT)
-	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
+	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) ODD_IP=$(ODD_IP)
 
 .PHONY: test
 test:
