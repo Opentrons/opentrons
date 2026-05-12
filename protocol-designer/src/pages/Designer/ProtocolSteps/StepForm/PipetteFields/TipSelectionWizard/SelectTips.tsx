@@ -294,6 +294,7 @@ export function SelectTips(
       clearTimeout(leaveTimeoutRef.current)
     }
     leaveTimeoutRef.current = setTimeout(() => {
+      setWellShadow(null)
       setHoveredWells(null)
       currentHoveredWellRef.current = null
 

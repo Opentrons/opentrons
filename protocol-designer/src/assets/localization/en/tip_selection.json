@@ -29,6 +29,10 @@
   "select_tiprack": "Select a tip rack to pick up tips from",
   "select_tips": "Select tips",
   "select_tips_for_tracking": "Select tips for manual tip tracking",
+  "selected_tiprack_not_valid": {
+    "title": "Not enough accessible tips in selected tiprack",
+    "body": "Select another tip rack to complete this action."
+  },
   "accessible": {
     "deselect_multiple": "Deselect tips",
     "deselect_one": "Deselect tip",
