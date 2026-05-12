@@ -5,7 +5,7 @@ import { getAuthStateForRobot } from './slice'
 
 import type { State } from '../types'
 
-/** A convenience wrapper for the `getAccessTokenForRobot` selector. */
+/** Return the OAuth 2 access token to make requests to the given robot, if we have one. */
 export function useAccessTokenForRobot(
   robotName: string | null
 ): string | null {
