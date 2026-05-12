@@ -39,6 +39,7 @@ import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
 import type { LocalizationProviderProps } from '../../LocalizationProvider'
@@ -225,6 +226,18 @@ describe('OnDeviceDisplayApp', () => {
   it('renders protocol receipt toasts', () => {
     render('/')
     expect(vi.mocked(useProtocolReceiptToast)).toHaveBeenCalled()
+  })
+  it('passes ODD ip to robot settings and access-control queries', () => {
+    render('/')
+    const expectedHostConfig: HostConfig = { hostname: _ODD_IP_ ?? 'localhost' }
+    expect(vi.mocked(useRobotSettingsQuery)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining(expectedHostConfig)
+    )
+    expect(vi.mocked(useAccessControlEnabledQuery)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining(expectedHostConfig)
+    )
   })
   it('renders TopLevelRedirects when it should conditionally render', () => {
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(<div>MOCK_REDIRECTS</div>)

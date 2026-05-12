@@ -176,7 +176,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const accessToken = useSelector(getLocalRobotAccessToken)
   const hostConfig = useMemo<HostConfig>(
     () => ({
-      hostname: '127.0.0.1',
+      hostname: _ODD_IP_ ?? 'localhost',
       token: accessToken,
     }),
     [accessToken]

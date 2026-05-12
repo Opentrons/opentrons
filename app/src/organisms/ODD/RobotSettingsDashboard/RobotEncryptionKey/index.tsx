@@ -97,7 +97,7 @@ function ViewPasswordModalElement(): JSX.Element {
 const ViewPasswordModal = NiceModal.create(
   (): JSX.Element => (
     <ApiHostProvider
-      hostname="127.0.0.1"
+      hostname={_ODD_IP_ ?? 'localhost'}
       requestor={appShellInternalApiRequestor}
     >
       <ViewPasswordModalElement />

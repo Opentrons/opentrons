@@ -31,7 +31,7 @@ electron := pnpm electron . \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
-	--discovery.candidates=localhost \
+	--discovery.candidates=$(ODD_IP) \
 
 OPENTRONS_PROJECT ?= robot-stack
 
