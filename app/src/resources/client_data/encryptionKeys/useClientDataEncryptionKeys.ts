@@ -14,9 +14,7 @@ export function useClientDataEncryptionKeys(
 ): ClientDataEncryptionKeys {
   const { data } = useNotifyClientDataEncryptionKeys(options)
 
-  const { keyDisplayRequestedNonces: keyDisplayRequestedData } =
-    data?.data ?? {}
-  const keyDisplayRequestedNonces = keyDisplayRequestedData ?? {}
-
-  return { keyDisplayRequestedNonces }
+  return {
+    keyDisplayRequestedNonces: data?.data?.keyDisplayRequestedNonces ?? {},
+  }
 }
