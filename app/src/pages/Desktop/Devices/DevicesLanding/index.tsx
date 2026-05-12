@@ -36,10 +36,12 @@ import {
   getUnreachableRobots,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
+import type { ReactNode } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
@@ -148,28 +150,16 @@ export function DevicesLanding(): JSX.Element {
             })}
           >
             {filteredHealthy.map(robot => (
-              <ApiHostProvider
-                key={robot.name}
-                hostname={robot.ip ?? null}
-                requestor={
-                  robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-                }
-              >
+              <ApiHostProviderForRobot key={robot.name} robot={robot}>
                 <RobotCertRotator>
                   <RobotCard robot={robot} />
                 </RobotCertRotator>
-              </ApiHostProvider>
+              </ApiHostProviderForRobot>
             ))}
             {filteredUnhealthy.map(robot => (
-              <ApiHostProvider
-                key={robot.name}
-                hostname={robot.ip ?? null}
-                requestor={
-                  robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-                }
-              >
+              <ApiHostProviderForRobot key={robot.name} robot={robot}>
                 <RobotCard robot={robot} />
-              </ApiHostProvider>
+              </ApiHostProviderForRobot>
             ))}
           </CollapsibleSection>
           <Divider />
@@ -243,5 +233,22 @@ function DevicesLoadingState(): JSX.Element {
         </Link>
       </Flex>
     </Flex>
+  )
+}
+
+function ApiHostProviderForRobot(props: {
+  robot: DiscoveredRobot
+  children: ReactNode
+}): JSX.Element {
+  const { robot, children } = props
+  const token = useAccessTokenForRobot(robot?.name ?? null)
+  return (
+    <ApiHostProvider
+      hostname={robot.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
+    >
+      {children}
+    </ApiHostProvider>
   )
 }
