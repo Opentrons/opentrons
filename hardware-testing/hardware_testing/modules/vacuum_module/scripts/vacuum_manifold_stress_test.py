@@ -305,7 +305,7 @@ async def _run_single_pump_api_cycle(
     await pump.set_vent_state(VentState.CLOSED)
 
 
-async def _pump_disconnect(self: OT3API, pump: Any) -> None: 
+async def _pump_disconnect(self: OT3API, pump: Any) -> None:
     await pump.disconnect()
 
 
