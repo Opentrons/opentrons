@@ -220,10 +220,9 @@ export const getViewableRobots: GetViewableRobots = createSelector(
     )
 )
 
-// todo(mm, 2026-04-15): This looks fragile--ip might be 127.0.0.1 or ::1?
 export const getLocalRobot: GetLocalRobot = createSelector(
   getAllRobots,
-  robots => find(robots, { ip: 'localhost' }) ?? null
+  robots => find(robots, { ip: _ODD_IP_ ?? 'localhost' }) ?? null
 )
 
 export const getRobotByName = (
