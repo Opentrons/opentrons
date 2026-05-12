@@ -12,7 +12,14 @@ These instructions explain how to downgrade the Opentrons App and OT-2 robot sof
 
 ## Software versions
 
-After the v9.0 release, Opentrons split its software into separate branches for OT-2 and Flex. This change restarts OT-2 software versioning at 26.06, enables robot-specific software releases, and reduces downtime from shared releases that don't benefit the OT-2.
+After the v9.0 release, Opentrons split its software into separate branches for OT-2 and Flex. This change provides several advantages. For example, it separates OT-2 software versioning from Flex (restarting at v26.06), enables robot-specific software releases, and reduces downtime from shared releases that don't benefit the OT-2.
+
+These different software versions are available on GitHub:
+
+- v26.06 (and later): [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
+- v9.0 (and earlier): [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
+
+## Downgrade paths
 
 Forking OT-2 software creates two downgrade paths:
 
@@ -20,15 +27,36 @@ Forking OT-2 software creates two downgrade paths:
 - **Legacy to Legacy**: From v9.0 to an earlier version.
 
 !!! note
-    Saved protocols are not migrated automatically during a "latest to legacy" downgrade. You have to find move those files manually.
+    During a "Latest to Legacy" downgrade, newer saved protocols are not migrated automatically into an older version of the App. You have to manually copy/paste those files into the downgraded App version.
 
-The following table provides information about software versions, repositories, and App directories that store saved protocols.
+The following table provides the default file paths for saved protocols. Refer to this resource when you need to copy protocol files across the forked software boundary.
 
-| Feature | Legacy software | Latest software |
-|----|----|----|
-| **Versions** | v9.0 and earlier | v26.06 and later |
-| **Software repository** | [Opentrons releases](https://github.com/Opentrons/opentrons/releases) | [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases) |
-| **Saved protocols location** | `.../Opentrons/protocols/` | `.../Opentrons OT-2/protocols/` |
+<table>
+  <thead>
+    <tr>
+      <th>OS</th>
+      <th>Legacy path (&le; v9.0)</th>
+      <th>Latest path (&ge; v26.06)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>macOS</td>
+      <td><code>~/Library/Application Support/Opentrons/protocols</code></td>
+      <td><code>~/Library/Application Support/Opentrons OT-2/protocols</code></td>
+    </tr>
+    <tr>
+      <td>Windows</td>
+      <td><code>%AppData%\Opentrons\protocols</code></td>
+      <td><code>%AppData%\Opentrons OT-2\protocols</code></td>
+    </tr>
+    <tr>
+      <td>Ubuntu</td>
+      <td><code>~/.config/Opentrons/protocols</code></td>
+      <td><code>~/.config/Opentrons OT-2/protocols</code></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Robot downgrade instructions
 
@@ -40,7 +68,7 @@ The following table provides information about software versions, repositories, 
 
 <div class="instruction-list" markdown>
 
-1. On the GitHub releases page, find a version of the OT-2 software you want to use:
+1. From GitHub, find a version of the OT-2 software you want to use:
 
     - v9.0 or earlier: [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
     - v26.06 or later: [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
@@ -83,7 +111,7 @@ To install an earlier version of the Opentrons App:
 
 <div class="instruction-list" markdown>
 
-1. On the GitHub releases page, find the Opentrons App version matching your downgraded OT-2:
+1. From GitHub, find the Opentrons App version matching your downgraded OT-2:
 
     - v9.0 or earlier: [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
     - v26.06 or later: [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
@@ -112,7 +140,7 @@ Installing multiple versions of the Opentrons App may cause system conflicts, pa
 
 - **macOS and Linux:** Software for these systems is encapsulated. You can typically run different versions by renaming the previously installed application.
 
-- **Windows:** Software integrates deeply with the operating system. This means an installer will overwrite existing App versions. Running multiple versions of the same software may create conflicts with shared registry files.
+- **Windows:** Software integrates deeply with the operating system. This means an installer will overwrite existing App versions. Attempts to install multiple versions of the App software may create conflicts with shared system and registry files.
 
 To avoid problems with multiple versions of the Opentrons App:
 
