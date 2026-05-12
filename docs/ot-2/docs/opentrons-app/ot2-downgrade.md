@@ -1,35 +1,33 @@
 ---
 title: "Opentrons OT-2: Downgrading Robot Software"
-description: "Roll back OT-2 robot and app software from v9.0 an earlier version."
+description: "Roll back OT-2 robot and app software from v9.0 or 26.06+ to earlier versions."
 ---
 
-These instructions explain how to downgrade the Opentrons App and OT-2 robot software.
+Start here for information and instructions about how to downgrade your Opentrons OT-2 robot and App software.
 
 !!! note
-    Downgrading your robot's software version should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes.
-
-<!-- maybe too much? The jump from 9 to 26.06 might leave people wondering what happened between 10 and 25. An attempt at context. -->
+    Downgrading robot software should only be done at direction of Opentrons Support for troubleshooting or software compliance purposes.
 
 ## Software versions
 
-After the v9.0 release, Opentrons split its software into separate branches for OT-2 and Flex. This change provides several advantages. For example, it separates OT-2 software versioning from Flex (restarting at v26.06), enables robot-specific software releases, and reduces downtime from shared releases that don't benefit the OT-2.
+After v9.0 release, Opentrons forked software into separate branches for OT-2 and Flex. This change provides several advantages: it separates OT-2 versioning from Flex (restarting at v26.06), enables robot-specific software releases, and reduces downtime from shared releases that do not benefit OT-2.
 
-These different software versions are available on GitHub:
+Software versions are available on GitHub:
 
-- v26.06 (and later): [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
-- v9.0 (and earlier): [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
+- **v26.06 (and later):** [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
+- **v9.0 (and earlier):** [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
 
 ## Downgrade paths
 
 Forking OT-2 software creates two downgrade paths:
 
-- **Latest to Legacy**: From v26.06 (or later) to v9.0 (or earlier).
-- **Legacy to Legacy**: From v9.0 to an earlier version.
+- **Latest to Legacy:** From v26.06 (or later) to v9.0 (or earlier).
+- **Legacy to Legacy:** From v9.0 to an earlier version.
 
 !!! note
-    During a "Latest to Legacy" downgrade, newer saved protocols are not migrated automatically into an older version of the App. You have to manually copy/paste those files into the downgraded App version.
+    During latest-to-legacy downgrades, newer saved protocols do not migrate automatically. Manually copy files into the downgraded App version directory.
 
-The following table provides the default file paths for saved protocols. Refer to this resource when you need to copy protocol files across the forked software boundary.
+Refer to the following table for the default file storage locations if you need to copy/paste protocol files across the software fork boundary. <div id="protocol-paths"></div>
 
 <table>
   <thead>
@@ -61,89 +59,84 @@ The following table provides the default file paths for saved protocols. Refer t
 ## Robot downgrade instructions
 
 !!! tip
-    - Make sure your OT-2 is idle before downgrading. Some required App features are not available while the robot is running a protocol.
-    - We recommend rolling back to the version closest to the latest release.
+    - Ensure OT-2 is idle before downgrading. Some required App features are not available while the robot is running a a protocol.
+    - Rolling back to the version closest to latest release is recommended.
 
 ### Download robot software
 
 <div class="instruction-list" markdown>
 
-1. From GitHub, find a version of the OT-2 software you want to use:
-
+1. From GitHub, find the OT-2 software version:
     - v9.0 or earlier: [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
     - v26.06 or later: [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
 
-2. In the Assets section of a release, click the small triangle (&rtrif;) to expand a list of compressed software files available for download.
+2. In **Assets** section of a release, click triangle (&rtrif;) to expand the software file list.
 
     <figure class="screenshot" markdown>
     ![OT-2 software on GitHub](../images/ot2-robot-software-releases.png)
     </figure>
 
-3. Click the compressed file named `ot2-system-<version number>.zip` to download and save it to your computer. For example, to get OT-2 software version 8.7, you'd click the file `ot2-system-8.7.0.zip`.
+3. Click compressed file named `ot2-system-<version number>.zip` to download. For example, to get OT-2 software version 8.7, click `ot2-system-8.7.0.zip`.
 
 ### Install robot software
 
-1. From the **Devices** tab in the App, find the robot you want to work with.
+1. In App **Devices** tab, select the robot.
 
-2. Click the three-dot menu (⋮) and then click **Robot Settings**.
+2. Click three-dot menu (⋮) and select **Robot Settings**.
 
-3. Click the **Advanced** tab.
+3. Select **Advanced** tab.
 
-4. In the Advanced settings, find the section labeled "Update robot software manually with a local file."
+4. Find section labeled "Update robot software manually with a local file."
 
     <figure class="screenshot" markdown>
     ![App image showing browse button](../images/ot2-robot-software-downgrade.png)
     </figure>
 
-5. Click **Browse file system** and navigate to the location where you saved the downloaded robot software.
+5. Click **Browse file system** and navigate to saved robot software.
 
-6. Select the `.zip` file containing the robot software and click **Open**. The software installs automatically and reboots the robot, which takes about 15 minutes. After restarting, the robot will be running the earlier operating system version.
+6. Select `.zip` file and click **Open**. Software installs automatically and reboots robot (approx. 15 minutes). After restarting, robot will be running earlier operating system version.
 
 </div>
 
 ## App version requirements
 
-To run protocols on a downgraded OT-2, the Opentrons App version must match the robot software version. While you can interact with the robot using mismatched software, you cannot run protocols until the robot software and App software versions are identical.
+To run protocols on a downgraded OT-2, Opentrons App version must match robot software version. While you can interact with robot using mismatched software, protocol execution requires identical App and robot software versions.
 
 ### App download and installation
 
-To install an earlier version of the Opentrons App:
+To install an earlier Opentrons App version:
 
 <div class="instruction-list" markdown>
 
-1. From GitHub, find the Opentrons App version matching your downgraded OT-2:
-
+1. From GitHub, find Opentrons App version matching downgraded OT-2:
     - v9.0 or earlier: [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
     - v26.06 or later: [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
 
-2. In the Assets section of a release, click the small triangle (&rtrif;) to expand a list of compressed software files available for download.
+2. In **Assets** section, click triangle (&rtrif;) to expand software file list.
 
     <figure class="screenshot" markdown>
     ![App software on GitHub](../images/ot2-app-software-releases.png)
     </figure>
 
-3. Find the file with the name and extension that matches the operating system of your computer. Click the file to download it. The Opentrons App supports these operating systems and file types:
-
+3. Find file with name and extension matching computer operating system. Click file to download. Opentrons supports these operating systems and file types:
     - **Linux:** `.AppImage`
     - **macOS:** `.dmg`
     - **Windows:** `.exe`
 
-3. Browse to the download location of the downloaded software and double-click the file to install the App.
+3. Navigate to the saved file location and double-click the file to install it.
 
-4. For "latest to legacy" downgrades (v26.06 and later to v9.0 and earlier): If you want to bring recent protocol files into the legacy App, you must copy and paste them into `.../Opentrons/protocols/` from `.../Opentrons OT-2/protocols/`.
+    !!! tip "Reminder for latest-to-legacy downgrades"
+        Downgrading from v26.06 means you must manually copy protocol files into the earlier version of the App. See the [file system storage table](#protocol-paths) for locations.
 
-<!-- Avoid detailed explanations of how to manage multiple versions, particularly on Windows. -->
-<!-- Document a best practice only. Let others get creative with hosting/switching versions, particularly Windows. -->
 ### Managing multiple App versions
 
-Installing multiple versions of the Opentrons App may cause system conflicts, particularly on Windows.
+Installing multiple Opentrons App versions may cause system conflicts, particularly on Windows.
 
-- **macOS and Linux:** Software for these systems is encapsulated. You can typically run different versions by renaming the previously installed application.
+- **macOS and Linux:** Systems use software encapsulation. You can typically run different versions by renaming the installed application.
+- **Windows:** Software integrates deeply with operating system. Installers will overwrite existing App versions. Installing multiple versions may conflict with shared system and registry files.
 
-- **Windows:** Software integrates deeply with the operating system. This means an installer will overwrite existing App versions. Attempts to install multiple versions of the App software may create conflicts with shared system and registry files.
+To avoid version conflicts:
 
-To avoid problems with multiple versions of the Opentrons App:
-
-- Uninstall the current Opentrons App before installing a downgraded version.
-- Get help from your IT team or Opentrons Support if you must run multiple versions of the Opentrons App.
-- Do not attempt to downgrade the robot or App software unless directed by Opentrons Support.
+- Uninstall current Opentrons App before installing downgraded version.
+- Consult IT team or Opentrons Support to run multiple software versions.
+- Do not attempt to downgrade robot or App software unless directed by Opentrons Support.
