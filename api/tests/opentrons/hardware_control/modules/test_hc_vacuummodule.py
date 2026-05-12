@@ -60,6 +60,12 @@ def set_pump_state_spy(mock_driver: SimulatingDriver) -> mock.AsyncMock:
 
 
 @pytest.fixture
+def set_vent_state_spy(mock_driver: SimulatingDriver) -> mock.AsyncMock:
+    """Build a spy for set pump state."""
+    return mock.AsyncMock(wraps=mock_driver.set_vent_state)
+
+
+@pytest.fixture
 async def test_execute_profile_subject(
     usb_port: USBPort,
     mock_driver: SimulatingDriver,
@@ -68,6 +74,7 @@ async def test_execute_profile_subject(
     module_disconnected_callback: ModuleDisconnectedCallback,
     set_vacuum_state_spy: mock.AsyncMock,
     set_pump_state_spy: mock.AsyncMock,
+    set_vent_state_spy: mock.AsyncMock,
     decoy: Decoy,
 ) -> AsyncGenerator[modules.VacuumModule, None]:
     """Test subject with mocked driver."""
@@ -75,6 +82,7 @@ async def test_execute_profile_subject(
     poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
     mock_driver.set_vacuum_state = set_vacuum_state_spy  # type: ignore[method-assign]
     mock_driver.set_pump_state = set_pump_state_spy  # type: ignore[method-assign]
+    mock_driver.set_vent_state = set_vent_state_spy  # type: ignore[method-assign]
     vacuum = modules.VacuumModule(
         port="/dev/ot_module_sim_vacuummodule0",
         usb_port=usb_port,
@@ -411,6 +419,7 @@ async def test_execute_profile(
     mock_driver: SimulatingDriver,
     set_vacuum_state_spy: mock.AsyncMock,
     set_pump_state_spy: mock.AsyncMock,
+    set_vent_state_spy: mock.AsyncMock,
 ) -> None:
     """Ensure that execute_profile calls down to the correct hardware control functions in the right quantity."""
     subject = test_execute_profile_subject
@@ -466,6 +475,7 @@ async def test_execute_profile(
                 },
             ],
             "repetitions": 9,
+            "vent_after": True,
         },
         {
             "enable_pump": False,
@@ -550,5 +560,8 @@ async def test_execute_profile(
             vent_after=False,
         )
     )
+    set_vent_state_expected_call_list = [mock.call(state=VentState.OPENED)]
+
     assert set_vacuum_state_spy.call_args_list == set_vacuum_state_expected_call_list
     assert set_pump_state_spy.call_args_list == set_pump_state_expected_call_list
+    assert set_vent_state_spy.call_args_list == set_vent_state_expected_call_list

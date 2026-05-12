@@ -455,6 +455,8 @@ class VacuumModule(mod_abc.AbstractModule):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
                         await self._execute_cycle_step(step)
+                if this_cycle["vent_after"] is not None and this_cycle["vent_after"]:
+                    await self.set_vent_state(vent_state=VentState.OPENED)
             else:
                 await self._execute_cycle_step(step_or_cycle)
 
