@@ -53,6 +53,8 @@ interface SlotOverlayProps {
   children?: ReactNode
 }
 
+const X_OFFSET = 30 // center the fixedTrash overlay
+
 export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const {
     slotId,
@@ -208,7 +210,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
         key="ot2_hover"
         width={width}
         height={height}
-        x={slotId === 'fixedTrash' ? x - 30 : x}
+        x={slotId === 'fixedTrash' ? x - X_OFFSET : x}
         y={y}
         flexProps={{ flex: '1' }}
         foreignObjectProps={{

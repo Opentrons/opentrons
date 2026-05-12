@@ -223,27 +223,26 @@ export function constructInvariantContextFromAnalysis(
           !Object.values(acc.trashBinEntities).some(
             entity => entity.location === location
           )
-        ) 
-        if (          addressableAreaName.includes('movableTrash'))
-        {
-          trashBinEntities = {
-            ...acc.trashBinEntities,
-            [id]: {
-              pythonName: 'trash_bin_1',
-              id,
-              location,
-            },
+        )
+          if (addressableAreaName.includes('movableTrash')) {
+            trashBinEntities = {
+              ...acc.trashBinEntities,
+              [id]: {
+                pythonName: 'trash_bin_1',
+                id,
+                location,
+              },
+            }
+          } else {
+            trashBinEntities = {
+              ...acc.trashBinEntities,
+              [id]: {
+                pythonName: 'trash_bin_1',
+                id,
+                location,
+              },
+            }
           }
-        } else {
-          trashBinEntities = {
-            ...acc.trashBinEntities,
-            [id]: {
-              pythonName: 'trash_bin_1',
-              id,
-              location,
-            },
-          }
-        }
         let wasteChuteEntities: WasteChuteEntities = acc.wasteChuteEntities
         if (addressableAreaName.includes('WasteChute')) {
           wasteChuteEntities = {
