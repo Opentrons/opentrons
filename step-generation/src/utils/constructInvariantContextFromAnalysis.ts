@@ -222,9 +222,19 @@ export function constructInvariantContextFromAnalysis(
         if (
           !Object.values(acc.trashBinEntities).some(
             entity => entity.location === location
-          ) &&
-          addressableAreaName.includes('movableTrash')
-        ) {
+          )
+        ) 
+        if (          addressableAreaName.includes('movableTrash'))
+        {
+          trashBinEntities = {
+            ...acc.trashBinEntities,
+            [id]: {
+              pythonName: 'trash_bin_1',
+              id,
+              location,
+            },
+          }
+        } else {
           trashBinEntities = {
             ...acc.trashBinEntities,
             [id]: {

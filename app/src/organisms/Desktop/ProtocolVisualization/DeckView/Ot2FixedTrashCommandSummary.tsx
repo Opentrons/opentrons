@@ -37,7 +37,6 @@ export function Ot2FixedTrashCommandSummary(
   )
   const commandSummary = useCommandTypeSummaries(commandType)
   const slotPosition = getPositionFromSlotId('fixedTrash', deckDef)
-  console.log('slotPosition', slotPosition)
   const slotBoundingBox = addressableArea?.boundingBox
 
   if (slotPosition == null || slotBoundingBox == null) {
@@ -46,7 +45,7 @@ export function Ot2FixedTrashCommandSummary(
   return (
     <>
       <RobotCoordsForeignDiv
-        x={slotPosition[0]}
+        x={slotPosition[0] - 30}
         y={slotPosition[1]}
         width={slotBoundingBox.xDimension}
         height={slotBoundingBox.yDimension}
@@ -76,7 +75,7 @@ export function Ot2FixedTrashCommandSummary(
             isZoomed: false,
           },
         ]}
-        x={slotPosition[0]}
+        x={slotPosition[0] - 30}
         y={slotPosition[1] - Y_OFFSET}
         width={slotBoundingBox.xDimension}
         height={slotBoundingBox.yDimension}
