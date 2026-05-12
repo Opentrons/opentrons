@@ -10,7 +10,7 @@ Start here for information and instructions about how to downgrade your Opentron
 
 ## Software versions
 
-After v9.0, Opentrons forked its software into separate branches for OT-2 and Flex. This change provides several advantages: it separates OT-2 versioning (restarting at v26.06) from Flex, enables robot-specific software releases, and reduces downtime from required updates that do not benefit the OT-2.
+After v9.0, Opentrons split its software into separate branches for OT-2 and Flex. This change provides several advantages: it separates OT-2 versioning (restarting at v26.06) from Flex, enables robot-specific software releases, and reduces downtime from required updates that do not benefit the OT-2.
 
 The different OT-2 software versions are available on GitHub:
 
@@ -27,31 +27,31 @@ Forking the OT-2 software creates two downgrade paths:
 !!! note
     During a latest-to-legacy downgrade, your saved protocols won't migrate automatically. You'll need to manually copy those files into your downgraded App's protocol directory to access them again.
 
-Refer to the following table for the default file storage locations if you need to copy and paste protocol files across the software fork boundary. <div id="protocol-paths"></div>
+The table below shows the default directory paths where the App saves your protocols. You can use these locations to manually copy and paste your files when moving across the software fork boundary. <div id="protocol-paths"></div>
 
 <table>
   <thead>
     <tr>
       <th>OS</th>
-      <th>Legacy path (&le; v9.0)</th>
       <th>Latest path (&ge; v26.06)</th>
+      <th>Legacy path (&le; v9.0)</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>macOS</td>
-      <td><code>~/Library/Application Support/Opentrons/protocols</code></td>
       <td><code>~/Library/Application Support/Opentrons OT-2/protocols</code></td>
+      <td><code>~/Library/Application Support/Opentrons/protocols</code></td>
     </tr>
     <tr>
       <td>Windows</td>
-      <td><code>%AppData%\Opentrons\protocols</code></td>
       <td><code>%AppData%\Opentrons OT-2\protocols</code></td>
+      <td><code>%AppData%\Opentrons\protocols</code></td>
     </tr>
     <tr>
       <td>Ubuntu</td>
-      <td><code>~/.config/Opentrons/protocols</code></td>
       <td><code>~/.config/Opentrons OT-2/protocols</code></td>
+      <td><code>~/.config/Opentrons/protocols</code></td>
     </tr>
   </tbody>
 </table>
