@@ -199,15 +199,15 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   } else {
     const { width, x, y, height } = getOT2HoverDimensions(
       hasTCOnSlot,
-      slotPosition
+      slotPosition,
+      true
     )
-
     return (
       <RobotCoordsForeignObject
         key="ot2_hover"
         width={width}
         height={height}
-        x={x}
+        x={slotId === 'fixedTrash' ? x - 30 : x}
         y={y}
         flexProps={{ flex: '1' }}
         foreignObjectProps={{
