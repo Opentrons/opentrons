@@ -63,7 +63,7 @@ export const getOT2HoverDimensions = (
   hasTCOnSlot: boolean,
   slotPosition: CoordinateTuple,
   // TODO: investigate why the TC adjusted Y is needed for PD???
-  forVisualization: boolean,
+  forVisualization: boolean
 ): HoverDimensions => {
   const y = slotPosition[1]
   const x = slotPosition[0]

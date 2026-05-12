@@ -8,6 +8,7 @@ import StackerAnalysis from './StackerAnalysis.json'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 import './styles.css'
+
 import { useState } from 'react'
 
 const analysis = StackerAnalysis as unknown as ProtocolAnalysisOutput
@@ -69,7 +70,8 @@ function DeckMapPage(): JSX.Element {
       <div className="analysis_info">
         <h3>Analysis</h3>
         <p>
-          <strong>Protocol:</strong> {analysis.metadata?.protocolName ?? 'ot-2 protocol'}
+          <strong>Protocol:</strong>{' '}
+          {analysis.metadata?.protocolName ?? 'ot-2 protocol'}
         </p>
         <p>
           <strong>Robot type:</strong> {analysis.robotType}
@@ -97,24 +99,39 @@ function DeckMapPage(): JSX.Element {
 }
 
 function VisualizationPage(): JSX.Element {
-
   const [showFlex, setShowFlex] = useState<boolean>(true)
   return (
     <main className="demo_section protocol_visualization_section">
       <h2>Protocol visualization</h2>
-      <div style={{display: 'flex', gap: '1rem'}}>
-      <PrimaryButton onClick={() => {setShowFlex(true)}}>Flex</PrimaryButton>
-       <PrimaryButton onClick={() => {setShowFlex(false)}}>Ot-2</PrimaryButton>
-       </div>
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <PrimaryButton
+          onClick={() => {
+            setShowFlex(true)
+          }}
+        >
+          Flex
+        </PrimaryButton>
+        <PrimaryButton
+          onClick={() => {
+            setShowFlex(false)
+          }}
+        >
+          Ot-2
+        </PrimaryButton>
+      </div>
       <p>
-        From <code>@opentrons/protocol-visualization</code> using the {' '}
-        {showFlex ? 'StackerAnalysis' : 'Ot2Analysis'} fixture as the deck map page.
+        From <code>@opentrons/protocol-visualization</code> using the{' '}
+        {showFlex ? 'StackerAnalysis' : 'Ot2Analysis'} fixture as the deck map
+        page.
       </p>
       <div
         data-testid="protocol-visualization-container"
         className="protocol_visualization_demo"
       >
-        <ProtocolVisualization analysis={showFlex ? analysis : ot2Analysis} groupedCommands={null} />
+        <ProtocolVisualization
+          analysis={showFlex ? analysis : ot2Analysis}
+          groupedCommands={null}
+        />
       </div>
     </main>
   )
