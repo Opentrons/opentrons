@@ -223,7 +223,7 @@ export function constructInvariantContextFromAnalysis(
           !Object.values(acc.trashBinEntities).some(
             entity => entity.location === location
           )
-        )
+        ) {
           if (addressableAreaName.includes('movableTrash')) {
             trashBinEntities = {
               ...acc.trashBinEntities,
@@ -243,6 +243,7 @@ export function constructInvariantContextFromAnalysis(
               },
             }
           }
+        }
         let wasteChuteEntities: WasteChuteEntities = acc.wasteChuteEntities
         if (addressableAreaName.includes('WasteChute')) {
           wasteChuteEntities = {
