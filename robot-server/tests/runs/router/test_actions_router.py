@@ -8,8 +8,8 @@ from decoy import Decoy
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
 from robot_server.fastapi_dependencies import (
-    get_run_action_body_has_user_notes,
     log_run_action_play_user_notes,
+    request_body_has_supplied_user_notes,
 )
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
@@ -66,7 +66,7 @@ async def test_create_run_action(
         )
     ).then_return(expected_result)
 
-    body_has_user_notes = get_run_action_body_has_user_notes(request_body)
+    body_has_user_notes = request_body_has_supplied_user_notes(request_body)
     log_run_action_play_user_notes(
         run_id,
         request_body,
@@ -125,7 +125,7 @@ async def test_play_action_clears_maintenance_run(
         )
     ).then_return(expected_result)
 
-    body_has_user_notes = get_run_action_body_has_user_notes(request_body)
+    body_has_user_notes = request_body_has_supplied_user_notes(request_body)
     log_run_action_play_user_notes(
         run_id,
         request_body,
@@ -189,7 +189,7 @@ async def test_create_play_action_not_allowed(
         )
     ).then_raise(exception)
 
-    body_has_user_notes = get_run_action_body_has_user_notes(request_body)
+    body_has_user_notes = request_body_has_supplied_user_notes(request_body)
     log_run_action_play_user_notes(
         run_id,
         request_body,
