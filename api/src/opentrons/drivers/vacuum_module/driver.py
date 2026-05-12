@@ -315,13 +315,17 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         start_pump: bool,
         target_rpm: Optional[int] = None,
         duty_cycle: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Start or the stop the pump at a given rpm or duty cycle."""
         if target_rpm and duty_cycle:
             raise ValueError(
                 "You cannot set the target rpm and duty cycle at the same time."
             )
-
+        # TODO: incorporate duration, timeout, rate, vent_after into SetPumpState gcode message
         command = GCODE.SET_PUMP_STATE.build_command().add_int("S", int(start_pump))
         if target_rpm is not None:
             command.add_int("R", max(0, min(target_rpm, MAX_PUMP_RPM)))

@@ -29,6 +29,34 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
+class VacuumModuleStepBase(TypedDict, total=False):
+    enable_pump: bool
+    hold_time_seconds: int | None
+    hold_time_minutes: int | None
+    ramp_rate: float | None
+    timeout_seconds: int | None
+    vent_after: bool | None
+
+
+class VacuumModulePowerStep(VacuumModuleStepBase):
+    percent_power: int | None
+
+
+class VacuumModulePressureStep(VacuumModuleStepBase):
+    gauge_pressure_mbar: int | None
+
+
+class VacuumModuleCycle(TypedDict):
+    steps: List[VacuumModuleStep]
+    repetitions: int
+
+
+VacuumModuleStep = Union[VacuumModulePowerStep, VacuumModulePressureStep]
+VacuumModuleProfileStep = Union[
+    VacuumModulePowerStep, VacuumModulePressureStep, VacuumModuleCycle
+]
+
+
 class ThermocyclerStepBase(TypedDict):
     temperature: float
 
