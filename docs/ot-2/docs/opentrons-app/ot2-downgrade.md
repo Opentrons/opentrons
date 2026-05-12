@@ -19,13 +19,11 @@ The different OT-2 software versions are available on GitHub:
 
 ## Downgrade paths
 
-Forking the OT-2 software creates two downgrade paths:
+Forking the OT-2 software creates two downgrade paths. Whether you need to move your protocols manually depends on which version you are downgrading from and to:
 
-- **Latest to Legacy:** From v26.06 (or later) to v9.0 (or earlier).
-- **Legacy to Legacy:** From v9.0 to an earlier version.
+- **Latest to Legacy:** From v26.06 (or later) to v9.0 (or earlier). This path crosses the software fork boundary. You'll need to manually move your protocols to use them in the downgraded App.
 
-!!! note
-    During a latest-to-legacy downgrade, your saved protocols won't migrate automatically. You'll need to manually copy those files into your downgraded App's protocol directory to access them again.
+- **Legacy to Legacy:** From v9.0 to an earlier version (like v8.7). Since both versions share the same directory, your protocols will appear in the App automatically.
 
 The table below shows the default directory paths where the App saves your protocols. You can use these locations to manually copy and paste your files when moving across the software fork boundary. <div id="protocol-paths"></div>
 
