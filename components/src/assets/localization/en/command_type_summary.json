@@ -115,6 +115,7 @@
   "vacuumModule/startSetVacuumPower": "Start vacuum power",
   "vacuumModule/openVent": "Open vent",
   "vacuumModule/closeVent": "Close vent",
+  "vacuumModule/startRunProfile": "Run profile",
   "verifyTipPresence": "Tip presence",
   "waitForDuration": "Wait",
   "waitForResume": "Wait",
