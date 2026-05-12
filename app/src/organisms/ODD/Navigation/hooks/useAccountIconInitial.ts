@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux'
 
-import { getLocalRobotAuthState } from '/app/redux/robot-auth'
+import { useSelfQuery } from '@opentrons/react-api-client'
 
-import type { State } from '/app/redux/types'
+import { getIsLoggedInToLocalRobot } from '/app/redux/robot-auth'
 
 export type UseAccountIconInitialResult =
   | {
@@ -19,16 +19,27 @@ export type UseAccountIconInitialResult =
  * (The first initial of the user's name.)
  */
 export function useAccountIconInitial(): UseAccountIconInitialResult {
-  // todo(mm, 2026-04-29): This should be based on the legal name, not the username.
-  // To do that, a user needs to be able to fetch `GET /auth/users/{username}` for
-  // their own username, but that's currently an admin-only endpoint.`
-  const currentUsername = useSelector(
-    (state: State) => getLocalRobotAuthState(state)?.username ?? null
-  )
-  if (currentUsername == null) {
-    return { showIcon: false }
+  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
+  const query = useSelfQuery({
+    enabled: isLoggedIn,
+  })
+
+  if (!isLoggedIn) {
+    return {
+      showIcon: false,
+    }
+  } else if (query.isLoading || query.isError || query.isIdle) {
+    return {
+      showIcon: true,
+      iconContents: '',
+    }
   } else {
-    const firstChar = currentUsername[0] ?? ''
-    return { showIcon: true, iconContents: firstChar.toLocaleUpperCase() }
+    const response = query.data
+    const fullName = response.data.fullName
+    const maybeFirstChar = fullName.at(0) ?? ''
+    return {
+      showIcon: true,
+      iconContents: maybeFirstChar.toLocaleUpperCase(),
+    }
   }
 }
