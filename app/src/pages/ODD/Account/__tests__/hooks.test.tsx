@@ -49,11 +49,11 @@ describe('useAccountInfo', () => {
     expect(result.current).toStrictEqual({
       isLoggedIn: false,
       username: null,
-      legalName: null,
+      fullName: null,
     })
   })
 
-  it('returns username and legalName when logged in', () => {
+  it('returns username and fullName when logged in', () => {
     vi.mocked(getLocalRobotAuthState).mockReturnValue({
       username: 'test-user',
       accessToken: 'token',
@@ -69,7 +69,7 @@ describe('useAccountInfo', () => {
       // todo(mm, 2026-05-01): This is a placeholder. Get the actual legal name once
       // https://opentrons.atlassian.net/browse/EXEC-2610 is resolved and react-api-client
       // can send requests with auth tokens.
-      legalName: 'test-user',
+      fullName: 'test-user',
     })
   })
 })

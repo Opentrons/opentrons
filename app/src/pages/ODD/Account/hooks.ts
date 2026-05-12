@@ -11,7 +11,7 @@ interface UseAccountInfoResult {
   /** null if not logged in. */
   username: string | null
   /** null if not logged in or the info is still loading. */
-  legalName: string | null
+  fullName: string | null
 }
 
 /** Returns information about the currently logged-in account. */
@@ -24,8 +24,8 @@ export function useAccountInfo(): UseAccountInfoResult {
   // can send requests with auth tokens.
   const legalName = username
   return useMemo(
-    () => ({ isLoggedIn, username, legalName }),
-    [isLoggedIn, username, legalName]
+    () => ({ isLoggedIn, username, fullName }),
+    [isLoggedIn, username, fullName]
   )
 }
 
