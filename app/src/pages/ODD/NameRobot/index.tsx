@@ -177,9 +177,7 @@ export function NameRobot(): JSX.Element {
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const value = e.target.value as string
-    setNewName(value)
-    keyboardRef.current?.setInput(value)
+    setNewName(e.target.value as string)
     void trigger('newRobotName')
   }
 
@@ -328,6 +326,7 @@ export function NameRobot(): JSX.Element {
                     handleKeyboardChange(input)
                   }}
                   keyboardRef={keyboardRef}
+                  value={newRobotName}
                 />
               )}
             />
