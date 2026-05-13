@@ -10,8 +10,8 @@
 .radial_timer_svg {
   position: absolute;
   width: 100%;
-  inset: 0;
   height: 100%;
+  inset: 0;
 }
 
 .radial_timer_track {
@@ -21,12 +21,12 @@
 }
 
 .radial_timer_progress {
+  animation: radial-timer-animation var(--animation-duration) linear forwards;
   fill: none;
   stroke: var(--grey-60);
   stroke-dasharray: var(--ring-circumference);
-  stroke-width: 3px;
-  animation: radial-timer-animation var(--animation-duration) linear forwards;
   stroke-linecap: round;
+  stroke-width: 3px;
 }
 
 @keyframes radial-timer-animation {
