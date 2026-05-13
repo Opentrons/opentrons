@@ -1,26 +1,24 @@
-import { useRef } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, renderHook, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { NumericalKeyboard } from '..'
+import { StatelessNumericalKeyboard } from '../StatelessNumericalKeyboard'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof NumericalKeyboard>) => {
-  return renderWithProviders(<NumericalKeyboard {...props} />)[0]
+const render = (props: ComponentProps<typeof StatelessNumericalKeyboard>) => {
+  return renderWithProviders(<StatelessNumericalKeyboard {...props} />)[0]
 }
 
-describe('NumericalKeyboard', () => {
+describe('StatelessNumericalKeyboard', () => {
   it('should render numerical keyboard isDecimal: false and hasHyphen: false', () => {
-    const { result } = renderHook(() => useRef(null))
     const props = {
+      value: '',
       onChange: vi.fn(),
-      keyboardRef: result.current,
       isDecimal: false,
       hasHyphen: false,
     }
@@ -47,10 +45,9 @@ describe('NumericalKeyboard', () => {
   })
 
   it('should render numerical keyboard isDecimal: false and hasHyphen: true', () => {
-    const { result } = renderHook(() => useRef(null))
     const props = {
+      value: '',
       onChange: vi.fn(),
-      keyboardRef: result.current,
       isDecimal: false,
       hasHyphen: true,
     }
@@ -78,10 +75,9 @@ describe('NumericalKeyboard', () => {
   })
 
   it('should render numerical keyboard isDecimal: true and hasHyphen: false', () => {
-    const { result } = renderHook(() => useRef(null))
     const props = {
+      value: '',
       onChange: vi.fn(),
-      keyboardRef: result.current,
       isDecimal: true,
       hasHyphen: false,
     }
@@ -109,10 +105,9 @@ describe('NumericalKeyboard', () => {
   })
 
   it('should render numerical keyboard isDecimal: true and hasHyphen: true', () => {
-    const { result } = renderHook(() => useRef(null))
     const props = {
+      value: '',
       onChange: vi.fn(),
-      keyboardRef: result.current,
       isDecimal: true,
       hasHyphen: true,
     }
@@ -140,45 +135,101 @@ describe('NumericalKeyboard', () => {
     })
   })
 
-  it('should call mock function when clicking num key', () => {
-    const { result } = renderHook(() => useRef(null))
+  it('should emit the next value when clicking a number key', () => {
     const props = {
+      value: '1',
       onChange: vi.fn(),
-      keyboardRef: result.current,
       isDecimal: false,
       hasHyphen: false,
     }
     render(props)
-    const numKey = screen.getByRole('button', { name: '1' })
-    fireEvent.click(numKey)
-    expect(props.onChange).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '2' }))
+
+    expect(props.onChange).toHaveBeenCalledWith('12')
   })
 
-  it('should call mock function when clicking decimal point key', () => {
-    const { result } = renderHook(() => useRef(null))
+  it('should emit the next value when clicking a decimal point key', () => {
     const props = {
+      value: '1',
       onChange: vi.fn(),
-      keyboardRef: result.current,
       isDecimal: true,
       hasHyphen: false,
     }
     render(props)
-    const numKey = screen.getByRole('button', { name: '.' })
-    fireEvent.click(numKey)
-    expect(props.onChange).toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+
+    expect(props.onChange).toHaveBeenCalledWith('1.')
   })
 
-  it('should call mock function when clicking hyphen key', () => {
-    const { result } = renderHook(() => useRef(null))
+  it('should not accumulate duplicate decimal points', () => {
     const props = {
+      value: '1.',
       onChange: vi.fn(),
-      keyboardRef: result.current,
       isDecimal: true,
+      hasHyphen: false,
+    }
+    render(props)
+
+    fireEvent.click(screen.getByRole('button', { name: '.' }))
+
+    expect(props.onChange).toHaveBeenCalledWith('1.')
+  })
+
+  it('should emit the next value when clicking a hyphen key at the start', () => {
+    const props = {
+      value: '',
+      onChange: vi.fn(),
+      isDecimal: false,
       hasHyphen: true,
     }
     render(props)
-    const numKey = screen.getByRole('button', { name: '-' })
-    fireEvent.click(numKey)
-    expect(props.onChange).toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: '-' }))
+
+    expect(props.onChange).toHaveBeenCalledWith('-')
+  })
+
+  it('should ignore a hyphen key when the value is not empty', () => {
+    const props = {
+      value: '1',
+      onChange: vi.fn(),
+      isDecimal: false,
+      hasHyphen: true,
+    }
+    render(props)
+
+    fireEvent.click(screen.getByRole('button', { name: '-' }))
+
+    expect(props.onChange).toHaveBeenCalledWith('1')
+  })
+
+  it('should delete the last character when clicking del', () => {
+    const props = {
+      value: '12',
+      onChange: vi.fn(),
+      isDecimal: false,
+      hasHyphen: false,
+    }
+    render(props)
+
+    fireEvent.click(screen.getByRole('button', { name: 'del' }))
+
+    expect(props.onChange).toHaveBeenCalledWith('1')
+  })
+
+  it('should call onKeyPress with the normalized key', () => {
+    const props = {
+      value: '12',
+      onChange: vi.fn(),
+      onKeyPress: vi.fn(),
+      isDecimal: false,
+      hasHyphen: false,
+    }
+    render(props)
+
+    fireEvent.click(screen.getByRole('button', { name: 'del' }))
+
+    expect(props.onKeyPress).toHaveBeenCalledWith('del')
   })
 })
