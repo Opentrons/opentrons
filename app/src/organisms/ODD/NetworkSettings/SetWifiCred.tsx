@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -17,6 +17,8 @@ import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
+
 interface SetWifiCredProps {
   password: string
   setPassword: (password: string) => void
@@ -27,11 +29,10 @@ export function SetWifiCred({
   setPassword,
 }: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const MemoizedInput = memo(TouchInputField)
   const handleBlur = (): void => {
     if (inputRef.current != null) inputRef.current?.focus()
   }
@@ -40,6 +41,7 @@ export function SetWifiCred({
     if (inputRef.current != null) {
       inputRef.current.focus()
     }
+    keyboardRef.current?.setInput(password)
   }, [password])
 
   return (
@@ -60,7 +62,7 @@ export function SetWifiCred({
             gridGap={SPACING.spacing24}
           >
             <Box width="42.625rem">
-              <MemoizedInput
+              <TouchInputField
                 aria-label="wifi_password"
                 id="wifiPassword"
                 value={password}
@@ -68,6 +70,9 @@ export function SetWifiCred({
                 onBlur={handleBlur}
                 ref={inputRef}
                 autoFocus
+                onChange={e => {
+                  setPassword(e.target.value)
+                }}
               />
             </Box>
             <PasswordVisibilityToggle
