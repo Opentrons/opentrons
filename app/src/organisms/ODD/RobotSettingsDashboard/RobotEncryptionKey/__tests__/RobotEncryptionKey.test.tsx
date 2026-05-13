@@ -85,9 +85,9 @@ describe('RobotEncryptionKey modal', () => {
       },
     } as UseQueryResult<CACertPassword>)
   })
-  it('should close the modal when clicking dismiss', () => {
+  it('should close the modal when clicking ok', () => {
     renderWithModal(props)
-    const okButton = screen.getByText('Dismiss')
+    const okButton = screen.getByText('Ok')
     fireEvent.click(okButton)
     expect(
       screen.queryByText(/enter this key into the opentrons app/i)
