@@ -32,7 +32,7 @@ export function WifiPasswordInput({
 
   const mainWrapperClasses = clsx(
     styles.main_wrapper,
-    !isUnboxingFlowOngoing && styles['main_wrapper--with_top_margin']
+    !isUnboxingFlowOngoing && styles.main_wrapper_with_top_margin
   )
 
   useEffect(() => {
