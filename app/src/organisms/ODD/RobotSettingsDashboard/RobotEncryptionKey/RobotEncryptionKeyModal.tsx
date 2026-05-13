@@ -10,7 +10,7 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { RadialTimer } from '/app/molecules/RadialTimer/RadialTimer'
+import { RadialTimer } from '/app/molecules/RadialTimer'
 import { appShellInternalApiRequestor } from '/app/redux/shell/remote'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
