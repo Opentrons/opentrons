@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
@@ -9,6 +10,7 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import { RadialTimer } from '/app/molecules/RadialTimer/RadialTimer'
 import { appShellInternalApiRequestor } from '/app/redux/shell/remote'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
@@ -32,7 +34,7 @@ function RobotEncryptionKeyModalElement({
     modal.remove()
     clearClientData()
   }
-  const { password } = useCACertPasswordQuery({
+  const { password, valid_from_utc, valid_until_utc } = useCACertPasswordQuery({
     refetchInterval: query =>
       !!query
         ? refetchTimeForPassword(
@@ -40,11 +42,35 @@ function RobotEncryptionKeyModalElement({
             new Date(query.data.valid_until_utc)
           )
         : BACKUP_REFETCH_TIME_MS,
-  }).data?.data ?? { password: '' }
+  }).data?.data ?? {
+    password: '',
+    valid_from_utc: new Date().toISOString(),
+    valid_until_utc: new Date(
+      Date.now() + BACKUP_REFETCH_TIME_MS
+    ).toISOString(),
+  }
   const header = {
     title: t('device_settings:robot_encryption_key'),
     onClick: close,
   }
+
+  const from = useMemo(
+    () => new Date(valid_from_utc).getTime(),
+    [valid_from_utc]
+  )
+
+  const until = useMemo(
+    () => new Date(valid_until_utc).getTime(),
+    [valid_until_utc]
+  )
+
+  const [lastPassword, setLastPassword] = useState<string | null>(null)
+
+  useEffect(() => {
+    return () => {
+      setLastPassword(password)
+    }
+  }, [password])
 
   return (
     <OddModal
@@ -54,7 +80,22 @@ function RobotEncryptionKeyModalElement({
     >
       <div className={styles.modal_content}>
         <div className={styles.password_container}>
-          <StyledText oddStyle="bodyTextRegular">{password}</StyledText>
+          <StyledText
+            oddStyle="bodyTextRegular"
+            className={styles.last_password}
+            aria-hidden="true"
+            key={lastPassword}
+          >
+            {lastPassword}
+          </StyledText>
+          <StyledText
+            oddStyle="bodyTextRegular"
+            className={styles.password}
+            key={password}
+          >
+            {password}
+          </StyledText>
+          <RadialTimer from={from} until={until} />
         </div>
         <StyledText oddStyle="bodyTextRegular">
           {t('branded:enter_this_key_into_the_app')}

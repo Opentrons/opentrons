@@ -14,10 +14,44 @@
 
 .password_container {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  min-height: 2.5rem;
-  align-items: start;
+  height: calc(var(--spacing-16) * 2 + 40px);
   padding: var(--spacing-16) var(--spacing-20);
   border-radius: var(--border-radius-8);
   background-color: var(--grey-30);
+  overflow: hidden;
+}
+
+.last_password {
+  animation: fade-out 0.2s forwards ease-in;
+  position: absolute;
+}
+
+.password {
+  animation: fade-in 0.2s forwards ease-in;
+}
+
+@keyframes fade-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-60%);
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    transform: translateY(60%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
