@@ -16,10 +16,7 @@ import styles from './robot_encryption_key_modal.module.css'
 
 const BACKUP_REFETCH_TIME_MS = 1000
 
-export function refetchTimeForPassword(
-  now: Date,
-  validUntil: Date
-): number | false {
+export function refetchTimeForPassword(now: Date, validUntil: Date): number {
   return Math.max(validUntil.getTime() - now.getTime(), 1)
 }
 
