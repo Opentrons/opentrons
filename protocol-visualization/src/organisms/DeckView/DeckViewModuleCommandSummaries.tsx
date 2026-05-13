@@ -42,12 +42,23 @@ export function DeckViewModuleCommandSummaries(
           console.warn(`no slot ${slot} for module ${id}`)
           return null
         }
-        const isStepAssociatedWithModule =
+        const hasModuleIdParam =
           selectedRunTimeCommand != null &&
-          'moduleId' in selectedRunTimeCommand.params &&
-          selectedRunTimeCommand.params.moduleId === id
+          'params' in selectedRunTimeCommand &&
+          'moduleId' in selectedRunTimeCommand.params
+        const moduleIdInParams = hasModuleIdParam
+          ? (selectedRunTimeCommand.params as { moduleId: string }).moduleId
+          : null
+        const isStepAssociatedWithModule =
+          hasModuleIdParam && moduleIdInParams === id
         const showModuleCommandSummary =
           isStepAssociatedWithModule && selectedRunTimeCommand != null
+
+        if (selectedRunTimeCommand != null) {
+          console.debug(
+            `Module ${id}: hasModuleIdParam=${hasModuleIdParam}, isStepAssociatedWithModule=${isStepAssociatedWithModule}, moduleIdInParams=${moduleIdInParams}, comparing with id=${id}, match=${moduleIdInParams === id}`
+          )
+        }
 
         if (!showModuleCommandSummary) {
           return null
