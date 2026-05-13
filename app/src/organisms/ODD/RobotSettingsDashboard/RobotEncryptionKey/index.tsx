@@ -10,11 +10,11 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
+import { RadialTimer } from '/app/molecules/RadialTimer/RadialTimer'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { RobotSettingButton } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { appShellInternalApiRequestor } from '/app/redux/shell/remote'
 
-import { RadialTimer } from './RadialTimer'
 import styles from './robot_encryption_key.module.css'
 
 import type { SetSettingOption } from '../types'
