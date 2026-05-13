@@ -207,14 +207,16 @@ export function getIsTiprackSelectable(args: {
   )
 }
 
-export const getIsTiprackSelectableAndValid = (args: {
+interface GetIsTiprackSelectableAndValidArgs {
   labware: LabwareOnDeck
   formTiprackUri: string
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
   validTiprackIds: string[]
-}): boolean => {
+}
+
+export const getIsTiprackSelectableAndValid = (args: GetIsTiprackSelectableAndValidArgs): boolean => {
   const {
     labware,
     formTiprackUri,
