@@ -9,8 +9,8 @@
 
 .radial_timer_svg {
   position: absolute;
-  inset: 0;
   width: 100%;
+  inset: 0;
   height: 100%;
 }
 
@@ -23,16 +23,17 @@
 .radial_timer_progress {
   fill: none;
   stroke: var(--grey-60);
-  stroke-width: 3px;
   stroke-dasharray: var(--ring-circumference);
-  stroke-linecap: round;
+  stroke-width: 3px;
   animation: radial-timer-animation var(--animation-duration) linear forwards;
+  stroke-linecap: round;
 }
 
 @keyframes radial-timer-animation {
   from {
     stroke-dashoffset: var(--ring-offset-start);
   }
+
   to {
     stroke-dashoffset: var(--ring-circumference);
   }
