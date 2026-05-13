@@ -1,6 +1,7 @@
 /** The Redux slice for authorization and authentication. */
 
 import { createSelector, createSlice } from '@reduxjs/toolkit'
+import isEqual from 'lodash/isEqual'
 
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { getLocalRobot } from '../discovery'
@@ -131,3 +132,49 @@ export const getCurrentUsernameForLocalRobot = createSelector(
     return getAuthStateForRobot(state, localRobotName)?.username ?? null
   }
 )
+
+interface GetNextExpirationResult {
+  robotName: string
+  expiresAt: number
+}
+
+export const getNextExpiration = createSelector(
+  (state: State) => state.robotAuth,
+  (robotAuthState: RobotAuthState): GetNextExpirationResult | null => {
+    let result: GetNextExpirationResult | null = null
+    for (const [candidateName, candidateState] of Object.entries(
+      robotAuthState
+    )) {
+      if (
+        candidateState?.expiresAt != null &&
+        (result?.expiresAt == null ||
+          candidateState.expiresAt < result.expiresAt)
+      ) {
+        result = {
+          robotName: candidateName,
+          expiresAt: candidateState.expiresAt,
+        }
+      }
+    }
+    return result
+  },
+  {
+    memoizeOptions: {
+      // Avoid waking up listeners if we return an object that's referentially new
+      // but semantically hasn't changed.
+      resultEqualityCheck: isEqual,
+    },
+  }
+)
+
+/*
+        ([_robotName, perRobotAuthState]) =>
+          perRobotAuthState?.expiresAt != null
+      )
+      .map(([robotName, perRobotAuthState]) => ({
+        robotName,
+        // These non-null assertions should be OK because of the .filter() above.
+        expiresAt: perRobotAuthState!.expiresAt!,
+      }))
+      .sort((a, b) => a.expiresAt - b.expiresAt)
+      */
