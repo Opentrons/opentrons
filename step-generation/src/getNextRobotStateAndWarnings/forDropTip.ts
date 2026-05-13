@@ -30,7 +30,9 @@ export function forDropTip(
   const tiprackDef = invariantContext.labwareEntities[labwareId]?.def
   if (tiprackDef == null || !getIsTiprack(tiprackDef)) {
     //  early exit if the labware isn't a tiprack or dropping tip into the fixedTrash
-    return
+    console.warn(
+      `forDropTip expected ${labwareId} to have definition and to be a tiprack`
+    )
   } else {
     // TODO (nd 08/12/2025): handle tip (re)placement more elegantly depending on pipette specs and selected nozzles
     if (nozzleConfiguration === SINGLE) {
