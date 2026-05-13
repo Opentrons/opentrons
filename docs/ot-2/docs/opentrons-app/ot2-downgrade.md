@@ -3,36 +3,37 @@ title: "Opentrons OT-2: Downgrading Robot Software"
 description: "Roll back OT-2 robot and app software from v9.0 or 26.06+ to earlier versions."
 ---
 
-Start here for information and instructions about how to downgrade your Opentrons OT-2 robot and App software.
+Start here for information and instructions about how to downgrade your Opentrons OT-2 robot and Opentrons App software.
 
 !!! note
     Downgrading robot software should only be done at direction of Opentrons Support for troubleshooting or software compliance purposes.
 
 ## Software versions
 
-After v9.0, Opentrons split its software into separate branches for OT-2 and Flex. This change provides several advantages: it separates OT-2 versioning (restarting at v26.06) from Flex, enables robot-specific software releases, and reduces downtime from required updates that do not benefit the OT-2.
+After v9.0, Opentrons split its software into separate branches for OT-2 and Flex. This change restarts OT-2 software versioning at 26.06 and helps reduce downtime by eliminating shared updates that do not benefit your robot.
 
-The different OT-2 software versions are available on GitHub:
+When downgrading, these separate OT-2 software versions are available on GitHub:
 
 - **v26.06 (and later):** [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
 - **v9.0 (and earlier):** [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
 
-## Downgrade paths
+## Downgrade paths and saved protocols
 
-Forking the OT-2 software creates two downgrade paths. Whether you need to move your protocols manually depends on which version you are downgrading from and to:
+Splitting the OT-2 software into separate branches creates two downgrade paths. Whether you need to move your protocols manually depends on which version you are downgrading from and to.
 
-- **Latest to Legacy:** From v26.06 (or later) to v9.0 (or earlier). This path crosses the software fork boundary. You'll need to manually move your protocols to use them in the downgraded App.
+| From version | To version | Move protocol file? |
+|----|----|----|
+| v26.06 or later | v9.0 or earlier | Yes. You will need to manually move your protocols to use them in the downgraded app. |
+| v9.0 | Any earlier version | No. App version 9.0 (and earlier) uses the same file structure. |
 
-- **Legacy to Legacy:** From v9.0 to an earlier version (like v8.7). Since both versions share the same directory, your protocols will appear in the App automatically.
-
-The table below shows the default directory paths where the App saves your protocols. You can use these locations to manually copy and paste your files when moving across the software fork boundary. <div id="protocol-paths"></div>
+The table below shows the default directory paths where the app saves your protocols. You can use these locations to manually copy and paste your files when moving from 26.06 to an earlier version like 9.0. <div id="protocol-paths"></div>
 
 <table>
   <thead>
     <tr>
       <th>OS</th>
-      <th>Latest path (&ge; v26.06)</th>
-      <th>Legacy path (&le; v9.0)</th>
+      <th>v26.06 (or later)</th>
+      <th>v9.0 (or earlier)</th>
     </tr>
   </thead>
   <tbody>
@@ -57,7 +58,7 @@ The table below shows the default directory paths where the App saves your proto
 ## Robot downgrade instructions
 
 !!! tip
-    - Make sure your OT-2 is idle before downgrading. Some required App features are not available while the robot is running a a protocol.
+    - Make sure your OT-2 is idle before downgrading. Some required app features are not available while the robot is running a a protocol.
     - We recommend rolling back to the version closest to latest release.
 
 ### Download robot software
@@ -131,10 +132,10 @@ To install an earlier version of the Opentrons App:
 Installing multiple Opentrons App versions may cause system conflicts, particularly on Windows.
 
 - **macOS and Linux:** These systems use software encapsulation. You can typically run different versions by renaming the installed application.
-- **Windows:** The software integrates deeply with the operating system. Trying to install and run multiple App versions may cause conflicts with shared Windows files.
+- **Windows:** The software integrates deeply with the operating system. Trying to install and run multiple app versions may cause conflicts with shared Windows files.
 
 To avoid version conflicts:
 
 - Uninstall your current Opentrons App before installing a downgraded version.
 - Consult your IT team or Opentrons Support if you need to run multiple versions of the Opentrons App.
-- Do not attempt to downgrade robot or App software unless directed by Opentrons Support.
+- Do not attempt to downgrade robot or app software unless directed by Opentrons Support.
