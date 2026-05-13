@@ -88,7 +88,7 @@ class VacuumModuleProfileCycle(BaseModel):
         return VacuumModuleCycle(
             steps=steps,
             repetitions=self.repetitions,
-            vent_after=self.ventAfter if self.ventAfter is not None else None,
+            vent_after=self.ventAfter,
         )
 
 
