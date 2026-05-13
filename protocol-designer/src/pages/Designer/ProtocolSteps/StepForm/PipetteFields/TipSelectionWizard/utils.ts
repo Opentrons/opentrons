@@ -7,7 +7,7 @@ import {
 import {
   COLUMN_4_SLOTS,
   getIsSafePickupWithinTiprack,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
@@ -300,17 +300,16 @@ export const getValidTiprackIds = (args: {
               tipsToIgnore: addedWells,
             })
           const isSafeMoveConsideringDeck =
-            robotState != null
-              ? getIsSafePipetteMovement({
-                  robotState,
-                  invariantContext,
-                  pipetteId,
-                  labwareId: id,
-                  wellTargetName: wellName,
-                  primaryNozzle,
-                  nozzleConfiguration: nozzles,
-                })
-              : true
+            robotState == null ||
+            getPipetteMovementSafetyStatus({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId: id,
+              wellTargetName: wellName,
+              primaryNozzle,
+              nozzleConfiguration: nozzles,
+            }).isSafe
           if (isSafeWithinTiprack && isSafeMoveConsideringDeck && isComplete) {
             const allAffectedWells = getEntireWellSelection(
               wellName,
