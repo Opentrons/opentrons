@@ -54,11 +54,11 @@ function RobotEncryptionKeyModalElement({
   return (
     <OddModal
       header={header}
-      className={styles.robot_encryption_key_modal_container}
+      className={styles.modal_container}
       modalSize="small"
     >
-      <div className={styles.robot_encryption_key_modal_content}>
-        <div className={styles.robot_encryption_key_password_container}>
+      <div className={styles.modal_content}>
+        <div className={styles.password_container}>
           <StyledText oddStyle="bodyTextRegular">{password}</StyledText>
         </div>
         <StyledText oddStyle="bodyTextRegular">

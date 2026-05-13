@@ -24,16 +24,14 @@ export function RobotEncryptionKeySettingOption({
     NiceModal.show(RobotEncryptionKeyModal)
   }
   return (
-    <div className={styles.robot_encryption_key_setting_option_container}>
+    <div className={styles.setting_option_container}>
       <ChildNavigation
         header={t('robot_encryption_key')}
         onClickBack={() => {
           setCurrentOption(null)
         }}
       />
-      <div
-        className={styles.robot_encryption_key_setting_option_content_container}
-      >
+      <div className={styles.content_container}>
         <RobotSettingButton
           settingName={t('view_robot_generated_key')}
           onClick={showPasswordModal}

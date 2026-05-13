@@ -1,10 +1,10 @@
-.robot_encryption_key_setting_option_container {
+.setting_option_container {
   display: flex;
   height: 100%;
   flex-direction: column;
 }
 
-.robot_encryption_key_setting_option_content_container {
+.content_container {
   display: flex;
   height: 100%;
   min-height: 12rem;
