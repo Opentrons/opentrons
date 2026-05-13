@@ -48,7 +48,7 @@ const renderWithModal = () => {
 }
 
 describe('RobotEncryptionKey modal', () => {
-  const mockClearKeyDisplay = vi.fn()
+  const mockClearClientData = vi.fn()
   beforeEach(() => {
     vi.mocked(useCACertPasswordQuery).mockReturnValue({
       data: {
@@ -60,7 +60,7 @@ describe('RobotEncryptionKey modal', () => {
       },
     } as UseQueryResult<CACertPassword>)
     vi.mocked(useUpdateClientDataEncryptionKeys).mockReturnValue({
-      clearKeyDisplay: mockClearKeyDisplay,
+      clearClientData: mockClearClientData,
     } as any as ReturnType<typeof useUpdateClientDataEncryptionKeys>)
   })
   it('should close the modal when clicking ok', () => {
@@ -75,7 +75,7 @@ describe('RobotEncryptionKey modal', () => {
     renderWithModal()
     const okButton = screen.getByText('Ok')
     fireEvent.click(okButton)
-    expect(mockClearKeyDisplay).toHaveBeenCalled()
+    expect(mockClearClientData).toHaveBeenCalled()
   })
   it('should render the password', () => {
     renderWithModal()
