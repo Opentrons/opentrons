@@ -24,8 +24,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.fastapi_dependencies import (
-    log_run_action_play_user_notes,
-    request_body_has_supplied_user_notes,
+    maybe_log_user_action_notes_when_setting_requires,
 )
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
@@ -119,8 +118,10 @@ async def create_run_action(
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    body_has_user_notes: Annotated[bool, Depends(request_body_has_supplied_user_notes)],
-    _user_notes_audit: Annotated[None, Depends(log_run_action_play_user_notes)],
+    _maybe_audit_run_action_play_user_notes: Annotated[
+        None,
+        Depends(maybe_log_user_action_notes_when_setting_requires),
+    ],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -137,8 +138,8 @@ async def create_run_action(
         maintenance_run_orchestrator_store: Maintenance run orchestrator store.
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        body_has_user_notes: From :func:`request_body_has_supplied_user_notes`.
-        _user_notes_audit: Logs / future audit when ``body_has_user_notes`` is true.
+        _maybe_audit_run_action_play_user_notes: When auth-server requires reasons for
+            interaction, logs actions that include ``userNotes``.
     """
     body = request_body.data
     action_type = body.actionType

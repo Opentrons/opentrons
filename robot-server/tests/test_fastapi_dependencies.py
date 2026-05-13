@@ -78,5 +78,5 @@ def test_whitespace_only_user_notes_is_false() -> None:
 
 
 async def test_get_require_reason_for_interaction_enabled_without_auth_client() -> None:
-    """When there is no auth-server client, use the same default as an unset setting row."""
-    assert await get_require_reason_for_interaction_enabled(None) is True
+    """When there is no auth-server client, the setting is treated as off."""
+    assert await get_require_reason_for_interaction_enabled(None) is False

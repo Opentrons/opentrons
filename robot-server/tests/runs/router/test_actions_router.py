@@ -82,8 +82,7 @@ async def test_create_run_action(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        body_has_user_notes=body_has_user_notes,
-        _user_notes_audit=None,
+        _maybe_audit_run_action_play_user_notes=None,
     )
 
     assert result.content.data == expected_result
@@ -141,8 +140,7 @@ async def test_play_action_clears_maintenance_run(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        body_has_user_notes=body_has_user_notes,
-        _user_notes_audit=None,
+        _maybe_audit_run_action_play_user_notes=None,
     )
 
     decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
@@ -206,8 +204,7 @@ async def test_create_play_action_not_allowed(
             maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
-            body_has_user_notes=body_has_user_notes,
-            _user_notes_audit=None,
+            _maybe_audit_run_action_play_user_notes=None,
         )
 
     assert exc_info.value.status_code == expected_status_code
