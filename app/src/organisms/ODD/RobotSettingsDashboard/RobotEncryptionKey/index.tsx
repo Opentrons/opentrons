@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
@@ -10,7 +9,6 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { RadialTimer } from '/app/molecules/RadialTimer/RadialTimer'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { RobotSettingButton } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { appShellInternalApiRequestor } from '/app/redux/shell/remote'
@@ -60,7 +58,7 @@ export function refetchTimeForPassword(
 function ViewPasswordModalElement(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])
   const modal = useModal()
-  const { password, valid_from_utc, valid_until_utc } = useCACertPasswordQuery({
+  const { password } = useCACertPasswordQuery({
     refetchInterval: query =>
       !!query
         ? refetchTimeForPassword(
@@ -68,29 +66,11 @@ function ViewPasswordModalElement(): JSX.Element {
             new Date(query.data.valid_until_utc)
           )
         : BACKUP_REFETCH_TIME_MS,
-  }).data?.data ?? {
-    password: '',
-    valid_from_utc: new Date().toISOString(),
-    valid_until_utc: new Date(
-      Date.now() + BACKUP_REFETCH_TIME_MS
-    ).toISOString(),
-  }
-
+  }).data?.data ?? { password: '' }
   const header = {
     title: t('device_settings:robot_encryption_key'),
     onClick: modal.remove,
   }
-
-  const from = useMemo(
-    () => new Date(valid_from_utc).getTime(),
-    [valid_from_utc]
-  )
-  const until = useMemo(
-    () => new Date(valid_until_utc).getTime(),
-    [valid_until_utc]
-  )
-
-  // TODO: Add a loading state
   return (
     <OddModal
       header={header}
@@ -100,7 +80,6 @@ function ViewPasswordModalElement(): JSX.Element {
       <div className={styles.robot_encryption_key_modal_content}>
         <div className={styles.robot_encryption_key_password_container}>
           <StyledText oddStyle="bodyTextRegular">{password}</StyledText>
-          {!!password && <RadialTimer from={from} until={until} />}
         </div>
         <StyledText oddStyle="bodyTextRegular">
           {t('branded:enter_this_key_into_the_app')}
@@ -108,7 +87,7 @@ function ViewPasswordModalElement(): JSX.Element {
       </div>
       <SmallButton
         flex="1"
-        buttonText={i18n.format(t('shared:dismiss'), 'capitalize')}
+        buttonText={i18n.format(t('shared:ok'), 'capitalize')}
         onClick={modal.remove}
       />
     </OddModal>
