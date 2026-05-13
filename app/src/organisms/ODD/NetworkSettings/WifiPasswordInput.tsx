@@ -1,66 +1,57 @@
-import { memo, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
-import {
-  Box,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  POSITION_FIXED,
-  SPACING,
-  TouchInputField,
-} from '@opentrons/components'
+import { StyledText, TouchInputField } from '@opentrons/components'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
-interface SetWifiCredProps {
+import styles from './wifipasswordinput.module.css'
+
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
+
+interface WifiPasswordInputProps {
   password: string
   setPassword: (password: string) => void
 }
 
-export function SetWifiCred({
+export function WifiPasswordInput({
   password,
   setPassword,
-}: SetWifiCredProps): JSX.Element {
+}: WifiPasswordInputProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const MemoizedInput = memo(TouchInputField)
   const handleBlur = (): void => {
     if (inputRef.current != null) inputRef.current?.focus()
   }
+
+  const mainWrapperClasses = clsx(
+    styles.main_wrapper,
+    !isUnboxingFlowOngoing && styles.main_wrapper_with_top_margin
+  )
 
   useEffect(() => {
     if (inputRef.current != null) {
       inputRef.current.focus()
     }
+    keyboardRef.current?.setInput(password)
   }, [password])
 
   return (
     <>
-      <Flex
-        width="100%"
-        flexDirection={DIRECTION_COLUMN}
-        padding={`0 6.25rem ${SPACING.spacing40}`}
-        marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText forwardedAs="p">
+      <div className={mainWrapperClasses}>
+        <div className={styles.form_content}>
+          <StyledText oddStyle="bodyTextRegular">
             {t('enter_password')}
-          </LegacyStyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            gridGap={SPACING.spacing24}
-          >
-            <Box width="42.625rem">
-              <MemoizedInput
+          </StyledText>
+          <div className={styles.input_row}>
+            <div className={styles.input_field_wrapper}>
+              <TouchInputField
                 aria-label="wifi_password"
                 id="wifiPassword"
                 value={password}
@@ -68,8 +59,11 @@ export function SetWifiCred({
                 onBlur={handleBlur}
                 ref={inputRef}
                 autoFocus
+                onChange={e => {
+                  setPassword(e.target.value)
+                }}
               />
-            </Box>
+            </div>
             <PasswordVisibilityToggle
               isVisible={showPassword}
               onToggle={() => {
@@ -77,10 +71,10 @@ export function SetWifiCred({
                 inputRef?.current?.focus()
               }}
             />
-          </Flex>
-        </Flex>
-      </Flex>
-      <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
+          </div>
+        </div>
+      </div>
+      <div className={styles.keyboard_wrapper}>
         <FullKeyboard
           onChange={e => {
             e != null && setPassword(String(e))
@@ -88,7 +82,7 @@ export function SetWifiCred({
           }}
           keyboardRef={keyboardRef}
         />
-      </Flex>
+      </div>
     </>
   )
 }
