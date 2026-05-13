@@ -216,7 +216,9 @@ interface GetIsTiprackSelectableAndValidArgs {
   validTiprackIds: string[]
 }
 
-export const getIsTiprackSelectableAndValid = (args: GetIsTiprackSelectableAndValidArgs): boolean => {
+export const getIsTiprackSelectableAndValid = (
+  args: GetIsTiprackSelectableAndValidArgs
+): boolean => {
   const {
     labware,
     formTiprackUri,
