@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { SetWifiCred as SetWifiCredComponent } from '/app/organisms/ODD/NetworkSettings'
+import { WifiPasswordInput } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -33,7 +33,7 @@ export function SetWifiCred({
         }}
         onClickButton={handleConnect}
       />
-      <SetWifiCredComponent password={password} setPassword={setPassword} />
+      <WifiPasswordInput password={password} setPassword={setPassword} />
     </Flex>
   )
 }

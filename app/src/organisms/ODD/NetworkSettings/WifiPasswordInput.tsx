@@ -19,15 +19,15 @@ import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
-interface SetWifiCredProps {
+interface WifiPasswordInputProps {
   password: string
   setPassword: (password: string) => void
 }
 
-export function SetWifiCred({
+export function WifiPasswordInput({
   password,
   setPassword,
-}: SetWifiCredProps): JSX.Element {
+}: WifiPasswordInputProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const [showPassword, setShowPassword] = useState<boolean>(false)
