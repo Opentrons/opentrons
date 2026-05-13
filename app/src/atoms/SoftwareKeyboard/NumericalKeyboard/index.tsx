@@ -1,9 +1,12 @@
+import { useRef } from 'react'
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
 import { numericalCustom, numericalKeyboardLayout } from '../constants'
+import { applyNumericalKeyboardKey, toNumericalKeyboardKey } from './utils'
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { NumericalKeyboardKey } from './utils'
 
 import '../index.css'
 import './index.css'
@@ -53,3 +56,59 @@ export function NumericalKeyboard({
     />
   )
 }
+
+interface StatelessNumericalKeyboardProps {
+  value: string
+  onChange: (input: string) => void
+  isDecimal?: boolean
+  hasHyphen?: boolean
+  debug?: boolean
+  onKeyPress?: (key: NumericalKeyboardKey) => void
+}
+
+export function StatelessNumericalKeyboard({
+  value,
+  onChange,
+  isDecimal = false,
+  hasHyphen = false,
+  debug = false,
+  onKeyPress,
+}: StatelessNumericalKeyboardProps): JSX.Element {
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const valueRef = useRef(value)
+  const layoutName = `${isDecimal ? 'float' : 'int'}${
+    hasHyphen ? 'NegKeyboard' : 'Keyboard'
+  }`
+  valueRef.current = value
+
+  return (
+    <Keyboard
+      keyboardRef={r => {
+        keyboardRef.current = r
+      }}
+      theme="hg-theme-default oddTheme1 numerical-keyboard"
+      onKeyPress={keyboardButton => {
+        const key = toNumericalKeyboardKey(keyboardButton)
+        keyboardRef.current?.setInput('')
+        if (key == null) {
+          return
+        }
+        onKeyPress?.(key)
+        onChange(
+          applyNumericalKeyboardKey(valueRef.current, key, {
+            allowDecimal: isDecimal,
+            allowNegative: hasHyphen,
+          })
+        )
+      }}
+      display={numericalCustom}
+      useButtonTag={true}
+      layoutName={layoutName}
+      layout={numericalKeyboardLayout}
+      debug={debug}
+    />
+  )
+}
+
+export type { NumericalKeyboardKey }
+export { applyNumericalKeyboardKey, isValidNumericalInput } from './utils'

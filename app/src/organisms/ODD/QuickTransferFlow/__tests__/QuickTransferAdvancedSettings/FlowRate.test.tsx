@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TouchInputField } from '@opentrons/components'
@@ -9,7 +9,7 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 
-import type { ComponentProps } from 'react'
+import type { ChangeEvent, ComponentProps } from 'react'
 import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
@@ -28,7 +28,23 @@ const render = (props: ComponentProps<typeof FlowRateEntry>) => {
     i18nInstance: i18n,
   })
 }
-let mockTrackEventWithRobotSerial: any
+const getLastTouchInputFieldProps = (): ComponentProps<
+  typeof TouchInputField
+> => {
+  const lastCall = vi.mocked(TouchInputField).mock.calls.at(-1)
+  if (lastCall == null) {
+    throw new Error('TouchInputField was not rendered')
+  }
+  return lastCall[0] as ComponentProps<typeof TouchInputField>
+}
+const changeTouchInputValue = (value: string): void => {
+  act(() => {
+    getLastTouchInputFieldProps().onChange?.({
+      target: { value },
+    } as ChangeEvent<HTMLInputElement>)
+  })
+}
+let mockTrackEventWithRobotSerial: ReturnType<typeof vi.fn>
 
 describe('FlowRate', () => {
   let props: ComponentProps<typeof FlowRateEntry>
@@ -97,8 +113,8 @@ describe('FlowRate', () => {
         autoFocus: true,
         label: 'Aspirate flow rate (µL/s)',
         error: null,
-        type: 'number',
-        value: 35,
+        type: 'text',
+        value: '35',
         onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
@@ -121,8 +137,8 @@ describe('FlowRate', () => {
         autoFocus: true,
         label: 'Dispense flow rate (µL/s)',
         error: null,
-        type: 'number',
-        value: 62,
+        type: 'text',
+        value: '62',
         onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
@@ -139,9 +155,9 @@ describe('FlowRate', () => {
       {
         autoFocus: true,
         label: 'Aspirate flow rate (µL/s)',
-        error: 'Value must be between 1 to 92',
-        type: 'number',
-        value: 0,
+        error: null,
+        type: 'text',
+        value: '',
         onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
@@ -162,5 +178,33 @@ describe('FlowRate', () => {
     fireEvent.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
+  })
+
+  it('deletes external keyboard input with the stateless numerical keyboard', () => {
+    render(props)
+
+    changeTouchInputValue('12')
+    fireEvent.click(screen.getByText('del'))
+
+    expect(getLastTouchInputFieldProps()).toEqual(
+      expect.objectContaining({
+        value: '1',
+      })
+    )
+  })
+
+  it('accepts stateless numerical keyboard input after external input is cleared', () => {
+    render(props)
+
+    changeTouchInputValue('8')
+    changeTouchInputValue('')
+    fireEvent.click(screen.getByText('.'))
+    fireEvent.click(screen.getByText('1'))
+
+    expect(getLastTouchInputFieldProps()).toEqual(
+      expect.objectContaining({
+        value: '.1',
+      })
+    )
   })
 })
