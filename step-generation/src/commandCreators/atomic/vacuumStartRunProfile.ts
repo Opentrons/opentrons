@@ -43,7 +43,7 @@ export const vacuumStartRunProfile: CommandCreator<
       return step
     })
 
-  const dummyPython = `${taskId} = ${vacuumPythonName}.start_execute_profile(\n${indentPyLines(profileArgs.join(',\n'))}\n)`
+  const python = `${taskId} = ${vacuumPythonName}.start_execute_profile(\n${indentPyLines(profileArgs.join(',\n'))}\n)`
 
   return {
     commands: [
@@ -57,7 +57,6 @@ export const vacuumStartRunProfile: CommandCreator<
         },
       },
     ],
-    // TODO: (nd, 2026-04-23) implement Python
-    python: dummyPython,
+    python,
   }
 }
