@@ -25,7 +25,9 @@ export function RadialTimer({ from, until }: RadialTimerProps): JSX.Element {
     const interval = setInterval(() => {
       setValue(getTimerValue(until))
     }, 1000)
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+    }
   }, [until])
 
   // Animation may launch partway through the timer
