@@ -2,14 +2,27 @@
 
 import logging
 from datetime import datetime
-from typing import Annotated, cast
+from typing import Annotated, Optional, cast
 
 from fastapi import Depends
 from pydantic import BaseModel
 
+from server_utils.auth.resource_server.auth_server import Client
+from server_utils.auth.resource_server.fastapi import get_auth_server_client
+
 from robot_server.runs.action_models import CreateRunActionRequest
 
 log = logging.getLogger(__name__)
+
+
+async def get_require_reason_for_interaction_enabled(
+    auth_client: Annotated[Optional[Client], Depends(get_auth_server_client)],
+) -> bool:
+    """Return whether auth-server is configured to require a reason for interaction."""
+    if auth_client is None:
+        return False
+    response = await auth_client.get_require_reason_for_interaction_settings()
+    return response.data.requireReasonForInteraction
 
 
 def request_body_has_supplied_user_notes(request_body: BaseModel) -> bool:

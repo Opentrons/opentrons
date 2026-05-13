@@ -4,7 +4,10 @@ from pydantic import BaseModel
 
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
-from robot_server.fastapi_dependencies import request_body_has_supplied_user_notes
+from robot_server.fastapi_dependencies import (
+    get_require_reason_for_interaction_enabled,
+    request_body_has_supplied_user_notes,
+)
 from robot_server.runs.action_models import (
     CreateRunActionRequest,
     RunActionCreate,
@@ -72,3 +75,8 @@ def test_whitespace_only_user_notes_is_false() -> None:
         userNotes="  \t  ",
     )
     assert request_body_has_supplied_user_notes(play) is False
+
+
+async def test_get_require_reason_for_interaction_enabled_without_auth_client() -> None:
+    """When there is no auth-server client, use the same default as an unset setting row."""
+    assert await get_require_reason_for_interaction_enabled(None) is True

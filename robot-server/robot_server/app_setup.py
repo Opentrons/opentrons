@@ -101,6 +101,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             build_authorization_checker(
                 auth_server_uds=settings.auth_server_uds,
                 auth_server_url=settings.auth_server_url,
+                app_state=app.state,
             )
         )
         install_authorization_checker(app.state, authorization_checker)
