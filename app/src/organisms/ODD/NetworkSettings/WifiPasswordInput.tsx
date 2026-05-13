@@ -1,21 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
-import {
-  Box,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  POSITION_FIXED,
-  SPACING,
-  TouchInputField,
-} from '@opentrons/components'
+import { StyledText, TouchInputField } from '@opentrons/components'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+
+import styles from './wifipasswordinput.module.css'
 
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
@@ -37,6 +30,11 @@ export function WifiPasswordInput({
     if (inputRef.current != null) inputRef.current?.focus()
   }
 
+  const mainWrapperClasses = clsx(
+    styles.main_wrapper,
+    !isUnboxingFlowOngoing && styles['main_wrapper--with_top_margin']
+  )
+
   useEffect(() => {
     if (inputRef.current != null) {
       inputRef.current.focus()
@@ -46,22 +44,13 @@ export function WifiPasswordInput({
 
   return (
     <>
-      <Flex
-        width="100%"
-        flexDirection={DIRECTION_COLUMN}
-        padding={`0 6.25rem ${SPACING.spacing40}`}
-        marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText forwardedAs="p">
+      <div className={mainWrapperClasses}>
+        <div className={styles.form_content}>
+          <StyledText oddStyle="bodyTextRegular">
             {t('enter_password')}
-          </LegacyStyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            gridGap={SPACING.spacing24}
-          >
-            <Box width="42.625rem">
+          </StyledText>
+          <div className={styles.input_row}>
+            <div className={styles.input_field_wrapper}>
               <TouchInputField
                 aria-label="wifi_password"
                 id="wifiPassword"
@@ -74,7 +63,7 @@ export function WifiPasswordInput({
                   setPassword(e.target.value)
                 }}
               />
-            </Box>
+            </div>
             <PasswordVisibilityToggle
               isVisible={showPassword}
               onToggle={() => {
@@ -82,10 +71,10 @@ export function WifiPasswordInput({
                 inputRef?.current?.focus()
               }}
             />
-          </Flex>
-        </Flex>
-      </Flex>
-      <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
+          </div>
+        </div>
+      </div>
+      <div className={styles.keyboard_wrapper}>
         <FullKeyboard
           onChange={e => {
             e != null && setPassword(String(e))
@@ -93,7 +82,7 @@ export function WifiPasswordInput({
           }}
           keyboardRef={keyboardRef}
         />
-      </Flex>
+      </div>
     </>
   )
 }
