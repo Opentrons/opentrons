@@ -15,6 +15,7 @@ import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { NumberParameter } from '@opentrons/shared-data'
 
 interface ChooseNumberProps {
@@ -22,6 +23,8 @@ interface ChooseNumberProps {
   parameter: NumberParameter
   setParameter: (value: number, variableName: string) => void
 }
+
+const getKeyboardInputMask = (value: string): string => '*'.repeat(value.length)
 
 export function ChooseNumber({
   handleGoBack,
@@ -31,17 +34,23 @@ export function ChooseNumber({
   const { makeSnackbar } = useToaster()
 
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+
   const [paramValue, setParamValue] = useState<string>(String(parameter.value))
 
   // We need to arbitrarily set the value of the keyboard to a string the
   // same length as the initial parameter value (as string) when the component mounts
-  // so that the delete button operates properly on the exisiting input field value.
+  // so that the delete button operates properly on the existing input field value.
   const [prevKeyboardValue, setPrevKeyboardValue] = useState<string>('')
+  const setParamValueAndSyncKeyboard = (value: string): void => {
+    setParamValue(value)
+    const keyboardInput = getKeyboardInputMask(value)
+    keyboardRef.current?.setInput(keyboardInput)
+    setPrevKeyboardValue(keyboardInput)
+  }
   useEffect(
     () => {
-      const arbitraryInput = new Array(paramValue).join('*')
-      // @ts-expect-error keyboard should expose for `setInput` method
+      const arbitraryInput = getKeyboardInputMask(paramValue)
       keyboardRef.current?.setInput(arbitraryInput)
       setPrevKeyboardValue(arbitraryInput)
     },
@@ -63,20 +72,26 @@ export function ChooseNumber({
     }
   }
 
-  const handleKeyboardInput = (e: string): void => {
-    if (prevKeyboardValue.length < e.length) {
-      const lastDigit = e.slice(-1)
-      if (
-        !'.-'.includes(lastDigit) ||
-        (lastDigit === '.' && !paramValue.includes('.')) ||
-        (lastDigit === '-' && paramValue.length === 0)
-      ) {
-        setParamValue(paramValue + lastDigit)
-      }
-    } else {
-      setParamValue(paramValue.slice(0, paramValue.length - 1))
+  const handleKeyboardInput = (keyboardValue: string): void => {
+    const isAddingInput = prevKeyboardValue.length < keyboardValue.length
+
+    if (!isAddingInput) {
+      setParamValueAndSyncKeyboard(paramValue.slice(0, paramValue.length - 1))
+      return
     }
-    setPrevKeyboardValue(e)
+
+    const lastInput = keyboardValue.slice(-1)
+    const isValidInput =
+      !'.-'.includes(lastInput) ||
+      (lastInput === '.' && !paramValue.includes('.')) ||
+      (lastInput === '-' && paramValue.length === 0)
+
+    if (!isValidInput) {
+      keyboardRef.current?.setInput(prevKeyboardValue)
+      return
+    }
+
+    setParamValueAndSyncKeyboard(paramValue + lastInput)
   }
 
   const paramValueAsNumber = paramValue !== '' ? Number(paramValue) : null
@@ -91,6 +106,20 @@ export function ChooseNumber({
           max: parameter.type === 'int' ? max : max.toFixed(1),
         })
       : null
+
+  const handleInputChange = (inputValue: string): void => {
+    const allowsNegative = min < 0
+    const intPattern = allowsNegative ? /^-?\d*$/ : /^\d*$/
+    const floatPattern = allowsNegative ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/
+    const inputPattern = parameter.type === 'int' ? intPattern : floatPattern
+
+    if (!inputPattern.test(inputValue)) {
+      return
+    }
+
+    setParamValueAndSyncKeyboard(inputValue)
+  }
+
   return (
     <>
       <ChildNavigation
@@ -101,9 +130,11 @@ export function ChooseNumber({
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
         onClickButton={() => {
-          resetValueDisabled
-            ? makeSnackbar(t('no_custom_values') as string)
-            : setParamValue(String(parameter.default))
+          if (resetValueDisabled) {
+            makeSnackbar(t('no_custom_values') as string)
+            return
+          }
+          setParamValueAndSyncKeyboard(String(parameter.default))
         }}
       />
       <Flex
@@ -146,17 +177,7 @@ export function ChooseNumber({
             }}
             onChange={e => {
               const inputValue = e.target.value
-              if (parameter.type === 'float') {
-                setParamValue(inputValue)
-                return
-              }
-
-              const roundedValue = Math.round(Number(inputValue))
-              if (Number.isNaN(roundedValue)) {
-                setParamValue('')
-                return
-              }
-              setParamValue(String(roundedValue))
+              handleInputChange(inputValue)
             }}
           />
         </Flex>
