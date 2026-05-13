@@ -173,7 +173,9 @@ push-labware-ot3:
 
 .PHONY: restart
 restart:
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call stop-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-pyro-nameserver opentrons-hardware-api")
+	$(call start-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart
 push-no-restart: wheel
