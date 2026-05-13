@@ -31,7 +31,7 @@ _log = logging.getLogger(__name__)
 _CLIENT_ID = "opentrons_app"
 
 # todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
-_TOKEN_LIFETIME = timedelta(hours=24)
+_TOKEN_LIFETIME = timedelta(days=30)
 
 
 Backend: TypeAlias = oauthlib.oauth2.LegacyApplicationServer
