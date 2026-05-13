@@ -12,9 +12,9 @@ interface RadialTimerProps {
 const RADIUS = 18
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
-// Gets the remaining seconds
 function getTimerValue(until: number): number {
-  return Math.max(0, Math.round((until - Date.now()) / 1000))
+  const r = until - Date.now()
+  return Math.max(0, Math.ceil(r / 1000))
 }
 
 export function RadialTimer({ from, until }: RadialTimerProps): JSX.Element {

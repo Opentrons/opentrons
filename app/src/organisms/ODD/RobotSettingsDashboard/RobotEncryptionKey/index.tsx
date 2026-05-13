@@ -90,6 +90,7 @@ function ViewPasswordModalElement(): JSX.Element {
     [valid_until_utc]
   )
 
+  // TODO: Add a loading state
   return (
     <OddModal
       header={header}
@@ -99,7 +100,7 @@ function ViewPasswordModalElement(): JSX.Element {
       <div className={styles.robot_encryption_key_modal_content}>
         <div className={styles.robot_encryption_key_password_container}>
           <StyledText oddStyle="bodyTextRegular">{password}</StyledText>
-          <RadialTimer from={from} until={until} />
+          {!!password && <RadialTimer from={from} until={until} />}
         </div>
         <StyledText oddStyle="bodyTextRegular">
           {t('branded:enter_this_key_into_the_app')}

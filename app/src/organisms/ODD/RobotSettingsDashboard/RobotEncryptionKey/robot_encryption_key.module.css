@@ -29,7 +29,7 @@
 .robot_encryption_key_password_container {
   display: flex;
   width: 100%;
-  min-height: 2.5rem;
+  min-height: calc(2 * var(--spacing-16) + 40px);
   padding: var(--spacing-16) var(--spacing-20);
   border-radius: var(--border-radius-8);
   background-color: var(--grey-30);
