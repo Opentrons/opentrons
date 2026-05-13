@@ -98,7 +98,7 @@ The table below shows the default directory paths where the App saves your proto
 
 ## App version requirements
 
-To run protocols on a downgraded OT-2, the Opentrons App version must match the robot's software version. While you can interact with an OT-2 using mismatched software, protocol execution requires identical App and robot software versions.
+To run protocols on a downgraded OT-2, the Opentrons App version must match the robot's software version. While you can interact with an OT-2 using mismatched software, protocol execution requires identical app and robot software versions.
 
 ### App download and installation
 
@@ -124,7 +124,7 @@ To install an earlier version of the Opentrons App:
 3. Navigate to the saved file location and double-click the file to install it.
 
     !!! tip "Reminder for latest-to-legacy downgrades"
-        Downgrading from v26.06 means you must manually copy protocol files into the earlier version of the App. See the [file system storage table](#protocol-paths) for locations.
+        Downgrading from v26.06 means you must manually copy protocol files into the earlier version of the app. See the [file system storage table](#protocol-paths) for locations.
 
 ### Managing multiple App versions
 
