@@ -31,8 +31,8 @@
   width: 100%;
   min-height: calc(2 * var(--spacing-16) + 40px);
   padding: var(--spacing-16) var(--spacing-20);
+  align-items: center;
   border-radius: var(--border-radius-8);
   background-color: var(--grey-30);
-  align-items: center;
   justify-content: space-between;
 }
