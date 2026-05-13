@@ -23,13 +23,11 @@ export function refetchTimeForPassword(
   return Math.max(validUntil.getTime() - now.getTime(), 1)
 }
 
-interface REKMEProps {
-  clearClientData: () => void
-}
-
 function RobotEncryptionKeyModalElement({
   clearClientData,
-}: REKMEProps): JSX.Element {
+}: {
+  clearClientData: () => void
+}): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])
   const modal = useModal()
 
