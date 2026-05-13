@@ -24,9 +24,14 @@ export function RobotCertImportModal(
   const { requestKeyDisplay, clearKeyDisplay } =
     useUpdateClientDataEncryptionKeys()
   const [requestKey, setRequestKey] = useState<string | null>(null)
-  useEffect(() => {
-    setRequestKey(requestKeyDisplay())
-  }, [])
+  useEffect(
+    (): void => {
+      setRequestKey(requestKeyDisplay())
+    },
+    // this hook should run on mount only, and requestKey is not read in its callback
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
   const handleClose = () => {
     requestKey != null && clearKeyDisplay(requestKey)
     props.onClose()

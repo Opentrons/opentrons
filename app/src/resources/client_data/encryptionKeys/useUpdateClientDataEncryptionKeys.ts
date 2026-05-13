@@ -16,7 +16,7 @@ export type UseUpdateClientDataRecoveryResult = Omit<
   UseUpdateClientDataMutationResult<ClientDataEncryptionKeys>,
   'updateClientData'
 > & {
-  /* Add a new request to display the robot key. Returns the requested string to be used with clearKeyDisplay.*/
+  /* Add a new request to display the robot key. Returns the requested string to be used with clearKeyDisplay. */
   requestKeyDisplay: () => string
   /* Clear the request (by nulling the nonce). */
   clearKeyDisplay: (request: string) => void
@@ -32,7 +32,6 @@ export function useUpdateClientDataEncryptionKeys(
   const { keyDisplayRequestedNonces } = useClientDataEncryptionKeys()
   const { updateClientData, ...mutate } =
     useUpdateClientData<ClientDataEncryptionKeys>(KEYS.ENCRYPTION_KEYS, options)
-  console.log(`requested: ${keyDisplayRequestedNonces}`)
   const requestKeyDisplay = (): string => {
     const newRequest = uuid()
     updateClientData({
@@ -41,7 +40,6 @@ export function useUpdateClientDataEncryptionKeys(
         [newRequest]: true,
       },
     })
-    console.log(`updated requests to add ${newRequest}`)
     return newRequest
   }
   const clearKeyDisplay = (request: string): void => {

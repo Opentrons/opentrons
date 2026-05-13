@@ -12,7 +12,7 @@ export function RobotEncryptionKeyTakeover(): JSX.Element {
   useEffect(() => {
     if (
       keyDisplayRequestedNonces == null ||
-      Object.keys(keyDisplayRequestedNonces).length == 0
+      Object.keys(keyDisplayRequestedNonces).length === 0
     ) {
       NiceModal.remove(RobotEncryptionKeyModal)
     } else {
