@@ -53,6 +53,10 @@ def _channel_status_label(channel_passed: bool, retest_mode: bool) -> str:
         return "MECHANICAL_FAIL_AFTER_RETEST"
     return "SUSPECT_MECHANICAL"
 
+
+class StopTestError(RuntimeError):
+    """Raised when the test should stop immediately."""
+
 NUM_SECONDS_TO_WAIT = 30
 LEAK_RATE_WINDOW_SECONDS = 60
 INSERT_PRESSURE_MIN = 500.0
@@ -528,10 +532,30 @@ async def _read_pressure_and_check_results(
     leak_rates_per_channel: List[float] = []
     test_pass_stability = True
     for c in range(channels):
-        _samples_per_channel[c].sort()
-        _c_min = min(_samples_per_channel[c][1:])
-        _c_max = max(_samples_per_channel[c][1:])
+        channel_samples = _samples_per_channel[c]
         channel_number = c + 1
+        if tag == PressureEvent.INSERT and all(
+            math.isclose(sample, 0.0, abs_tol=1e-9) for sample in channel_samples
+        ):
+            printsig = (
+                f"stop-test:测试工装气压,状态{tag.value},"
+                f"ch{channel_number}在insert阶段采样数据全部为0,"
+                "程序自动停止测试，原因工装可能存在线脱落。"
+            )
+            ui.print_fail(printsig)
+            FINAL_TEST_FAIL_INFOR.append(printsig)
+            LOG_GING.error(printsig)
+            write_cb(
+                [
+                    f"pressure-{tag.value}-channel-{channel_number}",
+                    "insert-all-zero",
+                    "FAIL",
+                ]
+            )
+            raise StopTestError(printsig)
+        channel_samples.sort()
+        _c_min = min(channel_samples[1:])
+        _c_max = max(channel_samples[1:])
         leak_rate = (_c_max - _c_min) / LEAK_RATE_WINDOW_SECONDS
         leak_rate += leak_rate_offsets.get(channel_number, 0.0)
         leak_rates_per_channel.append(leak_rate)
@@ -1212,6 +1236,14 @@ async def _main(
         csv_cb.write(["PRESSURE-DATA"])
         for press_data in PRESSURE_DATA_CACHE:
             csv_cb.write(press_data, first_row_value_included=True)
+    except StopTestError as err:
+        print("run fail:",err)
+        LOG_GING.error(f"test stopped: {err}")
+        await api.move_rel(OT3Mount.LEFT,Point(z=20))
+        try:
+            await api.drop_tip(OT3Mount.LEFT)
+        except Exception:
+            pass
     except Exception as err:
         print("run fail:",err)
         await api.move_rel(OT3Mount.LEFT,Point(z=20))
