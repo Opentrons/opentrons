@@ -32,7 +32,7 @@ export function RobotCertImportModal(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
-  const handleClose = () => {
+  const handleClose = (): void => {
     requestKey != null && clearKeyDisplay(requestKey)
     props.onClose()
   }
