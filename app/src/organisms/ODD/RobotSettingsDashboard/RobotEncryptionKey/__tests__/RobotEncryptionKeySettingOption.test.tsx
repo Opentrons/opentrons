@@ -20,7 +20,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('../RobotEncryptionKeyModal')
-vi.mock('/app/resources/client_data/encryptionkeys')
+vi.mock('/app/resources/client_data/encryptionKeys')
 
 describe('RobotEncryptionKey', () => {
   vi.mocked(RobotEncryptionKeyModal).mockReturnValue(
