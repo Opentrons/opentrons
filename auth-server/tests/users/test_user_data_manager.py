@@ -350,9 +350,9 @@ def test_update_user_not_found_raises(
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="userName"):
-        manager.update_user("test_admin", new_username="")
+        manager.update_user("testadmin", new_username="")
 
 
 def test_update_user_short_password_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="at least 8 characters"):
-        manager.update_user("test_admin", new_password="short")
+        manager.update_user("testadmin", new_password="short")
