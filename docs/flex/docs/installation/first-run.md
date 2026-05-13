@@ -74,6 +74,12 @@ Connect the provided USB A-to-B cable to the robot's USB-B port and an open port
 
 To proceed with setup, the connected computer must have the Opentrons App installed *and running*. For details on installing the Opentrons App, see the [App Installation section][app-installation].
 
+!!! note "Note for Linux Users"
+    If the Opentrons App shows “Not connected via USB” on Ubuntu, open a terminal and give your user account permission to access the robot’s USB port.
+
+    1. From the terminal, run `sudo usermod -a -G dialout $USER`
+    2. Log out of your Linux account entirely (or restart your computer) and log back in for the change to take effect.
+
 ## Install software updates
 
 Now that you've connected to a network or computer, the robot can check for software and firmware updates and download them if needed. If there is an update, it may take a few minutes to install. Once the update is complete, the robot will restart.
