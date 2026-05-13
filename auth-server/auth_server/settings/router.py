@@ -13,6 +13,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from .models import (
     AccessControlResponseData,
     PatchSettingsRequestData,
+    RequireReasonForInteractionResponseData,
     SettingsResponseData,
 )
 from .store import AccessControlAlreadySetError, SettingsStore, get_settings_store
@@ -31,6 +32,23 @@ async def get_settings(  # noqa: D103
 ) -> SimpleBody[SettingsResponseData]:
     settings = settings_store.get_settings()
     return SimpleBody.model_construct(data=settings)
+
+
+@router.get(
+    "/auth/settings/requireReasonForInteraction",
+    summary="Get require reason for interaction setting",
+    description=(
+        "Return whether a reason for interaction is required. "
+        "This is separated from the main settings endpoint for callers that only "
+        "need this flag."
+    ),
+)
+async def get_require_reason_for_interaction_settings(  # noqa: D103
+    settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+) -> SimpleBody[RequireReasonForInteractionResponseData]:
+    return SimpleBody.model_construct(
+        data=settings_store.get_require_reason_for_interaction_settings(),
+    )
 
 
 @router.get(

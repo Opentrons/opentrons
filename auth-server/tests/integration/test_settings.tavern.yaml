@@ -24,6 +24,15 @@ stages:
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
 
+  - name: GET /auth/settings/requireReasonForInteraction matches default
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings/requireReasonForInteraction'
+    response:
+      status_code: 200
+      json:
+        data:
+          requireReasonForInteraction: true
 
 
 ---
@@ -102,6 +111,16 @@ stages:
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
+
+  - name: GET /auth/settings/requireReasonForInteraction after PATCH
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/settings/requireReasonForInteraction'
+    response:
+      status_code: 200
+      json:
+        data:
+          requireReasonForInteraction: false
 
   - name: GET settings unchanged after rejected PATCH
     request:

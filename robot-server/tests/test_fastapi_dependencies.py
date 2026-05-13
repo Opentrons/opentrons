@@ -45,18 +45,28 @@ def test_request_body_has_supplied_user_notes_other_request_models() -> None:
     class _OtherRequest(RequestModel[_Payload]):
         pass
 
-    assert request_body_has_supplied_user_notes(
-        _OtherRequest(data=_Payload(), userNotes="x")
-    ) is True
-    assert request_body_has_supplied_user_notes(
-        _OtherRequest(data=_Payload(), userNotes=None)
-    ) is False
-    assert request_body_has_supplied_user_notes(
-        _OtherRequest(data=_Payload(), userNotes="   ")
-    ) is False
+    assert (
+        request_body_has_supplied_user_notes(
+            _OtherRequest(data=_Payload(), userNotes="x")
+        )
+        is True
+    )
+    assert (
+        request_body_has_supplied_user_notes(
+            _OtherRequest(data=_Payload(), userNotes=None)
+        )
+        is False
+    )
+    assert (
+        request_body_has_supplied_user_notes(
+            _OtherRequest(data=_Payload(), userNotes="   ")
+        )
+        is False
+    )
 
 
 def test_whitespace_only_user_notes_is_false() -> None:
+    """Whitespace-only ``userNotes`` is not considered supplied documentation."""
     play = CreateRunActionRequest(
         data=RunActionCreate(actionType=RunActionType.PLAY),
         userNotes="  \t  ",

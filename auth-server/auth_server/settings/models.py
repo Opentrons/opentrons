@@ -170,3 +170,17 @@ class AccessControlResponseData(pydantic.BaseModel):
             )
         ),
     ]
+
+
+class RequireReasonForInteractionResponseData(pydantic.BaseModel):
+    """A response with the current require-reason-for-interaction setting."""
+
+    requireReasonForInteraction: Annotated[
+        bool,
+        pydantic.Field(
+            description=(
+                "When true, clients should collect a reason for interaction "
+                "where the product policy calls for it."
+            )
+        ),
+    ]

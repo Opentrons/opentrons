@@ -11,6 +11,7 @@ from robot_server.runs.action_models import CreateRunActionRequest
 
 log = logging.getLogger(__name__)
 
+
 def request_body_has_supplied_user_notes(request_body: BaseModel) -> bool:
     """Determine if the request body has a non-empty ``userNotes`` field."""
     notes = getattr(request_body, "userNotes", None)
