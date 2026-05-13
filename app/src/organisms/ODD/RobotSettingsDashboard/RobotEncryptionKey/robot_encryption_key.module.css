@@ -30,8 +30,9 @@
   display: flex;
   width: 100%;
   min-height: 2.5rem;
-  align-items: start;
   padding: var(--spacing-16) var(--spacing-20);
   border-radius: var(--border-radius-8);
   background-color: var(--grey-30);
+  align-items: center;
+  justify-content: space-between;
 }
