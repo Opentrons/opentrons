@@ -58,16 +58,18 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
           Object.keys(modules).some(moduleId => lw.stack.includes(moduleId)) ||
           labwareEntitiesExtended[id].def.parameters.loadName ===
             PROTOCOL_ENGINE_LID_STACK_LOADNAME
-        )
+        ) {
           return []
-
+        }
         const slot = getSlotInLocationStack(lw.stack)
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           slot,
           deckDef
         )?.boundingBox
-        if (slotPosition == null || slotBoundingBox == null) return []
+        if (slotPosition == null || slotBoundingBox == null) {
+          return []
+        }
 
         const { isActiveLayerVisible } = getActiveLayer(
           id,
