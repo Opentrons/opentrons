@@ -8,12 +8,11 @@ import {
 } from '../../utils'
 import { getVacuumProfileStepString } from '../../utils/vacuumPythonArgs/getVacuumProfileStepString'
 
-import type { VacuumModuleStartRunProfileCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, VacuumStartRunProfileArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
 export const vacuumStartRunProfile: CommandCreator<
-  VacuumModuleStartRunProfileCreateCommand['params']
+  VacuumStartRunProfileArgs
 > = (args, invariantContext, prevRobotState) => {
   const { moduleId, profile, ventAfter } = args
 
@@ -37,9 +36,8 @@ export const vacuumStartRunProfile: CommandCreator<
   // 1-indexed profile task ID
   const taskId = `${vacuumPythonName}_task_${vacuumState.numPumpActivitiesStarted + 1}`
   const profileArgs = getVacuumProfileStepString(profile)
-  const ventAfterArg = ventAfter
-    ? `vent_after=${formatPyValue(ventAfter)}`
-    : null
+  const ventAfterArg =
+    ventAfter === true ? `vent_after=${formatPyValue(ventAfter)}` : null
   const allArgs = [
     ...profileArgs,
     ...(ventAfterArg != null ? [ventAfterArg] : []),

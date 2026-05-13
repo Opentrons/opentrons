@@ -1,0 +1,26 @@
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { vacuumCloseVent, vacuumStartRunProfile } from '../atomic'
+
+import type {
+  CommandCreator,
+  VacuumCloseVentStartProfileArgs,
+} from '../../types'
+
+export const vacuumCloseVentStartProfile: CommandCreator<
+  VacuumCloseVentStartProfileArgs
+> = (args, invariantContext, prevRobotState) => {
+  return reduceCommandCreators(
+    [
+      curryCommandCreator(vacuumCloseVent, {
+        moduleId: args.moduleId,
+        commandCreatorFnName: 'vacuumCloseVent',
+      }),
+      curryCommandCreator(vacuumStartRunProfile, {
+        ...args,
+        commandCreatorFnName: 'vacuumStartRunProfile',
+      }),
+    ],
+    invariantContext,
+    prevRobotState
+  )
+}
