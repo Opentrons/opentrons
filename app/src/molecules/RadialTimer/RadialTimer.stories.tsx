@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
 
-import { RadialTimer } from './RadialTimer'
+import { RadialTimer } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
