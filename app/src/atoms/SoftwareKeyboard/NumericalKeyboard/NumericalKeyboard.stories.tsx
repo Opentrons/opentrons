@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react'
+import * as React from 'react'
 
 import {
   DIRECTION_COLUMN,
-  InputField,
   POSITION_ABSOLUTE,
   SPACING,
+  TouchInputField,
   VIEWPORT,
 } from '@opentrons/components'
 
@@ -38,9 +38,9 @@ type Story = StoryObj<typeof NumericalKeyboard>
 
 const Keyboard = (args): JSX.Element => {
   const { isDecimal, hasHyphen } = args
-  const [showKeyboard, setShowKeyboard] = useState(false)
-  const [value, setValue] = useState<string>('')
-  const keyboardRef = useRef(null)
+  const [showKeyboard, setShowKeyboard] = React.useState(false)
+  const [value, setValue] = React.useState<string>('')
+  const keyboardRef = React.useRef(null)
   return (
     <div
       style={{
@@ -49,12 +49,16 @@ const Keyboard = (args): JSX.Element => {
       }}
     >
       <form id="test_form">
-        <InputField
+        <TouchInputField
           value={value}
           type="text"
+          label="Numerical keyboard input"
           placeholder="When focusing, the numpad shows up"
           onFocus={() => {
             setShowKeyboard(true)
+          }}
+          onChange={e => {
+            setValue(e.target.value)
           }}
         />
       </form>
