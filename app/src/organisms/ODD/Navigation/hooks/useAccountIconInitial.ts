@@ -11,7 +11,6 @@ export type UseAccountIconInitialResult =
     }
   | {
       showIcon: false
-      iconContents?: null | undefined
     }
 
 /**
