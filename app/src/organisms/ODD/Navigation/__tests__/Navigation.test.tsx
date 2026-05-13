@@ -37,7 +37,9 @@ describe('Navigation', () => {
   beforeEach(() => {
     props = {}
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
-    vi.mocked(useAccountIconInitial).mockReturnValue(null)
+    vi.mocked(useAccountIconInitial).mockReturnValue({
+      showIcon: false,
+    })
     vi.mocked(NavigationMenu).mockReturnValue(<div>mock NavigationMenu</div>)
     vi.mocked(useNetworkConnection).mockReturnValue({
       isEthernetConnected: false,
@@ -98,14 +100,19 @@ describe('Navigation', () => {
   describe('account icon', () => {
     const linkName = 'Account'
     it('should not render the account control when logged out', () => {
-      vi.mocked(useAccountIconInitial).mockReturnValue(null)
+      vi.mocked(useAccountIconInitial).mockReturnValue({
+        showIcon: false,
+      })
       render(props)
       expect(
         screen.queryByRole('link', { name: linkName })
       ).not.toBeInTheDocument()
     })
     it('should render the account initial and link to the account page when logged in', () => {
-      vi.mocked(useAccountIconInitial).mockReturnValue('T')
+      vi.mocked(useAccountIconInitial).mockReturnValue({
+        showIcon: true,
+        iconContents: 'T',
+      })
       render(props)
       const accountLink = screen.getByRole('link', { name: linkName })
       expect(accountLink).toHaveAttribute('href', '/account')
