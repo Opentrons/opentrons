@@ -124,9 +124,6 @@ To install an earlier version of the Opentrons App:
 
 3. Navigate to the saved file location and double-click the file to install it.
 
-    !!! tip "Reminder for latest-to-legacy downgrades"
-        Downgrading from v26.06 means you must manually copy protocol files into the earlier version of the app. See the [file system storage table](#protocol-paths) for locations.
-
 ### Managing multiple App versions
 
 Installing multiple Opentrons App versions may cause system conflicts, particularly on Windows.
