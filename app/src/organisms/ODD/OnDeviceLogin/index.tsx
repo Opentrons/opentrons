@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -59,6 +59,14 @@ export function OnDeviceLogin({
 
   const username = watch('username')
   const password = watch('password')
+
+  // reset keyboard input when switching steps
+  useEffect(() => {
+    if (!showKeyboard) return
+    const kb = keyboardRef.current
+    if (kb == null) return
+    kb.setInput(step === 'username' ? username : password)
+  }, [step, showKeyboard, username, password])
 
   const handleNext = (): void => {
     const { username, password } = getValues()
