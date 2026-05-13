@@ -54,12 +54,6 @@ export function DeckViewModuleCommandSummaries(
         const showModuleCommandSummary =
           isStepAssociatedWithModule && selectedRunTimeCommand != null
 
-        if (selectedRunTimeCommand != null) {
-          console.debug(
-            `Module ${id}: hasModuleIdParam=${hasModuleIdParam}, isStepAssociatedWithModule=${isStepAssociatedWithModule}, moduleIdInParams=${moduleIdInParams}, comparing with id=${id}, match=${moduleIdInParams === id}`
-          )
-        }
-
         if (!showModuleCommandSummary) {
           return null
         }
