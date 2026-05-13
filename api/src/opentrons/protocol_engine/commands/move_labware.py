@@ -205,6 +205,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 not fixture_validation.is_gripper_waste_chute(area_name)
                 and not fixture_validation.is_deck_slot(area_name)
                 and not fixture_validation.is_trash(area_name)
+                and not fixture_validation.is_vac_dock(area_name)
             ):
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move {current_labware.loadName} to addressable area {area_name}"
@@ -212,6 +213,17 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
                 area_name
             )
+
+            # If this is an addressable area check if this is a modulefixture
+            module = self._state_view.modules.get_by_addressable_area(
+                area_name, self._state_view.addressable_areas.deck_definition
+            )
+            # If this is the vacuum module dock, check labware compatability
+            if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
+                    params.newLocation, current_labware_definition
+                )
+
             state_update.set_addressable_area_used(addressable_area_name=area_name)
 
             if fixture_validation.is_gripper_waste_chute(area_name):
@@ -272,11 +284,21 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             )
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
-            location=params.newLocation
+            params.newLocation, None, current_labware_definition
         )
 
-        # Check that labware and destination do not have labware on top
-        self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+        # Only allow moving if the labware has nothing on top, unless it's a movable adapter.
+        # Movable adapters (e.g. manifold collar) are permitted to carry labware.
+        if (
+            current_labware_definition is not None
+            and not current_labware_definition.parameters.isMovableAdapter
+        ):
+            self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+                labware_id=params.labwareId
+            )
+
+        # Block move if this labware is contained inside another labware
+        self._state_view.labware.raise_if_labware_is_contained(
             labware_id=params.labwareId
         )
 
@@ -333,8 +355,11 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     f" If trying to move a labware on an adapter, load the adapter separately to allow"
                     f" gripper movement."
                 )
-            if labware_validation.validate_definition_is_adapter(
-                current_labware_definition
+            if (
+                labware_validation.validate_definition_is_adapter(
+                    current_labware_definition
+                )
+                and not current_labware_definition.parameters.isMovableAdapter
             ):
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move adapter '{current_labware_definition.parameters.loadName}' with gripper."

@@ -7,7 +7,11 @@ import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import { ProtocolAnalysisErrorModal } from '../../Devices/ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals'
 import styles from './annotatedsteps.module.css'
 import { AnnotatedStepsRowItem } from './AnnotatedStepsRowItem'
-import { getIsVisibleProtocolStep } from './utils'
+import {
+  getGroupedNodeIndexContainingCommandId,
+  getIsVisibleProtocolStep,
+  getLastVisibleAnalysisCommandId,
+} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -38,6 +42,7 @@ interface GroupRow {
   annotationType: string
   commandStartNumber: number
   annotationDescription: string
+  trailingErrors?: AnalysisError[]
 }
 
 interface CommandRow {
@@ -53,7 +58,15 @@ interface ErrorRow {
   errors: AnalysisError[]
 }
 
-type AnnotatedStepsRow = GroupRow | CommandRow | ErrorRow
+interface ErrorPastStepsMessageRow {
+  type: 'errors_past_steps_message'
+}
+
+type AnnotatedStepsRow =
+  | GroupRow
+  | CommandRow
+  | ErrorRow
+  | ErrorPastStepsMessageRow
 
 export interface ItemData {
   rows: AnnotatedStepsRow[]
@@ -85,6 +98,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     milliSecondsPerFrame = DEFAULT_STEP_GROUP_SECONDS,
     isGlobalPlaying = false,
   } = props
+
   const { t } = useTranslation('protocol_visualization')
   const [showErrorDetailsModal, setShowErrorDetailsModal] =
     useState<boolean>(false)
@@ -133,6 +147,11 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     currentCommandIndex != null
       ? (filteredCommands[currentCommandIndex]?.id ?? null)
       : null
+  const lastVisibleAnalysisCommandId = useMemo(
+    () => getLastVisibleAnalysisCommandId(analysis.commands),
+    [analysis.commands]
+  )
+
   const groupedCommandsHighlightedInfo = useMemo(
     () =>
       filteredGroupedCommands?.map(node => {
@@ -157,6 +176,25 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       }),
     [filteredGroupedCommands, currentCommandId]
   )
+
+  const groupedRowIndexForTrailingErrors = useMemo(() => {
+    if (
+      analysis.errors.length === 0 ||
+      groupedCommandsHighlightedInfo == null ||
+      groupedCommandsHighlightedInfo.length === 0 ||
+      lastVisibleAnalysisCommandId == null
+    ) {
+      return null
+    }
+    return getGroupedNodeIndexContainingCommandId(
+      groupedCommandsHighlightedInfo,
+      lastVisibleAnalysisCommandId
+    )
+  }, [
+    analysis.errors,
+    groupedCommandsHighlightedInfo,
+    lastVisibleAnalysisCommandId,
+  ])
 
   useEffect(() => {
     if (currentCommandId == null) return
@@ -205,6 +243,10 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
             annotationType: group.annotation?.name ?? '',
             commandStartNumber: subCommandStartNumber,
             annotationDescription: group.annotation?.description ?? '',
+            ...(groupedRowIndexForTrailingErrors === index &&
+            analysis.errors.length > 0
+              ? { trailingErrors: analysis.errors }
+              : {}),
           })
           group.subCommands.forEach(subCommand => {
             nextRowIndexByCommandId.set(subCommand.command.id, rowIndex)
@@ -239,10 +281,20 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       })
     }
 
-    if (analysis.errors.length > 0) {
+    if (
+      analysis.errors.length > 0 &&
+      groupedRowIndexForTrailingErrors == null
+    ) {
       nextRows.push({
         type: 'errors',
         errors: analysis.errors,
+      })
+    } else if (
+      analysis.errors.length > 0 &&
+      groupedRowIndexForTrailingErrors != null
+    ) {
+      nextRows.push({
+        type: 'errors_past_steps_message',
       })
     }
 
@@ -255,6 +307,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     filteredCommands,
     currentCommandIndex,
     analysis.errors,
+    groupedRowIndexForTrailingErrors,
   ])
 
   const [listRef, listRefCallback] = useListCallbackRef()

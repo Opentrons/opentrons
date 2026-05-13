@@ -24,3 +24,9 @@
   bottom: 0;
   left: 0;
 }
+
+.overlay {
+  position: fixed;
+  background-color: var(--white);
+  inset: 0;
+}

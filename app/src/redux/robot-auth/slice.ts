@@ -98,6 +98,13 @@ export const getLocalRobotAuthState = createSelector(
   }
 )
 
+export const getLocalRobotAccessToken = createSelector(
+  getLocalRobotAuthState,
+  (localRobotAuthState: PerRobotAuthState | null): string | null => {
+    return localRobotAuthState?.accessToken ?? null
+  }
+)
+
 /**
  * On the on-device display, this returns whether we're currently logged in to the
  * local robot. This should not be used in the desktop app.
@@ -109,4 +116,18 @@ export const getIsLoggedInToLocalRobot = createSelector(
   getLocalRobotAuthState,
   (localRobotAuthState: PerRobotAuthState | null): boolean =>
     localRobotAuthState != null
+)
+
+/**
+ * On the on-device display, this returns the username of the user currently
+ * logged in to the local robot, or null if not logged in. On the desktop app,
+ * this is not meaningful.
+ */
+export const getCurrentUsernameForLocalRobot = createSelector(
+  (state: State) => state,
+  (state: State) => getLocalRobot(state)?.name ?? null,
+  (state: State, localRobotName: string | null): string | null => {
+    if (localRobotName == null) return null
+    return getAuthStateForRobot(state, localRobotName)?.username ?? null
+  }
 )

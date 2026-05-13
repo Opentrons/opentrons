@@ -2,8 +2,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
-
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getHasOptedIn } from '../../../analytics/selectors'
 import { i18n } from '../../../assets/localization'
@@ -53,8 +51,7 @@ describe('Landing', () => {
       bakeToast: mockBakeToast,
       eatToast: mockEatToast,
     })
-    vi.mocked(getEnableFork).mockReturnValue(false)
-    vi.mocked(getIsProduction).mockReturnValue(false)
+    vi.mocked(getIsProduction).mockReturnValue(true)
   })
 
   it('renders the landing page image and text', () => {
@@ -78,7 +75,6 @@ describe('Landing', () => {
   })
 
   it('render the button to redirect to OT-2 app and Flex button', () => {
-    vi.mocked(getEnableFork).mockReturnValue(true)
     render()
     screen.getByRole('button', { name: 'Create a Flex protocol' })
     screen.getByRole('button', { name: 'Create an OT-2 protocol' })
@@ -88,7 +84,6 @@ describe('Landing', () => {
     const windowOpenSpy = vi
       .spyOn(window, 'open')
       .mockImplementation(() => null)
-    vi.mocked(getEnableFork).mockReturnValue(true)
     vi.mocked(getIsProduction).mockReturnValue(false)
     render()
 
@@ -99,7 +94,7 @@ describe('Landing', () => {
     expect(windowOpenSpy).toHaveBeenCalledWith(
       'https://ot2.staging.designer.opentrons.com/#/createNew',
       '_blank',
-      'noopener,noreferrer'
+      'noopener'
     )
     windowOpenSpy.mockRestore()
   })
@@ -108,8 +103,6 @@ describe('Landing', () => {
     const windowOpenSpy = vi
       .spyOn(window, 'open')
       .mockImplementation(() => null)
-    vi.mocked(getEnableFork).mockReturnValue(true)
-    vi.mocked(getIsProduction).mockReturnValue(true)
     render()
 
     fireEvent.click(
@@ -119,7 +112,7 @@ describe('Landing', () => {
     expect(windowOpenSpy).toHaveBeenCalledWith(
       'https://ot2.designer.opentrons.com/#/createNew',
       '_blank',
-      'noopener,noreferrer'
+      'noopener'
     )
     windowOpenSpy.mockRestore()
   })

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Iterator, List, Optional, Sequence, Union, cast
+from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Union, cast
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -1904,3 +1904,30 @@ class VacuumModuleContext(ModuleContext):
         self._core_map.add(labware_core, adapter)
 
         return adapter
+
+    @requires_version(2, 28)
+    def move_to_dock(
+        self,
+        labware: Labware,
+        use_gripper: bool = False,
+        pick_up_offset: Optional[Mapping[str, float]] = None,
+        drop_offset: Optional[Mapping[str, float]] = None,
+    ) -> None:
+        _pick_up_offset = (
+            validation.ensure_valid_labware_offset_vector(pick_up_offset)
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            validation.ensure_valid_labware_offset_vector(drop_offset)
+            if drop_offset
+            else None
+        )
+        self._protocol_core.move_labware(
+            labware._core,
+            new_location=self.manifold_dock,
+            use_gripper=use_gripper,
+            pause_for_manual_move=True,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
+        )

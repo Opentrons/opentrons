@@ -1,7 +1,7 @@
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
@@ -26,83 +26,72 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
 })
 
 const store: Store<State> = legacy_createStore(state => state, {} as State)
+const wrapper: FunctionComponent<{ children: ReactNode }> = ({ children }) => (
+  <Provider store={store}>{children}</Provider>
+)
+
+const mockAccessControlEnabled = (enabled: boolean): void => {
+  vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+    data: { data: { accessControlEnabled: enabled } },
+    isSuccess: true,
+  } as ReturnType<typeof useAccessControlEnabledQuery>)
+}
 
 describe('useShouldShowLoggedOutOverlay', () => {
-  let wrapper: FunctionComponent<{ children: ReactNode }>
-
-  beforeEach(() => {
-    wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
-  })
-
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('returns true when access control is enabled, user is logged out, and login page is closed', () => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-      isSuccess: true,
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
+  it('returns true when access control is enabled, the user is logged out, and the login modal is closed', () => {
+    mockAccessControlEnabled(true)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
-    const isShowingLoginPage = false
 
-    const { result } = renderHook(
-      () => useShouldShowLoggedOutOverlay(isShowingLoginPage),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
+      wrapper,
+    })
     expect(result.current).toBe(true)
   })
 
   it('returns false when access control is disabled', () => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: false } },
-      isSuccess: true,
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    mockAccessControlEnabled(false)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
-    const isShowingLoginPage = false
 
-    const { result } = renderHook(
-      () => useShouldShowLoggedOutOverlay(isShowingLoginPage),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
+      wrapper,
+    })
     expect(result.current).toBe(false)
   })
 
   it('returns false when the user is logged in', () => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-      isSuccess: true,
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    mockAccessControlEnabled(true)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(true)
-    const isShowingLoginPage = false
 
-    const { result } = renderHook(
-      () => useShouldShowLoggedOutOverlay(isShowingLoginPage),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
+      wrapper,
+    })
     expect(result.current).toBe(false)
   })
 
-  it('returns false when login page is showing', () => {
+  it('returns false when the login modal is open', () => {
+    mockAccessControlEnabled(true)
+    vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
+
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(true), {
+      wrapper,
+    })
+    expect(result.current).toBe(false)
+  })
+
+  it('returns false when the access-control-enabled query has not resolved', () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-      isSuccess: true,
+      data: undefined,
+      isSuccess: false,
     } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
-    const isShowingLoginPage = true
 
-    const { result } = renderHook(
-      () => useShouldShowLoggedOutOverlay(isShowingLoginPage),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
+      wrapper,
+    })
     expect(result.current).toBe(false)
   })
 })
