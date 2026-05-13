@@ -145,12 +145,18 @@ export function ChooseNumber({
               e.target.focus()
             }}
             onChange={e => {
-              const inputValue = Number(e.target.value as string)
-              const modifiedValue =
-                parameter.type === 'int' ? Math.round(inputValue) : inputValue
-              setParamValue(
-                Number.isNaN(modifiedValue) ? '' : String(modifiedValue)
-              )
+              const inputValue = e.target.value
+              if (parameter.type === 'float') {
+                setParamValue(inputValue)
+                return
+              }
+
+              const roundedValue = Math.round(Number(inputValue))
+              if (Number.isNaN(roundedValue)) {
+                setParamValue('')
+                return
+              }
+              setParamValue(String(roundedValue))
             }}
           />
         </Flex>
