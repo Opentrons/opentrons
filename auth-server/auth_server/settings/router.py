@@ -35,13 +35,9 @@ async def get_settings(  # noqa: D103
 
 
 @router.get(
-    "/auth/settings/requireReasonForInteraction",
-    summary="Get require reason for interaction setting",
-    description=(
-        "Return whether a reason for interaction is required. "
-        "This is separated from the main settings endpoint for callers that only "
-        "need this flag."
-    ),
+    "/auth/settings/requireReasonForInteractionEnabled",
+    summary="Get require reason for interaction enabled setting",
+    description="Get the current require reason for interaction enabled setting.",
 )
 async def get_require_reason_for_interaction_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],

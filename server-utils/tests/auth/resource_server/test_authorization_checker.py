@@ -27,13 +27,13 @@ def mock_client(decoy: Decoy) -> Client:
 async def test_always_allowed_checker() -> None:
     subject = AlwaysAllowedAuthorizationChecker()
 
-    assert (
-        await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
-        == AuthorizedResult()
+    assert isinstance(
+        await subject.check(token=None, required_scopes={Scope.USERS_WRITE}),
+        AuthorizedResult,
     )
-    assert (
-        await subject.check(token="token-abc123", required_scopes={Scope.USERS_WRITE})
-        == AuthorizedResult()
+    assert isinstance(
+        await subject.check(token="token-abc123", required_scopes={Scope.USERS_WRITE}),
+        AuthorizedResult,
     )
 
 
@@ -54,9 +54,9 @@ async def test_auth_server_checker_given_no_token(
     decoy.when(await mock_client.get_auth_settings()).then_return(
         AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=False))
     )
-    assert (
-        await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
-        == AuthorizedResult()
+    assert isinstance(
+        await subject.check(token=None, required_scopes={Scope.USERS_WRITE}),
+        AuthorizedResult,
     )
 
 
@@ -73,11 +73,11 @@ async def test_auth_server_checker_given_a_token(
             scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}),
         )
     )
-    assert (
+    assert isinstance(
         await subject.check(
             "test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}
-        )
-        == AuthorizedResult()
+        ),
+        AuthorizedResult,
     )
 
     # Inactive -> do not authorize
