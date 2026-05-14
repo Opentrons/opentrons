@@ -29,39 +29,67 @@ const _getAtomicVacuumProfileSteps = (
 }
 
 const _getVacuumProfileAtomicStepString = (
-  step: AtomicVacuumProfileStep
+  step: AtomicVacuumProfileStep,
+  ventAfter?: boolean
 ): string => {
-  if ('pressureMbar' in step) {
-    const { pressureMbar, holdSeconds } = step
+  const { holdSeconds } = step
+  const baseDict = {
+    hold_time_seconds: holdSeconds,
+    ...(ventAfter != null ? { vent_after: ventAfter } : {}),
+  }
+  if ('gaugePressureMbar' in step) {
+    const { gaugePressureMbar } = step
     return formatPyDict({
-      gauge_pressure: pressureMbar,
-      hold_time_seconds: holdSeconds,
+      gauge_pressure: gaugePressureMbar,
+      ...baseDict,
     })
   }
-  const { powerPercent, holdSeconds } = step
+  const { percentPower } = step
   return formatPyDict({
-    power_percent: Number(powerPercent),
-    hold_time_seconds: Number(holdSeconds),
+    power_percent: Number(percentPower),
+    ...baseDict,
   })
 }
 
 export const getVacuumProfileStepString = (
-  profile: VacuumProfile
+  profile: VacuumProfile,
+  ventAfter: boolean
 ): string[] => {
-  // return sole cycle with repetitions if applicable
-  let profileArg: string
-  let repetitionsArg: string
-  if (profile.length === 1 && 'repetitions' in profile[0]) {
-    const { steps, repetitions } = profile[0]
-    profileArg = `profile=[\n${indentPyLines(steps.map(_getVacuumProfileAtomicStepString).join(',\n'))}\n]`
-    repetitionsArg = `repetitions=${formatPyValue(repetitions)}`
-    return [profileArg, repetitionsArg]
-  } else {
-    // either a single atomic step or multiple steps
-    const atomicProfileSteps = _getAtomicVacuumProfileSteps(profile)
-    profileArg = `profile=[\n${indentPyLines(atomicProfileSteps.map(_getVacuumProfileAtomicStepString).join(',\n'))}\n]`
-    // hard-coded to 1 repetition if we flatten all steps
-    repetitionsArg = `repetitions=${formatPyValue(1)}`
-  }
+  // In the future, we should return sole cycle with repetitions if applicable
+  // For now, the shape of the PE command and specced PAPI does not accommodate a
+  // profile-scoped vent control param, so we flatten all steps and add the vent control
+  // to the final-final step (last step of the last cycle repetition)
+  // I will leave the code here for future reference if PE/PAPI support this behavior
+
+  // let profileArg: string
+  // let repetitionsArg: string
+  // if (profile.length === 1 && 'repetitions' in profile[0]) {
+  //   const { steps, repetitions } = profile[0]
+  //   profileArg = `profile=[\n${indentPyLines(
+  //     steps
+  //       .map((step, i) => {
+  //         if (i === steps.length - 1) {
+  //           return _getVacuumProfileAtomicStepString(step, ventAfter)
+  //         }
+  //         return _getVacuumProfileAtomicStepString(step)
+  //       })
+  //       .join(',\n')
+  //   )}\n]`
+  //   repetitionsArg = `repetitions=${formatPyValue(repetitions)}`
+  //   return [profileArg, repetitionsArg]
+
+  const atomicProfileSteps = _getAtomicVacuumProfileSteps(profile)
+  const profileArg = `profile=[\n${indentPyLines(
+    atomicProfileSteps
+      .map((step, i) => {
+        if (i === atomicProfileSteps.length - 1) {
+          return _getVacuumProfileAtomicStepString(step, ventAfter)
+        }
+        return _getVacuumProfileAtomicStepString(step)
+      })
+      .join(',\n')
+  )}\n]`
+  // hard-coded to 1 repetition if we flatten all steps
+  const repetitionsArg = `repetitions=${formatPyValue(1)}`
   return [profileArg, repetitionsArg]
 }

@@ -75,14 +75,14 @@ class UserDataManager:
         """Insert default placeholder users if they don't already exist."""
         defaults = [
             User(
-                username="test_admin",
-                hashed_password=password_hash.hash("test_admin_password"),
+                username="testadmin",
+                hashed_password=password_hash.hash("testadminpassword"),
                 full_name="Test Admin",
                 account_type=AccountType.ADMIN,
             ),
             User(
-                username="test_user",
-                hashed_password=password_hash.hash("test_user_password"),
+                username="testuser",
+                hashed_password=password_hash.hash("testuserpassword"),
                 full_name="Test User",
                 account_type=AccountType.USER,
             ),

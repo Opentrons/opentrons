@@ -93,13 +93,16 @@ const vacuumProfileStepToAtomic = (
   if (pumpData.mode === VACUUM_MODE_PRESSURE) {
     const mbar = pumpData.pressureMbar
     return {
+      enablePump: true,
       holdSeconds: durationSeconds,
-      pressureMbar: mbar != null && mbar !== '' ? Number.parseFloat(mbar) : 0,
+      gaugePressureMbar:
+        mbar != null && mbar !== '' ? Number.parseFloat(mbar) : 0,
     }
   }
   return {
+    enablePump: true,
     holdSeconds: durationSeconds,
-    powerPercent: pumpData.powerPercent,
+    percentPower: pumpData.powerPercent,
   }
 }
 
@@ -205,6 +208,7 @@ export const vacuumFormToArgs = (
       return {
         commandCreatorFnName: 'vacuumCloseVentStartProfile',
         profile: profileElements.map(vacuumProfileItemToPeProfileElement),
+        ventAfter: endingHoldVentCheckbox,
         ...baseValues,
       }
     }
