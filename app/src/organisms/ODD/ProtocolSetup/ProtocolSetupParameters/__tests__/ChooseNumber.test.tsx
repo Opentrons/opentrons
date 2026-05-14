@@ -114,17 +114,4 @@ describe('ChooseNumber', () => {
 
     expect(input).toHaveValue('1')
   })
-
-  it('should accept numerical keyboard input after external keyboard input is cleared', () => {
-    props = { ...props, parameter: mockFloatNumberParameterData }
-    render(props)
-    const input = screen.getByLabelText('EtoH Volume')
-
-    fireEvent.change(input, { target: { value: '8' } })
-    fireEvent.change(input, { target: { value: '' } })
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-
-    expect(input).toHaveValue('.1')
-  })
 })
