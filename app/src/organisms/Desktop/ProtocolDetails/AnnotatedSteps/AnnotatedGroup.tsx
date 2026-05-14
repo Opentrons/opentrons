@@ -20,7 +20,7 @@ const MIN_EXPANDED_BODY_PX = 160
 interface AnnotatedGroupProps {
   scrollTargetId: string | null
   listElement: HTMLElement | null
-  /** Pixel height of the annotated steps list viewport (used to cap expanded body height). */
+  /** pixel height of the annotated steps list viewport (used to cap expanded body height). */
   listViewportHeight: number
   annotationType: string
   subCommands: LeafNode[]
@@ -103,7 +103,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
             style={
               expandedMaxHeightPx != null
                 ? { maxHeight: expandedMaxHeightPx }
-                : undefined
+                : {}
             }
           >
             {subCommands.map((subCommand, index) => (

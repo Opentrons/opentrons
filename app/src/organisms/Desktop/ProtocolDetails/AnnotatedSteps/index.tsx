@@ -74,7 +74,7 @@ export interface ItemData {
   allRunDefs: LabwareDefinition[]
   scrollTargetId: string | null
   listElement: HTMLElement | null
-  /** Height of the virtualized list viewport; used to size expanded step groups vertically. */
+  /** height of the virtualized list viewport; used to size expanded step groups vertically. */
   listViewportHeight: number
   onShowErrorDetails: () => void
   t: (key: string) => string
@@ -321,16 +321,16 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   })
 
   useEffect(() => {
-    const el = listRef?.element
-    if (el == null) return
+    const element = listRef?.element
+    if (element == null) return
 
     const updateHeight = (): void => {
-      setListViewportHeight(el.clientHeight)
+      setListViewportHeight(element.clientHeight)
     }
 
     updateHeight()
     const resizeObserver = new ResizeObserver(updateHeight)
-    resizeObserver.observe(el)
+    resizeObserver.observe(element)
     return () => {
       resizeObserver.disconnect()
     }

@@ -103,7 +103,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
             style={
               expandedMaxHeightPx != null
                 ? { maxHeight: expandedMaxHeightPx }
-                : undefined
+                : {}
             }
           >
             {subCommands.map((subCommand, index) => (

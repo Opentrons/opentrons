@@ -38,8 +38,6 @@
   border-bottom: 1px solid var(--grey-30);
   gap: var(--spacing-4);
   overflow-y: auto;
-
-  /* Inline maxHeight from list viewport overrides this when the list is mounted. */
 }
 
 .annotated_group_expanded::-webkit-scrollbar {
