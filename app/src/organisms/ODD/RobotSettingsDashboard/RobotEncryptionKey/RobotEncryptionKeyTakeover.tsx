@@ -1,11 +1,15 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment, ReactNode, useEffect } from 'react'
 import NiceModal from '@ebay/nice-modal-react'
 
 import { useClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import { RobotEncryptionKeyModal } from './RobotEncryptionKeyModal'
 
-export function RobotEncryptionKeyTakeover(): JSX.Element {
+export function RobotEncryptionKeyTakeover({
+  children,
+}: {
+  children: ReactNode
+}): JSX.Element {
   const { keyDisplayRequestedNonces } = useClientDataEncryptionKeys({
     refetchInterval: 1000,
   })
@@ -19,5 +23,5 @@ export function RobotEncryptionKeyTakeover(): JSX.Element {
       NiceModal.show(RobotEncryptionKeyModal)
     }
   }, [keyDisplayRequestedNonces])
-  return <Fragment />
+  return <Fragment>{children}</Fragment>
 }
