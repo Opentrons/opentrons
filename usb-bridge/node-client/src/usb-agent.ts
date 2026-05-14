@@ -290,7 +290,8 @@ class SerialPortHttpAgent extends http.Agent {
 
   destroy(): void {
     this.destroyed = true
-    this.port.destroy(new Error('Agent was destroyed'))
+    this.log('debug', 'Agent was destroyed')
+    this.port.destroy()
   }
 
   createSocket(
