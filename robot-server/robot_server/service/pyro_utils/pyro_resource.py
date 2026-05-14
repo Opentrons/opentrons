@@ -1,5 +1,6 @@
 """Robot-server resouce class and functions for Pyro compatibility."""
 
+from __future__ import annotations
 import asyncio
 import logging
 import threading
@@ -29,11 +30,9 @@ if TYPE_CHECKING:
     from robot_server.deck_configuration.store import DeckConfigurationStore
     from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
         MaintenanceRunOrchestratorStore,
-        handle_estop_event,
     )
     from robot_server.runs.run_orchestrator_store import (
         RunOrchestratorStore,
-        handle_hardware_event,
     )
 
 robot_server_pyro_resource_accessor = AppStateAccessor["RobotServerPyroResource"](
@@ -56,7 +55,7 @@ class RobotServerPyroResource:
 
     def __init__(self, loop: asyncio.AbstractEventLoop) -> None:
         # Specialty private member for daemon execution overloading - Relevant to PyroSynchronousObjects only
-        self._execute_on_daemon_overload = True
+        self._execute_on_pyro_daemon_overload = True
 
         self._loop = loop
 
@@ -126,7 +125,7 @@ class RobotServerPyroResource:
                 event: HardwareEvent,
             ) -> None:
                 asyncio.run_coroutine_threadsafe(
-                    handle_hardware_event(orchestrator_store, event),
+                    orchestrator_store.handle_proxy_hardware_event(event),
                     self._loop,
                 )
 
@@ -149,7 +148,7 @@ class RobotServerPyroResource:
                 event: HardwareEvent,
             ) -> None:
                 asyncio.run_coroutine_threadsafe(
-                    handle_estop_event(orchestrator_store, event),
+                    orchestrator_store.handle_proxy_estop_event(event),
                     self._loop,
                 )
 

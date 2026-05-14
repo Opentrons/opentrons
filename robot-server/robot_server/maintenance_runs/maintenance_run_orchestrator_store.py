@@ -279,3 +279,29 @@ class MaintenanceRunOrchestratorStore:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self.run_orchestrator.add_labware_definition(definition)
+    
+    async def handle_proxy_estop_event(
+        self, event: HardwareEvent,
+    ) -> None:
+        """Handle an E-stop event from the hardware API.
+
+        When in subprocess mode this will run on the RobotServerPyroResource's event loop.
+
+        This will not be called otherwise, as it is only for proxy callback events.
+        """
+        try:
+            if isinstance(event, EstopStateNotification):
+                if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+                    return
+                if self.current_run_id is None:
+                    return
+                # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
+                # runner layer.
+                self.run_orchestrator.estop()
+                await self.run_orchestrator.finish(
+                    error=EStopActivatedError()
+                )
+        except Exception:
+            # This is a background task kicked off by a hardware event,
+            # so there's no one to propagate this exception to.
+            _log.exception("Exception handling proxy E-stop event.")

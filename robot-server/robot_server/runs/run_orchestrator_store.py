@@ -647,3 +647,21 @@ class RunOrchestratorStore:
             wait_until_complete=wait_until_complete,
             timeout=timeout,
         )
+
+    async def handle_proxy_hardware_event(
+        self, event: HardwareEvent
+    ) -> None:
+        """Handle an E-stop event from the hardware API.
+
+        When in subprocess mode this will run on the RobotServerPyroResource's event loop.
+
+        This will not be called otherwise, as it is only for proxy callback events.
+
+        Implementation is in _do_handle_hardware_event, so this can just catch exceptions.
+        """
+        try:
+            await _do_handle_hardware_event(self, event)
+        except Exception:
+            # This is a background task kicked off by a hardware event,
+            # so there's no one to propagate this exception to.
+            _log.exception("Exception handling E-stop event.")

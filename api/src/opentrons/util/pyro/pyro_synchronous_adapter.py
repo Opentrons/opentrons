@@ -1,5 +1,6 @@
 """Synchronous class wrapper and functions for creating Pyro compatible objects."""
 
+import logging
 import asyncio
 import enum
 import functools
@@ -18,6 +19,8 @@ from opentrons.util.pyro.pyro_serialization import (
     NonBuiltinKeyDictWrapper,
     TypedDictWrapper,
 )
+
+log = logging.getLogger(__name__)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -71,18 +74,19 @@ class PyroFunctionWrapper:
     """Wrapper class to safely wrap callable responses as Proxy objects."""
 
     def __init__(
-        self, callable: Callable[P, T], loop: asyncio.AbstractEventLoop
+        self, callable: Callable[P, T], loop: asyncio.AbstractEventLoop, execute_on_pyro_daemon_overload: bool
     ) -> None:
         self.callable = callable
         self._loop = loop
-        self._execute_on_daemon_overload = True     # Callbacks provided as proxies are always called from the daemon executor
+        # Wrapped callbacks inherit their parent resource's ruleset regarding inbound call execution
+        self._execute_on_pyro_daemon_overload = execute_on_pyro_daemon_overload
 
     @property
     def is_callable(self) -> bool:
         """Callable status for validation of a wrapped function, always true."""
         return True
 
-    def call(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+    def call(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         """Remote deployable function call."""
         return self.callable(*args, **kwargs)
 
@@ -304,22 +308,16 @@ def _build_classdict(  # noqa: C901
                 # Expose standard functions and bound the exposed function to the original instance
                 exposed = pyro.expose(attr)
                 bound_method = MethodType(exposed, core_obj)
-                execution_overload = False
-                if hasattr(core_obj, "_execute_on_daemon_overload"):
-                    execution_overload = core_obj._execute_on_daemon_overload
                 yield (
                     name,
                     parameter_validation_wrapper(
-                        execute_inbound_call_on_event_loop(core_obj, bound_method, execution_overload)
+                        execute_inbound_call_on_event_loop(core_obj, bound_method)
                     ),
                 )
             elif isinstance(attr, property):
                 # Bound property to the original instance through the inbound call executor and expose the bounded property
-                execution_overload = False
-                if hasattr(core_obj, "_execute_on_daemon_overload"):
-                    execution_overload = core_obj._execute_on_daemon_overload
                 exposed = pyro.expose(
-                    execute_inbound_call_on_event_loop(core_obj, attr, execution_overload)
+                    execute_inbound_call_on_event_loop(core_obj, attr)
                 )  # type: ignore
                 yield (name, exposed)
 
@@ -407,7 +405,7 @@ def _validate_inbound_proxy(arg: Any) -> Any:
     if isinstance(arg, pyro.Proxy):
         # NOTE: Cases like this are the result of multi-process callback forwarding
         try:
-            if arg.is_callable:
+            if "is_callable" in arg._pyroAttrs:
                 arg = AsyncPyroFunctionWrapper(proxy=arg)
         except AttributeError:
             try:
@@ -434,7 +432,7 @@ def parameter_validation_wrapper(attr: Callable[P, T]) -> Callable[P, T]:
 
 
 def execute_inbound_call_on_event_loop(
-    core_obj: Any, attr: Callable[P, T], execute_on_daemon_overload: Optional[bool] = False
+    core_obj: Any, attr: Callable[P, T]
 ) -> Callable[P, T]:
     """Wrapper to ensure that inbound calls are executed on the resource's native event loop.
 
@@ -464,18 +462,22 @@ def execute_inbound_call_on_event_loop(
 
     @functools.wraps(attr)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
-        if execute_on_daemon_overload:
-            # Instances wrapped by PSOs can specify that inbound calls execute from the daemon worker thread
+        # Grab the active event loop off the core object this was bound with
+        loop: Optional[asyncio.AbstractEventLoop] = getattr(core_obj, "_loop", None)
+
+        if hasattr(core_obj, "_execute_on_pyro_daemon_overload"):
+            # If the core object has been provided an `execute_on_pyro_daemon_overload` then it should be called from
+            # The thread of the request handler. These are move likely calls coming from the robot-server or a resource
+            # that will not have access to it's host process's event loop. Calls like this are expected to be threadsafe
+            # in their host process.
             if isinstance(attr, MethodType):
                 return attr(*args, **kwargs)
             elif isinstance(attr, property):
                 return getattr(core_obj, attr.fget.__name__)
             else:
                 raise ValueError(
-                    f"Provided base attribute must be a Property or a Method."
+                    f"Provided base attribute of a daemon overload resource must be a Property or a Method."
                 )
-        # Grab the active event loop off the core object this was bound with
-        loop: Optional[asyncio.AbstractEventLoop] = getattr(core_obj, "_loop", None)
 
         try:
             running_loop = asyncio.get_running_loop()
@@ -533,18 +535,12 @@ def convert_result_to_proxy(  # noqa: C901
             bound_method = MethodType(sync_func, core_obj)
             result = bound_method(*args, **kwargs)
         elif isinstance(attr, FunctionType):
-            execution_overload = False
-            if hasattr(core_obj, "_execute_on_daemon_overload"):
-                execution_overload = core_obj._execute_on_daemon_overload
             bound_method = execute_inbound_call_on_event_loop(
-                core_obj, MethodType(attr, core_obj), execute_on_daemon_overload=execution_overload
+                core_obj, MethodType(attr, core_obj)
             )
             result = bound_method(*args, **kwargs)
         elif isinstance(attr, property):
-            execution_overload = False
-            if hasattr(core_obj, "_execute_on_daemon_overload"):
-                execution_overload = core_obj._execute_on_daemon_overload
-            bound_property = execute_inbound_call_on_event_loop(core_obj, attr, execute_on_daemon_overload=execution_overload)
+            bound_property = execute_inbound_call_on_event_loop(core_obj, attr)
             result = bound_property.fget()
         else:
             raise ValueError(
@@ -562,9 +558,6 @@ def convert_result_to_proxy(  # noqa: C901
                     if not hasattr(r, "_loop"):
                         # Append the parents event loop to the child object for PSO forwarding
                         setattr(r, "_loop", core_obj._loop)
-                    if not hasattr(r, "_execute_on_daemon_overload"):
-                        # Append the parents daemon execution ruleset to the child object for PSO forwarding
-                        setattr(r, "_execute_on_daemon_overload", core_obj._execute_on_daemon_overload)
                     pyro_synchronous_obj = PyroSynchronousObject(r, utility)
                     utility.add_PSO(pyro_synchronous_obj)
                 proxy_list.append(utility.proxy_for(pyro_synchronous_obj))
@@ -572,16 +565,17 @@ def convert_result_to_proxy(  # noqa: C901
         except TypeError:
             if isinstance(result, FunctionType) or isinstance(result, MethodType):
                 # Wrap callable result in Proxy-safe format
-                result = PyroFunctionWrapper(result, core_obj._loop)
+                # For execute on daemon overload rules, a child callable (PyroFunctionWrapper)
+                # must inherit it's parents execution ruleset.
+                execute_overload_ruleset = False
+                if hasattr(core_obj, "_execute_on_pyro_daemon_overload"):
+                    execute_overload_ruleset = True
+                result = PyroFunctionWrapper(result, core_obj._loop, execute_overload_ruleset)
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
-                # CASEY NOTE: these need to optionally inherit their parents execution rule?
                 if not hasattr(result, "_loop"):
                     # Append the parents event loop to the child object for PSO forwarding
                     setattr(result, "_loop", core_obj._loop)
-                if not hasattr(result, "_execute_on_daemon_overload"):
-                    # Append the parents daemon execution ruleset to the child object for PSO forwarding
-                    setattr(result, "_execute_on_daemon_overload", core_obj._execute_on_daemon_overload)
                 pyro_synchronous_obj = PyroSynchronousObject(result, utility)
                 utility.add_PSO(pyro_synchronous_obj)
             return utility.proxy_for(pyro_synchronous_obj)
