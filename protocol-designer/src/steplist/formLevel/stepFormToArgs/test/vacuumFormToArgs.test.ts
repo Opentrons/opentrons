@@ -208,6 +208,7 @@ describe('vacuumFormToArgs', () => {
             mode: VACUUM_MODE_PRESSURE,
             pressureMbar: '12.5',
           },
+          ventAfter: false,
         },
         [cycleId]: {
           type: PROFILE_CYCLE,
@@ -224,6 +225,7 @@ describe('vacuumFormToArgs', () => {
                 mode: VACUUM_MODE_POWER,
                 powerPercent: 88,
               },
+              ventAfter: false,
             },
           },
         },
@@ -235,10 +237,22 @@ describe('vacuumFormToArgs', () => {
       name: annotation.stepName,
       description: annotation.stepDetails,
       profile: [
-        { enablePump: true, holdSeconds: 45, gaugePressureMbar: 12.5 },
+        {
+          enablePump: true,
+          holdSeconds: 45,
+          gaugePressureMbar: 12.5,
+          ventAfter: false,
+        },
         {
           repetitions: 3,
-          steps: [{ enablePump: true, holdSeconds: 90, percentPower: 88 }],
+          steps: [
+            {
+              enablePump: true,
+              holdSeconds: 90,
+              percentPower: 88,
+              ventAfter: false,
+            },
+          ],
         },
       ],
       ventAfter: false,
