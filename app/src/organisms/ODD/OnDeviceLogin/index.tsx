@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import {
   LEGACY_INPUT_TYPE_PASSWORD,
   setRefs,
-  StyledText,
   TouchInputField,
 } from '@opentrons/components'
 
