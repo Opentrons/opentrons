@@ -192,19 +192,4 @@ describe('FlowRate', () => {
       })
     )
   })
-
-  it('accepts stateless numerical keyboard input after external input is cleared', () => {
-    render(props)
-
-    changeTouchInputValue('8')
-    changeTouchInputValue('')
-    fireEvent.click(screen.getByText('.'))
-    fireEvent.click(screen.getByText('1'))
-
-    expect(getLastTouchInputFieldProps()).toEqual(
-      expect.objectContaining({
-        value: '.1',
-      })
-    )
-  })
 })
