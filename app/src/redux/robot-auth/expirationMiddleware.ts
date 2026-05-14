@@ -1,3 +1,13 @@
+/**
+ * When we're logged in to a robot, and enough time passes that the login expires,
+ * this automatically updates state to reflect the expiration.
+ *
+ * The server is still ultimately responsible for enforcing that a client can't
+ * use an expired access token. So we're not depending on this for security.
+ * This is merely for the benefit of UI that shows whether the user is currently
+ * logged in.
+ */
+
 import { createListenerMiddleware } from '@reduxjs/toolkit'
 
 import { getNextExpiration, logOutOrTimeOut } from './slice'
@@ -23,7 +33,9 @@ expirationMiddleware.startListening.withTypes<State, Dispatch>()({
     // 1. We run a fresh instance of this handler any time there's a change to any
     //    relevant state. See `predicate` above.
     // 2. We make sure there's at most one instance of this handler running at a time,
-    //    the most recent one. So nothing should be able to dispatch based on stale information.
+    //    the most recent one.
+    //
+    // So nothing should be able to dispatch based on stale information.
 
     listenerAPI.cancelActiveListeners()
 
