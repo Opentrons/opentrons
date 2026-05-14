@@ -74,6 +74,8 @@ export interface ItemData {
   allRunDefs: LabwareDefinition[]
   scrollTargetId: string | null
   listElement: HTMLElement | null
+  /** Height of the virtualized list viewport; used to size expanded step groups vertically. */
+  listViewportHeight: number
   onShowErrorDetails: () => void
   t: (key: string) => string
   milliSecondsPerFrame: number
@@ -312,10 +314,27 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
   const [listRef, listRefCallback] = useListCallbackRef()
   const [listWidth, setListWidth] = useState(0)
+  const [listViewportHeight, setListViewportHeight] = useState(0)
   const dynamicRowHeight = useDynamicRowHeight({
     defaultRowHeight: DEFAULT_ROW_HEIGHT_PX,
-    key: `${listWidth}-${rows.length}`,
+    key: `${listWidth}-${listViewportHeight}-${rows.length}`,
   })
+
+  useEffect(() => {
+    const el = listRef?.element
+    if (el == null) return
+
+    const updateHeight = (): void => {
+      setListViewportHeight(el.clientHeight)
+    }
+
+    updateHeight()
+    const resizeObserver = new ResizeObserver(updateHeight)
+    resizeObserver.observe(el)
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [listRef])
 
   useEffect(() => {
     if (scrollTargetId == null) return
@@ -347,6 +366,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       handlePause,
       scrollTargetId,
       listElement,
+      listViewportHeight,
       onShowErrorDetails: () => {
         setShowErrorDetailsModal(true)
       },
@@ -362,6 +382,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       handlePause,
       scrollTargetId,
       listElement,
+      listViewportHeight,
       t,
       milliSecondsPerFrame,
       isGlobalPlaying,

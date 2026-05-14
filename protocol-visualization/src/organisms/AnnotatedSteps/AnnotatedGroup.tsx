@@ -13,9 +13,15 @@ import type {
 } from '@opentrons/shared-data'
 import type { LeafNode } from '../../types'
 
+/** Reserve space for StepGroup header (title row, optional subtitle, padding). */
+const STEP_GROUP_HEADER_RESERVE_PX = 80
+const MIN_EXPANDED_BODY_PX = 160
+
 interface AnnotatedGroupProps {
   scrollTargetId: string | null
   listElement: HTMLElement | null
+  /** Pixel height of the annotated steps list viewport (used to cap expanded body height). */
+  listViewportHeight: number
   annotationType: string
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
@@ -39,6 +45,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     commandStartNumber,
     scrollTargetId,
     listElement,
+    listViewportHeight,
     annotationDescription,
     headerLeading,
     trailingErrorsFooter,
@@ -62,6 +69,14 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     command => command.isHighlighted
   )
 
+  const expandedMaxHeightPx =
+    listViewportHeight > 0
+      ? Math.max(
+          MIN_EXPANDED_BODY_PX,
+          listViewportHeight - STEP_GROUP_HEADER_RESERVE_PX - 8
+        )
+      : null
+
   return (
     <div className={styles.annotated_group_container}>
       <StepGroup
@@ -83,7 +98,14 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
         {...(isAnyStepHighlighted ? { titleColor: COLORS.purple50 } : {})}
       >
         {isExpanded ? (
-          <div className={styles.annotated_group_expanded}>
+          <div
+            className={styles.annotated_group_expanded}
+            style={
+              expandedMaxHeightPx != null
+                ? { maxHeight: expandedMaxHeightPx }
+                : undefined
+            }
+          >
             {subCommands.map((subCommand, index) => (
               <IndividualCommand
                 scrollTargetId={scrollTargetId}
