@@ -22,6 +22,7 @@ from hardware_testing.data.csv_report import (
     CSVSection,
     CSVLine,
 )
+from hardware_testing.data import data_io
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
@@ -65,8 +66,6 @@ PLUNGER_CURRENTS_SPEED = {
     1: TEST_SPEEDS,
 }
 
-# PLUNGER_CURRENTS_SPEED = {0.4: TEST_SPEEDS,
-#                           1: TEST_SPEEDS}
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -108,8 +107,35 @@ CYCLE_PLUNGER_RESULTS = "CYCLE_PLUNGER_RESULTS"
 TEST_PLUNGER_FAIL_REASON = "TEST_PLUNGER_FAIL_REASON"
 CYCLE_PLUNGER_REASON = "CYCLE_PLUNGER_REASON"
 
-def _build_csv_report(cycles: int, trials: int) -> CSVReport:
-    section_list=[
+def _build_results_report(cycles: int, trials: int, run_id: str) -> CSVReport:
+    """Build results report containing summary data: META_DATA, RESULTS_OVERVIEW, CYCLING-RESULTS, SUMMARY_RESULTS"""
+    # Results report only contains summary sections
+    section_list = [
+        CSVSection(
+            title=_get_cycling_section_tag(),
+            lines=[
+                CSVLine(_get_cycling_test_tag(cycle), [int, CSVResult])
+                for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
+            ],
+        ),
+        CSVSection(
+            title=SUMMARY_SECTION_TITLE,
+            lines=[
+                CSVLine(BURN_IN_TEST_RESULTS, [str]),
+                CSVLine(TEST_PLUNGER_RESULTS, [str]),
+                CSVLine(CYCLE_PLUNGER_RESULTS, [str]),
+                CSVLine(TEST_PLUNGER_FAIL_REASON, [str]),
+                CSVLine(CYCLE_PLUNGER_REASON, [str]),
+            ],
+        ),
+    ]
+    _report = CSVReport(test_name="peek-burn-in-qc-ot3-results", sections=section_list, run_id=run_id)
+    return _report
+
+def _build_recorder_report(cycles: int, trials: int, run_id: str) -> CSVReport:
+    """Build recorder report containing detailed test data: test plunger and cycle plunger records"""
+    # Recorder report only contains detailed test sections
+    section_list = [
         CSVSection(
             title=_get_section_tag(cycle, current),
             lines=[
@@ -128,32 +154,7 @@ def _build_csv_report(cycles: int, trials: int) -> CSVReport:
         for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
         for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     ]
-    section_list.append(
-        CSVSection(
-            title=_get_cycling_section_tag(),
-            lines=[
-                CSVLine(_get_cycling_test_tag(cycle), [int, CSVResult])
-                for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
-            ],
-        )
-    )
-    # Add summary section
-    section_list.append(
-        CSVSection(
-            title=SUMMARY_SECTION_TITLE,
-            lines=[
-                CSVLine(BURN_IN_TEST_RESULTS, [str]),
-                CSVLine(TEST_PLUNGER_RESULTS, [str]),
-                CSVLine(CYCLE_PLUNGER_RESULTS, [str]),
-                CSVLine(TEST_PLUNGER_FAIL_REASON, [str]),
-                CSVLine(CYCLE_PLUNGER_REASON, [str]),
-            ],
-        )
-    )
-
-
-    _report = CSVReport(test_name="peek-burn-in-qc-ot3", sections=section_list)
-
+    _report = CSVReport(test_name="peek-burn-in-qc-ot3-recorder", sections=section_list, run_id=run_id)
     return _report
 
 
@@ -506,9 +507,15 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
             #     continue
 
-            report = _build_csv_report(cycles=cycles, trials=trials)
+            # Create shared run_id for both reports
+            run_id = data_io.create_run_id()
+
+            # Create two separate reports
+            results_report = _build_results_report(cycles=cycles, trials=trials, run_id=run_id)
+            recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id=run_id)
+
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
-            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+            helpers_ot3.set_csv_report_meta_data_ot3(api, results_report, dut)
 
             # Track test results for summary
             test_plunger_fail_reasons = []
@@ -518,7 +525,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
 
             for cycle in range(0, cycles * TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
                 max_failed_current, fail_reason = await _test_plunger(
-                    api, mount, report,
+                    api, mount, recorder_report,
                     cycle=cycle, trials=trials,
                     continue_after_stall=continue_after_stall
                 )
@@ -539,7 +546,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     cycle_plunger_stall_reasons.append(stall_reason)
                     cycle_plunger_passed = False
                 data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
-                report(
+                results_report(
                     _get_cycling_section_tag(),
                     _get_cycling_test_tag(cycle),
                     data,
@@ -553,7 +560,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             # Only run final test_plunger if previous tests passed
             if test_plunger_passed and cycle_plunger_passed:
                 max_failed_current, fail_reason = await _test_plunger(
-                    api, mount, report,
+                    api, mount, recorder_report,
                     cycle=cycles * TRIALS_PER_CYCLE, trials=trials,
                     continue_after_stall=continue_after_stall
                 )
@@ -561,7 +568,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     test_plunger_fail_reasons.append(fail_reason)
                     test_plunger_passed = False
             data = [0, CSVResult.from_Numbool(0)]
-            report(
+            results_report(
                 _get_cycling_section_tag(),
                 _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
                 data,
@@ -575,16 +582,18 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             test_plunger_fail_str = "; ".join(test_plunger_fail_reasons) if test_plunger_fail_reasons else "N/A"
             cycle_plunger_stall_str = "; ".join(cycle_plunger_stall_reasons) if cycle_plunger_stall_reasons else "N/A"
 
-            # Write summary results to CSV
-            report(SUMMARY_SECTION_TITLE, BURN_IN_TEST_RESULTS, [burn_in_result])
-            report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_RESULTS, [test_plunger_result])
-            report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_RESULTS, [cycle_plunger_result])
-            report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_FAIL_REASON, [test_plunger_fail_str])
-            report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, [cycle_plunger_stall_str])
+            # Write summary results to results_report
+            results_report(SUMMARY_SECTION_TITLE, BURN_IN_TEST_RESULTS, [burn_in_result])
+            results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_RESULTS, [test_plunger_result])
+            results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_RESULTS, [cycle_plunger_result])
+            results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_FAIL_REASON, [test_plunger_fail_str])
+            results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, [cycle_plunger_stall_str])
 
             ui.print_title("DONE")
-            report.save_to_disk()
-            report.print_results()
+            # Save both reports
+            results_report.save_to_disk()
+            recorder_report.save_to_disk()
+            results_report.print_results()
             if api.is_simulator:
                 break
 
