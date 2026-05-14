@@ -1,4 +1,4 @@
-test_name: Run action userNotes on play; non-play body with userNotes parses
+test_name: Run action without userNotes when require-reason off (default integration server)
 
 marks:
   - usefixtures:
@@ -30,20 +30,78 @@ stages:
         json:
           run_id: data.id
 
-  - name: Non-play with userNotes parses (pause before play is not allowed)
+  - name: Play without userNotes succeeds when require-reason is off
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
-          actionType: pause
-        userNotes: userNotes on pause before play
+          actionType: play
     response:
-      status_code: 409
+      status_code: 201
+      strict:
+        - json:off
+      json:
+        data:
+          id: !anystr
+          actionType: play
 
-  - name: Play with userNotes succeeds
+  - name: Stop the run
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: stop
+    response:
+      status_code: 201
+
+---
+test_name: Run action with userNotes when require-reason forced on (integration override)
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url_require_user_notes_true
+
+stages:
+  - name: Upload a JSONv6 protocol
+    request:
+      url: '{ot2_server_base_url_require_user_notes_true}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/wait_for_resume_stop_v6.json'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{ot2_server_base_url_require_user_notes_true}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+
+  - name: Play without userNotes fails when require-reason is on
+    request:
+      url: '{ot2_server_base_url_require_user_notes_true}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 422
+
+  - name: Play with userNotes succeeds when require-reason is on
+    request:
+      url: '{ot2_server_base_url_require_user_notes_true}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -60,7 +118,7 @@ stages:
 
   - name: Stop the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url_require_user_notes_true}/runs/{run_id}/actions'
       method: POST
       json:
         data:

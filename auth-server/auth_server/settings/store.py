@@ -71,10 +71,12 @@ class SettingsStore:
             if row is None:
                 value = SettingsResponseData().requireReasonForInteraction
             else:
-                value = SettingsResponseData.model_validate(
-                    {_REQUIRE_REASON_FOR_INTERACTION_KEY: row.value},
-                    strict=False,
-                ).requireReasonForInteraction
+                raw = row.value
+                value = (
+                    raw
+                    if isinstance(raw, bool)
+                    else SettingsResponseData().requireReasonForInteraction
+                )
         return RequireReasonForInteractionResponseData(
             requireReasonForInteraction=value,
         )

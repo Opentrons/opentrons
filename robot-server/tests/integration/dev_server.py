@@ -19,6 +19,7 @@ class DevServer:
         maximum_runs: Optional[int] = None,
         maximum_unused_protocols: Optional[int] = None,
         maximum_quick_transfer_protocols: Optional[int] = None,
+        integration_require_reason_for_interaction_override: Optional[bool] = None,
     ) -> None:
         """Initialize a dev server."""
         self.port: str = port
@@ -37,6 +38,9 @@ class DevServer:
         self.maximum_runs = maximum_runs
         self.maximum_unused_protocols = maximum_unused_protocols
         self.maximum_quick_transfer_protocols = maximum_quick_transfer_protocols
+        self._integration_require_reason_for_interaction_override = (
+            integration_require_reason_for_interaction_override
+        )
 
     def __enter__(self) -> DevServer:
         return self
@@ -69,6 +73,12 @@ class DevServer:
         if self.maximum_quick_transfer_protocols is not None:
             env["OT_ROBOT_SERVER_maximum_quick_transfer_protocols"] = str(
                 self.maximum_quick_transfer_protocols
+            )
+        if self._integration_require_reason_for_interaction_override is not None:
+            env["OT_ROBOT_SERVER_integration_require_reason_for_interaction_override"] = (
+                "true"
+                if self._integration_require_reason_for_interaction_override
+                else "false"
             )
 
         # In order to collect coverage we run using `coverage`.
