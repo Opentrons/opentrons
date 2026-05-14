@@ -22,8 +22,8 @@ class AsyncPyroFunctionWrapper:
 
     def __call__(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         """Overload client-side call references with proxy-safe callable reference."""
-        threadsafe_proxy = Pyro5.api.Proxy(self.proxy._pyroUri)  # type: ignore
-        return threadsafe_proxy.call(*args, **kwargs)
+        with _get_thread_proxy(self.proxy) as threadsafe_proxy:
+            return threadsafe_proxy.call(*args, **kwargs)
 
 
 class _ACPO:
@@ -139,10 +139,9 @@ def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
     """
 
     def _property_result(proxy: Pyro5.api.Proxy, current_attr: str) -> Any:
-        threadsafe_proxy = _get_thread_proxy(proxy)
-        result = getattr(threadsafe_proxy, current_attr)
         # Ensure the proxy connection is gracefully released
-        threadsafe_proxy._pyroRelease()  # type: ignore[no-untyped-call]
+        with _get_thread_proxy(proxy) as threadsafe_proxy:
+            result = getattr(threadsafe_proxy, current_attr)
         return result
 
     return lambda self, current_attr=attr: wrap_result_validation(
@@ -172,11 +171,10 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str) -> Any:
             validated_args = (*validated_args, _validations(arg))
         # Validate each keyword argument and reconstruct the kwargs dictionary
         kwargs = {key: _validations(kwargs[key]) for key in kwargs.keys()}
-        threadsafe_proxy = _get_thread_proxy(proxy)
-        threadsafe_attr = getattr(threadsafe_proxy, func_name)
-        result = threadsafe_attr(*validated_args, **kwargs)
         # Ensure the proxy connection is gracefully released
-        threadsafe_proxy._pyroRelease()  # type: ignore[no-untyped-call]
+        with _get_thread_proxy(proxy) as threadsafe_proxy:
+            threadsafe_attr = getattr(threadsafe_proxy, func_name)
+            result = threadsafe_attr(*validated_args, **kwargs)
         return wrap_result_validation(proxy, func_name, result)
 
     return wrapper
@@ -233,12 +231,11 @@ def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) 
     as AsyncClientPyroObjects.
     """
     validated_result = result
-    threadsafe_proxy = _get_thread_proxy(proxy)
-    attributes_with_proxy_result: list[str] = getattr(
-        threadsafe_proxy, "get_pyro_attributes_with_proxy_result", []
-    )
     # Ensure the proxy connection is gracefully released
-    threadsafe_proxy._pyroRelease()  # type: ignore[no-untyped-call]
+    with _get_thread_proxy(proxy) as threadsafe_proxy:
+        attributes_with_proxy_result: list[str] = getattr(
+            threadsafe_proxy, "get_pyro_attributes_with_proxy_result", []
+        )
 
     if func_name in attributes_with_proxy_result:
         # Check if the result is a list of proxies or singular entity
