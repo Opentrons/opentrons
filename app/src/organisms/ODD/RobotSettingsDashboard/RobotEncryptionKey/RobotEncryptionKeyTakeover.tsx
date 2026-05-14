@@ -1,9 +1,11 @@
-import { Fragment, ReactNode, useEffect } from 'react'
+import { Fragment, useEffect } from 'react'
 import NiceModal from '@ebay/nice-modal-react'
 
 import { useClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import { RobotEncryptionKeyModal } from './RobotEncryptionKeyModal'
+
+import type { ReactNode } from 'react'
 
 export function RobotEncryptionKeyTakeover({
   children,
