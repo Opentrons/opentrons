@@ -6,7 +6,7 @@ description: "Use step grouping to organize groups of commands in Python protoco
 Step grouping lets you organize groups of commands within your Python protocols. This can be especially helpful when writing or working with long protocols. Beginning with API version 9.1.0, use commands to separate groups of steps:
 
 - the context manager [`group_steps()`][opentrons.protocol_api.ProtocolContext.group_steps], which uses `with` syntax.
-- the paired [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] and [`end_group()`][opentrons.protocol_api.GroupedSteps.end_group] commands.
+- the paired [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] and [`end_group()`][opentrons.protocol_api._command_annotations.GroupedSteps.end_group] commands.
 
 The examples on this page demonstrate using either method to create step groups that are visible in your Python protocol file, or in [visualization][../flex/protocol-viz.md] in the Opentrons App. 
 
@@ -32,7 +32,7 @@ with protocol_context.group_steps(name="Aspirate and Dispense Buffer", descripti
 
 Each command you add inside the `with` block becomes a part of the step group.
 
-The second example uses the [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] command to create a group of steps. Because this command isn't a context manager, you'll need to include the [`end_step_group][opentrons.protocol_api.GroupedSteps.end_group] command to close your step group. 
+The second example uses the [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] command to create a group of steps. Because this command isn't a context manager, you'll need to include the [`end_step_group][opentrons.protocol_api._command_annotations.GroupedSteps.end_group] command to close your step group.
 
 ```python
 
