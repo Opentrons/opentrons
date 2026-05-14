@@ -9,10 +9,10 @@ import type {
   CreateCommand,
   ModuleCreateCommand,
   VacuumModuleCloseVentCreateCommand,
-  VacuumModuleDeactivateCreateCommand,
   VacuumModuleOpenVentCreateCommand,
   VacuumModuleSetTargetPowerCreateCommand,
   VacuumModuleSetTargetPressureCreateCommand,
+  VacuumModuleStopPumpCreateCommand,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 
@@ -72,10 +72,10 @@ export function useVacuumModuleControls(
 
   const setVacuumPressure = (pressure: number): void => {
     const command: VacuumModuleSetTargetPressureCreateCommand = {
-      commandType: 'vacuumModule/setTargetPressure',
+      commandType: 'vacuumModule/startSetVacuumPressure',
       params: {
         moduleId: module.id,
-        pressure,
+        gaugePressure: pressure,
       },
     }
     executeCommand(command)
@@ -83,15 +83,15 @@ export function useVacuumModuleControls(
 
   const setVacuumPower = (power: number): void => {
     const command: VacuumModuleSetTargetPowerCreateCommand = {
-      commandType: 'vacuumModule/setTargetPower',
-      params: { moduleId: module.id, power },
+      commandType: 'vacuumModule/startSetVacuumPower',
+      params: { moduleId: module.id, percentPower: power },
     }
     executeCommand(command)
   }
 
   const deactivateVacuum = (): void => {
-    const command: VacuumModuleDeactivateCreateCommand = {
-      commandType: 'vacuumModule/deactivate',
+    const command: VacuumModuleStopPumpCreateCommand = {
+      commandType: 'vacuumModule/stopVacuum',
       params: { moduleId: module.id },
     }
     executeCommand(command)

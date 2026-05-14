@@ -20,12 +20,10 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
 import type { ReactNode } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
 
 import one from '../../assets/images/onboarding_animation_1.webm'
 import two from '../../assets/images/onboarding_animation_2.webm'
@@ -43,23 +41,7 @@ interface WizardBodyProps {
   goBack?: () => void
   subHeader?: string
   tooltipOnDisabled?: string
-  robotType?: RobotType
   subStepNumber?: number
-}
-
-const OT2_GIFS: Record<number, string> = {
-  2: new URL(
-    '../../assets/images/onboarding_animation_ot2_2.gif',
-    import.meta.url
-  ).href,
-  3: new URL(
-    '../../assets/images/onboarding_animation_ot2_3.gif',
-    import.meta.url
-  ).href,
-  4: new URL(
-    '../../assets/images/onboarding_animation_ot2_4.gif',
-    import.meta.url
-  ).href,
 }
 
 const ONBOARDING_ANIMATIONS: Record<number, string> = {
@@ -81,7 +63,6 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
     proceed,
     disabled = false,
     tooltipOnDisabled,
-    robotType,
     subStepNumber,
   } = props
   const { t } = useTranslation('shared')
@@ -92,7 +73,10 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
   const [loaded, setLoaded] = useState<boolean>(false)
 
   useLayoutEffect(() => {
-    const videoAsset = ONBOARDING_ANIMATIONS[subStepNumber!]
+    let videoAsset = one
+    if (subStepNumber != null && ONBOARDING_ANIMATIONS[subStepNumber] != null) {
+      videoAsset = ONBOARDING_ANIMATIONS[subStepNumber]
+    }
     setLoaded(false)
     setAsset(videoAsset)
     const timeout = setTimeout(() => {
@@ -181,32 +165,19 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
             transition: opacity 0.5s ease-in-out;
           `}
         >
-          {robotType === FLEX_ROBOT_TYPE || stepNumber === 1 ? (
-            <AnimationVideo
-              preload="auto"
-              css={css`
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                border-radius: ${BORDERS.borderRadius16};
-              `}
-              key={`video-${subStepNumber ?? 1}`}
-              aria-label={`onboarding animation for page ${stepNumber}`}
-            >
-              <source src={asset ?? ''} type="video/webm" />
-            </AnimationVideo>
-          ) : (
-            <img
-              src={OT2_GIFS[stepNumber]}
-              width="100%"
-              alt={`OT-2 asset for onboarding flow page ${stepNumber}`}
-              height="100%"
-              css={css`
-                object-fit: cover;
-                border-radius: ${BORDERS.borderRadius16};
-              `}
-            />
-          )}
+          <AnimationVideo
+            preload="auto"
+            css={css`
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              border-radius: ${BORDERS.borderRadius16};
+            `}
+            key={`video-${subStepNumber ?? 1}`}
+            aria-label={`onboarding animation for page ${stepNumber}`}
+          >
+            <source src={asset ?? ''} type="video/webm" />
+          </AnimationVideo>
         </Flex>
       )}
     </Flex>

@@ -1026,6 +1026,19 @@ class LocationIsOccupiedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwareIsContainedError(ProtocolEngineError):
+    """Raised when attempting to move a contained labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsContainedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LocationNotAccessibleByPipetteError(ProtocolEngineError):
     """Raised when attempting to move pipette to an inaccessible location."""
 

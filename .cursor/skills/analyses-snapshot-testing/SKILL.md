@@ -96,7 +96,7 @@ uv run python -m pytest -k analyses_snapshot_test -vv --tb=short    # Verbose de
 
 ## Environment Setup
 
-**Prerequisites**: Python 3.10+, **uv**, Node.js/yarn (for prettier)
+**Prerequisites**: Python 3.10+, **uv**, Node.js/pnpm (for prettier)
 
 ```bash
 cd analyses-snapshot-testing

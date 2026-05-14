@@ -8,7 +8,7 @@ import type {
   LoadedLabwareLocation,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { ModuleEntities } from '@opentrons/step-generation'
+import type { ModuleEntities, RobotState } from '@opentrons/step-generation'
 import type { PDMetadata } from '../../file-types'
 
 const moduleEntitiesFromMetadata = (
@@ -51,6 +51,19 @@ export const migrateFile = (
   const moduleEntities = moduleEntitiesFromMetadata(modules)
   const labwareEntityIds = new Set(Object.keys(labware))
 
+  const modulesRobotState = Object.fromEntries(
+    Object.entries(moduleLocationUpdate).map(([moduleId, slot]) => {
+      const entity = moduleEntities[moduleId]
+      return [
+        moduleId,
+        {
+          slot,
+          moduleState: { type: entity?.type },
+        },
+      ]
+    })
+  ) as RobotState['modules']
+
   const labwareStackedOnNodeUpdate = Object.keys(labwareLocationUpdate).reduce<
     Record<string, LoadedLabwareLocation>
   >((acc, labwareId) => {
@@ -65,6 +78,7 @@ export const migrateFile = (
       subjectLabwareId: labwareId,
       moduleEntities,
       labwareEntityIds,
+      modules: modulesRobotState,
     })
     if (stackedOnNode != null) {
       acc[labwareId] = stackedOnNode

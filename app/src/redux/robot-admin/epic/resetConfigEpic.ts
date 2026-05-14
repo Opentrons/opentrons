@@ -40,8 +40,9 @@ function mapActionToRequests(
 
   const requests: RobotApiRequestOptions[] = []
   requests.push(settingsResetRequest)
-  if (deleteLabwareOffsetsRequest !== null)
+  if (deleteLabwareOffsetsRequest !== null) {
     requests.push(deleteLabwareOffsetsRequest)
+  }
   return requests
 }
 

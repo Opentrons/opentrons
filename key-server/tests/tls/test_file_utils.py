@@ -278,3 +278,10 @@ def test_save_cert_handles_multiple_formats(tmp_path: Path) -> None:
     assert loaded_der
     assert loaded_pem.fingerprint(hashes.SHA256()) == cert.fingerprint(hashes.SHA256())
     assert loaded_der.fingerprint(hashes.SHA256()) == cert.fingerprint(hashes.SHA256())
+
+
+def test_load_wordlist() -> None:
+    """It should load the EFF wordlist."""
+    words = file_utils.load_wordlist()
+    assert words[0] == "aardvark"
+    assert words[-1] == "zucchini"

@@ -24,11 +24,13 @@
     "@types/lodash": "4.17.24",
     "@types/mixpanel-browser": "^2.35.6",
     "@types/query-string": "6.2.0",
+    "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "@types/yup": "0.29.11"
   },
   "dependencies": {
     "@opentrons/components": "link:../components",
+    "@opentrons/shared-data": "link:../shared-data",
     "ajv": "6.12.3",
     "classnames": "2.2.5",
     "cookie": "0.4.0",
@@ -42,6 +44,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.24.1",
+    "styled-components": "5.3.6",
     "yup": "0.32.9"
   }
 }

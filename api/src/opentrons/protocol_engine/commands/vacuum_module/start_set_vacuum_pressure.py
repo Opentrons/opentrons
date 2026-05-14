@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
     from opentrons.protocol_engine.state.state import StateView
 
-StartSetVacuumPressureCommandType = Literal["vacuum_module/startSetVacuumPressure"]
+StartSetVacuumPressureCommandType = Literal["vacuumModule/startSetVacuumPressure"]
 
 
 class StartSetVacuumPressureParams(BaseModel):
@@ -24,8 +24,8 @@ class StartSetVacuumPressureParams(BaseModel):
 
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
     gaugePressure: float = Field(..., description="Target gauge pressure in mBar.")
-    duration: int = Field(
-        ...,
+    duration: int | SkipJsonSchema[None] = Field(
+        None,
         description="Duration in sec. to hold target pressure for after it is reached.",
     )
     rate: float | SkipJsonSchema[None] = Field(
@@ -94,7 +94,7 @@ class StartSetVacuumPressure(
     """A command to start the vacuum pump."""
 
     commandType: StartSetVacuumPressureCommandType = (
-        "vacuum_module/startSetVacuumPressure"
+        "vacuumModule/startSetVacuumPressure"
     )
     params: StartSetVacuumPressureParams
     result: Optional[StartSetVacuumPressureResult] = None
@@ -106,7 +106,7 @@ class StartSetVacuumPressureCreate(BaseCommandCreate[StartSetVacuumPressureParam
     """A request to start the vacuum pump."""
 
     commandType: StartSetVacuumPressureCommandType = (
-        "vacuum_module/startSetVacuumPressure"
+        "vacuumModule/startSetVacuumPressure"
     )
     params: StartSetVacuumPressureParams
 

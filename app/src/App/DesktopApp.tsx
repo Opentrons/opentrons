@@ -32,13 +32,14 @@ import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
-import { PortalRoot as ModalPortalRoot } from './portal'
+import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
 
 import type { RouteProps } from './types'
@@ -178,14 +179,17 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
-  if (deviceRouteMatch == null || robot == null || robotName == null)
+  const token = useAccessTokenForRobot(robotName)
+  if (deviceRouteMatch == null || robot == null || robotName == null) {
     return null
+  }
 
   return (
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
     >
       <FlexOnlyRobotControlTakeover robotName={robotName} />
       <AllRobotsRobotControlTakeover robotName={robotName} />

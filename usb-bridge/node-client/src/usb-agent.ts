@@ -42,7 +42,7 @@ export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
       if (!port.isOpen && !port.opening) port.open()
       return port
     }
-  )
+  ) as unknown as http.Agent
 
   usbAgent.maxFreeSockets = 1
   usbAgent.maxSockets = 1
@@ -290,7 +290,8 @@ class SerialPortHttpAgent extends http.Agent {
 
   destroy(): void {
     this.destroyed = true
-    this.port.destroy(new Error('Agent was destroyed'))
+    this.log('debug', 'Agent was destroyed')
+    this.port.destroy()
   }
 
   createSocket(

@@ -5,12 +5,13 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { OPENTRONS_USB, UNREACHABLE } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import {
   getRobotUpdateSession,
   robotUpdateIgnored,
   setRobotUpdateSeen,
 } from '/app/redux/robot-update'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
 import { ViewUpdateModal } from './ViewUpdateModal'
@@ -36,8 +37,10 @@ const UpdateBuildroot = NiceModal.create(
     const robotName = useRef<string>(robot?.name ?? '')
     const dispatch = useDispatch<Dispatch>()
     const session = useSelector(getRobotUpdateSession)
-    if (!hasSeenSessionOnce.current && session)
+    const token = useAccessTokenForRobot(robot?.name ?? null)
+    if (!hasSeenSessionOnce.current && session) {
       hasSeenSessionOnce.current = true
+    }
 
     useEffect(
       () => {
@@ -62,14 +65,15 @@ const UpdateBuildroot = NiceModal.create(
       [robotName, close]
     )
 
-    if (hasSeenSessionOnce.current)
+    if (hasSeenSessionOnce.current) {
       return (
         <ApiHostProvider
           hostname={robot?.ip ?? null}
           port={robot?.port ?? null}
           requestor={
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
           }
+          token={token}
         >
           <RobotUpdateProgressModal
             robotName={robotName.current}
@@ -78,7 +82,7 @@ const UpdateBuildroot = NiceModal.create(
           />
         </ApiHostProvider>
       )
-    else if (robot != null && robot.status !== UNREACHABLE)
+    } else if (robot != null && robot.status !== UNREACHABLE) {
       return (
         <ViewUpdateModal
           robotName={robotName.current}
@@ -86,6 +90,8 @@ const UpdateBuildroot = NiceModal.create(
           closeModal={ignoreUpdate}
         />
       )
-    else return null
+    } else {
+      return null
+    }
   }
 )

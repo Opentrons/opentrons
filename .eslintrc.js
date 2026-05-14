@@ -29,6 +29,7 @@ module.exports = {
   reportUnusedDisableDirectives: true,
 
   rules: {
+    curly: 'error',
     camelcase: 'off',
     'no-var': 'error',
     'prefer-const': 'error',

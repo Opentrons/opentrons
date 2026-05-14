@@ -69,9 +69,6 @@ async def test_calibration_move_to_location_implementation_for_attach_instrument
             critical_point=CriticalPoint.MOUNT,
         ),
         await ot3_hardware_api.prepare_for_mount_movement(hw_mount),
-        await ot3_hardware_api.move_axes(
-            position={Axis.by_mount(hw_mount): 400},
-        ),
         await ot3_hardware_api.disengage_axes(
             [Axis.by_mount(hw_mount)],
         ),

@@ -120,6 +120,7 @@ markdown_extensions:
   - sane_lists
   - toc:
       permalink: true
+      title: Table of Contents
 
 extra_css:
   - ../shared/instruction-manuals.css

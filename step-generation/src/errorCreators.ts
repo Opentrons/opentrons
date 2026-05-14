@@ -480,3 +480,27 @@ export const labwareOnHopper = (): CommandCreatorError => {
     message: 'Labware cannot be moved from the Flex Stacker Hopper',
   }
 }
+
+export const missingPumpActivity = (): CommandCreatorError => {
+  return {
+    type: 'MISSING_PUMP_ACTIVITY',
+    message: 'This module is not currently running a pump activity.',
+  }
+}
+
+export const invalidWaitCondition = (
+  waitCondition: string
+): CommandCreatorError => {
+  return {
+    type: 'INVALID_WAIT_CONDITION',
+    message: `Invalid wait condition: ${waitCondition}`,
+  }
+}
+
+export const liveTaskError = (): CommandCreatorError => {
+  return {
+    type: 'LIVE_TASK_ERROR',
+    message:
+      'This module is currently running a live task. Please wait for it to complete before performing this action.',
+  }
+}

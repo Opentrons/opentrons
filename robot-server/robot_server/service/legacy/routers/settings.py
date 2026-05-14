@@ -17,6 +17,7 @@ from opentrons.config import (
 from opentrons.config import (
     reset as reset_util,
 )
+from opentrons.config.types import OT3Config
 from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
@@ -36,7 +37,7 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -385,6 +386,8 @@ async def post_settings_reset_options(
 async def get_robot_settings(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
+    if isinstance(hardware.config, OT3Config):
+        return hardware.config.model_dump()
     return asdict(hardware.config)
 
 

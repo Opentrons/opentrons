@@ -107,9 +107,9 @@ describe('getUserVisibleStepNumbers() and getNextUserVisibleStepNumber()', () =>
         { type: 'standaloneStep', stepId: 'a' },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'b',
+          startStepId: 'b',
           concurrentSteps: [{ type: 'standaloneStep', stepId: 'c' }],
-          waitForThermocyclerProfileStepId: 'd',
+          waitStepId: 'd',
         },
         { type: 'standaloneStep', stepId: 'e' },
       ],

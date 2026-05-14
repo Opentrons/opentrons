@@ -189,8 +189,9 @@ export function useDashboardCalibrateTipLength(
       tipLengthCalibrationSession != null ||
       showCalBlockModal != null
     )
-  )
+  ) {
     Wizard = null
+  }
 
   return [handleStartDashboardTipLengthCalSession, Wizard]
 }

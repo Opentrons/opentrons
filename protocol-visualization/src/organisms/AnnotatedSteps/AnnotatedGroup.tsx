@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 
-import { COLORS, Icon, StyledText } from '@opentrons/components'
+import { COLORS, Icon, StepGroup } from '@opentrons/components'
 
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
@@ -21,8 +21,12 @@ interface AnnotatedGroupProps {
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   allRunDefs: LabwareDefinition[]
   commandStartNumber: number
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  annotationDescription: string
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
   handlePause?: () => void
+  headerLeading?: ReactNode | null
+  // rendered after sub-commands when analysis failed inside this annotation group
+  trailingErrorsFooter?: ReactNode | null
 }
 export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const {
@@ -35,51 +39,69 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     commandStartNumber,
     scrollTargetId,
     listElement,
+    annotationDescription,
+    headerLeading,
+    trailingErrorsFooter,
   } = props
-  const [isExpanded, setIsExpanded] = useState(() =>
-    subCommands.some(command => command.isHighlighted)
-  )
-  useEffect(() => {
-    setIsExpanded(subCommands.some(command => command.isHighlighted))
-  }, [subCommands])
+  const hasTrailingErrors = trailingErrorsFooter != null
+
+  // Inactive groups start collapsed; open before paint if this group is active or has errors.
+  const [isExpanded, setIsExpanded] = useState(false)
+  useLayoutEffect(() => {
+    setIsExpanded(
+      subCommands.some(command => command.isHighlighted) || hasTrailingErrors
+    )
+  }, [subCommands, hasTrailingErrors])
 
   const handleClick = (): void => {
     setIsExpanded(!isExpanded)
     handlePause?.()
   }
 
+  const isAnyStepHighlighted = subCommands.some(
+    command => command.isHighlighted
+  )
+
   return (
     <div className={styles.annotated_group_container}>
-      <div onClick={handleClick} className={styles.annotated_group_header}>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {annotationType}
-        </StyledText>
-        <Icon
-          data-testid={isExpanded ? 'chevron-up' : 'chevron-down'}
-          name={isExpanded ? 'chevron-up' : 'chevron-down'}
-          size="2rem"
-          color={COLORS.black90}
-        />
-      </div>
-
-      {isExpanded ? (
-        <div className={styles.annotated_group_expanded}>
-          {subCommands.map((subCommand, index) => (
-            <IndividualCommand
-              scrollTargetId={scrollTargetId}
-              listElement={listElement}
-              fromGroup={false}
-              key={`${subCommand.command.id}_${index}`}
-              command={subCommand.command}
-              commandNumber={commandStartNumber + index}
-              analysis={analysis}
-              isHighlighted={subCommand.isHighlighted}
-              allRunDefs={allRunDefs}
-              setSelectedCommand={setSelectedCommand}
+      <StepGroup
+        title={annotationType}
+        isExpand={isExpanded}
+        handleClick={handleClick}
+        isActive={isAnyStepHighlighted}
+        subtitle={annotationDescription}
+        headerPrefixIcon={
+          hasTrailingErrors ? (
+            <Icon
+              name="ot-alert"
+              size="1rem"
+              color={isAnyStepHighlighted ? COLORS.purple50 : COLORS.red60}
             />
-          ))}
-        </div>
-      ) : null}
+          ) : null
+        }
+        headerLeading={headerLeading}
+        {...(isAnyStepHighlighted ? { titleColor: COLORS.purple50 } : {})}
+      >
+        {isExpanded ? (
+          <div className={styles.annotated_group_expanded}>
+            {subCommands.map((subCommand, index) => (
+              <IndividualCommand
+                scrollTargetId={scrollTargetId}
+                listElement={listElement}
+                fromGroup={true}
+                key={`${subCommand.command.id}_${index}`}
+                command={subCommand.command}
+                commandNumber={commandStartNumber + index}
+                analysis={analysis}
+                isHighlighted={subCommand.isHighlighted}
+                allRunDefs={allRunDefs}
+                setSelectedCommand={setSelectedCommand}
+              />
+            ))}
+            {trailingErrorsFooter}
+          </div>
+        ) : null}
+      </StepGroup>
     </div>
   )
 }
