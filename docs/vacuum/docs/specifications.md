@@ -10,20 +10,34 @@ The Vacuum Module ships in three separate boxes.
 
 ### Box 1: labware components
 
-This box includes manifold components that sit on the deck and hold ANSI/SLAS compliant vacuum filtration labware.
+This box includes module components that sit on the deck and hold ANSI/SLAS compliant vacuum filtration labware.
 
 (1) Short vacuum collar  
 (1) Tall vacuum collar  
+(1) Collar gasket  
 (1) Vacuum manifold base  
-(3) Spacers
+(_n_) Spacers
 
 ### Box 2: module components
 
-(1) Vacuum module (pump and electronics)  
-(1) Deck adapter  
-(2) Deck plate screws (M4 x 10)
+This box includes the vacuum pump, deck adapter hardware, and power and data cables. 
 
-### Box 3: accessories
+(1) Vacuum module (or Control Box) 
+(1) Deck adapter  
+(2) Deck adapters screws (M4 x 10)
+(1) Power cable
+(1) USB A-to-B cable
+
+### Box 3: accessories: waste collection
+
+This box includes hardware that transports and holds waste extracted during a protocol run.
+
+(1) Waste Carboy (2L GLS-80 glass bottle)
+(1) Waste carboy support plate
+(1) Custom carboy cap (GL-80 polypropolyine cap with float, stainless steel cap insert, EPDM gaskets)
+(2) Vacuum hoses
+
+
 
 
 
@@ -86,8 +100,8 @@ See <font color="red"><strong>section TBD for descriptions of selected parts.</s
   </thead>
   <tbody>
     <tr>
-      <td><strong>Pump dimensions</strong></td>
-      <td>L x W x H, weight</td>
+      <td><strong>Control box</strong></td>
+      <td>The control box includes the vacuum pump, air/water separator, electronics, and power supply.</td>
     </tr>
     <tr>
       <td><strong>Maximum pump rate</strong></td>
