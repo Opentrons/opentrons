@@ -1,0 +1,15 @@
+metric,value
+run_id,888f68a5-58d3-4626-8035-4b7a7806a7c9
+status,succeeded
+started_at,2025-05-29T18:56:44.498364Z
+completed_at,2025-05-30T12:12:57.317586Z
+configured_cycles,1000
+cycles_started,1000
+cycles_passed,1000
+cycles_failed,0
+last_cycle,1000
+total_retries,0
+total_reopens,0
+failed_command,
+failed_port,
+error_detail,
