@@ -3,10 +3,10 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
-  InputField,
   LEGACY_INPUT_TYPE_PASSWORD,
   setRefs,
   StyledText,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
@@ -116,18 +116,6 @@ export function OnDeviceLogin({
         />
         <div className={styles.content_container}>
           <div className={styles.form_inner_container}>
-            <StyledText
-              as="label"
-              htmlFor={activeFieldName}
-              oddStyle="bodyTextRegular"
-              className={`${styles.field_label}${
-                passwordLabelHasError ? ` ${styles.field_label_error}` : ''
-              }`}
-            >
-              {step === 'username'
-                ? t('device_settings:username')
-                : t('device_settings:password')}
-            </StyledText>
             <Controller
               key={activeFieldName}
               control={control}
@@ -136,6 +124,7 @@ export function OnDeviceLogin({
                 <LoginFieldInput
                   field={field}
                   step={step}
+                  t={t}
                   loginError={passwordLabelHasError ? loginError : null}
                   onClearLoginError={onClearLoginError}
                   onFocus={() => {
@@ -170,6 +159,7 @@ interface LoginFieldInputProps {
   field: ControllerRenderProps<LoginFormValues, 'username' | 'password'>
   step: LoginStep
   loginError: string | null
+  t: any
   onClearLoginError?: () => void
   onFocus: () => void
 }
@@ -185,6 +175,7 @@ function LoginFieldInput({
   loginError,
   onClearLoginError,
   onFocus,
+  t
 }: LoginFieldInputProps): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -197,11 +188,12 @@ function LoginFieldInput({
   }
 
   const inputField = (
-    <InputField
+    <TouchInputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={step === 'password'}
       type={inputType}
-      size="medium"
+      label={step === 'username'? t('device_settings:username')
+        : t('device_settings:password')}
       error={loginError}
       value={field.value ?? ''}
       name={field.name}

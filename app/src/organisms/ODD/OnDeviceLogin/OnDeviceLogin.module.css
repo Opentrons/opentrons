@@ -22,6 +22,14 @@
   gap: var(--spacing-6);
 }
 
+#username, #password{
+  height: 68px;
+}
+
+.field_area {
+  height: 68px;
+}
+
 .field_label {
   display: block;
   align-self: flex-start;
