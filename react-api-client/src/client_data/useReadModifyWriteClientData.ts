@@ -46,6 +46,8 @@ export function useReadModifyWriteClientData<T = DefaultClientData>(
     modifier =>
       getClientData<T>(host!, key)
         .then(response => modifier(response?.data?.data ?? null))
+        // if the get fails, we can treat it as an empty response
+        .catch(() => modifier(null))
         .then((newData: T) =>
           updateClientData<T>(host!, key, newData)
             .then(response => response.data)
