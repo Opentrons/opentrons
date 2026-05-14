@@ -1,10 +1,10 @@
 """Synchronous class wrapper and functions for creating Pyro compatible objects."""
 
-import logging
 import asyncio
 import enum
 import functools
 import inspect
+import logging
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
@@ -74,7 +74,10 @@ class PyroFunctionWrapper:
     """Wrapper class to safely wrap callable responses as Proxy objects."""
 
     def __init__(
-        self, callable: Callable[P, T], loop: asyncio.AbstractEventLoop, execute_on_pyro_daemon_overload: bool
+        self,
+        callable: Callable[P, T],
+        loop: asyncio.AbstractEventLoop,
+        execute_on_pyro_daemon_overload: bool,
     ) -> None:
         self.callable = callable
         self._loop = loop
@@ -436,9 +439,9 @@ def execute_inbound_call_on_event_loop(
 ) -> Callable[P, T]:
     """Wrapper to ensure that inbound calls are executed on the resource's native event loop.
 
-    This wrapper operates on the assumption it is recieveing a bounded reference. This is only
-    to be used on non-async methods and attributes, as async methods are already wrapped through
-    the `synchronous` decorator.
+    This wrapper operates on the assumption it is recieveing a method bound to its original core object.
+    This is only to be used on non-async methods and attributes, as async methods are already wrapped
+    through the `synchronous` decorator.
     """
 
     def wrap_sync_safe(
@@ -449,7 +452,10 @@ def execute_inbound_call_on_event_loop(
     ) -> Any:
         async def method_wrapper(*args, **kwargs) -> Any:
             return method(*args, **kwargs)
-        future = asyncio.run_coroutine_threadsafe(coro=method_wrapper(*args, **kwargs), loop=loop)
+
+        future = asyncio.run_coroutine_threadsafe(
+            coro=method_wrapper(*args, **kwargs), loop=loop
+        )
         return future.result()
 
     def wrap_property_sync_safe(loop, attribute) -> Any:
@@ -489,10 +495,8 @@ def execute_inbound_call_on_event_loop(
         if loop.is_running():
             if running_loop is loop:
                 # We're in the same thread and the loop is running, cannot block synchronously.
-                raise RuntimeError(
-                    "Cannot execute call from the same event loop."
-                )
-            
+                raise RuntimeError("Cannot execute call from the same event loop.")
+
             if isinstance(attr, MethodType):
                 result = wrap_sync_safe(loop, attr, *args, **kwargs)
             elif isinstance(attr, property):
@@ -503,7 +507,9 @@ def execute_inbound_call_on_event_loop(
                 )
             return result
         else:
-            raise RuntimeError(f"Instance event loop is not running inside inbound call executor.")
+            raise RuntimeError(
+                f"Instance event loop is not running inside inbound call executor."
+            )
 
     if isinstance(attr, property):
         # If the original attribute was a property, ensure the wrapped attribute is
@@ -570,7 +576,9 @@ def convert_result_to_proxy(  # noqa: C901
                 execute_overload_ruleset = False
                 if hasattr(core_obj, "_execute_on_pyro_daemon_overload"):
                     execute_overload_ruleset = True
-                result = PyroFunctionWrapper(result, core_obj._loop, execute_overload_ruleset)
+                result = PyroFunctionWrapper(
+                    result, core_obj._loop, execute_overload_ruleset
+                )
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
                 if not hasattr(result, "_loop"):

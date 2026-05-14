@@ -1,6 +1,7 @@
 """Robot-server resouce class and functions for Pyro compatibility."""
 
 from __future__ import annotations
+
 import asyncio
 import logging
 import threading

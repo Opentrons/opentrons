@@ -648,9 +648,7 @@ class RunOrchestratorStore:
             timeout=timeout,
         )
 
-    async def handle_proxy_hardware_event(
-        self, event: HardwareEvent
-    ) -> None:
+    async def handle_proxy_hardware_event(self, event: HardwareEvent) -> None:
         """Handle an E-stop event from the hardware API.
 
         When in subprocess mode this will run on the RobotServerPyroResource's event loop.

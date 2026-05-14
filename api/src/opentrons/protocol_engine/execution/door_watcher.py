@@ -128,7 +128,7 @@ class DoorWatcher:
             self._hardware_api.pause(PauseType.PAUSE)
 
         self._action_dispatcher.dispatch(action)
-        
+
     def _handle_proxy_hardware_door_event(self, event: HardwareEvent) -> None:
         """Handle a proxy request of a door state hardware event, ensuring loop safe calling.
 
@@ -138,12 +138,14 @@ class DoorWatcher:
         This method will return after the queueing up `call_soon` references to prepare
         requests to the hardware process for a pause and to dispatch an action to the Protocol
         Engine's action handler.
-        
+
         This prevents blocking the individual processes from proceeding and avoids deadlocking.
         """
         if isinstance(event, DoorStateNotification):
             # Execute a call soon on the Run Process event loop to handle dispatching actions and hardware requests
-            self._loop.call_soon(self._handle_proxy_hardware_door_event_call_safe, event)
+            self._loop.call_soon(
+                self._handle_proxy_hardware_door_event_call_safe, event
+            )
 
     def _handle_proxy_hardware_door_event_call_safe(
         self, event: DoorStateNotification
@@ -167,8 +169,6 @@ class DoorWatcher:
             and self._state_store.config.block_on_door_open
         ):
             # Execute a call soon to ensure a pause is requested of the hardware process
-            self._loop.call_soon(
-                self._hardware_api.pause, PauseType.PAUSE
-            ) 
+            self._loop.call_soon(self._hardware_api.pause, PauseType.PAUSE)
 
         self._action_dispatcher.dispatch(action)
