@@ -89,7 +89,7 @@ def test_handle_pipette_config_action(
                 sensors=["pressure", "capacitive", "environment"]
             ),
             volume_mode=VolumeModes.default,
-            available_volume_modes_min_vol={},
+            available_volume_modes_min_and_max_vol={},
         ),
     )
     subject.handle_action(
@@ -206,7 +206,7 @@ def test_active_channels(
                 sensors=["pressure", "capacitive", "environment"]
             ),
             volume_mode=VolumeModes.default,
-            available_volume_modes_min_vol={},
+            available_volume_modes_min_and_max_vol={},
         ),
     )
     subject.handle_action(
