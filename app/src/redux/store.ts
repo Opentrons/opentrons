@@ -4,7 +4,7 @@ import { thunk } from 'redux-thunk'
 
 import { rootEpic } from './epic'
 import { rootReducer } from './reducer'
-import { timeoutMiddleware } from './robot-auth/timeoutMiddleware'
+import { timeoutMiddleware } from './robot-auth'
 
 import type { StoreEnhancer } from 'redux'
 import type { Action, State } from './types'
