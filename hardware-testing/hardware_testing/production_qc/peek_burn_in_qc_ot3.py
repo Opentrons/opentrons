@@ -16,13 +16,15 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
+from pathlib import Path
+
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
     CSVSection,
     CSVLine,
 )
-from hardware_testing.data import create_run_id
+from hardware_testing.data import create_run_id, create_folder_for_test_data
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
@@ -510,16 +512,28 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             # Create shared run_id for both reports
             run_id = create_run_id()
 
-            # Create two separate reports
-            results_report = _build_results_report(cycles=cycles, trials=trials, run_id=run_id)
-            recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id=run_id)
-
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
             dut_str = str(dut)
+            # Create test name with dut for shared folder
+            test_name_with_dut = f"peek-burn-in-{dut_str}"
+
+            # Create two separate reports with empty run_id (no subfolder)
+            # run_id is passed but we'll override it for saving directly to test_name folder
+            results_report = _build_results_report(cycles=cycles, trials=trials, run_id="")
+            recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id="")
+
+            # Override test_name to put both reports in the same folder
+            results_report._test_name = test_name_with_dut
+            recorder_report._test_name = test_name_with_dut
+
             # Set meta data for results report
             helpers_ot3.set_csv_report_meta_data_ot3(api, results_report, dut)
-            # Set tag for recorder report (required before saving)
-            recorder_report.set_tag(dut_str)
+            # Set tag for recorder report (required before saving), include "recorder" in tag
+            recorder_report.set_tag(f"{dut_str}-recorder")
+
+            # Store run_id for filename generation
+            results_report._run_id = run_id
+            recorder_report._run_id = run_id
 
             # Track test results for summary
             test_plunger_fail_reasons = []
@@ -594,9 +608,26 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, [cycle_plunger_stall_str])
 
             ui.print_title("DONE")
-            # Save both reports
-            results_report.save_to_disk()
-            recorder_report.save_to_disk()
+            # Save both reports directly to peek-burn-in-{dut} folder (no run_id subfolder)
+            # Create folder for test data
+            test_folder = create_folder_for_test_data(test_name_with_dut)
+            
+            # Build filenames
+            results_filename = f"{test_name_with_dut}_{run_id}_{dut_str}.csv"
+            recorder_filename = f"{test_name_with_dut}_{run_id}_{dut_str}-recorder.csv"
+            
+            # Save results report
+            results_path = test_folder / results_filename
+            with open(results_path, "w") as f:
+                f.write(str(results_report) + "\n")
+            print(f"Results report saved to: {results_path}")
+            
+            # Save recorder report
+            recorder_path = test_folder / recorder_filename
+            with open(recorder_path, "w") as f:
+                f.write(str(recorder_report) + "\n")
+            print(f"Recorder report saved to: {recorder_path}")
+            
             results_report.print_results()
             if api.is_simulator:
                 break
