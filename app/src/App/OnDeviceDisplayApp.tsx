@@ -244,7 +244,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <MaintenanceRunTakeover>
                     <EstopTakeover />
                     <FirmwareUpdateTakeover />
-                    <RobotEncryptionKeyTakeover />
                     {showModuleSetupModal && localRobot?.name != null ? (
                       <ModuleWizardFlows
                         showSetupLauncher={true}
