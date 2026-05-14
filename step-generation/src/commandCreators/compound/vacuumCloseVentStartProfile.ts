@@ -9,6 +9,7 @@ import type {
 export const vacuumCloseVentStartProfile: CommandCreator<
   VacuumCloseVentStartProfileArgs
 > = (args, invariantContext, prevRobotState) => {
+  const { ventAfter } = args
   return reduceCommandCreators(
     [
       curryCommandCreator(vacuumCloseVent, {
@@ -18,6 +19,7 @@ export const vacuumCloseVentStartProfile: CommandCreator<
       curryCommandCreator(vacuumStartRunProfile, {
         ...args,
         commandCreatorFnName: 'vacuumStartRunProfile',
+        ventAfter,
       }),
     ],
     invariantContext,

@@ -109,7 +109,6 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
         },
       ],
       ventAfter: false,
-      commandCreatorFnName: 'vacuumStartRunProfile',
     }
     const result = vacuumStartRunProfile(args, invariantContext, robotState)
     expect(getSuccessResult(result)).toEqual({

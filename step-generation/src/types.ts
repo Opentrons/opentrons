@@ -909,7 +909,7 @@ export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentStartProfile'
   profile: VacuumRunProfileParams['profile']
-  ventAfter?: boolean
+  ventAfter: boolean
 }
 
 export type VacuumArgs =
