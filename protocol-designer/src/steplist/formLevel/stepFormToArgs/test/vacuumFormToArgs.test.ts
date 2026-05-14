@@ -235,12 +235,13 @@ describe('vacuumFormToArgs', () => {
       name: annotation.stepName,
       description: annotation.stepDetails,
       profile: [
-        { holdSeconds: 45, pressureMbar: 12.5 },
+        { enablePump: true, holdSeconds: 45, gaugePressureMbar: 12.5 },
         {
           repetitions: 3,
-          steps: [{ holdSeconds: 90, powerPercent: 88 }],
+          steps: [{ enablePump: true, holdSeconds: 90, percentPower: 88 }],
         },
       ],
+      ventAfter: false,
     }
     expect(vacuumFormToArgs(formData)).toEqual(expected)
   })

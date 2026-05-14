@@ -255,21 +255,23 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                       />
                     ) : null}
                     <NiceModal.Provider>
-                      <ToasterOven>
-                        <ProtocolReceiptToasts />
-                        {!showModuleSetupModal ? (
-                          <ModuleAttachedToasts
-                            openFlow={(open: boolean) => {
-                              setShowModuleSetupModal(open)
-                            }}
-                          />
-                        ) : null}
+                      <RobotEncryptionKeyTakeover>
+                        <ToasterOven>
+                          <ProtocolReceiptToasts />
+                          {!showModuleSetupModal ? (
+                            <ModuleAttachedToasts
+                              openFlow={(open: boolean) => {
+                                setShowModuleSetupModal(open)
+                              }}
+                            />
+                          ) : null}
 
-                        <SharedScrollRefProvider>
-                          <OnDeviceDisplayAppRoutes />
-                        </SharedScrollRefProvider>
-                        <LoggedOutOverlayMount />
-                      </ToasterOven>
+                          <SharedScrollRefProvider>
+                            <OnDeviceDisplayAppRoutes />
+                          </SharedScrollRefProvider>
+                          <LoggedOutOverlayMount />
+                        </ToasterOven>
+                      </RobotEncryptionKeyTakeover>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
                 </>

@@ -5,7 +5,13 @@ import { useClientDataEncryptionKeys } from '/app/resources/client_data/encrypti
 
 import { RobotEncryptionKeyModal } from './RobotEncryptionKeyModal'
 
-export function RobotEncryptionKeyTakeover(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function RobotEncryptionKeyTakeover({
+  children,
+}: {
+  children: ReactNode
+}): JSX.Element {
   const { keyDisplayRequestedNonces } = useClientDataEncryptionKeys({
     refetchInterval: 1000,
   })
@@ -19,5 +25,5 @@ export function RobotEncryptionKeyTakeover(): JSX.Element {
       NiceModal.show(RobotEncryptionKeyModal)
     }
   }, [keyDisplayRequestedNonces])
-  return <Fragment />
+  return <Fragment>{children}</Fragment>
 }

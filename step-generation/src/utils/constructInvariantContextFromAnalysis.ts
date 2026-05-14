@@ -233,7 +233,7 @@ export function constructInvariantContextFromAnalysis(
                 location,
               },
             }
-          } else {
+          } else if (addressableAreaName === 'fixedTrash') {
             trashBinEntities = {
               ...acc.trashBinEntities,
               [id]: {

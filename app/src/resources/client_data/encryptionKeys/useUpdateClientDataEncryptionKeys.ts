@@ -1,20 +1,19 @@
 import { omit } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
-import { useUpdateClientData } from '@opentrons/react-api-client'
+import { useReadModifyWriteClientData } from '@opentrons/react-api-client'
 
 import { KEYS } from '../constants'
-import { useClientDataEncryptionKeys } from './useClientDataEncryptionKeys'
 
 import type {
-  UseUpdateClientDataMutationOptions,
-  UseUpdateClientDataMutationResult,
+  UseReadModifyWriteClientDataMutationOptions,
+  UseReadModifyWriteClientDataMutationResult,
 } from '@opentrons/react-api-client'
 import type { ClientDataEncryptionKeys } from './types'
 
 export type UseUpdateClientDataRecoveryResult = Omit<
-  UseUpdateClientDataMutationResult<ClientDataEncryptionKeys>,
-  'updateClientData'
+  UseReadModifyWriteClientDataMutationResult<ClientDataEncryptionKeys>,
+  'readModifyWriteClientData'
 > & {
   /* Add a new request to display the robot key. Returns the requested string to be used with clearKeyDisplay. */
   requestKeyDisplay: () => string
@@ -27,28 +26,34 @@ export type UseUpdateClientDataRecoveryResult = Omit<
 const uuid: () => string = uuidv4
 // Update the client data store value associated with the error recovery key.
 export function useUpdateClientDataEncryptionKeys(
-  options: UseUpdateClientDataMutationOptions<ClientDataEncryptionKeys> = {}
+  options: UseReadModifyWriteClientDataMutationOptions<ClientDataEncryptionKeys> = {}
 ): UseUpdateClientDataRecoveryResult {
-  const { keyDisplayRequestedNonces } = useClientDataEncryptionKeys()
-  const { updateClientData, ...mutate } =
-    useUpdateClientData<ClientDataEncryptionKeys>(KEYS.ENCRYPTION_KEYS, options)
+  const { readModifyWriteClientData, ...mutate } =
+    useReadModifyWriteClientData<ClientDataEncryptionKeys>(
+      KEYS.ENCRYPTION_KEYS,
+      options
+    )
+
   const requestKeyDisplay = (): string => {
     const newRequest = uuid()
-    updateClientData({
+    readModifyWriteClientData(encryptionData => ({
       keyDisplayRequestedNonces: {
-        ...keyDisplayRequestedNonces,
+        ...(encryptionData?.keyDisplayRequestedNonces ?? {}),
         [newRequest]: true,
       },
-    })
+    }))
     return newRequest
   }
   const clearKeyDisplay = (request: string): void => {
-    const currentRequests = omit(keyDisplayRequestedNonces, request)
-    updateClientData({ keyDisplayRequestedNonces: currentRequests })
+    readModifyWriteClientData(encryptionData => ({
+      keyDisplayRequestedNonces: encryptionData?.keyDisplayRequestedNonces
+        ? omit(encryptionData.keyDisplayRequestedNonces, request)
+        : {},
+    }))
   }
 
   const clearClientData = (): void => {
-    updateClientData({ keyDisplayRequestedNonces: {} })
+    readModifyWriteClientData(() => ({ keyDisplayRequestedNonces: {} }))
   }
 
   return {

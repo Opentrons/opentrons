@@ -134,6 +134,7 @@ async def test_start_run_profile(
                 ),
             ],
             repetitions=vm_cycle.repetitions,
+            vent_after=vm_cycle.ventAfter,
         ),
     ]
 

@@ -7812,6 +7812,11 @@
           },
           "title": "Steps",
           "type": "array"
+        },
+        "ventAfter": {
+          "default": null,
+          "title": "Ventafter",
+          "type": "boolean"
         }
       },
       "required": ["steps", "repetitions"],
