@@ -6,7 +6,7 @@ title: 'Python API: Using Liquid Classes'
 
 You'll use a [liquid class definition](definitions.md) in your protocol to optimize transfer behavior based on liquid properties, along with your chosen Flex pipettes and tips.
 
-This section covers selecting a liquid class and using the [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] method. For more details, including using the [`distribute_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class] and [`consolidate_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class] methods, see [Complex Commands](complex-commands/index.md).
+This section covers selecting a liquid class and using the [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] method. For more details, including using the [`distribute_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class] and [`consolidate_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class] methods, see [Complex Commands](../complex-commands/index.md).
 
 Start by defining the tips, trash, pipette, and labware used in your transfers. Then, use [`ProtocolContext.get_liquid_class()`][opentrons.protocol_api.ProtocolContext.get_liquid_class] to select an Opentrons-verified liquid class and save its results to a variable. `get_liquid_class()` takes into account the pipette and tip racks in your protocol and only loads the relevant portion of the liquid class definition.
 
@@ -85,4 +85,4 @@ In many cases, the liquid class definition represents fine-tuned changes optimiz
 - Aspirating and dispensing at 30 µL/sec with a larger correction by volume.
 - Pushing out a larger volume of air to ensure all liquid leaves the tip.
 
-Not all transfer behavior is easily visible. See [Liquid Class Definitions](definitions.md) for a full list of changes based on liquid class, pipette, and tip combination. For more detail on individual transfer settings, see [Liquid Control](building-block-commands/liquids.md).
+Not all transfer behavior is easily visible. See [Liquid Class Definitions](definitions.md) for a full list of changes based on liquid class, pipette, and tip combination. For more detail on individual transfer settings, see [Liquid Control](../building-block-commands/liquids.md).

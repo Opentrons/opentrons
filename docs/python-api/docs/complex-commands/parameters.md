@@ -73,7 +73,7 @@ If this poses a contamination risk, you can work around it in a few ways:
 
 - Use `transfer()` or `transfer_with_liquid_class()` with `new_tip="always"` instead.
 - Set [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance] high enough that the tip doesn't contact liquid in the destination well.
-- [Customize your liquid class][customizing-liquid-classes] to change dispense heights or add touch tip behavior.
+- [Customize your liquid class](../liquid-classes/customize.md) to change dispense heights or add touch tip behavior.
 - Use [building block commands](../building-block-commands/liquids.md) instead of complex commands.
 
 ## Mix before
@@ -95,7 +95,7 @@ pipette.transfer(
 
 Mixing occurs before every aspiration, including when [tip refilling][tip-refilling] is required.
 
-Liquid class definitions determine mix behavior in liquid class complex commands like `transfer_with_liquid_class()`. If mixing is enabled before an aspiration, the pipette will mix in place at the aspirate position. You can see position and other values in the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
+Liquid class definitions determine mix behavior in liquid class complex commands like `transfer_with_liquid_class()`. If mixing is enabled before an aspiration, the pipette will mix in place at the aspirate position. You can see position and other values in the [Opentrons-verified liquid class definitions](../liquid-classes/definitions.md).
 
 !!! note
     `consolidate()` ignores any value of `mix_before`. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
@@ -130,7 +130,7 @@ pipette.distribute(
 
 The amount to dispense in the destination is 960 µL (120 µL for each of 8 wells in the column). Adding the 50 µL disposal volume exceeds the 1000 µL capacity of the tip. The command will be split across two aspirations, each with the full disposal volume of 50 µL. The pipette will dispose *a total of 100 µL* during the command.
 
-Liquid class definitions automatically include a disposal volume for liquid class commands like `distribute_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
+Liquid class definitions automatically include a disposal volume for liquid class commands like `distribute_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-classes/definitions.md).
 
 !!! note
     `transfer()` will not aspirate additional liquid if you set `disposal_volume`. However, it will perform a very small blow out after each dispense.
@@ -161,7 +161,7 @@ This parameter always uses default motion behavior for touch tip. Use the [touch
 - Only touch the tip after aspirating or dispensing, but not both.
 - Control the speed, radius, or height of the touch tip motion.
 
-Liquid class definitions determine tip-touching behavior in liquid class complex commands like `transfer_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
+Liquid class definitions determine tip-touching behavior in liquid class complex commands like `transfer_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-classes/definitions.md).
 
 ## Air gap { #air-gap-complex }
 
@@ -175,7 +175,7 @@ Air-gapping behavior is different for each complex command. The different behavi
 | `distribute()` | Air gap after each aspiration.<br>Air gap after dispensing if the pipette isn't empty. |
 | `consolidate()` | Air gap after each aspiration. This may create multiple air gaps within the tip.<br>Pipette is empty after dispensing. |
 
-Liquid class definitions determine whether air gaps are added after aspirating or dispensing in liquid class complex commands. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
+Liquid class definitions determine whether air gaps are added after aspirating or dispensing in liquid class complex commands. For more information, see the [Opentrons-verified liquid class definitions](../liquid-classes/definitions.md).
 
 This `transfer()` command will create a 20 µL air gap after each of its aspirations. When dispensing, it will clear the air gap and dispense the full 100 µL of liquid:
 
@@ -257,7 +257,7 @@ pipette.transfer(
 )
 ```
 
-Liquid class definitions determine mix behavior in liquid class complex commands like `transfer_with_liquid_class()`. If mixing is enabled after a dispense, the pipette will mix in place at the dispense position. You can see position and other values in the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
+Liquid class definitions determine mix behavior in liquid class complex commands like `transfer_with_liquid_class()`. If mixing is enabled after a dispense, the pipette will mix in place at the dispense position. You can see position and other values in the [Opentrons-verified liquid class definitions](../liquid-classes/definitions.md).
 
 *New in version 2.0*
 
@@ -268,7 +268,7 @@ Liquid class definitions determine mix behavior in liquid class complex commands
 
 There are two parameters that control whether and where the pipette blows out liquid. The `blow_out` parameter accepts a Boolean value. When `True`, the pipette blows out remaining liquid when the tip is empty or only contains the disposal volume. The `blowout_location` parameter controls in which of three locations these blowout actions occur.
 
-A liquid class definition defines both parameters and blowout behavior for any liquid class complex command. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
+A liquid class definition defines both parameters and blowout behavior for any liquid class complex command. For more information, see the [Opentrons-verified liquid class definitions](../liquid-classes/definitions.md).
 
 In a legacy complex command, the default blowout location is the trash. Blowout behavior is different for each command:
 

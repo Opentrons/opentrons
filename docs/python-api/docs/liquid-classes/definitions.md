@@ -10,7 +10,7 @@ This section details specific changes to transfer behavior for each Opentrons-ve
 !!! note
     You can customize a liquid class definition for your workflow, either by customizing individual properties of an Opentrons-verified liquid class definition or by creating your own definition from scratch.
     
-    For more information, see [Customizing Liquid Classes][customizing-liquid-classes].
+    For more information, see [Customizing Liquid Classes](customize.md).
 
 To use the tables below, select your liquid class: [Aqueous](#aqueous), [Viscous](#viscous), or [Volatile](#volatile). Then, click different tabs to view your pipette and tip combination.
 

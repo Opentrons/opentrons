@@ -46,7 +46,7 @@ _Changed in version 2.28_: Edit tip position for an aspirate, dispense, or blowo
 
 Then, complete your transfers with the modified `custom_water` liquid class.
 
-All Opentrons-verified liquid classes position the pipette relative to the well. To customize your liquid class to use [meniscus-relative](robot-position.md#meniscus) locations, set the `positionReference` to `"liquid-meniscus"` for actions like an aspirate or dispense.
+All Opentrons-verified liquid classes position the pipette relative to the well. To customize your liquid class to use [meniscus-relative](../robot-position.md#meniscus) locations, set the `positionReference` to `"liquid-meniscus"` for actions like an aspirate or dispense.
 
 ## Defining new liquid classes
 
@@ -143,9 +143,9 @@ _New in version 2.24_
 
 _Changed in version 2.28_: Add ability to control where and when the pipette blows out excess liquid.
 
-You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified [liquid class properties](https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1) for examples.
+You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified [liquid class properties](https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1) on Github for examples.
 
-The example above also defines some optional properties, like a mix and a blowout, in a custom liquid class. See [the liquid class schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json) for a complete list of properties.
+The example above also defines some optional properties, like a mix and a blowout, in a custom liquid class. See [the liquid class schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json) on Github for a complete list of properties.
 
 !!! note
 The [`ProtocolContext.get_liquid_class()`][opentrons.protocol_api.ProtocolContext.get_liquid_class] method only accepts Opentrons-verified liquid classes, like `glycerol_50`. You'll need to use [`ProtocolContext.define_liquid_class()`][opentrons.protocol_api.ProtocolContext.define_liquid_class] in each Flex protocol that uses a custom liquid class.
