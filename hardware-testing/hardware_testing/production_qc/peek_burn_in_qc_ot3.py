@@ -515,7 +515,11 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id=run_id)
 
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+            dut_str = str(dut)
+            # Set meta data for results report
             helpers_ot3.set_csv_report_meta_data_ot3(api, results_report, dut)
+            # Set tag for recorder report (required before saving)
+            recorder_report.set_tag(dut_str)
 
             # Track test results for summary
             test_plunger_fail_reasons = []
