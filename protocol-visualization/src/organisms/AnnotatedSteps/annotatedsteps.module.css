@@ -32,8 +32,8 @@
 
 .annotated_group_expanded {
   display: flex;
-  flex-direction: column;
   max-height: min(75dvh, calc(100dvh - 10rem));
+  flex-direction: column;
   padding: var(--spacing-8);
   border-bottom: 1px solid var(--grey-30);
   gap: var(--spacing-4);
