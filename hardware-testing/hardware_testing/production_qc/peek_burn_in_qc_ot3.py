@@ -22,7 +22,7 @@ from hardware_testing.data.csv_report import (
     CSVSection,
     CSVLine,
 )
-from hardware_testing.data import data_io
+from hardware_testing.data import create_run_id
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
@@ -508,7 +508,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             #     continue
 
             # Create shared run_id for both reports
-            run_id = data_io.create_run_id()
+            run_id = create_run_id()
 
             # Create two separate reports
             results_report = _build_results_report(cycles=cycles, trials=trials, run_id=run_id)
