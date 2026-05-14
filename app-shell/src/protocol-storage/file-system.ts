@@ -67,8 +67,11 @@ export function isOT2Protocol(protocolDirPath: string): Promise<boolean> {
       const mostRecent = jsonFiles.sort().pop() ?? ''
       const analysisPath = path.join(analysisDir, mostRecent)
       const analysis = fs.readJsonSync(analysisPath)
+      // Protocols created before robotType was introduced don't have this field,
+      // but they are implicitly OT-2 protocols since other robots didn't exist.
+      const { robotType } = analysis
 
-      return analysis.robotType === OT2_ROBOT_TYPE
+      return robotType === OT2_ROBOT_TYPE || robotType == null
     })
     .catch(() => false)
 }
