@@ -205,7 +205,11 @@ export function SelectLabwareModal(
 
       const isRecommendedFilter =
         filterRecommended &&
-        !getLabwareIsRecommended(labwareDef, selectedModuleModel, moduleHasLabware)
+        !getLabwareIsRecommended(
+          labwareDef,
+          selectedModuleModel,
+          moduleHasLabware
+        )
       const isHeightFilter =
         filterHeight &&
         getIsLabwareAboveHeight(
@@ -234,7 +238,14 @@ export function SelectLabwareModal(
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot, moduleHasLabware]
+    [
+      filterRecommended,
+      filterHeight,
+      getIsLabwareCompatible,
+      moduleType,
+      slot,
+      moduleHasLabware,
+    ]
   )
 
   const labwareByCategory = useMemo(

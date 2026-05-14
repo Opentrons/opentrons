@@ -154,7 +154,8 @@ export const FAKE_VACUUM_DOCK_LOCATION_MAP = {
   vacuumDockA4: 'A4',
 }
 
-export type VacuumDockLocationMapKey = keyof typeof FAKE_VACUUM_DOCK_LOCATION_MAP
+export type VacuumDockLocationMapKey =
+  keyof typeof FAKE_VACUUM_DOCK_LOCATION_MAP
 
 export const BOTTOM_UP_LABWARE_POOL_KEYS: Array<
   keyof FlexStackerStoredLabwareGroup

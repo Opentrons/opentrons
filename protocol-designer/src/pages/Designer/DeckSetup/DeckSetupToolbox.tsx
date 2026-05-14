@@ -368,7 +368,8 @@ export function DeckSetupToolbox(
               <EmptySelectorButton
                 textAlignment="left"
                 text={
-                  hasNoLabware || (hasVacuumModuleCreated && !isVacuumModuleFull)
+                  hasNoLabware ||
+                  (hasVacuumModuleCreated && !isVacuumModuleFull)
                     ? t('add_labware')
                     : t('replace_labware')
                 }

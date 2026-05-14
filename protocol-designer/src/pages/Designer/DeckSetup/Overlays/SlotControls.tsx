@@ -79,9 +79,10 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   const isSlotAVacuumDock = getIsSlotAVacuumDock(itemId)
   const isSlotAHopper = getIsSlotAHopper(itemId)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
-  const cutoutId = isSlotAHopper || isSlotAVacuumDock
-    ? null
-    : getCutoutIdFromAddressableArea(itemId, deckDef)
+  const cutoutId =
+    isSlotAHopper || isSlotAVacuumDock
+      ? null
+      : getCutoutIdFromAddressableArea(itemId, deckDef)
   const trashSlots = Object.values(additionalEquipment)
     .filter(ae => ae.name === 'trashBin' || ae.name === 'wasteChute')
     ?.map(ae => ae.location as CutoutId)
