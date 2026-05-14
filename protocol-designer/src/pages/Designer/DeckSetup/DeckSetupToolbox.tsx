@@ -23,6 +23,7 @@ import {
   ABSORBANCE_READER_V1,
   FLEX_STACKER_MODULE_TYPE,
   getModuleType,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
@@ -52,7 +53,7 @@ import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSlotInformation } from '../utils'
-import { getIsLabwareOnSlotInUse } from './utils'
+import { getIsLabwareOnSlotInUse, getIsVacuumModuleFull } from './utils'
 
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
@@ -105,6 +106,12 @@ export function DeckSetupToolbox(
   }
   const isHopperSlot = getIsSlotAHopper(slot)
   const offDeckLabware = deckSetup.labware[slot]
+  const isVacuumModule =
+    selectedModuleModel != null &&
+    getModuleType(selectedModuleModel) === VACUUM_MODULE_TYPE
+  const hasVacuumModuleCreated =
+    createdModuleForSlot != null &&
+    getModuleType(createdModuleForSlot.model) === VACUUM_MODULE_TYPE
   const handleResetToolbox = (): void => {
     dispatch(
       editSlotInfo({
@@ -130,9 +137,15 @@ export function DeckSetupToolbox(
       ? createdModuleForSlot.moduleState.labwareInHopper
       : null
 
+  const isVacuumModuleFull =
+    hasVacuumModuleCreated &&
+    getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware)
+
   const slotFull =
-    (createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
-    (createdStackForSlot.length > 0 && deckSetup.labware[slot] != null)
+    (((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
+      (createdStackForSlot.length > 0 && deckSetup.labware[slot] != null)) &&
+      !isVacuumModule) ||
+    isVacuumModuleFull
 
   const hasNoLabware =
     (createdAdapterForSlot == null && createdStackForSlot.length === 0) ||
@@ -172,17 +185,25 @@ export function DeckSetupToolbox(
   const handleConfirm = (): void => {
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
+    const isVacuumModule =
+      selectedModuleModel != null &&
+      getModuleType(selectedModuleModel) === VACUUM_MODULE_TYPE
     const isModuleStacker =
       selectedModuleModel != null &&
       getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
     const isOnShuttle = !isHopperSlot && isModuleStacker
+    const vacuumModuleHasLabware =
+      isVacuumModule &&
+      (createdAdapterForSlot != null || createdStackForSlot.length > 0)
 
     //  handle clear for if you are changing the adapter/labware combo
-    if (!isOffDeck) {
+    // For vacuum modules, only clear if it's full (replace behavior)
+    // Otherwise, use additive behavior
+    if (!isOffDeck && (!isVacuumModule || isVacuumModuleFull)) {
       handleClear()
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
-    if (hasModule) {
+    if (hasModule && (!vacuumModuleHasLabware || isVacuumModuleFull)) {
       let flexStackerInfo: CreateContainerAboveModuleArgs['stackerInfo']
       if (isModuleStacker) {
         flexStackerInfo = isOnShuttle
@@ -205,6 +226,23 @@ export function DeckSetupToolbox(
             lidDefURI: selectedLidLabware,
           },
           stackerInfo: flexStackerInfo,
+        })
+      )
+    } else if (vacuumModuleHasLabware && !isVacuumModuleFull) {
+      // For vacuum module with existing labware (not full), add new labware on top
+      const topLabwareId =
+        createdStackForSlot.length > 0
+          ? createdStackForSlot[0] // Get the top item (first in array)
+          : createdAdapterForSlot?.id
+      dispatch(
+        createContainer({
+          slot: topLabwareId,
+          labwareDefURIStack: [
+            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
+            ...(selectedTopLabware.labwareDefURI != null
+              ? [selectedTopLabware.labwareDefURI]
+              : []),
+          ],
         })
       )
     } else {
@@ -264,6 +302,7 @@ export function DeckSetupToolbox(
   const displaySlot = getIsSlotAHopper(slot)
     ? t('shared:stacker', { slot: getColumnFromWellName(slot) })
     : slot
+
   return (
     <>
       {showSelectLabwareModal ? (
@@ -274,6 +313,10 @@ export function DeckSetupToolbox(
           }}
           onConfirm={handleConfirmSelection}
           slotFull={slotFull}
+          moduleHasLabware={
+            isVacuumModule &&
+            (createdAdapterForSlot != null || createdStackForSlot.length > 0)
+          }
         />
       ) : null}
       {isLabwareOnSlotInUse && showDeleteEntityInUseModal ? (
@@ -324,7 +367,11 @@ export function DeckSetupToolbox(
             <Flex width={FLEX_MAX_CONTENT}>
               <EmptySelectorButton
                 textAlignment="left"
-                text={hasNoLabware ? t('add_labware') : t('replace_labware')}
+                text={
+                  hasNoLabware || (hasVacuumModuleCreated && !isVacuumModuleFull)
+                    ? t('add_labware')
+                    : t('replace_labware')
+                }
                 iconName="plus"
                 onClick={() => {
                   setShowSelectLabwareModal(true)
@@ -353,26 +400,28 @@ export function DeckSetupToolbox(
                   {t('top_slot')}
                 </StyledText>
               ) : null}
-              {createdStackForSlot.length > 0 ? (
-                <LabwareCard
-                  labware={
-                    deckSetup.labware[
-                      createdStackForSlot[0] // select top most labware in the stack
-                    ]
-                  }
-                  {...(createdLidForSlot != null &&
-                  createdStackForSlot.includes(createdLidForSlot?.id)
-                    ? {}
-                    : { lidId: createdLidForSlot?.id })}
-                  quantity={
-                    labwareInHopper != null
-                      ? labwareInHopper.length
-                      : createdStackForSlot.length
-                  }
-                  location={slot}
-                />
-              ) : null}
-              {createdAdapterForSlot != null ? (
+              {createdStackForSlot.length > 0
+                ? createdStackForSlot.map((labwareId, index) => (
+                    <LabwareCard
+                      key={labwareId}
+                      labware={deckSetup.labware[labwareId]}
+                      {...(createdLidForSlot != null &&
+                      createdStackForSlot.includes(createdLidForSlot?.id) &&
+                      labwareId === createdLidForSlot?.id
+                        ? {}
+                        : index === 0 && createdLidForSlot != null
+                          ? { lidId: createdLidForSlot?.id }
+                          : {})}
+                      quantity={
+                        labwareInHopper != null && index === 0
+                          ? labwareInHopper.length
+                          : 1
+                      }
+                      location={slot}
+                    />
+                  ))
+                : null}
+              {createdAdapterForSlot != null && !hasVacuumModuleCreated ? (
                 <LabwareCard
                   labware={createdAdapterForSlot}
                   quantity={1}

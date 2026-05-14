@@ -46,9 +46,12 @@ import {
   COLUMN_4_SLOTS,
   EMPTY,
   FAKE_HOPPER_LOCATION_MAP,
+  FAKE_VACUUM_DOCK_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
+  VACUUM_DOCK_FAKE_LOCATION,
+  VACUUM_DOCK_LOCATION,
   ZERO_OFFSET,
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -72,7 +75,10 @@ import type {
   PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
-import type { HopperLocationMapKey } from '../constants'
+import type {
+  HopperLocationMapKey,
+  VacuumDockLocationMapKey,
+} from '../constants'
 import type {
   CommandCreator,
   CurriedCommandCreator,
@@ -1115,6 +1121,20 @@ export const getModuleIdFromRobotStateStack = (
   return stack?.find(id => modules[id] != null) ?? null
 }
 
+const _getMappedLocation = (
+  slot: string,
+  isOnVacuumDock: boolean,
+  isOnHopper: boolean
+): string => {
+  if (isOnVacuumDock) {
+    return FAKE_VACUUM_DOCK_LOCATION_MAP[slot as VacuumDockLocationMapKey]
+  }
+  if (isOnHopper) {
+    return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  }
+  return slot
+}
+
 /**
  * Get the full stack in a slot given labware state
  * If the slot is offDeck, the offDeckOverrideId must be provided to override the offDeck slot,
@@ -1137,17 +1157,20 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
+  const isOnVacuumDock = getIsSlotAVacuumDock(slot)
   const isOnHopper = getIsSlotAHopper(slot)
-  const mappedLocation = isOnHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+  const mappedLocation = _getMappedLocation(slot, isOnVacuumDock, isOnHopper)
   const labwareStack = Object.values(labware).filter(
     lw =>
       lw.stack.includes(mappedLocation) &&
       (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
-      lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
+      lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
+      lw.stack.includes(VACUUM_DOCK_LOCATION) === isOnVacuumDock
   )
   if (isOnHopper) {
+    return labwareStack.reverse()[0].stack ?? []
+  }
+  if (isOnVacuumDock) {
     return labwareStack.reverse()[0].stack ?? []
   }
   return (
@@ -1510,6 +1533,10 @@ export const getLabwareIdOnHopper = (
 
 export const getIsSlotAHopper = (slot: string): boolean => {
   return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getIsSlotAVacuumDock = (slot: string): boolean => {
+  return slot === VACUUM_DOCK_FAKE_LOCATION
 }
 
 export const getLabwareIdOnShuttle = (
