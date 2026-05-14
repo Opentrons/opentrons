@@ -14,19 +14,19 @@
 
 .password_container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  overflow: hidden;
   width: 100%;
   height: calc(var(--spacing-16) * 2 + 40px);
+  align-items: center;
+  justify-content: space-between;
   padding: var(--spacing-16) var(--spacing-20);
   border-radius: var(--border-radius-8);
   background-color: var(--grey-30);
-  overflow: hidden;
 }
 
 .last_password {
-  animation: fade-out 0.2s forwards ease-in;
   position: absolute;
+  animation: fade-out 0.2s forwards ease-in;
 }
 
 .password {
@@ -35,23 +35,25 @@
 
 @keyframes fade-out {
   from {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
+
   to {
-    transform: translateY(-60%);
-    opacity: 0;
     display: none;
+    opacity: 0;
+    transform: translateY(-60%);
   }
 }
 
 @keyframes fade-in {
   from {
-    transform: translateY(60%);
     opacity: 0;
+    transform: translateY(60%);
   }
+
   to {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
 }
