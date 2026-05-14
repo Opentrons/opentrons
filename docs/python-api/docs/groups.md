@@ -8,7 +8,7 @@ Step grouping lets you organize groups of commands within your Python protocols.
 - the context manager [`group_steps()`][opentrons.protocol_api.ProtocolContext.group_steps], which uses `with` syntax.
 - the paired [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] and [`end_group()`][opentrons.protocol_api._command_annotations.GroupedSteps.end_group] commands.
 
-The examples on this page demonstrate using either method to create step groups that are visible in your Python protocol file, or in [visualization][../flex/protocol-viz.md] in the Opentrons App. 
+The examples on this page demonstrate using either method to create step groups that are visible in your Python protocol file, or in [visualization](../flex/opentrons-app/protocol-viz.md) in the Opentrons App.
 
 !!! note
     Step grouping doesn't affect the execution of your protocol. It's simply a way to organize writing and assessing your Python protocols.
