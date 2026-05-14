@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useRef, useState } from 'react'
 
 import {
   DIRECTION_COLUMN,
@@ -38,9 +38,9 @@ type Story = StoryObj<typeof NumericalKeyboard>
 
 const Keyboard = (args): JSX.Element => {
   const { isDecimal, hasHyphen } = args
-  const [showKeyboard, setShowKeyboard] = React.useState(false)
-  const [value, setValue] = React.useState<string>('')
-  const keyboardRef = React.useRef(null)
+  const [showKeyboard, setShowKeyboard] = useState(false)
+  const [value, setValue] = useState<string>('')
+  const keyboardRef = useRef(null)
   return (
     <div
       style={{
