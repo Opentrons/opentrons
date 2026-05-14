@@ -27,7 +27,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
 DEFAULT_TRIALS = 10 # The number of trials each current speed check does
-DEFAULT_CYCLES = 4 # The number of burn-in cycles
+DEFAULT_CYCLES = 40 # The number of burn-in cycles
 TRIALS_PER_CYCLE = 500 # number of plunger cycles in one burn in cycle
 
 STALL_THRESHOLD_MM = 0.1
@@ -274,6 +274,9 @@ async def _move_plunger_as_cycle_settings(api: OT3API,
             print(e)
             await _home_plunger(api, mount)
 
+# Test Plunger Threshold
+STOP_TEST_CURRENT_THRESHOLD = 0.45  # If current > 0.45A failed, stop test
+
 async def _test_plunger(
     api: OT3API,
     mount: types.OT3Mount,
@@ -315,6 +318,12 @@ async def _test_plunger(
                             f"failed moving {direction} at {current} amps and {speed} mm/sec"
                         )
                         max_failed_current = max(max_failed_current, current)
+                        # If current > 0.45A failed, stop test immediately
+                        if current > STOP_TEST_CURRENT_THRESHOLD:
+                            ui.print_error(
+                                f"FAILED at current > {STOP_TEST_CURRENT_THRESHOLD}A, stopping test immediately"
+                            )
+                            return max_failed_current
                         if continue_after_stall:
                             break
                         else:
@@ -413,10 +422,9 @@ async def _cycle_plunger(
                 ui.print_error(
                     f"-----failed at {trial} cycles and {failed_cycles} failed cycles"
                 )
-                if continue_after_stall:
-                    continue
-                else:
-                    return failed_cycles
+                # If a stall, stop test immediately
+                ui.print_error("STALL detected during cycling, stopping test immediately")
+                return failed_cycles
 
     return failed_cycles
 
