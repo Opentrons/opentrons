@@ -98,6 +98,16 @@ def _includes_result(current: float, speed: float) -> bool:
     return current >= MUST_PASS_CURRENT
 
 
+# summary section title
+SUMMARY_SECTION_TITLE = "SUMMARY_RESULTS"
+
+# summary results tags
+BURN_IN_TEST_RESULTS = "BURN_IN_TEST_RESULTS"
+TEST_PLUNGER_RESULTS = "TEST_PLUNGER_RESULTS"
+CYCLE_PLUNGER_RESULTS = "CYCLE_PLUNGER_RESULTS"
+TEST_PLUNGER_FAIL_REASON = "TEST_PLUNGER_FAIL_REASON"
+CYCLE_PLUNGER_REASON = "CYCLE_PLUNGER_REASON"
+
 def _build_csv_report(cycles: int, trials: int) -> CSVReport:
     section_list=[
         CSVSection(
@@ -124,6 +134,19 @@ def _build_csv_report(cycles: int, trials: int) -> CSVReport:
             lines=[
                 CSVLine(_get_cycling_test_tag(cycle), [int, CSVResult])
                 for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
+            ],
+        )
+    )
+    # Add summary section
+    section_list.append(
+        CSVSection(
+            title=SUMMARY_SECTION_TITLE,
+            lines=[
+                CSVLine(BURN_IN_TEST_RESULTS, [str]),
+                CSVLine(TEST_PLUNGER_RESULTS, [str]),
+                CSVLine(CYCLE_PLUNGER_RESULTS, [str]),
+                CSVLine(TEST_PLUNGER_FAIL_REASON, [str]),
+                CSVLine(CYCLE_PLUNGER_REASON, [str]),
             ],
         )
     )
@@ -284,10 +307,12 @@ async def _test_plunger(
     cycle: int,
     trials: int,
     continue_after_stall: bool,
-) -> float:
+) -> tuple:
     # start at HIGHEST (easiest) current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
+    # Collect fail reasons for current > 0.45A
+    fail_reasons = []
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
@@ -318,17 +343,18 @@ async def _test_plunger(
                             f"failed moving {direction} at {current} amps and {speed} mm/sec"
                         )
                         max_failed_current = max(max_failed_current, current)
-                        # If current > 0.45A failed, stop test immediately
-                        if current > STOP_TEST_CURRENT_THRESHOLD:
+                        # If current > 0.45A failed, record reason and stop test
+                        if current >= STOP_TEST_CURRENT_THRESHOLD:
+                            fail_reasons.append(f"current-{current}A&speed-{speed}")
                             ui.print_error(
                                 f"FAILED at current > {STOP_TEST_CURRENT_THRESHOLD}A, stopping test immediately"
                             )
-                            return max_failed_current
+                            return max_failed_current, "; ".join(fail_reasons)
                         if continue_after_stall:
                             break
                         else:
-                            return max_failed_current
-    return max_failed_current
+                            return max_failed_current, "; ".join(fail_reasons)
+    return max_failed_current, "; ".join(fail_reasons)
 
 
 async def _record_plunger_alignment_cycle(
@@ -392,10 +418,11 @@ async def _cycle_plunger(
     cycle: int,
     trials: int,
     continue_after_stall: bool,
-) -> float:
-    """Cycle the plunger at the set current and speed. Return number of failed cycles"""
+) -> tuple:
+    """Cycle the plunger at the set current and speed. Return number of failed cycles and stall reason"""
 
     failed_cycles = 0
+    stall_reasons = []
 
     for trial in range(trials):
         ui.print_header(
@@ -419,14 +446,15 @@ async def _cycle_plunger(
                     f"failed moving {direction} at {CYCLING_CURRENT} amps and {CYCLING_SPEED} mm/sec"
                 )
                 failed_cycles = failed_cycles + 1
+                stall_reasons.append(f"cycle{cycle}-{trial}")
                 ui.print_error(
                     f"-----failed at {trial} cycles and {failed_cycles} failed cycles"
                 )
                 # If a stall, stop test immediately
                 ui.print_error("STALL detected during cycling, stopping test immediately")
-                return failed_cycles
+                return failed_cycles, "; ".join(stall_reasons)
 
-    return failed_cycles
+    return failed_cycles, "; ".join(stall_reasons)
 
 
 async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
@@ -475,51 +503,90 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
     mount_list = await _get_next_pipette_mount(api)
 
     for mount in mount_list:
-        # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
-        #     continue
+            # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+            #     continue
 
-        report = _build_csv_report(cycles=cycles, trials=trials)
-        dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
-        helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+            report = _build_csv_report(cycles=cycles, trials=trials)
+            dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
-        for cycle in range(0, cycles * TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
-            await _test_plunger(
-                api, mount, report,
-                cycle=cycle, trials=trials,
-                continue_after_stall=continue_after_stall
-            )
+            # Track test results for summary
+            test_plunger_fail_reasons = []
+            cycle_plunger_stall_reasons = []
+            test_plunger_passed = True
+            cycle_plunger_passed = True
 
-            # this is the old fix, we can use it if the fw reset doesn't work
-            await _move_plunger_as_cycle_settings(api, mount)
-            # await _reset_pipette_fw(api, mount)
+            for cycle in range(0, cycles * TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
+                max_failed_current, fail_reason = await _test_plunger(
+                    api, mount, report,
+                    cycle=cycle, trials=trials,
+                    continue_after_stall=continue_after_stall
+                )
+                if fail_reason:
+                    test_plunger_fail_reasons.append(fail_reason)
+                    test_plunger_passed = False
 
-            failed_cycles = await _cycle_plunger(
-                api, mount,
-                cycle=cycle, trials=TRIALS_PER_CYCLE,
-                continue_after_stall=continue_after_stall
-            )
-            data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
+                # this is the old fix, we can use it if the fw reset doesn't work
+                await _move_plunger_as_cycle_settings(api, mount)
+                # await _reset_pipette_fw(api, mount)
+
+                failed_cycles, stall_reason = await _cycle_plunger(
+                    api, mount,
+                    cycle=cycle, trials=TRIALS_PER_CYCLE,
+                    continue_after_stall=continue_after_stall
+                )
+                if stall_reason:
+                    cycle_plunger_stall_reasons.append(stall_reason)
+                    cycle_plunger_passed = False
+                data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
+                report(
+                    _get_cycling_section_tag(),
+                    _get_cycling_test_tag(cycle),
+                    data,
+                )
+                # If test plunger failed at high current, break out of cycle loop
+                if not test_plunger_passed:
+                    break
+                # If cycle plunger had stall, break out of cycle loop
+                if not cycle_plunger_passed:
+                    break
+            # Only run final test_plunger if previous tests passed
+            if test_plunger_passed and cycle_plunger_passed:
+                max_failed_current, fail_reason = await _test_plunger(
+                    api, mount, report,
+                    cycle=cycles * TRIALS_PER_CYCLE, trials=trials,
+                    continue_after_stall=continue_after_stall
+                )
+                if fail_reason:
+                    test_plunger_fail_reasons.append(fail_reason)
+                    test_plunger_passed = False
+            data = [0, CSVResult.from_Numbool(0)]
             report(
                 _get_cycling_section_tag(),
-                _get_cycling_test_tag(cycle),
+                _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
                 data,
             )
-        await _test_plunger(
-            api, mount, report,
-            cycle=cycles * TRIALS_PER_CYCLE, trials=trials,
-            continue_after_stall=continue_after_stall
-        )
-        data = [0, CSVResult.from_Numbool(0)]
-        report(
-            _get_cycling_section_tag(),
-            _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
-            data,
-        )
-        ui.print_title("DONE")
-        report.save_to_disk()
-        report.print_results()
-        if api.is_simulator:
-            break
+
+            # Calculate summary results
+            burn_in_passed = test_plunger_passed and cycle_plunger_passed
+            test_plunger_result = "PASS" if test_plunger_passed else "FAIL"
+            cycle_plunger_result = "PASS" if cycle_plunger_passed else "FAIL"
+            burn_in_result = "PASS" if burn_in_passed else "FAIL"
+            test_plunger_fail_str = "; ".join(test_plunger_fail_reasons) if test_plunger_fail_reasons else "N/A"
+            cycle_plunger_stall_str = "; ".join(cycle_plunger_stall_reasons) if cycle_plunger_stall_reasons else "N/A"
+
+            # Write summary results to CSV
+            report(SUMMARY_SECTION_TITLE, BURN_IN_TEST_RESULTS, [burn_in_result])
+            report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_RESULTS, [test_plunger_result])
+            report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_RESULTS, [cycle_plunger_result])
+            report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_FAIL_REASON, [test_plunger_fail_str])
+            report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, [cycle_plunger_stall_str])
+
+            ui.print_title("DONE")
+            report.save_to_disk()
+            report.print_results()
+            if api.is_simulator:
+                break
 
 
 if __name__ == "__main__":
