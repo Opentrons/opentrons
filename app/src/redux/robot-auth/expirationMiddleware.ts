@@ -4,9 +4,9 @@ import { getNextExpiration, logOutOrTimeOut } from './slice'
 
 import type { Dispatch, State } from '../types'
 
-export const timeoutMiddleware = createListenerMiddleware()
+export const expirationMiddleware = createListenerMiddleware()
 
-timeoutMiddleware.startListening.withTypes<State, Dispatch>()({
+expirationMiddleware.startListening.withTypes<State, Dispatch>()({
   predicate: (_action, currentState, originalState) => {
     // Run whenever there's a change to the next scheduled expiration.
     // We're relying on having good memoization here.
