@@ -4,9 +4,13 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   build: {
     lib: {
-      entry: 'js/index.ts',
+      entry: {
+        index: 'js/index.ts',
+        labware: 'js/labware.ts',
+      },
       formats: ['es', 'cjs'],
-      fileName: format => (format === 'es' ? 'index.mjs' : 'index.cjs'),
+      fileName: (format, entryName) =>
+        format === 'es' ? `${entryName}.mjs` : `${entryName}.cjs`,
     },
     outDir: 'lib',
     // do not delete the outdir, typescript types might live there and we dont want to delete them

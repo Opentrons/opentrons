@@ -17,6 +17,11 @@
       "types": "./lib/js/index.d.ts",
       "import": "./lib/index.mjs",
       "require": "./lib/index.cjs"
+    },
+    "./labware": {
+      "types": "./lib/js/labware.d.ts",
+      "import": "./lib/labware.mjs",
+      "require": "./lib/labware.cjs"
     }
   },
   "files": [
