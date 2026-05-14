@@ -118,7 +118,7 @@ async def create_run_action(
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    _maybe_audit_run_action_play_user_notes: Annotated[
+    _maybe_audit_action_user_notes: Annotated[
         None,
         Depends(maybe_log_user_action_notes_when_setting_requires),
     ],
@@ -138,7 +138,7 @@ async def create_run_action(
         maintenance_run_orchestrator_store: Maintenance run orchestrator store.
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        _maybe_audit_run_action_play_user_notes: When auth-server requires reasons for
+        _maybe_audit_action_user_notes: When auth-server requires reasons for
             interaction, logs actions that include ``userNotes``.
     """
     body = request_body.data

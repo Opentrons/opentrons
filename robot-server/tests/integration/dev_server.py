@@ -75,7 +75,9 @@ class DevServer:
                 self.maximum_quick_transfer_protocols
             )
         if self._integration_require_reason_for_interaction_override is not None:
-            env["OT_ROBOT_SERVER_integration_require_reason_for_interaction_override"] = (
+            env[
+                "OT_ROBOT_SERVER_integration_require_reason_for_interaction_override"
+            ] = (
                 "true"
                 if self._integration_require_reason_for_interaction_override
                 else "false"
