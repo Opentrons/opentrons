@@ -80,7 +80,7 @@ describe('vacuumFormToArgs', () => {
       powerPercent: null,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPressure',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -97,7 +97,7 @@ describe('vacuumFormToArgs', () => {
       powerPercent: 75,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPower',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -115,7 +115,7 @@ describe('vacuumFormToArgs', () => {
       endingHoldVentCheckbox: true,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPressure',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -135,7 +135,7 @@ describe('vacuumFormToArgs', () => {
       endingHoldVentCheckbox: false,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPower',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -152,7 +152,7 @@ describe('vacuumFormToArgs', () => {
       pumpDurationTime: null,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPressure',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -230,7 +230,7 @@ describe('vacuumFormToArgs', () => {
       },
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumStartRunProfile',
+      commandCreatorFnName: 'vacuumCloseVentStartProfile',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
