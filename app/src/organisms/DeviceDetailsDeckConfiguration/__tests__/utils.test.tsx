@@ -50,6 +50,7 @@ describe('getModuleOptions', () => {
   ] as AttachedModule[]
   it('should get mag block and heater shaker to place on AA A3', () => {
     const result = getModuleOptions('cutoutA3', attachedModules, 'A3', deckDef)
+    expect(false).toBeTruthy()
     expect(result).toEqual([
       [
         {
