@@ -7,9 +7,9 @@
 .content_container {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-16) var(--spacing-60) var(--spacing-120)
+  margin-top: 7.5rem;
+  padding: var(--spacing-60) var(--spacing-60) var(--spacing-120)
     var(--spacing-60);
-  margin-top: 7.75rem;
   gap: var(--spacing-24);
 }
 
@@ -20,10 +20,6 @@
   align-items: center;
   margin: 0 auto;
   gap: var(--spacing-6);
-}
-
-#username, #password{
-  height: 68px;
 }
 
 .field_area {
@@ -39,17 +35,41 @@
   color: var(--red-50);
 }
 
+.password_step {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.password_step_label {
+  display: block;
+  align-self: flex-start;
+  padding-bottom: var(--spacing-4);
+  color: var(--grey-60);
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-28);
+}
+
+.password_step_label_error {
+  color: #9e5e00;
+}
+
 .password_field_row {
   display: flex;
   width: 100%;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   gap: var(--spacing-12);
+  margin-top: 5px;
 }
 
 .password_field_input {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
 .keyboard_container {

@@ -11,8 +11,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './OnDeviceLogin.module.css'
 
-import type { ChangeEvent } from 'react'
 import type { TFunction } from 'i18next'
+import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
@@ -171,31 +171,29 @@ function LoginFieldInput({
   loginError,
   onClearLoginError,
   onFocus,
-  t
+  t,
 }: LoginFieldInputProps): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = step === 'password' && !showPassword
-  const inputType: 'text' | 'password' = isPasswordHidden
-    ? 'password'
-    : 'text'
+  const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
   const togglePasswordVisibility = (): void => {
     setShowPassword(current => !current)
     inputRef.current?.focus()
   }
 
+  const label =
+    step === 'username'
+      ? t('device_settings:username')
+      : t('device_settings:password')
+
   const inputField = (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={step === 'password'}
       type={inputType}
-      size="medium"
-      label={
-        step === 'username'
-          ? t('device_settings:username')
-          : t('device_settings:password')
-      }
+      label={label}
       error={loginError}
       value={field.value ?? ''}
       name={field.name}
