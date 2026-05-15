@@ -6,20 +6,20 @@
 
 .content_container {
   display: flex;
-  flex: 1;
-  flex-direction: column;
-  margin-top: 7.75rem;
   width: 100%;
   max-width: 59rem;
+  flex: 1;
+  flex-direction: column;
   padding: 0 var(--spacing-60) var(--spacing-120);
+  margin-top: 7.75rem;
   gap: var(--spacing-24);
 }
 
 .text_area_container {
   display: flex;
+  min-width: 0;
   flex: 1;
   flex-direction: column;
-  min-width: 0;
   gap: var(--spacing-8);
 }
 
