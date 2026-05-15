@@ -143,10 +143,40 @@ describe('expirationMiddleware', () => {
     expect(getUnexpiredRobots(store.getState())).toStrictEqual(['robot-a'])
   })
 
-  it('immediately removes robots added in the past', () => {
+  it('immediately removes robots that expire in the past', async () => {
+    const store = configureStore({
+      reducer: rootReducer,
+      middleware: getDefaultMiddleware => {
+        return getDefaultMiddleware().prepend(expirationMiddleware.middleware)
+      },
+    })
 
-  }
-  // it immediately removes robots added in the past
+    store.dispatch(
+      logInOrRefresh({
+        robotName: 'robot-a',
+        username: 'username',
+        accessToken: 'accessToken',
+        refreshToken: 'refreshToken',
+        expiresAt: T0 - 1,
+      })
+    )
+    store.dispatch(
+      logInOrRefresh({
+        robotName: 'robot-b',
+        username: 'username',
+        accessToken: 'accessToken',
+        refreshToken: 'refreshToken',
+        expiresAt: T0 + 1000,
+      })
+    )
+
+    expect(getUnexpiredRobots(store.getState())).toStrictEqual([
+      'robot-a',
+      'robot-b',
+    ])
+    await vi.advanceTimersByTimeAsync(0)
+    expect(getUnexpiredRobots(store.getState())).toStrictEqual(['robot-b'])
+  })
 })
 
 function getUnexpiredRobots(state: State): string[] {
