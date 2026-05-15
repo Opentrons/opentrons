@@ -37,7 +37,7 @@ The action automatically routes notifications to different Slack channels based 
 ### Main Releases → `#release-cycle`
 
 - `v*` - Robot stack releases (for example `v26.04`, `v26.04@alpha.0`)
-- `internal@*` - Internal channel releases (for example `internal@26.04.23` or `internal@26.05.04.1`)
+- `internal@*` - Internal channel releases (for example `internal@26.4.23` or `internal@26.5.4-0`; month/day are not zero-padded)
 
 ### Component Releases → `#builds`
 

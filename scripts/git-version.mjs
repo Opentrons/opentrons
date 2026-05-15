@@ -26,10 +26,22 @@ import { fileURLToPath } from 'url'
 import git from 'simple-git'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
-const OT3_CALENDAR_TAG_RE = /^internal@\d{2}\.[1-9]\d?\.[1-9]\d?(?:\.(\d+))?$/
+// internal@YY.M.D, internal@YY.M.D.N (legacy dot), or internal@YY.M.D-N (same-day bump; canonical).
+// M and D are unpadded decimal (1–9, 10–12, 1–31 as applicable), e.g. April 23 → internal@26.4.23 — not 26.04.23.
+const OT3_CALENDAR_TAG_RE =
+  /^internal@(\d{2}\.[1-9]\d?\.[1-9]\d?)(?:(?:\.|-)(\d+))?$/
 
 export function monorepoGit() {
   return git({ baseDir: REPO_BASE })
+}
+
+function ot3CalendarVersionFromTag(tag) {
+  const m = OT3_CALENDAR_TAG_RE.exec(tag)
+  if (m == null) {
+    return null
+  }
+  const [, base, bump] = m
+  return bump != null ? `${base}-${bump}` : base
 }
 
 export const detailsFromTag = tag => {
@@ -37,6 +49,10 @@ export const detailsFromTag = tag => {
     return ['robot-stack', tag.slice(1)]
   }
   if (tag.startsWith('internal@')) {
+    const cal = ot3CalendarVersionFromTag(tag)
+    if (cal != null) {
+      return ['ot3', cal]
+    }
     return ['ot3', tag.slice('internal@'.length)]
   }
   if (tag.startsWith('ot3@')) {
@@ -51,6 +67,16 @@ export const detailsFromTag = tag => {
 
 export function tagFromDetails(project, version) {
   const prefix = prefixForProject(project)
+  if (project === 'ot3') {
+    const hyphenBump = /^(\d{2}\.[1-9]\d?\.[1-9]\d?)-(\d+)$/.exec(version)
+    if (hyphenBump != null) {
+      return `${prefix}${hyphenBump[1]}-${hyphenBump[2]}`
+    }
+    const dotBump = /^(\d{2}\.[1-9]\d?\.[1-9]\d?)\.(\d+)$/.exec(version)
+    if (dotBump != null) {
+      return `${prefix}${dotBump[1]}-${dotBump[2]}`
+    }
+  }
   return `${prefix}${version}`
 }
 

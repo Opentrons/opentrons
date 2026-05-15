@@ -21,14 +21,14 @@ Behavior:
     - opentrons: edge
 - Determines the alpha version from the buildroot repo's last tag for this version.
 - Uses that alpha version + 1 for buildroot and oe-core.
-- Tags opentrons with internal@yy.m.d (UTC), or internal@yy.m.d.N for extra same-day builds.
+- Tags opentrons with internal@yy.m.d (UTC), or internal@yy.m.d-N for extra same-day builds.
 
 Tag logic:
 - ot3-firmware: internal@v23 → internal@v24 (always increments, ignores version arg)
 - If buildroot last tag is internal@2.8.0-alpha.5, buildroot and oe-core get alpha.6:
   - buildroot:  internal@2.8.0-alpha.6
   - oe-core:    internal@2.8.0-alpha.6
-  - opentrons:  internal@26.4.23 or internal@26.4.23.1 (calendar; see allocate_next_opentrons_internal_tag)
+  - opentrons:  internal@26.4.23 or internal@26.4.23-0 (calendar; see allocate_next_opentrons_internal_tag; legacy internal@26.4.23.1 still recognized)
 """
 
 import argparse
@@ -44,10 +44,32 @@ from typing import Optional, List, Tuple
 # Root directory where clean clones will live
 CLEAN_ROOT = Path("./clean-repos")
 
-# Calendar internal tags on opentrons (excludes internal@v*, internal@*.*.*-alpha*, etc.)
+# Calendar internal tags on opentrons: internal@YY.M.D (M/D unpadded) with optional .N or -N bump.
 OPENTRONS_CALENDAR_TAG_RE = re.compile(
-    r'^internal@\d{2}\.[1-9]\d?\.[1-9]\d?(?:\.(\d+))?$'
+    r'^internal@(\d{2}\.[1-9]\d?\.[1-9]\d?)(?:(?:\.|-)(\d+))?$'
 )
+
+
+def _calendar_tag_exists(repo_path: Path, tag: str) -> bool:
+    result = subprocess.run(
+        ["git", "-C", str(repo_path), "rev-parse", tag],
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def _calendar_slot_taken_local(repo_path: Path, root: str, bump: Optional[int]) -> bool:
+    if bump is None:
+        return _calendar_tag_exists(repo_path, root)
+    return _calendar_tag_exists(repo_path, f"{root}-{bump}") or _calendar_tag_exists(
+        repo_path, f"{root}.{bump}"
+    )
+
+
+def _calendar_slot_taken_remote(tags: set[str], root: str, bump: Optional[int]) -> bool:
+    if bump is None:
+        return root in tags
+    return f"{root}-{bump}" in tags or f"{root}.{bump}" in tags
 
 # Configuration: repo info, tag patterns, clone URLs, and branches
 REPOS = [
@@ -314,35 +336,27 @@ def _utc_date_parts() -> Tuple[int, int, int]:
 
 
 def allocate_next_opentrons_internal_tag(repo_path: Path) -> str:
-    """Pick internal@yy.m.d or internal@yy.m.d.N (UTC) not already present in this clone."""
+    """Pick internal@yy.m.d or internal@yy.m.d-N (UTC) not already present in this clone."""
     yy, mm, dd = _utc_date_parts()
     root = f"internal@{yy:02d}.{mm}.{dd}"
     n = 0
     while True:
-        candidate = root if n == 0 else f"{root}.{n}"
-        check = subprocess.run(
-            ["git", "-C", str(repo_path), "rev-parse", candidate],
-            capture_output=True,
-        )
-        if check.returncode != 0:
-            return candidate
+        bump = None if n == 0 else n - 1
+        if not _calendar_slot_taken_local(repo_path, root, bump):
+            return root if bump is None else f"{root}-{bump}"
         n += 1
 
 
 def allocate_next_opentrons_internal_tag_remote(clone_url: str) -> str:
-    """Pick next internal@yy.m.d[.N] from remote tag names (UTC)."""
-    tags = {
-        t
-        for t in get_remote_tags(clone_url, "internal@*")
-        if OPENTRONS_CALENDAR_TAG_RE.match(t)
-    }
+    """Pick next internal@yy.m.d[-N] from remote tag names (UTC)."""
+    tags = set(get_remote_tags(clone_url, "internal@*"))
     yy, mm, dd = _utc_date_parts()
     root = f"internal@{yy:02d}.{mm}.{dd}"
     n = 0
     while True:
-        candidate = root if n == 0 else f"{root}.{n}"
-        if candidate not in tags:
-            return candidate
+        bump = None if n == 0 else n - 1
+        if not _calendar_slot_taken_remote(tags, root, bump):
+            return root if bump is None else f"{root}-{bump}"
         n += 1
 
 

@@ -163,10 +163,10 @@ ${projectPrefix}${projectVersion}
 
 - the tag for April 2026 alpha build 3 of the robot stack is `v26.04@alpha.3`
 - the tag for April 2026 production of the robot stack is `v26.04`
-- the tag for an internal (Flex / internal channel) build on 23 April 2026 is `internal@26.04.23` (UTC `yy.mm.dd`; same-day extra builds use `internal@26.04.23.1`, `internal@26.04.23.2`, …). Older tags may still use a `-dev` / `-prod` / `-stage` suffix; new tags omit that.
+- the tag for an internal (Flex / internal channel) build on 23 April 2026 is `internal@26.4.23` (UTC calendar: two-digit year, **unpadded** month and day, e.g. April → `4` not `04`; same-day extras use `internal@26.4.23-0`, `internal@26.4.23-1`, … — legacy `internal@26.4.23.1` is still accepted). Older tags may still use a `-dev` / `-prod` / `-stage` suffix; new tags omit that.
 - the tag for 4.0.0 of protocol designer is `protocol-designer@4.0.0`
 
-Robot stack calendar tags use `YY.MM` with optional `@alpha.N` for QA candidates. Internal monorepo tags for the internal app channel use `internal@yy.mm.dd` (GitHub and tooling match `internal@*`). Protocol Designer and Labware Library still use semver in their own tag namespaces. QA is done on alpha builds, and only alpha tags should be pushed until you're ready to release the project.
+Robot stack calendar tags use `YY.MM` with optional `@alpha.N` for QA candidates. Internal monorepo tags for the internal app channel use `internal@yy.m.d` (two-digit year, unpadded month and day; GitHub and tooling match `internal@*`). Protocol Designer and Labware Library still use semver in their own tag namespaces. QA is done on alpha builds, and only alpha tags should be pushed until you're ready to release the project.
 
 ## Releasing Web Projects
 

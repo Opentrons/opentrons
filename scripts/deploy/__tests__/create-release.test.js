@@ -111,9 +111,15 @@ describe('internal calendar version strings (tag suffix after internal@)', () =>
     expect(compareVersions('26.4.23.1', '26.4.23')).toBeLessThan(0)
     expect(compareVersions('26.4.22', '26.4.23')).toBeLessThan(0)
   })
+  it('sorts hyphen same-day bumps like dot bumps', () => {
+    expect(compareVersions('26.4.23-0', '26.4.23')).toBeLessThan(0)
+    expect(compareVersions('26.4.23-0', '26.4.23-1')).toBeLessThan(0)
+    expect(compareVersions('26.4.23.1', '26.4.23-1')).toBe(0)
+  })
   it('treats calendar internal builds as alpha for changelog window', () => {
     expect(releaseKind('26.4.23')).toBe('alpha')
     expect(releaseKind('26.4.23.2')).toBe('alpha')
+    expect(releaseKind('26.4.23-0')).toBe('alpha')
   })
   it('versionPrevious for internal alpha picks newest older than current', () => {
     const prev = ['26.4.24.1', '26.4.24', '26.4.23.2', '26.4.22']

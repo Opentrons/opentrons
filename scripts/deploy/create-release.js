@@ -37,8 +37,10 @@ const REPO_DETAILS = {
   repo: 'opentrons-ot2',
 }
 
-// internal@YY.M.D[.N]
-const OT3_CALENDAR_TAG_RE = /^internal@\d{2}\.[1-9]\d?\.[1-9]\d?(?:\.(\d+))?$/
+// internal@YY.M.D, internal@YY.M.D.N (legacy dot), or internal@YY.M.D-N — keep in sync with scripts/git-version.mjs.
+// M and D are unpadded (e.g. internal@26.4.23); zero-padded months like 26.04.23 do not match.
+const OT3_CALENDAR_TAG_RE =
+  /^internal@(\d{2}\.[1-9]\d?\.[1-9]\d?)(?:(?:\.|-)(\d+))?$/
 
 // The release kind is normally just the semver preproduction stage, but we need to account
 // for PD using candidate-a, candidate-b etc - semver preproduction stage is separated from
@@ -50,7 +52,7 @@ const releaseKind = version => {
   }
   if (
     typeof version === 'string' &&
-    /^\d{2}\.[1-9]\d?\.[1-9]\d?(\.\d+)?$/.test(version)
+    /^\d{2}\.[1-9]\d?\.[1-9]\d?(?:[.-]\d+)?$/.test(version)
   ) {
     return 'alpha'
   }
@@ -69,7 +71,7 @@ function toComparableSemver(version) {
   if (cal) {
     return `${parseInt(cal[1], 10)}.${parseInt(cal[2], 10)}.0`
   }
-  const calYyMmDd = /^(\d{2})\.([1-9]\d?)\.([1-9]\d?)(?:\.(\d+))?$/.exec(
+  const calYyMmDd = /^(\d{2})\.([1-9]\d?)\.([1-9]\d?)(?:[.-](\d+))?$/.exec(
     version
   )
   if (calYyMmDd) {
@@ -240,7 +242,7 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
   const isPre =
     !!semver.prerelease(semverKey(version)) ||
     /@alpha\./.test(version) ||
-    /^\d{2}\.[1-9]\d?\.[1-9]\d?(\.\d+)?$/.test(version)
+    /^\d{2}\.[1-9]\d?\.[1-9]\d?(?:[.-]\d+)?$/.test(version)
   if (deploy) {
     const octokit = new Octokit({
       auth: token,

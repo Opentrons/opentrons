@@ -76,6 +76,8 @@ class TestInternalReleaseHelpers(unittest.TestCase):
         for t in (
             "internal@26.4.23",
             "internal@26.4.23.1",
+            "internal@26.4.23-0",
+            "internal@26.4.23-1",
             "internal@26.11.9",
         ):
             with self.subTest(tag=t):
@@ -122,6 +124,12 @@ class TestPythonBuildUtilsOt3(unittest.TestCase):
         self.assertEqual(
             python_build_utils._pep440_from_git_version("ot3", "26.4.23.2"),
             "26.4.23.dev2",
+        )
+
+    def test_pep440_from_git_hyphen_same_day(self):
+        self.assertEqual(
+            python_build_utils._pep440_from_git_version("ot3", "26.4.23-0"),
+            "26.4.23.dev0",
         )
 
     def test_pep440_from_git_legacy_channel_rejected(self):

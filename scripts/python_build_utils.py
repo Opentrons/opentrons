@@ -33,7 +33,7 @@ package_entries = {
 }
 
 project_entries = {
-    # Internal Flex/monorepo builds: internal@yy.m.d[.N]
+    # Internal Flex/monorepo builds: internal@yy.m.d[-N] (legacy internal@yy.m.d.N still recognized)
     "ot3": ProjectEntry("internal@"),
     "robot-stack": ProjectEntry("v"),
     "docs": ProjectEntry("docs@"),
@@ -48,9 +48,9 @@ def _pep440_from_git_version(project, raw):
             return f"{m.group(1)}a{m.group(2)}"
         return raw
     if project == "ot3":
-        m_new = re.match(r"^(\d{2})\.([1-9]\d?)\.([1-9]\d?)(\.(\d+))?$", raw)
+        m_new = re.match(r"^(\d{2})\.([1-9]\d?)\.([1-9]\d?)(?:[.-](\d+))?$", raw)
         if m_new:
-            yy, mo, dd, _, c = m_new.groups()
+            yy, mo, dd, c = m_new.groups()
             base = f"{int(yy)}.{int(mo)}.{int(dd)}"
             return f"{base}.dev{c}" if c else base
         return raw
@@ -119,8 +119,19 @@ def _latest_tag_for_prefix(prefix, git_dir):
     return tags_matching[-1].decode("utf-8")
 
 
-# Opentrons calendar internal tags: internal@YY.M.D with optional .N same-day bump.
-_OT3_CAL_TAG = re.compile(r"^internal@\d{2}\.[1-9]\d?\.[1-9]\d?(?:\.(\d+))?$")
+# Opentrons calendar internal tags: internal@YY.M.D (M/D unpadded, e.g. 26.4.23) with optional .N or -N bump.
+_OT3_CAL_TAG = re.compile(
+    r"^internal@(\d{2}\.[1-9]\d?\.[1-9]\d?)(?:(?:\.|-)(\d+))?$"
+)
+
+
+def _ot3_calendar_version_from_tag(tag: str) -> str:
+    """Version tail after internal@; hyphen suffix when a bump is present (legacy .N → -N)."""
+    m = _OT3_CAL_TAG.match(tag)
+    if not m:
+        return tag.split("internal@", 1)[1]
+    base, bump = m.group(1), m.group(2)
+    return f"{base}-{bump}" if bump is not None else base
 
 
 def _latest_ot3_internal_release_tag(git_dir):
@@ -145,7 +156,7 @@ def _latest_ot3_internal_release_tag(git_dir):
     lines = [ln for ln in tags_result.strip().split(b"\n") if ln]
     for raw in lines:
         t = raw.decode("utf-8")
-        if _OT3_CAL_TAG.match(t):
+        if _OT3_CAL_TAG.match(t) is not None:
             return t
     sys.stderr.write(
         "Could not find tag in {check_dir} matching calendar internal@YY.M.D* ".format(
@@ -160,9 +171,9 @@ def _latest_version_for_project(project, git_dir):
     prefix = project_entries[project].tag_prefix
     if project == "ot3":
         tag = _latest_ot3_internal_release_tag(git_dir)
-    else:
-        tag = _latest_tag_for_prefix(prefix, git_dir)
-    return prefix.join(tag.split(prefix, 1)[1:])
+        return _ot3_calendar_version_from_tag(tag)
+    tag = _latest_tag_for_prefix(prefix, git_dir)
+    return tag.split(prefix, 1)[1]
 
 
 def _ref_from_sha(sha):

@@ -8,12 +8,18 @@ on:
     paths:
       - 'scripts/app-release/**'
       - 'scripts/python_build_utils.py'
+      - 'scripts/git-version.mjs'
+      - 'scripts/deploy/create-release.js'
+      - 'scripts/deploy/__tests__/create-release.test.js'
       - 'scripts/test_release_tag_mapping.py'
       - '.github/workflows/scripts-release-tag-tests.yaml'
   push:
     paths:
       - 'scripts/app-release/**'
       - 'scripts/python_build_utils.py'
+      - 'scripts/git-version.mjs'
+      - 'scripts/deploy/create-release.js'
+      - 'scripts/deploy/__tests__/create-release.test.js'
       - 'scripts/test_release_tag_mapping.py'
       - '.github/workflows/scripts-release-tag-tests.yaml'
     branches:
