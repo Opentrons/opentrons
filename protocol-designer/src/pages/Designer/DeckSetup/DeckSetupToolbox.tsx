@@ -41,6 +41,7 @@ import {
   LabwareCard,
   SelectLabwareModal,
 } from '../../../components/organisms'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import {
   createContainer,
@@ -87,6 +88,7 @@ export function DeckSetupToolbox(
   const { slot } = selectedSlot
   const [showSelectLabwareModal, setShowSelectLabwareModal] =
     useState<boolean>(false)
+  const { makeSnackbar } = useKitchen()
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
   const {
     createdAdapterForSlot,
@@ -142,10 +144,9 @@ export function DeckSetupToolbox(
     getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware)
 
   const slotFull =
-    (((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
+    ((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
       (createdStackForSlot.length > 0 && deckSetup.labware[slot] != null)) &&
-      !isVacuumModule) ||
-    isVacuumModuleFull
+    !isVacuumModule
 
   const hasNoLabware =
     (createdAdapterForSlot == null && createdStackForSlot.length === 0) ||
@@ -197,13 +198,12 @@ export function DeckSetupToolbox(
       (createdAdapterForSlot != null || createdStackForSlot.length > 0)
 
     //  handle clear for if you are changing the adapter/labware combo
-    // For vacuum modules, only clear if it's full (replace behavior)
-    // Otherwise, use additive behavior
-    if (!isOffDeck && (!isVacuumModule || isVacuumModuleFull)) {
+    // For vacuum modules, use additive behavior (never clear)
+    if (!isOffDeck && !isVacuumModule) {
       handleClear()
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
-    if (hasModule && (!vacuumModuleHasLabware || isVacuumModuleFull)) {
+    if (hasModule && !vacuumModuleHasLabware) {
       let flexStackerInfo: CreateContainerAboveModuleArgs['stackerInfo']
       if (isModuleStacker) {
         flexStackerInfo = isOnShuttle
@@ -228,8 +228,8 @@ export function DeckSetupToolbox(
           stackerInfo: flexStackerInfo,
         })
       )
-    } else if (vacuumModuleHasLabware && !isVacuumModuleFull) {
-      // For vacuum module with existing labware (not full), add new labware on top
+    } else if (vacuumModuleHasLabware) {
+      // For vacuum module with existing labware, add new labware on top
       const topLabwareId =
         createdStackForSlot.length > 0
           ? createdStackForSlot[0] // Get the top item (first in array)
@@ -368,14 +368,17 @@ export function DeckSetupToolbox(
               <EmptySelectorButton
                 textAlignment="left"
                 text={
-                  hasNoLabware ||
-                  (hasVacuumModuleCreated && !isVacuumModuleFull)
+                  hasNoLabware || hasVacuumModuleCreated
                     ? t('add_labware')
                     : t('replace_labware')
                 }
                 iconName="plus"
                 onClick={() => {
-                  setShowSelectLabwareModal(true)
+                  if (hasVacuumModuleCreated && isVacuumModuleFull) {
+                    makeSnackbar(t('labware_limit_reached') as string)
+                  } else {
+                    setShowSelectLabwareModal(true)
+                  }
                 }}
               />
             </Flex>

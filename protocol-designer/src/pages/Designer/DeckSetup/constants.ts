@@ -141,6 +141,8 @@ export const RECOMMENDED_LABWARE_BY_MODULE: {
   [VACUUM_MODULE_TYPE]: [
     'opentrons_vacuum_module_spacer_thingamajig',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'opentrons_vacuum_module_gen1_collar_tall',
+    'opentrons_vacuum_module_gen1_collar_short',
   ],
   VACUUM_MODULE_TYPE_WITH_LABWARE: [
     'opentrons_96_wellplate_200ul_pcr_full_skirt',

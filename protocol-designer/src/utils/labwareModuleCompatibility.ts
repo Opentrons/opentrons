@@ -89,6 +89,8 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   [VACUUM_MODULE_TYPE]: [
     'opentrons_vacuum_module_spacer_thingamajig',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'opentrons_vacuum_module_gen1_collar_tall',
+    'opentrons_vacuum_module_gen1_collar_short',
   ],
   VACUUM_MODULE_TYPE_WITH_LABWARE: [
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
