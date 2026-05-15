@@ -7,9 +7,9 @@
 .content_container {
   display: flex;
   flex-direction: column;
-  margin-top: 7.5rem;
   padding: var(--spacing-60) var(--spacing-60) var(--spacing-120)
     var(--spacing-60);
+  margin-top: 7.5rem;
   gap: var(--spacing-24);
 }
 
