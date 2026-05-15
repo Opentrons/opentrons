@@ -310,7 +310,7 @@ def _build_classdict(  # noqa: C901
                 if isinstance(
                     inspect.getattr_static(core_obj.__class__, name), staticmethod
                 ):
-                    bound_method = exposed
+                    bound_method = exposed  # type: ignore
                 else:
                     bound_method = MethodType(exposed, core_obj)
                 yield (name, parameter_validation_wrapper(bound_method))
@@ -321,7 +321,7 @@ def _build_classdict(  # noqa: C901
                 if isinstance(
                     inspect.getattr_static(core_obj.__class__, name), staticmethod
                 ):
-                    bound_method = exposed
+                    bound_method = exposed  # type: ignore
                 else:
                     bound_method = MethodType(exposed, core_obj)
                 yield (
@@ -661,7 +661,7 @@ def convert_result_to_dict_of_proxies(  # noqa: C901
                             utility.add_PSO(pyro_synchronous_obj)
                         proxy_dict[key] = utility.proxy_for(pyro_synchronous_obj)
                     else:
-                        proxy_dict[key] = None
+                        proxy_dict[key] = None  # type: ignore
 
                 # Format Proxy Dictionary into a safe-for-transport NonBuiltinKeyDictWrapper
                 if hasattr(return_types, "__args__"):
