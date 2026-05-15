@@ -29,7 +29,7 @@ export const AllSpacing: StoryObj<StoryArgs> = {
   args: {
     spacings: Object.entries(SPACING) as SpacingEntry[],
   },
-  render: args => {
+  render: (args: StoryArgs) => {
     const targetSpacings = args.spacings.filter(isValidSpacingEntry)
     // sort by rem value
     const sortedSpacing = targetSpacings.sort((a, b): number => {
