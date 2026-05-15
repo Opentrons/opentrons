@@ -10,6 +10,11 @@
   "license": "Apache-2.0",
   "source": "js/index.ts",
   "types": "lib/js/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "labware": ["./lib/js/labware.d.ts"]
+    }
+  },
   "main": "lib/index.cjs",
   "module": "lib/index.mjs",
   "exports": {
