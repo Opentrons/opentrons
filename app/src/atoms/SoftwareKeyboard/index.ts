@@ -6,3 +6,4 @@ export { StatelessNumericalKeyboard } from './NumericalKeyboard/StatelessNumeric
 export { applyNumericalKeyboardKey } from './utils/applyNumericalKeyboardKey'
 export { isValidNumericalInput } from './utils/isValidNumericalInput'
 export type { NumericalKeyboardKey } from './types'
+export { useExternalKeyboardGuard } from './hooks/useExternalKeyboardGuard'
