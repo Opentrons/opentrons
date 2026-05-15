@@ -55,7 +55,7 @@ jobs:
   js-unit-test-shards:
     # unit tests for the app's view layer (not the node layer)
     runs-on: 'ubuntu-22.04'
-    name: 'opentrons app frontend unit tests'
+    name: 'app frontend unit tests'
     # these tests take > 30 minutes with a single runner, so split into multiple shards
     # https://vitest.dev/guide/improving-performance.html#sharding
     strategy:
@@ -90,7 +90,7 @@ jobs:
   js-unit-test:
     needs: [js-unit-test-shards]
     runs-on: 'ubuntu-22.04'
-    name: 'opentrons app frontend unit test merge shard results'
+    name: 'app frontend unit test merge shard results'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
@@ -118,7 +118,7 @@ jobs:
         exclude:
           - os: 'windows-2022'
             shell: 'app-shell-odd'
-    name: 'opentrons ${{matrix.shell}} unit tests on ${{matrix.os}}'
+    name: '${{matrix.shell}} unit tests on ${{matrix.os}}'
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
