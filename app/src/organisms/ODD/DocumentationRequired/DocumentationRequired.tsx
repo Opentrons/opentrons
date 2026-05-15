@@ -21,6 +21,8 @@ export function DocumentationRequired({
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>('')
+  const [keyboardOpen, setKeyboardOpen] = useState(true)
+  const [textAreaHeight, setTextAreaHeight] = useState<string>('13.5625rem')
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -28,6 +30,11 @@ export function DocumentationRequired({
   const handleConfirm = (): void => {
     if (trimmedNote === '') return
     onConfirm(trimmedNote)
+  }
+
+  const handleKeyboardToggle = (): void => {
+    setKeyboardOpen(open => !open)
+    setTextAreaHeight(h => (h === '396px' ? '13.5625rem' : '396px'))
   }
 
   return (
@@ -51,6 +58,7 @@ export function DocumentationRequired({
           <div className={styles.text_area_container}>
             <TouchTextAreaField
               autoFocus
+              height={textAreaHeight}
               value={inputText}
               ref={textAreaRef}
               label={t('access_control_note', { user: username })}
@@ -65,7 +73,10 @@ export function DocumentationRequired({
         </div>
       </div>
       <div className={styles.keyboard_container}>
-        <AccordionKeyboard isOpen onToggle={() => {}}>
+        <AccordionKeyboard
+          isOpen={keyboardOpen}
+          onToggle={handleKeyboardToggle}
+        >
           <FullKeyboard
             onChange={(input: string) => {
               setInputText(input)
