@@ -168,8 +168,11 @@ async def _host_pyro_nameserver_and_ot3api(
 async def test_run_process_proxy(
     mock_app_state: AppState,
     ot3_hardware_api: OT3API,
+    mock_feature_flags: None,
+    decoy: Decoy,
 ) -> None:
     """Test the run process pyro creation and a proxy can be created that returns data and async commands can be called."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         ot3_hardware_api, mock_app_state
     )
