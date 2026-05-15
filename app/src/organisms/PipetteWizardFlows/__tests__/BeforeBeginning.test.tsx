@@ -345,7 +345,7 @@ describe('BeforeBeginning', () => {
           { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { maintenancePosition: 'attachPlate', mount: RIGHT },
+            params: { maintenancePosition: 'lowerZAxes', mount: RIGHT },
           },
         ],
         false

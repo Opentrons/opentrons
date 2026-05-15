@@ -86,7 +86,7 @@ async def test_calibration_move_to_location_implementation_for_attach_plate(
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=mount_type, maintenancePosition=MaintenancePosition.ATTACH_PLATE
+        mount=mount_type, maintenancePosition=MaintenancePosition.LOWER_Z_AXES
     )
 
     decoy.when(
