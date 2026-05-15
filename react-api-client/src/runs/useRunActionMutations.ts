@@ -8,6 +8,7 @@ import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '..'
+import { type DocumentationState } from '../acm/types'
 
 interface UseRunActionMutations {
   playRun: () => void
@@ -22,7 +23,10 @@ interface UseRunActionMutations {
   isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: boolean
 }
 
-export function useRunActionMutations(runId: string): UseRunActionMutations {
+export function useRunActionMutations(
+  runId: string,
+  documentationState: DocumentationState
+): UseRunActionMutations {
   const host = useHost()
   const queryClient = useQueryClient()
 
@@ -32,9 +36,12 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
     })
   }
 
-  const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation({
-    onSuccess,
-  })
+  const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation(
+    documentationState,
+    {
+      onSuccess,
+    }
+  )
 
   const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation({
     onSuccess,
