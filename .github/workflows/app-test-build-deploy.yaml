@@ -64,6 +64,7 @@ jobs:
     env:
       SHARD_TOTAL: 8
     timeout-minutes: 15 # if tests take longer than this, add more shards
+    continue-on-error: true # We want to see all test failures, so keep running all shards even after one fails.
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
