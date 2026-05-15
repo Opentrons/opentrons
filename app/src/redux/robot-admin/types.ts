@@ -65,6 +65,24 @@ export interface RestartRobotFailureAction {
   meta: RobotApiRequestMeta
 }
 
+export interface ShutdownRobotAction {
+  type: 'robotAdmin:SHUTDOWN'
+  payload: { robotName: string }
+  meta: Partial<RobotApiRequestMeta & { robot: true }>
+}
+
+export interface ShutdownRobotSuccessAction {
+  type: 'robotAdmin:SHUTDOWN_SUCCESS'
+  payload: { robotName: string }
+  meta: RobotApiRequestMeta | {}
+}
+
+export interface ShutdownRobotFailureAction {
+  type: 'robotAdmin:SHUTDOWN_FAILURE'
+  payload: { robotName: string; error: {} }
+  meta: RobotApiRequestMeta
+}
+
 export interface FetchResetConfigOptionsAction {
   type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS'
   payload: { robotName: string }
@@ -112,6 +130,9 @@ export type RobotAdminAction =
   | RestartStatusChangedAction
   | RestartRobotSuccessAction
   | RestartRobotFailureAction
+  | ShutdownRobotAction
+  | ShutdownRobotSuccessAction
+  | ShutdownRobotFailureAction
   | FetchResetConfigOptionsAction
   | FetchResetConfigOptionsSuccessAction
   | FetchResetConfigOptionsFailureAction
