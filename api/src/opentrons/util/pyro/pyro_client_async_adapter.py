@@ -251,7 +251,11 @@ def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) 
                 new_dict = {}
                 for key, value in result.items():
                     # Dictionary values are optional for Pyro dictionaries, so handle None case while assigning
-                    new_dict[key] = AsyncClientPyroObject(value) if isinstance(value, Pyro5.api.Proxy) else None
+                    new_dict[key] = (
+                        AsyncClientPyroObject(value)
+                        if isinstance(value, Pyro5.api.Proxy)
+                        else None
+                    )
                 validated_result = new_dict
 
             else:

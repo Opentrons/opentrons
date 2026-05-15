@@ -16,9 +16,9 @@ from opentrons.util.pyro.pyro_client_async_adapter import (
     AsyncPyroFunctionWrapper,
 )
 from opentrons.util.pyro.pyro_serialization import (
+    PYRO_PROXY,
     NonBuiltinKeyDictWrapper,
     TypedDictWrapper,
-    PYRO_PROXY,
 )
 
 log = logging.getLogger(__name__)
@@ -307,7 +307,9 @@ def _build_classdict(  # noqa: C901
                 async_methods[name] = async_metadata
 
                 # Bound methods to the original instance unless they are staticmethods
-                if isinstance(inspect.getattr_static(core_obj.__class__, name), staticmethod):
+                if isinstance(
+                    inspect.getattr_static(core_obj.__class__, name), staticmethod
+                ):
                     bound_method = exposed
                 else:
                     bound_method = MethodType(exposed, core_obj)
@@ -316,7 +318,9 @@ def _build_classdict(  # noqa: C901
                 # Expose standard functions and bound the exposed function to the original instance
                 exposed = pyro.expose(attr)
                 # Bound methods to the original instance unless they are staticmethods
-                if isinstance(inspect.getattr_static(core_obj.__class__, name), staticmethod):
+                if isinstance(
+                    inspect.getattr_static(core_obj.__class__, name), staticmethod
+                ):
                     bound_method = exposed
                 else:
                     bound_method = MethodType(exposed, core_obj)
@@ -366,7 +370,10 @@ def _build_metadata_dictionary(attr: Any) -> Dict[str, Any]:
 
 def _determine_attribute_result_metadata(specialty_func: Any) -> _ResultMeta:
     # Determines the result metadata for an attribute wrapped in a speciality function
-    if specialty_func.__name__ == "convert_result_to_proxy" or specialty_func.__name__ == "convert_result_to_dict_of_proxies":
+    if (
+        specialty_func.__name__ == "convert_result_to_proxy"
+        or specialty_func.__name__ == "convert_result_to_dict_of_proxies"
+    ):
         return _ResultMeta.PROXY
     # NOTE: extend this further as needed in the future for other custom return types
     return _ResultMeta.UNKNOWN
@@ -655,14 +662,16 @@ def convert_result_to_dict_of_proxies(  # noqa: C901
                         proxy_dict[key] = utility.proxy_for(pyro_synchronous_obj)
                     else:
                         proxy_dict[key] = None
-                        
+
                 # Format Proxy Dictionary into a safe-for-transport NonBuiltinKeyDictWrapper
                 if hasattr(return_types, "__args__"):
                     key_type, value_type = return_types.__args__
                     # Filter out `typing.Optional`` typings to the inner type, only works for non-tuples
                     # todo(chb: 2025-04-01): Catch and error on cases where we have optional tuples, does that even happen?
                     try:
-                        key_type = next(a for a in key_type.__args__ if a is not type(None))
+                        key_type = next(
+                            a for a in key_type.__args__ if a is not type(None)
+                        )
                     except AttributeError:
                         pass
                     wrapped_proxy_dict = NonBuiltinKeyDictWrapper(

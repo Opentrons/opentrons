@@ -143,8 +143,8 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
-    convert_result_to_proxy,
     convert_result_to_dict_of_proxies,
+    convert_result_to_proxy,
     convert_result_to_wrapped_dict,
     convert_result_to_wrapped_typed_dict,
     convert_type_to_instance,

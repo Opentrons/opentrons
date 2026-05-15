@@ -14,6 +14,7 @@ from typing_extensions import TypedDict, is_typeddict
 
 PYRO_PROXY = "PYRO_PROXY"
 
+
 class TypedDictWrapper(BaseModel):
     """This is a specialty model create to safely wrap TypedDicts like PipetteDict.
 
@@ -151,16 +152,25 @@ class OpentronsPyroSerializer:
     @classmethod
     def _pydantic_class_to_dict(cls, model: BaseModel) -> dict[str, Any]:
         # Handle dictionaries of proxies
-        if isinstance(model, NonBuiltinKeyDictWrapper) and model.value_type == PYRO_PROXY:
+        if (
+            isinstance(model, NonBuiltinKeyDictWrapper)
+            and model.value_type == PYRO_PROXY
+        ):
             # A dictionary of proxies requires specialized serializaiton
             model_dict = model.model_dump(mode="python", by_alias=True)
-            model_dict["dictionary"] = {key.value: value for key, value in model_dict["dictionary"].items()}
-            model_dict["__class__"] = ".".join((model.__module__, model.__class__.__name__))
+            model_dict["dictionary"] = {
+                key.value: value for key, value in model_dict["dictionary"].items()
+            }
+            model_dict["__class__"] = ".".join(
+                (model.__module__, model.__class__.__name__)
+            )
 
         # Handle standard pydantic models
         else:
             model_dict = model.model_dump(mode="json", by_alias=True)
-            model_dict["__class__"] = ".".join((model.__module__, model.__class__.__name__))
+            model_dict["__class__"] = ".".join(
+                (model.__module__, model.__class__.__name__)
+            )
         return model_dict
 
     @classmethod
