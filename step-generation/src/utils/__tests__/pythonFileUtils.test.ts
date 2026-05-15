@@ -2,11 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   ETHANOL_LIQUID_CLASS_NAME,
-  fixture96Plate,
   fixtureP300MultiV2Specs,
   fixtureP1000SingleV2Specs,
-  fixtureTiprack1000ul,
-  fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
@@ -19,6 +16,11 @@ import {
   WASTE_CHUTE_CUTOUT,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprack1000ul,
+  fixtureTiprackAdapter,
+} from '@opentrons/shared-data/labware'
 
 import { HOPPER_STACKER_LOCATION } from '../../constants'
 import {

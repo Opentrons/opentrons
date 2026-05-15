@@ -5,7 +5,7 @@ import {
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from './LabwareRender'

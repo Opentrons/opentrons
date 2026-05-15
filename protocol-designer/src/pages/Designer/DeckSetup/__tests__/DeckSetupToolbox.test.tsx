@@ -4,12 +4,11 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
+import { ABSORBANCE_READER_V1, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  ABSORBANCE_READER_V1,
   fixture96Plate,
   fixtureTiprackAdapter,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'

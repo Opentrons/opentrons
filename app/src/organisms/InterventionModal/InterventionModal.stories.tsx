@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { legacy_createStore } from 'redux'
 
-import { fixture96Plate } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { configReducer } from '/app/redux/config/reducer'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'

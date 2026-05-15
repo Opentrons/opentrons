@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import {
-  fixtureTiprack300ul as _fixtureTiprack300ul,
-  ALL,
-  COLUMN,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
+import { fixtureTiprack300ul as _fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { CLEAN, EMPTY } from '../../constants'
 import {

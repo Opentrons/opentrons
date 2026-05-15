@@ -19,7 +19,7 @@ import {
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
-import { labwareImages } from '@opentrons/shared-data'
+import { labwareImages } from '@opentrons/shared-data/labware'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'

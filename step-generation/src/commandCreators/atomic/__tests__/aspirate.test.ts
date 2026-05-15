@@ -7,9 +7,11 @@ import {
   getLabwareDefURI,
   getPipetteSpecsV2,
   OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+import {
   fixtureTiprack10ul as tip10,
   fixtureTiprack1000ul as tip1000,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { expectTimelineError } from '../../../__utils__/testMatchers'
 import {

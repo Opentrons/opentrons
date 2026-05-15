@@ -9,21 +9,23 @@ import {
   fixture96Plate,
   fixtureTiprackAdapter,
   getAllDefinitions,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { StackingOffsets } from '../../sections/StackingOffsets'
 
-import type * as SharedData from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('formik')
 
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof SharedData>()
+vi.mock('@opentrons/shared-data/labware', async importOriginal => {
+  const actual =
+    await importOriginal<typeof import('@opentrons/shared-data/labware')>()
   return {
     ...actual,
     getAllDefinitions: vi.fn(),
   }
 })
+
 describe('StackingOffsets', () => {
   beforeEach(() => {
     vi.mocked(getAllDefinitions).mockReturnValue({
@@ -37,8 +39,8 @@ describe('StackingOffsets', () => {
           ...fixtureTiprackAdapter.metadata,
           displayName: 'Opentrons Flex 96 Tip Rack Adapter',
         },
-      } as SharedData.LabwareDefinition2,
-      adapter2: fixture96Plate as SharedData.LabwareDefinition2,
+      } as LabwareDefinition2,
+      adapter2: fixture96Plate as LabwareDefinition2,
     })
     vi.mocked(useFormikContext).mockReturnValue({
       values: {

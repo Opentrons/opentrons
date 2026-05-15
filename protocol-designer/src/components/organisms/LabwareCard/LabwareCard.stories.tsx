@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 
 import { VIEWPORT } from '@opentrons/components'
-import { fixture96Plate } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { i18n } from '/protocol-designer/assets/localization'
 import { configureStore } from '/protocol-designer/configureStore'

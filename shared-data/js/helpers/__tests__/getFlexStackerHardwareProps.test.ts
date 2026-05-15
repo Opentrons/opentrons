@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  fixtureTiprack1000ul,
   FLEX_STACKER_MODULE_V1,
   getSchema2Dimensions,
   MAGNETIC_MODULE_V1,
 } from '../..'
+import { fixtureTiprack1000ul } from '../../labware'
 import {
   getHeightOfLabwareStackFromDefinitions,
   getLabwareOverlapOffset,

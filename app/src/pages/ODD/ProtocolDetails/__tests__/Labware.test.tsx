@@ -6,7 +6,7 @@ import {
   fixture96Plate,
   fixtureTiprack10ul,
   fixtureTiprack300ul,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

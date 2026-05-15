@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  fixture96Plate,
-  fixtureTiprackAdapter,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprackAdapter,
+} from '@opentrons/shared-data/labware'
 
 import {
   _sortLabwareDropdownOptions,

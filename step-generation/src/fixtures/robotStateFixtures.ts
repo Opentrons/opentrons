@@ -2,12 +2,6 @@ import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 
 import {
-  fixture12Trough as _fixture12Trough,
-  fixture96Plate as _fixture96Plate,
-  fixtureTiprack10ul as _fixtureTiprack10ul,
-  fixtureTiprack300ul as _fixtureTiprack300ul,
-  fixtureTiprack1000ul as _fixtureTiprack1000ul,
-  fixtureTiprackAdapter as _fixtureTiprackAdapter,
   fixtureP10MultiV2Specs,
   fixtureP10SingleV2Specs,
   fixtureP300MultiV2Specs,
@@ -17,6 +11,14 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import {
+  fixture12Trough as _fixture12Trough,
+  fixture96Plate as _fixture96Plate,
+  fixtureTiprack10ul as _fixtureTiprack10ul,
+  fixtureTiprack300ul as _fixtureTiprack300ul,
+  fixtureTiprack1000ul as _fixtureTiprack1000ul,
+  fixtureTiprackAdapter as _fixtureTiprackAdapter,
+} from '@opentrons/shared-data/labware'
 
 import {
   CLEAN,

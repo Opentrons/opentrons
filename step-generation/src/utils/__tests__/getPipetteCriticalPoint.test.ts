@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  ALL,
-  COLUMN,
-  fixture12Trough,
-  fixture96Plate,
-  ROW,
-} from '@opentrons/shared-data'
+import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
+import { fixture12Trough, fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { getPipetteCriticalPoint } from '../getPipetteCriticalPoint'
 

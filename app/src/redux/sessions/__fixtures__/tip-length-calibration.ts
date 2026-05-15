@@ -1,7 +1,7 @@
 import {
   fixtureCalibrationBlock,
   fixtureTiprack300ul,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { calibrationSlotFromSlotName } from '../utils'
 

@@ -3,7 +3,7 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fixture12Trough } from '@opentrons/shared-data'
+import { fixture12Trough } from '@opentrons/shared-data/labware'
 
 import {
   StaticLabwareComponent as StaticLabware,

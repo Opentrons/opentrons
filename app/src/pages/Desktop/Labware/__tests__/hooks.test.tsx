@@ -4,7 +4,7 @@ import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getAllDefinitions } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { i18n } from '/app/i18n'
 import { useAllLabware } from '/app/local-resources/labware'
@@ -22,15 +22,15 @@ import { useLabwareFailure, useNewLabwareName } from '../hooks'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
-import type * as SharedData from '@opentrons/shared-data'
 import type { FailedLabwareFile } from '/app/redux/custom-labware/types'
 import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/custom-labware')
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actualSharedData = await importOriginal<typeof SharedData>()
+vi.mock('@opentrons/shared-data/labware', async importOriginal => {
+  const actual =
+    await importOriginal<typeof import('@opentrons/shared-data/labware')>()
   return {
-    ...actualSharedData,
+    ...actual,
     getAllDefinitions: vi.fn(),
   }
 })

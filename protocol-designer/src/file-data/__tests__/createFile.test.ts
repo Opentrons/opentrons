@@ -5,9 +5,9 @@ import {
   commandSchemaV8,
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
-  labwareSchemaV2,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { labwareSchemaV2 } from '@opentrons/shared-data/labware'
 import {
   fixture_12_trough,
   fixture_96_plate,

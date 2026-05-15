@@ -2,13 +2,13 @@ import { describe, expect, it, test } from 'vitest'
 
 import {
   computeLabwareOrigin,
-  getAllDefinitions,
   getDeckSlotOriginToLabwareOrigin,
   getLabwareViewBox,
   getModuleDef,
   getSchema2Dimensions,
   ot3StandardDeckV5 as ot3StandardDeckV5Untyped,
 } from '../..'
+import { getAllDefinitions } from '../../labware'
 
 import type {
   AddressableArea,

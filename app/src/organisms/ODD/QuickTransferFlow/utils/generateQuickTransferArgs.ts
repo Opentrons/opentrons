@@ -3,13 +3,13 @@ import { v4 as uuidv4 } from 'uuid'
 
 import {
   ALL,
-  getAllDefinitions,
   getLabwareDefURI,
   orderWells,
   POSITION_REFERENCE_BOTTOM,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 import {
   AUTOMATIC,
   getDefaultPrimaryNozzle,

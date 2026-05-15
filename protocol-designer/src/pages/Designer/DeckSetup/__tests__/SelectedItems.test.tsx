@@ -6,13 +6,15 @@ import { screen } from '@testing-library/react'
 
 import { Module } from '@opentrons/components'
 import {
-  fixture24Tuberack,
-  fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
-  getAllDefinitions,
   getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
+import {
+  fixture24Tuberack,
+  fixtureTiprackAdapter,
+  getAllDefinitions,
+} from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
@@ -43,8 +45,9 @@ vi.mock('@opentrons/components', async importOriginal => {
     Module: vi.fn(),
   }
 })
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getAllDefinitions>()
+vi.mock('@opentrons/shared-data/labware', async importOriginal => {
+  const actual =
+    await importOriginal<typeof import('@opentrons/shared-data/labware')>()
   return {
     ...actual,
     getAllDefinitions: vi.fn(),

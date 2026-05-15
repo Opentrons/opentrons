@@ -6,13 +6,15 @@ import {
   ALL,
   COLUMN,
   F1_NOZZLE,
-  fixture384Plate,
-  fixtureTiprack1000ul,
-  fixtureTiprackAdapter,
   PARTIAL_COLUMN,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
+import {
+  fixture384Plate,
+  fixtureTiprack1000ul,
+  fixtureTiprackAdapter,
+} from '@opentrons/shared-data/labware'
 
 import {
   getAvailableNozzleConfigurations,

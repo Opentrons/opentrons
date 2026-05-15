@@ -4,10 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
-  fixture96Plate as _fixture96Plate,
-  fixtureTiprack10ul as _fixtureTiprack10ul,
-  fixtureTiprack300ul as _fixtureTiprack300ul,
-  fixtureTrash as _fixtureTrash,
   fixtureP10SingleV2Specs,
   fixtureP300MultiV2Specs,
   getIsLabwareAboveHeight,
@@ -20,6 +16,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import * as SharedData from '@opentrons/shared-data'
+import {
+  fixture96Plate as _fixture96Plate,
+  fixtureTiprack10ul as _fixtureTiprack10ul,
+  fixtureTiprack300ul as _fixtureTiprack300ul,
+  fixtureTrash as _fixtureTrash,
+} from '@opentrons/shared-data/labware'
 
 import {
   getIsHeaterShakerEastWestMultiChannelPipette,

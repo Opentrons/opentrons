@@ -1,9 +1,7 @@
 import groupBy from 'lodash/groupBy'
 
-import {
-  getAllDefinitions,
-  LABWAREV2_DO_NOT_LIST,
-} from '@opentrons/shared-data'
+import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 

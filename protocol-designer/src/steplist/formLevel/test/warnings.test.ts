@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 import {
   fixture24Tuberack,
   fixture96Plate,
-  getAllLiquidClassDefs,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import {
   incompatibleLiquidClass,

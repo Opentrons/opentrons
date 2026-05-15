@@ -5,7 +5,6 @@ import reduce from 'lodash/reduce'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
-  getAllDefinitions,
   getIsLid,
   getIsTiprack,
   getPositionFromSlotId,
@@ -15,6 +14,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,

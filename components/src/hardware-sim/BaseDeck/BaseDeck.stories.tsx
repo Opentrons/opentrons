@@ -1,12 +1,14 @@
 import {
-  fixture96Plate,
-  fixtureTiprack1000ul,
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprack1000ul,
+} from '@opentrons/shared-data/labware'
 
 import {
   EXTENDED_DECK_CONFIG_FIXTURE,

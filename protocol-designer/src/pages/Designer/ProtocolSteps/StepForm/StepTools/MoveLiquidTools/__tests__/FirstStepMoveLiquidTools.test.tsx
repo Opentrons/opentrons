@@ -1,12 +1,11 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
+import { fixtureP100096V2Specs, getLabwareDefURI } from '@opentrons/shared-data'
 import {
   fixture96Plate,
-  fixtureP100096V2Specs,
   fixtureTiprack1000ul,
-  getLabwareDefURI,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import formDataForSingleStep from '/protocol-designer/__fixtures__/formDataForSingleStep.json'
 import propsForFieldsForSingleStep from '/protocol-designer/__fixtures__/propsForFieldsForSingleStep.json'

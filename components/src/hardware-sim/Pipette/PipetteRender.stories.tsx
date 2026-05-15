@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 
-import { getAllDefinitions, getAllPipetteNames } from '@opentrons/shared-data'
+import { getAllPipetteNames } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from '../Labware'

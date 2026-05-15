@@ -5,8 +5,8 @@ import {
   getDeckDefFromRobotType,
   getSchema2CornerOffsetFromSlot,
   getSchema2Dimensions,
-  opentrons1Trash3200MlFixedV1 as trashLabwareDef,
 } from '@opentrons/shared-data'
+import { opentrons1Trash3200MlFixedV1 as trashLabwareDef } from '@opentrons/shared-data/labware'
 
 import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'

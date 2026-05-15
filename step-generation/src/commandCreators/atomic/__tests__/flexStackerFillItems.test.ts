@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  fixture96Plate,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import {
   getErrorResult,

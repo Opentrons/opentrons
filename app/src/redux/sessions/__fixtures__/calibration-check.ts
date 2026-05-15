@@ -1,4 +1,4 @@
-import { fixtureTiprack300ul } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import {
   CHECK_STEP_COMPARING_HEIGHT,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { fixtureTiprack10ul } from '@opentrons/shared-data'
+import { fixtureTiprack10ul } from '@opentrons/shared-data/labware'
 
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 

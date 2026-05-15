@@ -15,7 +15,10 @@ import {
   ModalShell,
   PrimaryButton,
 } from '@opentrons/components'
-import { getAllDefinitions, labwareSchemaV2 } from '@opentrons/shared-data'
+import {
+  getAllDefinitions,
+  labwareSchemaV2,
+} from '@opentrons/shared-data/labware'
 
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'

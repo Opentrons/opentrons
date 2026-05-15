@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  fixtureTiprack300ul as _fixtureTiprack300ul,
   A1_NOZZLE,
   A12_NOZZLE,
   ALL,
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul as _fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import {
   _getNextTip,

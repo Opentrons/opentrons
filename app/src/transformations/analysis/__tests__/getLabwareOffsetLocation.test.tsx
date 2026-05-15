@@ -4,8 +4,8 @@ import { when } from 'vitest-when'
 import {
   getLabwareDefURI,
   multiple_tipacks_with_tc,
-  opentrons96PcrAdapterV1,
 } from '@opentrons/shared-data'
+import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data/labware'
 
 import {
   getLabwareLocation,

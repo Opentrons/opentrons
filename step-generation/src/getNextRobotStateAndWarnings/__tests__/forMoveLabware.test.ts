@@ -2,12 +2,12 @@ import cloneDeep from 'lodash/cloneDeep'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  fixture96Plate,
   FLEX_STACKER_A4_ADDRESSABLE_AREA,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   MOVABLE_TRASH_A3_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { FLEX_STACKER_MODULE_INITIAL_STATE } from '../../constants'
 import {

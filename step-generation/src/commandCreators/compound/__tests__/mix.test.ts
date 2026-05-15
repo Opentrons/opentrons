@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   FIXED_TRASH_ID,
-  fixtureTiprack300ul,
   getLabwareDefURI,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { MANUAL } from '../../../constants'
 import {

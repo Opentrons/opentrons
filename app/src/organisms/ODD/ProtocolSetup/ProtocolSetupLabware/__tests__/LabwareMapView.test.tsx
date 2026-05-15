@@ -3,7 +3,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
-import { fixtureTiprack300ul, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

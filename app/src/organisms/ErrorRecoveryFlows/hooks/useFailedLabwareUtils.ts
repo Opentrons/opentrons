@@ -8,10 +8,10 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  getAllDefinitions,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'

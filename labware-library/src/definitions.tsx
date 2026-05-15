@@ -4,10 +4,8 @@ import { useLocation } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
 
-import {
-  getAllDefinitions as _getAllDefinitions,
-  LABWAREV2_DO_NOT_LIST,
-} from '@opentrons/shared-data'
+import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
+import { getAllDefinitions as _getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import type * as React from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

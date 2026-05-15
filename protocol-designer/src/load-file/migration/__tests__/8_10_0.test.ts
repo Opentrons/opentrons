@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { ALL, COLUMN, POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 import {
-  ALL,
-  COLUMN,
   fixture96Plate,
   fixtureTiprack1000ul,
-  POSITION_REFERENCE_TOP,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { migrateFile } from '../8_10_0'
 

@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  fixture96Plate,
-  fixtureP1000SingleV2Specs,
-} from '@opentrons/shared-data'
+import { fixtureP1000SingleV2Specs } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import {
   getLabwareLoadInfo,

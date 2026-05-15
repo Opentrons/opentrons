@@ -1,7 +1,5 @@
-import {
-  getAllDefinitions,
-  LABWAREV2_DO_NOT_LIST,
-} from '@opentrons/shared-data'
+import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import {
   EIGHT_CHANNEL_COMPATIBLE_LABWARE,

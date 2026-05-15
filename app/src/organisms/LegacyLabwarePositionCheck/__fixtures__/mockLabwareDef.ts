@@ -1,4 +1,4 @@
-import { fixture96Plate } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 

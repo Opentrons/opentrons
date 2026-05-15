@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
-  fixtureTiprack300ul,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 

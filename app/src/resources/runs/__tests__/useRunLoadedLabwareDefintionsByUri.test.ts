@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useRunLoadedLabwareDefinitions } from '@opentrons/react-api-client'
-import { fixture96Plate } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { useRunLoadedLabwareDefinitionsByUri } from '/app/resources/runs'
 

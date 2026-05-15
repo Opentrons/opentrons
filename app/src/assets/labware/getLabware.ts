@@ -1,7 +1,7 @@
 import {
   getAllLegacyDefinitions,
   getAllDefinitions as getLatestDefinitions,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import type {
   LabwareDefinition,

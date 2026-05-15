@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   A1_NOZZLE,
   ALL,
-  fixtureTiprack300ul,
   getLabwareDefURI,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 import {
   AUTOMATIC,
   DEFAULT_PIPETTE,

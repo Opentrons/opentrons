@@ -1,9 +1,6 @@
 import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
-import {
-  FLEX_ROBOT_TYPE,
-  getLabwareDefURI,
-  opentrons96PcrAdapterV1,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, getLabwareDefURI } from '@opentrons/shared-data'
+import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data/labware'
 
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 

@@ -5,14 +5,16 @@ import {
   A12_NOZZLE,
   ALL,
   COLUMN,
-  fixture96Plate,
   fixtureP100096V2Specs,
-  fixtureTiprack1000ul,
-  fixtureTiprackAdapter,
   SINGLE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprack1000ul,
+  fixtureTiprackAdapter,
+} from '@opentrons/shared-data/labware'
 
 import { getIsSafePipetteMovement } from '..'
 import { CLEAN } from '../../constants'

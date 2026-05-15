@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

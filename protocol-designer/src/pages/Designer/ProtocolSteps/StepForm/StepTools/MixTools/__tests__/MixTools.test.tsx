@@ -1,11 +1,8 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import {
-  fixture96Plate,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { getRobotType } from '/protocol-designer/file-data/selectors'

@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  fixture96Plate,
   fixtureP100096V2Specs,
-  fixtureTiprack300ul,
   NONE_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprack300ul,
+} from '@opentrons/shared-data/labware'
 
 import { retrieveLiquidClassValues } from '../../utils'
 

@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fixture12Trough, fixtureTiprack1000ul } from '@opentrons/shared-data'
+import {
+  fixture12Trough,
+  fixtureTiprack1000ul,
+} from '@opentrons/shared-data/labware'
 
 import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'

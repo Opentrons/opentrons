@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
   fixtureTiprack300ul,
-  getLabwareDefURI,
   opentrons96PcrAdapterV1,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
 

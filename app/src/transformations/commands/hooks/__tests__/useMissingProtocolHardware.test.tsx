@@ -9,10 +9,10 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import {
-  fixtureTiprack300ul,
   FLEX_SIMPLEST_DECK_CONFIG,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'

@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues'
 
-import { getAllDefinitions } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { uuid } from '../../utils'

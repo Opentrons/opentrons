@@ -3,7 +3,7 @@ import { describe, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fixture12Trough } from '@opentrons/shared-data'
+import { fixture12Trough } from '@opentrons/shared-data/labware'
 
 import { StrokedWells } from '../StrokedWells'
 import { WellComponent as Well } from '../Well'

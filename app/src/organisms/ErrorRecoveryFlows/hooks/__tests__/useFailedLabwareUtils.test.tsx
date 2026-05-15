@@ -20,39 +20,20 @@ vi.mock('@opentrons/shared-data', async () => {
   return {
     ...actual,
     getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
-    getAllDefinitions: vi.fn(() => ({
-      'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
-        some: 'definition',
-      },
-    })),
     getLoadedLabwareDefinitionsByUri: vi.fn(() => ({
       'some/uri': { some: 'definition' },
     })),
   }
 })
 
-vi.mock('@opentrons/components', async () => {
-  const actual = await vi.importActual('@opentrons/components')
+vi.mock('@opentrons/shared-data/labware', async () => {
+  const actual = await vi.importActual('@opentrons/shared-data/labware')
   return {
     ...actual,
-    getLabwareDisplayLocation: vi.fn(params =>
-      params.location ? `Slot ${params.location.slotName}` : ''
-    ),
-    getLoadedLabware: vi.fn(() => ({ displayName: 'Mock Nickname' })),
-  }
-})
-vi.mock('@opentrons/shared-data', async () => {
-  const actual = await vi.importActual('@opentrons/shared-data')
-  return {
-    ...actual,
-    getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
     getAllDefinitions: vi.fn(() => ({
       'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
         some: 'definition',
       },
-    })),
-    getLoadedLabwareDefinitionsByUri: vi.fn(() => ({
-      'some/uri': { some: 'definition' },
     })),
   }
 })

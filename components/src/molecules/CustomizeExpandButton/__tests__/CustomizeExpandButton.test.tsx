@@ -1,7 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fixture24Tuberack, fixture96Plate } from '@opentrons/shared-data'
+import {
+  fixture24Tuberack,
+  fixture96Plate,
+} from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { CustomizeExpandButton } from '../index'

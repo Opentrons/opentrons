@@ -7,7 +7,7 @@ import {
   fixture12Trough as _fixture12Trough,
   fixture96Plate as _fixture96Plate,
   fixture384Plate as _fixture384Plate,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import {
   DEFAULT_PIPETTE,

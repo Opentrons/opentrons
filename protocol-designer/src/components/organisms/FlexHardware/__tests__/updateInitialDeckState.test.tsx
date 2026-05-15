@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  fixture12Trough,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
@@ -13,6 +12,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
+import { fixture12Trough } from '@opentrons/shared-data/labware'
 
 import { deleteModule } from '/protocol-designer/modules'
 import { createModule } from '/protocol-designer/step-forms/actions'

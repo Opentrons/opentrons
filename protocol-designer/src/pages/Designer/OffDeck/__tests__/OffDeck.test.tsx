@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { screen } from '@testing-library/react'
 
-import { fixture96Plate } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { LiquidButton } from '/protocol-designer/components/molecules'

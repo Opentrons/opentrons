@@ -17,7 +17,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { labwareImages } from '@opentrons/shared-data'
+import { labwareImages } from '@opentrons/shared-data/labware'
 
 import { Divider } from '/app/atoms/structure'
 import { getIsOnDevice } from '/app/redux/config'

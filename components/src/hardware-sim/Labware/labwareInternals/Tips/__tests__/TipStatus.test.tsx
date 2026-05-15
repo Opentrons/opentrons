@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { fixtureTiprack1000ul } from '@opentrons/shared-data'
+import { fixtureTiprack1000ul } from '@opentrons/shared-data/labware'
 
 import { EmptyWell, SelectedWell } from '../../Wells'
 import { InaccessibleTip } from '../InaccessibleTip'

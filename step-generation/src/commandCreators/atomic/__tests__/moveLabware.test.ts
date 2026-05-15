@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  fixture12Trough,
-  fixtureTiprackAdapter,
   HEATERSHAKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import {
+  fixture12Trough,
+  fixtureTiprackAdapter,
+} from '@opentrons/shared-data/labware'
 
 import { moveLabware } from '..'
 import {

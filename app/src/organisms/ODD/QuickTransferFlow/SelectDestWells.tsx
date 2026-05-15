@@ -11,7 +11,7 @@ import {
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
-import { getAllDefinitions } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'

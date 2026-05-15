@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 import {
   FIXED_TRASH_ID,
   makeContext,

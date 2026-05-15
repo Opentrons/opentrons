@@ -8,7 +8,6 @@ import { handleActions } from 'redux-actions'
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
   FLEX_STACKER_MODULE_TYPE,
-  getAllDefinitions,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -16,6 +15,7 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 
 import {

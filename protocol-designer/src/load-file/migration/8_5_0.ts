@@ -5,7 +5,6 @@ import round from 'lodash/round'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllDefinitions,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getPipetteSpecsV2,
@@ -14,6 +13,7 @@ import {
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
 } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import {

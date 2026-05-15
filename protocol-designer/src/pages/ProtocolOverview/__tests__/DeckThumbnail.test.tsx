@@ -4,11 +4,8 @@ import '@testing-library/jest-dom/vitest'
 
 import { screen } from '@testing-library/react'
 
-import {
-  fixture12Trough,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { fixture12Trough } from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { LabwareOnDeck } from '../../../components/organisms'

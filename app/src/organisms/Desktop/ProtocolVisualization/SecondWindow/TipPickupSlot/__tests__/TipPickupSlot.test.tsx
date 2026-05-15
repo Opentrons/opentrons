@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { fixtureTiprack300ul } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 import { CLEAN, DIRTY, EMPTY } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/app/__testing-utils__'

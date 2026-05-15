@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   commandSchemaV7,
-  labwareSchemaV2,
   protocolSchemaV1,
   protocolSchemaV3,
   protocolSchemaV4,
@@ -15,6 +14,7 @@ import {
   protocolSchemaV7,
   protocolSchemaV8,
 } from '@opentrons/shared-data'
+import { labwareSchemaV2 } from '@opentrons/shared-data/labware'
 
 // TODO: copied from createFile.test.js
 const getAjvValidator = (_protocolSchema: object) => {

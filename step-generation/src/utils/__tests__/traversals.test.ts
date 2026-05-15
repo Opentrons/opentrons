@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  fixture96Plate,
   FLEX_STACKER_A4_ADDRESSABLE_AREA,
   FLEX_STACKER_MODULE_TYPE,
   flexDeckDefV5,
 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import {
   enrichRobotStateForStackGraphTraversals,

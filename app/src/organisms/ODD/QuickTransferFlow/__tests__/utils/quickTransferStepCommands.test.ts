@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   A1_NOZZLE,
   ALL,
-  fixture96Plate,
   fixtureP1000SingleV2Specs,
-  fixtureTiprack1000ul,
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprack1000ul,
+} from '@opentrons/shared-data/labware'
 import {
   AUTOMATIC,
   CLEAN,

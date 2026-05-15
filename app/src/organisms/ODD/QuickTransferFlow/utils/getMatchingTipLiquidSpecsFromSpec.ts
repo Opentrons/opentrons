@@ -1,4 +1,5 @@
-import { getAllDefinitions, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+import { LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { getPipetteNameFromSpecs } from './getPipetteNameFromSpecs'
 

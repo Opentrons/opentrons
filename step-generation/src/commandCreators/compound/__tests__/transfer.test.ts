@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, test } from 'vitest'
 
 import {
-  fixtureTiprack300ul,
   getLabwareDefURI,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   POSITION_REFERENCE_BOTTOM,
@@ -12,6 +11,7 @@ import {
   WELL_ORIGIN_CENTER,
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { CLEAN, FIXED_TRASH_ID, MANUAL } from '../../../constants'
 import {

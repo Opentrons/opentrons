@@ -8,7 +8,7 @@ import {
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
-import { getAllDefinitions } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { WellSelection } from '/app/organisms/WellSelection'

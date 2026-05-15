@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fixture12Trough as _fixture12Trough } from '@opentrons/shared-data'
+import { fixture12Trough as _fixture12Trough } from '@opentrons/shared-data/labware'
 
 import { LabwareWellLabels } from '../LabwareWellLabels'
 

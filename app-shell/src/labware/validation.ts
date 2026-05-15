@@ -3,10 +3,12 @@ import sortBy from 'lodash/sortBy'
 
 import {
   getLabwareDefIsStandard,
-  labwareSchemaV2,
-  labwareSchemaV3,
   validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
+import {
+  labwareSchemaV2,
+  labwareSchemaV3,
+} from '@opentrons/shared-data/labware'
 
 import {
   DUPLICATE_LABWARE_FILE,

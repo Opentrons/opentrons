@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  fixture96Plate,
   FLEX_ROBOT_TYPE,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
   getEmptyDeckConfiguration,
 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { ZERO_COORDINATE_TUPLE } from '../constants'
 import {

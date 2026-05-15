@@ -4,7 +4,7 @@ import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
-import { getAllDefinitions } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { getPDMetadata } from '../../file-types'
 import { getOnlyLatestDefs } from '../../labware-defs'

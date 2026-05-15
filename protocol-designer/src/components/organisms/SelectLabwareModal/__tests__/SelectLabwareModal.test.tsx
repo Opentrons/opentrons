@@ -6,10 +6,10 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import {
   fixtureP1000SingleV2Specs,
-  fixtureTiprack1000ul,
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import { fixtureTiprack1000ul } from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'

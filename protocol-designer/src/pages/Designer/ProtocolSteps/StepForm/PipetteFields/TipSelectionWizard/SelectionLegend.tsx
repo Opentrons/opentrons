@@ -6,7 +6,7 @@ import {
   TipStatus,
   WellStatus,
 } from '@opentrons/components'
-import { fixtureTiprack1000ul } from '@opentrons/shared-data'
+import { fixtureTiprack1000ul } from '@opentrons/shared-data/labware'
 
 import styles from './tipselectionwizard.module.css'
 import { useLegendItems } from './useLegendItems'

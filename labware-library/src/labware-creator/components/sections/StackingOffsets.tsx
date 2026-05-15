@@ -14,11 +14,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getAllDefinitions,
   getModuleDisplayName,
   MAGNETIC_BLOCK_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import {
   STACKING_OFFSET_HOW_TO,

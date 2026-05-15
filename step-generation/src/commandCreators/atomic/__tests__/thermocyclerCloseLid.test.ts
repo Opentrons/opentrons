@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  fixture96Plate,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import {
   getErrorResult,

@@ -1,7 +1,8 @@
 import * as React from 'react'
 
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
-import { getLabwareViewBox, labwareImages } from '@opentrons/shared-data'
+import { getLabwareViewBox } from '@opentrons/shared-data'
+import { labwareImages } from '@opentrons/shared-data/labware'
 
 import styles from './styles.module.css'
 

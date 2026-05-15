@@ -6,11 +6,11 @@ import {
   SPACING,
   VIEWPORT,
 } from '@opentrons/components'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
   fixture12Trough,
   fixtureTiprack10ul,
-  getLabwareDefURI,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { SmallButton } from '/app/atoms/buttons'
 

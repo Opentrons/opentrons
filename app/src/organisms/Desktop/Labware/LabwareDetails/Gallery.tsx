@@ -11,7 +11,8 @@ import {
   SPACING,
   SPACING_AUTO,
 } from '@opentrons/components'
-import { getLabwareViewBox, labwareImages } from '@opentrons/shared-data'
+import { getLabwareViewBox } from '@opentrons/shared-data'
+import { labwareImages } from '@opentrons/shared-data/labware'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 

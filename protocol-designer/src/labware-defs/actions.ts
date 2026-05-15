@@ -6,10 +6,10 @@ import values from 'lodash/values'
 import {
   getIsTiprack,
   getLabwareDefURI,
-  labwareSchemaV2,
   OPENTRONS_LABWARE_NAMESPACE,
   validateCustomLabwareHelper,
 } from '@opentrons/shared-data'
+import { labwareSchemaV2 } from '@opentrons/shared-data/labware'
 
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'

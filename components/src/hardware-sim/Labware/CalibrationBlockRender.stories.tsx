@@ -1,4 +1,5 @@
-import { getAllDefinitions, getLabwareViewBox } from '@opentrons/shared-data'
+import { getLabwareViewBox } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { RobotWorkSpace } from '../Deck'
 import { CalibrationBlockRender } from './CalibrationBlockRender'

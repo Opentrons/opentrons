@@ -1,13 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  fixtureTiprack10ul as _fixtureTiprack10ul,
-  fixtureTiprack300ul as _fixtureTiprack300ul,
   FLEX_STACKER_A4_ADDRESSABLE_AREA,
   FLEX_STACKER_MODULE_TYPE,
   getMmFromBottom,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
+import {
+  fixtureTiprack10ul as _fixtureTiprack10ul,
+  fixtureTiprack300ul as _fixtureTiprack300ul,
+} from '@opentrons/shared-data/labware'
 
 import {
   deckSlotKeyForFlexStackerShuttleAddressableArea,

@@ -4,11 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { BaseDeck, LabwareInfoOverlay } from '@opentrons/components'
-import {
-  fixtureTiprack300ul,
-  getModuleDef,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { getModuleDef, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

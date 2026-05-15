@@ -6,11 +6,13 @@ import {
   A12_NOZZLE,
   ALL,
   COLUMN,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
+import {
   fixture96Plate,
   fixtureTiprack300ul,
   fixtureTiprack1000ul,
-  getLabwareDefURI,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware'
 
 import { EMPTY, FIXED_TRASH_ID } from '../../../constants'
 import {

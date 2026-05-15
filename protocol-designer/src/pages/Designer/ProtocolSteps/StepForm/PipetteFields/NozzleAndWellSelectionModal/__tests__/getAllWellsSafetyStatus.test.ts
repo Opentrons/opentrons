@@ -8,15 +8,17 @@ import {
   D1_NOZZLE,
   E1_NOZZLE,
   F1_NOZZLE,
-  fixture96Plate,
   fixtureP100096V2Specs,
-  fixtureTiprack1000ul,
   G1_NOZZLE,
   getLabwareDefURI,
   PARTIAL_COLUMN,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  fixtureTiprack1000ul,
+} from '@opentrons/shared-data/labware'
 import { getIsSafePipetteMovement } from '@opentrons/step-generation'
 
 import { getAllWellsSafetyStatus } from '../getAllWellsSafetyStatus'

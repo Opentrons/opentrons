@@ -3,7 +3,6 @@ import React from 'react'
 
 import {
   ABSORBANCE_READER_V1,
-  fixture96Plate,
   FLEX_STACKER_MODULE_V1,
   getModuleDef,
   HEATERSHAKER_MODULE_V1,
@@ -15,6 +14,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { CenterLabwareInModuleChildSlot } from '../alignment'
 import { LabwareRender } from '../Labware'

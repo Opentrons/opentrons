@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fixture96Plate } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { LabwareSlot } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'

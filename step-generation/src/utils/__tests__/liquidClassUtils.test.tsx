@@ -4,12 +4,12 @@ import {
   A1_NOZZLE,
   ALL,
   FIXED_TRASH_ID,
-  fixtureTiprack300ul,
   getLabwareDefURI,
   POSITION_REFERENCE_BOTTOM,
   POSITION_REFERENCE_CENTER,
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data/labware'
 
 import { SOURCE_WELL_BLOWOUT_DESTINATION } from '..'
 import { AUTOMATIC } from '../../constants'

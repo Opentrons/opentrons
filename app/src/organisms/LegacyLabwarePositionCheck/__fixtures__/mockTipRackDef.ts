@@ -1,4 +1,4 @@
-import { fixtureTiprack10ul } from '@opentrons/shared-data'
+import { fixtureTiprack10ul } from '@opentrons/shared-data/labware'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 

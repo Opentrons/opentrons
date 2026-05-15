@@ -1,10 +1,7 @@
 import { expect, it } from 'vitest'
 
-import {
-  getAllDefinitions,
-  getDeckDefinitions,
-  getModuleDef,
-} from '@opentrons/shared-data'
+import { getDeckDefinitions, getModuleDef } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 
 import { resolveLabwareLocation } from '../resolveLabwareLocation'
 

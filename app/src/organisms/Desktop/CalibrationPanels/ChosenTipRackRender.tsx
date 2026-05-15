@@ -8,7 +8,7 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-import { labwareImages } from '@opentrons/shared-data'
+import { labwareImages } from '@opentrons/shared-data/labware'
 
 import type { SelectOption } from '@opentrons/components'
 

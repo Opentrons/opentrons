@@ -1,11 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  fixtureTiprack1000ul as _fixtureTiprack1000ul,
-  getLabwareDefURI,
-  getPipetteSpecsV2,
-} from '@opentrons/shared-data'
+import { getLabwareDefURI, getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { fixtureTiprack1000ul as _fixtureTiprack1000ul } from '@opentrons/shared-data/labware'
 
 import {
   DEFAULT_PIPETTE,

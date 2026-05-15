@@ -2,7 +2,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
-import { fixture96Plate, opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  opentrons96PcrAdapterV1,
+} from '@opentrons/shared-data/labware'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'

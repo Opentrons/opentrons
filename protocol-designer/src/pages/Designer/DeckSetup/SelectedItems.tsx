@@ -3,11 +3,11 @@ import { useSelector } from 'react-redux'
 import { Module } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
-  getAllDefinitions,
   getModuleDef,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data/labware'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'

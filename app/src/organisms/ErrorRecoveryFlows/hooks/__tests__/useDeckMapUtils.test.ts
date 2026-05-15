@@ -2,13 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getLabwareLocation } from '@opentrons/components'
 import {
-  fixture96Plate,
   getLoadedLabwareDefinitionsByUri,
   getModuleDef,
   getModuleType,
   getPositionFromSlotId,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data/labware'
 
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 

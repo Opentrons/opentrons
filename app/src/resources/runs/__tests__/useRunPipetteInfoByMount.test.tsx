@@ -4,10 +4,10 @@ import { when } from 'vitest-when'
 
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
-  opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
   getLoadedLabwareDefinitionsByUri,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+import { opentrons96Tiprack10UlV1Uncasted as _tiprack10ul } from '@opentrons/shared-data/labware'
 
 import {
   mockPipetteOffsetCalibration1,
