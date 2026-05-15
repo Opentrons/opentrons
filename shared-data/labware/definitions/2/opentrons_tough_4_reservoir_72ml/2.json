@@ -80,7 +80,7 @@
     "loadName": "opentrons_tough_4_reservoir_72ml"
   },
   "namespace": "opentrons",
-  "version": 1,
+  "version": 2,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,
