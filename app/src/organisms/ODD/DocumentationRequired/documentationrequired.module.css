@@ -4,7 +4,6 @@
   flex-direction: column;
 }
 
-/* Fixed ChildNavigation is 7.75rem tall — offset content with margin, not padding-top. */
 .content_container {
   display: flex;
   flex: 1;
@@ -22,12 +21,6 @@
   flex-direction: column;
   min-width: 0;
   gap: var(--spacing-8);
-}
-
-.text_area_container textarea {
-  width: 100%;
-  min-height: 13.5625rem;
-  box-sizing: border-box;
 }
 
 .keyboard_container {

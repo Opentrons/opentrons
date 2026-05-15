@@ -50,6 +50,7 @@ export function DocumentationRequired({
         <div className={styles.content_container}>
           <div className={styles.text_area_container}>
             <TouchTextAreaField
+              height="13.5625rem"
               autoFocus
               value={inputText}
               ref={textAreaRef}
