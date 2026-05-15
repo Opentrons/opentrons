@@ -151,37 +151,49 @@ describe('RobotNameEditor', () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'a!' } })
-    await waitFor(() => expect(input).toHaveValue('a!'))
-    await waitFor(() =>
-      expect(
-        screen.getByText("Character '!' is not supported")
-      ).toBeInTheDocument()
-    )
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
+    expect(
+      await screen.findByText("Character '!' is not supported")
+    ).toBeInTheDocument()
   })
 
   it('should block further input while invalid char is present', async () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'a!' } })
-    await waitFor(() => expect(input).toHaveValue('a!'))
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
     fireEvent.change(input, { target: { value: 'a!b' } })
-    await waitFor(() => expect(input).toHaveValue('a!'))
-    expect(screen.getByText("Character '!' is not supported")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
+    expect(
+      screen.getByText("Character '!' is not supported")
+    ).toBeInTheDocument()
   })
 
   it('should clear error and unlock input after deleting the invalid char', async () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'a!' } })
-    await waitFor(() => expect(input).toHaveValue('a!'))
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
     fireEvent.change(input, { target: { value: 'a' } })
-    await waitFor(() => expect(input).toHaveValue('a'))
-    await waitFor(() =>
+    await waitFor(() => {
+      expect(input).toHaveValue('a')
+    })
+    await waitFor(() => {
       expect(
         screen.queryByText("Character '!' is not supported")
       ).not.toBeInTheDocument()
-    )
+    })
     fireEvent.change(input, { target: { value: 'ab' } })
-    await waitFor(() => expect(input).toHaveValue('ab'))
+    await waitFor(() => {
+      expect(input).toHaveValue('ab')
+    })
   })
 })
