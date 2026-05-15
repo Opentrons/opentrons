@@ -26,13 +26,4 @@ export default defineConfig({
       target: 'es2020',
     },
   },
-  resolve: {
-    alias: {
-      // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
-      // files being processed with the wrong config (the config from the
-      // consuming project vs. the config from the source project).
-      // Can these be replaced with regular package.json dependencies?
-      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
-    },
-  },
 })

@@ -86,7 +86,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
       '@opentrons/components/styles': path.resolve(
         '../components/src/index.module.css'
       ),

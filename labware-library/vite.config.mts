@@ -122,7 +122,6 @@ export default defineConfig({
         '../components/src/index.module.css'
       ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
-      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
       '@opentrons/step-generation': path.resolve(
         '../step-generation/src/index.ts'
       ),

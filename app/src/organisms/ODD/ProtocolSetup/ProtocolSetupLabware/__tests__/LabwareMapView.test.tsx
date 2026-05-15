@@ -24,7 +24,6 @@ import type {
 vi.mock('/app/transformations/analysis')
 vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
-vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 vi.mock('/app/resources/deck_configuration/utils')
 vi.mock('/app/redux/config')
 

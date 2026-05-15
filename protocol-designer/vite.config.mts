@@ -196,7 +196,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
           '../components/src/styles/global.css'
         ),
         '@opentrons/components': path.resolve('../components/src/index.ts'),
-        '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
         '@opentrons/step-generation': path.resolve(
           '../step-generation/src/index.ts'
         ),

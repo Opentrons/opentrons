@@ -84,7 +84,6 @@ export default defineConfig({
       '@opentrons/shared-data/labware/fixtures/3': path.resolve(
         './shared-data/labware/fixtures/3/index.ts'
       ),
-      '@opentrons/shared-data': path.resolve('./shared-data/js/index.ts'),
       '@opentrons/step-generation': path.resolve(
         './step-generation/src/index.ts'
       ),

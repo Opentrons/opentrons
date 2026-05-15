@@ -73,7 +73,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
         // files being processed with the wrong config (the config from the
         // consuming project vs. the config from the source project).
         // Can these be replaced with regular package.json dependencies?
-        '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
         '@opentrons/step-generation': path.resolve(
           '../step-generation/src/index.ts'
         ),

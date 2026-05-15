@@ -95,7 +95,6 @@ export default defineConfig({
       // files being processed with the wrong config (the config from the
       // consuming project vs. the config from the source project).
       // Can these be replaced with regular package.json dependencies?
-      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
       '@opentrons/components/styles': path.resolve(
         '../components/src/index.module.css'
       ),
