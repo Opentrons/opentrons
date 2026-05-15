@@ -76,7 +76,7 @@ description: "Dimensions, weight, deck slots, connectivity, and power specificat
             <ul>
                 <li>Windows 10 or later</li>
                 <li>macOS 11 (Big Sur) or later</li>
-                <li>Ubuntu 20.04 or later</li>
+                <li>Ubuntu 22.04 or later</li>
             </ul>
         </td>
     </tr>

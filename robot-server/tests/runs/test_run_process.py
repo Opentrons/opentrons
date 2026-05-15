@@ -13,7 +13,6 @@ from Pyro5 import nameserver
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
@@ -74,16 +73,31 @@ def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture
-def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
-    """Get a mocked out OT3API."""
+def ot3_hardware_api(request: pytest.FixtureRequest) -> OT3API:
+    """Real OT3API backed by the software simulator, bound to a dedicated event loop."""
     request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
-        mock = decoy.mock(cls=OT3API)
-        mock._door_state = DoorState.CLOSED
-        decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
-        return mock
+        loop = asyncio.new_event_loop()
+
+        def _event_loop() -> None:
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
+
+        loop_thread = threading.Thread(target=_event_loop, daemon=True)
+        loop_thread.start()
+
+        fut = asyncio.run_coroutine_threadsafe(
+            OT3API.build_hardware_simulator(
+                loop=loop,
+                strict_attached_instruments=False,
+            ),
+            loop,
+        )
+        api = fut.result(timeout=120)
+        api._door_state = DoorState.CLOSED
+        return api
     except ImportError:
         return None  # type: ignore[return-value]
 
@@ -291,6 +305,8 @@ async def test_run_process_create(
     await run_process.create(
         run_id="cool-proxy-run",
         labware_offsets=[],
+        error_recovery_rules=[],
+        error_recovery_is_enabled=False,
         protocol=None,
         run_time_param_values=None,
         run_time_param_paths=None,

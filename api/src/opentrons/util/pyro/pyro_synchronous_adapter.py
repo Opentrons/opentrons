@@ -4,6 +4,7 @@ import asyncio
 import enum
 import functools
 import inspect
+import logging
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
@@ -19,6 +20,8 @@ from opentrons.util.pyro.pyro_serialization import (
     TypedDictWrapper,
     PYRO_PROXY,
 )
+
+log = logging.getLogger(__name__)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -69,20 +72,25 @@ class DaemonUtility:
 
 
 class PyroFunctionWrapper:
-    """Wrapper class to safely wrap callable responses as Proxy objects.."""
+    """Wrapper class to safely wrap callable responses as Proxy objects."""
 
     def __init__(
-        self, callable: Callable[P, T], loop: asyncio.AbstractEventLoop
+        self,
+        callable: Callable[P, T],
+        loop: asyncio.AbstractEventLoop,
+        execute_on_pyro_daemon_overload: bool,
     ) -> None:
         self.callable = callable
         self._loop = loop
+        # Wrapped callbacks inherit their parent resource's ruleset regarding inbound call execution
+        self._execute_on_pyro_daemon_overload = execute_on_pyro_daemon_overload
 
     @property
     def is_callable(self) -> bool:
         """Callable status for validation of a wrapped function, always true."""
         return True
 
-    def call(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+    def call(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         """Remote deployable function call."""
         return self.callable(*args, **kwargs)
 
@@ -312,27 +320,17 @@ def _build_classdict(  # noqa: C901
                     bound_method = exposed
                 else:
                     bound_method = MethodType(exposed, core_obj)
-                yield (name, parameter_validation_wrapper(bound_method))
-            elif isinstance(attr, property):
-                # Bound property to the original instance and expose the bounded property
-                # Accepts the functional arguments (Callables) of a property to rebind
-                def _bound(
-                    func: Callable[[Any], Any]
-                    | Callable[[Any, Any], None]
-                    | Callable[[Any], None]
-                    | None,
-                ) -> Any | None:
-                    if func is None:
-                        return None
-                    return lambda self, *a, **kw: func(core_obj, *a, **kw)
-
-                bound_property = property(
-                    fget=_bound(attr.fget),
-                    fset=_bound(attr.fset),
-                    fdel=_bound(attr.fdel),
-                    doc=attr.__doc__,
+                yield (
+                    name,
+                    parameter_validation_wrapper(
+                        execute_inbound_call_on_event_loop(core_obj, bound_method)
+                    ),
                 )
-                exposed = pyro.expose(bound_property)  # type: ignore
+            elif isinstance(attr, property):
+                # Bound property to the original instance through the inbound call executor and expose the bounded property
+                exposed = pyro.expose(
+                    execute_inbound_call_on_event_loop(core_obj, attr)  # type: ignore
+                )
                 yield (name, exposed)
 
     # Attach the known async methods list to the PSO as a private member and expose a getter method
@@ -419,7 +417,7 @@ def _validate_inbound_proxy(arg: Any) -> Any:
     if isinstance(arg, pyro.Proxy):
         # NOTE: Cases like this are the result of multi-process callback forwarding
         try:
-            if arg.is_callable:
+            if "is_callable" in arg._pyroAttrs:
                 arg = AsyncPyroFunctionWrapper(proxy=arg)
         except AttributeError:
             try:
@@ -443,6 +441,89 @@ def parameter_validation_wrapper(attr: Callable[P, T]) -> Callable[P, T]:
         return attr(*args, **kwargs)
 
     return wrapper  # type: ignore
+
+
+def execute_inbound_call_on_event_loop(  # noqa: C901
+    core_obj: Any, attr: Callable[P, T]
+) -> Callable[P, T]:
+    """Wrapper to ensure that inbound calls are executed on the resource's native event loop.
+
+    This wrapper operates on the assumption it is recieveing a method bound to its original core object.
+    This is only to be used on non-async methods and attributes, as async methods are already wrapped
+    through the `synchronous` decorator.
+    """
+
+    def wrap_sync_safe(
+        loop: asyncio.AbstractEventLoop,
+        method: Callable[P, T],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> Any:
+        async def method_wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
+            return method(*args, **kwargs)
+
+        future = asyncio.run_coroutine_threadsafe(
+            coro=method_wrapper(*args, **kwargs), loop=loop
+        )
+        return future.result()
+
+    def wrap_property_sync_safe(loop: asyncio.AbstractEventLoop, attribute: str) -> Any:
+        async def property_wrapper(attribute: str) -> Any:
+            return getattr(core_obj, attribute)
+
+        return asyncio.run_coroutine_threadsafe(
+            property_wrapper(attribute), loop
+        ).result()
+
+    @functools.wraps(attr)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:  # noqa: C901
+        # Grab the active event loop off the core object this was bound with
+        loop: Optional[asyncio.AbstractEventLoop] = getattr(core_obj, "_loop", None)
+
+        if hasattr(core_obj, "_execute_on_pyro_daemon_overload"):
+            # If the core object has been provided an `execute_on_pyro_daemon_overload` then it should be called from
+            # The thread of the request handler. These are move likely calls coming from the robot-server or a resource
+            # that will not have access to it's host process's event loop. Calls like this are expected to be threadsafe
+            # in their host process.
+            if isinstance(attr, MethodType):
+                return attr(*args, **kwargs)
+            elif isinstance(attr, property):
+                return getattr(core_obj, attr.fget.__name__)
+            else:
+                raise ValueError(
+                    "Provided base attribute of a daemon overload resource must be a Property or a Method."
+                )
+
+        try:
+            running_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # There is no running loop
+            running_loop = None
+
+        # If the loop is running and is not the current running loop, we can execute synchronously
+        if loop is not None and loop.is_running():
+            if running_loop is loop:
+                # We're in the same thread and the loop is running, cannot block synchronously.
+                raise RuntimeError("Cannot execute call from the same event loop.")
+
+            if isinstance(attr, MethodType):
+                result = wrap_sync_safe(loop, attr, *args, **kwargs)
+            elif isinstance(attr, property):
+                result = wrap_property_sync_safe(loop, attr.fget.__name__)
+            else:
+                raise ValueError(
+                    "Provided base attribute must be a Property or a Method."
+                )
+            return result
+        else:
+            raise RuntimeError(
+                "Instance event loop is not running inside inbound call executor."
+            )
+
+    if isinstance(attr, property):
+        # If the original attribute was a property, ensure the wrapped attribute is
+        return property(wrapper)
+    return wrapper
 
 
 ### Specialty Functions for use with the `pyro_behavior` decorator ###
@@ -469,10 +550,13 @@ def convert_result_to_proxy(  # noqa: C901
             bound_method = MethodType(sync_func, core_obj)
             result = bound_method(*args, **kwargs)
         elif isinstance(attr, FunctionType):
-            bound_method = MethodType(attr, core_obj)
+            bound_method = execute_inbound_call_on_event_loop(  # type: ignore
+                core_obj, MethodType(attr, core_obj)
+            )
             result = bound_method(*args, **kwargs)
         elif isinstance(attr, property):
-            result = getattr(core_obj, name)
+            bound_property = execute_inbound_call_on_event_loop(core_obj, attr)
+            result = bound_property.fget()
         else:
             raise ValueError(
                 "Provided base attribute must be a Property, a Method or an Async method."
@@ -483,6 +567,7 @@ def convert_result_to_proxy(  # noqa: C901
         try:
             proxy_list = []
             for r in result:
+                # CASEY NOTE: these need to optionally inherit their parents execution rule?
                 pyro_synchronous_obj = utility.find_PSO(r)
                 if pyro_synchronous_obj is None:
                     if not hasattr(r, "_loop"):
@@ -495,7 +580,14 @@ def convert_result_to_proxy(  # noqa: C901
         except TypeError:
             if isinstance(result, FunctionType) or isinstance(result, MethodType):
                 # Wrap callable result in Proxy-safe format
-                result = PyroFunctionWrapper(result, core_obj._loop)
+                # For execute on daemon overload rules, a child callable (PyroFunctionWrapper)
+                # must inherit it's parents execution ruleset.
+                execute_overload_ruleset = False
+                if hasattr(core_obj, "_execute_on_pyro_daemon_overload"):
+                    execute_overload_ruleset = True
+                result = PyroFunctionWrapper(
+                    result, core_obj._loop, execute_overload_ruleset
+                )
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
                 if not hasattr(result, "_loop"):
@@ -612,11 +704,14 @@ def convert_result_to_wrapped_dict(  # noqa: C901
             result = bound_method(*args, **kwargs)
             return_types = attr.__annotations__["return"]
         elif isinstance(attr, FunctionType):
-            bound_method = MethodType(attr, core_obj)
+            bound_method = execute_inbound_call_on_event_loop(  # type: ignore
+                core_obj, MethodType(attr, core_obj)
+            )
             result = bound_method(*args, **kwargs)
             return_types = attr.__annotations__["return"]
         elif isinstance(attr, property):
-            result = getattr(core_obj, name)
+            bound_property = execute_inbound_call_on_event_loop(core_obj, attr)
+            result = bound_property.fget()
             return_types = attr.fget.__annotations__["return"]
         else:
             raise ValueError(
@@ -676,9 +771,13 @@ def convert_type_to_instance(
             sync_func = synchronous(attr)
             result = sync_func(self, *args, **kwargs)
         elif isinstance(attr, FunctionType):
-            result = attr(self, *args, **kwargs)
+            bound_method = execute_inbound_call_on_event_loop(
+                core_obj, MethodType(attr, core_obj)
+            )
+            result = bound_method(*args, **kwargs)
         elif isinstance(attr, property):
-            result = getattr(core_obj, name)
+            bound_property = execute_inbound_call_on_event_loop(core_obj, attr)
+            result = bound_property.fget()
         else:
             raise ValueError(
                 "Provided base attribute must be a Property, a Method or an Async method."
@@ -711,11 +810,14 @@ def convert_result_to_wrapped_typed_dict(
             result = bound_method(*args, **kwargs)
             return_type = attr.__annotations__["return"]
         elif isinstance(attr, FunctionType):
-            bound_method = MethodType(attr, core_obj)
+            bound_method = execute_inbound_call_on_event_loop(  # type: ignore
+                core_obj, MethodType(attr, core_obj)
+            )
             result = bound_method(*args, **kwargs)
             return_type = attr.__annotations__["return"]
         elif isinstance(attr, property):
-            result = getattr(core_obj, name)
+            bound_property = execute_inbound_call_on_event_loop(core_obj, attr)
+            result = bound_property.fget()
             return_type = attr.fget.__annotations__["return"]
         else:
             raise ValueError(

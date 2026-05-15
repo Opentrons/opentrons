@@ -39,7 +39,7 @@ export {
   vacuumOpenVent,
   vacuumSetPumpPower,
   vacuumSetPumpPressure,
-  vacuumSetPumpProfile,
+  vacuumStartRunProfile,
   vacuumStopPump,
   waitForTemperature,
   waitForModuleTask,

@@ -22,5 +22,7 @@ onlyBuiltDependencies:
   - esbuild
   - '@serialport/bindings-cpp'
   - usb
+  - '@sentry/cli'
+  - sharp
 
 minimumReleaseAge: 10080 # 1 week

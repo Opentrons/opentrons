@@ -2,7 +2,13 @@ from typing import Annotated
 
 import fastapi
 
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.authorization_checker import (
+    AuthorizationNotRequiredResult,
+)
+from server_utils.auth.resource_server.fastapi import (
+    RequireScopesResult,
+    require_scopes,
+)
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -11,8 +17,6 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
-from auth_server.oauth2.backend import Backend
-from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.users.dependencies import get_user_data_manager
 from auth_server.users.models import UpdateUser, UserCreate, UserResponse
 from auth_server.users.user_data_manager import (
@@ -36,9 +40,7 @@ router = fastapi.APIRouter()
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def post_users(
-    request: fastapi.Request,
     request_body: RequestModel[UserCreate],
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -72,19 +74,17 @@ async def post_users(
 
 @PydanticResponse.wrap_route(
     router.get,
-    path="/auth/users/{userName}",
-    summary="Get a user information",
-    description="Get a specific user by its unique identifier.",
+    path="/auth/users/byUsername/{userName}",
+    summary="Get a user",
+    description="Get a specific user, identified by their unique username.",
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ))],
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ_OTHERS))],
 )
 async def get_user(
-    request: fastapi.Request,
     userName: str,
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -105,18 +105,16 @@ async def get_user(
 
 @PydanticResponse.wrap_route(
     router.delete,
-    path="/auth/users/{userName}",
+    path="/auth/users/byUsername/{userName}",
     summary="Delete a user",
-    description="Delete a specific user by its unique identifier.",
+    description="Delete a specific user, identified by their unique username.",
     responses={
         fastapi.status.HTTP_204_NO_CONTENT: {"description": "User deleted"},
     },
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def delete_user(
-    request: fastapi.Request,
     userName: str,
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -137,19 +135,17 @@ async def delete_user(
 
 @PydanticResponse.wrap_route(
     router.patch,
-    path="/auth/users/{userName}",
+    path="/auth/users/byUsername/{userName}",
     summary="Update a user",
-    description="Update a specific user by its unique identifier.",
+    description="Update a specific user, identified by their unique username.",
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
     },
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def update_user(
-    request: fastapi.Request,
     request_body: RequestModel[UpdateUser],
     userName: str,
-    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -173,6 +169,11 @@ async def update_user(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+    except UserAlreadyExistsError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="User already exists",
+        )
     except InvalidInputError as e:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -181,4 +182,40 @@ async def update_user(
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=updated_user),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/auth/users/self",
+    summary="Get the currently logged-in user",
+    description=(
+        'The "currently logged-in user" is determined from the OAuth 2 access token'
+        " that you attach to your request to this endpoint."
+        " See the `/auth/oauth2` endpoints."
+    ),
+    responses={fastapi.status.HTTP_401_UNAUTHORIZED: {}},
+)
+async def get_self(  # noqa: D103
+    authorization_details: Annotated[
+        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_READ_SELF))
+    ],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
+) -> PydanticResponse[SimpleBody[UserResponse]]:
+    if isinstance(authorization_details, AuthorizationNotRequiredResult):
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="This endpoint needs an access token to determine the current user.",
+        )
+
+    # Note: No try/except for UserNotFoundError. If the user passed `require_scopes()`,
+    # but we can't find them here, then that's some kind of server bug and we want to
+    # let it propagate with HTTP error code 500.
+    user = user_data_manager.get_user(authorization_details.username)
+
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(data=user),
     )

@@ -126,7 +126,8 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   } else {
     const { width, height, x, y } = getOT2HoverDimensions(
       hasTCOnSlot != null,
-      slotPosition
+      slotPosition,
+      false
     )
 
     return (

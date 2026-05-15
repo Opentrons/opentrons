@@ -8,6 +8,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useRobot } from '/app/redux-resources/robots'
 import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
 import { getGroupedCommands } from '/app/redux/protocol-storage/utils'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 
 import { VisualizerContainer } from '../../../../organisms/Desktop/ProtocolVisualization/VisualizerContainer'
 import styles from './visualization.module.css'
@@ -20,6 +21,7 @@ export function ProtocolVisualization(): JSX.Element {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(state, protocolKey)
@@ -64,7 +66,11 @@ export function ProtocolVisualization(): JSX.Element {
     return <LoadingIcon />
   }
   return (
-    <ApiHostProvider hostname={robot.ip ?? null} robotName={robotName}>
+    <ApiHostProvider
+      hostname={robot.ip ?? null}
+      robotName={robotName}
+      token={token}
+    >
       {visualizer}
     </ApiHostProvider>
   )

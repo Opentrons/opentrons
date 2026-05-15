@@ -1,0 +1,13 @@
+.setting_option_container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.content_container {
+  display: flex;
+  height: 100%;
+  min-height: 12rem;
+  flex-direction: column;
+  padding: 7.75rem var(--spacing-40) var(--spacing-40);
+}

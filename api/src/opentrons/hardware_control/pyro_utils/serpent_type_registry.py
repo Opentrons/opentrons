@@ -675,3 +675,8 @@ def register_hardware_types() -> None:
 
     # handle Typed Dicts for the hardware controller
     OpentronsPyroSerializer.register_opentrons_typed_dicts(_typed_dict_dict_to_class)
+
+    # Error serialization
+    OpentronsPyroSerializer.register_basic_error(
+        opentrons.hardware_control.types.FailedTipStateCheck
+    )

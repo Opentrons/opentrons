@@ -1,6 +1,11 @@
 import { useSelector } from 'react-redux'
 
-import { CenterLabwareInSlot, LabwareRender } from '@opentrons/components'
+import {
+  CenterLabwareInSlot,
+  INACCESSIBLE,
+  LabwareRender,
+  SELECTED_ERROR,
+} from '@opentrons/components'
 import { getIsLid } from '@opentrons/shared-data'
 import * as wellContentsSelectors from '@opentrons/step-generation'
 
@@ -85,11 +90,22 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     wellContents,
     liquidDisplayColors
   )
+
+  const newWellFill = statusByWellName
+    ? Object.fromEntries(
+        Object.entries(wellFill).filter(
+          ([wellName]) =>
+            statusByWellName[wellName] !== INACCESSIBLE &&
+            statusByWellName[wellName] !== SELECTED_ERROR
+        )
+      )
+    : wellFill
+
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}
       positioningMode="offsetInSlot"
-      wellFill={wellFill}
+      wellFill={newWellFill}
       handleClickWell={handleClickWell}
       {...(showHighlightedWells ? { highlightedWells } : {})}
       {...(ignoreMissingTips ? {} : { missingTips })}

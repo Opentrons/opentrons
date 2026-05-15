@@ -69,9 +69,14 @@ class Scope(enum.Enum):
         "Update the robot's software.",
     )
 
-    USERS_READ = (
-        "users.read",
-        "Read users.",
+    USERS_READ_OTHERS = (
+        "users.read.others",
+        "List all users and read their details.",
+    )
+
+    USERS_READ_SELF = (
+        "users.read.self",
+        "Read the details of the currently authenticated user.",
     )
 
     USERS_WRITE = (

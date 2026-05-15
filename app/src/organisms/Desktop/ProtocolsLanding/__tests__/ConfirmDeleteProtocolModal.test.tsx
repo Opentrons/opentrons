@@ -41,7 +41,7 @@ describe('ConfirmDeleteProtocolModal', () => {
       handleClickDelete: vi.fn(),
     }
     render(props)
-    const cancel = screen.getByText('cancel')
+    const cancel = screen.getByText('Cancel')
     fireEvent.click(cancel)
     expect(props.cancelDeleteProtocol).toHaveBeenCalled()
     const confirm = screen.getByRole('button', { name: 'Yes, delete protocol' })

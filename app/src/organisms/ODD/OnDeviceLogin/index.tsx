@@ -1,22 +1,17 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import {
-  COLORS,
-  Icon,
-  InputField,
-  LEGACY_INPUT_TYPE_PASSWORD,
-  setRefs,
-  StyledText,
-} from '@opentrons/components'
+import { setRefs, TouchInputField } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import styles from './OnDeviceLoginOverlayProvider.module.css'
+import styles from './OnDeviceLogin.module.css'
 
+import type { TFunction } from 'i18next'
 import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -60,6 +55,14 @@ export function OnDeviceLogin({
 
   const username = watch('username')
   const password = watch('password')
+
+  // reset keyboard input when switching steps
+  useEffect(() => {
+    if (!showKeyboard) return
+    const kb = keyboardRef.current
+    if (kb == null) return
+    kb.setInput(step === 'username' ? username : password)
+  }, [step, showKeyboard, username, password])
 
   const handleNext = (): void => {
     const { username, password } = getValues()
@@ -109,17 +112,6 @@ export function OnDeviceLogin({
         />
         <div className={styles.content_container}>
           <div className={styles.form_inner_container}>
-            <StyledText
-              as="label"
-              htmlFor={activeFieldName}
-              oddStyle="bodyTextRegular"
-              className={styles.field_label}
-              color={passwordLabelHasError ? COLORS.red50 : COLORS.black90}
-            >
-              {step === 'username'
-                ? t('device_settings:username')
-                : t('device_settings:password')}
-            </StyledText>
             <Controller
               key={activeFieldName}
               control={control}
@@ -128,6 +120,7 @@ export function OnDeviceLogin({
                 <LoginFieldInput
                   field={field}
                   step={step}
+                  t={t}
                   loginError={passwordLabelHasError ? loginError : null}
                   onClearLoginError={onClearLoginError}
                   onFocus={() => {
@@ -162,12 +155,13 @@ interface LoginFieldInputProps {
   field: ControllerRenderProps<LoginFormValues, 'username' | 'password'>
   step: LoginStep
   loginError: string | null
+  t: TFunction
   onClearLoginError?: () => void
   onFocus: () => void
 }
 
 /**
- * Renders the active username/password input. Lives inside the Controller's
+ * Renders the active username/password field with label. Lives inside the Controller
  * render prop so its `showPassword` state is reset automatically when the
  * Controller remounts on step change (via its `key` prop).
  */
@@ -177,20 +171,29 @@ function LoginFieldInput({
   loginError,
   onClearLoginError,
   onFocus,
+  t,
 }: LoginFieldInputProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = step === 'password' && !showPassword
-  const inputType = isPasswordHidden ? LEGACY_INPUT_TYPE_PASSWORD : 'text'
-  const toggleLabel = t('toggle_password_visibility')
+  const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
-  return (
-    <InputField
+  const togglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+    inputRef.current?.focus()
+  }
+
+  const label =
+    step === 'username'
+      ? t('device_settings:username')
+      : t('device_settings:password')
+
+  const inputField = (
+    <TouchInputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={step === 'password'}
       type={inputType}
-      size="medium"
+      label={label}
       error={loginError}
       value={field.value ?? ''}
       name={field.name}
@@ -201,33 +204,18 @@ function LoginFieldInput({
         onClearLoginError?.()
       }}
       onFocus={onFocus}
-      rightElement={
-        step === 'password' ? (
-          <div>
-            <button
-              aria-label={toggleLabel}
-              type="button"
-              title={toggleLabel}
-              onClick={() => {
-                setShowPassword(current => !current)
-                inputRef.current?.focus()
-              }}
-            >
-              <Icon name={showPassword ? 'eye-slash' : 'eye'} size="1.5rem" />
-            </button>
-          </div>
-        ) : null
-      }
     />
   )
-}
 
-export * from './getSafePostLoginPath'
-export {
-  OnDeviceLoginOverlayProvider,
-  useOnDeviceLoginModal,
-} from './OnDeviceLoginOverlayProvider'
-export type {
-  OnDeviceLoginModalContextValue,
-  OpenOnDeviceLoginOptions,
-} from './OnDeviceLoginOverlayProvider'
+  if (step !== 'password') return inputField
+
+  return (
+    <div className={styles.password_field_row}>
+      <div className={styles.password_field_input}>{inputField}</div>
+      <PasswordVisibilityToggle
+        isVisible={showPassword}
+        onToggle={togglePasswordVisibility}
+      />
+    </div>
+  )
+}

@@ -9,6 +9,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -38,6 +39,7 @@ import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
 import type { LocalizationProviderProps } from '../../LocalizationProvider'
@@ -57,6 +59,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('../../LocalizationProvider')
+vi.mock('/app/pages/ODD/Account')
 vi.mock('/app/pages/ODD/Welcome')
 vi.mock('/app/pages/ODD/NetworkSetupMenu')
 vi.mock('/app/pages/ODD/ChooseLanguage')
@@ -165,6 +168,10 @@ describe('OnDeviceDisplayApp', () => {
     render('/dashboard')
     expect(vi.mocked(RobotDashboard)).toHaveBeenCalled()
   })
+  it('renders Account component from /account', () => {
+    render('/account')
+    expect(vi.mocked(Account)).toHaveBeenCalled()
+  })
   it('renders ProtocolDashboard component from /protocols', () => {
     render('/protocols')
     expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalled()
@@ -219,6 +226,18 @@ describe('OnDeviceDisplayApp', () => {
   it('renders protocol receipt toasts', () => {
     render('/')
     expect(vi.mocked(useProtocolReceiptToast)).toHaveBeenCalled()
+  })
+  it('passes ODD ip to robot settings and access-control queries', () => {
+    render('/')
+    const expectedHostConfig: HostConfig = { hostname: _ODD_IP_ ?? 'localhost' }
+    expect(vi.mocked(useRobotSettingsQuery)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining(expectedHostConfig)
+    )
+    expect(vi.mocked(useAccessControlEnabledQuery)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining(expectedHostConfig)
+    )
   })
   it('renders TopLevelRedirects when it should conditionally render', () => {
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(<div>MOCK_REDIRECTS</div>)

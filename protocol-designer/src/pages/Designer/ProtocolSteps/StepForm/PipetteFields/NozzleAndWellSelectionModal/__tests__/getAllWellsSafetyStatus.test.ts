@@ -1,12 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  A1_NOZZLE,
+  B1_NOZZLE,
+  C1_NOZZLE,
   COLUMN,
+  D1_NOZZLE,
+  E1_NOZZLE,
+  F1_NOZZLE,
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
+  G1_NOZZLE,
   getLabwareDefURI,
+  PARTIAL_COLUMN,
   ROW,
+  SINGLE,
 } from '@opentrons/shared-data'
 import { getIsSafePipetteMovement } from '@opentrons/step-generation'
 
@@ -45,8 +54,8 @@ describe('getAllWellsSafetyStatus', () => {
     },
   } as any
   const mockRobotState = {} as any
-  const primaryNozzle = 'A1' as any
-  const singleNozzle = 'SINGLE' as any
+  const primaryNozzle = A1_NOZZLE
+  const singleNozzle = SINGLE
 
   const allWells = [
     ['A1', 'B1', 'C1'],
@@ -183,5 +192,44 @@ describe('getAllWellsSafetyStatus', () => {
 
       expect(getIsSafePipetteMovement).toHaveBeenCalledTimes(6)
     })
+  })
+  describe('PARTIAL COLUMN mode', () => {
+    const column = ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1']
+
+    const cases = [
+      { nozzle: B1_NOZZLE, tipCount: 2 },
+      { nozzle: C1_NOZZLE, tipCount: 3 },
+      { nozzle: D1_NOZZLE, tipCount: 4 },
+      { nozzle: E1_NOZZLE, tipCount: 5 },
+      { nozzle: F1_NOZZLE, tipCount: 6 },
+      { nozzle: G1_NOZZLE, tipCount: 7 },
+    ]
+
+    it.each(cases)(
+      'handles partial column mode with $tipCount tips ($nozzle)',
+      ({ nozzle, tipCount }) => {
+        ;(getIsSafePipetteMovement as any).mockReturnValue(true)
+
+        const result = getAllWellsSafetyStatus({
+          allWells: [column],
+          robotState: mockRobotState,
+          invariantContext: mockInvariantContext,
+          pipetteId,
+          labwareId,
+          primaryNozzle: nozzle,
+          nozzleConfiguration: PARTIAL_COLUMN,
+        })
+
+        // Assert correct block is marked safe
+        for (let i = 0; i < tipCount; i++) {
+          expect(result[column[i]]).toBe(0)
+        }
+
+        // Assert remaining wells are still present in output
+        for (let i = tipCount; i < column.length; i++) {
+          expect(result[column[i]]).toBeDefined()
+        }
+      }
+    )
   })
 })

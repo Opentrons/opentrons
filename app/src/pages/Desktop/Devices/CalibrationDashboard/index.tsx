@@ -3,9 +3,11 @@ import { useParams } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { CalibrationTaskList } from '/app/organisms/Desktop/CalibrationTaskList'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { useDashboardCalibrateDeck } from './hooks/useDashboardCalibrateDeck'
 import { useDashboardCalibratePipOffset } from './hooks/useDashboardCalibratePipOffset'
@@ -18,6 +20,7 @@ export function CalibrationDashboard(): JSX.Element {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
   const [dashboardOffsetCalLauncher, DashboardOffsetCalWizard] =
     useDashboardCalibratePipOffset(robotName)
   const [dashboardTipLengthCalLauncher, DashboardTipLengthCalWizard] =
@@ -31,18 +34,22 @@ export function CalibrationDashboard(): JSX.Element {
     <ApiHostProvider
       key={robot?.name}
       hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
     >
-      <CalibrationTaskList
-        robotName={robotName}
-        deckCalLauncher={dashboardDeckCalLauncher}
-        tipLengthCalLauncher={dashboardTipLengthCalLauncher}
-        pipOffsetCalLauncher={dashboardOffsetCalLauncher}
-        exitBeforeDeckConfigCompletion={exitBeforeDeckConfigCompletion}
-      />
-      {DashboardDeckCalWizard}
-      {DashboardOffsetCalWizard}
-      {DashboardTipLengthCalWizard}
+      <RobotCertRotator>
+        <CalibrationTaskList
+          robotName={robotName}
+          deckCalLauncher={dashboardDeckCalLauncher}
+          tipLengthCalLauncher={dashboardTipLengthCalLauncher}
+          pipOffsetCalLauncher={dashboardOffsetCalLauncher}
+          exitBeforeDeckConfigCompletion={exitBeforeDeckConfigCompletion}
+        />
+
+        {DashboardDeckCalWizard}
+        {DashboardOffsetCalWizard}
+        {DashboardTipLengthCalWizard}
+      </RobotCertRotator>
     </ApiHostProvider>
   )
 }
