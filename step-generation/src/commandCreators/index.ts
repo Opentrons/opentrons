@@ -11,6 +11,9 @@ export {
   thermocyclerProfileStep,
   thermocyclerStateStep,
   transfer,
+  vacuumCloseVentSetPumpPressure,
+  vacuumCloseVentSetPumpPower,
+  vacuumCloseVentStartProfile,
   waitForModuleTask,
 } from './compound'
 

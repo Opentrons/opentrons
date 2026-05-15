@@ -9,7 +9,7 @@ import {
   LanguageSetting,
   NetworkSettings,
   Privacy,
-  RobotEncryptionKey,
+  RobotEncryptionKeySettingOption,
   RobotName,
   RobotSettingsJoinOtherNetwork,
   RobotSettingsSelectAuthenticationType,
@@ -229,7 +229,9 @@ export function RobotSettingsDashboard(): JSX.Element {
       )
 
     case 'RobotEncryptionKey':
-      return <RobotEncryptionKey setCurrentOption={setCurrentOption} />
+      return (
+        <RobotEncryptionKeySettingOption setCurrentOption={setCurrentOption} />
+      )
 
     // fallthrough option: render the robot settings list of buttons
     default:
