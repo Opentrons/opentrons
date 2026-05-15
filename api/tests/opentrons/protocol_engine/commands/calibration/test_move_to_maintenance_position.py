@@ -43,7 +43,7 @@ async def test_calibration_move_to_location_implementation_for_attach_instrument
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=mount_type, maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT
+        mount=mount_type,
     )
 
     decoy.when(
@@ -139,7 +139,6 @@ async def test_calibration_move_to_location_implementation_for_gripper(
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
         mount=MountType.EXTENSION,
-        maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT,
     )
 
     decoy.when(

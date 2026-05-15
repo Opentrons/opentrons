@@ -32,7 +32,6 @@ class MaintenancePosition(enum.Enum):
     """Maintenance position options."""
 
     ATTACH_PLATE = "attachPlate"
-    ATTACH_INSTRUMENT = "attachInstrument"
 
 
 class MoveToMaintenancePositionParams(BaseModel):
@@ -43,8 +42,8 @@ class MoveToMaintenancePositionParams(BaseModel):
         description="Gantry mount to move maintenance position.",
     )
 
-    maintenancePosition: MaintenancePosition = Field(
-        MaintenancePosition.ATTACH_INSTRUMENT,
+    maintenancePosition: Optional[MaintenancePosition] = Field(
+        None,
         description="The position the gantry mount needs to move to.",
     )
 
@@ -92,12 +91,7 @@ class MoveToMaintenancePositionImplementation(
         )
 
         if params.mount != MountType.EXTENSION:
-            if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
-                mount = params.mount.to_hw_mount()
-                mount_to_axis = Axis.by_mount(mount)
-                await ot3_api.prepare_for_mount_movement(mount)
-                await ot3_api.disengage_axes([mount_to_axis])
-            else:
+            if params.maintenancePosition == MaintenancePosition.ATTACH_PLATE:
                 max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
                 await ot3_api.move_axes(
                     {
@@ -111,6 +105,11 @@ class MoveToMaintenancePositionImplementation(
                     }
                 )
                 await ot3_api.disengage_axes([Axis.Z_R])
+            else:
+                mount = params.mount.to_hw_mount()
+                mount_to_axis = Axis.by_mount(mount)
+                await ot3_api.prepare_for_mount_movement(mount)
+                await ot3_api.disengage_axes([mount_to_axis])
 
         return SuccessData(
             public=MoveToMaintenancePositionResult(),
