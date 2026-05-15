@@ -50,7 +50,7 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 
 <figure markdown>
 ![Spacers for adjusting wellplate height](images/image-placeholder.png "Height adjusting spacers")
-<figcaption>(?) X mm, Y mm, Z mm spacers</figcaption>
+<figcaption>(?) ? mm spacers</figcaption>
 </figure>
 
 </div>
@@ -111,9 +111,11 @@ Unnamed box 3 includes items that connect the manifold to the waste collection c
 
 </div>
 
-See <font color="red"><strong>section TBD for descriptions of selected parts.</strong></font>
-
 ## Physical specifications
+
+### Control Box
+
+The Control Box includes the vacuum pump, air/water separator, electronics, and power supply.
 
 <table>
   <thead>
@@ -124,8 +126,8 @@ See <font color="red"><strong>section TBD for descriptions of selected parts.</s
   </thead>
   <tbody>
     <tr>
-      <td><strong>Control box</strong></td>
-      <td>The control box includes the vacuum pump, air/water separator, electronics, and power supply.</td>
+      <td><strong>Dimensions</strong></td>
+      <td></td>
     </tr>
     <tr>
       <td><strong>Maximum pump rate</strong></td>
