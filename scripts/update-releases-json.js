@@ -29,21 +29,24 @@ async function readOrDefaultReleases(releasesPath) {
   }
 }
 
+// Robot-stack installers use Opentrons-OT2-*; internal (ot3) builds use Opentrons-Internal-OT2-*.
+const OT2_INSTALLER_RE = /Opentrons(?:-Internal)?-OT2.*\.(exe|dmg|AppImage)$/i
+
 const FILES_IN_RELEASE_JSON = [
-  /Opentrons-OT2.*\.exe$/,
-  /Opentrons-OT2.*\.dmg$/,
-  /Opentrons-OT2.*\.AppImage$/,
+  OT2_INSTALLER_RE,
   /latest.*yml$/,
   /alpha.*yml$/,
   /beta.*yml$/,
 ]
 
 function artifactNameToObj(artifactName, urlBase) {
-  if (artifactName.search(/Opentrons-OT2.*\.exe$/) !== -1) {
+  if (artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.exe$/i) !== -1) {
     return { 'Opentrons-OT2.exe': urlBase + artifactName }
-  } else if (artifactName.search(/Opentrons-OT2.*\.dmg$/) !== -1) {
+  } else if (artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.dmg$/i) !== -1) {
     return { 'Opentrons-OT2.dmg': urlBase + artifactName }
-  } else if (artifactName.search(/Opentrons-OT2.*\.AppImage$/) !== -1) {
+  } else if (
+    artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.AppImage$/i) !== -1
+  ) {
     return { 'Opentrons-OT2.AppImage': urlBase + artifactName }
   } else if (artifactName.search(/(latest|alpha|beta).*yml$/) !== -1) {
     return { [artifactName]: urlBase + artifactName }
