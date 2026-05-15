@@ -4,6 +4,9 @@ import { ConcurrentGroupCheckpoint } from './ConcurrentGroupCheckpoint'
 import { ConcurrentGroupChild } from './ConcurrentGroupChild'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ComponentProps } from 'react'
+
+type ConcurrentGroupProps = ComponentProps<typeof ConcurrentGroup>
 
 const meta: Meta<typeof ConcurrentGroup> = {
   title: 'Protocol-Designer/Molecules/ConcurrentGroup',
@@ -17,7 +20,7 @@ export const OnlyCheckpoints: Story = {
   args: {
     active: false,
   },
-  render: args => (
+  render: (args: ConcurrentGroupProps) => (
     <div style={{ width: '300px' }}>
       <ConcurrentGroup active={args.active}>
         <ConcurrentGroupChild type="checkpoint">
@@ -35,7 +38,7 @@ export const CheckpointsAndStepContainers: Story = {
   args: {
     active: false,
   },
-  render: args => (
+  render: (args: ConcurrentGroupProps) => (
     <div
       style={{
         display: 'flex',
@@ -120,7 +123,7 @@ export const LongTextWrapping: Story = {
   args: {
     active: false,
   },
-  render: args => (
+  render: (args: ConcurrentGroupProps) => (
     <div style={{ width: '300px' }}>
       <ConcurrentGroup active={args.active}>
         <ConcurrentGroupChild type="checkpoint">
