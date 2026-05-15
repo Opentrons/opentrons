@@ -73,11 +73,8 @@ jobs:
         run: |
           make -C app test-cov test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
           mv coverage/lcov.info coverage/lcov-shard-${{matrix.shard}}.info
-        # We want to see all test failures, so if a test in this shard fails, don't
-        # treat it as an error. Proceed to upload the test report. A subsequent step
-        # should read the merged reports, notice the test failure, and then fail the workflow.
-        continue-on-error: true
       - name: 'Upload frontend test shard result ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
+        if: ${{ !cancelled() }} # Make sure we forward along the report even if there were test failures.
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: frontend-unit-test-result-shard-${{matrix.shard}}
