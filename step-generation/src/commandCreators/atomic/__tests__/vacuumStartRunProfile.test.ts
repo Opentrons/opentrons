@@ -16,8 +16,11 @@ import {
 } from '../../../fixtures'
 import { vacuumStartRunProfile } from '../vacuumStartRunProfile'
 
-import type { VacuumModuleStartRunProfileCreateCommand } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '../../../types'
+import type {
+  InvariantContext,
+  RobotState,
+  VacuumStartRunProfileArgs,
+} from '../../../types'
 
 const vacuumModuleId = 'vacuumModuleId'
 
@@ -56,12 +59,19 @@ describe('vacuumStartRunProfile', () => {
   }
 
   it('generates JSON and python for a single atomic profile step with ventAfter', () => {
-    const params: VacuumModuleStartRunProfileCreateCommand['params'] = {
+    const args: VacuumStartRunProfileArgs = {
       moduleId: vacuumModuleId,
-      profile: [{ holdSeconds: 12, pressureMbar: 55 }],
+      commandCreatorFnName: 'vacuumStartRunProfile',
       ventAfter: true,
+      profile: [
+        {
+          enablePump: true,
+          holdSeconds: 12,
+          gaugePressureMbar: 55,
+        },
+      ],
     }
-    const result = vacuumStartRunProfile(params, invariantContext, robotState)
+    const result = vacuumStartRunProfile(args, invariantContext, robotState)
     expect(getSuccessResult(result)).toEqual({
       commands: [
         {
@@ -69,8 +79,7 @@ describe('vacuumStartRunProfile', () => {
           key: expect.any(String),
           params: {
             moduleId: vacuumModuleId,
-            profile: params.profile,
-            ventAfter: true,
+            profile: [{ ...args.profile[0], ventAfter: true }],
             taskId: 'mock_vacuum_module_task_1',
           },
         },
@@ -78,26 +87,30 @@ describe('vacuumStartRunProfile', () => {
       python: `
 mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     profile=[
-        {"gauge_pressure": 55, "hold_time_seconds": 12}
+        {
+            "gauge_pressure": 55,
+            "hold_time_seconds": 12,
+            "vent_after": True,
+        }
     ],
-    repetitions=1,
-    vent_after=True
+    repetitions=1
 )`.trim(),
     })
   })
 
   it('generates JSON and python for a sole cycle with repetitions (power steps)', () => {
-    const params: VacuumModuleStartRunProfileCreateCommand['params'] = {
+    const args: VacuumStartRunProfileArgs = {
+      commandCreatorFnName: 'vacuumStartRunProfile',
       moduleId: vacuumModuleId,
       profile: [
         {
           repetitions: 2,
-          steps: [{ holdSeconds: 5, powerPercent: 30 }],
+          steps: [{ enablePump: true, holdSeconds: 5, percentPower: 30 }],
         },
       ],
       ventAfter: false,
     }
-    const result = vacuumStartRunProfile(params, invariantContext, robotState)
+    const result = vacuumStartRunProfile(args, invariantContext, robotState)
     expect(getSuccessResult(result)).toEqual({
       commands: [
         {
@@ -105,8 +118,7 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
           key: expect.any(String),
           params: {
             moduleId: vacuumModuleId,
-            profile: params.profile,
-            ventAfter: false,
+            profile: [{ ...args.profile[0], ventAfter: false }],
             taskId: 'mock_vacuum_module_task_1',
           },
         },
@@ -114,9 +126,14 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
       python: `
 mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     profile=[
-        {"power_percent": 30, "hold_time_seconds": 5}
+        {"power_percent": 30, "hold_time_seconds": 5},
+        {
+            "power_percent": 30,
+            "hold_time_seconds": 5,
+            "vent_after": False,
+        }
     ],
-    repetitions=2
+    repetitions=1
 )`.trim(),
     })
   })
@@ -128,8 +145,16 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     }
     const result = vacuumStartRunProfile(
       {
+        commandCreatorFnName: 'vacuumStartRunProfile',
         moduleId: vacuumModuleId,
-        profile: [{ holdSeconds: 1, pressureMbar: 1 }],
+        ventAfter: false,
+        profile: [
+          {
+            enablePump: true,
+            holdSeconds: 1,
+            gaugePressureMbar: 1,
+          },
+        ],
       },
       invariantContext,
       robotNoVacuum
@@ -157,8 +182,16 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     })
     const result = vacuumStartRunProfile(
       {
+        commandCreatorFnName: 'vacuumStartRunProfile',
         moduleId: vacuumModuleId,
-        profile: [{ holdSeconds: 1, pressureMbar: 1 }],
+        ventAfter: false,
+        profile: [
+          {
+            enablePump: true,
+            holdSeconds: 1,
+            gaugePressureMbar: 1,
+          },
+        ],
       },
       invariantContext,
       busyRobot

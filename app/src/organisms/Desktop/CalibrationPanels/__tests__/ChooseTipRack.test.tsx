@@ -87,7 +87,7 @@ describe('ChooseTipRack', () => {
   it('renders the buttons and they work as expected', () => {
     render(props)
     screen.getByRole('link', { name: 'Need help?' })
-    const cancel = screen.getByRole('button', { name: 'cancel' })
+    const cancel = screen.getByRole('button', { name: 'Cancel' })
     const confirm = screen.getByRole('button', { name: 'Confirm tip rack' })
     fireEvent.click(cancel)
     expect(props.closeModal).toHaveBeenCalled()

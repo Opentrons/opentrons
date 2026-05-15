@@ -78,13 +78,18 @@ class VacuumModuleProfileCycle(BaseModel):
 
     steps: List[StartRunProfileStepParams]
     repetitions: int
+    ventAfter: bool | SkipJsonSchema[None] = None
 
     def convert_element(self) -> VacuumModuleCycle:
         """Convert a VacuumModuleCycle into a hardware controller type."""
         steps: List[VacuumModuleStep] = []
         for step in self.steps:
             steps.append(step.convert_element())
-        return VacuumModuleCycle(steps=steps, repetitions=self.repetitions)
+        return VacuumModuleCycle(
+            steps=steps,
+            repetitions=self.repetitions,
+            vent_after=self.ventAfter,
+        )
 
 
 StartRunProfileStepParams = Union[

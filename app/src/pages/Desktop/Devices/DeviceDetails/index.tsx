@@ -7,6 +7,7 @@ import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useRobot } from '/app/redux-resources/robots'
 import { getScanning, OPENTRONS_USB } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { DeviceDetailsComponent } from './DeviceDetailsComponent'
@@ -19,6 +20,7 @@ export function DeviceDetails(): JSX.Element | null {
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
+  const token = useAccessTokenForRobot(robotName)
 
   useSyncRobotClock(robotName)
 
@@ -29,6 +31,7 @@ export function DeviceDetails(): JSX.Element | null {
       key={robot.name}
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
     >
       <RobotCertRotator>
         <DeviceDetailsComponent robotName={robotName} />

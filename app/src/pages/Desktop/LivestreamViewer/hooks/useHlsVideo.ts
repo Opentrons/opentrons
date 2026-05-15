@@ -40,7 +40,7 @@ export function useHlsVideo(
 
   useEffect(() => {
     if (error) {
-      console.error(error)
+      console.warn(error)
     }
   }, [error])
 

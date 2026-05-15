@@ -47,7 +47,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'george_clooney',
-      legalName: 'George Clooney',
+      fullName: 'George Clooney',
     })
 
     renderAccount()
@@ -64,7 +64,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: false,
       username: null,
-      legalName: null,
+      fullName: null,
     })
 
     renderAccount()
@@ -82,7 +82,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'username',
-      legalName: 'Full Name',
+      fullName: 'Full Name',
     })
 
     renderAccount()
@@ -95,7 +95,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'george_clooney',
-      legalName: 'George Clooney',
+      fullName: 'George Clooney',
     })
 
     renderAccount()

@@ -135,18 +135,19 @@ export const forVacuumStartRunProfile = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, profile, taskId, ventAfter = true } = params
+  const { moduleId, profile, taskId } = params
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   // taskId should not be null, but this is to satisfy type checks
   if (moduleState == null || taskId == null) {
     return
   }
+  const shouldVentAfterFinalProfileStep = profile.at(-1)?.ventAfter ?? true
   moduleState.currentPumpActivity = {
     type: 'profile',
     profileElements: profile,
     taskId,
-    ventAfter,
+    ventAfter: shouldVentAfterFinalProfileStep,
   }
   moduleState.numPumpActivitiesStarted++
 }

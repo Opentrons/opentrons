@@ -49,6 +49,7 @@ class VacuumModulePressureStep(VacuumModuleStepBase):
 class VacuumModuleCycle(TypedDict):
     steps: List[VacuumModuleStep]
     repetitions: int
+    vent_after: bool | None
 
 
 VacuumModuleStep = Union[VacuumModulePowerStep, VacuumModulePressureStep]

@@ -1,8 +1,8 @@
 {
-  "createdAt": "2026-05-12T13:16:44.637079Z",
+  "createdAt": "2026-05-13T02:07:32.378868Z",
   "files": [
     {
-      "name": "ot2TC (1).py",
+      "name": "ot2TC (3).py",
       "role": "main"
     }
   ],
@@ -14,7 +14,7 @@
     "protocolName": "ot2TC",
     "created": "2026-05-11T13:33:07.098Z",
     "internalAppBuildDate": "Tue, 05 May 2026 15:37:27 GMT",
-    "lastModified": "2026-05-12T13:15:48.714Z",
+    "lastModified": "2026-05-13T02:07:25.730Z",
     "protocolDesigner": "8.10.1",
     "source": "Protocol Designer"
   },
@@ -23,21 +23,21 @@
   "runTimeParameters": [],
   "commands": [
     {
-      "id": "06f4b7d1-12d0-4ef0-a9bf-4226c4fdeb3e",
-      "createdAt": "2026-05-12T13:16:44.625823Z",
+      "id": "916634b4-ccfe-4732-9c43-cdf81dfee17c",
+      "createdAt": "2026-05-13T02:07:32.366927Z",
       "commandType": "home",
       "key": "50c7ae73a4e3f7129874f39dfb514803",
       "status": "succeeded",
       "params": {},
       "result": {},
-      "startedAt": "2026-05-12T13:16:44.625910Z",
-      "completedAt": "2026-05-12T13:16:44.625946Z",
+      "startedAt": "2026-05-13T02:07:32.367016Z",
+      "completedAt": "2026-05-13T02:07:32.367053Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "705af988-ab65-4858-835d-84cdbe05d53e",
-      "createdAt": "2026-05-12T13:16:44.626210Z",
+      "id": "ca97cd00-af40-4577-b0d5-09fa8bbc38be",
+      "createdAt": "2026-05-13T02:07:32.367328Z",
       "commandType": "loadModule",
       "key": "8511b05ba5565bf0e6dcccd800e2ee23",
       "status": "succeeded",
@@ -48,20 +48,42 @@
         }
       },
       "result": {
-        "moduleId": "2cef6ce2-1acc-4298-b28a-6a9e60f3aef0",
+        "moduleId": "f09e6ed3-0514-4831-b5b7-94ede4f4dc4a",
         "model": "thermocyclerModuleV1",
-        "serialNumber": "fake-serial-number-f951f55a-1754-4b24-bc95-be36ed5b47d3"
+        "serialNumber": "fake-serial-number-08a6a5d2-4b84-430d-8621-ea1ca1dff2ae"
       },
-      "startedAt": "2026-05-12T13:16:44.626263Z",
-      "completedAt": "2026-05-12T13:16:44.626736Z",
+      "startedAt": "2026-05-13T02:07:32.367384Z",
+      "completedAt": "2026-05-13T02:07:32.367884Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "4fbe2492-3749-4761-a31e-27a9e6100750",
-      "createdAt": "2026-05-12T13:16:44.627273Z",
+      "id": "9c6ab043-88e9-4f7f-8f03-32d53249181b",
+      "createdAt": "2026-05-13T02:07:32.368372Z",
+      "commandType": "loadModule",
+      "key": "b97e4480a1578eb15e73787ba193bdd5",
+      "status": "succeeded",
+      "params": {
+        "model": "magneticModuleV2",
+        "location": {
+          "slotName": "1"
+        }
+      },
+      "result": {
+        "moduleId": "0c3a7104-dd59-469d-9271-9a5e08a0621e",
+        "model": "magneticModuleV2",
+        "serialNumber": "fake-serial-number-37bc7a85-5889-43bc-b6b9-6bb402d61f53"
+      },
+      "startedAt": "2026-05-13T02:07:32.368418Z",
+      "completedAt": "2026-05-13T02:07:32.368724Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "f1823055-0174-41f1-883c-4ecd49ed8362",
+      "createdAt": "2026-05-13T02:07:32.369070Z",
       "commandType": "loadLabware",
-      "key": "b9563ff54d4bfe61c469a7da06e79f42",
+      "key": "dde8d6bda911c45c85095a893fe03859",
       "status": "succeeded",
       "params": {
         "location": {
@@ -72,7 +94,7 @@
         "version": 1
       },
       "result": {
-        "labwareId": "a0b54d20-da8c-4599-aa26-0ac784078938",
+        "labwareId": "54206c96-d978-4024-844c-2df932ae91d3",
         "locationSequence": [
           {
             "kind": "onAddressableArea",
@@ -1108,16 +1130,16 @@
           "gripperOffsets": {}
         }
       },
-      "startedAt": "2026-05-12T13:16:44.627335Z",
-      "completedAt": "2026-05-12T13:16:44.628433Z",
+      "startedAt": "2026-05-13T02:07:32.369127Z",
+      "completedAt": "2026-05-13T02:07:32.370203Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "82c045f8-38ee-44c2-b052-348420ae66e5",
-      "createdAt": "2026-05-12T13:16:44.628871Z",
+      "id": "697ed55d-dcd5-479b-b221-3ca4b1c3a253",
+      "createdAt": "2026-05-13T02:07:32.370684Z",
       "commandType": "loadLabware",
-      "key": "07af6536632377008ed92723cc8c5072",
+      "key": "2104f5857945e83bb1223f1209bc92ca",
       "status": "succeeded",
       "params": {
         "location": {
@@ -1128,7 +1150,7 @@
         "version": 2
       },
       "result": {
-        "labwareId": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+        "labwareId": "f3073639-2e5a-4257-9e51-76b394607240",
         "locationSequence": [
           {
             "kind": "onAddressableArea",
@@ -2308,16 +2330,16 @@
           }
         }
       },
-      "startedAt": "2026-05-12T13:16:44.628955Z",
-      "completedAt": "2026-05-12T13:16:44.629585Z",
+      "startedAt": "2026-05-13T02:07:32.370730Z",
+      "completedAt": "2026-05-13T02:07:32.371383Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "a88ec076-ef5a-46df-af71-6a8e9495d239",
-      "createdAt": "2026-05-12T13:16:44.629943Z",
+      "id": "51af01c0-7777-4561-90a0-6ff42ec7b81a",
+      "createdAt": "2026-05-13T02:07:32.371757Z",
       "commandType": "loadPipette",
-      "key": "07ec09c7938c2a88b56846006440a5ee",
+      "key": "e11c823809a717aed41f87b6e51f7407",
       "status": "succeeded",
       "params": {
         "pipetteName": "p300_single",
@@ -2326,46 +2348,46 @@
         "liquidPresenceDetection": false
       },
       "result": {
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
-      "startedAt": "2026-05-12T13:16:44.630000Z",
-      "completedAt": "2026-05-12T13:16:44.630949Z",
+      "startedAt": "2026-05-13T02:07:32.371804Z",
+      "completedAt": "2026-05-13T02:07:32.372555Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "0066fff4-bc2b-4888-9a04-f1b2412374b1",
-      "createdAt": "2026-05-12T13:16:44.631226Z",
+      "id": "f2c8d63a-e7d4-4a5d-8099-8c35b5d06aa7",
+      "createdAt": "2026-05-13T02:07:32.372813Z",
       "commandType": "waitForResume",
-      "key": "d761e2b6354642c721f8d64e993601d2",
+      "key": "ee0c23cc9883b2559fa06eb4eee6ccd9",
       "status": "succeeded",
       "params": {},
       "result": {},
-      "startedAt": "2026-05-12T13:16:44.631273Z",
-      "completedAt": "2026-05-12T13:16:44.631294Z",
+      "startedAt": "2026-05-13T02:07:32.372855Z",
+      "completedAt": "2026-05-13T02:07:32.372873Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "86f3a27d-3b9c-4fb5-8f40-6a4b3a7d8c13",
-      "createdAt": "2026-05-12T13:16:44.631442Z",
+      "id": "f342c614-6476-4970-a81c-1d5965d54978",
+      "createdAt": "2026-05-13T02:07:32.373036Z",
       "commandType": "thermocycler/openLid",
-      "key": "186376efac0a118ddce7f69c348f3b9e",
+      "key": "9cf881955cca0b8ab04cc91e54e56821",
       "status": "succeeded",
       "params": {
-        "moduleId": "2cef6ce2-1acc-4298-b28a-6a9e60f3aef0"
+        "moduleId": "f09e6ed3-0514-4831-b5b7-94ede4f4dc4a"
       },
       "result": {},
-      "startedAt": "2026-05-12T13:16:44.631490Z",
-      "completedAt": "2026-05-12T13:16:44.631515Z",
+      "startedAt": "2026-05-13T02:07:32.373088Z",
+      "completedAt": "2026-05-13T02:07:32.373115Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "90acd0a7-166a-4855-8a1e-5498a1070482",
-      "createdAt": "2026-05-12T13:16:44.632101Z",
+      "id": "953129e1-b17d-4a35-9a57-51acabab23cb",
+      "createdAt": "2026-05-13T02:07:32.373673Z",
       "commandType": "loadLiquidClass",
-      "key": "5df947dffea0310fd181ad7d47d57e94",
+      "key": "10504db46de54c3b5652bd602120ca6a",
       "status": "succeeded",
       "params": {
         "liquidClassRecord": {
@@ -2480,43 +2502,43 @@
         }
       },
       "result": {
-        "liquidClassId": "79d70002-4e58-46cc-9bd6-c4fcfe864609"
+        "liquidClassId": "da94e745-a1b0-4e73-a65a-e598132f3304"
       },
-      "startedAt": "2026-05-12T13:16:44.632148Z",
-      "completedAt": "2026-05-12T13:16:44.632339Z",
+      "startedAt": "2026-05-13T02:07:32.373723Z",
+      "completedAt": "2026-05-13T02:07:32.373981Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "3d633cf3-fbdc-4336-a2ab-6101e49a06c5",
-      "createdAt": "2026-05-12T13:16:44.632584Z",
+      "id": "68dc867c-90ea-47d5-bc9c-6352aa57f741",
+      "createdAt": "2026-05-13T02:07:32.374196Z",
       "commandType": "getNextTip",
-      "key": "372f8dafecf99e16e03c0385b52c8044",
+      "key": "9117497c4ba8d3ae4a0aa8629c8d35b4",
       "status": "succeeded",
       "params": {
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c",
-        "labwareIds": ["a0b54d20-da8c-4599-aa26-0ac784078938"]
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19",
+        "labwareIds": ["54206c96-d978-4024-844c-2df932ae91d3"]
       },
       "result": {
         "nextTipInfo": {
-          "labwareId": "a0b54d20-da8c-4599-aa26-0ac784078938",
+          "labwareId": "54206c96-d978-4024-844c-2df932ae91d3",
           "tipStartingWell": "A1"
         }
       },
-      "startedAt": "2026-05-12T13:16:44.632629Z",
-      "completedAt": "2026-05-12T13:16:44.632664Z",
+      "startedAt": "2026-05-13T02:07:32.374247Z",
+      "completedAt": "2026-05-13T02:07:32.374285Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "b4f76f53-4f27-4d7b-8ca0-5081101c909e",
-      "createdAt": "2026-05-12T13:16:44.632827Z",
+      "id": "17885b33-db25-45cc-bca7-3a53cb35452f",
+      "createdAt": "2026-05-13T02:07:32.374458Z",
       "commandType": "pickUpTip",
-      "key": "3bd634e4e19c8d3789a750a4dbaa4390",
+      "key": "42a224871b2ce59b66ace8162a01c760",
       "status": "succeeded",
       "params": {
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c",
-        "labwareId": "a0b54d20-da8c-4599-aa26-0ac784078938",
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19",
+        "labwareId": "54206c96-d978-4024-844c-2df932ae91d3",
         "wellName": "A1",
         "wellLocation": {
           "origin": "top",
@@ -2537,20 +2559,20 @@
         "tipLength": 51.83,
         "tipDiameter": 5.23
       },
-      "startedAt": "2026-05-12T13:16:44.632872Z",
-      "completedAt": "2026-05-12T13:16:44.633051Z",
+      "startedAt": "2026-05-13T02:07:32.374505Z",
+      "completedAt": "2026-05-13T02:07:32.374710Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "b04f02c8-e3b4-45da-8eed-d9063b9a2848",
-      "createdAt": "2026-05-12T13:16:44.633315Z",
+      "id": "b09cd25a-7815-47c0-ba8d-96d5bd623aad",
+      "createdAt": "2026-05-13T02:07:32.374984Z",
       "commandType": "moveToWell",
-      "key": "a136b8aa006b6b67b59f10220df675f4",
+      "key": "d18b72653686f0f4a6d2841cb30e2c34",
       "status": "succeeded",
       "params": {
         "forceDirect": false,
-        "labwareId": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+        "labwareId": "f3073639-2e5a-4257-9e51-76b394607240",
         "wellName": "A1",
         "wellLocation": {
           "origin": "top",
@@ -2561,7 +2583,7 @@
           },
           "volumeOffset": 0
         },
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {
         "position": {
@@ -2570,21 +2592,21 @@
           "z": 16.35
         }
       },
-      "startedAt": "2026-05-12T13:16:44.633357Z",
-      "completedAt": "2026-05-12T13:16:44.633494Z",
+      "startedAt": "2026-05-13T02:07:32.375029Z",
+      "completedAt": "2026-05-13T02:07:32.375179Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "1ae567b1-61ce-417f-8bfb-79a91aa8c888",
-      "createdAt": "2026-05-12T13:16:44.633625Z",
+      "id": "11ab7d3d-9b88-4a4e-9778-ae75ff66af80",
+      "createdAt": "2026-05-13T02:07:32.375319Z",
       "commandType": "moveToWell",
-      "key": "5d1d721e204730bd8bf8d64fc8243b04",
+      "key": "48645485199015a85e9425caf1c1678e",
       "status": "succeeded",
       "params": {
         "forceDirect": true,
         "speed": 125,
-        "labwareId": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+        "labwareId": "f3073639-2e5a-4257-9e51-76b394607240",
         "wellName": "A1",
         "wellLocation": {
           "origin": "top",
@@ -2595,7 +2617,7 @@
           },
           "volumeOffset": 0
         },
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {
         "position": {
@@ -2604,41 +2626,41 @@
           "z": 2.92
         }
       },
-      "startedAt": "2026-05-12T13:16:44.633664Z",
-      "completedAt": "2026-05-12T13:16:44.633737Z",
+      "startedAt": "2026-05-13T02:07:32.375358Z",
+      "completedAt": "2026-05-13T02:07:32.375437Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "815e0dd7-6115-4f62-be98-97c88eda3c8d",
-      "createdAt": "2026-05-12T13:16:44.633852Z",
+      "id": "1aae313f-59c5-4025-949e-dfaa2b63e12f",
+      "createdAt": "2026-05-13T02:07:32.375549Z",
       "commandType": "aspirateInPlace",
-      "key": "82c09fdc388371e6e275c0abed0eaea3",
+      "key": "43a6598ecaf9fc0a679155a9cb6d6cc0",
       "status": "succeeded",
       "params": {
         "flowRate": 150,
         "volume": 10,
         "correctionVolume": 0,
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {
         "volume": 10
       },
-      "startedAt": "2026-05-12T13:16:44.633893Z",
-      "completedAt": "2026-05-12T13:16:44.633931Z",
+      "startedAt": "2026-05-13T02:07:32.375589Z",
+      "completedAt": "2026-05-13T02:07:32.375626Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "fa8eaafe-2a6a-4052-9b75-7955d56f6807",
-      "createdAt": "2026-05-12T13:16:44.634096Z",
+      "id": "aee786fb-611e-4828-b57f-ed7dbf6df23c",
+      "createdAt": "2026-05-13T02:07:32.375795Z",
       "commandType": "moveToWell",
-      "key": "41b0c623e037c80479c73d7914abca70",
+      "key": "1257982b036b1e3b6be155565b03bd1e",
       "status": "succeeded",
       "params": {
         "forceDirect": true,
         "speed": 125,
-        "labwareId": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+        "labwareId": "f3073639-2e5a-4257-9e51-76b394607240",
         "wellName": "A1",
         "wellLocation": {
           "origin": "top",
@@ -2649,7 +2671,7 @@
           },
           "volumeOffset": 0
         },
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {
         "position": {
@@ -2658,20 +2680,20 @@
           "z": 16.35
         }
       },
-      "startedAt": "2026-05-12T13:16:44.634139Z",
-      "completedAt": "2026-05-12T13:16:44.634220Z",
+      "startedAt": "2026-05-13T02:07:32.375839Z",
+      "completedAt": "2026-05-13T02:07:32.375923Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "0ade959d-37d4-4f0c-bdc4-fe1531ef5535",
-      "createdAt": "2026-05-12T13:16:44.634423Z",
+      "id": "f4e02980-a483-49de-95b8-6663c6817032",
+      "createdAt": "2026-05-13T02:07:32.376124Z",
       "commandType": "moveToWell",
-      "key": "5fcbee4b850866d8d9489a704ce89ef5",
+      "key": "1a200f79ac25abe4113efc0eda3d881a",
       "status": "succeeded",
       "params": {
         "forceDirect": false,
-        "labwareId": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+        "labwareId": "f3073639-2e5a-4257-9e51-76b394607240",
         "wellName": "H12",
         "wellLocation": {
           "origin": "top",
@@ -2682,7 +2704,7 @@
           },
           "volumeOffset": 0
         },
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {
         "position": {
@@ -2691,21 +2713,21 @@
           "z": 16.35
         }
       },
-      "startedAt": "2026-05-12T13:16:44.634463Z",
-      "completedAt": "2026-05-12T13:16:44.634537Z",
+      "startedAt": "2026-05-13T02:07:32.376161Z",
+      "completedAt": "2026-05-13T02:07:32.376237Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "565248d2-6e91-4460-b100-1651f79e35d7",
-      "createdAt": "2026-05-12T13:16:44.634652Z",
+      "id": "c4221b62-361f-4b36-9efd-9347f9c31c74",
+      "createdAt": "2026-05-13T02:07:32.376361Z",
       "commandType": "moveToWell",
-      "key": "3d735e2061fd9f45b6e1ecbef33b77ff",
+      "key": "659a0f5d4e0c4292c21b9b65908cedf2",
       "status": "succeeded",
       "params": {
         "forceDirect": true,
         "speed": 125,
-        "labwareId": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+        "labwareId": "f3073639-2e5a-4257-9e51-76b394607240",
         "wellName": "H12",
         "wellLocation": {
           "origin": "top",
@@ -2716,7 +2738,7 @@
           },
           "volumeOffset": 0
         },
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {
         "position": {
@@ -2725,42 +2747,42 @@
           "z": 2.92
         }
       },
-      "startedAt": "2026-05-12T13:16:44.634690Z",
-      "completedAt": "2026-05-12T13:16:44.634758Z",
+      "startedAt": "2026-05-13T02:07:32.376401Z",
+      "completedAt": "2026-05-13T02:07:32.376474Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "f346d241-c4ab-43d3-80a0-7bad5238b7d9",
-      "createdAt": "2026-05-12T13:16:44.634873Z",
+      "id": "ba5e2ff5-71e3-4202-85bf-f37d4444554b",
+      "createdAt": "2026-05-13T02:07:32.376593Z",
       "commandType": "dispenseInPlace",
-      "key": "89ac622f98ffdbce34e21bced46ac44d",
+      "key": "b1a0d28b60c08131ada17bd1dae077df",
       "status": "succeeded",
       "params": {
         "flowRate": 300,
         "volume": 10,
         "correctionVolume": 0,
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c",
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19",
         "pushOut": 0
       },
       "result": {
         "volume": 10
       },
-      "startedAt": "2026-05-12T13:16:44.634913Z",
-      "completedAt": "2026-05-12T13:16:44.635220Z",
+      "startedAt": "2026-05-13T02:07:32.376634Z",
+      "completedAt": "2026-05-13T02:07:32.376757Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "200ffea4-7c51-4694-95b0-eedd25f71ec6",
-      "createdAt": "2026-05-12T13:16:44.635397Z",
+      "id": "026ebddb-36d5-437c-a3c7-6b2f8c3e2ed9",
+      "createdAt": "2026-05-13T02:07:32.376923Z",
       "commandType": "moveToWell",
-      "key": "bc54ecdc97dfb2c20606eb7a9e953435",
+      "key": "6c7eeee512b59cc57cd36f4d85bcd562",
       "status": "succeeded",
       "params": {
         "forceDirect": true,
         "speed": 125,
-        "labwareId": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+        "labwareId": "f3073639-2e5a-4257-9e51-76b394607240",
         "wellName": "H12",
         "wellLocation": {
           "origin": "top",
@@ -2771,7 +2793,7 @@
           },
           "volumeOffset": 0
         },
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {
         "position": {
@@ -2780,37 +2802,37 @@
           "z": 16.35
         }
       },
-      "startedAt": "2026-05-12T13:16:44.635436Z",
-      "completedAt": "2026-05-12T13:16:44.635508Z",
+      "startedAt": "2026-05-13T02:07:32.376961Z",
+      "completedAt": "2026-05-13T02:07:32.377035Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "80a73523-d1ba-47c9-a174-cde5859c80fc",
-      "createdAt": "2026-05-12T13:16:44.635620Z",
+      "id": "bdd91446-60a9-49f1-84e0-7bf8ac676280",
+      "createdAt": "2026-05-13T02:07:32.377165Z",
       "commandType": "configureForVolume",
-      "key": "d9d5478c49f977861f6597f88e9d8b25",
+      "key": "20aa5a358709aaf22372821f435c4c45",
       "status": "succeeded",
       "params": {
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c",
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19",
         "volume": 300,
         "tipOverlapNotAfterVersion": "v3"
       },
       "result": {},
-      "startedAt": "2026-05-12T13:16:44.635660Z",
-      "completedAt": "2026-05-12T13:16:44.635860Z",
+      "startedAt": "2026-05-13T02:07:32.377218Z",
+      "completedAt": "2026-05-13T02:07:32.377429Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "8d118b97-1559-47eb-8451-30acdbccd1d7",
-      "createdAt": "2026-05-12T13:16:44.636018Z",
+      "id": "bd99bbee-d5c1-4130-93fa-91009c9c27b1",
+      "createdAt": "2026-05-13T02:07:32.377593Z",
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "fd44a033b493191b18ff7b7dfc4e5db4",
+      "key": "c51862fb415ef41de3a4daba4e8153ff",
       "status": "succeeded",
       "params": {
         "forceDirect": false,
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c",
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19",
         "addressableAreaName": "fixedTrash",
         "offset": {
           "x": 0,
@@ -2827,30 +2849,46 @@
           "z": 82
         }
       },
-      "startedAt": "2026-05-12T13:16:44.636057Z",
-      "completedAt": "2026-05-12T13:16:44.636174Z",
+      "startedAt": "2026-05-13T02:07:32.377639Z",
+      "completedAt": "2026-05-13T02:07:32.377798Z",
       "notes": [],
       "commandAnnotationIds": []
     },
     {
-      "id": "5f27c820-1c6c-4aca-8084-32491c8a84ce",
-      "createdAt": "2026-05-12T13:16:44.636291Z",
+      "id": "1e5b3ab3-504a-4df3-8c30-25faa5e2d98b",
+      "createdAt": "2026-05-13T02:07:32.377916Z",
       "commandType": "dropTipInPlace",
-      "key": "4fa316a827defde08d2ead7ab3d2acfd",
+      "key": "4aa060cd0fe3d0f5ead5be5f27ca4a80",
       "status": "succeeded",
       "params": {
-        "pipetteId": "19452963-27bd-4c78-8496-220e6059e48c"
+        "pipetteId": "10718b8e-1f78-4c91-afcd-1fdb8acebe19"
       },
       "result": {},
-      "startedAt": "2026-05-12T13:16:44.636330Z",
-      "completedAt": "2026-05-12T13:16:44.636351Z",
+      "startedAt": "2026-05-13T02:07:32.377966Z",
+      "completedAt": "2026-05-13T02:07:32.377988Z",
+      "notes": [],
+      "commandAnnotationIds": []
+    },
+    {
+      "id": "1d9a0df2-e29a-4d75-bbdf-c8e6a930abd6",
+      "createdAt": "2026-05-13T02:07:32.378178Z",
+      "commandType": "magneticModule/engage",
+      "key": "cfda18c86c793f39d13e4f38c922b2cd",
+      "status": "succeeded",
+      "params": {
+        "moduleId": "0c3a7104-dd59-469d-9271-9a5e08a0621e",
+        "height": 0
+      },
+      "result": {},
+      "startedAt": "2026-05-13T02:07:32.378220Z",
+      "completedAt": "2026-05-13T02:07:32.378244Z",
       "notes": [],
       "commandAnnotationIds": []
     }
   ],
   "labware": [
     {
-      "id": "a0b54d20-da8c-4599-aa26-0ac784078938",
+      "id": "54206c96-d978-4024-844c-2df932ae91d3",
       "loadName": "opentrons_96_tiprack_300ul",
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",
       "location": {
@@ -2858,7 +2896,7 @@
       }
     },
     {
-      "id": "a4aeeff8-14d4-4d56-b188-bf9fa7fb0dde",
+      "id": "f3073639-2e5a-4257-9e51-76b394607240",
       "loadName": "axygen_96_wellplate_500ul",
       "definitionUri": "opentrons/axygen_96_wellplate_500ul/2",
       "location": {
@@ -2868,19 +2906,27 @@
   ],
   "pipettes": [
     {
-      "id": "19452963-27bd-4c78-8496-220e6059e48c",
+      "id": "10718b8e-1f78-4c91-afcd-1fdb8acebe19",
       "pipetteName": "p300_single",
       "mount": "left"
     }
   ],
   "modules": [
     {
-      "id": "2cef6ce2-1acc-4298-b28a-6a9e60f3aef0",
+      "id": "f09e6ed3-0514-4831-b5b7-94ede4f4dc4a",
       "model": "thermocyclerModuleV1",
       "location": {
         "slotName": "7"
       },
-      "serialNumber": "fake-serial-number-f951f55a-1754-4b24-bc95-be36ed5b47d3"
+      "serialNumber": "fake-serial-number-08a6a5d2-4b84-430d-8621-ea1ca1dff2ae"
+    },
+    {
+      "id": "0c3a7104-dd59-469d-9271-9a5e08a0621e",
+      "model": "magneticModuleV2",
+      "location": {
+        "slotName": "1"
+      },
+      "serialNumber": "fake-serial-number-37bc7a85-5889-43bc-b6b9-6bb402d61f53"
     }
   ],
   "liquids": [],
@@ -2994,7 +3040,7 @@
       "tiprack": "opentrons/opentrons_96_tiprack_300ul/1",
       "liquidClassName": "transfer_step_3",
       "pipetteModel": "p300_single",
-      "liquidClassId": "79d70002-4e58-46cc-9bd6-c4fcfe864609"
+      "liquidClassId": "da94e745-a1b0-4e73-a65a-e598132f3304"
     }
   ],
   "errors": [],

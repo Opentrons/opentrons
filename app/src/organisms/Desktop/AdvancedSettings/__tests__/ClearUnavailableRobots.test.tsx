@@ -73,7 +73,7 @@ describe('ClearUnavailableRobots', () => {
       'Clearing the list of unavailable robots on the Devices page cannot be undone.'
     )
     screen.getByRole('button', {
-      name: 'cancel',
+      name: 'Cancel',
     })
     screen.getByRole('button', {
       name: 'Clear unavailable robots',
@@ -106,7 +106,7 @@ describe('ClearUnavailableRobots', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: 'cancel',
+        name: 'Cancel',
       })
     )
     expect(mockCancel).toHaveBeenCalled()
