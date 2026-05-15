@@ -623,11 +623,14 @@ def convert_result_to_dict_of_proxies(  # noqa: C901
             result = bound_method(*args, **kwargs)
             return_types = attr.__annotations__["return"]
         elif isinstance(attr, FunctionType):
-            bound_method = MethodType(attr, core_obj)
+            bound_method = execute_inbound_call_on_event_loop(  # type: ignore
+                core_obj, MethodType(attr, core_obj)
+            )
             result = bound_method(*args, **kwargs)
             return_types = attr.__annotations__["return"]
         elif isinstance(attr, property):
-            result = getattr(core_obj, name)
+            bound_property = execute_inbound_call_on_event_loop(core_obj, attr)
+            result = bound_property.fget()
             return_types = attr.fget.__annotations__["return"]
         else:
             raise ValueError(
