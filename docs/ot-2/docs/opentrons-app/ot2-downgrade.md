@@ -10,9 +10,9 @@ Start here for information and instructions about how to downgrade your Opentron
 
 ## Software versions
 
-After v9.0, Opentrons split its software into separate branches for OT-2 and Flex. This change restarts OT-2 software versioning at 26.06 and helps reduce downtime by eliminating shared updates that do not benefit your robot.
+After v9.0, Opentrons created separate software versions for OT-2 and Flex. This change helps reduce downtime by eliminating shared updates that do not benefit your robot, while transitioning OT-2 software versioning to v26.06.
 
-When downgrading, these separate OT-2 software versions are available on GitHub:
+For downgrading, these separate OT-2 software versions are available on GitHub:
 
 - **v26.06 (and later):** [Opentrons OT-2 releases](https://github.com/Opentrons/opentrons-ot2/releases)
 - **v9.0 (and earlier):** [Opentrons releases](https://github.com/Opentrons/opentrons/releases)
