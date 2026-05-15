@@ -133,7 +133,7 @@ const getPumpEndSettings = (args: {
     return null
   }
   const duration = getTimeSecondsFromString(pumpDurationTime)
-  return { duration, ventAfter: endingHoldVentCheckbox === true }
+  return { duration, ventAfter: endingHoldVentCheckbox }
 }
 
 export const vacuumFormToArgs = (
@@ -171,14 +171,14 @@ export const vacuumFormToArgs = (
           })
           if (modeType === VACUUM_MODE_PRESSURE) {
             return {
-              commandCreatorFnName: 'vacuumSetPumpPressure',
+              commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
               gaugePressure: pressureMbar!,
               ...pumpAdvancedArgs,
               ...baseValues,
             }
           }
           return {
-            commandCreatorFnName: 'vacuumSetPumpPower',
+            commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
             powerPercent: powerPercent!,
             ...pumpAdvancedArgs,
             ...baseValues,
@@ -209,7 +209,7 @@ export const vacuumFormToArgs = (
         vacuumProfileItemsById
       )
       return {
-        commandCreatorFnName: 'vacuumStartRunProfile',
+        commandCreatorFnName: 'vacuumCloseVentStartProfile',
         profile: profileElements.map(vacuumProfileItemToPeProfileElement),
         ventAfter: endingHoldVentCheckbox,
         ...baseValues,

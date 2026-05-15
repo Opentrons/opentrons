@@ -841,6 +841,20 @@ export interface VacuumPumpPowerArgs
   powerPercent: number
 }
 
+export interface VacuumCloseVentSetPumpPressureArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentSetPumpPressure'
+  gaugePressure: number
+}
+
+export interface VacuumCloseVentSetPumpPowerArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
+  powerPercent: number
+}
+
 export interface VacuumOpenVentArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumOpenVent'
@@ -879,11 +893,22 @@ export interface VacuumProfileStep extends ProfileStepItemBase {
 
 export type VacuumProfileItem = VacuumProfileStepItem | VacuumProfileCycleItem
 
-export type VacuumPumpArgs = VacuumPumpPressureArgs | VacuumPumpPowerArgs
-
+export type VacuumPumpArgs =
+  | VacuumPumpPressureArgs
+  | VacuumPumpPowerArgs
+  | VacuumCloseVentSetPumpPowerArgs
+  | VacuumCloseVentSetPumpPressureArgs
+  | VacuumCloseVentStartProfileArgs
 export interface VacuumStartRunProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumStartRunProfile'
+  profile: VacuumRunProfileParams['profile']
+  ventAfter: boolean
+}
+
+export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentStartProfile'
   profile: VacuumRunProfileParams['profile']
   ventAfter: boolean
 }

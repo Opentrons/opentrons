@@ -7,9 +7,9 @@
 .content_container {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-16) var(--spacing-60) var(--spacing-120)
+  padding: var(--spacing-60) var(--spacing-60) var(--spacing-120)
     var(--spacing-60);
-  margin-top: 7.75rem;
+  margin-top: 7.5rem;
   gap: var(--spacing-24);
 }
 
@@ -35,8 +35,8 @@
   display: flex;
   width: 100%;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   gap: var(--spacing-12);
 }
 
