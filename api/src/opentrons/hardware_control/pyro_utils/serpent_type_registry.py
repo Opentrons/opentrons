@@ -9,6 +9,7 @@ from numpy import float64
 import opentrons_shared_data.errors.codes
 import opentrons_shared_data.pipette.pipette_definition
 import opentrons_shared_data.pipette.types
+import opentrons_shared_data.gripper.gripper_definition
 
 import opentrons.calibration_storage.types
 import opentrons.config.types
@@ -17,6 +18,7 @@ import opentrons.hardware_control.instruments.ot3.instrument_calibration
 import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
+import opentrons.hardware_control.peripherals.types
 import opentrons.types
 from opentrons.hardware_control import modules
 from opentrons.util.pyro.pyro_serialization import (
@@ -27,6 +29,8 @@ from opentrons.util.pyro.pyro_serialization import (
     register_type_to_serpent,
     serpent_enum_registration,
 )
+import opentrons.drivers.rpi_drivers.types
+import opentrons.drivers.types
 
 
 # Estop Overall Status registry
@@ -539,6 +543,31 @@ def _robot_type_dict_to_class(  # type: ignore
     return opentrons.hardware_control.protocols.types.FlexRobotType
 
 
+# USBPort registry - serialization and deserialization for the USBPort dataclass
+def _usb_port_class_to_dict(obj) -> Dict:  # type: ignore
+    return {
+        "__class__": "opentrons.drivers.rpi_drivers.types.USBPort",
+        "name": obj.name,
+        "port_number": obj.port_number,
+        "port_group": obj.port_group,
+        "hub": obj.hub,
+        "hub_port": obj.hub_port,
+        "device_path": obj.device_path
+    }
+
+
+def _usb_port_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.drivers.rpi_drivers.types.USBPort:
+    return opentrons.drivers.rpi_drivers.types.USBPort(
+        name=d["name"],
+        port_number=int(d["port_number"]),
+        port_group=d["port_group"],
+        hub=d["hub"],
+        hub_port=int(d["hub_port"]) if d["hub_port"] is not None else None,
+        device_path=d["device_path"]
+    )
+
 # Handy function to map all registries for the Hardware controller
 def register_hardware_types() -> None:
     """Registers serialize and deserialize behavior for Opentrons Hardware types and classes.
@@ -553,6 +582,10 @@ def register_hardware_types() -> None:
             opentrons_shared_data.pipette.pipette_definition,
             opentrons_shared_data.pipette.types,
             opentrons_shared_data.errors.codes,
+            opentrons.hardware_control.peripherals.types,
+            opentrons_shared_data.gripper.gripper_definition,
+            opentrons.calibration_storage.types,
+            opentrons.drivers.types,
         ]
     )
 
@@ -568,6 +601,7 @@ def register_hardware_types() -> None:
             opentrons.hardware_control.protocols.types,
             opentrons_shared_data.pipette.pipette_definition,
             opentrons.hardware_control.nozzle_manager,
+            opentrons_shared_data.gripper.gripper_definition,
         ]
     )
     for pydantic_type in opentrons_pydantic_types:
@@ -665,6 +699,13 @@ def register_hardware_types() -> None:
         class_type=opentrons.hardware_control.types.ModuleDisconnectedNotification,
         dict_to_class=_mod_disconnect_notif_dict_to_class,
         class_to_dict=_mod_disconnect_notif_class_to_dict,
+    )
+
+    # USBPort registration
+    register_type_to_serpent(
+        class_type=opentrons.drivers.rpi_drivers.types.USBPort,
+        dict_to_class=_usb_port_dict_to_class,
+        class_to_dict=_usb_port_class_to_dict,
     )
 
     # handle Typed Dicts for the hardware controller
