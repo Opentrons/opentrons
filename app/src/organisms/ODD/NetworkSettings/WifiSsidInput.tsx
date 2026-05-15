@@ -17,17 +17,17 @@ import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
 import type { Dispatch, SetStateAction } from 'react'
 
-interface SetWifiSsidProps {
+interface WifiSsidInputProps {
   errorMessage?: string | null
   inputSsid: string
   setInputSsid: Dispatch<SetStateAction<string>>
 }
 
-export function SetWifiSsid({
+export function WifiSsidInput({
   errorMessage,
   inputSsid,
   setInputSsid,
-}: SetWifiSsidProps): JSX.Element {
+}: WifiSsidInputProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = useRef(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
