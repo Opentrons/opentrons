@@ -30,27 +30,8 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 </figure>
 
 <figure markdown>
-![Vacuum mainifold base and related hardware](images/image-placeholder.png "Manifold base and related hardware")
+![Vacuum manifold base and related hardware](images/image-placeholder.png "Manifold base and related hardware")
 <figcaption>(1) Vacuum manifold base and fasteners</figcaption>
-</figure>
-
-</div>
-
-<div class="parts-list align-top" markdown>
-
-<figure markdown>
-![Collar gasket](images/image-placeholder.png "Collar gasket")
-<figcaption>(1) Collar gasket</figcaption>
-</figure>
-
-<figure markdown>
-![Vacuum manifold](images/image-placeholder.png "Vacuum manifold")
-<figcaption>(1) Vacuum manifold</figcaption>
-</figure>
-
-<figure markdown>
-![Spacers for adjusting wellplate height](images/image-placeholder.png "Height adjusting spacers")
-<figcaption>(?) ? mm spacers</figcaption>
 </figure>
 
 </div>
