@@ -17,7 +17,9 @@ const DEFS_BY_URI = Object.fromEntries(
 ) as Record<string, LabwareDefinition2>
 
 // Helper function to safely get labware definition
-const getLabwareDefFromArgs = (labwareDef: unknown): LabwareDefinition2 | null => {
+const getLabwareDefFromArgs = (
+  labwareDef: unknown
+): LabwareDefinition2 | null => {
   if (typeof labwareDef === 'string' && labwareDef in DEFS_BY_URI) {
     return DEFS_BY_URI[labwareDef]
   }
@@ -33,12 +35,13 @@ const meta: Meta<typeof CalibrationBlockRender> = {
   decorators: [
     (Story, context) => {
       const labwareDef = getLabwareDefFromArgs(context.args.labwareDef)
-      
+
       if (labwareDef == null) {
         return <div>Invalid labware definition</div>
       }
 
-      const { minX, minY, xDimension, yDimension } = getLabwareViewBox(labwareDef)
+      const { minX, minY, xDimension, yDimension } =
+        getLabwareViewBox(labwareDef)
       const viewBox = `${minX} ${minY} ${xDimension} ${yDimension}`
 
       return (

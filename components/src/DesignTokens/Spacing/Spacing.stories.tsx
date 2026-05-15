@@ -11,7 +11,9 @@ interface StoryArgs {
 }
 
 // Type guard to ensure spacing entry has string value
-const isValidSpacingEntry = (entry: readonly [string, unknown]): entry is SpacingEntry => {
+const isValidSpacingEntry = (
+  entry: readonly [string, unknown]
+): entry is SpacingEntry => {
   return typeof entry[1] === 'string' && !entry[1].includes('auto')
 }
 
