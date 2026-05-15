@@ -12,6 +12,9 @@ const ignoredLoadNames = new Set([
   'eppendorf_96_wellplate_1000ul',
   'opentrons_flex_lid_absorbance_plate_reader_module',
   'protocol_engine_lid_stack_object',
+  'opentrons_12_well_aluminumblock_tough_22ml',
+  'opentrons_1_well_aluminumblock_tough_300ml',
+  'opentrons_4_well_aluminumblock_tough_72ml',
 ])
 
 const loadNames = Array.from(
