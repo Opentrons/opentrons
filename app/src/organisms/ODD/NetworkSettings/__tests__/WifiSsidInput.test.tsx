@@ -5,15 +5,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { SetWifiSsid } from '../SetWifiSsid'
+import { WifiSsidInput } from '../WifiSsidInput'
 
 import type { ComponentProps } from 'react'
 
 const mockSetSelectedSsid = vi.fn()
-const render = (props: ComponentProps<typeof SetWifiSsid>) => {
+const render = (props: ComponentProps<typeof WifiSsidInput>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <SetWifiSsid {...props} />
+      <WifiSsidInput {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -21,8 +21,8 @@ const render = (props: ComponentProps<typeof SetWifiSsid>) => {
   )
 }
 
-describe('SetWifiSsid', () => {
-  let props: ComponentProps<typeof SetWifiSsid>
+describe('WifiSsidInput', () => {
+  let props: ComponentProps<typeof WifiSsidInput>
   beforeEach(() => {
     props = {
       setInputSsid: mockSetSelectedSsid,
