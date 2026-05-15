@@ -67,6 +67,11 @@ interface StoryArgs {
   styles: TypographyStandard
 }
 
+// Type guard to ensure the styles value is a valid TypographyStandard
+const isValidTypographyStandard = (value: unknown): value is TypographyStandard => {
+  return typeof value === 'string' && value in fontStyles
+}
+
 const convertToPx = (remFormat: string): string => {
   const numeric = Number(remFormat.replace('rem', ''))
   return `${numeric * 16}px`
@@ -225,6 +230,10 @@ export const AllTypographyStyles: StoryObj<StoryArgs> = {
     styles: 'Helix Product (Desktop)',
   },
   render: args => {
+    if (!isValidTypographyStandard(args.styles)) {
+      return <div>Invalid typography standard</div>
+    }
+    
     const which = args.styles
     const fonts = fontStyles[which] as readonly FontPair[]
 
