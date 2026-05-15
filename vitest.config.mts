@@ -140,6 +140,10 @@ export default defineConfig({
         replacement: path.resolve('./shared-data/labware/fixtures/3/index.ts'),
       },
       {
+        find: '@opentrons/shared-data/labware',
+        replacement: path.resolve('./shared-data/js/labware.ts'),
+      },
+      {
         find: '@opentrons/shared-data',
         replacement: path.resolve('./shared-data/js/index.ts'),
       },
