@@ -2,11 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import {
-  LEGACY_INPUT_TYPE_PASSWORD,
-  setRefs,
-  TouchInputField,
-} from '@opentrons/components'
+import { setRefs, TouchInputField } from '@opentrons/components'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -16,6 +12,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import styles from './OnDeviceLogin.module.css'
 
 import type { ChangeEvent } from 'react'
+import type { TFunction } from 'i18next'
 import type { ControllerRenderProps } from 'react-hook-form'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
@@ -158,13 +155,13 @@ interface LoginFieldInputProps {
   field: ControllerRenderProps<LoginFormValues, 'username' | 'password'>
   step: LoginStep
   loginError: string | null
-  t: any
+  t: TFunction
   onClearLoginError?: () => void
   onFocus: () => void
 }
 
 /**
- * Renders the active username/password input. Lives inside the Controller's
+ * Renders the active username/password field with label. Lives inside the Controller
  * render prop so its `showPassword` state is reset automatically when the
  * Controller remounts on step change (via its `key` prop).
  */
@@ -179,7 +176,9 @@ function LoginFieldInput({
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = step === 'password' && !showPassword
-  const inputType = isPasswordHidden ? LEGACY_INPUT_TYPE_PASSWORD : 'text'
+  const inputType: 'text' | 'password' = isPasswordHidden
+    ? 'password'
+    : 'text'
 
   const togglePasswordVisibility = (): void => {
     setShowPassword(current => !current)
@@ -191,8 +190,12 @@ function LoginFieldInput({
       ref={setRefs(inputRef, field.ref)}
       autoFocus={step === 'password'}
       type={inputType}
-      label={step === 'username'? t('device_settings:username')
-        : t('device_settings:password')}
+      size="medium"
+      label={
+        step === 'username'
+          ? t('device_settings:username')
+          : t('device_settings:password')
+      }
       error={loginError}
       value={field.value ?? ''}
       name={field.name}
