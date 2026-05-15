@@ -7,7 +7,7 @@ hide: toc
 
 # Opentrons Automated Vacuum Module GEN1 Instruction Manual
 
-![Vacuum module and carboy temporary HERO](images/temporary-HERO.png)
+![Vacuum module, waste carboy, and deck manifold render](images/test-1-HERO.png)
 
 **Opentrons Labworks Inc.**<br>
 Month Year
