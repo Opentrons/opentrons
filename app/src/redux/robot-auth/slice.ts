@@ -166,15 +166,3 @@ export const getNextExpiration = createSelector(
     },
   }
 )
-
-/*
-        ([_robotName, perRobotAuthState]) =>
-          perRobotAuthState?.expiresAt != null
-      )
-      .map(([robotName, perRobotAuthState]) => ({
-        robotName,
-        // These non-null assertions should be OK because of the .filter() above.
-        expiresAt: perRobotAuthState!.expiresAt!,
-      }))
-      .sort((a, b) => a.expiresAt - b.expiresAt)
-      */
