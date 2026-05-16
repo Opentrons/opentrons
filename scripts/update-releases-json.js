@@ -39,15 +39,28 @@ const FILES_IN_RELEASE_JSON = [
   /beta.*yml$/,
 ]
 
+function installerManifestKeys(artifactName) {
+  const isInternal = /Opentrons-Internal-OT2/i.test(artifactName)
+  const prefix = isInternal ? 'Opentrons-Internal-OT2' : 'Opentrons-OT2'
+  return {
+    exe: `${prefix}.exe`,
+    dmg: `${prefix}.dmg`,
+    appimage: `${prefix}.AppImage`,
+  }
+}
+
 function artifactNameToObj(artifactName, urlBase) {
+  const k = installerManifestKeys(artifactName)
   if (artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.exe$/i) !== -1) {
-    return { 'Opentrons-OT2.exe': urlBase + artifactName }
-  } else if (artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.dmg$/i) !== -1) {
-    return { 'Opentrons-OT2.dmg': urlBase + artifactName }
+    return { [k.exe]: urlBase + artifactName }
+  } else if (
+    artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.dmg$/i) !== -1
+  ) {
+    return { [k.dmg]: urlBase + artifactName }
   } else if (
     artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.AppImage$/i) !== -1
   ) {
-    return { 'Opentrons-OT2.AppImage': urlBase + artifactName }
+    return { [k.appimage]: urlBase + artifactName }
   } else if (artifactName.search(/(latest|alpha|beta).*yml$/) !== -1) {
     return { [artifactName]: urlBase + artifactName }
   } else {

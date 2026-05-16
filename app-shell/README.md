@@ -395,7 +395,7 @@ The release channel is set according to the version string:
 - `vM.m.p-beta.x` - "beta" channel
 - `vM.m.p` - "latest" channel
 
-The `electron-updater` autoupdate files (e.g. `beta-mac.yml`) will only be copied to the publish directory if `OT_TAG` is set.
+The `electron-updater` autoupdate files (e.g. `beta-mac.yml`) are copied to `dist/publish` when `OT_TAG` matches a **publish** tag for the active `OPENTRONS_PROJECT`: `v*` for robot-stack, or `ot3@*` / `internal@*` (calendar internal) for ot3.
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
