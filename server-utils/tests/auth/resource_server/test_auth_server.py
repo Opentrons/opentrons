@@ -191,10 +191,16 @@ async def test_token_introspection(
 
     app_mock.introspect_requests.clear()
 
-    app_mock.introspect_response = {"active": True, "scope": "mama_mia papa_pia"}
+    app_mock.introspect_response = {
+        "active": True,
+        "scope": "mama_mia papa_pia",
+        "username": "test_username",
+    }
     introspect_response = await client.introspect_token("test-token")
     assert introspect_response == TokenIntrospectionResponse(
-        active=True, scope="mama_mia papa_pia"
+        active=True,
+        scope="mama_mia papa_pia",
+        username="test_username",
     )
     assert app_mock.introspect_requests == [
         {"token": "test-token", "client_id": CLIENT_ID}

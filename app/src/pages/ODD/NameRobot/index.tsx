@@ -39,9 +39,13 @@ import {
   removeRobot,
 } from '/app/redux/discovery'
 
+import type { ChangeEvent } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
+
+const MAX_LENGTH = 17
 
 interface FormValues {
   newRobotName: string
@@ -57,7 +61,7 @@ export function NameRobot(): JSX.Element {
   const [newName, setNewName] = useState<string>('')
   const [isShowConfirmRobotName, setIsShowConfirmRobotName] =
     useState<boolean>(false)
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
@@ -79,7 +83,7 @@ export function NameRobot(): JSX.Element {
     let errorMessage: string | undefined
     // In ODD users cannot input letters and numbers from software keyboard
     // so the app only checks the length of input string
-    if (newName.length < 1) {
+    if (newName.length < 1 || newName.length > MAX_LENGTH) {
       errorMessage = t('name_rule_error_name_length')
     }
 
@@ -165,11 +169,21 @@ export function NameRobot(): JSX.Element {
       name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName: previousName,
-        newRobotName: newRobotName,
+        newRobotName,
         robotType: FLEX_ROBOT_TYPE,
       },
     })
-    handleSubmit(onSubmit)()
+    void handleSubmit(onSubmit)()
+  }
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setNewName(e.target.value as string)
+    void trigger('newRobotName')
+  }
+
+  const handleKeyboardChange = (input: string): void => {
+    setNewName(input)
+    void trigger('newRobotName')
   }
 
   return (
@@ -277,7 +291,7 @@ export function NameRobot(): JSX.Element {
                     }}
                     onChange={e => {
                       field.onChange(e)
-                      setNewName(e.target.value as string)
+                      handleChange(e)
                     }}
                   />
                 )}
@@ -309,9 +323,10 @@ export function NameRobot(): JSX.Element {
                 <AlphanumericKeyboard
                   onChange={(input: string) => {
                     field.onChange(input)
-                    void trigger('newRobotName')
+                    handleKeyboardChange(input)
                   }}
                   keyboardRef={keyboardRef}
+                  value={newRobotName}
                 />
               )}
             />

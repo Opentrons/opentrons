@@ -17,7 +17,7 @@ import { useAccountInfo, useLogOut } from './hooks'
 export function Account(): JSX.Element {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { isLoggedIn, username, legalName } = useAccountInfo()
+  const { isLoggedIn, username, fullName } = useAccountInfo()
   const logOut = useLogOut()
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export function Account(): JSX.Element {
             }
             content={
               <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-                {legalName}
+                {fullName}
               </StyledText>
             }
           />

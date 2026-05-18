@@ -59,6 +59,7 @@ const formVacuumProfileStepToItem = (
   id: step.id,
   durationSeconds: getTimeSecondsFromString(step.time),
   pumpData: pumpDataToStepGeneration(step.pumpData),
+  ventAfter: step.ventAfter,
 })
 
 /** Builds step-generation profile elements from `vacuumOrderedProfileIds` and `vacuumProfileItemsById`. */
@@ -89,17 +90,22 @@ function getProfileElementsFromForm(
 const vacuumProfileStepToAtomic = (
   step: StepGenVacuumProfileStep
 ): AtomicVacuumProfileStep => {
-  const { durationSeconds, pumpData } = step
+  const { durationSeconds, pumpData, ventAfter } = step
   if (pumpData.mode === VACUUM_MODE_PRESSURE) {
     const mbar = pumpData.pressureMbar
     return {
+      enablePump: true,
       holdSeconds: durationSeconds,
-      pressureMbar: mbar != null && mbar !== '' ? Number.parseFloat(mbar) : 0,
+      gaugePressureMbar:
+        mbar != null && mbar !== '' ? Number.parseFloat(mbar) : 0,
+      ventAfter,
     }
   }
   return {
+    enablePump: true,
     holdSeconds: durationSeconds,
-    powerPercent: pumpData.powerPercent,
+    percentPower: pumpData.powerPercent,
+    ventAfter,
   }
 }
 
@@ -127,7 +133,7 @@ const getPumpEndSettings = (args: {
     return null
   }
   const duration = getTimeSecondsFromString(pumpDurationTime)
-  return { duration, ventAfter: endingHoldVentCheckbox === true }
+  return { duration, ventAfter: endingHoldVentCheckbox }
 }
 
 export const vacuumFormToArgs = (
@@ -165,14 +171,14 @@ export const vacuumFormToArgs = (
           })
           if (modeType === VACUUM_MODE_PRESSURE) {
             return {
-              commandCreatorFnName: 'vacuumSetPumpPressure',
+              commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
               gaugePressure: pressureMbar!,
               ...pumpAdvancedArgs,
               ...baseValues,
             }
           }
           return {
-            commandCreatorFnName: 'vacuumSetPumpPower',
+            commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
             powerPercent: powerPercent!,
             ...pumpAdvancedArgs,
             ...baseValues,
@@ -203,8 +209,9 @@ export const vacuumFormToArgs = (
         vacuumProfileItemsById
       )
       return {
-        commandCreatorFnName: 'vacuumStartRunProfile',
+        commandCreatorFnName: 'vacuumCloseVentStartProfile',
         profile: profileElements.map(vacuumProfileItemToPeProfileElement),
+        ventAfter: endingHoldVentCheckbox,
         ...baseValues,
       }
     }

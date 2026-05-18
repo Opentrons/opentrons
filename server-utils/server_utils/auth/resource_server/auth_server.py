@@ -158,6 +158,7 @@ class TokenIntrospectionResponse(_StrictBaseModel):
 
     active: bool
     scope: str = ""
+    username: str | None = None
 
 
 class TokenIntrospectionRequestFormData(typing.TypedDict):

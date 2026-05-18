@@ -38,7 +38,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
   const { t } = useTranslation('top_navigation')
 
   const location = useLocation()
-  const accountIconInitial = useAccountIconInitial()
+  const accountIcon = useAccountIconInitial()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
@@ -130,13 +130,13 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ))}
           </div>
         </div>
-        {accountIconInitial != null && (
+        {accountIcon.showIcon && (
           <NavLink
             to="/account"
             className={clsx(styles.account_icon, styles.cursor_default)}
             aria-label={t('account')}
           >
-            {accountIconInitial}
+            {accountIcon.iconContents}
           </NavLink>
         )}
         <button

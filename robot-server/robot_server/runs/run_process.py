@@ -168,7 +168,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             event: HardwareEvent,
         ) -> None:
             if self._run_orchestrator is not None:
-                self._run_orchestrator._protocol_engine._door_watcher._handle_hardware_door_event(
+                self._run_orchestrator._protocol_engine._door_watcher._handle_proxy_hardware_door_event(
                     event
                 )
 

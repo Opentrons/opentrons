@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -12,22 +11,17 @@ import {
   FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  RadioButton,
   SPACING,
   StyledText,
-  WRAP,
 } from '@opentrons/components'
 import {
   FLEX_96_CHANNEL_PIPETTES,
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { uuid } from '@opentrons/step-generation'
-
-import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
 
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { BasicsButtons } from '../../components/molecules'
@@ -35,7 +29,6 @@ import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { WizardBody } from './WizardBody'
 
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { Fixtures } from '../../components/organisms'
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
 export function SelectBasics(props: WizardTileProps): JSX.Element {
@@ -51,9 +44,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const [pipetteType, setPipetteType] = useState<PipetteType | null>(null)
   const ref = useRef<HTMLDivElement | null>(null)
 
-  const enableFork = useSelector(getEnableFork)
-
-  const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
   const fixtures = watch('fixtures')
   const modules = watch('modules')
@@ -61,11 +51,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
   const hasThermocycer = watch('hasThermocycler')
   const hasWasteChute = watch('hasWasteChute')
 
-  const formRobotType = fields?.robotType
-  let robotType = formRobotType
-  if (enableFork) {
-    robotType = FLEX_ROBOT_TYPE
-  }
+  const robotType = FLEX_ROBOT_TYPE
   const has96Channel =
     pipettesByMount.left.pipetteName != null &&
     FLEX_96_CHANNEL_PIPETTES.includes(pipettesByMount.left.pipetteName)
@@ -82,10 +68,10 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       pipettesByMount.right.tiprackDefURI == null)
 
   const isDisabled =
-    robotType == null ||
     noPipette ||
-    (robotType === FLEX_ROBOT_TYPE &&
-      (hasGripper == null || hasThermocycer == null || hasWasteChute == null))
+    hasGripper == null ||
+    hasThermocycer == null ||
+    hasWasteChute == null
 
   const resetPipetteFields = (): void => {
     setPipetteType(null)
@@ -93,18 +79,8 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setPipetteVolume(null)
   }
 
-  const resetPipettes = (): void => {
-    setValue(`pipettesByMount.right.pipetteName`, undefined)
-    setValue(`pipettesByMount.right.tiprackDefURI`, undefined)
-    setValue(`pipettesByMount.left.pipetteName`, undefined)
-    setValue(`pipettesByMount.left.tiprackDefURI`, undefined)
-    resetPipetteFields()
-  }
-
-  let subStepNumber = 1
-  if (robotType != null && noPipette) {
-    subStepNumber = 2
-  } else if (!noPipette) {
+  let subStepNumber = 2
+  if (!noPipette) {
     subStepNumber = 3
   }
 
@@ -138,42 +114,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
     setValue('pipettesByMount.left.tiprackDefURI', rightTiprackDefURI)
     setValue('pipettesByMount.right.tiprackDefURI', leftTiprackDefURI)
   }
-
-  const flexTrashFixture: Fixtures = {
-    [uuid()]: {
-      cutoutId: 'cutoutA3',
-      name: 'trashBin',
-      cutoutFixtureId: 'trashBinAdapter',
-    },
-  }
-  const ot2TrashFixture: Fixtures = {
-    [uuid()]: {
-      cutoutId: 'cutout12',
-      name: 'trashBin',
-      cutoutFixtureId: 'fixedTrashSlot',
-    },
-  }
-
-  const handleSelectFlexRobot = (): void => {
-    setValue('fields.robotType', FLEX_ROBOT_TYPE)
-    resetPipettes()
-    setValue('hasGripper', null)
-    setValue('hasThermocycler', null)
-    setValue('hasWasteChute', null)
-    setValue('modules', {})
-    setValue('fixtures', flexTrashFixture)
-  }
-
-  useEffect(
-    () => {
-      if (enableFork && formRobotType !== FLEX_ROBOT_TYPE) {
-        handleSelectFlexRobot()
-      }
-    },
-    // TODO: Remove this effect with OT_PD_ENABLE_FORK.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [enableFork, formRobotType]
-  )
 
   const handlSelectWasteChute = (value: boolean): void => {
     if (value) {
@@ -278,7 +218,6 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
       ) : null}
       <HandleEnter onEnter={proceed}>
         <WizardBody
-          robotType={robotType}
           stepNumber={1}
           subStepNumber={subStepNumber}
           header={t('basics')}
@@ -287,154 +226,113 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
             proceed(1)
           }}
         >
-          {!enableFork && (
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+            <Flex
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+            >
               <StyledText desktopStyle="headingSmallBold">
-                {t('robot_type')}
+                {noPipette ? t('add_your_pipettes') : t('your_pipettes')}
               </StyledText>
-              <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
-                <RadioButton
-                  onChange={handleSelectFlexRobot}
-                  buttonLabel={t('shared:opentrons_flex')}
-                  buttonValue={FLEX_ROBOT_TYPE}
-                  isSelected={robotType === FLEX_ROBOT_TYPE}
-                />
-                <RadioButton
-                  onChange={() => {
-                    setValue('fields.robotType', OT2_ROBOT_TYPE)
-                    resetPipettes()
-                    setValue('hasGripper', false)
-                    setValue('modules', {})
-                    setValue('fixtures', ot2TrashFixture)
+              {has96Channel ||
+              (pipettesByMount.left.pipetteName == null &&
+                pipettesByMount.right.pipetteName == null) ||
+              (pipettesByMount.left.tiprackDefURI == null &&
+                pipettesByMount.right.tiprackDefURI == null) ? null : (
+                <Btn
+                  css={LINK_BUTTON_STYLE}
+                  onClick={() => {
+                    handleSwapMounts()
                   }}
-                  buttonLabel={t('shared:ot2')}
-                  buttonValue={OT2_ROBOT_TYPE}
-                  isSelected={robotType === OT2_ROBOT_TYPE}
-                />
-              </Flex>
-            </Flex>
-          )}
-          {robotType != null ? (
-            <>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing12}
-              >
-                <Flex
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  alignItems={ALIGN_CENTER}
                 >
-                  <StyledText desktopStyle="headingSmallBold">
-                    {noPipette ? t('add_your_pipettes') : t('your_pipettes')}
-                  </StyledText>
-                  {has96Channel ||
-                  (pipettesByMount.left.pipetteName == null &&
-                    pipettesByMount.right.pipetteName == null) ||
-                  (pipettesByMount.left.tiprackDefURI == null &&
-                    pipettesByMount.right.tiprackDefURI == null) ? null : (
-                    <Btn
-                      css={LINK_BUTTON_STYLE}
-                      onClick={() => {
-                        handleSwapMounts()
-                      }}
-                    >
-                      <Flex flexDirection={DIRECTION_ROW}>
-                        <Icon
-                          name="swap-horizontal"
-                          size="1rem"
-                          transform="rotate(90deg)"
-                        />
-                        <StyledText desktopStyle="captionSemiBold">
-                          {t('swap_pipette_mounts')}
-                        </StyledText>
-                      </Flex>
-                    </Btn>
-                  )}
-                </Flex>
+                  <Flex flexDirection={DIRECTION_ROW}>
+                    <Icon
+                      name="swap-horizontal"
+                      size="1rem"
+                      transform="rotate(90deg)"
+                    />
+                    <StyledText desktopStyle="captionSemiBold">
+                      {t('swap_pipette_mounts')}
+                    </StyledText>
+                  </Flex>
+                </Btn>
+              )}
+            </Flex>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing8}
+                  gridGap={SPACING.spacing4}
                 >
-                  <Flex
-                    flexDirection={DIRECTION_COLUMN}
-                    gridGap={SPACING.spacing4}
-                  >
-                    {pipettesByMount.left.pipetteName != null &&
-                    pipettesByMount.left.tiprackDefURI != null ? (
-                      <PipetteInfoItem
-                        mount="left"
-                        pipetteName={
-                          pipettesByMount.left.pipetteName as PipetteName
-                        }
-                        tiprackDefURIs={pipettesByMount.left.tiprackDefURI}
-                        editClick={() => {
-                          setMount('left')
-                          openPipetteModal(true)
-                        }}
-                        cleanForm={() => {
-                          setValue(
-                            `pipettesByMount.left.pipetteName`,
-                            undefined
-                          )
-                          setValue(
-                            `pipettesByMount.left.tiprackDefURI`,
-                            undefined
-                          )
-                          resetPipetteFields()
-                        }}
-                      />
-                    ) : null}
-                    {pipettesByMount.right.pipetteName != null &&
-                    pipettesByMount.right.tiprackDefURI != null ? (
-                      <PipetteInfoItem
-                        mount="right"
-                        pipetteName={
-                          pipettesByMount.right.pipetteName as PipetteName
-                        }
-                        tiprackDefURIs={pipettesByMount.right.tiprackDefURI}
-                        editClick={() => {
-                          setMount('right')
-                          openPipetteModal(true)
-                        }}
-                        cleanForm={() => {
-                          setValue(
-                            `pipettesByMount.right.pipetteName`,
-                            undefined
-                          )
-                          setValue(
-                            `pipettesByMount.right.tiprackDefURI`,
-                            undefined
-                          )
-                          resetPipetteFields()
-                        }}
-                      />
-                    ) : null}
-                  </Flex>
-                  <>
-                    {has96Channel ||
-                    (pipettesByMount.left.pipetteName != null &&
-                      pipettesByMount.right.pipetteName != null &&
-                      pipettesByMount.left.tiprackDefURI != null &&
-                      pipettesByMount.right.tiprackDefURI != null) ? null : (
-                      <Flex width={FLEX_MAX_CONTENT}>
-                        <EmptySelectorButton
-                          onClick={() => {
-                            setMount(targetPipetteMount)
-                            openPipetteModal(true)
-                            resetPipetteFields()
-                          }}
-                          text={t('add_pipette')}
-                          textAlignment="left"
-                          iconName="plus"
-                        />
-                      </Flex>
-                    )}
-                  </>
+                  {pipettesByMount.left.pipetteName != null &&
+                  pipettesByMount.left.tiprackDefURI != null ? (
+                    <PipetteInfoItem
+                      mount="left"
+                      pipetteName={
+                        pipettesByMount.left.pipetteName as PipetteName
+                      }
+                      tiprackDefURIs={pipettesByMount.left.tiprackDefURI}
+                      editClick={() => {
+                        setMount('left')
+                        openPipetteModal(true)
+                      }}
+                      cleanForm={() => {
+                        setValue(`pipettesByMount.left.pipetteName`, undefined)
+                        setValue(
+                          `pipettesByMount.left.tiprackDefURI`,
+                          undefined
+                        )
+                        resetPipetteFields()
+                      }}
+                    />
+                  ) : null}
+                  {pipettesByMount.right.pipetteName != null &&
+                  pipettesByMount.right.tiprackDefURI != null ? (
+                    <PipetteInfoItem
+                      mount="right"
+                      pipetteName={
+                        pipettesByMount.right.pipetteName as PipetteName
+                      }
+                      tiprackDefURIs={pipettesByMount.right.tiprackDefURI}
+                      editClick={() => {
+                        setMount('right')
+                        openPipetteModal(true)
+                      }}
+                      cleanForm={() => {
+                        setValue(`pipettesByMount.right.pipetteName`, undefined)
+                        setValue(
+                          `pipettesByMount.right.tiprackDefURI`,
+                          undefined
+                        )
+                        resetPipetteFields()
+                      }}
+                    />
+                  ) : null}
                 </Flex>
+                <>
+                  {has96Channel ||
+                  (pipettesByMount.left.pipetteName != null &&
+                    pipettesByMount.right.pipetteName != null &&
+                    pipettesByMount.left.tiprackDefURI != null &&
+                    pipettesByMount.right.tiprackDefURI != null) ? null : (
+                    <Flex width={FLEX_MAX_CONTENT}>
+                      <EmptySelectorButton
+                        onClick={() => {
+                          setMount(targetPipetteMount)
+                          openPipetteModal(true)
+                          resetPipetteFields()
+                        }}
+                        text={t('add_pipette')}
+                        textAlignment="left"
+                        iconName="plus"
+                      />
+                    </Flex>
+                  )}
+                </>
               </Flex>
-            </>
-          ) : null}
-          {robotType === FLEX_ROBOT_TYPE && !noPipette && (
+            </Flex>
+          </Flex>
+          {!noPipette && (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing60}>
               <BasicsButtons
                 type="gripper"

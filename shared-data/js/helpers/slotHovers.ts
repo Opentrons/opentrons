@@ -61,7 +61,9 @@ const TC_ADJUSTED_H = 178
 
 export const getOT2HoverDimensions = (
   hasTCOnSlot: boolean,
-  slotPosition: CoordinateTuple
+  slotPosition: CoordinateTuple,
+  // TODO: investigate why the TC adjusted Y is needed for PD???
+  forVisualization: boolean
 ): HoverDimensions => {
   const y = slotPosition[1]
   const x = slotPosition[0]
@@ -70,6 +72,6 @@ export const getOT2HoverDimensions = (
     width: hasTCOnSlot ? TC_ADJUSTED_W : 128, // 128 is the standard width
     height: hasTCOnSlot ? TC_ADJUSTED_H : 85, // 85 is the standard height
     x,
-    y: hasTCOnSlot ? y - TC_ADJUSTED_Y : y,
+    y: hasTCOnSlot && !forVisualization ? y - TC_ADJUSTED_Y : y,
   }
 }

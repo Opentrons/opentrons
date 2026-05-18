@@ -80,7 +80,7 @@ describe('vacuumFormToArgs', () => {
       powerPercent: null,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPressure',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -97,7 +97,7 @@ describe('vacuumFormToArgs', () => {
       powerPercent: 75,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPower',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -115,7 +115,7 @@ describe('vacuumFormToArgs', () => {
       endingHoldVentCheckbox: true,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPressure',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -135,7 +135,7 @@ describe('vacuumFormToArgs', () => {
       endingHoldVentCheckbox: false,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPower',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -152,7 +152,7 @@ describe('vacuumFormToArgs', () => {
       pumpDurationTime: null,
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumSetPumpPressure',
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
@@ -208,6 +208,7 @@ describe('vacuumFormToArgs', () => {
             mode: VACUUM_MODE_PRESSURE,
             pressureMbar: '12.5',
           },
+          ventAfter: false,
         },
         [cycleId]: {
           type: PROFILE_CYCLE,
@@ -224,23 +225,37 @@ describe('vacuumFormToArgs', () => {
                 mode: VACUUM_MODE_POWER,
                 powerPercent: 88,
               },
+              ventAfter: false,
             },
           },
         },
       },
     })
     const expected: VacuumArgs = {
-      commandCreatorFnName: 'vacuumStartRunProfile',
+      commandCreatorFnName: 'vacuumCloseVentStartProfile',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
       profile: [
-        { holdSeconds: 45, pressureMbar: 12.5 },
+        {
+          enablePump: true,
+          holdSeconds: 45,
+          gaugePressureMbar: 12.5,
+          ventAfter: false,
+        },
         {
           repetitions: 3,
-          steps: [{ holdSeconds: 90, powerPercent: 88 }],
+          steps: [
+            {
+              enablePump: true,
+              holdSeconds: 90,
+              percentPower: 88,
+              ventAfter: false,
+            },
+          ],
         },
       ],
+      ventAfter: false,
     }
     expect(vacuumFormToArgs(formData)).toEqual(expected)
   })

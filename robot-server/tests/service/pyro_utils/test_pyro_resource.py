@@ -160,14 +160,13 @@ async def test_run_hardware_event_callback(
 
     It should be provided to the hardware event handler, and recieves a callback proxy in response.
     """
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         hw_api=ot3_hardware_api, app_state=mock_app_state
     )
     # Cast the two Async proxies on the nameserver as a locally useful type
     ot3api = cast(OT3API, ot3_async)
     robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
-
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
 
     run_store = RunOrchestratorStore(
         hardware_api=ot3api,
@@ -197,14 +196,13 @@ async def test_maintenance_run_hardware_event_callback(
 
     It should be provided to the hardware event handler, and recieves a callback proxy in response.
     """
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         hw_api=ot3_hardware_api, app_state=mock_app_state
     )
     # Cast the two Async proxies on the nameserver as a locally useful type
     ot3api = cast(OT3API, ot3_async)
     robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
-
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
 
     maintenance_run_store = MaintenanceRunOrchestratorStore(
         hardware_api=ot3api,
@@ -230,6 +228,7 @@ async def test_camera_provider(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a Proxy of the CameraProvider."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         hw_api=ot3_hardware_api, app_state=mock_app_state
     )
@@ -260,6 +259,7 @@ async def test_file_provider(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a Proxy of the FileProvider."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         hw_api=ot3_hardware_api, app_state=mock_app_state
     )
@@ -303,6 +303,7 @@ async def test_deck_config(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides the DeckConfigurationType."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         hw_api=ot3_hardware_api, app_state=mock_app_state
     )
@@ -326,6 +327,7 @@ async def test_notify_publisher(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a Proxy of the Notify Publisher."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         hw_api=ot3_hardware_api, app_state=mock_app_state
     )

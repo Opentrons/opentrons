@@ -98,6 +98,13 @@ export const getLocalRobotAuthState = createSelector(
   }
 )
 
+export const getLocalRobotAccessToken = createSelector(
+  getLocalRobotAuthState,
+  (localRobotAuthState: PerRobotAuthState | null): string | null => {
+    return localRobotAuthState?.accessToken ?? null
+  }
+)
+
 /**
  * On the on-device display, this returns whether we're currently logged in to the
  * local robot. This should not be used in the desktop app.

@@ -48,10 +48,6 @@ def test_navigate_to_create_new_directly(page: Page, pd_base_url: str) -> None:
     # Use first() to handle multiple privacy policy links
     expect(page.locator('a[href="https://opentrons.com/privacy-policy"]').first).to_be_visible()
     expect(page.locator('a[href="https://opentrons.com/eula"]').first).to_be_visible()
-    # Check for robot selection which indicates onboarding page
-    # The page shows robot type options (OT-2 or Flex)
-    expect(page.get_by_text("Opentrons OT-2")).to_be_visible()
-    expect(page.get_by_text("Opentrons Flex")).to_be_visible()
 
 
 @pytest.mark.pdE2E

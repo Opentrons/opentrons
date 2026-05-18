@@ -294,6 +294,7 @@ type VacuumPumpData = VacuumPressureData | VacuumPowerData
 export interface VacuumProfileStep extends ProfileStepItemBase {
   time: string
   pumpData: VacuumPumpData
+  ventAfter: boolean
 }
 
 export interface VacuumProfileCycle extends ProfileCycleItemBase {

@@ -9,6 +9,26 @@
   gap: var(--spacing-4);
 }
 
+.step_group_header_left {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.step_group_prefix {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.step_group_header_left > :last-child {
+  min-width: 0;
+  flex: 1;
+}
+
 /* Title + subtitle only (no leading control) */
 .step_group_title_block_stacked {
   display: flex;

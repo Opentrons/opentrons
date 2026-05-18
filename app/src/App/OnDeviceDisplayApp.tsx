@@ -26,6 +26,7 @@ import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { LoggedOutOverlayMount } from '/app/organisms/ODD/OnDeviceLogin/LoggedOutOverlayMount'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
+import { RobotEncryptionKeyTakeover } from '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeyTakeover'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { Account } from '/app/pages/ODD/Account'
@@ -59,6 +60,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { LocalizationProvider } from '../LocalizationProvider'
+import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
@@ -171,13 +173,15 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
   // But here at the app root, that doesn't exist. So we need to make sure we pass this
   // override into all the hooks in this component that will try to use the robot API.
+  const localRobot = useSelector(getLocalRobot)
+  const accessToken = useSelector(getLocalRobotAccessToken)
   const hostConfig = useMemo<HostConfig>(
     () => ({
-      hostname: '127.0.0.1',
+      hostname: _ODD_IP_ ?? 'localhost',
+      token: accessToken,
     }),
-    []
+    [accessToken]
   )
-  const localRobot = useSelector(getLocalRobot)
 
   const { brightness: userSetBrightness, sleepMs } = useSelector(
     getOnDeviceDisplaySettings
@@ -226,7 +230,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname={hostConfig.hostname}>
+    <ApiHostProvider {...hostConfig}>
       <ReactQueryDevtools />
       {isReady ? (
         <LocalizationProvider>
@@ -250,21 +254,23 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                       />
                     ) : null}
                     <NiceModal.Provider>
-                      <ToasterOven>
-                        <ProtocolReceiptToasts />
-                        {!showModuleSetupModal ? (
-                          <ModuleAttachedToasts
-                            openFlow={(open: boolean) => {
-                              setShowModuleSetupModal(open)
-                            }}
-                          />
-                        ) : null}
+                      <RobotEncryptionKeyTakeover>
+                        <ToasterOven>
+                          <ProtocolReceiptToasts />
+                          {!showModuleSetupModal ? (
+                            <ModuleAttachedToasts
+                              openFlow={(open: boolean) => {
+                                setShowModuleSetupModal(open)
+                              }}
+                            />
+                          ) : null}
 
-                        <SharedScrollRefProvider>
-                          <OnDeviceDisplayAppRoutes />
-                        </SharedScrollRefProvider>
-                        <LoggedOutOverlayMount />
-                      </ToasterOven>
+                          <SharedScrollRefProvider>
+                            <OnDeviceDisplayAppRoutes />
+                          </SharedScrollRefProvider>
+                          <LoggedOutOverlayMount />
+                        </ToasterOven>
+                      </RobotEncryptionKeyTakeover>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
                 </>

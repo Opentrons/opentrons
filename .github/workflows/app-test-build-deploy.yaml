@@ -55,7 +55,7 @@ jobs:
   js-unit-test-shards:
     # unit tests for the app's view layer (not the node layer)
     runs-on: 'ubuntu-22.04'
-    name: 'opentrons app frontend unit tests'
+    name: 'app frontend unit tests'
     # these tests take > 30 minutes with a single runner, so split into multiple shards
     # https://vitest.dev/guide/improving-performance.html#sharding
     strategy:
@@ -64,6 +64,7 @@ jobs:
     env:
       SHARD_TOTAL: 8
     timeout-minutes: 15 # if tests take longer than this, add more shards
+    continue-on-error: true # We want to see all test failures, so keep running all shards even after one fails.
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
@@ -74,6 +75,7 @@ jobs:
           make -C app test-cov test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
           mv coverage/lcov.info coverage/lcov-shard-${{matrix.shard}}.info
       - name: 'Upload frontend test shard result ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
+        if: ${{ !cancelled() }} # Make sure we forward along the report even if there were test failures.
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: frontend-unit-test-result-shard-${{matrix.shard}}
@@ -86,7 +88,7 @@ jobs:
   js-unit-test:
     needs: [js-unit-test-shards]
     runs-on: 'ubuntu-22.04'
-    name: 'opentrons app frontend unit test merge shard results'
+    name: 'app frontend unit test merge shard results'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
@@ -114,7 +116,7 @@ jobs:
         exclude:
           - os: 'windows-2022'
             shell: 'app-shell-odd'
-    name: 'opentrons ${{matrix.shell}} unit tests on ${{matrix.os}}'
+    name: '${{matrix.shell}} unit tests on ${{matrix.os}}'
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
