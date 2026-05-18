@@ -1448,12 +1448,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         else:
             target_destinations = dest
 
-        working_volume = self.get_working_volume_for_tip_rack(tip_racks[0][1])
+        # When doing 1-to-1 transfers, we can safely assume that the pipette will be set to low volume mode (if it exists)
+        # only when the transfer volume is less than the pipette's minimum volume.
+        max_volume_for_pip_and_tip = (
+            self._get_pipette_max_volume_for_tip_and_transfer_volume(
+                tip_racks[0][1], volume
+            )
+        )
 
         source_dest_per_volume_step = (
             tx_commons.get_sources_and_destinations_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],
-                max_volume=working_volume,
+                max_volume=max_volume_for_pip_and_tip,
                 targets=zip(source, target_destinations),
                 transfer_properties=transfer_props,
             )
@@ -1614,14 +1620,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         # If the volume to dispense into a well is less than threshold for low volume mode,
         # then set the max working volume to the max volume of low volume mode.
         # NOTE: this logic will need to be updated once we support list of volumes
-        # TODO (spp): refactor this to use the volume thresholds from shared data
-        has_low_volume_mode = self.get_pipette_name() in [
-            "flex_1channel_50",
-            "flex_8channel_50",
-        ]
-        working_volume = self.get_working_volume_for_tip_rack(tip_racks[0][1])
-        if has_low_volume_mode and volume < 5:
-            working_volume = 30
+        max_volume_for_pip_and_tip = (
+            self._get_pipette_max_volume_for_tip_and_transfer_volume(
+                tip_racks[0][1], volume
+            )
+        )
+
         # If there are no multi-dispense properties or if the volume to distribute
         # per destination well is so large that the tip cannot hold enough liquid
         # to consecutively distribute to at least two wells, then we resort to using
@@ -1632,7 +1636,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             or not self._tip_can_hold_volume_for_multi_dispensing(
                 transfer_volume=min_asp_vol_for_multi_dispense,
                 multi_dispense_properties=transfer_props.multi_dispense,
-                tip_working_volume=working_volume,
+                tip_working_volume=max_volume_for_pip_and_tip,
             )
         ):
             return self.transfer_with_liquid_class(
@@ -1668,7 +1672,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dest_per_volume_step = (
             tx_commons.get_sources_and_destinations_for_liquid_classes(
                 volumes=[volume for _ in range(len(dest))],
-                max_volume=working_volume,
+                max_volume=max_volume_for_pip_and_tip,
                 targets=dest,
                 transfer_properties=transfer_props,
                 is_multi_dispense=True,
@@ -1704,7 +1708,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             while not is_last_step and self._tip_can_hold_volume_for_multi_dispensing(
                 transfer_volume=total_aspirate_volume + next_step_volume,
                 multi_dispense_properties=transfer_props.multi_dispense,
-                tip_working_volume=working_volume,
+                tip_working_volume=max_volume_for_pip_and_tip,
             ):
                 total_aspirate_volume += next_step_volume
                 vol_dest_combo.append((next_step_volume, next_dest))
@@ -1925,12 +1929,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             self._pipette_id
         )
 
-        working_volume = self.get_working_volume_for_tip_rack(tip_racks[0][1])
+        max_volume_for_pip_and_tip = (
+            self._get_pipette_max_volume_for_tip_and_transfer_volume(
+                tip_racks[0][1], volume
+            )
+        )
 
         source_per_volume_step = (
             tx_commons.get_sources_and_destinations_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],
-                max_volume=working_volume,
+                max_volume=max_volume_for_pip_and_tip,
                 targets=source,
                 transfer_properties=transfer_props,
             )
@@ -1959,7 +1967,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             vol_aspirate_combo = []
             air_gap = aspirate_air_gap_by_volume.get_for_volume(next_step_volume)
             # Take air gap into account because there will be a final air gap before the dispense
-            while total_dispense_volume + next_step_volume <= working_volume - air_gap:
+            while (
+                total_dispense_volume + next_step_volume
+                <= max_volume_for_pip_and_tip - air_gap
+            ):
                 total_dispense_volume += next_step_volume
                 vol_aspirate_combo.append((next_step_volume, next_source))
                 try:
@@ -2057,8 +2068,24 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 ) from None
             raise
 
-    def get_working_volume_for_tip_rack(self, tip_rack: LabwareCore) -> float:
-        """Given a tip rack, return the maximum allowed volume for the pipette."""
+    def _get_pipette_max_volume_for_tip_and_transfer_volume(
+        self, tip_rack: LabwareCore, volume: float
+    ) -> float:
+        """Given a tip rack and the volume to handle, return the maximum allowed volume for the pipette."""
+        # Get the volume mode that the pipette will be in for transferring the given volume, disregarding the current volume mode of the pipette
+        volume_mode = self._engine_client.state.pipettes.get_volume_mode_from_volume(
+            pipette_id=self._pipette_id, volume=volume
+        )
+        max_volume_for_pip_mode = (
+            self._engine_client.state.pipettes.get_max_volume_for_volume_mode(
+                pipette_id=self._pipette_id, volume_mode=volume_mode
+            )
+        )
+
+        # The 50ul pipettes have a low volume mode which changes the max volume a pipette can handle.
+        # Currently, this max volume is set to be 30uL regardless of the tip attached. So if there is, say, 20uL tip attached,
+        # then the max working volume will have to remain as 20uL.
+        # Hence, the final working volume is the smallest of: max pipette volume, tip volume and the max
         return min(
             self.get_max_volume(),
             self._engine_client.state.geometry.get_nominal_tip_geometry(
@@ -2066,6 +2093,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 labware_id=tip_rack.labware_id,
                 well_name=None,
             ).volume,
+            max_volume_for_pip_mode,
         )
 
     def _pick_up_tip_for_liquid_class(
