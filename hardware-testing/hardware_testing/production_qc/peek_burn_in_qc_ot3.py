@@ -514,13 +514,14 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
 
             dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
             dut_str = str(dut)
+            sn = helpers_ot3._get_serial_for_dut(api, dut)
             # Create test name with dut for shared folder
-            test_name_with_dut = f"peek-burn-in-{dut_str}"
+            test_name_with_dut = f"peek-burn-in-{sn}"
 
             # Create two separate reports with empty run_id (no subfolder)
             # run_id is passed but we'll override it for saving directly to test_name folder
-            results_report = _build_results_report(cycles=cycles, trials=trials, run_id="")
-            recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id="")
+            results_report = _build_results_report(cycles=cycles, trials=trials, run_id=run_id)
+            recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id=run_id)
 
             # Override test_name to put both reports in the same folder
             results_report._test_name = test_name_with_dut
@@ -529,11 +530,12 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             # Set meta data for results report
             helpers_ot3.set_csv_report_meta_data_ot3(api, results_report, dut)
             # Set tag for recorder report (required before saving), include "recorder" in tag
-            recorder_report.set_tag(f"{dut_str}-recorder")
+            results_report.set_tag(f"{sn}-results")
+            recorder_report.set_tag(f"{sn}-recorder")
 
             # Store run_id for filename generation
-            results_report._run_id = run_id
-            recorder_report._run_id = run_id
+            # results_report._run_id = run_id
+            # recorder_report._run_id = run_id
 
             # Track test results for summary
             test_plunger_fail_reasons = []
@@ -586,7 +588,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     test_plunger_fail_reasons.append(fail_reason)
                     test_plunger_passed = False
             data = [0, CSVResult.from_Numbool(0)]
-            results_report(
+            recorder_report(
                 _get_cycling_section_tag(),
                 _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
                 data,
@@ -610,25 +612,27 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
             ui.print_title("DONE")
             # Save both reports directly to peek-burn-in-{dut} folder (no run_id subfolder)
             # Create folder for test data
-            test_folder = create_folder_for_test_data(test_name_with_dut)
+            # test_folder = create_folder_for_test_data(test_name_with_dut)
             
-            # Build filenames
-            results_filename = f"{test_name_with_dut}_{run_id}_{dut_str}.csv"
-            recorder_filename = f"{test_name_with_dut}_{run_id}_{dut_str}-recorder.csv"
+            # # Build filenames
+            # results_filename = f"{test_name_with_dut}-results.csv"
+            # recorder_filename = f"{test_name_with_dut}-recorder.csv"
             
-            # Save results report
-            results_path = test_folder / results_filename
-            with open(results_path, "w") as f:
-                f.write(str(results_report) + "\n")
-            print(f"Results report saved to: {results_path}")
+            results_report.save_to_disk()
+            recorder_report.save_to_disk()
+            # # Save results report
+            # results_path = test_folder / results_filename
+            # with open(results_path, "w") as f:
+            #     f.write(str(results_report) + "\n")
+            # print(f"Results report saved to: {results_path}")
             
-            # Save recorder report
-            recorder_path = test_folder / recorder_filename
-            with open(recorder_path, "w") as f:
-                f.write(str(recorder_report) + "\n")
-            print(f"Recorder report saved to: {recorder_path}")
+            # # Save recorder report
+            # recorder_path = test_folder / recorder_filename
+            # with open(recorder_path, "w") as f:
+            #     f.write(str(recorder_report) + "\n")
+            # print(f"Recorder report saved to: {recorder_path}")
             
-            results_report.print_results()
+            # results_report.print_results()
             if api.is_simulator:
                 break
 
