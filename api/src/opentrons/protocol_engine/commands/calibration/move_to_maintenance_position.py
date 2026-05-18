@@ -28,8 +28,8 @@ _RIGHT_MOUNT_Z_MARGIN = 20
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
 
-class MaintenancePosition(enum.Enum):
-    """Maintenance position options."""
+class MotionModifier(enum.Enum):
+    """Motion modifier options for maintenance position moves."""
 
     LOWER_Z_AXES = "lowerZAxes"
 
@@ -42,7 +42,7 @@ class MoveToMaintenancePositionParams(BaseModel):
         description="Gantry mount to move maintenance position.",
     )
 
-    maintenancePosition: Optional[MaintenancePosition] = Field(
+    motionModifier: Optional[MotionModifier] = Field(
         None,
         description="The position the gantry mount needs to move to.",
     )
@@ -91,7 +91,7 @@ class MoveToMaintenancePositionImplementation(
         )
 
         if params.mount != MountType.EXTENSION:
-            if params.maintenancePosition == MaintenancePosition.LOWER_Z_AXES:
+            if params.motionModifier == MotionModifier.LOWER_Z_AXES:
                 max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
                 await ot3_api.move_axes(
                     {

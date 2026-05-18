@@ -164,7 +164,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
             params: {
               mount: nextMount === 'right' ? RIGHT : 'left',
               ...(nextMount === 'both'
-                ? { maintenancePosition: 'lowerZAxes' as const }
+                ? { motionModifier: 'lowerZAxes' as const }
                 : {}),
             },
           },

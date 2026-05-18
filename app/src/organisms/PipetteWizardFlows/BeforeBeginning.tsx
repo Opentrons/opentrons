@@ -230,7 +230,7 @@ export const BeforeBeginning = (
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,
-        maintenancePosition: 'lowerZAxes',
+        motionModifier: 'lowerZAxes',
       },
     },
   ]
