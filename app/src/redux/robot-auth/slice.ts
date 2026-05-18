@@ -145,8 +145,7 @@ export const getNextExpiration = createSelector(
       (acc, [candidateName, candidateState]) => {
         if (
           candidateState?.expiresAt != null &&
-          (acc?.expiresAt == null ||
-            candidateState.expiresAt < acc.expiresAt)
+          (acc?.expiresAt == null || candidateState.expiresAt < acc.expiresAt)
         ) {
           return {
             robotName: candidateName,
