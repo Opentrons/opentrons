@@ -43,6 +43,7 @@ WORKFLOW_NAME_DOCS = "API docs build"
 # GitHub Actions event names (GITHUB_EVENT_NAME).
 GITHUB_EVENT_PULL_REQUEST = "pull_request"
 GITHUB_EVENT_PUSH = "push"
+GITHUB_EVENT_WORKFLOW_DISPATCH = "workflow_dispatch"
 
 # Deployment target environment (match deploy_types.Environment).
 ENV_SANDBOX: Environment = "sandbox"
@@ -192,6 +193,14 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
             return ENV_SANDBOX, ref_name
         if ref_name_lower.startswith(TAG_PRODUCTION_REF_PREFIXES):
             return ENV_PRODUCTION, ref_name
+        return ENV_SANDBOX, ref_name
+
+    if event_name == GITHUB_EVENT_WORKFLOW_DISPATCH:
+        if ref_type == REF_TYPE_TAG:
+            raise ValueError(
+                "workflow_dispatch is only supported for branch refs. "
+                "Use a push tag trigger for staging or production deployments."
+            )
         return ENV_SANDBOX, ref_name
 
     raise ValueError(f"No deployment configuration found for event: {event_name}, ref_type: {ref_type}")
