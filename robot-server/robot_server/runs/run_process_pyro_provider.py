@@ -1,20 +1,21 @@
 """Manages protocol run subprocesses and provides Pyro proxies to communicate with them."""
 
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
 import subprocess
 import sys
 import time
-from typing import Optional, cast
-
-import Pyro5.api
+from typing import TYPE_CHECKING, Optional, cast
 
 from opentrons.config import feature_flags
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 
 from . import run_process_entry_point
-from .run_process import DirectedRunProcess, register_process_types
+
+if TYPE_CHECKING:
+    from .run_process import DirectedRunProcess
 
 _log = logging.getLogger(__name__)
 
@@ -40,6 +41,8 @@ class RunProcessPyroProvider:
         be used by a run.
         """
         if feature_flags.protocol_subprocess_enabled():
+            from .run_process import register_process_types
+
             register_process_types()
             self._start_run_process()
             self._start_simulating_process()
@@ -53,12 +56,16 @@ class RunProcessPyroProvider:
         if feature_flags.protocol_subprocess_enabled():
             await self._end_run_process()
             await self._end_simulating_process()
+            import Pyro5.api
+
             with Pyro5.api.locate_ns() as ns:
                 ns.remove(_RUN_PROXY_NAME)
                 ns.remove(_SIMULATING_RUN_PROXY_NAME)
 
     async def refresh(self) -> None:
         """Ends the currently running process and starts a new one."""
+        import Pyro5.api
+
         await self._end_run_process()
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_RUN_PROXY_NAME)
@@ -66,6 +73,8 @@ class RunProcessPyroProvider:
 
     async def refresh_simulating(self) -> None:
         """Ends the currently running simulating process and starts a new one."""
+        import Pyro5.api
+
         await self._end_simulating_process()
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_SIMULATING_RUN_PROXY_NAME)
@@ -73,6 +82,10 @@ class RunProcessPyroProvider:
 
     @staticmethod
     async def _wait_for_proxy(proxy_name: str) -> Optional[DirectedRunProcess]:
+        import Pyro5.api
+
+        from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+
         start_time = time.monotonic()
         with Pyro5.api.locate_ns() as ns:
             while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:

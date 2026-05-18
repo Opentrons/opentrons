@@ -6,9 +6,6 @@ import time
 from pathlib import Path
 from typing import Any, List, Tuple, cast
 
-import Pyro5.api as pyro
-import Pyro5.errors as pyro_errors
-
 from ._version import version
 from opentrons.config import (
     IS_ROBOT,
@@ -29,13 +26,9 @@ from opentrons.hardware_control import (
 from opentrons.hardware_control import (
     types as hw_types,
 )
-from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
-    register_hardware_types,
-)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.util import logging_config
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version
@@ -165,6 +158,14 @@ def identify_hardware_process() -> HardwareControlAPI:
     """
     Identify the Pyro Proxy for the OT3API and return a wrapped hardware instance.
     """
+    import Pyro5.api as pyro
+    import Pyro5.errors as pyro_errors
+
+    from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
+        register_hardware_types,
+    )
+    from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
     pyro.config.COMMTIMEOUT = 100

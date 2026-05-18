@@ -10,6 +10,7 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from opentrons import __version__
+from opentrons.config import feature_flags as ff
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from .errors.exception_handlers import exception_handlers
@@ -34,7 +35,6 @@ from .service.notifications import (
     initialize_pe_publisher_notifier,
     set_up_notification_client,
 )
-from .service.pyro_utils.pyro_resource import start_initializing_pyro_resource
 from .service.task_runner import set_up_task_runner
 from .settings import RobotServerSettings, get_settings
 
@@ -96,8 +96,14 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         exit_stack.enter_context(set_up_notification_client(app.state))
         initialize_pe_publisher_notifier(app.state)
 
-        # Always make an empty Robot Server Pyro Resource, and populate if appropriate
-        start_initializing_pyro_resource(app_state=app.state)
+        if ff.enable_ot3_hardware_controller():
+            # Pyro resource and run process pyro provider are only needed on Flex
+            from .service.pyro_utils.pyro_resource import (
+                start_initializing_pyro_resource,
+            )
+
+            # Always make an empty Robot Server Pyro Resource, and populate if appropriate
+            start_initializing_pyro_resource(app_state=app.state)
 
         # Start the run process pyro provider so a process is ready when a run starts
         await exit_stack.enter_async_context(

@@ -48,10 +48,6 @@ from robot_server.service.notifications import (
     RunsPublisher,
     get_runs_publisher,
 )
-from robot_server.service.pyro_utils.resource_utilities import (
-    get_pyro_resource,
-    register_run_orchestrator_store_to_pyro_resource,
-)
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.settings import get_settings
 
@@ -184,6 +180,11 @@ async def get_run_orchestrator_store(
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed
         if feature_flags.hardware_subprocess_enabled():
+            from robot_server.service.pyro_utils.resource_utilities import (
+                get_pyro_resource,
+                register_run_orchestrator_store_to_pyro_resource,
+            )
+
             register_run_orchestrator_store_to_pyro_resource(
                 app_state=app_state, run_orchestrator_store=run_orchestrator_store
             )

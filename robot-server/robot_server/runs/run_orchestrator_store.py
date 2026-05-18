@@ -1,8 +1,19 @@
 """In-memory storage of ProtocolEngine instances."""
 
+from __future__ import annotations
+
 import asyncio
 import logging
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Union,
+)
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -61,10 +72,12 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
-from .run_process import DirectedRunProcess
 from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+
+if TYPE_CHECKING:
+    from .run_process import DirectedRunProcess
 
 _log = logging.getLogger(__name__)
 
