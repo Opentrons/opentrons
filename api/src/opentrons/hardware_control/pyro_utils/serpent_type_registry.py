@@ -17,6 +17,7 @@ import opentrons.drivers.rpi_drivers.types
 import opentrons.drivers.types
 import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
+import opentrons.hardware_control.modules.types
 import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.peripherals.types
 import opentrons.hardware_control.protocols.types
@@ -587,6 +588,7 @@ def register_hardware_types() -> None:
             opentrons_shared_data.gripper.gripper_definition,
             opentrons.calibration_storage.types,
             opentrons.drivers.types,
+            opentrons.hardware_control.modules.types,
         ]
     )
 
