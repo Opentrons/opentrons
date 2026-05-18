@@ -101,6 +101,14 @@ FLEX_STACKER_STORE: Final = "command.FLEX_STACKER_STORE"
 FLEX_STACKER_EMPTY: Final = "command.FLEX_STACKER_EMPTY"
 FLEX_STACKER_FILL: Final = "command.FLEX_STACKER_FILL"
 
+VACUUM_MODULE_START_SET_VACUUM_PRESSURE: Final = (
+    "command.VACUUM_MODULE_START_SET_VACUUM_PRESSURE"
+)
+VACUUM_MODULE_START_SET_VACUUM_POWER: Final = (
+    "command.VACUUM_MODULE_START_SET_VACUUM_POWER"
+)
+VACUUM_MODULE_STOP_VACUUM: Final = "command.VACUUM_MODULE_STOP_VACUUM"
+
 # Robot #
 ROBOT_MOVE_TO: Final = "command.ROBOT_MOVE_TO"
 ROBOT_MOVE_AXES_TO: Final = "command.ROBOT_MOVE_AXES_TO"
@@ -448,6 +456,21 @@ class FlexStackerEmptyCommand(TypedDict):
 
 class FlexStackerFillCommand(TypedDict):
     name: Literal["command.FLEX_STACKER_FILL"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStartSetVacuumPressureCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_START_SET_VACUUM_PRESSURE"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStartSetVacuumPowerCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_START_SET_VACUUM_POWER"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStopVacuumCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_STOP_VACUUM"]
     payload: TextOnlyPayload
 
 
@@ -884,6 +907,10 @@ Command = Union[
     FlexStackerStoreCommand,
     FlexStackerEmptyCommand,
     FlexStackerFillCommand,
+    # Vacuum Module commands
+    VacuumModuleStartSetVacuumPressureCommand,
+    VacuumModuleStartSetVacuumPowerCommand,
+    VacuumModuleStopVacuumCommand,
     # Task commands
     WaitForTasksCommand,
     CreateTimerCommand,
