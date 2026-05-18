@@ -44,6 +44,36 @@ describe('robot admin actions', () => {
       },
     },
     {
+      name: 'robotAdmin:SHUTDOWN',
+      creator: Actions.shutdownRobot,
+      args: ['robotName'],
+      expected: {
+        type: 'robotAdmin:SHUTDOWN',
+        payload: { robotName: 'robotName' },
+        meta: { robot: true },
+      },
+    },
+    {
+      name: 'robotAdmin:SHUTDOWN_SUCCESS',
+      creator: Actions.shutdownRobotSuccess,
+      args: ['robotName', { requestId: 'foo' }],
+      expected: {
+        type: 'robotAdmin:SHUTDOWN_SUCCESS',
+        payload: { robotName: 'robotName' },
+        meta: { requestId: 'foo' } as any,
+      },
+    },
+    {
+      name: 'robotAdmin:SHUTDOWN_FAILURE',
+      creator: Actions.shutdownRobotFailure,
+      args: ['robotName', { message: 'AH' }, { requestId: 'foo' }],
+      expected: {
+        type: 'robotAdmin:SHUTDOWN_FAILURE',
+        payload: { robotName: 'robotName', error: { message: 'AH' } },
+        meta: { requestId: 'foo' } as any,
+      },
+    },
+    {
       name: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS',
       creator: Actions.fetchResetConfigOptions,
       args: ['robotName'],

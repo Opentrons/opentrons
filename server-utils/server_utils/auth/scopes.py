@@ -34,6 +34,11 @@ class Scope(enum.Enum):
         "Restart the robot.",
     )
 
+    SHUTDOWN_WRITE = (
+        "shutdown.write",
+        "Shut down the robot.",
+    )
+
     ROBOT_CONTROL_WRITE = (
         "robot_control.write",
         (
