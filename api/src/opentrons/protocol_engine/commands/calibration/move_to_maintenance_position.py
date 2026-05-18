@@ -31,7 +31,7 @@ MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePos
 class MotionModifier(enum.Enum):
     """Motion modifier options for maintenance position moves."""
 
-    LOWER_Z_AXES = "lowerZAxes"
+    LOWER_Z_AXES_SEQUENTIALLY = "lowerZAxesSequentially"
 
 
 class MoveToMaintenancePositionParams(BaseModel):
@@ -91,7 +91,7 @@ class MoveToMaintenancePositionImplementation(
         )
 
         if params.mount != MountType.EXTENSION:
-            if params.motionModifier == MotionModifier.LOWER_Z_AXES:
+            if params.motionModifier == MotionModifier.LOWER_Z_AXES_SEQUENTIALLY:
                 max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
                 await ot3_api.move_axes(
                     {

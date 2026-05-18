@@ -345,7 +345,7 @@ describe('BeforeBeginning', () => {
           { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { motionModifier: 'lowerZAxes', mount: RIGHT },
+            params: { motionModifier: 'lowerZAxesSequentially', mount: RIGHT },
           },
         ],
         false

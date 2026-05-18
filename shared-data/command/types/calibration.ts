@@ -73,7 +73,7 @@ interface CalibrateGripperResult {
 }
 interface MoveToMaintenancePositionParams {
   mount: GantryMount
-  motionModifier?: 'lowerZAxes'
+  motionModifier?: 'lowerZAxesSequentially'
 }
 interface CalibrateModuleResult {
   moduleOffset: Vector3D
