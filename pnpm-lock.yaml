@@ -1013,9 +1013,6 @@ importers:
       formik:
         specifier: 2.1.4
         version: 2.1.4(react@18.2.0)
-      jszip:
-        specifier: 3.2.2
-        version: 3.2.2
       lodash:
         specifier: 4.18.1
         version: 4.18.1
