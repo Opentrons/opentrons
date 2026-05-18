@@ -1,11 +1,10 @@
 """Pyro related utilities for daemons and request handling."""
 
+from __future__ import annotations
+
 import logging
 import socket
 from typing import Any, Callable
-
-from Pyro5 import api as pyro
-from Pyro5 import errors
 
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
@@ -23,6 +22,9 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     Registers the resource with the NameServer at the given PyroName.
     Runs the type registry provided before creating the Pyro Daemon request loop.
     """
+    from Pyro5 import api as pyro
+    from Pyro5 import errors
+
     log.info(f"Running Pyro type registry for {pyroname}.")
     registry()
 

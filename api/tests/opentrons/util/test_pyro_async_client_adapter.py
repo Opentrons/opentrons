@@ -162,7 +162,7 @@ async def test_thread_local_proxy_reuses_connections(
         if proxy_id not in seen_proxy_ids:
             seen_proxy_ids.add(proxy_id)
             new_proxy_count += 1
-        return result
+        return result  # type: ignore[no-any-return]
 
     call_count = 20
     with patch.object(

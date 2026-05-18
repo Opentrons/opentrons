@@ -1,5 +1,7 @@
 """Synchronous class wrapper and functions for creating Pyro compatible objects."""
 
+from __future__ import annotations
+
 import asyncio
 import enum
 import functools
@@ -8,12 +10,7 @@ from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
 from pydantic import BaseModel
-from Pyro5 import api as pyro
 
-from opentrons.util.pyro.pyro_client_async_adapter import (
-    AsyncClientPyroObject,
-    AsyncPyroFunctionWrapper,
-)
 from opentrons.util.pyro.pyro_serialization import (
     NonBuiltinKeyDictWrapper,
     TypedDictWrapper,
@@ -36,21 +33,21 @@ class DaemonUtility:
 
     def __init__(
         self,
-        daemon: pyro.Daemon,
+        daemon: Any,
     ) -> None:
-        self._PyroSynchronousObjects: Dict[pyro.URI, _PSO] = {}
+        self._PyroSynchronousObjects: Dict[Any, _PSO] = {}
         self._daemon = daemon
 
     def add_PSO(self, new_pso: Any) -> None:
         """Add a new PyroSynchronousObject to the list of objects managed by this Daemon Utility."""
-        uri = self._daemon.register(new_pso)  # type: ignore
+        uri = self._daemon.register(new_pso)
         self._PyroSynchronousObjects[uri] = new_pso
 
     def remove_PSO(self, pso: Any) -> None:
         """Remove specified PyroSynchronousObject from the list of objects managed by this Daemon Utility."""
-        uri = self._daemon.uriFor(pso)  # type: ignore
+        uri = self._daemon.uriFor(pso)
         if uri in self._PyroSynchronousObjects:
-            self._daemon.unregister(self._PyroSynchronousObjects[uri])  # type: ignore
+            self._daemon.unregister(self._PyroSynchronousObjects[uri])
             del self._PyroSynchronousObjects[uri]
 
     def find_PSO(self, core_obj: Any) -> _PSO | None:
@@ -60,11 +57,11 @@ class DaemonUtility:
                 return self._PyroSynchronousObjects[uri]
         return None
 
-    def proxy_for(self, pso: Any) -> pyro.Proxy:
+    def proxy_for(self, pso: Any) -> Any:
         """Return a Pyro5 Proxy for an already-registered PyroSynchronousObject."""
         # todo(chb, 2026-03-11): Add proper error handling here - what kind of raise case do we want this to result in?
         # This could trigger inside a wrapper pyro_behavior function on a PSO call for example.
-        return self._daemon.proxyFor(pso)  # type: ignore
+        return self._daemon.proxyFor(pso)
 
 
 class PyroFunctionWrapper:
@@ -246,6 +243,8 @@ def PyroSynchronousObject(core_obj: Any, utility: DaemonUtility) -> _PSO:
 def _build_classdict(  # noqa: C901
     core_obj: Any, utility: DaemonUtility
 ) -> Iterator[tuple[str, Any]]:
+    from Pyro5 import api as pyro
+
     async_methods: dict[str, dict[str, Any]] = {}
     proxy_attributes: list[str] = []
     for name, attr in inspect.getmembers(core_obj.__class__):
@@ -407,6 +406,13 @@ def _validated_parameters(*args: P.args, **kwargs: P.kwargs) -> tuple[tuple, dic
 
 def _validate_inbound_proxy(arg: Any) -> Any:
     """Handle an argument which is a remote Proxy that may have been forwarded through multiple processes."""
+    from Pyro5 import api as pyro
+
+    from opentrons.util.pyro.pyro_client_async_adapter import (
+        AsyncClientPyroObject,
+        AsyncPyroFunctionWrapper,
+    )
+
     if isinstance(arg, pyro.Proxy):
         # NOTE: Cases like this are the result of multi-process callback forwarding
         try:

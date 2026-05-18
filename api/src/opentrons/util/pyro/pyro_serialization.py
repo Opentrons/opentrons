@@ -1,5 +1,7 @@
 """Pyro related utilities for serialization of objects."""
 
+from __future__ import annotations
+
 import builtins
 import enum
 import inspect
@@ -9,7 +11,6 @@ from typing import Any, Callable, Iterator
 
 import serpent
 from pydantic import BaseModel
-from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
 
 
@@ -96,6 +97,8 @@ def register_type_to_serpent(
     class_to_dict: Callable[[Any], dict[Any, Any]],
 ) -> str:
     """Adapter function to call the serpent registries for individual types."""
+    from Pyro5 import api as pyro
+
     class_path = ".".join((class_type.__module__, class_type.__qualname__))
     pyro.register_dict_to_class(class_path, dict_to_class)  # type: ignore
     pyro.register_class_to_dict(class_type, class_to_dict)  # type: ignore
