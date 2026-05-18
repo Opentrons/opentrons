@@ -1,30 +1,30 @@
 import { useTranslation } from 'react-i18next'
 
-import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
-
 import { WifiPasswordInput } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
+
+import styles from './wificredentialform.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WifiScreenOption } from './'
 
-interface SetWifiCredProps {
+interface WifiCredentialFormProps {
   handleConnect: () => void
   password: string
   setCurrentOption: (option: WifiScreenOption) => void
   setPassword: Dispatch<SetStateAction<string>>
 }
 
-export function SetWifiCred({
+export function WifiCredentialForm({
   handleConnect,
   password,
   setCurrentOption,
   setPassword,
-}: SetWifiCredProps): JSX.Element {
+}: WifiCredentialFormProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <div className={styles.form_container}>
       <RobotSetupHeader
         buttonText={t('connect')}
         header={t('sign_into_wifi')}
@@ -34,6 +34,6 @@ export function SetWifiCred({
         onClickButton={handleConnect}
       />
       <WifiPasswordInput password={password} setPassword={setPassword} />
-    </Flex>
+    </div>
   )
 }
