@@ -708,6 +708,7 @@ interface VacuumProfileStepItem {
   id: string
   durationSeconds: number
   pumpData: VacuumPumpData
+  ventAfter: boolean
 }
 
 interface VacuumProfileCycleItem {
