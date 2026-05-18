@@ -59,6 +59,7 @@ from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.types import NozzleMapInterface
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
+    register_enumerated_errors_for_run_process,
     serpent_enum_registration,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
@@ -136,6 +137,7 @@ def register_all_needed_types() -> None:
     register_process_types()
     register_hardware_types()
     register_robot_server_types()
+    register_enumerated_errors_for_run_process()
 
 
 # DirectedRunProcess is created and run as a pyro daemon in its own subprocess

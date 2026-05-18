@@ -36,6 +36,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.util import logging_config
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_serialization import register_enumerated_errors
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version
@@ -189,6 +190,7 @@ def identify_hardware_process() -> HardwareControlAPI:
             hardware_api = cast(HardwareControlAPI, ot3_process_async_client)
             # Register hardware types for the robot server process
             register_hardware_types()
+            register_enumerated_errors()
             log.info("Opentrons Hardware API Subprocess identified and ready for use.")
 
             return hardware_api
