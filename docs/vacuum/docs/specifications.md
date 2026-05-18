@@ -108,33 +108,61 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
   <tbody>
     <tr>
       <td><strong>Dimensions</strong></td>
-      <td></td>
+      <td>225 mm L x 200 mm W x 278 mm H (&asymp; 9" L x 8" W x 11" H)</td>
     </tr>
     <tr>
+      <td><strong>Weight</strong></td>
+      <td>kg</td>
+    </tr>
       <td><strong>Maximum pump rate</strong></td>
       <td>L/min</td>
     </tr>
     <tr>
       <td><strong>Vacuum range (absolute)</strong></td>
-      <td>1,013 mbar (sea level ambient) to 400 mbar (max)</td>
+      <td>1,013 mbar (sea level ambient) to 200 mbar (max)</td>
+    </tr>
+  </tbody>
+</table>
+
+### Vacuum hoses
+
+The Vacuum Module ships with two vacuum hoses and factory installed quick connect/disconnect fittings.
+
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Hose dimensions</strong></td>
+      <td>
+        <ul>
+          <li>6 mm (&frac14;") ID, 2 m L (&asymp; 79")</li>
+          <li>9.5 mm (&frac38;") ID, 2 m L (&asymp; 79")</li>
+        </ul>
+      </td>
     </tr>
     <tr>
-      <td><strong>Hoses</strong></td>
-      <td>The module includes a set of polypropylene vacuum hoses:
+      <td><strong>Material composition</strong></td>
+      <td>
         <ul>
-          <li>6 mm (&frac14;") diameter, _XX_ cm (inches) length</li>
-          <li>9.5 mm (&frac38;") diameter, _XX_ cm (inches) length</li>
+          <li>Hoses: Perfluoroalkoxy (PFA)</li>
+          <li>Fittings: Polypropylene (PP)</li>
+          <li>Gaskets: Ethylene Propylene Diene Monomer (EPDM)</li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
 
-## Environmental specifications
+### Carboy
 
-- Temperature range
-- Humidity
-- Altitude
+The Vacuum Module ships with a wide-mouth, 2-liter glass carboy. An included safety cradle helps keep the carboy secure on the workbench and prevents tip-overs.
+
+The carboy seals with a GL80 cap. The cap includes a stainless steel insert with threaded openings for fastening quick connect fittings to the jar. The cap seals to the carboy with an EPDM gasket, and a float valve closes to help prevent liquid overflow into the Control Box.
 
 ## Power supply
 
@@ -203,38 +231,50 @@ The Vacuum Module requires the following power inputs, which are met by its inte
   </tbody>
 </table>
 
+## Environmental specifications
+
+- Temperature range
+- Humidity
+- Altitude
+
+
+
 ## LED Status Lights
 
 Status lights on the vacuum pump unit provide at-a-glance information about its operations. The colors and illumination patterns listed below indicate the different operating states.
 
 <table>
-    <tr>
-        <th>LED color</th>
-        <th>Module status</th>
-    </tr>
-<tr>
-    <td>
-        <div class="status-dot-container"> <!-- prevent line breaks in col 1 -->
-            <span class="status-dot white"></span> White
-        </div>
-    </td>
-    <td>A white light indicates a neutral operation state. For example:
-      <ul>
-        <li>Solid white: idle.</li>
-        <li>Pulsing white: busy (e.g., starting, updating, or canceling an operation).</li>
-            </ul>
-      </td>
-</tr>
-    <tr>
-        <td><span class="status-dot green"></span> Green</td>
-        <td>A solid green light indicates a protocol is running.</td>
-    </tr>
-    <tr>
-        <td><span class="status-dot blue"></span> Blue</td>
-        <td>A pulsing blue light indicates the module requires attention.</td>
-    </tr>
-    <tr>
-        <td><span class="status-dot red"></span> Red</td>
-        <td>A pulsing red light indicates an error condition.</td>
-    </tr>
+    <thead>
+        <tr>
+            <th>LED color</th>
+            <th>Module status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <div class="status-dot-container"> <!-- prevent line breaks in col 1 -->
+                    <span class="status-dot white"></span> White
+                </div>
+            </td>
+            <td>A white light indicates a neutral operation state. For example:
+              <ul>
+                <li>Solid white: idle.</li>
+                <li>Pulsing white: busy (e.g., starting, updating, or canceling an operation).</li>
+              </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><span class="status-dot green"></span> Green</td>
+            <td>A solid green light indicates a protocol is running.</td>
+        </tr>
+        <tr>
+            <td><span class="status-dot blue"></span> Blue</td>
+            <td>A pulsing blue light indicates the module requires attention.</td>
+        </tr>
+        <tr>
+            <td><span class="status-dot red"></span> Red</td>
+            <td>A pulsing red light indicates an error condition.</td>
+        </tr>
+    </tbody>
 </table>
