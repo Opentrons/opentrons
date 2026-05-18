@@ -160,9 +160,37 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
 
 ### Carboy
 
-The Vacuum Module ships with a wide-mouth, 2-liter glass carboy. An included safety cradle helps keep the carboy secure on the workbench and prevents tip-overs.
+The Vacuum Module ships with glass carboy for waste collection and a safety cradle to help keep the carboy secure on the workbench and prevent tip-overs.
 
-The carboy seals with a GL80 cap. The cap includes a stainless steel insert with threaded openings for fastening quick connect fittings to the jar. The cap seals to the carboy with an EPDM gasket, and a float valve closes to help prevent liquid overflow into the Control Box.
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Carboy</strong></td>
+      <td> <ul>
+          <li>Composition: clear glass</li>
+          <li>Capacity: 2 liters</li>
+          <li>Opening: wide-mouth, screw top</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Cap</strong></td>
+      <td>
+        <ul>
+          <li>Type: GL80 (blue)</li>
+          <li>Insert: Stainless steel, ported/threaded for hose connectors</li>
+          <li>Seal: integral lip seal (PP)</li>
+          <li>Backflow preventer: float ball and valve (PP)
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Power supply
 
@@ -196,7 +224,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td>
         <ul>
           <li>24 VDC</li>
-          <li>2.7 A to 25 A (varies by model and cooling method)</li>
+          <li>2.7 A to 25 A</li>
           <li>140 W (maximum, with convection cooling)</li>
         </ul>
       </td>
@@ -206,7 +234,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td>
         <ul>
           <li>Category III (OVC III)</li>
-          <li>Protection Type: Shutdown output voltage; requires re-powering to recover</li>
+          <li>Protection Type: Shutdown output voltage; requires re-powering to recover.</li>
         </ul>
       </td>
     </tr>
@@ -236,7 +264,6 @@ The Vacuum Module requires the following power inputs, which are met by its inte
 - Temperature range
 - Humidity
 - Altitude
-
 
 
 ## LED Status Lights
