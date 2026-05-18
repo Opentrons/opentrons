@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import clsx from 'clsx'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -24,8 +25,6 @@ export function DocumentationRequired({
   const [keyboardExpanded, setKeyboardExpanded] = useState(true)
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
-
-  const textAreaHeight = keyboardExpanded ? '13.5625rem' : '24.75rem'
 
   const handleKeyboardToggle = (): void => {
     setKeyboardExpanded(prev => !prev)
@@ -55,20 +54,28 @@ export function DocumentationRequired({
           onClickBack={onBack}
         />
         <div className={styles.content_container}>
-          <div className={styles.text_area_container}>
-            <TouchTextAreaField
-              height={textAreaHeight}
-              autoFocus
-              value={inputText}
-              ref={textAreaRef}
-              label={t('access_control_note', { user: username })}
-              onChange={e => {
-                setInputText(e.target.value)
-              }}
-              onBlur={e => {
-                e.target.focus()
-              }}
-            />
+          <div
+            className={clsx(
+              styles.text_area_container,
+              keyboardExpanded
+                ? styles.text_area_container_keyboard_expanded
+                : styles.text_area_container_keyboard_collapsed
+            )}
+          >
+            <div className={styles.text_area_field_fill}>
+              <TouchTextAreaField
+                autoFocus
+                value={inputText}
+                ref={textAreaRef}
+                label={t('access_control_note', { user: username })}
+                onChange={e => {
+                  setInputText(e.target.value)
+                }}
+                onBlur={e => {
+                  e.target.focus()
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
