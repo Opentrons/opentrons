@@ -28,7 +28,9 @@ export const restartRobotFailure = (
   meta,
 })
 
-export const shutdownRobot = (robotName: string): Types.ShutdownRobotAction => ({
+export const shutdownRobot = (
+  robotName: string
+): Types.ShutdownRobotAction => ({
   type: Constants.SHUTDOWN,
   payload: { robotName },
   meta: { robot: true },

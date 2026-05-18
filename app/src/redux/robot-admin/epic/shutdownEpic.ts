@@ -12,9 +12,9 @@ import type {
 import type { Action, Epic } from '../../types'
 import type { ShutdownRobotAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<ShutdownRobotAction> = (
-  action
-) => {
+const mapActionToRequest: ActionToRequestMapper<
+  ShutdownRobotAction
+> = action => {
   return { method: POST, path: Constants.SHUTDOWN_PATH }
 }
 
