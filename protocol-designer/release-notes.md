@@ -12,7 +12,18 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.10.2!**
 
-This hotfix release addresses a bug to allow manual tip tracking with a partial column pickup (for 5 or more pipette tips).
+This release incudes several bug fixes and improvements.
+
+### Improvements
+
+- When Protocol Designer detects a collision risk, the error message specifies the deck slot containing labware, modules, or fixtures at risk. To resolve the error, remove the items from the deck slot.
+- In every Protocol Designer step, pipettes must be able to safely pick up accessible tips from their tip rack. Improvements in this release can help you troubleshoot accessible tip erros:
+  - Warnings let you know when your deck setup or tip pickup settings present a collision risk with other tips or labware.
+  - In a transfer or mix step form, click **Manual tip tracking**, then click to select tips. This form can show you which tips are inaccessible and could cause a collision.
+
+### Bug Fixes
+
+- Protocol Designer allows manual tip tracking with a partial column pickup (for 5 or more pipette tips).
 
 ## Opentrons Protocol Designer Changes in 8.10.1
 
