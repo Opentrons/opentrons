@@ -8,10 +8,9 @@ RequestDataT = TypeVar("RequestDataT")
 
 
 class RequestModel(BaseModel, Generic[RequestDataT]):
-    """JSON:API-style request envelope.
+    """A request model."""
 
-    See https://jsonapi.org/format/#document-request-data
-    """
+    """See https://jsonapi.org/format/#document-request-data"""
 
     data: RequestDataT = Field(..., description="the document's 'primary data'")
     userNotes: str | None = Field(

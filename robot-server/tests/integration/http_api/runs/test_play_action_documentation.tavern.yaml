@@ -57,7 +57,7 @@ stages:
       status_code: 201
 
 ---
-test_name: Run action with userNotes when require-reason forced on (integration override)
+test_name: Run action with userNotes when require-reason on
 
 marks:
   - usefixtures:
