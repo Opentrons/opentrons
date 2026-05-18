@@ -405,6 +405,7 @@ export interface VacuumRunProfileParams {
   moduleId: string
   profile: VacuumProfile
   taskId?: string
+  ventAfter?: boolean
 }
 
 export interface ModuleOnlyParams {
