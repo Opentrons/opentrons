@@ -259,12 +259,18 @@ The Vacuum Module requires the following power inputs, which are met by its inte
   </tbody>
 </table>
 
-## Environmental specifications
+## Environmental conditions
+<!-- Using Flex specs as placeholder -->
 
-- Temperature range
-- Humidity
-- Altitude
+Environmental conditions for recommended use, acceptable use, and storage vary.
 
+|                 | Recommended for system operation | Acceptable for system operation | Storage and transportation |
+| :---------------------- | :----------------------------------- | :---------------------------------- | :----------------------------- |
+| **Ambient temperature** | +20 to +25 °C                        | +2 to +40 °C                        | −10 to +60 °C                  |
+| **Relative humidity** | 40–60%, non-condensing            | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
+| **Altitude** | Approximately 500 m above sea level | Up to 2000 m above sea level    | Up to 2000 m above sea level |
+
+Opentrons has validated the performance of the Vacuum Module in the conditions recommended for system operation, and operation in those conditions should provide optimal results. The module is safe to use in conditions acceptable for system operation, but results may vary. Do not power on or use the Vacuum Module in conditions outside of those bounds. The storage and transportation conditions only apply when the module is completely disconnected from power and other equipment.
 
 ## LED Status Lights
 
