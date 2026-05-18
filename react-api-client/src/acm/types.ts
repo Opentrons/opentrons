@@ -1,6 +1,6 @@
 import { type useMutation } from 'react-query'
 
-interface DocumentationReport {
+export interface DocumentationReport {
   note: string
   confirmedAt: string
   documentedBy: string
@@ -22,12 +22,6 @@ export type DocumentationState =
       askForDocumentation: () => Promise<DocumentationReport>
     }
 
-export type DocumentedMutationReturnType<
-  TData = unknown,
-  TError = unknown,
-  TVariables = void,
-  TContext = unknown,
-> = ReturnType<typeof useMutation<TData, TError, TVariables, TContext>>
 export type DocumentedMutationProps<
   TData = unknown,
   TError = unknown,

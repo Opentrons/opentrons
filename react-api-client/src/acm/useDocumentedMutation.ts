@@ -1,10 +1,13 @@
+import { useCallback } from 'react'
 import { useMutation } from 'react-query'
 
-import {
-  type DocumentationState,
-  type DocumentedMutationProps,
-  type DocumentedMutationReturnType,
-} from './types'
+import type {
+  MutationFunction,
+  MutationKey,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import type { DocumentationReport, DocumentationState } from './types'
 
 /**
  * Wrapper for a mutation function the ensure documentation is provided in ACM.
@@ -30,17 +33,44 @@ export function useDocumentedMutation<
   TContext = unknown,
 >(
   documentationState: DocumentationState,
-  ...props: DocumentedMutationProps<TData, TError, TVariables, TContext>
-): DocumentedMutationReturnType<TData, TError, TVariables, TContext> {
-  if (documentationState.accessControlEnabled) {
-    if (documentationState.docreport == null) {
-      // TODO(jj): this function is async...hmmm
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const docreport = documentationState.askForDocumentation()
-    }
-  }
-
-  const mutation = useMutation<TData, TError, TVariables, TContext>(...props)
+  mutationKey: MutationKey,
+  mutationFn: MutationFunction<TData, TVariables>,
+  options?: UseMutationOptions<TData, TError, TVariables, TContext>
+): UseMutationResult<TData, TError, TVariables, TContext> {
+  const wrappedMutationFn = useWrappedMutationFn(mutationFn, documentationState)
+  const mutation = useMutation<TData, TError, TVariables, TContext>(
+    mutationKey,
+    wrappedMutationFn,
+    options
+  )
 
   return mutation
+}
+
+const checkDocumentationReport = async (
+  documentationState: DocumentationState
+): Promise<DocumentationReport | null> => {
+  if (!documentationState.accessControlEnabled) {
+    return null
+  }
+  if (documentationState.docreport != null) {
+    return documentationState.docreport
+  }
+  return await documentationState.askForDocumentation()
+}
+
+function useWrappedMutationFn<TData, TVariables>(
+  mutationFn: MutationFunction<TData, TVariables>,
+  documentationState: DocumentationState
+): MutationFunction<TData, TVariables> {
+  const wrappedMutationFn = useCallback(
+    async (...args: Parameters<typeof mutationFn>) => {
+      const docreport = await checkDocumentationReport(documentationState)
+      // TODO(jj): actually use the docreport
+      console.log(docreport)
+      return await mutationFn(...args)
+    },
+    [documentationState, mutationFn]
+  )
+  return wrappedMutationFn
 }
