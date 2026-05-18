@@ -47,7 +47,8 @@ export function useRunActionMutations(
     onSuccess,
   })
 
-  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation()
+  const { stopRun, isLoading: isStopRunActionLoading } =
+    useStopRunMutation(documentationState)
 
   const {
     resumeRunFromRecovery,

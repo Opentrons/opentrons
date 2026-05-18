@@ -7,7 +7,7 @@
 .content_container {
   display: flex;
   width: 824px;
-  height:218px;
+  height: 218px;
   flex-direction: column;
   padding: 7.75rem var(--spacing-40) var(--spacing-120);
   margin: 0 auto;
@@ -29,4 +29,5 @@
   position: fixed;
   background-color: var(--white);
   inset: 0;
+  z-index: 1000;
 }
