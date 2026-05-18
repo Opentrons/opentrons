@@ -6,72 +6,16 @@
 
 .content_container {
   display: flex;
-  width: 100%;
-  max-width: 59rem;
-  flex: 1;
+  width: 824px;
+  height:218px;
   flex-direction: column;
-  padding: 0 var(--spacing-60) var(--spacing-120);
-  margin-top: 7.75rem;
+  padding: 7.75rem var(--spacing-40) var(--spacing-120);
+  margin: 0 auto;
   gap: var(--spacing-24);
 }
 
 .text_area_container {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  flex-direction: column;
-  gap: var(--spacing-8);
-}
-
-.text_area_container_keyboard_expanded {
-  height: 13.5625rem;
-}
-
-.text_area_container_keyboard_collapsed {
-  height: 24.75rem;
-}
-
-.text_area_field_fill {
-  display: flex;
-  height: 100%;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-}
-
-/* Stretch TouchTextAreaField internals to fill the container (label + textarea). */
-.text_area_field_fill > div {
-  display: flex;
-  height: 100%;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.text_area_field_fill > div > div {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-}
-
-.text_area_field_fill > div > div > div:nth-child(2) {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-}
-
-.text_area_field_fill > div > div > div:nth-child(2) > div {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  align-items: stretch;
-}
-
-.text_area_field_fill textarea {
-  height: 100%;
+  padding: 0 var(--spacing-60) 0;
 }
 
 .keyboard_container {
