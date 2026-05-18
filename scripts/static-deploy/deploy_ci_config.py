@@ -169,6 +169,18 @@ def _determine_application(ref_type: str, ref_name: str) -> str:
     )
 
 
+def _environment_and_prefix_for_tag(ref_name: str) -> tuple[str, str]:
+    """Resolve environment and sandbox prefix from a tag ref name."""
+    ref_name_lower = ref_name.lower()
+    if ref_name_lower.startswith(TAG_STAGING_ENV_PREFIX):
+        return ENV_STAGING, ref_name
+    if ref_name_lower.startswith(TAG_PD_TEST_SANDBOX_PREFIX):
+        return ENV_SANDBOX, ref_name
+    if ref_name_lower.startswith(TAG_PRODUCTION_REF_PREFIXES):
+        return ENV_PRODUCTION, ref_name
+    return ENV_SANDBOX, ref_name
+
+
 def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: str, head_ref: Optional[str]) -> tuple[str, str]:
     """Determine environment and sandbox prefix from event context."""
     if event_name == GITHUB_EVENT_PULL_REQUEST:
@@ -186,14 +198,7 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
         return ENV_SANDBOX, ref_name
 
     if event_name == GITHUB_EVENT_PUSH and ref_type == REF_TYPE_TAG:
-        ref_name_lower = ref_name.lower()
-        if ref_name_lower.startswith(TAG_STAGING_ENV_PREFIX):
-            return ENV_STAGING, ref_name
-        if ref_name_lower.startswith(TAG_PD_TEST_SANDBOX_PREFIX):
-            return ENV_SANDBOX, ref_name
-        if ref_name_lower.startswith(TAG_PRODUCTION_REF_PREFIXES):
-            return ENV_PRODUCTION, ref_name
-        return ENV_SANDBOX, ref_name
+        return _environment_and_prefix_for_tag(ref_name)
 
     if event_name == GITHUB_EVENT_WORKFLOW_DISPATCH:
         if ref_type == REF_TYPE_TAG:
