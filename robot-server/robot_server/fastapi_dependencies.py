@@ -10,6 +10,8 @@ from server_utils.auth.resource_server.auth_server import Client
 from server_utils.auth.resource_server.fastapi import get_auth_server_client
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
+from robot_server.service.dependencies import get_current_time
+
 log = logging.getLogger(__name__)
 
 
@@ -26,7 +28,7 @@ async def get_require_reason_for_interaction_enabled(
 async def maybe_log_user_action_notes_when_setting_requires(
     runId: str,
     request_body: RequestModel[Any],
-    created_at: datetime,
+    created_at: Annotated[datetime, Depends(get_current_time)],
     require_reason_for_interaction: Annotated[
         bool, Depends(get_require_reason_for_interaction_enabled)
     ],
