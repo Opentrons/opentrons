@@ -39,6 +39,25 @@ const FILES_IN_RELEASE_JSON = [
   /beta.*yml$/,
 ]
 
+// Shared electron-updater feeds at the app deploy root (same URLs for every version entry).
+const APP_CHANNEL_UPDATE_YMLS = [
+  'latest.yml',
+  'latest-mac.yml',
+  'latest-linux.yml',
+  'alpha.yml',
+  'alpha-mac.yml',
+  'alpha-linux.yml',
+  'beta.yml',
+  'beta-mac.yml',
+  'beta-linux.yml',
+]
+
+function channelUpdateManifestUrls(urlBase) {
+  return Object.fromEntries(
+    APP_CHANNEL_UPDATE_YMLS.map(name => [name, urlBase + name])
+  )
+}
+
 function installerManifestKeys(artifactName) {
   const isInternal = /Opentrons-Internal-OT2/i.test(artifactName)
   const prefix = isInternal ? 'Opentrons-Internal-OT2' : 'Opentrons-OT2'
@@ -91,11 +110,10 @@ async function main() {
   const versionFinder = await import('./git-version.mjs')
   const version = await versionFinder.versionForProject(project)
   console.log(`Adding data for ${version}`)
+  const normalizedUrlBase = urlBase.endsWith('/') ? urlBase : `${urlBase}/`
   releasesData.production[version] = {
-    ...(await artifactsFromDir(
-      artifactDirPath,
-      urlBase.endsWith('/') ? urlBase : `${urlBase}/`
-    )),
+    ...channelUpdateManifestUrls(normalizedUrlBase),
+    ...(await artifactsFromDir(artifactDirPath, normalizedUrlBase)),
     revoked: false,
   }
   console.log(
