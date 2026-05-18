@@ -52,9 +52,6 @@ class TestAuthServerAuthorizationChecker:
         """When there is no token, it should authorize the request if and only if access control is disabled."""
         subject = AuthServerAuthorizationChecker(mock_client)
 
-    decoy.when(await mock_client.get_auth_settings()).then_return(
-        AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=False))
-    )
         decoy.when(await mock_client.get_auth_settings()).then_return(
             AuthSettingsResponse(
                 data=AuthSettingsResponseData(accessControlEnabled=True)
