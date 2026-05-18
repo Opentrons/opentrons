@@ -5,12 +5,16 @@ import { useExternalKeyboardGuard } from '../useExternalKeyboardGuard'
 
 describe('useExternalKeyboardGuard - alphanumeric', () => {
   it('returns null invalidChar on mount', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     expect(result.current.invalidChar).toBeNull()
   })
 
   it('allows lowercase letters', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     let accepted = false
     act(() => {
       accepted = result.current.validateInput('abc', '')
@@ -20,7 +24,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('allows uppercase letters', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     let accepted = false
     act(() => {
       accepted = result.current.validateInput('ABC', '')
@@ -30,7 +36,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('allows digits', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     let accepted = false
     act(() => {
       accepted = result.current.validateInput('123', '')
@@ -40,7 +48,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('accepts invalid char and sets invalidChar state', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     let accepted = false
     act(() => {
       accepted = result.current.validateInput('a!', 'a')
@@ -50,7 +60,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('blocks further additions while invalidChar is set', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     act(() => {
       result.current.validateInput('a!', 'a')
     })
@@ -64,7 +76,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('allows deletion while in invalid state', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     act(() => {
       result.current.validateInput('a!', 'a')
     })
@@ -77,7 +91,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('clears invalidChar only when all invalid chars are removed', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     act(() => {
       result.current.validateInput('a!@', 'a')
     })
@@ -95,7 +111,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('blocks space character', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     let accepted = false
     act(() => {
       accepted = result.current.validateInput('a b', 'a')
@@ -105,7 +123,9 @@ describe('useExternalKeyboardGuard - alphanumeric', () => {
   })
 
   it('handles paste: records first invalid char, blocks further additions', () => {
-    const { result } = renderHook(() => useExternalKeyboardGuard('alphanumeric'))
+    const { result } = renderHook(() =>
+      useExternalKeyboardGuard('alphanumeric')
+    )
     let accepted = false
     act(() => {
       accepted = result.current.validateInput('ab!c@', '')
