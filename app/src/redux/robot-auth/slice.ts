@@ -140,24 +140,24 @@ interface GetNextExpirationResult {
 
 export const getNextExpiration = createSelector(
   (state: State) => state.robotAuth,
-  (robotAuthState: RobotAuthState): GetNextExpirationResult | null => {
-    let result: GetNextExpirationResult | null = null
-    for (const [candidateName, candidateState] of Object.entries(
-      robotAuthState
-    )) {
-      if (
-        candidateState?.expiresAt != null &&
-        (result?.expiresAt == null ||
-          candidateState.expiresAt < result.expiresAt)
-      ) {
-        result = {
-          robotName: candidateName,
-          expiresAt: candidateState.expiresAt,
+  (robotAuthState: RobotAuthState): GetNextExpirationResult | null =>
+    Object.entries(robotAuthState).reduce<GetNextExpirationResult | null>(
+      (acc, [candidateName, candidateState]) => {
+        if (
+          candidateState?.expiresAt != null &&
+          (acc?.expiresAt == null ||
+            candidateState.expiresAt < acc.expiresAt)
+        ) {
+          return {
+            robotName: candidateName,
+            expiresAt: candidateState.expiresAt,
+          }
+        } else {
+          return acc
         }
-      }
-    }
-    return result
-  },
+      },
+      null
+    ),
   {
     memoizeOptions: {
       // Avoid waking up listeners if we return an object that's referentially new
