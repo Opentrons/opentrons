@@ -203,8 +203,7 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
     if event_name == GITHUB_EVENT_WORKFLOW_DISPATCH:
         if ref_type == REF_TYPE_TAG:
             raise ValueError(
-                "workflow_dispatch is only supported for branch refs. "
-                "Use a push tag trigger for staging or production deployments."
+                "workflow_dispatch is only supported for branch refs. Use a push tag trigger for staging or production deployments."
             )
         return ENV_SANDBOX, ref_name
 
