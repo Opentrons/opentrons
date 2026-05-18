@@ -80,7 +80,9 @@ class _SelfClient(Client):
     async def get_require_reason_for_interaction_settings(
         self,
     ) -> RequireReasonForInteractionSettingsResponse:
-        reason_for_interaction_enabled = self._settings_store.get_require_reason_for_interaction_settings()
+        reason_for_interaction_enabled = (
+            self._settings_store.get_require_reason_for_interaction_settings()
+        )
         return RequireReasonForInteractionSettingsResponse(
             data=RequireReasonForInteractionSettingsResponseData(
                 requireReasonForInteraction=reason_for_interaction_enabled.requireReasonForInteraction,
