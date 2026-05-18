@@ -20,13 +20,13 @@ import {
   useMenuHandleClickOutside,
   useMountEffect,
 } from '@opentrons/components'
+import { useSetLightsMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import * as Config from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { restartRobot, shutdownRobot } from '/app/redux/robot-admin'
@@ -72,12 +72,14 @@ export const RobotOverviewOverflowMenu = (
 
   const dispatch = useDispatch<Dispatch>()
   const isFlex = useIsFlex(robot.name)
+  const { setLights } = useSetLightsMutation()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
   }
 
   const handleClickShutdown: MouseEventHandler<HTMLButtonElement> = () => {
+    setLights({ on: false })
     dispatch(shutdownRobot(robot.name))
   }
 
@@ -235,6 +237,7 @@ export const RobotOverviewOverflowMenu = (
                 robot.name
               )}`}
             >
+              {/* TODO(jh, 05-18-26): Update after Design finalizes implementation */}
               {t('robot_controls:shutdown_label')}
             </MenuItem>
           ) : null}

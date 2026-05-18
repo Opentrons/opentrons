@@ -17,8 +17,8 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { home, ROBOT } from '/app/redux/robot-controls'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { home, ROBOT } from '/app/redux/robot-controls'
 import { useLights } from '/app/resources/devices'
 
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
@@ -129,6 +129,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing12}
               >
+                {/* TODO(jh, 05-18-26): Update after Design finalizes implementation */}
                 {t('robot_controls:shutdown_label')}
               </LegacyStyledText>
             </Flex>

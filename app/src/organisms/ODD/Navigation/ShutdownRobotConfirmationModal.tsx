@@ -9,6 +9,7 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
+import { useSetLightsMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
@@ -29,11 +30,13 @@ export function ShutdownRobotConfirmationModal({
 }: ShutdownRobotConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
+    // TODO(jh, 05-18-26): Update after Design finalizes implementation
     title: t('shutdown_now'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
   const dispatch = useDispatch<Dispatch>()
+  const { setLights } = useSetLightsMutation()
 
   return (
     <OddModal header={modalHeader}>
@@ -68,7 +71,10 @@ export function ShutdownRobotConfirmationModal({
             flex="1"
             buttonType="alert"
             buttonText={i18n.format(t('shared:shutdown'), 'capitalize')}
-            onClick={() => dispatch(shutdownRobot(robotName))}
+            onClick={() => {
+              setLights({ on: false })
+              dispatch(shutdownRobot(robotName))
+            }}
           />
         </Flex>
       </Flex>
