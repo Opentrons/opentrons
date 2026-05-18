@@ -9,7 +9,10 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-import { useSetLightsMutation } from '@opentrons/react-api-client'
+import {
+  useCreateLiveCommandMutation,
+  useSetLightsMutation,
+} from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
@@ -37,6 +40,7 @@ export function ShutdownRobotConfirmationModal({
   }
   const dispatch = useDispatch<Dispatch>()
   const { setLights } = useSetLightsMutation()
+  const { createLiveCommand } = useCreateLiveCommandMutation()
 
   return (
     <OddModal header={modalHeader}>
@@ -72,8 +76,19 @@ export function ShutdownRobotConfirmationModal({
             buttonType="alert"
             buttonText={i18n.format(t('shared:shutdown'), 'capitalize')}
             onClick={() => {
-              setLights({ on: false })
-              dispatch(shutdownRobot(robotName))
+              createLiveCommand({
+                command: {
+                  commandType: 'setStatusBar',
+                  params: { animation: 'off' },
+                },
+              })
+                .catch(() => {
+                  console.warn('Failed to set status bar animation to off')
+                })
+                .finally(() => {
+                  setLights({ on: false })
+                  dispatch(shutdownRobot(robotName))
+                })
             }}
           />
         </Flex>

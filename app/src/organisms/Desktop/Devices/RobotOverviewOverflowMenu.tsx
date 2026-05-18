@@ -20,7 +20,10 @@ import {
   useMenuHandleClickOutside,
   useMountEffect,
 } from '@opentrons/components'
-import { useSetLightsMutation } from '@opentrons/react-api-client'
+import {
+  useCreateLiveCommandMutation,
+  useSetLightsMutation,
+} from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
@@ -73,14 +76,23 @@ export const RobotOverviewOverflowMenu = (
   const dispatch = useDispatch<Dispatch>()
   const isFlex = useIsFlex(robot.name)
   const { setLights } = useSetLightsMutation()
+  const { createLiveCommand } = useCreateLiveCommandMutation()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
   }
 
   const handleClickShutdown: MouseEventHandler<HTMLButtonElement> = () => {
-    setLights({ on: false })
-    dispatch(shutdownRobot(robot.name))
+    createLiveCommand({
+      command: { commandType: 'setStatusBar', params: { animation: 'off' } },
+    })
+      .catch(() => {
+        console.warn('Failed to set status bar animation to off')
+      })
+      .finally(() => {
+        setLights({ on: false })
+        dispatch(shutdownRobot(robot.name))
+      })
   }
 
   const handleClickHomeGantry: MouseEventHandler<HTMLButtonElement> = () => {
