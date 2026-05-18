@@ -14,7 +14,7 @@ import pydantic
 
 SETTINGS_ENDPOINT_PATH = "auth/settings/accessControlEnabled"
 REQUIRE_REASON_FOR_INTERACTION_SETTINGS_ENDPOINT_PATH = (
-    "auth/settings/requireReasonForInteraction"
+    "auth/settings/requireReasonForInteractionEnabled"
 )
 TOKEN_ENDPOINT_PATH = "auth/oauth2/token"
 TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
@@ -185,7 +185,7 @@ class AuthSettingsResponseData(_StrictBaseModel):
 
 
 class RequireReasonForInteractionSettingsResponse(_StrictBaseModel):
-    """A response body from auth-server's /auth/settings/requireReasonForInteraction endpoint."""
+    """A response body from auth-server's /auth/settings/requireReasonForInteractionEnabled endpoint."""
 
     data: RequireReasonForInteractionSettingsResponseData
 

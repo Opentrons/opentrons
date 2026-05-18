@@ -46,7 +46,7 @@ class AppMock:
     """
 
     require_reason_settings_response: object
-    """How the server should respond to GET /auth/settings/requireReasonForInteraction."""
+    """How the server should respond to GET /auth/settings/requireReasonForInteractionEnabled."""
 
     app: Final[aiohttp.web.Application]
 
