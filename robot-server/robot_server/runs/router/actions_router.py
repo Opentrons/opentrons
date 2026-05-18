@@ -9,9 +9,13 @@ from opentrons.protocol_engine.types import DeckConfigurationType
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
-from server_utils.fastapi_utils.models.json_api import PydanticResponse, SimpleBody
+from server_utils.fastapi_utils.models.json_api import (
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+)
 
-from ..action_models import CreateRunActionRequest, RunAction, RunActionType
+from ..action_models import RunAction, RunActionCreate, RunActionType
 from ..dependencies import get_run_orchestrator_store, get_run_store
 from ..run_controller import RunActionNotAllowedError, RunController
 from ..run_models import RunNotFoundError
@@ -107,7 +111,7 @@ async def get_run_controller(
 )
 async def create_run_action(
     runId: str,
-    request_body: CreateRunActionRequest,
+    request_body: RequestModel[RunActionCreate],
     run_controller: Annotated[RunController, Depends(get_run_controller)],
     action_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],

@@ -14,12 +14,9 @@ from robot_server.fastapi_dependencies import (
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
-from robot_server.runs.action_models import (
-    CreateRunActionRequest,
-    RunAction,
-    RunActionCreate,
-    RunActionType,
-)
+from server_utils.fastapi_utils.models.json_api import RequestModel
+
+from robot_server.runs.action_models import RunAction, RunActionCreate, RunActionType
 from robot_server.runs.router.actions_router import create_run_action
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
@@ -44,7 +41,7 @@ async def test_create_run_action(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = CreateRunActionRequest(
+    request_body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
         userNotes=_PLAY_USER_NOTES,
     )
@@ -100,7 +97,7 @@ async def test_play_action_clears_maintenance_run(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = CreateRunActionRequest(
+    request_body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
         userNotes=_PLAY_USER_NOTES,
     )
@@ -169,7 +166,7 @@ async def test_create_play_action_not_allowed(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = CreateRunActionRequest(
+    request_body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
         userNotes=_PLAY_USER_NOTES,
     )

@@ -5,7 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 from opentrons_shared_data.util import StrEnum
-from server_utils.fastapi_utils.models.json_api import RequestModel, ResourceModel
+from server_utils.fastapi_utils.models.json_api import ResourceModel
 
 
 class RunActionType(StrEnum):
@@ -62,10 +62,6 @@ class RunActionCreate(BaseModel):
     """Request model for new control action creation."""
 
     actionType: RunActionType
-
-
-class CreateRunActionRequest(RequestModel[RunActionCreate]):
-    """Run action POST body; optional ``userNotes`` (e.g. audit metadata)."""
 
 
 class RunAction(ResourceModel):
