@@ -389,6 +389,7 @@ async def test_update_pump_state(
             pressure_abs_b=0,
             pressure_atm=0,
             vacuum_enabled=False,
+            vacuum_duration=0,
             vent_state=VentState.CLOSED,
         )
     ],

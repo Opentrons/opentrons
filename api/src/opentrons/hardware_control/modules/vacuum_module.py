@@ -493,6 +493,7 @@ class VacuumModuleReader(Reader):
             pressure_abs_b=0,
             pressure_atm=0,
             vacuum_enabled=False,
+            vacuum_duration=0,
             vent_state=VentState.CLOSED,
         )
         self.pump_state: PumpState = PumpState(
