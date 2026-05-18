@@ -35,7 +35,6 @@ from opentrons.hardware_control.instruments.ot3 import (
     instrument_calibration as ot3_calibration,
 )
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
-from opentrons.hardware_control.instruments.ot3.pipette_handler import OT3PipetteHandler
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.modules import (
     AbsorbanceReader,
@@ -59,6 +58,7 @@ from opentrons.hardware_control.types import (
     DoorStateNotification,
     HardwareEvent,
     HardwareEventHandler,
+    OT3Mount,
 )
 from opentrons.types import Mount, Point
 from opentrons.util.pyro.pyro_client_async_adapter import (
@@ -580,5 +580,76 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     # Verify the resulting callback proxy (which is wrapped automagically) is wrapped and callable
     assert isinstance(result, AsyncPyroFunctionWrapper)
     result()
+
+    ot3_proxy._pyroRelease()  # type: ignore
+
+
+async def test_pipette_proxy_dictionary(
+    ot3_hardware: ThreadManager[OT3API],
+    hardware_pipette_ot3: Callable[
+        [Union[str, pipette_definition.PipetteModelVersionType]], Pipette
+    ],
+) -> None:
+    """Test that hardware_pipettes returns pipette proxies over Pyro."""
+    sock = socket.socket()
+    sock.bind(("localhost", 0))
+    host, port = sock.getsockname()
+    sock.close()
+
+    pyro.config.NS_HOST = host
+    pyro.config.NS_PORT = port
+
+    name_server_ready = threading.Event()
+
+    managed = ot3_hardware.managed_obj
+    assert managed is not None
+
+    hw_pipette = hardware_pipette_ot3(
+        pipette_load_name.convert_pipette_model(PipetteModel("p1000_single_v1.0"))
+    )
+    managed._pipette_handler._attached_instruments[OT3Mount.LEFT] = hw_pipette
+
+    def _nameserver_loop() -> None:
+        # start_ns returns (nameserver, daemon, uri)
+        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)  # type: ignore
+        name_server_ready.set()
+        # Run until the test process exits; thread is marked daemon=True.
+        ns_daemon.requestLoop()
+
+    def _pyro_daemon() -> None:
+        # Wait for the nameserver to be ready so locate_ns can succeed.
+        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        create_pyro_daemon("OT3API", managed, register_hardware_types)
+
+    ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
+    server_thread = threading.Thread(target=_pyro_daemon, daemon=True)
+
+    ns_thread.start()
+    server_thread.start()
+
+    # Client-side requests below
+    register_hardware_types()
+    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    ns = pyro.locate_ns()
+
+    retries_counter = 0
+    while ns.count() < 2:
+        # Wait and try again, the resource isnt registered yet
+        await asyncio.sleep(0.01)
+        retries_counter += 1
+        if retries_counter > 10:
+            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+
+    uri = pyro.resolve(uri="PYRONAME:OT3API")
+    ot3_proxy = pyro.Proxy(uri)  # type: ignore
+    ot3_async = AsyncClientPyroObject(ot3_proxy)
+    ot3api = cast(OT3API, ot3_async)
+
+    pipettes = ot3api.hardware_pipettes
+    assert pipettes[Mount.LEFT] is not None
+    assert pipettes[Mount.RIGHT] is None
+    left_proxy = pipettes[Mount.LEFT]
+    assert left_proxy.pipette_id == hw_pipette.pipette_id
 
     ot3_proxy._pyroRelease()  # type: ignore
