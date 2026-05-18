@@ -79,24 +79,31 @@ describe('useDocumentedMutation', () => {
     expect(mutationFn).toHaveBeenCalledWith(4)
   })
 
-  it('calls askForDocumentation when access control is on and docreport is missing', () => {
+  it('calls askForDocumentation when access control is on and docreport is missing', async () => {
     const askForDocumentation = vi.fn().mockResolvedValue(MOCK_REPORT)
+    const mutationFn = vi.fn(async (s: string) => `${s}-ok`)
 
-    renderHook(
+    const { result } = renderHook(
       () =>
-        useDocumentedMutation<null, AxiosError>(
+        useDocumentedMutation<string, AxiosError, string>(
           {
             accessControlEnabled: true,
             docreport: null,
             askForDocumentation,
           },
           testMutationKey,
-          async () => null,
+          (s: string) => mutationFn(s),
           {}
         ),
       { wrapper }
     )
 
+    act(() => {
+      result.current.mutate('run')
+    })
+    await waitFor(() => {
+      expect(result.current.data).toBe('run-ok')
+    })
     expect(askForDocumentation).toHaveBeenCalled()
   })
 
@@ -122,7 +129,6 @@ describe('useDocumentedMutation', () => {
     act(() => {
       result.current.mutate('run')
     })
-
     await waitFor(() => {
       expect(result.current.data).toBe('run-ok')
     })
