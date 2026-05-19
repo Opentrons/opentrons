@@ -16,18 +16,29 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
+from pathlib import Path
+from typing import Callable, List, Optional
+
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
     CSVSection,
     CSVLine,
+    META_DATA_TITLE,
+    META_DATA_TEST_TAG,
+    RESULTS_OVERVIEW_TITLE,
+)
+from hardware_testing.data import (
+    create_run_id,
+    create_folder_for_test_data,
+    get_git_description,
 )
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
 DEFAULT_TRIALS = 10 # The number of trials each current speed check does
-DEFAULT_CYCLES = 4 # The number of burn-in cycles
+DEFAULT_CYCLES = 40 # The number of burn-in cycles
 TRIALS_PER_CYCLE = 500 # number of plunger cycles in one burn in cycle
 
 STALL_THRESHOLD_MM = 0.1
@@ -40,16 +51,16 @@ DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
 
-MUST_PASS_CURRENT = 0.3  # the target spec (must pass here)
+MUST_PASS_CURRENT = 0.4  # the target spec (must pass here)
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
 
 TEST_SPEEDS = [
     90,
-    # 80,
-    # 70,
-    # 60
+    80,
+    70,
+    60
 ]
 
 # TEST_SPEEDS = [80, 70]
@@ -57,16 +68,14 @@ TEST_SPEEDS = [
 PLUNGER_CURRENTS_SPEED = {
     # 0.3: TEST_SPEEDS,
     # 0.35: TEST_SPEEDS,
-    # 0.4: TEST_SPEEDS,
-    # 0.45: TEST_SPEEDS,
-    # 0.5: TEST_SPEEDS,
-    # 0.55: TEST_SPEEDS,
-    # 0.6: TEST_SPEEDS,
+    0.4: TEST_SPEEDS,
+    0.45: TEST_SPEEDS,
+    0.5: TEST_SPEEDS,
+    0.55: TEST_SPEEDS,
+    0.6: TEST_SPEEDS,
     1: TEST_SPEEDS,
 }
 
-# PLUNGER_CURRENTS_SPEED = {0.4: TEST_SPEEDS,
-#                           1: TEST_SPEEDS}
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
@@ -98,8 +107,178 @@ def _includes_result(current: float, speed: float) -> bool:
     return current >= MUST_PASS_CURRENT
 
 
-def _build_csv_report(cycles: int, trials: int) -> CSVReport:
-    section_list=[
+# summary section title
+SUMMARY_SECTION_TITLE = "SUMMARY_RESULTS"
+
+# summary results tags
+BURN_IN_TEST_RESULTS = "BURN_IN_TEST_RESULTS"
+TEST_PLUNGER_RESULTS = "TEST_PLUNGER_RESULTS"
+CYCLE_PLUNGER_RESULTS = "CYCLE_PLUNGER_RESULTS"
+TEST_PLUNGER_FAIL_REASON = "TEST_PLUNGER_FAIL_REASON"
+CYCLE_PLUNGER_REASON = "CYCLE_PLUNGER_REASON"
+
+PEEK_BURN_IN_TEST_NAME = "peek-burn-in"
+
+
+def _get_run_output_paths(
+    run_id: str, sn: str, mount: types.OT3Mount
+) -> tuple[Path, Path]:
+    """Return results/recorder paths under testing_data/peek-burn-in/{run_id}/."""
+    test_folder = create_folder_for_test_data(PEEK_BURN_IN_TEST_NAME)
+    run_folder = create_folder_for_test_data(test_folder / run_id)
+    mount_tag = mount.name.lower()
+    results_path = run_folder / f"{PEEK_BURN_IN_TEST_NAME}_{sn}_{mount_tag}-results.csv"
+    recorder_path = run_folder / f"{PEEK_BURN_IN_TEST_NAME}_{sn}_{mount_tag}-recorder.csv"
+    return results_path, recorder_path
+
+
+def _build_results_report(cycles: int, trials: int, run_id: str) -> CSVReport:
+    """Build results report containing summary data: META_DATA, RESULTS_OVERVIEW, CYCLING-RESULTS, SUMMARY_RESULTS"""
+    # Results report only contains summary sections
+    section_list = [
+        CSVSection(
+            title=_get_cycling_section_tag(),
+            lines=[
+                CSVLine(_get_cycling_test_tag(cycle), [int, CSVResult])
+                for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
+            ],
+        ),
+        CSVSection(
+            title=SUMMARY_SECTION_TITLE,
+            lines=[
+                CSVLine(BURN_IN_TEST_RESULTS, [str]),
+                CSVLine(TEST_PLUNGER_RESULTS, [str]),
+                CSVLine(CYCLE_PLUNGER_RESULTS, [str]),
+                CSVLine(TEST_PLUNGER_FAIL_REASON, [str]),
+                CSVLine(CYCLE_PLUNGER_REASON, [str]),
+            ],
+        ),
+    ]
+    _report = CSVReport(
+        test_name="peek-burn-in-qc-ot3-results",
+        sections=section_list,
+        run_id=run_id,
+    )
+    _configure_peek_results_overview(_report)
+    return _report
+
+
+def _peek_results_overview_section(section_titles: List[str]) -> CSVSection:
+    return CSVSection(
+        title=RESULTS_OVERVIEW_TITLE,
+        lines=[
+            CSVLine(tag=f"RESULT_{title}", data=[CSVResult])
+            for title in section_titles
+        ],
+    )
+
+
+def _configure_peek_results_overview(report: CSVReport) -> None:
+    """RESULTS_OVERVIEW: only META_DATA + SUMMARY_RESULTS (no CYCLING-RESULTS)."""
+    peek_overview = _peek_results_overview_section(
+        [META_DATA_TITLE, SUMMARY_SECTION_TITLE]
+    )
+    for i, section in enumerate(report._sections):
+        if section.title == RESULTS_OVERVIEW_TITLE:
+            report._sections[i] = peek_overview
+            break
+
+    # New overview lines need the same start time as the rest of the report.
+    start_time = report[META_DATA_TITLE].lines[0]._start_time
+    assert start_time, "META_DATA lines must be initialized before overview setup"
+    for line in peek_overview.lines:
+        line.cache_start_time(start_time)
+
+    def _peek_refresh_results_overview() -> None:
+        results_section = report[RESULTS_OVERVIEW_TITLE]
+        meta_section = report[META_DATA_TITLE]
+        line = results_section[f"RESULT_{META_DATA_TITLE}"]
+        assert isinstance(line, CSVLine)
+        if meta_section.result_passed:
+            line.store(CSVResult.PASS, print_results=False)
+        elif meta_section.result_passed is False:
+            line.store(CSVResult.FAIL, print_results=False)
+        else:
+            line.store(None, print_results=False)
+
+    report._refresh_results_overview_values = _peek_refresh_results_overview  # type: ignore[method-assign]
+
+
+def _set_peek_summary_results_overview(
+    results_report: CSVReport, burn_in_result: str
+) -> None:
+    """RESULT_SUMMARY_RESULTS: PASS if BURN_IN_TEST_RESULTS and META_DATA both pass."""
+    meta_passed = results_report[META_DATA_TITLE].result_passed is True
+    summary_passed = burn_in_result == "PASS" and meta_passed
+    line = results_report[RESULTS_OVERVIEW_TITLE][f"RESULT_{SUMMARY_SECTION_TITLE}"]
+    assert isinstance(line, CSVLine)
+    line.store(
+        CSVResult.PASS if summary_passed else CSVResult.FAIL,
+        print_results=False,
+    )
+
+
+def _save_report_to_path(report: CSVReport, path: Path) -> None:
+    """Write report CSV to a fixed path (overwrites each call)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        f.write(str(report) + "\n")
+
+
+def _write_summary_and_save_results(
+    results_report: CSVReport,
+    results_path: Path,
+    *,
+    test_plunger_passed: bool,
+    cycle_plunger_passed: bool,
+    test_plunger_fail_reasons: List[str],
+    cycle_plunger_stall_reasons: List[str],
+) -> None:
+    """Write SUMMARY_RESULTS / overview and save results CSV."""
+    burn_in_passed = test_plunger_passed and cycle_plunger_passed
+    test_plunger_result = "PASS" if test_plunger_passed else "FAIL"
+    cycle_plunger_result = "PASS" if cycle_plunger_passed else "FAIL"
+    burn_in_result = "PASS" if burn_in_passed else "FAIL"
+    test_plunger_fail_str = (
+        "; ".join(test_plunger_fail_reasons) if test_plunger_fail_reasons else "N/A"
+    )
+    cycle_plunger_stall_str = (
+        "; ".join(cycle_plunger_stall_reasons) if cycle_plunger_stall_reasons else "N/A"
+    )
+    results_report(SUMMARY_SECTION_TITLE, BURN_IN_TEST_RESULTS, [burn_in_result])
+    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_RESULTS, [test_plunger_result])
+    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_RESULTS, [cycle_plunger_result])
+    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_FAIL_REASON, [test_plunger_fail_str])
+    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, [cycle_plunger_stall_str])
+    _set_peek_summary_results_overview(results_report, burn_in_result)
+    _save_report_to_path(results_report, results_path)
+    print(f"Results report saved to: {results_path}")
+
+
+def _set_csv_report_meta_data_no_save(
+    api: OT3API,
+    report: CSVReport,
+    dut: helpers_ot3.DeviceUnderTest,
+    meta_tag: str,
+) -> None:
+    """Set CSVReport meta-data without set_tag(), which would auto-save to disk."""
+    report.set_operator("operator")
+    robot_serial = helpers_ot3.get_robot_serial_ot3(api)
+    dut_str = helpers_ot3._get_serial_for_dut(api, dut)
+    print(f"device under test: {dut_str}")
+    barcode = dut_str
+    print(f"barcode: {barcode}")
+    report(META_DATA_TITLE, META_DATA_TEST_TAG, [meta_tag])
+    report.set_device_id(dut_str, barcode)
+    report.set_robot_id(robot_serial)
+    report.set_firmware(api.fw_version)
+    report.set_version(get_git_description())
+
+
+def _build_recorder_report(cycles: int, trials: int, run_id: str) -> CSVReport:
+    """Build recorder report containing detailed test data: test plunger and cycle plunger records"""
+    # Recorder report only contains detailed test sections
+    section_list = [
         CSVSection(
             title=_get_section_tag(cycle, current),
             lines=[
@@ -118,19 +297,7 @@ def _build_csv_report(cycles: int, trials: int) -> CSVReport:
         for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
         for current in sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     ]
-    section_list.append(
-        CSVSection(
-            title=_get_cycling_section_tag(),
-            lines=[
-                CSVLine(_get_cycling_test_tag(cycle), [int, CSVResult])
-                for cycle in range(0, (cycles+1)*TRIALS_PER_CYCLE, TRIALS_PER_CYCLE)
-            ],
-        )
-    )
-
-
-    _report = CSVReport(test_name="peek-burn-in-qc-ot3", sections=section_list)
-
+    _report = CSVReport(test_name="peek-burn-in-qc-ot3-recorder", sections=section_list, run_id=run_id)
     return _report
 
 
@@ -195,6 +362,7 @@ async def _record_plunger_alignment(
     speed: float,
     direction: str,
     position: str,
+    on_recorded: Optional[Callable[[], None]] = None,
 ) -> bool:
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
     _current_pos = await api.current_position_ot3(mount)
@@ -218,6 +386,8 @@ async def _record_plunger_alignment(
         _get_test_tag(cycle, current, speed, trial, direction, position),
         data,
     )
+    if on_recorded is not None:
+        on_recorded()
     return _did_pass
 
 
@@ -231,12 +401,14 @@ async def _test_direction(
     speed: float,
     acceleration: float,
     direction: str,
+    on_recorded: Optional[Callable[[], None]] = None,
 ) -> bool:
     plunger_poses = helpers_ot3.get_plunger_positions_ot3(api, mount)
     top, _, bottom, _ = plunger_poses
     # check that encoder/motor align
     aligned = await _record_plunger_alignment(
-        api, mount, report, cycle, trial, current, speed, direction, "start"
+        api, mount, report, cycle, trial, current, speed, direction, "start",
+        on_recorded=on_recorded,
     )
     if not aligned:
         print("ERROR: unable to align at the start")
@@ -247,7 +419,8 @@ async def _test_direction(
         await _move_plunger(api, mount, _plunger_target, speed, current, acceleration)
         # check that encoder/motor still align
         aligned = await _record_plunger_alignment(
-            api, mount, report, cycle, trial, current, speed, direction, "end"
+            api, mount, report, cycle, trial, current, speed, direction, "end",
+            on_recorded=on_recorded,
         )
     except StallOrCollisionDetectedError as e:
         print(e)
@@ -274,6 +447,9 @@ async def _move_plunger_as_cycle_settings(api: OT3API,
             print(e)
             await _home_plunger(api, mount)
 
+# Test Plunger Threshold
+STOP_TEST_CURRENT_THRESHOLD = 0.55  # If current >= 0.55A failed, stop burn-in and record fail_reason
+
 async def _test_plunger(
     api: OT3API,
     mount: types.OT3Mount,
@@ -281,10 +457,18 @@ async def _test_plunger(
     cycle: int,
     trials: int,
     continue_after_stall: bool,
-) -> float:
-    # start at HIGHEST (easiest) current
+    on_recorded: Optional[Callable[[], None]] = None,
+) -> tuple[float, str, bool, bool]:
+    """Return (max_failed_current, fail_reason, had_failure, stop_burn_in).
+
+    fail_reason is only set when current >= STOP_TEST_CURRENT_THRESHOLD.
+    stop_burn_in is True only for that case (entire burn-in must stop).
+    """
+    # start at lowest current
     currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
     max_failed_current = 0.0
+    fail_reasons: List[str] = []
+    had_failure = False
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
@@ -309,17 +493,30 @@ async def _test_plunger(
                         speed,
                         TEST_ACCELERATION,
                         direction,
+                        on_recorded=on_recorded,
                     )
                     if not _pass:
                         ui.print_error(
                             f"failed moving {direction} at {current} amps and {speed} mm/sec"
                         )
                         max_failed_current = max(max_failed_current, current)
+                        if current >= STOP_TEST_CURRENT_THRESHOLD:
+                            had_failure = True
+                            fail_reasons.append(f"current-{current}A&speed-{speed}")
+                            ui.print_error(
+                                f"FAILED at current >= {STOP_TEST_CURRENT_THRESHOLD}A, stopping burn-in"
+                            )
+                            return (
+                                max_failed_current,
+                                "; ".join(fail_reasons),
+                                True,
+                                True,
+                            )
                         if continue_after_stall:
                             break
                         else:
-                            return max_failed_current
-    return max_failed_current
+                            return max_failed_current, "", True, False
+    return max_failed_current, "", had_failure, False
 
 
 async def _record_plunger_alignment_cycle(
@@ -383,10 +580,11 @@ async def _cycle_plunger(
     cycle: int,
     trials: int,
     continue_after_stall: bool,
-) -> float:
-    """Cycle the plunger at the set current and speed. Return number of failed cycles"""
+) -> tuple:
+    """Cycle the plunger at the set current and speed. Return number of failed cycles and stall reason"""
 
     failed_cycles = 0
+    stall_reasons = []
 
     for trial in range(trials):
         ui.print_header(
@@ -410,18 +608,18 @@ async def _cycle_plunger(
                     f"failed moving {direction} at {CYCLING_CURRENT} amps and {CYCLING_SPEED} mm/sec"
                 )
                 failed_cycles = failed_cycles + 1
+                stall_reasons.append(f"cycle{cycle}-{trial}")
                 ui.print_error(
                     f"-----failed at {trial} cycles and {failed_cycles} failed cycles"
                 )
-                if continue_after_stall:
-                    continue
-                else:
-                    return failed_cycles
+                # If a stall, stop test immediately
+                ui.print_error("STALL detected during cycling, stopping test immediately")
+                return failed_cycles, "; ".join(stall_reasons)
 
-    return failed_cycles
+    return failed_cycles, "; ".join(stall_reasons)
 
 
-async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
+async def _get_next_pipette_mount(api: OT3API) -> List[types.OT3Mount]:
     # if not api.is_simulator:
     #     ui.get_user_ready("attach a pipette")
     await helpers_ot3.update_firmware(api)
@@ -454,6 +652,39 @@ async def _reset_gantry(api: OT3API) -> None:
     )
 
 
+def _dry_run_reports(cycles: int, trials: int) -> None:
+    """Build and save sample reports without hardware (smoke test)."""
+    run_id = create_run_id()
+    sn = "DRY-RUN-SN"
+    mount = types.OT3Mount.LEFT
+    results_report = _build_results_report(cycles=cycles, trials=trials, run_id=run_id)
+    recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id=run_id)
+    results_report._test_name = PEEK_BURN_IN_TEST_NAME
+    recorder_report._test_name = PEEK_BURN_IN_TEST_NAME
+    results_report(META_DATA_TITLE, META_DATA_TEST_TAG, [f"{sn}-results"])
+    results_report(META_DATA_TITLE, META_DATA_TEST_DEVICE_ID, ["DRY", "DRY", CSVResult.PASS])
+    results_report(
+        _get_cycling_section_tag(),
+        _get_cycling_test_tag(0),
+        [0, CSVResult.PASS],
+    )
+    results_report(SUMMARY_SECTION_TITLE, BURN_IN_TEST_RESULTS, ["PASS"])
+    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_RESULTS, ["PASS"])
+    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_RESULTS, ["PASS"])
+    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_FAIL_REASON, ["N/A"])
+    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, ["N/A"])
+    _set_peek_summary_results_overview(results_report, "PASS")
+    results_path, recorder_path = _get_run_output_paths(run_id, sn, mount)
+    _save_report_to_path(results_report, results_path)
+    _save_report_to_path(recorder_report, recorder_path)
+    overview = results_report[RESULTS_OVERVIEW_TITLE]
+    assert "RESULT_CYCLING-RESULTS" not in [ln.tag for ln in overview.lines]
+    assert "RESULT_META_DATA" in [ln.tag for ln in overview.lines]
+    assert "RESULT_SUMMARY_RESULTS" in [ln.tag for ln in overview.lines]
+    print(f"Dry-run OK: {results_path}")
+    print(f"Dry-run OK: {recorder_path}")
+
+
 async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_stall: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
@@ -467,51 +698,114 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
     mount_list = await _get_next_pipette_mount(api)
 
     for mount in mount_list:
-        # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
-        #     continue
+            # if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+            #     continue
 
-        report = _build_csv_report(cycles=cycles, trials=trials)
-        dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
-        helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+            # Create shared run_id for both reports
+            run_id = create_run_id()
 
-        for cycle in range(0, cycles * TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
-            # await _test_plunger(
-            #     api, mount, report,
-            #     cycle=cycle, trials=trials,
-            #     continue_after_stall=continue_after_stall
-            # )
+            dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+            dut_str = str(dut)
+            sn = helpers_ot3._get_serial_for_dut(api, dut)
 
-            # this is the old fix, we can use it if the fw reset doesn't work
-            await _move_plunger_as_cycle_settings(api, mount)
-            # await _reset_pipette_fw(api, mount)
+            results_report = _build_results_report(cycles=cycles, trials=trials, run_id=run_id)
+            recorder_report = _build_recorder_report(cycles=cycles, trials=trials, run_id=run_id)
 
-            failed_cycles = await _cycle_plunger(
-                api, mount,
-                cycle=cycle, trials=TRIALS_PER_CYCLE,
-                continue_after_stall=continue_after_stall
+            results_report._test_name = PEEK_BURN_IN_TEST_NAME
+            recorder_report._test_name = PEEK_BURN_IN_TEST_NAME
+
+            # Set meta data on both reports (do not use set_csv_report_meta_data_ot3:
+            # it calls set_tag() which auto-saves a single CSV via save_to_disk())
+            _set_csv_report_meta_data_no_save(
+                api, results_report, dut, meta_tag=f"{sn}-results"
             )
-            data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
-            report(
-                _get_cycling_section_tag(),
-                _get_cycling_test_tag(cycle),
-                data,
+            _set_csv_report_meta_data_no_save(
+                api, recorder_report, dut, meta_tag=f"{sn}-recorder"
             )
-        # await _test_plunger(
-        #     api, mount, report,
-        #     cycle=cycles * TRIALS_PER_CYCLE, trials=trials,
-        #     continue_after_stall=continue_after_stall
-        # )
-        data = [0, CSVResult.from_Numbool(0)]
-        report(
-            _get_cycling_section_tag(),
-            _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
-            data,
-        )
-        ui.print_title("DONE")
-        report.save_to_disk()
-        report.print_results()
-        if api.is_simulator:
-            break
+
+            results_path, recorder_path = _get_run_output_paths(run_id, sn, mount)
+
+            def _save_recorder() -> None:
+                _save_report_to_path(recorder_report, recorder_path)
+
+            # Initial recorder file so data exists from test start
+            _save_recorder()
+            print(f"Run folder: {recorder_path.parent}")
+            print(f"Recorder report (incremental): {recorder_path}")
+
+            # Track test results for summary
+            test_plunger_fail_reasons = []
+            cycle_plunger_stall_reasons = []
+            test_plunger_passed = True
+            cycle_plunger_passed = True
+
+            stop_burn_in = False
+            for cycle in range(0, cycles * TRIALS_PER_CYCLE, TRIALS_PER_CYCLE):
+                _max_failed, fail_reason, had_failure, stop_burn_in = await _test_plunger(
+                    api, mount, recorder_report,
+                    cycle=cycle, trials=trials,
+                    continue_after_stall=continue_after_stall,
+                    on_recorded=_save_recorder,
+                )
+                if had_failure:
+                    test_plunger_passed = False
+                if fail_reason:
+                    test_plunger_fail_reasons.append(fail_reason)
+
+                if stop_burn_in:
+                    break
+
+                # this is the old fix, we can use it if the fw reset doesn't work
+                await _move_plunger_as_cycle_settings(api, mount)
+                # await _reset_pipette_fw(api, mount)
+
+                failed_cycles, stall_reason = await _cycle_plunger(
+                    api, mount,
+                    cycle=cycle, trials=TRIALS_PER_CYCLE,
+                    continue_after_stall=continue_after_stall
+                )
+                if stall_reason:
+                    cycle_plunger_stall_reasons.append(stall_reason)
+                    cycle_plunger_passed = False
+                data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
+                results_report(
+                    _get_cycling_section_tag(),
+                    _get_cycling_test_tag(cycle),
+                    data,
+                )
+                # Only stop all burn-in cycles when test_plunger fails at >= 0.55A.
+                # Low-current failures and cycle stalls are recorded in SUMMARY but
+                # do not skip remaining cycles.
+            # Only run final test_plunger if burn-in was not stopped early
+            if not stop_burn_in:
+                _max_failed, fail_reason, had_failure, stop_burn_in = await _test_plunger(
+                    api, mount, recorder_report,
+                    cycle=cycles * TRIALS_PER_CYCLE, trials=trials,
+                    continue_after_stall=continue_after_stall,
+                    on_recorded=_save_recorder,
+                )
+                if had_failure:
+                    test_plunger_passed = False
+                if fail_reason:
+                    test_plunger_fail_reasons.append(fail_reason)
+                data = [0, CSVResult.from_Numbool(0)]
+                results_report(
+                    _get_cycling_section_tag(),
+                    _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
+                    data,
+                )
+
+            ui.print_title("DONE")
+            _write_summary_and_save_results(
+                results_report,
+                results_path,
+                test_plunger_passed=test_plunger_passed,
+                cycle_plunger_passed=cycle_plunger_passed,
+                test_plunger_fail_reasons=test_plunger_fail_reasons,
+                cycle_plunger_stall_reasons=cycle_plunger_stall_reasons,
+            )
+            if api.is_simulator:
+                break
 
 
 if __name__ == "__main__":
@@ -520,5 +814,13 @@ if __name__ == "__main__":
     parser.add_argument("--cycles", type=int, default=DEFAULT_CYCLES)
     parser.add_argument("--trials", type=int, default=DEFAULT_TRIALS)
     parser.add_argument("--continue-after-stall", action="store_true")
+    parser.add_argument(
+        "--dry-run-reports",
+        action="store_true",
+        help="Build sample CSV reports only (no robot); smoke test for report logic",
+    )
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate, args.cycles, args.trials, args.continue_after_stall))
+    if args.dry_run_reports:
+        _dry_run_reports(args.cycles, args.trials)
+    else:
+        asyncio.run(_main(args.simulate, args.cycles, args.trials, args.continue_after_stall))
