@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getInvalidCharForKeyboard,
   shouldAcceptKeyboardInput,
-} from '../../utils/externalKeyboardGuard'
+} from '../externalKeyboardGuard'
 
 describe('externalKeyboardGuard - alphanumeric', () => {
   it('returns null for empty value', () => {
