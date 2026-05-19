@@ -14,7 +14,7 @@ Follow these instructions to install the Vacuum Module.
 
 1. Clear the deck of all modules and labware to give yourself sufficient room to work.
 
-2. Remove the waste bin (if installed) and any modules, labware ,or deck adapter from slots A3—A4.
+2. Remove the waste bin (if installed) and any modules, labware, or deck adapter from slots A3—A4.
 
     <figure markdown>
     ![Deck map with sots A3 and A4 highlighted](./images/deck-map.png)
