@@ -12,6 +12,7 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
@@ -19,7 +20,10 @@ import {
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
-import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import {
+  HOPPER_LABWARE_X_OFFSET,
+  VACUUM_DOCK_LABWARE_X_OFFSET,
+} from '/protocol-designer/constants'
 import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'
 import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
@@ -311,8 +315,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const { topMostId, rightBelowTopId, hopperTopMostId } =
-          getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabwareValues)
+        const {
+          topMostId,
+          rightBelowTopId,
+          hopperTopMostId,
+          vacuumDockTopMostId,
+        } = getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabwareValues)
         const labwareInterfaceBoundingBox = {
           xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
           yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
@@ -472,6 +480,26 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   itemId={`hopper${slotId}`}
                   key={`${moduleOnDeck.slot}_flexHopper`}
                   slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                  slotBoundingBox={labwareInterfaceBoundingBox}
+                  moduleType={moduleOnDeck.type}
+                  handleDragHover={handleHoverEmptySlot}
+                  slotId={moduleOnDeck.id}
+                  hover={hover}
+                  setHover={setHover}
+                  setShowMenuListForId={setShowMenuListForId}
+                  isSelected={selectedZoomInSlot != null}
+                  deckDef={deckDef}
+                  stagingAreaAddressableAreas={[]}
+                  addEquipment={addEquipment}
+                />
+              ) : null}
+              {vacuumDockTopMostId == null &&
+              moduleOnDeck.type === VACUUM_MODULE_TYPE ? (
+                <SlotControls
+                  terminalItemId={terminalItemId}
+                  itemId={`vacuumDock${slotId}`}
+                  key={`${moduleOnDeck.slot}_vacuumDock`}
+                  slotPosition={[VACUUM_DOCK_LABWARE_X_OFFSET, 0, 0]}
                   slotBoundingBox={labwareInterfaceBoundingBox}
                   moduleType={moduleOnDeck.type}
                   handleDragHover={handleHoverEmptySlot}

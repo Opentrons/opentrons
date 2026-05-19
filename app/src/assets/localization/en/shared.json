@@ -65,6 +65,7 @@
   "reset_all": "Reset all",
   "restart": "restart",
   "resume": "resume",
+  "shutdown": "shutdown",
   "return": "return",
   "reverse": "Reverse alphabetical",
   "robot_is_analyzing": "Robot is analyzing",

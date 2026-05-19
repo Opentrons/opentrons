@@ -1,6 +1,11 @@
 import * as errorCreators from '../../errorCreators'
 import { vacuumModuleStateGetter } from '../../robotStateSelectors'
-import { getModuleHasLiveTask, indentPyLines, uuid } from '../../utils'
+import {
+  formatPyValue,
+  getModuleHasLiveTask,
+  indentPyLines,
+  uuid,
+} from '../../utils'
 import { getVacuumProfileStepString } from '../../utils/vacuumPythonArgs/getVacuumProfileStepString'
 
 import type { VacuumModuleStartRunProfileCreateCommand } from '@opentrons/shared-data'
@@ -31,7 +36,8 @@ export const vacuumStartRunProfile: CommandCreator<
 
   // 1-indexed profile task ID
   const taskId = `${vacuumPythonName}_task_${vacuumState.numPumpActivitiesStarted + 1}`
-  const profileArgs = getVacuumProfileStepString(profile, ventAfter)
+  const profilePythonArgs = getVacuumProfileStepString(profile)
+  const ventAfterPythonArg = `vent_after=${formatPyValue(ventAfter)}`
 
   // explicitly attach the ventAfter param to the final step of the profile in accordance with PE command shape
   // there is no direct ventAfter param at the startRunProfile command params top level
@@ -43,7 +49,7 @@ export const vacuumStartRunProfile: CommandCreator<
       return step
     })
 
-  const python = `${taskId} = ${vacuumPythonName}.start_execute_profile(\n${indentPyLines(profileArgs.join(',\n'))}\n)`
+  const python = `${taskId} = ${vacuumPythonName}.start_execute_profile(\n${indentPyLines([...profilePythonArgs, ventAfterPythonArg].join(',\n'))}\n)`
 
   return {
     commands: [
@@ -53,6 +59,7 @@ export const vacuumStartRunProfile: CommandCreator<
         params: {
           moduleId,
           profile: profileWithVentOnFinal,
+          ventAfter,
           taskId,
         },
       },

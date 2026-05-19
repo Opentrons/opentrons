@@ -1,5 +1,6 @@
 import type {
   ABSORBANCE_READER_TYPE,
+  AddressableArea,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerStoredLabwareGroup,
@@ -708,6 +709,7 @@ interface VacuumProfileStepItem {
   id: string
   durationSeconds: number
   pumpData: VacuumPumpData
+  ventAfter: boolean
 }
 
 interface VacuumProfileCycleItem {
@@ -1079,7 +1081,9 @@ export type ErrorType =
   | 'PIPETTE_HAS_TIP'
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'PIPETTING_INTO_COLUMN_4'
-  | 'POSSIBLE_PIPETTE_COLLISION'
+  | 'POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID'
+  | 'POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS'
+  | 'POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
@@ -1099,6 +1103,7 @@ export type ErrorType =
 export interface CommandCreatorError {
   message: string
   type: ErrorType
+  translationParams?: Record<string, string>
 }
 
 export type WarningType =
@@ -1175,3 +1180,19 @@ export interface WellContentsByNumber {
 }
 
 export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL
+
+export type UnsafePipetteMovementReason =
+  | {
+      type: 'thermocyclerLidCollision'
+    }
+  | {
+      type: 'outsidePipetteExtents'
+    }
+  | {
+      type: 'adjacentAdressableAreaCollision'
+      addressableAreaCausingCollision: AddressableArea
+    }
+
+export type PipetteMovementSafetyStatus =
+  | { isSafe: true }
+  | { isSafe: false; reason: UnsafePipetteMovementReason }

@@ -26,6 +26,7 @@ export interface VacuumCyclePropsBase {
   orderedProfileStepIds: string[]
   displayIndex: string
   type: typeof PROFILE_CYCLE
+  repetitions: string
   onDelete: () => void
 }
 

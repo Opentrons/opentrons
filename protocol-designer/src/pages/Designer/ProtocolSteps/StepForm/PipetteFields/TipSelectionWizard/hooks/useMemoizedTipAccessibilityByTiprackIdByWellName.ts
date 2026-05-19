@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 import {
   getIsSafePickupWithinTiprack,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
 } from '@opentrons/step-generation'
 
 import { OFFDECK } from '/protocol-designer/constants'
@@ -113,7 +113,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
               tiprackDef: def,
               tipsToIgnore: selectedTips.flat(),
             })
-            const isCollision = !getIsSafePipetteMovement({
+            const isCollision = getPipetteMovementSafetyStatus({
               robotState,
               invariantContext,
               pipetteId,
@@ -121,7 +121,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
               wellTargetName: wellName,
               primaryNozzle,
               nozzleConfiguration: nozzles,
-            })
+            }).isSafe
             const isAccessible = isSafe && isComplete && !isCollision
             let inaccessibleReason: InaccessibleReason | null = null
             if (isCollision) {
