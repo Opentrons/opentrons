@@ -17,7 +17,7 @@ import {
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
 
-import { NameRobot } from '..'
+import { RobotNameEditor } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
 
@@ -41,13 +41,13 @@ const mockTrackEvent = vi.fn()
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <NameRobot />
+      <RobotNameEditor />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
 }
 
-describe('NameRobot', () => {
+describe('RobotNameEditor', () => {
   beforeEach(() => {
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockConnectableRobot.name = 'connectableOtie'
@@ -145,5 +145,55 @@ describe('NameRobot', () => {
     render()
     fireEvent.click(screen.getByTestId('name_back_button'))
     expect(mockNavigate).toHaveBeenCalledWith('/robot-settings')
+  })
+
+  it('should show persistent error when invalid char is typed via external keyboard', async () => {
+    render()
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'a!' } })
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
+    expect(
+      await screen.findByText("Character '!' is not supported")
+    ).toBeInTheDocument()
+  })
+
+  it('should block further input while invalid char is present', async () => {
+    render()
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'a!' } })
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
+    fireEvent.change(input, { target: { value: 'a!b' } })
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
+    expect(
+      screen.getByText("Character '!' is not supported")
+    ).toBeInTheDocument()
+  })
+
+  it('should clear error and unlock input after deleting the invalid char', async () => {
+    render()
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'a!' } })
+    await waitFor(() => {
+      expect(input).toHaveValue('a!')
+    })
+    fireEvent.change(input, { target: { value: 'a' } })
+    await waitFor(() => {
+      expect(input).toHaveValue('a')
+    })
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Character '!' is not supported")
+      ).not.toBeInTheDocument()
+    })
+    fireEvent.change(input, { target: { value: 'ab' } })
+    await waitFor(() => {
+      expect(input).toHaveValue('ab')
+    })
   })
 })
