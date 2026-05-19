@@ -1,5 +1,5 @@
 import { usePlayRunMutation } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/acm/types'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 import { RECOVERY_MAP } from '../constants'
 

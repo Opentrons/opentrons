@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/acm/types'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
