@@ -38,7 +38,7 @@ const baseStateForm = (
   stateType: VACUUM_STATE_PUMP_ON,
   modeType: VACUUM_MODE_PRESSURE,
   pressureMbar: 100,
-  powerPercent: null,
+  percentPower: null,
   pumpDurationCheckbox: false,
   pumpDurationTime: null,
   endingHoldVentCheckbox: false,
@@ -77,7 +77,7 @@ describe('vacuumFormToArgs', () => {
       stateType: VACUUM_STATE_PUMP_ON,
       modeType: VACUUM_MODE_PRESSURE,
       pressureMbar: 250.5,
-      powerPercent: null,
+      percentPower: null,
     })
     const expected: VacuumArgs = {
       commandCreatorFnName: 'vacuumCloseVentSetPumpPressure',
@@ -94,14 +94,14 @@ describe('vacuumFormToArgs', () => {
       stateType: VACUUM_STATE_PUMP_ON,
       modeType: VACUUM_MODE_POWER,
       pressureMbar: null,
-      powerPercent: 75,
+      percentPower: 75,
     })
     const expected: VacuumArgs = {
       commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
-      powerPercent: 75,
+      percentPower: 75,
     }
     expect(vacuumFormToArgs(formData)).toEqual(expected)
   })
@@ -129,7 +129,7 @@ describe('vacuumFormToArgs', () => {
   it('sets ventAfter false when ending hold vent checkbox is off', () => {
     const formData = baseStateForm({
       modeType: VACUUM_MODE_POWER,
-      powerPercent: 50,
+      percentPower: 50,
       pumpDurationCheckbox: true,
       pumpDurationTime: '0:1:0',
       endingHoldVentCheckbox: false,
@@ -139,7 +139,7 @@ describe('vacuumFormToArgs', () => {
       moduleId,
       name: annotation.stepName,
       description: annotation.stepDetails,
-      powerPercent: 50,
+      percentPower: 50,
       duration: 60,
       ventAfter: false,
     }
@@ -196,7 +196,7 @@ describe('vacuumFormToArgs', () => {
       stateType: null,
       modeType: null,
       pressureMbar: null,
-      powerPercent: null,
+      percentPower: null,
       vacuumOrderedProfileIds: [stepAId, cycleId],
       vacuumProfileItemsById: {
         [stepAId]: {
@@ -223,7 +223,7 @@ describe('vacuumFormToArgs', () => {
               time: '1:30',
               pumpData: {
                 mode: VACUUM_MODE_POWER,
-                powerPercent: 88,
+                percentPower: 88,
               },
               ventAfter: false,
             },
