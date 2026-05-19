@@ -19,6 +19,7 @@ dependencies = [
     "oauthlib>=3.3.1,<4",
     "pwdlib[argon2,bcrypt]==0.3.0",
     "alembic==1.18.4",
+    "python-multipart==0.0.28",
 ]
 
 [tool.uv.dependency-groups]
@@ -35,6 +36,7 @@ robot = [
     "sqlalchemy==2.0.48",
     "oauthlib==3.3.1",
     "alembic==1.18.4",
+    "python-multipart==0.0.28",
 ]
 dev = [
     "ruff==0.14.10",
