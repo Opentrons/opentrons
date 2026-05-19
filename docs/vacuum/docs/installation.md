@@ -14,18 +14,22 @@ Follow these instructions to install the Vacuum Module.
 
 1. Clear the deck of all modules and labware to give yourself sufficient room to work.
 
-2. Remove the waste bin and its deck adapter (if installed), or any module from deck slots A3—A4.
+2. Remove the waste bin (if installed) and any modules, labware ,or deck adapter from slots A3—A4.
 
     <figure markdown>
     ![Deck map with sots A3 and A4 highlighted](./images/deck-map.png)
     <figcaption>Vacuum Module deck location.</figcaption>
     </figure>
 
-3. Install the Vacuum Module deck adapter in slots A3–A4. Fasten it to the deck with the original screws that held the waste bin adapter in place or use the screws provided with the module.
+3. Install the Vacuum Module deck adapter in slots A3–A4 only. Fasten it to the deck with the original deck screws or use the screws provided with the module.
 
 4. Seat the manifold base plate and collar firmly into the deck plate adapter.
 
 5. Secure one end of the 6 mm (&frac14;") vacuum tube to the manifold base plate, and route the remaining tubing through the opening in the deck plate adapter, under the deck, and to the waste collection area. You can knock out the small side plates on Flex to continue routing the hose.
+
+    <figure markdown>
+    ![Placeholder for image, FPO](./images/image-placeholder.png)
+    </figure>
 
 ## Part 2: External components setup
 
