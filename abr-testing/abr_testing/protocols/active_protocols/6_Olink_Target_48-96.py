@@ -16,7 +16,7 @@ metadata = {
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 open_location: Any = "A4"
 
@@ -85,7 +85,8 @@ def add_parameters(p: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
-    background_helpers.launch_background_tasks()
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
 
     global open_location
     protocol.capture_image(filename="start_of_run")
@@ -112,7 +113,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
     # Load Pipette and Tips
-    pip = protocol.load_instrument("flex_96channel_200")
+    pip = protocol.load_instrument("flex_96channel_1000")
 
     col_tips_1 = protocol.load_labware(
         "opentrons_flex_96_filtertiprack_50ul", "A1", "Tips per Column #1"
@@ -522,7 +523,7 @@ def run(protocol: ProtocolContext) -> None:
         liquid_heights = {}
         pip.pick_up_tip()
         for ifp_plate_well in ifp_plate.wells():
-            if ifp_plate_well.current_liquid_height() is not None:
+            if ifp_plate_well.current_liquid_height() > 1:
                 pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
             height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
             liquid_heights[ifp_plate_well.well_name] = height
