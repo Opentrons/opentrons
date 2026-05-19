@@ -109,7 +109,7 @@ class _PyroSpecialBehavior(BaseModel):
 
 def pyro_behavior(
     specialty_func: Callable[P, T], apply_local: bool
-) -> Callable[[Any], Any]:
+) -> Callable[[T], T]:
     """Decorator to indicate to the PyroSynchronousObject adapter that a function must be bound with a special method.
 
     This works by adding the `specialty_func` to the original function as metadata, to be used by the PyroSynchronousObject
@@ -121,14 +121,14 @@ def pyro_behavior(
                      on the original object instance. Setting to True applies the specialty function to the original instance.
     """
 
-    def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+    def decorator(func: Callable[[T], T]) -> Callable[[T], T]:
         func._pyro_specialty_behavior = _PyroSpecialBehavior(  # type: ignore
             specialty_function=specialty_func,  # type: ignore
             apply_local=apply_local,
         )
         return func
 
-    return decorator
+    return decorator  # type: ignore
 
 
 def synchronous(func: Callable[P, T]) -> Callable[P, T]:

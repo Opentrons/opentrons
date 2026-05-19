@@ -241,10 +241,9 @@ async def test_camera_provider(
     )
 
     # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
-    camera_proxy_async = robot_server_resource.get_camera_provider()
+    camera_provider = robot_server_resource.get_camera_provider()
 
-    cam_provider = cast(CameraProvider, camera_proxy_async)
-    settings = await cam_provider.get_camera_settings()
+    settings = await camera_provider.get_camera_settings()
 
     # Empty Camera settings defaults all to True, assert the proxy gave us that
     assert settings.cameraEnabled
@@ -272,9 +271,8 @@ async def test_file_provider(
     )
 
     # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
-    file_proxy_async = robot_server_resource.get_file_provider()
+    file_provider = robot_server_resource.get_file_provider()
 
-    file_provider = cast(FileProvider, file_proxy_async)
     results = await file_provider.write_file(
         data=bytes([1, 2, 3]),
         mime_type=MimeType("text/csv"),

@@ -581,6 +581,15 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     assert isinstance(result, AsyncPyroFunctionWrapper)
     result()
 
+    assert (
+        ot3api.build_temporary_identity_calibration().deck_calibration.source.value
+        is "default"
+    )
+    assert (
+        ot3api.build_temporary_identity_calibration().deck_calibration.status.source.value
+        is "default"
+    )
+
     ot3_proxy._pyroRelease()  # type: ignore
 
 
@@ -647,13 +656,16 @@ async def test_pipette_proxy_dictionary(
     ot3api = cast(OT3API, ot3_async)
 
     pipettes = ot3api.hardware_pipettes
-    assert pipettes[Mount.LEFT] is not None
-    assert pipettes[Mount.RIGHT] is None
     left_proxy = pipettes[Mount.LEFT]
+    assert left_proxy is not None
+    assert pipettes[Mount.RIGHT] is None
     assert left_proxy.pipette_id == hw_pipette.pipette_id
     assert (
         type(left_proxy.working_volume) is float
         and left_proxy.working_volume == hw_pipette.working_volume
     )
+
+    assert ot3api.get_instrument_offset(mount=Mount.LEFT).source.value == "user"  # type: ignore
+    assert ot3api.get_instrument_offset(mount=Mount.RIGHT) is None
 
     ot3_proxy._pyroRelease()  # type: ignore

@@ -2570,11 +2570,11 @@ class OT3API(
 
     @property
     @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead
-        return self.hardware_pipettes  # type: ignore
+        return self.hardware_pipettes
 
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:

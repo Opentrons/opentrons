@@ -77,13 +77,13 @@ def _GripperCalibrationOffset_dict_to_class(  # type: ignore
         None
         if d["status_source"] is None
         else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
-            d["status_source"]
+            d["status_source"]["value"]
         )
     )
     return opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset(
         offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
         source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
-            d["source"]
+            d["source"]["value"]
         ),
         status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
             markedBad=(d["status_markedBad"] == "True"),
@@ -135,13 +135,13 @@ def _PipetteOffsetSummary_dict_to_class(  # type: ignore
         None
         if d["status_source"] is None
         else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
-            d["status_source"]
+            d["status_source"]["value"]
         )
     )
     return opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary(
         offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
         source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
-            d["source"]
+            d["source"]["value"]
         ),
         status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
             markedBad=(d["status_markedBad"] == "True"),
@@ -363,7 +363,9 @@ def _ot3_transforms_dict_to_class(
             ),
             status=opentrons.calibration_storage.types.CalibrationStatus(
                 markedBad=d["deck_calibration"]["status"]["markedBad"],
-                source=opentrons.calibration_storage.types.SourceType(status_source)
+                source=None
+                if status_source is None
+                else opentrons.calibration_storage.types.SourceType(status_source)
                 if status_source is not None
                 else None,
                 markedAt=datetime.datetime.fromisoformat(status_marked_at)
