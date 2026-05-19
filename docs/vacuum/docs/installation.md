@@ -6,40 +6,45 @@ description: "Installing the Vacuum Module on a Flex robot."
 Follow these instructions to install the Vacuum Module.
 
 !!! warning
-    Turn off the power to your Flex before you begin. This prevents someone from using the robot during installation.
+    Turn off the power to the Flex before beginning the installation process. This prevents the robot from operating unexpectedly during setup.
 
 <div class="instruction-list" markdown>
 
 ## Part 1: Deck preparation
 
-1. **Clear the deck:** Remove all modules and labware from the robot to give yourself room to work.
+1. Clear the deck of all modules and labware to give yourself sufficient room to work.
 
-2. **Install the deck plate adapter:** The adapter and other on-deck components must be installed in slots A3—A4 only.
+2. Remove the waste bin and its deck adapter (if installed), or any module from deck slots A3—A4.
 
-    ![Deck map with slot A3 and A4 highlighted](images/vacuum-module-deck-slot.svg)
+    <figure markdown>
+    ![Deck map with sots A3 and A4 highlighted](./images/deck-map.png)
+    <figcaption>Vacuum Module deck location.</figcaption>
+    </figure>
 
-3. **Install the manifold:** Seat the base plate and collar firmly into the adapter.
+3. Install the Vacuum Module deck adapter in slots A3–A4. Fasten it to the deck with the original screws that held the waste bin adapter in place or use the screws provided with the module.
 
-4. **Route tubing:** Secure one end of the 6 mm (&frac14;") vacuum tube to the base plate. Feed the rest of the tube through the deck opening to the area where your collection jar will sit.
+4. Seat the manifold base plate and collar firmly into the deck plate adapter.
 
-## Part 2: External parts setup
+5. Secure one end of the 6 mm (&frac14;") vacuum tube to the manifold base plate, and route the remaining tubing through the opening in the deck plate adapter, under the deck, and to the waste collection area. You can knock out the small side plates on Flex to continue routing the hose.
 
-5. **Place jar:** Position the waste collection jar on the lab bench. For best results, put it at or below the level of the vacuum pump.
+## Part 2: External components setup
 
-6. **Secure cap:** Hand tighten the GL60 cap to the jar. Do not over-tighten. This is not a trial of strength.
+6. Position the carboy cradle and the 2-liter glass carboy on the lab bench at or below the level of the Control Box.
 
-7. **Connect waste tube:** Attach the free end of the 6 mm (&frac14;") tube from the manifold base to the jar inlet. You can measure and cut the tube to length as needed.
+7. Tighten the GL80 cap onto the carboy by hand until it is securely sealed. Do not over-tighten the cap, this is not a trial of strength.
 
-8. **Connect vacuum tube:** Attach the 9.5 mm (&frac38;") tube from the jar outlet to the vacuum pump. You can measure and cut the tube to length as needed.
+8. Connect the free end of the 6 mm (&frac14;") vacuum tube coming from the manifold base to the carboy inlet port. Measure and cut the tubing to length if necessary.
+
+8. Connect the 9.5 mm (&frac38;") vacuum hose from the carboy outlet port to the Control Box inlet. Measure and cut the hose to length if necessary.
 
 ## Part 3: Data and power connections
 
-9. **Data connection:** Connect the USB cable to the pump and to an available USB port on the Flex.
+10. Connect the USB cable to the data port on the Control Box and to an available USB port on the Flex.
 
-10. **Power connection:** Connect the power cable to the pump and power outlet.
+11. Connect the IEC power cable to the Control Box power inlet and plug it into a certified power outlet.
 
-11. **Initialize module:** Turn on power to your robot. After it starts, turn on the power to the vacuum module. The LED light on the vacuum pump <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font>.
+12. Turn on the main power to the Flex. After the Flex reboots, then power on the Vacuum Module. Verify that the LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font>.
 
-12. **Touchscreen instructions:** After attaching and powering on the Flex and Vacuum Module, additional instructions on the touchscreen will guide you through any final steps such as updating the module's firmware (if required) and mapping its deck location.
+13. Follow the instructions on the Flex touchscreen to complete the final system setup, map the module deck location, and update the module's firmware if required.
 
 </div>
