@@ -286,7 +286,7 @@ export interface VacuumPressureData {
 
 export interface VacuumPowerData {
   mode: typeof VACUUM_MODE_POWER
-  powerPercent: number
+  percentPower: number
 }
 
 type VacuumPumpData = VacuumPressureData | VacuumPowerData
@@ -595,7 +595,7 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   endingHoldVentCheckbox: boolean
   modeType: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER | null
   vacuumOrderedProfileIds: string[]
-  powerPercent: number | null
+  percentPower: number | null
   pressureMbar: number | null
   vacuumProfileItemsById: Record<string, VacuumProfileItem>
   programType: typeof VACUUM_PROGRAM_STATE | typeof VACUUM_PROGRAM_PROFILE

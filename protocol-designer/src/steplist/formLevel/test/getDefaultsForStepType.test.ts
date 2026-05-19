@@ -261,7 +261,7 @@ describe('getDefaultsForStepType', () => {
         vacuumOrderedProfileIds: [],
         vacuumProfileItemsById: {},
         pressureMbar: null,
-        powerPercent: null,
+        percentPower: null,
         pumpDurationCheckbox: null,
         pumpDurationTime: null,
         endingHoldVentCheckbox: null,

@@ -14,7 +14,6 @@ dependencies = [
     "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
-    "python-multipart==0.0.6",
     "pydantic>2.0.0,<3",
     "pydantic-settings>=2.0.0,<3",
     "typing-extensions>=4.0.0,<5",

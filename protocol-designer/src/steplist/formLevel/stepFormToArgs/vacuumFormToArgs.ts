@@ -47,7 +47,7 @@ const pumpDataToStepGeneration = (
   }
   return {
     mode: pumpData.mode,
-    powerPercent: pumpData.powerPercent,
+    percentPower: pumpData.percentPower,
   }
 }
 
@@ -104,7 +104,7 @@ const vacuumProfileStepToAtomic = (
   return {
     enablePump: true,
     holdSeconds: durationSeconds,
-    percentPower: pumpData.powerPercent,
+    percentPower: pumpData.percentPower,
     ventAfter,
   }
 }
@@ -145,7 +145,7 @@ export const vacuumFormToArgs = (
     stateType,
     modeType,
     pressureMbar,
-    powerPercent,
+    percentPower,
     pumpDurationCheckbox,
     pumpDurationTime,
     endingHoldVentCheckbox,
@@ -179,7 +179,7 @@ export const vacuumFormToArgs = (
           }
           return {
             commandCreatorFnName: 'vacuumCloseVentSetPumpPower',
-            powerPercent: powerPercent!,
+            percentPower: percentPower!,
             ...pumpAdvancedArgs,
             ...baseValues,
           }

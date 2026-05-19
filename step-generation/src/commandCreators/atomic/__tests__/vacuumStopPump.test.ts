@@ -51,7 +51,7 @@ describe('vacuumStopPump', () => {
           params: { moduleId: vacuumModuleId },
         },
       ],
-      python: 'mock_vacuum_module.stop_vacuum()',
+      python: 'mock_vacuum_module.stop_vacuum_pump()',
     })
   })
 
