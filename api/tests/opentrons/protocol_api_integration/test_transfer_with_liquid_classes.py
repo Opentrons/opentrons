@@ -1822,6 +1822,200 @@ def test_order_of_water_distribution_steps_using_multi_dispense_without_conditio
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.28", "Flex")], indirect=True
+)
+def test_distribution_steps_using_multi_dispense_with_20ul_tips_in_low_volume_mode(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should split the multi-dispense distribution steps by using the correct max volume for the given tip and volume mode combo."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_20ul", "D1"
+    )
+    pipette = simulated_protocol_context.load_instrument(
+        "flex_1channel_50", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+
+    water = simulated_protocol_context.get_liquid_class("water")
+    water_props = water.get_for(pipette, tiprack)
+
+    expected_conditioning_volume = 4
+    expected_disposal_volume = 4
+    water_props.multi_dispense.conditioning_by_volume.set_for_all_volumes(  # type: ignore[union-attr]
+        expected_conditioning_volume
+    )
+    water_props.multi_dispense.disposal_by_volume.set_for_all_volumes(  # type: ignore[union-attr]
+        expected_disposal_volume
+    )
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "load_liquid_class",
+            side_effect=InstrumentCore.load_liquid_class,
+            autospec=True,
+        ) as patched_load_liquid_class,
+        mock.patch.object(
+            InstrumentCore,
+            "aspirate_liquid_class",
+            side_effect=InstrumentCore.aspirate_liquid_class,
+            autospec=True,
+        ) as patched_aspirate,
+        mock.patch.object(
+            InstrumentCore,
+            "dispense_liquid_class_during_multi_dispense",
+            side_effect=InstrumentCore.dispense_liquid_class_during_multi_dispense,
+            autospec=True,
+        ) as patched_dispense,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_load_liquid_class, "load_liquid_class")
+        mock_manager.attach_mock(patched_aspirate, "aspirate_liquid_class")
+        mock_manager.attach_mock(
+            patched_dispense, "dispense_liquid_class_during_multi_dispense"
+        )
+        pipette.distribute_with_liquid_class(
+            liquid_class=water,
+            volume=4,
+            source=nest_plate.rows()[0][1],
+            dest=arma_plate.rows()[0][:5],
+            new_tip="once",
+            trash_location=trash,
+        )
+        expected_calls = [
+            mock.call.load_liquid_class(
+                mock.ANY,
+                name="water",
+                transfer_properties=mock.ANY,
+                tiprack_uri="opentrons/opentrons_flex_96_tiprack_20ul/1",
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=12 + expected_conditioning_volume + expected_disposal_volume,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_MANY,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                conditioning_volume=expected_conditioning_volume,
+                volume_for_pipette_mode_configuration=4,
+            ),
+            mock.call.dispense_liquid_class_during_multi_dispense(
+                mock.ANY,
+                volume=4,
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][0]),
+                    arma_plate.rows()[0][0]._core,
+                ),
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_MANY,
+                tip_contents=[
+                    LiquidAndAirGapPair(liquid=12 + expected_disposal_volume, air_gap=0)
+                ],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+                conditioning_volume=expected_conditioning_volume,
+                disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=False,
+            ),
+            mock.call.dispense_liquid_class_during_multi_dispense(
+                mock.ANY,
+                volume=4,
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][1]),
+                    arma_plate.rows()[0][1]._core,
+                ),
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_MANY,
+                tip_contents=[
+                    LiquidAndAirGapPair(liquid=8 + expected_disposal_volume, air_gap=0)
+                ],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+                conditioning_volume=expected_conditioning_volume,
+                disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=False,
+            ),
+            mock.call.dispense_liquid_class_during_multi_dispense(
+                mock.ANY,
+                volume=4,
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][2]),
+                    arma_plate.rows()[0][2]._core,
+                ),
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_MANY,
+                tip_contents=[
+                    LiquidAndAirGapPair(liquid=4 + expected_disposal_volume, air_gap=0)
+                ],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+                conditioning_volume=expected_conditioning_volume,
+                disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=True,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=8 + expected_conditioning_volume + expected_disposal_volume,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_MANY,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0.1)],
+                conditioning_volume=expected_conditioning_volume,
+                volume_for_pipette_mode_configuration=4,
+            ),
+            mock.call.dispense_liquid_class_during_multi_dispense(
+                mock.ANY,
+                volume=4,
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][3]),
+                    arma_plate.rows()[0][3]._core,
+                ),
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_MANY,
+                tip_contents=[
+                    LiquidAndAirGapPair(liquid=8 + expected_disposal_volume, air_gap=0)
+                ],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+                conditioning_volume=expected_conditioning_volume,
+                disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=False,
+            ),
+            mock.call.dispense_liquid_class_during_multi_dispense(
+                mock.ANY,
+                volume=4,
+                dest=(
+                    Location(Point(), arma_plate.rows()[0][4]),
+                    arma_plate.rows()[0][4]._core,
+                ),
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_MANY,
+                tip_contents=[
+                    LiquidAndAirGapPair(liquid=4 + expected_disposal_volume, air_gap=0)
+                ],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+                conditioning_volume=expected_conditioning_volume,
+                disposal_volume=expected_disposal_volume,
+                is_last_dispense_in_tip=True,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize(

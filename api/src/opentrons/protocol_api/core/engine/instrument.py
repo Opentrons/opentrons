@@ -2071,7 +2071,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def _get_pipette_max_volume_for_tip_and_transfer_volume(
         self, tip_rack: LabwareCore, volume: float
     ) -> float:
-        """Given a tip rack and the volume to handle, return the maximum allowed volume for the pipette."""
+        """Given a tip rack and the volume to handle, return the maximum allowed volume for the pipette, taking volume mode into consideration."""
         # Get the volume mode that the pipette will be in for transferring the given volume, disregarding the current volume mode of the pipette
         volume_mode = self._engine_client.state.pipettes.get_volume_mode_from_volume(
             pipette_id=self._pipette_id, volume=volume
@@ -2085,9 +2085,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         # The 50ul pipettes have a low volume mode which changes the max volume a pipette can handle.
         # Currently, this max volume is set to be 30uL regardless of the tip attached. So if there is, say, 20uL tip attached,
         # then the max working volume will have to remain as 20uL.
-        # Hence, the final working volume is the smallest of: max pipette volume, tip volume and the max
+        # Hence, the final working volume is the smallest of: max pipette volume for the given mode and the tip volume
         return min(
-            self.get_max_volume(),
             self._engine_client.state.geometry.get_nominal_tip_geometry(
                 pipette_id=self.pipette_id,
                 labware_id=tip_rack.labware_id,
