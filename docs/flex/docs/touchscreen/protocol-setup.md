@@ -6,7 +6,7 @@ description: "Configure labware and liquids, and prepare to run a protocol on th
 When you start setup for a protocol, you'll see the "Prepare to run" screen, which summarizes all of the requirements for the protocol.
 
 <figure class="screenshot" markdown>
-![Prepare to run screen for a nucleic acid purification protocol, showing instrument setup as complete (green); module and deck setup as incomplete (orange); and Labware Position Check, labware setup, and liquid setup as not started (grey).](../images/touchscreen-prepare-to-run.png "Prepare to run")
+![Prepare to run screen for a nucleic acid purification protocol, showing instrument setup as complete (green); module and deck setup as incomplete (orange); and Labware Position Check, labware setup, and liquid setup as not started (grey).](../images/touchscreen-prepare-to-run.svg)
 <figcaption>All sections of the "Prepare to run" screen. On the touchscreen, scroll the list to see all sections.</figcaption>
 </figure>
 
