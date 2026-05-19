@@ -10,7 +10,11 @@ from dataclasses import dataclass
 from typing import TypeAlias, override
 
 from ..scopes import Scope, parse_scopes
-from .auth_server import Client as AuthServerClient
+from .auth_server import (
+    Client as AuthServerClient,
+    RequireReasonForInteractionSettingsResponse,
+    RequireReasonForInteractionSettingsResponseData,
+)
 
 
 class AuthorizationChecker(ABC):
@@ -28,6 +32,21 @@ class AuthorizationChecker(ABC):
                 passes if the token is authorized for all of these.
         """
         pass
+
+    async def get_require_reason_for_interaction_settings(
+        self,
+    ) -> RequireReasonForInteractionSettingsResponse:
+        """Return auth-server require-reason-for-interaction settings."""
+        return RequireReasonForInteractionSettingsResponse(
+            data=RequireReasonForInteractionSettingsResponseData(
+                requireReasonForInteraction=False
+            )
+        )
+
+    async def get_require_reason_for_interaction_enabled(self) -> bool:
+        """Return whether auth-server requires a reason for interaction."""
+        settings = await self.get_require_reason_for_interaction_settings()
+        return settings.data.requireReasonForInteraction
 
 
 class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
@@ -79,6 +98,12 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                 )
             else:
                 return AuthorizedResult(username=token_info.username)
+
+    @override
+    async def get_require_reason_for_interaction_settings(
+        self,
+    ) -> RequireReasonForInteractionSettingsResponse:
+        return await self._client.get_require_reason_for_interaction_settings()
 
 
 @dataclass

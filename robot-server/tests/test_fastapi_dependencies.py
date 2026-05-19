@@ -8,7 +8,6 @@ from pydantic import BaseModel
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.fastapi_dependencies import (
-    get_require_reason_for_interaction_enabled,
     maybe_log_user_action_notes_when_setting_requires,
     request_body_has_supplied_user_notes,
 )
@@ -75,11 +74,6 @@ def test_whitespace_only_user_notes_is_false() -> None:
         userNotes="  \t  ",
     )
     assert request_body_has_supplied_user_notes(play) is False
-
-
-async def test_get_require_reason_for_interaction_enabled_without_auth_client() -> None:
-    """When there is no auth-server client, the setting is treated as off."""
-    assert await get_require_reason_for_interaction_enabled(None) is False
 
 
 @pytest.mark.asyncio

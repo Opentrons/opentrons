@@ -5,6 +5,8 @@ from server_utils.auth.resource_server.auth_server import (
     AuthSettingsResponse,
     AuthSettingsResponseData,
     Client,
+    RequireReasonForInteractionSettingsResponse,
+    RequireReasonForInteractionSettingsResponseData,
     TokenIntrospectionResponse,
 )
 from server_utils.auth.resource_server.authorization_checker import (
@@ -26,6 +28,12 @@ def mock_client(decoy: Decoy) -> Client:
 
 
 class TestAlwaysAllowedAuthorizationChecker:
+    async def test_get_require_reason_for_interaction_settings(self) -> None:
+        subject = AlwaysAllowedAuthorizationChecker()
+        settings = await subject.get_require_reason_for_interaction_settings()
+        assert settings.data.requireReasonForInteraction is False
+        assert await subject.get_require_reason_for_interaction_enabled() is False
+
     async def test_check(self) -> None:
         subject = AlwaysAllowedAuthorizationChecker()
         assert (
@@ -45,6 +53,23 @@ class TestAuthServerAuthorizationChecker:
     def mock_client(self, decoy: Decoy) -> Client:
         """Return a mock in the shape of a client."""
         return decoy.mock(cls=Client)
+
+    async def test_get_require_reason_for_interaction_settings(
+        self, mock_client: Client, decoy: Decoy
+    ) -> None:
+        subject = AuthServerAuthorizationChecker(mock_client)
+        expected = RequireReasonForInteractionSettingsResponse(
+            data=RequireReasonForInteractionSettingsResponseData(
+                requireReasonForInteraction=True
+            )
+        )
+        decoy.when(
+            await mock_client.get_require_reason_for_interaction_settings()
+        ).then_return(expected)
+        assert (
+            await subject.get_require_reason_for_interaction_settings() == expected
+        )
+        assert await subject.get_require_reason_for_interaction_enabled() is True
 
     async def test_check_given_no_token(
         self, mock_client: Client, decoy: Decoy

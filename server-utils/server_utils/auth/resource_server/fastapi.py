@@ -18,7 +18,12 @@ import fastapi
 import fastapi.responses
 import fastapi.security
 
-from .auth_server import TOKEN_ENDPOINT_PATH, Client, LocalHTTPClient
+from .auth_server import (
+    TOKEN_ENDPOINT_PATH,
+    Client,
+    LocalHTTPClient,
+    RequireReasonForInteractionSettingsResponse,
+)
 from .authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     AuthorizationChecker,
@@ -213,6 +218,15 @@ def get_auth_server_client(
 ) -> Optional[Client]:
     """Return the shared auth-server HTTP client, if the server is configured with one."""
     return _auth_server_client_accessor.get_from(app_state)
+
+
+async def get_require_reason_for_interaction_settings(
+    authorization_checker: Annotated[
+        AuthorizationChecker, fastapi.Depends(get_authorization_checker)
+    ],
+) -> RequireReasonForInteractionSettingsResponse:
+    """FastAPI dependency: auth-server require-reason-for-interaction settings."""
+    return await authorization_checker.get_require_reason_for_interaction_settings()
 
 
 class AuthorizationError(Exception):

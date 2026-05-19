@@ -2,12 +2,16 @@
 
 import logging
 from datetime import datetime
-from typing import Annotated, Any, Optional, cast
+from typing import Annotated, Any, cast
 
 from fastapi import Depends
 
-from server_utils.auth.resource_server.auth_server import Client
-from server_utils.auth.resource_server.fastapi import get_auth_server_client
+from server_utils.auth.resource_server.auth_server import (
+    RequireReasonForInteractionSettingsResponse,
+)
+from server_utils.auth.resource_server.fastapi import (
+    get_require_reason_for_interaction_settings,
+)
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.service.dependencies import get_current_time
@@ -15,26 +19,17 @@ from robot_server.service.dependencies import get_current_time
 log = logging.getLogger(__name__)
 
 
-async def get_require_reason_for_interaction_enabled(
-    auth_client: Annotated[Optional[Client], Depends(get_auth_server_client)],
-) -> bool:
-    """Return whether auth-server is configured to require a reason for interaction."""
-    if auth_client is None:
-        return False
-    response = await auth_client.get_require_reason_for_interaction_settings()
-    return response.data.requireReasonForInteraction
-
-
 async def maybe_log_user_action_notes_when_setting_requires(
     runId: str,
     request_body: RequestModel[Any],
     created_at: Annotated[datetime, Depends(get_current_time)],
-    require_reason_for_interaction: Annotated[
-        bool, Depends(get_require_reason_for_interaction_enabled)
+    require_reason_settings: Annotated[
+        RequireReasonForInteractionSettingsResponse,
+        Depends(get_require_reason_for_interaction_settings),
     ],
 ) -> None:
     """When auth-server requires reasons for interaction, log actions that carry ``userNotes``."""
-    if not require_reason_for_interaction:
+    if not require_reason_settings.data.requireReasonForInteraction:
         return
     log_user_action_notes(
         runId,
