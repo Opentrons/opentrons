@@ -17,7 +17,7 @@ export const vacuumStopPump: CommandCreator<
     }
   }
 
-  const python = `${module.pythonName}.stop_vacuum()`
+  const python = `${module.pythonName}.stop_vacuum_pump()`
   return {
     commands: [
       {
