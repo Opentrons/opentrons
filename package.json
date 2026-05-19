@@ -106,7 +106,6 @@
     "identity-obj-proxy": "^3.0.0",
     "jsdom": "26.1.0",
     "lost": "^8.3.1",
-    "madge": "^3.6.0",
     "mime": "^2.4.4",
     "portfinder": "^1.0.13",
     "postcss-apply": "0.12.0",
