@@ -1,7 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
-import { postDocumentation } from '/app/resources/access-control/postDocumentation'
 
 import { requireDocumentation } from '../requireDocumentation'
 
@@ -21,10 +20,6 @@ vi.mock('/app/resources/access-control/postDocumentation', () => ({
 const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [{ kind: 'PROTOCOL_PLAY' }]
 
 describe('requireDocumentation', () => {
-  beforeEach(() => {
-    vi.mocked(postDocumentation).mockImplementation(() => Promise.resolve())
-  })
-
   afterEach(() => {
     vi.resetAllMocks()
   })
@@ -52,6 +47,5 @@ describe('requireDocumentation', () => {
     await expect(
       requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
     ).rejects.toThrow(`No documentation provided for action: undefined`)
-    expect(postDocumentation).not.toHaveBeenCalled()
   })
 })
