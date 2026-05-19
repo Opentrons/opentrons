@@ -1,6 +1,7 @@
 /** The Redux slice for authorization and authentication. */
 
 import { createSelector, createSlice } from '@reduxjs/toolkit'
+import isEqual from 'lodash/isEqual'
 
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { getLocalRobot } from '../discovery'
@@ -129,5 +130,38 @@ export const getCurrentUsernameForLocalRobot = createSelector(
   (state: State, localRobotName: string | null): string | null => {
     if (localRobotName == null) return null
     return getAuthStateForRobot(state, localRobotName)?.username ?? null
+  }
+)
+
+interface GetNextExpirationResult {
+  robotName: string
+  expiresAt: number
+}
+
+export const getNextExpiration = createSelector(
+  (state: State) => state.robotAuth,
+  (robotAuthState: RobotAuthState): GetNextExpirationResult | null =>
+    Object.entries(robotAuthState).reduce<GetNextExpirationResult | null>(
+      (acc, [candidateName, candidateState]) => {
+        if (
+          candidateState?.expiresAt != null &&
+          (acc?.expiresAt == null || candidateState.expiresAt < acc.expiresAt)
+        ) {
+          return {
+            robotName: candidateName,
+            expiresAt: candidateState.expiresAt,
+          }
+        } else {
+          return acc
+        }
+      },
+      null
+    ),
+  {
+    memoizeOptions: {
+      // Avoid waking up listeners if we return an object that's referentially new
+      // but semantically hasn't changed.
+      resultEqualityCheck: isEqual,
+    },
   }
 )
