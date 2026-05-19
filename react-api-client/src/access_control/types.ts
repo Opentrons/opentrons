@@ -1,5 +1,3 @@
-import { type useMutation } from 'react-query'
-
 export interface DocumentationReport {
   note: string
   confirmedAt: string
@@ -21,10 +19,3 @@ export type DocumentationState =
       docreport: null
       askForDocumentation: () => Promise<DocumentationReport>
     }
-
-export type DocumentedMutationProps<
-  TData = unknown,
-  TError = unknown,
-  TVariables = void,
-  TContext = unknown,
-> = Parameters<typeof useMutation<TData, TError, TVariables, TContext>>

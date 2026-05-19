@@ -8,7 +8,7 @@ import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '..'
-import { type DocumentationState } from '../acm/types'
+import { type DocumentationState } from '../access_control/types'
 
 interface UseRunActionMutations {
   playRun: () => void

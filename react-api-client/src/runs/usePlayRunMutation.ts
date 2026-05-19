@@ -1,7 +1,7 @@
 import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
 
-import { type DocumentationState } from '../acm/types'
-import { useDocumentedMutation } from '../acm/useDocumentedMutation'
+import { type DocumentationState } from '../access_control/types'
+import { useDocumentedMutation } from '../access_control/useDocumentedMutation'
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
