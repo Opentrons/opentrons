@@ -10,7 +10,7 @@ import type {
 import type { DocumentationReport, DocumentationState } from './types'
 
 /**
- * Wrapper for a mutation function the ensure documentation is provided in ACM.
+ * Wrapper for a mutation function the ensure documentation is provided when access control is enabled.
  * In the future, all mutations should use this hook.
  *
  * When using a mutation, your options are to either prompt for the documentation separately and pass it into the hook,
