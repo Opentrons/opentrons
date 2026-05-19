@@ -12,6 +12,8 @@ from typing import TypeAlias, override
 from ..scopes import Scope, parse_scopes
 from .auth_server import (
     Client as AuthServerClient,
+)
+from .auth_server import (
     RequireReasonForInteractionSettingsResponse,
     RequireReasonForInteractionSettingsResponseData,
 )

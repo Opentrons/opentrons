@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime
-from typing import Annotated, Any, cast
+from typing import Annotated, Any
 
 from fastapi import Depends
 
@@ -31,40 +31,23 @@ async def maybe_log_user_action_notes_when_setting_requires(
     """When auth-server requires reasons for interaction, log actions that carry ``userNotes``."""
     if not require_reason_settings.data.requireReasonForInteraction:
         return
-    log_user_action_notes(
-        runId,
-        request_body,
-        created_at,
-        body_has_user_notes=request_body_has_supplied_user_notes(request_body),
-    )
-
-
-def request_body_has_supplied_user_notes(request_body: RequestModel[Any]) -> bool:
-    """Determine if the request body has a non-empty ``userNotes`` field."""
-    notes = request_body.userNotes
-    if notes is None:
-        return False
-    if isinstance(notes, str) and notes.strip() == "":
-        return False
-    return True
+    user_notes = request_body.supplied_user_notes()
+    if user_notes is None:
+        return
+    log_user_action_notes(runId, user_notes, created_at)
 
 
 def log_user_action_notes(
     runId: str,
-    request_body: RequestModel[Any],
+    user_notes: str,
     created_at: datetime,
-    *,
-    body_has_user_notes: bool,
 ) -> None:
     """Log (and later persist) when the request includes ``userNotes``."""
-    if not body_has_user_notes:
-        return
-    text = cast(str, request_body.userNotes)
     # TODO(TZ, 5-8-26): persist audit entry.
     log.info(
         "Run action with userNotes "
         "(persist audit entry TODO): run_id=%s recorded_at=%s note_len=%s",
         runId,
         created_at.isoformat(),
-        len(text),
+        len(user_notes),
     )

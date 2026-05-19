@@ -1,6 +1,6 @@
 """JSON API models for server request and response handling."""
 
-from .request import RequestDataT, RequestModel
+from .request import RequestDataT, RequestModel, parse_supplied_user_notes
 from .resource_links import ResourceLink, ResourceLinkKey, ResourceLinks
 from .response import (
     BaseResponseBody,
@@ -24,6 +24,7 @@ __all__ = [
     # request models
     "RequestModel",
     "RequestDataT",
+    "parse_supplied_user_notes",
     # response models
     "PydanticResponse",
     # response body models

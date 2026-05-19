@@ -9,10 +9,7 @@ from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
-from robot_server.fastapi_dependencies import (
-    log_user_action_notes,
-    request_body_has_supplied_user_notes,
-)
+from robot_server.fastapi_dependencies import log_user_action_notes
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
@@ -63,13 +60,9 @@ async def test_create_run_action(
         )
     ).then_return(expected_result)
 
-    body_has_user_notes = request_body_has_supplied_user_notes(request_body)
-    log_user_action_notes(
-        run_id,
-        request_body,
-        created_at,
-        body_has_user_notes=body_has_user_notes,
-    )
+    user_notes = request_body.supplied_user_notes()
+    if user_notes is not None:
+        log_user_action_notes(run_id, user_notes, created_at)
     result = await create_run_action(
         runId=run_id,
         request_body=request_body,
@@ -121,13 +114,9 @@ async def test_play_action_clears_maintenance_run(
         )
     ).then_return(expected_result)
 
-    body_has_user_notes = request_body_has_supplied_user_notes(request_body)
-    log_user_action_notes(
-        run_id,
-        request_body,
-        created_at,
-        body_has_user_notes=body_has_user_notes,
-    )
+    user_notes = request_body.supplied_user_notes()
+    if user_notes is not None:
+        log_user_action_notes(run_id, user_notes, created_at)
     result = await create_run_action(
         runId=run_id,
         request_body=request_body,
@@ -184,13 +173,9 @@ async def test_create_play_action_not_allowed(
         )
     ).then_raise(exception)
 
-    body_has_user_notes = request_body_has_supplied_user_notes(request_body)
-    log_user_action_notes(
-        run_id,
-        request_body,
-        created_at,
-        body_has_user_notes=body_has_user_notes,
-    )
+    user_notes = request_body.supplied_user_notes()
+    if user_notes is not None:
+        log_user_action_notes(run_id, user_notes, created_at)
     with pytest.raises(ApiError) as exc_info:
         await create_run_action(
             runId=run_id,

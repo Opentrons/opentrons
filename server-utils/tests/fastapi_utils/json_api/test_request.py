@@ -158,3 +158,49 @@ def test_user_notes_passed_when_provided() -> None:
     obj = ItemRequest.model_validate(payload)
 
     assert obj.userNotes == "audit note"
+
+
+def test_supplied_user_notes() -> None:
+    """`supplied_user_notes()` returns a stripped string or None."""
+    ItemRequest = RequestModel[ItemModel]
+    assert (
+        ItemRequest(
+            data=ItemModel(name="a", quantity=1, price=1.0), userNotes="audit note"
+        ).supplied_user_notes()
+        == "audit note"
+    )
+    assert (
+        ItemRequest(
+            data=ItemModel(name="a", quantity=1, price=1.0), userNotes=None
+        ).supplied_user_notes()
+        is None
+    )
+    assert (
+        ItemRequest(
+            data=ItemModel(name="a", quantity=1, price=1.0), userNotes="  \t  "
+        ).supplied_user_notes()
+        is None
+    )
+    assert (
+        ItemRequest(
+            data=ItemModel(name="a", quantity=1, price=1.0), userNotes="  trimmed  "
+        ).supplied_user_notes()
+        == "trimmed"
+    )
+
+
+def test_supplied_user_notes_ignores_user_notes_inside_data() -> None:
+    """``userNotes`` must be a sibling of ``data``; a nested field is not read."""
+    ItemRequest = RequestModel[ItemModel]
+    assert (
+        ItemRequest(
+            data=ItemModel(name="a", quantity=1, price=1.0),
+            userNotes="audit note",
+        ).supplied_user_notes()
+        == "audit note"
+    )
+    # Pydantic ignores unknown fields on ItemModel; simulate wrong client shape via dump+validate
+    wrong_shape = {
+        "data": {"name": "a", "quantity": 1, "price": 1.0, "userNotes": "nested"}
+    }
+    assert ItemRequest.model_validate(wrong_shape).supplied_user_notes() is None

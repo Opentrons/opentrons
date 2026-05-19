@@ -66,9 +66,7 @@ class TestAuthServerAuthorizationChecker:
         decoy.when(
             await mock_client.get_require_reason_for_interaction_settings()
         ).then_return(expected)
-        assert (
-            await subject.get_require_reason_for_interaction_settings() == expected
-        )
+        assert await subject.get_require_reason_for_interaction_settings() == expected
         assert await subject.get_require_reason_for_interaction_enabled() is True
 
     async def test_check_given_no_token(
