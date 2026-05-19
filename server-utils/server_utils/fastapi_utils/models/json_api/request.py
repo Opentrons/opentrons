@@ -16,7 +16,10 @@ class RequestModel(BaseModel, Generic[RequestDataT]):
     userNotes: str | None = Field(
         None,
         description=(
-            "Optional user-supplied notes (plain string). Endpoints may ignore this or "
-            "apply additional validation (e.g. only for certain `data` payloads). "
+            "Optional user-supplied notes (plain string) for the audit log when the "
+            "client performs an action that requires documenting about why they interacted "
+            "with the robot. Whether this field is required depends on the auth-server "
+            "require-reason-for-interaction setting; individual endpoints may ignore "
+            "it or apply additional validation (e.g. only for certain `data` payloads)."
         ),
     )

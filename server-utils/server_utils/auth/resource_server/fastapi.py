@@ -11,7 +11,6 @@ from typing import (
     Awaitable,
     Callable,
     Final,
-    Optional,
     TypeAlias,
 )
 
@@ -54,7 +53,7 @@ _authorization_checker_accessor = AppStateAccessor[AuthorizationChecker](
     "authorization_checker"
 )
 
-_auth_server_client_accessor = AppStateAccessor[Optional[Client]]("auth_server_client")
+_auth_server_client_accessor = AppStateAccessor[[Client]]("auth_server_client") | None
 
 
 RequireScopesResult: TypeAlias = AuthorizationNotRequiredResult | AuthorizedResult
