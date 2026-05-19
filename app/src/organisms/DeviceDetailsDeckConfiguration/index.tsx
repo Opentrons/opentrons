@@ -31,9 +31,11 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getJoinedVisualSlotDisplayNamesForFixture,
   getVisualSlotIdForAA,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_SLOT_FIXTURES,
+  VACUUM_MODULE_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { useIsRobotViewable } from '/app/redux-resources/robots'
@@ -138,6 +140,22 @@ export function DeviceDetailsDeckConfiguration({
             displayList: [...acc.displayList, { displayLocation, displayName }],
             groupedCutoutIds: [...acc.groupedCutoutIds, ...groupedCutoutIds],
           }
+        }
+      }
+      if (cutoutFixtureId === VACUUM_MODULE_V1_FIXTURE) {
+        return {
+          ...acc,
+          displayList: [
+            ...acc.displayList,
+            {
+              displayLocation: getJoinedVisualSlotDisplayNamesForFixture(
+                deckDef,
+                cutoutFixtureId,
+                cutoutId
+              ),
+              displayName,
+            },
+          ],
         }
       }
       const vsId = getVisualSlotIdForAA(

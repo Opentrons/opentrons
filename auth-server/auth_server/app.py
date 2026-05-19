@@ -9,7 +9,9 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from server_utils import systemd_utils
-from server_utils.auth.resource_server.fastapi_dependencies import (
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    handle_authorization_error,
     install_authorization_checker,
 )
 
@@ -61,9 +63,11 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         user_store = UserStore(sql_engine=engine)
         settings_store = SettingsStore(sql_engine=engine)
-        oauth2_backend = build_oauth2_backend(user_store)
+        oauth2_backend = build_oauth2_backend(user_store, settings_store)
         install_oauth2_backend(app.state, oauth2_backend)
-        user_service = UserDataManager(user_store=user_store)
+        user_service = UserDataManager(
+            user_store=user_store, settings_store=settings_store
+        )
         user_service.seed_initial_users()
         install_settings_store(app.state, settings_store)
         authorization_checker = build_authorization_checker(
@@ -83,6 +87,10 @@ app = FastAPI(
     redoc_url=None,
     lifespan=_lifespan,
 )
+
+
+app.exception_handler(AuthorizationError)(handle_authorization_error)
+
 
 app.include_router(oauth2_router)
 app.include_router(settings_router)

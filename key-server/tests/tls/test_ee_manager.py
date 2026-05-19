@@ -30,11 +30,13 @@ def ip_addresses() -> list[str]:
 @pytest.fixture
 def subject(ee_dir: Path, hostname: str, ip_addresses: list[str]) -> TLSEEManager:
     """An end-entity manager with typical settings."""
-    return TLSEEManager(ee_dir, ee_dir, hostname, ip_addresses)
+    return TLSEEManager(
+        ee_dir, ee_dir, hostname, ip_addresses, TLSEEManager.rotate_cert_none
+    )
 
 
 @pytest.fixture
-def initialized_subject(
+async def initialized_subject(
     subject: TLSEEManager,
     ca: cryptography_utils.X509Pair,
     hostname: str,
@@ -43,7 +45,7 @@ def initialized_subject(
     """An end-entity manager with certificates built."""
     precert = subject.generate_precert()
     signed = cryptography_utils.seal_cert_builder_with_ca(precert, ca)
-    subject.install_cert(signed)
+    await subject.install_cert(signed)
     return subject
 
 
@@ -67,7 +69,9 @@ def test_subject_does_not_reuse_certs(
     )
     signed = cryptography_utils.seal_cert_builder_with_ca(precert, ca)
     cryptography_utils.install_tls_cert(ee_dir, signed)
-    subject = TLSEEManager(ee_dir, ee_dir, hostname, ip_addresses)
+    subject = TLSEEManager(
+        ee_dir, ee_dir, hostname, ip_addresses, TLSEEManager.rotate_cert_none
+    )
     assert subject._ee_pair is None
     assert not subject.ready(now)
 
@@ -121,11 +125,11 @@ def test_subject_uses_robot_details(
 
 
 def test_generate_precert_saves_key(ee_dir: Path, subject: TLSEEManager) -> None:
-    """Generating a precert should save the key and the key alone."""
+    """Generating a precert should save the key (in a temp name) and the key alone."""
     precert = subject.generate_precert()
     contents = list(ee_dir.iterdir())
     assert len(contents) == 1
-    assert contents[0].name == constants.TLS_KEY_NAME
+    assert contents[0].name.startswith(constants.TLS_KEY_NAME)
     loaded = file_utils.load_key(contents[0])
     assert loaded
     assert (
@@ -134,13 +138,14 @@ def test_generate_precert_saves_key(ee_dir: Path, subject: TLSEEManager) -> None
     )
 
 
-def test_install_cert_saves_cert(
+def test_install_cert_saves_cert_and_moves_key(
     ee_dir: Path, initialized_subject: TLSEEManager
 ) -> None:
     """Installing a cert should save it."""
     ee_contents = list(ee_dir.iterdir())
     assert len(ee_contents) == 2
     assert constants.TLS_CERT_NAME in [entry.name for entry in ee_contents]
+    assert constants.TLS_KEY_NAME in [entry.name for entry in ee_contents]
     cert = file_utils.load_cert(ee_dir / constants.TLS_CERT_NAME, "PEM")
     assert cert
     assert initialized_subject._ee_pair

@@ -1,5 +1,5 @@
 import asyncio
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator, List, Optional, Union
 
 import pytest
 from decoy import Decoy
@@ -18,6 +18,9 @@ from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
+    VacuumModuleCycle,
+    VacuumModulePowerStep,
+    VacuumModulePressureStep,
 )
 from opentrons.hardware_control.modules.vacuum_module import (
     SIMULATING_POLL_PERIOD,
@@ -196,7 +199,7 @@ async def test_set_vent_state(
 @pytest.mark.parametrize(
     (
         "enable_vacuum",
-        "guage_pressure_mbar",
+        "gauge_pressure_mbar",
         "duration",
         "timeout",
         "rate",
@@ -211,7 +214,7 @@ async def test_set_vacuum_state(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
     enable_vacuum: bool,
-    guage_pressure_mbar: Optional[float],
+    gauge_pressure_mbar: Optional[float],
     duration: Optional[int],
     timeout: Optional[int],
     rate: Optional[float],
@@ -221,7 +224,7 @@ async def test_set_vacuum_state(
     """Ensure that the hardware controller calls the driver method w the correct arguments."""
     await subject.set_vacuum_state(
         enable_vacuum=enable_vacuum,
-        guage_pressure_mbar=guage_pressure_mbar,
+        gauge_pressure_mbar=gauge_pressure_mbar,
         duration_s=duration,
         timeout_s=timeout,
         rate=rate,
@@ -230,7 +233,7 @@ async def test_set_vacuum_state(
     decoy.verify(
         await mock_driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
-            guage_pressure_mbar=guage_pressure_mbar,
+            gauge_pressure_mbar=gauge_pressure_mbar,
             duration_s=duration,
             timeout_s=timeout,
             rate=rate,
@@ -240,7 +243,16 @@ async def test_set_vacuum_state(
 
 
 @pytest.mark.parametrize(
-    ("start_pump", "target_rpm", "duty_cycle"), [(True, 60, 75), (False, 0, 90)]
+    (
+        "start_pump",
+        "target_rpm",
+        "duty_cycle",
+        "duration_s",
+        "timeout_s",
+        "rate",
+        "vent_after",
+    ),
+    [(True, 60, 75, 99, 89, None, False), (False, 0, 90, None, None, 22.2, None)],
 )
 async def test_set_pump_state(
     subject: modules.VacuumModule,
@@ -249,14 +261,30 @@ async def test_set_pump_state(
     start_pump: bool,
     target_rpm: int,
     duty_cycle: int,
+    timeout_s: Optional[int],
+    duration_s: Optional[int],
+    rate: Optional[float],
+    vent_after: Optional[bool],
 ) -> None:
     """Ensure that the hardware controller calls the driver method w the correct arguments."""
     await subject.set_pump_state(
-        start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+        start_pump=start_pump,
+        target_rpm=target_rpm,
+        duty_cycle=duty_cycle,
+        duration_s=duration_s,
+        timeout_s=timeout_s,
+        rate=rate,
+        vent_after=vent_after,
     )
     decoy.verify(
         await mock_driver.set_pump_state(
-            start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+            start_pump=start_pump,
+            target_rpm=target_rpm,
+            duty_cycle=duty_cycle,
+            duration_s=duration_s,
+            timeout_s=timeout_s,
+            rate=rate,
+            vent_after=vent_after,
         )
     )
 
@@ -291,8 +319,8 @@ async def test_update_pump_state(
     "vacuum_state",
     [
         VacuumState(
-            target_guage_pressure=0,
-            current_guage_pressure=0,
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
             pressure_abs_a=0,
             pressure_abs_b=0,
             pressure_atm=0,
@@ -312,3 +340,151 @@ async def test_update_vacuum_state(
 
     await subject._reader.update_vacuum_state()
     assert subject._reader.vacuum_state == vacuum_state
+
+
+async def test_execute_profile(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Ensure that execute_profile calls down to the correct hardware control functions in the right quantity."""
+    profile: List[
+        Union[VacuumModuleCycle, VacuumModulePowerStep, VacuumModulePressureStep]
+    ] = [
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 43,
+            "hold_time_minutes": 5,
+            "ramp_rate": 1.3,
+            "timeout_seconds": 1101,
+            "vent_after": True,
+            "gauge_pressure_mbar": -300,
+        },
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 50,
+            "hold_time_minutes": 1,
+            "ramp_rate": 1.4,
+            "timeout_seconds": 1101,
+            "vent_after": False,
+            "percent_power": 61,
+        },
+        {
+            "steps": [
+                {
+                    "enable_pump": True,
+                    "hold_time_seconds": 9,
+                    "hold_time_minutes": 2,
+                    "ramp_rate": 0.9,
+                    "timeout_seconds": 1101,
+                    "vent_after": False,
+                    "percent_power": 99,
+                },
+                {
+                    "enable_pump": True,
+                    "hold_time_seconds": 99,
+                    "hold_time_minutes": 9,
+                    "ramp_rate": 1.8,
+                    "timeout_seconds": 1101,
+                    "vent_after": True,
+                    "gauge_pressure_mbar": -99,
+                },
+                {
+                    "enable_pump": True,
+                    "hold_time_seconds": 9,
+                    "hold_time_minutes": 2,
+                    "ramp_rate": 0.9,
+                    "timeout_seconds": 1101,
+                    "vent_after": False,
+                    "percent_power": 11,
+                },
+            ],
+            "repetitions": 9,
+            "vent_after": True,
+        },
+        {
+            "enable_pump": False,
+            "hold_time_seconds": None,
+            "hold_time_minutes": 12,
+            "ramp_rate": 5.5,
+            "timeout_seconds": 1101,
+            "vent_after": False,
+            "gauge_pressure_mbar": -111,
+        },
+    ]
+    await subject.execute_profile(profile)
+
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=True,
+            gauge_pressure_mbar=-300,
+            duration_s=343,
+            timeout_s=1101,
+            rate=1.3,
+            vent_after=True,
+        ),
+    )
+    decoy.verify(
+        await mock_driver.set_pump_state(
+            start_pump=True,
+            target_rpm=None,
+            duty_cycle=61,
+            duration_s=110,
+            timeout_s=1101,
+            rate=1.4,
+            vent_after=False,
+        )
+    )
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=False
+        ),  # there should be a call to disable pressure control for every set_pump_state call
+    )
+    for i in range(9):
+        decoy.verify(
+            await mock_driver.set_pump_state(
+                start_pump=True,
+                target_rpm=None,
+                duty_cycle=99,
+                duration_s=129,
+                timeout_s=1101,
+                rate=0.9,
+                vent_after=False,
+            )
+        )
+        decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
+        decoy.verify(
+            await mock_driver.set_vacuum_state(
+                enable_vacuum=True,
+                gauge_pressure_mbar=-99,
+                duration_s=639,
+                timeout_s=1101,
+                rate=1.8,
+                vent_after=True,
+            )
+        )
+
+        decoy.verify(
+            await mock_driver.set_pump_state(
+                start_pump=True,
+                target_rpm=None,
+                duty_cycle=11,
+                duration_s=129,
+                timeout_s=1101,
+                rate=0.9,
+                vent_after=False,
+            )
+        )
+        decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
+
+    decoy.verify(await mock_driver.set_vent_state(state=VentState.OPENED))
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=False,
+            gauge_pressure_mbar=-111,
+            duration_s=720,
+            timeout_s=1101,
+            rate=5.5,
+            vent_after=False,
+        )
+    )

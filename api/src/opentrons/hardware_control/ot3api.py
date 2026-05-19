@@ -4,7 +4,6 @@ import logging
 from collections import OrderedDict
 from concurrent.futures import Future
 from copy import deepcopy
-from dataclasses import replace
 from functools import lru_cache, partial, wraps
 from typing import (
     Any,
@@ -18,6 +17,7 @@ from typing import (
     Sequence,
     Set,
     Tuple,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -41,7 +41,7 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.pipette.types import PipetteModelType, PipetteName
 
-from . import modules
+from . import modules, peripherals
 from .backends.errors import SubsystemUpdating
 from .backends.flex_protocol import FlexBackend
 from .backends.ot3simulator import OT3Simulator
@@ -92,6 +92,7 @@ from .motion_utilities import (
 from .ot3_calibration import OT3RobotCalibrationProvider, OT3Transforms
 from .pause_manager import PauseManager
 from .protocols import FlexHardwareControlInterface
+from .protocols.types import FlexRobotType
 from .types import (
     AsynchronousModuleErrorNotification,
     Axis,
@@ -144,6 +145,8 @@ from opentrons.hardware_control.modules.module_calibration import (
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
     convert_result_to_wrapped_dict,
+    convert_result_to_wrapped_typed_dict,
+    convert_type_to_instance,
     pyro_behavior,
 )
 
@@ -255,6 +258,10 @@ class OT3API(
         self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
+
+    @pyro_behavior(specialty_func=convert_type_to_instance, apply_local=False)
+    def get_robot_type(self) -> Type[FlexRobotType]:
+        return FlexRobotType
 
     def is_idle_mount(self, mount: Union[top_types.Mount, OT3Mount]) -> bool:
         """Only the gripper mount or the 96-channel pipette mount would be idle
@@ -527,12 +534,14 @@ class OT3API(
         """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, OT3Simulator)
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """
         self._callbacks.add(cb)
 
+        # todo(chb: 04-08-2026): Do we need to add a LOCAL @pyro_behavior to this, which will destroy the proxy object when the time comes?
         def unregister() -> None:
             self._callbacks.remove(cb)
 
@@ -642,6 +651,11 @@ class OT3API(
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
 
+    @property
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def attached_peripherals(self) -> List[peripherals.AbstractPeripheral]:
+        return self._backend.module_controls.available_peripherals
+
     async def create_simulating_module(
         self,
         model: modules.types.ModuleModel,
@@ -649,7 +663,7 @@ class OT3API(
     ) -> modules.AbstractModule:
         """Create a simulating module hardware interface."""
 
-        return await self._backend.module_controls.register_simulated_module(
+        module = await self._backend.module_controls.register_simulated_device(
             simulated_usb_port=USBPort(
                 name="", port_number=1, port_group=PortGroup.LEFT
             ),
@@ -657,6 +671,27 @@ class OT3API(
             sim_model=model.value,
             sim_serial=sim_serial,
         )
+        assert isinstance(module, modules.AbstractModule)
+        return module
+
+    async def create_simulating_peripheral(
+        self,
+        model: peripherals.types.PeripheralModel,
+    ) -> peripherals.AbstractPeripheral:
+        """Create a simulating peripheral hardware interface."""
+        assert self.is_simulator, (
+            "Cannot build simulating peripheral from non-simulating hardware control API"
+        )
+
+        peripheral = await self._backend.module_controls.register_simulated_device(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.LEFT
+            ),
+            type=peripherals.PeripheralType.from_model(model),
+            sim_model=model.value,
+        )
+        assert isinstance(peripheral, peripherals.AbstractPeripheral)
+        return peripheral
 
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
@@ -1858,7 +1893,7 @@ class OT3API(
 
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
-        self._config = replace(self._config, **kwargs)
+        self._config = self._config.model_copy(update=kwargs)
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
@@ -2342,7 +2377,9 @@ class OT3API(
         real_mount = OT3Mount.from_mount(mount)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
-            raise FailedTipStateCheck(expected, status)
+            raise FailedTipStateCheck(
+                f"Expected tip state {expected}, but received {status}."
+            )
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
@@ -2655,19 +2692,27 @@ class OT3API(
             module_type, serial_number
         )
 
+    @pyro_behavior(
+        specialty_func=convert_result_to_wrapped_typed_dict, apply_local=False
+    )
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
         return self._pipette_handler.get_attached_instrument(OT3Mount.from_mount(mount))
 
+    @pyro_behavior(
+        specialty_func=convert_result_to_wrapped_typed_dict, apply_local=False
+    )
     def get_attached_instrument(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
         # Warning: don't use this in new code, used `get_attached_pipette` instead
-        return self.get_attached_pipette(mount)
+        pipette_dict: PipetteDict = self.get_attached_pipette(mount)
+        return pipette_dict
 
     @property
-    def attached_instruments(self) -> Any:
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    def attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         # Warning: don't use this in new code, used `attached_pipettes` instead
         return self.attached_pipettes
 

@@ -6,9 +6,19 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[options]
+exclude-newer = "2026-05-11T14:25:00.393367Z"
+exclude-newer-span = "P1W"
+
 [[package]]
 name = "abr-testing"
 source = { editable = "../abr-testing" }
+dependencies = [
+    { name = "slack-sdk" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "slack-sdk", specifier = "==3.39.0" }]
 
 [[package]]
 name = "aionotify"
@@ -1248,12 +1258,14 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyserial" },
     { name = "python-can" },
+    { name = "setuptools" },
     { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
 flex = [
     { name = "python-can" },
+    { name = "setuptools" },
 ]
 
 [package.metadata]
@@ -1265,6 +1277,8 @@ requires-dist = [
     { name = "pyserial", specifier = "==3.5" },
     { name = "python-can", specifier = "==4.2.2" },
     { name = "python-can", marker = "extra == 'flex'", specifier = "==4.2.2" },
+    { name = "setuptools", specifier = ">=69.1.1,<82.0.0" },
+    { name = "setuptools", marker = "extra == 'flex'", specifier = ">=69.1.1,<82.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
 ]
 provides-extras = ["flex"]
@@ -1915,6 +1929,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "slack-sdk"
+version = "3.39.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/dd/645f3eb93fce38eadbb649e85684730b1fc3906c2674ca59bddc2ca2bd2e/slack_sdk-3.39.0.tar.gz", hash = "sha256:6a56be10dc155c436ff658c6b776e1c082e29eae6a771fccf8b0a235822bbcb1", size = 247207, upload-time = "2025-11-20T15:27:57.556Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/1f/32bcf088e535c1870b1a1f2e3b916129c66fdfe565a793316317241d41e5/slack_sdk-3.39.0-py2.py3-none-any.whl", hash = "sha256:b1556b2f5b8b12b94e5ea3f56c4f2c7f04462e4e1013d325c5764ff118044fa8", size = 309850, upload-time = "2025-11-20T15:27:55.729Z" },
 ]
 
 [[package]]

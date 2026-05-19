@@ -359,9 +359,9 @@ class ProtocolAnalysisCLI:
             Protocol object.
         """
         # Determine robot type based on filename or content
-        robot_type = "OT2"  # Default
-        if "flex" in file_path.name.lower() or "Flex" in file_path.name:
-            robot_type = "Flex"
+        robot_type = "Flex"  # Default
+        if "ot2" in file_path.name.lower():
+            robot_type = "OT2"
 
         return Protocol(
             file_stem=file_path.stem,

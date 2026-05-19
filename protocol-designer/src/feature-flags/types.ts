@@ -39,6 +39,7 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_STACKING',
   'OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION',
   'OT_PD_ENABLE_REACT_SCAN',
+  'OT_PD_ENABLE_FORK',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =

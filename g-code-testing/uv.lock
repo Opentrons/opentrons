@@ -2,6 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 
+[options]
+exclude-newer = "2026-05-11T14:57:53.100462Z"
+exclude-newer-span = "P1W"
+
 [manifest]
 
 [[manifest.dependency-metadata]]
@@ -1085,12 +1089,14 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyserial" },
     { name = "python-can" },
+    { name = "setuptools" },
     { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
 flex = [
     { name = "python-can" },
+    { name = "setuptools" },
 ]
 
 [package.metadata]
@@ -1102,6 +1108,8 @@ requires-dist = [
     { name = "pyserial", specifier = "==3.5" },
     { name = "python-can", specifier = "==4.2.2" },
     { name = "python-can", marker = "extra == 'flex'", specifier = "==4.2.2" },
+    { name = "setuptools", specifier = ">=69.1.1,<82.0.0" },
+    { name = "setuptools", marker = "extra == 'flex'", specifier = ">=69.1.1,<82.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
 ]
 provides-extras = ["flex"]
@@ -1721,14 +1729,14 @@ dev = [
     { name = "pytest-xdist", marker = "python_full_version >= '3.11'", specifier = "~=2.5.0" },
     { name = "python-box", marker = "python_full_version >= '3.11'", specifier = "==6.1.0" },
     { name = "pyusb", marker = "python_full_version >= '3.11'", specifier = "==1.2.1" },
-    { name = "requests", marker = "python_full_version >= '3.11'", specifier = "==2.27.1" },
+    { name = "requests", marker = "python_full_version >= '3.11'", specifier = "==2.33.*" },
     { name = "rpds-py", marker = "python_full_version >= '3.11'", specifier = "==0.18.1" },
     { name = "ruff", marker = "python_full_version >= '3.11'", specifier = "==0.14.10" },
     { name = "sqlalchemy2-stubs", marker = "python_full_version >= '3.11'", specifier = "==0.0.2a38" },
     { name = "tavern", marker = "python_full_version >= '3.11'", specifier = ">=3.0.2" },
     { name = "types-mock", marker = "python_full_version >= '3.11'", specifier = "~=5.1.0" },
     { name = "types-paho-mqtt", marker = "python_full_version >= '3.11'", specifier = "==1.6.0.20240106" },
-    { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "~=2.27.1" },
+    { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.33.*" },
     { name = "zipp", marker = "python_full_version >= '3.11'", specifier = "==3.21.0" },
 ]
 robot = [
@@ -1795,6 +1803,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "idna" },
     { name = "pydantic" },
+    { name = "pydantic-settings" },
     { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "sqlalchemy" },
@@ -1811,6 +1820,7 @@ requires-dist = [
     { name = "fastapi", specifier = "==0.100.0" },
     { name = "idna", specifier = "==3.3" },
     { name = "pydantic", specifier = ">2.0.0,<3" },
+    { name = "pydantic-settings", specifier = ">=2.0.0,<3" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "python-multipart", specifier = "==0.0.6" },
     { name = "sqlalchemy", specifier = ">=1.4.51,<3" },

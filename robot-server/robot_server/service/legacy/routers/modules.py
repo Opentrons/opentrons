@@ -8,7 +8,7 @@ from opentrons.hardware_control import HardwareControlAPI, modules
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons_shared_data.errors.codes import ErrorCodes
 from opentrons_shared_data.errors.exceptions import APIRemoved, ModuleNotPresent
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import LegacyErrorResponse

@@ -39,6 +39,7 @@ from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
 
 @pytest.fixture(autouse=True)
@@ -72,9 +73,16 @@ def analysis_store(decoy: Decoy) -> AnalysisStore:
     return decoy.mock(cls=AnalysisStore)
 
 
+@pytest.fixture
+def run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
+    """Get a mocket out RunProcessPyroProvider."""
+    return decoy.mock(cls=RunProcessPyroProvider)
+
+
 async def test_load_orchestrator(
     decoy: Decoy,
     analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
 ) -> None:
     """It should load the appropriate run orchestrator."""
     robot_type: RobotType = "OT-3 Standard"
@@ -95,7 +103,9 @@ async def test_load_orchestrator(
         protocol_kind=ProtocolKind.STANDARD,
     )
     subject = ProtocolAnalyzer(
-        analysis_store=analysis_store, protocol_resource=protocol_resource
+        analysis_store=analysis_store,
+        protocol_resource=protocol_resource,
+        run_process_pyro_provider=run_process_pyro_provider,
     )
 
     run_orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
@@ -124,6 +134,7 @@ async def test_load_orchestrator(
 async def test_analyze(
     decoy: Decoy,
     analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
 ) -> None:
     """It should be able to start a protocol analysis and update the analysis store when completed."""
     robot_type: RobotType = "OT-3 Standard"
@@ -200,7 +211,9 @@ async def test_analyze(
         )
     ).then_return(orchestrator)
     subject = ProtocolAnalyzer(
-        analysis_store=analysis_store, protocol_resource=protocol_resource
+        analysis_store=analysis_store,
+        protocol_resource=protocol_resource,
+        run_process_pyro_provider=run_process_pyro_provider,
     )
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
@@ -256,6 +269,7 @@ async def test_analyze(
 async def test_analyze_updates_pending_on_error(
     decoy: Decoy,
     analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
 ) -> None:
     """It should update pending analysis with an internal error."""
     robot_type: RobotType = "OT-3 Standard"
@@ -299,7 +313,9 @@ async def test_analyze_updates_pending_on_error(
     ).then_return(orchestrator)
 
     subject = ProtocolAnalyzer(
-        analysis_store=analysis_store, protocol_resource=protocol_resource
+        analysis_store=analysis_store,
+        protocol_resource=protocol_resource,
+        run_process_pyro_provider=run_process_pyro_provider,
     )
     decoy.when(
         await orchestrator.run(

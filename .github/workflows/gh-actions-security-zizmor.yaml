@@ -1,0 +1,40 @@
+name: GitHub Actions security checks
+
+on:
+  push:
+    paths:
+      - .github/**
+  pull_request:
+    paths:
+      - .github/**
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8 # v0.5.2
+        with:
+          # For now, report failures to the console, not the "Security" tab,
+          # because this needs less special configuration on the repo.
+          advanced-security: false
+          # Pin to a specific zizmor version so rules added in the future don't make random PRs fail.
+          # If we ever set `advanced-security: true`, we'll probably want to change this to `latest`.
+          version: 1.23.1
+
+# If this workflow fails with zizmor violations, and you want to reproduce the failure
+# locally, try something like this. This assumes you have `uv` and `gh` installed.
+#
+#   uvx zizmor==<version> --gh-token $(gh auth token) .
+#
+# zizmor needs GitHub auth to detect certain violations.
+# If you omit `--gh-token $(gh auth token)`, it won't output anything for them.

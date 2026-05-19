@@ -34,6 +34,7 @@
   "confirm": "Confirm",
   "confirm_detached": "Confirm removal",
   "confirm_go_back_without_saving": "Are you sure you want to go back to the the labware list without saving?",
+  "confirm_offset": "Confirm offset",
   "confirm_pick_up_tip_modal_title": "Did the pipette pick up a tip successfully?",
   "confirm_pick_up_tip_modal_try_again_text": "No, try again",
   "confirm_placement": "Confirm placement",

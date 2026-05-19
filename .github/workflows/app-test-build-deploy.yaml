@@ -15,7 +15,7 @@ on:
       - '*.js'
       - 'scripts/**'
       - '*.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/app-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
       - 'vitest.config.*'
@@ -35,7 +35,7 @@ on:
       - 'discovery-client/**'
       - '*.js'
       - '*.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
       - 'scripts/**'
       - '.vitest.config.*'
   workflow_dispatch: {}
@@ -54,8 +54,8 @@ env:
 jobs:
   js-unit-test-shards:
     # unit tests for the app's view layer (not the node layer)
-    runs-on: 'ubuntu-24.04'
-    name: 'opentrons app frontend unit tests'
+    runs-on: 'ubuntu-22.04'
+    name: 'app frontend unit tests'
     # these tests take > 30 minutes with a single runner, so split into multiple shards
     # https://vitest.dev/guide/improving-performance.html#sharding
     strategy:
@@ -64,8 +64,9 @@ jobs:
     env:
       SHARD_TOTAL: 8
     timeout-minutes: 15 # if tests take longer than this, add more shards
+    continue-on-error: true # We want to see all test failures, so keep running all shards even after one fails.
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
       - name: 'Test frontend packages ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
         # The run produces 2 outputs that we'll upload to temporary storage on Github:
@@ -74,7 +75,8 @@ jobs:
           make -C app test-cov test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
           mv coverage/lcov.info coverage/lcov-shard-${{matrix.shard}}.info
       - name: 'Upload frontend test shard result ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
-        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }} # Make sure we forward along the report even if there were test failures.
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: frontend-unit-test-result-shard-${{matrix.shard}}
           path: |
@@ -85,22 +87,22 @@ jobs:
 
   js-unit-test:
     needs: [js-unit-test-shards]
-    runs-on: 'ubuntu-24.04'
-    name: 'opentrons app frontend unit test merge shard results'
+    runs-on: 'ubuntu-22.04'
+    name: 'app frontend unit test merge shard results'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
       - name: 'Download frontend test result shards'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: frontend-unit-test-result-shard-*
           merge-multiple: true
       - name: 'Merge frontend test report shards'
-        run: yarn vitest --merge-reports
+        run: pnpm vitest --merge-reports
       - name: 'Merge frontend test coverage shards'
         run: cat ./coverage/lcov-shard-*.info > ./coverage/lcov.info
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
         with:
           files: ./coverage/lcov.info
           flags: app
@@ -109,20 +111,20 @@ jobs:
   backend-unit-test:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         shell: ['app-shell', 'app-shell-odd', 'discovery-client']
         exclude:
           - os: 'windows-2022'
             shell: 'app-shell-odd'
-    name: 'opentrons ${{matrix.shell}} unit tests on ${{matrix.os}}'
+    name: '${{matrix.shell}} unit tests on ${{matrix.os}}'
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
         with:
           python-version: '3.12'
       - name: check make version
@@ -130,7 +132,7 @@ jobs:
       - name: 'test native(er) packages'
         run: make test-js-internal tests="${{matrix.shell}}/src" cov_opts="--coverage=true"
       - name: 'Upload coverage report'
-        uses: 'codecov/codecov-action@v3'
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
         with:
           files: ./coverage/lcov.info
           flags: app
@@ -214,7 +216,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         target: ['desktop', 'odd']
         exclude:
@@ -241,11 +243,11 @@ jobs:
              echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
              echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
           fi
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
         with:
           python-version: '3.12'
       - name: check make version
@@ -329,7 +331,7 @@ jobs:
 
       - name: 'upload github artifact'
         if: matrix.target == 'desktop'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: 'opentrons-${{matrix.variant}}-${{ matrix.os }}'
           path: app-shell/dist/publish
@@ -348,7 +350,7 @@ jobs:
 
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-22.04'
     needs:
       ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
@@ -357,7 +359,7 @@ jobs:
       contents: write
     steps:
       - name: 'download run app builds'
-        uses: 'actions/download-artifact@v4'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           path: ./artifacts
       - name: 'separate release and internal-release artifacts'
@@ -371,7 +373,7 @@ jobs:
               echo "Moved $(ls ./to_upload_${variant})"
           done
       - name: 'configure s3 deploy creds (GitHub OIDC)'
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           role-to-assume: ${{ vars.OT_APP_OT3_DEPLOY_ROLE }}
           aws-region: us-east-2
@@ -383,7 +385,7 @@ jobs:
           aws s3 sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
 
       - name: 'upload windows artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -394,7 +396,7 @@ jobs:
           artifacts: ./artifacts/*/*.exe
           artifactContentType: application/vnd.microsoft.portable-executable
       - name: 'upload macos artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -405,7 +407,7 @@ jobs:
           artifacts: ./artifacts/*/*.dmg
           artifactContentType: application/octet-stream
       - name: 'upload linux artifacts to GH release'
-        uses: 'ncipollo/release-action@v1.12.0'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
         if: needs.determine-build-type.outputs.type == 'release'
         with:
           allowUpdates: true
@@ -431,7 +433,7 @@ jobs:
               echo "linux-${variant}=$_linux_build">>$GITHUB_OUTPUT
           done
       - name: 'slack notify internal-release'
-        uses: slackapi/slack-github-action@v1.14.0
+        uses: slackapi/slack-github-action@d09f6a279ff492756a31df59952ee6dce8c9b772 # v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         continue-on-error: true
         with:
@@ -440,7 +442,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
       - name: 'slack notify release'
-        uses: slackapi/slack-github-action@v1.14.0
+        uses: slackapi/slack-github-action@d09f6a279ff492756a31df59952ee6dce8c9b772 # v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         continue-on-error: true
         with:
@@ -455,7 +457,7 @@ jobs:
           mkdir -p ${{ runner.temp }}/upload_backup
           mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
-        uses: 'actions/checkout@v4'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: 'restore upload folders after checkout'
         run: |
           # Restore upload folders from temp location
@@ -480,6 +482,22 @@ jobs:
           node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
           aws s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
 
+      # Robot-stack prod (builds.opentrons.com) only — not ot3-development.builds.opentrons.com.
+      # Set repo variable OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID to the CloudFront distribution
+      # that fronts builds.opentrons.com. Extend OT_APP_OT3_DEPLOY_ROLE with cloudfront:CreateInvalidation.
+      - name: 'invalidate CloudFront cache (builds.opentrons.com)'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') && vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID != ''
+        run: |
+          set -euo pipefail
+          INVALIDATION_ID="$(
+            aws cloudfront create-invalidation \
+              --distribution-id '${{ vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID }}' \
+              --paths '/app/*' \
+              --output text \
+              --query 'Invalidation.Id'
+          )"
+          echo "Started CloudFront invalidation: ${INVALIDATION_ID}"
+
   # Notification jobs for tagged builds
   notify-success:
     name: 'Notify Build Success'
@@ -495,7 +513,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         continue-on-error: true
@@ -518,7 +536,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -563,7 +581,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         continue-on-error: true

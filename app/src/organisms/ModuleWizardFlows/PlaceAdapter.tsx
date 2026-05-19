@@ -211,13 +211,13 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
     )
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  else {
+  } else {
     return (
       <GenericWizardTile
         header={

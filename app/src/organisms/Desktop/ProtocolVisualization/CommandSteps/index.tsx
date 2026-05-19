@@ -21,6 +21,8 @@ interface CommandStepsProps {
   percentComplete: number
   handlePause: () => void
   currentCommandIndex?: number
+  milliSecondsPerFrame: number
+  isGlobalPlaying: boolean
 }
 export function CommandSteps(props: CommandStepsProps): JSX.Element {
   const {
@@ -30,6 +32,8 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
     percentComplete,
     handlePause,
     currentCommandIndex,
+    milliSecondsPerFrame,
+    isGlobalPlaying,
   } = props
   const { t } = useTranslation('protocol_visualization')
   const [isAtBottom, setIsAtBottom] = useState<boolean>(false)
@@ -55,6 +59,8 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
             setSelectedCommand={setSelectedCommand}
             handlePause={handlePause}
             setIsAtBottom={setIsAtBottom}
+            milliSecondsPerFrame={milliSecondsPerFrame}
+            isGlobalPlaying={isGlobalPlaying}
           />
         </div>
       </div>

@@ -8,6 +8,18 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.10.1
+
+**Welcome to Protocol Designer 8.10.1!**
+
+This hotfix release addresses the following bugs:
+
+- Protocol Designer no longer includes excess collision errors when you choose a safe well and nozzle combination to:
+  - transfer liquid to or from labware in the OT-2 Thermocycler Module.
+  - use partial tip pickup with an 8- or 1-channel pipette in a 384-well plate.
+  - transfer liquid with a 96-channel pipette.
+- Protocol Designer lets you customize a location within the source or destination well to blow out excess liquid.
+
 ## Opentrons Protocol Designer Changes in 8.10.0
 
 **Welcome to Protocol Designer 8.10.0!**
@@ -33,6 +45,10 @@ This release adds full support for Flex 20 µL pipette tips and all available pa
 - Protocol Designer only lets you add a transfer step when the deck contains at least one labware without a lid, accessible to your attached pipette.
 - Protocol Designer lets you add compatible Opentrons Tough Universal Lids on custom well plates or reservoirs without errors.
 - Labware nicknames now apply to the topmost labware that is not a lid.
+
+### Known Issues
+
+- Opentrons pipettes' [low volume mode](https://docs.opentrons.com/python-api/pipettes/volume-modes/) makes small changes to pipette settings and behavior to ensure accuracy when aspirating and dispensing small volumes. Protocol Designer can make errors in these changes when distributing less than 5 µL with Flex 20 µL pipette tips. If your protocol fails analysis with an error for tip bounds, you'll need to adjust the volumes used in your step.
 
 ## Opentrons Protocol Designer Changes in 8.9.1
 

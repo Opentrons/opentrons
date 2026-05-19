@@ -1,0 +1,74 @@
+# JS package testing: ProtocolDeck + protocol-visualization against packed packages
+
+name: 'JS package testing'
+
+on:
+  pull_request:
+    paths:
+      - 'components/**'
+      - 'js-package-testing/**'
+      - 'protocol-visualization/**'
+      - 'shared-data/**'
+      - 'step-generation/**'
+      - '.github/workflows/js-package-testing.yaml'
+  push:
+    branches:
+      - 'edge'
+      - 'chore_release*'
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: 'true'
+
+jobs:
+  js-package-testing:
+    name: 'js package testing setup and validation'
+    timeout-minutes: 30
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/js/setup
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
+        with:
+          version: 10.32.1
+      - name: 'setup js-package-testing environment'
+        working-directory: js-package-testing
+        run: make test-setup
+      - name: 'run js-package-testing tests'
+        working-directory: js-package-testing
+        env:
+          # Eyes baseline branch = PR merge target (pull_request). workflow_dispatch falls back to ref_name.
+          APPLITOOLS_BRANCH: ${{ github.base_ref || github.ref_name }}
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+        run: make test
+      - name: 'upload playwright report'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() }}
+        id: upload-report
+        with:
+          name: playwright-report
+          path: js-package-testing/playwright-report/
+          retention-days: 30
+      - name: 'add test results to summary'
+        if: ${{ !cancelled() }}
+        run: |
+          echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d "js-package-testing/playwright-report" ]; then
+            echo "📊 **Test Report**: [Download HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-report.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The detailed HTML report with screenshots and traces has been uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ No test report generated" >> $GITHUB_STEP_SUMMARY
+          fi

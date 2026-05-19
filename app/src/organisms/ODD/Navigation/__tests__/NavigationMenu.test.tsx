@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { home } from '/app/redux/robot-controls'
 import { useLights } from '/app/resources/devices'
 
@@ -15,7 +16,9 @@ import type { NavigateFunction } from 'react-router-dom'
 vi.mock('/app/redux/robot-admin')
 vi.mock('/app/redux/robot-controls')
 vi.mock('/app/resources/devices')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../RestartRobotConfirmationModal')
+vi.mock('../ShutdownRobotConfirmationModal')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
@@ -46,6 +49,7 @@ describe('NavigationMenu', () => {
       lightsOn: false,
       toggleLights: mockToggleLights,
     })
+    vi.mocked(useIsFlex).mockReturnValue(true)
     vi.mocked(RestartRobotConfirmationModal).mockReturnValue(
       <div>mock RestartRobotConfirmationModal</div>
     )

@@ -42,7 +42,7 @@ export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
       if (!port.isOpen && !port.opening) port.open()
       return port
     }
-  )
+  ) as unknown as http.Agent
 
   usbAgent.maxFreeSockets = 1
   usbAgent.maxSockets = 1
@@ -154,6 +154,23 @@ function socketEmulatorFromPort(port: SerialPort): Socket {
     }
   }
 
+  // Proactively destroy the socket when the port closes or errors to prevent attempted
+  // writes to a closed port. Doing so ensures errors flow through the normal handling chain.
+  const handlePortClose = (): void => {
+    if (!socket.destroyed) {
+      socket.destroy(new Error('Underlying serial port closed'))
+    }
+  }
+
+  const handlePortError = (err: Error): void => {
+    if (!socket.destroyed) {
+      socket.destroy(err)
+    }
+  }
+
+  port.on('close', handlePortClose)
+  port.on('error', handlePortError)
+
   // since this socket is independent from the port, we can do stuff like "have an activity timeout"
   // without worrying that it will kill the socket
   let currentTimeout: NodeJS.Timeout | null = null
@@ -181,6 +198,8 @@ function socketEmulatorFromPort(port: SerialPort): Socket {
   // closes over the socket
   socket.on('close', () => {
     port.removeListener('data', dataForwarder)
+    port.removeListener('close', handlePortClose)
+    port.removeListener('error', handlePortError)
   })
 
   // some little functions to have the right shape for the http internals
@@ -290,7 +309,8 @@ class SerialPortHttpAgent extends http.Agent {
 
   destroy(): void {
     this.destroyed = true
-    this.port.destroy(new Error('Agent was destroyed'))
+    this.log('debug', 'Agent was destroyed')
+    this.port.destroy()
   }
 
   createSocket(

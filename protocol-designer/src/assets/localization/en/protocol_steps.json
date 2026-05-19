@@ -13,6 +13,7 @@
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
   "all_nozzles": "All nozzles (recommended)",
+  "all_nozzles_are_preselected": "All nozzles are preselected",
   "and": "and",
   "aspirate": "Aspirate",
   "aspirate_labware": "Source labware",
@@ -277,6 +278,14 @@
   "unknown_module": "Unknown module",
   "unoccupied_stack": "Stack of {{name}}",
   "vacuum": {
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
+    },
+    "state_timeline": {
+      "start": "Start vacuum",
+      "wait_for_complete": "Wait for vacuum to complete"
+    },
     "controls": {
       "duration": {
         "label": "Time at pressure",
@@ -313,6 +322,7 @@
         "add_step": "Add step",
         "cancel": "Cancel",
         "cycle": "Cycle",
+        "cycle_repetitions": "Cycle, {{repetitions}}x",
         "delete": "Delete",
         "edit": "Edit",
         "errors": {
@@ -344,7 +354,10 @@
       "state": {
         "label": "Select the state to change",
         "options": {
-          "pump": "Turn on Vacuum pump",
+          "pump": {
+            "off": "Turn off Vacuum pump",
+            "on": "Turn on Vacuum pump"
+          },
           "vent": {
             "closed": "Close vent",
             "open": "Open vent"
@@ -359,7 +372,8 @@
         "label": "Pump",
         "off": "Off",
         "power": "{{power}}%",
-        "pressure": "{{pressure}} mbar"
+        "pressure": "{{pressure}} mbar",
+        "profile": "Running profile"
       },
       "vent": {
         "closed": "Closed",
@@ -375,6 +389,7 @@
         "closed": "Closed",
         "open": "Open",
         "pump": {
+          "off": "Stop pump",
           "power": "<text>Set pump power to</text><tag/>",
           "pressure": "<text>Set gauge pressure to</text><tag/>"
         },

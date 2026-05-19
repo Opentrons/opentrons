@@ -79,3 +79,9 @@ TLS_KEY_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-key.pem$")
 TLS_CERT_NAME_PATTERN: Final = re.compile(r"^ot-robot-tls-cert.crt$")
 TLS_KEY_NAME: Final = "ot-robot-tls-key.pem"
 TLS_CERT_NAME: Final = "ot-robot-tls-cert.crt"
+
+# django's default work factor for PBKDF2HMAC/SHA256 is 1.2-1.5 million, for a real server (see the defaults
+# in the PBKDF2PasswordHasher class here:
+# https://github.com/django/django/blob/main/django/contrib/auth/hashers.py )
+# That would take about 20 seconds per spin, for us, so unfortunately we use a smaller number.
+KDF_ITERATIONS: Final = 600_000

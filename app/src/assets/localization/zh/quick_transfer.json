@@ -138,7 +138,6 @@
   "push_out_description": "有助于确保所有液体排出",
   "push_out_value": "{{volume}} µL",
   "push_out_volume": "推出体积 (µL)",
-  "quick_transfer": "快速移液",
   "quick_transfer_volume": "快速移液{{volume}}µL",
   "reservoir": "储液槽",
   "reset_kind_settings": "重置 {{transferName}} 设置吗？",

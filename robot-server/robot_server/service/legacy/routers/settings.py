@@ -17,6 +17,7 @@ from opentrons.config import (
 from opentrons.config import (
     reset as reset_util,
 )
+from opentrons.config.types import OT3Config
 from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
@@ -36,8 +37,12 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    get_app_state,
+)
 from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.deck_configuration.fastapi_dependencies import (
@@ -46,15 +51,22 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
+    clean_up_hardware,
     get_hardware,
+    get_hardware_resource,
     get_ot2_hardware,
     get_robot_type_enum,
+    start_initializing_hardware,
 )
 from robot_server.persistence.fastapi_dependencies import (
     get_images_resetter,
     get_persistence_resetter,
 )
 from robot_server.persistence.images_directory import ImagesResetter
+from robot_server.runs.dependencies import (
+    mark_light_control_startup_finished,
+    start_light_control_task,
+)
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
@@ -95,6 +107,29 @@ async def _set_oem_mode_request(enable: bool, authorization_header: str | None) 
             return resp.status
 
 
+async def _hardware_subprocess_transition(enable: bool, app_state: AppState) -> None:
+    """Request to transition the source of the hardware api between inner-process and subprocess."""
+    if enable:
+        # cleanup state/kill any local hardware API
+        await clean_up_hardware(app_state)
+        # todo(chb: 04-09-2026): Send SystemD socket request to opentrons-hardware-controller to start subprocess
+
+    else:
+        # cleanup state
+        await clean_up_hardware(app_state)
+
+        # todo(chb: 04-09-2026): Send SystemD socket request to opentrons-hardware-controller to end subprocess
+
+    # rerun the hardware API setup
+    start_initializing_hardware(
+        app_state=app_state,
+        callbacks=[
+            (start_light_control_task, True),
+            (mark_light_control_startup_finished, False),
+        ],
+    )
+
+
 @router.post(
     path="/settings",
     summary="Change a setting",
@@ -110,6 +145,7 @@ async def _set_oem_mode_request(enable: bool, authorization_header: str | None) 
 async def post_settings(
     update: AdvancedSettingRequest,
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    app_state: Annotated[AppState, Depends(get_app_state)],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
     authorization: Annotated[str | None, Header()] = None,
 ) -> AdvancedSettingsResponse:
@@ -130,6 +166,15 @@ async def post_settings(
                 raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
 
         await advanced_settings.set_adv_setting(update.id, update.value)
+        if update.id == "enableHardwareSubprocess" and robot_type == RobotTypeEnum.FLEX:
+            await _hardware_subprocess_transition(
+                enable=update.value if update.value is not None else False,
+                app_state=app_state,
+            )
+
+            # Refresh the hardware dependency
+            hardware = await get_hardware_resource(app_state)
+
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
     except ValueError as e:
@@ -341,6 +386,8 @@ async def post_settings_reset_options(
 async def get_robot_settings(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
+    if isinstance(hardware.config, OT3Config):
+        return hardware.config.model_dump()
     return asdict(hardware.config)
 
 

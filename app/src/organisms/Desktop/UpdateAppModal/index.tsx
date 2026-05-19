@@ -108,8 +108,9 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
 
-  if (downloaded)
+  if (downloaded) {
     setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
+  }
 
   const handleRemindMeLaterClick = (): void => {
     navigate('/app-settings/general')

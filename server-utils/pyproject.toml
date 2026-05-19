@@ -16,6 +16,7 @@ dependencies = [
     "python-dotenv==1.0.1",
     "python-multipart==0.0.6",
     "pydantic>2.0.0,<3",
+    "pydantic-settings>=2.0.0,<3",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
@@ -118,6 +119,9 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
+    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
+    # internally. Ignore until we upgrade FastAPI.
+    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

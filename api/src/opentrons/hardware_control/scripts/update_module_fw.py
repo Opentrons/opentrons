@@ -182,6 +182,7 @@ async def main(args: argparse.Namespace) -> None:  # noqa: C901
         print(f"Found mod: {mod.name} at {mod.port}")
         module = await build_module(mod, loop)
         if module is None:
+            print(f"ERROR: No abstract module exists for {mod.name}.")
             continue
 
         name = module.name()
@@ -228,9 +229,9 @@ async def main(args: argparse.Namespace) -> None:  # noqa: C901
             # refresh the device info
             print(f"Device {module.port} is back online, refreshing device info.")
             device_info = await module._driver.get_device_info()  # type: ignore
-            if not isinstance(dict, device_info):
+            if not isinstance(device_info, dict):
                 device_info = device_info.to_dict()
-
+            print(f"New version {device_info['version']}")
             success = device_info["version"] == target_version
             msg = "updated successfully!" if success else "failed to update"
             print(f"Device {name} {serial} {msg}")

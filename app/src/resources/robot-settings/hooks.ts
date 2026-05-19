@@ -12,7 +12,9 @@ import type { RobotSettingsField } from '@opentrons/api-client'
  * @returns boolean
  */
 export function useIsOEMMode(): boolean {
-  // set enabled false to avoid refetch that reinitializes localization provider
+  // Set `enabled: false` to pull from the cache without actually fetching, to avoid
+  // reinitializing the localization provider. The actual fetch happens elsewhere
+  // (at the time of writing, in the root OnDeviceDisplayApp component).
   const { settings } = useRobotSettingsQuery({ enabled: false }).data ?? {}
   const isOnDevice = useSelector(getIsOnDevice)
 
