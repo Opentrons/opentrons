@@ -30,7 +30,7 @@ Follow the prompts on the touchscreen to get your robot connected so it can chec
 
 ### Ethernet (recommended)
 
-Connect your Flex to a network switch, hub, or router with an Ethernet cable. Making this initial connection via Ethernet cable ensures the robot has a stable internet connection to download any required software or firmware updates. After the Flex has updated and restarted, you can then switch to a wireless network if desired.
+Connect your Flex to a network switch, hub, or router with an Ethernet cable. Making this initial connection via Ethernet cable ensures the robot has a stable internet connection to download any required software or *firmware* updates. After the Flex has updated and restarted, you can then switch to a wireless network if desired.
 
 ### Wi-Fi
 

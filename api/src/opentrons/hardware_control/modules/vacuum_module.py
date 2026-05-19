@@ -462,6 +462,7 @@ class VacuumModule(mod_abc.AbstractModule):
             else:
                 await self._execute_cycle_step(step_or_cycle)
 
+    # TODO: implement a wait_for in running profiles
     async def execute_profile(
         self, profile: List[Union[VacuumModuleCycle, VacuumModuleStep]]
     ) -> None:

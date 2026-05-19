@@ -550,3 +550,31 @@ class AbstractVacuumModuleCore(
     @abstractmethod
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
+
+    @abstractmethod
+    def start_set_vacuum_pressure(
+        self,
+        gauge_pressure_mbar: float,
+        duration: int | None,
+        ramp_rate: float | None,
+        timeout_s: int | None,
+        vent_after: bool | None,
+    ) -> None:
+        """Set vacuum pressure."""
+
+    @abstractmethod
+    def start_set_vacuum_power(
+        self,
+        percent_power: int,
+        duration: int | None,
+        ramp_rate: float | None,
+        timeout_s: int | None,
+        vent_after: bool | None,
+    ) -> None:
+        """Set vacuum power."""
+
+    @abstractmethod
+    def stop_vacuum(
+        self,
+    ) -> None:
+        """Stop the vacuum pump."""
