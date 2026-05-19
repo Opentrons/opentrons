@@ -20,7 +20,6 @@ import fastapi.security
 
 from .auth_server import (
     TOKEN_ENDPOINT_PATH,
-    Client,
     LocalHTTPClient,
     RequireReasonForInteractionSettingsResponse,
 )
@@ -57,8 +56,6 @@ _oauth_2_scheme = fastapi.security.OAuth2PasswordBearer(
 _authorization_checker_accessor = AppStateAccessor[AuthorizationChecker](
     "authorization_checker"
 )
-
-_auth_server_client_accessor = AppStateAccessor[[Client]]("auth_server_client") | None
 
 
 RequireScopesResult: TypeAlias = AuthorizationNotRequiredResult | AuthorizedResult
@@ -152,17 +149,11 @@ def install_authorization_checker(
     _authorization_checker_accessor.set_on(app_state, authorization_checker)
 
 
-def install_auth_server_client(app_state: AppState, client: Optional[Client]) -> None:
-    """Store the shared auth-server HTTP client on app state, or clear it."""
-    _auth_server_client_accessor.set_on(app_state, client)
-
-
 @asynccontextmanager
 async def build_authorization_checker(
     *,
     auth_server_uds: Optional[str] = None,
     auth_server_url: Optional[str] = None,
-    app_state: Optional[AppState] = None,
 ) -> AsyncGenerator[AuthorizationChecker, None]:
     """Build an `AuthorizationChecker` appropriately configured for most servers.
 
@@ -172,8 +163,6 @@ async def build_authorization_checker(
     specified, a dummy `AuthorizationChecker` is returned that allows unauthenticated
     access to everything.
 
-    When `app_state` is provided and the server talks to auth-server, the same
-    `LocalHTTPClient` instance is registered for `get_auth_server_client()`.
     """
     if auth_server_uds is None and auth_server_url is None:
         _log.info(
@@ -181,21 +170,13 @@ async def build_authorization_checker(
             " Access control will be disabled."
             " (This is normal in dev mode and on OT-2s.)"
         )
-        if app_state is not None:
-            install_auth_server_client(app_state, None)
         yield AlwaysAllowedAuthorizationChecker()
 
     else:
         async with LocalHTTPClient(
             auth_server_uds=auth_server_uds, auth_server_url=auth_server_url
         ) as client:
-            if app_state is not None:
-                install_auth_server_client(app_state, client)
-            try:
-                yield AuthServerAuthorizationChecker(client)
-            finally:
-                if app_state is not None:
-                    install_auth_server_client(app_state, None)
+            yield AuthServerAuthorizationChecker(client)
 
 
 def get_authorization_checker(
@@ -211,13 +192,6 @@ def get_authorization_checker(
         "Forgot to initialize authorization checker as part of server startup?"
     )
     return authorization_checker
-
-
-def get_auth_server_client(
-    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-) -> Optional[Client]:
-    """Return the shared auth-server HTTP client, if the server is configured with one."""
-    return _auth_server_client_accessor.get_from(app_state)
 
 
 async def get_require_reason_for_interaction_settings(
