@@ -21,6 +21,7 @@ export async function requireDocumentation(
 ): Promise<DocumentationReport> {
   const modalResult = await showDocumentationRequiredModal(username)
   if (modalResult == null || !isDocumentationReportValid(modalResult)) {
+    // TODO(jj): eventually, this will be handled on the backend and become unnecessary.
     throw new Error(
       `No documentation provided for action: ${modalResult?.note}`
     )

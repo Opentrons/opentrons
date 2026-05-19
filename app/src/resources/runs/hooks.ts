@@ -6,6 +6,7 @@ import {
   useCreateLiveCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 // TODO: refactor this so helper code doesn't spawn UI
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
@@ -128,10 +129,12 @@ type CreateTargetedMaintenanceRunMutation =
 
 // A wrapper around useCreateMaintenanceRunMutation that ensures the ODD TakeoverModal renders, if applicable.
 export function useCreateTargetedMaintenanceRunMutation(
+  documentationState: DocumentationState,
   options: UseCreateMaintenanceRunMutationOptions = {},
   hostOverride?: HostConfig | null
 ): CreateTargetedMaintenanceRunMutation {
   const createMaintenanceRunMutation = useCreateMaintenanceRunMutation(
+    documentationState,
     options,
     hostOverride
   )

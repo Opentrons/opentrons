@@ -30,6 +30,9 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+// TODO(jj): implement useGuardedAction on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useGuardedAction } from '../ODD/AccessControl'
 import { AttachProbe } from './AttachProbe'
 import { AttachWasteChute } from './AttachWasteChute'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -177,8 +180,11 @@ export const PipetteWizardFlows = (
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands()
 
+  const docState = useGuardedAction([])
+
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
+      docState,
       {
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)

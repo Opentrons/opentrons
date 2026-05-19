@@ -6,6 +6,9 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
+// TODO(jj): implement useGuardedAction on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useGuardedAction } from '../../ODD/AccessControl'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteData } from '@opentrons/api-client'
@@ -79,8 +82,10 @@ function useCreateDropTipMaintenanceRun({
 }: UseCreateDropTipMaintenanceRunParams): void {
   const { chainRunCommands } = useChainMaintenanceCommands()
 
+  const docState = useGuardedAction([])
+
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(docState, {
       onSuccess: response => {
         // The type assertions here are safe, since we only use this command after asserting these
         const loadPipetteCommand = buildLoadPipetteCommand(

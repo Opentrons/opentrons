@@ -29,6 +29,9 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+// TODO(jj): implement useGuardedAction on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useGuardedAction } from '../ODD/AccessControl'
 import { BeforeBeginning } from './BeforeBeginning'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { ExitConfirmation } from './ExitConfirmation'
@@ -81,8 +84,10 @@ export function GripperWizardFlows(
     setMonitorMaintenanceRunForDeletion,
   ] = useState<boolean>(false)
 
+  const docState = useGuardedAction([])
+
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(docState, {
       onSuccess: response => {
         setCreatedMaintenanceRunId(response.data.id)
       },
