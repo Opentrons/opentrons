@@ -16,6 +16,7 @@ import type { LeafNode } from '/app/redux/protocol-storage'
 /** Reserve space for StepGroup header (title row, optional subtitle, padding). */
 const STEP_GROUP_HEADER_RESERVE_PX = 80
 const MIN_EXPANDED_BODY_PX = 160
+const LIST_VIEWPORT_BOTTOM_BUFFER_PX = 8
 
 interface AnnotatedGroupProps {
   scrollTargetId: string | null
@@ -73,7 +74,9 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     listViewportHeight > 0
       ? Math.max(
           MIN_EXPANDED_BODY_PX,
-          listViewportHeight - STEP_GROUP_HEADER_RESERVE_PX - 8
+          listViewportHeight -
+            STEP_GROUP_HEADER_RESERVE_PX -
+            LIST_VIEWPORT_BOTTOM_BUFFER_PX
         )
       : null
 
