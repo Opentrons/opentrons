@@ -9,7 +9,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
-    MaintenancePosition,
+    MotionModifier,
     MoveToMaintenancePositionImplementation,
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionResult,
@@ -43,7 +43,7 @@ async def test_calibration_move_to_location_implementation_for_attach_instrument
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=mount_type, maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT
+        mount=mount_type,
     )
 
     decoy.when(
@@ -86,7 +86,7 @@ async def test_calibration_move_to_location_implementation_for_attach_plate(
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=mount_type, maintenancePosition=MaintenancePosition.ATTACH_PLATE
+        mount=mount_type, motionModifier=MotionModifier.LOWER_Z_AXES_SEQUENTIALLY
     )
 
     decoy.when(
@@ -139,7 +139,6 @@ async def test_calibration_move_to_location_implementation_for_gripper(
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
         mount=MountType.EXTENSION,
-        maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT,
     )
 
     decoy.when(

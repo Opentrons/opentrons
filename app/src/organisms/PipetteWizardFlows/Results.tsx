@@ -163,8 +163,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
             commandType: 'calibration/moveToMaintenancePosition' as const,
             params: {
               mount: nextMount === 'right' ? RIGHT : 'left',
-              maintenancePosition:
-                nextMount === 'both' ? 'attachPlate' : 'attachInstrument',
+              ...(nextMount === 'both'
+                ? { motionModifier: 'lowerZAxesSequentially' as const }
+                : {}),
             },
           },
         ],
