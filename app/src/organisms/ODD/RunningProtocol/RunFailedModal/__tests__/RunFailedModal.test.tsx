@@ -16,6 +16,9 @@ import type { NavigateFunction } from 'react-router-dom'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../ErrorContent')
+vi.mock('/app/organisms/ODD/AccessControl', () => ({
+  useGuardedAction: () => ({ accessControlEnabled: false }),
+}))
 
 const RUN_ID = 'mock_runID'
 const mockFn = vi.fn()
