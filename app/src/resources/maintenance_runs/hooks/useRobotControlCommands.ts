@@ -2,6 +2,10 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
+// TODO(jj): implement useGuardedAction on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
+
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 
@@ -46,8 +50,10 @@ export function useRobotControlCommands({
   const { mutateAsync: deleteMaintenanceRun } =
     useDeleteMaintenanceRunMutation()
 
+  const docState = useGuardedAction([])
+
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(docState, {
       onSuccess: response => {
         const runId = response.data.id as string
 

@@ -38,9 +38,12 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createMaintenanceRun).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useCreateMaintenanceRunMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
 
@@ -61,9 +64,12 @@ describe('useCreateMaintenanceRunMutation hook', () => {
       data: mockMaintenanceRunResponse,
     } as Response<MaintenanceRun>)
 
-    const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useCreateMaintenanceRunMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
     act(() => {
       result.current.createMaintenanceRun({ labwareOffsets: [mockOffset] })
     })

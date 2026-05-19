@@ -15,6 +15,9 @@ import {
   useNotifyRunQuery,
 } from '/app/resources/runs'
 
+// TODO(jj): implement useGuardedAction on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useGuardedAction } from '../../ODD/AccessControl'
 import {
   useCompatibleAnalysis,
   useHandleClientAppliedOffsets,
@@ -71,6 +74,8 @@ export function useLPCFlows({
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
+
+  const docState = useGuardedAction([])
 
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -131,7 +136,7 @@ export function useLPCFlows({
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation()
+    useCreateTargetedMaintenanceRunMutation(docState)
   const { createLabwareDefinition } =
     useCreateMaintenanceRunLabwareDefinitionMutation()
   const { deleteMaintenanceRun, isLoading: isClosing } =

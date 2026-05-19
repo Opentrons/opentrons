@@ -12,6 +12,9 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
+// TODO(jj): implement useGuardedAction on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useGuardedAction } from '../ODD/AccessControl'
 import { ACTIONS } from './constants'
 import { useSendIdentifyStacker } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
@@ -95,8 +98,10 @@ export function useModuleSetupWizard(
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands()
 
+  const docState = useGuardedAction([])
+
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(docState, {
       onSuccess: (response: {
         data: { id: SetStateAction<string | null> }
       }) => {
