@@ -651,5 +651,9 @@ async def test_pipette_proxy_dictionary(
     assert pipettes[Mount.RIGHT] is None
     left_proxy = pipettes[Mount.LEFT]
     assert left_proxy.pipette_id == hw_pipette.pipette_id
+    assert (
+        type(left_proxy.working_volume) is float
+        and left_proxy.working_volume == hw_pipette.working_volume
+    )
 
     ot3_proxy._pyroRelease()  # type: ignore
