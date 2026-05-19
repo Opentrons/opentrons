@@ -9,7 +9,6 @@ from contextlib import contextmanager
 from types import ModuleType
 from typing import Any, Callable, Iterator
 
-import serpent
 from pydantic import BaseModel
 from typing_extensions import TypedDict, is_typeddict
 
@@ -84,6 +83,8 @@ def serpent_enum_registration() -> Iterator[None]:
     Because Serpent matches by first isinstance() in registry order, we need to unregister enums first
     so that types like "Mount" don't automatically become strings/ints, then register the enums after.
     """
+    import serpent
+
     serpent.unregister_class(enum.Enum)  # type: ignore[no-untyped-call]
     try:
         yield
