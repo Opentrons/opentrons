@@ -61,8 +61,8 @@ dev = [
     "sqlalchemy2-stubs==0.0.2a38",
     "mypy==1.19.1",
     "decoy<3,>=2.2.0",
-    "types-requests==2.27.1",
-    "requests==2.27.1",
+    "types-requests==2.33.*",
+    "requests==2.33.*",
     "build~=1.2.0",
     "pytest-lazy-fixtures<2,>=1.1.4",
 ]

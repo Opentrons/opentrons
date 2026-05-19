@@ -7,7 +7,7 @@ description: "Home screen, status, and quick access to protocols and settings."
 ![The robot dashboard, showing main navigation and recently run protocols.  ](../images/touchscreen_dashboard.png "Robot dashboard")
 </figure>
 
-The dashboard is the main screen for the robot, accessible by tapping the robot's name in the top left corner of the touchscreen.
+The *dashboard* is the main screen for the robot, accessible by tapping the robot's name in the top left corner of the touchscreen.
 
 The dashboard provides quick access to recently run protocols. It displays protocols as large cards in a horizontal carousel. Green cards show protocols that are ready to run. Orange cards show protocols that require hardware setup or have a deck configuration conflict. The dashboard can display up to eight previously run protocols.
 
