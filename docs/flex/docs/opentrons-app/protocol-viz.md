@@ -2,7 +2,7 @@
 title: "Opentrons Flex: Protocol Visualization"
 ---
 
-Test new protocols in the Opentrons App before running them on your Flex. Use protocol visualization to: 
+Test new protocols in the Opentrons App before running them on your Flex. Use *protocol visualization* to: 
 
 - See protocol steps, including labware and liquid changes, even while offline and disconnected from your Flex.
 - Detect and fix protocol errors before the first run.
