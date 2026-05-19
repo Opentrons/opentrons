@@ -73,8 +73,8 @@ describe('vacuumSetPumpPower', () => {
         },
       ],
       python: `
-mock_vacuum_module.set_power(
-    power_percent=75
+mock_vacuum_module.start_set_vacuum_power(
+    percent_power=75
 )`.trim(),
     })
   })
@@ -106,8 +106,8 @@ mock_vacuum_module.set_power(
         },
       ],
       python: `
-mock_vacuum_module_task_1 = mock_vacuum_module.set_power(
-    power_percent=40,
+mock_vacuum_module_task_1 = mock_vacuum_module.start_set_vacuum_power(
+    percent_power=40,
     duration=120,
     vent_after=False
 )`.trim(),
