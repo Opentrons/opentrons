@@ -33,6 +33,7 @@ import {
 import {
   DECK_SETUP_TOOLS_WIDTH_REM,
   HOPPER_ZOOM_OFFSET_POSTITION,
+  VACUUM_DOCK_ZOOM_OFFSET_POSITION,
 } from '../../../constants'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import {
@@ -154,9 +155,30 @@ export function DeckSetupContainer(
     return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
   }, '')
 
-  const addEquipment = (location: string): void => {
+  const _getSlotFromRawLocation = (location: string): string => {
     const isOnHopper = location.includes('hopper')
-    const slot = isOnHopper ? location.split('hopper')[1] : location
+    const isOnVacuumDock = location.includes('vacuumDock')
+    return isOnHopper
+      ? location.split('hopper')[1]
+      : isOnVacuumDock
+        ? location.split('vacuumDock')[1]
+        : location
+  }
+
+  const _getZoomInOffsetFromRawLocation = (location: string): number => {
+    const isOnHopper = location.includes('hopper')
+    const isOnVacuumDock = location.includes('vacuumDock')
+    if (isOnHopper) {
+      return HOPPER_ZOOM_OFFSET_POSTITION
+    }
+    if (isOnVacuumDock) {
+      return VACUUM_DOCK_ZOOM_OFFSET_POSITION
+    }
+    return 0
+  }
+
+  const addEquipment = (location: string): void => {
+    const slot = _getSlotFromRawLocation(location)
     const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
       deckSetup: activeDeckSetup,
       slot: location,
@@ -176,7 +198,7 @@ export function DeckSetupContainer(
     const zoomInSlotPosition = getPositionFromSlotId(
       slot ?? '',
       deckDef,
-      ...(isOnHopper ? [HOPPER_ZOOM_OFFSET_POSTITION] : [])
+      _getZoomInOffsetFromRawLocation(location)
     )
     if (zoomInSlotPosition != null) {
       const zoomedInViewBox = zoomInOnCoordinate({
