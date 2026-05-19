@@ -553,12 +553,50 @@ async def _read_pressure_and_check_results(
                 ]
             )
             raise StopTestError(printsig)
-        channel_samples.sort()
-        _c_min = min(channel_samples[1:])
-        _c_max = max(channel_samples[1:])
+        sorted_samples = sorted(channel_samples)
+        # Use symmetric trimming when possible to reduce spike sensitivity.
+        # For very small sample counts, fall back to untrimmed data.
+        if len(sorted_samples) >= 3:
+            calc_samples = sorted_samples[1:-1]
+            trim_mode = "symmetric-trim-1"
+        else:
+            calc_samples = sorted_samples
+            trim_mode = "no-trim-small-sample"
+            warnsig = (
+                f"warning: pressure-{tag.value}-channel-{channel_number} "
+                f"sample-count={len(sorted_samples)} too small for symmetric trim, "
+                "fallback to untrimmed leak-rate calculation."
+            )
+            print(warnsig)
+            LOG_GING.warning(warnsig)
+            write_cb(
+                [
+                    f"pressure-{tag.value}-channel-{channel_number}",
+                    "trim-warning",
+                    warnsig,
+                ]
+            )
+        if not calc_samples:
+            calc_samples = sorted_samples
+        _c_min = min(calc_samples)
+        _c_max = max(calc_samples)
         leak_rate = (_c_max - _c_min) / LEAK_RATE_WINDOW_SECONDS
         leak_rate += leak_rate_offsets.get(channel_number, 0.0)
         leak_rates_per_channel.append(leak_rate)
+        write_cb(
+            [
+                f"pressure-{tag.value}-channel-{channel_number}",
+                "trim-mode",
+                trim_mode,
+            ]
+        )
+        write_cb(
+            [
+                f"pressure-{tag.value}-channel-{channel_number}",
+                "samples-used-for-leak-rate",
+                len(calc_samples),
+            ]
+        )
         csv_data_min = [f"pressure-{tag.value}-channel-{channel_number}", "min", _c_min]
         print(csv_data_min)
         write_cb(csv_data_min)
@@ -796,6 +834,17 @@ def _phase_volume_key(phase_name: str) -> str:
     return "default"
 
 
+def _phase_sort_order(phase_name: str) -> Tuple[int, str]:
+    phase_key = _phase_volume_key(phase_name)
+    order_map = {
+        "1ul": 0,
+        "50ul": 1,
+        "200ul": 2,
+        "default": 3,
+    }
+    return (order_map.get(phase_key, 99), phase_name)
+
+
 def _thresholds_for_phase(
     phase_name: str,
     leak_thresholds: Dict[str, float],
@@ -824,7 +873,10 @@ def _summarize_channel_leak_history(
     write_cb(["-------------"])
     write_cb(["CHANNEL-LEAK-STATS"])
     compact_summary_rows: List[List[Any]] = []
-    for phase_name, channel_histories in sorted(CHANNEL_LEAK_HISTORY.items()):
+    for phase_name, channel_histories in sorted(
+        CHANNEL_LEAK_HISTORY.items(),
+        key=lambda item: _phase_sort_order(item[0]),
+    ):
         leak_threshold, cv_threshold = _thresholds_for_phase(
             phase_name, leak_thresholds, cv_thresholds
         )
