@@ -29,7 +29,8 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import {
   AlphanumericKeyboard,
-  useExternalKeyboardGuard,
+  getInvalidCharForKeyboard,
+  shouldAcceptKeyboardInput,
 } from '/app/atoms/SoftwareKeyboard'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
@@ -66,9 +67,6 @@ export function RobotNameEditor(): JSX.Element {
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const { invalidChar, validateInput } =
-    useExternalKeyboardGuard('alphanumeric')
-
   const connectableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
   )
@@ -133,6 +131,7 @@ export function RobotNameEditor(): JSX.Element {
   })
 
   const newRobotName = watch('newRobotName')
+  const invalidChar = getInvalidCharForKeyboard(newRobotName, 'alphanumeric')
 
   const onSubmit = (data: FormValues): void => {
     const newName = data.newRobotName
@@ -285,7 +284,13 @@ export function RobotNameEditor(): JSX.Element {
                     }}
                     onChange={e => {
                       const newVal = e.target.value
-                      if (!validateInput(newVal, newRobotName)) {
+                      if (
+                        !shouldAcceptKeyboardInput(
+                          newVal,
+                          newRobotName,
+                          'alphanumeric'
+                        )
+                      ) {
                         field.onChange(newRobotName)
                         return
                       }
@@ -330,7 +335,13 @@ export function RobotNameEditor(): JSX.Element {
               render={({ field }) => (
                 <AlphanumericKeyboard
                   onChange={(input: string) => {
-                    if (!validateInput(input, newRobotName)) {
+                    if (
+                      !shouldAcceptKeyboardInput(
+                        input,
+                        newRobotName,
+                        'alphanumeric'
+                      )
+                    ) {
                       keyboardRef.current?.setInput(newRobotName)
                       return
                     }

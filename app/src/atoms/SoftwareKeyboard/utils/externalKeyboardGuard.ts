@@ -1,20 +1,13 @@
-import { useState } from 'react'
-
 import {
   alphanumericKeyboardLayout,
   numericalKeyboardLayout,
 } from '../constants'
 
-type KeyboardType = 'alphanumeric' | 'numerical'
+export type KeyboardType = 'alphanumeric' | 'numerical'
 
-interface NumericalOptions {
+export interface NumericalOptions {
   isDecimal?: boolean
   hasHyphen?: boolean
-}
-
-interface UseExternalKeyboardGuardResult {
-  invalidChar: string | null
-  validateInput: (newValue: string, prevValue: string) => boolean
 }
 
 const extractAllowedChars = (rows: string[]): Set<string> => {
@@ -41,9 +34,13 @@ const buildAllowedSet = (
     ])
   }
   const { isDecimal = false, hasHyphen = false } = options ?? {}
-  const layoutName = `${isDecimal ? 'float' : 'int'}${
-    hasHyphen ? 'NegKeyboard' : 'Keyboard'
-  }` as keyof typeof numericalKeyboardLayout
+  const layoutName: keyof typeof numericalKeyboardLayout = (() => {
+    if (isDecimal) {
+      return hasHyphen ? 'floatNegKeyboard' : 'floatKeyboard'
+    } else {
+      return hasHyphen ? 'intNegKeyboard' : 'intKeyboard'
+    }
+  })()
   return extractAllowedChars(numericalKeyboardLayout[layoutName])
 }
 
@@ -57,25 +54,23 @@ const findFirstInvalidChar = (
   return null
 }
 
-/**
- * detect the invalid char input from an external keyboard
- * invalid char: char isn't in software keyboard
- */
-export const useExternalKeyboardGuard = (
+export const getInvalidCharForKeyboard = (
+  value: string,
   type: KeyboardType,
   options?: NumericalOptions
-): UseExternalKeyboardGuardResult => {
-  const [invalidChar, setInvalidChar] = useState<string | null>(null)
+): string | null => {
+  return findFirstInvalidChar(value, buildAllowedSet(type, options))
+}
 
-  const allowedChars = buildAllowedSet(type, options)
-
-  const validateInput = (newValue: string, prevValue: string): boolean => {
-    if (invalidChar !== null && newValue.length > prevValue.length) {
-      return false
-    }
-    setInvalidChar(findFirstInvalidChar(newValue, allowedChars))
-    return true
+export const shouldAcceptKeyboardInput = (
+  newValue: string,
+  prevValue: string,
+  type: KeyboardType,
+  options?: NumericalOptions
+): boolean => {
+  if (newValue.length > prevValue.length) {
+    const prevInvalid = getInvalidCharForKeyboard(prevValue, type, options)
+    if (prevInvalid !== null) return false
   }
-
-  return { invalidChar, validateInput }
+  return true
 }
