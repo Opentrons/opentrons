@@ -39,8 +39,12 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getIsSlotAHopper } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getIsSlotAVacuumDock,
+} from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -59,6 +63,7 @@ import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
 import { getHas96Channel } from '/protocol-designer/utils'
 import {
   ADAPTER_96_CHANNEL,
+  COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
   getLabwareCompatibleWithModule,
 } from '/protocol-designer/utils/labwareModuleCompatibility'
 
@@ -153,11 +158,27 @@ export function SelectLabwareModal(
   const moduleType =
     selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
   const isOnHopper = getIsSlotAHopper(slot)
+  const isOnVacuumDock = getIsSlotAVacuumDock(slot)
+
+  // Check if dock itself has a collar (not the main vacuum area)
+  const vacuumModuleInA3 = Object.values(modulesById).find(
+    module => module.type === VACUUM_MODULE_TYPE && module.slot === 'A3'
+  )
+  const dockHasCollar = vacuumModuleInA3 && isOnVacuumDock
+    ? Object.values(deckSetup.labware).some(labware => {
+        const isOnDock = labware.stack.includes('vacuumDock')
+        const isCollar =
+          labware.def.parameters.loadName === 'opentrons_vacuum_module_gen1_collar_tall' ||
+          labware.def.parameters.loadName === 'opentrons_vacuum_module_gen1_collar_short'
+        return isOnDock && isCollar
+      })
+    : false
+
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
   const [filterRecommended, setFilterRecommended] = useState<boolean>(
-    moduleType != null
+    moduleType != null || isOnVacuumDock
   )
   //    for OT-2 usage only due to H-S collisions
   const isNextToHeaterShaker = initialModules.some(
@@ -175,9 +196,18 @@ export function SelectLabwareModal(
       if (moduleType == null || !getLabwareDefIsStandard(def)) {
         return true
       }
+      // For vacuum dock, use dock-specific compatibility
+      if (isOnVacuumDock && moduleType === VACUUM_MODULE_TYPE) {
+        return (
+          COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE['VACUUM_MODULE_DOCK']?.includes(
+            def.parameters.loadName
+          ) ||
+          def.metadata.displayCategory === 'wellPlate'
+        )
+      }
       return getLabwareCompatibleWithModule(def, moduleType)
     },
-    [moduleType]
+    [moduleType, isOnVacuumDock]
   )
 
   const getIsLabwareFiltered = useCallback(
@@ -191,9 +221,24 @@ export function SelectLabwareModal(
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
       const isLid = labwareDef.allowedRoles?.includes('lid')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
+      const isWellPlate = labwareDef.metadata.displayCategory === 'wellPlate'
+      const isVacuumCollar =
+        parameters.loadName === 'opentrons_vacuum_module_gen1_collar_tall' ||
+        parameters.loadName === 'opentrons_vacuum_module_gen1_collar_short'
+
+      // For vacuum dock: show collars when empty, wellplates when collar present
+      if (isOnVacuumDock) {
+        if (!dockHasCollar) {
+          // No collar on dock yet: show only collars
+          return !isVacuumCollar
+        }
+        // Collar present on dock: show only wellplates and lids
+        return !isWellPlate && !isLid
+      }
+
       return (
         (filterRecommended &&
-          !getLabwareIsRecommended(labwareDef, selectedModuleModel)) ||
+          !getLabwareIsRecommended(labwareDef, selectedModuleModel, isOnVacuumDock, dockHasCollar)) ||
         (filterHeight &&
           getIsLabwareAboveHeight(
             labwareDef,
@@ -202,7 +247,8 @@ export function SelectLabwareModal(
         !getIsLabwareCompatible(labwareDef) ||
         (isAdapter &&
           isIrregularSize &&
-          moduleType !== HEATERSHAKER_MODULE_TYPE) ||
+          moduleType !== HEATERSHAKER_MODULE_TYPE &&
+          moduleType !== VACUUM_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
         // NOTE (2026-03-30, RC): this is a temporary filter to prevent loading lids off deck until this is allowed in PAPI
         (slot === 'offDeck' && (isAdapter || isLid)) ||
@@ -213,7 +259,7 @@ export function SelectLabwareModal(
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
+    [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot, isOnVacuumDock, dockHasCollar]
   )
 
   const labwareByCategory = useMemo(
