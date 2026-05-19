@@ -16,11 +16,26 @@ Tap any row with a right arrow to show more information for that category. (The 
 
 | Category   | Description |
 |------------|------------|
-| Instruments    | See if all instruments are attached to the correct mounts and calibrated.<br />Tap <b>Attach</b> or <b>Calibrate</b> to set up any that aren't. |
 | Parameters     | See the names, descriptions, and default values of runtime parameters for the protocol.<br />Tap a parameter to edit its value. See the Runtime Parameters section below for more details. |
-| Hardware       | See the locations and connection statuses of hardware on the deck.<br><ul><li>Tap :fontawesome-solid-circle-info: <b>Setup Instructions</b> to get detailed instructions.</li><li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li></ul> |
-| Labware        | See the locations of labware. Each labware lists its initial deck location, and icons indicate labware that are on top of modules.<br />Tap <b>Map View</b> to switch to a visual layout of labware positions. |
-| Liquids        | See the types and total volumes of liquids.<br />Tap any liquid name to expand a list of well-by-well volumes. In turn, tap an individual volume row to show a visual layout of its location within labware. |
+| Instruments    | See if all instruments are attached to the correct mounts and calibrated.<br />Tap <b>Attach</b> or <b>Calibrate</b> to set up any that aren't. |
+| Deck hardware       | See the locations and connection statuses of hardware on the deck.<br><ul><li>Tap :fontawesome-solid-circle-info: <b>Setup Instructions</b> to get detailed instructions.</li><li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li></ul> |
+| Labware Offsets | |
+| Labware & Liquids       | See the locations of labware.  <ul><li>Each labware lists its initial deck location, and icons indicate labware that are on top of modules.</li><li>Tap <b>Map View</b> to switch to a visual layout of labware positions.</li></ul>See the types and total volumes of liquids. <ul><li>Tap any liquid name to expand a list of well-by-well volumes.</li><li>Tap an individual volume row to show a visual layout of its location within labware.</li></ul> |
+| Camera | |
+
+<table>
+<tr>
+      <td><b>Hardware</b></td>
+      <td>
+        See the locations and connection statuses of hardware on the deck.
+        <ul>
+          <li>Tap <span class="icon-info"></span> <b>Setup Instructions</b> to get detailed instructions.</li>
+          <li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li>
+        </ul>
+      </td>
+    </tr>
+</table>
+
 
 On any category screen, return to the "Prepare to run" screen by tapping the back arrow in the top left.
 
