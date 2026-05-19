@@ -53,19 +53,19 @@ def ot2_server_base_url(_ot2_session_server: str) -> Generator[str, None, None]:
 
 
 @pytest.fixture
-def ot2_server_base_url_require_user_notes_true(
-    _ot2_session_server_require_user_notes_true: str,
-) -> Generator[str, None, None]:
-    """URL for a dev server with ``integration_require_reason_for_interaction_override=true``."""
-    yield _ot2_session_server_require_user_notes_true
-    _clean_server_state(_ot2_session_server_require_user_notes_true)
-
-
-@pytest.fixture
 def ot3_server_base_url(_ot3_session_server: str) -> Generator[str, None, None]:
     """Like `ot2_server_base_url()`, but the server is configured as an OT-3 instead of an OT-2."""
     yield _ot3_session_server
     _clean_server_state(_ot3_session_server)
+
+
+@pytest.fixture
+def ot3_server_base_url_require_user_notes_true(
+    _ot3_session_server_require_user_notes_true: str,
+) -> Generator[str, None, None]:
+    """URL for an OT-3 dev server with ``integration_require_reason_for_interaction_override=true``."""
+    yield _ot3_session_server_require_user_notes_true
+    _clean_server_state(_ot3_session_server_require_user_notes_true)
 
 
 @pytest.fixture(scope="session")
@@ -106,15 +106,16 @@ def _ot3_session_server(
 
 
 @pytest.fixture(scope="session")
-def _ot2_session_server_require_user_notes_true(
+def _ot3_session_server_require_user_notes_true(
     server_temp_directory: str,
     unused_tcp_port_factory: Callable[[], int],
 ) -> Generator[str, None, None]:
-    """Session-scoped OT-2 dev server with require-reason-for-interaction forced on."""
+    """Session-scoped OT-3 dev server with require-reason-for-interaction forced on."""
     port = unused_tcp_port_factory()
     base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
     with DevServer(
         port=str(port),
+        is_ot3=True,
         ot_api_config_dir=Path(server_temp_directory),
         integration_require_reason_for_interaction_override=True,
     ) as dev_server:
