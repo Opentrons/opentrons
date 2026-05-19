@@ -4,20 +4,13 @@ title: "Vacuum Module: Safety and Compliance"
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
 
-!!! warning "Writer's note"
-    <p style="color: red"><strong>ALL CONTENT AND COMPLIANCE RULES ARE EXAMPLE/SAMPLE PLACEHOLDERS PENDING VERIFICATION AND CERTIFICATION</strong></p>
-
-
 ## General safety guidelines
 
-Use this product only as specified. Review the safety information before installing or operating this module. This information can help you operate the vacuum module safely and avoid damage to it or any other attached equipment. If the vacuum module is used in a manner not specified by Opentrons, the protection provided by the equipment may be impaired.
-
-!!! note
-    The Opentrons Vacuum Module should be used by trained personnel only. It is designed for laboratory research and other non-in-vitro diagnostic analyses.
+The Vacuum Module is designed for use only as specified. Review all safety information before installing or operating this module. If the equipment is used in a manner not specified by Opentrons, the protection provided by the module may be impaired. The Vacuum Module must be operated by trained personnel and is designed strictly for laboratory research and non-in-vitro diagnostic analyses.
 
 ## Instrument safety warnings
 
-<font color="red">SAMPLE PLACEHOLDERS</font>
+<font color="red">SAMPLE PLACEHOLDERS ONLY</font>
 
 Various labels on the vacuum module or in this manual warn you about sources of potential injury or harm.
 
@@ -49,32 +42,24 @@ The vacuum module has been tested and found to be in compliance with all applica
 
 ### Safety
 
-<font color="red">SAMPLE PLACEHOLDERS</font>
-
 | Rule ID | Title |
 |----|----|
-| EN/BSI 61326-1 | Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use–Part 1: General Requirements |
-| IEC/UL/CSA 61010-2-051 | Safety Requirements for Electrical Equipment for Measurement, Control and Laboratory Use - Part 2-051: Particular Requirements for Laboratory Equipment for Mixing and Stirring |
+| | |
+| | |
 
 ### Electromagnetic compatibility
 
-<font color="red">SAMPLE PLACEHOLDERS</font>
 
 | Rule ID | Title |
 |----|----|
-| EN/BSI 61326-1 | Electrical Equipment for Measurement, Control, and Laboratory Use–EMC Requirements–Part 1: General Requirements |
-| FCC 47 CFR Part 15 Subpart B Class A | Equipment Authorization of Unintentional Radiators |
-| IC ICES-003 | Spectrum Management and Telecommunications–Interference-Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus) |
+| | |
+| | |
 
 ### Hazardous substances
-
-<font color="red">SAMPLE PLACEHOLDERS</font>
 
 RoHS3 compliant.
 
 ### FCC warnings and notes
-
-<font color="red">SAMPLE PLACEHOLDERS</font>
 
 Warning: Changes or modifications to this module not expressly approved by Opentrons could void the user’s authority to operate the equipment. This device complies with part 15 of the FCC Rules.
 
@@ -82,15 +67,11 @@ Note: This equipment has been tested and found to comply with the limits for a C
 
 ### Canada ISED ICES-003(A)/NMB-003(A)
 
-<font color="red">SAMPLE PLACEHOLDERS</font>
-
 This product meets the applicable Innovation, Science and Economic Development Canada technical specifications.
 
 Le présent produit est conforme aux spécifications techniques applicables d’Innovation, Sciences et Développement économique Canada.
 
 ### CISPR 11 Class A
-
-<font color="red">SAMPLE PLACEHOLDERS</font>
 
 Caution: This equipment is not intended for use in residential environments and may not provide adequate protection to radio reception in such environments.
 

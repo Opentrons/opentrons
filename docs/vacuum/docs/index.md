@@ -16,6 +16,6 @@ Month Year
 
 ## Product Description
 
-The Opentrons Vacuum Module is an automated filtration system designed for Opentrons Flex. It supports protocols that use solid-phase extraction (SPE) to filter, concentrate, or purify samples.
+The Opentrons Vacuum Module is an automated filtration system designed for the Opentrons Flex. The module ships with all components required to run protocols that use vacuum-based, solid-phase extraction (SPE) to filter, concentrate, or purify samples.
 
-The module consists of a single-slot manifold stack, a module caddy, a 5-liter waste jar, and a vacuum pump (flexible tubing included). The on-deck components accept ANSI/SLAS compliant vacuum filtration labware and are compatible with the Flex Gripper. You can control the Vacuum Module via the Opentrons App, the Flex touchscreen, or the Opentrons Python API.
+The system consists of an on-deck manifold stack, an off-deck Control Box housing the vacuum pump and electronics, and a 2-liter glass carboy with a protective stabilization cradle. The on-deck components accept ANSI/SLAS compliant vacuum filtration labware and are fully compatible with the Flex Gripper. You can control the Vacuum Module via the Opentrons App, the Flex touchscreen, or the Opentrons Python API.
