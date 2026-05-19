@@ -324,7 +324,6 @@ Each package has a `Makefile` with some or all of:
 | `make format-css`                 | Auto-fix CSS with Stylelint                                        |
 | `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`)                              |
 | `make clean-ts`                   | Clean TS build output                                              |
-| `make circular-dependencies-js`   | Check circular imports (madge)                                     |
 
 ### Running Tests Directly
 

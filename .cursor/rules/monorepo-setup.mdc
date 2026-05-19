@@ -108,7 +108,6 @@ Run `format-js` first to auto-fix, then `lint-js` and `lint-css` to verify nothi
 | `make lint-json` | ESLint for JSON files |
 | `make lint-py` | Lint all robot Python projects (ruff + mypy) |
 | `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`) |
-| `make circular-dependencies-js` | Check for circular imports (madge) |
 
 ### Format (auto-fix, full reference)
 
