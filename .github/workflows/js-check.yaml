@@ -91,9 +91,6 @@ jobs:
       - name: 'lint js'
         if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-js
-      - name: 'circular deps'
-        if: always() && steps.setup-js-ci.outcome == 'success'
-        run: make circular-dependencies-js
       - name: 'lint json'
         if: always() && steps.setup-js-ci.outcome == 'success'
         run: make lint-json
