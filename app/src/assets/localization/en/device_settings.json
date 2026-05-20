@@ -305,6 +305,8 @@
   "resets_cannot_be_undone": "Resets cannot be undone",
   "restart_now": "Restart now?",
   "restart_robot_confirmation_description": "<span>It will take a few minutes for <bold>{{robotName}}</bold> to restart.</span>",
+  "shutdown_now": "Shutdown now?",
+  "shutdown_robot_confirmation_description": "<span><bold>{{robotName}}</bold> will shut down.</span>",
   "restart_taking_too_long": "{{robotName}} is taking longer than expected to restart. Check the Advanced tab of its settings page to see whether it updated successfully. If the robot is unresponsive, restart it manually.",
   "restarting_robot": "Install complete, robot restarting...",
   "restore_to_default": "Restore to default",

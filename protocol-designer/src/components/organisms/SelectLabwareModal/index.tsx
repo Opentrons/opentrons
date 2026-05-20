@@ -39,6 +39,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getIsSlotAHopper } from '@opentrons/step-generation'
 
@@ -47,6 +48,11 @@ import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
 import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
 import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import {
+  selectAdapter,
+  selectLid,
+  selectTopLabware,
+} from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   ALL_ORDERED_CATEGORIES,
@@ -85,6 +91,7 @@ interface SelectLabwareModalProps {
   onClose: () => void
   onConfirm: () => void
   slotFull: boolean
+  moduleHasLabware?: boolean
 }
 
 export interface LabwareInfo {
@@ -95,7 +102,7 @@ export interface LabwareInfo {
 export function SelectLabwareModal(
   props: SelectLabwareModalProps
 ): JSX.Element {
-  const { slot, onClose, onConfirm, slotFull } = props
+  const { slot, onClose, onConfirm, slotFull, moduleHasLabware = false } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)
   const [error, setError] = useState<string | null>(null)
@@ -144,6 +151,10 @@ export function SelectLabwareModal(
   const handleResetLabwareTools = (): void => {
     setUserCategoryExpandState(allCategoriesCollapsed)
     setSearchTerm('')
+    // Clear all selections when closing modal without saving
+    dispatch(selectAdapter({ adapterDefURI: null }))
+    dispatch(selectTopLabware({ labwareDefURI: null }))
+    dispatch(selectLid({ labwareDefURI: null }))
   }
 
   const searchFilter = (termToCheck: string): boolean =>
@@ -175,9 +186,9 @@ export function SelectLabwareModal(
       if (moduleType == null || !getLabwareDefIsStandard(def)) {
         return true
       }
-      return getLabwareCompatibleWithModule(def, moduleType)
+      return getLabwareCompatibleWithModule(def, moduleType, moduleHasLabware)
     },
-    [moduleType]
+    [moduleType, moduleHasLabware]
   )
 
   const getIsLabwareFiltered = useCallback(
@@ -191,29 +202,50 @@ export function SelectLabwareModal(
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
       const isLid = labwareDef.allowedRoles?.includes('lid')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
-      return (
-        (filterRecommended &&
-          !getLabwareIsRecommended(labwareDef, selectedModuleModel)) ||
-        (filterHeight &&
-          getIsLabwareAboveHeight(
-            labwareDef,
-            MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
-          )) ||
-        !getIsLabwareCompatible(labwareDef) ||
-        (isAdapter &&
-          isIrregularSize &&
-          moduleType !== HEATERSHAKER_MODULE_TYPE) ||
+
+      const isRecommendedFilter =
+        filterRecommended &&
+        !getLabwareIsRecommended(
+          labwareDef,
+          selectedModuleModel,
+          moduleHasLabware
+        )
+      const isHeightFilter =
+        filterHeight &&
+        getIsLabwareAboveHeight(
+          labwareDef,
+          MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
+        )
+      const isNotCompatible = !getIsLabwareCompatible(labwareDef)
+      const isIrregularAdapter =
+        isAdapter &&
+        isIrregularSize &&
+        moduleType !== HEATERSHAKER_MODULE_TYPE &&
+        moduleType !== VACUUM_MODULE_TYPE
+
+      const isFiltered =
+        isRecommendedFilter ||
+        isHeightFilter ||
+        isNotCompatible ||
+        isIrregularAdapter ||
         (isAdapter96Channel && !has96Channel) ||
-        // NOTE (2026-03-30, RC): this is a temporary filter to prevent loading lids off deck until this is allowed in PAPI
         (slot === 'offDeck' && (isAdapter || isLid)) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
         parameters.loadName === TIPRACK_LID_LOADNAME
-      )
+
+      return isFiltered
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
+    [
+      filterRecommended,
+      filterHeight,
+      getIsLabwareCompatible,
+      moduleType,
+      slot,
+      moduleHasLabware,
+    ]
   )
 
   const labwareByCategory = useMemo(
@@ -478,6 +510,7 @@ export function SelectLabwareModal(
               searchFilter={searchFilter}
               getIsLabwareFiltered={getIsLabwareFiltered}
               universalLid={universalLid}
+              moduleType={moduleType}
             />
           )}
         </Flex>

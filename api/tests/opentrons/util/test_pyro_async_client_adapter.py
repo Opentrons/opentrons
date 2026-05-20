@@ -150,18 +150,16 @@ async def test_thread_local_proxy_reuses_connections(
     casted_ot3api = cast(HardwareControlAPI, AsyncClientPyroObject(ot3_proxy))
 
     original_get_thread_proxy = _get_thread_proxy_module._get_thread_proxy
-    seen_proxy_ids: set[int] = set()
     new_proxy_count = 0
+    previous_proxy_count = 0
 
     def counting_get_thread_proxy(
         proxy: pyro.Proxy,
     ) -> pyro.Proxy:
         nonlocal new_proxy_count
         result = original_get_thread_proxy(proxy)
-        proxy_id = id(result)
-        if proxy_id not in seen_proxy_ids:
-            seen_proxy_ids.add(proxy_id)
-            new_proxy_count += 1
+
+        new_proxy_count += 1
         return result
 
     call_count = 20
@@ -170,14 +168,16 @@ async def test_thread_local_proxy_reuses_connections(
     ):
         for _ in range(call_count):
             await casted_ot3api.home()
+            assert new_proxy_count == previous_proxy_count + 2
+            previous_proxy_count = new_proxy_count
 
-    # With thread-local proxy reuse, new_proxy_count should be much less
-    # than call_count. Each worker thread creates one proxy and reuses it.
-    # Without reuse (the old behavior), every call would create a new proxy.
-    assert new_proxy_count < call_count, (
-        f"Expected proxy reuse but got {new_proxy_count} new proxies for "
-        f"{call_count} calls. Each call should reuse a thread-local proxy "
-        f"rather than creating a new one."
+    # With thread-local proxy reuse, new_proxy_count should be double
+    # the call_count as of 5/4/26. Each client request creates one proxy and reuses it.
+    # Every call creates a proxy then releases it, and result validators create a proxy and release it.
+    assert new_proxy_count == call_count * 2, (
+        f"Expected two proxies per query but got {new_proxy_count} new proxies for "
+        f"{call_count} calls. Each call create a thread local proxy and a "
+        f"result validator proxy."
     )
 
     ot3_proxy._pyroRelease()  # type: ignore

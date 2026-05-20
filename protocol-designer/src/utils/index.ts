@@ -17,6 +17,8 @@ import {
   getSlotInLocationStack,
   HOPPER_STACKER_LOCATION,
   PROTOCOL_CONTEXT_NAME,
+  VACUUM_DOCK_FAKE_LOCATION,
+  VACUUM_DOCK_LOCATION,
 } from '@opentrons/step-generation'
 
 import type { WellGroup } from '@opentrons/components'
@@ -388,6 +390,10 @@ export function getLocationStackTopToBottom(
       // So when the node is on the hopper, insert the hopper marker once
       stack.push(HOPPER_STACKER_LOCATION)
     }
+    const isOnVacuumDock = slot === VACUUM_DOCK_FAKE_LOCATION
+    if (isOnVacuumDock) {
+      stack.push(VACUUM_DOCK_LOCATION)
+    }
     current = parent
   }
   return stack
@@ -400,11 +406,14 @@ export const getLabwaresOnModuleFromStack = (
   topMostId: string | null
   rightBelowTopId: string | null
   hopperTopMostId: string | null
+  vacuumDockTopMostId: string | null
 } => {
-  // all stacks involving this module and not on the hopper if its a flex stacker
+  // all stacks involving this module and not on the hopper if its a flex stacker and not on the vacuum dock
   const allStacks = labware.filter(
     ({ stack }) =>
-      stack.includes(moduleId) && !stack.includes(HOPPER_STACKER_LOCATION)
+      stack.includes(moduleId) &&
+      !stack.includes(HOPPER_STACKER_LOCATION) &&
+      !stack.includes(VACUUM_DOCK_LOCATION)
   )
   const largestStack = allStacks.sort(
     (a, b) => b.stack.length - a.stack.length
@@ -421,10 +430,19 @@ export const getLabwaresOnModuleFromStack = (
   const largestStackOnHopper = allStacksOnHopper.sort(
     (a, b) => b.stack.length - a.stack.length
   )[0]
+  // all stacks involving the vacuum dock if there is one
+  const allStacksOnVacuumDock = labware.filter(
+    ({ stack }) =>
+      stack.includes(moduleId) && stack.includes(VACUUM_DOCK_LOCATION)
+  )
+  const largestStackOnVacuumDock = allStacksOnVacuumDock.sort(
+    (a, b) => b.stack.length - a.stack.length
+  )[0]
   return {
     topMostId: largestStack?.stack[0],
     rightBelowTopId: isTopMostIdALid ? largestStack?.stack[1] : null,
     hopperTopMostId: largestStackOnHopper?.stack[0],
+    vacuumDockTopMostId: largestStackOnVacuumDock?.stack[0],
   }
 }
 

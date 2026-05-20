@@ -12,16 +12,17 @@ import {
 
 import { RECOMMENDED_LABWARE_BY_MODULE } from '../pages/Designer/DeckSetup/constants'
 
-import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
+import type { ModuleLabwareCompatibilityKey } from '../types'
 
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 
 const PLATE_READER_MAX_LABWARE_Z_MM = 16
 
 export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
-  ModuleType,
+  ModuleLabwareCompatibilityKey,
   Readonly<string[]>
 > = {
   [TEMPERATURE_MODULE_TYPE]: [
@@ -83,12 +84,23 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   [FLEX_STACKER_MODULE_TYPE]: [
     ...RECOMMENDED_LABWARE_BY_MODULE[FLEX_STACKER_MODULE_TYPE],
   ],
-  // TODO (nd: 02/04/2026): configure this for vacuum module
-  [VACUUM_MODULE_TYPE]: [],
+
+  // TODO (nd: 2026-05-14): correctly reflect vacuum module compatible labware once they are added to shared-data
+  [VACUUM_MODULE_TYPE]: [
+    'opentrons_vacuum_module_spacer_thingamajig',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'opentrons_vacuum_module_gen1_collar_tall',
+    'opentrons_vacuum_module_gen1_collar_short',
+  ],
+  VACUUM_MODULE_TYPE_WITH_LABWARE: [
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'opentrons_vacuum_module_gen1_collar_tall',
+    'opentrons_vacuum_module_gen1_collar_short',
+  ],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,
-  moduleType: ModuleType
+  moduleType: ModuleLabwareCompatibilityKey
 ): boolean => {
   console.assert(
     moduleType in COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
@@ -129,15 +141,34 @@ const _getLabwareCompatibleWithFlexStacker = (
   def.metadata.displayCategory === 'wellPlate' ||
   def.metadata.displayCategory === 'reservoir'
 
+const _getLabwareCompatibleWithVacuumModule = (
+  def: LabwareDefinition2,
+  isOccupied: boolean = false
+): boolean => {
+  const key = isOccupied
+    ? 'VACUUM_MODULE_TYPE_WITH_LABWARE'
+    : VACUUM_MODULE_TYPE
+  return (
+    COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[key].includes(
+      def.parameters.loadName
+    ) ||
+    def.metadata.displayCategory === 'wellPlate' ||
+    def.metadata.displayCategory === 'reservoir'
+  )
+}
+
 export const getLabwareCompatibleWithModule = (
   def: LabwareDefinition2,
-  moduleType: ModuleType
+  moduleType: ModuleLabwareCompatibilityKey,
+  isOccupied: boolean = false
 ): boolean => {
   switch (moduleType) {
     case FLEX_STACKER_MODULE_TYPE:
       return _getLabwareCompatibleWithFlexStacker(def)
     case ABSORBANCE_READER_TYPE:
       return _getLabwareCompatibleWithAbsorbanceReader(def)
+    case VACUUM_MODULE_TYPE:
+      return _getLabwareCompatibleWithVacuumModule(def, isOccupied)
     default:
       return COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
         def.parameters.loadName

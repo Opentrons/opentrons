@@ -337,7 +337,7 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
         create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
 
     class cool_door_class:
-        def __init__(self, loop: bool):
+        def __init__(self, loop: asyncio.AbstractEventLoop):
             self._loop = loop  # placeholder dummy - never used by this object
 
         @pyro_behavior(convert_result_to_proxy, False)
@@ -351,10 +351,23 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
             return run_handler
 
     def _door_daemon() -> None:
-        cool_door_instance = cool_door_class(True)
+        def _door_loop_thread(loop: asyncio.AbstractEventLoop) -> None:
+            loop.run_forever()
+
+        new_loop = asyncio.new_event_loop()
+        loop_thread = threading.Thread(
+            target=_door_loop_thread, args=[new_loop], daemon=True
+        )
+        loop_thread.start()
+
+        cool_door_instance = cool_door_class(new_loop)
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=PYRO_TIMEOUT)
-        create_pyro_daemon("cool_door", cool_door_instance, register_hardware_types)
+        try:
+            create_pyro_daemon("cool_door", cool_door_instance, register_hardware_types)
+        finally:
+            new_loop.stop()
+            loop_thread.join()
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     server_thread = threading.Thread(target=_pyro_daemon, daemon=True)

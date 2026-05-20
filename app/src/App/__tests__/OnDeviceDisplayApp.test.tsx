@@ -17,12 +17,12 @@ import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
 import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
 import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
-import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
 import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
+import { RobotNameEditor } from '/app/pages/ODD/RobotNameEditor'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
 import { RunSummary } from '/app/pages/ODD/RunSummary'
@@ -74,7 +74,7 @@ vi.mock('/app/pages/ODD/ProtocolDetails')
 vi.mock('/app/pages/ODD/InstrumentsDashboard')
 vi.mock('/app/pages/ODD/RunningProtocol')
 vi.mock('/app/pages/ODD/RunSummary')
-vi.mock('/app/pages/ODD/NameRobot')
+vi.mock('/app/pages/ODD/RobotNameEditor')
 vi.mock('/app/pages/ODD/EmergencyStop')
 vi.mock('/app/pages/ODD/DeckConfiguration')
 vi.mock('/app/redux/config')
@@ -221,7 +221,7 @@ describe('OnDeviceDisplayApp', () => {
   })
   it('renders DeckConfiguration component from /deck-configuration', () => {
     render('/robot-settings/rename-robot')
-    expect(vi.mocked(NameRobot)).toHaveBeenCalled()
+    expect(vi.mocked(RobotNameEditor)).toHaveBeenCalled()
   })
   it('renders protocol receipt toasts', () => {
     render('/')
