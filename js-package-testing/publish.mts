@@ -1,10 +1,10 @@
 /**
  * publish.mts
  *
- * Builds @opentrons/shared-data, @opentrons/step-generation, and
- * @opentrons/components from monorepo source, fixes every known issue that
- * broke the 0.2.1-alpha.0 npm releases, injects a README and LICENSE into
- * each tarball, and publishes all three to npm.
+ * Builds @opentrons/shared-data, @opentrons/step-generation,
+ * @opentrons/components, and @opentrons/protocol-visualization from monorepo
+ * source, fixes every known issue that broke the 0.2.1-alpha.0 npm releases,
+ * injects a README and LICENSE into each tarball, and publishes all four to npm.
  *
  * Run with Node >= 22:
  *   node --experimental-strip-types js-package-testing/publish.mts [options]
@@ -78,6 +78,7 @@ const MONO_ROOT = path.resolve(import.meta.dirname, '..')
 const SHARED_DATA_ROOT = path.join(MONO_ROOT, 'shared-data')
 const STEP_GENERATION_ROOT = path.join(MONO_ROOT, 'step-generation')
 const COMPONENTS_ROOT = path.join(MONO_ROOT, 'components')
+const PROTOCOL_VISUALIZATION_ROOT = path.join(MONO_ROOT, 'protocol-visualization')
 const ROOT_LICENSE = path.join(MONO_ROOT, 'LICENSE')
 
 function run(cmd: string, cwd: string): void {
@@ -150,6 +151,15 @@ function buildComponents(skipBuild: boolean): void {
   console.log('\n=== Building @opentrons/components ===')
   if (!skipBuild) {
     run('make build-ts lib', COMPONENTS_ROOT)
+  } else {
+    console.log('  (--skip-build: skipping)')
+  }
+}
+
+function buildProtocolVisualization(skipBuild: boolean): void {
+  console.log('\n=== Building @opentrons/protocol-visualization ===')
+  if (!skipBuild) {
+    run('make build-ts lib', PROTOCOL_VISUALIZATION_ROOT)
   } else {
     console.log('  (--skip-build: skipping)')
   }
@@ -306,6 +316,50 @@ function patchComponentsPackageJson(
   }
 }
 
+function patchProtocolVisualizationPackageJson(
+  version: string
+): Record<string, unknown> {
+  const pkg = readJson(path.join(PROTOCOL_VISUALIZATION_ROOT, 'package.json'))
+
+  const devDeps: Record<string, string> = {
+    ...((pkg.devDependencies as Record<string, string> | undefined) ?? {}),
+  }
+  const cleanDeps: Record<string, string> = {}
+
+  for (const [name, range] of Object.entries(
+    (pkg.dependencies as Record<string, string> | undefined) ?? {}
+  )) {
+    if (name.startsWith('@types/')) {
+      devDeps[name] = range
+      continue
+    }
+    if (range.startsWith('link:')) {
+      if (
+        name === '@opentrons/shared-data' ||
+        name === '@opentrons/step-generation' ||
+        name === '@opentrons/components'
+      ) {
+        cleanDeps[name] = version
+      } else {
+        console.warn(
+          `  WARNING: unknown link: dep ${name} in protocol-visualization, rewriting to "*"`
+        )
+        cleanDeps[name] = '*'
+      }
+      continue
+    }
+    cleanDeps[name] = range
+  }
+
+  return {
+    ...pkg,
+    version,
+    files: ['lib/', 'README.md', 'LICENSE'],
+    dependencies: cleanDeps,
+    devDependencies: devDeps,
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Smoke-test the ESM build with Node dynamic import
 // ---------------------------------------------------------------------------
@@ -423,26 +477,33 @@ async function main(): Promise<void> {
   console.log(`  registry: ${args.registry}`)
   console.log(`  dry-run:  ${args.dryRun}`)
 
-  // Build all three (shared-data must build before step-generation and components
-  // because the Vite alias in components points at shared-data source)
+  // Build order: shared-data first, then step-generation and components (Vite
+  // aliases), then protocol-visualization (depends on published-style peers).
   buildSharedData(args.skipBuild)
   buildStepGeneration(args.skipBuild)
   buildComponents(args.skipBuild)
+  buildProtocolVisualization(args.skipBuild)
 
   // Smoke-test ESM outputs before touching npm
   await smokeTestEsm(path.join(SHARED_DATA_ROOT, 'lib'), '@opentrons/shared-data')
   await smokeTestEsm(path.join(STEP_GENERATION_ROOT, 'lib'), '@opentrons/step-generation')
   await smokeTestEsm(path.join(COMPONENTS_ROOT, 'lib'), '@opentrons/components')
+  await smokeTestEsm(
+    path.join(PROTOCOL_VISUALIZATION_ROOT, 'lib'),
+    '@opentrons/protocol-visualization'
+  )
 
   // Patch package.json files
   const sharedDataPkg = patchSharedDataPackageJson(args.version)
   const stepGenerationPkg = patchStepGenerationPackageJson(args.version)
   const componentsPkg = patchComponentsPackageJson(args.version, args.version)
+  const protocolVisualizationPkg = patchProtocolVisualizationPackageJson(args.version)
 
-  // Publish in dependency order: shared-data first, then step-generation, then components
+  // Publish in dependency order, then protocol-visualization
   publishPackage(SHARED_DATA_ROOT, sharedDataPkg, args.version, args)
   publishPackage(STEP_GENERATION_ROOT, stepGenerationPkg, args.version, args)
   publishPackage(COMPONENTS_ROOT, componentsPkg, args.version, args)
+  publishPackage(PROTOCOL_VISUALIZATION_ROOT, protocolVisualizationPkg, args.version, args)
 
   console.log('\nDone!')
   if (args.dryRun) {
