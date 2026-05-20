@@ -767,7 +767,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                 if stall_reason:
                     cycle_plunger_stall_reasons.append(stall_reason)
                     cycle_plunger_passed = False
-                data = [failed_cycles, CSVResult.from_Numbool(failed_cycles)]
+                data = [failed_cycles, CSVResult.from_bool(failed_cycles == 0)]
                 results_report(
                     _get_cycling_section_tag(),
                     _get_cycling_test_tag(cycle),
@@ -788,7 +788,7 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                     test_plunger_passed = False
                 if fail_reason:
                     test_plunger_fail_reasons.append(fail_reason)
-                data = [0, CSVResult.from_Numbool(0)]
+                data = [0, CSVResult.from_bool(0 == 0)]
                 results_report(
                     _get_cycling_section_tag(),
                     _get_cycling_test_tag(cycles * TRIALS_PER_CYCLE),
