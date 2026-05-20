@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getCalibrationPipetteOffset } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
@@ -23,7 +23,7 @@ export function useAllPipetteOffsetCalibrationsQuery(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
-    [host!, 'calibration', 'pipette_offset'],
+    getQueryKey(host, 'calibration', 'pipette_offset'),
     () => getCalibrationPipetteOffset(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )

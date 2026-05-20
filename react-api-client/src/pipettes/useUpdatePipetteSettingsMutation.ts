@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { updatePipetteSettings } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -50,12 +50,12 @@ export function useUpdatePipetteSettingsMutation(
     AxiosError,
     UpdatePipetteSettingsData
   >(
-    [host, 'pipettes', 'settings'],
+    getQueryKey(host, 'pipettes', 'settings'),
     ({ fields }) =>
       updatePipetteSettings(host!, pipetteId, { fields })
         .then(response => {
           queryClient
-            .invalidateQueries([host, 'pipettes', 'settings'])
+            .invalidateQueries(getQueryKey(host, 'pipettes', 'settings'))
             .catch((e: Error) => {
               console.error(
                 `error invalidating pipette settings query: ${e.message}`

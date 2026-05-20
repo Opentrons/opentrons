@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { createMaintenanceRunLabwareDefinition } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type {
   UseMutateAsyncFunction,
@@ -50,7 +50,7 @@ export function useCreateMaintenanceRunLabwareDefinitionMutation(): UseCreateLab
       labwareDef
     ).then(response => {
       queryClient
-        .invalidateQueries([host, 'maintenance_runs'])
+        .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
         .catch((e: Error) => {
           console.error(
             `error invalidating maintenance runs query: ${e.message}`
