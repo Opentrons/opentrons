@@ -1,5 +1,7 @@
 # e2e-testing makefile
 
+SHELL := bash
+
 # Environment selection (local, sandbox, staging, prod)
 TEST_ENV ?= local
 
