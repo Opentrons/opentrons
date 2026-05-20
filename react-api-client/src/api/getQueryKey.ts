@@ -1,11 +1,12 @@
 import mapValues from 'lodash/mapValues'
 
+import type { QueryKey } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 
 export function getQueryKey(
   hostConfig: HostConfig | null,
   ...rest: unknown[]
-): unknown[] {
+): QueryKey {
   // Note that we avoid volatile components of the hostConfig,
   // such as the robotName and the access token.
   const hostKey =

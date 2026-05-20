@@ -8,12 +8,7 @@ import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { GetRunsParams, HostConfig, Runs } from '@opentrons/api-client'
 
-export type UseAllRunsQueryOptions = UseQueryOptions<
-  Runs,
-  AxiosError,
-  Runs,
-  Array<string | HostConfig>
->
+export type UseAllRunsQueryOptions = UseQueryOptions<Runs, AxiosError>
 
 /**
  * @property {HostConfig | null | undefined} hostOverride:

@@ -11,12 +11,7 @@ import type {
 } from '@opentrons/api-client'
 
 export function useAllPipetteOffsetCalibrationsQuery(
-  options: UseQueryOptions<
-    AllPipetteOffsetCalibrations,
-    Error,
-    AllPipetteOffsetCalibrations,
-    Array<string | HostConfig>
-  > = {},
+  options: UseQueryOptions<AllPipetteOffsetCalibrations, Error> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<AllPipetteOffsetCalibrations> {
   const contextHost = useHost()

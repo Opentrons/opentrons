@@ -8,12 +8,7 @@ import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig, WifiListResponse } from '@opentrons/api-client'
 
 export function useWifiQuery(
-  options: UseQueryOptions<
-    WifiListResponse,
-    Error,
-    WifiListResponse,
-    Array<string | HostConfig>
-  > = {},
+  options: UseQueryOptions<WifiListResponse, Error> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<WifiListResponse> {
   const contextHost = useHost()

@@ -8,12 +8,7 @@ import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CalibrationStatus, HostConfig } from '@opentrons/api-client'
 
 export function useCalibrationStatusQuery(
-  options: UseQueryOptions<
-    CalibrationStatus,
-    Error,
-    CalibrationStatus,
-    Array<string | HostConfig>
-  > = {},
+  options: UseQueryOptions<CalibrationStatus, Error> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<CalibrationStatus> {
   const contextHost = useHost()

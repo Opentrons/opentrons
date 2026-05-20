@@ -11,12 +11,7 @@ import type {
 } from '@opentrons/api-client'
 
 export function useAllTipLengthCalibrationsQuery(
-  options: UseQueryOptions<
-    AllTipLengthCalibrations,
-    Error,
-    AllTipLengthCalibrations,
-    Array<string | HostConfig>
-  > = {},
+  options: UseQueryOptions<AllTipLengthCalibrations, Error> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<AllTipLengthCalibrations> {
   const contextHost = useHost()
