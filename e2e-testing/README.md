@@ -125,24 +125,24 @@ Tests use the **Page Object Model** pattern for maintainability:
 
 ### Key Fixtures (conftest.py)
 
-| Fixture       | Scope    | Purpose                                                                                        |
-| ------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| Fixture       | Scope    | Purpose                                                                                            |
+| ------------- | -------- | -------------------------------------------------------------------------------------------------- |
 | `pd_base_url` | session  | Resolves PD URL; discovers local preview server when `TEST_ENV=local` (start with `make serve-pd`) |
-| `ll_base_url` | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                             |
-| `page`        | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
-| `eyes`        | function | Applitools Eyes session (or `None` when disabled)                                              |
+| `ll_base_url` | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                                 |
+| `page`        | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video     |
+| `eyes`        | function | Applitools Eyes session (or `None` when disabled)                                                  |
 
 ### Environment Variables
 
-| Variable             | Default | Notes                                 |
-| -------------------- | ------- | ------------------------------------- |
-| `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
-| `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
-| `PD_SERVER_URL`      | auto    | Override PD URL when server is already running |
-| `SKIP_SERVER_START`  | `false` | Skip LL automatic server build+serve only      |
-| `LL_SERVER_URL`      | auto    | Override LL URL                       |
-| `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
-| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
+| Variable              | Default | Notes                                                                  |
+| --------------------- | ------- | ---------------------------------------------------------------------- |
+| `TEST_ENV`            | `local` | `local`, `staging`, `prod`, `sandbox`                                  |
+| `HEADLESS`            | (unset) | `true` / `false`; overrides default                                    |
+| `PD_SERVER_URL`       | auto    | Override PD URL when server is already running                         |
+| `SKIP_SERVER_START`   | `false` | Skip LL automatic server build+serve only                              |
+| `LL_SERVER_URL`       | auto    | Override LL URL                                                        |
+| `LL_SERVER_PORT`      | `4176`  | Preferred port for LL local server                                     |
+| `APPLITOOLS_API_KEY`  | (unset) | Enable Applitools visual checks                                        |
 | `APPLITOOLS_BATCH_ID` | (unset) | One batch per run; CI sets `run_id-run_attempt` so xdist workers match |
 
 ## Development Workflow
