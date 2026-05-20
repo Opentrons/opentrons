@@ -2210,10 +2210,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         volume_for_air_gap = aspirate_props.retract.air_gap_by_volume.get_for_volume(
             volume + current_volume
         )
+        tip_picked_up_from = self.get_tip_origin()
+        assert tip_picked_up_from is not None  # Check added for mypy purposes
         tx_commons.check_valid_liquid_class_volume_parameters(
             aspirate_volume=volume,
             air_gap=volume_for_air_gap if conditioning_volume is None else 0,
-            max_volume=self.get_working_volume(),
+            max_volume=self._get_pipette_max_volume_for_tip_and_transfer_volume(
+                tip_picked_up_from[0], volume
+            ),
             current_volume=current_volume,
         )
         source_loc, source_well = source

@@ -1822,7 +1822,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense_without_conditio
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.28", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.29", "Flex")], indirect=True
 )
 def test_distribution_steps_using_multi_dispense_with_20ul_tips_in_low_volume_mode(
     simulated_protocol_context: ProtocolContext,
