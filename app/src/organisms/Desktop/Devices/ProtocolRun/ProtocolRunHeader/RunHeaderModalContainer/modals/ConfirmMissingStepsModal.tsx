@@ -22,11 +22,14 @@ import {
 import { LPC_STEP_KEY, STEP_KEY_TO_I18N_KEY } from '/app/redux/protocol-runs'
 
 import type { StepKey } from '/app/redux/protocol-runs'
+//NOTE: I think import LPCSetupOffsetsTable from SetupLabwarePositionCheck to get the total offsets
+// import { LPCSetupOffsetsTable } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck/FlexSetupLPC/LPCSetupOffsetsTable'
 
 export interface ConfirmMissingStepsModalProps {
   onCloseClick: () => void
   onConfirmClick: () => void
   missingSteps: StepKey[]
+  // totalLPCOffsets: number
   isRunStarting: boolean
 }
 export const ConfirmMissingStepsModal = (
@@ -53,6 +56,9 @@ export const ConfirmMissingStepsModal = (
       : 'you_havent_confirmed'
     return t(i18nKey, { missingSteps: formattedSteps })
   }
+
+//some 
+
 
   return (
     <Modal
