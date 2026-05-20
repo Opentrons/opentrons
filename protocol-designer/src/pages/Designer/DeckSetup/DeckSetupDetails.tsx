@@ -49,6 +49,7 @@ import {
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
+import { useUpdateDeckConfigurationFromStartingDeck } from './hooks/useUpdateDeckConfigurationFromStartingDeck'
 import { HopperLabwareRenders } from './HopperLabwareRenders'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
@@ -123,6 +124,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const dispatch = useDispatch<any>()
+
+  useUpdateDeckConfigurationFromStartingDeck({
+    activeDeckSetup,
+    robotType,
+  })
+
   const { deckConfig } = useSelector(getDeckConfiguration)
 
   // handling module<>labware compat when moving labware to empty module

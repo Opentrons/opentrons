@@ -11,7 +11,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { getIsSlotAHopper, getIsSlotAVacuumDock } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getIsSlotAVacuumDock,
+} from '@opentrons/step-generation'
 
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
 import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'

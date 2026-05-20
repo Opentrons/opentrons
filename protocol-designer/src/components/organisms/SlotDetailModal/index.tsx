@@ -115,7 +115,12 @@ export const SlotDetailModal = (
         {t('labware_in')}
       </StyledText>
       <RobotInfoLabel
-        deckLabel={getDeckLabel(slotName, isHopper, isVacuumDock, t as TFunction)}
+        deckLabel={getDeckLabel(
+          slotName,
+          isHopper,
+          isVacuumDock,
+          t as TFunction
+        )}
       />
     </Flex>
   )
