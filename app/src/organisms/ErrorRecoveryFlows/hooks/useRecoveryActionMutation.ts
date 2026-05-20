@@ -1,4 +1,5 @@
 import { usePlayRunMutation } from '@opentrons/react-api-client'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 import { RECOVERY_MAP } from '../constants'
 
@@ -13,10 +14,11 @@ export interface RecoveryActionMutationResult {
 
 export function useRecoveryActionMutation(
   runId: ErrorRecoveryFlowsProps['runId'],
-  routeUpdateActions: ERUtilsResults['routeUpdateActions']
+  routeUpdateActions: ERUtilsResults['routeUpdateActions'],
+  documentationState: DocumentationState
 ): RecoveryActionMutationResult {
   const { mutateAsync, isLoading: isResumeRecoveryLoading } =
-    usePlayRunMutation()
+    usePlayRunMutation(documentationState)
   const { proceedToRouteAndStep } = routeUpdateActions
 
   const resumeRecovery = (): Promise<RunAction> => {
