@@ -197,7 +197,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   ])
 
   useEffect(() => {
-    if (currentCommandId == null) return
+    if (currentCommandId == null) {
+      return
+    }
     if (filteredGroupedCommands != null && filteredGroupedCommands.length > 0) {
       const flatCommands = filteredGroupedCommands.flatMap(node =>
         'subCommands' in node ? node.subCommands : [node]
