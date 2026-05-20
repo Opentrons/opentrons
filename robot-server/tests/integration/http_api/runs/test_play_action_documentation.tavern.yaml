@@ -10,7 +10,7 @@ stages:
       url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/wait_for_resume_stop_v6.json'
+        files: 'tests/integration/protocols/empty_ot3.json'
     response:
       status_code: 201
       save:
@@ -69,7 +69,7 @@ stages:
       url: '{ot3_server_base_url_require_reason_true}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/wait_for_resume_stop_v6.json'
+        files: 'tests/integration/protocols/empty_ot3.json'
     response:
       status_code: 201
       save:
