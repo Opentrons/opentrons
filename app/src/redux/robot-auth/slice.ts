@@ -10,7 +10,12 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import type { State } from '/app/redux/types'
 
 export interface RobotAuthState {
-  [robotName: string]: PerRobotAuthState | undefined
+  perRobotAuthStates: {
+    [robotName: string]: PerRobotAuthState | undefined
+  }
+
+  /** The robotName of the robot that's most recently been logged into. */
+  mostRecentRobotName: string | null
 }
 
 interface PerRobotAuthState {
@@ -33,7 +38,10 @@ interface PerRobotAuthState {
   expiresAt: number | null
 }
 
-export const INITIAL_ROBOT_AUTH_STATE: RobotAuthState = {}
+export const INITIAL_ROBOT_AUTH_STATE: RobotAuthState = {
+  perRobotAuthStates: {},
+  mostRecentRobotName: null,
+}
 
 /** Stores the result of logging in to a robot, of refreshing an existing login. */
 interface LogInOrRefreshPayload {
@@ -53,14 +61,15 @@ const robotAuthSlice = createSlice({
   name: 'robotAuth',
   initialState: INITIAL_ROBOT_AUTH_STATE,
   reducers: {
-    logInOrRefresh(state, action: PayloadAction<LogInOrRefreshPayload>) {
+    logInOrRefresh(stateDraft, action: PayloadAction<LogInOrRefreshPayload>) {
       const { robotName, ...robotAuthState } = action.payload
-      state[robotName] = robotAuthState
+      stateDraft.perRobotAuthStates[robotName] = robotAuthState
+      stateDraft.mostRecentRobotName = robotName
     },
-    logOutOrTimeOut(state, action: PayloadAction<LogOutOrTimeOutPayload>) {
+    logOutOrTimeOut(stateDraft, action: PayloadAction<LogOutOrTimeOutPayload>) {
       // dynamic-delete is normal and fine with Immer and Redux.
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete state[action.payload.robotName]
+      delete stateDraft.perRobotAuthStates[action.payload.robotName]
     },
   },
 })
@@ -77,7 +86,7 @@ export function getAuthStateForRobot(
   state: State,
   robotName: string
 ): PerRobotAuthState | null {
-  return state.robotAuth?.[robotName] ?? null
+  return state.robotAuth?.perRobotAuthStates[robotName] ?? null
 }
 
 /**
@@ -97,6 +106,11 @@ export const getLocalRobotAuthState = createSelector(
       return getAuthStateForRobot(state, localRobotName)
     }
   }
+)
+
+export const getMostRecentRobotName = createSelector(
+  (state: State) => state,
+  (state: State): string | null => state.robotAuth.mostRecentRobotName
 )
 
 export const getLocalRobotAccessToken = createSelector(
@@ -139,9 +153,11 @@ interface GetNextExpirationResult {
 }
 
 export const getNextExpiration = createSelector(
-  (state: State) => state.robotAuth,
-  (robotAuthState: RobotAuthState): GetNextExpirationResult | null =>
-    Object.entries(robotAuthState).reduce<GetNextExpirationResult | null>(
+  (state: State) => state.robotAuth.perRobotAuthStates,
+  (
+    perRobotAuthStates: RobotAuthState['perRobotAuthStates']
+  ): GetNextExpirationResult | null =>
+    Object.entries(perRobotAuthStates).reduce<GetNextExpirationResult | null>(
       (acc, [candidateName, candidateState]) => {
         if (
           candidateState?.expiresAt != null &&
