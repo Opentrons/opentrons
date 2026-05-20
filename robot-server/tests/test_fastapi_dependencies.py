@@ -9,19 +9,18 @@ from server_utils.auth.resource_server.auth_server import (
     RequireReasonForInteractionSettingsResponse,
     RequireReasonForInteractionSettingsResponseData,
 )
-from server_utils.fastapi_utils.models.json_api import RequestModel
-
-from robot_server.errors.error_responses import ApiError
 from server_utils.auth.resource_server.authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
 )
+from server_utils.fastapi_utils.models.json_api import RequestModel
 
+from robot_server.errors.error_responses import ApiError
 from robot_server.fastapi_dependencies import (
     get_robot_require_reason_for_interaction_settings,
     maybe_log_user_action_notes_when_setting_requires,
 )
-from robot_server.settings import RobotServerSettings
 from robot_server.runs.action_models import RunActionCreate, RunActionType
+from robot_server.settings import RobotServerSettings
 
 _REQUIRE_REASON_ON = RequireReasonForInteractionSettingsResponse(
     data=RequireReasonForInteractionSettingsResponseData(

@@ -2,12 +2,12 @@ test_name: Run action without userNotes when require-reason off (default integra
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload a JSONv6 protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/wait_for_resume_stop_v6.json'
@@ -19,7 +19,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -32,7 +32,7 @@ stages:
 
   - name: Play without userNotes succeeds when require-reason is off
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -48,7 +48,7 @@ stages:
 
   - name: Stop the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
