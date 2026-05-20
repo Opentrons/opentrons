@@ -152,8 +152,8 @@ def install_authorization_checker(
 @asynccontextmanager
 async def build_authorization_checker(
     *,
-    auth_server_uds: Optional[str] = None,
-    auth_server_url: Optional[str] = None,
+    auth_server_uds: str | None = None,
+    auth_server_url: str | None = None,
 ) -> AsyncGenerator[AuthorizationChecker, None]:
     """Build an `AuthorizationChecker` appropriately configured for most servers.
 
