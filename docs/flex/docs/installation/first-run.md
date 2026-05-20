@@ -30,7 +30,7 @@ Follow the prompts on the touchscreen to get your robot connected so it can chec
 
 ### Ethernet (recommended)
 
-Connect your Flex to a network switch, hub, or router with an Ethernet cable. Making this initial connection via Ethernet cable ensures the robot has a stable internet connection to download any required software or firmware updates. After the Flex has updated and restarted, you can then switch to a wireless network if desired.
+Connect your Flex to a network switch, hub, or router with an Ethernet cable. Making this initial connection via Ethernet cable ensures the robot has a stable internet connection to download any required software or *firmware* updates. After the Flex has updated and restarted, you can then switch to a wireless network if desired.
 
 ### Wi-Fi
 
@@ -73,6 +73,12 @@ Each of these methods requires a username and password, and depending on your ex
 Connect the provided USB A-to-B cable to the robot's USB-B port and an open port on your computer. Use a USB B-to-C cable or a USB A-to-C adapter if your computer does not have a USB-A port.
 
 To proceed with setup, the connected computer must have the Opentrons App installed *and running*. For details on installing the Opentrons App, see the [App Installation section][app-installation].
+
+!!! note "Note for Linux Users"
+    If the Opentrons App shows “Not connected via USB” on Ubuntu, open a terminal and give your user account permission to access the robot’s USB port.
+
+    1. From the terminal, run `sudo usermod -a -G dialout $USER`
+    2. Log out of your Linux account entirely (or restart your computer) and log back in for the change to take effect.
 
 ## Install software updates
 

@@ -27,7 +27,11 @@ import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { AlphanumericKeyboard } from '/app/atoms/SoftwareKeyboard'
+import {
+  AlphanumericKeyboard,
+  getInvalidCharForKeyboard,
+  shouldAcceptKeyboardInput,
+} from '/app/atoms/SoftwareKeyboard'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
@@ -39,7 +43,6 @@ import {
   removeRobot,
 } from '/app/redux/discovery'
 
-import type { ChangeEvent } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { UpdatedRobotName } from '@opentrons/api-client'
@@ -51,7 +54,7 @@ interface FormValues {
   newRobotName: string
 }
 
-export function NameRobot(): JSX.Element {
+export function RobotNameEditor(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
@@ -64,7 +67,6 @@ export function NameRobot(): JSX.Element {
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-
   const connectableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
   )
@@ -129,6 +131,7 @@ export function NameRobot(): JSX.Element {
   })
 
   const newRobotName = watch('newRobotName')
+  const invalidChar = getInvalidCharForKeyboard(newRobotName, 'alphanumeric')
 
   const onSubmit = (data: FormValues): void => {
     const newName = data.newRobotName
@@ -174,16 +177,6 @@ export function NameRobot(): JSX.Element {
       },
     })
     void handleSubmit(onSubmit)()
-  }
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setNewName(e.target.value as string)
-    void trigger('newRobotName')
-  }
-
-  const handleKeyboardChange = (input: string): void => {
-    setNewName(input)
-    void trigger('newRobotName')
   }
 
   return (
@@ -290,8 +283,20 @@ export function NameRobot(): JSX.Element {
                       e.target.focus()
                     }}
                     onChange={e => {
-                      field.onChange(e)
-                      handleChange(e)
+                      const newVal = e.target.value
+                      if (
+                        !shouldAcceptKeyboardInput(
+                          newVal,
+                          newRobotName,
+                          'alphanumeric'
+                        )
+                      ) {
+                        field.onChange(newRobotName)
+                        return
+                      }
+                      field.onChange(newVal)
+                      setNewName(newVal)
+                      void trigger('newRobotName')
                     }}
                   />
                 )}
@@ -304,7 +309,15 @@ export function NameRobot(): JSX.Element {
             >
               {t('name_rule_description')}
             </LegacyStyledText>
-            {errors.newRobotName != null ? (
+            {invalidChar != null ? (
+              <LegacyStyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                color={COLORS.red50}
+              >
+                {t('shared:character_not_supported', { char: invalidChar })}
+              </LegacyStyledText>
+            ) : errors.newRobotName != null ? (
               <LegacyStyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -322,8 +335,19 @@ export function NameRobot(): JSX.Element {
               render={({ field }) => (
                 <AlphanumericKeyboard
                   onChange={(input: string) => {
+                    if (
+                      !shouldAcceptKeyboardInput(
+                        input,
+                        newRobotName,
+                        'alphanumeric'
+                      )
+                    ) {
+                      keyboardRef.current?.setInput(newRobotName)
+                      return
+                    }
                     field.onChange(input)
-                    handleKeyboardChange(input)
+                    setNewName(input)
+                    void trigger('newRobotName')
                   }}
                   keyboardRef={keyboardRef}
                   value={newRobotName}

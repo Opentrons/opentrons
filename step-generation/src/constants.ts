@@ -146,6 +146,17 @@ export const FAKE_HOPPER_LOCATION_MAP = {
 
 export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP
 
+export const VACUUM_DOCK_LOCATION = 'vacuumDock'
+
+export const VACUUM_DOCK_FAKE_LOCATION = 'vacuumDockA4'
+
+export const FAKE_VACUUM_DOCK_LOCATION_MAP = {
+  vacuumDockA4: 'A4',
+}
+
+export type VacuumDockLocationMapKey =
+  keyof typeof FAKE_VACUUM_DOCK_LOCATION_MAP
+
 export const BOTTOM_UP_LABWARE_POOL_KEYS: Array<
   keyof FlexStackerStoredLabwareGroup
 > = ['adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']

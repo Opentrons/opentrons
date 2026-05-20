@@ -68,7 +68,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_state(cls, response: str) -> VacuumState:
         """Parse the get pressure state."""
-        pattern = r"T:(?P<T>-?\d.+) C:(?P<C>-?\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) V:(?P<V>\d)"
+        pattern = r"T:(?P<T>-?\d.+) C:(?P<C>-?\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) D:(?P<D>\d+) V:(?P<V>\d)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -80,6 +80,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("B")),
             float(match.group("H")),
             bool(int(match.group("E"))),
+            int(match.group("D")),
             VentState(int(match.group("V"))),
         )
 

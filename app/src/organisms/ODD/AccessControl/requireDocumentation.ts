@@ -1,34 +1,32 @@
 import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
-import { postDocumentation } from '/app/resources/access-control/postDocumentation'
+import { isDocumentationReportValid } from '/app/resources/access-control/utils'
 
 import type {
-  DocumentationResult,
+  DocumentationReport,
   DocumentedActionKind,
 } from '../../../resources/access-control/types'
 
 /**
- * Guard that captures a documentation note for an action and posts it
- * to the audit log.
+ * Guard that captures a pops DocumentationRequiredModal and returns the documentation report
  *
  * Assumes access control is enabled and the user is authenticated.
+ *
+ * TODO(jj): do something with the actionsToDocument
+ *
+ * @throws {Error} if the documentation report is invalid
  */
 export async function requireDocumentation(
   actionsToDocument: DocumentedActionKind[],
   username: string
-): Promise<DocumentationResult | null> {
+): Promise<DocumentationReport> {
   const modalResult = await showDocumentationRequiredModal(username)
-  if (modalResult == null) {
-    return null
+  if (modalResult == null || !isDocumentationReportValid(modalResult)) {
+    throw new Error(
+      `No documentation provided for action: ${modalResult?.note}`
+    )
   }
 
   const { note, confirmedAt } = modalResult
-
-  await postDocumentation({
-    actionsToDocument,
-    note,
-    username,
-    confirmedAt,
-  })
 
   return {
     note,
