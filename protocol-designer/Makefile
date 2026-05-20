@@ -45,7 +45,7 @@ dev: export NODE_OPTIONS := --max-old-space-size=8192
 dev:
 	vite serve
 
-# production assets server
+# production assets server (build + preview; used by e2e-testing/pd_server.py)
 .PHONY: serve
 serve: export NODE_OPTIONS := --max-old-space-size=8192
 serve: all

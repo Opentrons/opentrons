@@ -16,9 +16,12 @@ End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Libr
    make setup test-setup
    ```
 
-2. **Run tests to recreate the failure locally:**
+2. **Run PD e2e tests locally** (two terminals — same server script as CI):
 
    ```bash
+   # Terminal 1
+   make serve-pd
+   # Terminal 2
    make test-pd-local
    ```
 
@@ -36,8 +39,8 @@ End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Libr
 
 ## Tips
 
-- run `make -C protocol-designer serve` and `make -C labware-library serve` in separate terminals to keep local apps running while you develop tests. This keeps the test framework from spinning them up each test run. This only works if you are not making changes to the PD or LL code. `make serve` does not hot reload.
-- If you **are** making changes to PD or LL code, let the test suite handle starting/stopping the apps as needed.
+- run `make serve-pd` (from `e2e-testing/`) in a separate terminal before `make test-pd-local` when developing locally (required for pytest-xdist). In CI, `make test-pd-local` starts `serve-pd` automatically when `CI=true`.
+- Labware Library local tests still start the app from pytest when nothing is running on the expected ports.
 - use `page.highlight(selector)` to debug selectors in headed mode
 - have the Playwright MCP installed in your dev environment so that you may prompt agents to run the test and then use the Playwright MCP to recreate test steps and fix the test code. Example prompt: `Run test x and inspect the output and test code and then use the Playwright MCP to fix the test code, explaining as you go`
 
@@ -46,9 +49,11 @@ End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Libr
 ### Protocol Designer (PD)
 
 ```bash
-make test-pd-local                               # Headless, chromium
-make test-pd-local-headed                        # Headed, 250ms slow-mo
-make test-pd-local PYTEST_ARGS="-k test_name"    # Run one test
+make serve-pd                                    # Terminal 1: start PD (required for local)
+make test-pd-local                               # Terminal 2: headless, 2 workers (default)
+make test-pd-local PYTEST_ARGS="-k test_name"    # Parallel + filter one test
+make test-pd-local XDIST_ARGS="-n 0"             # Sequential (debugging)
+make test-pd-local-headed                        # Headed, sequential (-n 0), one test via -k
 make test-pd-staging                             # Against staging
 make test-pd-prod                                # Against production
 make test-pd-debug                               # Headed, 1000ms slow-mo, verbose
@@ -81,12 +86,7 @@ make codegen URL=<url>       # Record against a custom URL
 @pytest.mark.parametrize("pd_base_url", ["http://localhost:5178/", "https://designer.opentrons.com"])
 ```
 
-**Note:** Local tests automatically:
-
-- Look for an already-running server on the expected ports
-- Build and serve the app via `make -C ../protocol-designer serve` or `make -C ../labware-library serve` if nothing is running
-- Wait for the server to be ready
-- Clean up the server after tests complete if it was started by the test suite
+**PD server:** `e2e-testing/pd_server.py` via `make serve-pd` runs `make serve` in `protocol-designer/` (build + preview in one step). There is no separate `make dist` step, dist cache, or CI-only bash to start PD. CI uses `./.github/actions/js/setup` then `make test-pd-local` (which starts `serve-pd` when `CI=true`). LL tests still auto-start from pytest when needed.
 
 ### Custom Environment
 
@@ -127,7 +127,7 @@ Tests use the **Page Object Model** pattern for maintainability:
 
 | Fixture       | Scope    | Purpose                                                                                        |
 | ------------- | -------- | ---------------------------------------------------------------------------------------------- |
-| `pd_base_url` | session  | Resolves PD URL; starts local preview server when `TEST_ENV=local`                             |
+| `pd_base_url` | session  | Resolves PD URL; discovers local preview server when `TEST_ENV=local` (start with `make serve-pd`) |
 | `ll_base_url` | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                             |
 | `page`        | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
 | `eyes`        | function | Applitools Eyes session (or `None` when disabled)                                              |
@@ -138,11 +138,12 @@ Tests use the **Page Object Model** pattern for maintainability:
 | -------------------- | ------- | ------------------------------------- |
 | `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
 | `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
-| `SKIP_SERVER_START`  | `false` | Skip automatic server build+serve     |
-| `PD_SERVER_URL`      | auto    | Override PD URL                       |
+| `PD_SERVER_URL`      | auto    | Override PD URL when server is already running |
+| `SKIP_SERVER_START`  | `false` | Skip LL automatic server build+serve only      |
 | `LL_SERVER_URL`      | auto    | Override LL URL                       |
 | `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
 | `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
+| `APPLITOOLS_BATCH_ID` | (unset) | One batch per run; CI sets `run_id-run_attempt` so xdist workers match |
 
 ## Development Workflow
 
