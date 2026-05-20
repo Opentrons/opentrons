@@ -18,7 +18,12 @@ from server_utils.fastapi_utils.models.json_api import (
 )
 
 from auth_server.users.dependencies import get_user_data_manager
-from auth_server.users.models import UpdateUser, UserCreate, UserResponse
+from auth_server.users.models import (
+    ResetPasswordResponse,
+    UpdateUser,
+    UserCreate,
+    UserResponse,
+)
 from auth_server.users.user_data_manager import (
     InvalidInputError,
     UserAlreadyExistsError,
@@ -163,6 +168,7 @@ async def update_user(
             new_account_type=update_data.accountType,
             new_locked=update_data.locked,
             reset_password=update_data.resetPassword,
+            using_temporary_password=update_data.usingTemporaryPassword,
         )
     except UserNotFoundError:
         raise fastapi.HTTPException(
@@ -182,6 +188,40 @@ async def update_user(
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=updated_user),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.post,
+    path="/auth/users/byUsername/{userName}/resetPassword",
+    summary="Reset a user's password",
+    description=(
+        "Reset a specific user's password to a newly generated temporary password. "
+        "The user will be marked as using a temporary password and must change it upon login."
+    ),
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[ResetPasswordResponse]},
+        fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
+    },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
+)
+async def reset_user_password(
+    userName: str,
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
+) -> PydanticResponse[SimpleBody[ResetPasswordResponse]]:
+    """Reset a user's password to a random temporary password."""
+    try:
+        result = user_data_manager.reset_user_password(userName)
+    except UserNotFoundError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(data=result),
     )
 
 

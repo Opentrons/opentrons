@@ -1,5 +1,7 @@
 """User data manager – business logic between the router and the store."""
 
+import random
+import string
 from typing import Literal
 
 from pwdlib import PasswordHash
@@ -7,7 +9,12 @@ from pwdlib import PasswordHash
 from auth_server.persistence.orm_models import User
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType, UserResponse
+from auth_server.users.models import (
+    ACCOUNT_TYPE_TO_SCOPES,
+    AccountType,
+    ResetPasswordResponse,
+    UserResponse,
+)
 from auth_server.users.store import UserStore
 
 password_hash = PasswordHash.recommended()
@@ -69,6 +76,7 @@ class UserDataManager:
             ),
             locked=is_currently_locked,
             resetPassword=user.reset_password,
+            usingTemporaryPassword=user.using_temporary_password,
         )
 
     def seed_initial_users(self) -> None:
@@ -136,6 +144,7 @@ class UserDataManager:
         new_account_type: str | None = None,
         new_locked: Literal[False] | None = None,
         reset_password: bool = False,
+        using_temporary_password: bool = False,
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
@@ -163,7 +172,25 @@ class UserDataManager:
                 full_name=new_full_name,
                 account_type=new_account_type,
                 reset_password=reset_password,
+                using_temporary_password=using_temporary_password,
             )
             return self._to_response(updated_user)
         except ValueError as e:
             raise UserNotFoundError(e) from e
+
+    def reset_user_password(self, username: str) -> ResetPasswordResponse:
+        """Reset a user's password to a random temporary password."""
+        temporary_password = "".join(random.choices(string.ascii_letters + string.digits, k=16))
+        try:
+            updated_user = self._user_store.update(
+                username,
+                hashed_password=password_hash.hash(temporary_password),
+                using_temporary_password=True,
+            )
+        except ValueError as e:
+            raise UserNotFoundError(e) from e
+        user_response = self._to_response(updated_user)
+        return ResetPasswordResponse(
+            **user_response.model_dump(),
+            temporaryPassword=temporary_password,
+        )
