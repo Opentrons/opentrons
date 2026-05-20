@@ -459,6 +459,20 @@ describe('getFullStackFromLabwares', () => {
     const largestStack = getFullStackFromLabwares(labware, slot, undefined)
     expect(largestStack).toEqual(['labwareId2', 'labwareId1', 'D3'])
   })
+
+  it('return empty array if no labwares in slot', () => {
+    const labware = {
+      labwareId1: {
+        stack: [],
+      },
+      labwareId2: {
+        stack: [],
+      },
+    }
+    const slot = 'D3'
+    const largestStack = getFullStackFromLabwares(labware, slot, undefined)
+    expect(largestStack).toEqual([])
+  })
 })
 
 describe('flex stacker deck slot helpers', () => {
