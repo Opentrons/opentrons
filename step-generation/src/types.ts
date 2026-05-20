@@ -839,7 +839,7 @@ export interface VacuumPumpPowerArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumSetPumpPower'
-  powerPercent: number
+  percentPower: number
 }
 
 export interface VacuumCloseVentSetPumpPressureArgs
@@ -853,7 +853,7 @@ export interface VacuumCloseVentSetPumpPowerArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
-  powerPercent: number
+  percentPower: number
 }
 
 export interface VacuumOpenVentArgs extends CommonArgs {
@@ -878,7 +878,7 @@ export interface VacuumPressureData {
 
 export interface VacuumPowerData {
   mode: typeof VACUUM_MODE_POWER
-  powerPercent: number
+  percentPower: number
 }
 
 type VacuumPumpData = VacuumPressureData | VacuumPowerData

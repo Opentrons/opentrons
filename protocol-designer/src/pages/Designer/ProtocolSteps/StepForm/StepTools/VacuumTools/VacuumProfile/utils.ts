@@ -31,7 +31,7 @@ export function getDefaultStepData(mode: VacuumMode): VacuumProfileStep {
       }
     : {
         ...baseData,
-        pumpData: { mode: VACUUM_MODE_POWER, powerPercent: 1 },
+        pumpData: { mode: VACUUM_MODE_POWER, percentPower: 1 },
         ventAfter: false,
       }
 }

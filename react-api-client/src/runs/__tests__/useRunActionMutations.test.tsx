@@ -73,9 +73,12 @@ describe('useRunActionMutations hook', () => {
         mockResumeRunFromRecoveryAssumingFalsePositive,
     } as unknown as UseResumeRunFromRecoveryAssumingFalsePositiveMutationResult)
 
-    const { result } = renderHook(() => useRunActionMutations(RUN_ID_1), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useRunActionMutations(RUN_ID_1, { accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
 
     act(() => result.current.playRun())
     expect(mockPlayRun).toHaveBeenCalledTimes(1)

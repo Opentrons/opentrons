@@ -110,6 +110,7 @@ class VacuumState:
     pressure_abs_b: float
     pressure_atm: float
     vacuum_enabled: bool
+    vacuum_duration: int
     vent_state: VentState
 
 

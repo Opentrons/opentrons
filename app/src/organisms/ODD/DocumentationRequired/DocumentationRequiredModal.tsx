@@ -1,5 +1,7 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { type DocumentationReport } from '/app/resources/access-control/types'
+
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
@@ -7,19 +9,15 @@ export interface DocumentationRequiredModalArgs {
   username: string
 }
 
-export interface DocumentationRequiredModalResult {
-  note: string
-  confirmedAt: string
-}
-
 const DocumentationRequiredModalImpl = NiceModal.create(
   ({ username }: { username: string }): JSX.Element => {
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {
-      const result: DocumentationRequiredModalResult = {
+      const result: DocumentationReport = {
         note,
         confirmedAt: new Date().toISOString(),
+        documentedBy: username,
       }
       modal.resolve(result)
       modal.remove()
@@ -44,5 +42,5 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 
 export const showDocumentationRequiredModal = (
   username: string
-): Promise<DocumentationRequiredModalResult | null> =>
+): Promise<DocumentationReport | null> =>
   NiceModal.show(DocumentationRequiredModalImpl, { username })
