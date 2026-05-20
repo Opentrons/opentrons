@@ -65,6 +65,14 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
+    integration_require_reason_for_interaction_override: bool | None = Field(
+        default=None,
+        description=(
+            "Integration-test override for require-reason-for-interaction. When set, "
+            "robot-server uses this instead of querying auth-server. Unset in production."
+        ),
+    )
+
     # Literal must come first to avoid Pydantic parsing it as a relative Path
     # with the filename "automatically_make_temporary".
     persistence_directory: (

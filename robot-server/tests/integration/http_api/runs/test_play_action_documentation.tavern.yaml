@@ -61,12 +61,12 @@ test_name: Run action with userNotes when require-reason on
 
 marks:
   - usefixtures:
-      - ot3_server_base_url_require_user_notes_true
+      - ot3_server_base_url_require_reason_true
 
 stages:
   - name: Upload a JSONv6 protocol
     request:
-      url: '{ot3_server_base_url_require_user_notes_true}/protocols'
+      url: '{ot3_server_base_url_require_reason_true}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/wait_for_resume_stop_v6.json'
@@ -78,7 +78,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{ot3_server_base_url_require_user_notes_true}/runs'
+      url: '{ot3_server_base_url_require_reason_true}/runs'
       method: POST
       json:
         data:
@@ -91,7 +91,7 @@ stages:
 
   - name: Play without userNotes fails when require-reason is on
     request:
-      url: '{ot3_server_base_url_require_user_notes_true}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url_require_reason_true}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -101,7 +101,7 @@ stages:
 
   - name: Play with userNotes succeeds when require-reason is on
     request:
-      url: '{ot3_server_base_url_require_user_notes_true}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url_require_reason_true}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -118,7 +118,7 @@ stages:
 
   - name: Stop the run
     request:
-      url: '{ot3_server_base_url_require_user_notes_true}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url_require_reason_true}/runs/{run_id}/actions'
       method: POST
       json:
         data:

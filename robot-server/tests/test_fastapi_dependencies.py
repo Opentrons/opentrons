@@ -12,9 +12,15 @@ from server_utils.auth.resource_server.auth_server import (
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.errors.error_responses import ApiError
+from server_utils.auth.resource_server.authorization_checker import (
+    AlwaysAllowedAuthorizationChecker,
+)
+
 from robot_server.fastapi_dependencies import (
+    get_robot_require_reason_for_interaction_settings,
     maybe_log_user_action_notes_when_setting_requires,
 )
+from robot_server.settings import RobotServerSettings
 from robot_server.runs.action_models import RunActionCreate, RunActionType
 
 _REQUIRE_REASON_ON = RequireReasonForInteractionSettingsResponse(
@@ -27,6 +33,34 @@ _REQUIRE_REASON_OFF = RequireReasonForInteractionSettingsResponse(
         requireReasonForInteraction=False
     )
 )
+
+
+@pytest.mark.asyncio
+async def test_integration_override_returns_configured_value(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Integration override mocks require-reason without auth-server."""
+    monkeypatch.setattr(
+        "robot_server.fastapi_dependencies.get_settings",
+        lambda: RobotServerSettings(
+            integration_require_reason_for_interaction_override=True
+        ),
+    )
+    result = await get_robot_require_reason_for_interaction_settings(
+        AlwaysAllowedAuthorizationChecker()
+    )
+    assert result.data.requireReasonForInteraction is True
+
+    monkeypatch.setattr(
+        "robot_server.fastapi_dependencies.get_settings",
+        lambda: RobotServerSettings(
+            integration_require_reason_for_interaction_override=False
+        ),
+    )
+    result = await get_robot_require_reason_for_interaction_settings(
+        AlwaysAllowedAuthorizationChecker()
+    )
+    assert result.data.requireReasonForInteraction is False
 
 
 @pytest.mark.asyncio
