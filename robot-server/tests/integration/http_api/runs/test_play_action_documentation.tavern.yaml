@@ -123,5 +123,6 @@ stages:
       json:
         data:
           actionType: stop
+        userNotes: integration test userNotes note
     response:
       status_code: 201

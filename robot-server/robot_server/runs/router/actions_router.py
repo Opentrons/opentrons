@@ -27,6 +27,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.errors.global_errors import InvalidRequest
 from robot_server.fastapi_dependencies import (
     maybe_log_user_action_notes_when_setting_requires,
 )
@@ -102,6 +103,7 @@ async def get_run_controller(
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[RunAction]},
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[InvalidRequest]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorBody[Union[RunActionNotAllowed, RunStopped]],
         },
@@ -143,7 +145,7 @@ async def create_run_action(
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
         _maybe_audit_action_user_notes: When auth-server requires reasons for
-            interaction, logs actions that include ``userNotes``.
+            interaction, requires ``userNotes`` and logs supplied notes.
     """
     body = request_body.data
     action_type = body.actionType
