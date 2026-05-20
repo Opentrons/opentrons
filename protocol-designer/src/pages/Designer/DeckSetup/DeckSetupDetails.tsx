@@ -7,6 +7,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getModuleDef,
+  getPositionFromAddressableAreaId,
   getPositionFromSlotId,
   inferModuleOrientationFromSlot,
   inferModuleOrientationFromXCoordinate,
@@ -16,16 +17,19 @@ import {
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
+  FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
   getSlotInLocationStack,
+  VACUUM_DOCK_LOCATION,
 } from '@opentrons/step-generation'
 
-import {
-  HOPPER_LABWARE_X_OFFSET,
-  VACUUM_DOCK_LABWARE_X_OFFSET,
-} from '/protocol-designer/constants'
+import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'
-import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
+import {
+  getDeckConfiguration,
+  getPendingCreationState,
+} from '/protocol-designer/step-forms/selectors'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -53,14 +57,17 @@ import { SlotOverflowMenu } from './SlotOverflowMenu'
 import { SlotWarning } from './SlotWarning'
 import {
   getAdjacentLabware,
+  getIsVacuumCollar,
   getSwapBlockedAdapter,
   getSwapBlockedModule,
 } from './utils'
+import { VacuumDockLabwareRenders } from './VacuumDockLabwareRenders'
 
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
   AddressableAreaName,
+  CoordinateTuple,
   CutoutId,
   DeckDefinition,
   DeckSlotId,
@@ -69,6 +76,7 @@ import type {
   HopperLocationMapKey,
   ModuleTemporalProperties,
   ThermocyclerModuleState,
+  VacuumDockLocationMapKey,
 } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 import type {
@@ -115,6 +123,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const dispatch = useDispatch<any>()
+  const { deckConfig } = useSelector(getDeckConfiguration)
+
   // handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls. But when swapping labware when at least
   // one is on a module, we need to be aware of not only what labware is
@@ -217,17 +227,35 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =
     menuListId != null && getIsSlotAHopper(menuListId)
-  const adjustedMenuListId = isMenuListIdForHopper
-    ? FAKE_HOPPER_LOCATION_MAP[menuListId as HopperLocationMapKey]
-    : menuListId
-  const menuListSlotPosition =
-    adjustedMenuListId != null
-      ? getPositionFromSlotId(
+  const isMenuListIdForVacuumDock =
+    menuListId != null && getIsSlotAVacuumDock(menuListId)
+
+  let adjustedMenuListId: AddressableAreaName | string | null = menuListId
+  if (isMenuListIdForHopper) {
+    adjustedMenuListId =
+      FAKE_HOPPER_LOCATION_MAP[menuListId as HopperLocationMapKey]
+  } else if (isMenuListIdForVacuumDock) {
+    adjustedMenuListId =
+      FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA[
+        menuListId as VacuumDockLocationMapKey
+      ]
+  }
+
+  let menuListSlotPosition: CoordinateTuple | null = null
+  if (adjustedMenuListId != null) {
+    menuListSlotPosition = isMenuListIdForVacuumDock
+      ? getPositionFromAddressableAreaId({
+          addressableAreaId: adjustedMenuListId as AddressableAreaName,
+          deckDef,
+          deckConfiguration: deckConfig,
+        })
+      : getPositionFromSlotId(
           adjustedMenuListId as string,
           deckDef,
           ...(isMenuListIdForHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
         )
-      : null
+  }
+
   const multichannelWarningSlotIds: AddressableAreaName[] =
     showGen1MultichannelCollisionWarnings
       ? getSlotsWithCollisions(deckDef, allModules)
@@ -315,12 +343,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const {
-          topMostId,
-          rightBelowTopId,
-          hopperTopMostId,
-          vacuumDockTopMostId,
-        } = getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabwareValues)
+        const { topMostId, rightBelowTopId, hopperTopMostId } =
+          getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabwareValues)
         const labwareInterfaceBoundingBox = {
           xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
           yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
@@ -493,17 +517,88 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   addEquipment={addEquipment}
                 />
               ) : null}
-              {vacuumDockTopMostId == null &&
-              moduleOnDeck.type === VACUUM_MODULE_TYPE ? (
+            </Module>
+          </Fragment>
+        ) : null
+      })}
+
+      {/* Vacuum dock labware renders positioned independently in addressable area */}
+      {allModules
+        .filter(
+          module => module.type === VACUUM_MODULE_TYPE && module.slot === 'A3'
+        )
+        .map(vacuumModule => {
+          const { vacuumDockTopMostId } = getLabwaresOnModuleFromStack(
+            vacuumModule.id,
+            allLabwareValues
+          )
+          const dockLabwareStack =
+            vacuumDockTopMostId != null
+              ? allLabwareValues
+                  .filter(lw => lw.stack.includes(VACUUM_DOCK_LOCATION))
+                  .sort((a, b) => b.stack.length - a.stack.length)
+                  .map(lw => lw.id)
+              : []
+
+          // Check if dock has a collar (same logic as main module area)
+          const dockHasCollar = dockLabwareStack.some(labwareId => {
+            return (
+              activeLabware[labwareId] != null &&
+              getIsVacuumCollar(activeLabware[labwareId].def)
+            )
+          })
+
+          // this should pull the addressable area position for the vacuum dock
+          const dockSlotPosition = getPositionFromAddressableAreaId({
+            addressableAreaId: 'vacuumModuleV1DockA4',
+            deckDef,
+            deckConfiguration: deckConfig,
+          })
+          const topLabware =
+            vacuumDockTopMostId != null
+              ? activeLabware[vacuumDockTopMostId]
+              : null
+          const dockBoundingBox = topLabware
+            ? {
+                xDimension: topLabware.def.dimensions.xDimension,
+                yDimension: topLabware.def.dimensions.yDimension,
+                zDimension: 0,
+              }
+            : (getAddressableAreaFromSlotId('A4', deckDef)?.boundingBox ??
+                // should never hit, but default to standard slot addressable area footprint
+                {
+                  xDimension: 128,
+                  yDimension: 86,
+                  zDimension: 0,
+                })
+
+          return dockSlotPosition != null ? (
+            <Fragment key={`${vacuumModule.id}_dock`}>
+              {dockHasCollar ? (
+                <VacuumDockLabwareRenders
+                  labwaresOnDeck={activeLabware}
+                  dockLabwareStack={dockLabwareStack}
+                  allModules={allModules}
+                  terminalItemId={terminalItemId}
+                  setHover={setHover}
+                  setShowMenuListForId={setShowMenuListForId}
+                  hover={hover}
+                  setHoveredLabware={setHoveredLabware}
+                  setDraggedLabware={setDraggedLabware}
+                  selectedZoomInSlot={selectedZoomInSlot}
+                  x={dockSlotPosition[0]}
+                  y={dockSlotPosition[1]}
+                />
+              ) : (
                 <SlotControls
                   terminalItemId={terminalItemId}
-                  itemId={`vacuumDock${slotId}`}
-                  key={`${moduleOnDeck.slot}_vacuumDock`}
-                  slotPosition={[VACUUM_DOCK_LABWARE_X_OFFSET, 0, 0]}
-                  slotBoundingBox={labwareInterfaceBoundingBox}
-                  moduleType={moduleOnDeck.type}
+                  itemId={'vacuumDockA4'}
+                  key={`${vacuumModule.slot}_vacuumDock`}
+                  slotPosition={[dockSlotPosition[0], dockSlotPosition[1], 0]}
+                  slotBoundingBox={dockBoundingBox}
+                  moduleType={vacuumModule.type}
                   handleDragHover={handleHoverEmptySlot}
-                  slotId={moduleOnDeck.id}
+                  slotId={vacuumModule.id}
                   hover={hover}
                   setHover={setHover}
                   setShowMenuListForId={setShowMenuListForId}
@@ -512,11 +607,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   stagingAreaAddressableAreas={[]}
                   addEquipment={addEquipment}
                 />
-              ) : null}
-            </Module>
-          </Fragment>
-        ) : null
-      })}
+              )}
+            </Fragment>
+          ) : null
+        })}
 
       {/* on-deck warnings for OT-2 and GEN1 8-channels only */}
       {multichannelWarningSlotIds.map(slotId => {

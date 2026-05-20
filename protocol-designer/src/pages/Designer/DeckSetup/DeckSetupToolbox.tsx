@@ -27,7 +27,10 @@ import {
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
+  FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA,
+  FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
 } from '@opentrons/step-generation'
 
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
@@ -56,7 +59,11 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse, getIsVacuumModuleFull } from './utils'
 
-import type { HopperLocationMapKey } from '@opentrons/step-generation'
+import type {
+  HopperLocationMapKey,
+  VacuumDockFakeLocationType,
+  VacuumDockLocationMapKey,
+} from '@opentrons/step-generation'
 import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
 import type { ThunkDispatch } from '../../../types'
 
@@ -107,6 +114,13 @@ export function DeckSetupToolbox(
     return null
   }
   const isHopperSlot = getIsSlotAHopper(slot)
+  const isVacuumDockSlot = getIsSlotAVacuumDock(slot)
+  // For vacuum dock, use the addressable area, not the deck slot
+  const realSlot = isVacuumDockSlot
+    ? FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA[
+        slot as VacuumDockLocationMapKey
+      ]
+    : slot
   const offDeckLabware = deckSetup.labware[slot]
   const isVacuumModule =
     selectedModuleModel != null &&
@@ -142,6 +156,15 @@ export function DeckSetupToolbox(
   const isVacuumModuleFull =
     hasVacuumModuleCreated &&
     getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware)
+
+  // Check if vacuum dock is full by checking both stack and adapter for collar
+  // The dock and main module areas are independently managed
+  // Note: The collar might be in createdAdapterForSlot instead of createdStackForSlot
+  const isVacuumDockFull =
+    isVacuumDockSlot &&
+    (getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware) ||
+      (createdAdapterForSlot != null &&
+        getIsVacuumModuleFull([createdAdapterForSlot.id], deckSetup.labware)))
 
   const slotFull =
     ((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
@@ -248,7 +271,7 @@ export function DeckSetupToolbox(
     } else {
       dispatch(
         createContainer({
-          slot,
+          slot: realSlot,
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
             ...(selectedTopLabware.labwareDefURI != null
@@ -299,9 +322,17 @@ export function DeckSetupToolbox(
       handleClear()
     }
   }
-  const displaySlot = getIsSlotAHopper(slot)
-    ? t('shared:stacker', { slot: getColumnFromWellName(slot) })
-    : slot
+
+  let displaySlot = slot
+  if (getIsSlotAHopper(slot)) {
+    displaySlot = t('shared:stacker', { slot: getColumnFromWellName(slot) })
+  } else if (getIsSlotAVacuumDock(slot)) {
+    displaySlot =
+      FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT[slot as VacuumDockFakeLocationType]
+  }
+
+  const isMultiStack = createdStackForSlot.length > 1
+  const shouldShowTopBottomOfSlotLabels = slotFull || isMultiStack
 
   return (
     <>
@@ -368,13 +399,16 @@ export function DeckSetupToolbox(
               <EmptySelectorButton
                 textAlignment="left"
                 text={
-                  hasNoLabware || hasVacuumModuleCreated
+                  hasNoLabware || hasVacuumModuleCreated || isVacuumDockSlot
                     ? t('add_labware')
                     : t('replace_labware')
                 }
                 iconName="plus"
                 onClick={() => {
-                  if (hasVacuumModuleCreated && isVacuumModuleFull) {
+                  if (
+                    (hasVacuumModuleCreated && isVacuumModuleFull) ||
+                    isVacuumDockFull
+                  ) {
                     makeSnackbar(t('labware_limit_reached') as string)
                   } else {
                     setShowSelectLabwareModal(true)
@@ -396,7 +430,7 @@ export function DeckSetupToolbox(
             />
           ) : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              {slotFull ? (
+              {shouldShowTopBottomOfSlotLabels ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
@@ -432,7 +466,7 @@ export function DeckSetupToolbox(
                   location={slot}
                 />
               ) : null}
-              {slotFull ? (
+              {shouldShowTopBottomOfSlotLabels ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}

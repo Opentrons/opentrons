@@ -8,6 +8,7 @@ import {
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
@@ -44,9 +45,12 @@ export function SlotDetailsContainer(
     return null
   }
   const isSlotAHopper = getIsSlotAHopper(slot)
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(slot)
   const adjustedSlotToFindModule = isSlotAHopper
     ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+    : isSlotAVacuumDock
+      ? 'A3' // Vacuum dock is always associated with module at A3
+      : slot
 
   const {
     modules: deckSetupModules,
@@ -72,7 +76,8 @@ export function SlotDetailsContainer(
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),
     slot,
-    isSlotAHopper
+    isSlotAHopper,
+    isSlotAVacuumDock
   )
   const topLocationLabwareId =
     fullStackFromLabwares?.length > 0
@@ -125,6 +130,13 @@ export function SlotDetailsContainer(
     )
     labwareIds.forEach(id => {
       labwares.push(deckSetupLabwares[id].def.metadata.displayName)
+    })
+  } else if (isSlotAVacuumDock && fullStackFromLabwares?.length > 0) {
+    // For vacuum dock, show all labware in the stack
+    fullStackFromLabwares.forEach(id => {
+      if (deckSetupLabwares[id] != null) {
+        labwares.push(nickNames[id])
+      }
     })
   } else if (fullStackFromLabwares?.length > 0) {
     fullStackFromLabwares.forEach(id => {

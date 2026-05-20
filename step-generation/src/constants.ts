@@ -8,10 +8,12 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type {
+  AddressableAreaName,
   AddressableOffsetVector,
   DeckSlotId,
   FlexStackerStoredLabwareGroup,
@@ -146,17 +148,6 @@ export const FAKE_HOPPER_LOCATION_MAP = {
 
 export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP
 
-export const VACUUM_DOCK_LOCATION = 'vacuumDock'
-
-export const VACUUM_DOCK_FAKE_LOCATION = 'vacuumDockA4'
-
-export const FAKE_VACUUM_DOCK_LOCATION_MAP = {
-  vacuumDockA4: 'A4',
-}
-
-export type VacuumDockLocationMapKey =
-  keyof typeof FAKE_VACUUM_DOCK_LOCATION_MAP
-
 export const BOTTOM_UP_LABWARE_POOL_KEYS: Array<
   keyof FlexStackerStoredLabwareGroup
 > = ['adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
@@ -173,6 +164,27 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   C4: 'hopperC4',
   D4: 'hopperD4',
 }
+
+export const VACUUM_DOCK_LOCATION = 'vacuumDock'
+
+export const VACUUM_DOCK_FAKE_LOCATION: 'vacuumDockA4' = 'vacuumDockA4'
+
+export type VacuumDockFakeLocationType = typeof VACUUM_DOCK_FAKE_LOCATION
+
+export const FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA: Readonly<
+  Record<VacuumDockFakeLocationType, AddressableAreaName>
+> = {
+  vacuumDockA4: VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+}
+
+export const FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT: Readonly<
+  Record<VacuumDockFakeLocationType, DeckSlotId>
+> = {
+  vacuumDockA4: 'A4',
+}
+
+export type VacuumDockLocationMapKey =
+  keyof typeof FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT
 
 export const VACUUM_VENT_OPEN: 'open' = 'open'
 export const VACUUM_VENT_CLOSED: 'closed' = 'closed'

@@ -46,7 +46,7 @@ import {
   COLUMN_4_SLOTS,
   EMPTY,
   FAKE_HOPPER_LOCATION_MAP,
-  FAKE_VACUUM_DOCK_LOCATION_MAP,
+  FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
@@ -77,7 +77,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   HopperLocationMapKey,
-  VacuumDockLocationMapKey,
+  VacuumDockFakeLocationType,
 } from '../constants'
 import type {
   CommandCreator,
@@ -1127,7 +1127,9 @@ const _getMappedLocation = (
   isOnHopper: boolean
 ): string => {
   if (isOnVacuumDock) {
-    return FAKE_VACUUM_DOCK_LOCATION_MAP[slot as VacuumDockLocationMapKey]
+    return FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA[
+      slot as VacuumDockFakeLocationType
+    ]
   }
   if (isOnHopper) {
     return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
