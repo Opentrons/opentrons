@@ -211,6 +211,9 @@ export const containers: Reducer<ContainersState, any> = handleActions(
           allLabwareDefs,
           latestDefs
         )
+        if (latestLabwareId == null) {
+          return acc
+        }
 
         acc[latestLabwareId] = {
           nickname: labwareLoadInfo.displayName,
@@ -360,6 +363,9 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
             allLabwareDefs,
             latestDefs
           )
+          if (latestLabwareId == null) {
+            return acc
+          }
           acc[latestLabwareId] = liquidIngredient
           return acc
         },
