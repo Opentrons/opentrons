@@ -2,7 +2,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -33,10 +32,8 @@ export function ShutdownRobotConfirmationModal({
 }: ShutdownRobotConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
-    // TODO(jh, 05-18-26): Update after Design finalizes implementation
-    title: t('shutdown_now'),
-    iconName: 'ot-alert',
-    iconColor: COLORS.yellow50,
+    title: t('turn_off_robot'),
+    iconName: 'power-off',
   }
   const dispatch = useDispatch<Dispatch>()
   const { setLights } = useSetLightsMutation()
@@ -51,14 +48,14 @@ export function ShutdownRobotConfirmationModal({
       >
         <Trans
           t={t}
-          i18nKey="shutdown_robot_confirmation_description"
-          values={{ robotName: robotName }}
+          i18nKey="turn_off_robot_confirmation_description"
+          values={{ robotName }}
           components={{
             bold: <strong />,
             span: (
               <LegacyStyledText
                 forwardedAs="p"
-                data-testid="shutdown_robot_confirmation_description"
+                data-testid="turn_off_robot_confirmation_description"
               />
             ),
           }}
