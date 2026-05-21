@@ -72,42 +72,50 @@ class MigrationOrchestrator:
 
         The migration is performed atomically.
 
+        Interrupted migrations may leave behind stray temp files.
+        Call `clean_up_stray_temp_files()` at some point to prune them.
+
         :returns: The path to the latest version subdirectory.
         """
-        current = self._get_current()
-        if current is None:
+        initial_sequence_index = self._get_current()
+        if initial_sequence_index is None:
             sequence = self._migrations
-            previous_output = self._root
+            starting_dir = self._root
         else:
-            sequence = self._migrations[current + 1 :]
-            previous_output = self._root / self._migrations[current].subdirectory
-
-        final_output = (
-            self._root / sequence[-1].subdirectory
-            if len(sequence) > 0
-            else previous_output
-        )
+            sequence = self._migrations[initial_sequence_index + 1 :]
+            starting_dir = (
+                self._root / self._migrations[initial_sequence_index].subdirectory
+            )
 
         _log.info(f"Migrations to perform: {[m.subdirectory for m in sequence]}")
 
+        latest_dir_so_far = starting_dir
         for sequence_index, migration in enumerate(sequence):
-            is_first_migration = sequence_index == 0
-            is_final_migration = sequence_index == len(sequence) - 1
-
-            output_dir = Path(
-                tempfile.mkdtemp(dir=self._root, prefix=self._temp_file_prefix)
+            step_input_dir = latest_dir_so_far
+            step_output_dir = Path(
+                tempfile.mkdtemp(
+                    dir=self._root,
+                    # The _temp_file_prefix part is important so this can be deleted
+                    # by clean_up_stray_temp_files(). The migration.subdirectory part
+                    # is just to make debugging easier.
+                    prefix=f"{self._temp_file_prefix}{migration.subdirectory}-",
+                )
             )
+            step_input_is_initial = sequence_index == 0
+            step_output_is_final = sequence_index == len(sequence) - 1
 
             _log.info(f'Performing migration to "{migration.subdirectory}"...')
-            migration.migrate(source_dir=previous_output, dest_dir=output_dir)
+            migration.migrate(source_dir=step_input_dir, dest_dir=step_output_dir)
+
+            latest_dir_so_far = step_output_dir
 
             # If we're migrating e.g. A -> B -> C -> D, we should treat B and C as
             # as throwaway intermediate steps, deleting them when we're done with them,
-            # to keep peak filesystem usage low.
-            if not is_first_migration:
-                shutil.rmtree(previous_output)
+            # to keep peak filesystem usage low. We should never delete A.
+            if not step_input_is_initial:
+                shutil.rmtree(step_input_dir)
 
-            if is_final_migration:
+            if step_output_is_final:
                 # Promote the temporary directory to be permanent.
                 #
                 # At this point, we have a directory full of files, but we haven't yet moved it into
@@ -120,12 +128,12 @@ class MigrationOrchestrator:
                 # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
                 os.sync()
                 # Atomically move the filled directory into place.
-                os.replace(src=output_dir, dst=final_output)
-
-            previous_output = output_dir
+                final_output_dir = self._root / migration.subdirectory
+                os.replace(src=step_output_dir, dst=final_output_dir)
+                latest_dir_so_far = final_output_dir
 
         _log.info("All migrations complete.")
-        return final_output
+        return latest_dir_so_far
 
     def clean_up_stray_temp_files(self) -> None:
         """Delete any abandoned files or directories from prior interrupted work."""
