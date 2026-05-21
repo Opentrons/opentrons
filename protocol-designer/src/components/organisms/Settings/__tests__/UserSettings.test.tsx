@@ -44,7 +44,7 @@ describe('UserSettings', () => {
     screen.getByText(
       'Turn off all restrictions on module placement and related pipette crash guidance.'
     )
-    expect(screen.getAllByRole('switch').length).toBe(3)
+    expect(screen.getAllByRole('switch').length).toBe(2)
   })
 
   it('should not reset button if canClearHintDismissals is false', () => {
