@@ -59,6 +59,8 @@ class MigrationOrchestrator:
         """
         self._root = root
         self._migrations = migrations
+        if temp_file_prefix == "":
+            raise ValueError("temp_file_prefix must be non-empty.")
         self._temp_file_prefix = temp_file_prefix
 
     def migrate_to_latest(self) -> Path:
