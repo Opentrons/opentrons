@@ -97,7 +97,9 @@ class MigrationOrchestrator:
             _log.info(f'Performing migration to "{migration.subdirectory}"...')
             migration.migrate(source_dir=previous_output, dest_dir=output_dir)
 
-            # Throw away transient directories to keep filesystem usage low.
+            # If we're migrating e.g. A -> B -> C -> D, we should treat B and C as
+            # as throwaway intermediate steps, deleting them when we're done with them,
+            # to keep peak filesystem usage low.
             if not is_first_migration:
                 shutil.rmtree(previous_output)
 
