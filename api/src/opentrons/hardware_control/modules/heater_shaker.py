@@ -29,6 +29,7 @@ from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     pyro_behavior,
     remove_pyro_synchronous_object,
+    convert_result_to_proxy,
 )
 
 log = logging.getLogger(__name__)
@@ -212,6 +213,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 

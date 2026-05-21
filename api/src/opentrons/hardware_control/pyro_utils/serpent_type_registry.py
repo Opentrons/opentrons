@@ -2,6 +2,7 @@
 
 import dataclasses
 import datetime
+from pathlib import Path
 from typing import Any, Dict, get_args
 
 from numpy import float64
@@ -479,13 +480,15 @@ def _enumerated_error_reconstructor(
 
 
 def _module_model_reconstructor(
-    m_dict: Dict[str, Any],
+    module_str: str,
 ) -> modules.types.ModuleModel:
     for model in get_args(modules.types.ModuleModel):
-        if isinstance(m_dict["value"], model):
-            return model(m_dict["value"])  # type: ignore
+        try:
+            return model[module_str]  # type: ignore
+        except Exception:
+            pass
     raise ValueError(
-        f"Cannot determine module model during deserialization for: {m_dict}"
+        f"Cannot determine module model during deserialization for: {module_str}"
     )
 
 
@@ -569,6 +572,34 @@ def _usb_port_dict_to_class(  # type: ignore
         hub=d["hub"],
         hub_port=int(d["hub_port"]) if d["hub_port"] is not None else None,
         device_path=d["device_path"],
+    )
+
+
+# Pathlib Path registry
+def _path_class_to_dict(obj) -> Dict:  # type: ignore
+    return {"__class__": "pathlib.Path", "path_str": str(obj)}
+
+
+def _path_dict_to_class(  # type: ignore
+    classname, d
+) -> Path:
+    return Path(d["path_str"])
+
+
+# Pathlib Path registry
+def _bundled_fw_class_to_dict(obj) -> Dict:  # type: ignore
+    return {
+        "__class__": "opentrons.hardware_control.modules.types.BundledFirmware",
+        "version": obj.version,
+        "path_str": str(obj.path),
+    }
+
+
+def _bundled_fw_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.modules.types.BundledFirmware:
+    return opentrons.hardware_control.modules.types.BundledFirmware(
+        version=d["version"], path=Path(d["path_str"])
     )
 
 
@@ -711,6 +742,19 @@ def register_hardware_types() -> None:
         class_type=opentrons.drivers.rpi_drivers.types.USBPort,
         dict_to_class=_usb_port_dict_to_class,
         class_to_dict=_usb_port_class_to_dict,
+    )
+
+    # pathlib Path registration
+    register_type_to_serpent(
+        class_type=Path,
+        dict_to_class=_path_dict_to_class,
+        class_to_dict=_path_class_to_dict,
+    )
+
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.modules.types.BundledFirmware,
+        dict_to_class=_bundled_fw_dict_to_class,
+        class_to_dict=_bundled_fw_class_to_dict,
     )
 
     # handle Typed Dicts for the hardware controller

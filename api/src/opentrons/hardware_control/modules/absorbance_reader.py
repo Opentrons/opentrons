@@ -31,6 +31,7 @@ from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     pyro_behavior,
     remove_pyro_synchronous_object,
+    convert_result_to_proxy
 )
 
 log = logging.getLogger(__name__)
@@ -325,6 +326,7 @@ class AbsorbanceReader(mod_abc.AbstractModule):
         self._updating = False
         return success, res
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> UploadFunction:
         async def _update_function(
             port: str, firmware_file_path: str, kwargs: Dict[str, Any]

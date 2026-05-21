@@ -12,8 +12,9 @@ from pydantic import BaseModel
 from Pyro5 import api as pyro
 
 from opentrons.util.pyro.pyro_client_async_adapter import (
+    AsyncClientPyroFunctionWrapper,
     AsyncClientPyroObject,
-    AsyncPyroFunctionWrapper,
+    ClientPyroFunctionWrapper,
 )
 from opentrons.util.pyro.pyro_serialization import (
     PYRO_PROXY,
@@ -93,6 +94,30 @@ class PyroFunctionWrapper:
     def call(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         """Remote deployable function call."""
         return self.callable(*args, **kwargs)
+
+
+class PyroAsyncFunctionWrapper:
+    """Wrapper class to safely wrap async callable responses as Proxy objects."""
+
+    def __init__(
+        self,
+        callable: Callable[P, T],
+        loop: asyncio.AbstractEventLoop,
+        execute_on_pyro_daemon_overload: bool,
+    ) -> None:
+        self.callable = callable
+        self._loop = loop
+        # Wrapped callbacks inherit their parent resource's ruleset regarding inbound call execution
+        self._execute_on_pyro_daemon_overload = execute_on_pyro_daemon_overload
+
+    @property
+    def is_awaitable(self) -> bool:
+        """Awaitable status for validation of a wrapped function, indicates if a callback is async, always true."""
+        return True
+
+    def call(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+        """Remote deployable asynchronous function call."""
+        return asyncio.run_coroutine_threadsafe(coro=self.callable(*args, **kwargs), loop=self._loop).result()
 
 
 class _ResultMeta(enum.Enum):
@@ -330,6 +355,21 @@ def _build_classdict(  # noqa: C901
                         execute_inbound_call_on_event_loop(core_obj, bound_method)
                     ),
                 )
+            elif inspect.ismethod(attr) and inspect.iscoroutinefunction(attr):
+                # Wrap classmethod coroutines in a synchronous function call, and expose on the PSO
+                exposed = pyro.expose(synchronous(attr))
+                async_metadata = _build_metadata_dictionary(attr)
+                async_methods[name] = async_metadata
+
+                yield (name, parameter_validation_wrapper(exposed))
+            elif inspect.ismethod(attr):
+                # Expose classmethods on the PSO
+                method_handler = execute_inbound_call_on_event_loop(core_obj, attr)
+                exposed = pyro.expose(method_handler)
+                yield (
+                    name,
+                    parameter_validation_wrapper(exposed),
+                )
             elif isinstance(attr, property):
                 # Bound property to the original instance through the inbound call executor and expose the bounded property
                 exposed = pyro.expose(
@@ -423,10 +463,11 @@ def _validate_inbound_proxy(arg: Any) -> Any:
     """Handle an argument which is a remote Proxy that may have been forwarded through multiple processes."""
     if isinstance(arg, pyro.Proxy):
         # NOTE: Cases like this are the result of multi-process callback forwarding
-        try:
-            if "is_callable" in arg._pyroAttrs:
-                arg = AsyncPyroFunctionWrapper(proxy=arg)
-        except AttributeError:
+        if "is_callable" in arg._pyroAttrs:
+            arg = ClientPyroFunctionWrapper(proxy=arg)
+        elif "is_awaitable" in arg._pyroAttrs:
+            arg = AsyncClientPyroFunctionWrapper(proxy=arg)
+        else:
             try:
                 iter(arg)
                 validated_arg = []
@@ -592,9 +633,15 @@ def convert_result_to_proxy(  # noqa: C901
                 execute_overload_ruleset = False
                 if hasattr(core_obj, "_execute_on_pyro_daemon_overload"):
                     execute_overload_ruleset = True
-                result = PyroFunctionWrapper(
-                    result, core_obj._loop, execute_overload_ruleset
-                )
+                # Handle synchronous and asynchronous callable wrapping
+                if inspect.iscoroutinefunction(result):
+                    result = PyroAsyncFunctionWrapper(
+                        result, core_obj._loop, execute_overload_ruleset
+                    )
+                else:
+                    result = PyroFunctionWrapper(
+                        result, core_obj._loop, execute_overload_ruleset
+                    )
             pyro_synchronous_obj = utility.find_PSO(result)
             if pyro_synchronous_obj is None:
                 if not hasattr(result, "_loop"):
