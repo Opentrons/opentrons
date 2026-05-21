@@ -12,6 +12,7 @@ import {
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
+import { VACUUM_MODULE_SLOT } from '/protocol-designer/constants'
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
@@ -46,11 +47,13 @@ export function SlotDetailsContainer(
   }
   const isSlotAHopper = getIsSlotAHopper(slot)
   const isSlotAVacuumDock = getIsSlotAVacuumDock(slot)
-  const adjustedSlotToFindModule = isSlotAHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : isSlotAVacuumDock
-      ? 'A3' // Vacuum dock is always associated with module at A3
-      : slot
+  let adjustedSlotToFindModule = slot
+  if (isSlotAHopper) {
+    adjustedSlotToFindModule =
+      FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  } else if (isSlotAVacuumDock) {
+    adjustedSlotToFindModule = VACUUM_MODULE_SLOT
+  }
 
   const {
     modules: deckSetupModules,

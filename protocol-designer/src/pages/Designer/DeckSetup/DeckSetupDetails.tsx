@@ -13,18 +13,21 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
-  FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
   getSlotInLocationStack,
   VACUUM_DOCK_LOCATION,
 } from '@opentrons/step-generation'
 
-import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import {
+  HOPPER_LABWARE_X_OFFSET,
+  VACUUM_MODULE_SLOT,
+} from '/protocol-designer/constants'
 import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'
 import {
   getDeckConfiguration,
@@ -77,7 +80,6 @@ import type {
   HopperLocationMapKey,
   ModuleTemporalProperties,
   ThermocyclerModuleState,
-  VacuumDockLocationMapKey,
 } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 import type {
@@ -241,11 +243,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   if (isMenuListIdForHopper) {
     adjustedMenuListId =
       FAKE_HOPPER_LOCATION_MAP[menuListId as HopperLocationMapKey]
-  } else if (isMenuListIdForVacuumDock) {
-    adjustedMenuListId =
-      FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA[
-        menuListId as VacuumDockLocationMapKey
-      ]
   }
 
   let menuListSlotPosition: CoordinateTuple | null = null
@@ -532,7 +529,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       {/* Vacuum dock labware renders positioned independently in addressable area */}
       {allModules
         .filter(
-          module => module.type === VACUUM_MODULE_TYPE && module.slot === 'A3'
+          module =>
+            module.type === VACUUM_MODULE_TYPE &&
+            module.slot === VACUUM_MODULE_SLOT
         )
         .map(vacuumModule => {
           const { vacuumDockTopMostId } = getLabwaresOnModuleFromStack(
@@ -599,7 +598,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               ) : (
                 <SlotControls
                   terminalItemId={terminalItemId}
-                  itemId={'vacuumDockA4'}
+                  itemId={VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}
                   key={`${vacuumModule.slot}_vacuumDock`}
                   slotPosition={[dockSlotPosition[0], dockSlotPosition[1], 0]}
                   slotBoundingBox={dockBoundingBox}

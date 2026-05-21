@@ -18,7 +18,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
-  FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA,
   getFullStackFromLabwares,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
@@ -55,7 +54,6 @@ import type {
   LabwareEntities,
   LabwareEntity,
   RobotState,
-  VacuumDockFakeLocationType,
 } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -104,9 +102,7 @@ const _getAdjustedSlot = (
   isSlotAHopper: boolean
 ): string => {
   if (isSlotAVacuumDock) {
-    return FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA[
-      slot as VacuumDockFakeLocationType
-    ]
+    return slot
   }
   if (isSlotAHopper) {
     return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]

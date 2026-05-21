@@ -15,7 +15,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
-  FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA,
   getSlotInLocationStack,
   HOPPER_STACKER_LOCATION,
   PROTOCOL_CONTEXT_NAME,
@@ -40,7 +39,6 @@ import type {
   LabwareEntities,
   ModuleEntity,
   PipetteEntities,
-  VacuumDockLocationMapKey,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
 import type {
@@ -475,10 +473,7 @@ export const getFullStackFromLabwaresOnDeck = (
   if (onHopper) {
     slotInStack = FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
   } else if (onVacuumDock) {
-    slotInStack =
-      FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA[
-        slot as VacuumDockLocationMapKey
-      ]
+    slotInStack = slot
   } else {
     slotInStack = slot
   }

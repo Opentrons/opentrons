@@ -378,7 +378,10 @@ describe('getUnoccupiedStackOptions', () => {
       additionalEquipmentOnDeck: {},
     }
     expect(
-      getSlotInformation({ deckSetup: mockDeckSetup, slot: 'vacuumDockA4' })
+      getSlotInformation({
+        deckSetup: mockDeckSetup,
+        slot: 'vacuumModuleV1DockA4',
+      })
     ).toEqual({
       matchingLabwareFor4thColumn: null,
       slotPosition: null,

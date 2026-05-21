@@ -182,6 +182,7 @@ export const VACUUM_DOCK_LABWARE_X_OFFSET = 143
 export const VACUUM_DOCK_ZOOM_OFFSET_POSITION = VACUUM_DOCK_LABWARE_X_OFFSET
 
 export const VACUUM_DOCK_DISPLAY_LOCATION: 'A4' = 'A4'
+export const VACUUM_MODULE_SLOT = 'A3'
 
 export const VACUUM_MODULE_TYPE_WITH_LABWARE: 'vacuumModuleTypeWithLabware' =
   'vacuumModuleTypeWithLabware'

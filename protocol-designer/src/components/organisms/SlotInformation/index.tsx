@@ -23,18 +23,17 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
-  FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
 } from '@opentrons/step-generation'
 
+import { VACUUM_DOCK_DISPLAY_LOCATION } from '/protocol-designer/constants'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
-import type { VacuumDockFakeLocationType } from '@opentrons/step-generation'
 
 interface SlotInformationProps {
   location: string
@@ -73,10 +72,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
       slot: getColumnFromWellName(location),
     })
   } else if (getIsSlotAVacuumDock(location)) {
-    modifiedLocation =
-      FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT[
-        location as VacuumDockFakeLocationType
-      ]
+    modifiedLocation = VACUUM_DOCK_DISPLAY_LOCATION
   }
 
   return (

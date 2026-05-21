@@ -1,3 +1,5 @@
+import { VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA } from '@opentrons/shared-data'
+
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 
 import { HighlightLabware } from '../HighlightLabware'
@@ -70,20 +72,12 @@ export function VacuumDockLabwareRenders(
   return (
     <>
       {/* Render all labware in the stack (bottom to top) */}
-      {dockLabwareStack
-        .slice()
-        .reverse()
-        .map(labwareId => {
-          const labware = labwaresOnDeck[labwareId]
-          return labware ? (
-            <LabwareOnDeck
-              key={labwareId}
-              x={x}
-              y={y}
-              labwareOnDeck={labware}
-            />
-          ) : null
-        })}
+      {[...dockLabwareStack].reverse().map(labwareId => {
+        const labware = labwaresOnDeck[labwareId]
+        return labware ? (
+          <LabwareOnDeck key={labwareId} x={x} y={y} labwareOnDeck={labware} />
+        ) : null
+      })}
       <HighlightLabware
         labwareOnDeck={topLabware}
         position={[x, y, 0]}
@@ -91,7 +85,7 @@ export function VacuumDockLabwareRenders(
       />
       <LabwareControls
         terminalItemId={terminalItemId}
-        itemId="vacuumDockA4"
+        itemId={VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}
         setHover={setHover}
         setShowMenuListForId={setShowMenuListForId}
         hover={hover}
@@ -104,7 +98,7 @@ export function VacuumDockLabwareRenders(
         allModules={allModules}
       />
       <ActiveLabwareControls
-        itemId="vacuumDockA4"
+        itemId={VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}
         slotPosition={[x, y, 0]}
         hover={hover}
         setHover={setHover}

@@ -27,8 +27,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
-  FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA,
-  FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
 } from '@opentrons/step-generation'
@@ -45,7 +43,10 @@ import {
   SelectLabwareModal,
 } from '../../../components/organisms'
 import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
-import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
+import {
+  DECK_SETUP_TOOLS_WIDTH_REM,
+  VACUUM_DOCK_DISPLAY_LOCATION,
+} from '../../../constants'
 import {
   createContainer,
   deleteContainer,
@@ -59,11 +60,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse, getIsVacuumModuleFull } from './utils'
 
-import type {
-  HopperLocationMapKey,
-  VacuumDockFakeLocationType,
-  VacuumDockLocationMapKey,
-} from '@opentrons/step-generation'
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
 import type { ThunkDispatch } from '../../../types'
 
@@ -115,12 +112,7 @@ export function DeckSetupToolbox(
   }
   const isHopperSlot = getIsSlotAHopper(slot)
   const isVacuumDockSlot = getIsSlotAVacuumDock(slot)
-  // For vacuum dock, use the addressable area, not the deck slot
-  const realSlot = isVacuumDockSlot
-    ? FAKE_VACUUM_DOCK_LOCATION_TO_ADDRESSABLE_AREA[
-        slot as VacuumDockLocationMapKey
-      ]
-    : slot
+  const realSlot = slot
   const offDeckLabware = deckSetup.labware[slot]
   const isVacuumModule =
     selectedModuleModel != null &&
@@ -327,8 +319,7 @@ export function DeckSetupToolbox(
   if (getIsSlotAHopper(slot)) {
     displaySlot = t('shared:stacker', { slot: getColumnFromWellName(slot) })
   } else if (getIsSlotAVacuumDock(slot)) {
-    displaySlot =
-      FAKE_VACUUM_DOCK_LOCATION_TO_DECK_SLOT[slot as VacuumDockFakeLocationType]
+    displaySlot = VACUUM_DOCK_DISPLAY_LOCATION
   }
 
   const isMultiStack = createdStackForSlot.length > 1

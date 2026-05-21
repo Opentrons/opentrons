@@ -162,21 +162,18 @@ export function DeckSetupContainer(
   // Returns the actual slot/addressable area for positioning
   const _getSlotForPositioning = (location: string): string => {
     const isOnHopper = location.includes('hopper')
-    const isOnVacuumDock = location.includes('vacuumDock')
-    return isOnHopper
-      ? location.split('hopper')[1]
-      : isOnVacuumDock
-        ? 'vacuumModuleV1DockA4' // Use addressable area for positioning
-        : location
+    if (isOnHopper) {
+      return location.split('hopper')[1]
+    }
+    return location
   }
 
   const _getZoomInOffsetFromRawLocation = (location: string): number => {
     const isOnHopper = location.includes('hopper')
-    const isOnVacuumDock = location.includes('vacuumDock')
     if (isOnHopper) {
       return HOPPER_ZOOM_OFFSET_POSTITION
     }
-    if (isOnVacuumDock) {
+    if (getIsSlotAVacuumDock(location)) {
       return VACUUM_DOCK_ZOOM_OFFSET_POSITION
     }
     return 0
