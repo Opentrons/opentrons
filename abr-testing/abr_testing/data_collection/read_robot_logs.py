@@ -914,6 +914,7 @@ def get_logs(storage_directory: Path, ip: str) -> str:
             save_path = os.path.join(save_dir, "discovery.json")
         except subprocess.CalledProcessError as e:
             print(f"Error during file transfer: {e}")
+            return ""
     with open(save_path) as f:
         discovery_data = json.load(f)
     robot_name = discovery_data["robots"][0].get("name", "unknown")
