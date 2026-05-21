@@ -7,6 +7,8 @@
   "deck_setup": "Deck Setup",
   "device": "Device",
   "devices": "Devices",
+  "help": "Help",
+  "help_icon": "Help icon",
   "instruments": "Instruments",
   "labware": "Labware",
   "modules": "modules",
@@ -23,5 +25,6 @@
   "run": "run",
   "run_details": "Run Details",
   "settings": "Settings",
+  "settings_icon": "Settings icon",
   "visualization": "Visualization"
 }
