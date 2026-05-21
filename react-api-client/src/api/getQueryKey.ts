@@ -15,6 +15,8 @@ export function getQueryKey(
       : {
           hostname: hostConfig.hostname,
           port: hostConfig.port,
+          requestor: hostConfig.requestor,
+          secure: hostConfig.secure,
         }
 
   // map undefined values to null to agree with react query caching
