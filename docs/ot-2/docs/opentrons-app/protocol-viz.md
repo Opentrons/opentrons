@@ -12,10 +12,8 @@ Test new protocols in the Opentrons App before running them on your OT-2. Use pr
 Click **Visualize** on any OT-2 protocol's details page to get started. You'll be able to see details for any protocol using API version 2.16 and newer. 
 
 <figure class="screenshot" markdown>
-![Image showing the protocol visualization screen for a protocol.](../images/)
+![Image showing the protocol visualization screen for a protocol.](../images/protocol-viz.png)
 </figure>
-
-**TODO: insert main screen of a protocol (Heat Shock and Transfer protocol?)**
 
 The visualization screen shown above includes protocol steps on the left, a view of the OT-2 deck in the middle, and hardware and labware details on the right. The following sections take a closer look at using protocol visualization to preview, troubleshoot, and edit your OT-2 protocols. 
 
@@ -28,10 +26,8 @@ Choose how to visualize your OT-2 protocol's steps:
 - Scroll the timeline on the left and click on any protocol step to view it.
 
 <figure class="screenshot" markdown>
-![Image showing the play bar at the top of the page.](../images/)
+![Image showing the play bar at the top of the page.](../images/viz-play-bar.png)
 </figure>
-
-**should be able to use this same image? unless playback speed changes affect it**
 
 For each step of your protocol, the deck view changes to include liquid, labware, and pipette tip changes.
 
@@ -46,11 +42,11 @@ For each step, additional protocol details appear on the right side of the scree
 
 - **Pipettes**: attached pipettes and their mounts, including the active pipette performing liquid handling actions.
 - **Tip pickup**: a closer look at where tips will be picked up for this step, including the number of remaining tips in the rack.
-- **Well view**: well dimensions, the position of the pipette's attached tip, and a side view of liquids in the well. Hover over liquid in the well to view volumes.
+- **Well view**: well dimensions, the position of the pipette's attached tip, and a side view of liquids in the well.
 - **Labware**: top-down view liquid and well changes in labware like well plates and reservoirs.
 
 <figure class="screenshot" markdown>
-![Protocol viz details](../images/)
+![Protocol viz details](../images/viz-details.png)
 <figcaption> Examples of additional protocol details available on the right side of the screen.</figcaption>
 </figure>
 
@@ -59,8 +55,8 @@ For each step, additional protocol details appear on the right side of the scree
 At any point in your protocol, hover over labware on the deck to see labware names. For a closer look, click any slot to open a slot spotlight in a new window.
 
 <figure class="screenshot" markdown>
-![Image showing slot spotlight view.](../images/)
-<figcaption>A slot spotlight for C1, showing view changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.
+![Image showing slot spotlight view.](../images/slot-spotlight.png)
+<figcaption>A spotlight for slot 3, showing view changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.
 </figure>
 
 Open a slot spotlight to see changes over the course of your protocol. For example, spotlight a slot with a tip rack and drag the blue bar to see how quickly tips from that rack are used. Or spotlight a slot with a module to see changes in temperature, lid position, or other status.
