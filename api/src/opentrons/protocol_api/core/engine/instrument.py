@@ -1525,6 +1525,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 transfer_properties=transfer_props,
                 transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
                 tip_contents=post_disp_tip_contents,
+                max_pipette_and_tip_volume=max_volume_for_pip_and_tip,
                 volume_for_pipette_mode_configuration=step_volume,
             )
             post_disp_tip_contents = self.dispense_liquid_class(
@@ -1770,9 +1771,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 transfer_properties=transfer_props,
                 transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
                 tip_contents=tip_contents,
-                # We configure the mode based on the last dispense volume and disposal volume
-                # since the mode is only used to determine the dispense push out volume
-                # and we can do a push out only at the last dispense, that too if there is no disposal volume.
+                max_pipette_and_tip_volume=max_volume_for_pip_and_tip,
                 volume_for_pipette_mode_configuration=vol_dest_combo[-1][0],
                 conditioning_volume=conditioning_vol,
             )
@@ -2005,6 +2004,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     transfer_properties=transfer_props,
                     transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
                     tip_contents=tip_contents,
+                    max_pipette_and_tip_volume=max_volume_for_pip_and_tip,
                     volume_for_pipette_mode_configuration=(
                         total_dispense_volume if step_num == 0 else None
                     ),
@@ -2191,6 +2191,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         transfer_properties: TransferProperties,
         transfer_type: tx_comps_executor.TransferType,
         tip_contents: List[tx_comps_executor.LiquidAndAirGapPair],
+        max_pipette_and_tip_volume: float,
         volume_for_pipette_mode_configuration: Optional[float],
         conditioning_volume: Optional[float] = None,
         current_volume: float = 0.0,
@@ -2210,14 +2211,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         volume_for_air_gap = aspirate_props.retract.air_gap_by_volume.get_for_volume(
             volume + current_volume
         )
-        tip_picked_up_from = self.get_tip_origin()
-        assert tip_picked_up_from is not None  # Check added for mypy purposes
         tx_commons.check_valid_liquid_class_volume_parameters(
             aspirate_volume=volume,
             air_gap=volume_for_air_gap if conditioning_volume is None else 0,
-            max_volume=self._get_pipette_max_volume_for_tip_and_transfer_volume(
-                tip_picked_up_from[0], volume
-            ),
+            max_volume=max_pipette_and_tip_volume,
             current_volume=current_volume,
         )
         source_loc, source_well = source
