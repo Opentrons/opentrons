@@ -90,6 +90,11 @@ Unnamed box 3 includes items that connect the manifold to the waste collection c
 <figcaption>(2) Vacuum hoses</figcaption>
 </figure>
 
+<figure markdown>
+![Threaded and snap-on quick connectors](images/quick-connectors.png "Threaded and snap-on quick connectors")
+<figcaption>(8) Quick connectors</figcaption>
+</figure>
+
 </div>
 
 ## Physical specifications

@@ -15,6 +15,14 @@ Opentrons hardware modules add features and capabilities to your robot.
 
 <div class="grid cards" markdown>
 
+-   :opentrons-vacuum:{ .xl .middle } __Vacuum Module__
+
+    ---
+
+    An on-deck vacuum filtration and purification module.
+
+    [:octicons-arrow-right-24: Instruction Manual](../vacuum/index.md)
+
 -   :opentrons-stacker:{ .xl .middle } __Flex Stacker__
 
     ---
@@ -62,13 +70,5 @@ Opentrons hardware modules add features and capabilities to your robot.
     A hot and cold plate module with a range between 4°C and 95°C.
 
     [:octicons-arrow-right-24: Instruction Manual](../temperature-module/index.md)
-
--   :opentrons-vacuum:{ .xl .middle } __Vacuum Module__
-
-    ---
-
-    An on-deck vacuum filtration and purification module.
-
-    [:octicons-arrow-right-24: Instruction Manual](../vacuum/index.md)
 
 </div>
