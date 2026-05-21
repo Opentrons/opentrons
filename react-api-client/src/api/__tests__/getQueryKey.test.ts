@@ -9,12 +9,13 @@ describe('getQueryKey', () => {
     expect(getQueryKey(null, 'runs')).toStrictEqual([{}, 'runs'])
   })
 
-  it('uses only hostname and port from hostConfig', () => {
+  it('excludes robotName and token from hostConfig', () => {
     const hostConfig: HostConfig = {
       hostname: 'otie.local',
       port: 31950,
       robotName: 'otie',
       token: 'abc123',
+      requestor: undefined,
       secure: true,
     }
 
@@ -22,13 +23,15 @@ describe('getQueryKey', () => {
       {
         hostname: 'otie.local',
         port: 31950,
+        requestor: null,
+        secure: true,
       },
       'runs',
       'details',
     ])
   })
 
-  it('normalizes undefined properties of hostConfig to null', () => {
+  it('normalizes undefined and omitted properties of hostConfig to null', () => {
     const hostConfig: HostConfig = {
       hostname: 'otie.local',
       port: undefined,
@@ -38,6 +41,8 @@ describe('getQueryKey', () => {
       {
         hostname: 'otie.local',
         port: null,
+        requestor: null,
+        secure: null,
       },
       'runs',
     ])
