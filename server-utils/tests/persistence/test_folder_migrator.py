@@ -104,7 +104,7 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
     result = subject.migrate_to_latest()
 
     assert result == tmp_path / "c_dir"
-    assert {child.name for child in tmp_path.iterdir()} == {"initial_file", "c_dir"}
+    assert _children(tmp_path) == {"initial_file", "c_dir"}
     assert (tmp_path / "c_dir" / "c_file").exists()
 
 
@@ -148,7 +148,7 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
     result = subject.migrate_to_latest()
 
     assert result == tmp_path / "c_dir"
-    assert {child.name for child in tmp_path.iterdir()} == {
+    assert _children(tmp_path) == {
         "initial_file",
         "a_dir",
         "c_dir",
