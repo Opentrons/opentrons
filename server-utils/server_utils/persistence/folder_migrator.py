@@ -94,7 +94,9 @@ class MigrationOrchestrator:
             is_first_migration = sequence_index == 0
             is_final_migration = sequence_index == len(sequence) - 1
 
-            output_dir = Path(tempfile.mkdtemp(self._temp_file_prefix))
+            output_dir = Path(
+                tempfile.mkdtemp(dir=self._root, prefix=self._temp_file_prefix)
+            )
 
             _log.info(f'Performing migration to "{migration.subdirectory}"...')
             migration.migrate(source_dir=previous_output, dest_dir=output_dir)
