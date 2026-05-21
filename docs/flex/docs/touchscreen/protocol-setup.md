@@ -25,46 +25,54 @@ Tap any row with a right arrow to show more information for that category. (The 
     <tr>
       <td>Parameters</td>
       <td>
-        See the names, descriptions, and default values of runtime parameters for the protocol.<br />
-        Tap a parameter to edit its value. See the Runtime Parameters section below for more details.
+        <p>Review the names, descriptions, and default values of runtime parameters for the protocol.</p>
+        <p>Tap a parameter to edit its value. See the <a href="#runtime-parameters">Runtime Parameters section</a> for more information.</p>
       </td>
     </tr>
     <tr>
       <td>Instruments</td>
       <td>
-        See if all instruments are attached to the correct mounts and calibrated.<br />
-        Tap <b>Attach</b> or <b>Calibrate</b> to set up any that aren't.
+        <p>Verify that all instruments are attached to the correct mounts and calibrated.</p>
+        <p>Tap <strong>Attach</strong> or <strong>Calibrate</strong> to set up any that aren't.</p>
       </td>
     </tr>
     <tr>
       <td>Deck hardware</td>
       <td>
-        See the locations and connection statuses of hardware on the deck.
+        <p>Check the physical locations and connection statuses of hardware on the deck.</p>
         <ul>
-          <li>Tap <img src="../../images/info-icon.svg" alt="More information icon" style="vertical-align: middle; height: 1.25em;"> <b>Setup Instructions</b> to get detailed instructions.</li>
-          <li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li>
+          <li>Tap <img src="../../images/info-icon.svg" alt="More information icon" style="vertical-align: middle; height: 1.25em;"> <strong>Setup Instructions</strong> to get detailed instructions.</li>
+          <li>Tap <strong>Map View</strong> to switch to a visual layout of hardware positions.</li>
         </ul>
       </td>
     </tr>
     <tr>
       <td>Labware Offsets</td>
-      <td></td>
+      <td>
+        <p>Manage existing offset measurements or run <a href="#labware-offsets-and-position-checking">Labware Position Check</a>.</p>
+        <ul>
+          <li>Tap <strong>Apply Offsets</strong> to apply offset data to labware.</li>
+          <li>Tap <strong>Labware Position Check</strong> to verify or reverify offset data.</li>
+        </ul>
+      </td>
     </tr>
     <tr>
       <td>Labware &amp; Liquids</td>
       <td>
-        See the locations of labware along with the types and total volumes of liquids.
-          <ul>
-            <li>Each labware lists its initial deck location, and icons indicate labware that are on top of modules.</li>
-            <li>Tap <b>Map View</b> to switch to a visual layout of labware positions.</li>
-            <li>Tap any liquid name to expand a list of well-by-well volumes.</li>
-            <li>Tap an individual volume row to show a visual layout of its location within labware.</li>
-          </ul>
-        </td>
+        <p>Inspect deck locations alongside the specific types and total volumes of liquids loaded.</p>
+        <ul>
+          <li>Tap <strong>Map View</strong> or <strong>List View</strong> to switch between a visual map or list of on-deck labware.</li>
+          <li>Tap any labware to see a list of well-by-well liquids and volumes.</li>
+          <li>Tap <strong>Confirm Placements</strong> to verify labware locations.</li>
+        </ul>
+      </td>
     </tr>
     <tr>
       <td>Camera</td>
-      <td></td>
+      <td>
+        <p>Take still images with the built-in camera or watch a live video of a protocol in operation.</p>
+        <p>See <a href="../../opentrons-app/camera/">Using the Camera</a> for more information about settings and features for this device.</p>
+      </td>
     </tr>
   </tbody>
 </table>
