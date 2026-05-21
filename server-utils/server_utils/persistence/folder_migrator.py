@@ -16,14 +16,13 @@ Where each version has its own isolated subdirectory.
 
 from __future__ import annotations
 
-import contextlib
 import logging
 import os
 import shutil
 import tempfile
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Final, Generator, List, Union
+from typing import Final, List, Union
 
 _log = logging.getLogger(__name__)
 
@@ -89,36 +88,35 @@ class MigrationOrchestrator:
 
         _log.info(f"Migrations to perform: {[m.subdirectory for m in sequence]}")
 
-        with contextlib.ExitStack() as exit_stack:
-            for sequence_index, migration in enumerate(sequence):
-                is_final_migration = sequence_index == len(sequence) - 1
-                if is_final_migration:
-                    # For the final migration, set things up so that if everything
-                    # goes well, we'll commit its output to persistent storage.
-                    output_dir = exit_stack.enter_context(
-                        _atomic_dir(
-                            destination=self._root / migration.subdirectory,
-                            temp_prefix=self._temp_file_prefix,
-                        )
-                    )
-                else:
-                    # Unlike the final migration, for intermediate migrations,
-                    # we use normal temporary directories in the default system
-                    # location. This is inherently safer in case we crash and leave
-                    # anything behind, and it's also possibly faster (tmpfs instead of
-                    # flash storage).
-                    #
-                    # TODO: Consider freeing each directory when we're done with it.
-                    # e.g. if we're migrating from v1 to v10, we can free the temporary
-                    # directory for v2 as soon as we move past it; we don't need to wait
-                    # for v10 to complete.
-                    output_dir = Path(
-                        exit_stack.enter_context(tempfile.TemporaryDirectory())
-                    )
+        for sequence_index, migration in enumerate(sequence):
+            is_first_migration = sequence_index == 0
+            is_final_migration = sequence_index == len(sequence) - 1
 
-                _log.info(f'Performing migration to "{migration.subdirectory}"...')
-                migration.migrate(source_dir=previous_output, dest_dir=output_dir)
-                previous_output = output_dir
+            output_dir = Path(tempfile.mkdtemp(self._temp_file_prefix))
+
+            _log.info(f'Performing migration to "{migration.subdirectory}"...')
+            migration.migrate(source_dir=previous_output, dest_dir=output_dir)
+
+            # Throw away transient directories to keep filesystem usage low.
+            if not is_first_migration:
+                shutil.rmtree(previous_output)
+
+            if is_final_migration:
+                # Promote the temporary directory to be permanent.
+                #
+                # At this point, we have a directory full of files, but we haven't yet moved it into
+                # place. This os.sync() is a barrier to make sure that the kernel+filesystem don't
+                # reorder the "move into place" part before the "fill it with files" part, which
+                # would break our atomicity if we lost power between the two.
+                #
+                # We do a nuclear-option os.sync() instead of messing with the finer-grained
+                # os.fsync() because os.fsync() is difficult to get right.
+                # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
+                os.sync()
+                # Atomically move the filled directory into place.
+                os.replace(src=output_dir, dst=final_output)
+
+            previous_output = output_dir
 
         _log.info("All migrations complete.")
         return final_output
@@ -201,48 +199,6 @@ class Migration(ABC):
         If something goes wrong, this method should signal it by raising an exception.
         The migration sequence will be aborted safely.
         """
-
-
-@contextlib.contextmanager
-def _atomic_dir(destination: Path, temp_prefix: str) -> Generator[Path, None, None]:
-    """Atomically create a directory and its contained files.
-
-    This returns a temporary directory. While the `with`-block is open, you can fill
-    it with files. Then:
-
-    * If the code inside the `with`-block succeeds, the directory is promoted to be
-      non-temporary, by atomically moving it to be at `destination`.
-    * Or, if the code inside the `with`-block raises an exception, the temporary
-      directory is deleted.
-
-    Crashes or shutdowns may leave the temporary directory behind, adjacent to
-    `destination`. Choose a `temp_prefix` that's easily identifiable so you can
-    clean it up in case this happens.
-    """
-    temp_dir = tempfile.mkdtemp(
-        # Manually specify `dir` to keep the temporary directory on the same filesystem
-        # as our target. Otherwise, the rename won't be atomic.
-        dir=destination.parent,
-        prefix=temp_prefix,
-    )
-
-    try:
-        yield Path(temp_dir)
-    except Exception:
-        shutil.rmtree(temp_dir)
-        raise
-    else:
-        # At this point, we have a directory full of files, but we haven't yet moved it into
-        # place. This os.sync() is a barrier to make sure that the kernel+filesystem don't
-        # reorder the "move into place" part before the "fill it with files" part, which
-        # would break our atomicity if we lost power between the two.
-        #
-        # We do a nuclear-option os.sync() instead of messing with the finer-grained
-        # os.fsync() because os.fsync() is difficult to get right.
-        # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
-        os.sync()
-        # Atomically move the filled directory into place.
-        os.replace(src=temp_dir, dst=destination)
 
 
 def _validate_bare_name(name: str) -> None:
