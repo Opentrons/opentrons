@@ -40,7 +40,18 @@ def run(protocol_context):
         trash_location=trash,
     )
 
-    # The volume mode should be reset to low volume after the transfer.
+    # Similar to above, the transfer method should ignore the above volume mode and understand that
+    # max volume for a 20uL tip is 20uL. So this transfer should split each volume into two transfers of 10.5uL each.
+    pipette_50.transfer_with_liquid_class(
+        liquid_class=water,
+        volume=21,
+        source=nest_plate.rows()[0][:2],
+        dest=arma_plate.rows()[0][:2],
+        new_tip="always",
+        trash_location=trash,
+    )
+
+    # The volume mode should be reset to low volume after the transfers.
     # This is pipette max volume and does not take tip volume into consideration. Update this if/when attached tip also determines pipette max volume.
     assert pipette_50.max_volume == 30
 

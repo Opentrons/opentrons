@@ -2194,7 +2194,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         max_pipette_and_tip_volume: float,
         volume_for_pipette_mode_configuration: Optional[float],
         conditioning_volume: Optional[float] = None,
-        current_volume: float = 0.0,
+        current_volume: float = 0.0,  # TODO (spp, 2026-05-21): I think we can fetch this from the above tip contents. Check and remove this param.
     ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
         """Execute aspiration steps.
 

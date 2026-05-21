@@ -783,6 +783,116 @@ def test_order_of_water_consolidate_steps(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.29", "Flex")], indirect=True
+)
+def test_consolidate_steps_with_20ul_tips_in_low_volume_mode(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should perform the consolidation in low volume mode when volume to dispense is less than pipette default min volume."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_20ul", "D1"
+    )
+    pipette_50 = simulated_protocol_context.load_instrument(
+        "flex_1channel_50", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+
+    water = simulated_protocol_context.get_liquid_class("water")
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "load_liquid_class",
+            side_effect=InstrumentCore.load_liquid_class,
+            autospec=True,
+        ) as patched_load_liquid_class,
+        mock.patch.object(
+            InstrumentCore,
+            "aspirate_liquid_class",
+            side_effect=InstrumentCore.aspirate_liquid_class,
+            autospec=True,
+        ) as patched_aspirate,
+        mock.patch.object(
+            InstrumentCore,
+            "dispense_liquid_class",
+            side_effect=InstrumentCore.dispense_liquid_class,
+            autospec=True,
+        ) as patched_dispense,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_load_liquid_class, "load_liquid_class")
+        mock_manager.attach_mock(patched_aspirate, "aspirate_liquid_class")
+        mock_manager.attach_mock(patched_dispense, "dispense_liquid_class")
+        pipette_50.consolidate_with_liquid_class(
+            liquid_class=water,
+            volume=1,
+            source=nest_plate.rows()[0][:3],
+            dest=arma_plate.wells()[0],
+            new_tip="once",
+            trash_location=trash,
+        )
+        expected_calls = [
+            mock.call.load_liquid_class(
+                mock.ANY,
+                name="water",
+                transfer_properties=mock.ANY,
+                tiprack_uri="opentrons/opentrons_flex_96_tiprack_20ul/1",
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=1,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                max_pipette_and_tip_volume=20,
+                volume_for_pipette_mode_configuration=3,
+                current_volume=0.0,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=1,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=1, air_gap=0.1)],
+                max_pipette_and_tip_volume=20,
+                volume_for_pipette_mode_configuration=None,
+                current_volume=1.0,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=1,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=2, air_gap=0.1)],
+                max_pipette_and_tip_volume=20,
+                volume_for_pipette_mode_configuration=None,
+                current_volume=2.0,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=3,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.MANY_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=3, air_gap=0.1)],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 def test_order_of_water_consolidate_steps_larger_volume_than_tip(
