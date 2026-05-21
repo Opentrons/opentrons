@@ -30,6 +30,7 @@ stages:
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
+          usingTemporaryPassword: false
 
   - name: Create a new user with a password less than 8 characters
     request:
@@ -64,6 +65,7 @@ stages:
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
+          usingTemporaryPassword: false
 
   - name: Update the user
     request:
@@ -85,6 +87,7 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
+          usingTemporaryPassword: false
 
   - name: Update the username and password
     request:
@@ -106,6 +109,7 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
+          usingTemporaryPassword: false
 
   - name: Update the reset password flag
     request:
@@ -126,6 +130,7 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
+          usingTemporaryPassword: false
 
   - name: Get the user information
     request:
@@ -143,6 +148,47 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
+          usingTemporaryPassword: false
+
+  - name: Reset the user's password to a temporary password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated/resetPassword'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      save:
+        json:
+          temporary_password: data.temporaryPassword
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          userName: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: true
+          usingTemporaryPassword: true
+          temporaryPassword: !anystr
+
+  - name: Log in with the temporary password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_new_user_updated
+        password: '{temporary_password}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+        expires_in: !anyint
+        scope: !anystr
 
   - name: Get a new access token with the updated username and password
     request:
