@@ -583,11 +583,11 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
 
     assert (
         ot3api.build_temporary_identity_calibration().deck_calibration.source.value
-        is "default"
+        == "default"
     )
     assert (
-        ot3api.build_temporary_identity_calibration().deck_calibration.status.source.value
-        is "default"
+        ot3api.build_temporary_identity_calibration().deck_calibration.status.source
+        is None
     )
 
     ot3_proxy._pyroRelease()  # type: ignore
