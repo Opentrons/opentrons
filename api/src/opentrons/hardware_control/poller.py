@@ -110,8 +110,11 @@ class Poller:
         try:
             async with self._use_read_lock():
                 await self._reader.read()
-        except asyncio.CancelledError:
-            raise
+        except asyncio.CancelledError as ce:
+            log.error(f"canceled error: {ce}")
+            # cancelled error does not inherit from Exception so lets re-wrap it
+            new_exception = RuntimeError(str(ce)).with_traceback(ce.__traceback__)
+            self._error_callback(new_exception)
         except AbsorbanceReaderDisconnectedError as e:
             self._error_callback(e)
             self._complete_all(e, previous_waiters)
