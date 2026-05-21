@@ -68,7 +68,7 @@ export function RecentProtocolRuns({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         minHeight={SIZE_4}
-        paddingX={SPACING.spacing16}
+        padding={SPACING.spacing16}
         width="100%"
       >
         {isRobotViewable && allRunsMutable && allRunsMutable?.length > 0 && (

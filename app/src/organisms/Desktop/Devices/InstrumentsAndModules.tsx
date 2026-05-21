@@ -129,6 +129,7 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       gap={SPACING.spacing16}
+      paddingBottom={SPACING.spacing12}
     >
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('instruments_and_modules')}
