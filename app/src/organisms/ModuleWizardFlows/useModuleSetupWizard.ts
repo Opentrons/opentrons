@@ -14,7 +14,7 @@ import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 // TODO(jj): implement useGuardedAction on desktop
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import { useGuardedAction } from '../ODD/AccessControl'
+import { useMaintenanceRunDocumentation } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
 import { ACTIONS } from './constants'
 import { useSendIdentifyStacker } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
@@ -95,13 +95,13 @@ export function useModuleSetupWizard(
   }
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
 
-  const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands()
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
 
-  const docState = useGuardedAction([])
+  const { chainRunCommands, isCommandMutationLoading } =
+    useChainMaintenanceCommands(commandDocState)
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation(docState, {
+    useCreateTargetedMaintenanceRunMutation(commandDocState, {
       onSuccess: (response: {
         data: { id: SetStateAction<string | null> }
       }) => {
@@ -130,14 +130,17 @@ export function useModuleSetupWizard(
     if (onComplete != null) onComplete()
   }
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      setMaintenanceRunId(null)
-    },
-    onError: () => {
-      setMaintenanceRunId(null)
-    },
-  })
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    {
+      onSuccess: () => {
+        setMaintenanceRunId(null)
+      },
+      onError: () => {
+        setMaintenanceRunId(null)
+      },
+    }
+  )
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)

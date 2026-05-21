@@ -1,7 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { deleteMaintenanceRun } from '@opentrons/api-client'
 
+import { type DocumentationState } from '../access_control/types'
+import { useDocumentedMutation } from '../access_control/useDocumentedMutation'
 import { useHost } from '../api'
 
 import type {
@@ -26,12 +28,14 @@ export type UseDeleteMaintenanceRunMutationOptions = UseMutationOptions<
 >
 
 export function useDeleteMaintenanceRunMutation(
+  documentationState: DocumentationState,
   options: UseDeleteMaintenanceRunMutationOptions = {}
 ): UseDeleteMaintenanceRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, string>(
+  const mutation = useDocumentedMutation<EmptyResponse, unknown, string>(
+    documentationState,
     (maintenanceRunId: string) =>
       deleteMaintenanceRun(host!, maintenanceRunId).then(response => {
         queryClient.removeQueries([host, 'maintenance_runs', maintenanceRunId])

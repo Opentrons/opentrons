@@ -7,10 +7,7 @@ import { requireDocumentation } from '../requireDocumentation'
 import { useGuardedAction } from '../useGuardedAction'
 
 import type ReactRedux from 'react-redux'
-import type {
-  DocumentationReport,
-  DocumentedActionKind,
-} from '../../../../resources/access-control/types'
+import type { DocumentationReport } from '../../../../resources/access-control/types'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
@@ -37,12 +34,6 @@ vi.mock('../requireDocumentation', () => ({
   requireDocumentation: vi.fn(),
 }))
 
-const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [
-  {
-    kind: 'PROTOCOL_PLAY',
-  },
-]
-
 describe('useGuardedAction', () => {
   beforeEach(() => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
@@ -59,7 +50,7 @@ describe('useGuardedAction', () => {
       data: { data: { accessControlEnabled: false } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
 
-    const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
+    const { result } = renderHook(() => useGuardedAction())
 
     const currentResult = await act(() => !result.current.accessControlEnabled)
     expect(currentResult).toBe(true)
@@ -73,9 +64,7 @@ describe('useGuardedAction', () => {
       documentedBy: 'alice',
     }
 
-    const { result } = renderHook(() =>
-      useGuardedAction(ACTIONS_TO_DOCUMENT, docreport)
-    )
+    const { result } = renderHook(() => useGuardedAction(docreport))
 
     expect(result.current.accessControlEnabled).toBe(true)
     expect(
@@ -84,7 +73,7 @@ describe('useGuardedAction', () => {
   })
 
   it('returns callback to open modal when documentation is not provided', async () => {
-    const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
+    const { result } = renderHook(() => useGuardedAction())
 
     expect(result.current.accessControlEnabled).toBe(true)
     expect(

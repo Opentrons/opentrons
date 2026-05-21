@@ -5,9 +5,12 @@ import type {
   MutationFunction,
   MutationKey,
   UseMutationOptions,
-  UseMutationResult,
 } from 'react-query'
-import type { DocumentationReport, DocumentationState } from './types'
+import type {
+  DocumentationReport,
+  DocumentationState,
+  UseDocumentedMutation,
+} from './types'
 
 /**
  * Wrapper for a mutation function that ensures documentation is provided when access control is enabled.
@@ -25,26 +28,25 @@ import type { DocumentationReport, DocumentationState } from './types'
  *
  * TODO(jj): actually pass along the documentation report to the mutation.
  *
+ * Call signatures live in ./types as `UseDocumentedMutation`.
  */
-export function useDocumentedMutation<
-  TData = unknown,
-  TError = unknown,
-  TVariables = void,
-  TContext = unknown,
->(
-  documentationState: DocumentationState,
-  mutationKey: MutationKey,
-  mutationFn: MutationFunction<TData, TVariables>,
-  options?: UseMutationOptions<TData, TError, TVariables, TContext>
-): UseMutationResult<TData, TError, TVariables, TContext> {
-  const wrappedMutationFn = useWrappedMutationFn(mutationFn, documentationState)
-  const mutation = useMutation<TData, TError, TVariables, TContext>(
-    mutationKey,
-    wrappedMutationFn,
-    options
-  )
+export const useDocumentedMutation: UseDocumentedMutation = (
+  documentationState,
+  arg1,
+  arg2?,
+  arg3?
+) => {
+  const hasKey = typeof arg1 !== 'function'
+  const mutationFn = (hasKey ? arg2 : arg1) as MutationFunction
+  const options = (hasKey ? arg3 : arg2) as UseMutationOptions | undefined
 
-  return mutation
+  const wrappedMutationFn = useWrappedMutationFn(mutationFn, documentationState)
+
+  return useMutation({
+    ...options,
+    ...(hasKey ? { mutationKey: arg1 as MutationKey } : {}),
+    mutationFn: wrappedMutationFn,
+  })
 }
 
 const checkDocumentationReport = async (
@@ -67,7 +69,10 @@ function useWrappedMutationFn<TData, TVariables>(
     async (...args: Parameters<typeof mutationFn>) => {
       const docreport = await checkDocumentationReport(documentationState)
       // TODO(jj): actually use the docreport
-      console.log(docreport)
+      console.log(`reason for interaction: ${docreport?.note}`)
+      if (docreport == null) {
+        console.error('No documentation report provided')
+      }
       return await mutationFn(...args)
     },
     [documentationState, mutationFn]

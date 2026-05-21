@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
+// TODO(jj): implement documentation state generation on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useGuardedAction } from '../ODD/AccessControl'
 import { MaintenanceRunStatusProvider } from './MaintenanceRunStatusProvider'
 import { TakeoverModal } from './TakeoverModal'
 import { useMaintenanceRunTakeover } from './useMaintenanceRunTakeover'
@@ -41,7 +44,10 @@ export function MaintenanceRunTakeoverModal(
   const desktopMaintenanceRunInProgress =
     isMaintenanceRunCurrent && oddRunId !== currentRunId
 
-  const { deleteMaintenanceRun, reset } = useDeleteMaintenanceRunMutation()
+  const docState = useGuardedAction()
+
+  const { deleteMaintenanceRun, reset } =
+    useDeleteMaintenanceRunMutation(docState)
 
   const handleCloseAndTerminate = (): void => {
     if (currentRunId != null) {

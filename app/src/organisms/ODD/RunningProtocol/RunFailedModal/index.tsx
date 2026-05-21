@@ -38,7 +38,7 @@ export function RunFailedModal({
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const navigate = useNavigate()
-  const documentationState = useGuardedAction([])
+  const documentationState = useGuardedAction()
   const { stopRun } = useStopRunMutation(documentationState)
   const [isCanceling, setIsCanceling] = useState(false)
 

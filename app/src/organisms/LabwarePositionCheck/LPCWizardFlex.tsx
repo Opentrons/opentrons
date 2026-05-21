@@ -19,6 +19,9 @@ import {
   selectCurrentStep,
 } from '/app/redux/protocol-runs'
 
+// TODO(jj): implement documentation state generation on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useMaintenanceRunDocumentation } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
 import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
 import { LPCRobotInMotion } from './LPCRobotInMotion'
@@ -37,8 +40,11 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
     dispatch(goBackStepDispatch(props.runId))
   }
 
+  const { commandDocState } = useMaintenanceRunDocumentation()
+
   const dispatch = useDispatch()
   const LPCHandlerUtils = useLPCCommands({
+    commandDocState,
     ...props,
   })
 

@@ -2,6 +2,9 @@
 import { useState } from 'react'
 
 import { useDropTipCommandErrors } from '.'
+// TODO(jj): implement documentation state generation on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { useMaintenanceRunDocumentation } from '../../ODD/AccessControl/useMaintenanceRunDocumentation'
 import { useDropTipCommands } from './useDropTipCommands'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
@@ -36,10 +39,11 @@ export function useDropTipWithType(
 
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
   const { errorDetails, setErrorDetails } = useErrorDetails()
-
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
   const activeMaintenanceRunId = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
+    commandDocState,
   })
 
   const dtCreateCommandUtils = useDropTipCreateCommands({
@@ -48,6 +52,7 @@ export function useDropTipWithType(
     issuedCommandsType,
     activeMaintenanceRunId,
     fixitCommandTypeUtils,
+    commandDocState,
   })
   const dropTipCommands = useDropTipCommands({
     ...params,
@@ -56,6 +61,8 @@ export function useDropTipWithType(
     setErrorDetails,
     toggleIsExiting,
     fixitCommandTypeUtils,
+    commandDocState,
+    deletionDocState,
   })
 
   return {

@@ -34,9 +34,12 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(deleteMaintenanceRun).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDeleteMaintenanceRunMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID)
@@ -51,9 +54,12 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
       data: { data: null },
     } as Response<EmptyResponse>)
 
-    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDeleteMaintenanceRunMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID))
 
     await waitFor(() => {
