@@ -8,7 +8,10 @@ from typing_extensions import Final
 
 from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
-from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
+from opentrons.drivers.heater_shaker.driver import (
+    DEFAULT_COMMAND_RETRIES,
+    HeaterShakerDriver,
+)
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
@@ -329,9 +332,27 @@ class HeaterShaker(mod_abc.AbstractModule):
                 while self.temperature > awaiting_temperature:
                     await self._poller.wait_next_poll()
 
-        t = self._loop.create_task(_await_temperature())
-        self.make_cancellable(t)
-        await t
+        await self.run_task_fault_tolerant(_await_temperature, DEFAULT_COMMAND_RETRIES)
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        self._port = port
+        self._usb_port = usb_port
+
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        try:
+            if not await self._driver.is_connected():
+                await self.cleanup()
+                self._driver = await HeaterShakerDriver.create(
+                    port=self.port, loop=self.loop
+                )
+                self._reader._driver = self._driver
+            # restart the poller
+            await self._poller.stop()
+            await self._poller.start()
+        except BaseException:
+            log.exception("Got an error when trying to reconnect.")
+            raise
 
     async def set_speed(self, rpm: int) -> None:
         """
@@ -353,21 +374,27 @@ class HeaterShaker(mod_abc.AbstractModule):
             while self.speed_status != SpeedStatus.HOLDING:
                 await self._poller.wait_next_poll()
 
-        task = self._loop.create_task(_wait())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(_wait, DEFAULT_COMMAND_RETRIES)
 
     async def _wait_for_labware_latch(
         self, status: HeaterShakerLabwareLatchStatus
     ) -> None:
         """Wait until the hardware reports the labware latch status matches."""
-        while self.labware_latch_status != status:
-            await self._poller.wait_next_poll()
+
+        async def _wait() -> None:
+            while self.labware_latch_status != status:
+                await self._poller.wait_next_poll()
+
+        await self.run_task_fault_tolerant(_wait, DEFAULT_COMMAND_RETRIES)
 
     async def _wait_for_shake_deactivation(self) -> None:
         """Wait until hardware reports that module has stopped shaking and has homed."""
-        while self.speed_status != SpeedStatus.IDLE:
-            await self._poller.wait_next_poll()
+
+        async def _wait() -> None:
+            while self.speed_status != SpeedStatus.IDLE:
+                await self._poller.wait_next_poll()
+
+        await self.run_task_fault_tolerant(_wait, DEFAULT_COMMAND_RETRIES)
 
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
@@ -418,6 +445,7 @@ class HeaterShakerReader(Reader):
         self.error: Optional[str] = None
         self._driver = driver
         self._handle_error: Callable[[Exception], None] | None = None
+        self._error_debounce = DEFAULT_COMMAND_RETRIES * 4
 
     def register_error_handler(
         self, handle_error: Callable[[Exception], None]
@@ -450,7 +478,13 @@ class HeaterShakerReader(Reader):
     def _set_error(self, exception: Optional[Exception]) -> None:
         if exception is None:
             self.error = None
+            # we read 4 values per read, so we would consume a lot of the debounce every fail
+            self._error_debounce = DEFAULT_COMMAND_RETRIES
         else:
+            log.info(f"error {exception} debounce {self._error_debounce}")
+            self._error_debounce -= 1
+            if self._error_debounce > 0:
+                return
             if self._handle_error:
                 self._handle_error(exception)
             try:
