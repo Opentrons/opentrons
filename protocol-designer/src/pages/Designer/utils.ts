@@ -18,7 +18,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
-  FAKE_VACUUM_DOCK_LOCATION_MAP,
   getFullStackFromLabwares,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
@@ -55,7 +54,6 @@ import type {
   LabwareEntities,
   LabwareEntity,
   RobotState,
-  VacuumDockLocationMapKey,
 } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -80,6 +78,7 @@ interface SlotInformation {
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
   isSlotAHopper: boolean
+  isSlotAVacuumDock: boolean
   createdModuleForSlot?: ModuleOnDeck
   createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
@@ -103,7 +102,7 @@ const _getAdjustedSlot = (
   isSlotAHopper: boolean
 ): string => {
   if (isSlotAVacuumDock) {
-    return FAKE_VACUUM_DOCK_LOCATION_MAP[slot as VacuumDockLocationMapKey]
+    return slot
   }
   if (isSlotAHopper) {
     return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
@@ -165,7 +164,8 @@ export const getSlotInformation = (
     : getFullStackFromLabwaresOnDeck(
         Object.values(deckSetupLabware),
         slot,
-        isSlotAHopper
+        isSlotAHopper,
+        isSlotAVacuumDock
       )
   const labwareStackOnSlot =
     fullStackFromLabwares?.filter(
@@ -257,6 +257,7 @@ export const getSlotInformation = (
     preSelectedFixture,
     slotPosition: slotPosition,
     isSlotAHopper,
+    isSlotAVacuumDock,
     matchingLabwareFor4thColumn: matchingLabware,
     createdStackForSlot:
       slot === 'offDeck'
