@@ -3,95 +3,60 @@
 from datetime import datetime
 
 import pytest
+from decoy import Decoy
 from fastapi import status
 
-from server_utils.auth.resource_server.auth_server import (
-    RequireReasonForInteractionSettingsResponse,
-    RequireReasonForInteractionSettingsResponseData,
-)
 from server_utils.auth.resource_server.authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
 )
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.fastapi_dependencies import (
-    get_robot_require_reason_for_interaction_settings,
-    maybe_log_user_action_notes_when_setting_requires,
-)
+from robot_server.fastapi_dependencies import maybe_record_documented_interaction
 from robot_server.runs.action_models import RunActionCreate, RunActionType
-from robot_server.settings import RobotServerSettings
-
-_REQUIRE_REASON_ON = RequireReasonForInteractionSettingsResponse(
-    data=RequireReasonForInteractionSettingsResponseData(
-        requireReasonForInteraction=True
-    )
-)
-_REQUIRE_REASON_OFF = RequireReasonForInteractionSettingsResponse(
-    data=RequireReasonForInteractionSettingsResponseData(
-        requireReasonForInteraction=False
-    )
-)
-
-
-@pytest.mark.asyncio
-async def test_integration_override_returns_configured_value(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Integration override mocks require-reason without auth-server."""
-    monkeypatch.setattr(
-        "robot_server.fastapi_dependencies.get_settings",
-        lambda: RobotServerSettings(
-            integration_require_reason_for_interaction_override=True
-        ),
-    )
-    result = await get_robot_require_reason_for_interaction_settings(
-        AlwaysAllowedAuthorizationChecker()
-    )
-    assert result.data.requireReasonForInteraction is True
-
-    monkeypatch.setattr(
-        "robot_server.fastapi_dependencies.get_settings",
-        lambda: RobotServerSettings(
-            integration_require_reason_for_interaction_override=False
-        ),
-    )
-    result = await get_robot_require_reason_for_interaction_settings(
-        AlwaysAllowedAuthorizationChecker()
-    )
-    assert result.data.requireReasonForInteraction is False
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("action_type", [RunActionType.PLAY, RunActionType.PAUSE])
 async def test_action_without_notes_raises_when_reason_required(
+    decoy: Decoy,
     action_type: RunActionType,
 ) -> None:
-    """Run actions without ``userNotes`` are rejected when require-reason is on."""
+    """Run actions without ``userNotes`` are rejected when auth-server requires them."""
+    checker = decoy.mock(cls=AlwaysAllowedAuthorizationChecker)
+    decoy.when(await checker.get_require_reason_for_interaction_enabled()).then_return(
+        True
+    )
     body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
         userNotes=None,
     )
     with pytest.raises(ApiError) as exc_info:
-        await maybe_log_user_action_notes_when_setting_requires(
+        await maybe_record_documented_interaction(
             "run-id",
             body,
             datetime(year=2024, month=1, day=1),
-            require_reason_settings=_REQUIRE_REASON_ON,
+            authorization_checker=checker,
         )
     assert exc_info.value.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.asyncio
-async def test_action_without_notes_allowed_when_reason_not_required() -> None:
-    """When require-reason is off, actions without ``userNotes`` are not validated here."""
+async def test_action_without_notes_allowed_when_reason_not_required(
+    decoy: Decoy,
+) -> None:
+    """When auth-server does not require notes, actions without ``userNotes`` are allowed."""
+    checker = decoy.mock(cls=AlwaysAllowedAuthorizationChecker)
+    decoy.when(await checker.get_require_reason_for_interaction_enabled()).then_return(
+        False
+    )
     body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=RunActionType.PLAY),
         userNotes=None,
     )
-    await maybe_log_user_action_notes_when_setting_requires(
+    await maybe_record_documented_interaction(
         "run-id",
         body,
         datetime(year=2024, month=1, day=1),
-        require_reason_settings=_REQUIRE_REASON_OFF,
+        authorization_checker=checker,
     )

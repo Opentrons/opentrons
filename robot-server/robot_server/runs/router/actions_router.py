@@ -29,7 +29,7 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.errors.global_errors import InvalidRequest
 from robot_server.fastapi_dependencies import (
-    maybe_log_user_action_notes_when_setting_requires,
+    maybe_record_documented_interaction,
 )
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
@@ -126,7 +126,7 @@ async def create_run_action(
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     _maybe_audit_action_user_notes: Annotated[
         None,
-        Depends(maybe_log_user_action_notes_when_setting_requires),
+        Depends(maybe_record_documented_interaction),
     ],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
@@ -145,7 +145,7 @@ async def create_run_action(
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
         _maybe_audit_action_user_notes: When auth-server requires reasons for
-            interaction, requires ``userNotes`` and logs supplied notes.
+            interaction, requires ``userNotes`` and records the interaction for audit.
     """
     body = request_body.data
     action_type = body.actionType
