@@ -2,9 +2,9 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-// TODO(jj): implement useGuardedAction on desktop
+// TODO(jj): implement documentation state generation on desktop
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
+import { usePromptForInteractionReason } from '/app/organisms/ODD/AccessControl/usePromptForInteractionReason'
 
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
@@ -46,11 +46,11 @@ export function useRobotControlCommands({
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
   const [isExecuting, setIsExecuting] = useState(false)
 
-  const { chainRunCommands } = useChainMaintenanceCommands()
-  const { mutateAsync: deleteMaintenanceRun } =
-    useDeleteMaintenanceRunMutation()
+  const docState = usePromptForInteractionReason()
 
-  const docState = useGuardedAction([])
+  const { chainRunCommands } = useChainMaintenanceCommands(docState)
+  const { mutateAsync: deleteMaintenanceRun } =
+    useDeleteMaintenanceRunMutation(docState)
 
   const { createTargetedMaintenanceRun } =
     useCreateTargetedMaintenanceRunMutation(docState, {

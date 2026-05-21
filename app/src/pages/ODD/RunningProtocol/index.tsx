@@ -109,7 +109,7 @@ export function RunningProtocol(): JSX.Element {
   })
 
   // TODO(jj): figure out what to do with actionsToDocument
-  const docstate = useGuardedAction([])
+  const docstate = useGuardedAction()
 
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??

@@ -1,4 +1,5 @@
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
 import {
@@ -22,6 +23,7 @@ interface UseDropTipCreateCommandsParams {
   activeMaintenanceRunId: string | null
   fixitCommandTypeUtils?: FixitCommandTypeUtils
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
+  commandDocState: DocumentationState
 }
 
 export interface UseDropTipCreateCommandsResult {
@@ -39,6 +41,7 @@ export function useDropTipCreateCommands({
   fixitCommandTypeUtils,
   activeMaintenanceRunId,
   setErrorDetails,
+  commandDocState,
 }: UseDropTipCreateCommandsParams): UseDropTipCreateCommandsResult {
   const { failedCommandId, runId } = fixitCommandTypeUtils ?? {
     failedCommand: null,
@@ -48,14 +51,15 @@ export function useDropTipCreateCommands({
   const {
     chainRunCommands: chainRunSetupCommands,
     isCommandMutationLoading: isSetupCommandLoading,
-  } = useChainMaintenanceCommands()
+  } = useChainMaintenanceCommands(commandDocState)
 
   const {
     chainRunCommands: chainRunFixitCommands,
     isCommandMutationLoading: isFixitCommandLoading,
   } = useChainRunCommands(runId, failedCommandId)
 
-  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
+  const { createMaintenanceCommand } =
+    useCreateMaintenanceCommandMutation(commandDocState)
 
   const { createRunCommand } = useCreateRunCommandMutation(
     runId,

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
+
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
@@ -24,6 +26,7 @@ export type UseDropTipMaintenanceRunParams = Omit<
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   instrumentModelSpecs?: PipetteModelSpecs
   mount?: PipetteData['mount']
+  commandDocState: DocumentationState
 }
 
 // Manages the maintenance run state if the flow is utilizing "setup" type commands.
@@ -33,6 +36,7 @@ export function useDropTipMaintenanceRun({
   instrumentModelSpecs,
   setErrorDetails,
   closeFlow,
+  commandDocState,
 }: UseDropTipMaintenanceRunParams): string | null {
   const isMaintenanceRunType = issuedCommandsType === 'setup'
 
@@ -52,6 +56,7 @@ export function useDropTipMaintenanceRun({
     instrumentModelName: instrumentModelSpecs?.name,
     setErrorDetails,
     setCreatedMaintenanceRunId,
+    commandDocState,
   })
 
   useMonitorMaintenanceRunForDeletion({
@@ -70,6 +75,7 @@ type UseCreateDropTipMaintenanceRunParams = Omit<
 > & {
   setCreatedMaintenanceRunId: (id: string) => void
   instrumentModelName?: PipetteModelSpecs['name']
+  commandDocState: DocumentationState
 }
 
 // Handles the creation of the maintenance run for "setup" command type drop tip flows, including the loading of the pipette.
@@ -79,10 +85,11 @@ function useCreateDropTipMaintenanceRun({
   instrumentModelName,
   setErrorDetails,
   setCreatedMaintenanceRunId,
+  commandDocState,
 }: UseCreateDropTipMaintenanceRunParams): void {
-  const { chainRunCommands } = useChainMaintenanceCommands()
+  const { chainRunCommands } = useChainMaintenanceCommands(commandDocState)
 
-  const docState = useGuardedAction([])
+  const docState = useGuardedAction()
 
   const { createTargetedMaintenanceRun } =
     useCreateTargetedMaintenanceRunMutation(docState, {

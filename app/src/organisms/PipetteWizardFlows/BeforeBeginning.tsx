@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -9,6 +9,7 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -24,6 +25,9 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
+// TODO(jj): implement documentation state generation on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { isDocumentationProvided } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
 import {
   BODY_STYLE,
   CALIBRATION_PROBE,
@@ -59,6 +63,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   createdMaintenanceRunId: string | null
   deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
+  documentationState: DocumentationState
 }
 export const BeforeBeginning = (
   props: BeforeBeginningProps
@@ -80,18 +85,24 @@ export const BeforeBeginning = (
     maintenanceRunId,
     createdMaintenanceRunId,
     deckConfig,
+    documentationState,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  useEffect(
-    () => {
-      if (createdMaintenanceRunId == null) {
-        createMaintenanceRun({})
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+
+  const hasSentCreateMaintenanceRun = useRef(false)
+  useEffect(() => {
+    if (createdMaintenanceRunId != null) return
+    if (isCreateLoading || hasSentCreateMaintenanceRun.current) return
+    if (!isDocumentationProvided(documentationState)) return
+
+    hasSentCreateMaintenanceRun.current = true
+    createMaintenanceRun({})
+  }, [
+    createMaintenanceRun,
+    createdMaintenanceRunId,
+    documentationState,
+    isCreateLoading,
+  ])
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =

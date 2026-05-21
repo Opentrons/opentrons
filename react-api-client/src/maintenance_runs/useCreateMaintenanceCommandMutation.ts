@@ -1,7 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createMaintenanceCommand } from '@opentrons/api-client'
 
+import { type DocumentationState } from '../access_control/types'
+import { useDocumentedMutation } from '../access_control/useDocumentedMutation'
 import { getQueryKey, useHost } from '../api'
 
 import type {
@@ -37,35 +39,53 @@ export type UseCreateMaintenanceCommandMutationOptions = UseMutationOptions<
   CreateMaintenanceCommandMutateParams
 >
 
-export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceCommandMutationResult {
+export function useCreateMaintenanceCommandMutation(
+  documentationState: DocumentationState
+): UseCreateMaintenanceCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     CommandData,
     unknown,
     CreateMaintenanceCommandMutateParams
-  >(({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
-    createMaintenanceCommand(host!, maintenanceRunId, command, {
-      waitUntilComplete,
-      timeout,
-    })
-      .then(response => {
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
-          .catch((e: Error) => {
-            console.error(
-              `error invalidating maintenance runs query: ${e.message}`
-            )
-          })
-        return response.data
+  >(
+    documentationState,
+    ({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
+      createMaintenanceCommand(host!, maintenanceRunId, command, {
+        waitUntilComplete,
+        timeout,
       })
-      .catch((e: any) => {
-        queryClient.invalidateQueries(
-          getQueryKey(host, 'robot/control/estopStatus')
-        )
-        throw e
-      })
+        .then(response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
+            .catch((e: Error) => {
+              console.error(
+                `error invalidating maintenance runs query: ${e.message}`
+              )
+            })
+          return response.data
+        })
+        .catch((e: any) => {
+          queryClient.invalidateQueries(
+            getQueryKey(host, 'robot/control/estopStatus')
+          )
+          throw e
+        })
+        .then(response => {
+          queryClient
+            .invalidateQueries([host, 'maintenance_runs'])
+            .catch((e: Error) => {
+              console.error(
+                `error invalidating maintenance runs query: ${e.message}`
+              )
+            })
+          return response.data
+        })
+        .catch((e: any) => {
+          queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
+          throw e
+        })
   )
 
   return {

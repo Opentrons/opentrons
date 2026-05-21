@@ -30,9 +30,9 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-// TODO(jj): implement useGuardedAction on desktop
+// TODO(jj): implement documentation state generation on desktop
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import { useGuardedAction } from '../ODD/AccessControl'
+import { useMaintenanceRunDocumentation } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
 import { AttachProbe } from './AttachProbe'
 import { AttachWasteChute } from './AttachWasteChute'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -177,14 +177,14 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
-  const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands()
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
 
-  const docState = useGuardedAction([])
+  const { chainRunCommands, isCommandMutationLoading } =
+    useChainMaintenanceCommands(commandDocState)
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
-      docState,
+      commandDocState,
       {
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)
@@ -242,7 +242,7 @@ export const PipetteWizardFlows = (
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation({
+    useDeleteMaintenanceRunMutation(deletionDocState, {
       onSuccess: () => {
         closeFlow()
       },
@@ -359,6 +359,7 @@ export const PipetteWizardFlows = (
         isCreateLoading={isCreateLoading}
         deckConfig={deckConfig}
         requiredPipette={requiredPipette}
+        documentationState={commandDocState}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
@@ -9,10 +9,7 @@ import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 import { isDocumentationReportValid } from '../../../resources/access-control/utils'
 import { requireDocumentation } from './requireDocumentation'
 
-import type {
-  DocumentationReport,
-  DocumentedActionKind,
-} from '../../../resources/access-control/types'
+import type { DocumentationReport } from '../../../resources/access-control/types'
 
 /**
  * API for the access-control gate.
@@ -27,7 +24,6 @@ import type {
  *
  */
 export function useGuardedAction(
-  actionsToDocument: DocumentedActionKind[],
   docreport?: DocumentationReport
 ): DocumentationState {
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
@@ -36,24 +32,26 @@ export function useGuardedAction(
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
 
   const showDocumentationModal = useCallback(async () => {
-    const docResult = await requireDocumentation(
-      actionsToDocument,
-      currentUsername ?? ''
-    )
+    console.log('useGuardedAction: showing documentation modal')
+    const docResult = await requireDocumentation([], currentUsername ?? '')
     return docResult
-  }, [currentUsername, actionsToDocument])
+  }, [currentUsername])
 
-  if (!accessControlEnabled) {
-    return { accessControlEnabled }
-  }
+  const docState: DocumentationState = useMemo(() => {
+    if (!accessControlEnabled) {
+      return { accessControlEnabled }
+    }
 
-  if (docreport != null && isDocumentationReportValid(docreport)) {
-    return { accessControlEnabled, docreport }
-  }
+    if (docreport != null && isDocumentationReportValid(docreport)) {
+      return { accessControlEnabled, docreport }
+    }
 
-  return {
-    accessControlEnabled,
-    docreport: null,
-    askForDocumentation: showDocumentationModal,
-  }
+    return {
+      accessControlEnabled,
+      docreport: null,
+      askForDocumentation: showDocumentationModal,
+    }
+  }, [accessControlEnabled, docreport, showDocumentationModal])
+
+  return docState
 }

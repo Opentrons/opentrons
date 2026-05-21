@@ -29,9 +29,9 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-// TODO(jj): implement useGuardedAction on desktop
+// TODO(jj): implement documentation state generation on desktop
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import { useGuardedAction } from '../ODD/AccessControl'
+import { useMaintenanceRunDocumentation } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
 import { BeforeBeginning } from './BeforeBeginning'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { ExitConfirmation } from './ExitConfirmation'
@@ -65,12 +65,14 @@ export function GripperWizardFlows(
   props: MaintenanceRunManagerProps
 ): JSX.Element {
   const { flowType, closeFlow, attachedGripper } = props
+
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
-  } = useChainMaintenanceCommands()
+  } = useChainMaintenanceCommands(commandDocState)
   const { createMaintenanceCommand, isLoading: isCommandLoading } =
-    useCreateMaintenanceCommandMutation()
+    useCreateMaintenanceCommandMutation(commandDocState)
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
@@ -84,10 +86,8 @@ export function GripperWizardFlows(
     setMonitorMaintenanceRunForDeletion,
   ] = useState<boolean>(false)
 
-  const docState = useGuardedAction([])
-
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation(docState, {
+    useCreateTargetedMaintenanceRunMutation(commandDocState, {
       onSuccess: response => {
         setCreatedMaintenanceRunId(response.data.id)
       },
@@ -137,7 +137,7 @@ export function GripperWizardFlows(
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation({
+    useDeleteMaintenanceRunMutation(deletionDocState, {
       onSuccess: () => {
         closeFlow()
       },

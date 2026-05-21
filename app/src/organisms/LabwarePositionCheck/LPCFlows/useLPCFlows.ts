@@ -15,9 +15,9 @@ import {
   useNotifyRunQuery,
 } from '/app/resources/runs'
 
-// TODO(jj): implement useGuardedAction on desktop
+// TODO(jj): implement documentation state generation on desktop
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import { useGuardedAction } from '../../ODD/AccessControl'
+import { useMaintenanceRunDocumentation } from '../../ODD/AccessControl/useMaintenanceRunDocumentation'
 import {
   useCompatibleAnalysis,
   useHandleClientAppliedOffsets,
@@ -75,7 +75,7 @@ export function useLPCFlows({
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
-  const docState = useGuardedAction([])
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
 
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -136,11 +136,11 @@ export function useLPCFlows({
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation(docState)
+    useCreateTargetedMaintenanceRunMutation(commandDocState)
   const { createLabwareDefinition } =
     useCreateMaintenanceRunLabwareDefinitionMutation()
   const { deleteMaintenanceRun, isLoading: isClosing } =
-    useDeleteMaintenanceRunMutation()
+    useDeleteMaintenanceRunMutation(deletionDocState)
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(
