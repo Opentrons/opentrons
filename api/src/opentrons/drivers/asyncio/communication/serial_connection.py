@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from typing import AsyncIterator, Literal, Type
 
 from .async_serial import AsyncSerial
@@ -303,8 +304,12 @@ class SerialConnection:
         Returns: None
         """
         await asyncio.sleep(self._retry_wait_time_seconds)
-        await self._serial.close()
-        await self._serial.open()
+        if os.path.exists(self._port):
+            try:
+                await asyncio.wait_for(self._serial.close(), timeout=1)
+                await asyncio.wait_for(self._serial.open(), timeout=1)
+            except BaseException:
+                log.exception("Got an error during reconnect.")
 
     def process_raw_response(self, command: str, response: str) -> str:
         """
@@ -648,12 +653,20 @@ class AsyncResponseSerialConnection(SerialConnection):
         responses: list[str] = []
 
         for retry in range(retries + 1):
-            responses = await self._send_one_retry(data, acks)
-            if responses:
-                return responses
-            log.info(f"{self._name}: retry number {retry}/{retries}")
-            await self.on_retry()
+            try:
+                responses = await self._send_one_retry(data, acks)
+                if responses:
+                    return responses
+                log.info(f"{self._name}: retry number {retry}/{retries}")
 
+            except BaseException as e:
+                log.error(f"Got an error during send {e}")
+                if retry < retries:
+                    pass
+                else:
+                    raise e
+
+            await self.on_retry()
         raise NoResponse(port=self._port, command=data)
 
     async def _send_data(self, data: str, retries: int) -> str:
