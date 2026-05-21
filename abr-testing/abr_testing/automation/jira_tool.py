@@ -150,8 +150,8 @@ class JiraTicket:
                 auth=self.auth,
                 json=data,
             )
-            response.raise_for_status()
             response_str = str(response.content)
+            response.raise_for_status()
             issue_url = response.json().get("self")
             issue_key = response.json().get("key")
             print(f"issue key: {issue_key}")
@@ -258,6 +258,9 @@ class JiraTicket:
         component_url = f"{self.url}/rest/api/3/project/{project_id}/components"
         response = requests.get(component_url, headers=self.headers, auth=self.auth)
         components_list = response.json()
+        if not isinstance(components_list, list):
+            print(f"Failed to get components for project '{project_id}': {components_list}")
+            return []
         return components_list
 
     def comment(self, content_list: List[Dict[str, Any]], issue_key: str) -> None:
