@@ -6,13 +6,15 @@ import {
   getIsLid,
   getIsPipettableLabware,
   locationIsOffDeck,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { BOTTOM_UP_LABWARE_POOL_KEYS } from '../constants'
+import { BOTTOM_UP_LABWARE_POOL_KEYS, VACUUM_DOCK_LOCATION } from '../constants'
 import { TOUCHED_PIPETTABLE_LABWARE } from '../types'
 import {
   getFlexStackerShuttleAddressableArea,
   getFullStackFromLabwares,
+  getIsSlotAVacuumDock,
   getLargestStackInSlot,
   getSlotInLocationStack,
 } from '../utils'
@@ -176,6 +178,19 @@ export function forMoveLabware(
       FLEX_STACKER_MODULE_TYPE
     ) {
       newLocationStack.push(modules[newLocation.moduleId].slot)
+    } else if (
+      invariantContext.moduleEntities[newLocation.moduleId]?.type ===
+      VACUUM_MODULE_TYPE
+    ) {
+      // For vacuum module: stack onto whatever is currently on the module's main slot
+      // so that [collar, ...existingModuleLabware, moduleId, slot] is built correctly
+      const moduleSlot = modules[newLocation.moduleId].slot
+      const existingStack = getLargestStackInSlot(labware, moduleSlot)
+      if (existingStack.length > 0) {
+        newLocationStack.push(...existingStack)
+      } else {
+        newLocationStack.push(newLocation.moduleId, moduleSlot)
+      }
     } else {
       newLocationStack.push(
         newLocation.moduleId,
@@ -203,7 +218,19 @@ export function forMoveLabware(
     const labwareIdStack = labware[labwareId].stack
     newLocationStack.push(...labwareIdStack)
   } else if ('addressableAreaName' in newLocation) {
-    newLocationStack.push(newLocation.addressableAreaName)
+    if (getIsSlotAVacuumDock(newLocation.addressableAreaName)) {
+      const vacuumModuleId = Object.entries(modules).find(
+        ([moduleId]) =>
+          invariantContext.moduleEntities[moduleId]?.type === VACUUM_MODULE_TYPE
+      )?.[0]
+      newLocationStack.push(VACUUM_DOCK_LOCATION)
+      if (vacuumModuleId != null) {
+        newLocationStack.push(vacuumModuleId)
+      }
+      newLocationStack.push(newLocation.addressableAreaName)
+    } else {
+      newLocationStack.push(newLocation.addressableAreaName)
+    }
   }
   labwareToMove.forEach((id, i) => {
     if (labware[id] != null) {
@@ -235,6 +262,20 @@ export function forMoveLabware(
     )
     if (shuttleAa != null) {
       stackedOnNodeForMovedPrimary = { addressableAreaName: shuttleAa }
+    }
+  } else if (
+    typeof newLocation === 'object' &&
+    newLocation !== null &&
+    'moduleId' in newLocation &&
+    invariantContext.moduleEntities[newLocation.moduleId]?.type ===
+      VACUUM_MODULE_TYPE
+  ) {
+    // The collar stacks onto the topmost existing labware on the module, not the module itself
+    const moduleSlot = modules[newLocation.moduleId].slot
+    const existingStack = getLargestStackInSlot(labware, moduleSlot)
+    const topOnModule = existingStack.length > 0 ? existingStack[0] : null
+    if (topOnModule != null && topOnModule in labwareEntities) {
+      stackedOnNodeForMovedPrimary = { labwareId: topOnModule }
     }
   }
   robotState.labware[labwareId].stackedOnNode = stackedOnNodeForMovedPrimary

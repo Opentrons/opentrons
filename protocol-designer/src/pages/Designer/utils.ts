@@ -26,6 +26,7 @@ import {
 
 import {
   HOPPER_LABWARE_X_OFFSET,
+  VACUUM_DOCK_DISPLAY_LOCATION,
   VACUUM_DOCK_LABWARE_X_OFFSET,
 } from '/protocol-designer/constants'
 
@@ -38,6 +39,7 @@ import {
   getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
+import { getIsVacuumCollar } from './DeckSetup/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -325,10 +327,21 @@ const getLabwareInfo = (
 ): { nickName: string; latestSlot: string } => {
   const { modules } = activeDeckSetup
   const stack = activeDeckSetup.labware[labwareId]?.stack
-  const latestSlot =
-    stack != null
-      ? resolveSlotLocation(modules, stack, robotType)
-      : 'unknown slot'
+  let latestSlot: string = ''
+
+  // First resolve the slot from the stack
+  if (stack != null) {
+    latestSlot = resolveSlotLocation(modules, stack, robotType)
+  } else {
+    latestSlot = 'unknown slot'
+  }
+
+  // Then check if it's a vacuum dock and transform to display location
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(latestSlot)
+  if (isSlotAVacuumDock) {
+    latestSlot = VACUUM_DOCK_DISPLAY_LOCATION
+  }
+
   const name = nicknamesById[labwareId]
   let nickName: string = name
   if (latestSlot != null && latestSlot !== 'offDeck') {
@@ -389,6 +402,7 @@ export const useLabwareDropdownOptions = (
         deckSlot === 'fixedTrash'
 
       const isAdapter = def.allowedRoles?.includes('adapter') ?? false
+      const isVacuumCollar = getIsVacuumCollar(def)
       const { nickName, latestSlot } = getLabwareInfo(
         nicknamesById,
         activeDeckSetup,
@@ -406,11 +420,14 @@ export const useLabwareDropdownOptions = (
       const options: DropdownOption[] =
         isInaccessible ||
         (type === 'labware' && isOnStacker) ||
-        isAdapter ||
+        (isAdapter && !isVacuumCollar) ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
-        (type === 'moveLabware' && !isTopOfStack && !isLabwareLidCombo) ||
+        (type === 'moveLabware' &&
+          !isTopOfStack &&
+          !isVacuumCollar &&
+          !isLabwareLidCombo) ||
         (type === 'labware' && !isTopOfStack)
           ? acc
           : [
