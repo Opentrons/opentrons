@@ -37,6 +37,8 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
+from hardware_testing.scripts.data_center_client import upload_data_to_google_drive # test data auto upload
+
 DEFAULT_TRIALS = 10 # The number of trials each current speed check does
 DEFAULT_CYCLES = 40 # The number of burn-in cycles
 TRIALS_PER_CYCLE = 500 # number of plunger cycles in one burn in cycle
@@ -803,6 +805,10 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                 cycle_plunger_passed=cycle_plunger_passed,
                 test_plunger_fail_reasons=test_plunger_fail_reasons,
                 cycle_plunger_stall_reasons=cycle_plunger_stall_reasons,
+            )
+            upload_data_to_google_drive(
+                results_path,
+                True,
             )
             if api.is_simulator:
                 break
