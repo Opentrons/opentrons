@@ -111,6 +111,7 @@ class JiraTicket:
         components: list,
         affects_versions: str,
         labels: list,
+        parent: str,
     ) -> Tuple[str, str]:
         """Create ticket."""
         # Check if software version is a field on JIRA, if not replaces with existing version
@@ -143,6 +144,10 @@ class JiraTicket:
             print(f"Software version {affects_versions} added.")
         else:
             print("Software version of robot not in jira releases.")
+        issue_key = None
+        issue_url = None
+        if parent:
+            data["fields"]["parent"] = {"key": parent}
         try:
             response = requests.post(
                 f"{self.url}/rest/api/3/issue",

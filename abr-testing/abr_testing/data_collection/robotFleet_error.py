@@ -36,7 +36,6 @@ def retrieve_version_file(
     """Retrieve Version file."""
     version_file_path = "/etc/VERSION.json"
     save_dir = Path(f"{storage}")
-    print(save_dir)
     command = ["scp", "-r", f"root@{robot_ip}:{version_file_path}", save_dir]
     try:
         subprocess.run(command, check=True)  # type: ignore
@@ -192,6 +191,22 @@ def match_error_to_component(
     return components
 
 
+def get_parent_key(url: str, api_token: str, email: str, project_key: str, parent_name: str) -> str:
+    """Resolve a parent issue's key from its summary name."""
+    jql = f'project = {project_key} AND summary ~ "{parent_name}"'
+    response = requests.post(
+        f"{url}/rest/api/3/search/jql",
+        json={"jql": jql, "fields": ["summary"], "maxResults": 50},
+        auth=(email, api_token),
+    )
+    response.raise_for_status()
+    matches = [i for i in response.json()["issues"] if i["fields"]["summary"].strip().lower() == parent_name.strip().lower()]
+    if not matches:
+        raise ValueError(f"No issue named '{parent_name}' in {project_key}")
+    return matches[0]["key"]
+
+
+
 def get_user_id(user_file_path: str, assignee_name: str) -> str:
     """Get assignee account id."""
     users = json.load(open(user_file_path))
@@ -208,9 +223,8 @@ def get_error_runs_from_robot(ip: str) -> Tuple[List[str], List[str]]:
     error_run_ids = []
     protocol_ids = []
     response = requests.get(
-        f"http://{ip}:31950/runs", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/runs", headers={"opentrons-version": "*"}
     )
-    print("STATUS:", response.status_code)
     run_data = response.json()
     run_list = run_data.get("data", [])
     for run in run_list:
@@ -232,17 +246,17 @@ def get_robot_state(
     # Get instruments attached to robot
     try:
         response = requests.get(
-            f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+            f"http://{ip}:31950/health", headers={"opentrons-version": "*"}
         )
         print(f"Connected to {ip}")
     except Exception:
         print(f"ERROR: Failed to read IP address: {ip}")
         sys.exit()
     response = requests.get(
-        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/health", headers={"opentrons-version": "*"}
     )
     health_data = response.json()
-    print(f"health data {health_data}")
+    #print(f"health data {health_data}")
     robot = health_data.get("name", "")
     # Create summary name
     description["robot_name"] = robot
@@ -251,7 +265,7 @@ def get_robot_state(
     description["affects_version"] = affects_version
     # Instruments Attached
     response = requests.get(
-        f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/instruments", headers={"opentrons-version": "*"}
     )
 
     instrument_data = response.json()
@@ -259,7 +273,7 @@ def get_robot_state(
         description[instrument["mount"]] = instrument
     # Get modules attached to robot
     response = requests.get(
-        f"http://{ip}:31950/modules", headers={"opentrons-version": "3"}
+        f"http://{ip}:31950/modules", headers={"opentrons-version": "*"}
     )
     module_data = response.json()
     for module in module_data["data"]:
@@ -267,17 +281,19 @@ def get_robot_state(
     components = []
     #components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, reported_string, components)
-    if "9.0.0" in affects_version:
-        affects_version = "9.0.0-alpha.0"
-    # I NEED TO REMOVE THE ABOVE IT WILL BREAK STUFF
-    if "alpha" in affects_version:
-        components.append("flex internal release")
+    #if "alpha" in affects_version:
+    components.append("flex internal release")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
+    print(f"components: {str(components)}")
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    parent = affects_version + " Bugs"
+    parent_name = affects_version + " Bugs" #fix
+    print("test")
+    parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    print(f"parent: {parent}")
+
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -316,15 +332,23 @@ def get_run_error_info_from_robot(
     robot = results.get("robot_name", "")
     failure_level = "Level " + str(error_level) + " Failure"
 
-    #components = [failure_level, "Flex-RABR"]
+    components = []
+    #components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, str(error_type), components)
     affects_version = results["API_Version"]
-    if "alpha" in affects_version:
-        components.append("flex internal releases")
+    if affects_version == "9.0.0":
+        affects_version = "9.0.0-alpha.16"
+    #if "alpha" in affects_version:
+    components.append("flex internal release")
+    if "flexStacker" in str(description):
+        components.append("Flex Stacker")
+    print(f"components: {str(components)}")
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    parent = affects_version + " Bugs"
+    parent_name = affects_version + " Bugs"
+    parent = get_parent_key(url, api_token, email, project_key, parent_name)
+
     summary = robot + "_" + str(one_run) + "_" + str(error_code) + "_" + error_type
     # Description of error
     description["protocol_name"] = results["protocol"]["metadata"].get(
@@ -381,22 +405,13 @@ if __name__ == "__main__":
         nargs=1,
         help="Path to long term storage directory for run logs.",
     )
-    parser.add_argument(
-        "jira_api_token",
-        metavar="JIRA_API_TOKEN",
-        type=str,
-        nargs=1,
-        help="JIRA API Token. Get from https://id.atlassian.com/manage-profile/security.",
-    )
-    parser.add_argument(
-        "email",
-        metavar="EMAIL",
-        type=str,
-        nargs=1,
-        help="Email connected to JIRA account.",
-    )
-    
     args = parser.parse_args()
+    storage_directory = args.storage_directory[0]
+    credentials_path = os.path.join(storage_directory, "jiraCredentials.json")
+    with open(credentials_path) as f:
+        jiraCreds = json.load(f)
+    email = jiraCreds["Jira API"]["email"]
+    api_token = jiraCreds["Jira API"]["key"]
     while True:
         board = str(input("Enter ABR or RQA: ")).upper()
         if board == "ABR":
@@ -409,32 +424,30 @@ if __name__ == "__main__":
             break
         else:
             print("Invalid input, try again.")
-
-    storage_directory = args.storage_directory[0]
+    #TODO: auto grab from fleet
     ip = str(input("Enter Robot IP: "))
-    assignee = str(input("Enter Assignee Full Name: "))
+    #TODO: fix assignee, low priority
     run_or_other = str(
         input(
             "Press ENTER to report run error. If not a run error, type short summary of error: "
         )
     )
     url = "https://opentrons.atlassian.net"
-    api_token = args.jira_api_token[0]
-    email = args.email[0]
     log_zip_path = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    users_file_path = ticket.get_jira_users(storage_directory, project_key)
-    assignee_id = get_user_id(users_file_path, assignee)
+    #Nick Check
     run_log_file_path = ""
     protocol_found = False
+    #Nick Check
     try:
         error_runs, protocol_ids = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
-    #TODO: automatically populate this from robotFleet info
+    #Nick Check
     version_file_dir = retrieve_version_file(robot_ip=ip, storage=storage_directory)
     version_file_path = os.path.join(storage_directory, version_file_dir)
+    #Nick Check
     protocol_file_path = ""
     if len(run_or_other) < 1:
         # Retrieve the most recently run protocol file
@@ -455,8 +468,8 @@ if __name__ == "__main__":
         # Set protocol_found to true if python protocol was successfully copied over
         if protocol_file_path:
             protocol_found = True
-
         one_run = error_runs[-1]  # Most recent run with error.
+        #Nick check
         (
             summary,
             parent,
@@ -493,12 +506,13 @@ if __name__ == "__main__":
         summary,
         whole_description_str,
         project_key,
-        assignee_id,
+        "-1",
         "Bug",
         "Medium",
         components,
         affects_version,
         labels,
+        parent,
     )
     # Link Tickets - TODO: FIX THIS TO WORK
     to_link = ticket.match_issues(all_issues, summary)
