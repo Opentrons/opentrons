@@ -61,6 +61,10 @@ clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
+files_to_typecheck := src tests integration_testing
+files_to_lint := src tests integration_testing docs/v2/example_protocols
+files_to_format := src tests integration_testing docs/v2/example_protocols
+
 .PHONY: all
 all: clean wheel
 
@@ -133,13 +137,14 @@ test-ot2:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src tests integration_testing
-	$(ruff) check src tests integration_testing docs/v2/example_protocols
+	$(python) -m mypy $(files_to_typecheck)
+	$(ruff) check $(files_to_lint)
+	$(ruff) format --check $(files_to_format)
 
 .PHONY: format
 format:
-	$(ruff) format src tests integration_testing docs/v2/example_protocols
-	$(ruff) check --select I --fix src tests integration_testing docs/v2/example_protocols
+	$(ruff) format $(files_to_format)
+	$(ruff) check --select I --fix $(files_to_format)
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

@@ -72,7 +72,6 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       onClick={handleSelectedValue}
       width="10.3rem"
       minHeight={FLEX_MAX_CONTENT}
-      data-testid="LiquidDetailCard_box"
     >
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
         <Flex
@@ -125,7 +124,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {volumePerWellRange.map((well, index) => {
             return (
               <Flex
-                key={`${well.wellName}_${index}`}
+                key={well.wellName}
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 paddingBottom={

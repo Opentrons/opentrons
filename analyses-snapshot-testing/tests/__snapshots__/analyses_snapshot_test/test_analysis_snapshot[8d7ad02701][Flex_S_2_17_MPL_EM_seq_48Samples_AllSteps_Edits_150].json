@@ -18377,6 +18377,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutC3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -45709,6 +45713,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutC3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -51140,6 +51148,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [
     {

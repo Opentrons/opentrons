@@ -1,12 +1,23 @@
 import last from 'lodash/last'
 
-import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 import {
   getNextRobotStateAndWarningsSingleCommand,
   getWellsForTips,
 } from '@opentrons/step-generation'
 
-import type { CreateCommand } from '@opentrons/shared-data'
+import type {
+  ActiveNozzleNumber,
+  CreateCommand,
+  PartialPrimaryNozzles,
+} from '@opentrons/shared-data'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,
@@ -222,20 +233,26 @@ export const substepTimelineMultiChannel = (
           const isMoveToWell = labwareEntities[entityId] != null
           const channels = pipetteEntities[pipetteId].spec.channels
           const nozzles = pipetteEntity.nozzles
-
-          let numChannels = channels
+          const primaryNozzle = pipetteEntity.primaryNozzle
+          let numChannels: ActiveNozzleNumber
           if (nozzles === ALL && channels === 96) {
             numChannels = 96
           } else if (nozzles === COLUMN) {
             numChannels = 8
           } else if (nozzles === SINGLE) {
             numChannels = 1
+          } else if (nozzles === ROW) {
+            numChannels = 12
+          } else if (nozzles === PARTIAL_COLUMN && primaryNozzle) {
+            numChannels =
+              PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+          } else {
+            numChannels = channels
           }
           if (isMoveToWell) {
             const { def: labwareDef, id: labwareId } =
               invariantContext.labwareEntities[entityId]
             const wellsForTips =
-              numChannels &&
               labwareDef &&
               getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
 

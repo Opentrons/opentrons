@@ -2,6 +2,11 @@
 import dns from 'dns'
 import path from 'path'
 import { app, ipcMain } from 'electron'
+import {
+  installExtension,
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer'
 import fse from 'fs-extra'
 
 import {
@@ -13,6 +18,7 @@ import {
 } from './config'
 import { registerDiscovery } from './discovery'
 import { setUserDataPath } from './early'
+import { registerInternalApiListener } from './internal-api'
 import { createLogger } from './log'
 import { registerResourceMonitor } from './monitor'
 import {
@@ -25,8 +31,9 @@ import { initializeSentry } from './sentry'
 import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
-import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
-import { registerDataFiles, watchForMassStorage } from './usb'
+import { createUi, waitForBackendAndShowMainWindow } from './ui'
+import { registerSystemInfo } from './usb'
+import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
 import type { BrowserWindow } from 'electron'
 import type { LogEntry } from 'winston'
@@ -89,6 +96,7 @@ app.once('render-process-gone', (_, __, details) => {
 
 function startUp(): void {
   log.info('Starting App')
+  log.debug('get connected USB devices, getting devices')
   const storeNeedsReset = fse.existsSync(
     path.join(setUserDataPath(), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
@@ -131,6 +139,8 @@ function startUp(): void {
     })
   }
 
+  registerInternalApiListener()
+
   mainWindow = createUi(dispatch)
   rendererLogger = createRendererLogger()
   void establishBrokerConnection()
@@ -145,6 +155,7 @@ function startUp(): void {
     registerUpdateBrightness(),
     registerNotify(dispatch, mainWindow),
     registerDataFiles(dispatch),
+    registerSystemInfo(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
@@ -178,7 +189,7 @@ function startUp(): void {
     if (!!!mainWindow) {
       log.error('mainWindow went away before show')
     } else {
-      waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+      waitForBackendAndShowMainWindow(dispatch, mainWindow)
     }
   })
 }
@@ -193,16 +204,13 @@ function createRendererLogger(): OTLogger {
 }
 
 function installDevtools(): void {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const devtools = require('electron-devtools-installer')
-  const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
-  const install = devtools.installExtensions
+  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]
   const forceReinstall = config.reinstallDevtools
 
   log.debug('Installing devtools')
 
   try {
-    install(extensions, {
+    installExtension(extensions, {
       loadExtensionOptions: { allowFileAccess: true },
       forceDownload: forceReinstall,
     })

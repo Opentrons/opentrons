@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 import aiohttp
 import pydantic
 
-SETTINGS_ENDPOINT_PATH = "auth/settings"
+SETTINGS_ENDPOINT_PATH = "auth/settings/accessControlEnabled"
 TOKEN_ENDPOINT_PATH = "auth/oauth2/token"
 TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 
@@ -69,7 +69,13 @@ class LocalHTTPClient(Client):
 
         if auth_server_uds is not None:
             connector = aiohttp.UnixConnector(path=auth_server_uds)
-            session = aiohttp.ClientSession(connector=connector)
+            session = aiohttp.ClientSession(
+                connector=connector,
+                # We're connecting over a Unix socket, so this URL is nonsensical,
+                # but aiohttp seems to require it as a placeholder.
+                # https://github.com/aio-libs/aiohttp/issues/11324.
+                base_url="http://localhost",
+            )
         elif auth_server_url is not None:
             session = aiohttp.ClientSession(base_url=auth_server_url)
         else:
@@ -125,6 +131,7 @@ class TokenIntrospectionResponse(_StrictBaseModel):
 
     active: bool
     scope: str = ""
+    username: str | None = None
 
 
 class TokenIntrospectionRequestFormData(typing.TypedDict):

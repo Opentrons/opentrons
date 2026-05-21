@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Protocol Details"
+description: "View protocol steps, labware map, and run history on the touchscreen."
 ---
 
 Tap on any protocol to view its detail screen. This screen displays all of the types of information included in the protocol file, as well as common protocol actions. An indicator at the top left of the screen shows whether the protocol is ready to run, or whether you need to perform additional setup.
@@ -16,7 +17,7 @@ The Summary tab shows:
 
 - **Author:** Who created the protocol.
 
-- **Description:** For protocols with long descriptions, scroll to read the full text.
+- **Description:** Scroll to read the full text. Also identifies quick transfer protocols.
 
 - **Date added:** Timestamp when Flex received the protocol file.
 

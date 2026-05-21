@@ -2942,12 +2942,15 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -3144,7 +3147,7 @@
           ],
           "metadata": {
             "displayCategory": "system",
-            "displayName": "Protocol Engine Lid Stack",
+            "displayName": "Lid Stack",
             "displayVolumeUnits": "µL",
             "tags": []
           },
@@ -3187,12 +3190,15 @@
               "kind": "onAddressableArea"
             },
             {
+              "kind": "onModule",
+              "moduleId": "UUID"
+            },
+            {
               "cutoutId": "cutoutA3",
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ],
@@ -3214,12 +3220,15 @@
               "kind": "onAddressableArea"
             },
             {
+              "kind": "onModule",
+              "moduleId": "UUID"
+            },
+            {
               "cutoutId": "cutoutA3",
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ],
@@ -3245,47 +3254,15 @@
               "kind": "onAddressableArea"
             },
             {
-              "cutoutId": "cutoutA3",
-              "kind": "onCutoutFixture",
-              "possibleCutoutFixtureIds": [
-                "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
-              ]
-            }
-          ],
-          [
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "addressableAreaName": "A4",
-              "kind": "onAddressableArea"
+              "kind": "onModule",
+              "moduleId": "UUID"
             },
             {
               "cutoutId": "cutoutA3",
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ],
@@ -3311,6 +3288,44 @@
               "labwareId": "UUID"
             },
             {
+              "addressableAreaName": "A4",
+              "kind": "onAddressableArea"
+            },
+            {
+              "kind": "onModule",
+              "moduleId": "UUID"
+            },
+            {
+              "cutoutId": "cutoutA3",
+              "kind": "onCutoutFixture",
+              "possibleCutoutFixtureIds": [
+                "stagingAreaRightSlot",
+                "stagingAreaSlotWithMagneticBlockV1"
+              ]
+            }
+          ],
+          [
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
               "kind": "onLabware",
               "labwareId": "UUID"
             },
@@ -3319,12 +3334,15 @@
               "kind": "onAddressableArea"
             },
             {
+              "kind": "onModule",
+              "moduleId": "UUID"
+            },
+            {
               "cutoutId": "cutoutA3",
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1",
-                "vacuumModuleMilliporeV1"
+                "stagingAreaSlotWithMagneticBlockV1"
               ]
             }
           ]
@@ -3340,12 +3358,15 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -9520,6 +9541,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -9796,6 +9821,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -9898,7 +9927,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.31,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -10251,7 +10280,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.26499999999999,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -10875,6 +10904,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -11022,7 +11055,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.72399999999999,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -13596,12 +13629,15 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1",
-              "vacuumModuleMilliporeV1"
+              "stagingAreaSlotWithMagneticBlockV1"
             ]
           }
         ]
@@ -13735,6 +13771,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -14628,6 +14668,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -14758,6 +14802,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -14966,6 +15014,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -17486,7 +17538,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.31,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -18362,7 +18414,7 @@
           "z": 110.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.38999999999999,
+        "tipLength": 85.31,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -20692,7 +20744,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.26499999999999,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -21559,7 +21611,7 @@
           "z": 110.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.38999999999999,
+        "tipLength": 85.26499999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -25064,6 +25116,46 @@
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
       "location": {
         "moduleId": "UUID"
+      }
+    }
+  ],
+  "labwareOffsets": [
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
+      "id": "UUID",
+      "location": {
+        "slotName": "C2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "C2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      }
+    },
+    {
+      "createdAt": "TIMESTAMP",
+      "definitionUri": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
+      "id": "UUID",
+      "location": {
+        "slotName": "D2"
+      },
+      "locationSequence": [
+        {
+          "addressableAreaName": "D2",
+          "kind": "onAddressableArea"
+        }
+      ],
+      "vector": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
       }
     }
   ],

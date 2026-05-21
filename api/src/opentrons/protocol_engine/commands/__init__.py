@@ -23,6 +23,7 @@ from . import (
     temperature_module,
     thermocycler,
     unsafe,
+    vacuum_module,
 )
 from .air_gap_in_place import (
     AirGapInPlace,
@@ -111,12 +112,26 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
 )
+from .create_csv import (
+    CreateCSV,
+    CreateCSVCommandType,
+    CreateCSVCreate,
+    CreateCSVParams,
+    CreateCSVResult,
+)
 from .create_timer import (
     CreateTimer,
     CreateTimerCommandType,
     CreateTimerCreate,
     CreateTimerParams,
     CreateTimerResult,
+)
+from .csv_write_row import (
+    CSVWriteRow,
+    CSVWriteRowCommandType,
+    CSVWriteRowCreate,
+    CSVWriteRowParams,
+    CSVWriteRowResult,
 )
 from .custom import (
     Custom,
@@ -672,6 +687,7 @@ __all__ = [
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    "vacuum_module",
     # calibration command bundle
     "calibration",
     # unsafe command bundle
@@ -760,4 +776,16 @@ __all__ = [
     "CaptureImageParams",
     "CaptureImageResult",
     "CaptureImageCommandType",
+    # create csv command bundle
+    "CreateCSV",
+    "CreateCSVCreate",
+    "CreateCSVParams",
+    "CreateCSVResult",
+    "CreateCSVCommandType",
+    # csv write row command bundle
+    "CSVWriteRow",
+    "CSVWriteRowCreate",
+    "CSVWriteRowParams",
+    "CSVWriteRowResult",
+    "CSVWriteRowCommandType",
 ]

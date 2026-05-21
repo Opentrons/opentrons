@@ -29,6 +29,7 @@ import {
   InterventionModal,
   useInterventionModal,
 } from '/app/organisms/InterventionModal'
+import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
 import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   CurrentRunningProtocolCommand,
@@ -107,10 +108,13 @@ export function RunningProtocol(): JSX.Element {
     staleTime: Infinity,
   })
 
+  // TODO(jj): figure out what to do with actionsToDocument
+  const docstate = useGuardedAction([])
+
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const { playRun, pauseRun } = useRunActionMutations(runId)
+  const { playRun, pauseRun } = useRunActionMutations(runId, docstate)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
@@ -160,6 +164,8 @@ export function RunningProtocol(): JSX.Element {
       robotSideAnalysis != null
         ? getLabwareDefinitionsFromCommands(robotSideAnalysis.commands)
         : [],
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isValidRobotSideAnalysis]
   )
 

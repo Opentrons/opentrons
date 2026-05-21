@@ -1,5 +1,8 @@
 import * as errorCreators from '../../errorCreators'
-import { thermocyclerStateGetter } from '../../robotStateSelectors'
+import {
+  thermocyclerStateGetter,
+  vacuumModuleStateGetter,
+} from '../../robotStateSelectors'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { waitForTasks } from '../atomic/waitForTasks'
 
@@ -23,12 +26,26 @@ export const waitForModuleTask: CommandCreator<WaitForModuleTaskArgs> = (
   // For now, we only support this one wait condition.
   // Eventually, we'll probably need to support different kinds of module tasks here,
   // and this `satisfies` statement will need to become a `switch` or something.
-  waitCondition satisfies 'thermocyclerProfileComplete'
-  return waitForThermocyclerProfileComplete(
-    args,
-    invariantContext,
-    prevRobotState
-  )
+
+  if (waitCondition === 'thermocyclerProfileComplete') {
+    return waitForThermocyclerProfileComplete(
+      args,
+      invariantContext,
+      prevRobotState
+    )
+  } else if (
+    waitCondition === 'vacuumProfileComplete' ||
+    waitCondition === 'vacuumStateComplete'
+  ) {
+    return waitForVacuumPumpActivityComplete(
+      args,
+      invariantContext,
+      prevRobotState
+    )
+  }
+  return {
+    errors: [errorCreators.invalidWaitCondition(waitCondition)],
+  }
 }
 
 const waitForThermocyclerProfileComplete: CommandCreator<
@@ -56,6 +73,40 @@ const waitForThermocyclerProfileComplete: CommandCreator<
       errors: [errorCreators.missingProfileStep()],
     }
   }
+
+  commandCreators.push(
+    curryCommandCreator(waitForTasks, { task_ids: [taskId] })
+  )
+  return reduceCommandCreators(
+    commandCreators,
+    invariantContext,
+    prevRobotState
+  )
+}
+
+const waitForVacuumPumpActivityComplete: CommandCreator<
+  WaitForModuleTaskArgs
+> = (args, invariantContext, prevRobotState) => {
+  const { moduleId } = args
+  const commandCreators: CurriedCommandCreator[] = []
+
+  const vacuumState = vacuumModuleStateGetter(prevRobotState, moduleId)
+  if (vacuumState == null) {
+    return {
+      errors: [errorCreators.missingModuleError()],
+    }
+  }
+
+  if (
+    vacuumState.currentPumpActivity.type !== 'timedHold' &&
+    vacuumState.currentPumpActivity.type !== 'profile'
+  ) {
+    return {
+      errors: [errorCreators.missingPumpActivity()],
+    }
+  }
+
+  const taskId = vacuumState.currentPumpActivity.taskId
 
   commandCreators.push(
     curryCommandCreator(waitForTasks, { task_ids: [taskId] })

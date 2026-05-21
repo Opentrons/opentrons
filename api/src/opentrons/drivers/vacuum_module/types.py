@@ -20,6 +20,8 @@ class GCODE(StrEnum):
     SET_VENT_STATE = "M124"
     SET_PRESSURE_PID = "M125"
     GET_PRESSURE_PID = "M126"
+    SET_WASTE_CONFIG = "M127"
+    GET_WASTE_CONFIG = "M128"
 
     def build_command(self) -> CommandBuilder:
         """Build command."""
@@ -30,6 +32,7 @@ class HardwareRevision(Enum):
     """Hardware Revision."""
 
     NFF = "nff"
+    EVT = "a1"
 
 
 @dataclass
@@ -90,20 +93,24 @@ class LEDPattern(Enum):
 class VentState(Enum):
     """The State of the vent."""
 
-    OPENED = 0
-    CLOSED = 1
+    CLOSED = 0
+    OPENED = 1
+
+    def __init__(self, val: int) -> None:
+        self.formatted = self.name.lower()
 
 
 @dataclass
-class PressureState:
-    """Get the pressure state."""
+class VacuumState:
+    """Get the vacuum state."""
 
-    target_guage_pressure: float
-    current_guage_pressure: float
+    target_gauge_pressure: float
+    current_gauge_pressure: float
     pressure_abs_a: float
     pressure_abs_b: float
     pressure_atm: float
     vacuum_enabled: bool
+    vacuum_duration: int
     vent_state: VentState
 
 
@@ -117,6 +124,23 @@ class PressureControlTunings:
     overshoot_error: float
     k_velocity: float
     k_holding: float
+    tolerance_error: float
+
+
+@dataclass
+class WasteConfigParameters:
+    """Get the waste config parameters"""
+
+    waste_detection_enabled: bool
+    p_window_start: float
+    p_window_end: float
+    baseline_fast_factor: float
+    max_delta_per_tick: float
+    max_rise_per_tick: float
+    max_cummulative_rise: float
+    p_filter_alpha: float
+    min_window_time: float
+    max_window_time: float
 
 
 @dataclass

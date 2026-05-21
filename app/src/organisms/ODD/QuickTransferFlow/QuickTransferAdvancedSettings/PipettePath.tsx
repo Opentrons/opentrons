@@ -8,10 +8,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InputField,
   POSITION_FIXED,
   RadioButton,
   SPACING,
+  TouchInputField,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -202,12 +202,18 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing68}
           >
-            <InputField
+            <TouchInputField
+              autoFocus
               type="number"
               value={disposalVolume}
-              title={t('disposal_volume_µL')}
+              label={t('disposal_volume_µL')}
               error={volumeError}
-              readOnly
+              onBlur={e => {
+                e.target.focus()
+              }}
+              onChange={e => {
+                setDisposalVolume(Number(e.target.value))
+              }}
             />
           </Flex>
           <Flex

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import uuidv1 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   ALIGN_CENTER,
@@ -57,7 +57,7 @@ const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
-const uuid: () => string = uuidv1
+const uuid: () => string = uuidv4
 
 export function GeneralSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
@@ -71,6 +71,8 @@ export function GeneralSettings(): JSX.Element {
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
   let transactionId = ''
   useEffect(() => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     transactionId = uuid()
   }, [])
   const handleDropdownClick = (value: string): void => {

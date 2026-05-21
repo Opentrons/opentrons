@@ -150,7 +150,7 @@ export function SelectLabwareOnAdapter(
                   isNestedDefALid={false}
                   allowInputField={false}
                   stackingProps={stackingProps ?? undefined}
-                  key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
+                  key={`${category}_${loadName}_${tiprackDefUri}`}
                   id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   buttonText={nestedDef?.metadata.displayName ?? ''}
                   buttonValue={tiprackDefUri}
@@ -179,17 +179,24 @@ export function SelectLabwareOnAdapter(
               const nestedDef =
                 defs[nestedDefUri] ?? customLabwareDefs[nestedDefUri]
 
+              // don't show lid option for vacuum module adapters
+              const isVacuumModuleAdapter =
+                loadName === 'opentrons_vacuum_module_spacer_thingamajig'
+
               const stackingLabwareDefUris = getStackerDefinitions(
                 {
                   ...defs,
                   ...customLabwareDefs,
                 },
-                universalLid?.[0],
+                ...(isVacuumModuleAdapter ? [] : [universalLid?.[0]]),
                 nestedDef.parameters.loadName,
                 nestedDef.metadata.displayCategory
               )
+
               const stackingProps: StackingProps | null =
-                stackingLabwareDefUris.length === 1 && slot !== 'offDeck'
+                stackingLabwareDefUris.length === 1 &&
+                slot !== 'offDeck' &&
+                !isVacuumModuleAdapter
                   ? {
                       inputTitle: t('labware_quantity'),
                       errorMessage: t('unsupported_range'),
@@ -242,14 +249,16 @@ export function SelectLabwareOnAdapter(
                       nestedDefUri === selectedTopLabware.labwareDefURI
                     }
                   />
-                  <SelectLidOnLabware
-                    lidLoadNames={lidLoadNames}
-                    parentLabwareURI={nestedDefUri}
-                    isAdapter={false}
-                    category={category}
-                    loadName={loadName}
-                    lidURIs={stackingLabwareDefUris}
-                  />
+                  {!isVacuumModuleAdapter && (
+                    <SelectLidOnLabware
+                      lidLoadNames={lidLoadNames}
+                      parentLabwareURI={nestedDefUri}
+                      isAdapter={false}
+                      category={category}
+                      loadName={loadName}
+                      lidURIs={stackingLabwareDefUris}
+                    />
+                  )}
                 </Fragment>
               )
             })}

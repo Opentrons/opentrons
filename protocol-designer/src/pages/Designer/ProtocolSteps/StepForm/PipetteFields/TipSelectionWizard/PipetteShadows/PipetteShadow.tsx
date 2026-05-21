@@ -47,10 +47,9 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   },
 }
 
-// TODO: adjust once partial tip selection is enabled
 export function PipetteShadow(props: {
   pipetteSpec: PipetteV2Specs
-  slotPosition: CoordinateTuple
+  slotPosition?: CoordinateTuple
   hoveredWell: string
   selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
@@ -62,6 +61,7 @@ export function PipetteShadow(props: {
   robotType: RobotType
   enclosingViewbox: string | null
   nozzles: NozzleConfigurationStyle
+  rotate?: boolean
 }): JSX.Element {
   const {
     pipetteSpec,
@@ -77,8 +77,9 @@ export function PipetteShadow(props: {
     robotType,
     enclosingViewbox,
     nozzles,
+    rotate,
   } = props
-  const [slotX, slotY] = slotPosition
+  const [slotX, slotY] = slotPosition ?? [0, 0]
   const isTiprack = labwareState[selectedLabwareId].def.parameters.isTiprack
   const translationFile = isTiprack ? 'tip_selection' : 'well_selection'
   const { t } = useTranslation(translationFile)
@@ -111,7 +112,6 @@ export function PipetteShadow(props: {
       setLabelHeight(labelRef.current.offsetHeight)
     }
   }, [hoveredWell, labelText])
-
   const { x: xOffset, y: yOffset } = getHoveredOffsetFromWell({
     selectedLabwareId,
     labwareState,
@@ -143,6 +143,7 @@ export function PipetteShadow(props: {
           fill: `${COLORS.black90}${COLORS.opacity20HexCode}`,
           stroke: COLORS.blue50,
         }),
+    rotate,
   }
 
   const labelPlacement = getPlacementByViewboxAndPipetteSpec({
@@ -163,7 +164,6 @@ export function PipetteShadow(props: {
     shadowHeight: height,
     isOt2EightChannel,
   })
-
   return (
     <g className={styles.shadow_overlay}>
       <PipetteLabel

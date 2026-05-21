@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: HEPA/UV Module"
+description: "HEPA/UV Module on Flex: clean air and UV disinfection."
 ---
 
 ![hepa-uv hero](../images/hepa-uv-hero.png)

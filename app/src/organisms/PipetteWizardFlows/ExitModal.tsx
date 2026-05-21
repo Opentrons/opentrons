@@ -43,8 +43,9 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       break
     }
   }
-  if (Boolean(isRobotMoving))
+  if (Boolean(isRobotMoving)) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
 
   return (
     <SimpleWizardBody

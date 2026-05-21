@@ -6,6 +6,10 @@ from typing import Annotated
 import fastapi
 
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    get_app_state,
+)
 
 from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.dependencies import (
@@ -19,6 +23,9 @@ from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.service.notifications.publishers import (
     DataFilePublisher,
     get_data_file_publisher,
+)
+from robot_server.service.pyro_utils.resource_utilities import (
+    register_file_provider_to_pyro_resource,
 )
 from robot_server.settings import RobotServerSettings, get_settings
 
@@ -45,6 +52,7 @@ async def get_file_provider_executor(
 
 
 async def get_file_provider(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
     file_provider_executor: Annotated[
         FileProviderExecutor, fastapi.Depends(get_file_provider_executor)
     ],
@@ -53,5 +61,6 @@ async def get_file_provider(
     file_provider = FileProvider(
         data_files_write_file_cb=file_provider_executor.write_file_cb,
     )
+    register_file_provider_to_pyro_resource(app_state, file_provider)
 
     return file_provider

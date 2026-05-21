@@ -80,6 +80,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
+  const devInternalFlags = useSelector(getFeatureFlags)
+
   return (
     <div className={styles.main_content}>
       <Navigation />
@@ -177,6 +179,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="camera"
         />
         <RobotSettingButton
+          settingName={t('devices')}
+          dataTestId="RobotSettingButton_devices"
+          onClick={() => {
+            setCurrentOption('Devices')
+          }}
+          iconName="device"
+        />
+        <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"
           settingInfo={t('branded:choose_what_data_to_share')}
@@ -185,6 +195,16 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="privacy"
         />
+        {devInternalFlags?.accessControlMode ? (
+          <RobotSettingButton
+            settingName={t('robot_encryption_key')}
+            dataTestId="RobotSettingButton_encryption"
+            onClick={() => {
+              setCurrentOption('RobotEncryptionKey')
+            }}
+            iconName="verified"
+          />
+        ) : null}
         <RobotSettingButton
           settingName={i18n.format(
             t('app_settings:error_recovery_mode'),

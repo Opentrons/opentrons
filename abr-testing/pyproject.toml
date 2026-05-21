@@ -13,7 +13,7 @@ authors = [
 classifiers = [
     "Private :: Do Not Upload"  # Prevent uploading to PyPI.
 ]
-dependencies = []
+dependencies = ["slack-sdk==3.39.0"]
 dynamic = ["version"]
 
 [project.urls]

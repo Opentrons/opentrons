@@ -1,18 +1,25 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ListButton, StyledText } from '@opentrons/components'
-import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
+import { COLORS, ListButton, StyledText } from '@opentrons/components'
+import { ALL, COLUMN, PARTIAL_NOZZLE_MAP, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
-import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getInvariantContext,
+} from '/protocol-designer/step-forms/selectors'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
+import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
+import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
-import { getNozzleText, getWellGroupLength, partialNozzleMap } from './utils'
+import { getNozzleText, getWellGroupLength } from './utils'
 
 import type {
+  ActiveNozzleNumber,
   LabwareDefinition,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
@@ -32,6 +39,8 @@ export function ExtendedPartialTipField(
   const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
+  const invariantContext = useSelector(getInvariantContext)
+  const robotState = useSelector(getRobotStateAtActiveItem)
   const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
@@ -43,8 +52,6 @@ export function ExtendedPartialTipField(
     getDefaultPrimaryNozzle({ nozzles: ALL, channels: channels })
   const nozzleConfiguration =
     (propsForFields.nozzles.value as NozzleConfigurationStyle) ?? ALL
-  const partialNozzleCount =
-    partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
 
   let aspWells: string[] = []
   let aspLabwareDef: LabwareDefinition | null = null
@@ -64,19 +71,101 @@ export function ExtendedPartialTipField(
 
       break
   }
+  // if deck setup changes and selected wells are now inaccessible - unselect them so that an error is raised
+  interface WellCheckConfig {
+    wells: string[][]
+    selectedWells: string[]
+    labwareId: string | null
+    fieldKey: keyof FieldPropsByName
+  }
+  const wellConfigs: WellCheckConfig[] = []
+  const addWellConfig = (
+    labwareId: string,
+    selectedWells: string[] | undefined,
+    fieldKey: keyof FieldPropsByName
+  ): void => {
+    const wells =
+      invariantContext.labwareEntities[labwareId]?.def.ordering ?? []
+
+    wellConfigs.push({
+      wells,
+      selectedWells: selectedWells ?? [],
+      labwareId,
+      fieldKey,
+    })
+  }
+  if (stepType === 'mix') {
+    addWellConfig(
+      propsForFields.labware.value as string,
+      propsForFields.wells?.value as string[],
+      'wells'
+    )
+  }
+  if (stepType === 'transfer') {
+    addWellConfig(
+      propsForFields.aspirate_labware.value as string,
+      propsForFields.aspirate_wells?.value as string[],
+      'aspirate_wells'
+    )
+    addWellConfig(
+      propsForFields.dispense_labware.value as string,
+      propsForFields.dispense_wells?.value as string[],
+      'dispense_wells'
+    )
+  }
+  const tiprackLabwareDefURI = propsForFields.tipRack.value as string
+  const tiprackId = Object.values(deckSetup.labware).find(
+    labware => labware.labwareDefURI === tiprackLabwareDefURI
+  )?.id
+  const inaccessibleFields = wellConfigs
+    .map(config => {
+      if (!config.labwareId || config.wells.length === 0) {
+        return null
+      }
+
+      const status = getAllWellsSafetyStatus({
+        allWells: config.wells,
+        robotState,
+        invariantContext,
+        pipetteId: propsForFields.pipette.value as string,
+        labwareId: config.labwareId,
+        primaryNozzle: primaryNozzle,
+        nozzleConfiguration: nozzleConfiguration,
+        tiprackId,
+      })
+
+      const hasInaccessibleWell = config.selectedWells.some(
+        well => status[well] !== 0
+      )
+
+      return hasInaccessibleWell ? config.fieldKey : null
+    })
+    .filter(Boolean) as Array<keyof FieldPropsByName>
+  useEffect(() => {
+    inaccessibleFields.forEach(fieldKey => {
+      propsForFields[fieldKey]?.updateValue([])
+    })
+  }, [inaccessibleFields, propsForFields])
+
   const dspWells = propsForFields.dispense_wells
     ? (propsForFields.dispense_wells.value as [])
     : []
-  const dspLabwareDef = propsForFields.dispense_wells
-    ? (deckSetup.labware[propsForFields.dispense_labware.value as string]
-        .def as LabwareDefinition)
+  const dispenseLocation = propsForFields.dispense_labware?.value as string
+  const isDispenseInLabware = deckSetup.labware[dispenseLocation] !== undefined
+  const dspLabwareDef = isDispenseInLabware
+    ? (deckSetup.labware[dispenseLocation].def as LabwareDefinition)
     : null
-
+  const totalSteps = isDispenseInLabware ? 3 : 2
+  const partialChannels =
+    primaryNozzle in PARTIAL_NOZZLE_MAP
+      ? PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+      : 0
   const aspWellsLength = aspLabwareDef
     ? getWellGroupLength(
         aspWells.length,
         aspLabwareDef.ordering,
-        nozzleConfiguration
+        nozzleConfiguration,
+        partialChannels
       )
     : 0
 
@@ -84,46 +173,60 @@ export function ExtendedPartialTipField(
     ? getWellGroupLength(
         dspWells.length,
         dspLabwareDef.ordering,
-        nozzleConfiguration
+        nozzleConfiguration,
+        partialChannels
       )
     : 0
 
   function getNozzleWellText(
     primaryNozzle: PrimaryNozzleConfigurationStyle,
     nozzleConfiguration: NozzleConfigurationStyle,
-    stepType: string
+    stepType: string,
+    channels: ActiveNozzleNumber
   ): string {
-    const nozzleText = getNozzleText(
-      primaryNozzle,
-      nozzleConfiguration,
-      partialNozzleCount
-    )
+    const nozzleText = getNozzleText(primaryNozzle, nozzleConfiguration)
     const isTransfer = stepType === 'transfer'
-    const isRowOrColumn =
-      nozzleConfiguration === ROW || nozzleConfiguration === COLUMN
-    const hasRequiredWells =
-      aspWells.length > 0 && (!isTransfer || dspWells.length > 0)
-    if (!nozzleText || !hasRequiredWells) {
+    const isColumn =
+      (channels === 8 && nozzleConfiguration === ALL) ||
+      nozzleConfiguration === COLUMN
+    const isRow = nozzleConfiguration === ROW
+    if (
+      !nozzleText ||
+      aspWellsLength === 0 ||
+      (isTransfer && isDispenseInLabware && dspWellsLength === 0)
+    ) {
       return t('no_nozzles_and_wells_selected')
     }
-    const positionType = isRowOrColumn
-      ? `${nozzleConfiguration.toLowerCase()}s`
-      : 'wells'
+    let positionType: string = 'wells'
+    if (isColumn) {
+      positionType = PLURAL_COLUMNS
+    }
+    if (isRow) {
+      positionType = PLURAL_ROWS
+    }
 
     let nozzleSelection = `${nozzleText} nozzles`
-    if (isRowOrColumn) {
+    if ((isRow || isColumn) && channels === 96) {
       nozzleSelection = `${nozzleText}${positionType} nozzles`
     } else if (isTransfer) {
       nozzleSelection = nozzleText
     }
 
     if (isTransfer) {
-      return t('transfer_nozzles_selected', {
-        nozzleSelection,
-        aspWells: aspWellsLength,
-        dispWells: dspWellsLength,
-        positionType,
-      })
+      if (dspWellsLength > 0) {
+        return t('transfer_nozzles_selected', {
+          nozzleSelection,
+          aspWells: aspWellsLength,
+          dispWells: dspWellsLength,
+          positionType,
+        })
+      } else {
+        return t('transfer_nozzles_selected_no_dispense', {
+          nozzleSelection,
+          aspWells: aspWellsLength,
+          positionType,
+        })
+      }
     }
 
     return t('mix_nozzles_selected', {
@@ -135,16 +238,28 @@ export function ExtendedPartialTipField(
   return (
     <>
       <div className={styles.nozzle_selection_text}>
-        <ListButton type="noActive" onClick={handleOpen}>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          {t('pipette_nozzles_and_wells')}
+        </StyledText>
+        <ListButton
+          type="noActive"
+          onClick={handleOpen}
+          testId="nozzle_and_well_modal"
+        >
           <StyledText desktopStyle="bodyDefaultRegular">
-            {getNozzleWellText(primaryNozzle, nozzleConfiguration, stepType)}
+            {getNozzleWellText(
+              primaryNozzle,
+              nozzleConfiguration,
+              stepType,
+              channels
+            )}
           </StyledText>
         </ListButton>
       </div>
       {isNozzleAndWellModalOpen ? (
         <NozzleAndWellSelectionModal
           showModal={setIsNozzleAndWellModalOpen}
-          totalSteps={3}
+          totalSteps={totalSteps}
           pipetteSpecs={pipetteSpecs}
           deckSetup={deckSetup}
           propsForFields={propsForFields}

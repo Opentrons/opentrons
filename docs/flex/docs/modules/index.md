@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Modules"
+description: "Flex-compatible modules: Heater-Shaker, HEPA/UV, Temperature Module, Thermocycler, and more."
 ---
 
 Opentrons Flex integrates with several Opentrons hardware modules that add features and capabilities to the robot. Modules can occupy deck slots or are external, frame-mounted components. Flex communicates with and controls most modules via a USB connection.
@@ -30,7 +31,7 @@ Opentrons Flex is compatible with with the following Opentrons modules:
 
 - The [**Thermocycler Module**](thermocycler.md) provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.
 
-Certain module tasks, like heating from an ambient temperature to a high temperature or executing a Thermocycler profile, take more time than others. Starting with API version 2.27, you can use [concurrent commands](https://docs.opentrons.com/v2/modules/concurrent_module.html) to continue pipetting and other steps in your Flex protocols. 
+Certain module tasks, like heating from an ambient temperature to a high temperature or executing a Thermocycler profile, take more time than others. Starting with API version 2.27, you can use [concurrent commands](../../python-api/modules/concurrent.md) to continue pipetting and other steps in your Flex protocols. 
 
 Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark :material-check-bold:{ .green } indicates compatibility, and an :octicons-x-12:{ .red } indicates incompatibility.
 

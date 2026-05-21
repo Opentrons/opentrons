@@ -1,5 +1,6 @@
 ---
 title: "Python API: Heater-Shaker"
+description: "Control the Heater-Shaker: temperature, speed, and latch position in protocols."
 ---
 
 The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.
@@ -131,7 +132,7 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
 
 === "Blocking"
     ```python
-    hs_mod.set_and_wait_for_temperature(75)
+    hs_mod.set_and_wait_for_temperature(celsius=75)
     pipette.pick_up_tip()
     pipette.aspirate(50, plate["A1"])
     pipette.dispense(50, plate["B1"])
@@ -145,7 +146,7 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
 
 === "Concurrent"
     ```python
-    hs_mod.set_target_temperature(75)
+    hs_mod.set_target_temperature(celsius=75)
     pipette.pick_up_tip()   
     pipette.aspirate(50, plate["A1"])
     pipette.dispense(50, plate["B1"])
@@ -164,7 +165,7 @@ If you want the robot to continue pipetting while the module heats to prepare fo
 
 ```python
 # set target temperature
-heat_task = hs_mod.set_target_temperature(75)
+heat_task = hs_mod.set_target_temperature(celsius=75)
 
 # pipette while the module heats
 pipette.pick_up_tip()
@@ -175,7 +176,7 @@ pipette.dispense(50, plate["B1"])
 protocol.wait_for_tasks([heat_task])
 
 # set and hold for a sample incubation 
-incubation_timer = create_timer(seconds=120)
+incubation_timer = protocol.create_timer(seconds=120)
 protocol.wait_for_tasks([incubation_timer])
 hs_mod.deactivate_heater()
 ```

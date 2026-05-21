@@ -6,7 +6,9 @@ import {
   defaultTo,
   maskToFloat,
   maskToInteger,
+  maskToSignedDecimal,
   maskToTime,
+  maskToTimeWithPlaceholders,
   numberOrNull,
   onlyPositiveNumbers,
   trimDecimals,
@@ -440,6 +442,13 @@ const stepFieldHelperMap = {
   }),
   conditioning_volume: stepFieldHelpers({
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: numberOrNull,
+  }),
+  pumpDurationTime: stepFieldHelpers({
+    maskValue: composeMaskers(maskToTimeWithPlaceholders),
+  }),
+  pressureMbar: stepFieldHelpers({
+    maskValue: composeMaskers(maskToSignedDecimal),
     castValue: numberOrNull,
   }),
 }

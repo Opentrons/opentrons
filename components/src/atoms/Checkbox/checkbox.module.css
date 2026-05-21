@@ -1,0 +1,111 @@
+.checkbox_label {
+  display: flex;
+  width: var(--checkbox-width, max-content);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-12) var(--spacing-16);
+  border: none;
+  gap: var(--spacing-12);
+  user-select: none;
+}
+
+.checkbox_label_unchecked {
+  background-color: var(--blue-30);
+  color: var(--black-90);
+}
+
+.checkbox_label_checked {
+  background-color: var(--blue-50);
+  color: var(--white);
+}
+
+.checkbox_label_round {
+  border-radius: 200px;
+}
+
+.checkbox_label_neutral {
+  border-radius: var(--border-radius-8);
+}
+
+.checkbox_label_enabled {
+  cursor: pointer;
+}
+
+.checkbox_label_disabled {
+  background-color: var(--grey-30);
+  color: var(--grey-40);
+  cursor: default;
+}
+
+.checkbox_label_enabled.checkbox_label_unchecked:active {
+  background-color: var(--blue-40);
+}
+
+.checkbox_label_enabled.checkbox_label_checked:active {
+  background-color: var(--blue-55);
+}
+
+.checkbox_label_enabled.checkbox_label_unchecked:hover {
+  background-color: var(--blue-35);
+}
+
+.checkbox_label_enabled.checkbox_label_checked:hover {
+  background-color: var(--blue-55);
+}
+
+.checkbox_label:has(.checkbox_input_hidden:focus-visible) {
+  outline: 3px solid var(--blue-50);
+  outline-offset: 2px;
+}
+
+.checkbox_label_unchecked:has(.checkbox_input_hidden:focus-visible) {
+  background-color: var(--blue-35);
+}
+
+.checkbox_label_checked:has(.checkbox_input_hidden:focus-visible) {
+  background-color: var(--blue-50);
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .checkbox_label {
+    width: 100%;
+    padding: var(--spacing-20);
+    border-radius: var(--border-radius-16);
+    cursor: auto;
+  }
+}
+
+.checkbox_input_hidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border-width: 0;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.checkbox_wrapper {
+  display: flex;
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .checkbox_wrapper {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+.checkbox_wrapper_unchecked {
+  border: 2px solid var(--black-90);
+  border-radius: var(--border-radius-4);
+}
+
+.checkbox_wrapper_unchecked_disabled {
+  border-color: var(--grey-40);
+}

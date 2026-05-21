@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from typing import (
+    Any,
     Dict,
     List,
     NamedTuple,
@@ -19,6 +20,8 @@ from typing import (
 from numpy import array, dot
 from numpy import double as npdouble
 from numpy.typing import NDArray
+
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 
 from .. import errors
 from ..actions import (
@@ -68,11 +71,14 @@ from .module_substates import (
     TemperatureModuleSubState,
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
+    VacuumModuleId,
+    VacuumModuleSubState,
 )
 from .update_types import (
     AbsorbanceReaderStateUpdate,
     FlexStackerStateUpdate,
     LoadModuleUpdate,
+    VacuumModuleStateUpdate,
 )
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -306,6 +312,54 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if state_update.flex_stacker_state_update != update_types.NO_CHANGE:
             self._handle_flex_stacker_commands(state_update.flex_stacker_state_update)
 
+    def _module_model_map(
+        self, module_id: str, actual_model: Any, module_live_data: Any
+    ) -> Any:
+        live_data = module_live_data["data"] if module_live_data else None
+        return {
+            ModuleModel.is_magnetic_module_model: MagneticModuleSubState(
+                module_id=MagneticModuleId(module_id),
+                model=actual_model,
+            ),
+            ModuleModel.is_heater_shaker_module_model: HeaterShakerModuleSubState.from_live_data(
+                module_id=HeaterShakerModuleId(module_id),
+                data=live_data,
+            ),
+            ModuleModel.is_temperature_module_model: TemperatureModuleSubState.from_live_data(
+                module_id=TemperatureModuleId(module_id),
+                data=live_data,
+            ),
+            ModuleModel.is_thermocycler_module_model: ThermocyclerModuleSubState.from_live_data(
+                module_id=ThermocyclerModuleId(module_id), data=live_data
+            ),
+            ModuleModel.is_magnetic_block: MagneticBlockSubState(
+                module_id=MagneticBlockId(module_id)
+            ),
+            ModuleModel.is_absorbance_reader: AbsorbanceReaderSubState(
+                module_id=AbsorbanceReaderId(module_id),
+                configured=False,
+                measured=False,
+                is_lid_on=True,
+                data=None,
+                measure_mode=None,
+                configured_wavelengths=None,
+                reference_wavelength=None,
+            ),
+            ModuleModel.is_flex_stacker: FlexStackerSubState(
+                module_id=FlexStackerId(module_id),
+                pool_primary_definition=None,
+                pool_adapter_definition=None,
+                pool_lid_definition=None,
+                contained_labware_bottom_first=[],
+                max_pool_count=0,
+                pool_overlap=0,
+                pool_height=0,
+            ),
+            ModuleModel.is_vacuum_module: VacuumModuleSubState(
+                module_id=VacuumModuleId(module_id), pump_engaged=False
+            ),
+        }
+
     def _add_module_substate(
         self,
         module_id: str,
@@ -325,67 +379,24 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             load_location = slot_name
 
         actual_model = definition.model
-        live_data = module_live_data["data"] if module_live_data else None
         self._state.requested_model_by_id[module_id] = requested_model
         self._state.load_location_by_module_id[module_id] = load_location
         self._state.hardware_by_module_id[module_id] = HardwareModule(
             serial_number=serial_number,
             definition=definition,
         )
-
-        if ModuleModel.is_magnetic_module_model(actual_model):
-            self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
-                module_id=MagneticModuleId(module_id),
-                model=actual_model,
-            )
-        elif ModuleModel.is_heater_shaker_module_model(actual_model):
-            self._state.substate_by_module_id[module_id] = (
-                HeaterShakerModuleSubState.from_live_data(
-                    module_id=HeaterShakerModuleId(module_id),
-                    data=live_data,
-                )
-            )
-        elif ModuleModel.is_temperature_module_model(actual_model):
-            self._state.substate_by_module_id[module_id] = (
-                TemperatureModuleSubState.from_live_data(
-                    module_id=TemperatureModuleId(module_id),
-                    data=live_data,
-                )
-            )
-        elif ModuleModel.is_thermocycler_module_model(actual_model):
-            self._state.substate_by_module_id[module_id] = (
-                ThermocyclerModuleSubState.from_live_data(
-                    module_id=ThermocyclerModuleId(module_id), data=live_data
-                )
-            )
+        module_model_map = self._module_model_map(
+            module_id=module_id,
+            actual_model=actual_model,
+            module_live_data=module_live_data,
+        )
+        for is_module_type in module_model_map:
+            if is_module_type(actual_model):
+                substate = module_model_map[is_module_type]
+                self._state.substate_by_module_id[module_id] = substate
+        if ModuleModel.is_thermocycler_module_model(actual_model):
             self._update_additional_slots_occupied_by_thermocycler(
                 module_id=module_id, slot_name=slot_name
-            )
-        elif ModuleModel.is_magnetic_block(actual_model):
-            self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
-                module_id=MagneticBlockId(module_id)
-            )
-        elif ModuleModel.is_absorbance_reader(actual_model):
-            self._state.substate_by_module_id[module_id] = AbsorbanceReaderSubState(
-                module_id=AbsorbanceReaderId(module_id),
-                configured=False,
-                measured=False,
-                is_lid_on=True,
-                data=None,
-                measure_mode=None,
-                configured_wavelengths=None,
-                reference_wavelength=None,
-            )
-        elif ModuleModel.is_flex_stacker(actual_model):
-            self._state.substate_by_module_id[module_id] = FlexStackerSubState(
-                module_id=FlexStackerId(module_id),
-                pool_primary_definition=None,
-                pool_adapter_definition=None,
-                pool_lid_definition=None,
-                contained_labware_bottom_first=[],
-                max_pool_count=0,
-                pool_overlap=0,
-                pool_height=0,
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -656,6 +667,20 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             prev_substate.new_from_state_change(state_update)
         )
 
+    def _handle_vacuum_module_commands(
+        self, state_update: VacuumModuleStateUpdate
+    ) -> None:
+        """Handle Vacuum Module state updates."""
+        module_id = state_update.module_id
+        prev_substate = self._state.substate_by_module_id[module_id]
+        assert isinstance(prev_substate, VacuumModuleSubState), (
+            f"{module_id} is not a Vacuum Module."
+        )
+
+        self._state.substate_by_module_id[module_id] = (
+            prev_substate.new_from_state_change(state_update)
+        )
+
 
 class ModuleView:
     """Read-only view of computed module state."""
@@ -718,12 +743,18 @@ class ModuleView:
         return None
 
     def get_by_addressable_area(
-        self, addressable_area_name: str
+        self, addressable_area_name: str, deck_definition: DeckDefinitionV5
     ) -> Optional[LoadedModule]:
         """Get the module associated with this addressable area, if any."""
         for module_id in self._state.load_location_by_module_id.keys():
-            if addressable_area_name == self.get_provided_addressable_area(module_id):
-                return self.get(module_id)
+            module_addressable_area = self.get_provided_addressable_area(module_id)
+            cutout_fixtures = deck_configuration_provider.get_potential_cutout_fixtures(
+                module_addressable_area, deck_definition
+            )
+            for fixture in cutout_fixtures[1]:
+                if addressable_area_name in fixture.provided_addressable_areas:
+                    return self.get(module_id)
+
         return None
 
     def _get_module_substate(
@@ -842,6 +873,20 @@ class ModuleView:
             module_id=module_id,
             expected_type=FlexStackerSubState,
             expected_name="Flex Stacker",
+        )
+
+    def get_vacuum_module_substate(self, module_id: str) -> VacuumModuleSubState:
+        """Return a `VacuumModuleSubState` for the given Vacuum Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Vacuum Module.
+        """
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=VacuumModuleSubState,
+            expected_name="Vacuum Module",
         )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
@@ -1444,7 +1489,7 @@ class ModuleView:
         elif model == ModuleModel.VACUUM_MODULE_V1:
             # only allowed in column 3
             assert deck_slot.value[-1] == "3"
-            return f"vacuumModuleMilliporeV1{deck_slot.value}"
+            return f"vacuumModuleV1{deck_slot.value}"
 
         raise ValueError(
             f"Unknown module {model.name} has no addressable areas to provide."
@@ -1459,6 +1504,17 @@ class ModuleView:
         assert lid_doc_slot is not None
         lid_dock_area = AddressableAreaLocation(
             addressableAreaName="absorbanceReaderV1LidDock" + lid_doc_slot.value
+        )
+        return lid_dock_area
+
+    def vacuum_module_dock_location(self, module_id: str) -> AddressableAreaLocation:
+        """Get the addressable area for the vacuum module dock."""
+        reader_slot = self.get_location(module_id)
+        lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)
+        self.get_provided_addressable_area(module_id)
+        assert lid_doc_slot is not None
+        lid_dock_area = AddressableAreaLocation(
+            addressableAreaName="VacuumModuleV1LidDock" + lid_doc_slot.value
         )
         return lid_dock_area
 

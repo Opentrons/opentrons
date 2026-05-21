@@ -67,9 +67,14 @@ export function IgnoreErrorStepHome({
 
   // Reset client choice to ignore all errors whenever navigating back to this view. This prevents unexpected
   // behavior after pressing "go back" and ending up on this screen.
-  useEffect(() => {
-    void ignoreErrorKindThisRun(false)
-  }, [])
+  useEffect(
+    () => {
+      void ignoreErrorKindThisRun(false)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   // In order to keep routing linear, all extended "skip" flows should be kept as separate recovery options with
   // go back functionality that routes to this view. Those "skip" views encapsulate the generic "skip" view.

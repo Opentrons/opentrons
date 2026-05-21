@@ -26,10 +26,43 @@ import type { WebUpdateSource } from '../from-web'
 import type { UpdateDriver } from '../handler'
 import type { UpdateProvider } from '../types'
 
-vi.unmock('electron-updater') // ?
-vi.mock('electron-updater')
-vi.mock('../../log')
-vi.mock('../../config')
+vi.mock('electron', () => {
+  const app = {
+    getPath: () => '',
+    whenReady: () => Promise.resolve(undefined),
+    on: () => {},
+  }
+
+  const shell = {
+    openPath: vi.fn(),
+    trashItem: vi.fn(),
+  }
+
+  const dialog = {
+    showOpenDialog: vi.fn(),
+  }
+
+  return { app, shell, dialog }
+})
+
+vi.mock('../../log', () => {
+  const fakeLogger = {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  }
+
+  return {
+    createLogger: () => fakeLogger,
+  }
+})
+
+vi.mock('../../config', () => ({
+  getFullConfig: vi.fn(),
+  getConfig: vi.fn(),
+  handleConfigChange: vi.fn(),
+}))
 vi.mock('../../http')
 vi.mock('../directories')
 vi.mock('../from-web')

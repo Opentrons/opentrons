@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from .types import BarcodeModuleInfo, LEDProfile, SoundProfile
+from .types import BarcodeModuleInfo, SoundProfile
 
 
 class AbstractBarcodeScannerDriver(ABC):
@@ -14,7 +14,7 @@ class AbstractBarcodeScannerDriver(ABC):
         """Disconnect from the barcode scanner."""
 
     @abstractmethod
-    async def is_connected(self) -> bool:
+    def is_connected(self) -> bool:
         """Check connection to barcode scanner"""
         ...
 
@@ -29,7 +29,7 @@ class AbstractBarcodeScannerDriver(ABC):
         ...
 
     @abstractmethod
-    async def set_scan_timeout(self, timeout: float) -> None:
+    async def set_scan_timeout(self, timeout_ms: int) -> None:
         """Set how long to run the decoder before timing out."""
         ...
 
@@ -44,11 +44,6 @@ class AbstractBarcodeScannerDriver(ABC):
         ...
 
     @abstractmethod
-    async def set_led_profile(self, profile: LEDProfile) -> None:
-        """Set the led profile."""
-        ...
-
-    @abstractmethod
-    async def get_device_info(self) -> BarcodeModuleInfo:
+    def get_device_info(self) -> BarcodeModuleInfo:
         """Get Device Info."""
         ...

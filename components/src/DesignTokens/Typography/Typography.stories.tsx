@@ -5,7 +5,7 @@ import { Box, Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 const fontStyles = {
@@ -57,107 +57,132 @@ const fontStyles = {
     ['label', 'SemiBold'],
     ['linkP', 'SemiBold'],
   ],
-}
+} as const
 
 type TypographyStandard = keyof typeof fontStyles
+type FontPair = readonly [style: string, weight: string]
 
-export default {
-  title: 'Design Tokens/Typography',
-  argTypes: {
-    text: {
-      type: 'text',
-    },
-    styles: {
-      control: {
-        type: 'select',
-      },
-      options: Object.keys(fontStyles),
-    },
-  },
-} as Meta
-
-interface TypographyStorybookProps {
+interface StoryArgs {
   text: string
   styles: TypographyStandard
 }
 
-const convertToPx = (remFormat: string): string => {
-  const pxVal = Number(remFormat.replace('rem', '')) * 16
-  return `${pxVal}px`
+// Type guard to ensure the styles value is a valid TypographyStandard
+const isValidTypographyStandard = (
+  value: unknown
+): value is TypographyStandard => {
+  return typeof value === 'string' && value in fontStyles
 }
-const styleForPairForHelix = (style: string, weight: string): string => {
-  const fontPayload = PRODUCT.TYPOGRAPHY[`fontStyle${style}${weight}`]
+
+const convertToPx = (remFormat: string): string => {
+  const numeric = Number(remFormat.replace('rem', ''))
+  return `${numeric * 16}px`
+}
+
+const valueFromFlattenedInterp = (
+  style: FlattenSimpleInterpolation,
+  valueName: string
+): string => {
+  const found = style.reduce<[boolean, string | null]>(
+    (acc, el) => {
+      const [sawKey, value] = acc
+      const trimmed = String(el).trim()
+
+      if (sawKey) {
+        // next token after the key is the value we want (keep raw to preserve units)
+        return [true, value ?? String(el)]
+      }
+
+      if (trimmed.includes(valueName)) {
+        return [true, null]
+      }
+
+      return [false, null]
+    },
+    [false, null]
+  )[1]
+
+  if (found == null) return ''
+  return found.trim()
+}
+
+/**
+ * Helix Product (Desktop) helpers
+ */
+const styleForPairForHelix = (
+  style: string,
+  weight: string
+): FlattenSimpleInterpolation => {
+  const key = `fontStyle${style}${weight}` as keyof typeof PRODUCT.TYPOGRAPHY
+  const fontPayload = PRODUCT.TYPOGRAPHY[key] as unknown as string
   return css`
     font: ${fontPayload};
   `
 }
+
 const fontSizeForPairForHelix = (style: string, weight: string): string => {
-  const fontSize = PRODUCT.TYPOGRAPHY[`fontSize${style}${weight}`] as string
+  const key = `fontSize${style}${weight}` as keyof typeof PRODUCT.TYPOGRAPHY
+  const fontSize = PRODUCT.TYPOGRAPHY[key] as unknown as string
   const fontSizeInPx = convertToPx(fontSize)
   return `font-size: ${fontSize}/${fontSizeInPx}`
 }
+
 const lineHeightForPairForHelix = (style: string, weight: string): string => {
-  const lineHeight = PRODUCT.TYPOGRAPHY[`lineHeight${style}${weight}`] as string
+  const key = `lineHeight${style}${weight}` as keyof typeof PRODUCT.TYPOGRAPHY
+  const lineHeight = PRODUCT.TYPOGRAPHY[key] as unknown as string
   const lineHeightInPx = convertToPx(lineHeight)
   return `line-height: ${lineHeight}/${lineHeightInPx}`
 }
+
 const fontWeightForPairForHelix = (style: string, weight: string): string => {
-  const fontWeight = PRODUCT.TYPOGRAPHY[`fontWeight${style}${weight}`]
+  const key = `fontWeight${style}${weight}` as keyof typeof PRODUCT.TYPOGRAPHY
+  const fontWeight = PRODUCT.TYPOGRAPHY[key] as unknown as string | number
   return `font-weight: ${fontWeight}`
 }
 
-const styleForPairForLegacy = (style: string, weight: string): string => {
-  return TYPOGRAPHY[`${style}${weight}`]
+/**
+ * Legacy helpers (TYPOGRAPHY is FlattenSimpleInterpolation)
+ */
+const styleForPairForLegacy = (
+  style: string,
+  weight: string
+): FlattenSimpleInterpolation => {
+  const key = `${style}${weight}` as keyof typeof TYPOGRAPHY
+  return TYPOGRAPHY[key] as unknown as FlattenSimpleInterpolation
 }
 
 const fontSizeForPairForLegacy = (style: string, weight: string): string => {
   const stylePayload = styleForPairForLegacy(style, weight)
   const sizeStr = valueFromFlattenedInterp(stylePayload, 'font-size:')
-  const sizeInPx = convertToPx(sizeStr)
-
-  return `font-size: ${sizeStr}/${sizeInPx}`
+  const sizeInPx = sizeStr !== '' ? convertToPx(sizeStr) : ''
+  return sizeStr !== ''
+    ? `font-size: ${sizeStr}/${sizeInPx}`
+    : 'font-size: (unknown)'
 }
 
 const lineHeightForPairForLegacy = (style: string, weight: string): string => {
   const stylePayload = styleForPairForLegacy(style, weight)
-  const sizeStr = valueFromFlattenedInterp(stylePayload, 'line-height:')
-  const sizeInPx = convertToPx(sizeStr)
-  return `line-height: ${sizeStr}/${sizeInPx}`
+  const lhStr = valueFromFlattenedInterp(stylePayload, 'line-height:')
+  const lhInPx = lhStr !== '' ? convertToPx(lhStr) : ''
+  return lhStr !== ''
+    ? `line-height: ${lhStr}/${lhInPx}`
+    : 'line-height: (unknown)'
 }
 
 const fontWeightForPairForLegacy = (style: string, weight: string): string => {
   const stylePayload = styleForPairForLegacy(style, weight)
-  const fontWeight = valueFromFlattenedInterp(stylePayload, 'font-weight:')
-  return `font-weight: ${fontWeight}`
+  const fw = valueFromFlattenedInterp(stylePayload, 'font-weight:')
+  return fw !== '' ? `font-weight: ${fw}` : 'font-weight: (unknown)'
 }
 
-const valueFromFlattenedInterp = (
-  style: FlattenSimpleInterpolation,
-  valueName: str
-): string => {
-  return style.reduce(
-    ([sawKey, value]: [boolean, null | string], el) => {
-      const thisEl = el.trim()
-      if (sawKey && value == null) {
-        return [sawKey, el]
-      }
-      if (sawKey && value != null) {
-        return [sawKey, value]
-      }
-      if (thisEl.includes(valueName)) {
-        return [true, null]
-      }
-      return [false, null]
-    },
-    [false, null]
-  )[1]
-}
-
+/**
+ * Unified selectors
+ */
 const styleForPair = (
   style: string,
   weight: string,
   which: TypographyStandard
-): string =>
+): FlattenSimpleInterpolation =>
   which === 'Helix Product (Desktop)'
     ? styleForPairForHelix(style, weight)
     : styleForPairForLegacy(style, weight)
@@ -189,37 +214,53 @@ const fontWeightForPair = (
     ? fontWeightForPairForHelix(style, weight)
     : fontWeightForPairForLegacy(style, weight)
 
-const Template: Story<TypographyStorybookProps> = args => {
-  const fonts = fontStyles[args.styles]
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
-      padding={SPACING.spacing24}
-    >
-      {fonts.map(([style, weight]) => (
-        <Box key={`${style}_${weight}`} alignItems={ALIGN_CENTER}>
-          <Text css={styleForPair(style, weight, args.styles)}>
-            {`${style} ${weight} (${fontWeightForPair(
-              style,
-              weight,
-              args.styles
-            )}, ${fontSizeForPair(
-              style,
-              weight,
-              args.styles
-            )}, ${lineHeightForPair(style, weight, args.styles)}): ${
-              args.text
-            }`}
-          </Text>
-        </Box>
-      ))}
-    </Flex>
-  )
+const meta: Meta<StoryArgs> = {
+  title: 'Design Tokens/Typography',
+  argTypes: {
+    text: { control: 'text' },
+    styles: {
+      control: { type: 'select' },
+      options: Object.keys(fontStyles) as TypographyStandard[],
+    },
+  },
 }
+export default meta
 
-export const AllTypographyStyles = Template.bind({})
-AllTypographyStyles.args = {
-  text: 'The quick brown fox jumped over the lazy dog.',
-  styles: 'Helix Product (Desktop)',
+export const AllTypographyStyles: StoryObj<StoryArgs> = {
+  args: {
+    text: 'The quick brown fox jumped over the lazy dog.',
+    styles: 'Helix Product (Desktop)',
+  },
+  render: (args: StoryArgs) => {
+    if (!isValidTypographyStandard(args.styles)) {
+      return <div>Invalid typography standard</div>
+    }
+
+    const which = args.styles
+    const fonts = fontStyles[which] as readonly FontPair[]
+
+    return (
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+        padding={SPACING.spacing24}
+      >
+        {fonts.map(([style, weight]) => (
+          <Box key={`${style}_${weight}`} alignItems={ALIGN_CENTER}>
+            <Text css={styleForPair(style, weight, which)}>
+              {`${style} ${weight} (${fontWeightForPair(
+                style,
+                weight,
+                which
+              )}, ${fontSizeForPair(style, weight, which)}, ${lineHeightForPair(
+                style,
+                weight,
+                which
+              )}): ${args.text}`}
+            </Text>
+          </Box>
+        ))}
+      </Flex>
+    )
+  },
 }

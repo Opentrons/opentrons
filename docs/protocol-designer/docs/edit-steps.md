@@ -1,5 +1,6 @@
 ---
 title: "Protocol Designer: Editing Steps"
+description: "Add, reorder, duplicate, and delete steps in the protocol timeline."
 ---
 
 Each step in your protocol appears in the protocol timeline in the order you've added them. After adding steps the robot will perform in your protocol, you can make edits to finalize your protocol. 

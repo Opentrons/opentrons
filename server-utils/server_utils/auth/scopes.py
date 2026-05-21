@@ -13,7 +13,7 @@ class Scope(enum.Enum):
 
     # Example:
     #
-    # PYTHON_NAME = "api_name", "description"
+    # PYTHON_NAME = ("api_name", "description")
     #
     # "PYTHON_NAME" is arbitrary.
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
@@ -24,14 +24,64 @@ class Scope(enum.Enum):
         "Edit settings related to authentication, authorization, and access control.",
     )
 
-    RUNS_WRITE = (
-        "runs.write",
-        "Create and control protocol runs.",
+    PROTOCOLS_WRITE = (
+        "protocols.write",
+        "Upload or delete protocols.",
     )
 
-    USERS_READ = (
-        "users.read",
-        "Read users.",
+    RESTART_WRITE = (
+        "restart.write",
+        "Restart the robot.",
+    )
+
+    SHUTDOWN_WRITE = (
+        "shutdown.write",
+        "Shut down the robot.",
+    )
+
+    ROBOT_CONTROL_WRITE = (
+        "robot_control.write",
+        (
+            "Run a protocol, move pipettes, control hardware modules,"
+            " or otherwise make the robot do something physical."
+        ),
+    )
+
+    ROBOT_SETTINGS_WRITE = (
+        "robot_settings.write",
+        "Edit robot settings for which there is no more specific scope.",
+    )
+
+    RUN_DATA_WRITE = (
+        "run_data.write",
+        (
+            "Create, update, or delete data that's the input or output of a run,"
+            " such as images and CSV files."
+        ),
+    )
+
+    # We actually want access control mode to totally disable SSH, so this scope is
+    # kind of moot. At some point, we might delete this, and replace the SSH endpoints'
+    # use of `require_scopes(SSH_KEYS_WRITE)` with something like
+    # `require_access_control_disabled()`.
+    SSH_KEYS_WRITE = (
+        "ssh_keys.write",
+        "Edit the robot's authorized SSH keys, allowing access to the robot's shell.",
+    )
+
+    UPDATES_WRITE = (
+        "updates.write",
+        "Update the robot's software.",
+    )
+
+    USERS_READ_OTHERS = (
+        "users.read.others",
+        "List all users and read their details.",
+    )
+
+    USERS_READ_SELF = (
+        "users.read.self",
+        "Read the details of the currently authenticated user.",
     )
 
     USERS_WRITE = (

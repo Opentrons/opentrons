@@ -2,9 +2,10 @@
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import anyio
+from pydantic import BaseModel
 
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
@@ -42,6 +43,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.commands.command import CommandStatus
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CommandPreconditions,
     CustomCommandAnnotationLegacy,
     LegacyCommandAnnotation,
@@ -56,14 +58,14 @@ from opentrons.util.async_helpers import asyncio_yield
 from opentrons.util.broker import Broker
 
 
-class RunResult(NamedTuple):
+class RunResult(BaseModel):
     """Result data from a run, pulled from the ProtocolEngine."""
 
     commands: List[Command]
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
     command_annotations: List[
-        LegacyCommandAnnotation
+        CommandAnnotation
     ]  # TODO: can we remove this since annotations are now fetched from state summary?
     command_preconditions: Optional[CommandPreconditions]
 
@@ -104,7 +106,7 @@ class AbstractRunner(ABC):
         return []
 
     @property
-    def command_annotations(self) -> List[LegacyCommandAnnotation]:
+    def command_annotations(self) -> List[CommandAnnotation]:
         """Command annotations defined by protocol, if any. Currently only for json protocols."""
         return []
 
@@ -292,6 +294,9 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
+        command_annotations = (
+            self._protocol_engine.state_view.commands.get_all_command_annotations()
+        )
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
@@ -299,7 +304,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             commands=commands,
             state_summary=run_data,
             parameters=parameters,
-            command_annotations=[],
+            command_annotations=command_annotations,
             command_preconditions=preconditions,
         )
 
@@ -335,10 +340,10 @@ class JsonRunner(AbstractRunner):
 
         hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
-        self._command_annotations: List[LegacyCommandAnnotation] = []
+        self._command_annotations: List[CommandAnnotation] = []
 
     @property
-    def command_annotations(self) -> List[LegacyCommandAnnotation]:
+    def command_annotations(self) -> List[CommandAnnotation]:
         """Command annotations defined by protocol, if any."""
         return self._command_annotations
 
@@ -388,7 +393,9 @@ class JsonRunner(AbstractRunner):
                     command_keys_to_annotation_ids[cmd_key] = [annotation_id]
                 else:
                     command_keys_to_annotation_ids[cmd_key].append(annotation_id)
-
+        self._command_annotations = (
+            self._protocol_engine.state_view.commands.get_all_command_annotations()
+        )
         commands = await anyio.to_thread.run_sync(
             self._json_translator.translate_commands,
             protocol,

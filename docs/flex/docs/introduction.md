@@ -1,5 +1,6 @@
 ---
 title: 'Opentrons Flex: Introduction'
+description: "Overview of Flex features, manual structure, and how to control the robot."
 ---
 
 Opentrons Flex is a liquid-handling robot designed for high throughput and complex workflows. The Flex robot is the base of a modular system that includes pipettes, a labware gripper, deck fixtures, on-deck modules, and labware — all of which you can swap out yourself. Flex is designed with a touchscreen so you can work with it directly at the lab bench, or you can control it from across your lab with the Opentrons App or our open-source APIs.
@@ -27,4 +28,4 @@ Both Flex and OT-2 robots run on our open-source software, and the Opentrons App
 
 ## Flex workstations
 
-Opentrons Flex workstations are pre-configured bundles that include the Flex robot, accessories, pipettes and gripper, on-deck modules, and labware needed to automate a particular application. Because Flex is a modular system, you can easily add or swap hardware and compatible consumables to change applications. See the [workstations section](https://opentrons.com/products/categories/workstations) of the Opentrons website to get started automating steps in next-generation sequencing, proteomics, nucleic acid extraction, and other workflows.
+Opentrons Flex *workstations* are pre-configured bundles that include the Flex robot, accessories, pipettes and gripper, on-deck modules, and labware needed to automate a particular application. Because Flex is a modular system, you can easily add or swap hardware and compatible consumables to change applications. See the [workstations section](https://opentrons.com/products/categories/workstations) of the Opentrons website to get started automating steps in next-generation sequencing, proteomics, nucleic acid extraction, and other workflows.

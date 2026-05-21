@@ -1,5 +1,6 @@
 ---
 title: "Python API: Command Line"
+description: "Run and simulate protocols from the command line."
 ---
 
 The Python API also lets you perform many actions directly from the command line with `opentrons_execute`.

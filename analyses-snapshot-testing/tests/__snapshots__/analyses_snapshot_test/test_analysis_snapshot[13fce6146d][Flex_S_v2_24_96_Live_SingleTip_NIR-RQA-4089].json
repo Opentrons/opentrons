@@ -3618,7 +3618,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.59,
-        "tipLength": 48.015,
+        "tipLength": 47.85,
         "tipVolume": 200.0
       },
       "startedAt": "TIMESTAMP",
@@ -8672,6 +8672,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [
     {
       "aspirate": {

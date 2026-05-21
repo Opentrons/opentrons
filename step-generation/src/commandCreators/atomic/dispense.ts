@@ -9,8 +9,8 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  getIsSafePipetteMovement,
   getLabwareSlot,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   indentPyLines,
   modulePipetteCollision,
@@ -21,12 +21,18 @@ import {
   uuid,
 } from '../../utils'
 
-import type { CreateCommand, DispenseParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type {
+  CreateCommand,
+  DispenseParams,
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 export interface DispenseAtomicCommandParams extends DispenseParams {
   tipRack: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   isAirGap?: boolean
 }
 /** Dispense with given args. Requires tip. */
@@ -44,6 +50,8 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     isAirGap,
     wellLocation,
     pushOut,
+    primaryNozzle,
+    nozzles,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
@@ -112,22 +120,26 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
-  if (
-    isMultiChannelPipette &&
-    !getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      wellLocationOffset: (wellLocation?.offset as Point) ?? {
-        x: 0,
-        y: 0,
-        z: 0,
-      },
-      wellTargetName: wellName,
-    })
-  ) {
-    errors.push(errorCreators.possiblePipetteCollision())
+  const pipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
+    robotState: prevRobotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    wellLocationOffset: (wellLocation?.offset as Point) ?? {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    wellTargetName: wellName,
+    primaryNozzle,
+    nozzleConfiguration: nozzles,
+  })
+  if (isMultiChannelPipette && !pipetteMovementSafetyStatus.isSafe) {
+    errors.push(
+      errorCreators.possiblePipetteCollision({
+        unsafePipetteMovementReason: pipetteMovementSafetyStatus.reason,
+      })
+    )
   }
 
   if (

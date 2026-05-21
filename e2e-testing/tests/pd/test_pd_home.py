@@ -15,7 +15,7 @@ def test_home_page_loads_successfully(page: Page, pd_base_url: str) -> None:
     - The Settings icon button is visible
     - The welcome message is displayed
     - Privacy policy and EULA links are present
-    - Create a protocol button is visible
+    - Create a Flex protocol button is visible
     - Import existing protocol label is visible
     """
     # Navigate to home page (done automatically by page fixture)
@@ -29,11 +29,11 @@ def test_home_page_loads_successfully(page: Page, pd_base_url: str) -> None:
     # Verify header elements (use first for elements that appear multiple times)
     expect(page.get_by_text("Protocol Designer").first).to_be_visible()
     expect(page.get_by_text("Create new")).to_be_visible()
-    expect(page.get_by_test_id("SettingsIconButton")).to_be_visible()
+    expect(page.get_by_label("Settings Icon Button")).to_be_visible()
 
     # Verify home page specific elements
     expect(page.get_by_text("Welcome to Protocol Designer!")).to_be_visible()
     expect(page.locator('a[href="https://opentrons.com/privacy-policy"]')).to_be_visible()
     expect(page.locator('a[href="https://opentrons.com/eula"]')).to_be_visible()
-    expect(page.get_by_role("button", name="Create a protocol")).to_be_visible()
+    expect(page.get_by_role("button", name="Create a Flex protocol")).to_be_visible()
     expect(page.get_by_label("Import existing protocol")).to_be_visible()

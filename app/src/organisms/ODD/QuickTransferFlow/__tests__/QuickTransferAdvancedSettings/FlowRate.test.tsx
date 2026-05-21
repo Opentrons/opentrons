@@ -1,7 +1,7 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { InputField } from '@opentrons/components'
+import { TouchInputField } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -9,17 +9,17 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 
-import type { ComponentProps } from 'react'
+import type { ChangeEvent, ComponentProps } from 'react'
 import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof InputField>()
+  const actualComponents = await importOriginal<typeof TouchInputField>()
   return {
     ...actualComponents,
-    InputField: vi.fn(),
+    TouchInputField: vi.fn(),
   }
 })
 
@@ -28,7 +28,23 @@ const render = (props: ComponentProps<typeof FlowRateEntry>) => {
     i18nInstance: i18n,
   })
 }
-let mockTrackEventWithRobotSerial: any
+const getLastTouchInputFieldProps = (): ComponentProps<
+  typeof TouchInputField
+> => {
+  const lastCall = vi.mocked(TouchInputField).mock.calls.at(-1)
+  if (lastCall == null) {
+    throw new Error('TouchInputField was not rendered')
+  }
+  return lastCall[0] as ComponentProps<typeof TouchInputField>
+}
+const changeTouchInputValue = (value: string): void => {
+  act(() => {
+    getLastTouchInputFieldProps().onChange?.({
+      target: { value },
+    } as ChangeEvent<HTMLInputElement>)
+  })
+}
+let mockTrackEventWithRobotSerial: ReturnType<typeof vi.fn>
 
 describe('FlowRate', () => {
   let props: ComponentProps<typeof FlowRateEntry>
@@ -92,13 +108,15 @@ describe('FlowRate', () => {
     render(props)
     screen.getByText('Aspirate flow rate')
     screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate flow rate (µL/s)',
+        autoFocus: true,
+        label: 'Aspirate flow rate (µL/s)',
         error: null,
-        readOnly: true,
-        type: 'number',
-        value: 35,
+        type: 'text',
+        value: '35',
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -114,13 +132,15 @@ describe('FlowRate', () => {
     }
     render(props)
     screen.getByText('Dispense flow rate')
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Dispense flow rate (µL/s)',
+        autoFocus: true,
+        label: 'Dispense flow rate (µL/s)',
         error: null,
-        readOnly: true,
-        type: 'number',
-        value: 62,
+        type: 'text',
+        value: '62',
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -131,13 +151,15 @@ describe('FlowRate', () => {
     const deleteBtn = screen.getByText('del')
     fireEvent.click(deleteBtn)
     fireEvent.click(deleteBtn)
-    expect(vi.mocked(InputField)).toHaveBeenCalledWith(
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
-        title: 'Aspirate flow rate (µL/s)',
-        error: 'Value must be between 1 to 92',
-        readOnly: true,
-        type: 'number',
-        value: 0,
+        autoFocus: true,
+        label: 'Aspirate flow rate (µL/s)',
+        error: null,
+        type: 'text',
+        value: '',
+        onBlur: expect.any(Function),
+        onChange: expect.any(Function),
       },
       {}
     )
@@ -156,5 +178,18 @@ describe('FlowRate', () => {
     fireEvent.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
+  })
+
+  it('deletes external keyboard input with the stateless numerical keyboard', () => {
+    render(props)
+
+    changeTouchInputValue('12')
+    fireEvent.click(screen.getByText('del'))
+
+    expect(getLastTouchInputFieldProps()).toEqual(
+      expect.objectContaining({
+        value: '1',
+      })
+    )
   })
 })

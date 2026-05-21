@@ -23,44 +23,18 @@ jobs:
     name: 'OpentronsAI client prod deploy'
     timeout-minutes: 10
     steps:
-      - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v6'
-        with:
-          node-version: '22.22.0'
-      - name: 'install udev'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: 'setup-js'
-        run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: ./.github/actions/js/setup
       - name: 'build'
         env:
           OT_AI_CLIENT_MIXPANEL_ID: ${{ secrets.OT_AI_CLIENT_MIXPANEL_ID }}
         run: |
           make -C opentrons-ai-client build-production
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
-          role-to-assume: ${{ secrets.PROD_AI_ROLE_ARN }}
-          aws-region: ${{ secrets.PROD_AI_REGION }}
+          role-to-assume: ${{ vars.PROD_AI_ROLE_ARN }}
+          aws-region: ${{ vars.PROD_AI_REGION }}
       - name: 'deploy client to prod'
         run: |
           make -C opentrons-ai-client prod-deploy
@@ -85,22 +59,22 @@ jobs:
           SERVER_VERSION=${TAG_REF#refs/tags/ai-server@}
           echo "SERVER_VERSION=$SERVER_VERSION" >> "$GITHUB_OUTPUT"
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v6'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup UV
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
-          python-version: "3.12"
+          python-version: '3.12'
           enable-cache: true
-          cache-dependency-glob: "./opentrons-ai-server/uv.lock"
+          cache-dependency-glob: './opentrons-ai-server/uv.lock'
       - name: Setup
         id: install
         working-directory: ./opentrons-ai-server
         run: make setup
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
-          role-to-assume: ${{ secrets.PROD_AI_ROLE_ARN }}
-          aws-region: ${{ secrets.PROD_AI_REGION }}
+          role-to-assume: ${{ vars.PROD_AI_ROLE_ARN }}
+          aws-region: ${{ vars.PROD_AI_REGION }}
       - name: 'deploy api to prod'
         working-directory: ./opentrons-ai-server
         run: |
@@ -114,7 +88,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'success' || needs.deploy-server.result == 'success')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -129,7 +103,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'failure' || needs.deploy-server.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -160,7 +134,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'cancelled' || needs.deploy-server.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:

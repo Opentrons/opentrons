@@ -6,6 +6,7 @@ import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVi
 import { convertStepHierarchyToArray } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import type { MouseEvent } from 'react'
+import type { LabwareTemporalProperties } from '@opentrons/step-generation'
 import type { StepIdType } from '/protocol-designer/form-types'
 import type {
   ModuleOnDeck,
@@ -174,4 +175,28 @@ export const getFillLabwareToDeleteData = (
       ? [...acc, { labwareIds: formData.fillLabwareIds as string[], module }]
       : acc
   }, [])
+}
+
+export const getConsolidatedStacks = (
+  labwareAtLastState: Record<string, LabwareTemporalProperties>
+): string[][] => {
+  const stacks = Object.values(labwareAtLastState).map(labware => labware.stack)
+  // Only returns stacks that are not subsets of other stacks
+  return stacks.filter(
+    stack =>
+      !stacks.some(
+        previousStack =>
+          // Skip comparing the stack to itself
+          previousStack !== stack &&
+          // Only consider stacks that are longer than the current stack
+          previousStack.length > stack.length &&
+          // Check if the current stack exists at the end of the longer stack
+          // We align the end of both stacks and compare element-by-element
+          stack.every(
+            (labware, index) =>
+              previousStack[index + (previousStack.length - stack.length)] ===
+              labware
+          )
+      )
+  )
 }

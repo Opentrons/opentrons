@@ -26,9 +26,7 @@ interface AddMetadataProps extends WizardTileProps {
 export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
   const { goBack, proceed, watch, register, analyticsStartTime } = props
   const { t } = useTranslation(['onboarding', 'shared'])
-  const fields = watch('fields')
   const dispatch = useDispatch()
-  const robotType = fields.robotType
 
   const handleProceed = (): void => {
     const duration = new Date().getTime() - analyticsStartTime.getTime()
@@ -42,7 +40,6 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
   return (
     <HandleEnter onEnter={handleProceed}>
       <WizardBody
-        robotType={robotType}
         subStepNumber={6}
         stepNumber={3}
         header={t('tell_us')}
@@ -62,6 +59,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
               {t('name')}
             </StyledText>
             <InputField
+              aria-label={t('name')}
               {...register('fields.name')}
               type="text"
               value={watch('fields.name')}
@@ -72,9 +70,9 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('description')}
+              label={t('description')}
               {...register('fields.description')}
-              value={watch('fields.description')}
+              value={watch('fields.description') ?? ''}
               height="6.8125rem"
             />
           </Flex>
@@ -83,6 +81,7 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
               {t('author_org')}
             </StyledText>
             <InputField
+              aria-label={t('author_org')}
               {...register('fields.organizationOrAuthor')}
               type="text"
               value={watch('fields.organizationOrAuthor')}

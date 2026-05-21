@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Deck Configuration"
+description: "Configure deck layout, modules, and labware locations on the touchscreen."
 ---
 
 Deck configuration tells your Flex what fixtures are attached to the deck, in what locations. You need to inform the robot about installed fixtures because they're unpowered attachments. They do not contain electronic or mechanical components that communicate with the robot. Flex won't know what's attached and where it is until you configure deck fixtures via the touchscreen or Opentrons App.

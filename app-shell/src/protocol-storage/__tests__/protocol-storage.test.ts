@@ -10,10 +10,19 @@ import {
   getParsedAnalysisFromPath,
   getUnixTimeFromAnalysisPath,
 } from '../'
-import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
+import { NOT_OT2_PROTOCOLS_DIRECTORY_PATH } from '../file-system'
 
 vi.mock('electron-store')
 vi.mock('../../log')
+vi.mock('../../config', () => ({
+  getConfig: vi.fn((path?: string) => {
+    if (path === 'devInternal') {
+      return {}
+    } else {
+      return undefined
+    }
+  }),
+}))
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
@@ -23,7 +32,7 @@ describe('protocol storage directory utilities', () => {
 
   beforeEach(() => {
     mockAnalysisFilePath = tempy.file({ extension: 'json' })
-    protocolsDir = path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
+    protocolsDir = NOT_OT2_PROTOCOLS_DIRECTORY_PATH
     mockDispatch = vi.fn()
     requiredRmdir = true
   })

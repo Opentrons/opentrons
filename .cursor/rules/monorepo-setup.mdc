@@ -9,9 +9,9 @@ All commands run from the **monorepo root** unless noted otherwise.
 
 ## Node.js Version Management
 
-**Required:** Node.js >= 22.22.0 (`.nvmrc`: `22.22.0`), Yarn 1.22.19 (Classic).
+**Required:** Node.js >= 22.22.0 (`.nvmrc`: `22.22.0`), pnpm 10.32.1.
 
-Before running any `node`, `yarn`, or `make` command, ensure the correct Node version is active. The user may use **nvm**, **nvs**, or **asdf**:
+Before running any `node`, `pnpm`, or `make` command, ensure the correct Node version is active. The user may use **nvm**, **nvs**, or **asdf**:
 
 ```bash
 # nvm (most common)
@@ -41,7 +41,7 @@ Standalone Python projects (`opentrons-ai-server/`, `e2e-testing/`, `analyses-sn
 | Target | Description |
 | --- | --- |
 | `make setup` | Install all JS and Python dependencies |
-| `make setup-js` | Setup all JS projects (yarn install) |
+| `make setup-js` | Setup all JS projects (pnpm install) |
 | `make setup-py` | Setup all robot Python packages (pipenv/uv per project) |
 
 ### Teardown (uninstall dependencies)
@@ -67,7 +67,7 @@ Standalone Python projects (`opentrons-ai-server/`, `e2e-testing/`, `analyses-sn
 
 ```bash
 # Best: run tests for just the files near your changes
-yarn vitest protocol-designer/src/step-forms/
+pnpm vitest protocol-designer/src/step-forms/
 make test-js-protocol-designer tests="src/step-forms/"
 
 # For Python, run from the project directory
@@ -85,7 +85,19 @@ cd api && make test  # or: make -C api test
 
 Pass options: `make test-js-<project> tests="src/path" test_opts="--reporter=verbose"`
 
-### Lint & Type-Check
+### Frontend Lint & Format — Always Use These Three
+
+All frontend (TS/TSX/JS/CSS) lint and format commands run from the **monorepo root** via these three Make targets. Do not call ESLint, Prettier, or Stylelint directly.
+
+```bash
+make format-js    # Prettier auto-format (all TS/TSX/JS/MD/JSON)
+make lint-js      # ESLint + Prettier check (run after format-js to confirm clean)
+make lint-css     # Stylelint check for all CSS Modules
+```
+
+Run `format-js` first to auto-fix, then `lint-js` and `lint-css` to verify nothing remains.
+
+### Lint & Type-Check (full reference)
 
 | Target | Description |
 | --- | --- |
@@ -98,13 +110,22 @@ Pass options: `make test-js-<project> tests="src/path" test_opts="--reporter=ver
 | `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`) |
 | `make circular-dependencies-js` | Check for circular imports (madge) |
 
-### Format (auto-fix)
+### Format (auto-fix, full reference)
 
 | Target | Description |
 | --- | --- |
 | `make format-js` | Prettier auto-format |
 | `make format-py` | ruff format for all robot Python projects |
 | `make format-css` | Stylelint auto-fix |
+
+### opentrons-ai-server Lint & Format
+
+`opentrons-ai-server/` is a standalone Python project with its own Makefile. Run from inside that directory:
+
+```bash
+make format   # ruff format + ruff check --fix + prettier for MD/JSON
+make lint     # ruff format --check + ruff check + mypy
+```
 
 ## Standalone Python Projects
 
@@ -127,10 +148,10 @@ Run their setup from within their own directory.
 make teardown-js && make setup-js
 ```
 
-### Yarn Cache Corruption
+### Pnpm Cache Corruption
 
 ```bash
-yarn cache clean && make setup-js
+pnpm cache delete && make setup-js
 ```
 
 ### TypeScript Build Artifacts Out of Sync
@@ -166,7 +187,7 @@ asdf install nodejs
 
 ### "Module not found" Errors in JS
 
-Usually means `yarn` hasn't been run:
+Usually means `pnpm` hasn't been run:
 
 ```bash
 make setup-js

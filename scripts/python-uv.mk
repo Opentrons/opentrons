@@ -1,6 +1,9 @@
 # UV is required for Python dependency management
 UV ?= uv
 UV_PYTHON = 3.12
+# todo(mm, 2026-04-03): This export will implicitly affect uv behavior in any Makefile
+# that includes this one, which is a bit confusing. This shouldn't be necessary if we
+# consistently call `uv` through the Makefile variables defined here.
 export UV_PYTHON
 # Python/pip/pytest commands using UV
 python := $(UV) run --python $(UV_PYTHON) python

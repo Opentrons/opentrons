@@ -1,0 +1,44 @@
+{
+  "name": "@opentrons/protocol-visualization",
+  "version": "0.0.0-dev",
+  "description": "Standalone React protocol analysis visualization for Opentrons projects",
+  "source": "src/index.ts",
+  "types": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "module": "lib/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js"
+    },
+    "./package.json": "./package.json",
+    "./lib/style.css": "./lib/style.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Opentrons/opentrons.git"
+  },
+  "author": "Opentrons Labworks <engineering@opentrons.com> (https://opentrons.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "files": [
+    "lib"
+  ],
+  "peerDependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-i18next": "14.0.0"
+  },
+  "dependencies": {
+    "@opentrons/components": "link:../components",
+    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/step-generation": "link:../step-generation",
+    "clsx": "2.1.1",
+    "react-window": "2.2.4",
+    "lodash": "4.17.21"
+  }
+}

@@ -2,7 +2,7 @@ import { Fragment, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
-import uuidv1 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   BORDERS,
@@ -45,7 +45,7 @@ interface LanguageSettingProps {
   setCurrentOption: SetSettingOption
 }
 
-const uuid: () => string = uuidv1
+const uuid: () => string = uuidv4
 
 export function LanguageSetting({
   setCurrentOption,
@@ -56,6 +56,8 @@ export function LanguageSetting({
 
   let transactionId = ''
   useEffect(() => {
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     transactionId = uuid()
   }, [])
 

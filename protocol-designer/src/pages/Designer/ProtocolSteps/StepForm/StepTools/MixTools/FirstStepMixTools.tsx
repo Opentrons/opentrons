@@ -1,18 +1,14 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
-import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
 
 import {
   LabwareField,
-  PartialTipField,
   PipetteField,
   TiprackField,
   VolumeField,
-  WellSelectionField,
 } from '../../PipetteFields'
 import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
@@ -32,9 +28,6 @@ export function FirstStepMixTools({
   pipettes,
 }: FirstStepMixToolsProps): JSX.Element {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
-  const enableAdditionalPartialTip = useSelector(
-    getEnableAdditionalPartialTipSelection
-  )
   const completedSteps =
     formData.labware != null &&
     formData.tipRack != null &&
@@ -55,50 +48,28 @@ export function FirstStepMixTools({
       <Divider marginY="0" />
       <LabwareField {...propsForFields.labware} tooltipContent={null} />
       {completedSteps ? (
-        enableAdditionalPartialTip ? (
-          <>
-            <Divider marginY="0" />
-            <ExtendedPartialTipField
-              {...propsForFields.nozzles}
-              pipetteSpecs={
-                pipettes[String(propsForFields.pipette.value)]?.spec
-              }
-              propsForFields={propsForFields}
-              stepType="mix"
-            />
-          </>
-        ) : (
-          <>
-            <PartialTipField
-              {...propsForFields.nozzles}
-              pipetteSpecs={
-                pipettes[String(propsForFields.pipette.value)]?.spec
-              }
-            />
-            <Divider marginY="0" />
-            <WellSelectionField
-              {...propsForFields.wells}
-              labwareId={formData.labware}
-              pipetteId={formData.pipette}
-              nozzles={
-                typeof propsForFields.nozzles.value === 'string'
-                  ? propsForFields.nozzles.value
-                  : null
-              }
-              hasFormError={propsForFields.wells.errorToShow != null}
-            />
-          </>
-        )
+        <>
+          <Divider marginY="0" />
+          <ExtendedPartialTipField
+            {...propsForFields.nozzles}
+            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+            propsForFields={propsForFields}
+            stepType="mix"
+          />
+        </>
       ) : null}
 
       {completedSteps ? (
         <>
           <Divider marginY="0" />
-          <VolumeField fieldProps={propsForFields.volume} />
+          <VolumeField
+            fieldProps={propsForFields.volume}
+            stepType={formData.stepType}
+          />
           <Divider marginY="0" />
           <InputStepFormField
             {...propsForFields.times}
-            units={t('units.times')}
+            units={t('units.repetitions')}
             title={t('protocol_steps:mix_repetitions')}
             showTooltip={false}
           />

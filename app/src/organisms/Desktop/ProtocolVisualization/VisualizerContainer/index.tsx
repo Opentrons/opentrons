@@ -33,7 +33,7 @@ import type { MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
-const INITIAL_MILLISECONDS_PER_FRAME = 2000
+const INITIAL_MILLISECONDS_PER_FRAME = 1000
 const INITIAL_WIDTH_PX = 230
 const MIN_CENTER_WIDTH_PX = 148
 const MIN_LEFT_COLUMN_WIDTH_PX = 148
@@ -160,35 +160,40 @@ export function VisualizerContainer(
 
   //  update the data for the spotlight window
   //  whenever the command index changes
-  useEffect(() => {
-    if (selectedCommandId == null) return
+  useEffect(
+    () => {
+      if (selectedCommandId == null) return
 
-    const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
-    if (nextIndex < 0) return
+      const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
+      if (nextIndex < 0) return
 
-    const nextSpotlight = {
+      const nextSpotlight = {
+        protocolKey,
+        slot: selectedSlot,
+        command: commands[nextIndex],
+        robotState,
+        invariantContext,
+        analysis,
+        liquids,
+      }
+
+      if (nextSpotlight.slot != null && nextSpotlight.command != null) {
+        dispatch(stepDetailViewerUpdateAction(nextSpotlight))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      selectedCommandId,
+      selectedSlot,
       protocolKey,
-      slot: selectedSlot,
-      command: commands[nextIndex],
       robotState,
       invariantContext,
       analysis,
       liquids,
-    }
-
-    if (nextSpotlight.slot != null && nextSpotlight.command != null) {
-      dispatch(stepDetailViewerUpdateAction(nextSpotlight))
-    }
-  }, [
-    selectedCommandId,
-    selectedSlot,
-    protocolKey,
-    robotState,
-    invariantContext,
-    analysis,
-    liquids,
-    commands,
-  ])
+      commands,
+    ]
+  )
 
   const isThermocyclerAttached = Object.keys(robotState.modules).some(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
@@ -217,19 +222,24 @@ export function VisualizerContainer(
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
 
-  useEffect(() => {
-    if (
-      isThermocyclerAttached &&
-      selectedSlot != null &&
-      thermocyclerSlots.includes(selectedSlot)
-    ) {
-      if (robotType === FLEX_ROBOT_TYPE) {
-        setSelectedSlot('B1')
-      } else {
-        setSelectedSlot('7')
+  useEffect(
+    () => {
+      if (
+        isThermocyclerAttached &&
+        selectedSlot != null &&
+        thermocyclerSlots.includes(selectedSlot)
+      ) {
+        if (robotType === FLEX_ROBOT_TYPE) {
+          setSelectedSlot('B1')
+        } else {
+          setSelectedSlot('7')
+        }
       }
-    }
-  }, [isThermocyclerAttached, selectedSlot])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isThermocyclerAttached, selectedSlot]
+  )
 
   const handleMouseDown = (
     e: MouseEvent<HTMLDivElement>,
@@ -336,6 +346,8 @@ export function VisualizerContainer(
           handlePause={() => {
             setIsPlaying(false)
           }}
+          milliSecondsPerFrame={milliSecondsPerFrame}
+          isGlobalPlaying={isPlaying}
         />
       </div>
       {/* Gutter between left & center */}

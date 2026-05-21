@@ -5,9 +5,11 @@ import last from 'lodash/last'
 
 import {
   DeviceReset,
+  Devices,
   LanguageSetting,
   NetworkSettings,
   Privacy,
+  RobotEncryptionKeySettingOption,
   RobotName,
   RobotSettingsJoinOtherNetwork,
   RobotSettingsSelectAuthenticationType,
@@ -32,6 +34,7 @@ import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
 } from '/app/redux/robot-update'
+import { GIT_BRANCH_NAME, GIT_COMMIT_HASH } from '/app/redux/shell'
 import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 
 import { RobotSettingsList } from './RobotSettingsList'
@@ -114,6 +117,12 @@ export function RobotSettingsDashboard(): JSX.Element {
           isUpdateAvailable={isUpdateAvailable}
           setCurrentOption={setCurrentOption}
           robotUpdateInfo={robotUpdateInfo}
+          gitCommitHash={
+            GIT_COMMIT_HASH ?? i18n.format(t('shared:unknown'), 'capitalize')
+          }
+          gitBranchName={
+            GIT_BRANCH_NAME ?? i18n.format(t('shared:unknown'), 'capitalize')
+          }
         />
       )
     case 'NetworkSettings':
@@ -212,6 +221,16 @@ export function RobotSettingsDashboard(): JSX.Element {
           setCurrentOption={setCurrentOption}
           robotName={robotName}
         />
+      )
+
+    case 'Devices':
+      return (
+        <Devices robotName={robotName} setCurrentOption={setCurrentOption} />
+      )
+
+    case 'RobotEncryptionKey':
+      return (
+        <RobotEncryptionKeySettingOption setCurrentOption={setCurrentOption} />
       )
 
     // fallthrough option: render the robot settings list of buttons

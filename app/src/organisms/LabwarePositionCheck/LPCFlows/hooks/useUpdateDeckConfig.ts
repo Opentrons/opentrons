@@ -14,9 +14,14 @@ export function useUpdateDeckConfig(
 ): void {
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    if (runId != null && deckConfig != null && isFlex) {
-      dispatch(updateLPCDeck(runId, deckConfig))
-    }
-  }, [deckConfig, runId, isFlex])
+  useEffect(
+    () => {
+      if (runId != null && deckConfig != null && isFlex) {
+        dispatch(updateLPCDeck(runId, deckConfig))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [deckConfig, runId, isFlex]
+  )
 }

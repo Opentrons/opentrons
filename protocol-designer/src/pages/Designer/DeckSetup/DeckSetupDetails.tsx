@@ -12,6 +12,7 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
@@ -19,7 +20,10 @@ import {
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
-import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import {
+  HOPPER_LABWARE_X_OFFSET,
+  VACUUM_DOCK_LABWARE_X_OFFSET,
+} from '/protocol-designer/constants'
 import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'
 import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
@@ -163,42 +167,52 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     preSelectedFixture,
     slotPosition,
     isSlotAHopper,
-  } = useMemo(() => {
-    return getSlotInformation({
-      deckSetup: { ...activeDeckSetup, labware: allLabware },
-      slot: selectedZoomInSlot ?? '',
-      deckDef,
-      pendingCreationStateForHopper,
-    })
-  }, [activeDeckSetup, selectedZoomInSlot])
+  } = useMemo(
+    () => {
+      return getSlotInformation({
+        deckSetup: { ...activeDeckSetup, labware: allLabware },
+        slot: selectedZoomInSlot ?? '',
+        deckDef,
+        pendingCreationStateForHopper,
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeDeckSetup, selectedZoomInSlot]
+  )
 
   const createdTopLabwareForSlot = activeLabware[createdStackForSlot[0]]
   const amount = createdStackForSlot?.length ?? 1
   //  initiate the slot's info
-  useEffect(() => {
-    if (
-      createdTopLabwareForSlot ||
-      createdAdapterForSlot ||
-      createdLidForSlot
-    ) {
-      dispatch(
-        editSlotInfo({
-          labwareDefURI: createdTopLabwareForSlot?.labwareDefURI,
-          adapterDefURI: createdAdapterForSlot?.labwareDefURI,
-          moduleModel: createdModuleForSlot?.model,
-          fixture: preSelectedFixture,
-          lidDefURI: createdLidForSlot?.labwareDefURI,
-          amount,
-        })
-      )
-    }
-  }, [
-    createdAdapterForSlot,
-    createdLidForSlot,
-    createdTopLabwareForSlot,
-    amount,
-    selectedZoomInSlot,
-  ])
+  useEffect(
+    () => {
+      if (
+        createdTopLabwareForSlot ||
+        createdAdapterForSlot ||
+        createdLidForSlot
+      ) {
+        dispatch(
+          editSlotInfo({
+            labwareDefURI: createdTopLabwareForSlot?.labwareDefURI,
+            adapterDefURI: createdAdapterForSlot?.labwareDefURI,
+            moduleModel: createdModuleForSlot?.model,
+            fixture: preSelectedFixture,
+            lidDefURI: createdLidForSlot?.labwareDefURI,
+            amount,
+          })
+        )
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      createdAdapterForSlot,
+      createdLidForSlot,
+      createdTopLabwareForSlot,
+      amount,
+      selectedZoomInSlot,
+    ]
+  )
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =
@@ -301,8 +315,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const { topMostId, rightBelowTopId, hopperTopMostId } =
-          getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabwareValues)
+        const {
+          topMostId,
+          rightBelowTopId,
+          hopperTopMostId,
+          vacuumDockTopMostId,
+        } = getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabwareValues)
         const labwareInterfaceBoundingBox = {
           xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
           yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
@@ -462,6 +480,26 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   itemId={`hopper${slotId}`}
                   key={`${moduleOnDeck.slot}_flexHopper`}
                   slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                  slotBoundingBox={labwareInterfaceBoundingBox}
+                  moduleType={moduleOnDeck.type}
+                  handleDragHover={handleHoverEmptySlot}
+                  slotId={moduleOnDeck.id}
+                  hover={hover}
+                  setHover={setHover}
+                  setShowMenuListForId={setShowMenuListForId}
+                  isSelected={selectedZoomInSlot != null}
+                  deckDef={deckDef}
+                  stagingAreaAddressableAreas={[]}
+                  addEquipment={addEquipment}
+                />
+              ) : null}
+              {vacuumDockTopMostId == null &&
+              moduleOnDeck.type === VACUUM_MODULE_TYPE ? (
+                <SlotControls
+                  terminalItemId={terminalItemId}
+                  itemId={`vacuumDock${slotId}`}
+                  key={`${moduleOnDeck.slot}_vacuumDock`}
+                  slotPosition={[VACUUM_DOCK_LABWARE_X_OFFSET, 0, 0]}
                   slotBoundingBox={labwareInterfaceBoundingBox}
                   moduleType={moduleOnDeck.type}
                   handleDragHover={handleHoverEmptySlot}
@@ -660,8 +698,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         if (
           allModules.some(m => labware.stack.includes(m.id)) ||
           getSlotInLocationStack(labware.stack) === 'offDeck'
-        )
+        ) {
           return null
+        }
         if (
           deckDef.locations.addressableAreas.some(addressableArea =>
             labware.stack.includes(addressableArea.id)

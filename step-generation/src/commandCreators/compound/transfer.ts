@@ -1,8 +1,6 @@
-import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
-  ALL,
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
@@ -30,7 +28,6 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
@@ -150,6 +147,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     mixInDestination,
     pipette,
     preWetTip,
+    primaryNozzle,
     pushOut,
     sourceLabware,
     nozzles,
@@ -198,8 +196,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   ) {
     // No assertion failure, continue with the logic
   } else {
-    assert(
-      false,
+    throw new Error(
       `Transfer command creator expected N:N source-to-dest wells ratio. Got ${sourceWells.length}:${destWells?.length} in labware`
     )
   }
@@ -403,7 +400,8 @@ export const transfer: CommandCreator<TransferArgs> = (
     tiprackURI,
     invariantContext,
     prevRobotState,
-    ...(nozzles != null ? [nozzles] : [])
+    primaryNozzle,
+    nozzles
   )
   const liquidClassValuesForTip =
     getAllLiquidClassDefs()
@@ -481,11 +479,6 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
-
   const shouldSelectManualTips =
     tipTracking === MANUAL &&
     tiprackSelected != null &&
@@ -494,7 +487,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -639,6 +632,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             tipCommands = [
               curryCommandCreator(replaceTip, {
                 pipette,
+                primaryNozzle,
+                nozzles,
                 dropTipLocation:
                   isReturnTip && fallBackTrashLikeId != null
                     ? fallBackTrashLikeId

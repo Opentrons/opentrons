@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
+from pydantic import BaseModel, ConfigDict
 from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
@@ -122,27 +123,30 @@ class RunResult(enum.Enum):
     STOPPED = enum.auto()
 
 
-@dataclass(frozen=True)
-class CommandSlice:
+class CommandSlice(BaseModel):
     """A subset of all commands in state."""
+
+    model_config = ConfigDict(frozen=True)
 
     commands: List[Command]
     cursor: int
     total_length: int
 
 
-@dataclass(frozen=True)
-class CommandErrorSlice:
+class CommandErrorSlice(BaseModel):
     """A subset of all commands errors in state."""
+
+    model_config = ConfigDict(frozen=True)
 
     commands_errors: List[ErrorOccurrence]
     cursor: int
     total_length: int
 
 
-@dataclass(frozen=True)
-class CommandPointer:
+class CommandPointer(BaseModel):
     """Brief info about a command and where to find it."""
+
+    model_config = ConfigDict(frozen=True)
 
     command_id: str
     command_key: str
@@ -150,9 +154,10 @@ class CommandPointer:
     index: int
 
 
-@dataclass(frozen=True)
-class CommandAnnotationsSlice:
+class CommandAnnotationsSlice(BaseModel):
     """A subset of all commands annotations in state."""
+
+    model_config = ConfigDict(frozen=True)
 
     command_annotations: List[CommandAnnotation]
     cursor: int

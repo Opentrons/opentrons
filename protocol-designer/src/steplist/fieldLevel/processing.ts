@@ -31,6 +31,40 @@ export const maskToTime = (rawValue: unknown): string => {
       : String(rawValue)
   return rawTimeValue
 }
+/**
+ * Masks input as MM:SS, building up from the right as the user types.
+ * Digits are right-aligned and padded with leading zeros.
+ * e.g. '' -> '', '3' -> '00:03', '34' -> '00:34', '342' -> '03:42', '3421' -> '34:21'
+ */
+export const maskToTimeWithPlaceholders = (
+  rawValue: unknown,
+  mode: 'mmss' | 'hhmmss' = 'mmss'
+): string => {
+  if (rawValue == null || rawValue === '') {
+    return ''
+  }
+
+  const value = typeof rawValue === 'string' ? rawValue : String(rawValue)
+  const digits = value.replace(/\D/g, '').slice(-(mode === 'mmss' ? 4 : 6))
+  if (digits.length === 0) {
+    return ''
+  }
+
+  const padded = digits.padStart(4, '0')
+  return `${padded.slice(0, 2)}:${padded.slice(2)}`
+}
+export const maskToSignedDecimal = (rawValue: unknown): string => {
+  if (rawValue == null || rawValue === '') {
+    return ''
+  }
+  const value = typeof rawValue === 'string' ? rawValue : String(rawValue)
+  const sanitized = value.replace(/[^\d.-]/g, '').replace(/(?!^)-/g, '')
+  const parts = sanitized.split('.')
+  if (parts.length > 2) {
+    return `${parts[0]}.${parts.slice(1).join('')}`
+  }
+  return sanitized
+}
 const DEFAULT_DECIMAL_PLACES: number = 1
 export const maskToFloat = (rawValue: unknown): string =>
   typeof rawValue === 'string'

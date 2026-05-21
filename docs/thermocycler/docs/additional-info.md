@@ -1,5 +1,6 @@
 ---
 title: "Thermocycler Module: Additional Product Information"
+description: "Warranty, support, app download, and WEEE policy for the Thermocycler."
 ---
 
 ## Warranty
@@ -39,4 +40,4 @@ If you have any questions about the use of the system, abnormal phenomena, or sp
 
 Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.
 
-August 2025 © OPENTRONS 2025. ALL RIGHTS RESERVED
+© OPENTRONS 2026. ALL RIGHTS RESERVED

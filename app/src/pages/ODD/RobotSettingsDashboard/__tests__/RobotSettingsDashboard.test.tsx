@@ -7,6 +7,7 @@ import { i18n } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
+  Devices,
   LanguageSetting,
   NetworkSettings,
   Privacy,
@@ -16,7 +17,11 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
-import { getAppLanguage, toggleDevtools } from '/app/redux/config'
+import {
+  getAppLanguage,
+  getFeatureFlags,
+  toggleDevtools,
+} from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getRobotSettings } from '/app/redux/robot-settings'
@@ -50,6 +55,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Devices')
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
@@ -95,6 +101,7 @@ describe('RobotSettingsDashboard', () => {
       toggleERSettings: mockToggleER,
     })
     vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
+    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: false })
   })
 
   afterEach(() => {
@@ -123,6 +130,7 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Choose what data to share with Opentrons.')
     screen.getByText('Device Reset')
     screen.getByText('Camera Preferences')
+    screen.getByText('Devices')
     screen.getByText('Update Channel')
     screen.getByText('Developer Tools')
     screen.getByText('Access additional logging and feature flags.')
@@ -294,5 +302,20 @@ describe('RobotSettingsDashboard', () => {
     const button = screen.getByText('Language')
     fireEvent.click(button)
     expect(vi.mocked(LanguageSetting)).toHaveBeenCalled()
+  })
+
+  it('should call a mock function when tapping devices', () => {
+    render()
+    const button = screen.getByText('Devices')
+    fireEvent.click(button)
+    expect(vi.mocked(Devices)).toHaveBeenCalled()
+  })
+
+  it('should render the component when tapping show encryption key', () => {
+    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: true })
+    render()
+    const button = screen.getByText('Robot encryption key')
+    fireEvent.click(button)
+    screen.getByText('View robot generated key')
   })
 })

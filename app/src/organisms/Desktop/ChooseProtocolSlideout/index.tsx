@@ -56,7 +56,8 @@ import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistor
 import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -105,6 +106,7 @@ export function ChooseProtocolSlideoutComponent(
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
+  const token = useAccessTokenForRobot(name)
   const robotType = useRobotType(name)
   const isFlex = robotType === FLEX_ROBOT_TYPE
 
@@ -131,21 +133,31 @@ export function ChooseProtocolSlideoutComponent(
     }
   }, [currentPage])
 
-  useEffect(() => {
-    setRunTimeParametersOverrides(
-      selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
-    )
-  }, [selectedProtocol?.protocolKey])
-
-  useEffect(() => {
-    setHasParamError(errors.length > 0)
-    setHasMissingFileParam(
-      runTimeParametersOverrides.some(
-        parameter =>
-          parameter.type === 'csv_file' && parameter.file?.file == null
+  useEffect(
+    () => {
+      setRunTimeParametersOverrides(
+        selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
       )
-    )
-  }, [runTimeParametersOverrides])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedProtocol?.protocolKey]
+  )
+
+  useEffect(
+    () => {
+      setHasParamError(errors.length > 0)
+      setHasMissingFileParam(
+        runTimeParametersOverrides.some(
+          parameter =>
+            parameter.type === 'csv_file' && parameter.file?.file == null
+        )
+      )
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [runTimeParametersOverrides]
+  )
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
@@ -173,7 +185,7 @@ export function ChooseProtocolSlideoutComponent(
       ? {
           hostname: robot.ip,
           requestor:
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
         }
       : null
   )
@@ -666,8 +678,9 @@ export function ChooseProtocolSlideoutComponent(
         <ApiHostProvider
           hostname={robot.ip}
           requestor={
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
           }
+          token={token}
         >
           {currentPage === 1
             ? !isFlex && (
@@ -745,9 +758,14 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
   ).filter(
     protocol => protocol.mostRecentAnalysis?.robotType === robot.robotModel
   )
-  useEffect(() => {
-    handleSelectProtocol(first(storedProtocols) ?? null)
-  }, [])
+  useEffect(
+    () => {
+      handleSelectProtocol(first(storedProtocols) ?? null)
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return storedProtocols.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

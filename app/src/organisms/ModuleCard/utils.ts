@@ -51,7 +51,7 @@ export function getModuleCardImage(attachedModule: AttachedModule): string {
     case 'flexStackerModuleV1':
       return flexStacker
     //  this should never be reached
-    case 'vacuumModuleMilliporeV1':
+    case 'vacuumModuleV1':
       return vacuumModule
     default:
       return 'unknown module model, this is an error'

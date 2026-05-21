@@ -34,6 +34,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
         formats: ['cjs'],
       },
     },
+    ssr: {
+      external: ['mdns-js'],
+    },
     plugins: [
       sentryVitePlugin({
         org: 'opentrons-sw',

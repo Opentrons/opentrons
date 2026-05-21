@@ -42,7 +42,6 @@ import type {
 const EQUIPMENT_POLL_MS = 5000
 
 // stubbed vacuum module for testing
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface InstrumentsAndModulesProps {
   robotName: string
   isRobotViewable: boolean
@@ -130,11 +129,9 @@ export function InstrumentsAndModules({
       alignItems={ALIGN_FLEX_START}
       flexDirection={DIRECTION_COLUMN}
       width="100%"
+      gap={SPACING.spacing16}
     >
-      <StyledText
-        desktopStyle="bodyLargeSemiBold"
-        marginBottom={SPACING.spacing16}
-      >
+      <StyledText desktopStyle="bodyLargeSemiBold">
         {t('instruments_and_modules')}
       </StyledText>
       <Flex

@@ -7,7 +7,7 @@ import { RobotCoordsForeignObject } from '../../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_DEFAULT_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
-  VACUUM_MODULE_MILLIPORE_V1_FIXTURE_WIDTH,
+  VACUUM_MODULE_V1_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from '../constants'
 import { VacuumModuleItem } from '../VacuumModuleItem'
@@ -57,8 +57,8 @@ describe('VacuumModuleItem', () => {
     props = {
       deckDefinition: mockDeckDefinition,
       fixtureLocation: 'cutoutA3',
-      cutoutFixtureId: 'vacuumModuleMilliporeV1',
-      addressableAreaId: 'vacuumModuleMilliporeV1A3',
+      cutoutFixtureId: 'vacuumModuleV1',
+      addressableAreaId: 'vacuumModuleV1A3',
     }
 
     vi.mocked(RobotCoordsForeignObject).mockImplementation(({ children }) => (
@@ -79,7 +79,7 @@ describe('VacuumModuleItem', () => {
     render(props)
     expect(RobotCoordsForeignObject).toHaveBeenCalledWith(
       expect.objectContaining({
-        width: VACUUM_MODULE_MILLIPORE_V1_FIXTURE_WIDTH,
+        width: VACUUM_MODULE_V1_FIXTURE_WIDTH,
         height: FIXTURE_HEIGHT,
       }),
       expect.anything()
@@ -125,8 +125,8 @@ describe('VacuumModuleItem', () => {
 
     expect(mockHandleClickRemove).toHaveBeenCalledWith(
       'cutoutA3',
-      'vacuumModuleMilliporeV1',
-      'vacuumModuleMilliporeV1A3'
+      'vacuumModuleV1',
+      'vacuumModuleV1A3'
     )
   })
 

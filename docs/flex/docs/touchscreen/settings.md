@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Settings"
+description: "Touchscreen settings for network, display, and robot configuration."
 ---
 
 The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.
@@ -20,7 +21,7 @@ Many of these settings are covered when you [first set up your Flex](../installa
 
 ### Camera
 
-Every Flex comes equipped with a [built-in camera][camera-features-and-controls], which is off by default. Camera options include on/off settings for still photographs, video, and on-error image capture.
+Every Flex comes equipped with a [built-in camera](../opentrons-app/camera.md), which is off by default. Camera options include on/off settings for still photographs, video, and on-error image capture.
 
 ### Developer Tools
 

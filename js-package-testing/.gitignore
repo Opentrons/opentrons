@@ -1,0 +1,9 @@
+# Playwright test outputs
+test-results/**
+playwright-report/**
+
+# Local secrets (copy from .env.example)
+.env
+
+# Packed .tgz files from local package builds and extracted packages
+pack/
