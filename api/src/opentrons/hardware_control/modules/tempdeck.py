@@ -13,6 +13,7 @@ from opentrons.hardware_control.poller import Reader, Poller
 from typing_extensions import Final
 from opentrons.drivers.types import Temperature
 from opentrons.drivers.temp_deck import (
+    DEFAULT_COMMAND_RETRIES,
     SimulatingDriver,
     AbstractTempDeckDriver,
     TempDeckDriver,
@@ -184,9 +185,7 @@ class TempDeck(mod_abc.AbstractModule):
                 while self.temperature > awaiting_temperature:
                     await self._poller.wait_next_poll()
 
-        t = self._loop.create_task(_await_temperature())
-        self.make_cancellable(t)
-        await t
+        await self.run_task_fault_tolerant(_await_temperature, DEFAULT_COMMAND_RETRIES)
 
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling and turn off the fan"""
@@ -289,6 +288,25 @@ class TempDeck(mod_abc.AbstractModule):
             return "temperatureModuleV1"
         else:
             return "temperatureModuleV2"
+
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        try:
+            if not await self._driver.is_connected():
+                await self.cleanup()
+                self._driver = await TempDeckDriver.create(
+                    port=self.port, loop=self.loop
+                )
+                self._reader._driver = self._driver
+            # restart the poller
+            await self._poller.stop()
+            await self._poller.start()
+        except BaseException as e:
+            log.error(f"Got {e} when trying to reconnect.")
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        self._port = port
+        self._usb_port = usb_port
 
 
 class TempDeckReader(Reader):
