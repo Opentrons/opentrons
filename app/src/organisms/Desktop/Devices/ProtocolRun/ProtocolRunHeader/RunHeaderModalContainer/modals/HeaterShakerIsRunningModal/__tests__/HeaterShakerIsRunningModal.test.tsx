@@ -133,14 +133,13 @@ describe('HeaterShakerIsRunningModal', () => {
 
   it('renders the correct modal icon and title', () => {
     render(props)
-
-    screen.getByTestId('HeaterShakerIsRunning_warning_icon')
-    screen.getByText('Heater-Shaker Module is currently shaking')
+    screen.getByRole('heading', {
+      name: 'Heater-Shaker Module is currently shaking',
+    })
   })
 
   it('renders the heater shaker module card and prompt', () => {
     render(props)
-
     screen.getByText('mock HeaterShakerModuleCard')
     screen.getByText('Continue shaking while the protocol starts?')
   })
