@@ -1,12 +1,13 @@
 """User data manager – business logic between the router and the store."""
 
-import random
+import secrets
 import string
 from typing import Literal
 
 from pwdlib import PasswordHash
 
 from auth_server.persistence.orm_models import User
+from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
@@ -18,6 +19,36 @@ from auth_server.users.models import (
 from auth_server.users.store import UserStore
 
 password_hash = PasswordHash.recommended()
+
+_DEFAULT_MIN_PASSWORD_LENGTH = 8
+_PASSWORD_ALPHABET = string.ascii_letters + string.digits
+_PASSWORD_SPECIAL_CHARACTERS = "!@#$%^&*"
+
+
+def _generate_temporary_password(
+    min_length: int, require_special_characters: bool
+) -> str:
+    """Generate a random password that satisfies the given complexity rules."""
+    alphabet = _PASSWORD_ALPHABET
+    if require_special_characters:
+        alphabet += _PASSWORD_SPECIAL_CHARACTERS
+        password_chars = [secrets.choice(alphabet) for _ in range(min_length)]
+        password_chars[secrets.randbelow(min_length)] = secrets.choice(
+            _PASSWORD_SPECIAL_CHARACTERS
+        )
+        return "".join(password_chars)
+    return "".join(secrets.choice(alphabet) for _ in range(min_length))
+
+
+def _temporary_password_requirements(
+    settings: SettingsResponseData,
+) -> tuple[int, bool]:
+    """Return (min_length, require_special_characters) from auth settings."""
+    min_length = (
+        settings.passwordComplexityMinimumLength or _DEFAULT_MIN_PASSWORD_LENGTH
+    )
+    require_special = settings.passwordComplexitySpecialCharacters is True
+    return min_length, require_special
 
 
 class UserNotFoundError(ValueError):
@@ -180,7 +211,12 @@ class UserDataManager:
 
     def reset_user_password(self, username: str) -> ResetPasswordResponse:
         """Reset a user's password to a random temporary password."""
-        temporary_password = "".join(random.choices(string.ascii_letters + string.digits, k=16))
+        min_length, require_special = _temporary_password_requirements(
+            self._settings_store.get_settings()
+        )
+        temporary_password = _generate_temporary_password(
+            min_length, require_special
+        )
         try:
             updated_user = self._user_store.update(
                 username,

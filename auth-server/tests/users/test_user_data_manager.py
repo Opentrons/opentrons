@@ -1,3 +1,5 @@
+import string
+
 import pytest
 from decoy import Decoy, matchers
 
@@ -11,6 +13,8 @@ from auth_server.users.user_data_manager import (
     UserAlreadyExistsError,
     UserDataManager,
     UserNotFoundError,
+    _generate_temporary_password,
+    _temporary_password_requirements,
 )
 
 
@@ -373,12 +377,8 @@ def test_reset_user_password(
     decoy.when(
         mock_store.update(
             "reset_me",
-            None,
-            matchers.IsA(str),
-            None,
-            None,
-            True,
-            True,
+            hashed_password=matchers.IsA(str),
+            using_temporary_password=True,
         )
     ).then_return(updated)
 
@@ -387,36 +387,101 @@ def test_reset_user_password(
     assert result.userName == "reset_me"
     assert result.resetPassword is True
     assert result.usingTemporaryPassword is True
-    assert len(result.temporaryPassword) == 16
+    assert len(result.temporaryPassword) == 8
+    assert all(c in string.ascii_letters + string.digits for c in result.temporaryPassword)
     decoy.verify(
         mock_store.update(
             "reset_me",
-            None,
-            matchers.IsA(str),
-            None,
-            None,
-            True,
-            True,
+            hashed_password=matchers.IsA(str),
+            using_temporary_password=True,
         )
     )
 
 
-def test_reset_user_password_not_found_raises(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+def test_reset_user_password_uses_password_complexity_settings(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
 ) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(
+            passwordComplexityMinimumLength=12,
+            passwordComplexitySpecialCharacters=True,
+        )
+    )
+    updated = _make_orm_user(
+        username="reset_me",
+        using_temporary_password=True,
+    )
+    decoy.when(
+        mock_store.update(
+            "reset_me",
+            hashed_password=matchers.IsA(str),
+            using_temporary_password=True,
+        )
+    ).then_return(updated)
+
+    result = manager.reset_user_password("reset_me")
+
+    assert len(result.temporaryPassword) == 12
+    assert any(c in "!@#$%^&*" for c in result.temporaryPassword)
+
+
+def test_reset_user_password_not_found_raises(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     decoy.when(
         mock_store.update(
             "ghost",
-            None,
-            matchers.IsA(str),
-            None,
-            None,
-            True,
-            True,
+            hashed_password=matchers.IsA(str),
+            using_temporary_password=True,
         )
     ).then_raise(ValueError("User 'ghost' not found"))
     with pytest.raises(UserNotFoundError):
         manager.reset_user_password("ghost")
+
+
+@pytest.mark.parametrize(
+    ("settings", "expected_min_length", "expected_require_special"),
+    [
+        (SettingsResponseData(), 8, False),
+        (
+            SettingsResponseData(
+                passwordComplexityMinimumLength=10,
+                passwordComplexitySpecialCharacters=False,
+            ),
+            10,
+            False,
+        ),
+        (
+            SettingsResponseData(
+                passwordComplexityMinimumLength=10,
+                passwordComplexitySpecialCharacters=True,
+            ),
+            10,
+            True,
+        ),
+    ],
+)
+def test_temporary_password_requirements(
+    settings: SettingsResponseData,
+    expected_min_length: int,
+    expected_require_special: bool,
+) -> None:
+    min_length, require_special = _temporary_password_requirements(settings)
+    assert min_length == expected_min_length
+    assert require_special is expected_require_special
+
+
+def test_generate_temporary_password_meets_complexity_rules() -> None:
+    password = _generate_temporary_password(12, require_special_characters=True)
+    assert len(password) == 12
+    assert any(c in "!@#$%^&*" for c in password)
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
