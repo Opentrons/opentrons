@@ -66,7 +66,7 @@ Open a slot spotlight to see changes over the course of your protocol. For examp
 When you import any protocol, the Opentrons App analyzes it for errors. You can still visualize a protocol with errors, but you won't be able to see step details past the error. 
 
 <figure class="screenshot" markdown>
-![Image showing protocol visualization details for tips, labware, wells, and more.](../images/)
+![Image showing protocol visualization details for tips, labware, wells, and more.](../images/viz-error.png)
 </figure>
 
-In this example serial dilution protocol, the tip rack would run out of tips before the robot could complete the final transfer step. The visualization screen includes the number of errors at the top of the screen. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details.
+In this example serial dilution protocol, the tip rack would run out of tips before the robot can complete the final transfer step. The visualization screen includes the number of errors at the top of the screen. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details.
