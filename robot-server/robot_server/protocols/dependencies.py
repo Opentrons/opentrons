@@ -31,15 +31,15 @@ from .protocol_store import (
     ProtocolStore,
 )
 from robot_server.deletion_planner import ProtocolDeletionPlanner
+from robot_server.fastapi_dependencies import (
+    maybe_record_documented_interaction_non_json,
+)
 from robot_server.persistence.fastapi_dependencies import (
     get_active_persistence_directory,
     get_sql_engine,
 )
 from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
 from robot_server.protocols.protocol_models import ProtocolKind
-from robot_server.fastapi_dependencies import (
-    maybe_record_documented_interaction_non_json,
-)
 from robot_server.runs.dependencies import get_run_process_pyro_provider
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.dependencies import get_current_time, get_unique_id

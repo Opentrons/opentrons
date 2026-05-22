@@ -64,7 +64,6 @@ from .dependencies import (
     get_protocol_directory,
     get_protocol_reader,
     get_protocol_store,
-    get_protocol_upload_id,
     get_quick_transfer_protocol_auto_deleter,
     maybe_audit_protocol_upload,
 )
