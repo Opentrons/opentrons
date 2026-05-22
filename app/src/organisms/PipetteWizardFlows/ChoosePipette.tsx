@@ -28,6 +28,7 @@ import {
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 import {
   EIGHT_CHANNEL,
   LEFT,
@@ -42,9 +43,15 @@ import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.p
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
+import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
+// TODO(jj): implement documentation state generation on desktop
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { isDocumentationProvided } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { usePromptForInteractionReason } from '../ODD/AccessControl/usePromptForInteractionReason'
 import { FLOWS } from './constants'
 import { ExitModal } from './ExitModal'
 import { getIsGantryEmpty } from './utils'
@@ -110,7 +117,7 @@ const SELECTED_OPTIONS_STYLE = css`
 `
 
 interface ChoosePipetteProps {
-  proceed: () => void
+  proceed: (initialDocstate?: DocumentationState) => void
   selectedPipette: SelectablePipettes
   setSelectedPipette: Dispatch<SetStateAction<SelectablePipettes>>
   exit: () => void
@@ -123,6 +130,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const attachedPipettesByMount = useAttachedPipettesFromInstrumentsQuery()
   const [showExitConfirmation, setShowExitConfirmation] =
     useState<boolean>(false)
+
+  const initialDocstate = usePromptForInteractionReason()
+  const isWaitingForDocumentation = !isDocumentationProvided(initialDocstate)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)
     ? t('ninety_six_channel', {
@@ -171,6 +181,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               flowType={FLOWS.ATTACH}
               isOnDevice={isOnDevice}
             />
+          ) : isWaitingForDocumentation ? (
+            <SimpleWizardInProgressBody />
           ) : (
             <Flex
               margin={SPACING.spacing32}
@@ -197,7 +209,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               />
               <Flex justifyContent={JUSTIFY_FLEX_END}>
                 <SmallButton
-                  onClick={proceed}
+                  onClick={() => {
+                    proceed(initialDocstate)
+                  }}
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                   buttonText={i18n.format(t('shared:continue'), 'capitalize')}
                 />
@@ -217,6 +231,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             flowType={FLOWS.ATTACH}
             isOnDevice={isOnDevice}
           />
+        ) : isWaitingForDocumentation ? (
+          <SimpleWizardInProgressBody />
         ) : (
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -273,7 +289,12 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                 </PipetteMountOption>
               </Flex>
             </Flex>
-            <PrimaryButton onClick={proceed} alignSelf={ALIGN_FLEX_END}>
+            <PrimaryButton
+              onClick={() => {
+                proceed(initialDocstate)
+              }}
+              alignSelf={ALIGN_FLEX_END}
+            >
               {i18n.format(t('shared:continue'), 'capitalize')}
             </PrimaryButton>
           </Flex>

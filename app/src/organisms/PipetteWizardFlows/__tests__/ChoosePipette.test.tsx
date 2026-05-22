@@ -22,6 +22,12 @@ import type { ComponentProps } from 'react'
 vi.mock('../utils')
 vi.mock('/app/resources/instruments')
 vi.mock('/app/redux/config')
+vi.mock(
+  '/app/organisms/ODD/AccessControl/usePromptForInteractionReason',
+  () => ({
+    usePromptForInteractionReason: () => ({ accessControlEnabled: false }),
+  })
+)
 
 const render = (props: ComponentProps<typeof ChoosePipette>) => {
   return renderWithProviders(<ChoosePipette {...props} />, {
