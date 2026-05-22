@@ -3,28 +3,8 @@
 name: 'PD E2E Tests'
 
 on:
-  pull_request:
-    paths:
-      - 'protocol-designer/**'
-      - 'step-generation/**'
-      - 'shared-data/**'
-      - 'components/**'
-      - 'package.json'
-      - '.github/workflows/pd-test-build-deploy.yaml'
-      - '.github/actions/js/setup/action.yml'
-      - '.github/actions/git/resolve-tag/action.yml'
-      - '.github/actions/environment/complex-variables/action.yml'
-      - 'scripts/static-deploy/**'
-      - 'scripts/git-version-protocol-designer.mjs'
-      - '.github/workflows/pd-e2e-test.yaml'
-      - 'e2e-testing/tests/pd/**'
-      - 'e2e-testing/fixtures/**'
-      - 'e2e-testing/uv.lock'
-      - 'e2e-testing/pyproject.toml'
-      - 'e2e-testing/conftest.py'
-      - 'e2e-testing/eyes.py'
-      - 'e2e-testing/pytest.ini'
-      - 'e2e-testing/automation/pd_pages/**'
+  schedule:
+    - cron: '0 15 * * *' # 10:00 AM EST (15:00 UTC)
   workflow_dispatch: {}
 
 concurrency:

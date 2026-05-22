@@ -3,18 +3,8 @@
 name: 'JS package testing'
 
 on:
-  pull_request:
-    paths:
-      - 'components/**'
-      - 'js-package-testing/**'
-      - 'protocol-visualization/**'
-      - 'shared-data/**'
-      - 'step-generation/**'
-      - '.github/workflows/js-package-testing.yaml'
-  push:
-    branches:
-      - 'edge'
-      - 'chore_release*'
+  schedule:
+    - cron: '0 15 * * *' # 10:00 AM EST (15:00 UTC)
   workflow_dispatch: {}
 
 concurrency:
