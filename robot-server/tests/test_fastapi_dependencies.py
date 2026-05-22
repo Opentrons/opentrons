@@ -18,7 +18,7 @@ from robot_server.runs.action_models import RunActionCreate, RunActionType
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("action_type", [RunActionType.PLAY, RunActionType.PAUSE])
-async def test_action_without_notes_raises_when_reason_required(
+async def test_action_without_notes_raises_when_auth_server_requires_them(
     decoy: Decoy,
     action_type: RunActionType,
 ) -> None:
@@ -42,7 +42,7 @@ async def test_action_without_notes_raises_when_reason_required(
 
 
 @pytest.mark.asyncio
-async def test_action_without_notes_allowed_when_reason_not_required(
+async def test_action_without_notes_allowed_when_auth_server_does_not_require_them(
     decoy: Decoy,
 ) -> None:
     """When auth-server does not require notes, actions without ``userNotes`` are allowed."""

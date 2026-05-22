@@ -59,15 +59,6 @@ def ot3_server_base_url(_ot3_session_server: str) -> Generator[str, None, None]:
     _clean_server_state(_ot3_session_server)
 
 
-@pytest.fixture
-def ot3_server_base_url_require_reason_true(
-    _ot3_session_server_require_reason_true: str,
-) -> Generator[str, None, None]:
-    """OT-3 dev server with require-reason-for-interaction forced on (integration override)."""
-    yield _ot3_session_server_require_reason_true
-    _clean_server_state(_ot3_session_server_require_reason_true)
-
-
 @pytest.fixture(scope="session")
 def _ot2_session_server(
     server_temp_directory: str,
@@ -99,25 +90,6 @@ def _ot3_session_server(
         port=str(port),
         is_ot3=True,
         ot_api_config_dir=Path(server_temp_directory),
-    ) as dev_server:
-        dev_server.start()
-        _wait_until_ready(base_url)
-        yield base_url
-
-
-@pytest.fixture(scope="session")
-def _ot3_session_server_require_reason_true(
-    server_temp_directory: str,
-    unused_tcp_port_factory: Callable[[], int],
-) -> Generator[str, None, None]:
-    """Session-scoped OT-3 dev server with require-reason-for-interaction override true."""
-    port = unused_tcp_port_factory()
-    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
-    with DevServer(
-        port=str(port),
-        is_ot3=True,
-        ot_api_config_dir=Path(server_temp_directory),
-        integration_require_reason_for_interaction_override=True,
     ) as dev_server:
         dev_server.start()
         _wait_until_ready(base_url)
