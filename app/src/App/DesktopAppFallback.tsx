@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useSentryReport } from '/app/App/hooks'
+import { useSentryReport } from '/app/App/hooks/useSentryReport'
 import { reloadUi } from '/app/redux/shell'
 
 import type { FallbackProps } from 'react-error-boundary'

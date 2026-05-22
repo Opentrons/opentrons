@@ -25,7 +25,7 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { DesktopApp } from '../DesktopApp'
-import { useSoftwareUpdatePoll } from '../hooks'
+import { useSoftwareUpdatePoll } from '../hooks/useSoftwareUpdatePoll'
 
 import type { LocalizationProviderProps } from '/app/LocalizationProvider'
 

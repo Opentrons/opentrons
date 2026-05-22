@@ -35,7 +35,8 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { LocalizationProvider } from '../../LocalizationProvider'
 import { LoggedOutOverlay } from '../../molecules/LoggedOutOverlay'
-import { useProtocolReceiptToast, useScrollRef } from '../hooks'
+import { useScrollRef } from '../hooks/useModuleAttachedToast'
+import { useProtocolReceiptToast } from '../hooks/useProtocolReceiptToast'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 

@@ -9,7 +9,7 @@ import { getConfig } from '/app/redux/config'
 
 import { App } from '../'
 import { DesktopApp } from '../DesktopApp'
-import { useWindowType } from '../hooks'
+import { useWindowType } from '../hooks/useWindowType'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { SecondaryWindowApp } from '../SecondaryWindowApp'
 
