@@ -324,10 +324,13 @@ class TempDeckReader(Reader):
         self.temperature = Temperature(current=25, target=None)
         self._driver = driver
         self._error_callback: Optional[Callable[[Exception], None]] = None
+        self._debounce_count = DEFAULT_COMMAND_RETRIES
 
     async def read(self) -> None:
         """Read the module's current and target temperatures."""
         self.temperature = await self._driver.get_temperature()
+        # reset on success
+        self._debounce_count = DEFAULT_COMMAND_RETRIES
 
     def set_error_callback(
         self, error_callback: Callable[[Exception], None]
@@ -339,5 +342,11 @@ class TempDeckReader(Reader):
         self._error_callback = None
 
     def on_error(self, exception: Exception) -> None:
+        self._debounce_count -= 1
         if self._error_callback:
-            self._error_callback(exception)
+            if self._debounce_count == 0:
+                log.error(
+                    f"Reader encountered error {exception} but has {self._debounce_count} tries left"
+                )
+            else:
+                self._error_callback(exception)
