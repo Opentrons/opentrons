@@ -61,7 +61,24 @@ export default defineConfig(async (): Promise<UserConfig> => {
         output: {
           // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
           manualChunks(id) {
-            if (id.includes('node_modules')) return 'vendor'
+            // Monorepo packages resolved via alias (not node_modules paths)
+            // must be explicitly chunked — otherwise they get duplicated in
+            // every lazy page chunk, causing the "Duplicated JavaScript" warning
+            if (id.includes('/shared-data/js')) return 'opentrons-shared-data'
+            if (id.includes('/components/src')) return 'opentrons-components'
+            if (id.includes('/step-generation/src'))
+              return 'opentrons-step-generation'
+
+            if (id.includes('node_modules')) {
+              // plotly is only used in ByVolumeBuilder (inside the lazy Designer
+              // page) — keep it out of vendor so it doesn't load on every page
+              if (
+                id.includes('plotly.js-cartesian-dist') ||
+                id.includes('react-plotly.js')
+              )
+                return undefined
+              return 'vendor'
+            }
           },
         },
       },
@@ -134,6 +151,26 @@ export default defineConfig(async (): Promise<UserConfig> => {
             }
           : {}),
       }),
+
+      {
+        // Inject <link rel="preload"> for the LCP image (welcome_page.png) so
+        // the browser can start downloading it before JS executes
+        name: 'preload-lcp-image',
+        transformIndexHtml: {
+          order: 'post',
+          handler(html, { bundle }) {
+            if (!bundle) return html
+            const welcomeAsset = Object.values(bundle).find(chunk =>
+              chunk.fileName.match(/welcome_page.*\.png$/)
+            )
+            if (!welcomeAsset) return html
+            return html.replace(
+              '</head>',
+              `  <link rel="preload" as="image" fetchpriority="high" href="./${welcomeAsset.fileName}">\n</head>`
+            )
+          },
+        },
+      },
 
       {
         name: 'build-info-generator',
