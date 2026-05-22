@@ -26,8 +26,8 @@ from opentrons.protocol_engine.resources.file_provider import (
     UserDefinedCSVCmdFileNameMetadata,
 )
 from opentrons.util.pyro.pyro_client_async_adapter import (
-    AsyncClientPyroFunctionWrapper,
     AsyncClientPyroObject,
+    ClientPyroFunctionWrapper,
 )
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
@@ -183,7 +183,7 @@ async def test_run_hardware_event_callback(
         robot_server_resource.create_run_hardware_event_callback()
     )
 
-    assert isinstance(result, AsyncClientPyroFunctionWrapper)
+    assert isinstance(result, ClientPyroFunctionWrapper)
 
 
 async def test_maintenance_run_hardware_event_callback(
@@ -218,13 +218,13 @@ async def test_maintenance_run_hardware_event_callback(
         robot_server_resource.create_maintenance_run_hardware_event_callback()
     )
 
-    assert isinstance(result, AsyncClientPyroFunctionWrapper)
+    assert isinstance(result, ClientPyroFunctionWrapper)
 
     door_watcher_result = ot3api.register_callback(
         robot_server_resource.get_maintenance_run_door_watcher_callback()
     )
 
-    assert isinstance(door_watcher_result, AsyncClientPyroFunctionWrapper)
+    assert isinstance(door_watcher_result, ClientPyroFunctionWrapper)
 
 
 async def test_camera_provider(
@@ -345,4 +345,4 @@ async def test_notify_publisher(
 
     result = robot_server_resource.get_notify_publishers()
 
-    assert isinstance(result, AsyncClientPyroFunctionWrapper)
+    assert isinstance(result, ClientPyroFunctionWrapper)
