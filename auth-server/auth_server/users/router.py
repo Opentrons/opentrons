@@ -51,7 +51,7 @@ async def post_users(
     user_create = request_body.data
     try:
         new_user = user_data_manager.create_user(
-            username=user_create.userName,
+            username=user_create.username,
             password=user_create.password.get_secret_value(),
             full_name=user_create.fullName,
             account_type=user_create.accountType,
@@ -74,7 +74,7 @@ async def post_users(
 
 @PydanticResponse.wrap_route(
     router.get,
-    path="/auth/users/byUsername/{userName}",
+    path="/auth/users/byUsername/{username}",
     summary="Get a user",
     description="Get a specific user, identified by their unique username.",
     responses={
@@ -84,14 +84,14 @@ async def post_users(
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ_OTHERS))],
 )
 async def get_user(
-    userName: str,
+    username: str,
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
     try:
-        user = user_data_manager.get_user(userName)
+        user = user_data_manager.get_user(username)
     except UserNotFoundError:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
@@ -105,7 +105,7 @@ async def get_user(
 
 @PydanticResponse.wrap_route(
     router.delete,
-    path="/auth/users/byUsername/{userName}",
+    path="/auth/users/byUsername/{username}",
     summary="Delete a user",
     description="Delete a specific user, identified by their unique username.",
     responses={
@@ -114,14 +114,14 @@ async def get_user(
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def delete_user(
-    userName: str,
+    username: str,
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
     try:
-        user_data_manager.delete_user(userName)
+        user_data_manager.delete_user(username)
     except UserNotFoundError:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
@@ -135,7 +135,7 @@ async def delete_user(
 
 @PydanticResponse.wrap_route(
     router.patch,
-    path="/auth/users/byUsername/{userName}",
+    path="/auth/users/byUsername/{username}",
     summary="Update a user",
     description="Update a specific user, identified by their unique username.",
     responses={
@@ -145,7 +145,7 @@ async def delete_user(
 )
 async def update_user(
     request_body: RequestModel[UpdateUser],
-    userName: str,
+    username: str,
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -154,8 +154,8 @@ async def update_user(
     update_data = request_body.data
     try:
         updated_user = user_data_manager.update_user(
-            userName,
-            new_username=update_data.userName,
+            username,
+            new_username=update_data.username,
             new_password=update_data.password.get_secret_value()
             if update_data.password is not None
             else None,

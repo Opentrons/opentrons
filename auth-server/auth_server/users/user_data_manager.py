@@ -33,7 +33,7 @@ def _validate_fields(
 ) -> None:
     """Validate that provided fields are non-empty and passwords meet length requirements."""
     for field_name, value in [
-        ("userName", user_name),
+        ("username", user_name),
         ("password", password),
         ("fullName", full_name),
         ("accountType", account_type),
@@ -61,7 +61,7 @@ class UserDataManager:
         account_type = AccountType(user.account_type)
 
         return UserResponse(
-            userName=user.username,
+            username=user.username,
             fullName=user.full_name,
             accountType=account_type,
             scopes=sorted(
