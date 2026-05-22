@@ -17,7 +17,7 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
-from auth_server.users.dependencies import get_user_data_manager
+from auth_server.users.dependencies import get_user_by_username, get_user_data_manager
 from auth_server.users.models import (
     ResetPasswordResponse,
     UpdateUser,
@@ -28,7 +28,6 @@ from auth_server.users.user_data_manager import (
     InvalidInputError,
     UserAlreadyExistsError,
     UserDataManager,
-    UserNotFoundError,
 )
 
 router = fastapi.APIRouter()
@@ -89,19 +88,9 @@ async def post_users(
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ_OTHERS))],
 )
 async def get_user(
-    userName: str,
-    user_data_manager: Annotated[
-        UserDataManager, fastapi.Depends(get_user_data_manager)
-    ],
+    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Get a user by its unique identifier."""
-    try:
-        user = user_data_manager.get_user(userName)
-    except UserNotFoundError:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=user),
@@ -119,19 +108,13 @@ async def get_user(
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def delete_user(
-    userName: str,
+    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
-    try:
-        user_data_manager.delete_user(userName)
-    except UserNotFoundError:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
+    user_data_manager.delete_user(user.userName)
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),
         status_code=fastapi.status.HTTP_200_OK,
@@ -150,7 +133,7 @@ async def delete_user(
 )
 async def update_user(
     request_body: RequestModel[UpdateUser],
-    userName: str,
+    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
@@ -159,7 +142,7 @@ async def update_user(
     update_data = request_body.data
     try:
         updated_user = user_data_manager.update_user(
-            userName,
+            user.userName,
             new_username=update_data.userName,
             new_password=update_data.password.get_secret_value()
             if update_data.password is not None
@@ -169,11 +152,6 @@ async def update_user(
             new_locked=update_data.locked,
             reset_password=update_data.resetPassword,
             using_temporary_password=update_data.usingTemporaryPassword,
-        )
-    except UserNotFoundError:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="User not found",
         )
     except UserAlreadyExistsError:
         raise fastapi.HTTPException(
@@ -206,19 +184,13 @@ async def update_user(
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
 async def reset_user_password(
-    userName: str,
+    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleBody[ResetPasswordResponse]]:
     """Reset a user's password to a random temporary password."""
-    try:
-        result = user_data_manager.reset_user_password(userName)
-    except UserNotFoundError:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
+    result = user_data_manager.reset_user_password(user.userName)
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
@@ -250,9 +222,8 @@ async def get_self(  # noqa: D103
             detail="This endpoint needs an access token to determine the current user.",
         )
 
-    # Note: No try/except for UserNotFoundError. If the user passed `require_scopes()`,
-    # but we can't find them here, then that's some kind of server bug and we want to
-    # let it propagate with HTTP error code 500.
+    # Note: Does not use get_user_by_username. If the user passed require_scopes() but
+    # we cannot find them here, that is a server bug and should surface as 500.
     user = user_data_manager.get_user(authorization_details.username)
 
     return await PydanticResponse.create(
