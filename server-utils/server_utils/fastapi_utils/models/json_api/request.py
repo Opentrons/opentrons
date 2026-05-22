@@ -24,12 +24,9 @@ class RequestModel(BaseModel, Generic[RequestDataT]):
     userNotes: str | None = Field(
         None,
         description=(
-            "Optional user-supplied notes (plain string) for the audit log when the "
-            "client performs an action that requires documenting about why they interacted "
-            "with the robot. This is a sibling of ``data`` on the request document, not a "
-            "field inside ``data``. Whether it is required depends on the auth-server "
-            "require-reason-for-interaction setting; individual endpoints may ignore it or "
-            "apply additional validation."
+            "Optional user-supplied notes for the audit log when documenting why the "
+            "client interacted with the robot. Whether it is required depends on the "
+            "requireReasonForInteraction setting—see PATCH /auth/settings."
         ),
     )
 
