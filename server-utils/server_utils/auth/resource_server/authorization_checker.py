@@ -64,15 +64,12 @@ class AuthorizationChecker(ABC):
         """
         pass
 
+    @abstractmethod
     async def get_require_reason_for_interaction_settings(
         self,
     ) -> RequireReasonForInteractionSettingsResponse:
-        """Return auth-server require-reason-for-interaction settings."""
-        return RequireReasonForInteractionSettingsResponse(
-            data=RequireReasonForInteractionSettingsResponseData(
-                requireReasonForInteraction=False
-            )
-        )
+        """Return require-reason-for-interaction settings."""
+        pass
 
     async def get_require_reason_for_interaction_enabled(self) -> bool:
         """Return whether auth-server requires a reason for interaction."""
@@ -145,6 +142,17 @@ class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
         """See base class for documentation."""
         return AuthorizationNotRequiredResult()
+
+    @override
+    async def get_require_reason_for_interaction_settings(
+        self,
+    ) -> RequireReasonForInteractionSettingsResponse:
+        """Require-reason is disabled when access control is not configured."""
+        return RequireReasonForInteractionSettingsResponse(
+            data=RequireReasonForInteractionSettingsResponseData(
+                requireReasonForInteraction=False
+            )
+        )
 
 
 class AuthServerAuthorizationChecker(AuthorizationChecker):
