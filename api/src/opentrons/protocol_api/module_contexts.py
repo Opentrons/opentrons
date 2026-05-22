@@ -1993,10 +1993,15 @@ class VacuumModuleContext(ModuleContext):
 
         Args:
             steps: List of steps that make up a single cycle.
-                Each list item should be a dictionary that maps to the parameters
-                of the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature]
-                method. The dictionary's keys must be
-            repetitions: The number of times to repeat the cycled steps.
+            repetitions: How many times to perform the entire profile.
+                The dictionary's keys must be
+            enable_pump: whether to enable the pump motor
+                Optional arguments are:
+            hold_time_seconds: time in seconds to hold pressure/power for after target is reached
+            hold_time_minutes: time in minutes to hold pressure/power for after target is reached
+            ramp_rate: rate to increase the motor power at (get unit for this)
+            timeout_seconds: the time to wait for target pressure/power before throwing an error
+            vent_after: wheter to open the vent after the step is complete
         """
         repetitions = validation.ensure_profile_repetition_count(repetitions)
         validated_steps = validation.ensure_vacuum_module_profile(steps)
