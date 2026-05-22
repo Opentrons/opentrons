@@ -2,6 +2,9 @@
 
 from datetime import datetime
 
+import logging
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from decoy import Decoy
 from pydantic import BaseModel
@@ -12,6 +15,7 @@ from server_utils.auth.resource_server.auth_server import (
     RequireReasonForInteractionSettingsResponseData,
 )
 from server_utils.auth.resource_server.authorization_checker import (
+    AlwaysAllowedAuthorizationChecker,
     AuthServerAuthorizationChecker,
     DocumentedInteraction,
     MissingUserNotesError,
@@ -45,10 +49,6 @@ async def test_record_documented_interaction_uses_explicit_require_reason_flag(
 @pytest.mark.asyncio
 async def test_record_documented_interaction_skips_when_not_required() -> None:
     """No notes are required when require-reason-for-interaction is disabled."""
-    from server_utils.auth.resource_server.authorization_checker import (
-        AlwaysAllowedAuthorizationChecker,
-    )
-
     subject = AlwaysAllowedAuthorizationChecker()
     await subject.record_documented_interaction(
         DocumentedInteraction(
@@ -84,6 +84,36 @@ async def test_record_documented_interaction_raises_when_notes_missing(
             resource_id="run-1",
             recorded_at=datetime(year=2024, month=1, day=1),
         )
+
+
+@pytest.mark.asyncio
+async def test_record_documented_interaction_writes_audit_log(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """When notes are required and supplied, an audit log entry is emitted."""
+    subject = AlwaysAllowedAuthorizationChecker()
+    audit_logger = "server_utils.auth.resource_server.authorization_checker"
+    with (
+        patch.object(
+            subject,
+            "get_require_reason_for_interaction_enabled",
+            new=AsyncMock(return_value=True),
+        ),
+        caplog.at_level(logging.INFO, logger=audit_logger),
+    ):
+        await subject.record_documented_interaction(
+            DocumentedInteraction(
+                user_notes="audit note",
+                request_data=_ExampleRequestData(action="play"),
+            ),
+            resource_id="run-1",
+            recorded_at=datetime(year=2024, month=1, day=1),
+        )
+
+    assert any(
+        "Documented interaction" in record.message and "run-1" in record.message
+        for record in caplog.records
+    )
 
 
 @pytest.mark.asyncio
