@@ -4,7 +4,7 @@ from typing import Final
 
 from fastapi import Request
 
-from .models.json_api import parse_supplied_user_notes
+from .models.json_api.request import parse_supplied_user_notes
 
 _MUTATING_METHODS: Final = frozenset({"POST", "PUT", "PATCH"})
 

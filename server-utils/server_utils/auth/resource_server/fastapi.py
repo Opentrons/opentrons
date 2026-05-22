@@ -21,7 +21,6 @@ import fastapi.security
 from .auth_server import (
     TOKEN_ENDPOINT_PATH,
     LocalHTTPClient,
-    RequireReasonForInteractionSettingsResponse,
 )
 from .authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
@@ -192,15 +191,6 @@ def get_authorization_checker(
         "Forgot to initialize authorization checker as part of server startup?"
     )
     return authorization_checker
-
-
-async def get_require_reason_for_interaction_settings(
-    authorization_checker: Annotated[
-        AuthorizationChecker, fastapi.Depends(get_authorization_checker)
-    ],
-) -> RequireReasonForInteractionSettingsResponse:
-    """FastAPI dependency: auth-server require-reason-for-interaction settings."""
-    return await authorization_checker.get_require_reason_for_interaction_settings()
 
 
 class AuthorizationError(Exception):
