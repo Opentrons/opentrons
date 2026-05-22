@@ -128,7 +128,6 @@ async def test_upload_new_data_file(
         file_hasher=file_hasher,
         file_id="data-file-id",
         created_at=datetime(year=2024, month=6, day=18),
-        _maybe_audit_data_file_upload=None,
     )
 
     assert result.content.data == DataFile(
@@ -200,7 +199,6 @@ async def test_upload_existing_data_file(
         data_file_auto_deleter=file_auto_deleter,
         file_id="data-file-id",
         created_at=datetime(year=2024, month=6, day=18),
-        _maybe_audit_data_file_upload=None,
     )
     assert result.status_code == 200
     assert result.content.data == DataFile(
@@ -239,7 +237,6 @@ async def test_upload_new_data_file_path(
         file_hasher=file_hasher,
         file_id="data-file-id",
         created_at=datetime(year=2024, month=6, day=18),
-        _maybe_audit_data_file_upload=None,
     )
     assert result.status_code == 201
     assert result.content.data == DataFile(
@@ -291,7 +288,6 @@ async def test_upload_non_existent_file_path(
             data_file_auto_deleter=file_auto_deleter,
             file_id="data-file-id",
             created_at=datetime(year=2024, month=6, day=18),
-            _maybe_audit_data_file_upload=None,
         )
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "FileNotFound"
@@ -323,7 +319,6 @@ async def test_upload_non_csv_file(
             data_file_auto_deleter=file_auto_deleter,
             file_id="data-file-id",
             created_at=datetime(year=2024, month=6, day=18),
-            _maybe_audit_data_file_upload=None,
         )
     assert exc_info.value.status_code == 422
     assert exc_info.value.content["errors"][0]["id"] == "UnexpectedFileFormat"

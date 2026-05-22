@@ -1,0 +1,34 @@
+test_name: Upload protocol without userNotes when require-reason is off (default integration server)
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Upload without userNotes when require-reason is off
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/empty_ot3.json'
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+
+  - name: Upload with optional userNotes form field when require-reason is off
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/empty_ot3.json'
+      data:
+        userNotes: 'Uploading empty_ot3.json for integration coverage'
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"

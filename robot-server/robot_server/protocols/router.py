@@ -64,7 +64,9 @@ from .dependencies import (
     get_protocol_directory,
     get_protocol_reader,
     get_protocol_store,
+    get_protocol_upload_id,
     get_quick_transfer_protocol_auto_deleter,
+    maybe_audit_protocol_upload,
 )
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Metadata, Protocol, ProtocolFile, ProtocolKind
@@ -230,6 +232,10 @@ async def create_protocol(  # noqa: C901
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
     protocol_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    _maybe_audit_protocol_upload: Annotated[
+        None,
+        Depends(maybe_audit_protocol_upload),
+    ] = None,
     created_at: Annotated[datetime, Depends(get_current_time)],
     maximum_quick_transfer_protocols: Annotated[
         int, Depends(get_maximum_quick_transfer_protocols)
@@ -304,6 +310,8 @@ async def create_protocol(  # noqa: C901
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
+        _maybe_audit_protocol_upload: When auth-server requires reasons for
+            interaction, requires ``userNotes`` and records the interaction for audit.
     """
     # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
     #  so we can validate the data contents and return a better error response.

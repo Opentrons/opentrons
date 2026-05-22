@@ -520,6 +520,7 @@ async def test_create_existing_protocol(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        _maybe_audit_protocol_upload=None,
     )
 
     assert result.content.data == Protocol(
@@ -642,6 +643,7 @@ async def test_create_protocol(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        _maybe_audit_protocol_upload=None,
     )
 
     assert result.content.data == Protocol(
@@ -791,6 +793,7 @@ async def test_create_new_protocol_with_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        _maybe_audit_protocol_upload=None,
     )
 
     decoy.verify(
@@ -911,6 +914,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        _maybe_audit_protocol_upload=None,
     )
 
     assert result.content.data == Protocol(
@@ -1065,6 +1069,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        _maybe_audit_protocol_upload=None,
     )
 
     assert result.content.data == Protocol(
@@ -1195,6 +1200,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        _maybe_audit_protocol_upload=None,
     )
 
     assert result.content.data == Protocol(
@@ -1327,6 +1333,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             analysis_id="analysis-id",
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=20,
+            _maybe_audit_protocol_upload=None,
         )
 
     assert exc_info.value.status_code == 503
@@ -1373,6 +1380,7 @@ async def test_create_protocol_not_readable(
             robot_type="OT-2 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
+            _maybe_audit_protocol_upload=None,
         )
 
     assert exc_info.value.status_code == 422
@@ -1435,6 +1443,7 @@ async def test_create_protocol_different_robot_type(
             robot_type="OT-3 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
+            _maybe_audit_protocol_upload=None,
         )
 
     assert exc_info.value.status_code == 422
@@ -2112,6 +2121,7 @@ async def test_create_protocol_kind_quick_transfer(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
+        _maybe_audit_protocol_upload=None,
     )
 
     decoy.verify(
@@ -2197,6 +2207,7 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             protocol_kind=ProtocolKind.QUICK_TRANSFER,
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=1,
+            _maybe_audit_protocol_upload=None,
         )
 
         assert exc_info.value.status_code == 409
