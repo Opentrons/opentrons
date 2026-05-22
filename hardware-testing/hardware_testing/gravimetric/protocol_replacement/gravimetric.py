@@ -1191,6 +1191,7 @@ def aspirate_with_liquid_class(
                 air_gap=0,
             )
         ],
+        max_pipette_and_tip_volume=tip,
         volume_for_pipette_mode_configuration=None,
     )
     fixture_settings.recorder.clear_sample_tag()
