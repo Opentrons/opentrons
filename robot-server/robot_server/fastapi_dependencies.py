@@ -15,12 +15,13 @@ from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.errors.error_responses import ErrorSource
 from robot_server.errors.global_errors import InvalidRequest
+from robot_server.service.dependencies import get_current_time
 
 
 async def maybe_record_documented_interaction(
     runId: str,
     request_body: RequestModel[Any],
-    created_at: datetime,
+    created_at: Annotated[datetime, Depends(get_current_time)],
     authorization_checker: Annotated[
         AuthorizationChecker, Depends(get_authorization_checker)
     ],
