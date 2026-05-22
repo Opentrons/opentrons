@@ -29,7 +29,9 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { getIsSlotAVacuumDock } from '@opentrons/step-generation'
 
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import {
   DECK_SETUP_TOOLS_WIDTH_REM,
   HOPPER_ZOOM_OFFSET_POSTITION,
@@ -50,6 +52,7 @@ import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
+  getIsVacuumModuleFull,
   getSVGContainerWidth,
   zoomInOnCoordinate,
 } from './utils'
@@ -108,6 +111,7 @@ export function DeckSetupContainer(
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
+  const { makeSnackbar } = useKitchen()
 
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
@@ -155,48 +159,64 @@ export function DeckSetupContainer(
     return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
   }, '')
 
-  const _getSlotFromRawLocation = (location: string): string => {
+  // Returns the actual slot/addressable area for positioning
+  const _getSlotForPositioning = (location: string): string => {
     const isOnHopper = location.includes('hopper')
-    const isOnVacuumDock = location.includes('vacuumDock')
-    return isOnHopper
-      ? location.split('hopper')[1]
-      : isOnVacuumDock
-        ? location.split('vacuumDock')[1]
-        : location
+    if (isOnHopper) {
+      return location.split('hopper')[1]
+    }
+    return location
   }
 
   const _getZoomInOffsetFromRawLocation = (location: string): number => {
     const isOnHopper = location.includes('hopper')
-    const isOnVacuumDock = location.includes('vacuumDock')
     if (isOnHopper) {
       return HOPPER_ZOOM_OFFSET_POSTITION
     }
-    if (isOnVacuumDock) {
+    if (getIsSlotAVacuumDock(location)) {
       return VACUUM_DOCK_ZOOM_OFFSET_POSITION
     }
     return 0
   }
 
   const addEquipment = (location: string): void => {
-    const slot = _getSlotFromRawLocation(location)
+    // Check if vacuum dock is full before opening toolbox
+    const isVacuumDockSlot = getIsSlotAVacuumDock(location)
+    if (isVacuumDockSlot) {
+      const { createdStackForSlot } = getSlotInformation({
+        deckSetup: activeDeckSetup,
+        slot: location,
+        deckDef,
+      })
+      const isDockFull = getIsVacuumModuleFull(
+        createdStackForSlot,
+        activeDeckSetup.labware
+      )
+      if (isDockFull) {
+        makeSnackbar('Labware limit reached for this slot')
+        return
+      }
+    }
+
+    const slotForPositioning = _getSlotForPositioning(location)
     const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
       deckSetup: activeDeckSetup,
-      slot: location,
+      slot: location, // Keep using fake location for slot info
       deckDef,
     })
 
     const cutoutId =
       getCutoutIdForAddressableArea(
-        slot as AddressableAreaName,
+        slotForPositioning as AddressableAreaName,
         deckDef.cutoutFixtures
       ) ?? null
     if (cutoutId == null) {
       console.error('expected to find a cutoutId but could not')
     }
-    dispatch(selectZoomedIntoSlot({ slot: location, cutout: cutoutId }))
+    dispatch(selectZoomedIntoSlot({ slot: location, cutout: cutoutId })) // Keep using fake location
 
     const zoomInSlotPosition = getPositionFromSlotId(
-      slot ?? '',
+      slotForPositioning ?? '',
       deckDef,
       _getZoomInOffsetFromRawLocation(location)
     )

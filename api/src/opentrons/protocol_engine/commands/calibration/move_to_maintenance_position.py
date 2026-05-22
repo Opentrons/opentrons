@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=110)
 _MAX_Z_AXIS_MOTION_RANGE = 215
+# These offsets are estimated by eyeballing
+_INSTRUMENT_ATTACH_Z_POINT = 400.0
 _LEFT_MOUNT_Z_MARGIN = 5
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
 _RIGHT_MOUNT_Z_MARGIN = 20
@@ -32,6 +34,7 @@ class MotionModifier(enum.Enum):
     """Motion modifier options for maintenance position moves."""
 
     LOWER_Z_AXES_SEQUENTIALLY = "lowerZAxesSequentially"
+    LOWER_MOUNT_Z_AXIS = "lowerMountZAxis"
 
 
 class MoveToMaintenancePositionParams(BaseModel):
@@ -109,6 +112,14 @@ class MoveToMaintenancePositionImplementation(
                 mount = params.mount.to_hw_mount()
                 mount_to_axis = Axis.by_mount(mount)
                 await ot3_api.prepare_for_mount_movement(mount)
+
+                if params.motionModifier == MotionModifier.LOWER_MOUNT_Z_AXIS:
+                    await ot3_api.move_axes(
+                        {
+                            mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
+                        }
+                    )
+
                 await ot3_api.disengage_axes([mount_to_axis])
 
         return SuccessData(

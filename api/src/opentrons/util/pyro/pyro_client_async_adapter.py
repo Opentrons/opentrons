@@ -246,14 +246,29 @@ def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) 
                 validated_result = AsyncPyroFunctionWrapper(result)
 
         except AttributeError:
-            try:
-                iter(result)
-                validated_result = []
-                for r in result:
-                    assert isinstance(r, Pyro5.api.Proxy)
-                    validated_result.append(AsyncClientPyroObject(r))
-            except AttributeError:
-                assert isinstance(result, Pyro5.api.Proxy)
-                validated_result = AsyncClientPyroObject(result)
+            # Handle dictionaries of Proxies
+            if isinstance(result, dict):
+                new_dict = {}
+                for key, value in result.items():
+                    # Dictionary values are optional for Pyro dictionaries, so handle None case while assigning
+                    new_dict[key] = (
+                        AsyncClientPyroObject(value)
+                        if isinstance(value, Pyro5.api.Proxy)
+                        else None
+                    )
+                validated_result = new_dict
+
+            else:
+                try:
+                    # Attempt to handle a list of Proxies
+                    iter(result)
+                    validated_result = []
+                    for r in result:
+                        assert isinstance(r, Pyro5.api.Proxy)
+                        validated_result.append(AsyncClientPyroObject(r))
+                except AttributeError:
+                    # Handle a single Proxy instance
+                    assert isinstance(result, Pyro5.api.Proxy)
+                    validated_result = AsyncClientPyroObject(result)
 
     return validated_result

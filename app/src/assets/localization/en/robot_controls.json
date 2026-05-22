@@ -10,6 +10,6 @@
   "restart_button": "restart",
   "restart_description": "Restart robot.",
   "restart_label": "Restart robot",
-  "shutdown_label": "Shutdown robot",
+  "turn_off_label": "Turn off robot",
   "title": "robot controls"
 }

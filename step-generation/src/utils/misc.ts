@@ -23,6 +23,7 @@ import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 
 import {
@@ -46,11 +47,9 @@ import {
   COLUMN_4_SLOTS,
   EMPTY,
   FAKE_HOPPER_LOCATION_MAP,
-  FAKE_VACUUM_DOCK_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
-  VACUUM_DOCK_FAKE_LOCATION,
   VACUUM_DOCK_LOCATION,
   ZERO_OFFSET,
 } from '../constants'
@@ -75,10 +74,7 @@ import type {
   PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
-import type {
-  HopperLocationMapKey,
-  VacuumDockLocationMapKey,
-} from '../constants'
+import type { HopperLocationMapKey } from '../constants'
 import type {
   CommandCreator,
   CurriedCommandCreator,
@@ -1127,7 +1123,7 @@ const _getMappedLocation = (
   isOnHopper: boolean
 ): string => {
   if (isOnVacuumDock) {
-    return FAKE_VACUUM_DOCK_LOCATION_MAP[slot as VacuumDockLocationMapKey]
+    return slot
   }
   if (isOnHopper) {
     return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
@@ -1167,14 +1163,19 @@ export const getFullStackFromLabwares = (
       lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
       lw.stack.includes(VACUUM_DOCK_LOCATION) === isOnVacuumDock
   )
+  if (labwareStack.length === 0) {
+    return []
+  }
+
   if (isOnHopper) {
-    return labwareStack.reverse()[0].stack ?? []
+    return labwareStack.at(-1)?.stack ?? []
   }
   if (isOnVacuumDock) {
-    return labwareStack.reverse()[0].stack ?? []
+    return labwareStack.at(-1)?.stack ?? []
   }
   return (
-    labwareStack.sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+    labwareStack.toSorted((a, b) => b.stack.length - a.stack.length)[0]
+      ?.stack ?? []
   )
 }
 
@@ -1536,7 +1537,7 @@ export const getIsSlotAHopper = (slot: string): boolean => {
 }
 
 export const getIsSlotAVacuumDock = (slot: string): boolean => {
-  return slot === VACUUM_DOCK_FAKE_LOCATION
+  return slot === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
 }
 
 export const getLabwareIdOnShuttle = (

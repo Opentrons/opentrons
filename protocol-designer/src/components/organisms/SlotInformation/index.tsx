@@ -22,8 +22,12 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getIsSlotAHopper } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getIsSlotAVacuumDock,
+} from '@opentrons/step-generation'
 
+import { VACUUM_DOCK_DISPLAY_LOCATION } from '/protocol-designer/constants'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
@@ -67,6 +71,8 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     modifiedLocation = t('stacker', {
       slot: getColumnFromWellName(location),
     })
+  } else if (getIsSlotAVacuumDock(location)) {
+    modifiedLocation = VACUUM_DOCK_DISPLAY_LOCATION
   }
 
   return (

@@ -2,7 +2,7 @@ import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
 
 import { type DocumentationState } from '../access_control/types'
 import { useDocumentedMutation } from '../access_control/useDocumentedMutation'
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -33,7 +33,7 @@ export const usePlayRunMutation = (
   const host = useHost()
   const mutation = useDocumentedMutation<RunAction, AxiosError, string>(
     documentationState,
-    [host, 'runs', RUN_ACTION_TYPE_PLAY],
+    getQueryKey(host, 'runs', RUN_ACTION_TYPE_PLAY),
     (runId: string) =>
       createRunAction(host!, runId, {
         actionType: RUN_ACTION_TYPE_PLAY,

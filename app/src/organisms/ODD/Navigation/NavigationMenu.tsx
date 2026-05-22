@@ -119,18 +119,17 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           <MenuItem key="shutdown" onClick={handleShutdown}>
             <Flex alignItems={ALIGN_CENTER}>
               <Icon
-                name="no-icon"
+                name="power-off"
                 size="2.5rem"
                 color={COLORS.black90}
-                aria-label="shutdown_icon"
+                aria-label="power-off_icon"
               />
               <LegacyStyledText
                 forwardedAs="h4"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 marginLeft={SPACING.spacing12}
               >
-                {/* TODO(jh, 05-18-26): Update after Design finalizes implementation */}
-                {t('robot_controls:shutdown_label')}
+                {t('robot_controls:turn_off_label')}
               </LegacyStyledText>
             </Flex>
           </MenuItem>
