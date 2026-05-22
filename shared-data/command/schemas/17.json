@@ -3734,7 +3734,7 @@
     },
     "MotionModifier": {
       "description": "Motion modifier options for maintenance position moves.",
-      "enum": ["lowerZAxesSequentially"],
+      "enum": ["lowerZAxesSequentially", "lowerMountZAxis"],
       "title": "MotionModifier",
       "type": "string"
     },

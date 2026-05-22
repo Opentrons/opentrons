@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
+  InfoScreen,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
   SIZE_4,
@@ -67,7 +68,7 @@ export function RecentProtocolRuns({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         minHeight={SIZE_4}
-        paddingX={SPACING.spacing16}
+        padding={SPACING.spacing16}
         width="100%"
       >
         {isRobotViewable && allRunsMutable && allRunsMutable?.length > 0 && (
@@ -144,16 +145,7 @@ export function RecentProtocolRuns({
           </>
         )}
         {!isRobotViewable && (
-          <LegacyStyledText
-            forwardedAs="p"
-            alignItems={ALIGN_CENTER}
-            color={COLORS.grey50}
-            display={DISPLAY_FLEX}
-            flex="1 0"
-            id="RecentProtocolRuns_offline"
-          >
-            {t('offline_recent_protocol_runs')}
-          </LegacyStyledText>
+          <InfoScreen content={t('offline_recent_protocol_runs')} />
         )}
         {isRobotViewable && allRunsMutable?.length === 0 && (
           <LegacyStyledText

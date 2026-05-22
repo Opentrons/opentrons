@@ -1163,14 +1163,19 @@ export const getFullStackFromLabwares = (
       lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
       lw.stack.includes(VACUUM_DOCK_LOCATION) === isOnVacuumDock
   )
+  if (labwareStack.length === 0) {
+    return []
+  }
+
   if (isOnHopper) {
-    return labwareStack.reverse()[0].stack ?? []
+    return labwareStack.at(-1)?.stack ?? []
   }
   if (isOnVacuumDock) {
-    return labwareStack.reverse()[0].stack ?? []
+    return labwareStack.at(-1)?.stack ?? []
   }
   return (
-    labwareStack.sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+    labwareStack.toSorted((a, b) => b.stack.length - a.stack.length)[0]
+      ?.stack ?? []
   )
 }
 
