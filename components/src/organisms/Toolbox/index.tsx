@@ -107,7 +107,6 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
                   disabled={disableCloseButton}
                   onClick={onCloseClick}
                   textDecoration={textDecorationUnderline}
-                  data-testid="Toolbox_closeButton"
                   whiteSpace={NO_WRAP}
                 >
                   {closeButton}
@@ -136,11 +135,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
             alignItems={ALIGN_CENTER}
           >
             {onConfirmClick != null && confirmButtonText != null ? (
-              <PrimaryButton
-                width="100%"
-                data-testid="Toolbox_confirmButton"
-                onClick={onConfirmClick}
-              >
+              <PrimaryButton width="100%" onClick={onConfirmClick}>
                 {confirmButtonText}
               </PrimaryButton>
             ) : null}

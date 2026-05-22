@@ -97,11 +97,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
           {displayName}
         </LegacyStyledText>
-        <Link
-          onClick={props.onClose}
-          role="button"
-          data-testid="labwareDetails_slideout_close_button"
-        >
+        <Link onClick={props.onClose} role="button">
           <Icon
             name="close"
             height={SPACING.spacing24}

@@ -112,11 +112,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
             </StyledText>
           }
         />
-        <AnimationVideo
-          css={VIDEO_STYLE}
-          src={probeVideo()}
-          data-testid="probe-video"
-        />
+        <AnimationVideo css={VIDEO_STYLE} src={probeVideo()} />
       </TwoColumn>
     </LPCContentContainer>
   )

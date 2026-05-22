@@ -30,7 +30,6 @@ export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
         size={SIZE_1}
         color={isBadCal ? COLORS.yellow50 : COLORS.green50}
         marginRight={SPACING.spacing12}
-        data-testid="RenderResult_icon"
       />
     </Flex>
   )

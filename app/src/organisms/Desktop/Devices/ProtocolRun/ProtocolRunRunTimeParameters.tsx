@@ -226,7 +226,6 @@ const StyledTableRowComponent = (
                 name="information"
                 size={SPACING.spacing12}
                 color={COLORS.grey60}
-                data-testid="Icon"
               />
             </Flex>
             <Tooltip css={TYPOGRAPHY.labelRegular} tooltipProps={tooltipProps}>

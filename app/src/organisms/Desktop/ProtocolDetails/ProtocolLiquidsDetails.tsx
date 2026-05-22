@@ -45,7 +45,6 @@ export const ProtocolLiquidsDetails = (
       flexDirection={DIRECTION_COLUMN}
       maxHeight="25rem"
       overflowY="auto"
-      data-testid="LiquidsDetailsTab"
     >
       {liquidsInLoadOrder.length > 0 ? (
         liquidsInLoadOrder?.map((liquid, index) => {

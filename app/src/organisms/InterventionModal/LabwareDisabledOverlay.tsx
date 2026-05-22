@@ -14,7 +14,6 @@ export function LabwareDisabledOverlay({
   return (
     <g>
       <rect
-        data-testid="overlay_rect"
         x={0}
         y={0}
         width={xDimension}
@@ -24,7 +23,6 @@ export function LabwareDisabledOverlay({
         fillOpacity={0.9}
       />
       <path
-        data-testid="overlay_icon"
         transform={`translate(${xDimension / 2 - 22.25}, ${
           yDimension / 2 - 22.25
         }) rotate(90, 22.25, 22.25) scale(2)`}

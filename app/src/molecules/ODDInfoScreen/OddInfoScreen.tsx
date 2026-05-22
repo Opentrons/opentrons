@@ -91,7 +91,7 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius12}
       padding={`${SPACING.spacing40} ${SPACING.spacing80} `}
-      data-testid="InfoScreen"
+      aria-label="Info Screen"
       {...styleProps}
     >
       {hasIcon ? (

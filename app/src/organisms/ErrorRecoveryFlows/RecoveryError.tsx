@@ -195,7 +195,6 @@ export function ErrorContent({
         <Icon
           name="ot-alert"
           color={COLORS.red50}
-          data-testid="recovery_error_alert_icon"
           css={ICON_SIZE_ALERT_INFO_STYLE}
         />
         <Flex

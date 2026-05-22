@@ -82,7 +82,7 @@ export function ManualIpHostnameItem({
         <IpItem>
           <LegacyStyledText
             forwardedAs="p"
-            data-testid="ip-hostname"
+            aria-label="IP Hostname"
             color={discovered ? COLORS.black90 : COLORS.grey40}
           >
             {candidate}
@@ -102,7 +102,7 @@ export function ManualIpHostnameItem({
           color={COLORS.black90}
           onClick={remove}
           marginLeft={SPACING.spacing16}
-          data-testid="close-button"
+          aria-label="Close Button"
         >
           <Icon name="close" css={CLOSE_ICON_STYLE} />
         </Btn>

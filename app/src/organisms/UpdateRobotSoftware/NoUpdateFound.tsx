@@ -38,12 +38,7 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
         borderRadius={BORDERS.borderRadius12}
         padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
       >
-        <Icon
-          name="ot-check"
-          size="3.75rem"
-          color={COLORS.green50}
-          data-testid="NoUpdateFound_check_circle_icon"
-        />
+        <Icon name="ot-check" size="3.75rem" color={COLORS.green50} />
         <LegacyStyledText
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}

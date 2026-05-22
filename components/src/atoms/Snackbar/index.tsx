@@ -46,7 +46,7 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
   }, [duration, onClose])
 
   return (
-    <Flex css={animationStyle} data-testid="Snackbar" {...styleProps}>
+    <Flex css={animationStyle} {...styleProps}>
       <StyledText
         oddStyle="bodyTextSemiBold"
         desktopStyle="bodyDefaultSemiBold"

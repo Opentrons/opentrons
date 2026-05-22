@@ -17,16 +17,14 @@ export const MockLPCContentContainer: Mock = vi.fn(
       oddHeaderBtnCopy !== '' ? oddHeaderBtnCopy : desktopFooterBtnCopy
 
     return (
-      <div data-testid="mock-container">
-        <div data-testid="header-prop">{header}</div>
+      <div>
+        <div>{header}</div>
         <button
-          data-testid="primary-button"
           data-click-handler={String(!!onClickButton)}
           data-button-text={buttonText}
           onClick={onClickButton}
         />
         <button
-          data-testid="secondary-button"
           data-text={secondaryButtonProps?.buttonText}
           data-category={secondaryButtonProps?.buttonCategory}
           data-type={secondaryButtonProps?.buttonType}

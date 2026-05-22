@@ -43,12 +43,11 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
     <>
       <StyledModalHeader
         backgroundColor={backgroundColor}
-        data-testid="Modal_header"
         role="heading"
         aria-level={1}
       >
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
-          {icon != null && <Icon {...icon} data-testid="Modal_header_icon" />}
+          {icon != null && <Icon {...icon} />}
           {titleElement1}
           {titleElement2}
           <StyledText color={color} desktopStyle="bodyLargeSemiBold">
@@ -76,7 +75,7 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
             ))}
         </Flex>
       </StyledModalHeader>
-      <StyledDivider data-testid="divider" />
+      <StyledDivider />
     </>
   )
 }

@@ -34,11 +34,7 @@ export function MetadataDetails({
     ).map(item => ({ label: item[0], value: item[1] }))
 
     return (
-      <Flex
-        flex="1"
-        flexDirection={DIRECTION_COLUMN}
-        data-testid="ProtocolDetails_description"
-      >
+      <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText forwardedAs="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {description}
         </LegacyStyledText>

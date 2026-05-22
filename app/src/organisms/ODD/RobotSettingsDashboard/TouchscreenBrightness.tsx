@@ -99,7 +99,6 @@ export function TouchscreenBrightness({
           onClick={() => {
             handleClick('down')
           }}
-          data-testid="TouchscreenBrightness_decrease"
           iconName="minus"
         />
         <Flex
@@ -120,7 +119,6 @@ export function TouchscreenBrightness({
           onClick={() => {
             handleClick('up')
           }}
-          data-testid="TouchscreenBrightness_increase"
           iconName="plus"
         />
       </Flex>

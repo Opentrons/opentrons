@@ -137,7 +137,6 @@ function TouchscreenModal({
           />
         </ListItem>
         <SmallButton
-          data-testid="Estop_pressed_button"
           width="100%"
           iconName={
             isResuming || isWaitingForResumeOperation ? 'ot-spinner' : undefined

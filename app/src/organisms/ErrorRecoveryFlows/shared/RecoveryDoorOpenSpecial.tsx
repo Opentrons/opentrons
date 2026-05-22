@@ -130,11 +130,7 @@ export function RecoveryDoorOpenSpecial({
         justifyContent={ALIGN_CENTER}
         flex="1"
       >
-        <Icon
-          css={ICON_STYLE}
-          name="ot-alert"
-          data-testid="recovery_door_alert_icon"
-        />
+        <Icon css={ICON_STYLE} name="ot-alert" />
         <Flex css={TEXT_STYLE}>
           <StyledText
             desktopStyle="headingSmallBold"

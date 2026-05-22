@@ -56,30 +56,22 @@ export function FlexStackerModuleData(
   }
   return (
     <Flex css={MODULE_INFO_CONTAINER_STYLE}>
-      <Flex
-        css={MODULE_INFO_SUB_CONTAINER_STYLE}
-        data-testid="stacker_door_data"
-      >
+      <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_door_status')}
         </StyledText>
         <Chip
-          data-testid="stacker_door_label"
           text={doorDisplayStatus}
           chipSize="small"
           type={doorType}
           hasIcon={false}
         />
       </Flex>
-      <Flex
-        css={MODULE_INFO_SUB_CONTAINER_STYLE}
-        data-testid="stacker_shuttle_data"
-      >
+      <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('flex_stacker_shuttle_status')}
         </StyledText>
         <Chip
-          data-testid="stacker_shuttle_label"
           text={shuttleDisplayStatus}
           chipSize="small"
           type={shuttleType}

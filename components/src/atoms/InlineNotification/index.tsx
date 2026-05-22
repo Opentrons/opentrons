@@ -145,7 +145,6 @@ export function InlineNotification(
         )}
         {onCloseClick && (
           <Btn
-            data-testid="InlineNotification_close-button"
             onClick={onCloseClick}
             css={INLINE_NOTIFICATION_CLOSE_BUTTON_STYLE}
             height="fit-content"

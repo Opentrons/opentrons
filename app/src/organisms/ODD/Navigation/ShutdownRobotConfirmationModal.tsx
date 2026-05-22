@@ -52,12 +52,7 @@ export function ShutdownRobotConfirmationModal({
           values={{ robotName }}
           components={{
             bold: <strong />,
-            span: (
-              <LegacyStyledText
-                forwardedAs="p"
-                data-testid="turn_off_robot_confirmation_description"
-              />
-            ),
+            span: <LegacyStyledText forwardedAs="p" />,
           }}
         />
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>

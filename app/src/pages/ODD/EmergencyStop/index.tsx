@@ -70,12 +70,7 @@ export function EmergencyStop(): JSX.Element {
           >
             {isEstopConnected ? (
               <>
-                <Icon
-                  name="ot-check"
-                  size="3rem"
-                  color={COLORS.green50}
-                  data-testid="EmergencyStop_connected_icon"
-                />
+                <Icon name="ot-check" size="3rem" color={COLORS.green50} />
                 <LegacyStyledText
                   forwardedAs="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}

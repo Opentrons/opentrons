@@ -119,7 +119,6 @@ export function Troubleshooting({
         <LegacyStyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          data-testid="RobotSettings_Troubleshooting"
         >
           {t('download_logs')}
         </LegacyStyledText>

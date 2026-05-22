@@ -64,7 +64,6 @@ function HorizontalRule(): JSX.Element {
     <Box
       borderBottom={`1px solid ${COLORS.grey30}`}
       marginY={SPACING.spacing16}
-      data-testid="divider"
     />
   )
 }

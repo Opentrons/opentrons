@@ -134,7 +134,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       </PrimaryButton>
 
       <StyledLabel
-        data-testid="file_drop_zone"
+        aria-label="File Drop Zone"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
@@ -156,7 +156,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         {dragAndDropText}
         <StyledInput
           id="file_input"
-          data-testid="file_input"
+          aria-label="File Input"
           ref={fileInput}
           type="file"
           onChange={onChange}

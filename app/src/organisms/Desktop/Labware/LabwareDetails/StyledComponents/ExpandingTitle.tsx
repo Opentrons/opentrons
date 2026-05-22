@@ -50,9 +50,7 @@ export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
           </Link>
         )}
       </Flex>
-      {diagramVisible && (
-        <Box data-testid="expanding_title_diagram">{diagram}</Box>
-      )}
+      {diagramVisible && <Box>{diagram}</Box>}
       <Divider />
     </>
   )

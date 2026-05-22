@@ -78,11 +78,7 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
             />
           }
         />
-        <AnimationVideo
-          css={VIDEO_STYLE}
-          src={probeVideo()}
-          data-testid="probe-video"
-        />
+        <AnimationVideo css={VIDEO_STYLE} src={probeVideo()} />
       </TwoColumn>
     </LPCContentContainer>
   )

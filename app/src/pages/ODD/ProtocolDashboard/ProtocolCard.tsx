@@ -213,7 +213,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
       padding={SPACING.spacing24}
       ref={longpress.ref}
       css={PUSHED_STATE_STYLE}
-      data-testid="protocol_card"
     >
       {isPendingAnalysis ? (
         <Icon

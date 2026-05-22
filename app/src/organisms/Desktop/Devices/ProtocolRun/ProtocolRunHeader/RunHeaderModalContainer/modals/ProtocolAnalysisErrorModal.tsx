@@ -76,12 +76,7 @@ export function ProtocolAnalysisErrorModal({
   const { t, i18n } = useTranslation(['run_details', 'shared'])
 
   return createPortal(
-    <Modal
-      data-testid="ProtocolRunDetails_analysisErrorModal"
-      type="error"
-      title="Protocol analysis failure"
-      onClose={onClose}
-    >
+    <Modal type="error" title="Protocol analysis failure" onClose={onClose}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         {robotName == null && displayName == null ? null : (
           <StyledText

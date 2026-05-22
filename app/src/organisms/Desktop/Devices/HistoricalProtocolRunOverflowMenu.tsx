@@ -90,11 +90,7 @@ export function HistoricalProtocolRunOverflowMenu(
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      position={POSITION_RELATIVE}
-      data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
         onClick={handleOverflowClick}
@@ -102,10 +98,7 @@ export function HistoricalProtocolRunOverflowMenu(
       />
       {showOverflowMenu ? (
         <>
-          <Box
-            ref={protocolRunOverflowWrapperRef}
-            data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
-          >
+          <Box ref={protocolRunOverflowWrapperRef}>
             <MenuDropdown
               {...props}
               downloadRunLog={downloadRunLog}
@@ -223,9 +216,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       width={FLEX_MAX_CONTENT}
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
-        <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
-          {t('view_run_record')}
-        </MenuItem>
+        <MenuItem>{t('view_run_record')}</MenuItem>
       </NavLink>
       <MenuItem
         {...targetProps}
@@ -233,7 +224,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         disabled={
           robotIsBusy || isRobotOnWrongVersionOfSoftware || isRunControlLoading
         }
-        data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {t('rerun_now')}
@@ -258,11 +248,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
           {t('rerun_loading')}
         </Tooltip>
       )}
-      <MenuItem
-        data-testid="RecentProtocolRun_OverflowMenu_downloadRunLog"
-        disabled={isRunLogLoading}
-        onClick={onDownloadClick}
-      >
+      <MenuItem disabled={isRunLogLoading} onClick={onDownloadClick}>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {t('download_run_log')}
           {isRunLogLoading ? (
@@ -277,21 +263,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         </Flex>
       </MenuItem>
       {runHasImages && (
-        <MenuItem
-          onClick={onClearRunImages}
-          data-testid="RecentProtocolRun_OverflowMenu_clearRunImages"
-          disabled={isDeletingImages}
-        >
+        <MenuItem onClick={onClearRunImages} disabled={isDeletingImages}>
           {t('clear_run_images')}
         </MenuItem>
       )}
       <Divider marginY="0" />
-      <MenuItem
-        onClick={handleDeleteClick}
-        data-testid="RecentProtocolRun_OverflowMenu_deleteRun"
-      >
-        {t('delete_run')}
-      </MenuItem>
+      <MenuItem onClick={handleDeleteClick}>{t('delete_run')}</MenuItem>
     </Flex>
   )
 }

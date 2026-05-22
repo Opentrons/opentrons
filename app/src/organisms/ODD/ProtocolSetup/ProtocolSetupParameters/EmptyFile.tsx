@@ -25,11 +25,10 @@ export function EmptyFile(): JSX.Element {
       height="24rem"
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      data-testid="EmptyFile"
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing32}
     >
-      <Icon name="ot-alert" size="3rem" data-testid="EmptyFile_icon" />
+      <Icon name="ot-alert" size="3rem" />
       <LegacyStyledText
         fontSize={TYPOGRAPHY.fontSize28}
         lineHeight={TYPOGRAPHY.lineHeight36}

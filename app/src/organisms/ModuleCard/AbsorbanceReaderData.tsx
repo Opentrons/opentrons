@@ -53,12 +53,8 @@ export const AbsorbanceReaderData = (
         hasIcon={true}
         iconName="connection-status"
         textTransform="capitalize"
-        data-testid="abs_module_status"
       />
-      <StyledText
-        css={MODULE_INFO_DETAIL_TEXT_STYLE}
-        data-testid="abs_module_data"
-      >
+      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
         {t('abs_reader_lid_status', {
           status: lidDisplayStatus,
         })}

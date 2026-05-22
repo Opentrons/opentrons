@@ -108,7 +108,6 @@ export function RobotSettingsNetworking({
               name="ot-check"
               color={COLORS.green50}
               marginRight={SPACING.spacing8}
-              data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
             <Box height={SPACING.spacing16} width="1.75rem"></Box>
@@ -119,7 +118,6 @@ export function RobotSettingsNetworking({
             marginRight={
               wifi?.ipAddress != null ? SPACING.spacing8 : SPACING.spacing12
             }
-            data-testid="RobotSettings_Networking_wifi_icon"
           />
           <LegacyStyledText
             forwardedAs="h3"
@@ -201,7 +199,6 @@ export function RobotSettingsNetworking({
               name="ot-check"
               color={COLORS.green50}
               marginRight={SPACING.spacing8}
-              data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
             <Box height={SPACING.spacing16} width="1.75rem"></Box>
@@ -210,7 +207,6 @@ export function RobotSettingsNetworking({
             size="1.25rem"
             name={isFlex ? 'ethernet' : 'usb'}
             marginRight={SPACING.spacing12}
-            data-testid="RobotSettings_Networking_usb_icon"
           />
           <LegacyStyledText
             forwardedAs="h3"
@@ -296,17 +292,11 @@ export function RobotSettingsNetworking({
                   name="ot-check"
                   color={COLORS.green50}
                   marginRight={SPACING.spacing8}
-                  data-testid="RobotSettings_Networking_check_circle"
                 />
               ) : (
                 <Box height={SPACING.spacing16} width="1.75rem"></Box>
               )}
-              <Icon
-                size="1.25rem"
-                name="usb"
-                marginRight={SPACING.spacing12}
-                data-testid="RobotSettings_Networking_wifi_icon"
-              />
+              <Icon size="1.25rem" name="usb" marginRight={SPACING.spacing12} />
               <LegacyStyledText
                 forwardedAs="h3"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}

@@ -39,16 +39,11 @@ export const ProtocolLabwareDetails = (props: {
               desktopStyle="bodyDefaultRegular"
               color={COLORS.grey60}
               marginBottom={SPACING.spacing8}
-              data-testid="ProtocolLabwareDetails_labware_name"
               width="66%"
             >
               {t('labware_name')}
             </StyledText>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              color={COLORS.grey60}
-              data-testid="ProtocolLabwareDetails_quantity"
-            >
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
               {t('quantity')}
             </StyledText>
           </Flex>

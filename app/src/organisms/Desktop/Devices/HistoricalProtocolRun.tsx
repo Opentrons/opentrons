@@ -120,12 +120,7 @@ export function HistoricalProtocolRun(
             ) : null}
             {runStatus != null ? t(`status_${runStatus}`) : ''}
           </StyledText>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            data-testid="RecentProtocolRuns_Duration"
-          >
-            {duration}
-          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">{duration}</StyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <Box>

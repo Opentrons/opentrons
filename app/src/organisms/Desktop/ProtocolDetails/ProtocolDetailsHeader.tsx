@@ -197,7 +197,6 @@ export function ProtocolDetailsHeader({
                   onClick={() => {
                     handleRunProtocolButtonClick()
                   }}
-                  data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                   whiteSpace="nowrap"
                 >
@@ -267,7 +266,6 @@ export function ProtocolDetailsHeader({
             setShowSendProtocolToFlexSlideout(true)
           }}
           storedProtocolData={props}
-          data-testid="ProtocolDetails_overFlowMenu"
         />
       </Box>
     </Flex>

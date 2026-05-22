@@ -83,7 +83,7 @@ export function ClearUnavailableRobots(): JSX.Element {
               >
                 <Flex
                   paddingRight={SPACING.spacing4}
-                  data-testid="AdvancedSettings_ConfirmClear_Cancel"
+                  aria-label="Advanced Settings Confirm Clear Cancel"
                 >
                   <Btn
                     onClick={cancelExit}
@@ -95,7 +95,7 @@ export function ClearUnavailableRobots(): JSX.Element {
                     {t('shared:cancel')}
                   </Btn>
                 </Flex>
-                <Flex data-testid="AdvancedSettings_ConfirmClear_Proceed">
+                <Flex>
                   <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
                     {t('clear_confirm')}
                   </AlertPrimaryButton>

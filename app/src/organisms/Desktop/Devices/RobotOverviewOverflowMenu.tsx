@@ -130,7 +130,7 @@ export const RobotOverviewOverflowMenu = (
   const devInternalFlags = useSelector(Config.getFeatureFlags)
 
   return (
-    <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
+    <Flex position={POSITION_RELATIVE}>
       {showDisconnectModal
         ? createPortal(
             <DisconnectModal

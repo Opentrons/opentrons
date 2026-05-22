@@ -96,7 +96,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
   }
 
   return runTimeParameters.length > 0 ? (
-    <Table onClick={makeSnack} data-testid="Parameters_table">
+    <Table onClick={makeSnack}>
       <thead>
         <tr>
           <TableHeader>

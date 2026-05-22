@@ -83,34 +83,19 @@ export function RecentProtocolRuns({
               color={COLORS.grey60}
               gridTemplateColumns={COLUMNS}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                data-testid="RecentProtocolRuns_RunTitle"
-              >
+              <StyledText desktopStyle="bodyDefaultRegular">
                 {t('run')}
               </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                data-testid="RecentProtocolRuns_ProtocolTitle"
-              >
+              <StyledText desktopStyle="bodyDefaultRegular">
                 {t('protocol')}
               </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                data-testid="RecentProtocolRuns_FilesTitle"
-              >
+              <StyledText desktopStyle="bodyDefaultRegular">
                 {t('files')}
               </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                data-testid="RecentProtocolRuns_StatusTitle"
-              >
+              <StyledText desktopStyle="bodyDefaultRegular">
                 {t('status')}
               </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                data-testid="RecentProtocolRuns_DurationTitle"
-              >
+              <StyledText desktopStyle="bodyDefaultRegular">
                 {t('run_duration')}
               </StyledText>
             </Flex>

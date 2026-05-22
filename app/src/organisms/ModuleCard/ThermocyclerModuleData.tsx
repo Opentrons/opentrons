@@ -46,10 +46,7 @@ export const ThermocyclerModuleData = (
 
   return (
     <Flex css={MODULE_INFO_CONTAINER_STYLE}>
-      <Flex
-        css={MODULE_INFO_SUB_CONTAINER_STYLE}
-        data-testid="thermocycler_module_data_lid"
-      >
+      <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('tc_lid')}
         </StyledText>
@@ -61,7 +58,6 @@ export const ThermocyclerModuleData = (
               type="neutral"
               hasIcon={false}
               textTransform="capitalize"
-              data-testid="lidStatus"
             />
             <Chip
               text={data.lidTemperatureStatus}
@@ -74,7 +70,6 @@ export const ThermocyclerModuleData = (
               }
               iconName="connection-status"
               textTransform="capitalize"
-              data-testid="lidTempStatus"
             />
           </Flex>
           <StyledText
@@ -90,10 +85,7 @@ export const ThermocyclerModuleData = (
           </StyledText>
         </Flex>
       </Flex>
-      <Flex
-        css={MODULE_INFO_SUB_CONTAINER_STYLE}
-        data-testid="thermocycler_module_data_block"
-      >
+      <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('tc_block')}
         </StyledText>
@@ -106,7 +98,6 @@ export const ThermocyclerModuleData = (
             pulseIcon={data.status === 'cooling' || data.status === 'heating'}
             iconName="connection-status"
             textTransform="capitalize"
-            data-testid="blockStatus"
           />
           <StyledText
             css={MODULE_INFO_DETAIL_TEXT_STYLE}

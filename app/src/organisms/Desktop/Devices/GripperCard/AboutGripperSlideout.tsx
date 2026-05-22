@@ -31,11 +31,7 @@ export const AboutGripperSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton
-          onClick={onCloseClick}
-          width="100%"
-          data-testid="AboutPipette_slideout_close"
-        >
+        <PrimaryButton onClick={onCloseClick} width="100%">
           {i18n.format(t('shared:close'), 'capitalize')}
         </PrimaryButton>
       }

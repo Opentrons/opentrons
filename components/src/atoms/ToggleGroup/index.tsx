@@ -23,7 +23,6 @@ export const ToggleGroup = (props: ToggleGroupProps): JSX.Element => {
         css={selectedValue === leftText ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={leftText}
         onClick={leftClick}
-        data-testid="toggleGroup_leftButton"
       >
         <StyledText desktopStyle="bodyDefaultRegular">{leftText}</StyledText>
       </PrimaryButton>
@@ -31,7 +30,6 @@ export const ToggleGroup = (props: ToggleGroupProps): JSX.Element => {
         css={selectedValue === rightText ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={rightText}
         onClick={rightClick}
-        data-testid="toggleGroup_rightButton"
       >
         <StyledText desktopStyle="bodyDefaultRegular">{rightText}</StyledText>
       </PrimaryButton>

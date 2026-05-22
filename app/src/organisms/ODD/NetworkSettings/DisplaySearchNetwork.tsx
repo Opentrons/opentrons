@@ -21,7 +21,6 @@ export function DisplaySearchNetwork(): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       borderRadius={BORDERS.borderRadius12}
       width="100%"
-      data-testid="Display-Search-Network-text"
     >
       <Flex
         justifyContent={JUSTIFY_CENTER}

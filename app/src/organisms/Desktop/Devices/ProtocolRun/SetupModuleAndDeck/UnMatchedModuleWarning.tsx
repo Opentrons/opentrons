@@ -29,15 +29,11 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
         <LegacyStyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          data-testid="UnMatchedModuleWarning_title"
         >
           {t('extra_module_attached')}
         </LegacyStyledText>
 
-        <LegacyStyledText
-          forwardedAs="p"
-          data-testid="UnMatchedModuleWarning_body"
-        >
+        <LegacyStyledText forwardedAs="p">
           {`${t('module_mismatch_body')}.`}
         </LegacyStyledText>
       </Flex>

@@ -176,7 +176,6 @@ export const TestShakeSlideout = (
         paddingLeft={SPACING.spacing4}
         paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
-        data-testid="test_shake_slideout_banner_info"
       >
         <Flex color={COLORS.blue60}>
           <Icon
@@ -215,7 +214,6 @@ export const TestShakeSlideout = (
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               marginTop={SPACING.spacing8}
-              data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
             </LegacyStyledText>
@@ -253,7 +251,6 @@ export const TestShakeSlideout = (
             paddingRight={SPACING.spacing16}
           >
             <InputField
-              data-testid="TestShakeSlideout_shake_input"
               autoFocus
               units={RPM}
               value={shakeValue != null ? Math.round(shakeValue) : null}

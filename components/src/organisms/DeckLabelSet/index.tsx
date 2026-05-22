@@ -56,7 +56,6 @@ const DeckLabelSetComponent = (
           width={width}
           height={height}
           $isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
-          data-testid="DeckLabeSet"
           $showBorder={showBorder}
         />
         {showModuleIcon && (

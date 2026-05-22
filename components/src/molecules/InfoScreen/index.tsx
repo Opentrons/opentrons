@@ -34,7 +34,6 @@ export function InfoScreen({
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
-      data-testid="InfoScreen"
     >
       <Icon
         name={iconName ?? 'ot-alert'}

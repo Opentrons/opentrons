@@ -288,7 +288,6 @@ export function DeviceReset({
           </OptionLabel>
         </Flex>
         <MediumButton
-          data-testid="DeviceReset_clear_data_button"
           buttonText={t('clear_data_and_restart_robot')}
           buttonType="alert"
           disabled={!isAnyOptionSelected(resetOptions)}

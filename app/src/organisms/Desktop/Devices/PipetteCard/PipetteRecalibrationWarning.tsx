@@ -31,15 +31,11 @@ export const PipetteRecalibrationWarning = (): JSX.Element | null => {
           <LegacyStyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            data-testid="PipetteRecalibrationWarning_title"
           >
             {t('pipette_recalibration_recommended')}
           </LegacyStyledText>
 
-          <LegacyStyledText
-            forwardedAs="p"
-            data-testid="PipetteRecalibrationWarning_body"
-          >
+          <LegacyStyledText forwardedAs="p">
             {`${t('pipette_calibrations_differ')}`}
           </LegacyStyledText>
         </Flex>

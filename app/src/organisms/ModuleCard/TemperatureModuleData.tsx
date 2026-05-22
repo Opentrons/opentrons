@@ -25,10 +25,7 @@ export const TemperatureModuleData = (
   const shouldPulse = moduleStatus === 'cooling' || moduleStatus === 'heating'
 
   return (
-    <Flex
-      css={MODULE_INFO_DETAIL_CONTAINER_STYLE}
-      data-testid="temp_module_data"
-    >
+    <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
       <Chip
         text={moduleStatus}
         chipSize="small"

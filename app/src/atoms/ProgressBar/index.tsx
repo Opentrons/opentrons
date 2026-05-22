@@ -55,9 +55,9 @@ export function ProgressBar({
     <Box
       role="progressbar"
       css={LINER_PROGRESS_CONTAINER_STYLE}
-      data-testid="ProgressBar_Container"
+      aria-label="Progress Bar"
     >
-      <Box css={LINER_PROGRESS_FILLER_STYLE} data-testid="ProgressBar_Bar" />
+      <Box css={LINER_PROGRESS_FILLER_STYLE} aria-label="Progress Bar Fill" />
       {children}
     </Box>
   )

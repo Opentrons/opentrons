@@ -10,7 +10,6 @@ export function Divider(props: Props): JSX.Element {
       borderBottom={`1px solid ${String(COLORS.grey30)}`}
       marginY={SPACING.spacing4}
       {...props}
-      data-testid="divider"
     />
   )
 }

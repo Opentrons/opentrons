@@ -215,7 +215,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       onClick={handleSelectedValue}
       width="10.3rem"
       minHeight="max-content"
-      data-testid="LiquidDetailCard_box"
+      aria-label="Liquid Detail Card"
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

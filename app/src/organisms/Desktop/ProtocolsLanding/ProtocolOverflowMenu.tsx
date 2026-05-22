@@ -119,11 +119,7 @@ export function ProtocolOverflowMenu(
         e.stopPropagation()
       }}
     >
-      <OverflowBtn
-        alignSelf={ALIGN_FLEX_END}
-        onClick={handleOverflowClick}
-        data-testid="ProtocolOverflowMenu_overflowBtn"
-      />
+      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
           whiteSpace={NO_WRAP}
@@ -139,7 +135,6 @@ export function ProtocolOverflowMenu(
           {!invalidRobotType ? (
             <MenuItem
               onClick={handleClickRun}
-              data-testid="ProtocolOverflowMenu_run"
               css={css`
                 border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8}
                   0 0;
@@ -149,31 +144,21 @@ export function ProtocolOverflowMenu(
             </MenuItem>
           ) : null}
 
-          <MenuItem
-            onClick={handleClickReanalyze}
-            data-testid="ProtocolOverflowMenu_reanalyze"
-          >
+          <MenuItem onClick={handleClickReanalyze}>
             {t('shared:reanalyze')}
           </MenuItem>
           {robotType !== 'OT-2 Standard' && !invalidRobotType ? (
-            <MenuItem
-              onClick={handleClickSendToOT3}
-              data-testid="ProtocolOverflowMenu_sendToOT3"
-            >
+            <MenuItem onClick={handleClickSendToOT3}>
               {t('protocol_list:send_to_robot_overflow', {
                 robot_display_name: FLEX_DISPLAY_NAME,
               })}
             </MenuItem>
           ) : null}
-          <MenuItem
-            onClick={handleClickShowInFolder}
-            data-testid="ProtocolOverflowMenu_showInFolder"
-          >
+          <MenuItem onClick={handleClickShowInFolder}>
             {t('show_in_folder')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}
-            data-testid="ProtocolOverflowMenu_deleteProtocol"
             css={css`
               border-radius: 0 0 ${BORDERS.borderRadius8}
                 ${BORDERS.borderRadius8};

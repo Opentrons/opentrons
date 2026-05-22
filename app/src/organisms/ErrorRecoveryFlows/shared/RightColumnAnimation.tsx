@@ -15,7 +15,7 @@ export function RightColumnAnimation(
 
   return (
     <AnimationVideo role="presentation" css={ANIMATION_STYLE}>
-      <source src={animationSrc} data-testid="animation" />
+      <source src={animationSrc} aria-label="Animation" />
     </AnimationVideo>
   )
 }

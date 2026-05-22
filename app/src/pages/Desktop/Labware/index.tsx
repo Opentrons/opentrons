@@ -213,7 +213,6 @@ export function Labware(): JSX.Element {
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
                 paddingY={SPACING.spacing4}
-                data-testid="sortBy-label"
               >
                 {sortBy === 'alphabetical'
                   ? t('shared:alphabetical')

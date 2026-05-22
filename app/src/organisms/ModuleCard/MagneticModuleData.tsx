@@ -33,12 +33,8 @@ export const MagneticModuleData = (
         pulseIcon={moduleStatus === 'engaged'}
         iconName="connection-status"
         textTransform="capitalize"
-        data-testid="mag_module_chip"
       />
-      <StyledText
-        css={MODULE_INFO_DETAIL_TEXT_STYLE}
-        data-testid="mag_module_data"
-      >
+      <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
         {t(
           moduleModel === MAGNETIC_MODULE_V2
             ? 'magdeck_gen2_height'

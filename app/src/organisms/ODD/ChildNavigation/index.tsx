@@ -81,7 +81,6 @@ export function ChildNavigation({
             type="button"
             aria-label="Back to previous page"
             onClick={onClickBack}
-            data-testid="ChildNavigation_Back_Button"
           >
             <Icon
               name={backIconName || 'back'}
@@ -100,10 +99,7 @@ export function ChildNavigation({
       {onClickButton != null && buttonText != null ? (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           {secondaryButtonProps != null ? (
-            <SmallButton
-              data-testid="ChildNavigation_Secondary_Button"
-              {...secondaryButtonProps}
-            />
+            <SmallButton {...secondaryButtonProps} />
           ) : null}
 
           <SmallButton
@@ -114,7 +110,6 @@ export function ChildNavigation({
             iconName={iconName}
             iconPlacement={iconPlacement}
             disabled={buttonIsDisabled}
-            data-testid="ChildNavigation_Primary_Button"
             ariaDisabled={ariaDisabled}
           />
         </Flex>

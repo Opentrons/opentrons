@@ -187,7 +187,6 @@ export function ResultsSummary(
           role="button"
           onClick={handleDownloadButtonClick}
           css={TYPOGRAPHY.linkPSemiBold}
-          data-testid="ResultsSummary_Download_Button"
         >
           {t('download_details')}
         </Link>

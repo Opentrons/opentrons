@@ -57,7 +57,6 @@ export function CameraTileSetting({
             onClick={() => {
               handleClick('down')
             }}
-            data-testid="TouchscreenSetting_decrease"
             iconName="minus"
           />
           <div className={styles.tile_container}>
@@ -73,7 +72,6 @@ export function CameraTileSetting({
             onClick={() => {
               handleClick('up')
             }}
-            data-testid="TouchscreenSetting_increase"
             iconName="plus"
           />
         </div>

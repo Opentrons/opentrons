@@ -181,7 +181,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
-              data-testid="ProtocolList_SortByMenu"
             >
               <LegacyStyledText
                 forwardedAs="p"
@@ -189,7 +188,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
                 paddingY={SPACING.spacing4}
-                data-testid="sortBy-label"
               >
                 {sortByLabelType[sortBy].label}
               </LegacyStyledText>

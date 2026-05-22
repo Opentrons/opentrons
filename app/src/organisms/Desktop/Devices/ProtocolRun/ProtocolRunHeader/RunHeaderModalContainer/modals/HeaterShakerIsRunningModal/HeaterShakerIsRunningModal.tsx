@@ -62,9 +62,9 @@ interface HeaterShakerIsRunningModalProps {
   startRun: () => void
 }
 
-export const HeaterShakerIsRunningModal = (
+export function HeaterShakerIsRunningModal(
   props: HeaterShakerIsRunningModalProps
-): JSX.Element => {
+): JSX.Element {
   const { closeModal, module, startRun } = props
   const { t } = useTranslation('heater_shaker')
   const { createLiveCommand } = useCreateLiveCommandMutation()
@@ -85,7 +85,6 @@ export const HeaterShakerIsRunningModal = (
         marginX={SPACING.spacing8}
         size={SPACING.spacing20}
         color={COLORS.yellow50}
-        data-testid="HeaterShakerIsRunning_warning_icon"
       />
       {t('heater_shaker_is_shaking')}
     </Flex>

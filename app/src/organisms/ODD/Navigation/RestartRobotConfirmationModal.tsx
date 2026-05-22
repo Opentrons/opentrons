@@ -48,12 +48,7 @@ export function RestartRobotConfirmationModal({
           values={{ robotName: robotName }}
           components={{
             bold: <strong />,
-            span: (
-              <LegacyStyledText
-                forwardedAs="p"
-                data-testid="restart_robot_confirmation_description"
-              />
-            ),
+            span: <LegacyStyledText forwardedAs="p" />,
           }}
         />
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>

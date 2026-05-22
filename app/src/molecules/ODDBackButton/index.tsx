@@ -21,7 +21,7 @@ export function ODDBackButton(
       <Btn onClick={onClick}>
         <Icon
           color={COLORS.black90}
-          data-testid="back_icon"
+          aria-label="Back Icon"
           name="back"
           width="3rem"
         />

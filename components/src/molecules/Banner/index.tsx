@@ -129,7 +129,7 @@ export function Banner(props: BannerProps): JSX.Element {
         {props.children}
       </Flex>
       {onCloseClick != null && !(isCloseActionLoading ?? false) ? (
-        <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
+        <Btn onClick={props.onCloseClick}>
           {closeButton ?? (
             <Icon
               width={SPACING.spacing24}

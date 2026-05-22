@@ -100,7 +100,7 @@ export function ReleaseLabware({
         </Flex>
         <Flex css={ANIMATION_CONTAINER_STYLE}>
           <AnimationVideo role="presentation" css={ANIMATION_STYLE}>
-            <source src={animationSrc} data-testid="release-animation" />
+            <source src={animationSrc} />
           </AnimationVideo>
         </Flex>
       </TwoColumn>

@@ -153,7 +153,6 @@ export const TextAreaField = forwardRef<
                     name="information"
                     size={SPACING.spacing12}
                     color={COLORS.grey60}
-                    data-testid="tooltip-icon"
                   />
                 </div>
                 <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>

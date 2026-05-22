@@ -203,7 +203,6 @@ export function RobotNameEditor(): JSX.Element {
             >
               <Flex position={POSITION_ABSOLUTE} left="0">
                 <Btn
-                  data-testid="name_back_button"
                   onClick={() => {
                     if (isUnboxingFlowOngoing) {
                       navigate('/emergency-stop')
@@ -272,7 +271,6 @@ export function RobotNameEditor(): JSX.Element {
                 render={({ field, fieldState }) => (
                   <TouchInputField
                     autoFocus
-                    data-testid="name-robot_input"
                     id="newRobotName"
                     name="newRobotName"
                     type="text"

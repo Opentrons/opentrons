@@ -131,7 +131,7 @@ export function ManualIpHostnameForm({
           id="ip"
           type="text"
           {...register('ip')}
-          data-testid="manual-ip-hostname-input"
+          aria-label="Manual IP Hostname Input"
         />
         <TertiaryButton
           fontSize={TYPOGRAPHY.fontSizeH6}

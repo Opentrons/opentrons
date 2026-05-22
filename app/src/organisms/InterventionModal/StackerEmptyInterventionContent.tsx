@@ -93,7 +93,7 @@ export function StackerEmptyInterventionContent({
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <AnimationVideo role="presentation" width="100%">
-            <source src={EmptyHopper} data-testid="empty-animation" />
+            <source src={EmptyHopper} />
           </AnimationVideo>
         </Flex>
       </Flex>

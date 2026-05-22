@@ -5,7 +5,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  SIZE_1,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -93,10 +92,7 @@ export const HeaterShakerModuleData = (
   return (
     <Flex css={MODULE_INFO_CONTAINER_STYLE}>
       {(showTemperatureData ?? false) && (
-        <Flex
-          css={MODULE_INFO_SUB_CONTAINER_STYLE}
-          data-testid="heater_shaker_module_data_temp"
-        >
+        <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
           <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
             {t('heater')}
           </StyledText>
@@ -112,7 +108,6 @@ export const HeaterShakerModuleData = (
               }
               iconName="connection-status"
               textTransform="capitalize"
-              data-testid="tempStatus"
             />
             <StyledText
               title="heater_target_temp"
@@ -133,10 +128,7 @@ export const HeaterShakerModuleData = (
           </Flex>
         </Flex>
       )}
-      <Flex
-        css={MODULE_INFO_SUB_CONTAINER_STYLE}
-        data-testid="heater_shaker_module_data_shaker"
-      >
+      <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
           {t('shaker')}
         </StyledText>
@@ -152,7 +144,6 @@ export const HeaterShakerModuleData = (
             }
             iconName="connection-status"
             textTransform="capitalize"
-            data-testid="shakerStatus"
           />
           <StyledText
             title="shaker_target_speed"
@@ -170,10 +161,7 @@ export const HeaterShakerModuleData = (
           </StyledText>
         </Flex>
       </Flex>
-      <Flex
-        css={MODULE_INFO_SUB_CONTAINER_STYLE}
-        data-testid="heater_shaker_module_data_latch"
-      >
+      <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
         <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE} title="latch_status">
           {t('labware_latch', { ns: 'heater_shaker' })}
         </StyledText>
@@ -186,8 +174,7 @@ export const HeaterShakerModuleData = (
               paddingBottom="3px"
               paddingRight={SPACING.spacing4}
               name="closed-locked"
-              data-testid="HeaterShakerModuleData_latch_lock"
-              size={SIZE_1}
+              size="1rem"
             />
           )}
           <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>

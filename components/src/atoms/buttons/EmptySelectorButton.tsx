@@ -30,11 +30,7 @@ export function EmptySelectorButton(
   const { onClick, text, iconName, textAlignment, disabled = false } = props
 
   return (
-    <StyledButton
-      onClick={onClick}
-      disabled={disabled}
-      data-testid="EmptySelectorButton_click"
-    >
+    <StyledButton onClick={onClick} disabled={disabled}>
       <Flex
         gridGap={SPACING.spacing4}
         padding={SPACING.spacing12}
@@ -44,7 +40,6 @@ export function EmptySelectorButton(
         width="100%"
         height="100%"
         alignItems={ALIGN_CENTER}
-        data-testid="EmptySelectorButton_container"
         justifyContent={
           textAlignment === 'middle' ? JUSTIFY_CENTER : JUSTIFY_START
         }

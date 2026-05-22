@@ -54,12 +54,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         }
       >
         {showIcon ? (
-          <Icon
-            name="circle"
-            color={iconColor}
-            size={iconSize ?? '0.25rem'}
-            data-testid="status_circle"
-          >
+          <Icon name="circle" color={iconColor} size={iconSize ?? '0.25rem'}>
             {pulse != null && pulse ? (
               <animate
                 attributeName="fill"
@@ -67,7 +62,6 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
                 dur="1s"
                 calcMode="discrete"
                 repeatCount="indefinite"
-                data-testid="pulsing_status_circle"
               />
             ) : null}
           </Icon>

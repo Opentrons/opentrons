@@ -12,7 +12,7 @@ export const EmanatingNozzle = (props: {
   return (
     <Fragment>
       <circle
-        data-testid="origin_circle"
+        aria-label="Origin Circle"
         cx={cx}
         cy={cy}
         r={0.5}
@@ -20,7 +20,7 @@ export const EmanatingNozzle = (props: {
         fill={COLORS.blue50}
       ></circle>
       <circle
-        data-testid="emanating_circle"
+        aria-label="Emanating Circle"
         cx={cx}
         cy={cy}
         r={0.5}
@@ -29,7 +29,7 @@ export const EmanatingNozzle = (props: {
         fill={C_TRANSPARENT}
       >
         <animate
-          data-testid="radius_animation"
+          aria-label="Radius Animation"
           attributeName="r"
           from={5}
           to={SINGLE_CHANNEL_PIPETTE_HEIGHT / 2}
@@ -39,7 +39,7 @@ export const EmanatingNozzle = (props: {
           repeatCount="indefinite"
         />
         <animate
-          data-testid="opacity_animation"
+          aria-label="Opacity Animation"
           attributeName="opacity"
           from={0.7}
           to={0}

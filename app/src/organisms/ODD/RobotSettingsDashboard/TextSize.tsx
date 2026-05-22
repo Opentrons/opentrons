@@ -49,7 +49,6 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           onClick={() => {
             setCurrentOption(null)
           }}
-          data-testid="DisplayTextSize_back_button"
         >
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
@@ -82,7 +81,6 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
             onClick={() => {
               handleClick('down')
             }}
-            data-testid="DisplayTextSize_decrease"
           >
             <Icon size="5rem" name="minus" />
           </Btn>
@@ -97,7 +95,6 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
             onClick={() => {
               handleClick('up')
             }}
-            data-testid="DisplayTextSize_increase"
           >
             <Icon size="5rem" name="plus" />
           </Btn>

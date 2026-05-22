@@ -26,12 +26,8 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     : styles.step_meter_bar
 
   return (
-    <Box
-      data-testid="StepMeter_StepMeterContainer"
-      className={styles.step_meter_container}
-    >
+    <Box className={styles.step_meter_container}>
       <Box
-        data-testid="StepMeter_StepMeterBar"
         className={stepMeterBarClasses}
         style={{ width: `${percentComplete}%` }}
       />

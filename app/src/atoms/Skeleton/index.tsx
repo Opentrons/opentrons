@@ -39,5 +39,5 @@ export const Skeleton = (props: SkeletonProps): JSX.Element => {
     }
   `
 
-  return <Box data-testid="Skeleton" css={SKELETON_STYLE} />
+  return <Box aria-label="Skeleton Loading" css={SKELETON_STYLE} />
 }

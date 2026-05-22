@@ -89,7 +89,7 @@ export function StackerFillInterventionContent({
         </Flex>
         <Flex width="50%" css={STACKER_IMAGE_STYLE}>
           <AnimationVideo role="presentation" width="100%">
-            <source src={FillHopper} data-testid="fill-animation" />
+            <source src={FillHopper} />
           </AnimationVideo>
         </Flex>
       </Flex>

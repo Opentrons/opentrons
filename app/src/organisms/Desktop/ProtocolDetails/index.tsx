@@ -293,7 +293,6 @@ export function ProtocolDetailsContents(
                 backgroundColor={COLORS.white}
                 borderRadius={BORDERS.borderRadius8}
                 height="100%"
-                data-testid="ProtocolDetails_deckMap"
               >
                 <Flex
                   alignItems={ALIGN_CENTER}
