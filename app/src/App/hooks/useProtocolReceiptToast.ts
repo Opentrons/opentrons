@@ -16,6 +16,8 @@ import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
+const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000
+
 export function useProtocolReceiptToast(): void {
   const host = useHost()
   const { t, i18n } = useTranslation(['protocol_info', 'shared'])
@@ -106,4 +108,3 @@ export function useProtocolReceiptToast(): void {
     [protocolIds]
   )
 }
-export const PROTOCOL_IDS_RECHECK_INTERVAL_MS = 3000

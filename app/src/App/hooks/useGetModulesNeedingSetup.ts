@@ -10,14 +10,14 @@ import { useAttachedModules } from '/app/resources/modules'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleType } from '@opentrons/shared-data'
 
-export const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
+const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
 ]
-export const MODULES_NOT_REQUIRING_CALIBRATION =
+const MODULES_NOT_REQUIRING_CALIBRATION =
   MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP
-export const ATTACHED_MODULE_POLL_MS = 5000
-export const DECK_CONFIG_POLL_MS = 5000
+const ATTACHED_MODULE_POLL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 export function useGetModulesNeedingSetup(): AttachedModule[] {
   const attachedModules =

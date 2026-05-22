@@ -11,6 +11,9 @@ import { useCurrentRunId } from '/app/resources/runs'
 import { SharedScrollRefContext } from '../ODDProviders/ScrollRefProvider'
 import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from './useGetModulesNeedingSetup'
 
+const CURRENT_RUN_POLL = 5000
+const SUBSYSTEM_UPDATE_POLL = 5000
+
 export function useModuleAttachedToast(
   launchModuleSetupCallback: (open: boolean) => void
 ): void {
@@ -112,5 +115,3 @@ export function useScrollRef(): {
     element,
   }
 }
-export const CURRENT_RUN_POLL = 5000
-export const SUBSYSTEM_UPDATE_POLL = 5000
