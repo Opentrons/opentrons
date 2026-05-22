@@ -6,6 +6,7 @@ This is just the bare minimum required by resource servers.
 from __future__ import annotations
 
 import contextlib
+import json
 import typing
 from abc import ABC, abstractmethod
 
@@ -13,9 +14,7 @@ import aiohttp
 import pydantic
 
 SETTINGS_ENDPOINT_PATH = "auth/settings/accessControlEnabled"
-REQUIRE_REASON_FOR_INTERACTION_SETTINGS_ENDPOINT_PATH = (
-    "auth/settings/requireReasonForInteractionEnabled"
-)
+ALL_AUTH_SETTINGS_ENDPOINT_PATH = "auth/settings"
 TOKEN_ENDPOINT_PATH = "auth/oauth2/token"
 TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 
@@ -47,7 +46,7 @@ class Client(ABC):
     async def get_require_reason_for_interaction_settings(
         self,
     ) -> RequireReasonForInteractionSettingsResponse:
-        """Ask the Opentrons auth-server whether a reason for interaction is required.
+        """Read ``requireReasonForInteraction`` from GET /auth/settings.
 
         If there's an internal error (e.g. the auth server is unconnectable),
         the implementation should raise it as an exception.
@@ -121,13 +120,14 @@ class LocalHTTPClient(Client):
     async def get_require_reason_for_interaction_settings(
         self,
     ) -> RequireReasonForInteractionSettingsResponse:
-        async with self._session.get(
-            REQUIRE_REASON_FOR_INTERACTION_SETTINGS_ENDPOINT_PATH
-        ) as response:
+        async with self._session.get(ALL_AUTH_SETTINGS_ENDPOINT_PATH) as response:
             response_bytes = await response.read()
         response.raise_for_status()
-        return RequireReasonForInteractionSettingsResponse.model_validate_json(
-            response_bytes
+        body = json.loads(response_bytes)
+        return RequireReasonForInteractionSettingsResponse(
+            data=RequireReasonForInteractionSettingsResponseData(
+                requireReasonForInteraction=body["data"]["requireReasonForInteraction"],
+            )
         )
 
     @typing.override
@@ -183,9 +183,8 @@ class AuthSettingsResponseData(_StrictBaseModel):
 
     accessControlEnabled: bool
 
-
 class RequireReasonForInteractionSettingsResponse(_StrictBaseModel):
-    """A response body from auth-server's /auth/settings/requireReasonForInteractionEnabled endpoint."""
+    """A response body with the require-reason-for-interaction setting."""
 
     data: RequireReasonForInteractionSettingsResponseData
 
@@ -194,3 +193,4 @@ class RequireReasonForInteractionSettingsResponseData(_StrictBaseModel):
     """Response body data for the require-reason-for-interaction setting."""
 
     requireReasonForInteraction: bool
+    

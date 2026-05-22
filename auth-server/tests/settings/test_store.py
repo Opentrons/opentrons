@@ -7,7 +7,6 @@ from auth_server.persistence.database import create_schema, sql_engine_ctx
 from auth_server.settings.models import (
     PatchAccessControlRequestData,
     PatchSettingsRequestData,
-    RequireReasonForInteractionResponseData,
     SettingsResponseData,
 )
 from auth_server.settings.store import SettingsStore
@@ -92,25 +91,6 @@ def test_patch_settings_ignores_none_values(settings_store: SettingsStore) -> No
     )
     fetched = settings_store.get_settings()
     assert fetched == SettingsResponseData(idleLogout=1800.0)
-
-
-def test_get_require_reason_for_interaction_settings_matches_get_settings(
-    settings_store: SettingsStore,
-) -> None:
-    """Sliced query should agree with full settings for requireReasonForInteraction."""
-    assert settings_store.get_require_reason_for_interaction_settings() == (
-        RequireReasonForInteractionResponseData(
-            requireReasonForInteraction=settings_store.get_settings().requireReasonForInteraction
-        )
-    )
-    settings_store.patch_settings(
-        PatchSettingsRequestData(requireReasonForInteraction=False)
-    )
-    assert settings_store.get_require_reason_for_interaction_settings() == (
-        RequireReasonForInteractionResponseData(
-            requireReasonForInteraction=settings_store.get_settings().requireReasonForInteraction
-        )
-    )
 
 
 def test_get_access_control_settings(settings_store: SettingsStore) -> None:

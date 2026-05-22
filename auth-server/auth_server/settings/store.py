@@ -23,16 +23,12 @@ from auth_server.settings.models import (
     AccessControlResponseData,
     PatchAccessControlRequestData,
     PatchSettingsRequestData,
-    RequireReasonForInteractionResponseData,
     SettingsResponseData,
 )
 
 
 class AccessControlAlreadySetError(Exception):
     """Raised when attempting to modify access control after it has already been set."""
-
-
-_REQUIRE_REASON_FOR_INTERACTION_KEY = "requireReasonForInteraction"
 
 
 class SettingsStore:
@@ -57,29 +53,6 @@ class SettingsStore:
                 return SettingsResponseData()
             parsed = {row.key: row.value for row in rows}
             return SettingsResponseData.model_validate(parsed, strict=False)
-
-    def get_require_reason_for_interaction_settings(
-        self,
-    ) -> RequireReasonForInteractionResponseData:
-        """Return the require-reason-for-interaction flag without loading all settings."""
-        with self._session() as session:
-            row = session.scalars(
-                select(Setting).where(
-                    Setting.key == _REQUIRE_REASON_FOR_INTERACTION_KEY
-                )
-            ).first()
-            if row is None:
-                value = SettingsResponseData().requireReasonForInteraction
-            else:
-                raw = row.value
-                value = (
-                    raw
-                    if isinstance(raw, bool)
-                    else SettingsResponseData().requireReasonForInteraction
-                )
-        return RequireReasonForInteractionResponseData(
-            requireReasonForInteraction=value,
-        )
 
     def _get_access_control_enabled(self) -> bool | None:
         """Return the raw access-control value, or None if it has never been set."""
