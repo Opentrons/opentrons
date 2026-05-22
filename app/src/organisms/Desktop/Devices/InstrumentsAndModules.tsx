@@ -4,11 +4,10 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   Banner,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InfoScreen,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SIZE_3,
   SPACING,
   StyledText,
@@ -40,6 +39,8 @@ import type {
 } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
+
+// stubbed vacuum module for testing
 interface InstrumentsAndModulesProps {
   robotName: string
   isRobotViewable: boolean
@@ -116,7 +117,10 @@ export function InstrumentsAndModules({
   const halfAttachedModulesSize = isFlex
     ? Math.floor(attachedModules?.length / 2)
     : Math.ceil(attachedModules?.length / 2)
-  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
+  const leftColumnModules = [
+    ...attachedModules?.slice(0, halfAttachedModulesSize),
+    // STUBBED_ATTACHED_VACUUM_MODULE,
+  ]
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
   return (
@@ -124,11 +128,10 @@ export function InstrumentsAndModules({
       alignItems={ALIGN_FLEX_START}
       flexDirection={DIRECTION_COLUMN}
       width="100%"
+      gap={SPACING.spacing16}
+      paddingBottom={SPACING.spacing12}
     >
-      <StyledText
-        desktopStyle="bodyLargeSemiBold"
-        marginBottom={SPACING.spacing16}
-      >
+      <StyledText desktopStyle="bodyLargeSemiBold">
         {t('instruments_and_modules')}
       </StyledText>
       <Flex
@@ -273,23 +276,7 @@ export function InstrumentsAndModules({
             </Flex>
           </Flex>
         ) : (
-          <Flex
-            alignItems={ALIGN_CENTER}
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing12}
-            justifyContent={JUSTIFY_CENTER}
-            minHeight={SIZE_3}
-            padding={SPACING.spacing12}
-          >
-            {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
-            <LegacyStyledText
-              forwardedAs="p"
-              color={COLORS.grey40}
-              id="InstrumentsAndModules_offline"
-            >
-              {t('offline_instruments_and_modules')}
-            </LegacyStyledText>
-          </Flex>
+          <InfoScreen content={t('offline_instruments_and_modules')} />
         )}
       </Flex>
     </Flex>

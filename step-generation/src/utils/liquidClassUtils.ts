@@ -1,4 +1,7 @@
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  getAllLiquidClassDefs,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
 
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -34,7 +37,7 @@ export const getCustomLiquidClassProperties = (
   } else if ('mixFirstAspirate' in args) {
     aspirateMixArgs = args.mixFirstAspirate as InnerMixArgs | null
   }
-
+  const blowoutPosition = getBlowoutWellPosition(args)
   const sharedDispenseArgs = {
     dispense_position: {
       offset: {
@@ -104,6 +107,9 @@ export const getCustomLiquidClassProperties = (
         location: getBlowoutPythonLocation(args.blowoutLocation),
         flow_rate:
           args.blowoutLocation != null ? args.blowoutFlowRateUlSec : undefined,
+        ...(blowoutPosition != null
+          ? { blowout_position: blowoutPosition }
+          : {}),
       },
     },
   }
@@ -263,6 +269,23 @@ const getBlowoutPythonLocation = (
     return 'destination'
   } else {
     return 'trash'
+  }
+}
+
+const getBlowoutWellPosition = (
+  args: TransferArgs | ConsolidateArgs | DistributeArgs
+): {} | null => {
+  const location = getBlowoutPythonLocation(args.blowoutLocation)
+  if (!location || location === 'trash') {
+    return null
+  }
+  return {
+    offset: {
+      x: args.blowoutXPosition ?? 0,
+      y: args.blowoutYPosition ?? 0,
+      z: args.blowoutOffsetFromTopMm ?? 1,
+    },
+    position_reference: args.blowoutPositionReference ?? POSITION_REFERENCE_TOP,
   }
 }
 

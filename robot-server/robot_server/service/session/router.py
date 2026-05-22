@@ -4,10 +4,16 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query
 from starlette import status as http_status_codes
 
+from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.models.json_api import ResourceLink
+from server_utils.fastapi_utils.models.json_api.resource_links import (
+    ResourceLinkKey,
+    ResourceLinks,
+)
+
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import CommonErrorDef, RobotServerError
-from robot_server.service.json_api import ResourceLink
-from robot_server.service.json_api.resource_links import ResourceLinkKey, ResourceLinks
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import BaseSession, SessionManager
 from robot_server.service.session.models.command import CommandRequest, CommandResponse
@@ -54,6 +60,7 @@ def get_session(manager: SessionManager, session_id: IdentifierType) -> BaseSess
     deprecated=True,
     response_model=SessionResponse,
     status_code=http_status_codes.HTTP_201_CREATED,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_session_handler(
     create_request: SessionCreateRequest,
@@ -82,6 +89,7 @@ async def create_session_handler(
     ),
     deprecated=True,
     response_model=SessionResponse,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def delete_session_handler(
     sessionId: IdentifierType,
@@ -151,6 +159,7 @@ async def get_sessions_handler(
     ),
     deprecated=True,
     response_model=CommandResponse,
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def session_command_execute_handler(
     sessionId: IdentifierType,

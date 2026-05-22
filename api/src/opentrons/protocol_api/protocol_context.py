@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
+from contextlib import contextmanager
 from copy import deepcopy
 from typing import (
     Callable,
     Dict,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -23,6 +25,7 @@ from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from . import validation
+from ._command_annotations import GroupedSteps
 from ._liquid import Liquid, LiquidClass
 from ._liquid_properties import build_transfer_properties
 from ._parameters import Parameters
@@ -42,6 +45,7 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractVacuumModuleCore,
 )
+from .csv_context import CSVContext
 from .deck import Deck
 from .disposal_locations import TrashBin, WasteChute
 from .instrument_context import InstrumentContext
@@ -91,7 +95,14 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
     requires_version,
 )
-from opentrons.types import DeckLocation, DeckSlotName, Location, Mount, StagingSlotName
+from opentrons.types import (
+    DeckLocation,
+    DeckSlotName,
+    Location,
+    ModuleFixtureLocation,
+    Mount,
+    StagingSlotName,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -407,7 +418,7 @@ class ProtocolContext(CommandPublisher):
     def load_labware(  # noqa: C901
         self,
         load_name: str,
-        location: Union[DeckLocation, OffDeckType],
+        location: Union[DeckLocation, OffDeckType, ModuleFixtureLocation],
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
@@ -540,7 +551,13 @@ class ProtocolContext(CommandPublisher):
                 )
 
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
+        load_location: Union[
+            OffDeckType,
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            ModuleFixtureLocation,
+        ]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
@@ -566,7 +583,7 @@ class ProtocolContext(CommandPublisher):
                 version=checked_adapter_version,
             )
             load_location = loaded_adapter._core
-        elif isinstance(location, OffDeckType):
+        elif isinstance(location, (OffDeckType, ModuleFixtureLocation)):
             load_location = location
         else:
             load_location = validation.ensure_and_convert_deck_slot(
@@ -704,7 +721,7 @@ class ProtocolContext(CommandPublisher):
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckLocation, OffDeckType],
+        location: Union[DeckLocation, OffDeckType, ModuleFixtureLocation],
         namespace: Optional[str] = None,
         version: Optional[int] = None,
     ) -> Labware:
@@ -723,7 +740,7 @@ class ProtocolContext(CommandPublisher):
                 You can find the `load_name` for any standard adapter on the Opentrons
                 [Labware Library](https://labware.opentrons.com).
 
-            location (Union[int, str, OffDeckType]): Either a
+            location (Union[int, str, OffDeckType, ModuleFixtureLocation]): Either a
                 [deck slot](../deck-slots.md), like `1`, `"1"`, or `"D1"`, or the special value
                 [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
 
@@ -742,8 +759,10 @@ class ProtocolContext(CommandPublisher):
                 leave this unspecified to let `load_adapter()` choose a version automatically.
         """
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName]
-        if isinstance(location, OffDeckType):
+        load_location: Union[
+            OffDeckType, DeckSlotName, StagingSlotName, ModuleFixtureLocation
+        ]
+        if isinstance(location, (OffDeckType, ModuleFixtureLocation)):
             load_location = location
         else:
             load_location = validation.ensure_and_convert_deck_slot(
@@ -803,7 +822,13 @@ class ProtocolContext(CommandPublisher):
         self,
         labware: Labware,
         new_location: Union[
-            DeckLocation, Labware, ModuleTypes, OffDeckType, WasteChute, TrashBin
+            DeckLocation,
+            Labware,
+            ModuleTypes,
+            ModuleFixtureLocation,
+            OffDeckType,
+            WasteChute,
+            TrashBin,
         ],
         use_gripper: bool = False,
         pick_up_offset: Optional[Mapping[str, float]] = None,
@@ -866,11 +891,12 @@ class ProtocolContext(CommandPublisher):
             OffDeckType,
             DeckSlotName,
             StagingSlotName,
+            ModuleFixtureLocation,
             TrashBin,
         ]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
-        elif isinstance(new_location, (OffDeckType, WasteChute)):
+        elif isinstance(new_location, (OffDeckType, WasteChute, ModuleFixtureLocation)):
             location = new_location
         elif isinstance(new_location, TrashBin):
             if labware._core.is_lid():
@@ -1896,6 +1922,67 @@ class ProtocolContext(CommandPublisher):
                 saturation=saturation,
             )
         return None
+
+    @requires_version(2, 29)
+    @contextmanager
+    def group_steps(
+        self, name: str, description: Optional[str] = None
+    ) -> Iterator[None]:
+        """Group commands together for visualization in run previews and the run log.
+        This method is a [context manager](https://docs.python.org/3/reference/compound_stmts.html#the-with-statement)
+        that uses the `with` syntax. All commands within this block will be grouped together.
+
+        Grouping steps together has no effect on protocol execution.
+
+        Args:
+            name: A name for the group of steps.
+            description: An optional description for the step group.
+        """
+        annotation_id = self._core.start_step_grouping(name, description)
+        try:
+            yield
+        finally:
+            self._core.end_step_grouping(annotation_id)
+
+    @requires_version(2, 29)
+    def create_and_start_step_group(
+        self, name: str, description: Optional[str] = None
+    ) -> GroupedSteps:
+        """Starts a grouping of commands for visualization in run previews and the run log.
+        This returns a step group object which can then be closed by calling
+        [`end_group()`][opentrons.protocol_api.GroupedSteps.close_group].
+
+        Grouping steps together has no effect on protocol execution.
+
+        Args:
+            name: A name for the group of steps.
+            description: An optional description for the step group.
+        """
+        annotation_id = self._core.start_step_grouping(name, description)
+        return GroupedSteps(
+            annotation_id=annotation_id,
+            protocol_core=self._core,
+            api_version=self._api_version,
+        )
+
+    @requires_version(2, 27)
+    def create_csv(
+        self,
+        filename: str,
+        columns: Optional[int] = None,
+        title_row: Optional[List[str]] = None,
+    ) -> CSVContext:
+        if not columns and not title_row:
+            raise ValueError("You must supply either columns or title_row.")
+        if columns and title_row:
+            raise ValueError("Use title row OR columns but not both")
+        csv_core = self._core.create_csv(
+            filename=filename,
+            columns=columns if columns else len(title_row),  # type: ignore [arg-type]
+        )
+        if title_row:
+            csv_core.write_row(title_row)
+        return CSVContext(core=csv_core, api_version=self._api_version)
 
 
 def _create_module_context(

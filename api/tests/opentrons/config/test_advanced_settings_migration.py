@@ -9,7 +9,7 @@ from opentrons.config.advanced_settings import _ensure, _migrate
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 39
+    return 41
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -467,6 +467,25 @@ def v39_config(v38_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v40_config(v39_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v39_config.copy()
+    r.update(
+        {
+            "_version": 40,
+            "allowStepGrouping": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v41_config(v40_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = {k: v for k, v in v40_config.items() if k != "allowStepGrouping"}
+    r["_version"] = 41
+    return r
+
+
 @pytest.fixture(
     params=[
         lazy_fixture("empty_settings"),
@@ -510,6 +529,8 @@ def v39_config(v38_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v37_config"),
         lazy_fixture("v38_config"),
         lazy_fixture("v39_config"),
+        lazy_fixture("v40_config"),
+        lazy_fixture("v41_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:

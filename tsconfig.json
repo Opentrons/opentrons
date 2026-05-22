@@ -32,6 +32,9 @@
       "path": "./protocol-designer"
     },
     {
+      "path": "./protocol-visualization"
+    },
+    {
       "path": "./api-client"
     },
     {

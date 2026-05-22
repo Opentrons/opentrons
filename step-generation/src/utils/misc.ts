@@ -5,9 +5,13 @@ import reduce from 'lodash/reduce'
 
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_CUTOUT_BY_SLOT_ID,
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_V1_FIXTURE,
   getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
@@ -19,6 +23,7 @@ import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 
 import {
@@ -39,17 +44,20 @@ import {
 } from '../commandCreators/compound'
 import {
   CLEAN,
+  COLUMN_4_SLOTS,
   EMPTY,
   FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
+  VACUUM_DOCK_LOCATION,
   ZERO_OFFSET,
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators, uuid } from './index'
 
 import type {
+  ActiveNozzleNumber,
   AddressableAreaName,
   BlowoutParams,
   CutoutFixtureId,
@@ -59,9 +67,11 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadLidParams,
   LoadLidStackRunTimeCommand,
+  NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { HopperLocationMapKey } from '../constants'
@@ -338,7 +348,7 @@ export function mergeLiquid(
 
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
-  channels: 1 | 8 | 96,
+  channels: ActiveNozzleNumber,
   labwareDef: LabwareDefinition2,
   well: string
 ): {
@@ -598,6 +608,8 @@ interface DispenseLocationHelperArgs {
   xOffset: number
   yOffset: number
   tipRack: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
   offsetFromBottomMm?: number
   well?: string
 }
@@ -614,6 +626,8 @@ export const dispenseLocationHelper: CommandCreator<
     xOffset,
     yOffset,
     tipRack,
+    primaryNozzle,
+    nozzles,
   } = args
   const { labwareEntities, trashBinEntities, wasteChuteEntities } =
     invariantContext
@@ -646,6 +660,8 @@ export const dispenseLocationHelper: CommandCreator<
           },
         },
         tipRack,
+        primaryNozzle,
+        nozzles,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -676,6 +692,7 @@ interface MoveHelperArgs {
   destinationId: string
   pipetteId: string
   zOffset: number
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   well?: string
 }
 export const moveHelper: CommandCreator<MoveHelperArgs> = (
@@ -912,6 +929,75 @@ export const getLargestStackInSlot = (
     return acc
   }, [])
 
+/** Single-slot deck id (e.g. A3) for a staging-area slot (e.g. A4) on Flex. */
+export const getFlexStackerCutoutBaseDeckSlotId = (
+  column4StagingSlotId: (typeof COLUMN_4_SLOTS)[number]
+): string =>
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID[FLEX_CUTOUT_BY_SLOT_ID[column4StagingSlotId]]
+
+export const column4StagingSlotIdFromFlexStackerShuttleAddressableArea = (
+  addressableAreaName: AddressableAreaName
+): (typeof COLUMN_4_SLOTS)[number] | null => {
+  const index = FLEX_STACKER_ADDRESSABLE_AREAS.indexOf(addressableAreaName)
+  return index === -1 ? null : COLUMN_4_SLOTS[index]
+}
+
+/** Deck slot id used as the stack suffix for labware on the stacker shuttle. */
+export const deckSlotKeyForFlexStackerShuttleAddressableArea = (
+  addressableAreaName: AddressableAreaName
+): string | null => {
+  const stagingSlotId =
+    column4StagingSlotIdFromFlexStackerShuttleAddressableArea(
+      addressableAreaName
+    )
+  return stagingSlotId != null
+    ? getFlexStackerCutoutBaseDeckSlotId(stagingSlotId)
+    : null
+}
+
+/**
+ * Staging column ids (A4, B4, …) are the same physical cutout as the stacker's
+ * module slot (A3, B3, …). Labware on the shuttle uses the module slot in
+ * `labware.stack`; normalize here so stack-height checks match.
+ */
+export const resolveDeckSlotKeyForLabwareStackInSlot = (
+  deckSlotKey: string | null,
+  modules: RobotState['modules'],
+  moduleEntities: ModuleEntities
+): string | null => {
+  if (deckSlotKey == null) {
+    return null
+  }
+  if (COLUMN_4_SLOTS.includes(deckSlotKey)) {
+    const baseSlot = getFlexStackerCutoutBaseDeckSlotId(
+      deckSlotKey as (typeof COLUMN_4_SLOTS)[number]
+    )
+    const hasStackerOnCutout = Object.entries(modules).some(
+      ([moduleId, mod]) =>
+        moduleEntities[moduleId]?.type === FLEX_STACKER_MODULE_TYPE &&
+        mod.slot === baseSlot
+    )
+    return hasStackerOnCutout ? baseSlot : deckSlotKey
+  }
+  return deckSlotKey
+}
+
+export const getFlexStackerShuttleAddressableArea = (
+  moduleSlot: string
+): AddressableAreaName | null => {
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const transformedSlot = `${moduleSlot[0]}3`
+  const cutoutId = FLEX_CUTOUT_BY_SLOT_ID[transformedSlot]
+  const flexStackerAAs = deckDef.cutoutFixtures.find(
+    ({ id }) => id === FLEX_STACKER_V1_FIXTURE
+  )?.providesAddressableAreas[cutoutId]
+
+  return (
+    FLEX_STACKER_ADDRESSABLE_AREAS.find(aa => flexStackerAAs?.includes(aa)) ??
+    null
+  )
+}
+
 interface CompatibleWithStack {
   isCompatible: boolean
   isAboveStackLimit: boolean
@@ -1031,6 +1117,20 @@ export const getModuleIdFromRobotStateStack = (
   return stack?.find(id => modules[id] != null) ?? null
 }
 
+const _getMappedLocation = (
+  slot: string,
+  isOnVacuumDock: boolean,
+  isOnHopper: boolean
+): string => {
+  if (isOnVacuumDock) {
+    return slot
+  }
+  if (isOnHopper) {
+    return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  }
+  return slot
+}
+
 /**
  * Get the full stack in a slot given labware state
  * If the slot is offDeck, the offDeckOverrideId must be provided to override the offDeck slot,
@@ -1038,7 +1138,7 @@ export const getModuleIdFromRobotStateStack = (
  * @param labware - The labware object containing all labware entities
  * @param slot - The slot to get the full stack from
  * @param offDeckOverrideId - Labware ID for an offDeck stack
- * @returns The full stack from the labware object
+ * @returns The top full stack from the labware object
  */
 export const getFullStackFromLabwares = (
   labware: {
@@ -1053,19 +1153,29 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
+  const isOnVacuumDock = getIsSlotAVacuumDock(slot)
   const isOnHopper = getIsSlotAHopper(slot)
-  const mappedLocation = isOnHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+  const mappedLocation = _getMappedLocation(slot, isOnVacuumDock, isOnHopper)
+  const labwareStack = Object.values(labware).filter(
+    lw =>
+      lw.stack.includes(mappedLocation) &&
+      (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
+      lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
+      lw.stack.includes(VACUUM_DOCK_LOCATION) === isOnVacuumDock
+  )
+  if (labwareStack.length === 0) {
+    return []
+  }
+
+  if (isOnHopper) {
+    return labwareStack.at(-1)?.stack ?? []
+  }
+  if (isOnVacuumDock) {
+    return labwareStack.at(-1)?.stack ?? []
+  }
   return (
-    Object.values(labware)
-      .filter(
-        lw =>
-          lw.stack.includes(mappedLocation) &&
-          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
-          lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
-      )
-      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+    labwareStack.toSorted((a, b) => b.stack.length - a.stack.length)[0]
+      ?.stack ?? []
   )
 }
 
@@ -1424,6 +1534,10 @@ export const getLabwareIdOnHopper = (
 
 export const getIsSlotAHopper = (slot: string): boolean => {
   return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getIsSlotAVacuumDock = (slot: string): boolean => {
+  return slot === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
 }
 
 export const getLabwareIdOnShuttle = (

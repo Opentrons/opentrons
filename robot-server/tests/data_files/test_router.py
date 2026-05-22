@@ -17,6 +17,7 @@ from opentrons_shared_data.data_files import (
     DataFileSource,
     MimeType,
 )
+from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, SimpleEmptyBody
 
 from robot_server.data_files.data_files_store import (
     DataFilesByRunInfo,
@@ -45,7 +46,6 @@ from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import RunStore
-from robot_server.service.json_api import MultiBodyMeta, SimpleEmptyBody
 from robot_server.service.notifications.publishers import DataFilePublisher
 
 
@@ -554,7 +554,7 @@ async def test_get_run_image_metadata(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should return metadata for multiple images."""
-    file_info_1 = DataFileInfoWithCommands(
+    file_info_1 = DataFileInfoWithCommands.model_construct(
         id="file-id-1",
         name="image1.jpeg",
         file_hash="hash1",
@@ -569,7 +569,7 @@ async def test_get_run_image_metadata(
         ),
     )
 
-    file_info_2 = DataFileInfoWithCommands(
+    file_info_2 = DataFileInfoWithCommands.model_construct(
         id="file-id-2",
         name="image2.jpeg",
         file_hash="hash2",
@@ -616,7 +616,7 @@ async def test_get_run_image_metadata_with_pagination(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should respect pageLength and cursor parameters."""
-    file_info = DataFileInfoWithCommands(
+    file_info = DataFileInfoWithCommands.model_construct(
         id="file-id-3",
         name="image3.jpeg",
         file_hash="hash3",
@@ -713,7 +713,7 @@ async def test_download_run_images_success(
     image1_path.write_bytes(b"fake image data 1")
     image2_path.write_bytes(b"fake image data 2")
 
-    file_info_1 = DataFileInfoWithCommands(
+    file_info_1 = DataFileInfoWithCommands.model_construct(
         id="file-id-1",
         name="image1.jpeg",
         file_hash="hash1",
@@ -728,7 +728,7 @@ async def test_download_run_images_success(
         ),
     )
 
-    file_info_2 = DataFileInfoWithCommands(
+    file_info_2 = DataFileInfoWithCommands.model_construct(
         id="file-id-2",
         name="image2.jpeg",
         file_hash="hash2",

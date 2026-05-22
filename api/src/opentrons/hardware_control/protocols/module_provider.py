@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from typing_extensions import Protocol
 
@@ -13,5 +13,8 @@ class ModuleProvider(Protocol):
         """Return a list of currently-attached modules."""
         ...
 
-    async def create_simulating_module(self, model: ModuleModel) -> AbstractModule:
+    async def create_simulating_module(
+        self, model: ModuleModel, sim_serial: Optional[str] = None
+    ) -> AbstractModule:
         """Create a simulating module hardware interface."""
+        ...

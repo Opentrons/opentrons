@@ -49,6 +49,8 @@ beforeEach(() => {
     name: 'Transfer Test',
     description: 'test blah blah',
     pipette: DEFAULT_PIPETTE,
+    primaryNozzle: 'A1',
+
     tipRack: getLabwareDefURI(fixtureTiprack300ul as LabwareDefinition2),
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,

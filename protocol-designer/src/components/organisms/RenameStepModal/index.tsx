@@ -71,7 +71,6 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
             {t('shared:cancel')}
           </SecondaryButton>
           <PrimaryButton
-            data-testid="RenameStepModal_saveButton"
             disabled={stepName.length >= MAX_STEP_NAME_LENGTH}
             onClick={handleSave}
           >
@@ -103,7 +102,7 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <TextAreaField
-              title={t('form:step_edit_form.field.step_notes.label')}
+              label={t('form:step_edit_form.field.step_notes.label')}
               value={stepDetails}
               onChange={e => {
                 setStepDetails(e.target.value as string)

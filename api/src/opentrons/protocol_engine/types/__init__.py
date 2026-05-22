@@ -8,6 +8,7 @@ from .automatic_tip_selection import NextTipInfo, NoTipAvailable, NoTipReason
 from .command_annotations import (
     CommandAnnotation,
     CustomCommandAnnotationLegacy,
+    LegacyCommandAnnotation,
     SecondOrderCommandAnnotationLegacy,
 )
 from .command_preconditions import (
@@ -169,6 +170,7 @@ __all__ = [
     # Command annotations
     "SecondOrderCommandAnnotationLegacy",
     "CustomCommandAnnotationLegacy",
+    "LegacyCommandAnnotation",
     "CommandAnnotation",
     # Command preconditions
     "PreconditionTypes",

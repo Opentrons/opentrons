@@ -1,7 +1,6 @@
 import flatMap from 'lodash/flatMap'
 
 import {
-  ALL,
   getByVolumeValue,
   getIsTiprack,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -17,8 +16,7 @@ import {
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
-  getDefaultPrimaryNozzle,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
   indentPyLines,
@@ -289,6 +287,7 @@ export const mix: CommandCreator<MixArgs> = (
     zOffset,
     finalPushOut,
     nozzles,
+    primaryNozzle,
     tipsSelected,
     tiprackSelected,
     tipTracking,
@@ -371,25 +370,44 @@ export const mix: CommandCreator<MixArgs> = (
   }
 
   if (isMultiChannelPipette) {
-    const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
+    const aspiratePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: labware,
       wellLocationOffset: { x: xOffset, y: yOffset },
       wellTargetName: wells[0],
+      primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
-    const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId: pipette,
-      labwareId: labware,
-      wellLocationOffset: { x: xOffset, y: yOffset },
-      wellTargetName: wells[0],
-    })
-    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+    if (!aspiratePipetteMovementSafetyStatus.isSafe) {
       return {
-        errors: [errorCreators.possiblePipetteCollision()],
+        errors: [
+          errorCreators.possiblePipetteCollision({
+            unsafePipetteMovementReason:
+              aspiratePipetteMovementSafetyStatus.reason,
+          }),
+        ],
+      }
+    }
+    const dispensePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
+      robotState: prevRobotState,
+      invariantContext,
+      pipetteId: pipette,
+      labwareId: labware,
+      wellLocationOffset: { x: xOffset, y: yOffset },
+      wellTargetName: wells[0],
+      primaryNozzle,
+      nozzleConfiguration: nozzles,
+    })
+    if (!dispensePipetteMovementSafetyStatus.isSafe) {
+      return {
+        errors: [
+          errorCreators.possiblePipetteCollision({
+            unsafePipetteMovementReason:
+              dispensePipetteMovementSafetyStatus.reason,
+          }),
+        ],
       }
     }
   }
@@ -413,14 +431,11 @@ export const mix: CommandCreator<MixArgs> = (
     tiprackSelected != null &&
     tipsSelected != null &&
     tipsSelected.length > 0
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
+
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -437,13 +452,14 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            primaryNozzle,
             // the tip will only be dropped on the first time through this loop if we are returning tip to tiprack
             dropTipLocation:
               isReturnTip && fallBackTrashLikeId != null
                 ? fallBackTrashLikeId
                 : dropTipLocation,
             tipRack,
-            ...(nozzles != null ? { nozzles } : {}),
+            nozzles,
             ...(tipTracking === MANUAL &&
             nextTip != null &&
             tiprackSelected != null

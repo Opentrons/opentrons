@@ -9,7 +9,13 @@ import { LabwareListItem } from '../LabwareListItem'
 import { OffDeckLabwareList } from '../OffDeckLabwareList'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareDefinition, LabwareInStack } from '@opentrons/shared-data'
+
+const mockOffDeckItem = {
+  displayName: 'nickName',
+  definitionUri: 'mock def uri',
+  labwareId: '1234',
+} as LabwareInStack
 
 vi.mock('../LabwareListItem')
 
@@ -32,7 +38,7 @@ describe('OffDeckLabwareList', () => {
   })
   it('renders null if labware items is null', () => {
     render({
-      labwareItems: {},
+      offDeckItems: [],
       isFlex: false,
       definitionsByURI: {},
       setSelectedStack: vi.fn(),
@@ -41,15 +47,13 @@ describe('OffDeckLabwareList', () => {
   })
   it('renders additional offdeck labware info if there is an offdeck labware', () => {
     render({
-      labwareItems: {
-        offDeck: [
-          {
-            displayName: 'nickName',
-            definitionUri: 'mock def uri',
-            labwareId: '1234',
-          },
-        ],
-      },
+      offDeckItems: [
+        {
+          representativeItem: mockOffDeckItem,
+          stackedItems: [mockOffDeckItem],
+          quantity: 1,
+        },
+      ],
       isFlex: false,
       definitionsByURI: { 'mock def uri': {} as LabwareDefinition },
       setSelectedStack: vi.fn(),

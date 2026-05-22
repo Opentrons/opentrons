@@ -8,9 +8,13 @@ from mock import MagicMock, patch
 from pydantic import TypeAdapter
 from starlette.testclient import TestClient
 
+from server_utils.fastapi_utils.models.json_api import (
+    ResourceLink,
+    ResourceLinkKey,
+    ResourceLinks,
+)
 from tests.conftest import datetime_to_zulu_iso8601
 
-from robot_server.service.json_api import ResourceLink, ResourceLinkKey, ResourceLinks
 from robot_server.system import errors, router
 
 

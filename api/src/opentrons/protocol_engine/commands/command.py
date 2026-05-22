@@ -110,6 +110,10 @@ class BaseCommandCreate(
         ),
         json_schema_extra=_pop_default,
     )
+    commandAnnotationIds: List[str] = Field(
+        default_factory=list,
+        description="A list of command annotation IDs (if any) that apply to this command.",
+    )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -283,9 +287,9 @@ class BaseCommand(
             " the command's execution or the command's generation."
         ),
     )
-    commandAnnotations: Optional[List[str]] = Field(
-        None,
-        description="An optional list of command annotation IDs that apply to this command.",
+    commandAnnotationIds: List[str] = Field(
+        default_factory=list,
+        description="A list of command annotation IDs (if any) that apply to this command.",
     )
     failedCommandId: Optional[str] = Field(
         None,

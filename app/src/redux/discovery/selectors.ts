@@ -1,10 +1,10 @@
-import isIp from 'is-ip'
+import { isIPv6 } from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import orderBy from 'lodash/orderBy'
-import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
+import { createSelector, lruMemoize } from 'reselect'
 import semver from 'semver'
 
 import {
@@ -42,9 +42,6 @@ type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
-// from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
-
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
 const isLocal = (ip: string): boolean => {
@@ -57,7 +54,7 @@ const isLocal = (ip: string): boolean => {
   )
 }
 
-const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
+const ipToHostname = (ip: string): string => (isIPv6(ip) ? `[${ip}]` : ip)
 
 const makeRobotModel = (
   healthModel: string | null,
@@ -84,11 +81,23 @@ export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
+const getRobotModelDisplayName = (robot: DiscoveredRobot): string | null => {
+  const robotModelName = robot.robotModel?.split(/\s/)[0] ?? null
+
+  return robotModelName === 'OT-3' ? 'Opentrons Flex' : robotModelName
+}
+
+const isNotOT2Robot = (robot: DiscoveredRobot): boolean => {
+  const displayName = getRobotModelDisplayName(robot)
+
+  return displayName !== 'OT-2' && displayName !== null
+}
+
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
-    state => state.discovery.robotsByName,
+    (state: State) => state.discovery.robotsByName,
     robotsMap => {
-      return Object.keys(robotsMap).map((robotName: string) => {
+      const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
         const { addresses, ...robotState } = robot
         const { health, serverHealth } = robotState
@@ -149,6 +158,8 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
           status: UNREACHABLE,
         }
       })
+
+      return robots.filter(robot => isNotOT2Robot(robot))
     }
   )
 
@@ -207,7 +218,7 @@ export const getViewableRobots: GetViewableRobots = createSelector(
 
 export const getLocalRobot: GetLocalRobot = createSelector(
   getAllRobots,
-  robots => find(robots, { ip: 'localhost' }) ?? null
+  robots => find(robots, { ip: _ODD_IP_ ?? 'localhost' }) ?? null
 )
 
 export const getRobotByName = (
@@ -220,10 +231,16 @@ export const getRobotByName = (
 export const getDiscoverableRobotByName: (
   state: State,
   robotName: string | null
-) => DiscoveredRobot | null = createDeepEqualSelector(
+) => DiscoveredRobot | null = createSelector(
   getAllRobots,
   (state: State, robotName: string | null) => robotName,
-  (robots, robotName) => robots.find(r => r.name === robotName) ?? null
+  (robots, robotName) => robots.find(r => r.name === robotName) ?? null,
+  {
+    memoize: lruMemoize,
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
+  }
 )
 
 export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>
@@ -276,9 +293,8 @@ export const getRobotModelByName = (
   robotName: string
 ): string | null => {
   const robot = getDiscoverableRobotByName(state, robotName)
-  const robotModelName =
-    robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
-  return robotModelName === 'OT-3' ? 'Opentrons Flex' : robotModelName
+
+  return robot != null ? getRobotModelDisplayName(robot) : null
 }
 
 export const getRobotAddressesByName: (

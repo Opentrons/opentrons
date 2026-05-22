@@ -22,8 +22,12 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getIsSlotAHopper } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getIsSlotAVacuumDock,
+} from '@opentrons/step-generation'
 
+import { VACUUM_DOCK_DISPLAY_LOCATION } from '/protocol-designer/constants'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
@@ -40,13 +44,15 @@ interface SlotInformationProps {
   fixtures?: string[]
 }
 
+const EMPTY_ITEMS: string[] = []
+
 export const SlotInformation: FC<SlotInformationProps> = ({
   location,
   robotType,
-  liquids = [],
-  labwares = [],
-  modules = [],
-  fixtures = [],
+  liquids = EMPTY_ITEMS,
+  labwares = EMPTY_ITEMS,
+  modules = EMPTY_ITEMS,
+  fixtures = EMPTY_ITEMS,
 }) => {
   const { t } = useTranslation('shared')
   const isOffDeck = location === 'offDeck'
@@ -65,6 +71,8 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     modifiedLocation = t('stacker', {
       slot: getColumnFromWellName(location),
     })
+  } else if (getIsSlotAVacuumDock(location)) {
+    modifiedLocation = VACUUM_DOCK_DISPLAY_LOCATION
   }
 
   return (
@@ -142,9 +150,9 @@ function StackInfoList({ title, items }: StackInfoListProps): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       {reducedItems.length > 0 ? (
-        reducedItems.map((item, index) => (
+        reducedItems.map(item => (
           <StackInfo
-            key={`${title}_${index}`}
+            key={`${title}_${item.item}`}
             title={title}
             stackInformation={
               item.count > 1

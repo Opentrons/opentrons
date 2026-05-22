@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type {
@@ -28,6 +29,7 @@ import type {
   ModuleState,
   TemperatureModuleState,
   ThermocyclerModuleState,
+  VacuumModuleState,
 } from './types'
 
 // Temperature statuses
@@ -84,6 +86,13 @@ export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
   fillCount: 1,
 }
 
+export const VACUUM_MODULE_INITIAL_STATE: VacuumModuleState = {
+  type: VACUUM_MODULE_TYPE,
+  ventStatus: null,
+  numPumpActivitiesStarted: 0,
+  currentPumpActivity: { type: 'pumpDeactivated' },
+}
+
 export const MODULE_INITIAL_STATE_BY_TYPE: {
   [moduleType in ModuleType]: ModuleState
 } = {
@@ -94,6 +103,7 @@ export const MODULE_INITIAL_STATE_BY_TYPE: {
   [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
   [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_MODULE_INITIAL_STATE,
+  [VACUUM_MODULE_TYPE]: VACUUM_MODULE_INITIAL_STATE,
 } as const
 
 MODULE_INITIAL_STATE_BY_TYPE satisfies {
@@ -153,4 +163,25 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   D4: 'hopperD4',
 }
 
-export const AIR_GAP_LIQUID_STATE_CONST: '__air_gap__' = '__air_gap__'
+export const VACUUM_DOCK_LOCATION = 'vacuumDock'
+
+export const VACUUM_VENT_OPEN: 'open' = 'open'
+export const VACUUM_VENT_CLOSED: 'closed' = 'closed'
+
+export const VACUUM_MODE_POWER: 'power' = 'power'
+export const VACUUM_MODE_PRESSURE: 'pressure' = 'pressure'
+
+export const VACUUM_PROGRAM_STATE: 'state' = 'state'
+export const VACUUM_PROGRAM_PROFILE: 'profile' = 'profile'
+export const VACUUM_STATE_PUMP_OFF: 'pumpOff' = 'pumpOff'
+export const VACUUM_STATE_PUMP_ON: 'pumpOn' = 'pumpOn'
+export const VACUUM_STATE_VENT: 'vent' = 'vent'
+export const VACUUM_VENT_SET_OPEN: 'open' = 'open'
+export const VACUUM_VENT_SET_CLOSED: 'closed' = 'closed'
+
+// TODO (nd:2026-03-09) These should match physical min/max when defined
+export const VACUUM_MIN_PRESSURE_MBAR = 0.1
+export const VACUUM_MAX_PRESSURE_MBAR = 1000
+
+export const VACUUM_DEACTIVATED: 'VACUUM_DEACTIVATED' = 'VACUUM_DEACTIVATED'
+export const VACUUM_AT_TARGET: 'VACUUM_AT_TARGET' = 'VACUUM_AT_TARGET'

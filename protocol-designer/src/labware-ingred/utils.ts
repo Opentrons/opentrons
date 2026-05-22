@@ -134,13 +134,30 @@ export function getNextNickname(
     : proposedNickname
 }
 
+// Additional equipment types that are not stored in the labware object
+// and should not be migrated
+const ADDITIONAL_EQUIPMENT_TYPES = ['wasteChute', 'trashBin']
+
 export const getMigratedLabwareId = (
-  oldLabwareId: string,
+  // labware or trash-like entity ID
+  oldEntityId: string | null,
   labware: Labware,
   allLabwareDefs: Record<string, LabwareDefinition2>,
   latestDefs: LabwareDefByDefURI
-): string => {
-  const defURI = labware[oldLabwareId]?.labwareDefURI
+): string | null => {
+  if (oldEntityId == null) {
+    return null
+  }
+  // Check if this is an additional equipment ID (e.g., waste chute, trash bin)
+  // These are stored in additionalEquipmentOnDeck, not in labware, so return unchanged
+  const isAdditionalEquipment = ADDITIONAL_EQUIPMENT_TYPES.some(type =>
+    oldEntityId.includes(type)
+  )
+  if (isAdditionalEquipment) {
+    return oldEntityId
+  }
+
+  const defURI = labware[oldEntityId]?.labwareDefURI
   const loadName = allLabwareDefs[defURI]?.parameters.loadName
   const latestURI = Object.entries(latestDefs).find(
     ([_, def]) => def.parameters.loadName === loadName
@@ -148,11 +165,11 @@ export const getMigratedLabwareId = (
 
   if (defURI == null) {
     console.error(
-      `expected to find a matching defURI with labwareId ${oldLabwareId} but could not`
+      `expected to find a matching defURI with labwareId ${oldEntityId} but could not`
     )
   }
 
-  const labwareIdString = oldLabwareId.split(':')[0]
+  const labwareIdString = oldEntityId.split(':')[0]
   const latestLabwareId =
     latestURI != null
       ? `${labwareIdString}:${latestURI}`

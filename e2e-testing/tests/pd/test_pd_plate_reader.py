@@ -1,7 +1,9 @@
+import re
+
 import pytest
 from playwright.sync_api import Page
-from test_pd_create_new_flex import test_flex_onboarding_workflow
 
+from automation.pd_pages import LandingPage
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
@@ -11,18 +13,19 @@ from eyes import Eyes
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes) -> None:
+def test_flex_absorbance_reader_setup(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
     plate_reader_page = PlateReaderPage(page)
     protocol_editor = ProtocolEditorPage(page)
     create_protocol = CreateProtocolWizard(page)
 
     # Create new Flex protocol setup
     ## Note This will need to be refactored to a reusable function later
-    test_flex_onboarding_workflow(page, base_url)
+    test_flex_onboarding_workflow(page, pd_base_url)
 
     # Configure deck hardware
     ## Snapshot: Validate Absorbance Plate Reader module configuration option
     plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
+    plate_reader_page.button_selection("Confirm")
     create_protocol.name_protocol("test")
     plate_reader_page.button_selection("Confirm")
 
@@ -86,9 +89,38 @@ def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes) -> 
     plate_reader_page.wait_for_save_banner_gone()
     timeline = Timeline(page)
     timeline.scroll_timeline_to_bottom()
-    eyes.check(checkpoint_name="Fully Configured Plate Reader")
-    # now take a visual snapshot of the timeline element with stitching
-    eyes.check_element(
-        checkpoint_name="Stitched Final Timeline",
-        element=page.get_by_test_id(timeline.timeline_box_testid),
-    )
+    if eyes is not None:
+        eyes.check(checkpoint_name="Fully Configured Plate Reader")
+        # now take a visual snapshot of the timeline element with stitching
+        eyes.check_element(
+            checkpoint_name="Stitched Final Timeline",
+            element=page.get_by_test_id(timeline.timeline_box_testid),
+        )
+
+
+def test_flex_onboarding_workflow(page: Page, pd_base_url: str) -> None:
+    """This sets up the deck for the Flex Absorbance Reader test"""
+    # Start on home page
+    landing = LandingPage(page)
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+    # Click "Create a Flex protocol" to start onboarding
+    landing.click_create_protocol()
+    # Part 1: Add pipette - Click "Add a pipette" to open selector
+    page.get_by_text("Add a pipette").click()
+    # Select 1-Channel pipette type
+    page.get_by_text("1-Channel").click()
+    # Select 50 µL volume
+    page.get_by_text("50 µL").click()
+    # Select Tip Rack 50 µL (not Filter Tip Rack) - use exact match
+    page.locator("label").filter(has=page.get_by_text(re.compile(r"^Tip Rack 50 µL$"))).first.click()
+    # Save pipette configuration
+    page.get_by_role("button", name="Save").click()
+    # Part 2: Gripper question - "Do you want to move labware automatically with the gripper?"
+    page.get_by_text("Yes", exact=True).click()
+    # Part 3: Thermocycler question - "Are you using a Thermocycler in your protocol?"
+    page.get_by_test_id("BasicsButtons_thermocycler_no").get_by_text("No").click()
+    page.get_by_test_id("BasicsButtons_wasteChute_no").get_by_text("No").click()
+    # Now Confirm button should be enabled - click to proceed to Step 2
+    confirm_button = page.get_by_role("button", name="Confirm")
+    confirm_button.click()

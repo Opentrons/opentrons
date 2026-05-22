@@ -8,9 +8,11 @@ import {
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
+import { VACUUM_MODULE_SLOT } from '/protocol-designer/constants'
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
@@ -44,9 +46,14 @@ export function SlotDetailsContainer(
     return null
   }
   const isSlotAHopper = getIsSlotAHopper(slot)
-  const adjustedSlotToFindModule = isSlotAHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(slot)
+  let adjustedSlotToFindModule = slot
+  if (isSlotAHopper) {
+    adjustedSlotToFindModule =
+      FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  } else if (isSlotAVacuumDock) {
+    adjustedSlotToFindModule = VACUUM_MODULE_SLOT
+  }
 
   const {
     modules: deckSetupModules,
@@ -72,7 +79,8 @@ export function SlotDetailsContainer(
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),
     slot,
-    isSlotAHopper
+    isSlotAHopper,
+    isSlotAVacuumDock
   )
   const topLocationLabwareId =
     fullStackFromLabwares?.length > 0
@@ -125,6 +133,13 @@ export function SlotDetailsContainer(
     )
     labwareIds.forEach(id => {
       labwares.push(deckSetupLabwares[id].def.metadata.displayName)
+    })
+  } else if (isSlotAVacuumDock && fullStackFromLabwares?.length > 0) {
+    // For vacuum dock, show all labware in the stack
+    fullStackFromLabwares.forEach(id => {
+      if (deckSetupLabwares[id] != null) {
+        labwares.push(nickNames[id])
+      }
     })
   } else if (fullStackFromLabwares?.length > 0) {
     fullStackFromLabwares.forEach(id => {

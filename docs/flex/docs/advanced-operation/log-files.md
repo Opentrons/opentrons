@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Log Files"
+description: "Where to find and how to use Flex run logs and system logs."
 ---
 
 All Flex robots keep records of their movements and system processes. During normal operation, there's no need to download or examine these files. However, if a failure or malfunction occurs, Opentrons Support may request these files, as they provide detailed information that helps identify and resolve problems with the robot. This article summarizes each log file and explains how to download them using the Opentrons App.
@@ -7,7 +8,7 @@ All Flex robots keep records of their movements and system processes. During nor
 
 ## Understanding Flex log files
 
-In an idle state or during a protocol run, your Flex constantly writes data to several different log files. Each of these files tracks the activities specific to different parts of the robot and its attachments. The following table summarizes the data captured in each file.
+In an idle state or during a protocol run, your Flex constantly writes data to several different *log files*. Each of these files tracks the activities specific to different parts of the robot and its attachments. The following table summarizes the data captured in each file.
 
 
 | Log type | Description |

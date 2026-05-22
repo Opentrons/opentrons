@@ -101,54 +101,69 @@ export function CreateProtocol(): JSX.Element | null {
   })
 
   // Reset the chat data atom and protocol atoms when navigating to the update protocol page
-  useEffect(() => {
-    setCreateProtocolChatAtom({
-      prompt: '',
-      regenerate: false,
-      scientific_application_type: '',
-      description: '',
-      robots: 'opentrons_flex',
-      mounts: [],
-      flexGripper: false,
-      modules: [],
-      labware: [],
-      liquids: [],
-      steps: [],
-      fake: false,
-    })
-    setUpdateProtocolChatAtom({
-      prompt: '',
-      protocol_text: '',
-      regenerate: false,
-      update_type: 'adapt_python_protocol',
-      update_details: '',
-      fake: false,
-    })
-    setChatHistoryAtom([])
-    setChatData([])
-  }, [])
+  useEffect(
+    () => {
+      setCreateProtocolChatAtom({
+        prompt: '',
+        regenerate: false,
+        scientificApplicationType: '',
+        description: '',
+        robots: 'opentrons_flex',
+        mounts: [],
+        flexGripper: false,
+        modules: [],
+        labware: [],
+        liquids: [],
+        steps: [],
+        fake: false,
+      })
+      setUpdateProtocolChatAtom({
+        prompt: '',
+        protocolText: '',
+        regenerate: false,
+        updateType: 'adapt_python_protocol',
+        updateDetails: '',
+        fake: false,
+      })
+      setChatHistoryAtom([])
+      setChatData([])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
-  useEffect(() => {
-    setHeaderWithMeterAtom({
-      displayHeaderWithMeter: true,
-      progress: calculateProgress(),
-    })
-  }, [currentSection])
-
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => {
       setHeaderWithMeterAtom({
-        displayHeaderWithMeter: false,
-        progress: 0,
+        displayHeaderWithMeter: true,
+        progress: calculateProgress(),
       })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentSection]
+  )
 
-      methods.reset()
-      setCreateProtocolAtom({
-        currentSection: 0,
-        focusSection: 0,
-      })
-    }
-  }, [])
+  useEffect(
+    () => {
+      return () => {
+        setHeaderWithMeterAtom({
+          displayHeaderWithMeter: false,
+          progress: 0,
+        })
+
+        methods.reset()
+        setCreateProtocolAtom({
+          currentSection: 0,
+          focusSection: 0,
+        })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   useEffect(() => {
     if (parentRef.current != null) {
@@ -160,20 +175,25 @@ export function CreateProtocol(): JSX.Element | null {
     }
   }, [])
 
-  useEffect(() => {
-    if (isResizing) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-    } else {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
+  useEffect(
+    () => {
+      if (isResizing) {
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('mouseup', handleMouseUp)
+      } else {
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('mouseup', handleMouseUp)
+      }
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isResizing])
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('mouseup', handleMouseUp)
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isResizing]
+  )
 
   function calculateProgress(): number {
     return currentSection > 0 ? currentSection / TOTAL_STEPS : 0

@@ -4,7 +4,7 @@ import some from 'lodash/some'
 
 import { getRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig, Run, RunError } from '@opentrons/api-client'
@@ -19,7 +19,7 @@ export function useRunQuery<TError = Error>(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
   const query = useQuery<Run, TError>(
-    [host, 'runs', runId, 'details'],
+    getQueryKey(host, 'runs', runId, 'details'),
     () => getRun(host!, runId!).then(response => response.data),
     {
       enabled: host !== null && runId != null && options.enabled !== false,
@@ -37,21 +37,26 @@ export function useRunQuery<TError = Error>(
 
   // If the run contains an estop error, invalidate the estop query so we get the
   // estop modal as fast as we can
-  useEffect(() => {
-    if (
-      query.data?.data?.current &&
-      some(
-        ((query.data?.data?.errors ?? []) as RunError[]).map(estopInErrorTree)
-      )
-    ) {
-      queryClient.invalidateQueries([host, '/robot/control'])
-    }
-  }, [
-    runId,
-    query.isSuccess,
-    query.data?.data?.current,
-    query.data?.data?.errors,
-  ])
+  useEffect(
+    () => {
+      if (
+        query.data?.data?.current &&
+        some(
+          ((query.data?.data?.errors ?? []) as RunError[]).map(estopInErrorTree)
+        )
+      ) {
+        queryClient.invalidateQueries(getQueryKey(host, '/robot/control'))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      runId,
+      query.isSuccess,
+      query.data?.data?.current,
+      query.data?.data?.errors,
+    ]
+  )
 
   return query
 }

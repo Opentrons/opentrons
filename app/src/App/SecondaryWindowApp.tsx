@@ -19,9 +19,10 @@ import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 import { StepDetailViewer } from '/app/pages/Desktop/StepDetailViewer'
 import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
-import { DesktopAppFallback } from './DesktopAppFallback'
+import { SecondaryWindowAppFallback } from './SecondaryWindowAppFallback'
 import { ReactQueryDevtools } from './tools'
 
 import type { ReactNode } from 'react'
@@ -49,7 +50,7 @@ export const SecondaryWindowApp = (): JSX.Element => {
 
   return (
     <LocalizationProvider>
-      <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+      <ErrorBoundary FallbackComponent={SecondaryWindowAppFallback}>
         <ReactQueryDevtools />
         <Box width="100%">
           <Routes>
@@ -98,12 +99,14 @@ function HostProvider({ children }: HostProviderProps): JSX.Element | null {
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
 
   return (
     <ApiHostProvider
       key={robot?.name}
       hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
     >
       {children}
     </ApiHostProvider>

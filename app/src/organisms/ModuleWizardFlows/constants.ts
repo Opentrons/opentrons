@@ -4,6 +4,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { ModuleType } from '@opentrons/shared-data'
@@ -44,5 +45,6 @@ export const FLEX_SLOT_NAMES_BY_MOD_TYPE: {
   [HEATERSHAKER_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3', 'A3'],
   [TEMPERATURE_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3', 'A3'],
   [THERMOCYCLER_MODULE_TYPE]: ['B1'],
+  [VACUUM_MODULE_TYPE]: ['A3'],
 }
 export const LEFT_SLOTS: string[] = ['A1', 'B1', 'C1', 'D1']

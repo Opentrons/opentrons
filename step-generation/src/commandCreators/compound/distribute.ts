@@ -30,9 +30,8 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
   getTransferPlanAndReferenceVolumes,
@@ -141,6 +140,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     nozzles,
     pipette,
     preWetTip,
+    primaryNozzle,
     pushOut,
     sourceLabware,
     sourceWell,
@@ -323,24 +323,41 @@ export const distribute: CommandCreator<DistributeArgs> = (
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
-    const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
+    const aspiratePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: sourceLabware,
       wellLocationOffset: { x: aspirateXOffset, y: aspirateYOffset },
       wellTargetName: sourceWell,
+      primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
-    const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
+    if (!aspiratePipetteMovementSafetyStatus.isSafe) {
+      errors.push(
+        errorCreators.possiblePipetteCollision({
+          unsafePipetteMovementReason:
+            aspiratePipetteMovementSafetyStatus.reason,
+        })
+      )
+    }
+    const dispensePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
       labwareId: destLabware,
       wellLocationOffset: { x: dispenseXOffset, y: dispenseYOffset },
       wellTargetName: destWells[0],
+      primaryNozzle,
+      nozzleConfiguration: nozzles,
     })
-    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
-      errors.push(errorCreators.possiblePipetteCollision())
+    if (!dispensePipetteMovementSafetyStatus.isSafe) {
+      errors.push(
+        errorCreators.possiblePipetteCollision({
+          unsafePipetteMovementReason:
+            dispensePipetteMovementSafetyStatus.reason,
+        })
+      )
     }
   }
 
@@ -401,16 +418,18 @@ export const distribute: CommandCreator<DistributeArgs> = (
       })
     )
   }
-  if (errors.length > 0)
+  if (errors.length > 0) {
     return {
       errors,
     }
+  }
   const { tipracks } = getNextTiprack(
     pipette,
     tiprackURI,
     invariantContext,
     prevRobotState,
-    ...(nozzles != null ? [nozzles] : [])
+    primaryNozzle,
+    nozzles
   )
 
   const dispenseCorrectionVolumeForDestination =
@@ -463,11 +482,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
-
   const shouldSelectManualTips =
     tipTracking === MANUAL &&
     tiprackSelected != null &&
@@ -476,7 +490,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,
-        nozzles: nozzles ?? ALL,
+        nozzles,
         channels: pipetteSpecs.channels,
         primaryNozzle,
       })
@@ -662,12 +676,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            nozzles,
+            primaryNozzle,
             dropTipLocation:
               isReturnTip && fallBackTrashLikeId != null
                 ? fallBackTrashLikeId
                 : dropTipLocation,
             tipRack: tiprackURI,
-            ...(nozzles != null ? { nozzles } : {}),
             ...(tipTracking === MANUAL &&
             nextTip != null &&
             tiprackSelected != null

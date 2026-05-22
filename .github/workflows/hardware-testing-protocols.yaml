@@ -38,24 +38,20 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v4'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: 'actions/setup-node@v6'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: '12'
-
-      - name: Setup Python
-        uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.12'
+          node-version: '22.22.0'
 
       - name: Setup Project
-        uses: './.github/actions/python/setup'
+        uses: './.github/actions/python/setup-uv'
         with:
           project: 'hardware-testing'
+          python-version: '3.12'
 
       - name: Test-Integration
         run: make -C hardware-testing test-integration

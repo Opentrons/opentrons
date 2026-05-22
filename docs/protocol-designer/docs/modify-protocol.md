@@ -1,12 +1,13 @@
 ---
 title: "Protocol Designer: Modifying a Protocol"
+description: "Change robot, instruments, deck, or steps in an existing protocol."
 ---
 
 You can upload and edit protocols you've previously made in Protocol Designer. Click **Import** to upload an existing .py or .json file. 
 
 Your protocol details will be visible in the protocol overview. Click **Edit protocol** to make your desired changes. 
 
-When uploading a protocol file created in a previous version, Protocol Designer will automatically update your protocol steps and labware to the latest version. The update process lets you use all of the latest features of Protocol Designer in your protocol, such as new modules, labware, and improved pipetting behaviors. 
+When uploading a protocol file created in a previous version, Protocol Designer will automatically update your protocol steps and labware to the latest version. The update process lets you use all of the latest features of Protocol Designer in your protocol, such as new modules, labware, and improved pipetting behaviors.
 
 !!! note
     Updating a protocol, even without changing its steps, can lead to changes in protocol execution. Always perform your necessary level of testing, such as a dry or wet run, on any newly exported protocol file.

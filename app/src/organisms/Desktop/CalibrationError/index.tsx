@@ -38,11 +38,16 @@ export function useCalibrationError(
   const dispatch = useDispatch()
 
   // Dismiss all network requests during a unique session to prevent stale error state.
-  useEffect(() => {
-    if (sessionId != null) {
-      dispatch(dismissAllRequests())
-    }
-  }, [sessionId])
+  useEffect(
+    () => {
+      if (sessionId != null) {
+        dispatch(dismissAllRequests())
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sessionId]
+  )
 
   const reqs = useSelector((state: State) => {
     return getRequests(state, requestIds)

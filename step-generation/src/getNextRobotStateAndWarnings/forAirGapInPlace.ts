@@ -2,7 +2,7 @@ import range from 'lodash/range'
 
 import { COLUMN, SINGLE } from '@opentrons/shared-data'
 
-import { AIR_GAP_LIQUID_STATE_CONST } from '../constants'
+import { AIR } from '../utils'
 
 import type { AirGapInPlaceParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
@@ -27,11 +27,11 @@ export function forAirGapInPlace(
   range(channels).forEach((tipIndex): void => {
     const prev = robotState.liquidState.pipettes[pipetteId][tipIndex] ?? {}
 
-    const prevAirGapVolume = prev[AIR_GAP_LIQUID_STATE_CONST]?.volume ?? 0
+    const prevAirGapVolume = prev[AIR]?.volume ?? 0
 
     robotState.liquidState.pipettes[pipetteId][tipIndex] = {
       ...prev,
-      [AIR_GAP_LIQUID_STATE_CONST]: {
+      [AIR]: {
         volume: prevAirGapVolume + volume, // add previous air gap (if exists) + current
       },
     }

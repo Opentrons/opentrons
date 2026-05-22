@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { deleteRunImages } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
 import type { EmptyResponse } from '@opentrons/api-client'
@@ -22,7 +22,7 @@ export function useDeleteRunImages(): UseDeleteProtocolMutationResult {
   const mutation = useMutation<EmptyResponse, unknown, string>(
     (runId: string) =>
       deleteRunImages(host!, runId).then(response => {
-        queryClient.invalidateQueries([host, 'dataFiles', runId])
+        queryClient.invalidateQueries(getQueryKey(host, 'dataFiles', runId))
         return response.data
       })
   )

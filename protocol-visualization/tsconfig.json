@@ -1,0 +1,26 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [
+    {
+      "path": "../components"
+    },
+    {
+      "path": "../shared-data"
+    },
+    {
+      "path": "../step-generation"
+    }
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "lib",
+    "baseUrl": ".",
+    "paths": {
+      "@opentrons/components": ["../components/src/index.ts"],
+      "@opentrons/shared-data": ["../shared-data/js/index.ts"],
+      "@opentrons/step-generation": ["../step-generation/src/index.ts"]
+    }
+  },
+  "include": ["src", "src/**/*.json"]
+}

@@ -66,13 +66,18 @@ export function DropTipWizardFlows(
 
   // If the flow unrenders for any reason (ex, the pipette card managing the flow unrenders), don't re-render the flow
   // after it closes.
-  useEffect(() => {
-    return () => {
-      if (issuedCommandsType === 'setup') {
-        void dropTipWithTypeUtils.dropTipCommands.handleCleanUpAndClose()
+  useEffect(
+    () => {
+      return () => {
+        if (issuedCommandsType === 'setup') {
+          void dropTipWithTypeUtils.dropTipCommands.handleCleanUpAndClose()
+        }
       }
-    }
-  }, [issuedCommandsType])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [issuedCommandsType]
+  )
 
   return (
     <DropTipWizard

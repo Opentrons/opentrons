@@ -25,6 +25,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getQueryKey,
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
@@ -88,14 +89,19 @@ const QuickTransferHeader = ({
     displayedTitle = truncateString(displayedTitle, 80, 60)
   }
 
-  useEffect(() => {
-    trackEventWithRobotSerial({
-      name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
-      properties: {
-        name: title,
-      },
-    })
-  }, [])
+  useEffect(
+    () => {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
+        properties: {
+          name: title,
+        },
+      })
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   return (
     <Flex
@@ -322,9 +328,11 @@ export function QuickTransferDetails(): JSX.Element | null {
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
+      queryClient
+        .invalidateQueries(getQueryKey(host, 'runs'))
+        .catch((e: Error) => {
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        })
     },
   })
 

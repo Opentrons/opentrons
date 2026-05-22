@@ -21,7 +21,7 @@ import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Dispatch as ReactDispatch } from 'react'
@@ -74,7 +74,7 @@ export function AvailableRobotOption(
     },
     {
       hostname: ip,
-      requestor: ip === OPENTRONS_USB ? appShellRequestor : undefined,
+      requestor: ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
     }
   )
 
@@ -96,7 +96,7 @@ export function AvailableRobotOption(
     },
     {
       hostname: ip,
-      requestor: ip === OPENTRONS_USB ? appShellRequestor : undefined,
+      requestor: ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
     }
   )
 
@@ -113,10 +113,14 @@ export function AvailableRobotOption(
     iconName = 'usb'
   }
 
-  useEffect(() => {
-    dispatch(fetchStatus(robotName))
+  useEffect(
+    () => {
+      dispatch(fetchStatus(robotName))
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    []
+  )
 
   return showIdleOnly && isBusy ? null : (
     <>
@@ -133,6 +137,7 @@ export function AvailableRobotOption(
             width: 4rem;
             height: 3.5625rem;
           `}
+          alt={robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}

@@ -9,6 +9,7 @@ from typing import Dict, List, Mapping, Optional, Union
 
 import anyio.to_thread
 import sqlalchemy
+from pydantic import ValidationError
 
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
@@ -26,6 +27,14 @@ from robot_server.persistence.tables import (
 _log = getLogger(__name__)
 
 MAX_ANALYSES_TO_STORE = 5
+
+
+class UnreadableAnalysisError(ValueError):
+    """Exception raised if a given analysis is not readable."""
+
+    def __init__(self, analysis_id: str, error_msg: str) -> None:
+        """Initialize the error's message."""
+        super().__init__(f'Analysis "{analysis_id}" cannot be parsed: {error_msg}')
 
 
 @dataclass
@@ -93,7 +102,13 @@ class CompletedAnalysisResource:
         assert isinstance(protocol_id, str)
 
         def parse_completed_analysis() -> CompletedAnalysis:
-            return json_to_pydantic(CompletedAnalysis, sql_row.completed_analysis)
+            try:
+                parsed_analysis = json_to_pydantic(
+                    CompletedAnalysis, sql_row.completed_analysis
+                )
+            except ValidationError as e:
+                raise UnreadableAnalysisError(id, str(e)) from e
+            return parsed_analysis
 
         completed_analysis = await anyio.to_thread.run_sync(
             parse_completed_analysis,

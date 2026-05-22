@@ -23,6 +23,8 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
+  // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedNavigate = useCallback(
     debounce((path: string) => {
       navigate(path)
@@ -55,19 +57,28 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
       <div className={styles.bottom_container}>
         <Link
           role="button"
-          data-testid="Navbar_settingsLink"
           className={styles.nav_icon_link}
           onClick={(e: MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
             debouncedNavigate('/app-settings')
           }}
+          aria-label={t('app_settings')}
         >
-          <Icon name="gear" className={styles.navbar_icon} />
-        </Link>
-        <Link href={SALESFORCE_HELP_LINK} external className={styles.icon_link}>
           <Icon
-            data-testid="Navbar_helpLink"
+            name="gear"
+            aria-label={t('settings_icon')}
+            className={styles.navbar_icon}
+          />
+        </Link>
+        <Link
+          href={SALESFORCE_HELP_LINK}
+          external
+          className={styles.icon_link}
+          aria-label={t('help')}
+        >
+          <Icon
             name="help"
+            aria-label={t('help_icon')}
             className={styles.navbar_icon}
           />
         </Link>

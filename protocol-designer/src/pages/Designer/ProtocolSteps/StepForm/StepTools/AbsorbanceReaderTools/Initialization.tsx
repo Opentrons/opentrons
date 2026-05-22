@@ -187,7 +187,7 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
 
   const wavelengthItems: JSX.Element[] = []
   for (let i = 0; i < (mode === 'multi' ? numWavelengths : 1); i++) {
-    const wavelength = i <= wavelengths.length ? wavelengths[i] : null
+    const wavelength = i < wavelengths.length ? wavelengths[i] : null
     wavelengthItems.push(
       <ListItem
         type="default"
@@ -301,7 +301,7 @@ function WavelengthItem(props: WavelengthItemProps): JSX.Element {
               ({ value: val }) => val === wavelengthOption
             )
           ) {
-            const clone = wavelengths
+            const clone = [...wavelengths]
             clone[index] = wavelengthOption
             wavelengthsProps.updateValue(clone)
           }

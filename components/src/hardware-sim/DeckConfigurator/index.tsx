@@ -23,6 +23,7 @@ import { StaticItem } from './StaticItem'
 import { TemperatureModuleItem } from './TemperatureModuleItem'
 import { ThermocyclerItem } from './ThermocyclerItem'
 import { TrashBinConfigItem } from './TrashBinConfigItem'
+import { VacuumModuleItem } from './VacuumModuleItem'
 import { WasteChuteConfigFixture } from './WasteChuteConfigItem'
 
 import type { ReactNode } from 'react'
@@ -137,6 +138,12 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfigWithAA,
     deckDef,
     'flexStacker'
+  )
+
+  const vacuumModuleItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'vacuumModule'
   )
 
   return (
@@ -336,6 +343,24 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
             ].includes(cutoutFixtureId)}
             selected={cutoutId === selectedCutoutId}
             addressableAreaId={addressableAreaId}
+          />
+        )
+      )}
+      {vacuumModuleItems.map(
+        ({ cutoutId, cutoutFixtureId, addressableAreaId }) => (
+          <VacuumModuleItem
+            data-testid={cutoutId}
+            key={addressableAreaId}
+            deckDefinition={deckDef}
+            handleClickRemove={
+              editableCutoutIds.includes(cutoutId)
+                ? handleClickRemove
+                : undefined
+            }
+            fixtureLocation={cutoutId}
+            cutoutFixtureId={cutoutFixtureId}
+            addressableAreaId={addressableAreaId}
+            selected={cutoutId === selectedCutoutId}
           />
         )
       )}

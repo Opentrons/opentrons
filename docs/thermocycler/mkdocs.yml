@@ -23,13 +23,23 @@ nav:
       - OT-2 Attachment Steps: installation-ot2.md
   - Thermocycler Lid Seals: lid-seals.md
   - Maintenance and Cleaning: maintenance.md
+  - Thermocycler G-Codes:
+      - Thermocycler G-Code Concepts: g-code-concepts.md
+      - Thermocycler G-Codes: g-codes.md
+      - Thermocycler Error Codes: error-codes.md
   - Additional Product Information: additional-info.md
-
 
 plugins:
   - search
   - autorefs
   - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: true
+      cover_page_template: "docs/cover.tpl"
+      include_css: false
+      enumerate_headings: false
 
 markdown_extensions:
   - admonition
@@ -47,10 +57,12 @@ markdown_extensions:
   - sane_lists
   - toc:
       permalink: true
-      title: Page Contents
+      title: Table of Contents
       toc_depth: 3
 
 extra_css:
-  - manual.css
+  - ../shared/instruction-manuals.css
+  - ../shared/opentrons-theme.css
+  - ../shared/print-pdf.css
 
 copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

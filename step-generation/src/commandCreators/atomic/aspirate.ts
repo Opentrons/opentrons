@@ -10,8 +10,8 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  getIsSafePipetteMovement,
   getLabwareSlot,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   indentPyLines,
   modulePipetteCollision,
@@ -26,13 +26,14 @@ import type {
   AspDispAirgapParams,
   CreateCommand,
   NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
-import type { Point } from '../../utils'
+import type { CommandCreator, CommandCreatorError, Point } from '../../types'
 
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
-  nozzles: NozzleConfigurationStyle | null
+  nozzles: NozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   isAirGap?: boolean
 }
 /** Aspirate with given args. Requires tip. */
@@ -50,6 +51,8 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     isAirGap,
     tipRack,
     wellLocation,
+    primaryNozzle,
+    nozzles,
   } = args
   const actionName = 'aspirate'
   const labwareState = prevRobotState.labware
@@ -116,23 +119,31 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
 
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
+  const pipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
+    robotState: prevRobotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    wellLocationOffset: (wellLocation?.offset as Point) ?? {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    wellTargetName: wellName,
+    primaryNozzle,
+    nozzleConfiguration: nozzles,
+  })
 
   if (
     isMultiChannelPipette &&
-    !getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      wellLocationOffset: (wellLocation?.offset as Point) ?? {
-        x: 0,
-        y: 0,
-        z: 0,
-      },
-      wellTargetName: wellName,
-    })
+    pipetteSpec &&
+    !pipetteMovementSafetyStatus.isSafe
   ) {
-    errors.push(errorCreators.possiblePipetteCollision())
+    errors.push(
+      errorCreators.possiblePipetteCollision({
+        unsafePipetteMovementReason: pipetteMovementSafetyStatus.reason,
+      })
+    )
   }
 
   if (

@@ -8,6 +8,8 @@ class Settings:
     # One env file for all environments
     ENV_PATH: Path = Path(Path(__file__).parent, "test.env")
     ENV_VARIABLE_MAP: dict[str, str] = {}
+    # Keys in ENV_VARIABLE_MAP whose env vars are optional (set to None when absent)
+    OPTIONAL_KEYS: set[str] = set()
     TOKEN_URL: str
     BASE_URL: str
     CLIENT_ID: str
@@ -16,6 +18,11 @@ class Settings:
     GRANT_TYPE: str
     HF_API_KEY: str
     CACHED_TOKEN_PATH: str
+    # Unverified email live-test credentials — populated only when configured.
+    # These are username+password for a real Auth0 user whose email is not verified.
+    # The password grant must be enabled on the Auth0 application.
+    UNVERIFIED_USERNAME: str | None
+    UNVERIFIED_PASSWORD: str | None
     # Dynamic properties hard coded or computed
     excluded: list[str] = ["CACHED_TOKEN_PATH"]
 
@@ -23,6 +30,9 @@ class Settings:
         for key, env_var in self.ENV_VARIABLE_MAP.items():
             if key in self.excluded:
                 setattr(self, key, env_var)
+                continue
+            if key in self.OPTIONAL_KEYS:
+                setattr(self, key, os.environ.get(env_var))
                 continue
             value = self._get_required_env(env_var)
             setattr(self, key, value)
@@ -36,6 +46,7 @@ class Settings:
 
 
 class LocalSettings(Settings):
+    OPTIONAL_KEYS = {"UNVERIFIED_USERNAME", "UNVERIFIED_PASSWORD"}
     ENV_VARIABLE_MAP = {
         "TOKEN_URL": "LOCAL_TOKEN_URL",
         "BASE_URL": "LOCAL_BASE_URL",
@@ -45,6 +56,8 @@ class LocalSettings(Settings):
         "GRANT_TYPE": "LOCAL_GRANT_TYPE",
         "HF_API_KEY": "LOCAL_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
+        "UNVERIFIED_USERNAME": "LOCAL_UNVERIFIED_USERNAME",
+        "UNVERIFIED_PASSWORD": "LOCAL_UNVERIFIED_PASSWORD",
     }
 
     def __init__(self) -> None:
@@ -54,6 +67,7 @@ class LocalSettings(Settings):
 
 
 class DevSettings(Settings):
+    OPTIONAL_KEYS = {"UNVERIFIED_USERNAME", "UNVERIFIED_PASSWORD"}
     ENV_VARIABLE_MAP = {
         "TOKEN_URL": "DEV_TOKEN_URL",
         "BASE_URL": "DEV_BASE_URL",
@@ -63,6 +77,8 @@ class DevSettings(Settings):
         "GRANT_TYPE": "DEV_GRANT_TYPE",
         "HF_API_KEY": "DEV_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
+        "UNVERIFIED_USERNAME": "DEV_UNVERIFIED_USERNAME",
+        "UNVERIFIED_PASSWORD": "DEV_UNVERIFIED_PASSWORD",
     }
 
     def __init__(self) -> None:
@@ -72,6 +88,7 @@ class DevSettings(Settings):
 
 
 class SandboxSettings(Settings):
+    OPTIONAL_KEYS = {"UNVERIFIED_USERNAME", "UNVERIFIED_PASSWORD"}
     ENV_VARIABLE_MAP = {
         "TOKEN_URL": "SANDBOX_TOKEN_URL",
         "BASE_URL": "SANDBOX_BASE_URL",
@@ -81,6 +98,8 @@ class SandboxSettings(Settings):
         "GRANT_TYPE": "SANDBOX_GRANT_TYPE",
         "HF_API_KEY": "SANDBOX_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
+        "UNVERIFIED_USERNAME": "SANDBOX_UNVERIFIED_USERNAME",
+        "UNVERIFIED_PASSWORD": "SANDBOX_UNVERIFIED_PASSWORD",
     }
 
     def __init__(self) -> None:
@@ -90,6 +109,7 @@ class SandboxSettings(Settings):
 
 
 class CrtSettings(Settings):
+    OPTIONAL_KEYS = {"UNVERIFIED_USERNAME", "UNVERIFIED_PASSWORD"}
     ENV_VARIABLE_MAP = {
         "TOKEN_URL": "CRT_TOKEN_URL",
         "BASE_URL": "CRT_BASE_URL",
@@ -99,6 +119,8 @@ class CrtSettings(Settings):
         "GRANT_TYPE": "CRT_GRANT_TYPE",
         "HF_API_KEY": "CRT_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "cached_token.txt")),
+        "UNVERIFIED_USERNAME": "CRT_UNVERIFIED_USERNAME",
+        "UNVERIFIED_PASSWORD": "CRT_UNVERIFIED_PASSWORD",
     }
 
     def __init__(self) -> None:
@@ -108,6 +130,7 @@ class CrtSettings(Settings):
 
 
 class StagingSettings(Settings):
+    OPTIONAL_KEYS = {"UNVERIFIED_USERNAME", "UNVERIFIED_PASSWORD"}
     ENV_VARIABLE_MAP = {
         "TOKEN_URL": "STAGING_TOKEN_URL",
         "BASE_URL": "STAGING_BASE_URL",
@@ -117,6 +140,8 @@ class StagingSettings(Settings):
         "GRANT_TYPE": "STAGING_GRANT_TYPE",
         "HF_API_KEY": "STAGING_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "staging_cached_token.txt")),
+        "UNVERIFIED_USERNAME": "STAGING_UNVERIFIED_USERNAME",
+        "UNVERIFIED_PASSWORD": "STAGING_UNVERIFIED_PASSWORD",
     }
 
     def __init__(self) -> None:
@@ -126,6 +151,7 @@ class StagingSettings(Settings):
 
 
 class ProdSettings(Settings):
+    OPTIONAL_KEYS = {"UNVERIFIED_USERNAME", "UNVERIFIED_PASSWORD"}
     ENV_VARIABLE_MAP = {
         "TOKEN_URL": "PROD_TOKEN_URL",
         "BASE_URL": "PROD_BASE_URL",
@@ -135,6 +161,8 @@ class ProdSettings(Settings):
         "GRANT_TYPE": "PROD_GRANT_TYPE",
         "HF_API_KEY": "PROD_HF_API_KEY",
         "CACHED_TOKEN_PATH": str(Path(Path(__file__).parent, "prod_cached_token.txt")),
+        "UNVERIFIED_USERNAME": "PROD_UNVERIFIED_USERNAME",
+        "UNVERIFIED_PASSWORD": "PROD_UNVERIFIED_PASSWORD",
     }
 
     def __init__(self) -> None:

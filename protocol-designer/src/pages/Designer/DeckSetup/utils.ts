@@ -14,6 +14,8 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
@@ -60,6 +62,19 @@ const FLEX_TC_SLOTS = ['A1', 'B1']
 
 export type ModuleModelExtended = ModuleModel | 'stagingAreaAndMagneticBlock'
 
+/**
+ * Check if a labware definition is that of a vacuum module collar
+ * @param labwareDef - The labware definition to check
+ * @returns True if the labware definition is a vacuum module collar, false otherwise
+ */
+export function getIsVacuumCollar(labwareDef: LabwareDefinition2): boolean {
+  const loadName = labwareDef.parameters.loadName
+  return (
+    loadName === 'opentrons_vacuum_module_gen1_collar_tall' ||
+    loadName === 'opentrons_vacuum_module_gen1_collar_short'
+  )
+}
+
 export function getCutoutIdForAddressableArea(
   addressableArea: AddressableAreaName,
   cutoutFixtures: CutoutFixture[]
@@ -99,6 +114,8 @@ export function getModuleModelsBySlot(
           ].filter(model => {
             if (model === THERMOCYCLER_MODULE_V2) {
               return slot === 'B1'
+            } else if (model === VACUUM_MODULE_V1) {
+              return slot === 'A3'
             } else if (model === ABSORBANCE_READER_V1) {
               return FLEX_RIGHT_SLOTS.has(slot)
             } else if (
@@ -140,7 +157,10 @@ export function getModuleModelsBySlot(
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleModel?: ModuleModel | null
+  moduleModel?: ModuleModel | null,
+  moduleHasLabware?: boolean,
+  isVacuumDock?: boolean,
+  dockHasCollar?: boolean
 ): boolean => {
   //  special-casing the thermocycler module V2 recommended labware since the thermocyclerModuleTypes
   //  have different recommended labware
@@ -148,7 +168,41 @@ export const getLabwareIsRecommended = (
     // permissive early exit if no module passed
     return true
   }
+
+  // For vacuum dock, recommendations depend on whether collar is present
+  if (isVacuumDock) {
+    if (!dockHasCollar) {
+      // No collar is present, so recommend both collars
+      return getIsVacuumCollar(def)
+    }
+    // Collar is present, so recommend tough wellplate
+    return (
+      def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
+    )
+  }
+
   const moduleType = getModuleType(moduleModel)
+
+  // For vacuum module, show different labware based on whether module has labware
+  if (moduleType === VACUUM_MODULE_TYPE) {
+    if (moduleHasLabware) {
+      // Show collars and wellplates when module already has labware
+      return (
+        def.parameters.loadName ===
+          'opentrons_vacuum_module_gen1_collar_tall' ||
+        def.parameters.loadName ===
+          'opentrons_vacuum_module_gen1_collar_short' ||
+        def.parameters.loadName ===
+          'opentrons_96_wellplate_200ul_pcr_full_skirt'
+      )
+    } else {
+      // Show spacer and wellplate for empty module
+      return RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
+        def.parameters.loadName
+      )
+    }
+  }
+
   return moduleModel === THERMOCYCLER_MODULE_V2
     ? def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
     : RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
@@ -171,6 +225,20 @@ export const getLabwareCompatibleWithAdapter = (
         stackingOffsetWithLabware?.[adapterLoadName] != null
     )
     .map(([labwareDefUri]) => labwareDefUri)
+}
+
+export const getIsVacuumModuleFull = (
+  labwareStack: string[],
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+): boolean => {
+  // Vacuum module is considered "full" if it contains any collar adapter
+  return labwareStack.some(labwareId => {
+    const loadName = deckSetupLabware[labwareId]?.def.parameters.loadName
+    return (
+      loadName === 'opentrons_vacuum_module_gen1_collar_tall' ||
+      loadName === 'opentrons_vacuum_module_gen1_collar_short'
+    )
+  })
 }
 
 const getStackerDefinitionsFromLoadName = (

@@ -46,14 +46,19 @@ export function Hardware(): JSX.Element {
       : t('protocol_overview:untitled_protocol')
 
   //  TODO: remove this when we do the routing refactor
-  useEffect(() => {
-    if (fileMetadata?.created == null) {
-      console.warn(
-        'fileMetadata was refreshed while on the hardware page, redirecting to landing page'
-      )
-      navigate('/')
-    }
-  }, [fileMetadata])
+  useEffect(
+    () => {
+      if (fileMetadata?.created == null) {
+        console.warn(
+          'fileMetadata was refreshed while on the hardware page, redirecting to landing page'
+        )
+        navigate('/')
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fileMetadata]
+  )
 
   return (
     <Flex

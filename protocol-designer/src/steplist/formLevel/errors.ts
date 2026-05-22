@@ -4,7 +4,15 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
-import { MANUAL } from '@opentrons/step-generation'
+import {
+  MANUAL,
+  VACUUM_MAX_PRESSURE_MBAR,
+  VACUUM_MIN_PRESSURE_MBAR,
+  VACUUM_MODE_PRESSURE,
+  VACUUM_PROGRAM_PROFILE,
+  VACUUM_PROGRAM_STATE,
+  VACUUM_STATE_PUMP_ON,
+} from '@opentrons/step-generation'
 
 import {
   ABSORBANCE_READER_INITIALIZE,
@@ -31,6 +39,8 @@ import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
@@ -54,6 +64,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
+  HydratedVacuumFormData,
   LabwareOrAdditionalEquipmentEntity,
   StepFieldName,
 } from '../../form-types'
@@ -611,6 +622,42 @@ const TIPS_SELECTED_REQUIRED: FormError = {
   location: ['form', 'field'],
   page: 3,
 }
+const VACUUM_PROGRAM_REQUIRED: FormError = {
+  title: 'Select vacuum controls',
+  dependentFields: ['programType'],
+  location: ['form'],
+}
+const VACUUM_STATE_REQUIRED: FormError = {
+  title: 'Select vacuum state',
+  dependentFields: ['stateType'],
+  location: ['form'],
+}
+const VACUUM_MODE_REQUIRED: FormError = {
+  title: 'Select vacuum mode type',
+  dependentFields: ['modeType'],
+  location: ['form'],
+}
+const GAUGE_PRESSURE_REQUIRED: FormError = {
+  title: 'Enter a valid gauge pressure value',
+  dependentFields: ['pressureMbar'],
+  location: ['field'],
+}
+const VACUUM_DURATION_REQUIRED: FormError = {
+  title: 'Enter a valid duration',
+  dependentFields: ['pumpDurationTime'],
+  location: ['field'],
+}
+const VACUUM_PROFILE_REQUIRED: FormError = {
+  title: 'Select vacuum profile',
+  dependentFields: ['vacuumOrderedProfileIds', 'vacuumProfileItemsById'],
+  location: ['field'],
+}
+const VACUUM_MODULE_ID_REQUIRED: FormError = {
+  title: 'Select vacuum module',
+  dependentFields: ['moduleId'],
+  location: ['field'],
+  showOnReopen: true,
+}
 export type FormErrorChecker = (
   arg: HydratedFormData,
   moduleEntities?: ModuleEntities
@@ -623,13 +670,14 @@ export type FormErrorChecker = (
 export const incompatibleLabware = (
   fields: HydratedMixFormData
 ): FormError | null => {
-  const { labware, pipette } = fields
+  const { labware, pipette, nozzles } = fields
   if (!labware || !pipette) {
     return null
   }
   //  trashBin and wasteChute cannot mix into a labware
   return !canPipetteUseLabware(
     pipette.spec as PipetteV2Specs,
+    nozzles,
     labware.def as LabwareDefinition2
   )
     ? INCOMPATIBLE_LABWARE
@@ -638,12 +686,13 @@ export const incompatibleLabware = (
 export const incompatibleDispenseLabware = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  const { dispense_labware, pipette } = fields
+  const { dispense_labware, pipette, nozzles } = fields
   if (!dispense_labware || !pipette) {
     return null
   }
   return !canPipetteUseLabware(
     pipette.spec as PipetteV2Specs,
+    nozzles,
     'def' in dispense_labware
       ? (dispense_labware.def as LabwareDefinition2)
       : undefined,
@@ -655,13 +704,14 @@ export const incompatibleDispenseLabware = (
 export const incompatibleAspirateLabware = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  const { aspirate_labware, pipette } = fields
+  const { aspirate_labware, pipette, nozzles } = fields
   if (!aspirate_labware || !pipette) {
     return null
   }
   //  trashBin and wasteChute cannot aspirate into a labware
   return !canPipetteUseLabware(
     pipette.spec as PipetteV2Specs,
+    nozzles,
     aspirate_labware.def as LabwareDefinition2
   )
     ? INCOMPATIBLE_ASPIRATE_LABWARE
@@ -723,6 +773,13 @@ export const pauseForTimeOrUntilTold = (
   ) {
     // This is a system-created pause step that's paired with a TC profile step.
     return null
+  } else if (
+    'pauseAction' in fields &&
+    (fields.pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE ||
+      fields.pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE)
+  ) {
+    // System-created pause steps paired with a Vacuum profile or timed pump step.
+    return null
   } else {
     // user did not select a pause type
     return PAUSE_TYPE_REQUIRED
@@ -740,8 +797,9 @@ export const wellRatioMoveLiquid = (
     dispenseLabware != null
       ? dispenseLabware === 'wasteChute' || dispenseLabware === 'trashBin'
       : false
-  if (!aspirate_wells || (!isDispensingIntoTrash && !dispense_wells))
+  if (!aspirate_wells || (!isDispensingIntoTrash && !dispense_wells)) {
     return null
+  }
   const wellRatioFormError = isDispensingIntoTrash
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
@@ -933,7 +991,9 @@ export const pauseModuleRequired = (
   const { moduleId, pauseAction } = fields
   const expectingModuleId =
     pauseAction === PAUSE_UNTIL_TEMP ||
-    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE
+    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE ||
+    pauseAction === PAUSE_UNTIL_VACUUM_STATE_COMPLETE
   return expectingModuleId && moduleId == null ? PAUSE_MODULE_REQUIRED : null
 }
 export const pauseTemperatureRequired = (
@@ -1529,6 +1589,76 @@ export const tipSelectionRequired = (
     (tips_selected == null || tips_selected?.length === 0)
     ? TIPS_SELECTED_REQUIRED
     : null
+}
+
+export const vacuumProgramRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { programType } = fields
+  return programType == null ? VACUUM_PROGRAM_REQUIRED : null
+}
+
+export const vacuumStateRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { programType, stateType } = fields
+  return programType === VACUUM_PROGRAM_STATE && stateType == null
+    ? VACUUM_STATE_REQUIRED
+    : null
+}
+
+export const vacuumModeRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { programType, modeType, stateType } = fields
+  return modeType == null &&
+    programType === VACUUM_PROGRAM_STATE &&
+    stateType === VACUUM_STATE_PUMP_ON
+    ? VACUUM_MODE_REQUIRED
+    : null
+}
+
+export const vacuumProfileRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { programType, vacuumOrderedProfileIds } = fields
+  return programType === VACUUM_PROGRAM_PROFILE &&
+    vacuumOrderedProfileIds.length === 0
+    ? VACUUM_PROFILE_REQUIRED
+    : null
+}
+
+export const gaugePressureRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { programType, stateType, modeType, pressureMbar } = fields
+  return programType === VACUUM_PROGRAM_STATE &&
+    stateType === VACUUM_STATE_PUMP_ON &&
+    modeType === VACUUM_MODE_PRESSURE &&
+    (pressureMbar == null ||
+      pressureMbar < VACUUM_MIN_PRESSURE_MBAR ||
+      pressureMbar > VACUUM_MAX_PRESSURE_MBAR)
+    ? GAUGE_PRESSURE_REQUIRED
+    : null
+}
+export const vacuumDurationRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { programType, stateType, pumpDurationCheckbox, pumpDurationTime } =
+    fields
+  return programType === VACUUM_PROGRAM_STATE &&
+    stateType === VACUUM_STATE_PUMP_ON &&
+    pumpDurationCheckbox === true &&
+    !pumpDurationTime
+    ? VACUUM_DURATION_REQUIRED
+    : null
+}
+
+export const vacuumModuleIdRequired = (
+  fields: HydratedVacuumFormData
+): FormError | null => {
+  const { moduleId } = fields
+  return moduleId == null ? VACUUM_MODULE_ID_REQUIRED : null
 }
 
 /*******************

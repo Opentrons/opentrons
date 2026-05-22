@@ -116,6 +116,11 @@ class FlexStackerModuleKindaButSomethingElseReally(_Module):
     original_item: "DeckItem"
 
 
+@dataclass
+class VacuumModule(_Module):
+    """A Vacuum Module."""
+
+
 DeckItem = Union[
     Labware,
     HeaterShakerModule,
@@ -125,6 +130,7 @@ DeckItem = Union[
     TrashBin,
     FlexStackerModule,
     FlexStackerModuleKindaButSomethingElseReally,
+    VacuumModule,
 ]
 
 

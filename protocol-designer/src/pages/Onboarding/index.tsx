@@ -38,8 +38,7 @@ import { actions as steplistActions } from '../../steplist'
 import { uuid } from '../../utils'
 import { AddMetadata } from './AddMetadata'
 import { SelectBasics } from './SelectBasics'
-import { SelectHardware } from './SelectFlexHardware'
-import { SelectOt2Modules } from './SelectOt2Modules'
+import { SelectFlexHardware } from './SelectFlexHardware'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, SetStateAction } from 'react'
@@ -365,17 +364,21 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     resolver: yupResolver(validationSchema),
   })
   const dispatch = useDispatch()
-  const robotType = formProps.watch('fields').robotType
 
   // for resetting the onboarding page back to empty and page 1 when you hit "create new"
   //  from the nav bar
-  useEffect(() => {
-    if (location.state?.modalResetKey) {
-      formProps.reset()
-      setCurrentStepIndex(0)
-      dispatch(toggleNewProtocolModal(true))
-    }
-  }, [location.state?.modalResetKey])
+  useEffect(
+    () => {
+      if (location.state?.modalResetKey) {
+        formProps.reset()
+        setCurrentStepIndex(0)
+        dispatch(toggleNewProtocolModal(true))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.state?.modalResetKey]
+  )
 
   return (
     <form onSubmit={formProps.handleSubmit(() => {})}>
@@ -384,11 +387,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
           case 'basics':
             return <SelectBasics {...{ ...formProps, proceed, goBack }} />
           case 'modules':
-            return robotType === OT2_ROBOT_TYPE ? (
-              <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />
-            ) : (
-              <SelectHardware {...{ ...formProps, proceed, goBack }} />
-            )
+            return <SelectFlexHardware {...{ ...formProps, proceed, goBack }} />
           case 'metadata':
             return (
               <AddMetadata

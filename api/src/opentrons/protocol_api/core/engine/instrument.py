@@ -183,7 +183,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         Args:
             volume: The volume of air to aspirate, in microliters.
-            folw_rate: The flow rate of air into the pipette, in microliters/s
+            flow_rate: The flow rate of air into the pipette, in microliters/s
         """
         self._engine_client.execute_command(
             cmd.AirGapInPlaceParams(
@@ -191,7 +191,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 volume=volume,
                 flowRate=flow_rate,
                 correctionVolume=correction_volume,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def aspirate(
@@ -232,7 +233,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         minimumZHeight=None,
                         forceDirect=False,
                         speed=None,
-                    )
+                    ),
+                    command_annotations=self._protocol_core.annotation_ids,
                 )
 
             self._engine_client.execute_command(
@@ -241,7 +243,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     volume=volume,
                     flowRate=flow_rate,
                     correctionVolume=correction_volume,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
 
         else:
@@ -295,7 +298,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         flowRate=flow_rate,
                         correctionVolume=correction_volume,
                         movement_delay=movement_delay,
-                    )
+                    ),
+                    command_annotations=self._protocol_core.annotation_ids,
                 )
             else:
                 self._engine_client.execute_command(
@@ -307,7 +311,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         volume=volume,
                         flowRate=flow_rate,
                         correctionVolume=correction_volume,
-                    )
+                    ),
+                    command_annotations=self._protocol_core.annotation_ids,
                 )
 
         self._protocol_core.set_last_location(
@@ -367,7 +372,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                             minimumZHeight=None,
                             forceDirect=False,
                             speed=None,
-                        )
+                        ),
+                        command_annotations=self._protocol_core.annotation_ids,
                     )
 
             self._engine_client.execute_command(
@@ -377,7 +383,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     flowRate=flow_rate,
                     pushOut=push_out,
                     correctionVolume=correction_volume,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
         else:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -432,7 +439,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         pushOut=push_out,
                         correctionVolume=correction_volume,
                         movement_delay=movement_delay,
-                    )
+                    ),
+                    command_annotations=self._protocol_core.annotation_ids,
                 )
             else:
                 self._engine_client.execute_command(
@@ -445,7 +453,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         flowRate=flow_rate,
                         pushOut=push_out,
                         correctionVolume=correction_volume,
-                    )
+                    ),
+                    command_annotations=self._protocol_core.annotation_ids,
                 )
 
         self._protocol_core.set_last_location(
@@ -485,11 +494,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                             forceDirect=False,
                             minimumZHeight=None,
                             speed=None,
-                        )
+                        ),
+                        command_annotations=self._protocol_core.annotation_ids,
                     )
 
             self._engine_client.execute_command(
-                cmd.BlowOutInPlaceParams(pipetteId=self._pipette_id, flowRate=flow_rate)
+                cmd.BlowOutInPlaceParams(
+                    pipetteId=self._pipette_id, flowRate=flow_rate
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
         else:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -523,7 +536,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     wellName=well_name,
                     wellLocation=well_location,
                     flowRate=flow_rate,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -574,7 +588,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 radius=radius,
                 mmFromEdge=mm_from_edge,
                 speed=speed,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -633,7 +648,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
         # Set the "last location" unconditionally, even if the command failed
@@ -705,7 +721,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 homeAfter=home_after,
                 alternateDropLocation=alternate_drop_location,
                 scrape_tips=scrape_tips,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -752,7 +769,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     minimumZHeight=None,
                     alternateDropLocation=alternate_tip_drop,
                     ignoreTipConfiguration=True,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
 
         if isinstance(disposal_location, WasteChute):
@@ -771,7 +789,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     forceDirect=force_direct,
                     speed=speed,
                     minimumZHeight=None,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
 
     def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
@@ -779,7 +798,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             cmd.DropTipInPlaceParams(
                 pipetteId=self._pipette_id,
                 homeAfter=home_after,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def home(self) -> None:
@@ -787,13 +807,19 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
             self._pipette_id
         )
-        self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis, plunger_axis]))
+        self._engine_client.execute_command(
+            cmd.HomeParams(axes=[z_axis, plunger_axis]),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
 
     def home_plunger(self) -> None:
         plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
             self._pipette_id
         )
-        self._engine_client.execute_command(cmd.HomeParams(axes=[plunger_axis]))
+        self._engine_client.execute_command(
+            cmd.HomeParams(axes=[plunger_axis]),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
 
     def move_to(
         self,
@@ -849,7 +875,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     minimumZHeight=minimum_z_height,
                     forceDirect=force_direct,
                     speed=speed,
-                )
+                ),
+                command_annotations=self._protocol_core.annotation_ids,
             )
         else:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -866,7 +893,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         minimumZHeight=minimum_z_height,
                         forceDirect=force_direct,
                         speed=speed,
-                    )
+                    ),
+                    command_annotations=self._protocol_core.annotation_ids,
                 )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -892,7 +920,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def resin_tip_unseal(self, location: Location | None, well_core: WellCore) -> None:
@@ -931,7 +960,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -985,7 +1015,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 wellLocation=well_location,
                 volume=volume,
                 flowRate=flow_rate,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def get_mount(self) -> Mount:
@@ -1219,7 +1250,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tipOverlapNotAfterVersion=overlap_versions.overlap_for_api_version(
                     self._protocol_core.api_version
                 ),
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
         if self._protocol_core.api_version >= _DEFAULT_FLOW_RATE_BUG_FIXED_IN:
             self._user_aspirate_flow_rate = None
@@ -1228,7 +1260,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
     def prepare_to_aspirate(self) -> None:
         self._engine_client.execute_command(
-            cmd.PrepareToAspirateParams(pipetteId=self._pipette_id)
+            cmd.PrepareToAspirateParams(pipetteId=self._pipette_id),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def configure_nozzle_layout(
@@ -1270,7 +1303,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         self._engine_client.execute_command(
             cmd.ConfigureNozzleLayoutParams(
                 pipetteId=self._pipette_id, configurationParams=configuration_model
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def load_liquid_class(
@@ -1304,7 +1338,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLiquidClassParams(
                 liquidClassRecord=liquid_class_record,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
         return result.liquidClassId
 
@@ -1329,7 +1364,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 startingTipWell=(
                     starting_well.get_name() if starting_well is not None else None
                 ),
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
         next_tip_info = result.nextTipInfo
         if isinstance(next_tip_info, NoTipAvailable):
@@ -2480,7 +2516,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
-        self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
+        self._engine_client.execute_command(
+            cmd.HomeParams(axes=[z_axis]),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
 
     def _pressure_supported_by_pipette(self) -> bool:
         return self._engine_client.state.pipettes.get_pipette_supports_pressure(
@@ -2519,7 +2558,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 wellName=well_name,
                 wellLocation=well_location,
                 pipetteId=self.pipette_id,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
@@ -2568,7 +2608,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 wellName=well_name,
                 wellLocation=well_location,
                 pipetteId=self.pipette_id,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
@@ -2596,7 +2637,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 wellName=well_name,
                 wellLocation=well_location,
                 pipetteId=self.pipette_id,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())

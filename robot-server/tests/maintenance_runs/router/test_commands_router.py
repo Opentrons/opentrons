@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, RequestModel
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
@@ -39,7 +40,6 @@ from robot_server.runs.command_models import (
     CommandLinkMeta,
 )
 from robot_server.runs.run_models import RunCommandSummary
-from robot_server.service.json_api import MultiBodyMeta, RequestModel
 
 
 async def test_get_current_run_from_url(

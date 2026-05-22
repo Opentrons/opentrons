@@ -9,14 +9,14 @@ from opentrons.protocol_api import (
     Labware,
 )
 from typing import List, Any
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 metadata = {
     "protocolName": "Olink Target 96/ 48 v3",
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 open_location: Any = "A4"
 
@@ -80,17 +80,20 @@ def add_parameters(p: ParameterContext) -> None:
         default=False,
         description="ON - protocol will use the waste chute.",
     )
-    helpers.create_error_capture_duration_duration(p)
+    run_helpers.create_error_capture_duration_duration(p)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
+
     global open_location
     protocol.capture_image(filename="start_of_run")
 
     # Import Parameters
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
@@ -105,12 +108,12 @@ def run(protocol: ProtocolContext) -> None:
         open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
-    helpers.comment_protocol_version(protocol, "03")
+    run_helpers.comment_protocol_version(protocol, "03")
 
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
     # Load Pipette and Tips
-    pip = protocol.load_instrument("flex_96channel_200")
+    pip = protocol.load_instrument("flex_96channel_1000")
 
     col_tips_1 = protocol.load_labware(
         "opentrons_flex_96_filtertiprack_50ul", "A1", "Tips per Column #1"
@@ -520,17 +523,19 @@ def run(protocol: ProtocolContext) -> None:
         liquid_heights = {}
         pip.pick_up_tip()
         for ifp_plate_well in ifp_plate.wells():
-            if ifp_plate_well.current_liquid_height() is not None:
+            if ifp_plate_well.current_liquid_height() > 1:
                 pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
             height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
             liquid_heights[ifp_plate_well.well_name] = height
         protocol.comment(str(liquid_heights))
         protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

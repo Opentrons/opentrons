@@ -67,6 +67,8 @@ interface DeckViewProps {
   robotType: RobotType
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   liquids: Liquid[]
+  // filtered commands means we are filtering out the load commands
+  filteredCommands: RunTimeCommand[]
   selectedRunTimeCommand?: RunTimeCommand
 }
 
@@ -83,6 +85,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     selectedRunTimeCommand,
     liquids,
     commands,
+    filteredCommands,
   } = props
   const { t } = useTranslation('protocol_visualization')
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
@@ -101,6 +104,30 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const hasFlexStacker = Object.values(moduleEntities).some(
     module => module.type === FLEX_STACKER_MODULE_TYPE
   )
+  const flexStackerModules = Object.values(modules).filter(
+    module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE
+  )
+
+  const flexStackerLocations = new Set(
+    flexStackerModules.map(module => `${module.slot.slice(0, 1)}3`)
+  )
+
+  const flexStackerAsStagingAreas = Object.fromEntries(
+    flexStackerModules.map(module => {
+      const row = module.slot.slice(0, 1)
+      const location = `cutout${row}3`
+      const id = `flex-stacker-${module.slot}`
+
+      return [
+        id,
+        {
+          id,
+          location,
+        },
+      ]
+    })
+  )
+
   const baseViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
   const stackerViewBox = useMemo(() => {
     if (!hasFlexStacker) return baseViewBox
@@ -134,14 +161,29 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const wasteChuteStagingAreaFixtures = Object.values(
     stagingAreaEntities
   ).filter(stagingArea => stagingArea.location === WASTE_CHUTE_CUTOUT)
+  const filteredStagingAreas = {
+    ...flexStackerAsStagingAreas,
+    ...stagingAreaEntities,
+  }
 
+  const stagingAreaLocations = new Set(
+    Object.values(filteredStagingAreas).map(sa => sa.location)
+  )
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
-    aa => isAddressableAreaStandardSlot(aa.id, deckDef)
+    aa => {
+      return (
+        isAddressableAreaStandardSlot(aa.id, deckDef) &&
+        !stagingAreaLocations.has(`cutout${aa.id}`) &&
+        !flexStackerLocations.has(aa.id)
+      )
+    }
   )
 
   const selectedCommandIndex =
     selectedRunTimeCommand != null
-      ? commands.findIndex(command => command.id === selectedRunTimeCommand.id)
+      ? filteredCommands.findIndex(
+          command => command.id === selectedRunTimeCommand.id
+        )
       : 0
 
   return (
@@ -193,6 +235,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         labwareOnSlot != null
                           ? getActiveLayer(
                               labwareOnSlot[0],
+                              pipettes,
                               selectedRunTimeCommand
                             )
                           : { isActiveLayerVisible: false }
@@ -208,6 +251,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                             getIsCutoutA1Active(
                               labware,
                               modules,
+                              pipettes,
                               cutoutId,
                               selectedRunTimeCommand
                             )
@@ -218,7 +262,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         />
                       ) : null
                     })}
-                    {Object.values(stagingAreaEntities).map(entity => (
+                    {Object.values(filteredStagingAreas).map(entity => (
                       <StagingAreaFixture
                         key={entity.id}
                         cutoutId={entity.location as StagingAreaLocation}

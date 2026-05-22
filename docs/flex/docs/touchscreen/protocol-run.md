@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Protocol Run"
+description: "Start, pause, cancel, and monitor protocol execution on the touchscreen."
 ---
 
 Once everything is set up, begin your run by tapping the play button :material-play-circle: on the "Prepare to run" screen. Flex will begin the protocol and you'll see the Running screen.
@@ -20,7 +21,7 @@ Swipe from right to left to see an alternative view with smaller controls and mo
 
 ## Error recovery
 
-Starting in robot software version 8.0.0, if something unexpected happens during the protocol run, Flex will pause and give you the option to enter error recovery mode. In earlier versions, Flex cancels the run when an error occurs.
+Starting in robot software version 8.0.0, if something unexpected happens during the protocol run, Flex will pause and give you the option to enter *error recovery mode*. In earlier versions, Flex cancels the run when an error occurs.
 
 ![Error recovery screen showing a pipette overpressure error, with options to cancel the run or launch recovery mode.](../images/touchscreen-error-recovery.png "Error recovery")
 

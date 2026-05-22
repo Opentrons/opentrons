@@ -103,5 +103,11 @@
   "well_allocations": "Well allocations: Describe where liquids should go in labware.",
   "what_if_you": "<span>What if you don’t provide all of those pieces of information? <bold>OpentronsAI asks you to provide it!</bold></span>",
   "what_typeof_protocol": "What type of protocol do you need?",
-  "you": "You"
+  "you": "You",
+  "error_context_length": "Your request is too large for the AI to process. Try removing attached files or shortening your message.",
+  "error_rate_limit": "The AI is currently busy. Please wait a moment and try again.",
+  "error_timeout": "The request exceeded 3 minutes. Please simplify your request and try again.",
+  "error_connection": "Could not reach the AI service.",
+  "error_generic": "Something went wrong. Please try again.",
+  "error_dismiss": "Dismiss"
 }

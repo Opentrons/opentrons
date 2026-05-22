@@ -24,10 +24,19 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": ["**"]
+    "nohoist": [
+      "**"
+    ]
   },
   "devDependencies": {
-    "@opentrons/app": "link:../app"
+    "@opentrons/app": "link:../app",
+    "@types/node-fetch": "2.6.11",
+    "@types/yargs-parser": "^21.0.3",
+    "is-ip": "5.0.1",
+    "postcss-apply": "0.12.0",
+    "postcss-color-mod-function": "3.0.3",
+    "postcss-import": "16.0.0",
+    "postcss-preset-env": "9.3.0"
   },
   "dependencies": {
     "@opentrons/discovery-client": "link:../discovery-client",
@@ -35,10 +44,10 @@
     "@sentry/electron": "7.5.0",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "4.17.24",
     "@types/pump": "^1.1.0",
-    "@types/uuid": "^3.4.7",
     "ajv": "6.12.3",
+    "axios": "^0.21.1",
     "dateformat": "3.0.3",
     "electron-devtools-installer": "4.0.0",
     "electron-store": "5.1.1",
@@ -47,7 +56,7 @@
     "form-data": "2.5.4",
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
-    "lodash": "4.17.21",
+    "lodash": "4.18.1",
     "merge-options": "1.0.1",
     "mqtt": "4.3.8",
     "node-fetch": "2.6.7",
@@ -55,8 +64,9 @@
     "pump": "3.0.0",
     "semver": "5.7.2",
     "tempy": "1.0.1",
-    "uuid": "3.2.1",
+    "uuid": "14.0.0",
     "winston": "3.15.0",
+    "winston-transport": "^4.9.0",
     "yargs-parser": "13.1.2"
   }
 }

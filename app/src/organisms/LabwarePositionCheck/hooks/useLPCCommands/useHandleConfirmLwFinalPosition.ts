@@ -44,10 +44,11 @@ export function useHandleConfirmLwFinalPosition({
     return chainLPCCommands(confirmCommands, false).then(responses => {
       const firstResponse = responses[0]
       if (
-        firstResponse.data.commandType === 'savePosition' &&
+        firstResponse != null &&
+        firstResponse.data?.commandType === 'savePosition' &&
         firstResponse.data?.result != null
       ) {
-        const { position } = firstResponse.data?.result
+        const { position } = firstResponse.data.result
 
         return Promise.resolve(position)
       } else {

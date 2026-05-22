@@ -39,6 +39,7 @@ export const MountingPlate = (
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: LEFT,
+            motionModifier: 'lowerMountZAxis',
           },
         },
       ],
@@ -52,8 +53,9 @@ export const MountingPlate = (
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
   return errorMessage != null ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}

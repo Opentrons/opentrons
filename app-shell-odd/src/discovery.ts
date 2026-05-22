@@ -93,7 +93,6 @@ export function registerDiscovery(
   let disableCache = config.disableCache
   let initialRobots: DiscoveryClientRobot[] = []
 
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!disableCache) {
     const legacyCachedServices: LegacyService[] | undefined = store.get(
       'services',

@@ -5,7 +5,7 @@ from typing import Literal
 
 from playwright.sync_api import Page
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class PlateReaderPage(BasePage):
@@ -24,7 +24,6 @@ class PlateReaderPage(BasePage):
         self.page.get_by_test_id(slot).click()
         self.page.get_by_test_id("Modules").click()
         self.page.get_by_test_id(module).click()
-        self.button_selection("Confirm")
 
     def dimiss_deck_hardware_modal(self) -> None:
         """Dismiss the deck hardware modal if it appears."""
@@ -42,7 +41,7 @@ class PlateReaderPage(BasePage):
             wavelength: Wavelength value for defining own wavelength ("Other") selection, or None if not
         """
         define_init = self.page.locator("div").filter(has_text=re.compile(r"^Define initialization settings$")).nth(1)
-        change_lid = self.page.locator("div").filter(has_text=re.compile(r"^Change intialization settings$")).nth(1)
+        change_lid = self.page.locator("div").filter(has_text=re.compile(r"^Change initialization settings$")).nth(1)
 
         if define_init.is_visible() or change_lid.is_visible():
             if define_init.is_visible():
@@ -69,7 +68,6 @@ class PlateReaderPage(BasePage):
     def read_labware(self, file_name: str) -> None:
         self.page.locator("div").filter(has_text=re.compile(r"^Read labware$")).nth(1).click()
         self.button_selection("Continue")
-        self.page.get_by_role("textbox").click()
         self.page.get_by_role("textbox").fill(file_name)
 
     def save_pr_step(self) -> None:

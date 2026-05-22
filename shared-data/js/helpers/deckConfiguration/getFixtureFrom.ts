@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from '..'
 import {
   ABSORBANCE_READER_V1_FIXTURE,
+  COMBO_FIXTURE_TO_FIXTURE_MAP,
   DEFAULT_AA_FOR_WASTE_CHUTE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
@@ -20,9 +21,11 @@ import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  VACUUM_MODULE_V1_FIXTURE,
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  WASTE_CHUTE_STAGING_AREA_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '../../constants'
 import { getAAByAAId, getVisualSlotIdForAA } from '../../fixtures'
@@ -163,6 +166,17 @@ export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
           cutoutFixtureId: cutoutFixtureReplacment,
         })
       }
+    } else if (obj.cutoutFixtureId === VACUUM_MODULE_V1_FIXTURE) {
+      const vacuumModuleAA = aaPerCutoutFixture?.find(
+        aa => getAAByAAId(aa, deckDef).areaType === 'vacuumModule'
+      )
+      if (vacuumModuleAA != null) {
+        acc.push({
+          ...obj,
+          addressableAreaId: vacuumModuleAA,
+          cutoutFixtureId: cutoutFixtureReplacment,
+        })
+      }
     } else {
       aaPerCutoutFixture?.forEach(item => {
         acc.push({
@@ -200,13 +214,24 @@ export const replaceCutoutFixtureForFixtureRemoval = (
   )
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
-      return WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)
-        ? FLEX_STACKER_V1_FIXTURE
-        : SINGLE_RIGHT_SLOT_FIXTURE
+      if (WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)) {
+        return FLEX_STACKER_V1_FIXTURE
+      } else if (
+        WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(
+          cutoutFixtureRemoved as CutoutFixtureId
+        )
+      ) {
+        return STAGING_AREA_RIGHT_SLOT_FIXTURE
+      }
+      return SINGLE_RIGHT_SLOT_FIXTURE
     } else {
       return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }
   } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
+    return SINGLE_RIGHT_SLOT_FIXTURE
+  } else if (cutoutFixtureRemoved === VACUUM_MODULE_V1_FIXTURE) {
+    // Vacuum spans two AAs on one cutout; the generic matcher below cannot
+    // resolve to singleRightSlot (only provides A3), so removal must be explicit.
     return SINGLE_RIGHT_SLOT_FIXTURE
   } else if (cutoutFixtureRemoved === FLEX_STACKER_V1_FIXTURE) {
     return SINGLE_RIGHT_SLOT_FIXTURE
@@ -244,6 +269,56 @@ export function getCutoutFixtureIdsForModuleModel(
 ): CutoutFixtureId[] {
   const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
   return moduleFixtures ?? []
+}
+
+export function getModuleModelFromFixtureId(
+  fixtureId: CutoutFixtureId
+): ModuleModel | null {
+  for (const [moduleModel, fixtureIds] of Object.entries(
+    MODULE_FIXTURES_BY_MODEL
+  )) {
+    if (fixtureIds?.includes(fixtureId)) {
+      return moduleModel as ModuleModel
+    }
+  }
+  return null
+}
+
+/**
+ * Returns true if the fixture is a module fixture, including when the fixture
+ * is a combo fixture that contains a module (e.g. flex stacker + waste chute).
+ */
+export function isModuleFixtureId(fixtureId: CutoutFixtureId): boolean {
+  const componentFixtureIds = COMBO_FIXTURE_TO_FIXTURE_MAP[fixtureId] ?? [
+    fixtureId,
+  ]
+  return componentFixtureIds.some(
+    id => getModuleModelFromFixtureId(id as CutoutFixtureId) !== null
+  )
+}
+
+/**
+ * Given a list of fixture IDs, find the combo fixture that contains all of them.
+ * @param fixtureIds - Array of fixture IDs to find a combo for
+ * @returns The combo fixture ID if found, null otherwise
+ */
+export function getComboFixtureFromFixtureIds(
+  fixtureIds: CutoutFixtureIdsWithFakes[]
+): CutoutFixtureId | null {
+  for (const [comboFixtureId, componentFixtures] of Object.entries(
+    COMBO_FIXTURE_TO_FIXTURE_MAP
+  )) {
+    if (componentFixtures == null) continue
+    // Check same length and that both arrays contain exactly the same set (all components present)
+    const allMatch =
+      fixtureIds.length === componentFixtures.length &&
+      fixtureIds.every(fixtureId => componentFixtures.includes(fixtureId)) &&
+      componentFixtures.every(cf => fixtureIds.includes(cf))
+    if (allMatch) {
+      return comboFixtureId as CutoutFixtureId
+    }
+  }
+  return null
 }
 
 export function getCutoutFixturesForModuleModel(

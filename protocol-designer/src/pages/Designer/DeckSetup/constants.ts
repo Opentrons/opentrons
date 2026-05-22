@@ -25,9 +25,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_TYPE,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { VACUUM_MODULE_TYPE_WITH_LABWARE } from '../../../constants'
+
+import type { ModuleModel } from '@opentrons/shared-data'
+import type { ModuleLabwareCompatibilityKey } from '../../../types'
 
 export const FLEX_MODULE_MODELS: ModuleModel[] = [
   ABSORBANCE_READER_V1,
@@ -36,6 +41,7 @@ export const FLEX_MODULE_MODELS: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
   FLEX_STACKER_MODULE_V1,
+  VACUUM_MODULE_V1,
 ]
 
 export const OT2_MODULE_MODELS: ModuleModel[] = [
@@ -74,7 +80,9 @@ export const ORDERED_CATEGORIES: string[] = [
 export const CUSTOM_CATEGORY = 'custom'
 export const ALL_ORDERED_CATEGORIES = [CUSTOM_CATEGORY, ...ORDERED_CATEGORIES]
 
-export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
+export const RECOMMENDED_LABWARE_BY_MODULE: {
+  [K in ModuleLabwareCompatibilityKey]: string[]
+} = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
     'opentrons_96_well_aluminum_block',
@@ -129,6 +137,19 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_tough_12_reservoir_22ml',
     'opentrons_tough_1_reservoir_300ml',
     'opentrons_tough_4_reservoir_72ml',
+  ],
+  // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
+  [VACUUM_MODULE_TYPE]: [
+    'opentrons_vacuum_module_spacer_thingamajig',
+    'opentrons_vacuum_module_gen1_collar_tall',
+    'opentrons_vacuum_module_gen1_collar_short',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+  ],
+  // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
+  [VACUUM_MODULE_TYPE_WITH_LABWARE]: [
+    'opentrons_vacuum_module_gen1_collar_tall',
+    'opentrons_vacuum_module_gen1_collar_short',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
 }
 

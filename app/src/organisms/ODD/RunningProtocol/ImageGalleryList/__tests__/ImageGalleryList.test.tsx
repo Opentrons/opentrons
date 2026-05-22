@@ -1,5 +1,4 @@
 import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
@@ -102,12 +101,6 @@ describe('ImageGalleryList', () => {
     screen.getByText('MOCK_GALLERY_LIST_ITEM_2024-01-01 11:00:00')
   })
 
-  it('renders image capture floating action button', () => {
-    render(mockProps)
-
-    screen.getByText('Image capture')
-  })
-
   it('renders with running status', () => {
     const runningProps = { ...mockProps, runStatus: RUN_STATUS_RUNNING }
     render(runningProps)
@@ -116,14 +109,6 @@ describe('ImageGalleryList', () => {
       runningProps,
       {}
     )
-  })
-
-  it('calls image capture button onClick handler', async () => {
-    const user = userEvent.setup()
-    render(mockProps)
-
-    const captureButton = screen.getByText('Image capture')
-    await user.click(captureButton)
   })
 
   it('renders no images copy when no images are present', () => {

@@ -1438,6 +1438,7 @@ def test_create_user_command_annotation(
         annotation_name="My annotation",
         annotation_id="abc123",
         description="Hello world",
+        params={},
     )
 
     assert result == "abc123"
@@ -1446,8 +1447,8 @@ def test_create_user_command_annotation(
         action_dispatcher.dispatch(
             CreateUserCommandAnnotation(
                 annotation_id="abc123",
-                user_defined_name="My annotation",
-                user_description="Hello world",
+                name="My annotation",
+                description="Hello world",
                 params={},
             ),
         ),

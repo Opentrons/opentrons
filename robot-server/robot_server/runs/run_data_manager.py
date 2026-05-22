@@ -16,8 +16,10 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 from opentrons.protocol_engine.types import (
+    CommandAnnotation,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
     PrimitiveRunTimeParamValuesType,
@@ -226,6 +228,7 @@ class RunDataManager:
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
+                command_annotations=prev_run_result.command_annotations,
                 run_time_parameters=prev_run_result.parameters,
             )
 
@@ -257,6 +260,8 @@ class RunDataManager:
             run_id=run_id,
             labware_offsets=labware_offsets,
             initial_error_recovery_policy=initial_error_recovery_policy,
+            error_recovery_rules=self._current_run_error_recovery_rules,
+            error_recovery_is_enabled=error_recovery_is_enabled,
             deck_configuration=deck_configuration,
             file_provider=self._file_provider,
             camera_provider=camera_provider,
@@ -420,6 +425,7 @@ class RunDataManager:
                     run_id=run_id,
                     summary=run_result.state_summary,
                     commands=run_result.commands,
+                    command_annotations=run_result.command_annotations,
                     run_time_parameters=run_result.parameters,
                 )
             )
@@ -553,6 +559,38 @@ class RunDataManager:
             return len(self._run_orchestrator_store.get_command_errors())
         return self._run_store.get_command_errors_count(run_id)
 
+    def get_total_command_annotations_count(self, run_id: str) -> int:
+        """Get the total number of command annotations in the specified run."""
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_total_command_annotations_count()
+        return self._run_store.get_total_command_annotations_count(run_id)
+
+    def get_command_annotations_slice(
+        self, run_id: str, cursor: int, length: int
+    ) -> CommandAnnotationsSlice:
+        """Get a slice of the run's commands annotations.
+
+        Args:
+            run_id: ID of the run.
+            cursor: Requested index of the first command annotation in the returned slice.
+            length: Length of slice to return.
+        """
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_annotations_slice(
+                cursor=cursor, length=length
+            )
+        return self._run_store.get_command_annotations_slice(
+            run_id=run_id, cursor=cursor, length=length
+        )
+
+    def get_command_annotation(
+        self, run_id: str, annotation_id: str
+    ) -> CommandAnnotation:
+        """Get a run's command annotation by ID."""
+        if run_id == self._run_orchestrator_store.current_run_id:
+            return self._run_orchestrator_store.get_command_annotation(annotation_id)
+        return self._run_store.get_command_annotation(run_id, annotation_id)
+
     def get_nozzle_maps(self, run_id: str) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
         if run_id == self._run_orchestrator_store.current_run_id:
@@ -608,7 +646,11 @@ class RunDataManager:
         mapped_policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
             self._current_run_error_recovery_rules, is_enabled
         )
-        self._run_orchestrator_store.set_error_recovery_policy(policy=mapped_policy)
+        self._run_orchestrator_store.set_error_recovery_policy(
+            policy=mapped_policy,
+            error_recovery_rules=self._current_run_error_recovery_rules,
+            error_recovery_is_enabled=is_enabled,
+        )
 
     def get_error_recovery_rules(self, run_id: str) -> List[ErrorRecoveryRule]:
         """Get the run's error recovery policy."""

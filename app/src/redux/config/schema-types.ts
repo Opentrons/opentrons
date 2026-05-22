@@ -17,6 +17,9 @@ export type DevInternalFlag =
   | 'reactQueryDevtools'
   | 'reactScan'
   | 'quickTransferProtocolContentsLog'
+  | 'accessControlMode'
+  | 'robotSearchBar'
+  | 'showGitDetails'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

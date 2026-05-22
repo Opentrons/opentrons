@@ -310,10 +310,13 @@ To blow an extra amount of air through the pipette's tip, call the [`InstrumentC
 pipette.blow_out()
 ```
 
-You can also specify a particular well as the blowout location:
+You can also specify a particular well as the blowout location and an absolute flow rate:
 
 ```python
-pipette.blow_out(plate["B1"])
+pipette.blow_out(
+    location=plate["B1"],
+    flow_rate=50
+)
 ```
 
 Many protocols use a trash container for blowing out the pipette. You can specify the pipette's current trash container as the blowout location by using the [`InstrumentContext.trash_container`][opentrons.protocol_api.InstrumentContext.trash_container] property:
@@ -326,6 +329,8 @@ pipette.blow_out(pipette.trash_container)
 
 *Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` locations.
 
+*Changed in version 2.28:* Use the optional `flow_rate` argument to specify an absolute flow rate for blowing out the pipette.
+
 ## Touch tip { #touch-tip-building-block }
 
 The [`InstrumentContext.touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps knock off any droplets that might cling to the pipette's tip. This method includes optional arguments that allow you to control where the tip will touch the inner walls of a well and the touch speed. Calling `touch_tip()` without arguments causes the pipette to touch the well walls from its current location:
@@ -333,6 +338,9 @@ The [`InstrumentContext.touch_tip()`][opentrons.protocol_api.InstrumentContext.t
 ```python
 pipette.touch_tip()
 ```
+
+!!! note
+    Calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] moves the pipette across the well. In large spaces like reservoirs, trash containers, and 6- or 24-well plates, this can cause large, rapid pipette movements. Beginning in API version 2.28, the API will raise an error if your protocol specifies a `touch_tip()` in labware like the examples listed above.
 
 ### Touch location
 

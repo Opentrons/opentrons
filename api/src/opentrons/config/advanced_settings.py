@@ -756,7 +756,7 @@ def _migrate36to37(previous: SettingsMap) -> SettingsMap:
 
 
 def _migrate37to38(previous: SettingsMap) -> SettingsMap:
-    """Migrate to version 36 of the feature flags file.
+    """Migrate to version 38 of the feature flags file.
 
     -  Adds the disableFlexStackerLabwareDetection config element.
     """
@@ -775,6 +775,24 @@ def _migrate38to39(previous: SettingsMap) -> SettingsMap:
     newmap["enableProtocolSubprocess"] = False
     newmap["enableHardwareSubprocess"] = False
     return newmap
+
+
+def _migrate39to40(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 40 of the feature flags file.
+
+    - Adds the allowStepGrouping config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["allowStepGrouping"] = None
+    return newmap
+
+
+def _migrate40to41(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 41 of the feature flags file.
+
+    - Removes the allowStepGrouping config element.
+    """
+    return {k: v for k, v in previous.items() if "allowStepGrouping" != k}
 
 
 _MIGRATIONS = [
@@ -817,6 +835,8 @@ _MIGRATIONS = [
     _migrate36to37,
     _migrate37to38,
     _migrate38to39,
+    _migrate39to40,
+    _migrate40to41,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

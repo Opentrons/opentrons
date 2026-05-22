@@ -82,11 +82,16 @@ export const BeforeBeginning = (
     deckConfig,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (createdMaintenanceRunId == null) {
+        createMaintenanceRun({})
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
@@ -100,8 +105,9 @@ export const BeforeBeginning = (
   if (
     pipetteId == null &&
     (flowType === FLOWS.CALIBRATE || flowType === FLOWS.DETACH)
-  )
+  ) {
     return null
+  }
 
   let equipmentList = [CALIBRATION_PROBE]
   const proceedButtonText = t('move_gantry_to_front')
@@ -181,6 +187,9 @@ export const BeforeBeginning = (
   )
 
   const handleOnClickCalibrateOrDetach = (): void => {
+    const is96Channel =
+      attachedPipettes[mount]?.instrumentName === 'p1000_96' ||
+      attachedPipettes[mount]?.instrumentName === 'p200_96'
     let moveToFrontCommands: CreateCommand[] = [
       {
         commandType: 'loadPipette' as const,
@@ -195,6 +204,9 @@ export const BeforeBeginning = (
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
           mount,
+          ...(is96Channel
+            ? { motionModifier: 'lowerMountZAxis' as const }
+            : {}),
         },
       },
     ]
@@ -224,7 +236,7 @@ export const BeforeBeginning = (
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,
-        maintenancePosition: 'attachPlate',
+        motionModifier: 'lowerZAxesSequentially',
       },
     },
   ]
@@ -244,8 +256,9 @@ export const BeforeBeginning = (
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
 
   return errorMessage != null ? (
     <SimpleWizardBody

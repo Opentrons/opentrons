@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Absorbance Plate Reader"
+description: "Absorbance Plate Reader Module on Flex: on-deck spectrophotometry."
 ---
 
 ![plate reader hero](../images/plate-reader-hero-lid-off.png)

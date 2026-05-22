@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -38,17 +38,43 @@ export function RobotDashboard(): JSX.Element {
     unfinishedUnboxingFlowRoute !== null
   )
 
-  const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
-    .reduceRight<RunData[]>((acc, run) => {
-      if (
-        acc.some(collectedRun => collectedRun.protocolId === run.protocolId)
-      ) {
-        return acc
-      } else {
-        return [...acc, run]
+  const recentRunsOfUniqueProtocols = useMemo(() => {
+    const runs = allRunsQueryData?.data ?? []
+    const seenProtocolIds = new Set<string>()
+    const result: RunData[] = []
+    for (let i = runs.length - 1; i >= 0; i--) {
+      const run = runs[i]
+      if (seenProtocolIds.has(run.protocolId!)) continue
+
+      seenProtocolIds.add(run.protocolId!)
+      result.push(run)
+
+      if (result.length === MAXIMUM_RECENT_RUN_PROTOCOLS) break
+    }
+
+    return result
+  }, [allRunsQueryData?.data])
+
+  const [standardRunIds, setStandardRunIds] = useState<Set<string>>(
+    () => new Set()
+  )
+  const [resolvedRunIds, setResolvedRunIds] = useState<Set<string>>(
+    () => new Set()
+  )
+
+  const handleCardResolved = useCallback(
+    (runId: string, isStandard: boolean) => {
+      setResolvedRunIds(prev => new Set(prev).add(runId))
+      if (isStandard) {
+        setStandardRunIds(prev => new Set(prev).add(runId))
       }
-    }, [])
-    .slice(0, MAXIMUM_RECENT_RUN_PROTOCOLS)
+    },
+    []
+  )
+
+  const totalCards = recentRunsOfUniqueProtocols.length
+  const allResolved = resolvedRunIds.size === totalCards
+  const hasStandardProtocols = standardRunIds.size > 0
 
   let contents: JSX.Element = <EmptyRecentRun />
   // GET runs query will error with 503 if database is initializing
@@ -56,21 +82,27 @@ export function RobotDashboard(): JSX.Element {
   // so, all errors will be mapped to an initializing spinner
   if (allRunsQueryError?.code === '503') {
     contents = <ServerInitializing />
-  } else if (recentRunsOfUniqueProtocols.length > 0) {
-    contents = (
-      <>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.grey60}
-        >
-          {t('run_again')}
-        </LegacyStyledText>
-        <RecentRunProtocolCarousel
-          recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
-        />
-      </>
-    )
+  } else if (totalCards > 0) {
+    // When cards are still loading or at least one is standard, show the carousel
+    if (!allResolved || hasStandardProtocols) {
+      contents = (
+        <>
+          {hasStandardProtocols ? (
+            <LegacyStyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.grey60}
+            >
+              {t('run_again')}
+            </LegacyStyledText>
+          ) : null}
+          <RecentRunProtocolCarousel
+            recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
+            onCardResolved={handleCardResolved}
+          />
+        </>
+      )
+    }
   }
 
   return (

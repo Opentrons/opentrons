@@ -14,7 +14,17 @@ from typing_extensions import Literal
 
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import EngineStatus
+from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    Body,
+    PydanticResponse,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
+)
 
 from ..dependencies import get_maintenance_run_data_manager
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
@@ -39,14 +49,6 @@ from robot_server.runs.dependencies import (
 )
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import (
-    Body,
-    PydanticResponse,
-    RequestModel,
-    ResourceLink,
-    SimpleBody,
-    SimpleEmptyBody,
-)
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
@@ -149,6 +151,7 @@ async def get_run_data_from_url(
         status.HTTP_201_CREATED: {"model": SimpleBody[MaintenanceRun]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[ProtocolRunIsActive]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run(
     run_data_manager: Annotated[
@@ -274,6 +277,7 @@ async def get_run(
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def remove_run(
     runId: str,

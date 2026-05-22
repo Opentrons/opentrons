@@ -29,6 +29,7 @@ from . import (
     load_labware_params,
     overlap_versions,
 )
+from .csv import CSVCore
 from .exceptions import InvalidModuleLocationError
 from .instrument import InstrumentCore
 from .labware import LabwareCore
@@ -86,6 +87,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
+    ModuleFixtureLocation,
     Mount,
     MountType,
     Point,
@@ -108,7 +110,7 @@ class ProtocolCore(
 
     Args:
         engine_client: A client to the ProtocolEngine that is executing the protocol.
-        api_version: The Python Protocol API versionat which  this core is operating.
+        api_version: The Python Protocol API version at which this core is operating.
         sync_hardware: A SynchronousAdapter-wrapped Hardware Control API.
     """
 
@@ -130,6 +132,7 @@ class ProtocolCore(
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
         self._liquid_class_def_cache: Dict[Tuple[str, int], LiquidClassSchemaV1] = {}
         self._load_fixed_trash()
+        self._annotation_ids: List[str] = []
 
     @property
     def api_version(self) -> APIVersion:
@@ -148,6 +151,10 @@ class ProtocolCore(
             return self._labware_cores_by_id[trash_id]
         return None
 
+    @property
+    def annotation_ids(self) -> List[str]:
+        return self._annotation_ids
+
     def _load_fixed_trash(self) -> None:
         if self.robot_type == "OT-2 Standard" or self._api_version < APIVersion(2, 16):
             trash_id = self._engine_client.state.labware.get_fixed_trash_id()
@@ -155,6 +162,7 @@ class ProtocolCore(
                 self._labware_cores_by_id[trash_id] = LabwareCore(
                     labware_id=trash_id,
                     engine_client=self._engine_client,
+                    protocol_core=self,
                 )
 
     def append_disposal_location(
@@ -220,6 +228,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
         ],
@@ -244,7 +253,8 @@ class ProtocolCore(
                 namespace=namespace,
                 version=version,
                 displayName=label,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_labware(load_result.definition)
@@ -279,6 +289,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
@@ -293,6 +304,7 @@ class ProtocolCore(
             StagingSlotName,
             ModuleCore,
             NonConnectedModuleCore,
+            ModuleFixtureLocation,
             OffDeckType,
         ],
         namespace: Optional[str],
@@ -300,7 +312,6 @@ class ProtocolCore(
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
         load_location = self._get_non_stacked_location(location=location)
-
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
@@ -313,8 +324,10 @@ class ProtocolCore(
                 location=load_location,
                 namespace=namespace,
                 version=version,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
+
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_adapter(load_result.definition)
 
@@ -334,6 +347,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
@@ -361,7 +375,8 @@ class ProtocolCore(
                 location=load_location,
                 namespace=namespace,
                 version=version,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
         # FIXME(chb, 2024-12-06) validating after loading the object issue
         validation.ensure_definition_is_lid(load_result.definition)
@@ -381,6 +396,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
@@ -394,6 +410,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -434,7 +451,8 @@ class ProtocolCore(
                 strategy=strategy,
                 pickUpOffset=_pick_up_offset,
                 dropOffset=_drop_offset,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
@@ -493,7 +511,9 @@ class ProtocolCore(
                     "Lid cannot be loaded on non-labware position."
                 )
             else:
-                labware = LabwareCore(labware_in_slot.id, self._engine_client)
+                labware = LabwareCore(
+                    labware_in_slot.id, self._engine_client, protocol_core=self
+                )
         else:
             labware = source_location
 
@@ -568,7 +588,9 @@ class ProtocolCore(
                     create_new_lid_stack = True
 
                 to_location = self._convert_labware_location(
-                    location=LabwareCore(highest_child_location, self._engine_client)
+                    location=LabwareCore(
+                        highest_child_location, self._engine_client, protocol_core=self
+                    )
                 )
         elif isinstance(new_location, LabwareCore):
             highest_child_location = (
@@ -582,7 +604,9 @@ class ProtocolCore(
                 # absolutely must make a new lid stack
                 create_new_lid_stack = True
             to_location = self._convert_labware_location(
-                location=LabwareCore(highest_child_location, self._engine_client)
+                location=LabwareCore(
+                    highest_child_location, self._engine_client, protocol_core=self
+                )
             )
         else:
             to_location = self._convert_labware_location(location=new_location)
@@ -597,7 +621,8 @@ class ProtocolCore(
                     version=1,
                     namespace="empty",
                     quantity=0,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
 
             # Move the lid stack object from the SYSTEM_LOCATION space to the desired deck location
@@ -608,11 +633,14 @@ class ProtocolCore(
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
                     dropOffset=None,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
 
             output_result = LabwareCore(
-                labware_id=result.stackLabwareId, engine_client=self._engine_client
+                labware_id=result.stackLabwareId,
+                engine_client=self._engine_client,
+                protocol_core=self,
             )
             destination = self._convert_labware_location(location=output_result)
         else:
@@ -625,7 +653,8 @@ class ProtocolCore(
                 strategy=strategy,
                 pickUpOffset=_pick_up_offset,
                 dropOffset=_drop_offset,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         # Handle leftover empty lid stack if there is one
@@ -647,7 +676,8 @@ class ProtocolCore(
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
                     dropOffset=None,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
         elif (
             potential_lid_stack
@@ -666,7 +696,8 @@ class ProtocolCore(
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
                     dropOffset=None,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
 
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
@@ -732,7 +763,8 @@ class ProtocolCore(
             cmd.LoadModuleParams(
                 model=EngineModuleModel(model),
                 location=DeckSlotLocation(slotName=normalized_deck_slot),
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         module_core = self._get_module_core(load_module_result=result, model=model)
@@ -815,14 +847,17 @@ class ProtocolCore(
         if labware_id in self._labware_cores_by_id:
             return self._labware_cores_by_id[labware_id]
         else:
-            core = LabwareCore(labware_id, self._engine_client)
+            core = LabwareCore(labware_id, self._engine_client, protocol_core=self)
             self._labware_cores_by_id[labware_id] = core
             return core
 
     def load_robot(self) -> RobotCore:
         """Load a robot core into the RobotContext."""
         return RobotCore(
-            engine_client=self._engine_client, sync_hardware_api=self._sync_hardware
+            engine_client=self._engine_client,
+            protocol_core=self,
+            api_version=self._api_version,
+            sync_hardware_api=self._sync_hardware,
         )
 
     def load_instrument(
@@ -849,7 +884,8 @@ class ProtocolCore(
                     self._api_version
                 ),
                 liquidPresenceDetection=liquid_presence_detection,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         return InstrumentCore(
@@ -908,27 +944,38 @@ class ProtocolCore(
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        self._engine_client.execute_command(cmd.WaitForResumeParams(message=msg))
+        self._engine_client.execute_command(
+            cmd.WaitForResumeParams(message=msg),
+            command_annotations=self._annotation_ids,
+        )
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
-        self._engine_client.execute_command(cmd.CommentParams(message=msg))
+        self._engine_client.execute_command(
+            cmd.CommentParams(message=msg), command_annotations=self._annotation_ids
+        )
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""
         self._engine_client.execute_command(
-            cmd.WaitForDurationParams(seconds=seconds, message=msg)
+            cmd.WaitForDurationParams(seconds=seconds, message=msg),
+            command_annotations=self._annotation_ids,
         )
 
     def wait_for_tasks(self, task_cores: Sequence[EngineTaskCore]) -> None:
         """Wait for specified tasks to complete."""
         task_ids = task_ids = [task._id for task in task_cores if task._id is not None]
-        self._engine_client.execute_command(cmd.WaitForTasksParams(task_ids=task_ids))
+        self._engine_client.execute_command(
+            cmd.WaitForTasksParams(task_ids=task_ids), command_annotations=[]
+        )
 
     def create_timer(self, seconds: float) -> EngineTaskCore:
         """Create a timer task that runs in the background."""
         result = self._engine_client.execute_command_without_recovery(
-            cmd.CreateTimerParams(time=seconds)
+            cmd.CreateTimerParams(
+                time=seconds
+            ),  # TODO should this have command annotations?
+            command_annotations=[],
         )
         timer_task = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.task_id
@@ -937,11 +984,16 @@ class ProtocolCore(
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        self._engine_client.execute_command(cmd.HomeParams(axes=None))
+        self._engine_client.execute_command(
+            cmd.HomeParams(axes=None), command_annotations=self._annotation_ids
+        )
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        self._engine_client.execute_command(cmd.SetRailLightsParams(on=on))
+        self._engine_client.execute_command(
+            cmd.SetRailLightsParams(on=on),
+            command_annotations=self._annotation_ids,
+        )
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
@@ -1007,7 +1059,8 @@ class ProtocolCore(
                 namespace=namespace,
                 version=version,
                 quantity=quantity,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         # FIXME(CHB, 2024-12-04) just like load labware and load adapter we have a validating after loading the object issue
@@ -1031,6 +1084,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.stackLabwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
@@ -1213,7 +1267,45 @@ class ProtocolCore(
                 saturation=saturation
                 if saturation is not None
                 else self._engine_client.state.camera.get_saturation(),
+            ),
+            command_annotations=self._annotation_ids,
+        )
+
+    def start_step_grouping(
+        self, annotation_name: str, annotation_description: Optional[str]
+    ) -> str:
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
+        if len(self._annotation_ids) > 0:
+            raise ValueError(
+                "Cannot start a new step grouping when one is already active."
             )
+        annotation_id = self._engine_client.create_user_command_annotation(
+            annotation_name=annotation_name,
+            description=annotation_description,
+        )
+        self.annotation_ids.append(annotation_id)
+        return annotation_id
+
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
+        try:
+            self._annotation_ids.remove(annotation_id)
+        except ValueError:
+            raise ValueError(
+                f"Could not find command annotation with ID: '{annotation_id}'"
+            )
+
+    def create_csv(self, filename: str, columns: int) -> CSVCore:
+        """Create a new csv file"""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.CreateCSVParams(fileName=filename, columns=columns),
+            command_annotations=self._annotation_ids,
+        )
+        return CSVCore(
+            file_id=result.fileId,
+            columns=result.columns,
+            engine_client=self._engine_client,
+            protocol_core=self,
         )
 
     def _convert_labware_location(
@@ -1223,6 +1315,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -1240,6 +1333,7 @@ class ProtocolCore(
             DeckSlotName,
             StagingSlotName,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,
@@ -1261,3 +1355,7 @@ class ProtocolCore(
             return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, TrashBin):
             return AddressableAreaLocation(addressableAreaName=location.area_name)
+        elif isinstance(location, ModuleFixtureLocation):
+            return AddressableAreaLocation(
+                addressableAreaName=location.addressable_area_name
+            )

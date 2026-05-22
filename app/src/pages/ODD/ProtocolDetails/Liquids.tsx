@@ -26,7 +26,6 @@ const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
   border-spacing: 0 ${BORDERS.borderRadius8};
-  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`

@@ -14,6 +14,12 @@ export const customDisplay = {
   '{abc}': 'abc',
   '{ABC}': 'ABC',
   '{symbols}': '#+=',
+  '{globe}': '',
+  '{return}': 'return',
+}
+
+export const customDisplayForIndividual = {
+  '{backspace}': 'del',
 }
 
 // keyboard layout for Alphanumeric Keyboard
@@ -37,25 +43,25 @@ export const fullKeyboardLayout = {
     'q w e r t y u i o p',
     '{numbers} a s d f g h j k l',
     '{shift} z x c v b n m {backspace}',
-    '{space}',
+    '{globe} {space} {return}',
   ],
   shift: [
     'Q W E R T Y U I O P',
     '{numbers} A S D F G H J K L',
-    '{abc} Z X C V B N M {backspace}',
-    '{space}',
+    '{shift} Z X C V B N M {backspace}',
+    '{globe} {space} {return}',
   ],
   symbols: [
     '[ ] { } % ^ +',
     '{abc} _ \\ | < > # =',
     "{numbers} . , ? ! ' * ~ {backspace}",
-    '{space}',
+    '{globe} {space} {return}',
   ],
   numbers: [
     '1 2 3 4 5 6 7 8 9 0',
     '{abc} - / : ; ( ) $ & @ "',
     "{symbols} . , ? ! ' * ~ {backspace}",
-    '{space}',
+    '{globe} {space} {return}',
   ],
 }
 

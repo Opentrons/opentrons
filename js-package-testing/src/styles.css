@@ -1,0 +1,76 @@
+@import url('@fontsource/public-sans');
+@import url('@fontsource/public-sans/600.css');
+@import url('@fontsource/public-sans/700.css');
+
+* {
+  font-family: 'Public Sans', sans-serif;
+}
+
+.app_container {
+  max-width: 90rem;
+  padding: var(--spacing-16);
+}
+
+.demo_header {
+  margin-bottom: var(--spacing-32);
+}
+
+.demo_lead {
+  max-width: 50rem;
+  line-height: var(--lh-copy);
+}
+
+.demo_nav {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-16);
+  gap: var(--spacing-16);
+}
+
+.demo_nav a {
+  color: var(--blue-50);
+}
+
+.demo_section {
+  max-width: 80rem;
+  padding-bottom: var(--spacing-32);
+  border-bottom: 0.0625rem solid var(--grey-30);
+  margin-bottom: var(--spacing-48);
+}
+
+.demo_section:last-child {
+  border-bottom: none;
+}
+
+.analysis_info {
+  padding: var(--spacing-16);
+  margin-top: var(--spacing-16);
+  margin-bottom: var(--spacing-16);
+  background-color: var(--grey-10);
+}
+
+.protocol_deck_container {
+  overflow: hidden;
+  width: 75rem;
+  height: 50rem;
+  box-sizing: border-box;
+  padding: var(--spacing-16);
+  border: 0.0625rem solid var(--grey-35);
+  border-radius: var(--border-radius-8);
+  margin-top: var(--spacing-16);
+  background-color: var(--white);
+}
+
+.annotated_steps_demo {
+  max-width: 50rem;
+  height: 32rem;
+  border: 0.0625rem solid var(--grey-35);
+  border-radius: var(--border-radius-8);
+  margin-top: var(--spacing-16);
+  background-color: var(--white);
+}
+
+.protocol_visualization_demo {
+  width: 100%;
+  height: 700px;
+}

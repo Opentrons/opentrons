@@ -12,4 +12,5 @@ export const MoveLiquidPrefixToAction: Record<MoveLiquidPrefixType, string> = {
   dispense_retract: 'retract',
   aspirate_submerge: 'submerge',
   dispense_submerge: 'submerge',
+  blowout: 'blowout',
 }

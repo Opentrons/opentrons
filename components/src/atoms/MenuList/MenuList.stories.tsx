@@ -1,4 +1,4 @@
-import { action } from '@storybook/addon-actions'
+import { action } from 'storybook/actions'
 
 import { MenuList as MenuListComponent } from './index'
 import { MenuItem } from './MenuItem'

@@ -23,16 +23,20 @@ module.exports = {
     'testing-library',
     'opentrons',
     '@eslint-react',
+    'jsx-a11y',
   ],
 
+  reportUnusedDisableDirectives: true,
+
   rules: {
+    curly: 'error',
     camelcase: 'off',
     'no-var': 'error',
     'prefer-const': 'error',
     'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': [
-      'warn',
+      'error',
       {
         additionalHooks: '(useDrag|useDrop)',
       },
@@ -148,6 +152,7 @@ module.exports = {
       rules: {
         'import/no-absolute-path': 'off',
         '@eslint-react/no-nested-component-definitions': 'error',
+        'jsx-a11y/alt-text': 'error',
       },
     },
     {
@@ -179,13 +184,6 @@ module.exports = {
       rules: {
         'import/no-default-export': 'off',
         '@typescript-eslint/consistent-type-assertions': 'off',
-      },
-    },
-    {
-      files: ['**/cypress/**'],
-      extends: ['plugin:cypress/recommended'],
-      rules: {
-        'cypress/unsafe-to-chain-command': 'warn',
       },
     },
     // Allow HTTP hooks in notification wrappers and tests

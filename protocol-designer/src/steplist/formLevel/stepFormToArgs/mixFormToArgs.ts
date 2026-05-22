@@ -35,6 +35,7 @@ export const mixFormToArgs = (
     mix_wellOrder_second,
     mix_touchTip_checkbox,
     blowout_z_offset,
+    primaryNozzle,
     pushOut_checkbox,
     pushOut_volume,
     tip_tracking,
@@ -68,7 +69,7 @@ export const mixFormToArgs = (
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
   console.assert(
-    castFormData.changeTip,
+    castFormData.changeTip != null,
     'mixFormToArgs expected non-falsey changeTip option'
   )
   const changeTip = castFormData.changeTip || DEFAULT_CHANGE_TIP_OPTION
@@ -118,6 +119,7 @@ export const mixFormToArgs = (
     dropTipLocation: dropTip_location,
     nozzles,
     positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
+    primaryNozzle,
     xOffset: mix_x_position ?? 0,
     yOffset: mix_y_position ?? 0,
     zOffset: mix_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,

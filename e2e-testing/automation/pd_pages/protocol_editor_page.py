@@ -5,7 +5,7 @@ from typing import Sequence
 
 from playwright.sync_api import Page, TimeoutError, expect
 
-from .base_page import BasePage
+from automation.base_page import BasePage
 
 
 class ProtocolEditorPage(BasePage):
@@ -21,7 +21,7 @@ class ProtocolEditorPage(BasePage):
             slot: Slot identifier like "D2"
         """
 
-        slot_region = self.page.locator(f"[data-testid='{slot}']").first
+        slot_region = self.page.get_by_test_id(slot)
         if slot_region.count() == 0:
             test_ids = self.page.locator("[data-testid]").evaluate_all(
                 "elements => elements.map(el => el.getAttribute('data-testid'))"
@@ -36,17 +36,21 @@ class ProtocolEditorPage(BasePage):
             if add_button.count() == 0:
                 text_trigger = slot_region.get_by_text("Add labware", exact=False)
                 if text_trigger.count() > 0:
-                    self.wait_for_visible(text_trigger.first)
-                    text_trigger.first.click()
+                    self.wait_for_visible(text_trigger)
+                    text_trigger.click()
                 else:
                     self.wait_for_visible(slot_region)
                     slot_region.click()
             else:
-                self.wait_for_visible(add_button.first)
-                add_button.first.click()
+                self.wait_for_visible(add_button)
+                add_button.click()
+                edit_labware_option = self.page.get_by_text("Edit labware", exact=True).last
+                self.wait_for_visible(edit_labware_option)
+                edit_labware_option.click()
+
         else:
-            self.wait_for_visible(add_button.first)
-            add_button.first.click()
+            self.wait_for_visible(add_button)
+            add_button.click()
 
         self._ensure_labware_tab_active()
         self._open_select_labware_modal()
@@ -100,19 +104,44 @@ class ProtocolEditorPage(BasePage):
 
     def select_labware_category_by_name(self, category_name: str) -> None:
         """Select a labware category by its visible label."""
+        self._open_select_labware_modal()
 
-        category = self.page.get_by_role("button", name=category_name, exact=False)
+        search_input = self.page.locator("input[placeholder='Search labware']").first
+        if search_input.count() > 0 and search_input.is_visible():
+            search_input.fill("")
+
+        modal = self.page.get_by_label("ModalShell_ModalArea")
+        category = modal.locator("[data-testid^='ListButton_']").filter(has_text=category_name).first
         if category.count() == 0:
-            category = self.page.get_by_text(category_name, exact=False)
+            category = modal.get_by_text(category_name, exact=False)
+        if category.count() == 0:
+            category_index_by_name = {
+                "Tip racks": 0,
+                "Tube racks": 1,
+                "Well plates": 2,
+                "Reservoirs": 3,
+                "Aluminum blocks": 4,
+                "Adapters": 5,
+                "Lids": 6,
+            }
+            category_index = category_index_by_name.get(category_name)
+            if category_index is not None:
+                category = self.page.get_by_test_id("ListButton_noActive").nth(category_index)
         self.wait_for_visible(category.first)
         category.first.click()
 
-    def select_labware_by_name(self, labware_name: str) -> None:
+    def select_labware_by_name(
+        self, labware_name: str, stacker: bool = False, fill_num: int = 6, lid: bool = False
+    ) -> None:
         """Select a specific labware by its name.
 
         Args:
-            labware_name: Name of the labware, e.g., "Axygen 96 Well Plate 500 µL"
+            labware_name: Name of the labware to select
+            stacker: Whether to add a stacker and fill number
+            fill_num: Number of labware to fill if using stacker
+            lid: Whether to add a lid to the labware
         """
+
         search_input = self.page.locator("input[placeholder='Search labware']").first
         if search_input.count() > 0:
             search_input.fill(labware_name)
@@ -126,37 +155,53 @@ class ProtocolEditorPage(BasePage):
                 filter_label.click()
 
         pattern = re.compile(re.escape(labware_name), re.IGNORECASE)
-        target = self.page.locator("label").filter(has_text=pattern).first
+        modal = self.page.get_by_label("ModalShell_ModalArea")
+        target = modal.locator("label").filter(has_text=pattern).first
 
         try:
-            target.wait_for(state="visible", timeout=5000)
-        except TimeoutError as error:
-            category_button = (
-                self.page.locator("[data-testid='ListButton_noActive']")
-                .filter(has_text=re.compile("Well plates", re.IGNORECASE))
-                .first
-            )
-            if category_button.count() > 0:
-                category_button.click()
-                try:
-                    target.wait_for(state="visible", timeout=5000)
-                except TimeoutError as retry_error:
-                    visible_options = self.page.locator("label").all_inner_texts()
+            target.wait_for(state="visible", timeout=1000)
+        except TimeoutError:
+            fallback_target = modal.get_by_text(pattern, exact=False).first
+            try:
+                fallback_target.wait_for(state="visible", timeout=1000)
+                target = fallback_target
+            except TimeoutError as retry_error:
+                if search_input.count() > 0 and search_input.is_visible():
+                    search_input.fill("")
+                category_buttons = self.page.get_by_test_id("ListButton_noActive")
+                found = False
+                for index in range(category_buttons.count()):
+                    category_buttons.nth(index).click()
+                    label_target = modal.locator("label").filter(has_text=pattern).first
+                    text_target = modal.get_by_text(pattern, exact=False).first
+                    try:
+                        label_target.wait_for(state="visible", timeout=500)
+                        target = label_target
+                        found = True
+                        break
+                    except TimeoutError:
+                        try:
+                            text_target.wait_for(state="visible", timeout=500)
+                            target = text_target
+                            found = True
+                            break
+                        except TimeoutError:
+                            continue
+
+                if not found:
+                    visible_options = modal.locator("label, [role='label'], button").all_inner_texts()
                     raise AssertionError(
                         f"Labware '{labware_name}' was not found in the selection modal. "
                         f"Available options: {visible_options}"
                     ) from retry_error
-            else:
-                visible_options = self.page.locator("label").all_inner_texts()
-                raise AssertionError(
-                    f"Labware '{labware_name}' was not found in the selection modal. "
-                    f"Available options: {visible_options}"
-                ) from error
 
         target.click()
-        self.click_test_id("SelectLabwareModal_confirm")
-
-        modal = self.page.get_by_role("dialog", name="Add labware", exact=False)
+        if stacker:
+            self.page.get_by_test_id("customize-expand-button-input-field").click()
+            self.page.get_by_test_id("customize-expand-button-input-field").fill(str(fill_num))
+        if lid:
+            self._add_lid("Opentrons Flex 96 Tip Rack 50", "CheckboxField_icon")
+        modal.get_by_role("button", name=re.compile(r"^Add labware$", re.IGNORECASE)).click()
         if modal.count() > 0:
             modal.wait_for(state="hidden", timeout=5000)
 
@@ -238,6 +283,19 @@ class ProtocolEditorPage(BasePage):
         self.wait_for_visible(button.first)
         button.first.click()
 
+    def select_confirm_text(self) -> None:
+        """
+        Click a button with the text "Confirm".
+        This is used in various places where a confirmation action is needed.
+        """
+        self.page.get_by_text("Confirm").click()
+
+    def select_save_text(self) -> None:
+        """
+        Click a button with the text "Save".
+        This is used in various places where a save action is needed."""
+        self.page.get_by_text("Save", exact=True).click()
+
     def close_toolbox(self) -> None:
         """Close the deck setup toolbox if it is open."""
 
@@ -305,9 +363,21 @@ class ProtocolEditorPage(BasePage):
             self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
 
     def toggle_checkbox(self, field_name: str) -> None:
-        """Toggle a checkbox-like control by its field name."""
+        """Toggle a checkbox-like control by its field name.
 
-        self.page.get_by_role("checkbox", name=field_name, exact=True).click()
+        Args:
+            field_name: The name of the checkbox field to toggle.
+        """
+
+        self.click_checkbox_label(field_name)
+
+    def _add_lid(self, labware: str, test_id: str) -> None:
+        """Add a lid to the selected labware.
+        Args:
+            labware: Name of the labware to add a lid to.
+            test_id: Test ID of the lid checkbox element.
+        """
+        self.page.locator("label").filter(has_text=labware).get_by_test_id(test_id).click()
 
     def move_labware(self, labware: str, new_location: str) -> None:
         """Select labware and new location to move the labware."""

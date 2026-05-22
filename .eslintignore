@@ -11,7 +11,6 @@
 **/CHANGELOG.md
 !api/release-notes.md
 !app-shell/build/release-notes.md
-**/.yarn-cache/**
 
 # components library
 storybook-static
@@ -41,9 +40,13 @@ analyses-snapshot-testing/chunks
 opentrons-ai-server/package
 opentrons-ai-server/api/storage/
 
+# MkDocs build output (generated; may exist locally after `mkdocs build`, gitignored)
+docs/**/site/**
+
 # Leave Markdown formatting alone because some of it is load-bearing for MkDocs.
 # Note that this is a Prettier thing, not an ESLint thing. Prettier shares this config file.
 /docs/**/*.md
+/.cursor/skills/docs/SKILL.md
 # And ignore non-semantic formatting issues in mkdocs YAML configuration files.
 /docs/**/*.yml
 

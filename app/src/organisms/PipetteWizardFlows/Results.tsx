@@ -163,8 +163,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
             commandType: 'calibration/moveToMaintenancePosition' as const,
             params: {
               mount: nextMount === 'right' ? RIGHT : 'left',
-              maintenancePosition:
-                nextMount === 'both' ? 'attachPlate' : 'attachInstrument',
+              ...(nextMount === 'both'
+                ? { motionModifier: 'lowerZAxesSequentially' as const }
+                : {}),
             },
           },
         ],
@@ -305,8 +306,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
       </>
     )
   }
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
   if (errorMessage != null) {
     return (
       <SimpleWizardBody

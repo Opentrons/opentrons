@@ -59,37 +59,42 @@ export function useInitLPCStore({
     runRecordOffsets !== undefined
 
   // Initialize the store. This effect should only occur once.
-  useEffect(() => {
-    if (isReadyToInit && isFlex) {
-      const activePipetteId = getActivePipetteId(analysis.pipettes)
+  useEffect(
+    () => {
+      if (isReadyToInit && isFlex) {
+        const activePipetteId = getActivePipetteId(analysis.pipettes)
 
-      const initialState: LPCWizardState = {
-        ...rest,
-        protocolData: analysis,
-        labwareDefs,
-        activePipetteId: activePipetteId ?? 'NO_PIPETTE',
-        protocolName,
-        deckConfig,
-        labwareInfo: {
-          ...rest.labwareInfo,
-          sourcedOffsets: OFFSETS_SOURCE_INITIALIZING,
-          initialRunRecordOffsets: sortRunRecordOffsets(runRecordOffsets),
-          initialDatabaseOffsets: flexStoredOffsets,
-        },
-        steps: {
-          currentStepIndex: 0,
-          totalStepCount: LPC_STEPS.length,
-          all: LPC_STEPS,
-          lastStepIndices: null,
-          currentSubstep: null,
-        },
-        ui: {
-          showDefaultOffsetInfoBanner: true,
-          showSnackbar: null,
-        },
+        const initialState: LPCWizardState = {
+          ...rest,
+          protocolData: analysis,
+          labwareDefs,
+          activePipetteId: activePipetteId ?? 'NO_PIPETTE',
+          protocolName,
+          deckConfig,
+          labwareInfo: {
+            ...rest.labwareInfo,
+            sourcedOffsets: OFFSETS_SOURCE_INITIALIZING,
+            initialRunRecordOffsets: sortRunRecordOffsets(runRecordOffsets),
+            initialDatabaseOffsets: flexStoredOffsets,
+          },
+          steps: {
+            currentStepIndex: 0,
+            totalStepCount: LPC_STEPS.length,
+            all: LPC_STEPS,
+            lastStepIndices: null,
+            currentSubstep: null,
+          },
+          ui: {
+            showDefaultOffsetInfoBanner: true,
+            showSnackbar: null,
+          },
+        }
+
+        dispatch(updateLPC(runId, initialState))
       }
-
-      dispatch(updateLPC(runId, initialState))
-    }
-  }, [isReadyToInit])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isReadyToInit]
+  )
 }

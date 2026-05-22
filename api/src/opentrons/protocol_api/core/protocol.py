@@ -13,6 +13,7 @@ from opentrons_shared_data.robot.types import RobotType
 from .._liquid import Liquid, LiquidClass
 from .._types import OffDeckType
 from ..disposal_locations import TrashBin, WasteChute
+from .csv import AbstractCSV
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
@@ -24,6 +25,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
+    ModuleFixtureLocation,
     Mount,
     Point,
     StagingSlotName,
@@ -76,7 +78,12 @@ class AbstractProtocol(
         self,
         load_name: str,
         location: Union[
-            DeckSlotName, StagingSlotName, LabwareCoreType, ModuleCoreType, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCoreType,
+            ModuleCoreType,
+            ModuleFixtureLocation,
+            OffDeckType,
         ],
         label: Optional[str],
         namespace: Optional[str],
@@ -89,7 +96,13 @@ class AbstractProtocol(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, StagingSlotName, ModuleCoreType, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCoreType,
+            ModuleFixtureLocation,
+            OffDeckType,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:
@@ -116,6 +129,7 @@ class AbstractProtocol(
             StagingSlotName,
             LabwareCoreType,
             ModuleCoreType,
+            ModuleFixtureLocation,
             OffDeckType,
             WasteChute,
             TrashBin,
@@ -303,5 +317,21 @@ class AbstractProtocol(
         "Capture an image using a camera."
 
     @abstractmethod
+    def start_step_grouping(
+        self,
+        annotation_name: str,
+        annotation_description: Optional[str],
+    ) -> str:
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
+
+    @abstractmethod
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
+
+    @abstractmethod
     def load_robot(self) -> AbstractRobot:
         """Load a Robot Core context into a protocol"""
+
+    @abstractmethod
+    def create_csv(self, filename: str, columns: int) -> AbstractCSV:
+        """Create a new csv file"""

@@ -372,7 +372,7 @@ class Well:
 
     @requires_version(2, 27)
     def has_tracked_liquid(self) -> bool:
-        """Get the current liquid volume in a well."""
+        """Return `True` if liquid has been loaded or probed in a well."""
         return self._core.has_tracked_liquid()
 
     @requires_version(2, 24)
@@ -1383,10 +1383,11 @@ class Labware:
         When this is called, all tip wells in the tip rack will be marked as empty. Any tips
         that are dropped into this empty tip rack will be marked as used, and therefore will not
         be available to pick up via automatic tip tracking. If an empty well is filled with tips,
-        [`reset()`][opentrons.protocol_api.InstrumentContext.reset] can be called to treat it as
+        [`reset()`][opentrons.protocol_api.Labware.reset] can be called to treat it as
         a fresh tip rack.
+        be available to pick up via automatic tip tracking.
 
-        This will raise if the labware is not a tip rack.
+        The API will raise an error if the labware is not a tip rack.
         """
         self._core.set_empty()
 

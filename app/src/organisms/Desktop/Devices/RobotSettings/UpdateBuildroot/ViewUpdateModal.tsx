@@ -57,7 +57,7 @@ export function ViewUpdateModal(
   let releaseNotes = ''
   if (updateInfo?.releaseNotes != null) releaseNotes = updateInfo.releaseNotes
 
-  if (availableAppUpdateVersion && showAppUpdateModal)
+  if (availableAppUpdateVersion && showAppUpdateModal) {
     return createPortal(
       <UpdateAppModal
         closeModal={() => {
@@ -66,6 +66,7 @@ export function ViewUpdateModal(
       />,
       getTopPortalEl()
     )
+  }
 
   if (showMigrationWarning) {
     return (
@@ -79,7 +80,7 @@ export function ViewUpdateModal(
     )
   }
 
-  if (robotSystemType != null)
+  if (robotSystemType != null) {
     return (
       <UpdateRobotModal
         robotName={robotName}
@@ -89,6 +90,7 @@ export function ViewUpdateModal(
         closeModal={closeModal}
       />
     )
+  }
 
   return null
 }

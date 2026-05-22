@@ -54,12 +54,5 @@ describe('NewRobotSetupHelp', () => {
       name: 'Opentrons Flex Quickstart Guide',
     })
     expect(supportLinkFlex).toHaveAttribute('href', targetLinkUrlFlex)
-
-    const targetLinkUrlOt2 =
-      'https://insights.opentrons.com/hubfs/Products/OT-2/OT-2%20Quick%20Start%20Guide.pdf'
-    const supportLinkOt2 = screen.getByRole('link', {
-      name: 'OT-2 Quickstart Guide',
-    })
-    expect(supportLinkOt2).toHaveAttribute('href', targetLinkUrlOt2)
   })
 })

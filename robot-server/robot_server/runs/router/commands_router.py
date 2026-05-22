@@ -14,7 +14,17 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine import (
     errors as pe_errors,
 )
+from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBody,
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+    SimpleMultiBody,
+)
 
 from ..command_models import (
     CommandCollectionLinks,
@@ -36,14 +46,6 @@ from ..run_store import CommandNotFoundError, RunStore
 from .base_router import RunNotFound, RunStopped
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.robot.control.dependencies import require_estop_in_good_state
-from robot_server.service.json_api import (
-    MultiBody,
-    MultiBodyMeta,
-    PydanticResponse,
-    RequestModel,
-    SimpleBody,
-    SimpleMultiBody,
-)
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
@@ -156,6 +158,7 @@ async def get_current_run_from_url(
         },
         status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[CommandNotAllowed]},
     },
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
@@ -333,6 +336,9 @@ async def get_run_commands(
             error=c.error,
             notes=c.notes,
             failedCommandId=c.failedCommandId,
+            commandAnnotationIds=c.commandAnnotationIds
+            if c.commandAnnotationIds
+            else None,
         )
         for c in command_slice.commands
     ]

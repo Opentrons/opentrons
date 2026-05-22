@@ -1,5 +1,5 @@
 ---
-title: "Python API: Liquid Classes"
+title: 'Python API: Liquid Classes'
 ---
 
 Accounting for properties of liquids in your protocol can increase pipetting accuracy on the Flex. For example, a slower flow rate can improve pipetting for a viscous liquid, and an air gap can prevent a volatile liquid from dripping onto the deck.
@@ -11,10 +11,10 @@ This page covers the properties of Opentrons-verified liquid classes, how to use
 Opentrons-verified liquid classes are based on the properties of common liquids: water, ethanol, and glycerol.
 
 | Opentrons-verified liquid class | Description              | Load name {width="25%"} |
-|---------------------------------|--------------------------|---------------|
-| Aqueous                        | Based on deionized water | `water`       |
-| Volatile                       | Based on 80% ethanol     | `ethanol_80`  |
-| Viscous                        | Based on 50% glycerol    | `glycerol_50` |
+| ------------------------------- | ------------------------ | ----------------------- |
+| Aqueous                         | Based on deionized water | `water`                 |
+| Volatile                        | Based on 80% ethanol     | `ethanol_80`            |
+| Viscous                         | Based on 50% glycerol    | `glycerol_50`           |
 
 Use an Opentrons-verified liquid class in your transfers to automatically apply optimized behavior. For example, choosing the `glycerol_50` liquid class changes properties, like flow rate, to accurately transfer viscous liquid.
 
@@ -191,7 +191,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # select liquid class to use in your protocol
     viscous_liquid = protocol.get_liquid_class(name="glycerol_50")
 ```
-*New in version 2.24*
+
+_New in version 2.24_
 
 Next, use the [`InstrumentContext.transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] method to transfer an aqueous, volatile, or viscous liquid defined in a Flex protocol. This method requires the stored set of properties defined earlier, `viscous_liquid`, instead of the `glycerol_50` load name. It accepts additional arguments that let you specify your liquid, volume, source and destination wells, tip handling preferences, and trash location.
 
@@ -210,7 +211,8 @@ pipette.transfer_with_liquid_class(
    trash_location=trash,
 )
 ```
-*New in version 2.24*
+
+_New in version 2.24_
 
 Here, the `glycerol_50` viscous liquid class definition accounts for all other transfer behavior, like flow rate, whether or not to add an air gap or delay, and submerge and retract speeds. For each aspirate, the pipette:
 
@@ -232,7 +234,7 @@ And for each dispense, the pipette:
 In many cases, the liquid class definition represents fine-tuned changes optimized for each liquid class. If you instead used the same pipette to transfer 50 µL of the volatile `liquid_2`, transfer behavior would include:
 
 - Submerging into and retracting from the volatile `liquid_2` at 100 mm/sec.
-- Adding larger air gaps after aspirating *and* dispensing to prevent dripping onto the deck.
+- Adding larger air gaps after aspirating _and_ dispensing to prevent dripping onto the deck.
 - Aspirating and dispensing at 30 µL/sec with a larger correction by volume.
 - Pushing out a larger volume of air to ensure all liquid leaves the tip.
 
@@ -251,22 +253,36 @@ custom_water_properties = custom_water.get_for(pipette, tiprack)
 
 Here, you can also use the optional `version` parameter to specify which version of the liquid class definition you’d like to customize. If unspecified, the API loads the latest version.
 
-*New in version 2.24*
-*Changed in version 2.26:* The `version` parameter lets you apply a previous liquid class definition version.
+_New in version 2.24_
+
+_Changed in version 2.26:_ The `version` parameter lets you apply a previous liquid class definition version.
 
 Next, edit individual liquid class properties based on your Flex pipette and tip combination.
 
 ```python
 # edit aspirate submerge speed to 80 μL/sec
 custom_water_properties.aspirate.submerge.speed = 80
+
 # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
 custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(10.0, 40.0)]
 custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30.0)]
+
 # edit to delay for 1 sec before retracting after an aspirate
 custom_water_properties.aspirate.retract.delay.enabled = True
 custom_water_properties.aspirate.retract.delay.duration = 1.0
+
+# edit aspirate tip position
+custom_water_properties.aspirate.aspirate_position = {
+    "position_reference": "well-top",
+    "offset": {"x": 1, "y": 2, "z": 3}
+}
+# use aspirate tip position to set dispense tip position
+custom_water_properties.dispense.dispense_position = custom_water_properties.aspirate.aspirate_position
 ```
-*New in version 2.24*
+
+_New in version 2.24_
+
+_Changed in version 2.28_: Edit tip position for an aspirate, dispense, or blowout in a single line, and use one tip position to set another.
 
 Then, complete your transfers with the modified `custom_water` liquid class.
 
@@ -288,7 +304,11 @@ custom_liquid_class_properties = {
                 "correction_by_volume": [(0.0, 0.0)],
                 "delay": {"enabled": False},
                 "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
-                "mix": {"enabled": False},
+                "mix": {
+                    "enabled": True,
+                    "repetitions": 1,
+                    "volume": 50,
+                },
                 "pre_wet": True,
                 "retract": {
                     "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
@@ -321,7 +341,11 @@ custom_liquid_class_properties = {
                 "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
                 "retract": {
                     "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
-                    "blowout": {"enabled": False},
+                    "blowout": {
+                        "enabled": True,
+                        "location": "destination",
+                        "flowRate": 50,
+                    },
                     "delay": {"enabled": False},
                     "end_position": {
                         "offset": {"x": 1, "y": 2, "z": 3},
@@ -355,11 +379,13 @@ custom_viscous = protocol.define_liquid_class(
 )
 ```
 
-*New in version 2.24*
+_New in version 2.24_
+
+_Changed in version 2.28_: Add ability to control where and when the pipette blows out excess liquid.
 
 You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified [liquid class properties](https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1) for examples.
 
-You can also define optional properties, like a mix or blowout, in your liquid class. See [the liquid class schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json) for a complete list of properties.
+The example above also defines some optional properties, like a mix and a blowout, in a custom liquid class. See [the liquid class schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json) for a complete list of properties.
 
 !!! note
-    The [`ProtocolContext.get_liquid_class()`][opentrons.protocol_api.ProtocolContext.get_liquid_class] method only accepts Opentrons-verified liquid classes, like `glycerol_50`. You'll need to use [`ProtocolContext.define_liquid_class()`][opentrons.protocol_api.ProtocolContext.define_liquid_class] in each Flex protocol that uses a custom liquid class.
+The [`ProtocolContext.get_liquid_class()`][opentrons.protocol_api.ProtocolContext.get_liquid_class] method only accepts Opentrons-verified liquid classes, like `glycerol_50`. You'll need to use [`ProtocolContext.define_liquid_class()`][opentrons.protocol_api.ProtocolContext.define_liquid_class] in each Flex protocol that uses a custom liquid class.

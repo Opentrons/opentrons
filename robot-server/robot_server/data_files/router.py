@@ -12,7 +12,16 @@ from fastapi.responses import FileResponse, StreamingResponse
 from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
+)
 
 from ..protocols.dependencies import (
     get_file_hasher,
@@ -45,13 +54,6 @@ from robot_server.runs.router.base_router import RunNotFound
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import RunStore
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    PydanticResponse,
-    SimpleBody,
-    SimpleEmptyBody,
-    SimpleMultiBody,
-)
 from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
 from robot_server.service.notifications.publishers import (
     DataFilePublisher,
@@ -116,6 +118,7 @@ class DataFileInUse(ErrorDetails):
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
 )
 async def upload_data_file(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
@@ -327,6 +330,7 @@ async def get_all_data_files(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[DataFileInUse]},
     },
+    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
 )
 async def delete_file_by_id(
     dataFileId: str,
@@ -513,6 +517,7 @@ async def get_run_image_metadata(
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
+    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
 )
 async def delete_run_images(
     runId: str,

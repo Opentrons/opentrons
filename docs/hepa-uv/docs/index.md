@@ -1,5 +1,6 @@
 ---
 title: "HEPA/UV Module Instruction Manual"
+description: "Flex clean-air and UV disinfectant module; ISO-5 environment, HEPA and UV-C."
 hide: toc
 ---
 
@@ -11,7 +12,7 @@ hide: toc
 
 **Opentrons Labworks Inc.**
 
-July 2024
+September 2025
 
 </div>
 

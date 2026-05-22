@@ -17,10 +17,7 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { MagnetModuleChangeContent } from '/protocol-designer/components/molecules'
 import { ConfirmDeleteEntityInUseModal } from '/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
-import {
-  getDisableModuleRestrictions,
-  getEnableMutlipleTempsOT2,
-} from '/protocol-designer/feature-flags/selectors'
+import { getDisableModuleRestrictions } from '/protocol-designer/feature-flags/selectors'
 import {
   deleteModule,
   getAllModuleSlotsByTypeOt2,
@@ -84,7 +81,6 @@ const mockModules = {
 const mockMakeSnackbar = vi.fn()
 describe('Ot2Modules', () => {
   beforeEach(() => {
-    vi.mocked(getEnableMutlipleTempsOT2).mockReturnValue(false)
     vi.mocked(MagnetModuleChangeContent).mockReturnValue(
       <div>mock MagnetModuleChangeContent</div>
     )
@@ -283,16 +279,5 @@ describe('Ot2Modules', () => {
     render()
     fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0])
     screen.getByText('mock ConfirmDeleteEntityInUseModal')
-  })
-  it('should render 2 temperature module GEN2 buttons when the useFacing flag is turned on', () => {
-    vi.mocked(getEnableMutlipleTempsOT2).mockReturnValue(true)
-    vi.mocked(getInitialDeckSetup).mockReturnValue({
-      pipettes: {},
-      modules: {},
-      labware: {},
-      additionalEquipmentOnDeck: {},
-    })
-    render()
-    expect(screen.getAllByText('Temperature Module GEN2')).toHaveLength(2)
   })
 })

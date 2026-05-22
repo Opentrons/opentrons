@@ -10,6 +10,7 @@ from ..._liquid import Liquid, LiquidClass
 from ..._types import OffDeckType
 from ...disposal_locations import TrashBin, WasteChute
 from ...labware import Labware
+from ..csv import AbstractCSV
 from ..labware import LabwareLoadParams
 from ..protocol import AbstractProtocol
 from . import legacy_module_core, module_geometry
@@ -28,6 +29,7 @@ from opentrons.protocols.api_support.util import APIVersionError, AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
+    ModuleFixtureLocation,
     Mount,
     Point,
     StagingSlotName,
@@ -172,6 +174,7 @@ class LegacyProtocolCore(
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             StagingSlotName,
+            ModuleFixtureLocation,
             OffDeckType,
         ],
         label: Optional[str],
@@ -191,6 +194,10 @@ class LegacyProtocolCore(
         elif isinstance(location, StagingSlotName):
             raise APIVersionError(
                 api_element="Using a staging deck slot", until_version="2.16"
+            )
+        elif isinstance(location, ModuleFixtureLocation):
+            raise APIVersionError(
+                api_element="Using a module addressable area", until_version="2.28"
             )
 
         deck_slot = (
@@ -271,6 +278,7 @@ class LegacyProtocolCore(
             StagingSlotName,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
+            ModuleFixtureLocation,
         ],
         namespace: Optional[str],
         version: Optional[int],
@@ -303,6 +311,7 @@ class LegacyProtocolCore(
             OffDeckType,
             WasteChute,
             TrashBin,
+            ModuleFixtureLocation,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,
@@ -624,6 +633,16 @@ class LegacyProtocolCore(
         "Capture an image using a camera."
         assert False, "capture_image only supported on engine core"
 
+    def start_step_grouping(
+        self, annotation_name: str, annotation_description: Optional[str]
+    ) -> str:
+        """Creates an active command annotation for step grouping and adds the ID to list of active annotations."""
+        assert False, "start_step_grouping only supported on engine core"
+
+    def end_step_grouping(self, annotation_id: str) -> None:
+        """Ends a step group by removing the command annotation ID from the list of active annotations."""
+        assert False, "close_command_annotation only supported on engine core"
+
     def wait_for_tasks(self, task: Sequence[LegacyTaskCore]) -> None:
         """Wait for list of tasks to complete before executing subsequent commands."""
         assert False, "wait_for_tasks only supported on engine core"
@@ -631,3 +650,7 @@ class LegacyProtocolCore(
     def create_timer(self, seconds: float) -> LegacyTaskCore:
         """Create a timer task that runs in the background."""
         assert False, "create_timer only supported on engine core"
+
+    def create_csv(self, filename: str, columns: int) -> AbstractCSV:
+        """Create a new csv file"""
+        assert False, "create_csv only supported on engine core"

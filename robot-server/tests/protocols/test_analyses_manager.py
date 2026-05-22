@@ -25,6 +25,7 @@ from robot_server.protocols.analysis_models import (
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.task_runner import TaskRunner
 
 
@@ -38,6 +39,12 @@ def analysis_store(decoy: Decoy) -> AnalysisStore:
 def task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mocked out TaskRunner."""
     return decoy.mock(cls=TaskRunner)
+
+
+@pytest.fixture
+def run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
+    """Get a mocket out RunProcessPyroProvider."""
+    return decoy.mock(cls=RunProcessPyroProvider)
 
 
 @pytest.fixture(autouse=True)
@@ -59,15 +66,24 @@ def patch_mock_map_unexpected_error(
 
 
 @pytest.fixture
-def subject(analysis_store: AnalysisStore, task_runner: TaskRunner) -> AnalysesManager:
+def subject(
+    analysis_store: AnalysisStore,
+    task_runner: TaskRunner,
+    run_process_pyro_provider: RunProcessPyroProvider,
+) -> AnalysesManager:
     """Get the Analyses Manager with mocked out dependencies."""
-    return AnalysesManager(analysis_store=analysis_store, task_runner=task_runner)
+    return AnalysesManager(
+        analysis_store=analysis_store,
+        task_runner=task_runner,
+        run_process_pyro_provider=run_process_pyro_provider,
+    )
 
 
 async def test_initialize_analyzer(
     decoy: Decoy,
     analysis_store: AnalysisStore,
     task_runner: TaskRunner,
+    run_process_pyro_provider: RunProcessPyroProvider,
     subject: AnalysesManager,
 ) -> None:
     """It should create analyzer and load its orchestrator."""
@@ -92,6 +108,7 @@ async def test_initialize_analyzer(
         protocol_analyzer.create_protocol_analyzer(
             analysis_store=analysis_store,
             protocol_resource=protocol_resource,
+            run_process_pyro_provider=run_process_pyro_provider,
         )
     ).then_return(analyzer)
 
@@ -113,6 +130,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
     decoy: Decoy,
     analysis_store: AnalysisStore,
     task_runner: TaskRunner,
+    run_process_pyro_provider: RunProcessPyroProvider,
     subject: AnalysesManager,
 ) -> None:
     """It should save the result to analysis store and re-raise error when analyzer initialization errors out."""
@@ -142,6 +160,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
         protocol_analyzer.create_protocol_analyzer(
             analysis_store=analysis_store,
             protocol_resource=protocol_resource,
+            run_process_pyro_provider=run_process_pyro_provider,
         )
     ).then_return(analyzer)
     decoy.when(

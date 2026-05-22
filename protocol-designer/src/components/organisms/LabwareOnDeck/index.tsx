@@ -1,6 +1,11 @@
 import { useSelector } from 'react-redux'
 
-import { CenterLabwareInSlot, LabwareRender } from '@opentrons/components'
+import {
+  CenterLabwareInSlot,
+  INACCESSIBLE,
+  LabwareRender,
+  SELECTED_ERROR,
+} from '@opentrons/components'
 import { getIsLid } from '@opentrons/shared-data'
 import * as wellContentsSelectors from '@opentrons/step-generation'
 
@@ -10,7 +15,13 @@ import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
 import type { CSSProperties } from 'react'
-import type { TipType, WellMouseEvent } from '@opentrons/components'
+import type {
+  TipType,
+  WellGroup,
+  WellLabelOption,
+  WellMouseEvent,
+  WellType,
+} from '@opentrons/components'
 import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
 interface LabwareOnDeckProps {
@@ -20,13 +31,14 @@ interface LabwareOnDeckProps {
   highlight?: boolean
   showHighlightedWells?: boolean
   handleClickWell?: (wellName: string) => void
-  tipStatusByWellName?: Record<string, TipType>
+  statusByWellName?: Record<string, TipType | WellType>
   onMouseEnterWell?: (e: WellMouseEvent) => void
   onMouseLeaveWell?: (e: WellMouseEvent) => void
   selectedTipsByIndex?: Record<string, number>
   fill?: CSSProperties['fill']
   borderStroke?: CSSProperties['stroke']
   ignoreMissingTips?: boolean
+  wellLabelOptions?: WellLabelOption
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -36,7 +48,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     y,
     highlight = false,
     showHighlightedWells = true,
-    tipStatusByWellName,
+    statusByWellName,
     handleClickWell,
     onMouseEnterWell,
     onMouseLeaveWell,
@@ -44,6 +56,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     fill,
     borderStroke,
     ignoreMissingTips = false,
+    wellLabelOptions,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -58,31 +71,52 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const wellContents = allWellContentsForActiveItem
     ? allWellContentsForActiveItem[labwareOnDeck.id]
     : null
-  const highlightedWells = allHighlightedWells[labwareOnDeck.id]
+  const selectedWells: WellGroup = Object.entries(statusByWellName ?? {})
+    .filter(([, status]) => status === 'selected')
+    .reduce<WellGroup>((acc, [wellName]) => {
+      acc[wellName] = null
+      return acc
+    }, {})
+  const highlightedWells = statusByWellName
+    ? selectedWells
+    : allHighlightedWells[labwareOnDeck.id]
   const labwareTipInfo =
     missingAndUsedTipsByLabwareId != null
       ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
       : null
   const { missingTips } = labwareTipInfo ?? {}
   const isLid = getIsLid(labwareOnDeck.def)
+  const wellFill = wellContentsSelectors.wellFillFromWellContents(
+    wellContents,
+    liquidDisplayColors
+  )
+
+  const newWellFill = statusByWellName
+    ? Object.fromEntries(
+        Object.entries(wellFill).filter(
+          ([wellName]) =>
+            statusByWellName[wellName] !== INACCESSIBLE &&
+            statusByWellName[wellName] !== SELECTED_ERROR
+        )
+      )
+    : wellFill
+
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}
       positioningMode="offsetInSlot"
-      wellFill={wellContentsSelectors.wellFillFromWellContents(
-        wellContents,
-        liquidDisplayColors
-      )}
+      wellFill={newWellFill}
       handleClickWell={handleClickWell}
       {...(showHighlightedWells ? { highlightedWells } : {})}
       {...(ignoreMissingTips ? {} : { missingTips })}
       highlight={highlight}
-      tipStatusByWellName={tipStatusByWellName}
+      statusByWellName={statusByWellName}
       onMouseEnterWell={onMouseEnterWell}
       onMouseLeaveWell={onMouseLeaveWell}
       selectedTipsByIndex={selectedTipsByIndex}
       fill={fill}
       labwareStroke={borderStroke}
+      wellLabelOption={wellLabelOptions}
     />
   )
   return (

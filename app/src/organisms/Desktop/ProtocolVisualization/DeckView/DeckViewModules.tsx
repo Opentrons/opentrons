@@ -55,7 +55,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
     selectedRunTimeCommand,
   } = props
   const { moduleEntities } = invariantContext
-  const { modules, labware } = robotState
+  const { modules, labware, pipettes } = robotState
 
   return (
     <>
@@ -71,6 +71,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
         )
         const { isActiveLayerVisible } = getActiveLayer(
           labwareLoadedOnModuleId,
+          pipettes,
           selectedRunTimeCommand,
           id
         )
@@ -84,6 +85,9 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
               ? 'closed'
               : 'open',
         }
+        const isThermocyclerLidClosed =
+          moduleType === THERMOCYCLER_MODULE_TYPE &&
+          innerTCProps.lidMotorState === 'closed'
         const isSelectedCommandForThisModule =
           selectedRunTimeCommand != null &&
           'moduleId' in selectedRunTimeCommand.params &&
@@ -138,6 +142,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                   hoveredSlot={hoveredSlot}
                   labwareEntitiesExtended={labwareEntitiesExtended}
                   selectedRunTimeCommand={selectedRunTimeCommand}
+                  renderLabware={!isThermocyclerLidClosed}
                 />
               ) : null}
               <DeckViewOverlay

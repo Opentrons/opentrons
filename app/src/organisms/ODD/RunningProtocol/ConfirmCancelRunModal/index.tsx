@@ -17,6 +17,7 @@ import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
+import { useGuardedAction } from '../../AccessControl'
 import { CancelingRunModal } from '../CancelingRunModal'
 import styles from './confirmcancelmodal.module.css'
 
@@ -36,7 +37,8 @@ export function ConfirmCancelRunModal({
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
-  const { stopRun } = useStopRunMutation()
+  const documentationState = useGuardedAction([])
+  const { stopRun } = useStopRunMutation(documentationState)
   const { dismissCurrentRun, isLoading: isDismissing } =
     useDismissCurrentRunMutation()
   const localRobot = useSelector(getLocalRobot)
@@ -63,19 +65,24 @@ export function ConfirmCancelRunModal({
     })
   }
 
-  useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      if (!isActiveRun) {
-        dismissCurrentRun(runId)
-        if (protocolId != null) {
-          navigate(`/protocols/${protocolId}`)
-        } else {
-          navigate('/protocols')
+  useEffect(
+    () => {
+      if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
+        if (!isActiveRun) {
+          dismissCurrentRun(runId)
+          if (protocolId != null) {
+            navigate(`/protocols/${protocolId}`)
+          } else {
+            navigate('/protocols')
+          }
         }
       }
-    }
-  }, [runStatus])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [runStatus]
+  )
 
   return isCanceling || isDismissing ? (
     <CancelingRunModal />

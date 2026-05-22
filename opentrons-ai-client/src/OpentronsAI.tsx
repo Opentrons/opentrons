@@ -12,6 +12,7 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 
+import { EmailVerificationRequired } from '/ai-client/components/molecules/EmailVerificationRequired'
 import { ExitConfirmModal } from '/ai-client/components/molecules/ExitConfirmModal'
 import { Footer } from '/ai-client/components/molecules/Footer'
 import { Header } from '/ai-client/components/molecules/Header'
@@ -21,13 +22,14 @@ import { Loading } from '/ai-client/components/molecules/Loading'
 import { initializeMixpanel, setMixpanelTracking } from './analytics/mixpanel'
 import { OpentronsAIRoutes } from './OpentronsAIRoutes'
 import {
+  emailVerifiedAtom,
   featureFlagsAtom,
   headerWithMeterAtom,
   mixpanelAtom,
-  tokenAtom,
 } from './resources/atoms'
 import { CLIENT_MAX_WIDTH } from './resources/constants'
-import { useGetAccessToken } from './resources/hooks'
+import { isEmailVerifiedFromUser } from './resources/emailVerifiedClaim'
+import { useGetAccessToken } from './resources/hooks/useGetAccessToken'
 import { useTrackEvent } from './resources/hooks/useTrackEvent'
 
 export function OpentronsAI(): JSX.Element | null {
@@ -39,45 +41,52 @@ export function OpentronsAI(): JSX.Element | null {
 }
 
 function OpentronsAIApp(): JSX.Element | null {
-  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
-  const [, setToken] = useAtom(tokenAtom)
+  const { isAuthenticated, isLoading, loginWithRedirect, user } = useAuth0()
+  const [emailVerified, setEmailVerified] = useAtom(emailVerifiedAtom)
   const [{ displayHeaderWithMeter, progress }] = useAtom(headerWithMeterAtom)
   const [mixpanelState, setMixpanelState] = useAtom(mixpanelAtom)
-  const { getAccessToken } = useGetAccessToken()
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
   const location = useLocation()
   const isOnChatPage = location.pathname === '/chat'
 
   const trackEvent = useTrackEvent()
-
-  const fetchAccessToken = async (): Promise<void> => {
-    try {
-      const accessToken = await getAccessToken()
-      setToken(accessToken)
-    } catch (error) {
-      console.error('Error fetching access token:', error)
-    }
-  }
+  const { getAccessToken } = useGetAccessToken()
 
   if (mixpanelState?.isInitialized === false) {
     setMixpanelState({ ...mixpanelState, isInitialized: true })
     initializeMixpanel(mixpanelState)
   }
 
-  useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      void loginWithRedirect()
-    }
-    if (isAuthenticated) {
-      void fetchAccessToken()
-    }
-  }, [isAuthenticated, isLoading, loginWithRedirect])
+  useEffect(
+    () => {
+      if (!isAuthenticated && !isLoading) {
+        void loginWithRedirect()
+      }
+      if (isAuthenticated) {
+        void getAccessToken()
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isAuthenticated, isLoading, loginWithRedirect]
+  )
 
   useEffect(() => {
     if (isAuthenticated) {
-      trackEvent({ name: 'user-login', properties: {} })
+      setEmailVerified(isEmailVerifiedFromUser(user ?? undefined))
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, user, setEmailVerified])
+
+  useEffect(
+    () => {
+      if (isAuthenticated) {
+        trackEvent({ name: 'user-login', properties: {} })
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isAuthenticated]
+  )
 
   // Sync feature flag changes with Mixpanel analytics state
   useEffect(() => {
@@ -102,6 +111,14 @@ function OpentronsAIApp(): JSX.Element | null {
 
   if (!isAuthenticated) {
     return null
+  }
+
+  if (emailVerified === null) {
+    return <Loading />
+  }
+
+  if (emailVerified === false) {
+    return <EmailVerificationRequired />
   }
 
   global.enablePrereleaseMode = () => {

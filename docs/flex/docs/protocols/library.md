@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Protocol Library"
+description: "Pre-built protocols available for Flex and how to use them."
 ---
 
 The Opentrons Protocol Library hosts protocols authored either by Opentrons itself or by members of the Opentrons community. To find a protocol that fits your target application, use the search field at the top of the [Protocol Library homepage](https://library.opentrons.com).

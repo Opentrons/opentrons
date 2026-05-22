@@ -1,3 +1,5 @@
+import { LABWARE } from '../types'
+import { EmptyWell, SelectedWell } from '../Wells'
 import {
   INACCESSIBLE,
   NEW,
@@ -9,32 +11,65 @@ import {
 } from './constants'
 import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
-import { NoTip } from './NoTip'
-import { SelectedTip } from './SelectedTip'
 import { UsedTip } from './UsedTip'
 
+import type { LabwareWellMap } from '@opentrons/shared-data'
 import type { TipType } from '../types'
 
-export function TipStatus(props: {
+interface TipStatusProps {
   type: TipType
-  size?: string
+  wellMap: LabwareWellMap
+  wellName: string
+  size: string
   text?: string
-}): JSX.Element {
-  const { type, size, text } = props
+}
+
+export function TipStatus(props: TipStatusProps): JSX.Element {
+  const { type, size, text, wellMap, wellName } = props
   switch (type) {
     case NEW:
-      return <NewTip size={size} />
+      return <NewTip size={size} wellName={wellName} />
     case USED:
-      return <UsedTip size={size} />
+      return <UsedTip size={size} wellName={wellName} />
     case SELECTED:
-      return <SelectedTip size={size} textInsideTip={text} />
+      return (
+        <SelectedWell
+          size={size}
+          textInsideTip={text}
+          wellMap={wellMap}
+          wellName={wellName}
+        />
+      )
     case NO:
-      return <NoTip size={size} />
+      return (
+        <EmptyWell
+          size={size}
+          wellMap={wellMap}
+          parentType={LABWARE}
+          wellName={wellName}
+        />
+      )
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:
-      return <SelectedTip size={size} textInsideTip={text} isUsed />
+      return (
+        <SelectedWell
+          size={size}
+          textInsideTip={text}
+          isUsed
+          wellMap={wellMap}
+          wellName={wellName}
+        />
+      )
     case SELECTED_ERROR:
-      return <SelectedTip size={size} textInsideTip={text} isError />
+      return (
+        <SelectedWell
+          size={size}
+          textInsideTip={text}
+          isError
+          wellMap={wellMap}
+          wellName={wellName}
+        />
+      )
   }
 }

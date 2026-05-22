@@ -33,7 +33,7 @@ import type { MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
-const INITIAL_MILLISECONDS_PER_FRAME = 2000
+const INITIAL_MILLISECONDS_PER_FRAME = 1000
 const INITIAL_WIDTH_PX = 230
 const MIN_CENTER_WIDTH_PX = 148
 const MIN_LEFT_COLUMN_WIDTH_PX = 148
@@ -70,9 +70,7 @@ export function VisualizerContainer(
   )
   const [isDragging, setIsDragging] = useState<boolean>(false)
 
-  const [selectedCommandId, setSelectedCommand] = useState<string | null>(
-    commands[0]?.id ?? null
-  )
+  const [selectedCommandId, setSelectedCommand] = useState<string | null>(null)
 
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -131,14 +129,25 @@ export function VisualizerContainer(
   )
 
   useEffect(() => {
+    if (selectedCommandId != null) return
+    const initialId = filteredCommands[0]?.id ?? commands[0]?.id ?? null
+    setSelectedCommand(initialId)
+  }, [selectedCommandId, filteredCommands, commands])
+
+  useEffect(() => {
     if (!isPlaying) return
+    if (filteredCommands.length === 0) return
 
     const intervalId = setInterval(() => {
       setSelectedCommand(prevId => {
-        const currentIndex = commands.findIndex(cmd => cmd.id === prevId)
+        const currentIndex = filteredCommands.findIndex(
+          cmd => cmd.id === prevId
+        )
         const nextIndex =
-          currentIndex < commands.length - 1 ? currentIndex + 1 : 0
-        const nextId = commands[nextIndex]?.id ?? null
+          currentIndex >= 0 && currentIndex < filteredCommands.length - 1
+            ? currentIndex + 1
+            : 0
+        const nextId = filteredCommands[nextIndex]?.id ?? null
 
         return nextId
       })
@@ -147,39 +156,44 @@ export function VisualizerContainer(
     return () => {
       clearInterval(intervalId)
     }
-  }, [isPlaying, commands, milliSecondsPerFrame])
+  }, [isPlaying, filteredCommands, milliSecondsPerFrame])
 
   //  update the data for the spotlight window
   //  whenever the command index changes
-  useEffect(() => {
-    if (selectedCommandId == null) return
+  useEffect(
+    () => {
+      if (selectedCommandId == null) return
 
-    const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
-    if (nextIndex < 0) return
+      const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
+      if (nextIndex < 0) return
 
-    const nextSpotlight = {
+      const nextSpotlight = {
+        protocolKey,
+        slot: selectedSlot,
+        command: commands[nextIndex],
+        robotState,
+        invariantContext,
+        analysis,
+        liquids,
+      }
+
+      if (nextSpotlight.slot != null && nextSpotlight.command != null) {
+        dispatch(stepDetailViewerUpdateAction(nextSpotlight))
+      }
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      selectedCommandId,
+      selectedSlot,
       protocolKey,
-      slot: selectedSlot,
-      command: commands[nextIndex],
       robotState,
-      invariantContext: invariantContext,
+      invariantContext,
       analysis,
       liquids,
-    }
-
-    if (nextSpotlight.slot != null && nextSpotlight.command != null) {
-      dispatch(stepDetailViewerUpdateAction(nextSpotlight))
-    }
-  }, [
-    selectedCommandId,
-    selectedSlot,
-    protocolKey,
-    robotState,
-    invariantContext,
-    analysis,
-    liquids,
-    commands,
-  ])
+      commands,
+    ]
+  )
 
   const isThermocyclerAttached = Object.keys(robotState.modules).some(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
@@ -190,26 +204,42 @@ export function VisualizerContainer(
     srcFileNames,
     analysisOutput
   )
-  const percentComplete =
-    filteredSelectedCommandIndex != null
-      ? (filteredSelectedCommandIndex / filteredCommands.length) * 100
-      : 0
+  const clamp = (n: number, min: number, max: number): number =>
+    Math.min(max, Math.max(min, n))
+  let percentComplete = 0
+
+  if (filteredSelectedCommandIndex == null) {
+    percentComplete = 0
+  } else if (filteredCommands.length <= 1) {
+    percentComplete = 100
+  } else {
+    percentComplete = clamp(
+      (filteredSelectedCommandIndex / (filteredCommands.length - 1)) * 100,
+      0,
+      100
+    )
+  }
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
 
-  useEffect(() => {
-    if (
-      isThermocyclerAttached &&
-      selectedSlot != null &&
-      thermocyclerSlots.includes(selectedSlot)
-    ) {
-      if (robotType === FLEX_ROBOT_TYPE) {
-        setSelectedSlot('B1')
-      } else {
-        setSelectedSlot('7')
+  useEffect(
+    () => {
+      if (
+        isThermocyclerAttached &&
+        selectedSlot != null &&
+        thermocyclerSlots.includes(selectedSlot)
+      ) {
+        if (robotType === FLEX_ROBOT_TYPE) {
+          setSelectedSlot('B1')
+        } else {
+          setSelectedSlot('7')
+        }
       }
-    }
-  }, [isThermocyclerAttached, selectedSlot])
+    },
+    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isThermocyclerAttached, selectedSlot]
+  )
 
   const handleMouseDown = (
     e: MouseEvent<HTMLDivElement>,
@@ -316,6 +346,8 @@ export function VisualizerContainer(
           handlePause={() => {
             setIsPlaying(false)
           }}
+          milliSecondsPerFrame={milliSecondsPerFrame}
+          isGlobalPlaying={isPlaying}
         />
       </div>
       {/* Gutter between left & center */}
@@ -340,6 +372,7 @@ export function VisualizerContainer(
           setMilliSecondsPerFrame={setMilliSecondsPerFrame}
         />
         <DeckView
+          filteredCommands={filteredCommands}
           commands={analysis.commands}
           liquids={liquids}
           invariantContext={invariantContext}
@@ -347,7 +380,7 @@ export function VisualizerContainer(
           robotType={robotType ?? FLEX_ROBOT_TYPE}
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
-            if (selectedRunTimeCommand != null && selectedSlot != null) {
+            if (selectedRunTimeCommand != null && typeof slot === 'string') {
               trackEvent({
                 name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
                 properties: {},
@@ -355,7 +388,7 @@ export function VisualizerContainer(
               dispatch(
                 stepDetailViewerOpenAction({
                   protocolKey,
-                  slot: selectedSlot,
+                  slot,
                   command: selectedRunTimeCommand,
                   robotState,
                   invariantContext,

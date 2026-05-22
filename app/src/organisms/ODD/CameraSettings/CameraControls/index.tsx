@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 
@@ -37,14 +36,14 @@ export function CameraControls({
   const settings = useCameraSettingsValues(runId)
   const { createCameraImageSettings } = useCreateCameraImageSettings()
 
-  const returnToHomeView = (settings: CameraImageSettings): void => {
+  const returnToHomeView = (partialSettings: CameraImageSettings): void => {
     setIsLoading(true)
 
     const cameraImageSettings: CameraImageSettings = {
-      zoom: settings.zoom,
-      brightness: settings.brightness,
-      contrast: settings.contrast,
-      saturation: settings.saturation,
+      zoom: partialSettings.zoom ?? settings.zoom,
+      brightness: partialSettings.brightness ?? settings.brightness,
+      contrast: partialSettings.contrast ?? settings.contrast,
+      saturation: partialSettings.saturation ?? settings.saturation,
     }
 
     if (runId != null) {

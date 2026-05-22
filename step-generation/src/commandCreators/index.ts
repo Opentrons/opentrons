@@ -11,6 +11,9 @@ export {
   thermocyclerProfileStep,
   thermocyclerStateStep,
   transfer,
+  vacuumCloseVentSetPumpPressure,
+  vacuumCloseVentSetPumpPower,
+  vacuumCloseVentStartProfile,
   waitForModuleTask,
 } from './compound'
 
@@ -39,5 +42,11 @@ export {
   moveToAddressableAreaForDropTip,
   setTemperature,
   touchTip,
+  vacuumCloseVent,
+  vacuumOpenVent,
+  vacuumSetPumpPower,
+  vacuumSetPumpPressure,
+  vacuumStartRunProfile,
+  vacuumStopPump,
   waitForTemperature,
 } from './atomic'

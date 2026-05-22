@@ -1,7 +1,7 @@
 """Evotips Clean-up with 96-channel Pipette."""
 from opentrons.types import Point
 from opentrons.protocol_api import ProtocolContext, ParameterContext
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers
 
 metadata = {
     "protocolName": "Sample Clean-up by Evotips with 96-ch Pipette",
@@ -141,7 +141,7 @@ def run(protocol: ProtocolContext) -> None:
     type_dumpster = protocol.params.type_dumpster  # type: ignore[attr-defined]
     vol_extra = protocol.params.vol_extra  # type: ignore[attr-defined]
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     if test:
@@ -367,7 +367,7 @@ def run(protocol: ProtocolContext) -> None:
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

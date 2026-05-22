@@ -5,7 +5,6 @@
  2. upper letter keys: hg-layout-shift
  3. number keys: hg-layout-numbers
  4. symbol keys: hg-layout-symbols
- 1, 2 are using the same style but 3 & 4 have their own styles.
  */
 
 .simple-keyboard.oddTheme1.hg-theme-default {
@@ -20,7 +19,6 @@
 .hg-layout-shift .hg-row,
 .hg-layout-symbols .hg-row,
 .hg-layout-numbers .hg-row {
-  /* adding 3px because package's css add margin-right:5px */
   grid-gap: 3px;
 }
 
@@ -28,29 +26,37 @@
   margin-bottom: 3px;
 }
 
-.simple-keyboard .hg-button:active {
-  background-color: #dedede;
-  color: #16212d;
-}
-
+/* common layout */
 .hg-layout-default .hg-row .hg-button,
 .hg-layout-shift .hg-row .hg-button,
 .hg-layout-symbols .hg-row .hg-button,
 .hg-layout-numbers .hg-row .hg-button {
-  padding: 10px 22px;
+  height: 44.75px;
+  padding: 0;
+  box-sizing: border-box;
+
   background-color: #fff;
   color: #16212d;
+
   font-size: 20px;
   font-style: normal;
   font-weight: 600;
-  line-height: 24px;
+  line-height: 44.75px;
+}
+
+.simple-keyboard .hg-button:active {
+  background-color: #cbcccc; /* grey35 */
+  color: #16212d;
 }
 
 .hg-layout-default .hg-row:nth-child(1) .hg-button,
-.hg-layout-default .hg-row:nth-child(2) .hg-button,
 .hg-layout-shift .hg-row:nth-child(1) .hg-button,
-.hg-layout-shift .hg-row:nth-child(2) .hg-button,
 .hg-layout-numbers .hg-row:nth-child(1) .hg-button {
+  width: 93.6px;
+}
+
+.hg-layout-default .hg-row:nth-child(2) .hg-button,
+.hg-layout-shift .hg-row:nth-child(2) .hg-button {
   width: 93.6px;
 }
 
@@ -63,7 +69,6 @@
 }
 
 .hg-layout-numbers .hg-row:nth-child(2) .hg-button:nth-child(10) {
-  /* This is needed to override the package style */
   max-width: 83.4px !important;
 }
 
@@ -78,11 +83,6 @@
 .hg-layout-symbols .hg-row:nth-child(3) .hg-button {
   width: 97px;
 }
-
-/* .hg-layout-default .hg-row:nth-child(3) .hg-button,
-.hg-layout-shift .hg-row:nth-child(3) .hg-button {
-  width: 97px;
-} */
 
 .hg-layout-default .hg-row:nth-child(3) .hg-button:first-child,
 .hg-layout-default .hg-row:nth-child(3) .hg-button:last-child,
@@ -99,9 +99,93 @@
   width: 137.1px;
 }
 
-.simple-keyboard .hg-button:active {
-  background-color: #e3e3e3; /* grey30 */
-  color: #16212d;
+.hg-layout-default .hg-row:nth-child(4) .hg-button,
+.hg-layout-shift .hg-row:nth-child(4) .hg-button,
+.hg-layout-symbols .hg-row:nth-child(4) .hg-button,
+.hg-layout-numbers .hg-row:nth-child(4) .hg-button {
+  height: 44.75px;
+}
+
+/* globe key and return key */
+.hg-layout-default .hg-row:nth-child(4) .hg-button.hg-globe,
+.hg-layout-default .hg-row:nth-child(4) .hg-button.hg-return,
+.hg-layout-shift .hg-row:nth-child(4) .hg-button.hg-globe,
+.hg-layout-shift .hg-row:nth-child(4) .hg-button.hg-return,
+.hg-layout-symbols .hg-row:nth-child(4) .hg-button.hg-globe,
+.hg-layout-symbols .hg-row:nth-child(4) .hg-button.hg-return,
+.hg-layout-numbers .hg-row:nth-child(4) .hg-button.hg-globe,
+.hg-layout-numbers .hg-row:nth-child(4) .hg-button.hg-return {
+  width: 132px;
+  max-width: 132px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hide text */
+.simple-keyboard.oddTheme1 .hg-button.hg-globe span {
+  font-size: 0;
+}
+
+/* globe svg */
+.simple-keyboard.oddTheme1 .hg-button.hg-globe::before {
+  content: '';
+  display: block;
+
+  width: 20px;
+  height: 20px;
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='8.5' stroke='%2316212d' stroke-width='1.5'/%3E%3Cpath d='M1.5 10h17M10 1.5c2.4 2.2 3.8 5.3 3.8 8.5S12.4 16.3 10 18.5M10 1.5C7.6 3.7 6.2 6.8 6.2 10S7.6 16.3 10 18.5M3.5 5.2C5.2 6 7.5 6.5 10 6.5s4.8-.5 6.5-1.3M3.5 14.8c1.7-.8 4-1.3 6.5-1.3s4.8.5 6.5 1.3' stroke='%2316212d' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* shift key with custom svg */
+.hg-layout-default .hg-row:nth-child(3) .hg-button.hg-shift-icon,
+.hg-layout-shift .hg-row:nth-child(3) .hg-button.hg-shift-icon {
+  width: 132px;
+  max-width: 132px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hide text */
+.simple-keyboard.oddTheme1 .hg-button.hg-shift-icon span {
+  font-size: 0;
+}
+
+/* default: outline */
+.simple-keyboard.oddTheme1.hg-layout-default .hg-button.hg-shift-icon::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg width='28' height='22' viewBox='0 0 28 22' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 2L24.3923 11H3.6077L14 2Z' stroke='%2316212D' stroke-width='2'/%3E%3Crect x='8' y='11' width='12' height='10' stroke='%2316212D' stroke-width='2'/%3E%3Crect x='9' y='10' width='10' height='2.5' fill='white'/%3E%3C/svg%3E");
+}
+
+/* shift on: filled */
+.simple-keyboard.oddTheme1.hg-layout-shift .hg-button.hg-shift-icon::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg width='28' height='22' viewBox='0 0 28 22' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 2L24.3923 11H3.6077L14 2Z' fill='%2316212D' stroke='%2316212D' stroke-width='2'/%3E%3Crect x='8' y='11' width='12' height='10' fill='%2316212D' stroke='%2316212D' stroke-width='2'/%3E%3Crect x='9' y='10' width='10' height='2.5' fill='%2316212D'/%3E%3C/svg%3E");
+}
+
+/* space key */
+.hg-layout-default .hg-row:nth-child(4) .hg-button.hg-space-key,
+.hg-layout-shift .hg-row:nth-child(4) .hg-button.hg-space-key,
+.hg-layout-symbols .hg-row:nth-child(4) .hg-button.hg-space-key,
+.hg-layout-numbers .hg-row:nth-child(4) .hg-button.hg-space-key {
+  flex: 1;
 }
 
 .hg-candidate-box {

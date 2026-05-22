@@ -1,0 +1,33 @@
+.accordion_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  background-color: var(--transparent);
+}
+
+.accordion_header {
+  display: flex;
+  width: 100%;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: var(--transparent);
+}
+
+.chevron_button {
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background-color: var(--grey-35);
+  color: var(--black-90);
+  cursor: pointer;
+}
+
+.accordion_body {
+  width: 100%;
+  background-color: var(--grey-35);
+}

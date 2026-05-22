@@ -28,6 +28,11 @@ from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Mount, MountType
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 from server_utils.fastapi_utils.light_router import LightRouter
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleMultiBody,
+)
 
 from .instrument_models import (
     AttachedItem,
@@ -42,11 +47,6 @@ from .instrument_models import (
     PipetteState,
 )
 from robot_server.hardware import get_hardware
-from robot_server.service.json_api import (
-    MultiBodyMeta,
-    PydanticResponse,
-    SimpleMultiBody,
-)
 from robot_server.subsystems.models import SubSystem
 from robot_server.subsystems.router import status_route_for, update_route_for
 

@@ -1,5 +1,6 @@
 ---
 title: "Opentrons Flex: Command Line Operation Over SSH"
+description: "Connect via SSH and use command-line tools to manage Flex."
 ---
 
 Opentrons Flex gives you command-line access to its operating system through a Secure Shell (SSH) terminal connection. Terminal access lets you:
