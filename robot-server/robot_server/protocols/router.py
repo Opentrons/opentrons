@@ -232,10 +232,6 @@ async def create_protocol(  # noqa: C901
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
     protocol_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
-    _maybe_audit_protocol_upload: Annotated[
-        None,
-        Depends(maybe_audit_protocol_upload),
-    ] = None,
     created_at: Annotated[datetime, Depends(get_current_time)],
     maximum_quick_transfer_protocols: Annotated[
         int, Depends(get_maximum_quick_transfer_protocols)
@@ -281,6 +277,10 @@ async def create_protocol(  # noqa: C901
             description="Param-file pairs of CSV run-time parameters defined in the protocol.",
             alias="runTimeParameterFiles",
         ),
+    ] = None,
+    _maybe_audit_protocol_upload: Annotated[
+        None,
+        Depends(maybe_audit_protocol_upload),
     ] = None,
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
