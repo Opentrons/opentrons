@@ -72,20 +72,6 @@ export function useCreateMaintenanceCommandMutation(
           )
           throw e
         })
-        .then(response => {
-          queryClient
-            .invalidateQueries([host, 'maintenance_runs'])
-            .catch((e: Error) => {
-              console.error(
-                `error invalidating maintenance runs query: ${e.message}`
-              )
-            })
-          return response.data
-        })
-        .catch((e: any) => {
-          queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
-          throw e
-        })
   )
 
   return {
