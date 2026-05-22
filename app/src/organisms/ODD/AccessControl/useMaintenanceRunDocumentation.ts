@@ -11,11 +11,13 @@ import { usePromptForInteractionReason } from './usePromptForInteractionReason'
  * @returns commandDocState: DocumentationState to be passed to the creation hook and the maintenance run commands.
  * @returns deletionDocState: DocumentationState to be passed to the deletion hook.
  */
-export const useMaintenanceRunDocumentation = (): {
+export const useMaintenanceRunDocumentation = (
+  initialDocstate?: DocumentationState
+): {
   commandDocState: DocumentationState
   deletionDocState: DocumentationState
 } => {
-  const commandDocState = usePromptForInteractionReason()
+  const commandDocState = usePromptForInteractionReason(initialDocstate)
   const deletionDocState = useGuardedAction()
 
   return { commandDocState, deletionDocState }

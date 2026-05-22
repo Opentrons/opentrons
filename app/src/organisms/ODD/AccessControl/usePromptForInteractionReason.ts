@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
@@ -9,22 +9,38 @@ import { useGuardedAction } from './useGuardedAction'
 /**
  * Immediately prompts for the interaction reason and returns a documentation State.
  *
+
  * Use this to prompt for a documentation report to pass between multiple mutations that only need to be prompted once.
  * e.g. maintenance run commands
  * If mutations can prompt for documentation themselves, use useGuardedAction instead.
+ * 
+ *  @param initialDocstate - an optional documentation state to use as a base. To be used when a flow needs to sometimes but not always prompt before the first mutation.
+ *
  */
-export const usePromptForInteractionReason = (): DocumentationState => {
+export const usePromptForInteractionReason = (
+  initialDocstate?: DocumentationState
+): DocumentationState => {
   const [docReport, setDocReport] = useState<DocumentationReport>()
-  const docState = useGuardedAction(docReport)
+  const docStateToUse = initialDocstate?.accessControlEnabled
+    ? initialDocstate.docreport
+    : docReport
+  const docState = useGuardedAction(docStateToUse ?? undefined)
+  const promptInFlight = useRef(false)
 
   useEffect(() => {
     const promptForDocumentation = async (): Promise<void> => {
       if (docState.accessControlEnabled) {
-        if (docState.docreport == null) {
+        if (docState.docreport == null && !promptInFlight.current) {
+          promptInFlight.current = true
           console.log(
             'usePromptForInteractionReason: prompting for documentation'
           )
-          await docState.askForDocumentation().then(setDocReport)
+          await docState
+            .askForDocumentation()
+            .then(setDocReport)
+            .finally(() => {
+              promptInFlight.current = false
+            })
         }
       }
     }

@@ -16,6 +16,7 @@ import {
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -67,12 +68,20 @@ interface PipetteWizardFlowsProps {
   closeFlow: () => void
   onComplete?: () => void
   pipetteInfo?: LoadedPipette[]
+  initialDocstate?: DocumentationState
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
+  const {
+    flowType,
+    mount,
+    closeFlow,
+    selectedPipette,
+    onComplete,
+    initialDocstate,
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const deckConfig = useNotifyDeckConfigurationQuery()
@@ -177,7 +186,8 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const { commandDocState, deletionDocState } =
+    useMaintenanceRunDocumentation(initialDocstate)
 
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands(commandDocState)
