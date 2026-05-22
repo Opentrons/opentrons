@@ -910,10 +910,15 @@ class PipetteView:
         Note: This merely returns the maxVolume value from the definition of the specific volume mode,
         without taking attached tip volume into consideration.
         """
-        # TODO: Raise an error if the volume mode is not defined in the config
-        return self.get_config(pipette_id).available_volume_modes_min_and_max_vol[
-            volume_mode
-        ]["max_volume"]
+        try:
+            volume = self.get_config(pipette_id).available_volume_modes_min_and_max_vol[
+                volume_mode
+            ]["max_volume"]
+        except KeyError as e:
+            raise errors.VolumeModeDoesNotExistError(
+                f"Volume mode {volume_mode} does not exist for pipette {pipette_id}."
+            ) from e
+        return volume
 
     def lookup_volume_to_mm_conversion(
         self, pipette_id: str, volume: float, action: str

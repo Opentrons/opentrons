@@ -643,8 +643,185 @@ def test_order_of_water_transfer_steps_with_no_new_tips(
                 trash_location=mock.ANY,
             ),
         ]
-        assert len(mock_manager.mock_calls) == len(expected_calls)
-        assert mock_manager.mock_calls[2] == expected_calls[2]
+        assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.26", "Flex")], indirect=True
+)
+def test_transfer_steps_volume_split_in_low_volume_mode_in_older_apis(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should split the transfer volume into multiple transfers (unnecessarily) in low volume mode.
+
+    This test documents the unexpected behavior of the volume split calculations in liquid-class-based transfers prior to the fix in APIv2.29
+    """
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_50ul", "D1"
+    )
+    pipette_50 = simulated_protocol_context.load_instrument(
+        "flex_1channel_50", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+
+    water = simulated_protocol_context.get_liquid_class("water")
+    pipette_50.pick_up_tip()
+    pipette_50.configure_for_volume(1)
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "aspirate_liquid_class",
+            side_effect=InstrumentCore.aspirate_liquid_class,
+            autospec=True,
+        ) as patched_aspirate,
+        mock.patch.object(
+            InstrumentCore,
+            "dispense_liquid_class",
+            side_effect=InstrumentCore.dispense_liquid_class,
+            autospec=True,
+        ) as patched_dispense,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_aspirate, "aspirate_liquid_class")
+        mock_manager.attach_mock(patched_dispense, "dispense_liquid_class")
+        pipette_50.transfer_with_liquid_class(
+            liquid_class=water,
+            volume=40,
+            source=nest_plate.rows()[0][:1],
+            dest=arma_plate.rows()[0][:1],
+            new_tip="never",
+            trash_location=trash,
+        )
+        expected_calls = [
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=20,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                max_pipette_and_tip_volume=30,
+                volume_for_pipette_mode_configuration=20,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=20,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=20, air_gap=0.1)],
+                add_final_air_gap=True,
+                trash_location=mock.ANY,
+            ),
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=20,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0.1)],
+                max_pipette_and_tip_volume=30,
+                volume_for_pipette_mode_configuration=20,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=20,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=20, air_gap=0.1)],
+                add_final_air_gap=False,
+                trash_location=mock.ANY,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.29", "Flex")], indirect=True
+)
+def test_transfer_steps_volume_split_in_low_volume_mode(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should NOT split the transfer volume into multiple transfers unnecessarily in low volume mode."""
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_50ul", "D1"
+    )
+    pipette_50 = simulated_protocol_context.load_instrument(
+        "flex_1channel_50", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+
+    water = simulated_protocol_context.get_liquid_class("water")
+    pipette_50.pick_up_tip()
+    pipette_50.configure_for_volume(1)
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "aspirate_liquid_class",
+            side_effect=InstrumentCore.aspirate_liquid_class,
+            autospec=True,
+        ) as patched_aspirate,
+        mock.patch.object(
+            InstrumentCore,
+            "dispense_liquid_class",
+            side_effect=InstrumentCore.dispense_liquid_class,
+            autospec=True,
+        ) as patched_dispense,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_aspirate, "aspirate_liquid_class")
+        mock_manager.attach_mock(patched_dispense, "dispense_liquid_class")
+        pipette_50.transfer_with_liquid_class(
+            liquid_class=water,
+            volume=40,
+            source=nest_plate.rows()[0][:1],
+            dest=arma_plate.rows()[0][:1],
+            new_tip="never",
+            trash_location=trash,
+        )
+        expected_calls = [
+            mock.call.aspirate_liquid_class(
+                mock.ANY,
+                volume=40,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=0, air_gap=0)],
+                max_pipette_and_tip_volume=50,
+                volume_for_pipette_mode_configuration=40,
+            ),
+            mock.call.dispense_liquid_class(
+                mock.ANY,
+                volume=40,
+                dest=mock.ANY,
+                source=mock.ANY,
+                transfer_properties=mock.ANY,
+                transfer_type=TransferType.ONE_TO_ONE,
+                tip_contents=[LiquidAndAirGapPair(liquid=40, air_gap=0.1)],
+                add_final_air_gap=False,
+                trash_location=mock.ANY,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
 
 
 @pytest.mark.ot3_only
@@ -2012,6 +2189,8 @@ def test_distribution_steps_using_multi_dispense_with_20ul_tips_in_low_volume_mo
         mock_manager.attach_mock(
             patched_dispense, "dispense_liquid_class_during_multi_dispense"
         )
+        # This distribution should use low volume mode, have max volume as 20uL
+        # and make two aspirations for the total distribution: First of (4uL * 3) uL and then (4uL * 2) uL
         pipette.distribute_with_liquid_class(
             liquid_class=water,
             volume=4,
@@ -2029,7 +2208,9 @@ def test_distribution_steps_using_multi_dispense_with_20ul_tips_in_low_volume_mo
             ),
             mock.call.aspirate_liquid_class(
                 mock.ANY,
-                volume=12 + expected_conditioning_volume + expected_disposal_volume,
+                volume=12
+                + expected_conditioning_volume
+                + expected_disposal_volume,  # = 20
                 source=mock.ANY,
                 transfer_properties=mock.ANY,
                 transfer_type=TransferType.ONE_TO_MANY,

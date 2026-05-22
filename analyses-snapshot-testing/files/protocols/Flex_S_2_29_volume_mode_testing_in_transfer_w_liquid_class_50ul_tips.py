@@ -23,9 +23,11 @@ def run(protocol_context):
         "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
     )
 
+
+    water = protocol_context.get_liquid_class("water")
+    pipette_50.pick_up_tip()
     # Make the pipette use low volume mode
     pipette_50.configure_for_volume(3)
-    water = protocol_context.get_liquid_class("water")
 
     # Transfer 32uL of water from source to destination.
     # The transfer method should ignore the above volume mode and instead, understand that all 32uL of liquid
@@ -36,7 +38,7 @@ def run(protocol_context):
         volume=32,
         source=nest_plate.rows()[0][:2],
         dest=arma_plate.rows()[0][:2],
-        new_tip="always",
+        new_tip="never",
         trash_location=trash,
     )
 
@@ -52,9 +54,10 @@ def run(protocol_context):
         volume=4,
         source=nest_plate.rows()[0][:2],
         dest=arma_plate.rows()[0][:2],
-        new_tip="always",
+        new_tip="never",
         trash_location=trash,
     )
 
     # The volume mode should be reset to default after the transfer.
     assert pipette_50.max_volume == 50
+    pipette_50.drop_tip()
