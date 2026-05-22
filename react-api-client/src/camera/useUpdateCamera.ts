@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { createCamera } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -43,12 +43,14 @@ export function useUpdateCamera(
     AxiosError<ErrorResponse>,
     CameraData
   >(
-    [host, 'camera'],
+    getQueryKey(host, 'camera'),
     (data: CameraData) =>
       createCamera(host!, data).then(response => {
-        queryClient.invalidateQueries([host, 'camera']).catch((e: Error) => {
-          throw e
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'camera'))
+          .catch((e: Error) => {
+            throw e
+          })
         return response.data
       }),
     options

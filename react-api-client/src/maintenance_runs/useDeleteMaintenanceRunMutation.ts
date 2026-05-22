@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { deleteMaintenanceRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type {
   UseMutateFunction,
@@ -34,9 +34,11 @@ export function useDeleteMaintenanceRunMutation(
   const mutation = useMutation<EmptyResponse, unknown, string>(
     (maintenanceRunId: string) =>
       deleteMaintenanceRun(host!, maintenanceRunId).then(response => {
-        queryClient.removeQueries([host, 'maintenance_runs', maintenanceRunId])
+        queryClient.removeQueries(
+          getQueryKey(host, 'maintenance_runs', maintenanceRunId)
+        )
         queryClient
-          .invalidateQueries([host, 'maintenance_runs'])
+          .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
           .catch((e: Error) => {
             console.error(
               `error invalidating maintenance_runs query: ${e.message}`
