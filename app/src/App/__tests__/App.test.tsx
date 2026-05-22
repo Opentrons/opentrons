@@ -18,7 +18,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/config')
 vi.mock('../DesktopApp')
-vi.mock('../hooks')
+vi.mock('../hooks/useWindowType')
 vi.mock('../OnDeviceDisplayApp')
 vi.mock('../SecondaryWindowApp')
 vi.mock('/app/App/sentry')
