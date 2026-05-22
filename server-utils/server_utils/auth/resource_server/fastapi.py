@@ -18,10 +18,7 @@ import fastapi
 import fastapi.responses
 import fastapi.security
 
-from .auth_server import (
-    TOKEN_ENDPOINT_PATH,
-    LocalHTTPClient,
-)
+from .auth_server import TOKEN_ENDPOINT_PATH, LocalHTTPClient
 from .authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     AuthorizationChecker,
@@ -150,9 +147,7 @@ def install_authorization_checker(
 
 @asynccontextmanager
 async def build_authorization_checker(
-    *,
-    auth_server_uds: str | None = None,
-    auth_server_url: str | None = None,
+    *, auth_server_uds: str | None = None, auth_server_url: str | None = None
 ) -> AsyncGenerator[AuthorizationChecker, None]:
     """Build an `AuthorizationChecker` appropriately configured for most servers.
 
@@ -161,7 +156,6 @@ async def build_authorization_checker(
     typically be taken from CLI options or environment variables. If neither are
     specified, a dummy `AuthorizationChecker` is returned that allows unauthenticated
     access to everything.
-
     """
     if auth_server_uds is None and auth_server_url is None:
         _log.info(
