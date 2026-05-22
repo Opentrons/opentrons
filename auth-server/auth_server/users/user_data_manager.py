@@ -26,14 +26,14 @@ class InvalidInputError(ValueError):
 
 
 def _validate_fields(
-    user_name: str | None = None,
+    username: str | None = None,
     password: str | None = None,
     full_name: str | None = None,
     account_type: str | None = None,
 ) -> None:
     """Validate that provided fields are non-empty and passwords meet length requirements."""
     for field_name, value in [
-        ("username", user_name),
+        ("username", username),
         ("password", password),
         ("fullName", full_name),
         ("accountType", account_type),
@@ -98,7 +98,7 @@ class UserDataManager:
     ) -> UserResponse:
         """Validate inputs, check for duplicates, and create a new user."""
         _validate_fields(
-            user_name=username,
+            username=username,
             password=password,
             full_name=full_name,
             account_type=account_type,
@@ -139,7 +139,7 @@ class UserDataManager:
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
-            user_name=new_username,
+            username=new_username,
             password=new_password,
             full_name=new_full_name,
             account_type=new_account_type,
