@@ -32,7 +32,11 @@ const hasSentryCreds =
   !!process.env.SENTRY_ORG &&
   !!process.env.SENTRY_PROJECT
 
-// need to specify to avoid duplicated bundling
+// Local opt-in only: devs can enable the plugin by exporting SENTRY_* env vars.
+// When enabled locally, the plugin will upload sourcemaps under the `local-dev`
+// release name. The runtime SDK is configured to report the same release so local
+// events can resolve uploaded sourcemaps.
+// In CI, sourcemap upload is disabled by default and must be explicitly opted in.
 const enableSentryLocalSourcemapUpload = !isCI && hasSentryCreds
 const enableSentryCiSourcemapUpload =
   isCI && hasSentryCreds && process.env.OT_PD_SENTRY_PLUGIN_UPLOAD === 'true'
@@ -57,9 +61,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
         output: {
           // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
           manualChunks(id) {
-            // Monorepo packages resolved via alias (not node_modules paths)
-            // must be explicitly chunked — otherwise they get duplicated in
-            // every lazy page chunk, causing the "Duplicated JavaScript" warning
+            // need to specify to avoid duplicated bundling
             if (id.includes('/shared-data/js')) return 'opentrons-shared-data'
             if (id.includes('/components/src')) return 'opentrons-components'
             if (id.includes('/step-generation/src'))
