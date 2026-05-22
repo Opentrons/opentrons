@@ -32,11 +32,7 @@ const hasSentryCreds =
   !!process.env.SENTRY_ORG &&
   !!process.env.SENTRY_PROJECT
 
-// Local opt-in only: devs can enable the plugin by exporting SENTRY_* env vars.
-// When enabled locally, the plugin will upload sourcemaps under the `local-dev`
-// release name. The runtime SDK is configured to report the same release so local
-// events can resolve uploaded sourcemaps.
-// In CI, sourcemap upload is disabled by default and must be explicitly opted in.
+// need to specify to avoid duplicated bundling
 const enableSentryLocalSourcemapUpload = !isCI && hasSentryCreds
 const enableSentryCiSourcemapUpload =
   isCI && hasSentryCreds && process.env.OT_PD_SENTRY_PLUGIN_UPLOAD === 'true'
