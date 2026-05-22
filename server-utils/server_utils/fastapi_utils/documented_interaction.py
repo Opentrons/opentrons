@@ -1,7 +1,5 @@
 """FastAPI helpers for audit ``userNotes`` on non–JSON:API request bodies."""
 
-from __future__ import annotations
-
 from typing import Final
 
 from fastapi import Request
