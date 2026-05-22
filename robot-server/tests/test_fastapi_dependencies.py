@@ -1,9 +1,10 @@
 """Tests for ``robot_server.fastapi_dependencies``."""
 
+import logging
 from datetime import datetime
+from unittest.mock import AsyncMock, patch
 
 import pytest
-from decoy import Decoy
 from fastapi import status
 
 from server_utils.auth.resource_server.authorization_checker import (
@@ -15,48 +16,88 @@ from robot_server.errors.error_responses import ApiError
 from robot_server.fastapi_dependencies import maybe_record_documented_interaction
 from robot_server.runs.action_models import RunActionCreate, RunActionType
 
+_RUN_ID = "run-abc"
+_CREATED_AT = datetime(year=2024, month=1, day=1)
+_PLAY_ACTION = RunActionCreate(actionType=RunActionType.PLAY)
+_USER_NOTES = "User documented why they pressed play"
+_AUDIT_LOGGER = "server_utils.auth.resource_server.authorization_checker"
+
+
+@pytest.mark.asyncio
+async def test_maybe_record_documented_interaction_records_audit_when_required(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Forwards request notes and data to the checker and writes an audit log entry."""
+    checker = AlwaysAllowedAuthorizationChecker()
+    body = RequestModel[RunActionCreate](
+        data=_PLAY_ACTION,
+        userNotes=f"  {_USER_NOTES}  ",
+    )
+    with (
+        patch.object(
+            checker,
+            "get_require_reason_for_interaction_enabled",
+            new=AsyncMock(return_value=True),
+        ),
+        caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER),
+    ):
+        await maybe_record_documented_interaction(
+            _RUN_ID,
+            body,
+            _CREATED_AT,
+            authorization_checker=checker,
+        )
+
+    assert any(
+        "Documented interaction" in record.message and _RUN_ID in record.message
+        for record in caplog.records
+    )
+
+
+@pytest.mark.asyncio
+async def test_maybe_record_documented_interaction_skips_audit_when_not_required(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """When auth-server does not require notes, no audit entry is recorded."""
+    checker = AlwaysAllowedAuthorizationChecker()
+    body = RequestModel[RunActionCreate](
+        data=_PLAY_ACTION,
+        userNotes=None,
+    )
+    with caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER):
+        await maybe_record_documented_interaction(
+            _RUN_ID,
+            body,
+            _CREATED_AT,
+            authorization_checker=checker,
+        )
+
+    assert not any("Documented interaction" in record.message for record in caplog.records)
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("action_type", [RunActionType.PLAY, RunActionType.PAUSE])
-async def test_action_without_notes_raises_when_auth_server_requires_them(
-    decoy: Decoy,
+async def test_maybe_record_documented_interaction_raises_when_notes_required_but_missing(
     action_type: RunActionType,
 ) -> None:
     """Run actions without ``userNotes`` are rejected when auth-server requires them."""
-    checker = decoy.mock(cls=AlwaysAllowedAuthorizationChecker)
-    decoy.when(await checker.get_require_reason_for_interaction_enabled()).then_return(
-        True
-    )
+    checker = AlwaysAllowedAuthorizationChecker()
     body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
         userNotes=None,
     )
-    with pytest.raises(ApiError) as exc_info:
+    with (
+        patch.object(
+            checker,
+            "get_require_reason_for_interaction_enabled",
+            new=AsyncMock(return_value=True),
+        ),
+        pytest.raises(ApiError) as exc_info,
+    ):
         await maybe_record_documented_interaction(
-            "run-id",
+            _RUN_ID,
             body,
-            datetime(year=2024, month=1, day=1),
+            _CREATED_AT,
             authorization_checker=checker,
         )
     assert exc_info.value.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
-
-@pytest.mark.asyncio
-async def test_action_without_notes_allowed_when_auth_server_does_not_require_them(
-    decoy: Decoy,
-) -> None:
-    """When auth-server does not require notes, actions without ``userNotes`` are allowed."""
-    checker = decoy.mock(cls=AlwaysAllowedAuthorizationChecker)
-    decoy.when(await checker.get_require_reason_for_interaction_enabled()).then_return(
-        False
-    )
-    body = RequestModel[RunActionCreate](
-        data=RunActionCreate(actionType=RunActionType.PLAY),
-        userNotes=None,
-    )
-    await maybe_record_documented_interaction(
-        "run-id",
-        body,
-        datetime(year=2024, month=1, day=1),
-        authorization_checker=checker,
-    )
