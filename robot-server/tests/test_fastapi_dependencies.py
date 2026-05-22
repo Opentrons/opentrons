@@ -141,6 +141,7 @@ async def test_maybe_record_documented_interaction_non_json_records_audit_when_r
 async def test_maybe_record_documented_interaction_non_json_skips_audit_when_not_required(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
+    """When auth-server does not require notes, no audit entry is recorded."""
     checker = AlwaysAllowedAuthorizationChecker()
     with caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER):
         await maybe_record_documented_interaction_non_json(
@@ -160,6 +161,7 @@ async def test_maybe_record_documented_interaction_non_json_skips_audit_when_not
 async def test_maybe_record_documented_interaction_non_json_raises_when_notes_required_but_missing() -> (
     None
 ):
+    """Non-JSON routes reject requests without ``userNotes`` when auth-server requires them."""
     checker = AlwaysAllowedAuthorizationChecker()
     with (
         patch.object(

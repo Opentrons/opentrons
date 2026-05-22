@@ -34,6 +34,7 @@ from .dependencies import (
     get_data_file_auto_deleter,
     get_data_files_directory,
     get_data_files_store,
+    maybe_audit_data_file_upload,
 )
 from .file_auto_deleter import DataFileAutoDeleter
 from .models import (
@@ -128,7 +129,7 @@ async def upload_data_file(
     ],
     file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
     file_hasher: Annotated[FileHasher, Depends(get_file_hasher)],
-    file_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    file_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
     file: Annotated[
         Optional[UploadFile], File(description="Data file to upload")
@@ -140,8 +141,16 @@ async def upload_data_file(
             alias="filePath",
         ),
     ] = None,
+    _maybe_audit_data_file_upload: Annotated[
+        None,
+        Depends(maybe_audit_data_file_upload),
+    ] = None,
 ) -> PydanticResponse[SimpleBody[DataFile]]:
-    """Save the uploaded data file to persistent storage and update database."""
+    """Save the uploaded data file to persistent storage and update database.
+
+    When auth-server requires reasons for interaction, clients must supply
+    ``userNotes`` as a query parameter or form field on this multipart request.
+    """
     if all([file, file_path]):
         raise MultipleDataFileSources(
             detail="Can accept either a file or a file path, not both."

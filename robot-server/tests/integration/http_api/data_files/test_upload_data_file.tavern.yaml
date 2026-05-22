@@ -64,3 +64,44 @@ stages:
           name: "color_codes.csv"
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           source: "uploaded"
+
+---
+test_name: Upload a data file with userNotes on OT-3 when require-reason is off
+
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Upload without userNotes when require-reason is off
+    request:
+      url: '{ot3_server_base_url}/dataFiles'
+      method: POST
+      files:
+        file: 'tests/integration/data_files/color_codes.csv'
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          name: "color_codes.csv"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          source: "uploaded"
+
+  - name: Upload with optional userNotes form field when require-reason is off
+    request:
+      url: '{ot3_server_base_url}/dataFiles'
+      method: POST
+      files:
+        file: 'tests/integration/data_files/test.csv'
+      data:
+        userNotes: 'Uploading test.csv for integration coverage'
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          name: "test.csv"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          source: "uploaded"
