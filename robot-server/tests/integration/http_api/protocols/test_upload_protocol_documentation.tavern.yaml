@@ -23,6 +23,13 @@ stages:
           id: !anystr
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
 
+  - name: Delete protocol so second upload is not deduplicated
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
+
   - name: Upload with optional userNotes form field when require-reason is off
     request:
       url: '{ot3_server_base_url}/protocols'
