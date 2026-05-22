@@ -12,6 +12,11 @@ stages:
       files:
         files: 'tests/integration/protocols/empty_ot3.json'
     response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
       status_code: 201
       json:
         data:
@@ -27,6 +32,8 @@ stages:
       data:
         userNotes: 'Uploading empty_ot3.json for integration coverage'
     response:
+      strict:
+        - json:off
       status_code: 201
       json:
         data:

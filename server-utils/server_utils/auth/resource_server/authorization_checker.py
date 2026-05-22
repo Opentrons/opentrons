@@ -33,12 +33,12 @@ class DocumentedInteraction(Generic[RequestDataT]):
     user_notes: str | None
     request_data: RequestDataT
 
-    @classmethod
+    @staticmethod
     def from_request_model(
-        cls, request: RequestModel[RequestDataT]
+        request: RequestModel[RequestDataT],
     ) -> DocumentedInteraction[RequestDataT]:
         """Build from a JSON:API ``RequestModel`` (``data`` + optional ``userNotes``)."""
-        return cls(
+        return DocumentedInteraction(
             user_notes=request.supplied_user_notes(),
             request_data=request.data,
         )
@@ -78,7 +78,7 @@ class AuthorizationChecker(ABC):
 
     async def record_documented_interaction(
         self,
-        interaction: DocumentedInteraction[object],
+        interaction: DocumentedInteraction[RequestDataT],
         *,
         resource_id: str,
         recorded_at: datetime,
@@ -112,7 +112,7 @@ class AuthorizationChecker(ABC):
     def _log_documented_interaction(
         self,
         *,
-        interaction: DocumentedInteraction[object],
+        interaction: DocumentedInteraction[RequestDataT],
         resource_id: str,
         recorded_at: datetime,
     ) -> None:
