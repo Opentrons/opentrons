@@ -82,6 +82,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             bool(int(match.group("E"))),
             int(match.group("D")),
             VentState(int(match.group("V"))),
+            int(match.group("D")),
         )
 
     @classmethod

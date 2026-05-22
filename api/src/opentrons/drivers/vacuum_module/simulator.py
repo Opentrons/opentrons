@@ -111,6 +111,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
             self.vacuum_on,
             self.duration,
             self.vent_state,
+            0,
         )
 
     async def set_pump_state(

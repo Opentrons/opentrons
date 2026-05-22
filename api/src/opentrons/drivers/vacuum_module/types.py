@@ -112,6 +112,7 @@ class VacuumState:
     vacuum_enabled: bool
     vacuum_duration: int
     vent_state: VentState
+    time_remaining: int
 
 
 @dataclass
