@@ -183,6 +183,7 @@ class AuthSettingsResponseData(_StrictBaseModel):
 
     accessControlEnabled: bool
 
+
 class RequireReasonForInteractionSettingsResponse(_StrictBaseModel):
     """A response body with the require-reason-for-interaction setting."""
 
@@ -193,4 +194,3 @@ class RequireReasonForInteractionSettingsResponseData(_StrictBaseModel):
     """Response body data for the require-reason-for-interaction setting."""
 
     requireReasonForInteraction: bool
-    

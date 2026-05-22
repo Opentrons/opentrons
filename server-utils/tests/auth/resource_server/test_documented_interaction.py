@@ -1,8 +1,7 @@
 """Tests for documented interaction audit handling on ``AuthorizationChecker``."""
 
-from datetime import datetime
-
 import logging
+from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -43,7 +42,9 @@ async def test_record_documented_interaction_uses_explicit_require_reason_flag(
         recorded_at=datetime(year=2024, month=1, day=1),
         require_reason_for_interaction=False,
     )
-    decoy.verify(await mock_client.get_require_reason_for_interaction_settings(), times=0)
+    decoy.verify(
+        await mock_client.get_require_reason_for_interaction_settings(), times=0
+    )
 
 
 @pytest.mark.asyncio
