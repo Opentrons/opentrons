@@ -34,10 +34,10 @@
     "@opentrons/shared-data": "link:../shared-data",
     "core-js": "3.2.1",
     "immer": "^10.1.3",
-    "lodash": "4.18.1",
+    "lodash": "catalog:",
     "uuid": "14.0.0"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.24"
+    "@types/lodash": "catalog:"
   }
 }
