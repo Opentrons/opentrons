@@ -7,7 +7,7 @@
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
   "peerDependencies": {
-    "react": "catalog:"
+    "react": "catalog:react18"
   },
   "dependencies": {
     "@opentrons/api-client": "link:../api-client",

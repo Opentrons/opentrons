@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "peerDependencies": {
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "react": "catalog:react18",
+    "react-dom": "catalog:react18"
   },
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",

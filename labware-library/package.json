@@ -40,8 +40,8 @@
     "lodash": "catalog:",
     "mixpanel-browser": "2.29.1",
     "query-string": "6.2.0",
-    "react": "catalog:",
-    "react-dom": "catalog:",
+    "react": "catalog:react18",
+    "react-dom": "catalog:react18",
     "react-router-dom": "6.24.1",
     "styled-components": "5.3.6",
     "yup": "0.32.9"
