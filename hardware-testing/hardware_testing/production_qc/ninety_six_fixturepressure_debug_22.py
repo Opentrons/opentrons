@@ -402,6 +402,7 @@ async def _fixture_check_pressure(
     pip_channels = int(pip.channels)
     print("pip_channels",pip_channels)
     delaytime = 3 #
+    fixture_pickup_position = await api.gantry_position(mount)
     # above the fixture
     r, _ = await _read_pressure_and_check_results(
         api,
@@ -416,38 +417,41 @@ async def _fixture_check_pressure(
         repeat_index=repeat_index,
     )
     results.append(r)
-    # insert into the fixture
-    # NOTE: unknown amount of pressure here (depends on where Z was calibrated)
-    # fixture_depth = PRESSURE_FIXTURE_INSERT_DEPTH[pip_vol]
-    # await api.move_rel(mount, Point(z=-fixture_depth))
-    print("picking up tips (hold gear engaged)")
-    await _pick_up_tip_96_hold_gear_engaged(
-        api,
-        OT3Mount.LEFT,
-        helpers_ot3.get_default_tip_length(1000),
-    )
-    # await api.pick_up_tip(
-    #     OT3Mount.LEFT, helpers_ot3.get_default_tip_length(50)
-    # )
-    await asyncio.sleep(delaytime)
-    r, inserted_pressure_data = await _read_pressure_and_check_results(
-        api,
-        pip_channels,
-        pip_vol,
-        fixture,
-        PressureEvent.INSERT,
-        cfg,
-        write_cb,
-        accumulate_raw_data_cb,
-        pip_channels,
-        repeat_index=repeat_index,
-    )
-    results.append(r)
-    # aspirate 50uL
     
     aspiratevol = PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol]
+    aspirate_volumes = (
+        aspiratevol if isinstance(aspiratevol, list) else [aspiratevol]
+    )
+    inserted_pressure_data: Optional[List[List[float]]] = None
 
-    for aspval in aspiratevol:
+    for volume_index, aspval in enumerate(aspirate_volumes):
+        # Each volume gets a fresh pickup. Return to the calibrated fixture
+        # pickup point because drop_tip raises Z after releasing the gears.
+        await helpers_ot3.move_to_arched_ot3(api, mount, fixture_pickup_position)
+        print("picking up tips (hold gear engaged)")
+        await _pick_up_tip_96_hold_gear_engaged(
+            api,
+            OT3Mount.LEFT,
+            helpers_ot3.get_default_tip_length(1000),
+        )
+        await asyncio.sleep(delaytime)
+
+        # Keep the original CSV structure: only one insert record per repeat.
+        if volume_index == 0:
+            r, inserted_pressure_data = await _read_pressure_and_check_results(
+                api,
+                pip_channels,
+                pip_vol,
+                fixture,
+                PressureEvent.INSERT,
+                cfg,
+                write_cb,
+                accumulate_raw_data_cb,
+                pip_channels,
+                repeat_index=repeat_index,
+            )
+            results.append(r)
+
         print("aspirate:",aspval)
         write_cb(["aspirate-dispense",aspval,"ul"])
         await api.aspirate(mount, aspval)
@@ -494,11 +498,13 @@ async def _fixture_check_pressure(
         )
         results.append(r)
         await api.prepare_for_aspirate(OT3Mount.LEFT)
-    # retract out of fixture
-    #await api.move_rel(mount, Point(z=fixture_depth))
-    # Release gears only after pressure testing, then drop tip.
-    await _release_gear_then_drop_tip(api)
-    await asyncio.sleep(delaytime)
+
+        # Release gears after each volume so the next volume starts from an
+        # independent tip pickup state.
+        await _release_gear_then_drop_tip(api)
+        await asyncio.sleep(delaytime)
+
+    # Keep the original CSV structure: only one post record per repeat.
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,

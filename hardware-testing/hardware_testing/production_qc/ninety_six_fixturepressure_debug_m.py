@@ -76,6 +76,9 @@ TIP_RACK_96_SLOT = 3
 TIP_RACK_PARTIAL_SLOT = 5
 RESERVOIR_SLOT = 2
 TRASH_SLOT = 12
+PRESSURE_FIXTURE_SLOT = 11  # OT-3/Flex deck slot A2
+PRESSURE_FIXTURE_SIDE = "left"
+PRESSURE_FIXTURE_PICKUP_Z = 111.5
 FINAL_TEST_FAIL_INFOR = []
 CHANNEL_LEAK_HISTORY: Dict[str, List[List[float]]] = {}
 INSERT_PRESSURE_FAILED_COUNTS: Dict[int, int] = {}
@@ -209,6 +212,19 @@ def get_tiprack_partial_nominal(pipette: Literal[200, 1000]) -> Point:
         TIP_RACK_PARTIAL_SLOT, f"opentrons_flex_96_tiprack_{pipette}ul"
     )
     return tip_rack_a1_nominal
+
+
+def get_pressure_fixture_pickup_nominal() -> Point:
+    """Get nominal pressure fixture pickup point in deck slot A2."""
+    slot_bottom_left = helpers_ot3.get_slot_bottom_left_position_ot3(
+        PRESSURE_FIXTURE_SLOT
+    )
+    fixture_a1 = pressure_fixture_a1_location(PRESSURE_FIXTURE_SIDE)
+    return slot_bottom_left + Point(
+        x=fixture_a1.x,
+        y=fixture_a1.y,
+        z=PRESSURE_FIXTURE_PICKUP_Z,
+    )
 
 
 async def aspirate_and_wait(
@@ -1284,8 +1300,13 @@ async def _main(
         for repeat_index in range(cfg.repeat_count):
             await api.home()
             if fixture_pick_up_point is None:
+                fixture_a2_pickup_point = get_pressure_fixture_pickup_nominal()
+                print(
+                    "pressure fixture pickup point:",
+                    fixture_a2_pickup_point,
+                )
                 await helpers_ot3.move_to_arched_ot3(
-                    api, OT3Mount.LEFT, Point(x=342, y=288, z=111.5)
+                    api, OT3Mount.LEFT, fixture_a2_pickup_point
                 )
             else:
                 await helpers_ot3.move_to_arched_ot3(
