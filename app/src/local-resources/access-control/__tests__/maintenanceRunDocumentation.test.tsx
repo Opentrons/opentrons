@@ -16,7 +16,7 @@ import {
 } from '@opentrons/react-api-client'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import { requireDocumentation } from '/app/organisms/DocumentationRequired/requireDocumentation'
+import { requireDocumentation } from '/app/organisms/DocumentationRequired'
 
 import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
 
@@ -73,7 +73,7 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   }
 })
 
-vi.mock('../requireDocumentation', () => ({
+vi.mock('/app/organisms/DocumentationRequired/requireDocumentation', () => ({
   requireDocumentation: vi.fn(),
 }))
 

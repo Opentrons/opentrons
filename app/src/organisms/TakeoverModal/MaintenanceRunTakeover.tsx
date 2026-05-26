@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { useGuardedAction } from '../../local-resources/access-control'
+import { useGuardedAction } from '/app/local-resources/access-control'
+
 import { MaintenanceRunStatusProvider } from './MaintenanceRunStatusProvider'
 import { TakeoverModal } from './TakeoverModal'
 import { useMaintenanceRunTakeover } from './useMaintenanceRunTakeover'

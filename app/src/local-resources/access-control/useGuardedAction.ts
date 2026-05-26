@@ -4,13 +4,13 @@ import { useSelector } from 'react-redux'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
-import { getIsOnDevice } from '/app/redux/config'
-import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
-
 // Used to generate the callback which opens the documentation modal
 // Don't really see a way to avoid this
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import { requireDocumentation } from '../../organisms/DocumentationRequired/requireDocumentation'
+import { requireDocumentation } from '/app/organisms/DocumentationRequired'
+import { getIsOnDevice } from '/app/redux/config'
+import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
+
 import { isDocumentationReportValid } from './utils'
 
 import type { DocumentationReport } from './types'

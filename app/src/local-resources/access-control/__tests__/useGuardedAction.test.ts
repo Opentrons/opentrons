@@ -32,7 +32,7 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   }
 })
 
-vi.mock('../requireDocumentation', () => ({
+vi.mock('/app/organisms/DocumentationRequired', () => ({
   requireDocumentation: vi.fn(),
 }))
 

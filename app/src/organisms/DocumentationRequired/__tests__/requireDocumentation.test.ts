@@ -1,21 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { showDocumentationRequiredModal } from '/app/organisms/DocumentationRequired/DocumentationRequiredModal'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { requireDocumentation } from '/app/organisms/DocumentationRequired/requireDocumentation'
+import { showDocumentationRequiredModal } from '../DocumentationRequiredModal'
+import { requireDocumentation } from '../requireDocumentation'
 
-import type { DocumentedActionKind } from '../types'
+import type { DocumentedActionKind } from '../../../local-resources/access-control/types'
 
-vi.mock(
-  '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal',
-  () => ({
-    showDocumentationRequiredModal: vi.fn(),
-  })
-)
-
-vi.mock('/app/resources/access-control/postDocumentation', () => ({
-  postDocumentation: vi.fn(),
+vi.mock('../DocumentationRequiredModal', () => ({
+  showDocumentationRequiredModal: vi.fn(),
 }))
 
 const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [{ kind: 'PROTOCOL_PLAY' }]
@@ -43,7 +34,7 @@ describe('requireDocumentation', () => {
       confirmedAt: '2026-05-01T16:00:00.000Z',
       documentedBy: 'alice',
     })
-    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice')
+    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice', true)
   })
 
   it('returns null when the user backs out of the modal', async () => {
