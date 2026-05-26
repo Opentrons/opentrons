@@ -206,5 +206,5 @@ describe('expirationMiddleware', () => {
 })
 
 function getUnexpiredRobots(state: State): string[] {
-  return Object.keys(state.robotAuth).sort()
+  return Object.keys(state.robotAuth.perRobotAuthStates).sort()
 }

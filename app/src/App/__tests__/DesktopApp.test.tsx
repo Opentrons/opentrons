@@ -28,6 +28,7 @@ import { DesktopApp } from '../DesktopApp'
 import { useSoftwareUpdatePoll } from '../hooks/useSoftwareUpdatePoll'
 
 import type { LocalizationProviderProps } from '/app/LocalizationProvider'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/LocalizationProvider')
 vi.mock('/app/organisms/Desktop/Breadcrumbs')
@@ -46,11 +47,16 @@ vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization')
 
 const render = (path = '/') => {
-  return renderWithProviders(
+  return renderWithProviders<State>(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <DesktopApp />
     </MemoryRouter>,
-    { i18nInstance: i18n }
+    {
+      initialState: {
+        robotAuth: { mostRecentRobotName: null, perRobotAuthStates: {} },
+      } satisfies Partial<State> as State,
+      i18nInstance: i18n,
+    }
   )
 }
 
