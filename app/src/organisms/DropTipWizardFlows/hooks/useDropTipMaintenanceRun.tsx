@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
-
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
@@ -12,6 +10,7 @@ import { useGuardedAction } from '../../../local-resources/access-control'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteData } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 
