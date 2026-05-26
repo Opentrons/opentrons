@@ -13,6 +13,7 @@ import {
   useScrolling,
 } from '@opentrons/components'
 import {
+  getQueryKey,
   useAllProtocolIdsQuery,
   useCreateLiveCommandMutation,
   useCurrentAllSubsystemUpdatesQuery,
@@ -122,7 +123,7 @@ export function useProtocolReceiptToast(): void {
           })
           .then(() => {
             queryClient
-              .invalidateQueries([host, 'protocols'])
+              .invalidateQueries(getQueryKey(host, 'protocols'))
               .catch((e: Error) => {
                 console.error(
                   `error invalidating protocols query: ${e.message}`

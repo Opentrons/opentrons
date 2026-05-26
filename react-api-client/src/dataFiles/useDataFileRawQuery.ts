@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getDataFileRaw } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
@@ -24,7 +24,7 @@ export function useDataFileRawQuery(
   }
 
   const query = useQuery<DownloadedDataFileResponse>(
-    [host, 'dataFiles', fileId, 'download'],
+    getQueryKey(host, 'dataFiles', fileId, 'download'),
     () =>
       getDataFileRaw(host!, fileId, axiosConfig).then(
         response => response.data

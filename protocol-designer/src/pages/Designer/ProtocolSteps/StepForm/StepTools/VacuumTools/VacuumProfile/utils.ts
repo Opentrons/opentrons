@@ -27,8 +27,13 @@ export function getDefaultStepData(mode: VacuumMode): VacuumProfileStep {
     ? {
         ...baseData,
         pumpData: { mode: VACUUM_MODE_PRESSURE, pressureMbar: null },
+        ventAfter: false,
       }
-    : { ...baseData, pumpData: { mode: VACUUM_MODE_POWER, powerPercent: 1 } }
+    : {
+        ...baseData,
+        pumpData: { mode: VACUUM_MODE_POWER, percentPower: 1 },
+        ventAfter: false,
+      }
 }
 
 const getIsTitleError = (title: string): boolean => {

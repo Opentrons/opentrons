@@ -7,7 +7,10 @@ import { requireDocumentation } from '../requireDocumentation'
 import { useGuardedAction } from '../useGuardedAction'
 
 import type ReactRedux from 'react-redux'
-import type { DocumentedActionKind } from '../../../../resources/access-control/types'
+import type {
+  DocumentationReport,
+  DocumentedActionKind,
+} from '../../../../resources/access-control/types'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
@@ -51,24 +54,46 @@ describe('useGuardedAction', () => {
     vi.resetAllMocks()
   })
 
-  it('resolves true and skips both guards when access control is disabled', async () => {
+  it('skips both guards when access control is disabled', async () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: false } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
 
     const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
-    const currentResult = await act(async () => await result.current())
+    const currentResult = await act(() => !result.current.accessControlEnabled)
     expect(currentResult).toBe(true)
     expect(requireDocumentation).not.toHaveBeenCalled()
   })
 
-  it('returns false when documentation is dismissed', async () => {
-    vi.mocked(requireDocumentation).mockResolvedValue(null)
+  it('skips guards when documentation is provided', async () => {
+    const docreport: DocumentationReport = {
+      note: 'starting run for QC',
+      confirmedAt: '2026-05-01T16:00:00.000Z',
+      documentedBy: 'alice',
+    }
 
+    const { result } = renderHook(() =>
+      useGuardedAction(ACTIONS_TO_DOCUMENT, docreport)
+    )
+
+    expect(result.current.accessControlEnabled).toBe(true)
+    expect(
+      result.current.accessControlEnabled && result.current.docreport
+    ).toBe(docreport)
+  })
+
+  it('returns callback to open modal when documentation is not provided', async () => {
     const { result } = renderHook(() => useGuardedAction(ACTIONS_TO_DOCUMENT))
 
-    const currentResult = await act(async () => await result.current())
-    expect(currentResult).toBe(false)
+    expect(result.current.accessControlEnabled).toBe(true)
+    expect(
+      result.current.accessControlEnabled && result.current.docreport
+    ).toBeNull()
+    expect(
+      result.current.accessControlEnabled &&
+        result.current.docreport == null &&
+        result.current.askForDocumentation
+    ).toBeDefined()
   })
 })

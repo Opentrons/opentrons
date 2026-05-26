@@ -35,7 +35,12 @@ describe('getModuleHasLiveTask', () => {
         currentPumpActivity: {
           type: 'profile' as const,
           profileElements: [
-            { enablePump: true, holdSeconds: 1, gaugePressureMbar: 50 },
+            {
+              enablePump: true,
+              holdSeconds: 1,
+              gaugePressureMbar: 50,
+              ventAfter: false,
+            },
           ],
           taskId: 'vac-task',
           ventAfter: false,

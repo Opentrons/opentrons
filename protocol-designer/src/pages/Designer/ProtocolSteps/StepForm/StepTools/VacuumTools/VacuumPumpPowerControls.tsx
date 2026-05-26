@@ -22,9 +22,9 @@ export function VacuumPumpPowerControls(
     <div className={styles.pump_controls_wrapper}>
       <div className={styles.pump_controls_list_item}>
         <Slider
-          value={formData.powerPercent ?? 1}
+          value={formData.percentPower ?? 1}
           label={t('vacuum.controls.mode.power')}
-          adjustValue={propsForFields.powerPercent.updateValue}
+          adjustValue={propsForFields.percentPower.updateValue}
           backgroundColor={COLORS.grey35}
         />
         <PumpDurationField

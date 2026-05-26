@@ -187,6 +187,9 @@ export const BeforeBeginning = (
   )
 
   const handleOnClickCalibrateOrDetach = (): void => {
+    const is96Channel =
+      attachedPipettes[mount]?.instrumentName === 'p1000_96' ||
+      attachedPipettes[mount]?.instrumentName === 'p200_96'
     let moveToFrontCommands: CreateCommand[] = [
       {
         commandType: 'loadPipette' as const,
@@ -201,6 +204,9 @@ export const BeforeBeginning = (
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
           mount,
+          ...(is96Channel
+            ? { motionModifier: 'lowerMountZAxis' as const }
+            : {}),
         },
       },
     ]
@@ -230,7 +236,7 @@ export const BeforeBeginning = (
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,
-        maintenancePosition: 'attachPlate',
+        motionModifier: 'lowerZAxesSequentially',
       },
     },
   ]

@@ -3,6 +3,7 @@ import { useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
 
 import {
+  getQueryKey,
   useCreateProtocolMutation,
   useCreateRunMutation,
   useHost,
@@ -57,9 +58,11 @@ export function useCreateRunFromProtocol(
     {
       ...options,
       onSuccess: (...args) => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
         options.onSuccess?.(...args)
       },
     },

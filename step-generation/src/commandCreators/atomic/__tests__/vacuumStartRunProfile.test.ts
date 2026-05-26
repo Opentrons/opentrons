@@ -68,6 +68,7 @@ describe('vacuumStartRunProfile', () => {
           enablePump: true,
           holdSeconds: 12,
           gaugePressureMbar: 55,
+          ventAfter: false,
         },
       ],
     }
@@ -81,6 +82,7 @@ describe('vacuumStartRunProfile', () => {
             moduleId: vacuumModuleId,
             profile: [{ ...args.profile[0], ventAfter: true }],
             taskId: 'mock_vacuum_module_task_1',
+            ventAfter: true,
           },
         },
       ],
@@ -90,10 +92,11 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
         {
             "gauge_pressure": 55,
             "hold_time_seconds": 12,
-            "vent_after": True,
+            "vent_after": False,
         }
     ],
-    repetitions=1
+    repetitions=1,
+    vent_after=True
 )`.trim(),
     })
   })
@@ -105,7 +108,14 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
       profile: [
         {
           repetitions: 2,
-          steps: [{ enablePump: true, holdSeconds: 5, percentPower: 30 }],
+          steps: [
+            {
+              enablePump: true,
+              holdSeconds: 5,
+              percentPower: 30,
+              ventAfter: false,
+            },
+          ],
         },
       ],
       ventAfter: false,
@@ -120,20 +130,21 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
             moduleId: vacuumModuleId,
             profile: [{ ...args.profile[0], ventAfter: false }],
             taskId: 'mock_vacuum_module_task_1',
+            ventAfter: false,
           },
         },
       ],
       python: `
 mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
     profile=[
-        {"power_percent": 30, "hold_time_seconds": 5},
         {
             "power_percent": 30,
             "hold_time_seconds": 5,
             "vent_after": False,
         }
     ],
-    repetitions=1
+    repetitions=2,
+    vent_after=False
 )`.trim(),
     })
   })
@@ -153,6 +164,7 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
             enablePump: true,
             holdSeconds: 1,
             gaugePressureMbar: 1,
+            ventAfter: false,
           },
         ],
       },
@@ -190,6 +202,7 @@ mock_vacuum_module_task_1 = mock_vacuum_module.start_execute_profile(
             enablePump: true,
             holdSeconds: 1,
             gaugePressureMbar: 1,
+            ventAfter: false,
           },
         ],
       },

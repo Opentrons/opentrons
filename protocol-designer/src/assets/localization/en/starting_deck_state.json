@@ -48,6 +48,7 @@
   "here": "here.",
   "labware_already_in_slot": "Labware already in this slot cannot be combined with other labware.",
   "labware_compatible_lids": "Compatible labware lids",
+  "labware_limit_reached": "Labware limit reached for this slot",
   "labware_quantity": "Labware quantity",
   "labware": "Labware",
   "lid": "Lids",
