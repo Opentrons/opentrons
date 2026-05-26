@@ -244,7 +244,7 @@ def _validate_outbound_nested_proxy(arg: Any) -> Any:  # noqa: C901
 
     For roundtrip functions, which may be sent across multiple processes, we only want to perserve the inner Proxy while maintaining the shape of argument.
     """
-    if isinstance(arg, tuple):
+    if type(arg) is tuple:
         validated_tuple: tuple[Any, ...] = ()
         for inner in arg:
             if hasattr(inner, "_proxy"):
