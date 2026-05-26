@@ -17,6 +17,7 @@ from .instruments.router import instruments_router
 from .labware_offsets.router import router as labware_offset_router
 from .maintenance_runs.router import maintenance_runs_router
 from .modules.router import modules_router
+from .fastapi_dependencies import get_audit_logger
 from .protocols.router import protocols_router
 from .robot.router import robot_router
 from .runs.router import runs_router
@@ -87,7 +88,7 @@ router.include_router(
 router.include_router(
     router=protocols_router,
     tags=["Protocol Management"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(get_audit_logger)],
 )
 
 router.include_router(

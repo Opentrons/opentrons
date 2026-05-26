@@ -29,12 +29,16 @@ from opentrons.protocol_reader import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from server_utils.auth.resource_server.authorization_checker import (
+    AlwaysAllowedAuthorizationChecker,
+)
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     RequestModel,
     SimpleEmptyBody,
 )
 
+from robot_server.fastapi_dependencies import AuditLogger
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
@@ -83,6 +87,17 @@ from robot_server.protocols.router import (
     get_protocol_ids,
     get_protocols,
 )
+
+
+def _test_audit_logger(created_at: datetime | None = None) -> AuditLogger:
+    """Audit logger for direct ``create_protocol`` calls (skips yield enforcement)."""
+    audit_logger = AuditLogger(
+        user_notes=None,
+        created_at=created_at or datetime(year=2021, month=1, day=1),
+        authorization_checker=AlwaysAllowedAuthorizationChecker(),
+    )
+    audit_logger.did_log = True
+    return audit_logger
 
 
 @pytest.fixture
@@ -520,7 +535,7 @@ async def test_create_existing_protocol(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
-        _maybe_audit_protocol_upload=None,
+        audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
     )
 
     assert result.content.data == Protocol(
@@ -643,7 +658,7 @@ async def test_create_protocol(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
-        _maybe_audit_protocol_upload=None,
+        audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
     )
 
     assert result.content.data == Protocol(
@@ -793,7 +808,7 @@ async def test_create_new_protocol_with_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
-        _maybe_audit_protocol_upload=None,
+        audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
     )
 
     decoy.verify(
@@ -914,7 +929,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
-        _maybe_audit_protocol_upload=None,
+        audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
     )
 
     assert result.content.data == Protocol(
@@ -1069,7 +1084,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
-        _maybe_audit_protocol_upload=None,
+        audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
     )
 
     assert result.content.data == Protocol(
@@ -1200,7 +1215,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
-        _maybe_audit_protocol_upload=None,
+        audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
     )
 
     assert result.content.data == Protocol(
@@ -1333,7 +1348,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             analysis_id="analysis-id",
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=20,
-            _maybe_audit_protocol_upload=None,
+            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
         )
 
     assert exc_info.value.status_code == 503
@@ -1380,7 +1395,7 @@ async def test_create_protocol_not_readable(
             robot_type="OT-2 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
-            _maybe_audit_protocol_upload=None,
+            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
         )
 
     assert exc_info.value.status_code == 422
@@ -1443,7 +1458,7 @@ async def test_create_protocol_different_robot_type(
             robot_type="OT-3 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
-            _maybe_audit_protocol_upload=None,
+            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
         )
 
     assert exc_info.value.status_code == 422
@@ -1455,7 +1470,11 @@ async def test_delete_protocol_by_id(
     protocol_store: ProtocolStore,
 ) -> None:
     """It should remove a single protocol file."""
-    result = await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
+    result = await delete_protocol_by_id(
+        "protocol-id",
+        protocol_store=protocol_store,
+        audit_logger=_test_audit_logger(),
+    )
 
     decoy.verify(protocol_store.remove(protocol_id="protocol-id"))
 
@@ -1475,7 +1494,11 @@ async def test_delete_protocol_not_found(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
+        await delete_protocol_by_id(
+            "protocol-id",
+            protocol_store=protocol_store,
+            audit_logger=_test_audit_logger(),
+        )
 
     assert exc_info.value.status_code == 404
 
@@ -1492,7 +1515,11 @@ async def test_delete_protocol_run_exists(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
+        await delete_protocol_by_id(
+            "protocol-id",
+            protocol_store=protocol_store,
+            audit_logger=_test_audit_logger(),
+        )
 
     assert exc_info.value.status_code == 409
 
@@ -1790,6 +1817,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
         data_files_directory=data_files_directory,
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
+        audit_logger=_test_audit_logger(),
     )
     assert result.content.data == analysis_summaries
     assert result.status_code == 200
@@ -1916,6 +1944,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         data_files_store=data_files_store,
         data_files_directory=Path("/dev/null"),
         analysis_id="analysis-id-2",
+        audit_logger=_test_audit_logger(),
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
@@ -1997,6 +2026,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         data_files_directory=data_files_directory,
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
+        audit_logger=_test_audit_logger(),
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
@@ -2121,7 +2151,7 @@ async def test_create_protocol_kind_quick_transfer(
         analysis_id="analysis-id",
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
-        _maybe_audit_protocol_upload=None,
+        audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
     )
 
     decoy.verify(
@@ -2207,7 +2237,7 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             protocol_kind=ProtocolKind.QUICK_TRANSFER,
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=1,
-            _maybe_audit_protocol_upload=None,
+            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
         )
 
         assert exc_info.value.status_code == 409

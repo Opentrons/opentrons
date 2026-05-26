@@ -65,8 +65,8 @@ from .dependencies import (
     get_protocol_reader,
     get_protocol_store,
     get_quick_transfer_protocol_auto_deleter,
-    maybe_audit_protocol_upload,
 )
+from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Metadata, Protocol, ProtocolFile, ProtocolKind
 from .protocol_store import (
@@ -235,6 +235,7 @@ async def create_protocol(  # noqa: C901
     maximum_quick_transfer_protocols: Annotated[
         int, Depends(get_maximum_quick_transfer_protocols)
     ],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
@@ -277,10 +278,6 @@ async def create_protocol(  # noqa: C901
             alias="runTimeParameterFiles",
         ),
     ] = None,
-    _maybe_audit_protocol_upload: Annotated[
-        None,
-        Depends(maybe_audit_protocol_upload),
-    ] = None,
 ) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
@@ -309,9 +306,19 @@ async def create_protocol(  # noqa: C901
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
-        _maybe_audit_protocol_upload: When auth-server requires reasons for
-            interaction, requires ``userNotes`` and records the interaction for audit.
+        audit_logger: Records the upload for audit when auth-server requires ``userNotes``.
     """
+    await audit_logger.log(
+        resource_id=protocol_id,
+        request_data={
+            "uploadedFileNames": [f.filename for f in files],
+            "key": key,
+            "protocolKind": protocol_kind,
+            "runTimeParameterValues": run_time_parameter_values,
+            "runTimeParameterFiles": run_time_parameter_files,
+        },
+    )
+
     # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
     #  so we can validate the data contents and return a better error response.
     parsed_rtp_values = (
@@ -696,12 +703,14 @@ async def get_protocol_by_id(
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete an uploaded protocol by ID.
 
     Arguments:
         protocolId: Protocol identifier to delete, pulled from URL.
         protocol_store: In-memory database of protocol resources.
+        audit_logger: Records the deletion for audit when auth-server requires ``userNotes``.
     """
     try:
         protocol_store.remove(protocol_id=protocolId)
@@ -711,6 +720,11 @@ async def delete_protocol_by_id(
 
     except ProtocolUsedByRunError as e:
         raise ProtocolUsedByRun(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+
+    await audit_logger.log(
+        resource_id=protocolId,
+        request_data={"protocolId": protocolId},
+    )
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),
@@ -744,6 +758,7 @@ async def create_protocol_analysis(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
@@ -794,6 +809,12 @@ async def create_protocol_analysis(
         raise LastAnalysisPending(detail=str(error)).as_error(
             status.HTTP_503_SERVICE_UNAVAILABLE
         ) from error
+
+    await audit_logger.log(
+        resource_id=protocolId,
+        request_data=request_body.data if request_body is not None else {},
+    )
+
     return await PydanticResponse.create(
         content=SimpleMultiBody.model_construct(
             data=analysis_summaries,

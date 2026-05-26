@@ -1,29 +1,19 @@
 """FastAPI dependencies for protocol endpoints."""
 
 from asyncio import Lock as AsyncLock
-from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import Annotated
 
 from anyio import Path as AsyncPath
-from fastapi import Depends, File, Form, UploadFile
+from fastapi import Depends
 from sqlalchemy.engine import Engine as SQLEngine
-from typing_extensions import Annotated
 
 from opentrons.protocol_reader import FileHasher, FileReaderWriter, ProtocolReader
-from server_utils.auth.resource_server.authorization_checker import (
-    AuthorizationChecker,
-)
-from server_utils.auth.resource_server.fastapi import get_authorization_checker
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-from server_utils.fastapi_utils.documented_interaction import (
-    get_supplied_user_notes,
-)
-
 from .analyses_manager import AnalysesManager
 from .analysis_store import AnalysisStore
 from .protocol_auto_deleter import ProtocolAutoDeleter
@@ -31,18 +21,13 @@ from .protocol_store import (
     ProtocolStore,
 )
 from robot_server.deletion_planner import ProtocolDeletionPlanner
-from robot_server.fastapi_dependencies import (
-    maybe_record_documented_interaction_non_json,
-)
 from robot_server.persistence.fastapi_dependencies import (
     get_active_persistence_directory,
     get_sql_engine,
 )
 from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
-from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.runs.dependencies import get_run_process_pyro_provider
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
-from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.settings import get_settings
 
@@ -69,65 +54,6 @@ def get_file_reader_writer() -> FileReaderWriter:
 def get_file_hasher() -> FileHasher:
     """Get a FileHasher to hash a file and see if it already exists on the server."""
     return FileHasher()
-
-
-async def get_protocol_upload_id() -> str:
-    """Unique id for a new protocol upload (shared by route and audit dependencies)."""
-    return await get_unique_id()
-
-
-async def maybe_audit_protocol_upload(
-    protocol_id: Annotated[str, Depends(get_protocol_upload_id)],
-    created_at: Annotated[datetime, Depends(get_current_time)],
-    authorization_checker: Annotated[
-        AuthorizationChecker, Depends(get_authorization_checker)
-    ],
-    user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
-    files: List[UploadFile] = File(...),
-    key: Annotated[
-        Optional[str],
-        Form(
-            description=(
-                "An arbitrary client-defined string to attach to the new protocol resource."
-            ),
-        ),
-    ] = None,
-    run_time_parameter_values: Annotated[
-        Optional[str],
-        Form(
-            description="Key-value pairs of run-time parameters defined in a protocol.",
-            alias="runTimeParameterValues",
-        ),
-    ] = None,
-    protocol_kind: Annotated[
-        ProtocolKind,
-        Form(
-            description="Whether this is a `standard` or `quick-transfer` protocol.",
-            alias="protocolKind",
-        ),
-    ] = ProtocolKind.STANDARD,
-    run_time_parameter_files: Annotated[
-        Optional[str],
-        Form(
-            description="Param-file pairs of CSV run-time parameters defined in the protocol.",
-            alias="runTimeParameterFiles",
-        ),
-    ] = None,
-) -> None:
-    """When auth-server requires it, require ``userNotes`` and record the upload."""
-    await maybe_record_documented_interaction_non_json(
-        resource_id=protocol_id,
-        request_data={
-            "uploadedFileNames": [f.filename for f in files],
-            "key": key,
-            "protocolKind": protocol_kind,
-            "runTimeParameterValues": run_time_parameter_values,
-            "runTimeParameterFiles": run_time_parameter_files,
-        },
-        user_notes=user_notes,
-        created_at=created_at,
-        authorization_checker=authorization_checker,
-    )
 
 
 async def get_protocol_directory(
