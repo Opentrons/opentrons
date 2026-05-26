@@ -4,7 +4,11 @@ import { robotSystemReducer } from './is-ready/reducer'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { ShellState, ShellUpdateState, StepDetailViewerClosedState } from './types'
+import type {
+  ShellState,
+  ShellUpdateState,
+  StepDetailViewerClosedState,
+} from './types'
 
 const INITIAL_STATE: ShellUpdateState = {
   checking: false,
