@@ -15,7 +15,7 @@ from .settings_page import SettingsPage
 from .tc_step_form_page import ThermocyclerStepPage
 from .tempdeck_step_form_page import TemperatureStepPage
 from .timeline import Timeline
-from .transfer_form import TransferPage
+from .transfer_form import TransferPage, TransferStepConfig, add_transfer_step
 
 __all__ = [
     "BasePage",
@@ -31,6 +31,8 @@ __all__ = [
     "TemperatureStepPage",
     "HeaterShakerStepPage",
     "TransferPage",
+    "TransferStepConfig",
+    "add_transfer_step",
     "Timeline",
     "AddMagneticModule",
 ]
