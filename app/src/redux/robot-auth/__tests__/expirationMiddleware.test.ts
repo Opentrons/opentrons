@@ -97,6 +97,32 @@ describe('expirationMiddleware', () => {
     ])
   })
 
+  it('handles long (> int32 max) expiration times', async () => {
+    const int32Max = 0x7fffffff
+
+    const store = configureStore({
+      reducer: rootReducer,
+      middleware: getDefaultMiddleware => {
+        return getDefaultMiddleware().prepend(expirationMiddleware.middleware)
+      },
+    })
+
+    store.dispatch(
+      logInOrRefresh({
+        robotName: 'robot-a',
+        username: 'username',
+        accessToken: 'accessToken',
+        refreshToken: 'refreshToken',
+        expiresAt: T0 + int32Max + 1000,
+      })
+    )
+
+    await vi.advanceTimersByTimeAsync(int32Max + 500) // Now at T0+int32Max+500.
+    expect(getUnexpiredRobots(store.getState())).toStrictEqual(['robot-a'])
+    await vi.advanceTimersByTimeAsync(1000) // Now at T0+int32Max+1500.
+    expect(getUnexpiredRobots(store.getState())).toStrictEqual([])
+  })
+
   it('handles an expiration being postponed (a login being refreshed)', async () => {
     const store = configureStore({
       reducer: rootReducer,
