@@ -7,7 +7,7 @@ import {
 import {
   COLUMN_4_SLOTS,
   getIsSafePickupWithinTiprack,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
@@ -185,17 +185,10 @@ export function getIsTiprackSelectable(args: {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
-  validTiprackIds: string[]
 }): boolean {
   // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
-  const {
-    labware,
-    formTiprackUri,
-    pipetteSpecs,
-    nozzles,
-    labwareEntities,
-    validTiprackIds,
-  } = args
+  const { labware, formTiprackUri, pipetteSpecs, nozzles, labwareEntities } =
+    args
   const { channels } = pipetteSpecs
   const { def, labwareDefURI, stack } = labware
   const isPickupCompatibleWithPossibleAdapter =
@@ -210,9 +203,76 @@ export function getIsTiprackSelectable(args: {
     getIsTiprack(def) &&
     labwareDefURI === formTiprackUri &&
     !COLUMN_4_SLOTS.includes(slot) &&
-    isPickupCompatibleWithPossibleAdapter &&
-    validTiprackIds.includes(labware.id)
+    isPickupCompatibleWithPossibleAdapter
   )
+}
+
+interface GetIsTiprackSelectableAndValidArgs {
+  labware: LabwareOnDeck
+  formTiprackUri: string
+  pipetteSpecs: PipetteV2Specs
+  nozzles: NozzleConfigurationStyle
+  labwareEntities: LabwareEntities
+  validTiprackIds: string[]
+}
+
+export const getIsTiprackSelectableAndValid = (
+  args: GetIsTiprackSelectableAndValidArgs
+): boolean => {
+  const {
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+  } = args
+  const isSelectable = getIsTiprackSelectable({
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+  })
+  return isSelectable && validTiprackIds.includes(labware.id)
+}
+
+export const getAreAnyMatchingTipracksSelectable = (args: {
+  allLabware: LabwareOnDeck[]
+  formTiprackUri: string
+  pipetteSpecs: PipetteV2Specs
+  nozzles: NozzleConfigurationStyle
+  labwareEntities: LabwareEntities
+  validTiprackIds: string[]
+}): boolean => {
+  const {
+    allLabware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+  } = args
+  const { channels } = pipetteSpecs
+  return validTiprackIds.some(id => {
+    const labware = allLabware.find(l => l.id === id)
+    if (labware == null) {
+      return false
+    }
+    const { def, labwareDefURI, stack } = labware
+    const isPickupCompatibleWithPossibleAdapter =
+      getIsPickupCompatibleWithPossibleAdapter(
+        stack,
+        labwareEntities,
+        nozzles,
+        channels
+      )
+    return (
+      getIsTiprack(def) &&
+      labwareDefURI === formTiprackUri &&
+      isPickupCompatibleWithPossibleAdapter
+    )
+  })
 }
 
 export const getAllWellsInColumn = (
@@ -300,17 +360,16 @@ export const getValidTiprackIds = (args: {
               tipsToIgnore: addedWells,
             })
           const isSafeMoveConsideringDeck =
-            robotState != null
-              ? getIsSafePipetteMovement({
-                  robotState,
-                  invariantContext,
-                  pipetteId,
-                  labwareId: id,
-                  wellTargetName: wellName,
-                  primaryNozzle,
-                  nozzleConfiguration: nozzles,
-                })
-              : true
+            robotState == null ||
+            getPipetteMovementSafetyStatus({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId: id,
+              wellTargetName: wellName,
+              primaryNozzle,
+              nozzleConfiguration: nozzles,
+            }).isSafe
           if (isSafeWithinTiprack && isSafeMoveConsideringDeck && isComplete) {
             const allAffectedWells = getEntireWellSelection(
               wellName,

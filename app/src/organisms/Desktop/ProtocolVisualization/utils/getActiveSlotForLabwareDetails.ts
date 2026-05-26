@@ -41,21 +41,28 @@ export const getActiveSlotForLabwareDetails = (
     pipette => pipette.entityId != null
   )?.entityId
   let slot = null
-
-  if ('labwareId' in currentCommand.params) {
-    const isTiprack =
-      labwareEntities[currentCommand.params.labwareId].def.parameters.isTiprack
-    if (!isTiprack) {
-      slot = currentCommand.params.labwareId
+  if (
+    'labwareId' in currentCommand.params &&
+    currentCommand.params.labwareId !== 'fixedTrash'
+  ) {
+    if (
+      'labwareId' in currentCommand.params &&
+      currentCommand.params.labwareId !== 'fixedTrash'
+    ) {
+      const isTiprack =
+        labwareEntities[currentCommand.params.labwareId].def.parameters
+          .isTiprack
+      if (!isTiprack) {
+        slot = currentCommand.params.labwareId
+      }
+    } else if (entityUnderPipette != null) {
+      slot = getSlotFromPipetteLocation(
+        entityUnderPipette,
+        labware,
+        trashBinEntities,
+        wasteChuteEntities
+      )
     }
-  } else if (entityUnderPipette != null) {
-    slot = getSlotFromPipetteLocation(
-      entityUnderPipette,
-      labware,
-      trashBinEntities,
-      wasteChuteEntities
-    )
   }
-
   return slot
 }

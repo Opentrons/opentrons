@@ -178,7 +178,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           ))}
         </Flex>
       </Flex>
-      {formData.tip_tracking === MANUAL && hasValidTiprackForPickup ? (
+      {formData.tip_tracking === MANUAL ? (
         <Flex className={styles.manual_container}>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('step_edit_form.field.tip_tracking.manual.title')}
