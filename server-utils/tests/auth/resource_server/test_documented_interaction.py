@@ -121,7 +121,7 @@ async def test_record_documented_interaction_writes_audit_log(
 async def test_record_documented_interaction_accepts_notes_from_request_model(
     decoy: Decoy,
 ) -> None:
-    """``DocumentedInteraction.from_request_model`` supplies notes and request data."""
+    """``DocumentedInteraction.from_request_model`` records payload data and header notes."""
     mock_client = decoy.mock(cls=Client)
     subject = AuthServerAuthorizationChecker(mock_client)
     decoy.when(
@@ -136,10 +136,12 @@ async def test_record_documented_interaction_accepts_notes_from_request_model(
 
     request = RequestModel[_ExampleRequestData](
         data=_ExampleRequestData(action="play"),
-        userNotes="audit note",
     )
     await subject.record_documented_interaction(
-        DocumentedInteraction.from_request_model(request),
+        DocumentedInteraction.from_request_model(
+            request,
+            user_notes="audit note",
+        ),
         resource_id="run-1",
         recorded_at=datetime(year=2024, month=1, day=1),
     )

@@ -21,10 +21,7 @@ def test_attributes_as_dict() -> None:
     DictRequest = RequestModel[dict]  # type: ignore[type-arg]
     obj_to_validate = {"data": {"some_data": 1}}
     my_request_obj = DictRequest.model_validate(obj_to_validate)
-    assert my_request_obj.model_dump() == {
-        "data": {"some_data": 1},
-        "userNotes": None,
-    }
+    assert my_request_obj.model_dump() == {"data": {"some_data": 1}}
 
 
 def test_attributes_as_item_model() -> None:
@@ -32,10 +29,7 @@ def test_attributes_as_item_model() -> None:
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {"data": {"name": "apple", "quantity": 10, "price": 1.20}}
     my_request_obj = ItemRequest.model_validate(obj_to_validate)
-    assert my_request_obj.model_dump() == {
-        **obj_to_validate,
-        "userNotes": None,
-    }
+    assert my_request_obj.model_dump() == obj_to_validate
 
 
 def test_attributes_as_item_model_empty_dict() -> None:
@@ -113,42 +107,11 @@ def test_request_with_id() -> None:
         "data": {"type": "item", "attributes": {}, "id": "abc123"},
     }
     my_request_obj = MyRequest.model_validate(obj_to_validate)
-    assert my_request_obj.model_dump() == {
-        "data": {"type": "item", "attributes": {}, "id": "abc123"},
-        "userNotes": None,
-    }
+    assert my_request_obj.model_dump() == obj_to_validate
 
 
-def test_user_notes_omitted_from_payload() -> None:
-    """`userNotes` is optional; payloads without it validate."""
-    ItemRequest = RequestModel[ItemModel]
-    payload = {"data": {"name": "apple", "quantity": 10, "price": 1.20}}
-    assert "userNotes" not in payload
-
-    obj = ItemRequest.model_validate(payload)
-
-    assert obj.userNotes is None
-    assert obj.model_dump() == {
-        **payload,
-        "userNotes": None,
-    }
-
-
-def test_user_notes_explicit_null_accepted() -> None:
-    """Explicit JSON null for `userNotes` is valid."""
-    ItemRequest = RequestModel[ItemModel]
-    payload: Dict[str, Any] = {
-        "data": {"name": "apple", "quantity": 10, "price": 1.20},
-        "userNotes": None,
-    }
-
-    obj = ItemRequest.model_validate(payload)
-
-    assert obj.userNotes is None
-
-
-def test_user_notes_passed_when_provided() -> None:
-    """When supplied, `userNotes` is parsed as a string."""
+def test_legacy_user_notes_field_is_ignored() -> None:
+    """Top-level ``userNotes`` in JSON bodies is no longer read; use the header instead."""
     ItemRequest = RequestModel[ItemModel]
     payload = {
         "data": {"name": "apple", "quantity": 10, "price": 1.20},
@@ -157,50 +120,4 @@ def test_user_notes_passed_when_provided() -> None:
 
     obj = ItemRequest.model_validate(payload)
 
-    assert obj.userNotes == "audit note"
-
-
-def test_supplied_user_notes() -> None:
-    """`supplied_user_notes()` returns a stripped string or None."""
-    ItemRequest = RequestModel[ItemModel]
-    assert (
-        ItemRequest(
-            data=ItemModel(name="a", quantity=1, price=1.0), userNotes="audit note"
-        ).supplied_user_notes()
-        == "audit note"
-    )
-    assert (
-        ItemRequest(
-            data=ItemModel(name="a", quantity=1, price=1.0), userNotes=None
-        ).supplied_user_notes()
-        is None
-    )
-    assert (
-        ItemRequest(
-            data=ItemModel(name="a", quantity=1, price=1.0), userNotes="  \t  "
-        ).supplied_user_notes()
-        is None
-    )
-    assert (
-        ItemRequest(
-            data=ItemModel(name="a", quantity=1, price=1.0), userNotes="  trimmed  "
-        ).supplied_user_notes()
-        == "trimmed"
-    )
-
-
-def test_supplied_user_notes_ignores_user_notes_inside_data() -> None:
-    """``userNotes`` must be a sibling of ``data``; a nested field is not read."""
-    ItemRequest = RequestModel[ItemModel]
-    assert (
-        ItemRequest(
-            data=ItemModel(name="a", quantity=1, price=1.0),
-            userNotes="audit note",
-        ).supplied_user_notes()
-        == "audit note"
-    )
-    # Pydantic ignores unknown fields on ItemModel; simulate wrong client shape via dump+validate
-    wrong_shape = {
-        "data": {"name": "a", "quantity": 1, "price": 1.0, "userNotes": "nested"}
-    }
-    assert ItemRequest.model_validate(wrong_shape).supplied_user_notes() is None
+    assert obj.model_dump() == {"data": payload["data"]}

@@ -1,4 +1,4 @@
-"""FastAPI helpers for audit ``userNotes`` on non–JSON:API request bodies."""
+"""FastAPI helpers for audit notes supplied on mutating HTTP requests."""
 
 from typing import Final
 
@@ -6,36 +6,15 @@ from fastapi import Request
 
 from .models.json_api.request import parse_supplied_user_notes
 
-_MUTATING_METHODS: Final = frozenset({"POST", "PUT", "PATCH"})
+_MUTATING_METHODS: Final = frozenset({"POST", "PUT", "PATCH", "DELETE"})
+
+USER_NOTES_HEADER: Final[str] = "Opentrons-User-Notes"
+"""Audit reason when ``requireReasonForInteraction`` is enabled."""
 
 
 async def get_supplied_user_notes(request: Request) -> str | None:
-    """Return normalized ``userNotes`` for POST, PUT, or PATCH requests.
-
-    Notes may be supplied as:
-
-    - a ``userNotes`` query parameter, or
-    - a ``userNotes`` form field on ``multipart/form-data`` or
-      ``application/x-www-form-urlencoded`` bodies.
-
-    JSON:API endpoints should continue to use top-level ``userNotes`` on
-    ``RequestModel`` instead of this dependency.
-    """
+    """Return normalized audit notes from the ``Opentrons-User-Notes`` request header."""
     if request.method not in _MUTATING_METHODS:
         return None
 
-    if "userNotes" in request.query_params:
-        return parse_supplied_user_notes(request.query_params.get("userNotes"))
-
-    content_type = request.headers.get("content-type", "")
-    if not (
-        "multipart/form-data" in content_type
-        or "application/x-www-form-urlencoded" in content_type
-    ):
-        return None
-
-    form = await request.form()
-    form_notes = form.get("userNotes")
-    if isinstance(form_notes, str):
-        return parse_supplied_user_notes(form_notes)
-    return None
+    return parse_supplied_user_notes(request.headers.get(USER_NOTES_HEADER))

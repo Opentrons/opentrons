@@ -36,10 +36,12 @@ class DocumentedInteraction(Generic[RequestDataT]):
     @staticmethod
     def from_request_model(
         request: RequestModel[RequestDataT],
+        *,
+        user_notes: str | None,
     ) -> DocumentedInteraction[RequestDataT]:
-        """Build from a JSON:API ``RequestModel`` (``data`` + optional ``userNotes``)."""
+        """Build from request payload data and audit notes from the request header."""
         return DocumentedInteraction(
-            user_notes=request.supplied_user_notes(),
+            user_notes=user_notes,
             request_data=request.data,
         )
 
@@ -100,7 +102,7 @@ class AuthorizationChecker(ABC):
 
         if interaction.user_notes is None:
             raise MissingUserNotesError(
-                "userNotes is required when require-reason-for-interaction is enabled."
+                "Opentrons-User-Notes is required when require-reason-for-interaction is enabled."
             )
 
         self._log_documented_interaction(

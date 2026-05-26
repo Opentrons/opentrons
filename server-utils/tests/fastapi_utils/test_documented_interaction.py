@@ -1,17 +1,20 @@
-"""Tests for non–JSON:API ``userNotes`` extraction."""
+"""Tests for audit notes header extraction."""
 
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
-from server_utils.fastapi_utils.documented_interaction import get_supplied_user_notes
+from server_utils.fastapi_utils.documented_interaction import (
+    USER_NOTES_HEADER,
+    get_supplied_user_notes,
+)
 
 
 def _build_client() -> TestClient:
     app = FastAPI()
 
-    @app.api_route("/notes", methods=["GET", "POST", "PUT", "PATCH"])
+    @app.api_route("/notes", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
     async def read_notes(
         user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
     ) -> dict[str, str | None]:
@@ -20,38 +23,51 @@ def _build_client() -> TestClient:
     return TestClient(app)
 
 
-def test_get_supplied_user_notes_from_query() -> None:
+def test_get_supplied_user_notes_from_header() -> None:
     client = _build_client()
-    response = client.post("/notes?userNotes=audit%20note")
+    response = client.post(
+        "/notes",
+        headers={USER_NOTES_HEADER: "  audit note  "},
+    )
     assert response.status_code == 200
     assert response.json() == {"userNotes": "audit note"}
 
 
-def test_get_supplied_user_notes_from_multipart_form() -> None:
+def test_get_supplied_user_notes_from_header_on_delete() -> None:
     client = _build_client()
-    response = client.post(
+    response = client.delete(
         "/notes",
-        data={"userNotes": "  form note  "},
+        headers={USER_NOTES_HEADER: "delete reason"},
     )
     assert response.status_code == 200
-    assert response.json() == {"userNotes": "form note"}
+    assert response.json() == {"userNotes": "delete reason"}
 
 
-def test_get_supplied_user_notes_ignores_whitespace_only_query() -> None:
+def test_get_supplied_user_notes_ignores_whitespace_only_header() -> None:
     client = _build_client()
-    response = client.post("/notes?userNotes=%20%20")
+    response = client.post("/notes", headers={USER_NOTES_HEADER: "  "})
+    assert response.status_code == 200
+    assert response.json() == {"userNotes": None}
+
+
+def test_get_supplied_user_notes_ignores_query_and_form() -> None:
+    client = _build_client()
+    response = client.post(
+        "/notes?userNotes=ignored",
+        data={"userNotes": "ignored"},
+    )
     assert response.status_code == 200
     assert response.json() == {"userNotes": None}
 
 
 def test_get_supplied_user_notes_returns_none_for_get() -> None:
     client = _build_client()
-    response = client.get("/notes?userNotes=ignored")
+    response = client.get("/notes", headers={USER_NOTES_HEADER: "ignored"})
     assert response.status_code == 200
     assert response.json() == {"userNotes": None}
 
 
-def test_get_supplied_user_notes_returns_none_without_notes() -> None:
+def test_get_supplied_user_notes_returns_none_without_header() -> None:
     client = _build_client()
     response = client.put("/notes", json={"data": "ignored"})
     assert response.status_code == 200
