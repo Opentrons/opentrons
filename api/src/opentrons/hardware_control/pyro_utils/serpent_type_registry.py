@@ -586,7 +586,7 @@ def _path_dict_to_class(  # type: ignore
     return Path(d["path_str"])
 
 
-# Pathlib Path registry
+# BundledFirmware registry
 def _bundled_fw_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.modules.types.BundledFirmware",
@@ -751,6 +751,7 @@ def register_hardware_types() -> None:
         class_to_dict=_path_class_to_dict,
     )
 
+    # BundledFirmware registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.modules.types.BundledFirmware,
         dict_to_class=_bundled_fw_dict_to_class,
