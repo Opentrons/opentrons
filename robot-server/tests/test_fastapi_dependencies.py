@@ -36,6 +36,7 @@ def _request(method: str = "POST") -> Request:
 async def test_audit_logger_log_records_when_required(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
+    """Records the interaction when required."""
     checker = AlwaysAllowedAuthorizationChecker()
     audit_logger = AuditLogger(
         user_notes=_USER_NOTES,
@@ -64,6 +65,7 @@ async def test_audit_logger_log_records_when_required(
 
 @pytest.mark.asyncio
 async def test_get_audit_logger_raises_when_required_but_forgot_to_log() -> None:
+    """Raises when the endpoint forgot to send anything to the audit log."""
     checker = AlwaysAllowedAuthorizationChecker()
     with patch.object(
         checker,
@@ -76,7 +78,7 @@ async def test_get_audit_logger_raises_when_required_but_forgot_to_log() -> None
             created_at=_CREATED_AT,
             authorization_checker=checker,
         )
-        audit_logger = await generator.__anext__()
+        await generator.__anext__()
         with pytest.raises(
             RuntimeError, match="forgot to send anything to the audit log"
         ):
@@ -85,6 +87,7 @@ async def test_get_audit_logger_raises_when_required_but_forgot_to_log() -> None
 
 @pytest.mark.asyncio
 async def test_get_audit_logger_ok_when_audit_not_required_and_forgot_to_log() -> None:
+    """Skips enforcement for non-mutating requests."""
     checker = AlwaysAllowedAuthorizationChecker()
     generator = get_audit_logger(
         _request("POST"),
@@ -99,6 +102,7 @@ async def test_get_audit_logger_ok_when_audit_not_required_and_forgot_to_log() -
 
 @pytest.mark.asyncio
 async def test_get_audit_logger_skips_enforcement_for_get() -> None:
+    """Skips enforcement for GET requests."""
     checker = AlwaysAllowedAuthorizationChecker()
     with patch.object(
         checker,
