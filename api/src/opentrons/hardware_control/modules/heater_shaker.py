@@ -28,6 +28,7 @@ from opentrons.hardware_control.modules.types import (
     LiveData,
     HeaterShakerData,
 )
+from opentrons.config import IS_ROBOT
 
 log = logging.getLogger(__name__)
 
@@ -334,6 +335,8 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     async def attempt_reconnect(self) -> None:
         """Attempt to reestablish connections."""
+        if not IS_ROBOT:
+            return
         try:
             if not await self._driver.is_connected():
                 await self.cleanup()
@@ -477,7 +480,7 @@ class HeaterShakerReader(Reader):
         else:
             log.info(f"error {exception} debounce {self._error_debounce}")
             self._error_debounce -= 1
-            if self._error_debounce > 0:
+            if self._error_debounce > 0 and IS_ROBOT:
                 return
             if self._handle_error:
                 self._handle_error(exception)
