@@ -37,7 +37,7 @@ import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
-import { useSoftwareUpdatePoll } from './hooks'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'

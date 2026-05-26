@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { i18n } from '/app/i18n'
 import { checkShellUpdate } from '/app/redux/shell'
 
-import { useSoftwareUpdatePoll } from '../hooks'
+import { useSoftwareUpdatePoll } from '../useSoftwareUpdatePoll'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'

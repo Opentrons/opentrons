@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { useSentryReport } from '/app/App/hooks'
+import { useSentryReport } from '/app/App/hooks/useSentryReport'
 import { remote } from '/app/redux/shell/remote'
 
 import type { FallbackProps } from 'react-error-boundary'

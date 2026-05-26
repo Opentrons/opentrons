@@ -6,7 +6,7 @@ import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { ApiHostProvider, useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks'
+import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
