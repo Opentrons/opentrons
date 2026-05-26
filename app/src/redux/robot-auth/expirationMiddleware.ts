@@ -1,6 +1,6 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit'
 
-import { getNextExpiration, logOutOrTimeOut } from './slice'
+import { getNextExpiration, timeOutLogin } from './slice'
 
 import type { ListenerEffectAPI } from '@reduxjs/toolkit'
 import type { Dispatch, State } from '../types'
@@ -45,7 +45,7 @@ expirationMiddleware.startListening.withTypes<State, Dispatch>()({
       const waitDuration = nextExpiration.expiresAt - Date.now()
       await longDelay(listenerAPI, waitDuration)
       listenerAPI.dispatch(
-        logOutOrTimeOut({ robotName: nextExpiration.robotName })
+        timeOutLogin({ robotName: nextExpiration.robotName })
       )
     }
   },
