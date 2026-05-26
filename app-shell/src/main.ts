@@ -25,10 +25,11 @@ import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerProtocolStorage } from './protocol-storage'
 import { registerRobotUpdate } from './robot-update'
 import {
+  clearMainWindow,
   closeSecondaryWindows,
   registerCameraStream,
+  setMainWindow,
 } from './secondary-windows'
-import { clearMainWindow, setMainWindow } from './main-window-dispatch'
 import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
 import {

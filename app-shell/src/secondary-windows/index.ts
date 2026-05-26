@@ -17,7 +17,6 @@ import {
   STEP_DETAIL_VIEWER_UPDATE,
 } from '../constants'
 import { createLogger } from '../log'
-import { dispatchActionToMainWindow } from '../main-window-dispatch'
 import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
 import {
@@ -32,6 +31,22 @@ import type { Action, Dispatch } from '../types'
 import type { SecondaryWindowDetails } from './types'
 
 const log = createLogger('camera-stream')
+
+let mainWindow: BrowserWindow | null = null
+
+export function setMainWindow(window: BrowserWindow): void {
+  mainWindow = window
+}
+
+export function clearMainWindow(): void {
+  mainWindow = null
+}
+
+function dispatchActionToMainWindow(action: Action): void {
+  if (mainWindow != null && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('dispatch', action)
+  }
+}
 
 // Cache of all BrowserWindows by unique window id.
 const secondaryWindows = new Map<string, BrowserWindow>()
