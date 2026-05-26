@@ -1,4 +1,6 @@
-import { type DocumentationReport } from '/app/resources/access-control/types'
+import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
+
+import { type DocumentationReport } from './types'
 
 export function isDocumentationReportValid(
   docreport: DocumentationReport
@@ -8,4 +10,11 @@ export function isDocumentationReportValid(
   const confirmedAtIsValid = confirmedAt != null && confirmedAt.length > 0
   const documentedByIsValid = documentedBy != null && documentedBy.length > 0
   return noteIsValid && confirmedAtIsValid && documentedByIsValid
+}
+
+export function isDocumentationProvided(state: DocumentationState): boolean {
+  if (!state.accessControlEnabled) {
+    return true
+  }
+  return state.docreport != null
 }

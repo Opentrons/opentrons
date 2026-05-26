@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { showDocumentationRequiredModal } from '/app/organisms/DocumentationRequired/DocumentationRequiredModal'
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { requireDocumentation } from '/app/organisms/DocumentationRequired/requireDocumentation'
 
-import { requireDocumentation } from '../requireDocumentation'
-
-import type { DocumentedActionKind } from '../../../../resources/access-control/types'
+import type { DocumentedActionKind } from '../types'
 
 vi.mock(
   '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal',
@@ -31,7 +32,11 @@ describe('requireDocumentation', () => {
       documentedBy: 'alice',
     })
 
-    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
+    const result = await requireDocumentation(
+      ACTIONS_TO_DOCUMENT,
+      'alice',
+      true
+    )
 
     expect(result).toEqual({
       note: 'starting run for QC',
@@ -45,7 +50,7 @@ describe('requireDocumentation', () => {
     vi.mocked(showDocumentationRequiredModal).mockResolvedValue(null)
 
     await expect(
-      requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
+      requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice', true)
     ).rejects.toThrow(`No documentation provided for action: undefined`)
   })
 })

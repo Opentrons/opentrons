@@ -10,7 +10,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { getHighestPriorityError } from '/app/transformations/runs'
 
-import { useGuardedAction } from '../../AccessControl'
+import { useGuardedAction } from '../../../../local-resources/access-control'
 import { ErrorContent } from './ErrorContent'
 import styles from './runfailedmodal.module.css'
 

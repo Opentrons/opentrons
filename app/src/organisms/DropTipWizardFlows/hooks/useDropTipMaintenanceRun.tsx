@@ -8,9 +8,7 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
-// TODO(jj): implement useGuardedAction on desktop
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useGuardedAction } from '../../ODD/AccessControl'
+import { useGuardedAction } from '../../../local-resources/access-control'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteData } from '@opentrons/api-client'

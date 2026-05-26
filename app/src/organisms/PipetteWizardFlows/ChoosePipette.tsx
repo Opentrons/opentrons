@@ -47,11 +47,10 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
-// TODO(jj): implement documentation state generation on desktop
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { isDocumentationProvided } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { usePromptForInteractionReason } from '../ODD/AccessControl/usePromptForInteractionReason'
+import {
+  isDocumentationProvided,
+  usePromptForInteractionReason,
+} from '../../local-resources/access-control'
 import { FLOWS } from './constants'
 import { ExitModal } from './ExitModal'
 import { getIsGantryEmpty } from './utils'

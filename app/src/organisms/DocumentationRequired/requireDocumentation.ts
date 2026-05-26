@@ -1,10 +1,10 @@
-import { showDocumentationRequiredModal } from '/app/organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
-import { isDocumentationReportValid } from '/app/resources/access-control/utils'
+import { isDocumentationReportValid } from '../../local-resources/access-control/utils'
+import { showDocumentationRequiredModal } from './DocumentationRequiredModal'
 
 import type {
   DocumentationReport,
   DocumentedActionKind,
-} from '../../../resources/access-control/types'
+} from '../../local-resources/access-control/types'
 
 /**
  * Guard that captures a pops DocumentationRequiredModal and returns the documentation report
@@ -17,9 +17,10 @@ import type {
  */
 export async function requireDocumentation(
   actionsToDocument: DocumentedActionKind[],
-  username: string
+  username: string,
+  isOnDevice: boolean
 ): Promise<DocumentationReport> {
-  const modalResult = await showDocumentationRequiredModal(username)
+  const modalResult = await showDocumentationRequiredModal(username, isOnDevice)
   if (modalResult == null || !isDocumentationReportValid(modalResult)) {
     // TODO(jj): eventually, this will be handled on the backend and become unnecessary.
     throw new Error(

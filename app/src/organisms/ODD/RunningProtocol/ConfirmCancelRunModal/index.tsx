@@ -17,7 +17,7 @@ import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
-import { useGuardedAction } from '../../AccessControl'
+import { useGuardedAction } from '../../../../local-resources/access-control'
 import { CancelingRunModal } from '../CancelingRunModal'
 import styles from './confirmcancelmodal.module.css'
 

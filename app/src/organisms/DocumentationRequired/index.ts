@@ -1,0 +1,1 @@
+export { requireDocumentation } from './requireDocumentation'

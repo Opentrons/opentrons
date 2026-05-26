@@ -19,9 +19,7 @@ import {
   selectCurrentStep,
 } from '/app/redux/protocol-runs'
 
-// TODO(jj): implement documentation state generation on desktop
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useMaintenanceRunDocumentation } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
+import { useMaintenanceRunDocumentation } from '../../local-resources/access-control'
 import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
 import { LPCRobotInMotion } from './LPCRobotInMotion'

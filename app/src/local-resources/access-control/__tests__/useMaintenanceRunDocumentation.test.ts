@@ -3,15 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-import { requireDocumentation } from '../requireDocumentation'
-import {
-  isDocumentationProvided,
-  useMaintenanceRunDocumentation,
-} from '../useMaintenanceRunDocumentation'
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { requireDocumentation } from '/app/organisms/DocumentationRequired'
+
+import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
+import { isDocumentationProvided } from '../utils'
 
 import type ReactRedux from 'react-redux'
 import type { DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
-import type { DocumentationReport } from '../../../../resources/access-control/types'
+import type { DocumentationReport } from '../types'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),

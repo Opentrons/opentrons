@@ -2,10 +2,7 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-// TODO(jj): implement documentation state generation on desktop
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { usePromptForInteractionReason } from '/app/organisms/ODD/AccessControl/usePromptForInteractionReason'
-
+import { usePromptForInteractionReason } from '../../../local-resources/access-control/usePromptForInteractionReason'
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 

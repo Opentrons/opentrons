@@ -28,10 +28,8 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
+import { useMaintenanceRunDocumentation } from '../../local-resources/access-control'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-// TODO(jj): implement documentation state generation on desktop
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useMaintenanceRunDocumentation } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
 import { BeforeBeginning } from './BeforeBeginning'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { ExitConfirmation } from './ExitConfirmation'

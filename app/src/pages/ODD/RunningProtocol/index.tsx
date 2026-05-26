@@ -29,7 +29,6 @@ import {
   InterventionModal,
   useInterventionModal,
 } from '/app/organisms/InterventionModal'
-import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
 import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   CurrentRunningProtocolCommand,
@@ -53,6 +52,7 @@ import {
   useRunTimestamps,
 } from '/app/resources/runs'
 
+import { useGuardedAction } from '../../../local-resources/access-control'
 import styles from './runningprotocol.module.css'
 
 import type { OnDeviceRouteParams } from '/app/App/types'

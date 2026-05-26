@@ -2,9 +2,7 @@
 import { useState } from 'react'
 
 import { useDropTipCommandErrors } from '.'
-// TODO(jj): implement documentation state generation on desktop
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useMaintenanceRunDocumentation } from '../../ODD/AccessControl/useMaintenanceRunDocumentation'
+import { useMaintenanceRunDocumentation } from '../../../local-resources/access-control'
 import { useDropTipCommands } from './useDropTipCommands'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'

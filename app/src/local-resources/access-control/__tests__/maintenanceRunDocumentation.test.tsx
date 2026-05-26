@@ -15,14 +15,16 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
-import { requireDocumentation } from '../requireDocumentation'
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { requireDocumentation } from '/app/organisms/DocumentationRequired/requireDocumentation'
+
 import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type ReactRedux from 'react-redux'
 import type * as ApiClient from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { DocumentationReport } from '../../../../resources/access-control/types'
+import type { DocumentationReport } from '../types'
 
 /**
  * Integration test to ensure that maintenance runs prompt for interaction reasons correctly.

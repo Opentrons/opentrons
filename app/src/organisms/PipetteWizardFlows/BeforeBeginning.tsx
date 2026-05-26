@@ -25,9 +25,7 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
-// TODO(jj): implement documentation state generation on desktop
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { isDocumentationProvided } from '../ODD/AccessControl/useMaintenanceRunDocumentation'
+import { isDocumentationProvided } from '../../local-resources/access-control'
 import {
   BODY_STYLE,
   CALIBRATION_PROBE,

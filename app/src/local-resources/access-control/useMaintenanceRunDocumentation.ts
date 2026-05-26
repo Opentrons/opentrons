@@ -22,10 +22,3 @@ export const useMaintenanceRunDocumentation = (
 
   return { commandDocState, deletionDocState }
 }
-
-export function isDocumentationProvided(state: DocumentationState): boolean {
-  if (!state.accessControlEnabled) {
-    return true
-  }
-  return state.docreport != null
-}

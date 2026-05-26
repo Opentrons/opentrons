@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
-import { type DocumentationReport } from '/app/resources/access-control/types'
-
+import { type DocumentationReport } from './types'
 import { useGuardedAction } from './useGuardedAction'
 
 /**
