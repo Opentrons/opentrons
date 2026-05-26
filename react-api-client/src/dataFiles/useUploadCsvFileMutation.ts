@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { uploadCsvFile } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -52,9 +52,12 @@ export function useUploadCsvFileMutation(
     (fileData: FileData) =>
       uploadCsvFile(host!, fileData).then(response => {
         queryClient
-          .invalidateQueries([host, 'dataFiles'])
+          .invalidateQueries(getQueryKey(host, 'dataFiles'))
           .then(() =>
-            queryClient.setQueryData([host, 'dataFiles'], response.data)
+            queryClient.setQueryData(
+              getQueryKey(host, 'dataFiles'),
+              response.data
+            )
           )
           .catch((e: Error) => {
             throw e

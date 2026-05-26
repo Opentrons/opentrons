@@ -90,7 +90,7 @@ export const AllColors: StoryObj<StoryArgs> = {
         .map(([k, v]) => [k, v])
     ),
   },
-  render: args => {
+  render: (args: StoryArgs) => {
     const colorCategories = groupByCategory(args.colors)
 
     return (

@@ -109,6 +109,7 @@ import type {
   CutoutConfig,
   CutoutConfigMap,
   CutoutFixture,
+  DeckConfiguration,
   DeckDefinition,
   DeckDefinitionWithFakes,
   ModuleModel,
@@ -404,6 +405,50 @@ export function getPositionFromSlotId(
       : null
 
   return slotPosition
+}
+
+export function getPositionFromAddressableAreaId(args: {
+  addressableAreaId: AddressableAreaName
+  deckDef: DeckDefinition
+  deckConfiguration: DeckConfiguration
+}): CoordinateTuple | null {
+  const { addressableAreaId, deckDef, deckConfiguration } = args
+
+  for (const cutoutFixture of deckDef.cutoutFixtures) {
+    const match = Object.entries(cutoutFixture.providesAddressableAreas).find(
+      ([_, providedAA]) => providedAA.includes(addressableAreaId)
+    )
+    const isInDeckConfig = deckConfiguration.some(
+      config => config.cutoutFixtureId === cutoutFixture.id
+    )
+    if (match == null) {
+      continue
+    }
+    const [cutoutMatch] = match
+    if (isInDeckConfig) {
+      const addressableAreaOffset = getAAByAAId(
+        addressableAreaId,
+        deckDef
+      ).offsetFromCutoutFixture
+      const cutoutPosition =
+        deckDef.locations.cutouts.find(cutout => cutout.id === cutoutMatch)
+          ?.position ?? null
+      if (cutoutPosition == null) {
+        continue
+      }
+      return [
+        cutoutPosition[0] + addressableAreaOffset[0],
+        cutoutPosition[1] + addressableAreaOffset[1],
+        cutoutPosition[2] + addressableAreaOffset[2],
+      ]
+    }
+  }
+  console.warn('no match found', {
+    addressableAreaId,
+    deckDef,
+    deckConfiguration,
+  })
+  return [0, 0, 0]
 }
 
 export function getAddressableAreaFromSlotId(

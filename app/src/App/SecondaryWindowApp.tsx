@@ -19,6 +19,7 @@ import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 import { StepDetailViewer } from '/app/pages/Desktop/StepDetailViewer'
 import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { SecondaryWindowAppFallback } from './SecondaryWindowAppFallback'
@@ -98,12 +99,14 @@ function HostProvider({ children }: HostProviderProps): JSX.Element | null {
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
   const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
 
   return (
     <ApiHostProvider
       key={robot?.name}
       hostname={robot?.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
     >
       {children}
     </ApiHostProvider>

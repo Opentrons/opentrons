@@ -10,6 +10,13 @@ interface StoryArgs {
   spacings: SpacingEntry[]
 }
 
+// Type guard to ensure spacing entry has string value
+const isValidSpacingEntry = (
+  entry: readonly [string, unknown]
+): entry is SpacingEntry => {
+  return typeof entry[1] === 'string' && !entry[1].includes('auto')
+}
+
 const convertToPx = (remFormat: string): string => {
   const pxVal = Number(remFormat.replace('rem', '')) * 16
   return `${pxVal}px`
@@ -24,13 +31,10 @@ export const AllSpacing: StoryObj<StoryArgs> = {
   args: {
     spacings: Object.entries(SPACING) as SpacingEntry[],
   },
-  render: args => {
-    const targetSpacings = args.spacings.filter(
-      (s): s is SpacingEntry =>
-        typeof s[1] === 'string' && !s[1].includes('auto')
-    )
+  render: (args: StoryArgs) => {
+    const targetSpacings = args.spacings.filter(isValidSpacingEntry)
     // sort by rem value
-    const sortedSpacing = targetSpacings.sort((a, b) => {
+    const sortedSpacing = targetSpacings.sort((a, b): number => {
       const aValue = parseFloat(a[1].replace('rem', ''))
       const bValue = parseFloat(b[1].replace('rem', ''))
       return aValue - bValue

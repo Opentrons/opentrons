@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getRobotSettings } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig, RobotSettingsResponse } from '@opentrons/api-client'
@@ -17,7 +17,7 @@ export function useRobotSettingsQuery(
   const hostFromProvider = useHost()
   const host = hostOverride ?? hostFromProvider
   const query = useQuery<RobotSettingsResponse>(
-    [host!, 'robot_settings'],
+    getQueryKey(host, 'robot_settings'),
     () => getRobotSettings(host!).then(response => response.data),
     { enabled: host != null, ...options }
   )

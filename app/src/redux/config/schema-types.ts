@@ -17,7 +17,6 @@ export type DevInternalFlag =
   | 'reactQueryDevtools'
   | 'reactScan'
   | 'quickTransferProtocolContentsLog'
-  | 'ignoreOT2App'
   | 'accessControlMode'
   | 'robotSearchBar'
   | 'showGitDetails'

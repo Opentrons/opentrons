@@ -2,7 +2,7 @@ export interface DocumentedActionKind {
   kind: 'PROTOCOL_PLAY'
 }
 
-export interface DocumentationResult {
+export interface DocumentationReport {
   note: string
   confirmedAt: string
   documentedBy: string

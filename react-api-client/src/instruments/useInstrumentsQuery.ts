@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getInstruments } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { Instruments } from '@opentrons/api-client'
@@ -12,7 +12,7 @@ export function useInstrumentsQuery(
 ): UseQueryResult<Instruments> {
   const host = useHost()
   const query = useQuery<Instruments>(
-    [host, 'instruments'],
+    getQueryKey(host, 'instruments'),
     () => getInstruments(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )

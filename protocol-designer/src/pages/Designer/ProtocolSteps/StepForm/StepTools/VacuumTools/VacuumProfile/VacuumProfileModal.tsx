@@ -188,6 +188,7 @@ export function VacuumProfileModal(
                     onDelete={() => {
                       handleDeleteStep(id)
                     }}
+                    repetitions={cycleItem.repetitions}
                   />
                 )
               }

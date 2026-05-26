@@ -163,6 +163,8 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   D4: 'hopperD4',
 }
 
+export const VACUUM_DOCK_LOCATION = 'vacuumDock'
+
 export const VACUUM_VENT_OPEN: 'open' = 'open'
 export const VACUUM_VENT_CLOSED: 'closed' = 'closed'
 

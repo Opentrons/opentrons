@@ -40,6 +40,7 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION',
   'OT_PD_ENABLE_REACT_SCAN',
   'OT_PD_ENABLE_FORK',
+  'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
@@ -47,7 +48,6 @@ export type FlagTypes =
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
   | 'OT_PD_ENABLE_COMMENT'
   | 'OT_PD_ENABLE_HOT_KEYS_DISPLAY'
-  | 'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2'
   | 'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS'
   | 'OT_PD_ENABLE_BY_VOLUME_BUILDER'
   | 'OT_PD_ENABLE_CAMERA_SUPPORT'
@@ -56,7 +56,6 @@ export type FlagTypes =
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
   'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
-  'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2',
 ]
 export const allFlags: FlagTypes[] = [
   ...userFacingFlags,

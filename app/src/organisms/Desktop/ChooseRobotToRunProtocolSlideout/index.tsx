@@ -27,6 +27,7 @@ import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOf
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
@@ -360,6 +361,7 @@ export function ChooseRobotToRunProtocolSlideout(
   props: ChooseRobotToRunProtocolSlideoutProps
 ): JSX.Element | null {
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
+  const token = useAccessTokenForRobot(selectedRobot?.name ?? null)
   return (
     <ApiHostProvider
       hostname={selectedRobot?.ip ?? null}
@@ -367,6 +369,7 @@ export function ChooseRobotToRunProtocolSlideout(
       requestor={
         selectedRobot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
       }
+      token={token}
     >
       <ChooseRobotToRunProtocolSlideoutComponent
         {...{ ...props, selectedRobot, setSelectedRobot }}

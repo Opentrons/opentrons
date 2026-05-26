@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { createMaintenanceCommand } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type {
   UseMutateAsyncFunction,
@@ -52,7 +52,7 @@ export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceComma
     })
       .then(response => {
         queryClient
-          .invalidateQueries([host, 'maintenance_runs'])
+          .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
           .catch((e: Error) => {
             console.error(
               `error invalidating maintenance runs query: ${e.message}`
@@ -61,7 +61,9 @@ export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceComma
         return response.data
       })
       .catch((e: any) => {
-        queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
+        queryClient.invalidateQueries(
+          getQueryKey(host, 'robot/control/estopStatus')
+        )
         throw e
       })
   )
