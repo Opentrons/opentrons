@@ -19,6 +19,7 @@ nav:
       - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
+  - HTTP API (demo): '!include http-api/mkdocs.yml'
 
 exclude_docs: |
   python-api/liquid-class-tables/*.md
@@ -58,6 +59,7 @@ plugins:
   - macros:
       # Same partials as standalone python-api site (liquid-class-tables/*.md).
       include_dir: python-api/docs
+  - redoc-tag
 
 theme:
   name: material

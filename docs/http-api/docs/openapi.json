@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Opentrons Liquid Handling API",
+    "version": "1.0.0",
+    "description": "Local test definition for the Opentrons Robot Server HTTP API layer."
+  },
+  "paths": {
+    "/protocols": {
+      "get": {
+        "summary": "List all protocols",
+        "description": "Returns a comprehensive array of all protocol files stored natively on the liquid handler hard drive.",
+        "x-codeSamples": [
+          {
+            "lang": "Python",
+            "label": "Python (Requests)",
+            "source": "import requests\n\nurl = 'http://localhost:31950/protocols'\nresponse = requests.get(url)\nprint(response.json())"
+          },
+          {
+            "lang": "cURL",
+            "label": "cURL CLI",
+            "source": "curl -X GET http://localhost:31950/protocols"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of stored protocols.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                },
+                "example": [
+                  {
+                    "id": "protocol_v1_99f3b",
+                    "name": "Aqueous_Transfer_Flex.py",
+                    "createdAt": "2026-05-26T09:15:00Z"
+                  },
+                  {
+                    "id": "protocol_v1_22a7d",
+                    "name": "PCR_Gen2_Plate_Prep.json",
+                    "createdAt": "2026-05-26T10:30:00Z"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Upload a new protocol",
+        "description": "Accepts a raw Python script or Protocol Designer JSON file to stage for execution.",
+        "x-codeSamples": [
+          {
+            "lang": "Python",
+            "label": "Python (Requests)",
+            "source": "import requests\n\nurl = 'http://localhost:31950/protocols'\nfiles = {'file': open('my_protocol.py', 'rb')}\nresponse = requests.post(url, files=files)\nprint(response.json())"
+          },
+          {
+            "lang": "cURL",
+            "label": "cURL CLI",
+            "source": "curl -X POST http://localhost:31950/protocols \\\n  -F 'file=@/path/to/my_protocol.py'"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Protocol uploaded successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "message": "Protocol uploaded successfully.",
+                  "id": "protocol_v1_88c4b",
+                  "analysisStatus": "pending"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/robot/home": {
+      "post": {
+        "summary": "Home physical robot gantry",
+        "description": "Directly pulses the motor controllers to reset the X, Y, and Z coordinate axes to safety positions.",
+        "x-codeSamples": [
+          {
+            "lang": "Python",
+            "label": "Python (Requests)",
+            "source": "import requests\n\nurl = 'http://localhost:31950/robot/home'\nresponse = requests.post(url)\nprint(response.json())"
+          },
+          {
+            "lang": "cURL",
+            "label": "cURL CLI",
+            "source": "curl -X POST http://localhost:31950/robot/home \\\n  -H 'Content-Type: application/json'"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gantry successfully homed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "status": "complete",
+                  "axes_homed": ["X", "Y", "Z"],
+                  "timestamp": "2026-05-26T11:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+site_name: HTTP API
+
+nav:
+  - Introduction: index.md
+  - API Reference: reference.md
+  - Examples: examples.md
