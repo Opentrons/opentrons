@@ -9,7 +9,7 @@ import { getConfig } from '/app/redux/config'
 
 import { App } from '../'
 import { DesktopApp } from '../DesktopApp'
-import { useWindowType } from '../hooks'
+import { useWindowType } from '../hooks/useWindowType'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { SecondaryWindowApp } from '../SecondaryWindowApp'
 
@@ -18,7 +18,7 @@ import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/config')
 vi.mock('../DesktopApp')
-vi.mock('../hooks')
+vi.mock('../hooks/useWindowType')
 vi.mock('../OnDeviceDisplayApp')
 vi.mock('../SecondaryWindowApp')
 vi.mock('/app/App/sentry')

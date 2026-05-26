@@ -174,6 +174,21 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.vacuumStopPump,
         args
       )
+    case 'vacuumCloseVentSetPumpPressure':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumCloseVentSetPumpPressure,
+        args
+      )
+    case 'vacuumCloseVentSetPumpPower':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumCloseVentSetPumpPower,
+        args
+      )
+    case 'vacuumCloseVentStartProfile':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumCloseVentStartProfile,
+        args
+      )
   }
 
   args satisfies never // Make sure we handle every commandCreatorFnName.

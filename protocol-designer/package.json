@@ -21,9 +21,9 @@
   "dependencies": {
     "@fontsource/public-sans": "5.0.3",
     "@hookform/resolvers": "3.1.1",
-    "@opentrons/components": "link:../components",
-    "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/step-generation": "link:../step-generation",
+    "@opentrons/components": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
+    "@opentrons/step-generation": "workspace:*",
     "@sentry/react": "^9.12.0",
     "@types/file-saver": "2.0.1",
     "@types/lodash": "4.17.24",

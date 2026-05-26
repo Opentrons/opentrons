@@ -1,6 +1,8 @@
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useSelfQuery } from '@opentrons/react-api-client'
+
 import { getLocalRobot } from '/app/redux/discovery'
 import { getLocalRobotAuthState, logOutOrTimeOut } from '/app/redux/robot-auth'
 
@@ -10,22 +12,21 @@ interface UseAccountInfoResult {
   isLoggedIn: boolean
   /** null if not logged in. */
   username: string | null
-  /** null if not logged in or the info is still loading. */
-  legalName: string | null
+  /** null if not logged in, data is still loading, or there was a load error. */
+  fullName: string | null
 }
 
 /** Returns information about the currently logged-in account. */
 export function useAccountInfo(): UseAccountInfoResult {
   const authState = useSelector(getLocalRobotAuthState)
-  const isLoggedIn = authState != null
   const username = authState?.username ?? null
-  // todo(mm, 2026-05-01): This is a placeholder. Get the actual legal name once
-  // https://opentrons.atlassian.net/browse/EXEC-2610 is resolved and react-api-client
-  // can send requests with auth tokens.
-  const legalName = username
+  const isLoggedIn = username != null
+  const query = useSelfQuery()
+  const fullName = query.data?.data.fullName ?? null
+
   return useMemo(
-    () => ({ isLoggedIn, username, legalName }),
-    [isLoggedIn, username, legalName]
+    () => ({ isLoggedIn, username, fullName }),
+    [isLoggedIn, username, fullName]
   )
 }
 

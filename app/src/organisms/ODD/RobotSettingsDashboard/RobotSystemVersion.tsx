@@ -15,6 +15,7 @@ import {
 
 import { MediumButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useFeatureFlag } from '/app/redux/config'
 
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
@@ -25,6 +26,8 @@ const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 
 interface RobotSystemVersionProps {
   currentVersion: string
+  gitCommitHash: string
+  gitBranchName: string
   isUpdateAvailable: boolean
   robotUpdateInfo: RobotUpdateInfo | null
   setCurrentOption: SetSettingOption
@@ -32,6 +35,8 @@ interface RobotSystemVersionProps {
 
 export function RobotSystemVersion({
   currentVersion,
+  gitCommitHash,
+  gitBranchName,
   isUpdateAvailable,
   robotUpdateInfo,
   setCurrentOption,
@@ -44,6 +49,8 @@ export function RobotSystemVersion({
     'branded',
   ])
   const [showModal, setShowModal] = useState<boolean>(isUpdateAvailable)
+
+  const showGitDetails = useFeatureFlag('showGitDetails')
 
   return (
     <>
@@ -97,6 +104,40 @@ export function RobotSystemVersion({
                 {currentVersion}
               </LegacyStyledText>
             </Flex>
+            {showGitDetails && (
+              <>
+                <Flex
+                  backgroundColor={COLORS.grey35}
+                  flexDirection={DIRECTION_ROW}
+                  padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  borderRadius={BORDERS.borderRadius8}
+                >
+                  <LegacyStyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >{`${t('device_details:current_git_commit')}`}</LegacyStyledText>
+                  <LegacyStyledText forwardedAs="p">
+                    {gitCommitHash}
+                  </LegacyStyledText>
+                </Flex>
+                <Flex
+                  backgroundColor={COLORS.grey35}
+                  flexDirection={DIRECTION_ROW}
+                  padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  borderRadius={BORDERS.borderRadius8}
+                >
+                  <LegacyStyledText
+                    forwardedAs="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  >{`${t('device_details:current_git_branch')}`}</LegacyStyledText>
+                  <LegacyStyledText forwardedAs="p">
+                    {gitBranchName}
+                  </LegacyStyledText>
+                </Flex>
+              </>
+            )}
           </Flex>
           <Flex>
             {isUpdateAvailable ? (

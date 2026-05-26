@@ -1,11 +1,13 @@
 """Protocol editor page object."""
 
 import re
+from dataclasses import dataclass
 from typing import List, Literal, Optional, Union
 
 from playwright.sync_api import Locator, Page
 
 from automation.base_page import BasePage
+from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
 
 
 class TransferPage(BasePage):
@@ -23,9 +25,25 @@ class TransferPage(BasePage):
         args:
             tiprack: The tip rack to select like "Opentrons 96 Filter Tip Rack 20 µL".
         """
-        self.page.get_by_test_id("tipRack_dropdownMenu").click()
-        tip_rack = self.page.get_by_text(tiprack)
-        tip_rack.click()
+        self.tip_rack_select(tiprack)
+
+    def tip_rack_select(self, tiprack: str) -> None:
+        """Select tip rack in transfer step step 1, if multiple racks are available."""
+        dropdown = self.page.get_by_test_id("tipRack_dropdownMenu")
+        if dropdown.count() == 0:
+            return
+        self.wait_for_visible(dropdown)
+        dropdown.click()
+        self.page.get_by_role("listbox").get_by_text(tiprack).click()
+
+    def pipette_select(self, pipette: str) -> None:
+        """Select pipette in transfer step step 1."""
+        dropdown = self.page.get_by_test_id("pipette_dropdownMenu")
+        if dropdown.count() == 0:
+            return
+        self.wait_for_visible(dropdown)
+        dropdown.click()
+        self.page.get_by_role("listbox").get_by_text(pipette).click()
 
     def source_labware_select(self, labware: str) -> None:
         """Select source labware in transfer step.
@@ -43,11 +61,63 @@ class TransferPage(BasePage):
         self.page.get_by_test_id("nozzle_and_well_modal").click()
 
     def select_nozzles(self) -> None:
+        """Select all nozzles and continue to well selection."""
+        self.select_nozzle_configuration("All nozzles (recommended)")
+
+    NozzleConfig = Literal[
+        "All nozzles (recommended)",
+        "Single nozzle",
+        "Single column of nozzles",
+        "Single row of nozzles",
+        "Partial nozzles",
+    ]
+
+    def select_primary_nozzle(self, nozzle: str) -> None:
+        """Click a primary nozzle in the 96-channel nozzle selection modal."""
+        modal = self._modal_area()
+        modal.locator(f'[data-wellname="{nozzle}"]').click()
+
+    def select_nozzle_configuration(
+        self,
+        config: NozzleConfig,
+        partial_count: Optional[int] = None,
+        primary_nozzle: Optional[str] = None,
+    ) -> None:
+        """Select nozzle configuration in step 1 of the nozzle/well modal."""
         modal = self._modal_area()
         self.wait_for_visible(modal.get_by_text("Select Pipette nozzles to use", exact=False).first)
         self.wait_for_visible(modal.get_by_role("button", name="Continue"))
-        modal.locator('label:has-text("All nozzles (recommended)")').click()
+        modal.locator(f'label:has-text("{config}")').click()
+        if partial_count is not None:
+            self.select_partial_nozzle_count(partial_count)
+        if primary_nozzle is not None:
+            self.select_primary_nozzle(primary_nozzle)
         modal.get_by_role("button", name="Continue").click()
+
+    def select_partial_nozzle_count(self, count: int) -> None:
+        """Select partial nozzle count from the dropdown (e.g. 5 for 5/8 nozzles)."""
+        modal = self._modal_area()
+        dropdown = modal.get_by_test_id("dropdownMenu")
+        self.wait_for_visible(dropdown)
+        dropdown.click()
+        modal.get_by_role("listbox").get_by_text(f"{count} nozzles", exact=True).click()
+
+    def configure_nozzle_and_wells(
+        self,
+        *,
+        nozzle_config: NozzleConfig,
+        partial_count: Optional[int],
+        source_labware: str,
+        source_wells: Union[str, List[str]],
+        dest_labware: str,
+        dest_wells: Union[str, List[str]],
+        primary_nozzle: Optional[str] = None,
+    ) -> None:
+        """Open the nozzle/well modal and complete all three wizard steps."""
+        self.open_nozzle_and_well_selector()
+        self.select_nozzle_configuration(nozzle_config, partial_count, primary_nozzle)
+        self.wells_select("Source", source_labware, source_wells, False)
+        self.wells_select("Destination", dest_labware, dest_wells, True)
 
     def wells_select(
         self, location: locations, labwareName: str, wells: Union[str, List[str]], finalStep: bool
@@ -68,9 +138,14 @@ class TransferPage(BasePage):
         well_list = [wells] if isinstance(wells, str) else wells
 
         for well in well_list:
-            modal.locator(f"#{well}").click()
+            well_locator = modal.locator(f"#{well}")
+            if well_locator.count() == 0:
+                well_locator = modal.locator(f"[data-wellname='{well}']").first
+            self.wait_for_visible(well_locator)
+            well_locator.click(force=True)
         if finalStep:
             modal.get_by_role("button", name="Save").click()
+            self.page.get_by_test_id("nozzle_and_well_modal").wait_for(state="visible", timeout=10000)
         else:
             modal.get_by_role("button", name="Continue").click()
 
@@ -109,6 +184,15 @@ class TransferPage(BasePage):
         self.page.get_by_text("Back", exact=True).click()
 
     ## STEP 2 Selecting liquid class
+
+    def complete_liquid_class_step(self, liquid_class: str = "Aqueous") -> None:
+        """Select a liquid class and continue to advanced settings."""
+        self.part_2_transfer_form_liquid_class(liquid_class)
+        self.transfer_continue_to_next_step()
+
+    def complete_advanced_settings_step(self) -> None:
+        """Continue through advanced settings with defaults."""
+        self.transfer_continue_to_next_step()
 
     def part_2_transfer_form_liquid_class(self, liquid_class: str) -> None:
         """Select liquid class in part 2 of transfer step.
@@ -416,6 +500,45 @@ class TransferPage(BasePage):
         self.page.locator(f"input[name='{strat}_mix_volume']").fill(str(mix_volume))
 
     ## Step 4
+    TipTrackingMode = Literal["Automatic tip tracking (recommended)", "Manual tip tracking"]
+
+    def select_tip_tracking(self, mode: TipTrackingMode) -> None:
+        """Select automatic or manual tip tracking on the tip settings step."""
+        self.page.locator(f'label:has-text("{mode}")').click()
+
+    def select_manual_tips(self, tips: List[str]) -> None:
+        """Open the manual tip tracking wizard and select tip positions."""
+        self.page.get_by_text("No tips selected").click()
+        modal = self._modal_area()
+        self.wait_for_visible(modal.get_by_text("Select tips for manual tip tracking"))
+        continue_button = modal.get_by_role("button", name="Continue")
+        if continue_button.count() > 0 and continue_button.is_visible():
+            continue_button.click()
+        self.wait_for_visible(modal.get_by_text("Click to select tips in", exact=False))
+        for tip in tips:
+            tip_locator = modal.locator(f"[id='{tip}']")
+            if tip_locator.count() > 0:
+                tip_locator.click()
+            else:
+                modal.get_by_text(tip, exact=True).click()
+        modal.get_by_role("button", name="Select tips").click()
+        self.wait_for_visible(self.page.get_by_text(re.compile(r"\d+ pickup selected")), timeout=10000)
+
+    def save_transfer_with_tip_settings(
+        self,
+        change_tip: str,
+        drop_location: str = "Tip rack",
+        tip_tracking: TipTrackingMode = "Automatic tip tracking (recommended)",
+        manual_tips: Optional[List[str]] = None,
+    ) -> None:
+        """Configure tip settings and save the transfer step."""
+        self.tip_change_strategy(change_tip, drop_location=drop_location)
+        if change_tip != "Never":
+            self.select_tip_tracking(tip_tracking)
+            if tip_tracking == "Manual tip tracking" and manual_tips is not None:
+                self.select_manual_tips(manual_tips)
+        self.save_transfer_step()
+
     def tip_change_strategy(self, tipstrat: str, drop_location: str) -> None:
         """Sets tip change strategy to Once and drop location to Tip rack.
         args:
@@ -423,10 +546,67 @@ class TransferPage(BasePage):
             drop_location: Drop location like "Tip rack", "Trash", etc.
         """
         self.page.get_by_test_id("changeTip_dropdownMenu").click()
-        self.page.get_by_text(tipstrat).click()
+        self.page.get_by_role("listbox").get_by_text(tipstrat, exact=True).click()
         self.page.get_by_test_id("dropTip_location_dropdownMenu").click()
-        self.page.get_by_text(drop_location).click()
+        self.page.get_by_role("listbox").get_by_text(drop_location, exact=True).click()
 
     def save_transfer_step(self) -> None:
         """Click save transfer step button in transfer step."""
-        self.page.get_by_text("Save", exact=True).click()
+        self.dismiss_release_notes_toast()
+        self.page.get_by_role("button", name="Save", exact=True).last.click()
+
+
+@dataclass
+class TransferStepConfig:
+    """Configuration for a single transfer step in the wizard."""
+
+    tip_rack: str
+    source_labware: str
+    dest_labware: str
+    source_wells: Union[str, List[str]]
+    dest_wells: Union[str, List[str]]
+    path: str
+    volume: str
+    change_tip: str
+    pipette: Optional[str] = None
+    drop_location: str = "Tip rack"
+    tip_tracking: TransferPage.TipTrackingMode = "Automatic tip tracking (recommended)"
+    manual_tips: Optional[List[str]] = None
+    nozzle_config: TransferPage.NozzleConfig = "All nozzles (recommended)"
+    partial_count: Optional[int] = None
+    primary_nozzle: Optional[str] = None
+
+
+def add_transfer_step(
+    editor: ProtocolEditorPage,
+    transfer: TransferPage,
+    config: TransferStepConfig,
+) -> None:
+    """Add and save a transfer step through the four-step wizard."""
+    editor.add_step("Transfer")
+    transfer.wait_for_visible(transfer.page.get_by_test_id("aspirate_labware_dropdownMenu"))
+    if config.pipette is not None:
+        transfer.pipette_select(config.pipette)
+    transfer.tip_rack_select(config.tip_rack)
+    transfer.source_labware_select(config.source_labware)
+    transfer.destination_labware_select(config.dest_labware)
+    transfer.configure_nozzle_and_wells(
+        nozzle_config=config.nozzle_config,
+        partial_count=config.partial_count,
+        primary_nozzle=config.primary_nozzle,
+        source_labware=config.source_labware,
+        source_wells=config.source_wells,
+        dest_labware=config.dest_labware,
+        dest_wells=config.dest_wells,
+    )
+    transfer.pipette_path_select(config.path)
+    transfer.input_volume(config.volume)
+    transfer.transfer_continue_to_next_step()
+    transfer.complete_liquid_class_step()
+    transfer.complete_advanced_settings_step()
+    transfer.save_transfer_with_tip_settings(
+        change_tip=config.change_tip,
+        drop_location=config.drop_location,
+        tip_tracking=config.tip_tracking,
+        manual_tips=config.manual_tips,
+    )

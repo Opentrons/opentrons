@@ -19,17 +19,19 @@ import type { AlertLevel } from './types'
 interface ErrorContentsProps {
   errorType: ErrorType
   level: AlertLevel
+  translationParams?: Record<string, string>
 }
 export const ErrorContents = (
   props: ErrorContentsProps
 ): JSX.Element | null => {
-  const { errorType, level } = props
+  const { errorType, level, translationParams } = props
   const { t } = useTranslation(['alert', 'shared'])
   const dispatch = useDispatch()
 
   if (level === 'timeline') {
     const bodyText = t(`timeline.error.${errorType}.body`, {
       defaultValue: '',
+      ...translationParams,
     })
     switch (errorType) {
       case 'INSUFFICIENT_TIPS':

@@ -1931,3 +1931,44 @@ class VacuumModuleContext(ModuleContext):
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_start_set_vacuum_pressure)
+    def start_set_vacuum_pressure(
+        self,
+        gauge_pressure_mbar: float,
+        duration_s: Optional[int] = None,
+        ramp_rate: Optional[float] = None,
+        timeout_s: Optional[int] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        self._core.start_set_vacuum_pressure(
+            gauge_pressure_mbar=gauge_pressure_mbar,
+            duration=duration_s,
+            ramp_rate=ramp_rate,
+            timeout_s=timeout_s,
+            vent_after=vent_after,
+        )
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_start_set_vacuum_power)
+    def start_set_vacuum_power(
+        self,
+        percent_power: int,
+        duration_s: Optional[int] = None,
+        ramp_rate: Optional[float] = None,
+        timeout_s: Optional[int] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        self._core.start_set_vacuum_power(
+            percent_power=percent_power,
+            duration=duration_s,
+            ramp_rate=ramp_rate,
+            timeout_s=timeout_s,
+            vent_after=vent_after,
+        )
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_stop_vacuum)
+    def stop_vacuum_pump(self) -> None:
+        self._core.stop_vacuum()

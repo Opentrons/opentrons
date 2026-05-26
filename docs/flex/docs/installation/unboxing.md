@@ -189,7 +189,7 @@ Continue to unpack the Flex and get it off the crate base.
 
     ![Location of the four handles with arrow showing clockwise attachment motion.](../images/unboxing/11-attach-handles.svg "Unboxing step 11")
 
-12. With help from your lab partner, lift the Flex by its carrying handles and move it to a workbench for final assembly.
+12. With help from your lab partner, lift the Flex by its *carrying handles* and move it to a workbench for final assembly.
 
     ![Flex robot on top of a workbench.](../images/unboxing/12-flex-on-bench.svg "Unboxing step 12")
 
@@ -201,7 +201,7 @@ After moving the Flex to a temporary work area, or its permanent home, it's time
 
 <div class="instruction-list" markdown>
 
-13. If you have moved the robot to its final, working location, remove the carrying handles and replace them with the finishing caps. The caps close the handle openings in the frame and give the robot a clean appearance. Return the handles to the User Kit for storage.
+13. If you have moved the robot to its final, working location, remove the carrying handles and replace them with the *finishing caps*. The caps close the handle openings in the frame and give the robot a clean appearance. Return the handles to the User Kit for storage.
 
     ![Location of finishing caps, with inset showing clockwise attachment with the hex key.](../images/unboxing/13-finishing-caps.svg "Unboxing step 13")
 

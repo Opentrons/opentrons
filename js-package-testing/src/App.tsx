@@ -1,14 +1,19 @@
-import { ProtocolDeck } from '@opentrons/components'
+import { PrimaryButton, ProtocolDeck } from '@opentrons/components'
 import { ProtocolVisualization } from '@opentrons/protocol-visualization'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import Ot2Analysis from './ot2Analysis.json'
 import StackerAnalysis from './StackerAnalysis.json'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 import './styles.css'
 
+import { useState } from 'react'
+
 const analysis = StackerAnalysis as unknown as ProtocolAnalysisOutput
+const ot2Analysis = Ot2Analysis as unknown as ProtocolAnalysisOutput
+
 type DemoPage = 'deck-map' | 'protocol-visualization'
 
 function getCurrentPage(): DemoPage {
@@ -65,7 +70,8 @@ function DeckMapPage(): JSX.Element {
       <div className="analysis_info">
         <h3>Analysis</h3>
         <p>
-          <strong>Protocol:</strong> {analysis.metadata.protocolName}
+          <strong>Protocol:</strong>{' '}
+          {analysis.metadata?.protocolName ?? 'ot-2 protocol'}
         </p>
         <p>
           <strong>Robot type:</strong> {analysis.robotType}
@@ -74,7 +80,6 @@ function DeckMapPage(): JSX.Element {
           <strong>FLEX_ROBOT_TYPE:</strong> {FLEX_ROBOT_TYPE}
         </p>
       </div>
-
       <div
         data-testid="protocol-deck-container"
         className="protocol_deck_container"
@@ -94,18 +99,39 @@ function DeckMapPage(): JSX.Element {
 }
 
 function VisualizationPage(): JSX.Element {
+  const [showFlex, setShowFlex] = useState<boolean>(true)
   return (
     <main className="demo_section protocol_visualization_section">
       <h2>Protocol visualization</h2>
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <PrimaryButton
+          onClick={() => {
+            setShowFlex(true)
+          }}
+        >
+          Flex
+        </PrimaryButton>
+        <PrimaryButton
+          onClick={() => {
+            setShowFlex(false)
+          }}
+        >
+          Ot-2
+        </PrimaryButton>
+      </div>
       <p>
-        From <code>@opentrons/protocol-visualization</code> using the same
-        StackerAnalysis fixture as the deck map page.
+        From <code>@opentrons/protocol-visualization</code> using the{' '}
+        {showFlex ? 'StackerAnalysis' : 'Ot2Analysis'} fixture as the deck map
+        page.
       </p>
       <div
         data-testid="protocol-visualization-container"
         className="protocol_visualization_demo"
       >
-        <ProtocolVisualization analysis={analysis} groupedCommands={null} />
+        <ProtocolVisualization
+          analysis={showFlex ? analysis : ot2Analysis}
+          groupedCommands={null}
+        />
       </div>
     </main>
   )

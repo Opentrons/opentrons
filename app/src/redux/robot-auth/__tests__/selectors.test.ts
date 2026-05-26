@@ -50,7 +50,7 @@ describe('robot auth selectors', () => {
       ],
       health: {} as any,
       name: 'testRobot',
-      serverHealth: {} as any,
+      serverHealth: { robotModel: 'OT-3 Standard' } as any,
     }
     const authState = {
       accessToken: 'access-token',

@@ -33,6 +33,7 @@ import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   useCurrentRunId,
@@ -56,6 +57,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const dispatch = useDispatch<Dispatch>()
 
   const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
   useSyncRobotClock(robotName)
   useEffect(() => {
     dispatch(fetchProtocols())
@@ -66,6 +68,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
       robotName={robot.name}
+      token={token}
     >
       <RobotCertRotator>
         <Box

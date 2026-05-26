@@ -7,7 +7,6 @@ import { BasicButton, COLORS, StyledText } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { ACCEPTED_PROTOCOL_FILE_TYPES } from '/protocol-designer/constants'
-import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
 import {
   getFileMetadata,
   getRobotType,
@@ -33,7 +32,6 @@ export function Navigation(): JSX.Element | null {
   const pendingNav = useRef(false)
   const metadata = useSelector(getFileMetadata)
   const robotType = useSelector(getRobotType)
-  const enableFork = useSelector(getEnableFork)
   const [showOt2Modal, setShowOt2Modal] = useState(false)
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
@@ -47,14 +45,14 @@ export function Navigation(): JSX.Element | null {
   useEffect(() => {
     if (pendingNav.current && metadata?.created != null) {
       pendingNav.current = false
-      if (enableFork && robotType === OT2_ROBOT_TYPE) {
+      if (robotType === OT2_ROBOT_TYPE) {
         dispatch(loadFileActions.undoLoadFile())
         setShowOt2Modal(true)
       } else {
         navigate('/overview')
       }
     }
-  }, [metadata, navigate, enableFork, robotType, dispatch])
+  }, [metadata, navigate, robotType, dispatch])
 
   const handleCreateNew = (): void => {
     if (
@@ -76,7 +74,7 @@ export function Navigation(): JSX.Element | null {
 
   const openOt2DesignerInNewTab = (): void => {
     const redirectTarget = getOt2DesignerCreateUrl()
-    window.open(redirectTarget, '_blank', 'noopener,noreferrer')
+    window.open(redirectTarget, '_blank', 'noopener')
   }
 
   const handleOpenOt2Designer = (): void => {

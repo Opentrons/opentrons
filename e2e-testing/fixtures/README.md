@@ -12,7 +12,8 @@ fixtures/
 │ ├── 5/ # Protocol version 5 files
 │ ├── 6/ # Protocol version 6 files
 │ ├── 7/ # Protocol version 7 files
-│ └── 8/ # Protocol version 8 files (current)
+│ ├── 8/ # Protocol version 8 files (current)
+│ └── 9/ # Python protocol exports from PD (Flex setup fixtures)
 ├── cypress_fixtures/ # Test files from original Cypress tests
 │ ├── garbage.txt # Invalid file for error testing
 │ ├── generic_96_tiprack_200ul.json # Generic labware definition
@@ -43,6 +44,14 @@ Each protocol version directory contains test protocols used for:
 - **multipleLiquids.json** - Multiple liquid handling
 - **ninetySixChannelFullAndColumn.json** - 96-channel pipette testing
 - **newAdvancedSettingsAndMultiTemp.json** - Advanced settings and multi-temp module
+
+### Protocol version 9 (Python Flex setup fixtures)
+
+- **smoke_flex_setup.py** - Flex module smoke-test deck setup
+- **Liquid_Class_96_Channel_Test.py** - 96-channel pipette + 384-well plate setup
+- **PD_Move_Lids_Setup.py** - Gripper lid-move deck setup
+- **single_eight_partial_tip_setup.py** - 8-channel partial/single tip + 1-channel transfers (384 plate, temp 24-tube block, TC, HS)
+- **96_channel_setup.py** - 96-channel partial/full tip transfers (384 plate, NEST 96 deep well, 1000µL + 200µL tip racks)
 
 ## Usage in Tests
 

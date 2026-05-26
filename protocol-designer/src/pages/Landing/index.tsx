@@ -13,7 +13,6 @@ import {
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { getEnableFork } from '/protocol-designer/feature-flags/selectors'
 import { getOt2DesignerCreateUrl } from '/protocol-designer/utils/getOt2DesignerCreateUrl'
 
 import { getHasOptedIn } from '../../analytics/selectors'
@@ -59,8 +58,6 @@ export function Landing(): JSX.Element {
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
     hasOptedIn != null
 
-  const enableFork = useSelector(getEnableFork)
-
   useEffect(
     () => {
       if (
@@ -95,7 +92,7 @@ export function Landing(): JSX.Element {
 
   useEffect(() => {
     if (metadata?.created != null) {
-      if (enableFork && robotType === OT2_ROBOT_TYPE) {
+      if (robotType === OT2_ROBOT_TYPE) {
         setShowOt2Modal(true)
         dispatch(loadFileActions.undoLoadFile())
       } else {
@@ -103,7 +100,7 @@ export function Landing(): JSX.Element {
         navigate('/overview')
       }
     }
-  }, [metadata, navigate, enableFork, robotType, dispatch])
+  }, [metadata, navigate, robotType, dispatch])
 
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
@@ -117,7 +114,7 @@ export function Landing(): JSX.Element {
 
   const openOt2DesignerInNewTab = (): void => {
     const redirectTarget = getOt2DesignerCreateUrl()
-    window.open(redirectTarget, '_blank', 'noopener,noreferrer')
+    window.open(redirectTarget, '_blank', 'noopener')
   }
 
   const handleOpenOt2Designer = (): void => {
@@ -177,17 +174,15 @@ export function Landing(): JSX.Element {
               }
             />
           </NavLink>
-          {enableFork ? (
-            <LargeButton
-              buttonType="blueStroke"
-              onClick={openOt2DesignerInNewTab}
-              buttonText={
-                <span className={styles.button_text}>
-                  {t('create_a_ot2_protocol')}
-                </span>
-              }
-            />
-          ) : null}
+          <LargeButton
+            buttonType="blueStroke"
+            onClick={openOt2DesignerInNewTab}
+            buttonText={
+              <span className={styles.button_text}>
+                {t('create_a_ot2_protocol')}
+              </span>
+            }
+          />
         </div>
         <label className={styles.label}>
           <BasicButton onClick={handleImportClick} underLine>

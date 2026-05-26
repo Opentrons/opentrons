@@ -127,7 +127,6 @@ export const forVacuumStopPump = (
   moduleState.currentPumpActivity = {
     type: 'pumpDeactivated',
   }
-  moduleState.ventStatus = VACUUM_VENT_OPEN
 }
 
 export const forVacuumStartRunProfile = (

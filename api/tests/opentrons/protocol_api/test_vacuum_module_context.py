@@ -213,3 +213,85 @@ def test_vacuum_module_move_to_dock_with_options(
             drop_offset=(-1, -2, -3),
         )
     )
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+)
+def test_vacuum_module_start_set_vacuum_pressure(
+    decoy: Decoy,
+    subject: VacuumModuleContext,
+    mock_core: VacuumModuleCore,
+) -> None:
+    """Make sure the command parameters get passed to the protocol engine correctly."""
+    gauge_pressure_mbar = -300
+    duration_s = 40
+    ramp_rate = None
+    timeout_s = 100
+    vent_after = None
+
+    subject.start_set_vacuum_pressure(
+        gauge_pressure_mbar=gauge_pressure_mbar,
+        duration_s=duration_s,
+        ramp_rate=ramp_rate,
+        timeout_s=timeout_s,
+        vent_after=vent_after,
+    )
+
+    decoy.verify(
+        mock_core.start_set_vacuum_pressure(
+            gauge_pressure_mbar=gauge_pressure_mbar,
+            duration=duration_s,
+            ramp_rate=ramp_rate,
+            timeout_s=timeout_s,
+            vent_after=vent_after,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+)
+def test_vacuum_module_start_set_vacuum_power(
+    decoy: Decoy,
+    subject: VacuumModuleContext,
+    mock_core: VacuumModuleCore,
+) -> None:
+    """Make sure the command parameters get passed to the protocol engine correctly."""
+    percent_power = 22
+    duration_s = 40
+    ramp_rate = 1.2
+    timeout_s = 101
+    vent_after = True
+
+    subject.start_set_vacuum_power(
+        percent_power=percent_power,
+        duration_s=duration_s,
+        ramp_rate=ramp_rate,
+        timeout_s=timeout_s,
+        vent_after=vent_after,
+    )
+
+    decoy.verify(
+        mock_core.start_set_vacuum_power(
+            percent_power=percent_power,
+            duration=duration_s,
+            ramp_rate=ramp_rate,
+            timeout_s=timeout_s,
+            vent_after=vent_after,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+)
+def test_vacuum_module_stop_vacuum(
+    decoy: Decoy,
+    subject: VacuumModuleContext,
+    mock_core: VacuumModuleCore,
+) -> None:
+    """Make sure the the protocol engine function gets called correctly."""
+    subject.stop_vacuum_pump()
+
+    decoy.verify(mock_core.stop_vacuum())

@@ -406,6 +406,9 @@ export const savedStepForms = (
           allLabware,
           latestDefs
         )
+        if (updatedLabwareId == null) {
+          return acc
+        }
         // The `location` can be a labwareId too, so update its version as well.
         // (We only recently realized that we need to update `location`, so there are
         // probably saved protocols out there where we hadn't updated `location` and
