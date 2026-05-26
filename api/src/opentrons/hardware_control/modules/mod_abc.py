@@ -2,7 +2,7 @@ import abc
 import asyncio
 import logging
 import re
-from typing import Any, ClassVar, Mapping, Optional, TypeVar
+from typing import Any, Callable, ClassVar, Coroutine, Mapping, Optional, TypeVar
 from packaging.version import InvalidVersion, parse, Version
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -251,3 +251,36 @@ class AbstractModule(abc.ABC):
     def cleanup_persistent(self) -> None:
         """Reset any persistent data on the module that should not exist outside of a run."""
         pass
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        pass
+
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        pass
+
+    async def run_task_fault_tolerant(
+        self,
+        task_function: Callable[[], Coroutine[Any, Any, None]],
+        debounce_count: int = 4,
+    ) -> None:
+        """Convenience function for module actions where we have to wait for some action to happen.
+        This will end up calling the task function multiple times in the event of a failure.
+        """
+        while debounce_count > 0:
+            try:
+                t = self._loop.create_task(task_function())
+                self.make_cancellable(t)
+                await t
+            except BaseException as e:
+                mod_log.info(
+                    f"error in fault tollerant module call {e} debounce {debounce_count}"
+                )
+                debounce_count -= 1
+                await asyncio.sleep(1)
+                if debounce_count == 0:
+                    # out of retries
+                    raise
+            else:
+                # success
+                return
