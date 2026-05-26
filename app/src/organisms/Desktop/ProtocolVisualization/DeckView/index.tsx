@@ -65,6 +65,7 @@ interface DeckViewProps {
   invariantContext: InvariantContext
   robotState: TimelineFrame
   robotType: RobotType
+  selectedSlot: string | null
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   liquids: Liquid[]
   // filtered commands means we are filtering out the load commands
@@ -80,6 +81,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const {
     robotType,
     invariantContext,
+    selectedSlot,
     setSelectedSlot,
     robotState,
     selectedRunTimeCommand,
@@ -339,6 +341,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   liquids={liquids}
                   hoveredSlot={hoveredSlot}
                   setHoveredSlot={setHoveredSlot}
+                  selectedSlot={selectedSlot}
                   robotType={robotType}
                   setSelectedSlot={setSelectedSlot}
                   robotState={robotState}

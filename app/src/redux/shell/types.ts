@@ -75,7 +75,13 @@ export interface ShellState {
   isReady: boolean
   filePaths: string[]
   systemLanguage: string[] | null
+  stepDetailViewerClosed: StepDetailViewerClosedState
 }
+
+export type StepDetailViewerClosedState = {
+  protocolKey: string
+  closedAt: number
+} | null
 
 export interface UiInitializedAction {
   type: 'shell:UI_INITIALIZED'
@@ -251,6 +257,13 @@ export interface StepDetailViewerCloseAction {
   }
 }
 
+export interface StepDetailViewerClosedAction {
+  type: 'shell:STEP_DETAIL_VIEWER_CLOSED'
+  payload: {
+    protocolKey: string
+  }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -272,6 +285,7 @@ export type ShellAction =
   | StepDetailViewerOpenAction
   | StepDetailViewerUpdateAction
   | StepDetailViewerCloseAction
+  | StepDetailViewerClosedAction
 
 export type IPCSafeFormDataEntry =
   | {

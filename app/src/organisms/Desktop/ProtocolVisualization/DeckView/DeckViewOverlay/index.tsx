@@ -40,7 +40,7 @@ import type {
   RobotState,
 } from '@opentrons/step-generation'
 
-interface SlotOverlayProps {
+interface DeckViewOverlayProps {
   slotId: DeckSlotId
   slotPosition: CoordinateTuple | null
   slotFillColor: string
@@ -51,11 +51,14 @@ interface SlotOverlayProps {
   robotType: RobotType
   hover: string | null
   children?: ReactNode
+  selectedSlot: string | null
 }
 
 const X_OFFSET = 30 // center the fixedTrash overlay
 
-export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
+export function DeckViewOverlay(
+  props: DeckViewOverlayProps
+): JSX.Element | null {
   const {
     slotId,
     slotPosition,
@@ -67,6 +70,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     setSelectedSlot,
     setHoveredSlot,
     hover,
+    selectedSlot,
   } = props
   const { stagingAreaEntities, moduleEntities, wasteChuteEntities } =
     invariantContext
@@ -97,7 +101,13 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotMapped))) {
     return null
   }
-  const hoverOpacity = hover != null && hover === slotId ? 0.9 : 0
+
+  // Note the outline is kept when a user opens the spotlight window
+  const hoverOpacity =
+    (hover != null && hover === slotId) ||
+    (selectedSlot != null && selectedSlot === slotId)
+      ? 0.9
+      : 0
 
   if (robotType === FLEX_ROBOT_TYPE) {
     const thermocyclerModuleEntry = Object.entries(modules).find(

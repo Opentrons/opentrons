@@ -12,13 +12,16 @@ import {
   CAMERA_PHOTO_OPEN,
   CAMERA_STREAM_OPEN,
   STEP_DETAIL_VIEWER_CLOSE,
+  STEP_DETAIL_VIEWER_CLOSED,
   STEP_DETAIL_VIEWER_OPEN,
   STEP_DETAIL_VIEWER_UPDATE,
 } from '../constants'
 import { createLogger } from '../log'
+import { dispatchActionToMainWindow } from '../main-window-dispatch'
 import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
 import {
+  clearStepDetailViewerData,
   getWindowIdStepDetailViewer,
   openStepDetailViewer,
   updateStepDetailViewerData,
@@ -154,7 +157,17 @@ function openWindow(details: SecondaryWindowDetails): void {
     newWindow.webContents.send('window-type', 'secondary')
   })
   newWindow.once('closed', () => {
-    log.debug('Camera stream window closed')
+    log.debug(`${type} window closed`)
     secondaryWindows.delete(windowId)
+
+    if (type === 'step-detail-viewer') {
+      const protocolKey = windowId.slice('step-detail-viewer-'.length)
+      clearStepDetailViewerData(protocolKey)
+
+      dispatchActionToMainWindow({
+        type: STEP_DETAIL_VIEWER_CLOSED,
+        payload: { protocolKey },
+      })
+    }
   })
 }

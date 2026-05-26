@@ -33,6 +33,7 @@ interface DeckViewLabwareProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
 }
 
@@ -47,6 +48,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
     setSelectedSlot,
     setHoveredSlot,
     hoveredSlot,
+    selectedSlot,
     selectedRunTimeCommand,
   } = props
   const { labware, modules, pipettes } = robotState
@@ -119,6 +121,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
             setSelectedSlot={setSelectedSlot}
             setHoveredSlot={setHoveredSlot}
             hover={hoveredSlot}
+            selectedSlot={selectedSlot}
           >
             {showCommandSummary ? null : (
               <StyledText desktopStyle="captionRegular" color={COLORS.white}>

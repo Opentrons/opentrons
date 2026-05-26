@@ -22,6 +22,7 @@ interface DeckViewSlotsProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   robotState: RobotState
   invariantContext: InvariantContext
   stagingAreaCutoutIds: CutoutId[]
@@ -35,6 +36,7 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
     setSelectedSlot,
     setHoveredSlot,
     hoveredSlot,
+    selectedSlot,
     robotState,
     invariantContext,
     stagingAreaCutoutIds,
@@ -72,6 +74,7 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
                 setSelectedSlot={setSelectedSlot}
                 setHoveredSlot={setHoveredSlot}
                 hover={hoveredSlot}
+                selectedSlot={selectedSlot}
               />,
             ]
           }

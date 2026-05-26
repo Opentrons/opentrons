@@ -28,6 +28,7 @@ import {
   closeSecondaryWindows,
   registerCameraStream,
 } from './secondary-windows'
+import { clearMainWindow, setMainWindow } from './main-window-dispatch'
 import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
 import {
@@ -177,9 +178,11 @@ async function startUp(): Promise<void> {
 
   initializeDiscovery()
   mainWindow = createUi()
+  setMainWindow(mainWindow)
   rendererLogger = createRendererLogger()
 
   mainWindow.once('closed', () => {
+    clearMainWindow()
     mainWindow = null
     closeSecondaryWindows()
   })

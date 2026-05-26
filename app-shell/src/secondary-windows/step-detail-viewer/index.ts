@@ -65,6 +65,10 @@ export function getWindowIdStepDetailViewer(protocolKey: string): string {
   return `step-detail-viewer-${protocolKey}`
 }
 
+export function clearStepDetailViewerData(protocolKey: string): void {
+  stepDetailDataStore.delete(protocolKey)
+}
+
 const STEP_DETAIL_VIEWER_URL = (protocolKey: string): string => {
   return `${
     SECONDARY_WINDOW_CONFIG.url.protocol
