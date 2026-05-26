@@ -29,7 +29,7 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "link:../app",
+    "@opentrons/app": "workspace:*",
     "@types/node-fetch": "2.6.11",
     "@types/yargs-parser": "^21.0.3",
     "is-ip": "5.0.1",
@@ -39,8 +39,8 @@
     "postcss-preset-env": "9.3.0"
   },
   "dependencies": {
-    "@opentrons/discovery-client": "link:../discovery-client",
-    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/discovery-client": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
     "@sentry/electron": "7.5.0",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
