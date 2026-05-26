@@ -105,7 +105,10 @@ async def get_run_controller(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(maybe_record_documented_interaction),
+    ],
 )
 async def create_run_action(
     runId: str,
@@ -120,10 +123,6 @@ async def create_run_action(
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    _maybe_record_documented_interaction: Annotated[
-        None,
-        Depends(maybe_record_documented_interaction),
-    ],
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -140,9 +139,6 @@ async def create_run_action(
         maintenance_run_orchestrator_store: Maintenance run orchestrator store.
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        _maybe_record_documented_interaction: When auth-server requires reasons for
-            interaction, requires the ``Opentrons-User-Notes`` header and records
-            the interaction for audit.
     """
     body = request_body.data
     action_type = body.actionType
