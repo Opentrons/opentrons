@@ -17,6 +17,7 @@ storybook-static
 
 # js-package-testing
 js-package-testing/pack/**
+js-package-testing/test-results/**
 
 # python projects and tools
 **/.mypy_cache/**
