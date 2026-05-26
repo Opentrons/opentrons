@@ -114,10 +114,10 @@ SUMMARY_SECTION_TITLE = "SUMMARY_RESULTS"
 
 # summary results tags
 BURN_IN_TEST_RESULTS = "BURN_IN_TEST_RESULTS"
-TEST_PLUNGER_RESULTS = "CURRENTS_SPEEDS_CHECK_RESULTS"
-CYCLE_PLUNGER_RESULTS = "STALL_CHECK_RESULTS"
-TEST_PLUNGER_FAIL_REASON = "CURRENTS_SPEEDS_CHECK_FAIL_REASON"
-CYCLE_PLUNGER_REASON = "STALL_CHECK_FAIL_REASON"
+CURRENTS_SPEEDS_CHECK_RESULTS = "CURRENTS_SPEEDS_CHECK_RESULTS"
+STALL_CHECK_RESULTS = "STALL_CHECK_RESULTS"
+CURRENTS_SPEEDS_CHECK_FAIL_REASON = "CURRENTS_SPEEDS_CHECK_FAIL_REASON"
+STALL_CHECK_FAIL_REASON = "STALL_CHECK_FAIL_REASON"
 
 PEEK_BURN_IN_TEST_NAME = "peek-burn-in"
 
@@ -149,10 +149,10 @@ def _build_results_report(cycles: int, trials: int, run_id: str) -> CSVReport:
             title=SUMMARY_SECTION_TITLE,
             lines=[
                 CSVLine(BURN_IN_TEST_RESULTS, [str]),
-                CSVLine(TEST_PLUNGER_RESULTS, [str]),
-                CSVLine(CYCLE_PLUNGER_RESULTS, [str]),
-                CSVLine(TEST_PLUNGER_FAIL_REASON, [str]),
-                CSVLine(CYCLE_PLUNGER_REASON, [str]),
+                CSVLine(CURRENTS_SPEEDS_CHECK_RESULTS, [str]),
+                CSVLine(STALL_CHECK_RESULTS, [str]),
+                CSVLine(CURRENTS_SPEEDS_CHECK_FAIL_REASON, [str]),
+                CSVLine(STALL_CHECK_FAIL_REASON, [str]),
             ],
         ),
     ]
@@ -248,10 +248,10 @@ def _write_summary_and_save_results(
         "; ".join(cycle_plunger_stall_reasons) if cycle_plunger_stall_reasons else "N/A"
     )
     results_report(SUMMARY_SECTION_TITLE, BURN_IN_TEST_RESULTS, [burn_in_result])
-    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_RESULTS, [test_plunger_result])
-    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_RESULTS, [cycle_plunger_result])
-    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_FAIL_REASON, [test_plunger_fail_str])
-    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, [cycle_plunger_stall_str])
+    results_report(SUMMARY_SECTION_TITLE, CURRENTS_SPEEDS_CHECK_RESULTS, [test_plunger_result])
+    results_report(SUMMARY_SECTION_TITLE, STALL_CHECK_RESULTS, [cycle_plunger_result])
+    results_report(SUMMARY_SECTION_TITLE, CURRENTS_SPEEDS_CHECK_FAIL_REASON, [test_plunger_fail_str])
+    results_report(SUMMARY_SECTION_TITLE, STALL_CHECK_FAIL_REASON, [cycle_plunger_stall_str])
     _set_peek_summary_results_overview(results_report, burn_in_result)
     _save_report_to_path(results_report, results_path)
     print(f"Results report saved to: {results_path}")
@@ -671,10 +671,10 @@ def _dry_run_reports(cycles: int, trials: int) -> None:
         [0, CSVResult.PASS],
     )
     results_report(SUMMARY_SECTION_TITLE, BURN_IN_TEST_RESULTS, ["PASS"])
-    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_RESULTS, ["PASS"])
-    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_RESULTS, ["PASS"])
-    results_report(SUMMARY_SECTION_TITLE, TEST_PLUNGER_FAIL_REASON, ["N/A"])
-    results_report(SUMMARY_SECTION_TITLE, CYCLE_PLUNGER_REASON, ["N/A"])
+    results_report(SUMMARY_SECTION_TITLE, CURRENTS_SPEEDS_CHECK_RESULTS, ["PASS"])
+    results_report(SUMMARY_SECTION_TITLE, STALL_CHECK_RESULTS, ["PASS"])
+    results_report(SUMMARY_SECTION_TITLE, CURRENTS_SPEEDS_CHECK_FAIL_REASON, ["N/A"])
+    results_report(SUMMARY_SECTION_TITLE, STALL_CHECK_FAIL_REASON, ["N/A"])             
     _set_peek_summary_results_overview(results_report, "PASS")
     results_path, recorder_path = _get_run_output_paths(run_id, sn, mount)
     _save_report_to_path(results_report, results_path)
