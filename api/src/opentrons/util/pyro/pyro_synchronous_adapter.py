@@ -117,7 +117,10 @@ class PyroAsyncFunctionWrapper:
 
     def call(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         """Remote deployable asynchronous function call."""
-        return asyncio.run_coroutine_threadsafe(coro=self.callable(*args, **kwargs), loop=self._loop).result()
+        return asyncio.run_coroutine_threadsafe(
+            coro=self.callable(*args, **kwargs),  # type: ignore
+            loop=self._loop,
+        ).result()
 
 
 class _ResultMeta(enum.Enum):

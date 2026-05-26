@@ -175,7 +175,7 @@ def wrap_property(proxy: Pyro5.api.Proxy, attr: str) -> Any:
 def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str) -> Any:
     """Validate outbound parameter requests before allowing serialization."""
 
-    def wrapper(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+    def wrapper(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         # Validate individual arguments before forwarding the call
         def _validations(arg: Any) -> Any:
             # NOTE: Extend this as further validations are needed
@@ -239,35 +239,35 @@ def _validate_outbound_proxy(arg: Any) -> Any:
     return arg
 
 
-def _validate_outbound_nested_proxy(arg: Any) -> Any:
+def _validate_outbound_nested_proxy(arg: Any) -> Any:  # noqa: C901
     """Handle an argument which may contain a nested wrapped proxy, such as a callback Function Wrapper or Async Client Pyro Object.
 
     For roundtrip functions, which may be sent across multiple processes, we only want to perserve the inner Proxy while maintaining the shape of argument.
     """
     if isinstance(arg, tuple):
-        validated_arg = tuple()
+        validated_tuple: tuple[Any, ...] = ()
         for inner in arg:
             if hasattr(inner, "_proxy"):
-                validated_arg = (*validated_arg, inner._proxy)
+                validated_tuple = (*validated_tuple, inner._proxy)
             else:
-                validated_arg = (*validated_arg, inner)
-        return validated_arg
+                validated_tuple = (*validated_tuple, inner)
+        return validated_tuple
     elif isinstance(arg, dict):
-        validated_arg = dict()
+        validated_dict: dict[Any, Any] = {}
         for inner_key, inner_val in arg.items():
             if hasattr(inner_val, "_proxy"):
-                validated_arg[inner_key] = inner_val._proxy
+                validated_dict[inner_key] = inner_val._proxy
             else:
-                validated_arg[inner_key] = inner_val
-        return validated_arg
+                validated_dict[inner_key] = inner_val
+        return validated_dict
     elif isinstance(arg, list):
-        validated_arg = []
+        validated_list = []
         for inner in arg:
             if hasattr(inner, "_proxy"):
-                validated_arg.append(inner._proxy)
+                validated_list.append(inner._proxy)
             else:
-                validated_arg.append(inner)
-        return validated_arg
+                validated_list.append(inner)
+        return validated_list
 
     return arg
 
@@ -275,7 +275,7 @@ def _validate_outbound_nested_proxy(arg: Any) -> Any:
 ### Result Validations
 
 
-def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) -> Any:
+def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) -> Any:  # noqa: C901
     """Validate incoming result format before returning from a remote call.
 
     This is not to be confused with serialization. The validation process can be used to reformat
