@@ -29,8 +29,8 @@ test.describe('ProtocolVisualization', () => {
     )
     await page.getByText('100% complete').waitFor({ state: 'visible' })
     // Wait for CSS transitions to settle (AnnotatedSteps has 500ms background/border transitions)
-    await page.waitForFunction(
-      () => document.getAnimations().every(a => a.playState !== 'running')
+    await page.waitForFunction(() =>
+      document.getAnimations().every(a => a.playState !== 'running')
     )
 
     await eyes.check('ProtocolVisualization last step', {
