@@ -43,7 +43,7 @@ type Story = StoryObj<typeof DocumentationRequiredComponent>
 
 export const DocumentationRequired: Story = {
   args: {
-    userName: 'John Doe',
+    username: 'John Doe',
     onBack: action('onBack'),
     onConfirm: action('onConfirm'),
   },
