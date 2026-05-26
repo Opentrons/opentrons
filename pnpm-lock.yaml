@@ -947,13 +947,13 @@ importers:
         specifier: ^19.8.3
         version: 19.9.2
       react:
-        specifier: catalog:react18
+        specifier: 18.2.0
         version: 18.2.0
       react-dom:
-        specifier: catalog:react18
+        specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
       react-i18next:
-        specifier: 'catalog:'
+        specifier: 14.0.0
         version: 14.0.0(i18next@19.9.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
     devDependencies:
       '@applitools/eyes-playwright':
@@ -966,7 +966,7 @@ importers:
         specifier: 18.2.51
         version: 18.2.51
       '@types/react-dom':
-        specifier: catalog:react18
+        specifier: 18.2.0
         version: 18.2.0
       '@vitejs/plugin-react':
         specifier: 4.2.0
