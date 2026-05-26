@@ -8,7 +8,7 @@
  * logged in.
  */
 
-import { createListenerMiddleware } from '@reduxjs/toolkit'
+import { createListenerMiddleware, ListenerEffectAPI } from '@reduxjs/toolkit'
 
 import { getNextExpiration, logOutOrTimeOut } from './slice'
 
@@ -42,10 +42,25 @@ expirationMiddleware.startListening.withTypes<State, Dispatch>()({
     const nextExpiration = getNextExpiration(listenerAPI.getState())
     if (nextExpiration != null) {
       const waitDuration = nextExpiration.expiresAt - Date.now()
-      await listenerAPI.delay(waitDuration)
+      await longDelay(listenerAPI, waitDuration)
       listenerAPI.dispatch(
         logOutOrTimeOut({ robotName: nextExpiration.robotName })
       )
     }
   },
 })
+
+// JS's window.setTimeout() function, and by extension Redux's listenerAPI.delay()
+// function, can't handle durations bigger than an int32, so we need this workaround.
+// Durations probably be this long in production, but they might be in testing.
+async function longDelay(
+  listenerAPI: ListenerEffectAPI<State, Dispatch>,
+  waitDuration: number
+): Promise<void> {
+  const int32Max = 0x7fffffff
+  while (waitDuration > int32Max) {
+    await listenerAPI.delay(int32Max)
+    waitDuration -= int32Max
+  }
+  await listenerAPI.delay(waitDuration)
+}
