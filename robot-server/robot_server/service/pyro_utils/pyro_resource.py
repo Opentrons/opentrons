@@ -22,7 +22,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 
 from robot_server.service.pyro_utils.serpent_type_registry import (
-    register_all_robot_server_types,
+    register_robot_server_types,
 )
 
 if TYPE_CHECKING:
@@ -232,7 +232,7 @@ def start_initializing_pyro_resource(app_state: AppState) -> None:
         args=(),
         kwargs={
             "pyroname": RS_PYRONAME,
-            "registry": register_all_robot_server_types,
+            "registry": register_robot_server_types,
         },
         daemon=True,
     )

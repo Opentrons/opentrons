@@ -35,9 +35,4 @@ def register_robot_server_types() -> None:
     )
     for pydantic_type in opentrons_pydantic_types:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_type)
-
-
-def register_all_robot_server_types() -> None:
-    """Registers robot server types plus safe enumerated error handling."""
-    register_robot_server_types()
     register_enumerated_errors()

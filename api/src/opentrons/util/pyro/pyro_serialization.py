@@ -109,51 +109,16 @@ def register_type_to_serpent(
 
 
 def _enumerated_error_class_to_dict(obj: EnumeratedError) -> dict[str, Any]:
-    wrapping = (
-        [
-            _enumerated_error_class_to_dict(wrapped_error)
-            for wrapped_error in obj.wrapping
-        ]
-        if obj.wrapping is not None
-        else None
-    )
     return {
         "__class__": "opentrons_shared_data.errors.exceptions.EnumeratedError",
-        "enumerated_error_class": ".".join((obj.__module__, obj.__class__.__name__)),
-        "message": obj.message,
-        "detail": obj.detail,
-        "wrapping": wrapping,
         "bytes": pickle.dumps(obj),
     }
 
 
-def _enumerated_error_class_name_to_class(class_name: str) -> type[EnumeratedError]:
-    if class_name.startswith("opentrons_shared_data.errors.exceptions"):
-        error = getattr(
-            opentrons_shared_data.errors.exceptions, class_name.split(".")[-1]
-        )
-    elif class_name.startswith("opentrons.hardware_control.errors"):
-        error = getattr(opentrons.hardware_control.errors, class_name.split(".")[-1])
-    else:
-        raise RuntimeError(
-            f"Could not recognize enumerated error path for '{class_name}"
-        )
-    if not issubclass(error, EnumeratedError):
-        raise ValueError(
-            f"Class '{class_name}' labeled as enumerated error is a {type(error)}"
-        )
-    return error  # type: ignore[no-any-return]
-
-
-def _unsafe_enumerated_error_dict_to_class(
+def _enumerated_error_dict_to_class(
     class_name: str, d: dict[str, Any]
 ) -> EnumeratedError:
-    """Deserializes errors via pickle.
-
-    This method of deserializing errors uses pickle `loads` and therefore SHOULD NOT be used anywhere
-    where we are running as root, as code that does bad things can be injected in. We do a basic check that
-    we get back an enumerated error, but that is not sufficient to prevent malicious code.
-    """
+    """Deserializes errors via pickle."""
     error = pickle.loads(d["bytes"])
     if not isinstance(error, EnumeratedError):
         raise ValueError(
@@ -162,56 +127,11 @@ def _unsafe_enumerated_error_dict_to_class(
     return error
 
 
-def _safe_enumerated_error_dict_to_class(
-    class_name: str, d: dict[str, Any]
-) -> EnumeratedError:
-    """Deserializes basic enumerated errors that have an init of only a message, detail, and wrapping.
-
-    Anything else will raise as a RuntimeError with information on what failed.
-    """
-    error_class = _enumerated_error_class_name_to_class(d["enumerated_error_class"])
-    wrapping = (
-        [
-            _safe_enumerated_error_dict_to_class("", error_dict)
-            for error_dict in d["wrapping"]
-        ]
-        if d["wrapping"] is not None
-        else None
-    )
-    try:
-        return error_class(  # type: ignore[call-arg]
-            message=d["message"],
-            detail=d["detail"],
-            wrapping=wrapping,
-        )
-    except TypeError:
-        raise RuntimeError(
-            f"Could not deserialize enumerated error {error_class.__name__} with data: {d}"
-        )
-
-
 def register_enumerated_errors() -> None:
-    """Registers serializer and deserializer for enumerated errors.
-
-    This only covers basic enumerated errors with an init of message, detail, and wrapping. If an enumerated error
-    with a different init signature needs to be registered, it should be called BEFORE this function. Pyro does
-    `isinstance` checks on incoming types in order, so this would preempt any more specific check after the fact.
-    """
+    """Registers serializer and deserializer for enumerated errors."""
     register_type_to_serpent(
         class_type=EnumeratedError,
-        dict_to_class=_safe_enumerated_error_dict_to_class,
-        class_to_dict=_enumerated_error_class_to_dict,
-    )
-
-
-def register_enumerated_errors_for_run_process() -> None:
-    """Registers serializer and UNSAFE deserializer for enumerated errors.
-
-    DO NOT USE THIS FOR ANY PROCESS THAT RUNS AS ROOT!
-    """
-    register_type_to_serpent(
-        class_type=EnumeratedError,
-        dict_to_class=_unsafe_enumerated_error_dict_to_class,
+        dict_to_class=_enumerated_error_dict_to_class,
         class_to_dict=_enumerated_error_class_to_dict,
     )
 
