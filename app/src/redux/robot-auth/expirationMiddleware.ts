@@ -53,7 +53,7 @@ expirationMiddleware.startListening.withTypes<State, Dispatch>()({
 
 // JS's window.setTimeout() function, and by extension Redux's listenerAPI.delay()
 // function, can't handle durations bigger than an int32, so we need this workaround.
-// Durations probably be this long in production, but they might be in testing.
+// Durations probably won't be this long in production, but they might be in testing.
 async function longDelay(
   listenerAPI: ListenerEffectAPI<State, Dispatch>,
   waitDuration: number
