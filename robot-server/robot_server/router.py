@@ -12,6 +12,7 @@ from .data_files.router import datafiles_router
 from .deck_configuration.router import router as deck_configuration_router
 from .error_recovery.settings.router import router as error_recovery_settings_router
 from .errors.error_responses import LegacyErrorResponse
+from .fastapi_dependencies import get_audit_logger
 from .health.router import health_router
 from .instruments.router import instruments_router
 from .labware_offsets.router import router as labware_offset_router
@@ -87,7 +88,7 @@ router.include_router(
 router.include_router(
     router=protocols_router,
     tags=["Protocol Management"],
-    dependencies=[Depends(check_version_header)],
+    dependencies=[Depends(check_version_header), Depends(get_audit_logger)],
 )
 
 router.include_router(
