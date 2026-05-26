@@ -15,6 +15,9 @@
 # components library
 storybook-static
 
+# js-package-testing
+js-package-testing/pack/**
+
 # python projects and tools
 **/.mypy_cache/**
 **/.pytest_cache/**
