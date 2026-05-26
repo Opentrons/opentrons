@@ -27,6 +27,8 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
     remove_pyro_synchronous_object,
 )
 
+from opentrons.config import IS_ROBOT
+
 log = logging.getLogger(__name__)
 
 TEMP_POLL_INTERVAL_SECS = 1.0
@@ -297,6 +299,8 @@ class TempDeck(mod_abc.AbstractModule):
 
     async def attempt_reconnect(self) -> None:
         """Attempt to reestablish connections."""
+        if not IS_ROBOT:
+            return
         try:
             if not await self._driver.is_connected():
                 await self.cleanup()
