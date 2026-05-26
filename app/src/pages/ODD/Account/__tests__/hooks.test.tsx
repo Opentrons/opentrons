@@ -74,7 +74,7 @@ describe('useAccountInfo', () => {
     vi.mocked(useSelfQuery).mockReturnValue({
       data: {
         data: {
-          userName: 'test-user',
+          username: 'test-user',
           fullName: 'Test User Name',
           accountType: 'user',
           scopes: [],

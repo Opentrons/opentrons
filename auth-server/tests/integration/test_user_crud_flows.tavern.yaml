@@ -14,7 +14,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: test_new_user
+          username: test_new_user
           password: securepassword123
           fullName: Test New User
           accountType: user
@@ -24,7 +24,7 @@ stages:
       status_code: 201
       json:
         data:
-          userName: test_new_user
+          username: test_new_user
           fullName: Test New User
           accountType: user
           locked: false
@@ -39,7 +39,7 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          userName: test_new_user_password_less_than_8_characters
+          username: test_new_user_password_less_than_8_characters
           password: '1234567'
           fullName: Test New User
           accountType: user
@@ -60,7 +60,7 @@ stages:
         data:
           accountType: user
           fullName: Test New User
-          userName: test_new_user
+          username: test_new_user
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
@@ -81,7 +81,7 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user
+          username: test_new_user
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
@@ -92,7 +92,7 @@ stages:
       url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
-          userName: test_new_user_updated
+          username: test_new_user_updated
           password: securepassword123
       headers:
         Authorization: '{admin_access_token}'
@@ -102,7 +102,7 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user_updated
+          username: test_new_user_updated
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
@@ -122,7 +122,7 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user_updated
+          username: test_new_user_updated
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
@@ -139,7 +139,7 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user_updated
+          username: test_new_user_updated
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
@@ -210,7 +210,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: regular_user_1
+          username: regular_user_1
           password: securepassword123
           fullName: Regular User 1
           accountType: user
@@ -228,7 +228,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: regular_user_2
+          username: regular_user_2
           password: securepassword123
           fullName: Regular User 2
           accountType: user
