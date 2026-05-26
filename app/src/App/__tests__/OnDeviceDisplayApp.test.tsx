@@ -35,7 +35,8 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { LocalizationProvider } from '../../LocalizationProvider'
 import { LoggedOutOverlay } from '../../molecules/LoggedOutOverlay'
-import { useProtocolReceiptToast, useScrollRef } from '../hooks'
+import { useScrollRef } from '../hooks/useModuleAttachedToast'
+import { useProtocolReceiptToast } from '../hooks/useProtocolReceiptToast'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
@@ -82,7 +83,9 @@ vi.mock('/app/redux/shell')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/organisms/ModuleWizardFlows')
-vi.mock('../hooks')
+vi.mock('../hooks/useModuleAttachedToast')
+vi.mock('../hooks/useProtocolReceiptToast')
+vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('../ODDTopLevelRedirects')
 vi.mock('../../molecules/LoggedOutOverlay')
 
