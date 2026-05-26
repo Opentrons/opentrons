@@ -318,7 +318,7 @@ importers:
   api-client:
     dependencies:
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@types/lodash':
         specifier: 4.17.24
@@ -345,25 +345,25 @@ importers:
         specifier: 5.0.3
         version: 5.0.3
       '@opentrons/api-client':
-        specifier: link:../api-client
+        specifier: workspace:*
         version: link:../api-client
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/discovery-client':
-        specifier: link:../discovery-client
+        specifier: workspace:*
         version: link:../discovery-client
       '@opentrons/labware-library':
-        specifier: link:../labware-library
+        specifier: workspace:*
         version: link:../labware-library
       '@opentrons/react-api-client':
-        specifier: link:../react-api-client
+        specifier: workspace:*
         version: link:../react-api-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@reduxjs/toolkit':
         specifier: 2.11.2
@@ -526,16 +526,16 @@ importers:
   app-shell:
     dependencies:
       '@opentrons/app':
-        specifier: link:../app
+        specifier: workspace:*
         version: link:../app
       '@opentrons/discovery-client':
-        specifier: link:../discovery-client
+        specifier: workspace:*
         version: link:../discovery-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@opentrons/usb-bridge/node-client':
         specifier: link:../usb-bridge/node-client
@@ -677,10 +677,10 @@ importers:
   app-shell-odd:
     dependencies:
       '@opentrons/discovery-client':
-        specifier: link:../discovery-client
+        specifier: workspace:*
         version: link:../discovery-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@sentry/electron':
         specifier: 7.5.0
@@ -765,7 +765,7 @@ importers:
         version: 13.1.2
     devDependencies:
       '@opentrons/app':
-        specifier: link:../app
+        specifier: workspace:*
         version: link:../app
       '@types/node-fetch':
         specifier: 2.6.11
@@ -792,10 +792,10 @@ importers:
   components:
     dependencies:
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@popperjs/core':
         specifier: 2.1.1
@@ -968,10 +968,10 @@ importers:
   labware-designer:
     dependencies:
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       styled-components:
         specifier: 5.3.6
@@ -984,10 +984,10 @@ importers:
   labware-library:
     dependencies:
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       ajv:
         specifier: 6.12.3
@@ -1072,10 +1072,10 @@ importers:
         specifier: 5.0.3
         version: 5.0.3
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       axios:
         specifier: ^0.21.1
@@ -1154,13 +1154,13 @@ importers:
         specifier: 3.1.1
         version: 3.1.1(react-hook-form@7.49.3(react@18.2.0))
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@sentry/react':
         specifier: ^9.12.0
@@ -1308,13 +1308,13 @@ importers:
   protocol-visualization:
     dependencies:
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@types/lodash':
         specifier: 4.17.24
@@ -1341,10 +1341,10 @@ importers:
   react-api-client:
     dependencies:
       '@opentrons/api-client':
-        specifier: link:../api-client
+        specifier: workspace:*
         version: link:../api-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@types/lodash':
         specifier: 4.17.24
@@ -1384,7 +1384,7 @@ importers:
   step-generation:
     dependencies:
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       core-js:
         specifier: 3.2.1
