@@ -29,17 +29,17 @@
     "lib"
   ],
   "peerDependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-i18next": "14.0.0"
+    "react": "catalog:react18",
+    "react-dom": "catalog:react18",
+    "react-i18next": "catalog:"
   },
   "dependencies": {
     "@opentrons/components": "workspace:*",
     "@opentrons/shared-data": "workspace:*",
     "@opentrons/step-generation": "workspace:*",
-    "@types/lodash": "4.17.24",
+    "@types/lodash": "catalog:",
     "clsx": "2.1.1",
-    "lodash": "4.18.1",
+    "lodash": "catalog:",
     "react-window": "2.2.4"
   }
 }
