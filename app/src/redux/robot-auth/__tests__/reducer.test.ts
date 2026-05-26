@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   INITIAL_ROBOT_AUTH_STATE,
-  logInOrRefresh,
-  logOutOrTimeOut,
+  logIn,
+  logOut,
+  refreshLogin,
   robotAuthReducer,
 } from '../slice'
 
@@ -25,7 +26,7 @@ describe('robotAuthReducer', () => {
     // Log in to first robot:
     state = robotAuthReducer(
       INITIAL_ROBOT_AUTH_STATE,
-      logInOrRefresh({
+      logIn({
         robotName: 'testRobotNameA',
         username: 'testUserA',
         accessToken: 'testAccessTokenA',
@@ -48,7 +49,7 @@ describe('robotAuthReducer', () => {
     // Log in to second robot:
     state = robotAuthReducer(
       state,
-      logInOrRefresh({
+      logIn({
         robotName: 'testRobotNameB',
         username: 'testUserB',
         accessToken: 'testAccessTokenB',
@@ -77,7 +78,7 @@ describe('robotAuthReducer', () => {
     // Refresh login for first robot:
     state = robotAuthReducer(
       state,
-      logInOrRefresh({
+      refreshLogin({
         robotName: 'testRobotNameA',
         username: 'testUserARefreshed',
         accessToken: 'testAccessTokenARefreshed',
@@ -125,7 +126,7 @@ describe('robotAuthReducer', () => {
 
     const newState = robotAuthReducer(
       initialState,
-      logOutOrTimeOut({
+      logOut({
         robotName: 'testRobotNameB',
       })
     )

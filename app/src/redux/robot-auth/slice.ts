@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual'
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { getLocalRobot } from '../discovery'
 
-import type { PayloadAction } from '@reduxjs/toolkit'
+import type { Draft, PayloadAction } from '@reduxjs/toolkit'
 import type { State } from '/app/redux/types'
 
 export interface RobotAuthState {
@@ -61,22 +61,49 @@ const robotAuthSlice = createSlice({
   name: 'robotAuth',
   initialState: INITIAL_ROBOT_AUTH_STATE,
   reducers: {
-    logInOrRefresh(stateDraft, action: PayloadAction<LogInOrRefreshPayload>) {
-      const { robotName, ...robotAuthState } = action.payload
-      stateDraft.perRobotAuthStates[robotName] = robotAuthState
-      stateDraft.mostRecentRobotName = robotName
+    logIn: (stateDraft, action: PayloadAction<LogInOrRefreshPayload>) => {
+      logInOrRefresh(stateDraft, action.payload)
     },
-    logOutOrTimeOut(stateDraft, action: PayloadAction<LogOutOrTimeOutPayload>) {
-      // dynamic-delete is normal and fine with Immer and Redux.
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete stateDraft.perRobotAuthStates[action.payload.robotName]
+    refreshLogin: (
+      stateDraft,
+      action: PayloadAction<LogInOrRefreshPayload>
+    ) => {
+      logInOrRefresh(stateDraft, action.payload)
+    },
+    logOut: (stateDraft, action: PayloadAction<LogOutOrTimeOutPayload>) => {
+      logOutOrTimeOut(stateDraft, action.payload)
+    },
+    timeOutLogin: (
+      stateDraft,
+      action: PayloadAction<LogOutOrTimeOutPayload>
+    ) => {
+      logOutOrTimeOut(stateDraft, action.payload)
     },
   },
 })
 
+function logInOrRefresh(
+  stateDraft: Draft<RobotAuthState>,
+  payload: LogInOrRefreshPayload
+): void {
+  const { robotName, ...robotAuthState } = payload
+  stateDraft.perRobotAuthStates[robotName] = robotAuthState
+  stateDraft.mostRecentRobotName = robotName
+}
+
+function logOutOrTimeOut(
+  stateDraft: Draft<RobotAuthState>,
+  payload: LogOutOrTimeOutPayload
+): void {
+  // dynamic-delete is normal and fine with Immer and Redux.
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  delete stateDraft.perRobotAuthStates[payload.robotName]
+}
+
 export const robotAuthReducer = robotAuthSlice.reducer
 
-export const { logInOrRefresh, logOutOrTimeOut } = robotAuthSlice.actions
+export const { logIn, refreshLogin, logOut, timeOutLogin } =
+  robotAuthSlice.actions
 
 export type RobotAuthAction = ActionTypesFromSlice<
   typeof robotAuthSlice.actions

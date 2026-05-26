@@ -10,7 +10,7 @@ import { OPENTRONS_USB } from '/app/redux/discovery'
 import {
   getAuthStateForRobot,
   getMostRecentRobotName,
-  logInOrRefresh,
+  refreshLogin,
   useAccessTokenForRobot,
 } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
@@ -67,7 +67,7 @@ export function useRefreshAccessTokenOnActivity(): void {
       const expiresIn = response.data.expires_in ?? null
       const expiresAt = expiresIn != null ? Date.now() + expiresIn : null
       dispatch(
-        logInOrRefresh({
+        refreshLogin({
           robotName,
           username: authState.username,
           accessToken: response.data.access_token,
