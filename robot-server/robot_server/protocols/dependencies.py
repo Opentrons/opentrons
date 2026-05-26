@@ -14,9 +14,11 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
+
 from .analyses_manager import AnalysesManager
 from .analysis_store import AnalysisStore
 from .protocol_auto_deleter import ProtocolAutoDeleter
+from .protocol_models import ProtocolKind
 from .protocol_store import (
     ProtocolStore,
 )

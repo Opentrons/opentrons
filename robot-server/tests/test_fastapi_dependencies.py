@@ -13,6 +13,7 @@ from server_utils.auth.resource_server.authorization_checker import (
     MissingUserNotesError,
 )
 from server_utils.fastapi_utils.models.json_api import RequestModel
+
 from robot_server.fastapi_dependencies import (
     AuditLogger,
     get_audit_logger,
@@ -76,7 +77,9 @@ async def test_get_audit_logger_raises_when_required_but_forgot_to_log() -> None
             authorization_checker=checker,
         )
         audit_logger = await generator.__anext__()
-        with pytest.raises(RuntimeError, match="forgot to send anything to the audit log"):
+        with pytest.raises(
+            RuntimeError, match="forgot to send anything to the audit log"
+        ):
             await generator.__anext__()
 
 

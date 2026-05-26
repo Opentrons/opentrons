@@ -66,7 +66,6 @@ from .dependencies import (
     get_protocol_store,
     get_quick_transfer_protocol_auto_deleter,
 )
-from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Metadata, Protocol, ProtocolFile, ProtocolKind
 from .protocol_store import (
@@ -82,6 +81,7 @@ from robot_server.data_files.dependencies import (
 )
 from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFoundError
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from robot_server.hardware import get_robot_type
 from robot_server.service.dependencies import get_current_time, get_unique_id
 

@@ -12,12 +12,12 @@ from .data_files.router import datafiles_router
 from .deck_configuration.router import router as deck_configuration_router
 from .error_recovery.settings.router import router as error_recovery_settings_router
 from .errors.error_responses import LegacyErrorResponse
+from .fastapi_dependencies import get_audit_logger
 from .health.router import health_router
 from .instruments.router import instruments_router
 from .labware_offsets.router import router as labware_offset_router
 from .maintenance_runs.router import maintenance_runs_router
 from .modules.router import modules_router
-from .fastapi_dependencies import get_audit_logger
 from .protocols.router import protocols_router
 from .robot.router import robot_router
 from .runs.router import runs_router

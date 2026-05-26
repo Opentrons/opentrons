@@ -27,7 +27,6 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.errors.global_errors import InvalidRequest
 from robot_server.fastapi_dependencies import maybe_record_documented_interaction
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
@@ -101,7 +100,6 @@ async def get_run_controller(
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[RunAction]},
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[InvalidRequest]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorBody[Union[RunActionNotAllowed, RunStopped]],
         },

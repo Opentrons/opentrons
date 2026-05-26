@@ -38,12 +38,12 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
-from robot_server.fastapi_dependencies import AuditLogger
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 from robot_server.data_files.models import DataFile
 from robot_server.errors.error_responses import ApiError
+from robot_server.fastapi_dependencies import AuditLogger
 from robot_server.protocols.analyses_manager import AnalysesManager
 from robot_server.protocols.analysis_models import (
     AnalysisRequest,
@@ -1348,7 +1348,9 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             analysis_id="analysis-id",
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=20,
-            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+            audit_logger=_test_audit_logger(
+                created_at=datetime(year=2021, month=1, day=1)
+            ),
         )
 
     assert exc_info.value.status_code == 503
@@ -1395,7 +1397,9 @@ async def test_create_protocol_not_readable(
             robot_type="OT-2 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
-            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+            audit_logger=_test_audit_logger(
+                created_at=datetime(year=2021, month=1, day=1)
+            ),
         )
 
     assert exc_info.value.status_code == 422
@@ -1458,7 +1462,9 @@ async def test_create_protocol_different_robot_type(
             robot_type="OT-3 Standard",
             analysis_id="analysis-id",
             created_at=datetime.now(),
-            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+            audit_logger=_test_audit_logger(
+                created_at=datetime(year=2021, month=1, day=1)
+            ),
         )
 
     assert exc_info.value.status_code == 422
@@ -2237,7 +2243,9 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             protocol_kind=ProtocolKind.QUICK_TRANSFER,
             created_at=datetime(year=2021, month=1, day=1),
             maximum_quick_transfer_protocols=1,
-            audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+            audit_logger=_test_audit_logger(
+                created_at=datetime(year=2021, month=1, day=1)
+            ),
         )
 
         assert exc_info.value.status_code == 409
