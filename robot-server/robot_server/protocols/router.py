@@ -306,7 +306,8 @@ async def create_protocol(  # noqa: C901
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
-        audit_logger: Records the upload for audit when auth-server requires ``userNotes``.
+        audit_logger: Records the upload for audit when auth-server requires
+            ``Opentrons-User-Notes``.
     """
     await audit_logger.log(
         resource_id=protocol_id,
@@ -710,7 +711,8 @@ async def delete_protocol_by_id(
     Arguments:
         protocolId: Protocol identifier to delete, pulled from URL.
         protocol_store: In-memory database of protocol resources.
-        audit_logger: Records the deletion for audit when auth-server requires ``userNotes``.
+        audit_logger: Records the deletion for audit when auth-server requires
+            ``Opentrons-User-Notes``.
     """
     try:
         protocol_store.remove(protocol_id=protocolId)

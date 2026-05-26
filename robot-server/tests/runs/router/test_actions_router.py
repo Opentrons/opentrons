@@ -17,9 +17,6 @@ from robot_server.runs.router.actions_router import create_run_action
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
 
-_PLAY_USER_NOTES = "pytest play documentation"
-
-
 @pytest.fixture
 def mock_run_controller(decoy: Decoy) -> RunController:
     """Get a fake RunController dependency."""
@@ -39,7 +36,6 @@ async def test_create_run_action(
     action_type = RunActionType.PLAY
     request_body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
-        userNotes=_PLAY_USER_NOTES,
     )
     expected_result = RunAction(
         id="some-action-id",
@@ -68,7 +64,7 @@ async def test_create_run_action(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        _maybe_audit_action_user_notes=None,
+        _maybe_record_documented_interaction=None,
     )
 
     assert result.content.data == expected_result
@@ -88,7 +84,6 @@ async def test_play_action_clears_maintenance_run(
     action_type = RunActionType.PLAY
     request_body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
-        userNotes=_PLAY_USER_NOTES,
     )
     expected_result = RunAction(
         id="some-action-id",
@@ -119,7 +114,7 @@ async def test_play_action_clears_maintenance_run(
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
-        _maybe_audit_action_user_notes=None,
+        _maybe_record_documented_interaction=None,
     )
 
     decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
@@ -150,7 +145,6 @@ async def test_create_play_action_not_allowed(
     action_type = RunActionType.PLAY
     request_body = RequestModel[RunActionCreate](
         data=RunActionCreate(actionType=action_type),
-        userNotes=_PLAY_USER_NOTES,
     )
 
     decoy.when(
@@ -176,7 +170,7 @@ async def test_create_play_action_not_allowed(
             maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
-            _maybe_audit_action_user_notes=None,
+            _maybe_record_documented_interaction=None,
         )
 
     assert exc_info.value.status_code == expected_status_code

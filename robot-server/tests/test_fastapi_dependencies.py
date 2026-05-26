@@ -6,20 +6,17 @@ from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from fastapi import status
 from starlette.requests import Request
 
 from server_utils.auth.resource_server.authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
+    MissingUserNotesError,
 )
 from server_utils.fastapi_utils.models.json_api import RequestModel
-
-from robot_server.errors.error_responses import ApiError
 from robot_server.fastapi_dependencies import (
     AuditLogger,
     get_audit_logger,
     maybe_record_documented_interaction,
-    maybe_record_documented_interaction_non_json,
 )
 from robot_server.runs.action_models import RunActionCreate, RunActionType
 
@@ -122,10 +119,6 @@ async def test_maybe_record_documented_interaction_records_audit_when_required(
 ) -> None:
     """Forwards request notes and data to the checker and writes an audit log entry."""
     checker = AlwaysAllowedAuthorizationChecker()
-    body = RequestModel[RunActionCreate](
-        data=_PLAY_ACTION,
-        userNotes=f"  {_USER_NOTES}  ",
-    )
     with (
         patch.object(
             checker,
@@ -136,7 +129,8 @@ async def test_maybe_record_documented_interaction_records_audit_when_required(
     ):
         await maybe_record_documented_interaction(
             _RUN_ID,
-            body,
+            RequestModel(data=_PLAY_ACTION),
+            f"  {_USER_NOTES}  ",
             _CREATED_AT,
             authorization_checker=checker,
         )
@@ -153,14 +147,11 @@ async def test_maybe_record_documented_interaction_skips_audit_when_not_required
 ) -> None:
     """When auth-server does not require notes, no audit entry is recorded."""
     checker = AlwaysAllowedAuthorizationChecker()
-    body = RequestModel[RunActionCreate](
-        data=_PLAY_ACTION,
-        userNotes=None,
-    )
     with caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER):
         await maybe_record_documented_interaction(
             _RUN_ID,
-            body,
+            RequestModel(data=_PLAY_ACTION),
+            None,
             _CREATED_AT,
             authorization_checker=checker,
         )
@@ -175,34 +166,30 @@ async def test_maybe_record_documented_interaction_skips_audit_when_not_required
 async def test_maybe_record_documented_interaction_raises_when_notes_required_but_missing(
     action_type: RunActionType,
 ) -> None:
-    """Run actions without ``userNotes`` are rejected when auth-server requires them."""
+    """Run actions without audit notes header are rejected when auth-server requires them."""
     checker = AlwaysAllowedAuthorizationChecker()
-    body = RequestModel[RunActionCreate](
-        data=RunActionCreate(actionType=action_type),
-        userNotes=None,
-    )
     with (
         patch.object(
             checker,
             "get_require_reason_for_interaction_enabled",
             new=AsyncMock(return_value=True),
         ),
-        pytest.raises(ApiError) as exc_info,
+        pytest.raises(MissingUserNotesError),
     ):
         await maybe_record_documented_interaction(
             _RUN_ID,
-            body,
+            RequestModel(data=RunActionCreate(actionType=action_type)),
+            None,
             _CREATED_AT,
             authorization_checker=checker,
         )
-    assert exc_info.value.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.asyncio
-async def test_maybe_record_documented_interaction_non_json_records_audit_when_required(
+async def test_maybe_record_documented_interaction_records_protocol_upload_audit(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Non-JSON routes forward supplied notes and request data to the checker."""
+    """Forwards header notes and request data to the checker."""
     checker = AlwaysAllowedAuthorizationChecker()
     request_data = {"protocolKind": "standard", "fileCount": 2}
     with (
@@ -213,11 +200,11 @@ async def test_maybe_record_documented_interaction_non_json_records_audit_when_r
         ),
         caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER),
     ):
-        await maybe_record_documented_interaction_non_json(
-            resource_id="protocol-1",
-            request_data=request_data,
-            user_notes=_USER_NOTES,
-            created_at=_CREATED_AT,
+        await maybe_record_documented_interaction(
+            "protocol-1",
+            RequestModel(data=request_data),
+            _USER_NOTES,
+            _CREATED_AT,
             authorization_checker=checker,
         )
 
@@ -225,47 +212,3 @@ async def test_maybe_record_documented_interaction_non_json_records_audit_when_r
         "Documented interaction" in record.message and "protocol-1" in record.message
         for record in caplog.records
     )
-
-
-@pytest.mark.asyncio
-async def test_maybe_record_documented_interaction_non_json_skips_audit_when_not_required(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """When auth-server does not require notes, no audit entry is recorded."""
-    checker = AlwaysAllowedAuthorizationChecker()
-    with caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER):
-        await maybe_record_documented_interaction_non_json(
-            resource_id="data-file-1",
-            request_data={"filePath": "/data/foo.csv"},
-            user_notes=None,
-            created_at=_CREATED_AT,
-            authorization_checker=checker,
-        )
-
-    assert not any(
-        "Documented interaction" in record.message for record in caplog.records
-    )
-
-
-@pytest.mark.asyncio
-async def test_maybe_record_documented_interaction_non_json_raises_when_notes_required_but_missing() -> (
-    None
-):
-    """Non-JSON routes reject requests without ``userNotes`` when auth-server requires them."""
-    checker = AlwaysAllowedAuthorizationChecker()
-    with (
-        patch.object(
-            checker,
-            "get_require_reason_for_interaction_enabled",
-            new=AsyncMock(return_value=True),
-        ),
-        pytest.raises(ApiError) as exc_info,
-    ):
-        await maybe_record_documented_interaction_non_json(
-            resource_id="data-file-1",
-            request_data={"uploadedFileName": "foo.csv"},
-            user_notes=None,
-            created_at=_CREATED_AT,
-            authorization_checker=checker,
-        )
-    assert exc_info.value.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
