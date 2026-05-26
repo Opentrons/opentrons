@@ -10,8 +10,8 @@
     "react": "catalog:react18"
   },
   "dependencies": {
-    "@opentrons/api-client": "link:../api-client",
-    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/api-client": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
     "@types/lodash": "catalog:",
     "axios": "^0.21.1",
     "lodash": "catalog:",

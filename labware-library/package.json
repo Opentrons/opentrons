@@ -29,8 +29,8 @@
     "@types/yup": "0.29.11"
   },
   "dependencies": {
-    "@opentrons/components": "link:../components",
-    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/components": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
     "ajv": "6.12.3",
     "classnames": "2.2.5",
     "cookie": "0.4.0",

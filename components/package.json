@@ -33,8 +33,8 @@
     "react-dom": "catalog:react18"
   },
   "dependencies": {
-    "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/step-generation": "link:../step-generation",
+    "@opentrons/shared-data": "workspace:*",
+    "@opentrons/step-generation": "workspace:*",
     "@popperjs/core": "2.1.1",
     "@react-spring/types": "9.6.1",
     "@react-spring/web": "9.6.1",

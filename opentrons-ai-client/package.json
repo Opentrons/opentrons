@@ -21,8 +21,8 @@
   "dependencies": {
     "@auth0/auth0-react": "2.2.4",
     "@fontsource/public-sans": "5.0.3",
-    "@opentrons/components": "link:../components",
-    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/components": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
     "axios": "^0.21.1",
     "lodash": "catalog:",
     "jotai": "2.8.0",

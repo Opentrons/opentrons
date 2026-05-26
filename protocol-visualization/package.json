@@ -34,9 +34,9 @@
     "react-i18next": "catalog:"
   },
   "dependencies": {
-    "@opentrons/components": "link:../components",
-    "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/step-generation": "link:../step-generation",
+    "@opentrons/components": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
+    "@opentrons/step-generation": "workspace:*",
     "@types/lodash": "catalog:",
     "clsx": "2.1.1",
     "lodash": "catalog:",
