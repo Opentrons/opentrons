@@ -1,3 +1,10 @@
+import { createListenerMiddleware } from '@reduxjs/toolkit'
+
+import { getNextExpiration, logOutOrTimeOut } from './slice'
+
+import type { ListenerEffectAPI } from '@reduxjs/toolkit'
+import type { Dispatch, State } from '../types'
+
 /**
  * When we're logged in to a robot, and enough time passes that the login expires,
  * this automatically updates state to reflect the expiration.
@@ -7,12 +14,6 @@
  * This is merely for the benefit of UI that shows whether the user is currently
  * logged in.
  */
-
-import { createListenerMiddleware, ListenerEffectAPI } from '@reduxjs/toolkit'
-
-import { getNextExpiration, logOutOrTimeOut } from './slice'
-
-import type { Dispatch, State } from '../types'
 
 export const expirationMiddleware = createListenerMiddleware()
 
