@@ -3,18 +3,7 @@ import { useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import clsx from 'clsx'
 
-import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_START,
-  BORDERS,
-  Box,
-  COLORS,
-  DIRECTION_ROW,
-  Flex,
-  Icon,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'
