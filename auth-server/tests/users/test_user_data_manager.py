@@ -45,7 +45,6 @@ def _make_orm_user(
     full_name: str = "Full Name",
     account_type: AccountType = AccountType.USER,
     reset_password: bool = False,
-    using_temporary_password: bool = False,
 ) -> User:
     """Helper to build an ORM User for mock return values."""
     return User(
@@ -54,7 +53,6 @@ def _make_orm_user(
         full_name=full_name,
         account_type=account_type,
         reset_password=reset_password,
-        using_temporary_password=using_temporary_password,
     )
 
 
@@ -108,7 +106,6 @@ def test_create_user_success(
         ),
         locked=False,
         resetPassword=False,
-        usingTemporaryPassword=False,
     )
 
 
@@ -140,7 +137,6 @@ def test_create_user_hashes_password(
         ),
         locked=False,
         resetPassword=False,
-        usingTemporaryPassword=False,
     )
 
 
@@ -221,7 +217,6 @@ def test_get_user_returns_existing(
         ),
         locked=False,
         resetPassword=False,
-        usingTemporaryPassword=False,
     )
 
 
@@ -249,7 +244,6 @@ def test_get_user_locked_when_failed_logins_reach_limit(
         ),
         locked=True,
         resetPassword=False,
-        usingTemporaryPassword=False,
     )
 
 
@@ -303,7 +297,6 @@ def test_update_user_username(
             full_name=None,
             account_type=None,
             reset_password=False,
-            using_temporary_password=False,
         )
     ).then_return(expected)
 
@@ -319,7 +312,6 @@ def test_update_user_username(
         ),
         locked=False,
         resetPassword=False,
-        usingTemporaryPassword=False,
     )
 
 
@@ -334,13 +326,35 @@ def test_update_user_password_is_hashed(
     decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     updated = _make_orm_user(username="pw_user", full_name="X")
     decoy.when(
-        mock_store.update(
-            "pw_user", None, matchers.IsA(str), None, None, True, False
-        )
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None, False)
     ).then_return(updated)
     manager.update_user("pw_user", new_password="newpassword2", reset_password=True)
     decoy.verify(
-        mock_store.update("pw_user", None, matchers.IsA(str), None, None, True, False)
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None, False)
+    )
+
+
+def test_update_user_password_clears_reset_password_flag(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    """Setting a new password clears resetPassword."""
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    updated = _make_orm_user(username="pw_user", reset_password=True)
+    decoy.when(
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None, False)
+    ).then_return(updated)
+
+    manager.update_user(
+        "pw_user",
+        new_password="newpassword2",
+        reset_password=True,
+    )
+
+    decoy.verify(
+        mock_store.update("pw_user", None, matchers.IsA(str), None, None, False)
     )
 
 
@@ -356,7 +370,7 @@ def test_update_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
     decoy.when(
-        mock_store.update("ghost", None, None, "Nope", None, False, False)
+        mock_store.update("ghost", None, None, "Nope", None, False)
     ).then_raise(ValueError("User 'ghost' not found"))
     with pytest.raises(UserNotFoundError):
         manager.update_user("ghost", new_full_name="Nope", reset_password=False)
@@ -369,16 +383,12 @@ def test_reset_user_password(
     manager: UserDataManager,
 ) -> None:
     decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
-    updated = _make_orm_user(
-        username="reset_me",
-        reset_password=True,
-        using_temporary_password=True,
-    )
+    updated = _make_orm_user(username="reset_me", reset_password=True)
     decoy.when(
         mock_store.update(
             "reset_me",
             hashed_password=matchers.IsA(str),
-            using_temporary_password=True,
+            reset_password=True,
         )
     ).then_return(updated)
 
@@ -386,14 +396,13 @@ def test_reset_user_password(
 
     assert result.userName == "reset_me"
     assert result.resetPassword is True
-    assert result.usingTemporaryPassword is True
     assert len(result.temporaryPassword) == 8
     assert all(c in string.ascii_letters + string.digits for c in result.temporaryPassword)
     decoy.verify(
         mock_store.update(
             "reset_me",
             hashed_password=matchers.IsA(str),
-            using_temporary_password=True,
+            reset_password=True,
         )
     )
 
@@ -410,15 +419,12 @@ def test_reset_user_password_uses_password_complexity_settings(
             passwordComplexitySpecialCharacters=True,
         )
     )
-    updated = _make_orm_user(
-        username="reset_me",
-        using_temporary_password=True,
-    )
+    updated = _make_orm_user(username="reset_me", reset_password=True)
     decoy.when(
         mock_store.update(
             "reset_me",
             hashed_password=matchers.IsA(str),
-            using_temporary_password=True,
+            reset_password=True,
         )
     ).then_return(updated)
 
@@ -439,7 +445,7 @@ def test_reset_user_password_not_found_raises(
         mock_store.update(
             "ghost",
             hashed_password=matchers.IsA(str),
-            using_temporary_password=True,
+            reset_password=True,
         )
     ).then_raise(ValueError("User 'ghost' not found"))
     with pytest.raises(UserNotFoundError):

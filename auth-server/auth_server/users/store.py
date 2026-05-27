@@ -83,7 +83,6 @@ class UserStore:
         full_name: str | None = None,
         account_type: str | None = None,
         reset_password: bool | None = None,
-        using_temporary_password: bool | None = None,
     ) -> User:
         """Update a user's fields and return the updated User.
 
@@ -101,7 +100,6 @@ class UserStore:
                 if account_type is not None
                 else None,
                 "reset_password": reset_password,
-                "using_temporary_password": using_temporary_password,
             }
             for attr, value in updates.items():
                 if value is not None:

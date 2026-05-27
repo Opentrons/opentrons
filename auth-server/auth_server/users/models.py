@@ -78,14 +78,7 @@ class UpdateUser(BaseModel):
     resetPassword: Annotated[
         bool,
         Field(
-            description="Set to true to reset the password for this user.",
-            default=False,
-        ),
-    ] = False
-    usingTemporaryPassword: Annotated[
-        bool,
-        Field(
-            description="Set to true to indicate that the user is using a temporary password and will need to reset it upon login.",
+            description="Set to true to require this user to change their password.",
             default=False,
         ),
     ] = False
@@ -100,7 +93,6 @@ class UserResponse(BaseModel):
     scopes: list[str]
     locked: bool
     resetPassword: bool
-    usingTemporaryPassword: bool
 
 
 class ResetPasswordResponse(UserResponse):

@@ -133,7 +133,6 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(
             "full_name",
             "account_type",
             "reset_password",
-            "using_temporary_password",
         }
 
 

@@ -41,9 +41,6 @@ class User(Base):
     full_name: Mapped[str]
     account_type: Mapped[str]
     reset_password: Mapped[bool] = mapped_column(server_default=false(), default=False)
-    using_temporary_password: Mapped[bool] = mapped_column(
-        server_default=false(), default=False
-    )
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",

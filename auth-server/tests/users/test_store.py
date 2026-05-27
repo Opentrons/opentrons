@@ -111,20 +111,6 @@ def test_update_persists(user_store: UserStore) -> None:
     assert not fetched.reset_password
 
 
-def test_update_using_temporary_password(user_store: UserStore) -> None:
-    """update should persist the using_temporary_password flag."""
-    user_store.add(
-        username="temp_pwd_user",
-        hashed_password=HASHED_PW,
-        full_name="Temp Pwd",
-        account_type=AccountType.USER,
-    )
-    user_store.update("temp_pwd_user", using_temporary_password=True)
-    fetched = user_store.get("temp_pwd_user")
-    assert fetched is not None
-    assert fetched.using_temporary_password
-
-
 def test_failed_login_counter(user_store: UserStore) -> None:
     # All methods should raise ValueError if the given username isn't found.
     with pytest.raises(ValueError):

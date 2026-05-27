@@ -151,7 +151,6 @@ async def update_user(
             new_account_type=update_data.accountType,
             new_locked=update_data.locked,
             reset_password=update_data.resetPassword,
-            using_temporary_password=update_data.usingTemporaryPassword,
         )
     except UserAlreadyExistsError:
         raise fastapi.HTTPException(

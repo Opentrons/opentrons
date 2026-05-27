@@ -30,8 +30,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
-          usingTemporaryPassword: false
-
   - name: Create a new user with a password less than 8 characters
     request:
       method: POST
@@ -65,8 +63,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
-          usingTemporaryPassword: false
-
   - name: Update the user
     request:
       method: PATCH
@@ -87,8 +83,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
-          usingTemporaryPassword: false
-
   - name: Update the username and password
     request:
       method: PATCH
@@ -109,8 +103,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
-          usingTemporaryPassword: false
-
   - name: Update the reset password flag
     request:
       method: PATCH
@@ -130,8 +122,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
-          usingTemporaryPassword: false
-
   - name: Get the user information
     request:
       method: GET
@@ -148,8 +138,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
-          usingTemporaryPassword: false
-
   - name: Reset the user's password to a temporary password
     request:
       method: POST
@@ -169,7 +157,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
-          usingTemporaryPassword: true
           temporaryPassword: !anystr
 
   - name: Log in with the temporary password

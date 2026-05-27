@@ -107,7 +107,6 @@ class UserDataManager:
             ),
             locked=is_currently_locked,
             resetPassword=user.reset_password,
-            usingTemporaryPassword=user.using_temporary_password,
         )
 
     def seed_initial_users(self) -> None:
@@ -175,7 +174,6 @@ class UserDataManager:
         new_account_type: str | None = None,
         new_locked: Literal[False] | None = None,
         reset_password: bool = False,
-        using_temporary_password: bool = False,
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
@@ -194,6 +192,8 @@ class UserDataManager:
             if new_locked is not None and not new_locked:
                 # Note: do this BEFORE the username is potentially changed
                 self._user_store.clear_failed_logins(username_to_update)
+            if new_password is not None:
+                reset_password = False
             updated_user = self._user_store.update(
                 username_to_update,
                 new_username=new_username,
@@ -203,7 +203,6 @@ class UserDataManager:
                 full_name=new_full_name,
                 account_type=new_account_type,
                 reset_password=reset_password,
-                using_temporary_password=using_temporary_password,
             )
             return self._to_response(updated_user)
         except ValueError as e:
@@ -221,7 +220,7 @@ class UserDataManager:
             updated_user = self._user_store.update(
                 username,
                 hashed_password=password_hash.hash(temporary_password),
-                using_temporary_password=True,
+                reset_password=True,
             )
         except ValueError as e:
             raise UserNotFoundError(e) from e
