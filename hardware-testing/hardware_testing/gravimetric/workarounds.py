@@ -8,7 +8,7 @@ from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.opentrons_api.helpers_ot3 import start_server_ot3, stop_server_ot3
-from hardware_testing.opentrons_api.types import Point
+from opentrons.types import Point
 
 from opentrons.protocol_engine.types import LabwareOffset
 
