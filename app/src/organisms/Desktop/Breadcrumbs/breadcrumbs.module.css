@@ -7,6 +7,11 @@
   background-color: var(--white);
 }
 
+.crumb_container {
+  display: flex;
+  padding-right: var(--spacing-4);
+}
+
 .text_style {
   display: -webkit-box;
   overflow: hidden;

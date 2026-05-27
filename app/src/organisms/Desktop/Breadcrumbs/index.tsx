@@ -149,7 +149,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
         const isLastCrumb = i === pathCrumbs.length - 1
 
         return (
-          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing4}>
+          <div className={styles.crumb_container} key={crumb.linkPath}>
             <Link
               className={
                 isLastCrumb ? styles.crumb_link_inactive : styles.crumb_link
@@ -161,7 +161,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
                 isLastCrumb={isLastCrumb}
               />
             </Link>
-          </Flex>
+          </div>
         )
       })}
     </div>
