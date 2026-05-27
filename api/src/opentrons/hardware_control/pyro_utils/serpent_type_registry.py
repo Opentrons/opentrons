@@ -34,12 +34,13 @@ from opentrons.util.pyro.pyro_serialization import (
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
+    register_enumerated_errors,
     register_type_to_serpent,
     serpent_enum_registration,
-    register_enumerated_errors,
 )
 
-Pyro5.config.SERPENT_BYTES_REPR = True
+Pyro5.config.SERPENT_BYTES_REPR = True  # type: ignore
+
 
 # Estop Overall Status registry
 def _estop_overall_status_dict_to_class(  # type: ignore
@@ -833,4 +834,3 @@ def register_hardware_types() -> None:
         opentrons.hardware_control.types.FailedTipStateCheck
     )
     register_enumerated_errors()
-

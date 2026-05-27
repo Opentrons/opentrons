@@ -13,14 +13,9 @@ from pydantic import BaseModel
 from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
 
-<<<<<<< HEAD
-import opentrons_shared_data.errors.exceptions
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
-import opentrons.hardware_control.errors
-=======
 PYRO_PROXY = "PYRO_PROXY"
->>>>>>> 0553f84df6eef561de18c2fa56d4c0cd96b5f844
 
 
 class TypedDictWrapper(BaseModel):

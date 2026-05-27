@@ -168,7 +168,9 @@ async def _verify_edge_pos(
             return
         else:
             last_result = hit_deck
-    raise EdgeNotFoundError(f"Edge {edge_name_str} could not be verified at {check_stride} mm resolution.")
+    raise EdgeNotFoundError(
+        f"Edge {edge_name_str} could not be verified at {check_stride} mm resolution."
+    )
 
 
 def critical_edge_offset(

@@ -36,7 +36,6 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.util import logging_config
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
-from opentrons.util.pyro.pyro_serialization import register_enumerated_errors
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version
