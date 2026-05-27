@@ -75,7 +75,7 @@ describe('FlexPipetteCard', () => {
 
   it('renders correct info when gripper is attached', () => {
     render(props)
-    screen.getByText('left Mount')
+    screen.getByText('left mount')
     screen.getByText('Left Pipette')
     const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
@@ -114,7 +114,7 @@ describe('FlexPipetteCard', () => {
       isEstopNotDisengaged: false,
     }
     render(props)
-    screen.getByText('Both Mounts')
+    screen.getByText('left+right mounts')
     screen.getByText('Left Pipette')
   })
   it('renders recalibrate banner when no calibration data is present', () => {

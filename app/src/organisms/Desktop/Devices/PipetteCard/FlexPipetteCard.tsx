@@ -204,8 +204,8 @@ export function FlexPipetteCard({
           }
           label={
             attachedPipetteIs96Channel
-              ? t('both_mounts')
-              : t('mount', {
+              ? t('both_instrument_mounts')
+              : t('instrument_mount', {
                   side: mount === LEFT ? t('left') : t('right'),
                 })
           }
