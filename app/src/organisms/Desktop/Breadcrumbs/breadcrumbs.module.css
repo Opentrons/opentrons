@@ -41,20 +41,21 @@
   opacity: 1;
 }
 
-.crumb_active {
+.crumb_and_separator {
   display: flex;
   align-items: center;
+  gap: var(--spacing-4);
+}
+
+.crumb_active {
   color: var(--blue-50);
 }
 
 .crumb_inactive {
-  display: flex;
-  align-items: center;
   color: var(--grey-50);
 }
 
 .crumb_name {
-  padding-right: var(--spacing-4);
   text-transform: none;
 }
 

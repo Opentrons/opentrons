@@ -30,7 +30,12 @@ function CrumbAndSeparator({
   isLastCrumb,
 }: CrumbAndSeparatorProps): JSX.Element {
   return (
-    <div className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}>
+    <div
+      className={clsx(
+        styles.crumb_and_separator,
+        isLastCrumb ? styles.crumb_inactive : styles.crumb_active
+      )}
+    >
       <StyledText
         className={clsx(styles.crumb_name, styles.text_style)}
         desktopStyle="captionRegular"
