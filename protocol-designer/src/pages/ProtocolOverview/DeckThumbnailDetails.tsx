@@ -167,7 +167,9 @@ export const DeckThumbnailDetails = (
             deckDef,
             deckConfiguration: deckConfig,
           })
-          if (dockSlotPosition == null) return null
+          if (dockSlotPosition == null) {
+            return null
+          }
           const dockLabware = allLabware
             .filter(
               lw =>
