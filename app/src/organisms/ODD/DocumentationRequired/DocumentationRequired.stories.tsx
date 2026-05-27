@@ -6,7 +6,7 @@ import { action } from 'storybook/actions'
 
 import { VIEWPORT } from '@opentrons/components'
 
-import { configReducer } from '../../redux/config/reducer'
+import { configReducer } from '../../../redux/config/reducer'
 import { DocumentationRequired as DocumentationRequiredComponent } from './DocumentationRequired'
 
 import type { Meta, StoryObj } from '@storybook/react'
