@@ -38,10 +38,7 @@ interface CrumbNameProps {
 
 function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}
-    >
+    <div className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}>
       <Box
         paddingRight={SPACING.spacing4}
         textTransform={TYPOGRAPHY.textTransformNone}
@@ -52,7 +49,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
       {!isLastCrumb ? (
         <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
       ) : null}
-    </Flex>
+    </div>
   )
 }
 
