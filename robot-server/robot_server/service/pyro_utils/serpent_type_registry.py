@@ -9,7 +9,6 @@ from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
-    register_enumerated_errors,
 )
 
 # Set the serpent bytes handling configuration to ensure bytes for things like images serialize correctly
@@ -35,4 +34,3 @@ def register_robot_server_types() -> None:
     )
     for pydantic_type in opentrons_pydantic_types:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_type)
-    register_enumerated_errors()

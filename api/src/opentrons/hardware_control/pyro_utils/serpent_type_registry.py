@@ -4,6 +4,7 @@ import dataclasses
 import datetime
 from typing import Any, Dict, get_args
 
+import Pyro5
 from numpy import float64
 
 import opentrons_shared_data.errors.codes
@@ -26,8 +27,10 @@ from opentrons.util.pyro.pyro_serialization import (
     find_typed_dict_classes_in_packages,
     register_type_to_serpent,
     serpent_enum_registration,
+    register_enumerated_errors,
 )
 
+Pyro5.config.SERPENT_BYTES_REPR = True
 
 # Estop Overall Status registry
 def _estop_overall_status_dict_to_class(  # type: ignore
@@ -674,3 +677,4 @@ def register_hardware_types() -> None:
     OpentronsPyroSerializer.register_basic_error(
         opentrons.hardware_control.types.FailedTipStateCheck
     )
+    register_enumerated_errors()
