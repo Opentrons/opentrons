@@ -53,7 +53,7 @@ teardown:
 
 .PHONY: format-readme
 format-readme:
-	pnpm run prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
+	cd .. && pnpm exec prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
 
 
 .PHONY: snapshot-test

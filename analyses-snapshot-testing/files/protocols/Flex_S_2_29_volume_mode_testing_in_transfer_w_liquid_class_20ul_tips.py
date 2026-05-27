@@ -66,7 +66,7 @@ def run(protocol_context):
         volume=4,
         source=nest_plate.rows()[0][:2],
         dest=arma_plate.rows()[0][:2],
-        new_tip="always",
+        new_tip="never",
         trash_location=trash,
     )
 
