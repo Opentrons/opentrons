@@ -273,9 +273,13 @@ export function forMoveLabware(
     // The collar stacks onto the topmost existing labware on the module, not the module itself
     const moduleSlot = modules[newLocation.moduleId].slot
     const existingStack = getLargestStackInSlot(labware, moduleSlot)
-    const topOnModule = existingStack.length > 0 ? existingStack[0] : null
-    if (topOnModule != null && topOnModule in labwareEntities) {
-      stackedOnNodeForMovedPrimary = { labwareId: topOnModule }
+    const topLabwareIdOnModule =
+      existingStack.length > 0 ? existingStack[0] : null
+    if (
+      topLabwareIdOnModule != null &&
+      topLabwareIdOnModule in labwareEntities
+    ) {
+      stackedOnNodeForMovedPrimary = { labwareId: topLabwareIdOnModule }
     }
   }
   robotState.labware[labwareId].stackedOnNode = stackedOnNodeForMovedPrimary

@@ -23,10 +23,10 @@ import {
   FLEX_STACKER_IN_HOPPER_ACTIONS,
   HOPPER_LABWARE_X_OFFSET,
 } from '/protocol-designer/constants'
+import { getDeckConfiguration } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
 
-import { getDeckConfiguration } from '../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,

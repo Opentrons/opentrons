@@ -191,7 +191,7 @@ export function LabwareLocationField(
           lw.stack.includes(vacuumModuleId) &&
           !lw.stack.includes(VACUUM_DOCK_LOCATION)
       )
-      const moduleHasNoCollar = !labwareOnModule.some(([lwId]) => {
+      const vacuumModuleHasNoCollar = !labwareOnModule.some(([lwId]) => {
         return (
           labwareEntities[lwId] != null &&
           getIsVacuumCollar(labwareEntities[lwId].def)
@@ -201,10 +201,10 @@ export function LabwareLocationField(
       // offer the vacuum module as a destination when it has no collar yet
       // (empty module is valid — collar can sit directly on the module)
       // forMoveLabware will build the full stack including any existing module labware
-      if (moduleHasNoCollar) {
+      if (vacuumModuleHasNoCollar) {
         const isVacuumModuleAlreadyIncluded =
           unoccupiedLabwareLocationsOptions.some(
-            opt => opt.value === vacuumModuleId
+            ({ value }) => value === vacuumModuleId
           )
         if (!isVacuumModuleAlreadyIncluded) {
           unoccupiedLabwareLocationsOptions = [
@@ -223,7 +223,7 @@ export function LabwareLocationField(
         unoccupiedLabwareLocationsOptions.filter(
           ({ value }) =>
             value === VACUUM_DOCK_ADDRESSABLE_AREA ||
-            (moduleHasNoCollar && value === vacuumModuleId)
+            (vacuumModuleHasNoCollar && value === vacuumModuleId)
         )
     }
   }

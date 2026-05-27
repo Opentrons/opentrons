@@ -333,6 +333,7 @@ const getLabwareInfo = (
   if (stack != null) {
     latestSlot = resolveSlotLocation(modules, stack, robotType)
   } else {
+    console.warn(`Could not find slot for labware ${labwareId}`)
     latestSlot = 'unknown slot'
   }
 
@@ -417,7 +418,7 @@ export const useLabwareDropdownOptions = (
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
       //  TODO: refactor this to be easier to read
-      const options: DropdownOption[] =
+      const shouldExclude =
         isInaccessible ||
         (type === 'labware' && isOnStacker) ||
         (isAdapter && !isVacuumCollar) ||
@@ -429,20 +430,17 @@ export const useLabwareDropdownOptions = (
           !isVacuumCollar &&
           !isLabwareLidCombo) ||
         (type === 'labware' && !isTopOfStack)
-          ? acc
-          : [
-              ...acc,
-              {
-                name: nickName,
-                value: labwareId,
-                deckLabel: latestSlot,
-              },
-            ]
-
-      //  filter out moving adapters, and labware in
-      //  waste chute for moveLabware, labware off-deck and
-      //  labware that is a tiprack for the labware dropdown only
-      return options
+      if (shouldExclude) {
+        return acc
+      }
+      return [
+        ...acc,
+        {
+          name: nickName,
+          value: labwareId,
+          deckLabel: latestSlot,
+        },
+      ]
     },
     []
   )
