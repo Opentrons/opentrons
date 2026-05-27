@@ -1,9 +1,8 @@
-import { DocumentationReport } from '@opentrons/react-api-client'
-
 import { isDocumentationReportValid } from '/app/local-resources/access-control/utils'
 
 import { showDocumentationRequiredModal } from './DocumentationRequiredModal'
 
+import type { DocumentationReport } from '@opentrons/react-api-client'
 import type { DocumentedActionKind } from '/app/local-resources/access-control/types'
 
 /**
