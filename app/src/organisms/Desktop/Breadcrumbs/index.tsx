@@ -65,9 +65,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
       | null
       | { linkPath: string; crumbName: string | null }
   } = {
-    '/devices': !(isOnDevice ?? false)
-      ? 'This is very long text the quick brown fox jumps over the lazy dog the quick brown fox jumps over the lazy dog'
-      : null,
+    '/devices': !(isOnDevice ?? false) ? t('devices') : null,
     [`/devices/${robotName}`]: robotName,
     [`/devices/${robotName}/robot-settings`]: t('robot_settings'),
     [`/devices/${robotName}/protocol-runs/${runId}`]:
