@@ -54,3 +54,8 @@
   align-items: center;
   color: var(--grey-50);
 }
+
+.crumb_name {
+  padding-right: var(--spacing-4);
+  text-transform: none;
+}

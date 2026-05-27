@@ -39,13 +39,9 @@ interface CrumbNameProps {
 function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
     <div className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}>
-      <Box
-        paddingRight={SPACING.spacing4}
-        textTransform={TYPOGRAPHY.textTransformNone}
-        className={styles.text_style}
-      >
+      <div className={clsx(styles.crumb_name, styles.text_style)}>
         {crumbName}
-      </Box>
+      </div>
       {!isLastCrumb ? (
         <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
       ) : null}
