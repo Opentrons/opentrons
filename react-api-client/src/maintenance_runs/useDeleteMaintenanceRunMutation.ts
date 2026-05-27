@@ -2,8 +2,7 @@ import { useQueryClient } from 'react-query'
 
 import { deleteMaintenanceRun } from '@opentrons/api-client'
 
-import { type DocumentationState } from '../access_control/types'
-import { useDocumentedMutation } from '../access_control/useDocumentedMutation'
+import { useDocumentedMutation } from '../access_control'
 import { getQueryKey, useHost } from '../api'
 
 import type {
@@ -12,6 +11,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { EmptyResponse } from '@opentrons/api-client'
+import type { DocumentationState } from '../access_control'
 
 export type UseDeleteMaintenanceRunMutationResult = UseMutationResult<
   EmptyResponse,

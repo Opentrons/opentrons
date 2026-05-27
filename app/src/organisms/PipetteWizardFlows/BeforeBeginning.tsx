@@ -9,7 +9,6 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -43,6 +42,7 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   DeckConfiguration,

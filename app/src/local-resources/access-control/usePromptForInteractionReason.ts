@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
-
-import { type DocumentationReport } from './types'
 import { useGuardedAction } from './useGuardedAction'
+
+import type { DocumentationState } from '@opentrons/react-api-client'
+import type { DocumentationReport } from './types'
 
 /**
  * Immediately prompts for the interaction reason and returns a documentation State.
@@ -31,9 +31,6 @@ export const usePromptForInteractionReason = (
       if (docState.accessControlEnabled) {
         if (docState.docreport == null && !promptInFlight.current) {
           promptInFlight.current = true
-          console.log(
-            'usePromptForInteractionReason: prompting for documentation'
-          )
           await docState
             .askForDocumentation()
             .then(setDocReport)

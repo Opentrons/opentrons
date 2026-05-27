@@ -15,7 +15,7 @@ import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToM
 import { useSaveWorkingOffsets } from './useSaveWorkingOffsets'
 
 import type { CommandData } from '@opentrons/api-client'
-import type { DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
 import type { UseHandleConditionalCleanupResult } from './useHandleClose'

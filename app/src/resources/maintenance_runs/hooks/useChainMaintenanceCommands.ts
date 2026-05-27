@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 import { chainMaintenanceCommandsRecursive } from '../../runs'
 
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export function useChainMaintenanceCommands(

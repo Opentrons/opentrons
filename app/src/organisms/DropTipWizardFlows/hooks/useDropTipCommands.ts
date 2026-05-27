@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -14,6 +13,7 @@ import {
 import { getAddressableAreaFromConfig } from '../utils'
 
 import type { CommandData, PipetteData } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   AddressableAreaName,
   CreateCommand,

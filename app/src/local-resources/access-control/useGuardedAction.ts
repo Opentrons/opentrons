@@ -2,13 +2,13 @@ import { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isDocumentationReportValid } from './utils'
 
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { DocumentationReport } from './types'
 
 /**

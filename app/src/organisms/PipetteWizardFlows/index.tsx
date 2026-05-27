@@ -16,7 +16,6 @@ import {
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -50,6 +49,7 @@ import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   LoadedPipette,

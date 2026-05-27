@@ -1,7 +1,5 @@
+export type { DocumentationReport } from '@opentrons/react-api-client'
+
 export interface DocumentedActionKind {
   kind: 'PROTOCOL_PLAY'
-}
-
-export type DocumentationReport = string & {
-  readonly _brand: 'DocumentationReport'
 }

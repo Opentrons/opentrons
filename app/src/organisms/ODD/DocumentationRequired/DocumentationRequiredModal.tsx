@@ -1,9 +1,9 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { type DocumentationReport } from '/app/local-resources/access-control/types'
-
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
+
+import type { DocumentationReport } from '@opentrons/react-api-client'
 
 export interface DocumentationRequiredModalArgs {
   username: string

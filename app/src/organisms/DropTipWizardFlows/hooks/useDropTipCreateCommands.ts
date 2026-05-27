@@ -1,5 +1,4 @@
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
 import {
@@ -8,6 +7,7 @@ import {
 } from '/app/resources/runs'
 
 import type { CommandData } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type { FixitCommandTypeUtils } from '../types'

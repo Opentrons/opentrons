@@ -8,8 +8,9 @@ import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '..'
-import { type DocumentationState } from '../access_control/types'
 import { getQueryKey } from '../api'
+
+import type { DocumentationState } from '../access_control'
 
 interface UseRunActionMutations {
   playRun: () => void

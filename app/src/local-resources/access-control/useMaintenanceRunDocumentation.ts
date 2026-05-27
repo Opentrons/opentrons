@@ -1,7 +1,7 @@
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
-
 import { useGuardedAction } from './useGuardedAction'
 import { usePromptForInteractionReason } from './usePromptForInteractionReason'
+
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 /**
  * Generates documentation states for maintenane run flows.

@@ -2,8 +2,7 @@ import { useQueryClient } from 'react-query'
 
 import { createMaintenanceRun } from '@opentrons/api-client'
 
-import { type DocumentationState } from '../access_control/types'
-import { useDocumentedMutation } from '../access_control/useDocumentedMutation'
+import { useDocumentedMutation } from '../access_control'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -17,6 +16,7 @@ import type {
   HostConfig,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../access_control'
 
 export type CreateMaintenanceRunType = UseMutateAsyncFunction<
   MaintenanceRun,

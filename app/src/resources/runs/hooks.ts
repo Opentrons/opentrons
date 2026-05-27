@@ -6,7 +6,6 @@ import {
   useCreateLiveCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
 // TODO: refactor this so helper code doesn't spawn UI
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
@@ -22,6 +21,7 @@ import {
 import type { ErrorRecoveryPolicy, HostConfig } from '@opentrons/api-client'
 import type {
   CreateMaintenanceRunType,
+  DocumentationState,
   useCreateMaintenanceCommandMutation,
   UseCreateMaintenanceRunMutationOptions,
   UseCreateMaintenanceRunMutationResult,

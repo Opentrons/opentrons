@@ -28,7 +28,6 @@ import {
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
-import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 import {
   EIGHT_CHANNEL,
   LEFT,
@@ -57,6 +56,7 @@ import { getIsGantryEmpty } from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { SelectablePipettes } from './types'
 
