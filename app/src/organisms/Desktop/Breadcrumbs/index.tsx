@@ -36,10 +36,7 @@ function CrumbAndSeparator({
         isLastCrumb ? styles.crumb_inactive : styles.crumb_active
       )}
     >
-      <StyledText
-        className={clsx(styles.crumb_name, styles.text_style)}
-        desktopStyle="captionRegular"
-      >
+      <StyledText className={styles.text_style} desktopStyle="captionRegular">
         {crumbName}
       </StyledText>
       {!isLastCrumb ? (
