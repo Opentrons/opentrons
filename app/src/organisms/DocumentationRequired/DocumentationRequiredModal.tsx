@@ -1,6 +1,7 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { type DocumentationReport } from '../../local-resources/access-control/types'
+import { type DocumentationReport } from '/app/local-resources/access-control/types'
+
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
@@ -13,17 +14,13 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {
-      const result: DocumentationReport = {
-        note,
-        confirmedAt: new Date().toISOString(),
-        documentedBy: username,
-      }
+      const result: DocumentationReport = note as DocumentationReport
       modal.resolve(result)
       modal.remove()
     }
 
     const handleBack = (): void => {
-      modal.resolve(null)
+      modal.resolve('' as DocumentationReport)
       modal.remove()
     }
 
@@ -40,11 +37,6 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 )
 
 export const showDocumentationRequiredModal = (
-  username: string,
-  isOnDevice: boolean
-): Promise<DocumentationReport | null> => {
-  return isOnDevice
-    ? NiceModal.show(DocumentationRequiredModalImpl, { username })
-    : Promise.resolve(null)
-  // TODO(jj): handle on desktop
-}
+  username: string
+): Promise<DocumentationReport> =>
+  NiceModal.show(DocumentationRequiredModalImpl, { username })

@@ -1,10 +1,11 @@
-import { isDocumentationReportValid } from '../../local-resources/access-control/utils'
+import { isDocumentationReportValid } from '/app/local-resources/access-control'
+
 import { showDocumentationRequiredModal } from './DocumentationRequiredModal'
 
 import type {
   DocumentationReport,
   DocumentedActionKind,
-} from '../../local-resources/access-control/types'
+} from '/app/local-resources/access-control'
 
 /**
  * Guard that captures a pops DocumentationRequiredModal and returns the documentation report
@@ -17,22 +18,13 @@ import type {
  */
 export async function requireDocumentation(
   actionsToDocument: DocumentedActionKind[],
-  username: string,
-  isOnDevice: boolean
+  username: string
 ): Promise<DocumentationReport> {
-  const modalResult = await showDocumentationRequiredModal(username, isOnDevice)
-  if (modalResult == null || !isDocumentationReportValid(modalResult)) {
+  const modalResult = await showDocumentationRequiredModal(username)
+  if (!isDocumentationReportValid(modalResult)) {
     // TODO(jj): eventually, this will be handled on the backend and become unnecessary.
-    throw new Error(
-      `No documentation provided for action: ${modalResult?.note}`
-    )
+    throw new Error(`No documentation provided for action: ${modalResult}`)
   }
 
-  const { note, confirmedAt } = modalResult
-
-  return {
-    note,
-    confirmedAt,
-    documentedBy: username,
-  }
+  return modalResult
 }

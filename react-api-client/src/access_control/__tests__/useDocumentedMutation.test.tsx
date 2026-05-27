@@ -6,12 +6,9 @@ import { useDocumentedMutation } from '../useDocumentedMutation'
 
 import type { AxiosError } from 'axios'
 import type * as React from 'react'
+import type { DocumentationReport } from '../types'
 
-const MOCK_REPORT = {
-  note: 'test note',
-  confirmedAt: '2024-01-01T00:00:00.000Z',
-  documentedBy: 'tester',
-}
+const MOCK_REPORT = 'test note' as DocumentationReport
 
 const testMutationKey = ['acm', 'useDocumentedMutation', 'test'] as const
 

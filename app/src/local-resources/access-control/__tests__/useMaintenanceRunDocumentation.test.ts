@@ -3,11 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { requireDocumentation } from '/app/organisms/DocumentationRequired'
-
 import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
 import { isDocumentationProvided } from '../utils'
+import {
+  mockShowDocumentationRequiredModal,
+  wrapWithDocumentationRequiredModal,
+} from './documentationRequiredModalTestUtils'
 
 import type ReactRedux from 'react-redux'
 import type { DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
@@ -34,15 +35,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   }
 })
 
-vi.mock('/app/organisms/DocumentationRequired', () => ({
-  requireDocumentation: vi.fn(),
-}))
-
-const mockDocreport: DocumentationReport = {
-  note: 'starting maintenance for QC',
-  confirmedAt: '2026-05-01T16:00:00.000Z',
-  documentedBy: 'alice',
-}
+const mockDocreport = 'starting calibration' as DocumentationReport
+const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('isDocumentationProvided', () => {
   it('returns true when access control is disabled', () => {
@@ -76,7 +70,9 @@ describe('useMaintenanceRunDocumentation', () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: true } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(requireDocumentation).mockResolvedValue(mockDocreport)
+    vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
+      mockDocreport
+    )
   })
 
   afterEach(() => {
@@ -84,10 +80,12 @@ describe('useMaintenanceRunDocumentation', () => {
   })
 
   it('auto-prompts for command documentation but not for deletion', async () => {
-    const { result } = renderHook(() => useMaintenanceRunDocumentation())
+    const { result } = renderHook(() => useMaintenanceRunDocumentation(), {
+      wrapper,
+    })
 
     await waitFor(() => {
-      expect(requireDocumentation).toHaveBeenCalledTimes(1)
+      expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     })
 
     await waitFor(() => {
@@ -110,10 +108,12 @@ describe('useMaintenanceRunDocumentation', () => {
   })
 
   it('prompts for deletion documentation only when askForDocumentation is invoked', async () => {
-    const { result } = renderHook(() => useMaintenanceRunDocumentation())
+    const { result } = renderHook(() => useMaintenanceRunDocumentation(), {
+      wrapper,
+    })
 
     await waitFor(() => {
-      expect(requireDocumentation).toHaveBeenCalledTimes(1)
+      expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     })
 
     await act(async () => {
@@ -125,6 +125,6 @@ describe('useMaintenanceRunDocumentation', () => {
       }
     })
 
-    expect(requireDocumentation).toHaveBeenCalledTimes(2)
+    expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(2)
   })
 })

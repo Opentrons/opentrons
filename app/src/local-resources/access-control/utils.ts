@@ -5,16 +5,12 @@ import { type DocumentationReport } from './types'
 export function isDocumentationReportValid(
   docreport: DocumentationReport
 ): boolean {
-  const { note, confirmedAt, documentedBy } = docreport
-  const noteIsValid = note != null && note.length > 0
-  const confirmedAtIsValid = confirmedAt != null && confirmedAt.length > 0
-  const documentedByIsValid = documentedBy != null && documentedBy.length > 0
-  return noteIsValid && confirmedAtIsValid && documentedByIsValid
+  return docreport != null && docreport.length > 0
 }
 
 export function isDocumentationProvided(state: DocumentationState): boolean {
   if (!state.accessControlEnabled) {
     return true
   }
-  return state.docreport != null
+  return state.docreport != null && state.docreport.length > 0
 }

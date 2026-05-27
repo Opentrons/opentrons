@@ -3,10 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { requireDocumentation } from '/app/organisms/DocumentationRequired'
-
 import { usePromptForInteractionReason } from '../usePromptForInteractionReason'
+import {
+  mockShowDocumentationRequiredModal,
+  wrapWithDocumentationRequiredModal,
+} from './documentationRequiredModalTestUtils'
 
 import type ReactRedux from 'react-redux'
 import type { DocumentationReport } from '../types'
@@ -32,22 +33,17 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   }
 })
 
-vi.mock('/app/organisms/DocumentationRequired', () => ({
-  requireDocumentation: vi.fn(),
-}))
-
-const mockDocreport: DocumentationReport = {
-  note: 'starting maintenance for QC',
-  confirmedAt: '2026-05-01T16:00:00.000Z',
-  documentedBy: 'alice',
-}
+const mockDocreport = 'starting calibration' as DocumentationReport
+const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('usePromptForInteractionReason', () => {
   beforeEach(() => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: true } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(requireDocumentation).mockResolvedValue(mockDocreport)
+    vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
+      mockDocreport
+    )
   })
 
   afterEach(() => {
@@ -59,17 +55,21 @@ describe('usePromptForInteractionReason', () => {
       data: { data: { accessControlEnabled: false } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
 
-    const { result } = renderHook(() => usePromptForInteractionReason())
+    const { result } = renderHook(() => usePromptForInteractionReason(), {
+      wrapper,
+    })
 
     expect(result.current.accessControlEnabled).toBe(false)
-    expect(requireDocumentation).not.toHaveBeenCalled()
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
 
   it('prompts for documentation when access control is enabled', async () => {
-    const { result } = renderHook(() => usePromptForInteractionReason())
+    const { result } = renderHook(() => usePromptForInteractionReason(), {
+      wrapper,
+    })
 
     await waitFor(() => {
-      expect(requireDocumentation).toHaveBeenCalledTimes(1)
+      expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     })
 
     await waitFor(() => {

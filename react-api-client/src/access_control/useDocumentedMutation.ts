@@ -69,7 +69,7 @@ function useWrappedMutationFn<TData, TVariables>(
     async (...args: Parameters<typeof mutationFn>) => {
       const docreport = await checkDocumentationReport(documentationState)
       // TODO(jj): actually use the docreport
-      console.log(`reason for interaction: ${docreport?.note}`)
+      console.log(`reason for interaction: ${docreport}`)
       if (docreport == null) {
         console.error('No documentation report provided')
       }

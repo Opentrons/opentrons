@@ -5,12 +5,9 @@ import type {
   UseMutationResult,
 } from 'react-query'
 
-export interface DocumentationReport {
-  note: string
-  confirmedAt: string
-  documentedBy: string
+export type DocumentationReport = string & {
+  readonly _brand: 'DocumentationReport'
 }
-
 /**
  * Documentation state to be passed to the useDocumentedMutation hook.
  *

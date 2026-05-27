@@ -1,16 +1,12 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 import { type DocumentationState } from '@opentrons/react-api-client/src/access_control/types'
 
-// Used to generate the callback which opens the documentation modal
-// Don't really see a way to avoid this
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { requireDocumentation } from '/app/organisms/DocumentationRequired'
-import { getIsOnDevice } from '/app/redux/config'
 import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
+import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isDocumentationReportValid } from './utils'
 
 import type { DocumentationReport } from './types'
@@ -34,16 +30,15 @@ export function useGuardedAction(
   const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
-  const isOnDevice = useSelector(getIsOnDevice)
+
+  const { showDocumentationRequiredModal: requireDocumentation } = useContext(
+    DocumentationRequiredModalContext
+  )
 
   const showDocumentationModal = useCallback(async () => {
-    const docResult = await requireDocumentation(
-      [],
-      currentUsername ?? '',
-      isOnDevice
-    )
+    const docResult = await requireDocumentation(currentUsername ?? '')
     return docResult
-  }, [currentUsername, isOnDevice])
+  }, [currentUsername, requireDocumentation])
 
   const docState: DocumentationState = useMemo(() => {
     if (!accessControlEnabled) {

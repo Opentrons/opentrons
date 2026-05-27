@@ -15,10 +15,11 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { requireDocumentation } from '/app/organisms/DocumentationRequired'
-
 import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
+import {
+  mockShowDocumentationRequiredModal,
+  wrapWithDocumentationRequiredModal,
+} from './documentationRequiredModalTestUtils'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type ReactRedux from 'react-redux'
@@ -73,18 +74,11 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   }
 })
 
-vi.mock('/app/organisms/DocumentationRequired/requireDocumentation', () => ({
-  requireDocumentation: vi.fn(),
-}))
-
 const HOST_CONFIG: ApiClient.HostConfig = { hostname: 'localhost' }
 const MAINTENANCE_RUN_ID = 'maintenance-run-1'
 
-const MOCK_DOCREPORT: DocumentationReport = {
-  note: 'starting pipette attach for QC',
-  confirmedAt: '2026-05-01T16:00:00.000Z',
-  documentedBy: 'alice',
-}
+const MOCK_DOCREPORT: DocumentationReport =
+  'starting pipette attach for QC' as DocumentationReport
 
 /**
  * Simulates the lifecycle of a real maintenance run by composing the same
@@ -131,8 +125,9 @@ describe('maintenance run documentation flow', () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: true } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(requireDocumentation).mockResolvedValue(MOCK_DOCREPORT)
-
+    vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
+      MOCK_DOCREPORT
+    )
     vi.mocked(createMaintenanceRun).mockResolvedValue({
       data: { data: { id: MAINTENANCE_RUN_ID } },
     } as any)
@@ -144,9 +139,9 @@ describe('maintenance run documentation flow', () => {
     const queryClient = new QueryClient({
       defaultOptions: { mutations: { retry: false } },
     })
-    wrapper = ({ children }) => (
+    wrapper = wrapWithDocumentationRequiredModal(({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    )
+    ))
   })
 
   afterEach(() => {
@@ -160,7 +155,7 @@ describe('maintenance run documentation flow', () => {
     //    the resulting report is bound to the commandDocState used by every
     //    in-run command.
     await waitFor(() => {
-      expect(requireDocumentation).toHaveBeenCalledTimes(1)
+      expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
       expect(
@@ -205,7 +200,7 @@ describe('maintenance run documentation flow', () => {
     expect(createMaintenanceCommand).toHaveBeenCalledTimes(2)
     // Still only the single launch prompt — every step reused the
     // commandDocState's report rather than asking the user again.
-    expect(requireDocumentation).toHaveBeenCalledTimes(1)
+    expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     expect(
       result.current.commandDocState.accessControlEnabled &&
         result.current.commandDocState.docreport
@@ -220,6 +215,6 @@ describe('maintenance run documentation flow', () => {
     await waitFor(() => {
       expect(deleteMaintenanceRun).toHaveBeenCalledTimes(1)
     })
-    expect(requireDocumentation).toHaveBeenCalledTimes(2)
+    expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(2)
   })
 })

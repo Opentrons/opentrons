@@ -3,7 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { showDocumentationRequiredModal } from '../DocumentationRequiredModal'
 import { requireDocumentation } from '../requireDocumentation'
 
-import type { DocumentedActionKind } from '../../../local-resources/access-control/types'
+import type {
+  DocumentationReport,
+  DocumentedActionKind,
+} from '/app/local-resources/access-control'
 
 vi.mock('../DocumentationRequiredModal', () => ({
   showDocumentationRequiredModal: vi.fn(),
@@ -17,31 +20,23 @@ describe('requireDocumentation', () => {
   })
 
   it('opens the modal, posts on confirm, and resolves with the modal result', async () => {
-    vi.mocked(showDocumentationRequiredModal).mockResolvedValue({
-      note: 'starting run for QC',
-      confirmedAt: '2026-05-01T16:00:00.000Z',
-      documentedBy: 'alice',
-    })
-
-    const result = await requireDocumentation(
-      ACTIONS_TO_DOCUMENT,
-      'alice',
-      true
+    vi.mocked(showDocumentationRequiredModal).mockResolvedValue(
+      'starting calibration' as DocumentationReport
     )
 
-    expect(result).toEqual({
-      note: 'starting run for QC',
-      confirmedAt: '2026-05-01T16:00:00.000Z',
-      documentedBy: 'alice',
-    })
-    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice', true)
+    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
+
+    expect(result).toEqual('starting calibration' as DocumentationReport)
+    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice')
   })
 
-  it('returns null when the user backs out of the modal', async () => {
-    vi.mocked(showDocumentationRequiredModal).mockResolvedValue(null)
+  it('returns empty string when the user backs out of the modal', async () => {
+    vi.mocked(showDocumentationRequiredModal).mockResolvedValue(
+      '' as DocumentationReport
+    )
 
     await expect(
-      requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice', true)
-    ).rejects.toThrow(`No documentation provided for action: undefined`)
+      requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
+    ).rejects.toThrow(`No documentation provided for action: `)
   })
 })
