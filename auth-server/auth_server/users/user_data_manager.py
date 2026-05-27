@@ -33,9 +33,7 @@ def _generate_temporary_password(
         return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
 
     special = secrets.choice(_PASSWORD_SPECIAL_CHARACTERS)
-    alphanumeric = "".join(
-        secrets.choice(_ALPHANUMERIC) for _ in range(min_length - 1)
-    )
+    alphanumeric = "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length - 1))
     position = secrets.randbelow(min_length)
     return alphanumeric[:position] + special + alphanumeric[position:]
 
@@ -213,9 +211,7 @@ class UserDataManager:
         min_length, require_special = _temporary_password_requirements(
             self._settings_store.get_settings()
         )
-        temporary_password = _generate_temporary_password(
-            min_length, require_special
-        )
+        temporary_password = _generate_temporary_password(min_length, require_special)
         try:
             updated_user = self._user_store.update(
                 username,

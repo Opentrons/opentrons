@@ -369,9 +369,9 @@ def test_update_user_rename_to_existing_username_raises(
 def test_update_user_not_found_raises(
     decoy: Decoy, mock_store: UserStore, manager: UserDataManager
 ) -> None:
-    decoy.when(
-        mock_store.update("ghost", None, None, "Nope", None, False)
-    ).then_raise(ValueError("User 'ghost' not found"))
+    decoy.when(mock_store.update("ghost", None, None, "Nope", None, False)).then_raise(
+        ValueError("User 'ghost' not found")
+    )
     with pytest.raises(UserNotFoundError):
         manager.update_user("ghost", new_full_name="Nope", reset_password=False)
 
@@ -397,7 +397,9 @@ def test_reset_user_password(
     assert result.username == "reset_me"
     assert result.resetPassword is True
     assert len(result.temporaryPassword) == 8
-    assert all(c in string.ascii_letters + string.digits for c in result.temporaryPassword)
+    assert all(
+        c in string.ascii_letters + string.digits for c in result.temporaryPassword
+    )
     decoy.verify(
         mock_store.update(
             "reset_me",
