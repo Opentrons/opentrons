@@ -12,13 +12,8 @@ from server_utils.auth.resource_server.authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     MissingUserNotesError,
 )
-from server_utils.fastapi_utils.models.json_api import RequestModel
 
-from robot_server.fastapi_dependencies import (
-    AuditLogger,
-    get_audit_logger,
-    maybe_record_documented_interaction,
-)
+from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from robot_server.runs.action_models import RunActionCreate, RunActionType
 
 _RUN_ID = "run-abc"
@@ -121,11 +116,16 @@ async def test_get_audit_logger_skips_enforcement_for_get() -> None:
 
 
 @pytest.mark.asyncio
-async def test_maybe_record_documented_interaction_records_audit_when_required(
+async def test_audit_logger_log_records_run_action_when_required(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Forwards request notes and data to the checker and writes an audit log entry."""
+    """Run-action audit uses the same AuditLogger.log path as protocol routes."""
     checker = AlwaysAllowedAuthorizationChecker()
+    audit_logger = AuditLogger(
+        user_notes=_USER_NOTES,
+        created_at=_CREATED_AT,
+        authorization_checker=checker,
+    )
     with (
         patch.object(
             checker,
@@ -134,14 +134,9 @@ async def test_maybe_record_documented_interaction_records_audit_when_required(
         ),
         caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER),
     ):
-        await maybe_record_documented_interaction(
-            _RUN_ID,
-            RequestModel(data=_PLAY_ACTION),
-            f"  {_USER_NOTES}  ",
-            _CREATED_AT,
-            authorization_checker=checker,
-        )
+        await audit_logger.log(resource_id=_RUN_ID, request_data=_PLAY_ACTION)
 
+    assert audit_logger.did_log is True
     assert any(
         "Documented interaction" in record.message and _RUN_ID in record.message
         for record in caplog.records
@@ -149,20 +144,20 @@ async def test_maybe_record_documented_interaction_records_audit_when_required(
 
 
 @pytest.mark.asyncio
-async def test_maybe_record_documented_interaction_skips_audit_when_not_required(
+async def test_audit_logger_log_skips_run_action_when_not_required(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """When auth-server does not require notes, no audit entry is recorded."""
+    """When auth-server does not require notes, run-action audit is a no-op."""
     checker = AlwaysAllowedAuthorizationChecker()
+    audit_logger = AuditLogger(
+        user_notes=None,
+        created_at=_CREATED_AT,
+        authorization_checker=checker,
+    )
     with caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER):
-        await maybe_record_documented_interaction(
-            _RUN_ID,
-            RequestModel(data=_PLAY_ACTION),
-            None,
-            _CREATED_AT,
-            authorization_checker=checker,
-        )
+        await audit_logger.log(resource_id=_RUN_ID, request_data=_PLAY_ACTION)
 
+    assert audit_logger.did_log is True
     assert not any(
         "Documented interaction" in record.message for record in caplog.records
     )
@@ -170,11 +165,16 @@ async def test_maybe_record_documented_interaction_skips_audit_when_not_required
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("action_type", [RunActionType.PLAY, RunActionType.PAUSE])
-async def test_maybe_record_documented_interaction_raises_when_notes_required_but_missing(
+async def test_audit_logger_log_raises_when_notes_required_but_missing(
     action_type: RunActionType,
 ) -> None:
     """Run actions without audit notes header are rejected when auth-server requires them."""
     checker = AlwaysAllowedAuthorizationChecker()
+    audit_logger = AuditLogger(
+        user_notes=None,
+        created_at=_CREATED_AT,
+        authorization_checker=checker,
+    )
     with (
         patch.object(
             checker,
@@ -183,39 +183,7 @@ async def test_maybe_record_documented_interaction_raises_when_notes_required_bu
         ),
         pytest.raises(MissingUserNotesError),
     ):
-        await maybe_record_documented_interaction(
-            _RUN_ID,
-            RequestModel(data=RunActionCreate(actionType=action_type)),
-            None,
-            _CREATED_AT,
-            authorization_checker=checker,
+        await audit_logger.log(
+            resource_id=_RUN_ID,
+            request_data=RunActionCreate(actionType=action_type),
         )
-
-
-@pytest.mark.asyncio
-async def test_maybe_record_documented_interaction_records_protocol_upload_audit(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Forwards header notes and request data to the checker."""
-    checker = AlwaysAllowedAuthorizationChecker()
-    request_data = {"protocolKind": "standard", "fileCount": 2}
-    with (
-        patch.object(
-            checker,
-            "get_require_reason_for_interaction_enabled",
-            new=AsyncMock(return_value=True),
-        ),
-        caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER),
-    ):
-        await maybe_record_documented_interaction(
-            "protocol-1",
-            RequestModel(data=request_data),
-            _USER_NOTES,
-            _CREATED_AT,
-            authorization_checker=checker,
-        )
-
-    assert any(
-        "Documented interaction" in record.message and "protocol-1" in record.message
-        for record in caplog.records
-    )
