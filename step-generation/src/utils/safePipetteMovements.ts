@@ -46,6 +46,7 @@ import type {
   LabwareEntity,
   ModuleEntities,
   PipetteEntity,
+  PipetteMovementSafetyStatus,
   Point,
   RobotState,
   TipState,
@@ -218,13 +219,13 @@ const getHighestZInSlot = (
 }
 
 //  check if the slot overlaps with the pipette position
-const getSlotHasPotentialCollidingObject = (
+const getSlotPotentialCollidingObject = (
   pipetteBounds: Point[],
   slotInfo: SlotInfo[],
   robotState: RobotState,
   invariantContext: InvariantContext,
   robotType: RobotType
-): boolean => {
+): { addressableAreaCausingCollision: AddressableArea } | null => {
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
@@ -258,12 +259,15 @@ const getSlotHasPotentialCollidingObject = (
         robotType
       )
 
-      if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
-        return true
+      if (
+        highestZInSurroundingSlot >= pipetteBounds[0]?.z &&
+        slot.addressableArea != null
+      ) {
+        return { addressableAreaCausingCollision: slot.addressableArea }
       }
     }
   }
-  return false
+  return null
 }
 
 const getWillCollideWithThermocyclerLid = (
@@ -309,7 +313,7 @@ const getWellPosition = (
 }
 
 //  util to use in step-generation for if the pipette movement is safe
-export const getIsSafePipetteMovement = (args: {
+export const getPipetteMovementSafetyStatus = (args: {
   robotState: RobotState
   invariantContext: InvariantContext
   pipetteId: string
@@ -319,7 +323,7 @@ export const getIsSafePipetteMovement = (args: {
   tiprackId?: string
   primaryNozzle: PrimaryNozzleConfigurationStyle
   nozzleConfiguration: NozzleConfigurationStyle
-}): boolean => {
+}): PipetteMovementSafetyStatus => {
   const {
     robotState,
     invariantContext,
@@ -341,6 +345,11 @@ export const getIsSafePipetteMovement = (args: {
 
   const pipetteEntity = pipetteEntities[pipetteId]
 
+  // if pipette entity is not found, return safe, since the responsibility of this function is to check if the pipette movement is safe, not to check if the pipette exists
+  if (pipetteEntity == null) {
+    return { isSafe: true }
+  }
+
   const { spec: pipetteSpecs } = pipetteEntity
   const { channels } = pipetteSpecs
 
@@ -356,7 +365,7 @@ export const getIsSafePipetteMovement = (args: {
     wellTargetName == null ||
     channels === 1
   ) {
-    return true
+    return { isSafe: true }
   }
   // If tiprackId is explicitly provided, assume the pipette currently has a tip attached.
   // This is used in WellSelector.ts / getAllWellsSafetyStatus to force "tip present"
@@ -434,7 +443,7 @@ export const getIsSafePipetteMovement = (args: {
     robotType,
   })
   if (!isWithinPipetteExtents) {
-    return false
+    return { isSafe: false, reason: { type: 'outsidePipetteExtents' } }
   }
   const surroundingSlots =
     robotType === OT2_ROBOT_TYPE
@@ -448,19 +457,35 @@ export const getIsSafePipetteMovement = (args: {
       position,
     }
   })
-  return (
-    !getWillCollideWithThermocyclerLid(
+  if (
+    getWillCollideWithThermocyclerLid(
       pipetteBoundsAtWellLocation,
       moduleEntities
-    ) &&
-    !getSlotHasPotentialCollidingObject(
-      pipetteBoundsAtWellLocation,
-      slotInfos,
-      robotState,
-      invariantContext,
-      robotType
     )
+  ) {
+    return {
+      isSafe: false,
+      reason: { type: 'thermocyclerLidCollision' },
+    }
+  }
+  const slotPotentialCollidingObject = getSlotPotentialCollidingObject(
+    pipetteBoundsAtWellLocation,
+    slotInfos,
+    robotState,
+    invariantContext,
+    robotType
   )
+  if (slotPotentialCollidingObject != null) {
+    return {
+      isSafe: false,
+      reason: {
+        type: 'adjacentAdressableAreaCollision',
+        addressableAreaCausingCollision:
+          slotPotentialCollidingObject.addressableAreaCausingCollision,
+      },
+    }
+  }
+  return { isSafe: true }
 }
 
 interface TipPickupAvailability {

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Iterator, List, Optional, Sequence, Union, cast
+from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Union, cast
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -42,6 +42,7 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
     requires_version,
 )
+from opentrons.types import ModuleFixtureLocation
 
 from . import (
     validation,
@@ -1864,3 +1865,110 @@ class VacuumModuleContext(ModuleContext):
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
+
+    @property
+    @requires_version(2, 28)
+    def manifold_dock(self) -> ModuleFixtureLocation:
+        base_slot = self._core.get_deck_slot().id
+        area_name = f"{self.model}Dock{base_slot[0]}4"
+        return ModuleFixtureLocation(addressable_area_name=area_name)
+
+    @requires_version(2, 28)
+    def load_adapter_to_dock(
+        self,
+        name: str,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load a collar adapter to the vacuum module dock."""
+
+        labware_core = self._protocol_core.load_adapter(
+            load_name=name,
+            namespace=namespace,
+            version=version,
+            location=self.manifold_dock,
+        )
+
+        if isinstance(self._core, LegacyModuleCore) and isinstance(
+            labware_core, LegacyLabwareCore
+        ):
+            adapter = self._core.add_labware_core(labware_core)
+        else:
+            adapter = Labware(
+                core=labware_core,
+                api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
+            )
+
+        self._core_map.add(labware_core, adapter)
+
+        return adapter
+
+    @requires_version(2, 28)
+    def move_to_dock(
+        self,
+        labware: Labware,
+        use_gripper: bool = False,
+        pick_up_offset: Optional[Mapping[str, float]] = None,
+        drop_offset: Optional[Mapping[str, float]] = None,
+    ) -> None:
+        _pick_up_offset = (
+            validation.ensure_valid_labware_offset_vector(pick_up_offset)
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            validation.ensure_valid_labware_offset_vector(drop_offset)
+            if drop_offset
+            else None
+        )
+        self._protocol_core.move_labware(
+            labware._core,
+            new_location=self.manifold_dock,
+            use_gripper=use_gripper,
+            pause_for_manual_move=True,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
+        )
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_start_set_vacuum_pressure)
+    def start_set_vacuum_pressure(
+        self,
+        gauge_pressure_mbar: float,
+        duration_s: Optional[int] = None,
+        ramp_rate: Optional[float] = None,
+        timeout_s: Optional[int] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        self._core.start_set_vacuum_pressure(
+            gauge_pressure_mbar=gauge_pressure_mbar,
+            duration=duration_s,
+            ramp_rate=ramp_rate,
+            timeout_s=timeout_s,
+            vent_after=vent_after,
+        )
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_start_set_vacuum_power)
+    def start_set_vacuum_power(
+        self,
+        percent_power: int,
+        duration_s: Optional[int] = None,
+        ramp_rate: Optional[float] = None,
+        timeout_s: Optional[int] = None,
+        vent_after: Optional[bool] = None,
+    ) -> None:
+        self._core.start_set_vacuum_power(
+            percent_power=percent_power,
+            duration=duration_s,
+            ramp_rate=ramp_rate,
+            timeout_s=timeout_s,
+            vent_after=vent_after,
+        )
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_stop_vacuum)
+    def stop_vacuum_pump(self) -> None:
+        self._core.stop_vacuum()

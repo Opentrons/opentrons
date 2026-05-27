@@ -404,7 +404,8 @@ function PrepareToRun({
     areFixturesReady &&
     !isAnyNecessaryDefaultOffsetMissing &&
     isCameraReadyToRun
-  const onPlay = (): void => {
+
+  const onPlay = async (): Promise<void> => {
     if (doorStatus.isDoorOpen) {
       if (
         doorStatus.moduleDoorLocation !== null &&

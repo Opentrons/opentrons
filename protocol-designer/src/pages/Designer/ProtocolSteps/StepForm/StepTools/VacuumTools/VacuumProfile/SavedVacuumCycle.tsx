@@ -28,6 +28,7 @@ export function SavedVacuumCycle(props: SavedVacuumCycleProps): JSX.Element {
     onEdit,
     onDelete,
     onDeleteStep,
+    repetitions,
   } = props
   const { t } = useTranslation('protocol_steps')
 
@@ -39,7 +40,9 @@ export function SavedVacuumCycle(props: SavedVacuumCycleProps): JSX.Element {
             <div className={styles.flex_row_gap_24}>
               <Tag text={displayIndex} type="default" shrinkToContent />
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('vacuum.controls.profile.cycle')}
+                {t('vacuum.controls.profile.cycle_repetitions', {
+                  repetitions,
+                })}
               </StyledText>
             </div>
             <div className={styles.flex_row_gap_8}>

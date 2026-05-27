@@ -6,7 +6,7 @@ from starlette import status
 from opentrons import types as ot_types
 from opentrons.calibration_storage.ot2 import models, pipette_offset
 from opentrons.hardware_control import API
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from robot_server.errors.error_responses import ErrorBody

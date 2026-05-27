@@ -26,14 +26,14 @@ class InvalidInputError(ValueError):
 
 
 def _validate_fields(
-    user_name: str | None = None,
+    username: str | None = None,
     password: str | None = None,
     full_name: str | None = None,
     account_type: str | None = None,
 ) -> None:
     """Validate that provided fields are non-empty and passwords meet length requirements."""
     for field_name, value in [
-        ("userName", user_name),
+        ("username", username),
         ("password", password),
         ("fullName", full_name),
         ("accountType", account_type),
@@ -61,7 +61,7 @@ class UserDataManager:
         account_type = AccountType(user.account_type)
 
         return UserResponse(
-            userName=user.username,
+            username=user.username,
             fullName=user.full_name,
             accountType=account_type,
             scopes=sorted(
@@ -75,14 +75,14 @@ class UserDataManager:
         """Insert default placeholder users if they don't already exist."""
         defaults = [
             User(
-                username="test_admin",
-                hashed_password=password_hash.hash("test_admin_password"),
+                username="testadmin",
+                hashed_password=password_hash.hash("testadminpassword"),
                 full_name="Test Admin",
                 account_type=AccountType.ADMIN,
             ),
             User(
-                username="test_user",
-                hashed_password=password_hash.hash("test_user_password"),
+                username="testuser",
+                hashed_password=password_hash.hash("testuserpassword"),
                 full_name="Test User",
                 account_type=AccountType.USER,
             ),
@@ -98,7 +98,7 @@ class UserDataManager:
     ) -> UserResponse:
         """Validate inputs, check for duplicates, and create a new user."""
         _validate_fields(
-            user_name=username,
+            username=username,
             password=password,
             full_name=full_name,
             account_type=account_type,
@@ -139,7 +139,7 @@ class UserDataManager:
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
         _validate_fields(
-            user_name=new_username,
+            username=new_username,
             password=new_password,
             full_name=new_full_name,
             account_type=new_account_type,

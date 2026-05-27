@@ -11,7 +11,7 @@ hide: toc
 ![Heater-Shaker hero image](images/heater-shaker-hero.png)
 
 **Opentrons Labworks Inc.**<br>
-May 2024
+April 2026
 
 </div>
 

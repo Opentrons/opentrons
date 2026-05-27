@@ -5,6 +5,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { OPENTRONS_USB, UNREACHABLE } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import {
   getRobotUpdateSession,
   robotUpdateIgnored,
@@ -36,6 +37,7 @@ const UpdateBuildroot = NiceModal.create(
     const robotName = useRef<string>(robot?.name ?? '')
     const dispatch = useDispatch<Dispatch>()
     const session = useSelector(getRobotUpdateSession)
+    const token = useAccessTokenForRobot(robot?.name ?? null)
     if (!hasSeenSessionOnce.current && session) {
       hasSeenSessionOnce.current = true
     }
@@ -71,6 +73,7 @@ const UpdateBuildroot = NiceModal.create(
           requestor={
             robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
           }
+          token={token}
         >
           <RobotUpdateProgressModal
             robotName={robotName.current}

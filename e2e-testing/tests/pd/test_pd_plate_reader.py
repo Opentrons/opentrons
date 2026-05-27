@@ -104,7 +104,7 @@ def test_flex_onboarding_workflow(page: Page, pd_base_url: str) -> None:
     landing = LandingPage(page)
     landing.wait_for_page_load()
     landing.confirm_welcome_modal()
-    # Click "Create a protocol" to start onboarding
+    # Click "Create a Flex protocol" to start onboarding
     landing.click_create_protocol()
     # Part 1: Add pipette - Click "Add a pipette" to open selector
     page.get_by_text("Add a pipette").click()

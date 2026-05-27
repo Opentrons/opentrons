@@ -1,0 +1,362 @@
+import { useRef, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
+import {
+  ALIGN_CENTER,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  SPACING,
+  StepMeter,
+  TouchInputField,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { SmallButton } from '/app/atoms/buttons'
+import {
+  AlphanumericKeyboard,
+  getInvalidCharForKeyboard,
+  shouldAcceptKeyboardInput,
+} from '/app/atoms/SoftwareKeyboard'
+import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
+import {
+  getConnectableRobots,
+  getLocalRobot,
+  getReachableRobots,
+  getUnreachableRobots,
+  removeRobot,
+} from '/app/redux/discovery'
+
+import type { FieldError, Resolver } from 'react-hook-form'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { UpdatedRobotName } from '@opentrons/api-client'
+import type { Dispatch, State } from '/app/redux/types'
+
+const MAX_LENGTH = 17
+
+interface FormValues {
+  newRobotName: string
+}
+
+export function RobotNameEditor(): JSX.Element {
+  const { t } = useTranslation(['device_settings', 'shared'])
+  const navigate = useNavigate()
+  const trackEvent = useTrackEvent()
+  const localRobot = useSelector(getLocalRobot)
+  const ipAddress = localRobot?.ip
+  const previousName = localRobot?.name != null ? localRobot.name : null
+  const [newName, setNewName] = useState<string>('')
+  const [isShowConfirmRobotName, setIsShowConfirmRobotName] =
+    useState<boolean>(false)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const dispatch = useDispatch<Dispatch>()
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
+  const connectableRobots = useSelector((state: State) =>
+    getConnectableRobots(state)
+  )
+  const reachableRobots = useSelector((state: State) =>
+    getReachableRobots(state)
+  )
+  const unreachableRobots = useSelector((state: State) =>
+    getUnreachableRobots(state)
+  )
+
+  const validate = (
+    data: FormValues,
+    errors: Record<string, FieldError>
+  ): Record<string, FieldError> => {
+    const newName = data.newRobotName
+    let errorMessage: string | undefined
+    // In ODD users cannot input letters and numbers from software keyboard
+    // so the app only checks the length of input string
+    if (newName.length < 1 || newName.length > MAX_LENGTH) {
+      errorMessage = t('name_rule_error_name_length')
+    }
+
+    if (
+      [...connectableRobots, ...reachableRobots].some(
+        robot => newName === robot.name && robot.ip !== ipAddress
+      )
+    ) {
+      errorMessage = t('name_rule_error_exist')
+    }
+
+    const updatedErrors =
+      errorMessage != null
+        ? {
+            ...errors,
+            newRobotName: {
+              type: 'error',
+              message: errorMessage,
+            },
+          }
+        : errors
+    return updatedErrors
+  }
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validate(values, errors)
+    return { values, errors }
+  }
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+    trigger,
+    watch,
+  } = useForm({
+    defaultValues: {
+      newRobotName: '',
+    },
+    resolver,
+  })
+
+  const newRobotName = watch('newRobotName')
+  const invalidChar = getInvalidCharForKeyboard(newRobotName, 'alphanumeric')
+
+  const onSubmit = (data: FormValues): void => {
+    const newName = data.newRobotName
+    const sameNameRobotInUnavailable = unreachableRobots.find(
+      robot => robot.name === newName
+    )
+    if (sameNameRobotInUnavailable != null) {
+      dispatch(removeRobot(sameNameRobotInUnavailable.name))
+    }
+    updateRobotName(newName)
+    reset({ newRobotName: '' })
+  }
+
+  const { updateRobotName, isLoading: isNaming } = useUpdateRobotNameMutation({
+    onSuccess: (data: UpdatedRobotName) => {
+      if (data.name != null) {
+        setNewName(data.name)
+        if (!isUnboxingFlowOngoing) {
+          navigate('/robot-settings')
+        } else {
+          setIsShowConfirmRobotName(true)
+        }
+        if (previousName != null) {
+          dispatch(removeRobot(previousName))
+        }
+      }
+    },
+    onError: (error: Error) => {
+      console.error('error', error.message)
+    },
+  })
+
+  const handleConfirm = async (): Promise<void> => {
+    await trigger('newRobotName')
+
+    // check robot name in the same network
+    trackEvent({
+      name: ANALYTICS_RENAME_ROBOT,
+      properties: {
+        previousRobotName: previousName,
+        newRobotName,
+        robotType: FLEX_ROBOT_TYPE,
+      },
+    })
+    void handleSubmit(onSubmit)()
+  }
+
+  return (
+    <>
+      {isShowConfirmRobotName && isUnboxingFlowOngoing ? (
+        <ConfirmRobotName robotName={newName} />
+      ) : (
+        <>
+          {isUnboxingFlowOngoing ? (
+            <StepMeter totalSteps={6} currentStep={5} />
+          ) : null}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            paddingY={SPACING.spacing32}
+            paddingX={SPACING.spacing40}
+          >
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              justifyContent={
+                isUnboxingFlowOngoing ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
+              }
+              position={POSITION_RELATIVE}
+            >
+              <Flex position={POSITION_ABSOLUTE} left="0">
+                <Btn
+                  data-testid="name_back_button"
+                  onClick={() => {
+                    if (isUnboxingFlowOngoing) {
+                      navigate('/emergency-stop')
+                    } else {
+                      navigate('/robot-settings')
+                    }
+                  }}
+                >
+                  <Icon name="back" size="3rem" color={COLORS.black90} />
+                </Btn>
+              </Flex>
+              <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
+                <LegacyStyledText
+                  forwardedAs="h2"
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
+                  {isUnboxingFlowOngoing
+                    ? t('name_your_robot')
+                    : t('rename_robot')}
+                </LegacyStyledText>
+              </Flex>
+              <Flex position={POSITION_ABSOLUTE} right="0">
+                {Boolean(isNaming) ? (
+                  <Icon
+                    name="ot-spinner"
+                    size="1.25rem"
+                    spin
+                    marginRight={SPACING.spacing8}
+                  />
+                ) : (
+                  <SmallButton
+                    buttonText={t('shared:confirm')}
+                    buttonCategory="rounded"
+                    onClick={handleConfirm}
+                  />
+                )}
+              </Flex>
+            </Flex>
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            paddingX={SPACING.spacing40}
+            height="15.125rem"
+            paddingTop={isUnboxingFlowOngoing ? undefined : SPACING.spacing80}
+          >
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginBottom={SPACING.spacing8}
+              paddingX={SPACING.spacing60}
+              width="100%"
+            >
+              {isUnboxingFlowOngoing ? (
+                <LegacyStyledText
+                  forwardedAs="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  color={COLORS.grey60}
+                  marginBottom={SPACING.spacing24}
+                >
+                  {t('name_your_robot_description')}
+                </LegacyStyledText>
+              ) : null}
+              <Controller
+                control={control}
+                name="newRobotName"
+                render={({ field, fieldState }) => (
+                  <TouchInputField
+                    autoFocus
+                    data-testid="name-robot_input"
+                    id="newRobotName"
+                    name="newRobotName"
+                    type="text"
+                    value={field.value}
+                    error={fieldState.error?.message && ''}
+                    textAlign={TYPOGRAPHY.textAlignCenter}
+                    onBlur={e => {
+                      e.target.focus()
+                    }}
+                    onChange={e => {
+                      const newVal = e.target.value
+                      if (
+                        !shouldAcceptKeyboardInput(
+                          newVal,
+                          newRobotName,
+                          'alphanumeric'
+                        )
+                      ) {
+                        field.onChange(newRobotName)
+                        return
+                      }
+                      field.onChange(newVal)
+                      setNewName(newVal)
+                      void trigger('newRobotName')
+                    }}
+                  />
+                )}
+              />
+            </Flex>
+            <LegacyStyledText
+              forwardedAs="p"
+              color={COLORS.grey60}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+            >
+              {t('name_rule_description')}
+            </LegacyStyledText>
+            {invalidChar != null ? (
+              <LegacyStyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                color={COLORS.red50}
+              >
+                {t('shared:character_not_supported', { char: invalidChar })}
+              </LegacyStyledText>
+            ) : errors.newRobotName != null ? (
+              <LegacyStyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                color={COLORS.red50}
+              >
+                {errors.newRobotName.message}
+              </LegacyStyledText>
+            ) : null}
+          </Flex>
+
+          <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
+            <Controller
+              control={control}
+              name="newRobotName"
+              render={({ field }) => (
+                <AlphanumericKeyboard
+                  onChange={(input: string) => {
+                    if (
+                      !shouldAcceptKeyboardInput(
+                        input,
+                        newRobotName,
+                        'alphanumeric'
+                      )
+                    ) {
+                      keyboardRef.current?.setInput(newRobotName)
+                      return
+                    }
+                    field.onChange(input)
+                    setNewName(input)
+                    void trigger('newRobotName')
+                  }}
+                  keyboardRef={keyboardRef}
+                  value={newRobotName}
+                />
+              )}
+            />
+          </Flex>
+        </>
+      )}
+    </>
+  )
+}

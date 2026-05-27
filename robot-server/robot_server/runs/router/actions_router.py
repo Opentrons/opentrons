@@ -1,13 +1,12 @@
 """Router for /runs actions endpoints."""
 
-import logging
 from datetime import datetime
 from typing import Annotated, Literal, Union
 
 from fastapi import Depends, status
 
 from opentrons.protocol_engine.types import DeckConfigurationType
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
@@ -28,6 +27,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.fastapi_dependencies import maybe_record_documented_interaction
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
 )
@@ -44,7 +44,6 @@ from robot_server.service.notifications import (
 )
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
-log = logging.getLogger(__name__)
 actions_router = LightRouter()
 
 
@@ -106,7 +105,10 @@ async def get_run_controller(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(maybe_record_documented_interaction),
+    ],
 )
 async def create_run_action(
     runId: str,
@@ -131,16 +133,15 @@ async def create_run_action(
     Arguments:
         runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
-        run_orchestrator_store: Dependency to fetch the engine store.
         run_controller: Run controller bound to the given run ID.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
-        maintenance_run_orchestrator_store: The maintenance run's EngineStore
-        deck_configuration_store: The deck configuration store
+        maintenance_run_orchestrator_store: Maintenance run orchestrator store.
+        deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        deck_configuration_store: Dependency to fetch the deck configuration.
     """
-    action_type = request_body.data.actionType
+    body = request_body.data
+    action_type = body.actionType
     if (
         action_type == RunActionType.PLAY
         and maintenance_run_orchestrator_store.current_run_id is not None
@@ -150,6 +151,7 @@ async def create_run_action(
         deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
+
         action = run_controller.create_action(
             action_id=action_id,
             action_type=action_type,

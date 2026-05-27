@@ -23,6 +23,7 @@ import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   OT2_ROBOT_TYPE,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 
 import {
@@ -49,6 +50,7 @@ import {
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
+  VACUUM_DOCK_LOCATION,
   ZERO_OFFSET,
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -1115,6 +1117,20 @@ export const getModuleIdFromRobotStateStack = (
   return stack?.find(id => modules[id] != null) ?? null
 }
 
+const _getMappedLocation = (
+  slot: string,
+  isOnVacuumDock: boolean,
+  isOnHopper: boolean
+): string => {
+  if (isOnVacuumDock) {
+    return slot
+  }
+  if (isOnHopper) {
+    return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  }
+  return slot
+}
+
 /**
  * Get the full stack in a slot given labware state
  * If the slot is offDeck, the offDeckOverrideId must be provided to override the offDeck slot,
@@ -1137,21 +1153,29 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
+  const isOnVacuumDock = getIsSlotAVacuumDock(slot)
   const isOnHopper = getIsSlotAHopper(slot)
-  const mappedLocation = isOnHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+  const mappedLocation = _getMappedLocation(slot, isOnVacuumDock, isOnHopper)
   const labwareStack = Object.values(labware).filter(
     lw =>
       lw.stack.includes(mappedLocation) &&
       (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
-      lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
+      lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
+      lw.stack.includes(VACUUM_DOCK_LOCATION) === isOnVacuumDock
   )
+  if (labwareStack.length === 0) {
+    return []
+  }
+
   if (isOnHopper) {
-    return labwareStack.reverse()[0].stack ?? []
+    return labwareStack.at(-1)?.stack ?? []
+  }
+  if (isOnVacuumDock) {
+    return labwareStack.at(-1)?.stack ?? []
   }
   return (
-    labwareStack.sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+    labwareStack.toSorted((a, b) => b.stack.length - a.stack.length)[0]
+      ?.stack ?? []
   )
 }
 
@@ -1510,6 +1534,10 @@ export const getLabwareIdOnHopper = (
 
 export const getIsSlotAHopper = (slot: string): boolean => {
   return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getIsSlotAVacuumDock = (slot: string): boolean => {
+  return slot === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
 }
 
 export const getLabwareIdOnShuttle = (

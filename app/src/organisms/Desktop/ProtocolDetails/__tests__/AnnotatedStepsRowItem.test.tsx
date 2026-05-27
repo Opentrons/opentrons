@@ -25,8 +25,11 @@ describe('AnnotatedStepsRowItem', () => {
     allRunDefs: [],
     scrollTargetId: null,
     listElement: null,
+    listViewportHeight: 0,
     onShowErrorDetails: vi.fn(),
     t: (key: string) => key,
+    milliSecondsPerFrame: 2000,
+    isGlobalPlaying: false,
   }
 
   const buildProps = (

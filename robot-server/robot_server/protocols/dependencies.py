@@ -2,11 +2,11 @@
 
 from asyncio import Lock as AsyncLock
 from pathlib import Path
+from typing import Annotated
 
 from anyio import Path as AsyncPath
 from fastapi import Depends
 from sqlalchemy.engine import Engine as SQLEngine
-from typing_extensions import Annotated
 
 from opentrons.protocol_reader import FileHasher, FileReaderWriter, ProtocolReader
 from server_utils.fastapi_utils.app_state import (
@@ -18,6 +18,7 @@ from server_utils.fastapi_utils.app_state import (
 from .analyses_manager import AnalysesManager
 from .analysis_store import AnalysisStore
 from .protocol_auto_deleter import ProtocolAutoDeleter
+from .protocol_models import ProtocolKind
 from .protocol_store import (
     ProtocolStore,
 )
@@ -27,7 +28,6 @@ from robot_server.persistence.fastapi_dependencies import (
     get_sql_engine,
 )
 from robot_server.persistence.file_and_directory_names import PROTOCOLS_DIRECTORY
-from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.runs.dependencies import get_run_process_pyro_provider
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.task_runner import TaskRunner, get_task_runner

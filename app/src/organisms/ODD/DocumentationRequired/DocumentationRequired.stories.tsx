@@ -6,7 +6,7 @@ import { VIEWPORT } from '@opentrons/components'
 
 import { configReducer } from '/app/redux/config/reducer'
 
-import { DocumentationRequired as DocumentationRequiredComponent } from '.'
+import { DocumentationRequired as DocumentationRequiredComponent } from './DocumentationRequired'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
@@ -43,7 +43,8 @@ type Story = StoryObj<typeof DocumentationRequiredComponent>
 
 export const DocumentationRequired: Story = {
   args: {
-    userName: 'John Doe',
+    username: 'John Doe',
     onBack: action('onBack'),
+    onConfirm: action('onConfirm'),
   },
 }

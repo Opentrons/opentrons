@@ -5,18 +5,14 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
-from server_utils.fastapi_utils.models.json_api.request import RequestModel
+from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
-from robot_server.runs.action_models import (
-    RunAction,
-    RunActionCreate,
-    RunActionType,
-)
+from robot_server.runs.action_models import RunAction, RunActionCreate, RunActionType
 from robot_server.runs.router.actions_router import create_run_action
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
@@ -39,7 +35,9 @@ async def test_create_run_action(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = RequestModel[RunActionCreate](
+        data=RunActionCreate(actionType=action_type),
+    )
     expected_result = RunAction(
         id="some-action-id",
         createdAt=created_at,
@@ -84,7 +82,9 @@ async def test_play_action_clears_maintenance_run(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = RequestModel[RunActionCreate](
+        data=RunActionCreate(actionType=action_type),
+    )
     expected_result = RunAction(
         id="some-action-id",
         createdAt=created_at,
@@ -142,7 +142,9 @@ async def test_create_play_action_not_allowed(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = RequestModel[RunActionCreate](
+        data=RunActionCreate(actionType=action_type),
+    )
 
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()

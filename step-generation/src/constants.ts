@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -162,6 +163,14 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   C4: 'hopperC4',
   D4: 'hopperD4',
 }
+
+// Vacuum dock location marker (used in labware stack to indicate labware is on vacuum dock)
+// TODO (nd: 05/21/2026): refactor this; we should be able to rely simply on the actual dock addressable area name
+export const VACUUM_DOCK_LOCATION = 'vacuumDock'
+
+// The actual addressable area for the vacuum dock (re-exported for convenience)
+export const VACUUM_DOCK_ADDRESSABLE_AREA =
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
 
 export const VACUUM_VENT_OPEN: 'open' = 'open'
 export const VACUUM_VENT_CLOSED: 'closed' = 'closed'

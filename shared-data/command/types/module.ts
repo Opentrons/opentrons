@@ -374,14 +374,20 @@ export interface TCProfileParams {
 // Vacuum Profile params (not finalized) (nd, 2026-04-23)
 export interface AtomicVacuumProfileStepBase {
   holdSeconds: number
+  enablePump: boolean
+  holdTimeSeconds?: number
+  holdTimeMinutes?: number
+  rampRate?: number
+  timeoutSeconds?: number
+  ventAfter?: boolean
 }
 
 export interface AtomicVacuumProfileStepPressure extends AtomicVacuumProfileStepBase {
-  pressureMbar: number
+  gaugePressureMbar: number
 }
 
 export interface AtomicVacuumProfileStepPower extends AtomicVacuumProfileStepBase {
-  powerPercent: number
+  percentPower: number
 }
 
 export type AtomicVacuumProfileStep =
@@ -391,13 +397,14 @@ export type AtomicVacuumProfileStep =
 export interface VacuumProfileCycle {
   steps: AtomicVacuumProfileStep[]
   repetitions: number
+  ventAfter?: boolean
 }
 
 export type VacuumProfile = Array<VacuumProfileCycle | AtomicVacuumProfileStep>
 export interface VacuumRunProfileParams {
   moduleId: string
   profile: VacuumProfile
-  taskId?: string | null
+  taskId?: string
   ventAfter?: boolean
 }
 
