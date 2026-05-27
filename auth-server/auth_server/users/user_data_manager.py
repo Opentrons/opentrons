@@ -1,9 +1,10 @@
 """User data manager – business logic between the router and the store."""
 
+import secrets
+import string
 from typing import Literal
 
 from pwdlib import PasswordHash
-from server_utils.password_generation import generate_temporary_password
 
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
@@ -20,6 +21,23 @@ from auth_server.users.store import UserStore
 password_hash = PasswordHash.recommended()
 
 _DEFAULT_MIN_PASSWORD_LENGTH = 8
+_ALPHANUMERIC = string.ascii_letters + string.digits
+_PASSWORD_SPECIAL_CHARACTERS = string.punctuation
+
+
+def _generate_temporary_password(
+    min_length: int, require_special_characters: bool
+) -> str:
+    """Generate a random password that satisfies the given complexity rules."""
+    if not require_special_characters:
+        return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
+
+    special = secrets.choice(_PASSWORD_SPECIAL_CHARACTERS)
+    alphanumeric = "".join(
+        secrets.choice(_ALPHANUMERIC) for _ in range(min_length - 1)
+    )
+    position = secrets.randbelow(min_length)
+    return alphanumeric[:position] + special + alphanumeric[position:]
 
 
 def _temporary_password_requirements(
@@ -195,8 +213,8 @@ class UserDataManager:
         min_length, require_special = _temporary_password_requirements(
             self._settings_store.get_settings()
         )
-        temporary_password = generate_temporary_password(
-            min_length, require_special_characters=require_special
+        temporary_password = _generate_temporary_password(
+            min_length, require_special
         )
         try:
             updated_user = self._user_store.update(

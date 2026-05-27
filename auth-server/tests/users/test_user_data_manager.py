@@ -13,6 +13,7 @@ from auth_server.users.user_data_manager import (
     UserAlreadyExistsError,
     UserDataManager,
     UserNotFoundError,
+    _generate_temporary_password,
     _temporary_password_requirements,
 )
 
@@ -481,6 +482,12 @@ def test_temporary_password_requirements(
     min_length, require_special = _temporary_password_requirements(settings)
     assert min_length == expected_min_length
     assert require_special is expected_require_special
+
+
+def test_generate_temporary_password_meets_complexity_rules() -> None:
+    password = _generate_temporary_password(12, require_special_characters=True)
+    assert len(password) == 12
+    assert any(c in string.punctuation for c in password)
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
