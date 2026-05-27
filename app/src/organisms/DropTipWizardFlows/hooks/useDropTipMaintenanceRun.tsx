@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
-import { useGuardedAction } from '../../../local-resources/access-control'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteData } from '@opentrons/api-client'

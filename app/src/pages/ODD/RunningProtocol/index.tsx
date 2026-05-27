@@ -19,6 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
@@ -52,7 +53,6 @@ import {
   useRunTimestamps,
 } from '/app/resources/runs'
 
-import { useGuardedAction } from '../../../local-resources/access-control'
 import styles from './runningprotocol.module.css'
 
 import type { OnDeviceRouteParams } from '/app/App/types'

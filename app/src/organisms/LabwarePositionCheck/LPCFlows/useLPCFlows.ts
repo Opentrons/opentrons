@@ -7,6 +7,7 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
@@ -15,7 +16,6 @@ import {
   useNotifyRunQuery,
 } from '/app/resources/runs'
 
-import { useMaintenanceRunDocumentation } from '../../../local-resources/access-control'
 import {
   useCompatibleAnalysis,
   useHandleClientAppliedOffsets,

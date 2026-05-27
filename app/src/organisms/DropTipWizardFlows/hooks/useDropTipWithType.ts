@@ -1,8 +1,9 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
 import { useState } from 'react'
 
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+
 import { useDropTipCommandErrors } from '.'
-import { useMaintenanceRunDocumentation } from '../../../local-resources/access-control'
 import { useDropTipCommands } from './useDropTipCommands'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'

@@ -59,9 +59,9 @@ import {
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
-import { DocumentationRequiredModalContext } from '../local-resources/access-control'
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
-import { showDocumentationRequiredModal } from '../organisms/ODD/DocumentationRequired'
+import { showDocumentationRequiredModal } from '../organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {

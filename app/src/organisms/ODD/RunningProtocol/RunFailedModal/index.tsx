@@ -7,10 +7,10 @@ import { LegacyStyledText } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import { OddModal } from '/app/molecules/OddModal'
 import { getHighestPriorityError } from '/app/transformations/runs'
 
-import { useGuardedAction } from '../../../../local-resources/access-control'
 import { ErrorContent } from './ErrorContent'
 import styles from './runfailedmodal.module.css'
 

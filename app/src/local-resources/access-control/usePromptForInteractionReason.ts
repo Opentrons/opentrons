@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useGuardedAction } from './useGuardedAction'
 
-import type { DocumentationState } from '@opentrons/react-api-client'
-import type { DocumentationReport } from './types'
+import type {
+  DocumentationReport,
+  DocumentationState,
+} from '@opentrons/react-api-client'
 
 /**
  * Immediately prompts for the interaction reason and returns a documentation State.

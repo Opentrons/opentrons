@@ -8,8 +8,10 @@ import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isDocumentationReportValid } from './utils'
 
-import type { DocumentationState } from '@opentrons/react-api-client'
-import type { DocumentationReport } from './types'
+import type {
+  DocumentationReport,
+  DocumentationState,
+} from '@opentrons/react-api-client'
 
 /**
  * API for the access-control gate.

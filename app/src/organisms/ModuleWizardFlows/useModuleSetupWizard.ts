@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -12,7 +13,6 @@ import {
 } from '/app/resources/maintenance_runs'
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
-import { useMaintenanceRunDocumentation } from '../../local-resources/access-control'
 import { ACTIONS } from './constants'
 import { useSendIdentifyStacker } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'

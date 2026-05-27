@@ -41,15 +41,13 @@ import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_
 import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
+import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
-import {
-  isDocumentationProvided,
-  usePromptForInteractionReason,
-} from '../../local-resources/access-control'
 import { FLOWS } from './constants'
 import { ExitModal } from './ExitModal'
 import { getIsGantryEmpty } from './utils'

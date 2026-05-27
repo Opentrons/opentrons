@@ -25,7 +25,7 @@ import type { FunctionComponent, ReactNode } from 'react'
 import type ReactRedux from 'react-redux'
 import type * as ApiClient from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { DocumentationReport } from '../types'
+import type { DocumentationReport } from '@opentrons/react-api-client'
 
 /**
  * Integration test to ensure that maintenance runs prompt for interaction reasons correctly.

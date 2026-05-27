@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 
-import type { DocumentationReport } from '/app/local-resources/access-control'
+import type { DocumentationReport } from '@opentrons/react-api-client'
 
 export interface DocumentationRequiredModalContextType {
   showDocumentationRequiredModal: (

@@ -16,6 +16,7 @@ import {
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
@@ -24,7 +25,6 @@ import {
 } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
-import { isDocumentationProvided } from '../../local-resources/access-control'
 import {
   BODY_STYLE,
   CALIBRATION_PROBE,

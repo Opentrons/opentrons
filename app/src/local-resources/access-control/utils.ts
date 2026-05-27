@@ -1,5 +1,7 @@
-import type { DocumentationState } from '@opentrons/react-api-client'
-import type { DocumentationReport } from './types'
+import type {
+  DocumentationReport,
+  DocumentationState,
+} from '@opentrons/react-api-client'
 
 export function isDocumentationReportValid(
   docreport: DocumentationReport

@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 import { DocumentationRequiredModalContext } from '../DocumentationRequiredModalContext'
 
 import type { FunctionComponent, ReactNode } from 'react'
-import type { DocumentationReport } from '../types'
+import type { DocumentationReport } from '@opentrons/react-api-client'
 
 export const mockShowDocumentationRequiredModal: (
   username: string

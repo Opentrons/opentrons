@@ -11,8 +11,10 @@ import {
 } from './documentationRequiredModalTestUtils'
 
 import type ReactRedux from 'react-redux'
-import type { DocumentationState } from '@opentrons/react-api-client'
-import type { DocumentationReport } from '../types'
+import type {
+  DocumentationReport,
+  DocumentationState,
+} from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),

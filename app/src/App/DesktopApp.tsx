@@ -35,7 +35,7 @@ import { OPENTRONS_USB } from '/app/redux/discovery'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
-import { DocumentationRequiredModalContext } from '../local-resources/access-control'
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
@@ -43,7 +43,7 @@ import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
 
-import type { DocumentationReport } from '../local-resources/access-control'
+import type { DocumentationReport } from '@opentrons/react-api-client'
 import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {

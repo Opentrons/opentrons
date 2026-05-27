@@ -1,11 +1,10 @@
-import { isDocumentationReportValid } from '/app/local-resources/access-control'
+import { DocumentationReport } from '@opentrons/react-api-client'
+
+import { isDocumentationReportValid } from '/app/local-resources/access-control/utils'
 
 import { showDocumentationRequiredModal } from './DocumentationRequiredModal'
 
-import type {
-  DocumentationReport,
-  DocumentedActionKind,
-} from '/app/local-resources/access-control'
+import type { DocumentedActionKind } from '/app/local-resources/access-control/types'
 
 /**
  * Guard that captures a pops DocumentationRequiredModal and returns the documentation report

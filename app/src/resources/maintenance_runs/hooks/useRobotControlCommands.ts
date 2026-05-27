@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { usePromptForInteractionReason } from '/app/local-resources/access-control'
+import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
 
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'

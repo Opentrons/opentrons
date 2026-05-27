@@ -22,10 +22,17 @@ import type { ComponentProps } from 'react'
 vi.mock('../utils')
 vi.mock('/app/resources/instruments')
 vi.mock('/app/redux/config')
-vi.mock('/app/local-resources/access-control', () => ({
+vi.mock('/app/local-resources/access-control/utils', () => ({
   isDocumentationProvided: vi.fn(() => true),
-  usePromptForInteractionReason: vi.fn(() => ({ accessControlEnabled: false })),
 }))
+vi.mock(
+  '/app/local-resources/access-control/usePromptForInteractionReason',
+  () => ({
+    usePromptForInteractionReason: vi.fn(() => ({
+      accessControlEnabled: false,
+    })),
+  })
+)
 
 const render = (props: ComponentProps<typeof ChoosePipette>) => {
   return renderWithProviders(<ChoosePipette {...props} />, {

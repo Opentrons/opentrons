@@ -19,9 +19,15 @@ import type { PipetteWithTip } from '/app/resources/instruments'
 
 vi.mock('/app/resources/runs/useCloseCurrentRun')
 vi.mock('..')
-vi.mock('/app/local-resources/access-control', () => ({
-  usePromptForInteractionReason: vi.fn(() => ({ accessControlEnabled: false })),
-}))
+vi.mock(
+  '/app/local-resources/access-control/useMaintenanceRunDocumentation',
+  () => ({
+    useMaintenanceRunDocumentation: vi.fn(() => ({
+      commandDocState: { accessControlEnabled: false },
+      deletionDocState: { accessControlEnabled: false },
+    })),
+  })
+)
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
