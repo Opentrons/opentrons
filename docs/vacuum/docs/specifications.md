@@ -30,8 +30,8 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 </figure>
 
 <figure markdown>
-![Vacuum manifold base and related hardware](images/image-placeholder.png "Manifold base and related hardware")
-<figcaption>(1) Vacuum manifold base and fasteners</figcaption>
+![Vacuum manifold base](images/image-placeholder.png "Manifold base")
+<figcaption>(1) Vacuum manifold base</figcaption>
 </figure>
 
 </div>
@@ -48,11 +48,6 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 </figure>
 
 <figure markdown>
-![Spare deck plate screws, M4 x 10](images/image-placeholder.png "Spare deck plate screws")
-<figcaption>(2) Deck plate screws (M4 x 10)</figcaption>
-</figure>
-
-<figure markdown>
 ![USB A-to-B cable](images/usb-ab-cable.png "USB A-to-B cable")
 <figcaption>(1) USB A-B cable</figcaption>
 </figure>
@@ -62,9 +57,18 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 <figcaption>(1) IEC power cable</figcaption>
 </figure>
 
+</div>
+
+<div class="parts-list align-top" markdown>
+
 <figure markdown>
 ![Deck plate adapter](images/deck-adapter-3.png" Deck plate adapter")
 <figcaption>(1) Deck adapter</figcaption>
+</figure>
+
+<figure markdown>
+![Spare deck plate screws, M4 x 10](images/deck-screws.png "Spare deck plate screws"){ width="75%" }
+<figcaption>(2) Deck plate screws (M4 x 10)</figcaption>
 </figure>
 
 </div>
