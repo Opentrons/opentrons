@@ -425,7 +425,7 @@ def test_reset_user_password_uses_password_complexity_settings(
     result = manager.reset_user_password("reset_me")
 
     assert len(result.temporaryPassword) == 12
-    assert any(c in "!@#$%^&*" for c in result.temporaryPassword)
+    assert any(c in string.punctuation for c in result.temporaryPassword)
 
 
 def test_reset_user_password_not_found_raises(
@@ -481,7 +481,7 @@ def test_temporary_password_requirements(
 def test_generate_temporary_password_meets_complexity_rules() -> None:
     password = _generate_temporary_password(12, require_special_characters=True)
     assert len(password) == 12
-    assert any(c in "!@#$%^&*" for c in password)
+    assert any(c in string.punctuation for c in password)
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
