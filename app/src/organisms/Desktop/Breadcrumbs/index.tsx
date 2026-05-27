@@ -144,7 +144,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
   })
 
   return pathCrumbs.length > 1 ? (
-    <div className={clsx(styles.root_container, styles.text_style)}>
+    <div className={styles.root_container}>
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
 

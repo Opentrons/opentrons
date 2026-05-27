@@ -1,5 +1,5 @@
 .root_container {
-  display: flex !important;
+  display: flex;
   flex-direction: row;
   align-items: flex-start;
   padding: var(--spacing-4) 0 var(--spacing-4) var(--spacing-8);
