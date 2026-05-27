@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from playwright.sync_api import Page, expect
 
+from automation.helpers.app_readiness import click_when_ui_ready
 from automation.helpers.screenshot_helper import ScreenshotHelper
 
 
@@ -17,7 +18,7 @@ class ProtocolsPage:
         return self.page.get_by_role("link", name="Protocols")
 
     def navigate_landing(self):
-        self.nav_link.click()
+        click_when_ui_ready(self.page, self.nav_link)
         self.page.wait_for_url("**/protocols**")
         expect(self.nav_link).to_have_attribute("aria-current", "page")
 

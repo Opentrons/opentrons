@@ -8,6 +8,8 @@ import urllib.error
 import urllib.request
 from playwright.sync_api import Browser, Page, Playwright, sync_playwright
 
+from automation.helpers.app_readiness import dismiss_blocking_ui
+
 DEBUG_PORT = 9222
 
 
@@ -114,4 +116,5 @@ def init(*, debug_port: int = DEBUG_PORT, quiet: bool = True) -> Page:
         debug_port=debug_port,
         quiet=quiet,
     )
+    dismiss_blocking_ui(page)
     return page

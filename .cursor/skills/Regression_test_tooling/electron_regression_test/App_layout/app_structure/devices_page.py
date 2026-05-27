@@ -1,5 +1,7 @@
 from playwright.sync_api import Page, expect
 
+from automation.helpers.app_readiness import click_when_ui_ready
+
 
 class DevicesPage:
     def __init__(self, page: Page, *, robot_name: str = "QA1Potato"):
@@ -15,7 +17,7 @@ class DevicesPage:
         return self.page.locator(f"#RobotCard_{self.robot_name}_robotImage")
 
     def navigate(self):
-        self.nav_link.click()
+        click_when_ui_ready(self.page, self.nav_link)
         self.page.wait_for_url("**/devices**")
         expect(self.nav_link).to_have_attribute("aria-current", "page")
         card = self.robot_card

@@ -12,7 +12,7 @@ from playwright.sync_api import Page
 import Open_app
 from App_layout.app_structure.Device_card_helper import DeviceCardHelper
 from App_layout.app_structure.devices_page import DevicesPage
-from setup_usb_or_wifi import RobotConnection
+from setup_usb_or_wifi import DEFAULT_ROBOT_IP, RobotConnection
 
 from check_health import find_opentrons_usb_port
 
@@ -29,18 +29,15 @@ def _connect_robot_for_tests() -> RobotConnection:
         connection("/health")
         return connection
 
-    ip = os.environ.get("ROBOT_IP")
-    if ip:
-        connection = RobotConnection(ip=ip.strip())
-        connection("/health")
-        return connection
-
-    pytest.skip("No robot on USB and ROBOT_IP env var is not set.")
+    ip = os.environ.get("ROBOT_IP", DEFAULT_ROBOT_IP).strip()
+    connection = RobotConnection(ip=ip)
+    connection("/health")
+    return connection
 
 
 @pytest.fixture(scope="session")
 def robot_connection() -> RobotConnection:
-    """Connect to the robot over USB or ROBOT_IP before the app opens the port."""
+    """Connect to the robot over USB or Wi-Fi before the app opens the port."""
     return _connect_robot_for_tests()
 
 

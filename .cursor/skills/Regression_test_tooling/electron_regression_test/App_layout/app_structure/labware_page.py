@@ -4,6 +4,7 @@ from pathlib import Path
 
 from playwright.sync_api import Page, expect
 
+from automation.helpers.app_readiness import click_when_ui_ready
 from automation.helpers.scroll_video_helper import ScrollVideoHelper
 
 
@@ -17,7 +18,7 @@ class LabwarePage:
         return self.page.get_by_role("link", name="Labware", exact=True)
 
     def navigate(self):
-        self.nav_link.click()
+        click_when_ui_ready(self.page, self.nav_link)
         self.page.wait_for_url("**/labware**")
         expect(self.nav_link).to_have_attribute("aria-current", "page")
 

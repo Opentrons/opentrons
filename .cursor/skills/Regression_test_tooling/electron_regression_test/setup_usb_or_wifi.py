@@ -2,7 +2,7 @@
 """Connect to a robot over USB or Wi-Fi.
 
 1. Is the robot on USB? Use serial as an IP substitute.
-2. Otherwise, prompt for the robot IP.
+2. Otherwise, connect over Wi-Fi using ``default_ip`` (or ``DEFAULT_ROBOT_IP``).
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ from check_health import find_opentrons_usb_port, http_get_over_serial  # noqa: 
 
 ROBOT_PORT = 31950
 TIMEOUT = 10.0
+DEFAULT_ROBOT_IP = "10.14.19.233"
 
 
 class RobotConnection:
@@ -54,8 +55,8 @@ class RobotConnection:
         return json.loads(body.decode("utf-8"))
 
 
-def connect_robot() -> RobotConnection:
-    """USB first; otherwise ask for an IP. Returns a callable connection."""
+def connect_robot(default_ip: Optional[str] = None) -> RobotConnection:
+    """USB first; otherwise connect over Wi-Fi. Returns a callable connection."""
     usb_port = find_opentrons_usb_port()
     if usb_port is not None:
         connection = RobotConnection(usb_port=usb_port)
@@ -63,7 +64,7 @@ def connect_robot() -> RobotConnection:
         print(f"Connected over USB ({usb_port})")
         return connection
 
-    ip = input("Enter robot IP address: ").strip()
+    ip = (default_ip or DEFAULT_ROBOT_IP).strip()
     connection = RobotConnection(ip=ip)
     connection("/health")
     print(f"Connected over network ({ip}:{ROBOT_PORT})")

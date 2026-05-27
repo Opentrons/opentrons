@@ -3,15 +3,16 @@ import bootstrap  # noqa: F401
 import Open_app
 from App_layout.app_tests.devices_test import DevicesCardTest
 from App_layout.app_tests.left_panel_nav import LeftPanelNav
-from setup_usb_or_wifi import connect_robot
+from setup_usb_or_wifi import DEFAULT_ROBOT_IP, connect_robot
 
 PROTOCOL_NAME = "Flex Smoke Test - v2.29 - No LLD/meniscus"
 ROBOT_NAME = "QA1Potato"
+IP_address = DEFAULT_ROBOT_IP
 
 
 def main():
     # Connect to robot before the app grabs the USB port
-    robot = connect_robot()
+    robot = connect_robot(default_ip=IP_address)
     if robot.over_usb:
         print("Robot is connected over usb")
         connector = robot.usb_port
