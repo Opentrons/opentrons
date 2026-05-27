@@ -1,3 +1,12 @@
+.root_container {
+  display: flex !important;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: var(--spacing-4) 0 var(--spacing-4) var(--spacing-8);
+  border-bottom: 1px solid var(--grey-30);
+  background-color: var(--white);
+}
+
 .text_style {
   display: -webkit-box;
   overflow: hidden;

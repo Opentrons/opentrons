@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import clsx from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -143,14 +144,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
   })
 
   return pathCrumbs.length > 1 ? (
-    <Flex
-      alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.white}
-      borderBottom={BORDERS.lineBorder}
-      flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}
-      className={styles.text_style}
-    >
+    <div className={clsx(styles.root_container, styles.text_style)}>
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
 
@@ -170,7 +164,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
           </Flex>
         )
       })}
-    </Flex>
+    </div>
   ) : null
 }
 
