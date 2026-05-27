@@ -25,7 +25,6 @@ import type { FunctionComponent, ReactNode } from 'react'
 import type ReactRedux from 'react-redux'
 import type * as ApiClient from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { DocumentationReport } from '@opentrons/react-api-client'
 
 /**
  * Integration test to ensure that maintenance runs prompt for interaction reasons correctly.
@@ -77,8 +76,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
 const HOST_CONFIG: ApiClient.HostConfig = { hostname: 'localhost' }
 const MAINTENANCE_RUN_ID = 'maintenance-run-1'
 
-const MOCK_DOCREPORT: DocumentationReport =
-  'starting pipette attach for QC' as DocumentationReport
+const MOCK_DOCREPORT: ReactApiClient.DocumentationReport =
+  'starting pipette attach for QC' as ReactApiClient.DocumentationReport
 
 /**
  * Simulates the lifecycle of a real maintenance run by composing the same
