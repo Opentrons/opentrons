@@ -190,9 +190,8 @@ async def test_get_vacuum_state(
     get_pressure = types.GCODE.GET_PRESSURE_STATE.build_command()
     connection.send_command.assert_any_call(get_pressure)
     connection.reset_mock()
-
     assert pressure_state == types.VacuumState(
-        400, 988, 989.3, 988.6, 992.5, True, 10, types.VentState.CLOSED, 0
+        400, 988, 989.3, 988.6, 992.5, True, 10, types.VentState.CLOSED
     )
 
     # test idle
@@ -207,7 +206,7 @@ async def test_get_vacuum_state(
     connection.reset_mock()
 
     assert pressure_state == types.VacuumState(
-        0, 0, 989.3, 988.6, 992.5, False, 0, types.VentState.OPENED, 0
+        0, 0, 989.3, 988.6, 992.5, False, 0, types.VentState.OPENED
     )
 
 

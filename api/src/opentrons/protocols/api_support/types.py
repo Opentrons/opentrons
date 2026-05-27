@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import (
     Callable,
-    List,
     Literal,
     NamedTuple,
     Optional,
@@ -74,7 +73,6 @@ class VacuumModuleStepBase(TypedDict, total=False):
     vent_after: bool | None
 
 
-# should get rid of hold_time_minutes in the pe
 class VacuumModulePowerStep(VacuumModuleStepBase):
     percent_power: int | None
 
@@ -83,13 +81,4 @@ class VacuumModulePressureStep(VacuumModuleStepBase):
     gauge_pressure_mbar: int | None
 
 
-class VacuumModuleCycle(TypedDict):
-    steps: List[VacuumModuleSingleStep]
-    repetitions: int
-    vent_after: bool | None
-
-
-VacuumModuleSingleStep = Union[VacuumModulePowerStep, VacuumModulePressureStep]
-VacuumModuleProfileStep = Union[
-    VacuumModulePowerStep, VacuumModulePressureStep, VacuumModuleCycle
-]
+VacuumModuleStep = Union[VacuumModulePowerStep, VacuumModulePressureStep]

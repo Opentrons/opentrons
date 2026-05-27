@@ -18,7 +18,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     TemperatureStatus,
     ThermocyclerStep,
-    VacuumModuleProfileStep,
+    VacuumModuleStep,
 )
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
@@ -583,7 +583,7 @@ class AbstractVacuumModuleCore(
     @abstractmethod
     def start_execute_profile(
         self,
-        steps: List[VacuumModuleProfileStep],
+        steps: List[VacuumModuleStep],
         repetitions: int,
     ) -> AbstractTaskCore:
         """Start a vacuum module profile."""

@@ -39,7 +39,7 @@ from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.protocols.api_support.types import (
     APIVersion,
     ThermocyclerStep,
-    VacuumModuleProfileStep,
+    VacuumModuleStep,
 )
 from opentrons.protocols.api_support.util import (
     APIVersionError,
@@ -1981,8 +1981,8 @@ class VacuumModuleContext(ModuleContext):
     @publish(command=cmds.vacuum_module_start_execute_profile)
     def start_execute_profile(
         self,
-        steps: List[VacuumModuleProfileStep],
-        repetitions: int,
+        steps: List[VacuumModuleStep],
+        repetitions: int = 1,
     ) -> Task:
         """
         Starts a defined Vacuum Module profile and returns a [`Task`][opentrons.protocol_api.Task] representing its concurrent execution.

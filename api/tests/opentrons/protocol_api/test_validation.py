@@ -24,7 +24,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     ThermocyclerStep,
-    VacuumModuleProfileStep,
+    VacuumModuleStep,
 )
 from opentrons.protocol_api import (
     Labware,
@@ -447,56 +447,46 @@ def test_ensure_thermocycler_profile_steps(
         (
             [
                 {
-                    "steps": [
-                        {
-                            "enable_pump": True,
-                            "hold_time_seconds": 15,
-                            "hold_time_minutes": 1,
-                            "ramp_rate": 1.1,
-                            "timeout_seconds": 101,
-                            "vent_after": False,
-                            "percent_power": 89,
-                        },
-                        {
-                            "enable_pump": True,
-                            "hold_time_seconds": 15,
-                            "hold_time_minutes": 1,
-                            "ramp_rate": 1.1,
-                            "timeout_seconds": 101,
-                            "vent_after": False,
-                        },
-                    ],
-                    "repetitions": 2,
+                    "enable_pump": True,
+                    "hold_time_seconds": 15,
+                    "hold_time_minutes": 1,
+                    "ramp_rate": 1.1,
+                    "timeout_seconds": 101,
+                    "vent_after": False,
+                    "percent_power": 89,
+                },
+                {
+                    "enable_pump": True,
+                    "hold_time_seconds": 15,
+                    "hold_time_minutes": 1,
+                    "ramp_rate": 1.1,
+                    "timeout_seconds": 101,
+                    "vent_after": False,
                 },
             ],
             [
                 {
-                    "steps": [
-                        {
-                            "enable_pump": True,
-                            "hold_time_seconds": 75,
-                            "ramp_rate": 1.1,
-                            "timeout_seconds": 101,
-                            "vent_after": False,
-                            "percent_power": 89,
-                        },
-                        {
-                            "enable_pump": True,
-                            "hold_time_seconds": 15,
-                            "hold_time_minutes": 1,
-                            "ramp_rate": 1.1,
-                            "timeout_seconds": 101,
-                            "vent_after": False,
-                        },
-                    ],
-                    "repetitions": 2,
-                }
+                    "enable_pump": True,
+                    "hold_time_seconds": 75,
+                    "ramp_rate": 1.1,
+                    "timeout_seconds": 101,
+                    "vent_after": False,
+                    "percent_power": 89,
+                },
+                {
+                    "enable_pump": True,
+                    "hold_time_seconds": 75,
+                    "ramp_rate": 1.1,
+                    "timeout_seconds": 101,
+                    "vent_after": False,
+                    "gauge_pressure_mbar": None,
+                },
             ],
         )
     ],
 )
 def test_ensure_vacuum_module_profile_steps(
-    steps: List[VacuumModuleProfileStep], expected: List[VacuumModuleProfileStep]
+    steps: List[VacuumModuleStep], expected: List[VacuumModuleStep]
 ) -> None:
     """It should ensure thermocycler profile steps are valid and hold time is expressed in seconds only."""
     result = subject.ensure_vacuum_module_profile(steps)

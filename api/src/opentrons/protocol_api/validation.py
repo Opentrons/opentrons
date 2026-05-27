@@ -39,11 +39,9 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocols.api_support.types import (
     APIVersion,
     ThermocyclerStep,
-    VacuumModuleCycle,
     VacuumModulePowerStep,
     VacuumModulePressureStep,
-    VacuumModuleProfileStep,
-    VacuumModuleSingleStep,
+    VacuumModuleStep,
 )
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import (
@@ -534,26 +532,31 @@ def ensure_thermocycler_profile_steps(
     return validated_steps
 
 
-def _ensure_vacuum_module_step(step: VacuumModuleSingleStep) -> VacuumModuleSingleStep:
+def _check_vm_step_base_values(step: VacuumModuleStep) -> None:
     enable_pump = step.get("enable_pump")
-    if enable_pump is None:
-        raise ValueError("enable_pump is required for each step")
-    hold_time_minutes = step.get("hold_time_minutes")
-    hold_time_seconds = step.get("hold_time_seconds")
     ramp_rate = step.get("ramp_rate")
     timeout_s = step.get("timeout_seconds")
+
+    if enable_pump is None:
+        raise ValueError("enable_pump is required for each step")
+    if timeout_s is not None and timeout_s <= 0:
+        raise ValueError("timeout_s must be greater than 0")
+    if ramp_rate is not None and (ramp_rate <= 0 or ramp_rate > 400):
+        raise ValueError("ramp rate must be between 0 and 400 mbar/sec")
+
+
+def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
+    enable_pump = step.get("enable_pump")
+    ramp_rate = step.get("ramp_rate")
+    timeout_s = step.get("timeout_seconds")
+    hold_time_minutes = step.get("hold_time_minutes")
+    hold_time_seconds = step.get("hold_time_seconds")
     vent_after = step.get("vent_after")
     unverified_percent_power = step.get("percent_power")
     unverified_gauge_pressure_mbar = step.get("gauge_pressure_mbar")
-    # reveal_type(percent_power)
-    # reveal_type(gauge_pressure_mbar)
-    # reveal_type(ramp_rate)
-    # reveal_type(enable_pump)
-    # should I enforce bounds for the gauge_pressure here too?
-    # ramp rate bounds?
-    # reveal_type(timeout_s)
-    if timeout_s is not None and timeout_s <= 0:
-        raise ValueError("timeout_s must be greater than 0")
+
+    _check_vm_step_base_values(step=step)
+    assert enable_pump is not None
 
     if hold_time_minutes is None and hold_time_seconds is None:
         validated_seconds = None
@@ -584,10 +587,15 @@ def _ensure_vacuum_module_step(step: VacuumModuleSingleStep) -> VacuumModuleSing
         )
     else:
         # default to pressure step in case neither pressure nor power is present
-        gauge_pressure_mbar = cast(VacuumModulePressureStep, step).get(
-            "gauge_pressure_mbar"
-        )
-        assert gauge_pressure_mbar is not None
+        if unverified_gauge_pressure_mbar is not None:
+            gauge_pressure_mbar = cast(VacuumModulePressureStep, step).get(
+                "gauge_pressure_mbar"
+            )
+            assert gauge_pressure_mbar is not None
+            if gauge_pressure_mbar > 0 or gauge_pressure_mbar < -150:
+                raise ValueError("gauge pressure should be between 0 and -150 mbar")
+        else:
+            gauge_pressure_mbar = unverified_gauge_pressure_mbar
         return VacuumModulePressureStep(
             enable_pump=enable_pump,
             hold_time_seconds=validated_seconds,
@@ -598,35 +606,14 @@ def _ensure_vacuum_module_step(step: VacuumModuleSingleStep) -> VacuumModuleSing
         )
 
 
-def _ensure_vacuum_module_cycle(cycle: VacuumModuleCycle) -> VacuumModuleCycle:
-    steps = cycle.get("steps")
-    repetitions = cycle.get("repetitions")
-    vent_after = cycle.get("vent_after")
-    if steps is None:
-        raise ValueError("A list of steps is required for a cycle.")
-    if repetitions is None:
-        raise ValueError("Repetitions must be defined for a cycle.")
-    validated_steps = []
-    for step in steps:
-        validated_steps.append(_ensure_vacuum_module_step(step=step))
-    return VacuumModuleCycle(
-        steps=validated_steps, repetitions=repetitions, vent_after=vent_after
-    )
-
-
 def ensure_vacuum_module_profile(
-    steps: List[VacuumModuleProfileStep],
-) -> List[VacuumModuleProfileStep]:
+    steps: List[VacuumModuleStep],
+) -> List[VacuumModuleStep]:
     """Ensure vacuum module steps are valid and hold time is expressed in seconds only."""
     # HAVE TO HAVE PE COMMAND TAKE IN ONLY SECONDS
-    validated_profile: List[VacuumModuleProfileStep] = []
+    validated_profile: List[VacuumModuleStep] = []
     for step in steps:
-        if step.get("repetitions") is not None:
-            cycle = cast(VacuumModuleCycle, step)
-            validated_profile.append(_ensure_vacuum_module_cycle(cycle=cycle))
-        else:
-            individual_step = cast(VacuumModuleSingleStep, step)
-            validated_profile.append(_ensure_vacuum_module_step(individual_step))
+        validated_profile.append(_ensure_vacuum_module_step(step))
     return validated_profile
 
 

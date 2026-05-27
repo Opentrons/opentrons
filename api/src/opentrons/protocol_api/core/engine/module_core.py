@@ -53,11 +53,9 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocols.api_support.types import (
     APIVersion,
     ThermocyclerStep,
-    VacuumModuleCycle,
     VacuumModulePowerStep,
     VacuumModulePressureStep,
-    VacuumModuleProfileStep,
-    VacuumModuleSingleStep,
+    VacuumModuleStep,
 )
 from opentrons.types import DeckSlotName
 
@@ -1218,14 +1216,11 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
 
     def _convert_vm_profile_steps(
         self,
-        steps: List[VacuumModuleProfileStep],
+        steps: List[VacuumModuleStep],
     ) -> cmd.vacuum_module.ProfileType:
         protocol_engine_steps: cmd.vacuum_module.ProfileType = []
 
-        def _add_single_step(
-            step: VacuumModuleSingleStep,
-            return_list_for_cycle: bool = False,
-        ) -> Optional[cmd.vacuum_module.StartRunProfileStepParams]:
+        for step in steps:
             enable_pump = step.get("enable_pump")
             hold_time_seconds = step.get("hold_time_seconds")
             ramp_rate = step.get("ramp_rate")
@@ -1242,10 +1237,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
                     ventAfter=vent_after,
                     percentPower=percent_power,
                 )
-                if return_list_for_cycle:
-                    return pe_power_step
-                else:
-                    protocol_engine_steps.append(pe_power_step)
+                protocol_engine_steps.append(pe_power_step)
             else:
                 this_pressure_step = cast(VacuumModulePressureStep, step)
                 gauge_pressure_mbar = this_pressure_step.get("gauge_pressure_mbar")
@@ -1257,39 +1249,13 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
                     ventAfter=vent_after,
                     gaugePressureMbar=gauge_pressure_mbar,
                 )
-                if return_list_for_cycle:
-                    return pe_pressure_step
-                else:
-                    protocol_engine_steps.append(pe_pressure_step)
-            return None
-
-        for step in steps:
-            if step.get("repetitions") is not None:
-                this_cycle = cast(VacuumModuleCycle, step)
-                this_cycle_steps = this_cycle.get("steps")
-                repetitions = this_cycle.get("repetitions")
-                vent_after = this_cycle.get("vent_after")
-                pe_cycle_steps = []
-                for s in this_cycle_steps:
-                    single_step = _add_single_step(s, return_list_for_cycle=True)
-                    assert single_step is not None
-                    pe_cycle_steps.append(single_step)
-                assert pe_cycle_steps is not None
-                protocol_engine_steps.append(
-                    cmd.vacuum_module.VacuumModuleProfileCycle(
-                        steps=pe_cycle_steps,
-                        repetitions=repetitions,
-                        ventAfter=vent_after,
-                    )
-                )
-            else:
-                _add_single_step(cast(VacuumModuleSingleStep, step))
+                protocol_engine_steps.append(pe_pressure_step)
 
         return protocol_engine_steps
 
     def start_execute_profile(
         self,
-        steps: List[VacuumModuleProfileStep],
+        steps: List[VacuumModuleStep],
         repetitions: int,
     ) -> EngineTaskCore:
         """Start the execution of a vacuum module profile and return a task."""

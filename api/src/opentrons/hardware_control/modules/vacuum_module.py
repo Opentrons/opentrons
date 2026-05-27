@@ -492,7 +492,7 @@ class VacuumModule(mod_abc.AbstractModule):
     async def _wait_for_command_duration(self) -> None:
         await self._reader.update_vacuum_state()
 
-        while self.vacuum_state.time_remaining > 0:
+        while self.vacuum_state.vacuum_duration > 0:
             await self._poller.wait_next_poll()
 
     async def wait_for_command_duration(self) -> None:
@@ -517,7 +517,6 @@ class VacuumModuleReader(Reader):
             vacuum_enabled=False,
             vacuum_duration=0,
             vent_state=VentState.CLOSED,
-            time_remaining=0,
         )
         self.pump_state: PumpState = PumpState(
             target_rpm=0,
