@@ -12,6 +12,7 @@ from key_server.log_signing.dependency import (
     build_signing_key_manager,
     install_signing_key_manager,
 )
+from key_server.log_signing.router import router as log_signing_router
 from key_server.secure_volume.dependency import (
     build_secure_volume_manager,
     install_secure_volume_manager,
@@ -55,3 +56,4 @@ app = FastAPI(
 
 app.include_router(settings_router)
 app.include_router(tls_router)
+app.include_router(log_signing_router)
