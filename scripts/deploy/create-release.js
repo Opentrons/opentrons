@@ -37,10 +37,13 @@ const REPO_DETAILS = {
   repo: 'opentrons-ot2',
 }
 
-// internal@YY.M.D, internal@YY.M.D.N (legacy dot), or internal@YY.M.D-N — keep in sync with scripts/git-version.mjs.
-// M and D are unpadded (e.g. internal@26.4.23); zero-padded months like 26.04.23 do not match.
-const OT3_CALENDAR_TAG_RE =
-  /^internal@(\d{2}\.[1-9]\d?\.[1-9]\d?)(?:(?:\.|-)(\d+))?$/
+// internal@YY.M.DNN[-alpha|-beta] — keep in sync with scripts/git-version.mjs and ot2_calendar_semver.py.
+const OT2_INTERNAL_TAG_RE =
+  /^internal@(\d{2}\.(?:[1-9]|1[0-2])\.(\d+)(?:-(?:alpha|beta))?)$/
+
+// vYY.M.N[-alpha.N|-beta.N] — external OT-2 calendar semver
+const OT2_EXTERNAL_TAG_RE =
+  /^v(\d{2}\.(?:[1-9]|1[0-2])\.[0-9](?:-(?:alpha|beta)\.\d+)?)$/
 
 // The release kind is normally just the semver preproduction stage, but we need to account
 // for PD using candidate-a, candidate-b etc - semver preproduction stage is separated from
@@ -50,16 +53,10 @@ const releaseKind = version => {
   if (typeof version === 'string' && /@alpha\./.test(version)) {
     return 'alpha'
   }
-  if (
-    typeof version === 'string' &&
-    /^\d{2}\.[1-9]\d?\.[1-9]\d?(?:[.-]\d+)?$/.test(version)
-  ) {
-    return 'alpha'
-  }
   return (semver.prerelease(version)?.at(0) ?? 'production').split('-')[0]
 }
 
-/** Map monorepo calendar / internal version strings to semver for sorting. */
+/** Map monorepo version strings to semver for sorting. Calendar semver is already valid. */
 function toComparableSemver(version) {
   const calAlpha = /^(\d+)\.(\d+)@alpha\.(\d+)$/.exec(version)
   if (calAlpha) {
@@ -71,16 +68,13 @@ function toComparableSemver(version) {
   if (cal) {
     return `${parseInt(cal[1], 10)}.${parseInt(cal[2], 10)}.0`
   }
-  const calYyMmDd = /^(\d{2})\.([1-9]\d?)\.([1-9]\d?)(?:[.-](\d+))?$/.exec(
-    version
-  )
-  if (calYyMmDd) {
-    return `${parseInt(calYyMmDd[1], 10)}.${parseInt(
-      calYyMmDd[2],
-      10
-    )}.${parseInt(calYyMmDd[3], 10)}${
-      calYyMmDd[4] !== undefined ? `-alpha.${calYyMmDd[4]}` : ''
-    }`
+  if (
+    /^\d{2}\.(?:[1-9]|1[0-2])\.[0-9](?:-(?:alpha|beta)\.\d+)?$/.test(version)
+  ) {
+    return version
+  }
+  if (/^\d{2}\.(?:[1-9]|1[0-2])\.(\d+)(?:-(?:alpha|beta))?$/.test(version)) {
+    return version
   }
   return version
 }
@@ -172,14 +166,16 @@ async function versionDetailsFromGit(tag, allowOld) {
   const [project, currentVersion] = await detailsFromTag(tag)
   const prefix = await prefixForProject(project)
   const allTagsRaw =
-    project === 'ot3'
+    project === 'robot-stack-internal'
       ? await (await monorepoGit()).raw(['tag', '-l', 'internal@*'])
       : await (await monorepoGit()).raw(['tag', '-l', `${prefix}*`])
   const allTagsListed = allTagsRaw.split('\n').filter(Boolean)
   const allTags =
-    project === 'ot3'
-      ? allTagsListed.filter(t => OT3_CALENDAR_TAG_RE.test(t))
-      : allTagsListed
+    project === 'robot-stack-internal'
+      ? allTagsListed.filter(t => OT2_INTERNAL_TAG_RE.test(t))
+      : project === 'robot-stack'
+        ? allTagsListed.filter(t => OT2_EXTERNAL_TAG_RE.test(t))
+        : allTagsListed
   if (!allTags.includes(tag)) {
     throw new Error(
       `Tag ${tag} does not exist - create it before running this script`
@@ -240,9 +236,7 @@ async function buildChangelog(project, currentVersion, previousVersion) {
 async function createRelease(token, tag, project, version, changelog, deploy) {
   const title = titleForRelease(project, version)
   const isPre =
-    !!semver.prerelease(semverKey(version)) ||
-    /@alpha\./.test(version) ||
-    /^\d{2}\.[1-9]\d?\.[1-9]\d?(?:[.-]\d+)?$/.test(version)
+    !!semver.prerelease(semverKey(version)) || /@alpha\./.test(version)
   if (deploy) {
     const octokit = new Octokit({
       auth: token,

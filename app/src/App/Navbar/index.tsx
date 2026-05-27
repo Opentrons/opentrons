@@ -43,7 +43,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
       <div className={styles.nav_container}>
         <div className={styles.nav_header_container}>
           <img
-            src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
+            src={PROJECT === 'robot-stack-internal' ? logoSvgThree : logoSvg}
             alt="opentrons logo"
             className={styles.logo_img}
           />

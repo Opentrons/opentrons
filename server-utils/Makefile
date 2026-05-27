@@ -11,7 +11,7 @@ SRC_PATH = server_utils
 # Project to get the version for
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),robot-stack-internal)
 
 
 # Find the version of the wheel from git using a helper script. We

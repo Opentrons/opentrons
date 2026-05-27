@@ -29,7 +29,7 @@ async function readOrDefaultReleases(releasesPath) {
   }
 }
 
-// Robot-stack installers use Opentrons-OT2-*; internal (ot3) builds use Opentrons-Internal-OT2-*.
+// Robot-stack installers use Opentrons-OT2-*; internal builds use Opentrons-Internal-OT2-*.
 const OT2_INSTALLER_RE = /Opentrons(?:-Internal)?-OT2.*\.(exe|dmg|AppImage)$/i
 
 const FILES_IN_RELEASE_JSON = [

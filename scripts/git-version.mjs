@@ -10,7 +10,8 @@
 // Determines versions for projects from git tags.
 //
 // A "project" is a coherent built application or applications that serve a purpose, that are versioned together.
-// For instance, protocol-designer is a project; so is the robot stack for OT-2; so is the robot stack for OT-3.
+// For instance, protocol-designer is a project; so is the OT-2 external robot stack (robot-stack);
+// so is the OT-2 internal robot stack (robot-stack-internal).
 // A project is made of packages in subdirectories of this monorepo. A version of a project is the the contents
 // of the monorepo and the packages in the project at a specific git commit, pointed to by a specific git tag.
 //
@@ -26,37 +27,52 @@ import { fileURLToPath } from 'url'
 import git from 'simple-git'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
-// internal@YY.M.D, internal@YY.M.D.N (legacy dot), or internal@YY.M.D-N (same-day bump; canonical).
-// M and D are unpadded decimal (1–9, 10–12, 1–31 as applicable), e.g. April 23 → internal@26.4.23 — not 26.04.23.
-const OT3_CALENDAR_TAG_RE =
-  /^internal@(\d{2}\.[1-9]\d?\.[1-9]\d?)(?:(?:\.|-)(\d+))?$/
+
+// Keep in sync with scripts/ot2_calendar_semver.py and robot-stack automation/go.py.
+const OT2_MONTH = '(?:[1-9]|1[0-2])'
+
+// Internal: internal@YY.M.DNN[-alpha|-beta]
+const OT2_INTERNAL_VERSION_RE = new RegExp(
+  `^(\\d{2}\\.${OT2_MONTH}\\.(\\d+)(?:-(?:alpha|beta))?)`
+)
+const OT2_INTERNAL_TAG_RE = new RegExp(
+  `^internal@${OT2_INTERNAL_VERSION_RE.source}$`
+)
+
+// External: vYY.M.N[-alpha.N|-beta.N] where N is 0-9
+const OT2_EXTERNAL_VERSION_RE = new RegExp(
+  `^(\\d{2}\\.${OT2_MONTH}\\.[0-9](?:-(?:alpha|beta)\\.\\d+)?)`
+)
+const OT2_EXTERNAL_TAG_RE = new RegExp(`^v${OT2_EXTERNAL_VERSION_RE.source}$`)
 
 export function monorepoGit() {
   return git({ baseDir: REPO_BASE })
 }
 
-function ot3CalendarVersionFromTag(tag) {
-  const m = OT3_CALENDAR_TAG_RE.exec(tag)
-  if (m == null) {
-    return null
-  }
-  const [, base, bump] = m
-  return bump != null ? `${base}-${bump}` : base
+function ot2InternalVersionFromTag(tag) {
+  const m = OT2_INTERNAL_TAG_RE.exec(tag)
+  return m != null ? m[1] : null
+}
+
+function ot2ExternalVersionFromTag(tag) {
+  const m = OT2_EXTERNAL_TAG_RE.exec(tag)
+  return m != null ? m[1] : null
 }
 
 export const detailsFromTag = tag => {
   if (tag.startsWith('v')) {
+    const ext = ot2ExternalVersionFromTag(tag)
+    if (ext != null) {
+      return ['robot-stack', ext]
+    }
     return ['robot-stack', tag.slice(1)]
   }
   if (tag.startsWith('internal@')) {
-    const cal = ot3CalendarVersionFromTag(tag)
+    const cal = ot2InternalVersionFromTag(tag)
     if (cal != null) {
-      return ['ot3', cal]
+      return ['robot-stack-internal', cal]
     }
-    return ['ot3', tag.slice('internal@'.length)]
-  }
-  if (tag.startsWith('ot3@')) {
-    return ['ot3', tag.slice('ot3@'.length)]
+    return ['robot-stack-internal', tag.slice('internal@'.length)]
   }
   if (tag.includes('@')) {
     const at = tag.indexOf('@')
@@ -67,16 +83,6 @@ export const detailsFromTag = tag => {
 
 export function tagFromDetails(project, version) {
   const prefix = prefixForProject(project)
-  if (project === 'ot3') {
-    const hyphenBump = /^(\d{2}\.[1-9]\d?\.[1-9]\d?)-(\d+)$/.exec(version)
-    if (hyphenBump != null) {
-      return `${prefix}${hyphenBump[1]}-${hyphenBump[2]}`
-    }
-    const dotBump = /^(\d{2}\.[1-9]\d?\.[1-9]\d?)\.(\d+)$/.exec(version)
-    if (dotBump != null) {
-      return `${prefix}${dotBump[1]}-${dotBump[2]}`
-    }
-  }
   return `${prefix}${version}`
 }
 
@@ -84,7 +90,7 @@ export function prefixForProject(project) {
   if (project === 'robot-stack') {
     return 'v'
   }
-  if (project === 'ot3') {
+  if (project === 'robot-stack-internal') {
     return 'internal@'
   }
   return `${project}@`
@@ -95,14 +101,14 @@ export function matchGlobForProject(project) {
   if (project === 'robot-stack') {
     return 'v*'
   }
-  if (project === 'ot3') {
+  if (project === 'robot-stack-internal') {
     return 'internal@*'
   }
   return `${project}@*`
 }
 
 export async function latestTagForProject(project) {
-  if (project === 'ot3') {
+  if (project === 'robot-stack-internal') {
     const tags = await monorepoGit().raw([
       'tag',
       '-l',
@@ -113,11 +119,27 @@ export async function latestTagForProject(project) {
     ])
     const latestCalendarTag = tags
       .split('\n')
-      .find(tag => OT3_CALENDAR_TAG_RE.test(tag))
+      .find(tag => OT2_INTERNAL_TAG_RE.test(tag))
     if (latestCalendarTag == null) {
-      throw new Error('No OT3 calendar tag found')
+      throw new Error('No OT-2 calendar internal tag found')
     }
     return latestCalendarTag
+  }
+  if (project === 'robot-stack') {
+    const tags = await monorepoGit().raw([
+      'tag',
+      '-l',
+      'v*',
+      '--merged',
+      'HEAD',
+      '--sort=-creatordate',
+    ])
+    const latestExternalTag = tags
+      .split('\n')
+      .find(tag => OT2_EXTERNAL_TAG_RE.test(tag))
+    if (latestExternalTag != null) {
+      return latestExternalTag
+    }
   }
   return (
     await monorepoGit().raw([

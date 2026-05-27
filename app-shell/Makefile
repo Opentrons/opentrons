@@ -43,14 +43,14 @@ ssh_opts ?= $(default_ssh_opts)
 # if tagged build (tag ~= ^v.+) -> b$(BUILD_NUMBER)
 # if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
 # only copy update files publish directory on tagged builds that match the provided OPENTRONS_PROJECT
-# environment variable (i.e. if OT_TAG is vxxx and OPENTRONS_PROJECT is robot-stack, or OT_TAG is ot3@xxx
-# or internal@... (calendar internal) and OPENTRONS_PROJECT is ot3)
-_publish_ot2 := $(and $(filter v%,$(OT_TAG)), $(filter robot-stack,$(OPENTRONS_PROJECT)))
-_publish_ot3 := $(and $(filter ot3,$(OPENTRONS_PROJECT)),$(or $(filter ot3@%,$(OT_TAG)),$(filter internal@%,$(OT_TAG))))
-publish_update := $(or $(_publish_ot2),$(_publish_ot3))
+# environment variable (i.e. if OT_TAG is vxxx and OPENTRONS_PROJECT is robot-stack, or OT_TAG is
+# internal@... (calendar internal) and OPENTRONS_PROJECT is robot-stack-internal)
+_publish_external := $(and $(filter v%,$(OT_TAG)), $(filter robot-stack,$(OPENTRONS_PROJECT)))
+_publish_internal := $(and $(filter robot-stack-internal,$(OPENTRONS_PROJECT)),$(filter internal@%,$(OT_TAG)))
+publish_update := $(or $(_publish_external),$(_publish_internal))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
-OPENTRONS_PROJECT ?= $(if $(or $(filter ot3@%,$(publish_update)),$(filter internal@%,$(publish_update))),ot3,robot-stack)
+OPENTRONS_PROJECT ?= $(if $(filter internal@%,$(OT_TAG)),robot-stack-internal,robot-stack)
 
 # set this to anything on command-line invocations of this makefile to skip bundling
 # standalone python, as is necessary for on-device app builds:

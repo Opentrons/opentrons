@@ -1,4 +1,4 @@
-"""Regression tests for calendar / internal release tag helpers.
+"""Regression tests for OT-2 calendar semver and build version helpers.
 
 Run from repository root:
 
@@ -9,141 +9,116 @@ CI: .github/workflows/scripts-release-tag-tests.yaml runs the same command.
 
 from __future__ import annotations
 
-import importlib.util
 import sys
 import unittest
+from datetime import date
 from pathlib import Path
 
 _SCRIPTS = Path(__file__).resolve().parent
-_APP_RELEASE = _SCRIPTS / "app-release"
-
-
-def _load_script(module_name: str, relative_path: str):
-    path = _SCRIPTS / relative_path
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Cannot load {path}")
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = mod
-    spec.loader.exec_module(mod)
-    return mod
-
-
-chore_release = _load_script("_chore_release_under_test", "app-release/chore-release.py")
-internal_release = _load_script(
-    "_internal_release_under_test", "app-release/internal-release.py"
-)
-
 sys.path.insert(0, str(_SCRIPTS))
+
+import ot2_calendar_semver as ot2_calendar_semver  # noqa: E402
 import python_build_utils as python_build_utils  # noqa: E402
 
 
-class TestChoreReleaseIncrementTag(unittest.TestCase):
-    def test_calendar_alpha_bump(self):
-        self.assertEqual(
-            chore_release.increment_tag("v26.4@alpha.6", "alpha"),
-            "v26.4@alpha.7",
-        )
-
-    def test_calendar_stable_to_next_alpha(self):
-        self.assertEqual(
-            chore_release.increment_tag("v26.4", "alpha"),
-            "v26.5@alpha.0",
-        )
-
-    def test_calendar_year_rollover(self):
-        self.assertEqual(
-            chore_release.increment_tag("v26.12", "alpha"),
-            "v27.1@alpha.0",
-        )
-
-    def test_parse_chore_release_branch_semver(self):
-        self.assertEqual(
-            chore_release.parse_chore_release_branch("chore_release-8.8.0"),
-            (8, 8, 0),
-        )
-
-    def test_parse_chore_release_branch_calendar(self):
-        self.assertEqual(
-            chore_release.parse_chore_release_branch("chore_release-26.4"),
-            (26, 4, 0),
-        )
-
-
-class TestInternalReleaseHelpers(unittest.TestCase):
-    def test_opentrons_calendar_tag_regex_accepts(self):
-        cal = internal_release.OPENTRONS_CALENDAR_TAG_RE
-        for t in (
-            "internal@26.4.23",
-            "internal@26.4.23.1",
-            "internal@26.4.23-0",
-            "internal@26.4.23-1",
-            "internal@26.11.9",
+class TestOt2CalendarTagRegex(unittest.TestCase):
+    def test_internal_tag_regex_accepts(self):
+        for tag in (
+            "internal@26.5.2601",
+            "internal@26.5.2602-alpha",
+            "internal@26.5.2602-beta",
         ):
-            with self.subTest(tag=t):
-                self.assertIsNotNone(cal.match(t), t)
+            with self.subTest(tag=tag):
+                self.assertIsNotNone(ot2_calendar_semver.OT2_INTERNAL_TAG_RE.match(tag), tag)
 
-    def test_opentrons_calendar_tag_regex_rejects(self):
-        cal = internal_release.OPENTRONS_CALENDAR_TAG_RE
-        for t in (
-            "internal@26.04.23",
-            "internal@26.4.03",
-            "internal@26.4.23-dev",
-            "internal@v23",
-            "internal@2.8.0-alpha.5",
-            "v26.04",
+    def test_external_tag_regex_accepts(self):
+        for tag in (
+            "v26.6.0",
+            "v26.6.0-alpha.0",
+            "v26.6.0-beta.1",
         ):
-            with self.subTest(tag=t):
-                self.assertIsNone(cal.match(t), t)
+            with self.subTest(tag=tag):
+                self.assertIsNotNone(ot2_calendar_semver.OT2_EXTERNAL_TAG_RE.match(tag), tag)
 
-    def test_get_next_tag_numeric(self):
+    def test_version_from_tag_helpers(self):
         self.assertEqual(
-            internal_release.get_next_tag(
-                "internal@v23", "internal_numeric", "", 0
-            ),
-            "internal@v24",
+            ot2_calendar_semver.version_from_internal_tag("internal@26.5.2601-alpha"),
+            "26.5.2601-alpha",
         )
-
-    def test_get_next_tag_alpha(self):
         self.assertEqual(
-            internal_release.get_next_tag(
-                None, "internal_alpha", "2.8.0", 6
-            ),
-            "internal@2.8.0-alpha.6",
+            ot2_calendar_semver.version_from_external_tag("v26.6.0-alpha.0"),
+            "26.6.0-alpha.0",
         )
 
 
-class TestPythonBuildUtilsOt3(unittest.TestCase):
-    def test_pep440_from_git_calendar(self):
+class TestOt2InternalSemver(unittest.TestCase):
+    def test_encode_decode_may_26(self):
         self.assertEqual(
-            python_build_utils._pep440_from_git_version("ot3", "26.4.23"),
-            "26.4.23",
+            ot2_calendar_semver.encode_ot2_internal_version(2026, 5, 26, 1),
+            "26.5.2601",
+        )
+        self.assertEqual(
+            ot2_calendar_semver.decode_ot2_internal_version("26.5.2601-alpha"),
+            (2026, 5, 26, 1, "alpha"),
         )
 
-    def test_pep440_from_git_same_day_bump(self):
+    def test_allocate_next_internal_tag(self):
+        existing = {
+            "internal@26.5.2601-alpha",
+            "internal@26.5.2601",
+        }
+        tag = ot2_calendar_semver.allocate_next_internal_tag(
+            existing,
+            "alpha",
+            release_date=date(2026, 5, 26),
+        )
+        self.assertEqual(tag, "internal@26.5.2602-alpha")
+
+
+class TestOt2ExternalSemver(unittest.TestCase):
+    def test_encode_decode_june_first(self):
         self.assertEqual(
-            python_build_utils._pep440_from_git_version("ot3", "26.4.23.2"),
-            "26.4.23.dev2",
+            ot2_calendar_semver.encode_ot2_external_version(2026, 6, 0),
+            "26.6.0",
+        )
+        self.assertEqual(
+            ot2_calendar_semver.decode_ot2_external_version("26.6.0-alpha.0"),
+            (2026, 6, 0, "alpha", 0),
         )
 
-    def test_pep440_from_git_hyphen_same_day(self):
-        self.assertEqual(
-            python_build_utils._pep440_from_git_version("ot3", "26.4.23-0"),
-            "26.4.23.dev0",
+    def test_allocate_next_external_stable(self):
+        existing = {"v26.6.0", "v26.6.1"}
+        tag = ot2_calendar_semver.allocate_next_external_tag(
+            existing,
+            "stable",
+            release_date=date(2026, 6, 15),
         )
+        self.assertEqual(tag, "v26.6.2")
 
-    def test_pep440_from_git_legacy_channel_rejected(self):
-        self.assertEqual(
-            python_build_utils._pep440_from_git_version("ot3", "26.4.23-dev.1"),
-            "26.4.23-dev.1",
+    def test_allocate_next_external_alpha(self):
+        existing = {"v26.6.0-alpha.0", "v26.6.0"}
+        tag = ot2_calendar_semver.allocate_next_external_tag(
+            existing,
+            "alpha",
+            base_version="26.6.0",
+            release_date=date(2026, 6, 15),
         )
+        self.assertEqual(tag, "v26.6.0-alpha.1")
 
-    def test_pep440_robot_stack_calendar_alpha(self):
+
+class TestPythonBuildUtilsRobotStackInternal(unittest.TestCase):
+    def test_pep440_internal(self):
         self.assertEqual(
             python_build_utils._pep440_from_git_version(
-                "robot-stack", "26.4@alpha.3"
+                "robot-stack-internal", "26.5.2601-alpha"
             ),
-            "26.4a3",
+            "26.5.2601-alpha",
+        )
+
+    def test_pep440_external(self):
+        self.assertEqual(
+            python_build_utils._pep440_from_git_version("robot-stack", "26.6.0-alpha.0"),
+            "26.6.0-alpha.0",
         )
 
 

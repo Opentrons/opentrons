@@ -13,12 +13,20 @@ from collections import namedtuple
 PackageEntry = namedtuple("PackageEntry", ("br_version_prefix"))
 ProjectEntry = namedtuple("ProjectEntry", ("tag_prefix"))
 
-
 HERE = os.path.dirname(__file__)
 
 # current working directory for shell calls. will only be empty if running
 # from script directory.
 CWD = HERE or "."
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+
+from ot2_calendar_semver import (
+    OT2_EXTERNAL_TAG_RE,
+    OT2_INTERNAL_TAG_RE,
+    version_from_external_tag,
+    version_from_internal_tag,
+)
 
 package_entries = {
     "api": PackageEntry("opentrons_api"),
@@ -33,8 +41,8 @@ package_entries = {
 }
 
 project_entries = {
-    # Internal Flex/monorepo builds: internal@yy.m.d[-N] (legacy internal@yy.m.d.N still recognized)
-    "ot3": ProjectEntry("internal@"),
+    # Internal OT-2 builds: internal@YY.M.DNN[-alpha|-beta]
+    "robot-stack-internal": ProjectEntry("internal@"),
     "robot-stack": ProjectEntry("v"),
     "docs": ProjectEntry("docs@"),
 }
@@ -46,13 +54,18 @@ def _pep440_from_git_version(project, raw):
         m = re.match(r"^(\d+\.\d+)@alpha\.(\d+)$", raw)
         if m:
             return f"{m.group(1)}a{m.group(2)}"
+        if re.match(
+            rf"^\d{{2}}\.(?:[1-9]|1[0-2])\.[0-9](?:-(?:alpha|beta)\.\d+)?$",
+            raw,
+        ):
+            return raw
         return raw
-    if project == "ot3":
-        m_new = re.match(r"^(\d{2})\.([1-9]\d?)\.([1-9]\d?)(?:[.-](\d+))?$", raw)
-        if m_new:
-            yy, mo, dd, c = m_new.groups()
-            base = f"{int(yy)}.{int(mo)}.{int(dd)}"
-            return f"{base}.dev{c}" if c else base
+    if project == "robot-stack-internal":
+        if re.match(
+            rf"^\d{{2}}\.(?:[1-9]|1[0-2])\.(\d+)(?:-(?:alpha|beta))?$",
+            raw,
+        ):
+            return raw
         return raw
     return raw
 
@@ -119,22 +132,23 @@ def _latest_tag_for_prefix(prefix, git_dir):
     return tags_matching[-1].decode("utf-8")
 
 
-# Opentrons calendar internal tags: internal@YY.M.D (M/D unpadded, e.g. 26.4.23) with optional .N or -N bump.
-_OT3_CAL_TAG = re.compile(
-    r"^internal@(\d{2}\.[1-9]\d?\.[1-9]\d?)(?:(?:\.|-)(\d+))?$"
-)
+def _robot_stack_internal_version_from_tag(tag: str) -> str:
+    """Version tail after internal@ for OT-2 internal calendar semver tags."""
+    version = version_from_internal_tag(tag)
+    if version is not None:
+        return version
+    return tag.split("internal@", 1)[1]
 
 
-def _ot3_calendar_version_from_tag(tag: str) -> str:
-    """Version tail after internal@; hyphen suffix when a bump is present (legacy .N → -N)."""
-    m = _OT3_CAL_TAG.match(tag)
-    if not m:
-        return tag.split("internal@", 1)[1]
-    base, bump = m.group(1), m.group(2)
-    return f"{base}-{bump}" if bump is not None else base
+def _robot_stack_version_from_tag(tag: str) -> str:
+    """Version tail after v for OT-2 external calendar semver tags."""
+    version = version_from_external_tag(tag)
+    if version is not None:
+        return version
+    return tag.split("v", 1)[1]
 
 
-def _latest_ot3_internal_release_tag(git_dir):
+def _latest_robot_stack_internal_release_tag(git_dir):
     """Latest merged calendar internal@ tag (by creator date; excludes internal@v*, etc.)."""
     check_dir = git_dir or CWD
     try:
@@ -156,22 +170,58 @@ def _latest_ot3_internal_release_tag(git_dir):
     lines = [ln for ln in tags_result.strip().split(b"\n") if ln]
     for raw in lines:
         t = raw.decode("utf-8")
-        if _OT3_CAL_TAG.match(t) is not None:
+        if OT2_INTERNAL_TAG_RE.match(t) is not None:
             return t
     sys.stderr.write(
-        "Could not find tag in {check_dir} matching calendar internal@YY.M.D* ".format(
+        "Could not find tag in {check_dir} matching calendar internal@YY.M.DNN* ".format(
             check_dir=check_dir
         )
-        + "- build before release or no tags. Using internal@00.1.1\n"
+        + "- build before release or no tags. Using internal@00.1.101\n"
     )
-    return "internal@00.1.1"
+    return "internal@00.1.101"
+
+
+def _latest_robot_stack_external_tag(git_dir):
+    """Latest merged external v tag matching OT-2 YY.M.N calendar semver."""
+    check_dir = git_dir or CWD
+    try:
+        tags_result = subprocess.check_output(
+            [
+                "git",
+                "tag",
+                "-l",
+                "v*",
+                "--merged",
+                "HEAD",
+                "--sort=-creatordate",
+            ],
+            cwd=check_dir,
+        )
+    except subprocess.CalledProcessError:
+        tags_result = b""
+
+    lines = [ln for ln in tags_result.strip().split(b"\n") if ln]
+    for raw in lines:
+        t = raw.decode("utf-8")
+        if OT2_EXTERNAL_TAG_RE.match(t) is not None:
+            return t
+    sys.stderr.write(
+        "Could not find tag in {check_dir} matching external vYY.M.N* ".format(
+            check_dir=check_dir
+        )
+        + "- build before release or no tags. Using v00.1.0\n"
+    )
+    return "v00.1.0"
 
 
 def _latest_version_for_project(project, git_dir):
     prefix = project_entries[project].tag_prefix
-    if project == "ot3":
-        tag = _latest_ot3_internal_release_tag(git_dir)
-        return _ot3_calendar_version_from_tag(tag)
+    if project == "robot-stack-internal":
+        tag = _latest_robot_stack_internal_release_tag(git_dir)
+        return _robot_stack_internal_version_from_tag(tag)
+    if project == "robot-stack":
+        tag = _latest_robot_stack_external_tag(git_dir)
+        return _robot_stack_version_from_tag(tag)
     tag = _latest_tag_for_prefix(prefix, git_dir)
     return tag.split(prefix, 1)[1]
 

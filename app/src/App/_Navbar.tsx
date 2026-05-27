@@ -143,7 +143,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
       >
         <LogoImg
-          src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
+          src={PROJECT === 'robot-stack-internal' ? logoSvgThree : logoSvg}
           alt="opentrons logo"
         />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (

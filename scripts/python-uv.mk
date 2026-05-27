@@ -22,7 +22,7 @@ pypi_test_upload_url := https://test.pypi.org/legacy/
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ir_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),robot-stack-internal)
 
 PROJECT = $(project_rs_default)
 
@@ -31,13 +31,13 @@ git_describe_base := git describe --dirty --tags --long --match
 # get the appropriate git describe command for a given project
 # parameter 1: project
 define git_describe_cmd_for_project
-$(if $(findstring robot-stack,$(1)),$(git_describe_base)=v*,$(if $(findstring ot3,$(1)),git describe --dirty --tags --long --match=internal@* --exclude=internal@v* --exclude=internal@*.*.*-alpha*,$(error "Unknown project $(1) (valid: ot3, robot-stack)")))
+$(if $(filter robot-stack-internal,$(1)),git describe --dirty --tags --long --match=internal@* --exclude=internal@v* --exclude=internal@*.*.*-alpha.*,$(if $(filter robot-stack,$(1)),$(git_describe_base)=v*,$(error "Unknown project $(1) (valid: robot-stack-internal, robot-stack)")))
 endef
 
 # get the appropriate tag regex for a given project
 # parameter 1: project
 define git_tag_regex_for_project
-$(if $(findstring robot-stack,$(1)),v(?P<version>.*),$(if $(findstring ot3,$(1)),internal@(?P<version>.*),$(error "Unknown project $(1) (valid: ot3, robot-stack)")))
+$(if $(filter robot-stack-internal,$(1)),internal@(?P<version>.*),$(if $(filter robot-stack,$(1)),v(?P<version>.*),$(error "Unknown project $(1) (valid: robot-stack-internal, robot-stack)")))
 endef
 
 # get the full environment variable definition for hatch git describe
@@ -58,7 +58,7 @@ endef
 
 # get the name of the wheel that setup.py will build
 # parameter 1: the name of the package (aka api, robot-server, etc)
-# parameter 2: the name of the project (aka robot-stack, ot3, etc)
+# parameter 2: the name of the project (aka robot-stack, robot-stack-internal, etc)
 # parameter 3: the name of the python package (aka opentrons, robot_server, etc)
 # parameter 4: any extra version tags
 # parameter 5: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
@@ -69,7 +69,7 @@ endef
 # get the name of the sdist that setup.py will build
 # parameter 1: the name of the project (aka api, robot-server, etc)
 # parameter 2: the name of the python package (aka opentrons, robot_server, etc)
-# parameter 3: the name of the project (aka robot-stack, ot3, docs)
+# parameter 3: the name of the project (aka robot-stack, robot-stack-internal, docs)
 # parameter 4: any extra version tags
 # parameter 5: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
 define python_get_sdistname
@@ -87,7 +87,7 @@ endef
 
 # Get an enhanced version dict of the project
 # parameter 1: name of the package (aka api, robot-server, etc)
-# parameter 2: name of the project (aka robot-stack, ot3, etc)
+# parameter 2: name of the project (aka robot-stack, robot-stack-internal, etc)
 # parameter 3: an extra version tag string
 # parameter 4: override python_br_version.py path (default: ../scripts/python_build_utils.py)
 define python_get_git_version

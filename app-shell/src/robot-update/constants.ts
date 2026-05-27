@@ -19,7 +19,7 @@ const UPDATE_MANIFEST_URLS_INTERNAL_RELEASE = {
 }
 
 export const getUpdateManifestUrls = (): UpdateManifestUrls =>
-  OPENTRONS_PROJECT.includes('robot-stack')
+  OPENTRONS_PROJECT === 'robot-stack'
     ? UPDATE_MANIFEST_URLS_RELEASE
     : UPDATE_MANIFEST_URLS_INTERNAL_RELEASE
 
