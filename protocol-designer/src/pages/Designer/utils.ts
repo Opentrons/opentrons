@@ -329,14 +329,14 @@ const getLabwareInfo = (
   const stack = activeDeckSetup.labware[labwareId]?.stack
   let latestSlot: string = ''
 
-  // First resolve the slot from the stack
+  // resolve the slot from the stack
   if (stack != null) {
     latestSlot = resolveSlotLocation(modules, stack, robotType)
   } else {
     latestSlot = 'unknown slot'
   }
 
-  // Then check if it's a vacuum dock and transform to display location
+  // check if it's a vacuum dock and transform to display location
   const isSlotAVacuumDock = getIsSlotAVacuumDock(latestSlot)
   if (isSlotAVacuumDock) {
     latestSlot = VACUUM_DOCK_DISPLAY_LOCATION
