@@ -9,6 +9,7 @@ import { useLights } from '/app/resources/devices'
 
 import { NavigationMenu } from '../NavigationMenu'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
+import { ShutdownRobotConfirmationModal } from '../ShutdownRobotConfirmationModal'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -53,6 +54,9 @@ describe('NavigationMenu', () => {
     vi.mocked(RestartRobotConfirmationModal).mockReturnValue(
       <div>mock RestartRobotConfirmationModal</div>
     )
+    vi.mocked(ShutdownRobotConfirmationModal).mockReturnValue(
+      <div>mock ShutdownRobotConfirmationModal</div>
+    )
   })
 
   afterEach(() => {
@@ -74,6 +78,14 @@ describe('NavigationMenu', () => {
     screen.getByLabelText('restart_icon')
     fireEvent.click(restart)
     screen.getByText('mock RestartRobotConfirmationModal')
+  })
+
+  it('should render the turn off robot menu item and clicking it, dispatches turn off robot', () => {
+    render(props)
+    const turnOff = screen.getByText('Turn off robot')
+    screen.getByLabelText('power-off_icon')
+    fireEvent.click(turnOff)
+    screen.getByText('mock ShutdownRobotConfirmationModal')
   })
 
   it('should render the lights menu item with lights off and clicking it, calls useLights', () => {

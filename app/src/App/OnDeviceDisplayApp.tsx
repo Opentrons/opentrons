@@ -64,10 +64,11 @@ import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
-  useProtocolReceiptToast,
   useScrollRef,
-  useSoftwareUpdatePoll,
-} from './hooks'
+} from './hooks/useModuleAttachedToast'
+import { useProtocolReceiptToast } from './hooks/useProtocolReceiptToast'
+import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
@@ -200,6 +201,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
       )
     }
   }, [dispatch, isIdle, userSetBrightness])
+
+  useRefreshAccessTokenOnActivity()
 
   const isShellReady = useSelector(getIsShellReady)
 

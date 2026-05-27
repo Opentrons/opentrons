@@ -11,7 +11,7 @@ from auth_server.users.user_data_manager import UserDataManager, UserNotFoundErr
 async def test_get_user_by_username_returns_user(decoy: Decoy) -> None:
     manager = decoy.mock(cls=UserDataManager)
     expected = UserResponse(
-        userName="alice",
+        username="alice",
         fullName="Alice",
         accountType=AccountType.USER,
         scopes=[],

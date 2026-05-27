@@ -37,7 +37,8 @@ import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
-import { useSoftwareUpdatePoll } from './hooks'
+import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
@@ -46,6 +47,7 @@ import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
+  useRefreshAccessTokenOnActivity()
   const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
     useState<boolean>(false)
 

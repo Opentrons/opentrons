@@ -62,6 +62,19 @@ const FLEX_TC_SLOTS = ['A1', 'B1']
 
 export type ModuleModelExtended = ModuleModel | 'stagingAreaAndMagneticBlock'
 
+/**
+ * Check if a labware definition is that of a vacuum module collar
+ * @param labwareDef - The labware definition to check
+ * @returns True if the labware definition is a vacuum module collar, false otherwise
+ */
+export function getIsVacuumCollar(labwareDef: LabwareDefinition2): boolean {
+  const loadName = labwareDef.parameters.loadName
+  return (
+    loadName === 'opentrons_vacuum_module_gen1_collar_tall' ||
+    loadName === 'opentrons_vacuum_module_gen1_collar_short'
+  )
+}
+
 export function getCutoutIdForAddressableArea(
   addressableArea: AddressableAreaName,
   cutoutFixtures: CutoutFixture[]
@@ -145,7 +158,9 @@ export function getModuleModelsBySlot(
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
   moduleModel?: ModuleModel | null,
-  moduleHasLabware: boolean = false
+  moduleHasLabware?: boolean,
+  isVacuumDock?: boolean,
+  dockHasCollar?: boolean
 ): boolean => {
   //  special-casing the thermocycler module V2 recommended labware since the thermocyclerModuleTypes
   //  have different recommended labware
@@ -153,6 +168,19 @@ export const getLabwareIsRecommended = (
     // permissive early exit if no module passed
     return true
   }
+
+  // For vacuum dock, recommendations depend on whether collar is present
+  if (isVacuumDock) {
+    if (!dockHasCollar) {
+      // No collar is present, so recommend both collars
+      return getIsVacuumCollar(def)
+    }
+    // Collar is present, so recommend tough wellplate
+    return (
+      def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
+    )
+  }
+
   const moduleType = getModuleType(moduleModel)
 
   // For vacuum module, show different labware based on whether module has labware
@@ -571,7 +599,9 @@ export function getHighlightLabwareAndModules(
         const moduleIdUnderLabwareToUse =
           item.id != null &&
           labware[item.id] != null &&
-          getIsAdapter(item.id, labware)
+          getIsAdapter(item.id, labware) &&
+          // collars are unique adapters in that they can be moved around the deck
+          !getIsVacuumCollar(labware[item.id].def)
             ? getModuleIdFromStack(labware[item.id].stack, modules)
             : null
 

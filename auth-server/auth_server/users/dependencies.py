@@ -44,12 +44,12 @@ async def get_user_data_manager(
 
 
 async def get_user_by_username(
-    userName: str,
+    username: str,
     user_data_manager: Annotated[UserDataManager, Depends(get_user_data_manager)],
 ) -> UserResponse:
     """Load the user named in the URL path, or raise HTTP 404."""
     try:
-        return user_data_manager.get_user(userName)
+        return user_data_manager.get_user(username)
     except UserNotFoundError:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,

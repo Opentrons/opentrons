@@ -57,7 +57,7 @@ describe('MountingPlate', () => {
           },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT },
+            params: { mount: LEFT, motionModifier: 'lowerMountZAxis' },
           },
         ],
         false

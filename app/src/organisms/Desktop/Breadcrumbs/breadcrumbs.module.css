@@ -1,3 +1,17 @@
+.root_container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: var(--spacing-4) 0 var(--spacing-4) var(--spacing-8);
+  border-bottom: 1px solid var(--grey-30);
+  background-color: var(--white);
+}
+
+.crumb_container {
+  display: flex;
+  padding-right: var(--spacing-4);
+}
+
 .text_style {
   display: -webkit-box;
   overflow: hidden;
@@ -30,9 +44,18 @@
 }
 
 .crumb_active {
+  display: flex;
+  align-items: center;
   color: var(--blue-50);
 }
 
 .crumb_inactive {
+  display: flex;
+  align-items: center;
   color: var(--grey-50);
+}
+
+.crumb_name {
+  padding-right: var(--spacing-4);
+  text-transform: none;
 }

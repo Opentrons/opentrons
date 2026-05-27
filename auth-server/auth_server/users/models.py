@@ -42,7 +42,7 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
-    userName: Annotated[str, Field(..., description="The username of the user.")]
+    username: Annotated[str, Field(..., description="The username of the user.")]
     password: Annotated[SecretStr, Field(..., description="The password for the user.")]
     fullName: Annotated[str, Field(..., description="The full name of the user.")]
     accountType: Annotated[
@@ -53,7 +53,7 @@ class UserCreate(BaseModel):
 class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
-    userName: Annotated[
+    username: Annotated[
         str | None,
         Field(description="The username of the user."),
     ] = None
@@ -87,7 +87,7 @@ class UpdateUser(BaseModel):
 class UserResponse(BaseModel):
     """Response body for a user (no password)."""
 
-    userName: str
+    username: str
     fullName: str
     accountType: AccountType
     scopes: list[str]

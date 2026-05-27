@@ -98,7 +98,7 @@ def test_create_user_success(
         account_type=AccountType.USER,
     )
     assert result == UserResponse(
-        userName="new_user",
+        username="new_user",
         fullName="New User",
         accountType=AccountType.USER,
         scopes=sorted(
@@ -129,7 +129,7 @@ def test_create_user_hashes_password(
         account_type=AccountType.USER,
     )
     assert result == UserResponse(
-        userName="hash_check",
+        username="hash_check",
         fullName="X",
         accountType=AccountType.USER,
         scopes=sorted(
@@ -156,7 +156,7 @@ def test_create_user_duplicate_raises(
 
 
 def test_create_user_empty_username_raises(manager: UserDataManager) -> None:
-    with pytest.raises(InvalidInputError, match="userName"):
+    with pytest.raises(InvalidInputError, match="username"):
         manager.create_user(
             username="",
             password="validpass123",
@@ -209,7 +209,7 @@ def test_get_user_returns_existing(
     decoy.when(mock_store.get("admin")).then_return(expected)
     result = manager.get_user("admin")
     assert result == UserResponse(
-        userName="admin",
+        username="admin",
         fullName="Full Name",
         accountType=AccountType.ADMIN,
         scopes=sorted(
@@ -236,7 +236,7 @@ def test_get_user_locked_when_failed_logins_reach_limit(
     manager = UserDataManager(user_store=mock_store, settings_store=mock_settings)
     result = manager.get_user("alice")
     assert result == UserResponse(
-        userName="alice",
+        username="alice",
         fullName="Alice",
         accountType=AccountType.USER,
         scopes=sorted(
@@ -304,7 +304,7 @@ def test_update_user_username(
         "old_name", new_username="new_name", reset_password=False
     )
     assert result == UserResponse(
-        userName="new_name",
+        username="new_name",
         fullName="Name Test",
         accountType=AccountType.USER,
         scopes=sorted(
@@ -394,7 +394,7 @@ def test_reset_user_password(
 
     result = manager.reset_user_password("reset_me")
 
-    assert result.userName == "reset_me"
+    assert result.username == "reset_me"
     assert result.resetPassword is True
     assert len(result.temporaryPassword) == 8
     assert all(c in string.ascii_letters + string.digits for c in result.temporaryPassword)
@@ -491,7 +491,7 @@ def test_generate_temporary_password_meets_complexity_rules() -> None:
 
 
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
-    with pytest.raises(InvalidInputError, match="userName"):
+    with pytest.raises(InvalidInputError, match="username"):
         manager.update_user("testadmin", new_username="")
 
 

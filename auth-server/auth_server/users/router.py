@@ -55,7 +55,7 @@ async def post_users(
     user_create = request_body.data
     try:
         new_user = user_data_manager.create_user(
-            username=user_create.userName,
+            username=user_create.username,
             password=user_create.password.get_secret_value(),
             full_name=user_create.fullName,
             account_type=user_create.accountType,
@@ -78,7 +78,7 @@ async def post_users(
 
 @PydanticResponse.wrap_route(
     router.get,
-    path="/auth/users/byUsername/{userName}",
+    path="/auth/users/byUsername/{username}",
     summary="Get a user",
     description="Get a specific user, identified by their unique username.",
     responses={
@@ -99,7 +99,7 @@ async def get_user(
 
 @PydanticResponse.wrap_route(
     router.delete,
-    path="/auth/users/byUsername/{userName}",
+    path="/auth/users/byUsername/{username}",
     summary="Delete a user",
     description="Delete a specific user, identified by their unique username.",
     responses={
@@ -114,7 +114,7 @@ async def delete_user(
     ],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a user by its unique identifier."""
-    user_data_manager.delete_user(user.userName)
+    user_data_manager.delete_user(user.username)
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),
         status_code=fastapi.status.HTTP_200_OK,
@@ -123,7 +123,7 @@ async def delete_user(
 
 @PydanticResponse.wrap_route(
     router.patch,
-    path="/auth/users/byUsername/{userName}",
+    path="/auth/users/byUsername/{username}",
     summary="Update a user",
     description="Update a specific user, identified by their unique username.",
     responses={
@@ -142,8 +142,8 @@ async def update_user(
     update_data = request_body.data
     try:
         updated_user = user_data_manager.update_user(
-            user.userName,
-            new_username=update_data.userName,
+            user.username,
+            new_username=update_data.username,
             new_password=update_data.password.get_secret_value()
             if update_data.password is not None
             else None,
@@ -170,11 +170,11 @@ async def update_user(
 
 @PydanticResponse.wrap_route(
     router.post,
-    path="/auth/users/byUsername/{userName}/resetPassword",
+    path="/auth/users/byUsername/{username}/resetPassword",
     summary="Reset a user's password",
     description=(
         "Reset a specific user's password to a newly generated temporary password. "
-        "The user will be marked as using a temporary password and must change it upon login."
+        "The user must change their password upon next login."
     ),
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[ResetPasswordResponse]},
@@ -189,7 +189,7 @@ async def reset_user_password(
     ],
 ) -> PydanticResponse[SimpleBody[ResetPasswordResponse]]:
     """Reset a user's password to a random temporary password."""
-    result = user_data_manager.reset_user_password(user.userName)
+    result = user_data_manager.reset_user_password(user.username)
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),

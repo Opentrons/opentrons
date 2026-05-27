@@ -9,6 +9,7 @@ import {
   useStopRunMutation,
 } from '..'
 import { type DocumentationState } from '../access_control/types'
+import { getQueryKey } from '../api'
 
 interface UseRunActionMutations {
   playRun: () => void
@@ -31,9 +32,11 @@ export function useRunActionMutations(
   const queryClient = useQueryClient()
 
   const onSuccess = (): void => {
-    queryClient.invalidateQueries([host, 'runs', runId]).catch((e: Error) => {
-      console.error(`error invalidating run ${runId} query: ${e.message}`)
-    })
+    queryClient
+      .invalidateQueries(getQueryKey(host, 'runs', runId))
+      .catch((e: Error) => {
+        console.error(`error invalidating run ${runId} query: ${e.message}`)
+      })
   }
 
   const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation(

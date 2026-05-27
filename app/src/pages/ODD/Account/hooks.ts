@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useSelfQuery } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import { getLocalRobotAuthState, logOutOrTimeOut } from '/app/redux/robot-auth'
+import { getLocalRobotAuthState, logOut } from '/app/redux/robot-auth'
 
 import type { State } from '/app/redux/types'
 
@@ -36,16 +36,16 @@ export function useLogOut(): () => void {
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
   )
-  const logOut = useCallback(() => {
+  const logOutCallback = useCallback(() => {
     if (localRobotName == null) {
       console.warn("Couldn't determine the local robot.")
     } else {
       dispatch(
-        logOutOrTimeOut({
+        logOut({
           robotName: localRobotName,
         })
       )
     }
   }, [dispatch, localRobotName])
-  return logOut
+  return logOutCallback
 }

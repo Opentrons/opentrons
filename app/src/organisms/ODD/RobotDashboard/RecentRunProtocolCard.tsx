@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
@@ -44,14 +44,31 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
   runData: RunData
+  onCardResolved: (runId: string, isStandard: boolean) => void
 }
 
 export function RecentRunProtocolCard({
   runData,
+  onCardResolved,
 }: RecentRunProtocolCardProps): JSX.Element | null {
   const { data, isLoading } = useProtocolQuery(runData.protocolId ?? null)
   const protocolData = data?.data ?? null
   const isProtocolFetching = isLoading
+  const prevResolvedRef = useRef(false)
+
+  useEffect(() => {
+    if (prevResolvedRef.current) {
+      return
+    }
+    if (isProtocolFetching || protocolData == null) {
+      return
+    }
+
+    prevResolvedRef.current = true
+    const isStandard = protocolData.protocolKind !== 'quick-transfer'
+    onCardResolved(runData.id, isStandard)
+  }, [isProtocolFetching, protocolData, onCardResolved, runData.id])
+
   return protocolData == null ||
     protocolData.protocolKind === 'quick-transfer' ? null : (
     <ProtocolWithLastRun

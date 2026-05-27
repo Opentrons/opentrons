@@ -166,28 +166,13 @@ export function HistoricalProtocolRunDrawer(
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
         >
           <Box width="33%" minWidth="0">
-            <LegacyStyledText
-              forwardedAs="p"
-              datatest-id="RecentProtocolRun_Drawer_fileNameTitle"
-            >
-              {t('name')}
-            </LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">{t('name')}</LegacyStyledText>
           </Box>
           <Box width="33%" minWidth="0">
-            <LegacyStyledText
-              forwardedAs="p"
-              datatest-id="RecentProtocolRun_Drawer_fileDateTitle"
-            >
-              {t('date')}
-            </LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">{t('date')}</LegacyStyledText>
           </Box>
           <Box width="34%" minWidth="0">
-            <LegacyStyledText
-              forwardedAs="p"
-              datatest-id="RecentProtocolRun_Drawer_fileDownloadTitle"
-            >
-              {t('download')}
-            </LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">{t('download')}</LegacyStyledText>
           </Box>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -226,26 +211,17 @@ export function HistoricalProtocolRunDrawer(
             width="75%"
             paddingY={`${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing4}`}
           >
-            <LegacyStyledText
-              forwardedAs="p"
-              datatest-id="RecentProtocolRun_Drawer_locationTitle"
-            >
+            <LegacyStyledText forwardedAs="p">
               {i18n.format(t('labware'), 'capitalize')}
             </LegacyStyledText>
           </Box>
           <Box width="25%" padding={`${SPACING.spacing4} 0`}>
-            <LegacyStyledText
-              forwardedAs="p"
-              datatest-id="RecentProtocolRun_Drawer_labwareTitle"
-            >
+            <LegacyStyledText forwardedAs="p">
               {i18n.format(t('location'), 'capitalize')}
             </LegacyStyledText>
           </Box>
           <Box width="25%" padding={`${SPACING.spacing4} 0`}>
-            <LegacyStyledText
-              forwardedAs="p"
-              datatest-id="RecentProtocolRun_Drawer_labwareOffsetDataTitle"
-            >
+            <LegacyStyledText forwardedAs="p">
               {i18n.format(t('labware_offset_data'), 'sentenceCase')}
             </LegacyStyledText>
           </Box>

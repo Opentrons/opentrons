@@ -25,9 +25,10 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { DesktopApp } from '../DesktopApp'
-import { useSoftwareUpdatePoll } from '../hooks'
+import { useSoftwareUpdatePoll } from '../hooks/useSoftwareUpdatePoll'
 
 import type { LocalizationProviderProps } from '/app/LocalizationProvider'
+import type { State } from '/app/redux/types'
 
 vi.mock('/app/LocalizationProvider')
 vi.mock('/app/organisms/Desktop/Breadcrumbs')
@@ -42,15 +43,20 @@ vi.mock('/app/pages/Desktop/Devices/RobotSettings')
 vi.mock('/app/organisms/Desktop/Alerts/AlertsModal')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../hooks')
+vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization')
 
 const render = (path = '/') => {
-  return renderWithProviders(
+  return renderWithProviders<State>(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <DesktopApp />
     </MemoryRouter>,
-    { i18nInstance: i18n }
+    {
+      initialState: {
+        robotAuth: { mostRecentRobotName: null, perRobotAuthStates: {} },
+      } satisfies Partial<State> as State,
+      i18nInstance: i18n,
+    }
   )
 }
 
