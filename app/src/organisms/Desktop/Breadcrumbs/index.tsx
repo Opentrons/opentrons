@@ -20,12 +20,15 @@ import styles from './breadcrumbs.module.css'
 import type { DesktopRouteParams } from '/app/App/types'
 import type { State } from '/app/redux/types'
 
-interface CrumbNameProps {
+interface CrumbAndSeparatorProps {
   crumbName: string
   isLastCrumb: boolean
 }
 
-function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
+function CrumbAndSeparator({
+  crumbName,
+  isLastCrumb,
+}: CrumbAndSeparatorProps): JSX.Element {
   return (
     <div className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}>
       <StyledText
@@ -35,7 +38,12 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
         {crumbName}
       </StyledText>
       {!isLastCrumb ? (
-        <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
+        <Icon
+          className={styles.separator}
+          name="caret-right"
+          width="0.25rem"
+          height="0.3125rem"
+        />
       ) : null}
     </div>
   )
@@ -139,7 +147,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
               }
               to={crumb.linkPath}
             >
-              <CrumbName
+              <CrumbAndSeparator
                 crumbName={crumb.crumbName}
                 isLastCrumb={isLastCrumb}
               />
