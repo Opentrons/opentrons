@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import clsx from 'clsx'
 
-import { Icon } from '@opentrons/components'
+import { Icon, StyledText } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'
@@ -28,9 +28,12 @@ interface CrumbNameProps {
 function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
     <div className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}>
-      <div className={clsx(styles.crumb_name, styles.text_style)}>
+      <StyledText
+        className={clsx(styles.crumb_name, styles.text_style)}
+        desktopStyle="captionRegular"
+      >
         {crumbName}
-      </div>
+      </StyledText>
       {!isLastCrumb ? (
         <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
       ) : null}
