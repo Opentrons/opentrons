@@ -38,7 +38,7 @@ The second example uses the [`create_and_start_step_group()`][opentrons.protocol
 
 ## create a step group for aspirating and dispensing steps
 
-step_group_1 = protocol_context.create_and_start_step_group(
+step_group_1 = protocol.create_and_start_step_group(
     name="Aspirate and Dispense Buffer",
     description="Do X, Y, and Z")
 
@@ -54,5 +54,11 @@ step_group_1.end_group()
 ```
 *New in version 2.29*
 
+Step groups can organize a protocol with hundreds of commands into dozens of easily readable groups. This makes a long Python protocol easier to understand, whether in your favorite code editor or in [protocol visualization](../../flex/docs/opentrons-app/protocol-viz.md) in the Opentrons App. 
 
-** idea: screenshot of step grouping in protocol viz? show why this is truly useful? + of course, some text as well
+<figure class="screenshot" markdown>
+![Image showing the protocol visualization screen for a protocol.](../img/step-groups-viz.png)
+<figcaption>Step groups, names, and descriptions are shown in protocol visualization in the Opentrons App.
+</figure>
+
+Click **Visualize** in a Flex protocol's details page (API version 2.16 and newer) to get started. In the example above, three groups combine related steps, like transferring all the required reagents to assemble a PCR  master mix. Use either method's optional `name` and `description` parameters to provide a name (like "Assemble master mix") and description, which appear both in your protocol and in the app.
