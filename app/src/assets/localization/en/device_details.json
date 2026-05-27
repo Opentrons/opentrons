@@ -123,7 +123,7 @@
   "module_error": "Module error",
   "module_name_error": "{{moduleName}} error",
   "module_status_range": "Between {{min}} - {{max}} {{unit}}",
-  "mount": "{{side}} Mount",
+  "mount": "{{side}} mount",
   "na_current": "Current: N/A",
   "na_speed": "Target: N/A RPM",
   "na_target": "Target: N/A",
