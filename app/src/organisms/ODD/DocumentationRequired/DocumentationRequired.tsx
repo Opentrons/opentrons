@@ -5,7 +5,6 @@ import clsx from 'clsx'
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { TouchTextAreaField } from '/app/molecules/TouchTextAreaField'
-// eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './documentationrequired.module.css'

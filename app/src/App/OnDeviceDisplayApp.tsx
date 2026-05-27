@@ -61,7 +61,7 @@ import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control'
 import { LocalizationProvider } from '../LocalizationProvider'
-import { showDocumentationRequiredModal } from '../organisms/DocumentationRequired'
+import { showDocumentationRequiredModal } from '../organisms/ODD/DocumentationRequired'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
