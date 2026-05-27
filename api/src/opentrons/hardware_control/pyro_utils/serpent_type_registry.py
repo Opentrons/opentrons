@@ -2,6 +2,7 @@
 
 import dataclasses
 import datetime
+from pathlib import Path
 from typing import Any, Dict, get_args
 
 from numpy import float64
@@ -11,18 +12,21 @@ import opentrons_shared_data.gripper.gripper_definition
 import opentrons_shared_data.pipette.pipette_definition
 import opentrons_shared_data.pipette.types
 
+import opentrons.calibration_storage.ot3.models.v1
 import opentrons.calibration_storage.types
 import opentrons.config.types
 import opentrons.drivers.rpi_drivers.types
 import opentrons.drivers.types
 import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
+import opentrons.hardware_control.modules.module_calibration
 import opentrons.hardware_control.modules.types
 import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.peripherals.types
 import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
 import opentrons.types
+from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.hardware_control import modules
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
@@ -173,6 +177,59 @@ def _PipetteOffsetSummary_class_to_dict(obj) -> Dict:  # type: ignore
         "status_markedAt": markedAt,
         "last_modified": modified,
         "reasonability_check_failures": None,  # todo(chb: 04-09-2026): These are skipped for integration simplicity, they should be handled by automatic process
+    }
+
+
+# ModuleCalibrationOffset registration
+
+
+def _ModuleCalibrationOffset_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.modules.module_calibration.ModuleCalibrationOffset:
+    modified = (
+        None
+        if d["last_modified"] is None
+        else datetime.datetime.fromisoformat(d["last_modified"])
+    )
+    return (
+        opentrons.hardware_control.modules.module_calibration.ModuleCalibrationOffset(
+            offset=opentrons.types.Point(
+                x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]
+            ),
+            module_id=d["module_id"],
+            module=opentrons.hardware_control.modules.types.ModuleType(d["module"]),
+            source=opentrons.calibration_storage.types.SourceType(d["source"]),
+            status=CalibrationStatus.model_validate(d["status"]),
+            slot=d["slot"],
+            mount=None
+            if d["mount"] is None
+            else opentrons.hardware_control.types.OT3Mount(d["mount"]),
+            instrument_id=d["instrument_id"],
+            last_modified=modified,
+        )
+    )
+
+
+def _ModuleCalibrationOffset_class_to_dict(
+    obj: opentrons.hardware_control.modules.module_calibration.ModuleCalibrationOffset,
+) -> Dict:  # type: ignore
+    if isinstance(obj.last_modified, datetime.datetime):
+        modified = obj.last_modified.isoformat()
+    else:
+        modified = None
+    return {
+        "__class__": "opentrons.hardware_control.modules.module_calibration.ModuleCalibrationOffset",
+        "offset_x": obj.offset.x,
+        "offset_y": obj.offset.y,
+        "offset_z": obj.offset.z,
+        "module_id": obj.module_id,
+        "module": obj.module.value,
+        "source": obj.source.value,
+        "status": obj.status.model_dump(mode="json", by_alias=True),
+        "slot": obj.slot,
+        "mount": None if obj.mount is None else obj.mount.value,
+        "instrument_id": obj.instrument_id,
+        "last_modified": modified,
     }
 
 
@@ -479,13 +536,15 @@ def _enumerated_error_reconstructor(
 
 
 def _module_model_reconstructor(
-    m_dict: Dict[str, Any],
+    module_str: str,
 ) -> modules.types.ModuleModel:
     for model in get_args(modules.types.ModuleModel):
-        if isinstance(m_dict["value"], model):
-            return model(m_dict["value"])  # type: ignore
+        try:
+            return model[module_str]  # type: ignore
+        except Exception:
+            pass
     raise ValueError(
-        f"Cannot determine module model during deserialization for: {m_dict}"
+        f"Cannot determine module model during deserialization for: {module_str}"
     )
 
 
@@ -572,6 +631,34 @@ def _usb_port_dict_to_class(  # type: ignore
     )
 
 
+# Pathlib Path registry
+def _path_class_to_dict(obj) -> Dict:  # type: ignore
+    return {"__class__": "pathlib.Path", "path_str": str(obj)}
+
+
+def _path_dict_to_class(  # type: ignore
+    classname, d
+) -> Path:
+    return Path(d["path_str"])
+
+
+# BundledFirmware registry
+def _bundled_fw_class_to_dict(obj) -> Dict:  # type: ignore
+    return {
+        "__class__": "opentrons.hardware_control.modules.types.BundledFirmware",
+        "version": obj.version,
+        "path_str": str(obj.path),
+    }
+
+
+def _bundled_fw_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.modules.types.BundledFirmware:
+    return opentrons.hardware_control.modules.types.BundledFirmware(
+        version=d["version"], path=Path(d["path_str"])
+    )
+
+
 # Handy function to map all registries for the Hardware controller
 def register_hardware_types() -> None:
     """Registers serialize and deserialize behavior for Opentrons Hardware types and classes.
@@ -607,6 +694,7 @@ def register_hardware_types() -> None:
             opentrons_shared_data.pipette.pipette_definition,
             opentrons.hardware_control.nozzle_manager,
             opentrons_shared_data.gripper.gripper_definition,
+            opentrons.calibration_storage.ot3.models.v1,
         ]
     )
     for pydantic_type in opentrons_pydantic_types:
@@ -711,6 +799,27 @@ def register_hardware_types() -> None:
         class_type=opentrons.drivers.rpi_drivers.types.USBPort,
         dict_to_class=_usb_port_dict_to_class,
         class_to_dict=_usb_port_class_to_dict,
+    )
+
+    # pathlib Path registration
+    register_type_to_serpent(
+        class_type=Path,
+        dict_to_class=_path_dict_to_class,
+        class_to_dict=_path_class_to_dict,
+    )
+
+    # BundledFirmware registration
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.modules.types.BundledFirmware,
+        dict_to_class=_bundled_fw_dict_to_class,
+        class_to_dict=_bundled_fw_class_to_dict,
+    )
+
+    # ModuleCalibrationOffset registration
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.modules.module_calibration.ModuleCalibrationOffset,
+        dict_to_class=_ModuleCalibrationOffset_dict_to_class,
+        class_to_dict=_ModuleCalibrationOffset_class_to_dict,
     )
 
     # handle Typed Dicts for the hardware controller
