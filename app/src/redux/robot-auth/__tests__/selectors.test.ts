@@ -4,6 +4,7 @@ import {
   getAuthStateForRobot,
   getIsLoggedInToLocalRobot,
   getLocalRobotAuthState,
+  getMostRecentRobotName,
 } from '../slice'
 
 import type {
@@ -11,10 +12,17 @@ import type {
   DiscoveryClientRobotAddress,
 } from '@opentrons/discovery-client'
 import type { State } from '../../types'
+import type { RobotAuthState } from '../slice'
+
+function makeTestState(robotAuth: RobotAuthState): State {
+  return {
+    robotAuth,
+  } satisfies Partial<State> as State
+}
 
 describe('robot auth selectors', () => {
-  const stateWithRobotA = {
-    robotAuth: {
+  const stateWithRobotA = makeTestState({
+    perRobotAuthStates: {
       robotA: {
         username: 'alice',
         accessToken: 'token-a',
@@ -22,9 +30,13 @@ describe('robot auth selectors', () => {
         expiresAt: 1234,
       },
     },
-  } as unknown as State
+    mostRecentRobotName: 'robotA',
+  })
 
-  const emptyRobotAuthState = { robotAuth: {} } as unknown as State
+  const emptyRobotAuthState = makeTestState({
+    perRobotAuthStates: {},
+    mostRecentRobotName: null,
+  })
 
   describe('getAuthStateForRobot', () => {
     it('returns null when robot is not in state', () => {
@@ -68,12 +80,13 @@ describe('robot auth selectors', () => {
           },
         },
         robotAuth: {
-          [localRobot.name]: authState,
+          perRobotAuthStates: { [localRobot.name]: authState },
+          mostRecentRobotName: null,
         },
       } satisfies Partial<State> as State
 
       expect(getLocalRobotAuthState(state)).toStrictEqual(
-        state.robotAuth[localRobot.name]
+        state.robotAuth.perRobotAuthStates[localRobot.name]
       )
       expect(getIsLoggedInToLocalRobot(state)).toStrictEqual(true)
     })
@@ -85,7 +98,8 @@ describe('robot auth selectors', () => {
           robotsByName: {},
         },
         robotAuth: {
-          [localRobot.name]: authState,
+          perRobotAuthStates: { [localRobot.name]: authState },
+          mostRecentRobotName: null,
         },
       } satisfies Partial<State> as State
 
@@ -100,11 +114,32 @@ describe('robot auth selectors', () => {
             [localRobot.name]: localRobot,
           },
         },
-        robotAuth: {},
+        robotAuth: { perRobotAuthStates: {}, mostRecentRobotName: null },
       } satisfies Partial<State> as State
 
       expect(getLocalRobotAuthState(state)).toStrictEqual(null)
       expect(getIsLoggedInToLocalRobot(state)).toStrictEqual(false)
+    })
+  })
+
+  describe('getMostRecentRobotName', () => {
+    it('returns the most recent robot name', () => {
+      expect(
+        getMostRecentRobotName(
+          makeTestState({
+            perRobotAuthStates: {},
+            mostRecentRobotName: null,
+          })
+        )
+      ).toStrictEqual(null)
+      expect(
+        getMostRecentRobotName(
+          makeTestState({
+            perRobotAuthStates: {},
+            mostRecentRobotName: 'Otie',
+          })
+        )
+      ).toStrictEqual('Otie')
     })
   })
 })

@@ -27,6 +27,8 @@ from server_utils.auth.resource_server.auth_server import (
     CLIENT_ID,
     AuthSettingsResponse,
     Client,
+    RequireReasonForInteractionSettingsResponse,
+    RequireReasonForInteractionSettingsResponseData,
     TokenIntrospectionRequestFormData,
     TokenIntrospectionResponse,
 )
@@ -73,6 +75,17 @@ class _SelfClient(Client):
         response_body = {"data": {"accessControlEnabled": access_control_enabled}}
         converted_response_body = AuthSettingsResponse.model_validate(response_body)
         return converted_response_body
+
+    @override
+    async def get_require_reason_for_interaction_settings(
+        self,
+    ) -> RequireReasonForInteractionSettingsResponse:
+        settings = self._settings_store.get_settings()
+        return RequireReasonForInteractionSettingsResponse(
+            data=RequireReasonForInteractionSettingsResponseData(
+                requireReasonForInteraction=settings.requireReasonForInteraction,
+            )
+        )
 
     @override
     async def introspect_token(self, token: str) -> TokenIntrospectionResponse:

@@ -15,6 +15,9 @@ catalogs:
     react-i18next:
       specifier: 14.0.0
       version: 14.0.0
+    react-router-dom:
+      specifier: 6.24.1
+      version: 6.24.1
   react18:
     '@types/react-dom':
       specifier: 18.2.0
@@ -457,7 +460,7 @@ importers:
         specifier: 8.1.2
         version: 8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-select:
         specifier: 5.4.0
@@ -1045,7 +1048,7 @@ importers:
         specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       styled-components:
         specifier: 5.3.6
@@ -1127,7 +1130,7 @@ importers:
         specifier: 9.0.1
         version: 9.0.1(@types/react@18.2.51)(react@18.2.0)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-transition-group:
         specifier: 4.4.5
@@ -1287,7 +1290,7 @@ importers:
         specifier: 8.1.2
         version: 8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       redux:
         specifier: 5.0.1

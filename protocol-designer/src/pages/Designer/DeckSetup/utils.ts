@@ -599,7 +599,9 @@ export function getHighlightLabwareAndModules(
         const moduleIdUnderLabwareToUse =
           item.id != null &&
           labware[item.id] != null &&
-          getIsAdapter(item.id, labware)
+          getIsAdapter(item.id, labware) &&
+          // collars are unique adapters in that they can be moved around the deck
+          !getIsVacuumCollar(labware[item.id].def)
             ? getModuleIdFromStack(labware[item.id].stack, modules)
             : null
 
