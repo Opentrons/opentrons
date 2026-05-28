@@ -88,97 +88,97 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
   const robotState = useSelector(getRobotStateAtActiveItem)
   const invariantContext = useSelector(getInvariantContext)
 
-  return useMemo(
-    () => {
-      if (robotState == null) {
-        return {}
+  return useMemo(() => {
+    if (robotState == null) {
+      return {}
+    }
+    return Object.entries(robotState.labware).reduce<
+      Record<string, Record<string, AccessibilityStatus>>
+    >((acc, [id, { stack }]) => {
+      const { labwareEntities } = invariantContext
+      const { def, labwareDefURI } = labwareEntities[id]
+      const isMatchingTiprackOnDeck =
+        !stack.includes(OFFDECK) &&
+        def.parameters.isTiprack &&
+        labwareDefURI === tiprackUri
+      if (!isMatchingTiprackOnDeck) {
+        return acc
       }
-      return Object.entries(robotState.labware).reduce<
-        Record<string, Record<string, AccessibilityStatus>>
-      >((acc, [id, { stack }]) => {
-        const { labwareEntities } = invariantContext
-        const { def, labwareDefURI } = labwareEntities[id]
-        const isMatchingTiprackOnDeck =
-          !stack.includes(OFFDECK) &&
-          def.parameters.isTiprack &&
-          labwareDefURI === tiprackUri
-        if (!isMatchingTiprackOnDeck) {
-          return acc
-        }
-        const tipState = robotState?.tipState.tipracks[id] ?? null
-        if (tipState == null) {
-          return acc
-        }
-        const pipetteChannels = pipetteSpecs.channels
-        const wellNamesToCheck = getWellsToCheck(
-          nozzles,
-          def.ordering,
-          pipetteChannels,
-          primaryNozzle
-        )
-        return {
-          ...acc,
-          [id]: wellNamesToCheck.reduce<Record<string, AccessibilityStatus>>(
-            (tiprackAcc, wellName) => {
-              const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
-                tipState,
-                primaryNozzle,
-                channels: pipetteChannels,
-                nozzleConfiguration: nozzles,
-                wellName,
-                tiprackDef: def,
-                tipsToIgnore: selectedTips.flat(),
-              })
-              const isCollision = !getPipetteMovementSafetyStatus({
-                robotState,
-                invariantContext,
-                pipetteId,
-                labwareId: id,
-                wellTargetName: wellName,
-                primaryNozzle,
-                nozzleConfiguration: nozzles,
-              }).isSafe
-              const isAccessible = isSafe && (isComplete === true) && !isCollision
-              const affectedWells = 
-                getEntireWellSelection(
-                  wellName,
-                  def.ordering,
-                  nozzles,
-                  primaryNozzle,
-                  pipetteChannels
-                )
+      const tipState = robotState?.tipState.tipracks[id] ?? null
+      if (tipState == null) {
+        return acc
+      }
+      const pipetteChannels = pipetteSpecs.channels
+      const wellNamesToCheck = getWellsToCheck(
+        nozzles,
+        def.ordering,
+        pipetteChannels,
+        primaryNozzle
+      )
+      return {
+        ...acc,
+        [id]: wellNamesToCheck.reduce<Record<string, AccessibilityStatus>>(
+          (tiprackAcc, wellName) => {
+            const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
+              tipState,
+              primaryNozzle,
+              channels: pipetteChannels,
+              nozzleConfiguration: nozzles,
+              wellName,
+              tiprackDef: def,
+              tipsToIgnore: selectedTips.flat(),
+            })
+            const isCollision = !getPipetteMovementSafetyStatus({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId: id,
+              wellTargetName: wellName,
+              primaryNozzle,
+              nozzleConfiguration: nozzles,
+            }).isSafe
+            const isAccessible = isSafe && isComplete === true && !isCollision
+            const affectedWells = getEntireWellSelection(
+              wellName,
+              def.ordering,
+              nozzles,
+              primaryNozzle,
+              pipetteChannels
+            )
 
-              let status: AccessibilityStatus
-              if (isAccessible) {
-                status = { isAccessible: true, affectedWells }
+            let status: AccessibilityStatus
+            if (isAccessible) {
+              status = { isAccessible: true, affectedWells }
+            } else {
+              let inaccessibleReason: InaccessibleReason
+              if (isCollision) {
+                inaccessibleReason = INACCESSIBLE_COLLISION
+              } else if (!isSafe) {
+                inaccessibleReason = INACCESSIBLE_TOO_MANY_PICKUPS
               } else {
-                let inaccessibleReason: InaccessibleReason
-                if ( isCollision) {
-                  inaccessibleReason = INACCESSIBLE_COLLISION
-                } else if (!isSafe) {
-                  inaccessibleReason = INACCESSIBLE_TOO_MANY_PICKUPS
-                } else {
-                  inaccessibleReason = INACCESSIBLE_INCOMPLETE
-                }
-                status = { isAccessible: false, affectedWells, inaccessibleReason }
+                inaccessibleReason = INACCESSIBLE_INCOMPLETE
               }
+              status = {
+                isAccessible: false,
+                affectedWells,
+                inaccessibleReason,
+              }
+            }
 
-              return { ...tiprackAcc, [wellName]: status }
-            },
-            {}
-          ),
-        }
-      }, {})
-    },
-    [
-      robotState,
-      invariantContext,
-      nozzles,
-      primaryNozzle,
-      pipetteSpecs,
-      pipetteId,
-      tiprackUri,
-      selectedTips,
-    ]
-  )
+            return { ...tiprackAcc, [wellName]: status }
+          },
+          {}
+        ),
+      }
+    }, {})
+  }, [
+    robotState,
+    invariantContext,
+    nozzles,
+    primaryNozzle,
+    pipetteSpecs,
+    pipetteId,
+    tiprackUri,
+    selectedTips,
+  ])
 }

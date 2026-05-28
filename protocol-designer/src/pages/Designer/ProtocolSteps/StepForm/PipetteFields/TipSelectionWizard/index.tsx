@@ -127,24 +127,24 @@ export function TipSelectionWizard(
       labwareEntities,
       validTiprackIds,
     })
-  const isAnySelectedWellTooManyPickups = selectedTips
-    .some(group => {
-      const primaryWell = group[0]
-      const selectedStatus = selectedTiprackStatus[primaryWell]
-      return (
-        selectedStatus != null &&
-        !selectedStatus.isAccessible &&
-        selectedStatus.inaccessibleReason === INACCESSIBLE_TOO_MANY_PICKUPS
-      )
-    })
+  const isAnySelectedWellTooManyPickups = selectedTips.some(group => {
+    const primaryWell = group[0]
+    const selectedStatus = selectedTiprackStatus[primaryWell]
+    return (
+      selectedStatus != null &&
+      !selectedStatus.isAccessible &&
+      selectedStatus.inaccessibleReason === INACCESSIBLE_TOO_MANY_PICKUPS
+    )
+  })
   // Check physical tip state rather than the accessibility map for incompleteness. The map uses
-  // tipsToIgnore as all selected wells, so every selected group's own wells appear as isComplete=false. 
+  // tipsToIgnore as all selected wells, so every selected group's own wells appear as isComplete=false.
   // A group is actaully incomplete only when a well is physically absent in the robot state.
   const isAnySelectedWellIncomplete =
     tipState != null &&
     selectedTips.some(group => {
       const primary = group[0]
-      const affectedWells = selectedTiprackStatus[primary]?.affectedWells ?? group
+      const affectedWells =
+        selectedTiprackStatus[primary]?.affectedWells ?? group
       return affectedWells.some(w => tipState[w] === EMPTY)
     })
 

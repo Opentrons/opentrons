@@ -246,8 +246,9 @@ export function SelectTips(
     let allHoveredWells: string[]
 
     if (owningPrimary != null) {
-      allHoveredWells =
-        selectedTips.find(g => g[0] === owningPrimary) ?? [wellName]
+      allHoveredWells = selectedTips.find(g => g[0] === owningPrimary) ?? [
+        wellName,
+      ]
     } else {
       const directStatus = tipAccessibileStatusByWellName[wellName]
       if (directStatus != null) {
@@ -319,7 +320,8 @@ export function SelectTips(
         // getEntireWellSelection — snap-back groups (e.g. F1→[D1-H1] in a 5-nozzle
         // D1 config) would otherwise route clicks on invalid wells to a selected
         // primary and trigger incorrect deselection.
-        const actualClickedWell = Object.keys(getCollidingWells(rect))[0] ?? null
+        const actualClickedWell =
+          Object.keys(getCollidingWells(rect))[0] ?? null
         if (actualClickedWell != null) {
           handleClickWell(actualClickedWell)
         }
@@ -330,7 +332,8 @@ export function SelectTips(
       const filteredWellsUnderRect = wellsUnderRect.filter(wellGroup => {
         const primaryWell = wellGroup[0]
         return (
-          (tipAccessibileStatusByWellName[primaryWell]?.isAccessible ?? false) &&
+          (tipAccessibileStatusByWellName[primaryWell]?.isAccessible ??
+            false) &&
           hasPickupsRemaining
         )
       })
@@ -397,27 +400,29 @@ export function SelectTips(
                   group.includes(wellName)
                 )
                 const primaryOfGroup = groupContainingWell?.[0] ?? wellName
-                const primaryStatus = tipAccessibileStatusByWellName[primaryOfGroup]
+                const primaryStatus =
+                  tipAccessibileStatusByWellName[primaryOfGroup]
                 // Use physical tip state to detect truly erroneous selections.
                 // The accessibility map's isComplete accounts for tipsToIgnore
                 // (= all selected wells), so every group's own wells appear as
                 // incomplete — a false positive. Only COLLISION is safe to read
                 // from the map since it is independent of tipsToIgnore.
-                const affectedWells =
-                  primaryStatus?.affectedWells ?? groupContainingWell ?? [wellName]
+                const affectedWells = primaryStatus?.affectedWells ??
+                  groupContainingWell ?? [wellName]
                 const hasPhysicallyEmptyWell = affectedWells.some(
                   w => tipState?.[w] === EMPTY
                 )
                 const isGroupInError =
                   (primaryStatus != null &&
                     !primaryStatus.isAccessible &&
-                    primaryStatus.inaccessibleReason === INACCESSIBLE_COLLISION) ||
+                    primaryStatus.inaccessibleReason ===
+                      INACCESSIBLE_COLLISION) ||
                   hasPhysicallyEmptyWell
                 status = isGroupInError
                   ? SELECTED_ERROR
                   : rawState === USED
-                  ? SELECTED_USED
-                  : SELECTED
+                    ? SELECTED_USED
+                    : SELECTED
               } else if (allWellsAffectedByHover.includes(wellName)) {
                 status =
                   areAllHoveredWellsAccessibleAndOccupied && hasPickupsRemaining

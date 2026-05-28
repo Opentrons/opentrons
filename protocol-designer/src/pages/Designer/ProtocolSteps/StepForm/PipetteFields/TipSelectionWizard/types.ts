@@ -55,7 +55,6 @@ export type InaccessibleReason =
   | typeof INACCESSIBLE_PARTIAL_TIP
   | typeof INACCESSIBLE_WELL_SPACING_MISMATCH
 
-
 interface AccessibilityStatusBase {
   affectedWells: string[]
 }
@@ -67,10 +66,7 @@ interface InaccessibleStatus extends AccessibilityStatusBase {
   isAccessible: false
   inaccessibleReason: InaccessibleReason
 }
-export type AccessibilityStatus = 
-  | AccessibleStatus
-  | InaccessibleStatus
-
+export type AccessibilityStatus = AccessibleStatus | InaccessibleStatus
 
 export type TipSelectionBannerReason =
   | 'incompletePickup'
