@@ -539,13 +539,31 @@ export const getIsSafePickupWithinTiprack = (args: {
       const targetWellIndex = tipColumnOrdered.indexOf(wellName)
       const targetWellLength =
         PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+      // Active nozzle positions in the (possibly reversed) column ordering.
+      // Reversed columns grow toward index 0 (H→G→F→...) so active wells are
+      // slice(targetWellIndex - count + 1, targetWellIndex + 1).
+      // Non-reversed (A1 primary) columns grow toward higher indices so active
+      // wells are slice(targetWellIndex, targetWellIndex + count).
+      const activeWells = shouldReverse
+        ? tipColumnOrdered.slice(
+            targetWellIndex - targetWellLength + 1,
+            targetWellIndex + 1
+          )
+        : tipColumnOrdered.slice(
+            targetWellIndex,
+            targetWellIndex + targetWellLength
+          )
       return {
         isSafe: tipColumnOrdered
-          .slice(targetWellIndex + targetWellLength, tipColumnOrdered.length)
+          .slice(targetWellIndex + 1)
           .every(
             well => tipState[well] === EMPTY || tipsToIgnore.includes(well)
           ),
-        isComplete: tipState[wellName] !== EMPTY,
+        // All active nozzle wells must have tips AND must not be claimed by an
+        // earlier selection in the same wizard session (tipsToIgnore).
+        isComplete: activeWells.every(
+          well => tipState[well] !== EMPTY && !tipsToIgnore.includes(well)
+        ),
       }
     }
     // 8 channel pickup, full column
