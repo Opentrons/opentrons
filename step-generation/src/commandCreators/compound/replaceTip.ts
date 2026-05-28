@@ -90,10 +90,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       primaryNozzle,
       nozzles
     )
-    console.log(nextTiprackResult)
-    console.log(
-      prevRobotState.labware[nextTiprackResult.nextTiprack?.tiprackId ?? '']
-    )
 
     nextTiprack = nextTiprackResult.nextTiprack
     const tipracks = nextTiprackResult.tipracks
