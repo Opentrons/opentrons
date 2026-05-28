@@ -1273,3 +1273,15 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
             engine_client=self._engine_client, task_id=result.taskId
         )
         return start_execute_profile_result
+
+    def open_vent(self) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.OpenVentParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def close_vent(self) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.CloseVentParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
