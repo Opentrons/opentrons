@@ -2,7 +2,7 @@
 import argparse
 import asyncio
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
 from hardware_testing.drivers.touch_probe import TouchProbe, ProbeConfig
 
 # ============================================================================
