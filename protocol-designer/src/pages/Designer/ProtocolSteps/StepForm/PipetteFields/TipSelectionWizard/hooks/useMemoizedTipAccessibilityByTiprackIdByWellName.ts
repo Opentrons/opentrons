@@ -46,14 +46,18 @@ export const getWellsToCheck = (
   } else if (nozzles === COLUMN || (channels === 8 && nozzles === ALL)) {
     return wellOrdering.map(col => col[0])
   } else if (nozzles === PARTIAL_COLUMN && primaryNozzle != null) {
-    const count = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-    // Single-column labware has no snap-back; all wells are valid primaries.
+    // partial column config
+    const nozzleCount =
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
     const isSingleColumn = wellOrdering.length === 1
     return wellOrdering.flatMap(column => {
-      if (isSingleColumn) return column
-      // Wells beyond (length - count) would snap back to the same final group,
-      // so only the first (length - count + 1) wells are unique primaries.
-      const uniqueCount = Math.max(1, column.length - count + 1)
+      if (isSingleColumn) {
+        return column
+      }
+      // find only valid primaries such that the nozzles wouldn't "fall off" the labware
+      // for example, if you have 3 nozzles configured, the only valid wells to check
+      // are column wells A-F (targeting G + H does not supply enough wells)
+      const uniqueCount = Math.max(1, column.length - nozzleCount + 1)
       return column.slice(0, uniqueCount)
     })
   } else {

@@ -99,8 +99,8 @@ export function TipSelectionWizard(
       const primary = group[0]
       const affectedWells = selectedTiprackStatus[primary]?.affectedWells
       return affectedWells != null
-        ? [...affectedWells].some(w => tipState[w] === DIRTY)
-        : group.some(w => tipState[w] === DIRTY)
+        ? affectedWells.some(tip => tipState[tip] === DIRTY)
+        : group.some(tip => tipState[tip] === DIRTY)
     })
   const handleSave = (): void => {
     updateFormTiprackSelected(selectedTiprackId)
@@ -138,7 +138,7 @@ export function TipSelectionWizard(
   })
   // Check physical tip state rather than the accessibility map for incompleteness. The map uses
   // tipsToIgnore as all selected wells, so every selected group's own wells appear as isComplete=false.
-  // A group is actaully incomplete only when a well is physically absent in the robot state.
+  // A group is actually incomplete only when a well is physically absent in the robot state.
   const isAnySelectedWellIncomplete =
     tipState != null &&
     selectedTips.some(group => {
