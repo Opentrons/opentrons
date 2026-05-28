@@ -2,7 +2,8 @@
 
 from pathlib import Path
 
-from cryptography.hazmat.primitives import serialization
+import pytest
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
@@ -132,3 +133,50 @@ def test_create_or_load_loads_own_creation(tmp_path: Path) -> None:
     created_key = key_utils.create_or_load(tmp_path / "some-keyfile.der")
     loaded_key = key_utils.create_or_load(tmp_path / "some-keyfile.der")
     assert created_key.private_bytes_raw() == loaded_key.private_bytes_raw()
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        pytest.param(
+            b"",
+            id="empty",
+        ),
+        pytest.param(
+            b"\xaa",
+            id="one",
+        ),
+        pytest.param(
+            b"\xaa" * 32,
+            id="small",
+        ),
+        pytest.param(
+            b"\xaa" * (key_utils.HASH_CHUNK_SIZE - 1),
+            id="one-under-chunk",
+        ),
+        pytest.param(b"\xaa" * key_utils.HASH_CHUNK_SIZE, id="exactly-chunk"),
+        pytest.param(
+            b"\xaa" * (key_utils.HASH_CHUNK_SIZE + 1),
+            id="one-over-chunk",
+        ),
+        pytest.param(b"\xaa" * (key_utils.HASH_CHUNK_SIZE * 2), id="two-chunks"),
+        pytest.param(b"\xaa" * (key_utils.HASH_CHUNK_SIZE * 10), id="ten-chunks"),
+    ],
+)
+async def test_hashes_various_size_content(content: bytes) -> None:
+    """It should correctly hash bytes of various sizes relative to the chunk size."""
+    hasher = hashes.Hash(hashes.SHA256())
+    hasher.update(content)
+    oneshot = hasher.finalize()
+    assert await key_utils.hash_content(content) == oneshot
+
+
+def test_sign_hashpair_verifies() -> None:
+    """It should generate a signature that can be verified"""
+    key = Ed25519PrivateKey.generate()
+    hash_1 = b"asdasdasd"
+    hash_2 = b"lkjlkjlkj"
+    content = hash_1 + hash_2
+    signature = key_utils.sign_hashpair(hash_1, hash_2, key)
+    public = key.public_key()
+    public.verify(signature, content)
