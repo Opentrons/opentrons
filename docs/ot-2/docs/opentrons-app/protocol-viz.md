@@ -34,7 +34,7 @@ For each step of your protocol, the deck view changes to include liquid, labware
 !!! note
     In the example protocol above, liquids are assigned a color in Protocol Designer, so wells containing liquids are colored and changes on the deck are more visible.
 
-    You're not required to define or label liquids in protocols created using the Python Protocol API. In order to see liquid changes on the deck, we recommend using [optional liquid labels][labeling-wells-and-reservoirs] and colors for the best protocol visualization.
+    You're not required to define or label liquids in protocols created using the Python Protocol API. To see liquid changes on the deck, we recommend using [optional liquid labels][labeling-wells-and-reservoirs] and colors for the best protocol visualization.
 
 ## Step details
 
@@ -43,11 +43,11 @@ For each step, additional protocol details appear on the right side of the scree
 - **Pipettes**: attached pipettes and their mounts, including the active pipette performing liquid handling actions.
 - **Tip pickup**: a closer look at where tips will be picked up for this step, including the number of remaining tips in the rack.
 - **Well view**: well dimensions, the position of the pipette's attached tip, and a side view of liquids in the well.
-- **Labware**: top-down view liquid and well changes in labware like well plates and reservoirs.
+- **Labware**: top-down view of liquid and well changes in labware like well plates and reservoirs.
 
 <figure class="screenshot" markdown>
 ![Protocol viz details](../images/viz-details.png)
-<figcaption> Examples of additional protocol details available on the right side of the screen.</figcaption>
+<figcaption>Examples of additional protocol details available on the right side of the screen.</figcaption>
 </figure>
 
 ## Slot spotlights
@@ -56,7 +56,7 @@ At any point in your protocol, hover over labware on the deck to see labware nam
 
 <figure class="screenshot" markdown>
 ![Image showing slot spotlight view.](../images/slot-spotlight.png)
-<figcaption>A spotlight for slot 3, showing view changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.
+<figcaption>A spotlight for slot 3, showing view changes for the Temperature Module and any labware and liquids inside. Hover over individual wells to view liquid volumes.</figcaption>
 </figure>
 
 Open a slot spotlight to see changes over the course of your protocol. For example, spotlight a slot with a tip rack and drag the blue bar to see how quickly tips from that rack are used. Or spotlight a slot with a module to see changes in temperature, lid position, or other status.
