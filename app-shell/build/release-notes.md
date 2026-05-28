@@ -8,7 +8,9 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons App Changes in 9.1.0
 
-Welcome to the v9.1.0 release of the Opentrons App! This release introduces the Opentrons App for Flex and includes other new features, improvements, and bug fixes.
+Welcome to the v9.1.0 release of the Opentrons App! This release introduces an Opentrons App version specifically for use with the Flex and includes other new features, improvements, and bug fixes.
+
+Download the Opentrons OT-2 App [here][https://opentrons.com/app].
 
 ### New Features
 
@@ -24,6 +26,7 @@ Welcome to the v9.1.0 release of the Opentrons App! This release introduces the 
 - View individual labware loaded off-deck to check liquid volumes and locations.
 - Protocol run setup correctly displays the number of labware loaded in a Flex Stacker.
 - Slot spotlights in protocol visualization correctly display the number of tips returned to an empty tip rack.
+- Open slot spotlights for deck slots containing a Flex Stacker without crashes in the app. 
 
 ---
 
