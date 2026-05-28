@@ -32,10 +32,10 @@ def _generate_temporary_password(
     if not require_special_characters:
         return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
 
-    special = secrets.choice(_PASSWORD_SPECIAL_CHARACTERS)
-    alphanumeric = "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length - 1))
-    position = secrets.randbelow(min_length)
-    return alphanumeric[:position] + special + alphanumeric[position:]
+    return "".join(
+        secrets.choice(_ALPHANUMERIC + _PASSWORD_SPECIAL_CHARACTERS)
+        for _ in range(min_length)
+    )
 
 
 def _temporary_password_requirements(

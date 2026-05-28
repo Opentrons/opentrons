@@ -229,3 +229,38 @@ async def get_self(  # noqa: D103
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=user),
     )
+
+
+@PydanticResponse.wrap_route(
+    router.post,
+    path="/auth/users/self/resetPassword",
+    summary="Reset the currently logged-in user's password",
+    description=(
+        "Reset the currently logged-in user's password to a newly generated temporary "
+        "password. The user must change their password upon next login."
+    ),
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[ResetPasswordResponse]},
+        fastapi.status.HTTP_401_UNAUTHORIZED: {},
+    },
+)
+async def reset_self_password(
+    authorization_details: Annotated[
+        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_READ_SELF))
+    ],
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
+) -> PydanticResponse[SimpleBody[ResetPasswordResponse]]:
+    """Reset the current user's password to a random temporary password."""
+    if isinstance(authorization_details, AuthorizationNotRequiredResult):
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="This endpoint needs an access token to determine the current user.",
+        )
+
+    result = user_data_manager.reset_user_password(authorization_details.username)
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(data=result),
+    )

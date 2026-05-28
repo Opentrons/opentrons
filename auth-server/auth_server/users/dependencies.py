@@ -2,8 +2,7 @@
 
 from typing import Annotated
 
-import fastapi
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.engine import Engine as SQLEngine
 
 from server_utils.fastapi_utils.app_state import (
@@ -51,7 +50,7 @@ async def get_user_by_username(
     try:
         return user_data_manager.get_user(username)
     except UserNotFoundError:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
