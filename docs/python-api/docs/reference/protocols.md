@@ -13,4 +13,4 @@ description: "Protocol context, metadata, and protocol-level API reference."
 
 ::: opentrons.protocol_api.Task
 
-::: opentrons.protocol_api.GroupedSteps
+::: opentrons.protocol_api._command_annotations.GroupedSteps
