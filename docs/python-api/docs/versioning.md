@@ -55,7 +55,10 @@ On the one hand, using the highest available version will give your protocol acc
 
 The maximum supported API version for your robot is listed in the Opentrons App under **Robots** > your robot > **Robot Settings** > **Advanced**. Before version 6.0.0 of the app, the same information was listed on your robot's **Information** card.
 
-If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
+If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App.
+
+!!! note
+    API version 2.29 and newer include separate robot software and apps for the Flex and OT-2 robots. After updating your OT-2 to the latest software version, download the [Opentrons OT-2 App](https://opentrons.com/app).
 
 Opentrons robots running the latest software ({{ robot_stack_version }}) support the following version ranges: 
 
