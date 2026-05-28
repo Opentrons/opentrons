@@ -516,6 +516,7 @@ class FailedGripperPickupError(RoboticsControlError):
             wrapping,
         )
 
+
 class EdgeNotFoundError(RoboticsControlError):
     """An error indicating that a calibration square edge was not able to be found."""
 
@@ -532,6 +533,7 @@ class EdgeNotFoundError(RoboticsControlError):
             detail,
             wrapping,
         )
+
 
 class EarlyCapacitiveSenseTrigger(RoboticsControlError):
     """An error indicating that a capacitive probe triggered too early."""
@@ -879,7 +881,6 @@ class FlexStackerHopperLabwareError(RoboticsInteractionError):
         self.args = (serial, labware_expected, message, detail, wrapping)
 
 
-
 class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
     """An error occurred when the Flex Stacker Shuttle is not empty when it should be."""
 
@@ -908,6 +909,7 @@ class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
             wrapping,
         )
         self.args = (serial, shuttle_state, labware_expected, message, detail, wrapping)
+
 
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
     """An error indicating that a firmware update is required."""
@@ -1246,7 +1248,13 @@ class CommandParameterLimitViolated(GeneralError):
                 for e in wrapping_checked
             ],
         )
-        self.args = (command_name, parameter_name, limit_statement, actual_value, wrapping)
+        self.args = (
+            command_name,
+            parameter_name,
+            limit_statement,
+            actual_value,
+            wrapping,
+        )
 
 
 class UnsupportedHardwareCommand(GeneralError):
