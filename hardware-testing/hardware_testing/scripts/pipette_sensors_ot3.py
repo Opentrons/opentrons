@@ -8,7 +8,8 @@ from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
 from opentrons_hardware.firmware_bindings.constants import SensorId, SensorType
 
-from hardware_testing.opentrons_api.types import OT3Mount
+
+from opentrons.hardware_control.types import OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
 
 

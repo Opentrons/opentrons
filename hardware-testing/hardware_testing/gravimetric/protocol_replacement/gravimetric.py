@@ -468,6 +468,7 @@ class FixtureSettings(CSVSettings):
             trials=csv_settings.trials,
             name=csv_settings.name,
             run_id=run_id,
+            blank_trials=csv_settings.blank_trials,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
         )
