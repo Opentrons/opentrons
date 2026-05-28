@@ -36,15 +36,15 @@ async def sign_message(
     """Sign a message on request."""
     message_hash = await signing_key_manager.hash_message(request_body.data.message)
     signature = signing_key_manager.sign_hashpair(
-        message_hash, request_body.data.previous_hash
+        message_hash, request_body.data.previousHash
     )
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(
             data=SignedMessage.model_construct(
                 message=request_body.data.message,
-                message_hash=message_hash,
-                message_signature=signature,
-                signature_version=signing_key_manager.implemented_version,
+                messageHash=message_hash,
+                messageSignature=signature,
+                signatureVersion=signing_key_manager.implemented_version,
             )
         ),
         status_code=fastapi.status.HTTP_200_OK,
@@ -66,6 +66,6 @@ async def get_public_key(
     public_key = signing_key_manager.get_public_key_pem()
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(
-            data=SigningPublicKey.model_construct(public_key_pem=public_key)
+            data=SigningPublicKey.model_construct(publicKeyPem=public_key)
         )
     )

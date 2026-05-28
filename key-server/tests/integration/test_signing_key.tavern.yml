@@ -13,7 +13,7 @@ stages:
       status_code: 200
       json:
         data:
-          public_key_pem: "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAqvlF5UaVgYPvt/vNtirrzIWSlARPyf69ZVWpnSqpdB4=\n-----END PUBLIC KEY-----\n"
+          publicKeyPem: "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAqvlF5UaVgYPvt/vNtirrzIWSlARPyf69ZVWpnSqpdB4=\n-----END PUBLIC KEY-----\n"
   - name: Get message signature with a none hash
     request:
       method: POST
@@ -21,15 +21,15 @@ stages:
       json:
         data:
           message: 'hello world'
-          previous_hash: null
+          previousHash: null
     response:
       status_code: 200
       json:
         data:
           message: 'hello world'
-          message_hash: 'sha256:uU0nuZNNPgilLlLX2n2r-sSE7-N6U4DukIj3rOLvzek='
-          message_signature: 'ed25519:4ZvNo2ZJ4GuRPowoTSLBmlzoOaUpVZKpq86QwWlz0t17gisEsXOCTSJgSwhGiJvxFQwWV-H1RyzdlMPace5oBA=='
-          signature_version: 1
+          messageHash: 'sha256:uU0nuZNNPgilLlLX2n2r-sSE7-N6U4DukIj3rOLvzek='
+          messageSignature: 'ed25519:4ZvNo2ZJ4GuRPowoTSLBmlzoOaUpVZKpq86QwWlz0t17gisEsXOCTSJgSwhGiJvxFQwWV-H1RyzdlMPace5oBA=='
+          signatureVersion: 1
   - name: Get message signature with provided hash
     request:
       method: POST
@@ -37,12 +37,12 @@ stages:
       json:
         data:
           message: 'hello world'
-          previous_hash: 'sha256:YXNsZGhhbHNkaGFzZGE='
+          previousHash: 'sha256:YXNsZGhhbHNkaGFzZGE='
     response:
       status_code: 200
       json:
         data:
           message: 'hello world'
-          message_hash: 'sha256:uU0nuZNNPgilLlLX2n2r-sSE7-N6U4DukIj3rOLvzek='
-          message_signature: 'ed25519:Mtkdob5mctnAD_VK17h5CT0WuwV-UvYCfsReze2o_KAfG74SQIYCzD8AHBljAel4jhO9DTAQRWhW3lB4fOSaBQ=='
-          signature_version: 1
+          messageHash: 'sha256:uU0nuZNNPgilLlLX2n2r-sSE7-N6U4DukIj3rOLvzek='
+          messageSignature: 'ed25519:Mtkdob5mctnAD_VK17h5CT0WuwV-UvYCfsReze2o_KAfG74SQIYCzD8AHBljAel4jhO9DTAQRWhW3lB4fOSaBQ=='
+          signatureVersion: 1

@@ -15,7 +15,7 @@ class SignableMessage(BaseModel):
             description="The message to sign. This should be representable in UTF-8 (it will be hashed in that encoding).",
         ),
     ]
-    previous_hash: Annotated[
+    previousHash: Annotated[
         str | None,
         Field(
             ...,
@@ -32,35 +32,35 @@ class SignedMessage(BaseModel):
     """A message that has been signed by the robot's signing key."""
 
     message: Annotated[str, Field(..., description="The message that has been signed.")]
-    message_hash: Annotated[
+    messageHash: Annotated[
         str,
         Field(
             ...,
             description=(
-                "The hash of the concatenation of hash(message) + previous_hash. This value is in the format "
+                "The hash of the concatenation of hash(message) + previousHash. This value is in the format "
                 '"hashAlg:b64hash" where hashAlg is sha256 and b64hash is the url-safe base64 encoding of the binary hash data.'
             ),
         ),
     ]
-    message_signature: Annotated[
+    messageSignature: Annotated[
         str,
         Field(
             ...,
             description=(
-                'The signature of the message_hash. This value is in the form "sigAlg:b64sig" where sigAlg identifies the signature '
+                'The signature of the messageHash. This value is in the form "sigAlg:b64sig" where sigAlg identifies the signature '
                 "method, here ed25519, and b64sig is the url-safe base64 encoding of the Ed25519 signature of the hash field."
             ),
         ),
     ]
-    signature_version: Annotated[
+    signatureVersion: Annotated[
         Literal[1],
         Field(
             default=1,
             description=(
-                "The version of the signing algorithm used. In version 1, the signature is an Ed25519 signature over (message_hash + previous_hash) "
-                "where + indicates concatenation, message_hash is the SHA-256 hash of the provided message encoded as UTF-8 with no replacements "
-                "(signing fails if a message character cannot be represented in UTF-8), previous_hash is the SHA-256 hash of the previous message "
-                "as provided by the request, and if previous_hash is None the empty byte string is used instead. Signatures of empty messages are allowed."
+                "The version of the signing algorithm used. In version 1, the signature is an Ed25519 signature over (messageHash + previousHash) "
+                "where + indicates concatenation, messageHash is the SHA-256 hash of the provided message encoded as UTF-8 with no replacements "
+                "(signing fails if a message character cannot be represented in UTF-8), previousHash is the SHA-256 hash of the previous message "
+                "as provided by the request, and if previousHash is None the empty byte string is used instead. Signatures of empty messages are allowed."
             ),
         ),
     ]
@@ -69,7 +69,7 @@ class SignedMessage(BaseModel):
 class SigningPublicKey(BaseModel):
     """The public key used for signing messages."""
 
-    public_key_pem: Annotated[
+    publicKeyPem: Annotated[
         str,
         Field(..., description="The public key in PEM SubjectPublicKeyInfo format."),
     ]
