@@ -49,6 +49,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from ..data import get_git_description, csv_report
@@ -324,7 +325,9 @@ class DeviceUnderTest(Enum):
         return lookup[mount]
 
 
-def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
+def _get_serial_for_dut(
+    api: Union[OT3API, SyncHardwareAPI], dut: DeviceUnderTest
+) -> str:
     if dut == DeviceUnderTest.ROBOT:
         return get_robot_serial_ot3(api)
     elif dut == DeviceUnderTest.PIPETTE_LEFT or dut == DeviceUnderTest.PIPETTE_RIGHT:
@@ -343,7 +346,7 @@ def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
 
 
 def set_csv_report_meta_data_ot3(
-    api: OT3API,
+    api: Union[OT3API, SyncHardwareAPI],
     report: csv_report.CSVReport,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
@@ -1164,7 +1167,7 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     return f"P{volume}{channels}V{version}{id}"
 
 
-def get_robot_serial_ot3(api: OT3API) -> str:
+def get_robot_serial_ot3(api: Union[OT3API, SyncHardwareAPI]) -> str:
     """Get robot serial number."""
     if api.is_simulator:
         return "FLXA1000000000000"
