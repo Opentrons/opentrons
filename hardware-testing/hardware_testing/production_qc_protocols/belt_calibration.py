@@ -312,6 +312,13 @@ def run_belt_calibration(
     current_pos = api.gantry_position(mount)
     api.move_to(mount, attach_pos._replace(z=current_pos.z))
     api.move_rel(mount, Point(x=0, y=0, z=-20))
+    found = False
+    while not found:
+        ctx.pause("Attach Pipette: Press Resume when Ready")
+        found = api.hardware_pipettes[mount.to_mount()] is not None
+        if not found:
+            ctx.delay(seconds=5, msg="No pipette found try again or quit the protocol.")
+
     ctx.pause("Attach probe to pipette")
 
     without_data: Optional[_TestBeltCalibrationData] = None
@@ -351,8 +358,6 @@ def run_belt_calibration(
 def run(ctx: ProtocolContext) -> None:
     """Entry point into testing protocol."""
     ctx.comment("starting belt calibration.")
-    pipette = ctx.load_instrument("flex_1channel_1000", "left")
-    ctx.pause(f"{pipette.default_speed}")
     before: Optional[_TestBeltCalibrationData] = None
     after: Optional[_TestBeltCalibrationData] = None
     attitude: Optional[AttitudeMatrix] = None
