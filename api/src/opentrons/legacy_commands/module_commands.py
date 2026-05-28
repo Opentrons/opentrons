@@ -3,7 +3,7 @@ from typing import Any, List
 
 from . import types as command_types
 from opentrons.drivers import utils
-from opentrons.hardware_control.modules import ThermocyclerStep
+from opentrons.hardware_control.modules import ThermocyclerStep, VacuumModuleProfileStep
 
 
 def magdeck_engage() -> command_types.MagdeckEngageCommand:
@@ -373,5 +373,16 @@ def vacuum_module_stop_vacuum(
     text = f"Stopping module {self}"
     return {
         "name": command_types.VACUUM_MODULE_STOP_VACUUM,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_start_execute_profile(
+    self: Any,
+    steps: List[VacuumModuleProfileStep],
+) -> command_types.VacuumModuleStartExecuteProfileCommand:
+    text = f"starting {self} profile"
+    return {
+        "name": command_types.VACUUM_MODULE_START_EXECUTE_PROFILE,
         "payload": {"text": text},
     }
