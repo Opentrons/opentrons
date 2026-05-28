@@ -1,7 +1,12 @@
 # e2e-testing makefile
 
+SHELL := bash
+
 # Environment selection (local, sandbox, staging, prod)
 TEST_ENV ?= local
+
+# Parallel pytest workers (override: make test-pd-local XDIST_ARGS="-n 0")
+XDIST_ARGS ?= -n 2 --dist loadscope
 
 .PHONY: setup
 setup:
@@ -23,7 +28,7 @@ lint:
 
 .PHONY: typecheck
 typecheck:
-	uv run mypy automation tests conftest.py
+	uv run mypy automation tests conftest.py pd_server.py
 
 .PHONY: prep
 prep: 
@@ -34,11 +39,23 @@ prep:
 .PHONY: check
 check: lint typecheck
 
+.PHONY: serve-pd
+serve-pd:
+	uv run python pd_server.py
+
 .PHONY: test-pd-local
 test-pd-local:
-	@# Always print the summary banner, but preserve pytest's exit code.
-	@status=0; \
-	TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS) || status=$$?; \
+	@# Local dev: run `make serve-pd` in another terminal first (needed for xdist).
+	@# CI (CI=true): builds and serves PD via pd_server.py, then runs pytest.
+	@set -euo pipefail; \
+	status=0; \
+	if [ "$${CI:-}" = "true" ]; then \
+	  echo "Starting Protocol Designer via make serve-pd..."; \
+	  $(MAKE) serve-pd & pd_pid=$$!; \
+	  trap 'kill $$pd_pid 2>/dev/null || true; wait $$pd_pid 2>/dev/null || true' EXIT INT TERM; \
+	  uv run python pd_server.py --wait || exit 1; \
+	fi; \
+	TEST_ENV=local uv run pytest -m pdE2E $(XDIST_ARGS) $(PYTEST_ARGS) || status=$$?; \
 	echo ""; \
 	echo "---------------------------------------------------------"; \
 	echo "🧪 Tests Finished!"; \
@@ -56,9 +73,9 @@ troubleshoot:
 
 .PHONY: test-pd-local-headed
 test-pd-local-headed:
-	@echo "Example to run one test: "
-	@echo "make test-pd-local PYTEST_ARGS=\"-k test_flex_onboarding_workflow\""
-	TEST_ENV=local HEADLESS=false uv run pytest -m pdE2E $(PYTEST_ARGS)
+	@# Headed debugging: always sequential (no xdist); use PYTEST_ARGS="-k ..." for one test.
+	@echo "Example: make test-pd-local-headed PYTEST_ARGS=\"-k test_pd_home\""
+	TEST_ENV=local HEADLESS=false uv run pytest -m pdE2E -n 0 $(PYTEST_ARGS)
 
 # TODO: Implement sandbox testing with branch-specific URL
 .PHONY: test-pd-sandbox
