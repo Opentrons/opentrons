@@ -42,7 +42,7 @@
     "query-string": "6.2.0",
     "react": "catalog:react18",
     "react-dom": "catalog:react18",
-    "react-router-dom": "6.24.1",
+    "react-router-dom": "catalog:",
     "styled-components": "5.3.6",
     "yup": "0.32.9"
   }

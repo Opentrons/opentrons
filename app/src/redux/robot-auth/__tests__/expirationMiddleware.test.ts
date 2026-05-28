@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { rootReducer } from '../../reducer'
 import { expirationMiddleware } from '../expirationMiddleware'
-import { logInOrRefresh } from '../slice'
+import { logIn, refreshLogin } from '../slice'
 
 import type { State } from '../../types'
 
@@ -34,7 +34,7 @@ describe('expirationMiddleware', () => {
     })
 
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-a-expires-at-3000',
         username: 'username',
         accessToken: 'accessToken',
@@ -43,7 +43,7 @@ describe('expirationMiddleware', () => {
       })
     )
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-b-expires-at-1000',
         username: 'username',
         accessToken: 'accessToken',
@@ -52,7 +52,7 @@ describe('expirationMiddleware', () => {
       })
     )
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-c-expires-at-2000',
         username: 'username',
         accessToken: 'accessToken',
@@ -61,7 +61,7 @@ describe('expirationMiddleware', () => {
       })
     )
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-d-expires-never',
         username: 'username',
         accessToken: 'accessToken',
@@ -108,7 +108,7 @@ describe('expirationMiddleware', () => {
     })
 
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-a',
         username: 'username',
         accessToken: 'accessToken',
@@ -132,7 +132,7 @@ describe('expirationMiddleware', () => {
     })
 
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-a',
         username: 'username',
         accessToken: 'accessToken',
@@ -141,7 +141,7 @@ describe('expirationMiddleware', () => {
       })
     )
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-b',
         username: 'username',
         accessToken: 'accessToken',
@@ -157,7 +157,7 @@ describe('expirationMiddleware', () => {
     ])
 
     store.dispatch(
-      logInOrRefresh({
+      refreshLogin({
         robotName: 'robot-a',
         username: 'username',
         accessToken: 'accessToken',
@@ -178,7 +178,7 @@ describe('expirationMiddleware', () => {
     })
 
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-a',
         username: 'username',
         accessToken: 'accessToken',
@@ -187,7 +187,7 @@ describe('expirationMiddleware', () => {
       })
     )
     store.dispatch(
-      logInOrRefresh({
+      logIn({
         robotName: 'robot-b',
         username: 'username',
         accessToken: 'accessToken',
@@ -206,5 +206,5 @@ describe('expirationMiddleware', () => {
 })
 
 function getUnexpiredRobots(state: State): string[] {
-  return Object.keys(state.robotAuth).sort()
+  return Object.keys(state.robotAuth.perRobotAuthStates).sort()
 }

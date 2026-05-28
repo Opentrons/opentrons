@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -16,6 +16,7 @@ import {
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
@@ -41,6 +42,7 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   DeckConfiguration,
@@ -59,6 +61,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   createdMaintenanceRunId: string | null
   deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
+  documentationState: DocumentationState
 }
 export const BeforeBeginning = (
   props: BeforeBeginningProps
@@ -80,18 +83,24 @@ export const BeforeBeginning = (
     maintenanceRunId,
     createdMaintenanceRunId,
     deckConfig,
+    documentationState,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  useEffect(
-    () => {
-      if (createdMaintenanceRunId == null) {
-        createMaintenanceRun({})
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+
+  const hasSentCreateMaintenanceRun = useRef(false)
+  useEffect(() => {
+    if (createdMaintenanceRunId != null) return
+    if (isCreateLoading || hasSentCreateMaintenanceRun.current) return
+    if (!isDocumentationProvided(documentationState)) return
+
+    hasSentCreateMaintenanceRun.current = true
+    createMaintenanceRun({})
+  }, [
+    createMaintenanceRun,
+    createdMaintenanceRunId,
+    documentationState,
+    isCreateLoading,
+  ])
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =

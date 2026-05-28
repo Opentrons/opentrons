@@ -316,7 +316,7 @@ jobs:
           WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
-          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}
+          APPLE_ID: ${{ vars.OT_APP_APPLE_ID_V2 }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD_V2 }}
           APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID_V2 }}
           HOST_PYTHON: python

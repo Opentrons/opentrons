@@ -16,9 +16,10 @@ export interface UseHandleConditionalCleanupResult {
 export function useHandleClose({
   onCloseClick,
   maintenanceRunId,
+  commandDocState,
 }: UseLPCCommandChildProps): UseHandleConditionalCleanupResult {
   const [isExiting, setIsExiting] = useState(false)
-  const { chainRunCommands } = useChainMaintenanceCommands()
+  const { chainRunCommands } = useChainMaintenanceCommands(commandDocState)
 
   const handleHomeAndClose = (): Promise<void> => {
     setIsExiting(true)
