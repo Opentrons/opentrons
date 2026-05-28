@@ -178,4 +178,15 @@ To fix the collision error, move the tip racks so they are no longer adjacent, o
 
 Fix all errors before exporting to ensure your protocol runs successfully. You won't be able to run protocols with unresolved errors. 
 
+To make it easier to resolve tip pickup warnings, be sure **Manual tip tracking** is selected, then click to select tips for manual pickup. This form can show you which selection is causing the collision error, and which tip pickups could work for your step. 
+
+<figure class="screenshot" markdown>
+  ![Inaccessible tip selections](../images/inaccessible-tip-pickup.png)
+  <figcaption>The Flex 96-channel pipette can only access one tip in the rack.</figcaption>
+</figure>
+
+Here, the Flex 96-channel pipette can only access one tip in the rack (H8). Because of the deck layout, any other tip selection will cause a collision. 
+
+
+
 
