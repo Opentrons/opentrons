@@ -1,6 +1,8 @@
 // This is the main unifying function for maintenanceRun and fixit type flows.
 import { useState } from 'react'
 
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+
 import { useDropTipCommandErrors } from '.'
 import { useDropTipCommands } from './useDropTipCommands'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
@@ -36,10 +38,11 @@ export function useDropTipWithType(
 
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
   const { errorDetails, setErrorDetails } = useErrorDetails()
-
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
   const activeMaintenanceRunId = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
+    commandDocState,
   })
 
   const dtCreateCommandUtils = useDropTipCreateCommands({
@@ -48,6 +51,7 @@ export function useDropTipWithType(
     issuedCommandsType,
     activeMaintenanceRunId,
     fixitCommandTypeUtils,
+    commandDocState,
   })
   const dropTipCommands = useDropTipCommands({
     ...params,
@@ -56,6 +60,8 @@ export function useDropTipWithType(
     setErrorDetails,
     toggleIsExiting,
     fixitCommandTypeUtils,
+    commandDocState,
+    deletionDocState,
   })
 
   return {

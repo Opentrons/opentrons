@@ -1,9 +1,13 @@
-export interface DocumentationReport {
-  note: string
-  confirmedAt: string
-  documentedBy: string
-}
+import type {
+  MutationFunction,
+  MutationKey,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
 
+export type DocumentationReport = string & {
+  readonly _brand: 'DocumentationReport'
+}
 /**
  * Documentation state to be passed to the useDocumentedMutation hook.
  *
@@ -19,3 +23,24 @@ export type DocumentationState =
       docreport: null
       askForDocumentation: () => Promise<DocumentationReport>
     }
+
+/**
+ * Call signatures for useDocumentedMutation — mirrors the `useMutation`
+ * shapes actually used in this codebase:
+ *   (state, mutationFn, options?)
+ *   (state, mutationKey, mutationFn, options?)
+ */
+export interface UseDocumentedMutation {
+  <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
+    documentationState: DocumentationState,
+    mutationFn: MutationFunction<TData, TVariables>,
+    options?: UseMutationOptions<TData, TError, TVariables, TContext>
+  ): UseMutationResult<TData, TError, TVariables, TContext>
+
+  <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
+    documentationState: DocumentationState,
+    mutationKey: MutationKey,
+    mutationFn: MutationFunction<TData, TVariables>,
+    options?: UseMutationOptions<TData, TError, TVariables, TContext>
+  ): UseMutationResult<TData, TError, TVariables, TContext>
+}
