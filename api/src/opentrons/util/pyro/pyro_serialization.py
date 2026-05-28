@@ -3,6 +3,7 @@
 import builtins
 import enum
 import inspect
+import pickle
 from contextlib import contextmanager
 from types import ModuleType
 from typing import Any, Callable, Iterator
@@ -11,6 +12,8 @@ import serpent
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
+
+from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 PYRO_PROXY = "PYRO_PROXY"
 
@@ -102,6 +105,34 @@ def register_type_to_serpent(
     pyro.register_dict_to_class(class_path, dict_to_class)  # type: ignore
     pyro.register_class_to_dict(class_type, class_to_dict)  # type: ignore
     return class_path
+
+
+def _enumerated_error_class_to_dict(obj: EnumeratedError) -> dict[str, Any]:
+    return {
+        "__class__": "opentrons_shared_data.errors.exceptions.EnumeratedError",
+        "bytes": pickle.dumps(obj),
+    }
+
+
+def _enumerated_error_dict_to_class(
+    class_name: str, d: dict[str, Any]
+) -> EnumeratedError:
+    """Deserializes errors via pickle."""
+    error = pickle.loads(d["bytes"])
+    if not isinstance(error, EnumeratedError):
+        raise ValueError(
+            f"Class '{class_name}' labeled as enumerated error is a {type(error)}"
+        )
+    return error
+
+
+def register_enumerated_errors() -> None:
+    """Registers serializer and deserializer for enumerated errors."""
+    register_type_to_serpent(
+        class_type=EnumeratedError,
+        dict_to_class=_enumerated_error_dict_to_class,
+        class_to_dict=_enumerated_error_class_to_dict,
+    )
 
 
 class OpentronsPyroSerializer:

@@ -5,6 +5,7 @@ import datetime
 from pathlib import Path
 from typing import Any, Dict, get_args
 
+import Pyro5
 from numpy import float64
 
 import opentrons_shared_data.errors.codes
@@ -33,9 +34,12 @@ from opentrons.util.pyro.pyro_serialization import (
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
+    register_enumerated_errors,
     register_type_to_serpent,
     serpent_enum_registration,
 )
+
+Pyro5.config.SERPENT_BYTES_REPR = True  # type: ignore
 
 
 # Estop Overall Status registry
@@ -829,3 +833,4 @@ def register_hardware_types() -> None:
     OpentronsPyroSerializer.register_basic_error(
         opentrons.hardware_control.types.FailedTipStateCheck
     )
+    register_enumerated_errors()
