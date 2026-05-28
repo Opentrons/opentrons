@@ -1,4 +1,9 @@
-"""Regression tests for OT-2 calendar semver and build version helpers.
+"""Regression tests for OT-2 calendar tag gates used by build/CI.
+
+We test OT2_*_TAG_RE and version_from_* as the tag gate in python_build_utils and
+git-version.mjs. We also test _pep440_from_git_version for the one legacy transform
+it performs (YY.M@alpha.N to YY.MaN); calendar tails are covered indirectly via the
+tag gate and are asserted unchanged in pep440 tests.
 
 Run from repository root:
 
@@ -11,7 +16,6 @@ from __future__ import annotations
 
 import sys
 import unittest
-from datetime import date
 from pathlib import Path
 
 _SCRIPTS = Path(__file__).resolve().parent
@@ -27,18 +31,45 @@ class TestOt2CalendarTagRegex(unittest.TestCase):
             "internal@26.5.2601",
             "internal@26.5.2602-alpha",
             "internal@26.5.2602-beta",
+            "internal@26.5.2699-beta",
+            "internal@26.5.2801",
+            "internal@26.12.3112",
         ):
             with self.subTest(tag=tag):
                 self.assertIsNotNone(ot2_calendar_semver.OT2_INTERNAL_TAG_RE.match(tag), tag)
+
+    def test_internal_tag_regex_rejects(self):
+        for tag in (
+            "internal@26.5.22-1",  # no dash anymore
+            "internal@v6",  # no v prefix anymore
+            "internal@26.0.2601",  # no 0 month
+            "internal@26.13.2601",  # no 13 month
+            "internal@26.5.2601-alpha.0",  # no alpha.0 suffix
+        ):
+            with self.subTest(tag=tag):
+                self.assertIsNone(ot2_calendar_semver.OT2_INTERNAL_TAG_RE.match(tag), tag)
 
     def test_external_tag_regex_accepts(self):
         for tag in (
             "v26.6.0",
             "v26.6.0-alpha.0",
+            "v26.6.0-alpha.13",
             "v26.6.0-beta.1",
+            "v28.12.0-beta.999",
+            "v26.6.9",
         ):
             with self.subTest(tag=tag):
                 self.assertIsNotNone(ot2_calendar_semver.OT2_EXTERNAL_TAG_RE.match(tag), tag)
+
+    def test_external_tag_regex_rejects(self):
+        for tag in (
+            "v26.6.10",  # cannot go past 9
+            "v26.6.0-alpha",  # no alpha suffix without number
+            "v26.13.0",  # no 13 month
+            "v8.9.9-alpha.13",  # not calendar YY format (single-digit year)
+        ):
+            with self.subTest(tag=tag):
+                self.assertIsNone(ot2_calendar_semver.OT2_EXTERNAL_TAG_RE.match(tag), tag)
 
     def test_version_from_tag_helpers(self):
         self.assertEqual(
@@ -46,79 +77,62 @@ class TestOt2CalendarTagRegex(unittest.TestCase):
             "26.5.2601-alpha",
         )
         self.assertEqual(
+            ot2_calendar_semver.version_from_internal_tag("internal@26.5.2801"),
+            "26.5.2801",
+        )
+        self.assertIsNone(
+            ot2_calendar_semver.version_from_internal_tag("internal@26.5.22-1")
+        )
+        self.assertEqual(
             ot2_calendar_semver.version_from_external_tag("v26.6.0-alpha.0"),
             "26.6.0-alpha.0",
         )
 
 
-class TestOt2InternalSemver(unittest.TestCase):
-    def test_encode_decode_may_26(self):
-        self.assertEqual(
-            ot2_calendar_semver.encode_ot2_internal_version(2026, 5, 26, 1),
-            "26.5.2601",
-        )
-        self.assertEqual(
-            ot2_calendar_semver.decode_ot2_internal_version("26.5.2601-alpha"),
-            (2026, 5, 26, 1, "alpha"),
-        )
+class TestPep440FromGitVersion(unittest.TestCase):
+    def test_legacy_external_yy_m_at_alpha_n(self):
+        """Old v tags used 6.1@alpha.0; wheels need 6.1a0."""
+        for raw, expected in (
+            ("6.1@alpha.0", "6.1a0"),
+            ("26.5@alpha.13", "26.5a13"),
+        ):
+            with self.subTest(raw=raw):
+                self.assertEqual(
+                    python_build_utils._pep440_from_git_version("robot-stack", raw),
+                    expected,
+                )
 
-    def test_allocate_next_internal_tag(self):
-        existing = {
-            "internal@26.5.2601-alpha",
-            "internal@26.5.2601",
-        }
-        tag = ot2_calendar_semver.allocate_next_internal_tag(
-            existing,
-            "alpha",
-            release_date=date(2026, 5, 26),
-        )
-        self.assertEqual(tag, "internal@26.5.2602-alpha")
-
-
-class TestOt2ExternalSemver(unittest.TestCase):
-    def test_encode_decode_june_first(self):
-        self.assertEqual(
-            ot2_calendar_semver.encode_ot2_external_version(2026, 6, 0),
+    def test_calendar_external_unchanged(self):
+        for raw in (
             "26.6.0",
-        )
-        self.assertEqual(
-            ot2_calendar_semver.decode_ot2_external_version("26.6.0-alpha.0"),
-            (2026, 6, 0, "alpha", 0),
-        )
-
-    def test_allocate_next_external_stable(self):
-        existing = {"v26.6.0", "v26.6.1"}
-        tag = ot2_calendar_semver.allocate_next_external_tag(
-            existing,
-            "stable",
-            release_date=date(2026, 6, 15),
-        )
-        self.assertEqual(tag, "v26.6.2")
-
-    def test_allocate_next_external_alpha(self):
-        existing = {"v26.6.0-alpha.0", "v26.6.0"}
-        tag = ot2_calendar_semver.allocate_next_external_tag(
-            existing,
-            "alpha",
-            base_version="26.6.0",
-            release_date=date(2026, 6, 15),
-        )
-        self.assertEqual(tag, "v26.6.0-alpha.1")
-
-
-class TestPythonBuildUtilsRobotStackInternal(unittest.TestCase):
-    def test_pep440_internal(self):
-        self.assertEqual(
-            python_build_utils._pep440_from_git_version(
-                "robot-stack-internal", "26.5.2601-alpha"
-            ),
-            "26.5.2601-alpha",
-        )
-
-    def test_pep440_external(self):
-        self.assertEqual(
-            python_build_utils._pep440_from_git_version("robot-stack", "26.6.0-alpha.0"),
             "26.6.0-alpha.0",
+            "26.6.0-alpha.13",
+            "26.6.0-beta.1",
+        ):
+            with self.subTest(raw=raw):
+                self.assertEqual(
+                    python_build_utils._pep440_from_git_version("robot-stack", raw),
+                    raw,
+                )
+
+    def test_calendar_internal_unchanged(self):
+        for raw in (
+            "26.5.2601",
+            "26.5.2601-alpha",
+            "26.5.2699-beta",
+        ):
+            with self.subTest(raw=raw):
+                self.assertEqual(
+                    python_build_utils._pep440_from_git_version(
+                        "robot-stack-internal", raw
+                    ),
+                    raw,
+                )
+
+    def test_other_projects_unchanged(self):
+        self.assertEqual(
+            python_build_utils._pep440_from_git_version("docs", "1.2.3"),
+            "1.2.3",
         )
 
 

@@ -28,22 +28,48 @@ import git from 'simple-git'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
 
-// Keep in sync with scripts/ot2_calendar_semver.py and robot-stack automation/go.py.
+// Keep in sync with scripts/ot2_calendar_semver.py and scripts/deploy/create-release.js.
 const OT2_MONTH = '(?:[1-9]|1[0-2])'
 
+// Tail patterns without anchors (used to build tag regexes without a duplicate `^`).
+const OT2_INTERNAL_VERSION_TAIL = `(\\d{2}\\.${OT2_MONTH}\\.(\\d+)(?:-(?:alpha|beta))?)`
+const OT2_EXTERNAL_VERSION_TAIL = `(\\d{2}\\.${OT2_MONTH}\\.[0-9](?:-(?:alpha|beta)\\.\\d+)?)`
+
 // Internal: internal@YY.M.DNN[-alpha|-beta]
-const OT2_INTERNAL_VERSION_RE = new RegExp(
-  `^(\\d{2}\\.${OT2_MONTH}\\.(\\d+)(?:-(?:alpha|beta))?)`
+export const OT2_INTERNAL_VERSION_RE = new RegExp(
+  `^${OT2_INTERNAL_VERSION_TAIL}$`
 )
-const OT2_INTERNAL_TAG_RE = new RegExp(
-  `^internal@${OT2_INTERNAL_VERSION_RE.source}$`
+export const OT2_INTERNAL_TAG_RE = new RegExp(
+  `^internal@${OT2_INTERNAL_VERSION_TAIL}$`
 )
 
-// External: vYY.M.N[-alpha.N|-beta.N] where N is 0-9
-const OT2_EXTERNAL_VERSION_RE = new RegExp(
-  `^(\\d{2}\\.${OT2_MONTH}\\.[0-9](?:-(?:alpha|beta)\\.\\d+)?)`
+// External: vYY.M.N[-alpha.N|-beta.N] where monthly N is 0-9
+export const OT2_EXTERNAL_VERSION_RE = new RegExp(
+  `^${OT2_EXTERNAL_VERSION_TAIL}$`
 )
-const OT2_EXTERNAL_TAG_RE = new RegExp(`^v${OT2_EXTERNAL_VERSION_RE.source}$`)
+export const OT2_EXTERNAL_TAG_RE = new RegExp(`^v${OT2_EXTERNAL_VERSION_TAIL}$`)
+
+/** First calendar internal tag in git tag-list order (e.g. creatordate descending). */
+export function firstCalendarInternalTagFromList(tagList) {
+  const tags = typeof tagList === 'string' ? tagList.split('\n') : tagList
+  return (
+    tags
+      .map(tag => tag.trim())
+      .filter(Boolean)
+      .find(tag => OT2_INTERNAL_TAG_RE.test(tag)) ?? null
+  )
+}
+
+/** First calendar external tag in git tag-list order (e.g. creatordate descending). */
+export function firstCalendarExternalTagFromList(tagList) {
+  const tags = typeof tagList === 'string' ? tagList.split('\n') : tagList
+  return (
+    tags
+      .map(tag => tag.trim())
+      .filter(Boolean)
+      .find(tag => OT2_EXTERNAL_TAG_RE.test(tag)) ?? null
+  )
+}
 
 export function monorepoGit() {
   return git({ baseDir: REPO_BASE })
@@ -117,9 +143,7 @@ export async function latestTagForProject(project) {
       'HEAD',
       '--sort=-creatordate',
     ])
-    const latestCalendarTag = tags
-      .split('\n')
-      .find(tag => OT2_INTERNAL_TAG_RE.test(tag))
+    const latestCalendarTag = firstCalendarInternalTagFromList(tags)
     if (latestCalendarTag == null) {
       throw new Error('No OT-2 calendar internal tag found')
     }
@@ -134,9 +158,7 @@ export async function latestTagForProject(project) {
       'HEAD',
       '--sort=-creatordate',
     ])
-    const latestExternalTag = tags
-      .split('\n')
-      .find(tag => OT2_EXTERNAL_TAG_RE.test(tag))
+    const latestExternalTag = firstCalendarExternalTagFromList(tags)
     if (latestExternalTag != null) {
       return latestExternalTag
     }

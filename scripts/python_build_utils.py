@@ -49,7 +49,17 @@ project_entries = {
 
 
 def _pep440_from_git_version(project, raw):
-    """Map git tag version strings to PEP 440 for wheel metadata."""
+    """Map a git tag version tail to a PEP 440 string for wheel/sdist metadata.
+
+    ``get_version()`` supplies the tail after calendar tag selection
+    (``version_from_internal_tag`` / ``version_from_external_tag``). Current OT-2
+    calendar semver is already valid PEP 440 and is returned unchanged.
+
+    This helper exists for one legacy external format: pre-calendar robot-stack tags
+    used ``YY.M@alpha.N`` (e.g. ``6.1@alpha.0``). That string is not valid PEP 440,
+    so ``packaging.version`` / setuptools reject it when writing wheel metadata.
+    Those tails are normalized to ``YY.MaN`` (e.g. ``6.1a0``).
+    """
     if project == "robot-stack":
         m = re.match(r"^(\d+\.\d+)@alpha\.(\d+)$", raw)
         if m:
