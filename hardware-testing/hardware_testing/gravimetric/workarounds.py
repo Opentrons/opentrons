@@ -40,24 +40,6 @@ def http_get_all_labware_offsets() -> List[LabwareOffset]:
     return offsets
 
 
-def _old_slot_to_ot3_slot(old_api_slot: str) -> str:
-    conversion_dict = {
-        "1": "D1",
-        "2": "D2",
-        "3": "D3",
-        "4": "C1",
-        "5": "C2",
-        "6": "C3",
-        "7": "B1",
-        "8": "B2",
-        "9": "B3",
-        "10": "A1",
-        "11": "A2",
-        "12": "A3",
-    }
-    return conversion_dict[old_api_slot]
-
-
 def get_latest_offset_for_labware(
     labware_offsets: List[LabwareOffset], labware: Labware
 ) -> Point:
