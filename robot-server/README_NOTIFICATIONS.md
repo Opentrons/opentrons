@@ -12,7 +12,7 @@ Our MQTT messages are JSON objects, which might contain any of the following pro
 
 - ```json
   {
-  	"refetch": true
+    "refetch": true
   }
   ```
 
@@ -20,7 +20,7 @@ Our MQTT messages are JSON objects, which might contain any of the following pro
 
 - ```json
   {
-  	"unsubscribe": true
+    "unsubscribe": true
   }
   ```
 
