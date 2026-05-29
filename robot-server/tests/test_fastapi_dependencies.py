@@ -41,7 +41,7 @@ async def test_audit_logger_log_records_when_required(
     with (
         patch.object(
             checker,
-            "get_require_reason_for_interaction_enabled",
+            "is_require_reason_for_interaction_enabled",
             new=AsyncMock(return_value=True),
         ),
         caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER),
@@ -64,7 +64,7 @@ async def test_get_audit_logger_raises_when_required_but_forgot_to_log() -> None
     checker = AlwaysAllowedAuthorizationChecker()
     with patch.object(
         checker,
-        "get_require_reason_for_interaction_enabled",
+        "is_require_reason_for_interaction_enabled",
         new=AsyncMock(return_value=True),
     ):
         generator: AsyncGenerator[AuditLogger, None] = get_audit_logger(
@@ -101,7 +101,7 @@ async def test_get_audit_logger_skips_enforcement_for_get() -> None:
     checker = AlwaysAllowedAuthorizationChecker()
     with patch.object(
         checker,
-        "get_require_reason_for_interaction_enabled",
+        "is_require_reason_for_interaction_enabled",
         new=AsyncMock(return_value=True),
     ):
         generator = get_audit_logger(
@@ -129,7 +129,7 @@ async def test_audit_logger_log_records_run_action_when_required(
     with (
         patch.object(
             checker,
-            "get_require_reason_for_interaction_enabled",
+            "is_require_reason_for_interaction_enabled",
             new=AsyncMock(return_value=True),
         ),
         caplog.at_level(logging.INFO, logger=_AUDIT_LOGGER),
@@ -178,7 +178,7 @@ async def test_audit_logger_log_raises_when_notes_required_but_missing(
     with (
         patch.object(
             checker,
-            "get_require_reason_for_interaction_enabled",
+            "is_require_reason_for_interaction_enabled",
             new=AsyncMock(return_value=True),
         ),
         pytest.raises(MissingUserNotesError),

@@ -32,7 +32,7 @@ class TestAlwaysAllowedAuthorizationChecker:
         subject = AlwaysAllowedAuthorizationChecker()
         settings = await subject.get_require_reason_for_interaction_settings()
         assert settings.data.requireReasonForInteraction is False
-        assert await subject.get_require_reason_for_interaction_enabled() is False
+        assert await subject.is_reason_for_interaction_required() is False
 
     async def test_check(self) -> None:
         subject = AlwaysAllowedAuthorizationChecker()
@@ -72,7 +72,7 @@ class TestAuthServerAuthorizationChecker:
             )
         )
         assert await subject.get_require_reason_for_interaction_settings() == expected
-        assert await subject.get_require_reason_for_interaction_enabled() is True
+        assert await subject.is_reason_for_interaction_required() is True
 
     async def test_get_require_reason_disabled_when_access_control_off(
         self, mock_client: Client, decoy: Decoy
@@ -92,7 +92,7 @@ class TestAuthServerAuthorizationChecker:
                 data=AuthSettingsResponseData(accessControlEnabled=False)
             )
         )
-        assert await subject.get_require_reason_for_interaction_enabled() is False
+        assert await subject.is_reason_for_interaction_required() is False
 
     async def test_check_given_no_token(
         self, mock_client: Client, decoy: Decoy

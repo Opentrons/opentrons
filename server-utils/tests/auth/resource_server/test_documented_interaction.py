@@ -97,7 +97,7 @@ async def test_record_documented_interaction_writes_audit_log(
     with (
         patch.object(
             subject,
-            "get_require_reason_for_interaction_enabled",
+            "is_require_reason_for_interaction_enabled",
             new=AsyncMock(return_value=True),
         ),
         caplog.at_level(logging.INFO, logger=audit_logger),
