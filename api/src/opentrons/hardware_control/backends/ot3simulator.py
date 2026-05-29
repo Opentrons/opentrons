@@ -95,6 +95,7 @@ def coalesce_move_segments(
 def axis_pad(positions: Dict[Axis, float], default_value: float) -> Dict[Axis, float]:
     return {ax: positions.get(ax, default_value) for ax in Axis.node_axes()}
 
+
 def _sanitize_attached_instrument(
     mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
 ) -> Union[PipetteSpec, GripperSpec]:
@@ -111,9 +112,7 @@ def _sanitize_attached_instrument(
     if not passed_ai or not passed_ai.get("model"):
         return pipette_spec
 
-    if pipette_load_name.supported_pipette(
-        cast(PipetteModel, passed_ai["model"])
-    ):
+    if pipette_load_name.supported_pipette(cast(PipetteModel, passed_ai["model"])):
         pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
         pipette_spec["id"] = passed_ai.get("id")
         return pipette_spec
@@ -124,6 +123,7 @@ def _sanitize_attached_instrument(
         "should be pipette names or pipette models, but "
         f"{passed_ai['model']} is not"
     )
+
 
 class OT3Simulator(FlexBackend):
     """OT3 Hardware Controller Backend."""
@@ -185,8 +185,6 @@ class OT3Simulator(FlexBackend):
         self._gear_motor_position: Dict[Axis, float] = {}
         self._engaged_axes: Dict[Axis, bool] = {}
         self._feature_flags = feature_flags or HardwareFeatureFlags()
-
-
 
         self._attached_instruments = {
             m: _sanitize_attached_instrument(m, attached_instruments.get(m))
