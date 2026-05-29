@@ -1,6 +1,9 @@
 import { useSelector } from 'react-redux'
 
-import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useSelfQuery,
+} from '@opentrons/react-api-client'
 
 import { getIsLoggedInToLocalRobot } from '/app/redux/robot-auth'
 
@@ -10,10 +13,18 @@ export function useShouldShowLoggedOutOverlay(
 ): boolean {
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
   const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
-  const shouldShowLoggedOutOverlay =
+  const accessControlEnabled =
+    accessControlEnabledQuery.data?.data?.accessControlEnabled ?? false
+  const selfQuery = useSelfQuery({
+    enabled: accessControlEnabled && isLoggedIn,
+  })
+  const mustReLogin = selfQuery.data?.data.resetPassword ?? false
+  const needsLogin = !isLoggedIn || mustReLogin
+
+  return (
     accessControlEnabledQuery.data != null &&
-    accessControlEnabledQuery.data.data.accessControlEnabled &&
-    !isLoggedIn &&
+    accessControlEnabled &&
+    needsLogin &&
     !isShowingLoginPage
-  return shouldShowLoggedOutOverlay
+  )
 }
