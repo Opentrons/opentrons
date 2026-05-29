@@ -37,15 +37,15 @@ interface WizardBodyProps {
 }
 
 const OT2_GIFS: Record<number, string> = {
-  2: new URL(
+  1: new URL(
     '../../assets/images/onboarding_animation_ot2_2.gif',
     import.meta.url
   ).href,
-  3: new URL(
+  2: new URL(
     '../../assets/images/onboarding_animation_ot2_3.gif',
     import.meta.url
   ).href,
-  4: new URL(
+  3: new URL(
     '../../assets/images/onboarding_animation_ot2_4.gif',
     import.meta.url
   ).href,
