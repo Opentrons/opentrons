@@ -23,7 +23,11 @@ import {
 } from '@opentrons/shared-data'
 
 import { CLEAN, COLUMN_4_SLOTS } from './constants'
-import { getSlotInLocationStack } from './utils'
+import {
+  getIsSafePickupWithinTiprack,
+  getPipetteMovementSafetyStatus,
+  getSlotInLocationStack,
+} from './utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -273,8 +277,39 @@ export function getNextTiprack(
       robotState,
       primaryNozzle,
     })
+    const { isSafe: isCandidateSafeMovement } =
+      candidateTip != null
+        ? getPipetteMovementSafetyStatus({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId: tiprackId,
+            wellTargetName: candidateTip,
+            primaryNozzle,
+            nozzleConfiguration: nozzles,
+          })
+        : { isSafe: false }
+    const {
+      isSafe: isSafeWithinTiprack,
+      isComplete: isCompletePickup = false,
+    } =
+      candidateTip != null
+        ? getIsSafePickupWithinTiprack({
+            tipState: robotState.tipState.tipracks[tiprackId],
+            primaryNozzle,
+            channels: pipetteEntity.spec.channels,
+            nozzleConfiguration: nozzles,
+            wellName: candidateTip,
+            tiprackDef: invariantContext.labwareEntities[tiprackId].def,
+          })
+        : { isSafe: false }
 
-    if (candidateTip) {
+    if (
+      candidateTip &&
+      isCandidateSafeMovement &&
+      isSafeWithinTiprack &&
+      isCompletePickup
+    ) {
       firstAvailableTiprack = tiprackId
       nextTip = candidateTip
       break
