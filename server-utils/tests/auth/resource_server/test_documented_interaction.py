@@ -70,9 +70,7 @@ async def test_record_documented_interaction_raises_when_notes_missing(
     mock_client = decoy.mock(cls=Client)
     subject = AuthServerAuthorizationChecker(mock_client)
     decoy.when(await mock_client.get_auth_settings()).then_return(
-        AuthSettingsResponse(
-            data=AuthSettingsResponseData(accessControlEnabled=True)
-        )
+        AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=True))
     )
     decoy.when(
         await mock_client.get_require_reason_for_interaction_settings()
@@ -132,9 +130,7 @@ async def test_record_documented_interaction_accepts_notes_from_request_model(
     mock_client = decoy.mock(cls=Client)
     subject = AuthServerAuthorizationChecker(mock_client)
     decoy.when(await mock_client.get_auth_settings()).then_return(
-        AuthSettingsResponse(
-            data=AuthSettingsResponseData(accessControlEnabled=True)
-        )
+        AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=True))
     )
     decoy.when(
         await mock_client.get_require_reason_for_interaction_settings()
