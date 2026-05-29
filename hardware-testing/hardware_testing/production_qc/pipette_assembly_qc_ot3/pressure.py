@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import enum
 from typing import Dict
 
-from hardware_testing.opentrons_api.types import Point
+from opentrons.types import Point
 
 
 LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=100)
