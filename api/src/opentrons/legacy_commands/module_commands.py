@@ -345,7 +345,7 @@ def vacuum_module_start_set_vacuum_pressure(
     timeout_s: int | None,
     vent_after: bool | None,
 ) -> command_types.VacuumModuleStartSetVacuumPressureCommand:
-    text = f"Setting module {self} pressure to {gauge_pressure_mbar}: duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, vent_after={vent_after}"
+    text = f"Setting module {self} pressure to {gauge_pressure_mbar} mbar: duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, vent_after={vent_after}"
     return {
         "name": command_types.VACUUM_MODULE_START_SET_VACUUM_PRESSURE,
         "payload": {"text": text},
@@ -370,7 +370,7 @@ def vacuum_module_start_set_vacuum_power(
 def vacuum_module_stop_vacuum(
     self: Any,
 ) -> command_types.VacuumModuleStopVacuumCommand:
-    text = f"Stopping module {self}"
+    text = f"Stopping vacuum for {self}"
     return {
         "name": command_types.VACUUM_MODULE_STOP_VACUUM,
         "payload": {"text": text},
@@ -380,8 +380,14 @@ def vacuum_module_stop_vacuum(
 def vacuum_module_start_execute_profile(
     self: Any,
     steps: List[VacuumModuleProfileStep],
+    repetitions: bool,
 ) -> command_types.VacuumModuleStartExecuteProfileCommand:
-    text = f"starting {self} profile"
+    steps_msg = "\n".join([f"\t{str(s)}" for s in steps])
+    text = (
+        f"In the background, vacuum module {self} starting to"
+        f" run {repetitions} repetitions"
+        f" of cycle composed of the following steps: \n{steps_msg}"
+    )
     return {
         "name": command_types.VACUUM_MODULE_START_EXECUTE_PROFILE,
         "payload": {"text": text},
@@ -391,7 +397,7 @@ def vacuum_module_start_execute_profile(
 def vacuum_module_open_vent(
     self: Any,
 ) -> command_types.VacuumModuleOpenVentCommand:
-    text = f"Stopping module {self}"
+    text = f"Opening vent for {self}"
     return {
         "name": command_types.VACUUM_MODULE_OPEN_VENT,
         "payload": {"text": text},
@@ -401,7 +407,7 @@ def vacuum_module_open_vent(
 def vacuum_module_close_vent(
     self: Any,
 ) -> command_types.VacuumModuleCloseVentCommand:
-    text = f"Stopping module {self}"
+    text = f"Closing vent for {self}"
     return {
         "name": command_types.VACUUM_MODULE_CLOSE_VENT,
         "payload": {"text": text},

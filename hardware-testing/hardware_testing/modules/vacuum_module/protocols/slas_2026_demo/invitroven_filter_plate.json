@@ -1020,6 +1020,11 @@
       "x": 0,
       "y": 0,
       "z": 22.38
+    },
+    "opentrons_vacuum_manifold_collar_tall": {
+      "x": 0,
+      "y": 0,
+      "z": 22.38
     }
   },
   "gripperOffsets": {
