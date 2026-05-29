@@ -182,9 +182,9 @@ const AccountIconButtonTemplate: Story<
   ComponentProps<typeof AccountIconButton>
 > = args => {
   return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+    <div>
       <AccountIconButton {...args} />
-    </Flex>
+    </div>
   )
 }
 
