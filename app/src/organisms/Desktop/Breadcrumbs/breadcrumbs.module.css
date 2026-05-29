@@ -2,10 +2,23 @@
   display: flex;
   height: 2.75rem;
   flex-direction: row;
-  align-items: center;
+  justify-content: space-between;
   padding: 0 var(--spacing-8);
   border-bottom: 1px solid var(--grey-30);
   background-color: var(--white);
+  gap: var(--spacing-24);
+}
+
+.left_container {
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.right_container {
+  display: flex;
+  height: 100%;
+  align-items: center;
 }
 
 .crumb_container {
@@ -57,4 +70,8 @@
 
 .separator {
   flex: none;
+}
+
+.account_popover_menu_container {
+  position: relative;
 }
