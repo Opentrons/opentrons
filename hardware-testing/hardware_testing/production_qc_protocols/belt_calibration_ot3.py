@@ -362,7 +362,6 @@ def run(ctx: ProtocolContext) -> None:
     after: Optional[_TestBeltCalibrationData] = None
     attitude: Optional[AttitudeMatrix] = None
     details: Optional[Dict[str, Any]] = None
-    print("starting")
     if not ctx.is_simulating():
         try:
             before, attitude, details, after = run_belt_calibration(ctx)
@@ -399,5 +398,4 @@ def run(ctx: ProtocolContext) -> None:
         details = sim_cal_data.build_details()
         passing = True
     _generate_report(before, details, attitude, after, ctx)
-    print("done.")
     ctx.pause(f"Belt calibration pass: {passing}")
