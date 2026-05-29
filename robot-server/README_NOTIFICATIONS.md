@@ -57,3 +57,7 @@ If the client is doing something where that would be harmful, like sending a cha
 
 [mqtt]: https://en.wikipedia.org/wiki/MQTT
 [topics]: ./robot_server/service/notifications/topics.py
+
+## Versioning and compatibility
+
+Changes to this API are rare. However, we reserve the right to make breaking changes when we have a good reason, such as improving performance, fixing bugs, or supporting new product features. Our release notes will not necessarily mention breaking changes to this API.
