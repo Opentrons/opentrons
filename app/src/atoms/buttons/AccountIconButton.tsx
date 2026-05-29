@@ -14,7 +14,7 @@ export function AccountIconButton(props: AccountIconButtonProps): JSX.Element {
   // todo(mm, 2026-05-27): Since the button only contains a single letter,
   // do we need some kind of aria label?
   return (
-    <button className={styles.button} onClick={onClick}>
+    <button className={styles.button} onClick={onClick} type="button">
       <StyledText desktopStyle="bodyLargeSemiBold">{initial}</StyledText>
     </button>
   )
