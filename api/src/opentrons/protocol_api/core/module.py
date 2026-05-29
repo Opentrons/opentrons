@@ -587,3 +587,15 @@ class AbstractVacuumModuleCore(
         repetitions: int,
     ) -> AbstractTaskCore:
         """Start a vacuum module profile."""
+
+    @abstractmethod
+    def open_vent(
+        self,
+    ) -> None:
+        """Open the vent."""
+
+    @abstractmethod
+    def close_vent(
+        self,
+    ) -> None:
+        """Close the vent."""

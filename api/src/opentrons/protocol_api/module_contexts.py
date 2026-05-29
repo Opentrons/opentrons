@@ -2010,3 +2010,15 @@ class VacuumModuleContext(ModuleContext):
             repetitions=repetitions,
         )
         return Task(api_version=self._api_version, core=task)
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_open_vent)
+    def open_vent(self) -> None:
+        """Opens the vent."""
+        self._core.open_vent()
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_close_vent)
+    def close_vent(self) -> None:
+        """Closes the vent."""
+        self._core.close_vent()

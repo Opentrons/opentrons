@@ -386,3 +386,23 @@ def vacuum_module_start_execute_profile(
         "name": command_types.VACUUM_MODULE_START_EXECUTE_PROFILE,
         "payload": {"text": text},
     }
+
+
+def vacuum_module_open_vent(
+    self: Any,
+) -> command_types.VacuumModuleOpenVentCommand:
+    text = f"Stopping module {self}"
+    return {
+        "name": command_types.VACUUM_MODULE_OPEN_VENT,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_close_vent(
+    self: Any,
+) -> command_types.VacuumModuleCloseVentCommand:
+    text = f"Stopping module {self}"
+    return {
+        "name": command_types.VACUUM_MODULE_CLOSE_VENT,
+        "payload": {"text": text},
+    }
