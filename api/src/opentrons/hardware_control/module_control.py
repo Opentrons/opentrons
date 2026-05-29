@@ -247,7 +247,7 @@ class AttachedModulesControl:
                 f"Async error callback for module {model} {serial} at {port} for exc {exc} failed"
             )
 
-    def _clear_old_modules(self) -> None:
+    async def _clear_old_modules(self) -> None:
         for old_mod in self._recently_removed_modules:
             # Important: this wants to be after the remove because this may trigger
             # recursion back to here; we therefore want the module to already be
@@ -255,18 +255,19 @@ class AttachedModulesControl:
             old_mod.disconnected_callback()
             log.info(f"did not find {old_mod.serial_number}")
             self._recently_removed_modules.remove(old_mod)
+            await old_mod.cleanup()
 
     async def _reconnect_patch(self, attempts_left: int) -> None:
         if attempts_left == 0:
             # if the module isn't back then remove it
-            self._clear_old_modules()
+            await self._clear_old_modules()
             return
 
         await asyncio.sleep(1)
         try:
             for old_mod in self._recently_removed_modules:
                 log.info(
-                    f"Attempting to find and reconect {old_mod.serial_number} attempt {RECONNECT_ATTEMPTS-attempts_left+1}"
+                    f"Attempting to find and reconect {old_mod.serial_number} attempt {RECONNECT_ATTEMPTS - attempts_left + 1}"
                 )
                 for attached_mod in self._available_modules:
                     if attached_mod.serial_number == old_mod.serial_number:
@@ -319,7 +320,7 @@ class AttachedModulesControl:
                 ):
                     self._recently_removed_modules.append(removed_dev)
                     self._available_modules.remove(removed_dev)
-                    start_reconnect_task=True
+                    start_reconnect_task = True
                 if removed_dev in self._available_peripherals and isinstance(
                     removed_dev, peripherals.AbstractPeripheral
                 ):
@@ -328,16 +329,15 @@ class AttachedModulesControl:
                     # recursion back to here; we therefore want the module to already be
                     # removed so that the recursion terminates next loop
                     removed_dev.disconnected_callback()
+                    log.info(
+                        f"Device {removed_dev.name()} detached from port {removed_dev.port}"
+                    )
+                    await removed_dev.cleanup()
 
             except ValueError:
                 log.warning(
                     f"Removed Device {removed_dev} not found in attached device"
                 )
-        for removed_dev in removed_devices:
-            log.info(
-                f"Device {removed_dev.name()} detached from port {removed_dev.port}"
-            )
-            await removed_dev.cleanup()
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
         )
@@ -346,7 +346,7 @@ class AttachedModulesControl:
         )
         if start_reconnect_task:
             if self._api.is_simulator:
-                self._clear_old_modules()
+                await self._clear_old_modules()
             else:
                 self._api.loop.create_task(self._reconnect_patch(RECONNECT_ATTEMPTS))
 

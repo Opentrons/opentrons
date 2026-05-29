@@ -146,12 +146,16 @@ class HeaterShaker(mod_abc.AbstractModule):
     def _handle_error(self, error: Exception) -> None:
         self.error_callback(error)
 
-    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
-    async def cleanup(self) -> None:
-        """Stop the poller task"""
+    async def _cleanup(self) -> None:
+        """Stop the poller task."""
         self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
+
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self._cleanup()
 
     @classmethod
     def name(cls) -> str:
@@ -345,7 +349,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             return
         try:
             if not await self._driver.is_connected():
-                await self.cleanup()
+                await self._cleanup()
                 self._driver = await HeaterShakerDriver.create(
                     port=self.port, loop=self.loop
                 )

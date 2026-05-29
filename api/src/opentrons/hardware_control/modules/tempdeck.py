@@ -130,11 +130,15 @@ class TempDeck(mod_abc.AbstractModule):
         self._poller = poller
         self._reader.set_error_callback(self.error_callback)
 
-    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
-    async def cleanup(self) -> None:
+    async def _cleanup(self) -> None:
         """Stop the poller task."""
         await self._poller.stop()
         await self._driver.disconnect()
+
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self._cleanup()
 
     @classmethod
     def name(cls) -> str:
@@ -302,7 +306,7 @@ class TempDeck(mod_abc.AbstractModule):
             return
         try:
             if not await self._driver.is_connected():
-                await self.cleanup()
+                await self._cleanup()
                 self._driver = await TempDeckDriver.create(
                     port=self.port, loop=self.loop
                 )
