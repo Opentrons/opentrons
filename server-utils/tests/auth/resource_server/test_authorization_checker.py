@@ -66,8 +66,33 @@ class TestAuthServerAuthorizationChecker:
         decoy.when(
             await mock_client.get_require_reason_for_interaction_settings()
         ).then_return(expected)
+        decoy.when(await mock_client.get_auth_settings()).then_return(
+            AuthSettingsResponse(
+                data=AuthSettingsResponseData(accessControlEnabled=True)
+            )
+        )
         assert await subject.get_require_reason_for_interaction_settings() == expected
         assert await subject.get_require_reason_for_interaction_enabled() is True
+
+    async def test_get_require_reason_disabled_when_access_control_off(
+        self, mock_client: Client, decoy: Decoy
+    ) -> None:
+        subject = AuthServerAuthorizationChecker(mock_client)
+        decoy.when(
+            await mock_client.get_require_reason_for_interaction_settings()
+        ).then_return(
+            RequireReasonForInteractionSettingsResponse(
+                data=RequireReasonForInteractionSettingsResponseData(
+                    requireReasonForInteraction=True
+                )
+            )
+        )
+        decoy.when(await mock_client.get_auth_settings()).then_return(
+            AuthSettingsResponse(
+                data=AuthSettingsResponseData(accessControlEnabled=False)
+            )
+        )
+        assert await subject.get_require_reason_for_interaction_enabled() is False
 
     async def test_check_given_no_token(
         self, mock_client: Client, decoy: Decoy

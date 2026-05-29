@@ -199,6 +199,17 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                 return AuthorizedResult(username=token_info.username)
 
     @override
+    async def get_require_reason_for_interaction_enabled(self) -> bool:
+        """Require reason only when access control (ACM) is on and the setting is enabled."""
+        access_control_enabled = (
+            await self._client.get_auth_settings()
+        ).data.accessControlEnabled
+        if not access_control_enabled:
+            return False
+        settings = await self.get_require_reason_for_interaction_settings()
+        return settings.data.requireReasonForInteraction
+
+    @override
     async def get_require_reason_for_interaction_settings(
         self,
     ) -> RequireReasonForInteractionSettingsResponse:
