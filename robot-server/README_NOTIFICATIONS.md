@@ -30,7 +30,9 @@ Our MQTT messages are JSON objects, which might contain any of the following pro
 
 ## The notifications API is read-only
 
-Treat the notifications API as read-only. Because of the way MQTT works, clients can technically use it to send messages to each other, using the robot as a relay. Don't do that, please.
+Because of the way MQTT works, clients can technically use it to send arbitrary messages to each other, using the robot as a relay. Don't do that, please. It's an accidental artifact of the implementation, not an API that we intend to support. Only read MQTT messages, never send MQTT messages.
+
+If you need to send data from client to client, use the `/clientData` HTTP endpoints instead. A client can get notified of new data the same way as any other robot API endpoint: subscribe to the `robot-server/clientData` MQTT topic, and issue a new HTTP `GET` request any time it receives a `"refetch": true` message.
 
 ## Subscribing to updates without any gaps
 
