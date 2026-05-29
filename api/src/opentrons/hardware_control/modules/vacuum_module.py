@@ -444,7 +444,9 @@ class VacuumModule(mod_abc.AbstractModule):
             )
 
     async def _execute_profile(
-        self, profile: List[Union[VacuumModuleCycle, VacuumModuleStep]]
+        self,
+        profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
+        vent_after: bool = False,
     ) -> None:
         self._current_cycle_index = 0
         self._current_step_index = 0
@@ -465,10 +467,14 @@ class VacuumModule(mod_abc.AbstractModule):
             else:
                 await self._execute_cycle_step(step_or_cycle)
                 await self.wait_for_command_duration()
+        if vent_after:
+            await self.set_vent_state(VentState.OPENED)
 
     # TODO: implement a wait_for in running profiles
     async def execute_profile(
-        self, profile: List[Union[VacuumModuleCycle, VacuumModuleStep]]
+        self,
+        profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
+        vent_after: bool = False,
     ) -> None:
         await self.wait_for_is_running()
         self._total_cycle_count = 0

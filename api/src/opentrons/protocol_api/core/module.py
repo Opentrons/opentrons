@@ -582,9 +582,7 @@ class AbstractVacuumModuleCore(
 
     @abstractmethod
     def start_execute_profile(
-        self,
-        steps: List[VacuumModuleStep],
-        repetitions: int,
+        self, steps: List[VacuumModuleStep], repetitions: int, vent_after: bool = False
     ) -> AbstractTaskCore:
         """Start a vacuum module profile."""
 

@@ -533,12 +533,9 @@ def ensure_thermocycler_profile_steps(
 
 
 def _check_vm_step_base_values(step: VacuumModuleStep) -> None:
-    enable_pump = step.get("enable_pump")
     ramp_rate = step.get("ramp_rate")
     timeout_s = step.get("timeout_seconds")
 
-    if enable_pump is None:
-        raise ValueError("enable_pump is required for each step")
     if timeout_s is not None and timeout_s <= 0:
         raise ValueError("timeout_s must be greater than 0")
     if ramp_rate is not None and (ramp_rate <= 0 or ramp_rate > 400):
@@ -546,7 +543,7 @@ def _check_vm_step_base_values(step: VacuumModuleStep) -> None:
 
 
 def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
-    enable_pump = step.get("enable_pump")
+    unverified_enable_pump = step.get("enable_pump")
     ramp_rate = step.get("ramp_rate")
     timeout_s = step.get("timeout_seconds")
     hold_time_minutes = step.get("hold_time_minutes")
@@ -555,8 +552,17 @@ def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
     unverified_percent_power = step.get("percent_power")
     unverified_gauge_pressure_mbar = step.get("gauge_pressure_mbar")
 
+    enable_pump = (
+        unverified_enable_pump if unverified_enable_pump is not None else False
+    )
+
     _check_vm_step_base_values(step=step)
-    assert enable_pump is not None
+    if not enable_pump:
+        if (
+            unverified_percent_power is not None
+            or unverified_gauge_pressure_mbar is not None
+        ):
+            raise ValueError("cannot disable pump and issue power/pressure command")
 
     if hold_time_minutes is None and hold_time_seconds is None:
         validated_seconds = None
@@ -592,8 +598,8 @@ def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
                 "gauge_pressure_mbar"
             )
             assert gauge_pressure_mbar is not None
-            if gauge_pressure_mbar > 0 or gauge_pressure_mbar < -150:
-                raise ValueError("gauge pressure should be between 0 and -150 mbar")
+            if gauge_pressure_mbar > 0 or gauge_pressure_mbar < -800:
+                raise ValueError("gauge pressure should be between 0 and -800 mbar")
         else:
             gauge_pressure_mbar = unverified_gauge_pressure_mbar
         return VacuumModulePressureStep(

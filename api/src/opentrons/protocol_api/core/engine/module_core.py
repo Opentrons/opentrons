@@ -1255,6 +1255,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         self,
         steps: List[VacuumModuleStep],
         repetitions: int,
+        vent_after: bool = False,
     ) -> EngineTaskCore:
         """Start the execution of a vacuum module profile and return a task."""
         self._repetitions = repetitions
@@ -1264,8 +1265,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartRunProfileParams(
-                moduleId=self.module_id,
-                profile=engine_steps,
+                moduleId=self.module_id, profile=engine_steps, vent_after=vent_after
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
