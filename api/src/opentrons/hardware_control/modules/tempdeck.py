@@ -6,6 +6,7 @@ from typing import Callable, Dict, Optional
 
 from typing_extensions import Final
 
+from opentrons.config import IS_ROBOT
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.temp_deck import (
     DEFAULT_COMMAND_RETRIES,
@@ -26,8 +27,6 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
-
-from opentrons.config import IS_ROBOT
 
 log = logging.getLogger(__name__)
 

@@ -6,6 +6,7 @@ from typing import Callable, Mapping, Optional
 
 from typing_extensions import Final
 
+from opentrons.config import IS_ROBOT
 from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.heater_shaker.driver import (
@@ -33,7 +34,6 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
-from opentrons.config import IS_ROBOT
 
 log = logging.getLogger(__name__)
 

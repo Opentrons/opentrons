@@ -2,7 +2,7 @@ import abc
 import asyncio
 import logging
 import re
-from typing import Any, Callable, ClassVar, Coroutine, Mapping, Optional, TypeVar
+from typing import Any, Callable, ClassVar, Coroutine, Optional, TypeVar
 
 from packaging.version import InvalidVersion, Version, parse
 

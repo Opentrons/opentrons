@@ -15,9 +15,8 @@ from .errors import (
     NoResponse,
     UnhandledGcode,
 )
-from opentrons.drivers.command_builder import CommandBuilder
-
 from opentrons.config import IS_ROBOT
+from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
 

@@ -1,10 +1,11 @@
 from typing import AsyncGenerator, Type, Union
+from unittest.mock import patch
 
 import mock
 import pytest
 from _pytest.fixtures import SubRequest
-from mock import AsyncMock, call, patch
-from unittest.mock import
+from mock import AsyncMock, call
+
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
 from opentrons.drivers.asyncio.communication.errors import (
     AlarmResponse,
