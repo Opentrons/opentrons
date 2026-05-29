@@ -11,6 +11,7 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_MAX_SPEEDS,
     DEFAULT_RUN_CURRENT,
 )
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import GripperProbe, OT3AxisKind
 
 # ------ TODO remove and move necessary libraries into a standard release library. ----
@@ -139,27 +140,27 @@ class TestConfig:
     increment: bool
 
 
-def test_mount() -> None:
+def test_mount(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
     """Test the gripper mount."""
     pass
 
 
-def test_probe() -> None:
+def test_probe(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
     """Test the grippers probes."""
     pass
 
 
-def test_width() -> None:
+def test_width(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
     """Test the gripper width."""
     pass
 
 
-def test_force() -> None:
+def test_force(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
     """Test the gripper force."""
     pass
 
 
-def test_force_increment() -> None:
+def test_force_increment(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
     """Test the gripper force increment."""
     pass
 
@@ -341,6 +342,19 @@ def run(ctx: ProtocolContext) -> None:
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.GRIPPER
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
+    args = ctx.params.get_all()
+    t_sections = {s: f for s, f in TESTS if not args[f"skip_{s.value.lower()}"]}
+    if args["increment"]:
+        t_sections = {s: f for s, f in TESTS_INCREMENT}
+
+    config = TestConfig(
+        simulate=ctx.is_simulating(),
+        tests=t_sections,
+        increment=bool(args["increment"]),
+    )
+
+    for section, test_run in config.tests.items():
+        test_run(api, report, section.value)
 
     # SAVE REPORT
     report.save_to_disk()
