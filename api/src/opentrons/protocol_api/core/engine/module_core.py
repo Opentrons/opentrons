@@ -1265,7 +1265,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartRunProfileParams(
-                moduleId=self.module_id, profile=engine_steps, vent_after=vent_after
+                moduleId=self.module_id, profile=engine_steps, ventAfter=vent_after
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )

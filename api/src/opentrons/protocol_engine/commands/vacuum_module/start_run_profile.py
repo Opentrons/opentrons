@@ -110,7 +110,7 @@ class StartRunProfileParams(BaseModel):
     profile: ProfileType = Field(
         ..., description="List of Vacuum Module profile steps."
     )
-    vent_after: bool = Field(
+    ventAfter: bool = Field(
         False, description="Whether to open the vent after the profile is complete."
     )
     taskId: str | None = Field(None, description="The id of the profile task")
@@ -152,7 +152,7 @@ class StartRunProfileImpl(
             if vm_hardware is not None:
                 async with task_handler.synchronize_cancel_latest(vm_state.module_id):
                     await vm_hardware.execute_profile(
-                        profile=profile, vent_after=params.vent_after
+                        profile=profile, vent_after=params.ventAfter
                     )
 
         task = await self._task_handler.create_task(

@@ -337,7 +337,7 @@ def test_vacuum_module_start_execute_profile(
             ramp_rate=2.2,
             timeout_seconds=200,
             vent_after=True,
-            gauge_pressure_mbar=-10,
+            gauge_pressure_mbar=None,
         ),
         VacuumModulePowerStep(
             enable_pump=True,
@@ -372,7 +372,7 @@ def test_vacuum_module_start_execute_profile(
             ramp_rate=2.2,
             timeout_seconds=200,
             vent_after=True,
-            gauge_pressure_mbar=-10,
+            gauge_pressure_mbar=None,
         ),
         VacuumModulePowerStep(
             enable_pump=True,
@@ -389,6 +389,6 @@ def test_vacuum_module_start_execute_profile(
 
     decoy.verify(
         mock_core.start_execute_profile(
-            steps=expected_core_steps, repetitions=repetitions
+            steps=expected_core_steps, repetitions=repetitions, vent_after=False
         )
     )
