@@ -258,11 +258,6 @@ class AttachedModulesControl:
             await old_mod.cleanup()
 
     async def _reconnect_patch(self, attempts_left: int) -> None:
-        if attempts_left == 0:
-            # if the module isn't back then remove it
-            await self._clear_old_modules()
-            return
-
         await asyncio.sleep(1)
         try:
             for old_mod in self._recently_removed_modules:
@@ -291,7 +286,12 @@ class AttachedModulesControl:
         except BaseException:
             log.exception("Encountered an error during reconnect attempt.")
         if len(self._recently_removed_modules) > 0:
-            self._api.loop.create_task(self._reconnect_patch(attempts_left - 1))
+            if attempts_left == 1:
+                # if the module isn't back then remove it
+                await self._clear_old_modules()
+                return
+            else:
+                await self._reconnect_patch(attempts_left - 1)
 
     async def unregister_devices(  # noqa: C901
         self,
