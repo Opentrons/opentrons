@@ -35,7 +35,8 @@ using table_entry_action = dev_data::table_entry_action;
 
 struct BookAccessorIntermediate {
   protected:
-    DataBufferType<static_cast<size_t>(types::page_length)> intermediate_buffer;
+    DataBufferType<static_cast<size_t>(types::page_length)>
+        intermediate_buffer{};
 };
 
 /*Accessor for OT Library. Takes byte arrays as data. Ensure they are in
@@ -55,7 +56,8 @@ class BookAccessor
         DataBufferType<BUFFER_SIZE>& buffer,
         dev_data::DevDataTailAccessor<EEpromTaskClient>& tail_accessor,
         std::array<std::array<uint8_t, types::page_length>, 4>& all_reads)
-        : accessor::EEPromAccessor<EEpromTaskClient,
+        : BookAccessorIntermediate(),
+          accessor::EEPromAccessor<EEpromTaskClient,
                                    addresses::ot_library_begin>(
               eeprom_client, *this,
               accessor::AccessorBuffer(intermediate_buffer.begin(),
@@ -87,6 +89,10 @@ class BookAccessor
         // page.
         std::array<uint8_t, types::page_length> page_data{};
         page_data.fill(0x00);
+        // set the length immediately. This is important for CRC calculations,
+        // as the length of the data is not necessarily the same as the size of
+        // the array passed in
+        action_cmd_m.len = len;
 
         if (!data.empty()) {
             if (data.size() > types::page_data) {
@@ -95,10 +101,6 @@ class BookAccessor
                     types::page_data);
             }
             uint16_t counter = 1;
-            // move data to larger container
-            std::array<uint8_t, types::page_data> data_container{};
-            data_container.fill(0x00);
-            std::copy(data.begin(), data.end(), data_container.begin());
             uint16_t crc = calc_crc(data);
 
             // copy CRC, counter, and data to page_data
@@ -108,7 +110,7 @@ class BookAccessor
             // copy len into page_data
             std::memcpy(page_data.data() + 4, &len, sizeof(len));
 
-            std::copy(data_container.begin(), data_container.end(),
+            std::copy(data.begin(), data.begin() + len,
                       page_data.begin() + types::book_header_length);
         }
         if (table_ready()) {
@@ -202,17 +204,18 @@ class BookAccessor
                     len, types::page_data);
                 len = types::page_data;
             }
+
+            this->action_cmd_m =
+                table_entry_action{.key = key,
+                                   .offset = offset,
+                                   .len = len,
+                                   .action = TableAction::READ_BEFORE_WRITE};
+
             LOG("Writing %d bytes to data partition", types::page_length);
 
             // format data to page
             std::array<uint8_t, types::page_length> page_data{};
-            std::array<uint8_t, types::page_data> data_container{};
             page_data.fill(0x00);
-            data_container.fill(0x00);
-
-            // copy data into data_container to make sure it's the right size
-            // for CRC calculations
-            std::copy_n(data.begin(), len, data_container.begin());
 
             // counter will be updated in table_action_callback
             uint16_t counter = 0;
@@ -227,7 +230,7 @@ class BookAccessor
             std::memcpy(page_data.data() + 4, &len, sizeof(len));
 
             // make the data the rest of the page
-            std::copy_n(data_container.begin(), data_container.size(),
+            std::copy_n(data.begin(), len,
                         page_data.begin() + types::book_header_length);
 
             // copy the data to our internal buffer (write_buffer is used as
@@ -238,19 +241,10 @@ class BookAccessor
 
             // if we're writing to the same key as the cached key, we can skip
             // the read and use the data that was already in all_reads
-            this->action_cmd_m =
-                table_entry_action{.key = key,
-                                   .offset = offset,
-                                   .len = len,
-                                   .action = TableAction::READ_BEFORE_WRITE};
-            // call a read to the table entry so we know where
-            // to put the data
-            // call get_data. call table action callback from inside read
-            // flow
-
             if (key == cached_key) {
                 read_final(0);
             } else {
+                // otherwise, call get_data and launch read flow
                 get_data(key, len, offset, 0);
             }
         }
@@ -370,24 +364,14 @@ class BookAccessor
     int16_t cached_key = -1;
 
     template <size_t num_bytes>
-    auto calc_crc(std::array<uint8_t, num_bytes> data, bool checking = false)
-        -> uint16_t {
+    auto calc_crc(std::array<uint8_t, num_bytes> data) -> uint16_t {
         crc16_init();
-        // crc16_reset_accumulator();
 
-        // divide num_bytes by 4 because crc16_compute takes in number of 32 bit
-        // words, not number of bytes
-
-        uint16_t crc{};
-
-        // if we're checking the CRC, we want to make sure we're checking the
-        // right amount of bytes.
-        if (checking) {
-            crc = crc16_compute(data.begin(),
-                                static_cast<uint8_t>(action_cmd_m.len));
-        } else {
-            crc = crc16_compute(data.begin(), static_cast<uint8_t>(num_bytes));
-        }
+        // pass the length of the data from action_cmd_m, not the size of the
+        // array, since the array may be larger than the actual data being
+        // written
+        uint16_t crc =
+            crc16_compute(data.begin(), static_cast<uint8_t>(action_cmd_m.len));
 
         return crc;
     }
@@ -403,42 +387,40 @@ class BookAccessor
         std::copy_n(bytes.begin() + types::book_header_length, types::page_data,
                     given_data.begin());
 
-        uint16_t calculated_crc = calc_crc<types::page_data>(given_data, true);
+        uint16_t calculated_crc = calc_crc<types::page_data>(given_data);
 
         return (calculated_crc == given_crc);
     }
 
-    // TODO: use bytes 4 and 5 to get the length of the data stored in the page
-    // and only use that many bytes in CRC calculations and
     void read_final(uint16_t message_index) {
         // create variables representing read page addresses
-        uint16_t read_00 = 0;
-        uint16_t read_01 = 0;
-        uint16_t read_10 = 0;
-        uint16_t read_11 = 0;
+        uint16_t read0 = 0;
+        uint16_t read1 = 0;
+        uint16_t read2 = 0;
+        uint16_t read3 = 0;
         // convert counter from bytes to longs
 
-        std::memcpy(&read_00, &all_reads[0][2], sizeof(read_00));
-        std::memcpy(&read_01, &all_reads[1][2], sizeof(read_01));
-        std::memcpy(&read_10, &all_reads[2][2], sizeof(read_10));
-        std::memcpy(&read_11, &all_reads[3][2], sizeof(read_11));
+        std::memcpy(&read0, &all_reads[0][2], sizeof(read0));
+        std::memcpy(&read1, &all_reads[1][2], sizeof(read1));
+        std::memcpy(&read2, &all_reads[2][2], sizeof(read2));
+        std::memcpy(&read3, &all_reads[3][2], sizeof(read3));
 
         // quickly zero out all reads that are xFFFF
-        if (read_00 == 0xFFFF) {
-            read_00 = 0x0000;
+        if (read0 == 0xFFFF) {
+            read0 = 0x0000;
         }
-        if (read_01 == 0xFFFF) {
-            read_01 = 0x0000;
+        if (read1 == 0xFFFF) {
+            read1 = 0x0000;
         }
-        if (read_10 == 0xFFFF) {
-            read_10 = 0x0000;
+        if (read2 == 0xFFFF) {
+            read2 = 0x0000;
         }
-        if (read_11 == 0xFFFF) {
-            read_11 = 0x0000;
+        if (read3 == 0xFFFF) {
+            read3 = 0x0000;
         }
 
         // find maximum value
-        std::array<uint16_t, 4> reads = {read_00, read_01, read_10, read_11};
+        std::array<uint16_t, 4> reads = {read0, read1, read2, read3};
 
         // sort reads from largest to smallest
         std::sort(reads.begin(), reads.end(), std::greater<uint16_t>());
@@ -505,19 +487,19 @@ class BookAccessor
 
                 most_recent_valid = reads[most_recent_index];
 
-                if (most_recent_valid == read_00) {
+                if (most_recent_valid == read0) {
                     crc_valid = check_crc(all_reads[0]);
                     all_reads_index = 0;
 
-                } else if (most_recent_valid == read_01) {
+                } else if (most_recent_valid == read1) {
                     crc_valid = check_crc(all_reads[1]);
                     all_reads_index = 1;
 
-                } else if (most_recent_valid == read_10) {
+                } else if (most_recent_valid == read2) {
                     crc_valid = check_crc(all_reads[2]);
                     all_reads_index = 2;
 
-                } else if (most_recent_valid == read_11) {
+                } else if (most_recent_valid == read3) {
                     crc_valid = check_crc(all_reads[3]);
                     all_reads_index = 3;
                 }
@@ -547,10 +529,10 @@ class BookAccessor
             // because all_reads contains 4 pages in the order they were
             // read (00, 01, 11, 10), we can use the most_recent_valid
             // variable to determine where to write the new data
-            types::address read_00_offset = 0;
-            types::address read_01_offset = types::page_length;
-            types::address read_10_offset = types::page_length * 2;
-            types::address read_11_offset = types::page_length * 3;
+            types::address read0_offset = 0;
+            types::address read1_offset = types::page_length;
+            types::address read2_offset = types::page_length * 2;
+            types::address read3_offset = types::page_length * 3;
 
             // because of the wraparound counter logic, we can be assured
             // that the last page is the least recently written page, so we
@@ -562,14 +544,14 @@ class BookAccessor
             // NOTE: this logic will break once a location eventually wears
             // out. It does not prevent writes to that location.
 
-            if (least_recent == read_00) {
-                page_address += read_00_offset;
-            } else if (least_recent == read_01) {
-                page_address += read_01_offset;
-            } else if (least_recent == read_10) {
-                page_address += read_10_offset;
-            } else if (least_recent == read_11) {
-                page_address += read_11_offset;
+            if (least_recent == read0) {
+                page_address += read0_offset;
+            } else if (least_recent == read1) {
+                page_address += read1_offset;
+            } else if (least_recent == read2) {
+                page_address += read2_offset;
+            } else if (least_recent == read3) {
+                page_address += read3_offset;
             }
 
             // clear write_msg.data just in case
