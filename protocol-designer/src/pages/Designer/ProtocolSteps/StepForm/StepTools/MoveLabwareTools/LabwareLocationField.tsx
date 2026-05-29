@@ -122,6 +122,7 @@ export function LabwareLocationField(
   // check lid-compatible labware and modules
   if (isLabwareALid) {
     const def = labwareEntities[labware]?.def
+    console.log(Object.keys(def?.stackingOffsetWithLabware ?? {}))
     const compatibleParentLoadNames = new Set([
       ...(def?.compatibleParentLabware ?? []),
       ...Object.keys(def?.stackingOffsetWithLabware ?? {}),
@@ -135,9 +136,11 @@ export function LabwareLocationField(
             moduleEntities[value].model
           )
         } else if (value in labwareEntities) {
-          isCompatible = compatibleParentLoadNames.has(
-            labwareEntities[value].def.parameters.loadName
-          )
+          isCompatible =
+            compatibleParentLoadNames.has(
+              labwareEntities[value].def.parameters.loadName
+            ) || def.parameters.loadName === 'opentrons_tough_universal_lid'
+          // universal  lid can be moved onto any labware
         }
         return isCompatible
       })
