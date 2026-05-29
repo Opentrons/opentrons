@@ -95,6 +95,35 @@ def coalesce_move_segments(
 def axis_pad(positions: Dict[Axis, float], default_value: float) -> Dict[Axis, float]:
     return {ax: positions.get(ax, default_value) for ax in Axis.node_axes()}
 
+def _sanitize_attached_instrument(
+    mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
+) -> Union[PipetteSpec, GripperSpec]:
+    if mount is OT3Mount.GRIPPER:
+        gripper_spec: GripperSpec = {"model": None, "id": None}
+        if passed_ai and passed_ai.get("model"):
+            gripper_spec["model"] = GripperModel.v1
+            gripper_spec["id"] = passed_ai.get("id")
+        return gripper_spec
+
+    # TODO (lc 12-5-2022) need to not always pass in defaults here
+    # but doing it to satisfy linter errors for now.
+    pipette_spec: PipetteSpec = {"model": None, "id": None}
+    if not passed_ai or not passed_ai.get("model"):
+        return pipette_spec
+
+    if pipette_load_name.supported_pipette(
+        cast(PipetteModel, passed_ai["model"])
+    ):
+        pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
+        pipette_spec["id"] = passed_ai.get("id")
+        return pipette_spec
+    # TODO (lc 12-05-2022) When the time comes we should properly
+    # support backwards compatibility
+    raise KeyError(
+        "If you specify attached_instruments, the model "
+        "should be pipette names or pipette models, but "
+        f"{passed_ai['model']} is not"
+    )
 
 class OT3Simulator(FlexBackend):
     """OT3 Hardware Controller Backend."""
@@ -157,35 +186,7 @@ class OT3Simulator(FlexBackend):
         self._engaged_axes: Dict[Axis, bool] = {}
         self._feature_flags = feature_flags or HardwareFeatureFlags()
 
-        def _sanitize_attached_instrument(
-            mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
-        ) -> Union[PipetteSpec, GripperSpec]:
-            if mount is OT3Mount.GRIPPER:
-                gripper_spec: GripperSpec = {"model": None, "id": None}
-                if passed_ai and passed_ai.get("model"):
-                    gripper_spec["model"] = GripperModel.v1
-                    gripper_spec["id"] = passed_ai.get("id")
-                return gripper_spec
 
-            # TODO (lc 12-5-2022) need to not always pass in defaults here
-            # but doing it to satisfy linter errors for now.
-            pipette_spec: PipetteSpec = {"model": None, "id": None}
-            if not passed_ai or not passed_ai.get("model"):
-                return pipette_spec
-
-            if pipette_load_name.supported_pipette(
-                cast(PipetteModel, passed_ai["model"])
-            ):
-                pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
-                pipette_spec["id"] = passed_ai.get("id")
-                return pipette_spec
-            # TODO (lc 12-05-2022) When the time comes we should properly
-            # support backwards compatibility
-            raise KeyError(
-                "If you specify attached_instruments, the model "
-                "should be pipette names or pipette models, but "
-                f"{passed_ai['model']} is not"
-            )
 
         self._attached_instruments = {
             m: _sanitize_attached_instrument(m, attached_instruments.get(m))

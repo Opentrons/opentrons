@@ -336,8 +336,6 @@ def _get_serial_for_dut(
         assert pipette
         return get_pipette_serial_ot3(pipette)
     elif dut == DeviceUnderTest.GRIPPER:
-        if api.is_simulator:
-            return "GRPV1120230323A01"
         gripper = api.attached_gripper
         assert gripper
         return str(gripper["gripper_id"])
@@ -713,7 +711,9 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
     await api.hold_jaw_width(int(delta))
 
 
-def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[Axis, float]:
+def get_endstop_position_ot3(
+    api: Union[OT3API, SyncHardwareAPI], mount: OT3Mount
+) -> Dict[Axis, float]:
     """Get the endstop's position per mount."""
     carriage_pos = api.get_deck_from_machine(api._backend.home_position())
     pos_at_home = api._effector_pos_from_carriage_pos(
@@ -893,6 +893,27 @@ async def move_to_arched_ot3(
     ]
     for p in points:
         await api.move_to(mount=mount, abs_position=p, speed=speed)
+
+
+def move_to_arched_ot3_sync(
+    api: SyncHardwareAPI,
+    mount: OT3Mount,
+    abs_position: Point,
+    speed: Optional[float] = None,
+    safe_height: float = -100.0,
+) -> None:
+    """Move OT3 gantry in an arched path."""
+    z_ax = Axis.by_mount(mount)
+    max_z = get_endstop_position_ot3(api, mount)[z_ax]
+    here = api.gantry_position(mount=mount, refresh=True)
+    arch_z = min(max(here.z, abs_position.z, safe_height), max_z)
+    points = [
+        here._replace(z=arch_z),
+        abs_position._replace(z=arch_z),
+        abs_position,
+    ]
+    for p in points:
+        api.move_to(mount=mount, abs_position=p, speed=speed)
 
 
 class SensorResponseBad(Exception):

@@ -2,7 +2,8 @@
 
 from dataclasses import dataclass
 import enum
-from typing import Dict, Callable, List, Optional, Union
+from time import sleep
+from typing import Dict, Callable, List, Optional, Union, Tuple
 from opentrons.protocol_api import ParameterContext, ProtocolContext
 from opentrons.types import Point
 
@@ -11,8 +12,17 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_MAX_SPEEDS,
     DEFAULT_RUN_CURRENT,
 )
+from opentrons.hardware_control.backends.ot3simulator import (
+    _sanitize_attached_instrument,
+)
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.types import GripperProbe, OT3AxisKind
+from opentrons.hardware_control.types import (
+    GripperProbe,
+    OT3AxisKind,
+    OT3Mount,
+    Axis,
+    GripperJawState,
+)
 
 # ------ TODO remove and move necessary libraries into a standard release library. ----
 import importlib
@@ -69,6 +79,8 @@ from hardware_testing.data.csv_report import (  # noqa: E402
     CSVLine,
 )
 from hardware_testing.opentrons_api import helpers_ot3  # noqa: E402
+from hardware_testing.drivers import find_port  # noqa: E402
+from hardware_testing.drivers.mark10 import Mark10, SimMark10  # noqa: E402
 
 metadata = {"protocolName": "Production qc Gripper assembly qc"}
 
@@ -140,27 +152,169 @@ class TestConfig:
     increment: bool
 
 
-def test_mount(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
+# -----------------   TEST Mount   ----------------
+
+
+def test_mount(
+    api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
+) -> None:
     """Test the gripper mount."""
     pass
 
 
-def test_probe(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
+# -----------------   TEST Probe   ----------------
+
+
+def test_probe(
+    api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
+) -> None:
     """Test the grippers probes."""
     pass
 
 
-def test_width(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
+# -----------------   TEST Width   ----------------
+
+
+def test_width(
+    api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
+) -> None:
     """Test the gripper width."""
     pass
 
 
-def test_force(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
+# -----------------   TEST Force   ----------------
+
+
+def _get_gauge(is_simulating: bool) -> Union[Mark10, SimMark10]:
+    if is_simulating:
+        return SimMark10()
+    else:
+        try:
+            port = find_port(*Mark10.vid_pid())
+        except RuntimeError:
+            raise RuntimeError("Unable to find Mark10 guage.")
+        return Mark10.create(port=port)
+
+
+def _read_forces(gauge: Union[Mark10, SimMark10]) -> List[float]:
+    n = list()
+    for _ in range(FORCE_GAUGE_TRIAL_SAMPLE_COUNT):
+        force = gauge.read_force()
+        n.append(force)
+        if not gauge.is_simulator():
+            sleep(FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL)
+    return n
+
+
+def _get_force_gauge_hover_and_grip_positions(
+    api: SyncHardwareAPI,
+) -> Tuple[Point, Point]:
+    grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_FORCE_GAUGE)
+    grip_pos += GAUGE_OFFSET
+    hover_pos = grip_pos._replace(z=api.get_instrument_max_height(OT3Mount.GRIPPER))
+    return hover_pos, grip_pos
+
+
+def _grip_and_read_forces(
+    api: SyncHardwareAPI,
+    gauge: Union[Mark10, SimMark10],
+    force: Optional[int] = None,
+    duty: Optional[int] = None,
+) -> List[float]:
+    if not api.is_simulator:
+        sleep(2)  # let sensor settle
+    if duty is not None:
+        displacement = api._gripper_handler.get_gripper().max_jaw_displacement()
+        api._grip(duty_cycle=float(duty), expected_displacement=displacement)
+        api._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
+    else:
+        assert force is not None
+        api.grip(float(force))
+    if gauge.is_simulator():
+        if duty is not None:
+            gauge.set_simulation_force(float(duty) * 0.5)  # type: ignore[union-attr]
+        elif force is not None:
+            gauge.set_simulation_force(float(force))  # type: ignore[union-attr]
+    ret_list = _read_forces(gauge)
+    api.ungrip()
+    return ret_list
+
+
+def _setup(api: SyncHardwareAPI, ctx: ProtocolContext) -> Union[Mark10, SimMark10]:
+    z_ax = Axis.Z_G
+    g_ax = Axis.G
+    mount = OT3Mount.GRIPPER
+
+    # OPERATOR SETS UP GAUGE
+    ctx.pause(f"add gauge to slot {SLOT_FORCE_GAUGE} and resume")
+    ctx.pause("plug gauge into USB port on OT3 and resume")
+    gauge = _get_gauge(api.is_simulator)
+    gauge.connect()
+    ret_list = _read_forces(gauge)
+    assert ret_list
+
+    # HOME
+    api.home([z_ax, g_ax])
+    # MOVE TO GAUGE
+    api.ungrip()
+    _, target_pos = _get_force_gauge_hover_and_grip_positions(api)
+    if not api.is_simulator:
+        helpers_ot3.move_to_arched_ot3_sync(api, mount, target_pos + Point(z=15))
+    ctx.pause("please make sure the gauge in the middle of the gripper")
+    ctx.pause("about to grip")
+    api.grip(20)
+    for sec in range(WARMUP_SECONDS):
+        if not api.is_simulator:
+            sleep(1)
+    api.ungrip()
+    return gauge
+
+
+def _get_force_test_tag(
+    trial: int,
+    newtons: Optional[int] = None,
+    duty_cycle: Optional[int] = None,
+) -> str:
+    if newtons and duty_cycle:
+        raise ValueError("must measure either force or duty-cycle, not both")
+    if newtons is None and duty_cycle is None:
+        raise ValueError("both newtons and duty-cycle are None")
+    if newtons is not None:
+        return f"newtons-{newtons}-trial-{trial + 1}"
+    else:
+        return f"duty-cycle-{duty_cycle}-trial-{trial + 1}"
+
+
+def test_force(
+    api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
+) -> None:
     """Test the gripper force."""
-    pass
+    gauge = _setup(api, ctx)
+
+    # LOOP THROUGH FORCES
+    for expected_force, allowed_percent_error in zip(
+        GRIP_FORCES_NEWTON_FORCE, FAILURE_THRESHOLD_PERCENTAGES
+    ):
+        for trial in range(NUM_NEWTONS_TRIALS):
+            actual_forces = _grip_and_read_forces(api, gauge, force=expected_force)
+            # base PASS/FAIL on average
+            avg_force = sum(actual_forces) / len(actual_forces)
+            error = (avg_force - expected_force) / expected_force
+            result = CSVResult.from_bool(abs(error) * 100 < allowed_percent_error)
+            # store all data in CSV
+            tag = _get_force_test_tag(trial, newtons=expected_force)
+            report(section, f"{tag}-data", actual_forces)
+            report(section, f"{tag}-average", [avg_force])
+            report(section, f"{tag}-target", [expected_force])
+            report(section, f"{tag}-pass-%", [allowed_percent_error])
+            report(section, f"{tag}-result", [result])
+
+    api.retract(OT3Mount.GRIPPER)
 
 
-def test_force_increment(api: SyncHardwareAPI, report: CSVReport, section: str) -> None:
+def test_force_increment(
+    api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
+) -> None:
     """Test the gripper force increment."""
     pass
 
@@ -194,25 +348,10 @@ TESTS_INCREMENT = [
 
 def build_test_force_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-
-    def _get_test_tag(
-        trial: int,
-        newtons: Optional[int] = None,
-        duty_cycle: Optional[int] = None,
-    ) -> str:
-        if newtons and duty_cycle:
-            raise ValueError("must measure either force or duty-cycle, not both")
-        if newtons is None and duty_cycle is None:
-            raise ValueError("both newtons and duty-cycle are None")
-        if newtons is not None:
-            return f"newtons-{newtons}-trial-{trial + 1}"
-        else:
-            return f"duty-cycle-{duty_cycle}-trial-{trial + 1}"
-
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
     for force in GRIP_FORCES_NEWTON_FORCE:
         for trial in range(NUM_NEWTONS_TRIALS):
-            tag = _get_test_tag(trial, newtons=force)
+            tag = _get_force_test_tag(trial, newtons=force)
             force_data_types = [float] * FORCE_GAUGE_TRIAL_SAMPLE_COUNT
             lines.append(CSVLine(f"{tag}-data", force_data_types))
             lines.append(CSVLine(f"{tag}-average", [float]))
@@ -221,7 +360,7 @@ def build_test_force_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
             lines.append(CSVLine(f"{tag}-result", [CSVResult]))
     for duty_cycle in GRIP_DUTY_CYCLES:
         for trial in range(NUM_DUTY_CYCLE_TRIALS):
-            tag = _get_test_tag(trial, duty_cycle=duty_cycle)
+            tag = _get_force_test_tag(trial, duty_cycle=duty_cycle)
             force_data_types = [float] * FORCE_GAUGE_TRIAL_SAMPLE_COUNT
             lines.append(CSVLine(f"{tag}-data", force_data_types))
             lines.append(CSVLine(f"{tag}-average", [float]))
@@ -339,6 +478,18 @@ def run(ctx: ProtocolContext) -> None:
     ctx.comment("starting robot test.")
     test_name = "gripper-assembly-qc-ot3"
     api = ctx._core.get_hardware()
+    if ctx.is_simulating():
+        sim_backend = api._backend
+        sim_backend._attached_instruments = {
+            m: _sanitize_attached_instrument(
+                m,
+                helpers_ot3._create_attached_instruments_dict(
+                    gripper="GRPV1120230323A01"
+                ).get(m),
+            )
+            for m in OT3Mount
+        }
+        api.reset()
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.GRIPPER
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
@@ -354,7 +505,7 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     for section, test_run in config.tests.items():
-        test_run(api, report, section.value)
+        test_run(api, report, section.value, ctx)
 
     # SAVE REPORT
     report.save_to_disk()
