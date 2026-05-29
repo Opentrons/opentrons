@@ -8,6 +8,28 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 9.0.0
+
+**Welcome to Protocol Designer 9.0.0!**
+
+This release is designed specifically for use with Opentrons Flex, and includes several bug fixes and improvements.
+
+### Improvements
+
+- When Protocol Designer detects a collision risk, the error message specifies the deck slot containing labware, modules, or fixtures at risk. To resolve the error, remove the items from the deck slot.
+- In every Protocol Designer step, pipettes must be able to safely pick up accessible tips from their tip rack. Improvements in this release can help you troubleshoot accessible tip errors:
+  - Warnings let you know when your deck setup or tip pickup settings present a collision risk with other tips or labware.
+  - In a transfer or mix step form, click **Manual tip tracking**, then click to select tips. This form can show you which tips are inaccessible and could cause a collision.
+- When you import a protocol with timeline errors, Protocol Designer maintains and displays the errors to help you troubleshoot.
+
+### Bug Fixes
+
+- Protocol Designer allows manual tip tracking with:
+  - A partial column pickup (for 5 or more pipette tips).
+  - Tip pickups with Flex 20 µL pipette tips.
+- Protocol Designer no longer includes unnecessary collision warnings when transferring liquid with every nozzle of a Flex 96-channel pipette.
+- Move Opentrons Tough Universal Lids onto any compatible labware on the deck.
+
 ## Opentrons Protocol Designer Changes in 8.10.1
 
 **Welcome to Protocol Designer 8.10.1!**
