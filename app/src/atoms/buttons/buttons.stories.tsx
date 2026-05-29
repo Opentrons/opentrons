@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { action } from 'storybook/actions'
 
 import {
   DIRECTION_COLUMN,
@@ -73,9 +74,7 @@ export const SubmitPrimary = SubmitPrimaryButtonTemplate.bind({})
 SubmitPrimary.args = {
   form: 'storybook-form',
   value: 'submit primary button',
-  onClick: () => {
-    console.log('submit primary button clicked')
-  },
+  onClick: action('submit primary button clicked'),
   disabled: false,
 }
 
@@ -95,9 +94,7 @@ TouchControl.args = {
   subText: 'touch control subtext',
   isActive: true,
   isOnDevice: false,
-  onClick: () => {
-    console.log('touch control button clicked')
-  },
+  onClick: action('touch control button clicked'),
 }
 
 const ToggleButtonTemplate: Story<
@@ -191,7 +188,5 @@ const AccountIconButtonTemplate: Story<
 export const AccountIcon = AccountIconButtonTemplate.bind({})
 AccountIcon.args = {
   initial: 'F',
-  onClick: () => {
-    console.log('account icon button clicked')
-  },
+  onClick: action('account icon button clicked'),
 }
