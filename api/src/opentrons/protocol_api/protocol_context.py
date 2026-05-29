@@ -1950,7 +1950,7 @@ class ProtocolContext(CommandPublisher):
     ) -> GroupedSteps:
         """Starts a group of commands for visualization in your Pytyon protocol or in the Opentrons App.
         This returns a step group object, which can be closed by calling
-        [`end_group()`][opentrons.protocol_api.GroupedSteps.end_group].
+        [`end_group()`][opentrons.protocol_api._command_annotations.GroupedSteps.end_group].
 
         Grouping steps together has no effect on protocol execution.
 
