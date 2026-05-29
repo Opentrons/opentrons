@@ -11,7 +11,10 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control import types
 from opentrons.hardware_control.abstract_device import AbstractDevice
-from opentrons.hardware_control.module_control import AttachedModulesControl, RECONNECT_ATTEMPTS
+from opentrons.hardware_control.module_control import (
+    RECONNECT_ATTEMPTS,
+    AttachedModulesControl,
+)
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleAtPort,
@@ -248,6 +251,8 @@ async def test_unregister_modules(
     subject: AttachedModulesControl,
 ) -> None:
     """It should register attached modules."""
+    loop = decoy.mock(cls=asyncio.AbstractEventLoop)
+    decoy.when(hardware_api.loop).then_return(loop)
     # Add a module
     module_1 = decoy.mock(cls=AbstractModule)
     decoy.when(module_1.usb_port).then_return(
@@ -264,7 +269,7 @@ async def test_unregister_modules(
     decoy.when(module_2.port).then_return("/dev/bar")
 
     decoy.when(hardware_api.is_simulator).then_return(False)
-    #setup ports for mod 1
+    # setup ports for mod 1
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
         ModuleAtPort(port="/dev/foo", name="magdeck", usb_port=module_1.usb_port),
@@ -297,17 +302,15 @@ async def test_unregister_modules(
     assert subject.available_modules == [module_1]
     assert subject._available_modules == []
     assert subject._recently_removed_modules == [module_1]
-    hardware_api.loop.create_task.called_once()
-
+    decoy.verify(loop.create_task(matchers.Anything()), times=1)
 
     # Test a module gets removed after reconnect patch and it doesn't infinite recurse
     async with asyncio.timeout(RECONNECT_ATTEMPTS + 1):
         await subject._reconnect_patch(RECONNECT_ATTEMPTS)
     assert subject._recently_removed_modules == []
 
-
     # Test a module gets reconnected when it reappers on a new port
-    #connect and disconnect
+    # connect and disconnect
     await subject.register_devices(new_devices_at_ports=new_mods_at_ports)
     await subject.unregister_devices(devices_at_ports=new_mods_at_ports)
     # device comes back on another port
@@ -322,9 +325,6 @@ async def test_unregister_modules(
     assert subject.available_modules == [module_1]
     assert subject._available_modules == [module_1]
     assert subject._recently_removed_modules == []
-
-    module_1.move_port.assert_called_once_with(port="/dev/bar", usb_port=module_2.usb_port)
-
-
-
-
+    decoy.verify(
+        await module_1.move_port(port="/dev/bar", usb_port=module_2.usb_port), times=1
+    )
