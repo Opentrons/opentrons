@@ -40,10 +40,7 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { getSortedAddressableArea } from './utils'
 
-import type {
-  AddressableAreaName,
-  LabwareDefinition,
-} from '@opentrons/shared-data'
+import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { Option } from '/protocol-designer/top-selectors/labware-locations'
 import type { FieldProps } from '../../types'
 
