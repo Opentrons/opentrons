@@ -2,7 +2,7 @@
 
 from collections.abc import AsyncGenerator
 from datetime import datetime
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import Depends, Request
 
@@ -12,7 +12,6 @@ from server_utils.auth.resource_server.authorization_checker import (
 )
 from server_utils.auth.resource_server.fastapi import get_authorization_checker
 from server_utils.fastapi_utils.documented_interaction import get_supplied_user_notes
-from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.service.dependencies import get_current_time
 
@@ -85,23 +84,4 @@ async def _record_documented_interaction(
         DocumentedInteraction(user_notes=user_notes, request_data=request_data),
         resource_id=resource_id,
         recorded_at=created_at,
-    )
-
-
-async def maybe_record_documented_interaction(
-    runId: str,
-    request_body: RequestModel[Any],
-    user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
-    created_at: Annotated[datetime, Depends(get_current_time)],
-    authorization_checker: Annotated[
-        AuthorizationChecker, Depends(get_authorization_checker)
-    ],
-) -> None:
-    """When auth-server requires it, require audit notes and record the interaction."""
-    await _record_documented_interaction(
-        resource_id=runId,
-        request_data=request_body.data,
-        user_notes=user_notes,
-        created_at=created_at,
-        authorization_checker=authorization_checker,
     )

@@ -27,7 +27,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.fastapi_dependencies import maybe_record_documented_interaction
+from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
 )
@@ -105,14 +105,12 @@ async def get_run_controller(
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[
-        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
-        Depends(maybe_record_documented_interaction),
-    ],
+    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
 )
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
     run_controller: Annotated[RunController, Depends(get_run_controller)],
     action_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
@@ -139,7 +137,10 @@ async def create_run_action(
         maintenance_run_orchestrator_store: Maintenance run orchestrator store.
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
+        audit_logger: Records the action for audit setting requires
+            ``Opentrons-User-Notes``.
     """
+    await audit_logger.log(resource_id=runId, request_data=request_body.data)
     body = request_body.data
     action_type = body.actionType
     if (

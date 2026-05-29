@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Union, overload
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Union, cast, overload
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
@@ -50,7 +50,13 @@ from opentrons.protocol_engine.types import (
     StackerLabwareMovementStrategy,
     StackerStoredLabwareGroup,
 )
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.types import (
+    APIVersion,
+    ThermocyclerStep,
+    VacuumModulePowerStep,
+    VacuumModulePressureStep,
+    VacuumModuleStep,
+)
 from opentrons.types import DeckSlotName
 
 if TYPE_CHECKING:
@@ -1205,5 +1211,77 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
     ) -> None:
         self._engine_client.execute_command(
             cmd.vacuum_module.StopVacuumParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def _convert_vm_profile_steps(
+        self, steps: List[VacuumModuleStep], repetitions: int
+    ) -> cmd.vacuum_module.ProfileType:
+        protocol_engine_steps: cmd.vacuum_module.ProfileType = []
+
+        for step in steps:
+            enable_pump = step.get("enable_pump")
+            hold_time_seconds = step.get("hold_time_seconds")
+            ramp_rate = step.get("ramp_rate")
+            timeout_s = step.get("timeout_seconds")
+            vent_after = step.get("vent_after")
+            if step.get("percent_power") is not None:
+                this_power_step = cast(VacuumModulePowerStep, step)
+                percent_power = this_power_step.get("percent_power")
+                pe_power_step = cmd.vacuum_module.VacuumModuleProfilePowerStep(
+                    enablePump=enable_pump if enable_pump is not None else False,
+                    holdTimeSeconds=hold_time_seconds,
+                    rampRate=ramp_rate,
+                    timeoutSeconds=timeout_s,
+                    ventAfter=vent_after,
+                    percentPower=percent_power,
+                )
+                protocol_engine_steps.append(pe_power_step)
+            else:
+                this_pressure_step = cast(VacuumModulePressureStep, step)
+                gauge_pressure_mbar = this_pressure_step.get("gauge_pressure_mbar")
+                pe_pressure_step = cmd.vacuum_module.VacuumModuleProfilePressureStep(
+                    enablePump=enable_pump if enable_pump is not None else False,
+                    holdTimeSeconds=hold_time_seconds,
+                    rampRate=ramp_rate,
+                    timeoutSeconds=timeout_s,
+                    ventAfter=vent_after,
+                    gaugePressureMbar=gauge_pressure_mbar,
+                )
+                protocol_engine_steps.append(pe_pressure_step)
+        return protocol_engine_steps * repetitions
+
+    def start_execute_profile(
+        self,
+        steps: List[VacuumModuleStep],
+        repetitions: int,
+    ) -> EngineTaskCore:
+        """Start the execution of a vacuum module profile and return a task."""
+        self._repetitions = repetitions
+        self._step_count = len(steps)
+        engine_steps = self._convert_vm_profile_steps(
+            steps=steps, repetitions=repetitions
+        )
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.vacuum_module.StartRunProfileParams(
+                moduleId=self.module_id,
+                profile=engine_steps,
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+        start_execute_profile_result = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_execute_profile_result
+
+    def open_vent(self) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.OpenVentParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def close_vent(self) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.CloseVentParams(moduleId=self.module_id),
             command_annotations=self._protocol_core.annotation_ids,
         )

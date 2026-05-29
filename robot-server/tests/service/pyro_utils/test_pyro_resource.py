@@ -185,6 +185,12 @@ async def test_run_hardware_event_callback(
 
     assert isinstance(result, ClientPyroFunctionWrapper)
 
+    default_run_door_watcher_result = ot3api.register_callback(
+        robot_server_resource.get_default_run_orchestrator_door_watcher_callback()
+    )
+
+    assert isinstance(default_run_door_watcher_result, ClientPyroFunctionWrapper)
+
 
 async def test_maintenance_run_hardware_event_callback(
     ot3_hardware_api: OT3API,

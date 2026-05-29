@@ -19,6 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
@@ -29,7 +30,6 @@ import {
   InterventionModal,
   useInterventionModal,
 } from '/app/organisms/InterventionModal'
-import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
 import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   CurrentRunningProtocolCommand,
@@ -109,7 +109,7 @@ export function RunningProtocol(): JSX.Element {
   })
 
   // TODO(jj): figure out what to do with actionsToDocument
-  const docstate = useGuardedAction([])
+  const docstate = useGuardedAction()
 
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??

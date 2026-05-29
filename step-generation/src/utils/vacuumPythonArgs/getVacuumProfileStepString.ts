@@ -39,14 +39,14 @@ const _getVacuumProfileAtomicStepString = (
   if ('gaugePressureMbar' in step) {
     const { gaugePressureMbar } = step
     return formatPyDict({
-      gauge_pressure: gaugePressureMbar,
+      gauge_pressure_mbar: gaugePressureMbar,
       ...baseDict,
       vent_after: ventAfter,
     })
   }
   const { percentPower } = step
   return formatPyDict({
-    power_percent: Number(percentPower),
+    percent_power: Number(percentPower),
     ...baseDict,
     vent_after: ventAfter,
   })
