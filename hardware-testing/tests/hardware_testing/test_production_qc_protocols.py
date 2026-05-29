@@ -81,7 +81,7 @@ def _get_analysis_result(
 @pytest.mark.parametrize(
     "protocol",
     [
-        pytest.param("belt_calibration.py"),
+        pytest.param("belt_calibration_ot3.py"),
     ],
 )
 def test_production_protocol(protocol: str) -> None:
