@@ -201,42 +201,34 @@ export function SelectTips(
     return highlightedWells
   }
 
-  // `wellName` is the primary from getEntireWellSelection, but the reverse map
-  // lets us also handle clicks on cascading wells (e.g. clicking B1 when A1's
-  // group A1-E1 is selected should deselect the A1 group).
   const handleClickWell = (wellName: string): void => {
-    // Resolve which primary owns this well in the current selection (if any).
+    // If this well belongs to an already-selected group, deselect that group.
     const owningPrimary = selectedWellToPrimary[wellName]
-    const isAlreadySelected = owningPrimary != null
+    if (owningPrimary != null) {
+      setShowErrorBanner(false)
+      const groupIndex = selectedTips.findIndex(g => g[0] === owningPrimary)
+      setSelectedTips(selectedTips.slice(0, groupIndex))
+      return
+    }
 
-    // for new selections, `wellName` is always a primary (from handleSelectionDone).
-    const status = tipAccessibileStatusByWellName[wellName]
+    // for new selections, lookup primary first
+    // fall back to the covering-primary map for cascading (non-primary) wells.
+    const status =
+      tipAccessibileStatusByWellName[wellName] ?? wellToPrimaryStatus[wellName]
 
-    if (!isAlreadySelected) {
-      if (!(status?.isAccessible === true)) {
-        return
-      }
-      // Confirm every affected well has a tip — the primary-only isComplete check
-      // in the hook is insufficient when some cascading wells may be empty.
-      const affectedWells = [...status.affectedWells]
-      if (affectedWells.some(w => tipState?.[w] === EMPTY)) {
-        return
-      }
-      if (!hasPickupsRemaining) {
-        return
-      }
+    if (!(status?.isAccessible === true)) {
+      return
+    }
+    const affectedWells = [...status.affectedWells]
+    if (affectedWells.some(w => tipState?.[w] === EMPTY)) {
+      return
+    }
+    if (!hasPickupsRemaining) {
+      return
     }
 
     setShowErrorBanner(false)
-
-    if (isAlreadySelected) {
-      // Slice removes the owning group and all later selections.
-      const groupIndex = selectedTips.findIndex(g => g[0] === owningPrimary)
-      setSelectedTips(selectedTips.slice(0, groupIndex))
-    } else {
-      const wellsToSelect = [...(status?.affectedWells ?? [wellName])]
-      setSelectedTips([...selectedTips, wellsToSelect])
-    }
+    setSelectedTips([...selectedTips, affectedWells])
   }
 
   const handleHoverWell = (e: WellMouseEvent): void => {
