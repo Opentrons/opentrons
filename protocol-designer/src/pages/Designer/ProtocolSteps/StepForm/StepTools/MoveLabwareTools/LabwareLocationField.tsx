@@ -5,6 +5,7 @@ import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getIsLid,
   getModuleDisplayName,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
   VACUUM_MODULE_TYPE,
@@ -135,9 +136,15 @@ export function LabwareLocationField(
             moduleEntities[value].model
           )
         } else if (value in labwareEntities) {
-          isCompatible = compatibleParentLoadNames.has(
+          const isCompatibleFromDefinition = compatibleParentLoadNames.has(
             labwareEntities[value].def.parameters.loadName
           )
+          const { def: defToMoveTo } = labwareEntities[value]
+          const isAllowedForUniversalLid =
+            def.parameters.loadName === 'opentrons_tough_universal_lid' &&
+            // moving to a non-lid is allowed implicitly
+            !getIsLid(defToMoveTo)
+          isCompatible = isCompatibleFromDefinition || isAllowedForUniversalLid
         }
         return isCompatible
       })

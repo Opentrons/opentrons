@@ -186,9 +186,5 @@ export const VACUUM_STATE_VENT: 'vent' = 'vent'
 export const VACUUM_VENT_SET_OPEN: 'open' = 'open'
 export const VACUUM_VENT_SET_CLOSED: 'closed' = 'closed'
 
-// TODO (nd:2026-03-09) These should match physical min/max when defined
-export const VACUUM_MIN_PRESSURE_MBAR = 0.1
-export const VACUUM_MAX_PRESSURE_MBAR = 1000
-
 export const VACUUM_DEACTIVATED: 'VACUUM_DEACTIVATED' = 'VACUUM_DEACTIVATED'
 export const VACUUM_AT_TARGET: 'VACUUM_AT_TARGET' = 'VACUUM_AT_TARGET'

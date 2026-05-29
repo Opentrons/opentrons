@@ -9,6 +9,8 @@ from decoy import Decoy
 from pydantic import BaseModel
 
 from server_utils.auth.resource_server.auth_server import (
+    AuthSettingsResponse,
+    AuthSettingsResponseData,
     Client,
     RequireReasonForInteractionSettingsResponse,
     RequireReasonForInteractionSettingsResponseData,
@@ -67,6 +69,9 @@ async def test_record_documented_interaction_raises_when_notes_missing(
     """Missing user notes are rejected when require-reason-for-interaction is on."""
     mock_client = decoy.mock(cls=Client)
     subject = AuthServerAuthorizationChecker(mock_client)
+    decoy.when(await mock_client.get_auth_settings()).then_return(
+        AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=True))
+    )
     decoy.when(
         await mock_client.get_require_reason_for_interaction_settings()
     ).then_return(
@@ -97,7 +102,7 @@ async def test_record_documented_interaction_writes_audit_log(
     with (
         patch.object(
             subject,
-            "get_require_reason_for_interaction_enabled",
+            "is_reason_for_interaction_required",
             new=AsyncMock(return_value=True),
         ),
         caplog.at_level(logging.INFO, logger=audit_logger),
@@ -124,6 +129,9 @@ async def test_record_documented_interaction_accepts_notes_from_request_model(
     """``DocumentedInteraction.from_request_model`` records payload data and header notes."""
     mock_client = decoy.mock(cls=Client)
     subject = AuthServerAuthorizationChecker(mock_client)
+    decoy.when(await mock_client.get_auth_settings()).then_return(
+        AuthSettingsResponse(data=AuthSettingsResponseData(accessControlEnabled=True))
+    )
     decoy.when(
         await mock_client.get_require_reason_for_interaction_settings()
     ).then_return(

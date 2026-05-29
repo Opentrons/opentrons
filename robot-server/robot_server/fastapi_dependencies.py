@@ -64,7 +64,7 @@ async def get_audit_logger(
         return
     if (
         not audit_logger.did_log
-        and await authorization_checker.get_require_reason_for_interaction_enabled()
+        and await authorization_checker.is_reason_for_interaction_required()
     ):
         raise RuntimeError(
             "Internal error: the endpoint forgot to send anything to the audit log."

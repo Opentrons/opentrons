@@ -1,5 +1,7 @@
 """Tests for Flex Stacker Engine Core."""
 
+from typing import List
+
 import pytest
 from decoy import Decoy
 
@@ -11,8 +13,14 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.engine.module_core import VacuumModuleCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocols.api_support.types import (
+    VacuumModulePowerStep,
+    VacuumModulePressureStep,
+    VacuumModuleStep,
+)
 
 SyncVacuumModuleHardware = SynchronousAdapter[VacuumModule]
 
@@ -144,6 +152,128 @@ def test_stop_vacuum(
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.vacuum_module.StopVacuumParams(
+                moduleId="1234",
+            ),
+            command_annotations=[],
+        )
+    )
+
+
+def test_start_execute_profile(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: VacuumModuleCore
+) -> None:
+    """Verify that the pe profile command gets called w the correct params."""
+    papi_profile_steps: List[VacuumModuleStep] = [
+        VacuumModulePressureStep(
+            enable_pump=True,
+            hold_time_seconds=143,
+            ramp_rate=2.2,
+            timeout_seconds=200,
+            vent_after=True,
+            gauge_pressure_mbar=-99,
+        ),
+        VacuumModulePowerStep(
+            enable_pump=True,
+            hold_time_seconds=23,
+            ramp_rate=20.9,
+            timeout_seconds=300,
+            vent_after=None,
+            percent_power=40,
+        ),
+        VacuumModulePressureStep(
+            enable_pump=False,
+            hold_time_seconds=324,
+            ramp_rate=2.2,
+            timeout_seconds=200,
+            vent_after=True,
+            gauge_pressure_mbar=-10,
+        ),
+        VacuumModulePowerStep(
+            enable_pump=True,
+            hold_time_seconds=120,
+            ramp_rate=100,
+            timeout_seconds=18,
+            vent_after=False,
+            percent_power=50,
+        ),
+    ]
+    expected_pe_profile_steps: cmd.vacuum_module.ProfileType = [
+        cmd.vacuum_module.VacuumModuleProfilePressureStep(
+            enablePump=True,
+            holdTimeSeconds=143,
+            rampRate=2.2,
+            timeoutSeconds=200,
+            ventAfter=True,
+            gaugePressureMbar=-99,
+        ),
+        cmd.vacuum_module.VacuumModuleProfilePowerStep(
+            enablePump=True,
+            holdTimeSeconds=23,
+            rampRate=20.9,
+            timeoutSeconds=300,
+            ventAfter=None,
+            percentPower=40,
+        ),
+        cmd.vacuum_module.VacuumModuleProfilePressureStep(
+            enablePump=False,
+            holdTimeSeconds=324,
+            rampRate=2.2,
+            timeoutSeconds=200,
+            ventAfter=True,
+            gaugePressureMbar=-10,
+        ),
+        cmd.vacuum_module.VacuumModuleProfilePowerStep(
+            enablePump=True,
+            holdTimeSeconds=120,
+            rampRate=100,
+            timeoutSeconds=18,
+            ventAfter=False,
+            percentPower=50,
+        ),
+    ]
+    repetitions = 3
+
+    task_mock = decoy.mock(cls=EngineTaskCore)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.vacuum_module.StartRunProfileParams(
+                moduleId="1234",
+                profile=expected_pe_profile_steps * repetitions,
+            ),
+            command_annotations=[],
+        )
+    ).then_return(cmd.vacuum_module.StartRunProfileResult(taskId="taskId"))
+    task_mock._id = "taskId"
+    result = subject.start_execute_profile(
+        steps=papi_profile_steps, repetitions=repetitions
+    )
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
+
+
+def test_open_vent(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: VacuumModuleCore
+) -> None:
+    """Make sure pe open vent gets called corrrectly."""
+    subject.open_vent()
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.vacuum_module.OpenVentParams(
+                moduleId="1234",
+            ),
+            command_annotations=[],
+        )
+    )
+
+
+def test_close_vent(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: VacuumModuleCore
+) -> None:
+    """Make sure pe close vent gets called corrrectly."""
+    subject.close_vent()
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.vacuum_module.CloseVentParams(
                 moduleId="1234",
             ),
             command_annotations=[],
