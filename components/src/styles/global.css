@@ -127,7 +127,7 @@
   --border-radius-40: 2.5rem; /* 40px */
   /* Round to a pill or full circle. The exact value here is arbitrary and might
   change. It just needs to be greater than the element's width and height. */
-  --border-radius-full: 50rem; /* 200px */
+  --border-radius-full: 50rem;
 
   /* font-size */
   --font-size-80: 5rem; /* 80px */
