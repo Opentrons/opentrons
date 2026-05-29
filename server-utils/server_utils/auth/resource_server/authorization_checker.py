@@ -90,7 +90,7 @@ class AuthorizationChecker(ABC):
 
         Params:
             require_reason_for_interaction: When ``None``, read from auth-server
-                settings via ``is_require_reason_for_interaction_enabled()``. Callers
+                settings via ``is_reason_for_interaction_required()``. Callers
                 that already resolved the setting locally may pass an explicit value.
         """
         if require_reason_for_interaction is None:
