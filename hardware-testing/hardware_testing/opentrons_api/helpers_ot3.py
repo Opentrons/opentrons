@@ -336,6 +336,8 @@ def _get_serial_for_dut(
         assert pipette
         return get_pipette_serial_ot3(pipette)
     elif dut == DeviceUnderTest.GRIPPER:
+        if api.is_simulator:
+            return "GRPV1120230323A01"
         gripper = api.attached_gripper
         assert gripper
         return str(gripper["gripper_id"])
