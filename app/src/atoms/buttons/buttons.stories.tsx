@@ -10,6 +10,7 @@ import {
   useLongPress,
 } from '@opentrons/components'
 
+import { AccountIconButton } from './AccountIconButton'
 import {
   QuaternaryButton,
   SubmitPrimaryButton,
@@ -176,3 +177,21 @@ const TextOnlyButtonTemplate: Story<
 }
 
 export const TextOnly = TextOnlyButtonTemplate.bind({})
+
+const AccountIconButtonTemplate: Story<
+  ComponentProps<typeof AccountIconButton>
+> = args => {
+  return (
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <AccountIconButton {...args} />
+    </Flex>
+  )
+}
+
+export const AccountIcon = AccountIconButtonTemplate.bind({})
+AccountIcon.args = {
+  initial: 'F',
+  onClick: () => {
+    console.log('account icon button clicked')
+  },
+}
