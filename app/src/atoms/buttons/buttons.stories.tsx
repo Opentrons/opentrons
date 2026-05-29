@@ -74,7 +74,9 @@ export const SubmitPrimary = SubmitPrimaryButtonTemplate.bind({})
 SubmitPrimary.args = {
   form: 'storybook-form',
   value: 'submit primary button',
-  onClick: action('submit primary button clicked'),
+  onClick: () => {
+    console.log('submit primary button clicked')
+  },
   disabled: false,
 }
 
@@ -94,7 +96,9 @@ TouchControl.args = {
   subText: 'touch control subtext',
   isActive: true,
   isOnDevice: false,
-  onClick: action('touch control button clicked'),
+  onClick: () => {
+    console.log('touch control button clicked')
+  },
 }
 
 const ToggleButtonTemplate: Story<
