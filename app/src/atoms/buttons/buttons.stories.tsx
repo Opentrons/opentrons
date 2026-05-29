@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { action } from 'storybook/actions'
 
 import {
   DIRECTION_COLUMN,
@@ -10,6 +11,7 @@ import {
   useLongPress,
 } from '@opentrons/components'
 
+import { AccountIconButton } from './AccountIconButton'
 import {
   QuaternaryButton,
   SubmitPrimaryButton,
@@ -176,3 +178,19 @@ const TextOnlyButtonTemplate: Story<
 }
 
 export const TextOnly = TextOnlyButtonTemplate.bind({})
+
+const AccountIconButtonTemplate: Story<
+  ComponentProps<typeof AccountIconButton>
+> = args => {
+  return (
+    <div>
+      <AccountIconButton {...args} />
+    </div>
+  )
+}
+
+export const AccountIcon = AccountIconButtonTemplate.bind({})
+AccountIcon.args = {
+  initial: 'F',
+  onClick: action('account icon button clicked'),
+}
