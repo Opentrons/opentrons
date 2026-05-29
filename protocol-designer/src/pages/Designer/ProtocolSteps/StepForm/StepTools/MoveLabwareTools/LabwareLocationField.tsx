@@ -271,7 +271,3 @@ export function LabwareLocationField(
     />
   )
 }
-
-const getIsUniversalLid = (def: LabwareDefinition): boolean => {
-  return def.parameters.loadName === 'opentrons_tough_universal_lid'
-}
