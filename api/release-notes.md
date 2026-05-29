@@ -12,18 +12,16 @@ Welcome to the v9.1.0 release of the Opentrons Flex robot software! This release
 
 ### New Features
 
-- Use new methods to create step groups within your Python protocols. These groups are visible in your protocol file, or in protocol [visualization][https://docs.opentrons.com/flex/opentrons-app/protocol-viz/]:
-  - `group_steps()`
-  - the `create_and_start_step_group()` and `end_group() commands
-- Use the `set_empty() method to label a tip rack as empty, and return used tips to an empty rack throughout your protocol.
+- Use new methods to create step groups within your Python protocols. These groups are visible in your protocol file, or in [protocol visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
+- Use the `set_empty()` method to label a tip rack as empty, and return used tips to an empty rack throughout your protocol.
 
 ### Feature Improvements
 
-Most pipettes, with the exception of the Flex 96-channel pipette, no longer descend during attachment, detachment, or probe attachment to prevent collision risk.
+Most Flex pipettes no longer descend during attachment, detachment, or probe attachment to prevent collision risk. The 96-channel pipette still descends.
 
 ### Bug Fixes
 
-The API correctly calculates maximum aspirate volume for liquid handling steps using Flex 1-Channel (1--50 µL) pipette and 20 µL pipette tips to prevent unnecessary protocol errors.
+Distributing with a liquid class now correctly calculates maximum aspirate volume for Flex 50 µL pipettes using 20 µL tips.
 
 ---
 
