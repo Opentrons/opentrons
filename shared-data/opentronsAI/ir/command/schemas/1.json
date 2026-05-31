@@ -12,7 +12,14 @@
         },
         "nozzles": {
           "type": "string",
-          "enum": ["SINGLE", "ROW", "COLUMN", "QUADRANT", "ALL", "PARTIAL_COLUMN"]
+          "enum": [
+            "SINGLE",
+            "ROW",
+            "COLUMN",
+            "QUADRANT",
+            "ALL",
+            "PARTIAL_COLUMN"
+          ]
         },
         "primaryNozzle": {
           "type": "string",

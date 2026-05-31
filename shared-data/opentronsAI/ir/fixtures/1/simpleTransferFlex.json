@@ -207,7 +207,7 @@
         }
       }
     },
-     {
+    {
       "commandType": "dropTipInPlace",
       "key": "drop-tip-in-place-1",
       "params": {

@@ -42,11 +42,11 @@
   "labware": {
     "tip-rack-1": {
       "labwareDefURI": "opentrons/opentrons_96_tiprack_10ul/1",
-      "stackedOnNode": {"slotName": "8"}
+      "stackedOnNode": { "slotName": "8" }
     },
     "source-plate-1": {
       "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
-      "stackedOnNode": {"slotName": "1"}
+      "stackedOnNode": { "slotName": "1" }
     },
     "dest-plate-1": {
       "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
@@ -184,9 +184,9 @@
         "addressableAreaName": "fixedTrash",
         "alternateDropLocation": true,
         "offset": {
-           "x": 0,
-            "y": 0,
-            "z": 0
+          "x": 0,
+          "y": 0,
+          "z": 0
         }
       }
     },
