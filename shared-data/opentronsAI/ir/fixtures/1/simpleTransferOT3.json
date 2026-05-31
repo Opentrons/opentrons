@@ -1,0 +1,218 @@
+{
+  "$otSharedSchema": "#/opentronsAI/ir/schemas/1",
+  "schemaVersion": 1,
+  "metadata": {
+    "name": "Simple Flex transfer",
+    "author": "Hopia",
+    "description": "A minimal IR fixture: transfer 50 µL from a plate on a temperature module to a deck plate on Flex",
+    "created": 1748739600000,
+    "lastModified": 1748739600000
+  },
+  "robotType": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  },
+  "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
+  "customLabwareDefinitions": {},
+  "liquidSchemaId": "opentronsLiquidSchemaV1",
+  "liquids": {
+    "sample-id": {
+      "liquidGroupId": "0",
+      "displayName": "Sample",
+      "displayColor": "#ffd600",
+      "description": "Sample liquid in source plate"
+    }
+  },
+  "ingredLocations": {
+    "source-plate-1": {
+      "A1": {
+        "sample-id": {
+          "volume": 200
+        }
+      }
+    }
+  },
+  "pipettes": {
+    "pipette-1": {
+      "name": "p1000_single_flex",
+      "mount": "left",
+      "tiprackDefURIs": ["opentrons/opentrons_flex_96_tiprack_1000ul/1"]
+    }
+  },
+  "labware": {
+    "tip-rack-1": {
+      "labwareDefURI": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "stackedOnNode": { "slotName": "C2" }
+    },
+    "source-plate-1": {
+      "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
+      "stackedOnNode": { "moduleId": "temp-module-1" }
+    },
+    "dest-plate-1": {
+      "labwareDefURI": "opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4",
+      "stackedOnNode": { "slotName": "B2" }
+    }
+  },
+  "modules": {
+    "temp-module-1": {
+      "type": "temperatureModuleType",
+      "model": "temperatureModuleV2",
+      "location": "D1"
+    }
+  },
+  "wasteChuteLocation": "cutoutD3",
+  "trashBinLocations": [],
+  "stagingAreaLocations": [],
+  "commandSchemaId": "opentronsAICommandSchemaV1",
+  "commands": [
+    {
+      "commandType": "loadPipette",
+      "key": "load-pipette-1",
+      "params": {
+        "pipetteId": "pipette-1",
+        "pipetteName": "p1000_single_flex",
+        "mount": "left"
+      }
+    },
+    {
+      "commandType": "loadModule",
+      "key": "load-temp-module-1",
+      "params": {
+        "moduleId": "temp-module-1",
+        "model": "temperatureModuleV2",
+        "location": {
+          "slotName": "D1"
+        }
+      }
+    },
+    {
+      "commandType": "loadLabware",
+      "key": "load-tip-rack-1",
+      "params": {
+        "labwareId": "tip-rack-1",
+        "loadName": "opentrons_flex_96_tiprack_1000ul",
+        "namespace": "opentrons",
+        "version": 1,
+        "location": {
+          "slotName": "C2"
+        },
+        "displayName": "Opentrons Flex 96 Tip Rack 1000 µL"
+      }
+    },
+    {
+      "commandType": "loadLabware",
+      "key": "load-source-plate-1",
+      "params": {
+        "labwareId": "source-plate-1",
+        "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 4,
+        "location": {
+          "moduleId": "temp-module-1"
+        },
+        "displayName": "Source Plate"
+      }
+    },
+    {
+      "commandType": "loadLabware",
+      "key": "load-dest-plate-1",
+      "params": {
+        "labwareId": "dest-plate-1",
+        "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 4,
+        "location": {
+          "slotName": "B2"
+        },
+        "displayName": "Destination Plate"
+      }
+    },
+    {
+      "commandType": "loadLiquid",
+      "key": "load-liquid-sample",
+      "params": {
+        "liquidId": "sample-id",
+        "labwareId": "source-plate-1",
+        "volumeByWell": {
+          "A1": 200
+        }
+      }
+    },
+    {
+      "commandType": "pickUpTip",
+      "key": "pick-up-tip-1",
+      "nozzles": "ALL",
+      "primaryNozzle": "A1",
+      "params": {
+        "pipetteId": "pipette-1",
+        "labwareId": "tip-rack-1",
+        "wellName": "A1"
+      }
+    },
+    {
+      "commandType": "aspirate",
+      "key": "aspirate-1",
+      "tipRack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "nozzles": "ALL",
+      "primaryNozzle": "A1",
+      "params": {
+        "pipetteId": "pipette-1",
+        "labwareId": "source-plate-1",
+        "wellName": "A1",
+        "volume": 50,
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          }
+        }
+      }
+    },
+    {
+      "commandType": "dispense",
+      "key": "dispense-1",
+      "tipRack": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "nozzles": "ALL",
+      "primaryNozzle": "A1",
+      "params": {
+        "pipetteId": "pipette-1",
+        "labwareId": "dest-plate-1",
+        "wellName": "A1",
+        "volume": 50,
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": {
+            "x": 0,
+            "y": 0,
+            "z": 2
+          }
+        }
+      }
+    },
+    {
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "move-to-addressable-area-for-drop-tip-1",
+      "params": {
+        "pipetteId": "pipette-1",
+        "addressableAreaName": "wasteChuteAddressableArea",
+        "alternateDropLocation": true,
+        "offset": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      }
+    },
+     {
+      "commandType": "dropTipInPlace",
+      "key": "drop-tip-in-place-1",
+      "params": {
+        "pipetteId": "pipette-1"
+      }
+    }
+  ]
+}

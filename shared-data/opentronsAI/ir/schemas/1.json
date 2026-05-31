@@ -1,0 +1,323 @@
+{
+  "$id": "opentronsAIIntermediateRepresentationSchemaV1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "AddressableAreaLocation": {
+      "description": "The location of something placed in an addressable area. This is a superset of deck slots.",
+      "type": "object",
+      "required": ["addressableAreaName"],
+      "additionalProperties": false,
+      "properties": {
+        "addressableAreaName": {
+          "description": "The id of an addressable area from the deck definition.",
+          "type": "string"
+        }
+      }
+    },
+    "DeckSlotLocation": {
+      "description": "The location of something placed in a single deck slot.",
+      "type": "object",
+      "required": ["slotName"],
+      "additionalProperties": false,
+      "properties": {
+        "slotName": {
+          "description": "A slot on the robot deck. OT-2 uses plain numbers; Flex uses coordinates like C2.",
+          "type": "string"
+        }
+      }
+    },
+    "InStackerHopperLocation": {
+      "description": "The location of labware stored in a Flex Stacker hopper.",
+      "type": "object",
+      "required": ["kind", "moduleId"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "inStackerHopper"
+        },
+        "moduleId": {
+          "description": "The ID of the stacker module containing this labware.",
+          "type": "string"
+        }
+      }
+    },
+    "ModuleLocation": {
+      "description": "The location of something placed atop a hardware module.",
+      "type": "object",
+      "required": ["moduleId"],
+      "additionalProperties": false,
+      "properties": {
+        "moduleId": {
+          "description": "The ID of a loaded module.",
+          "type": "string"
+        }
+      }
+    },
+    "OnLabwareLocation": {
+      "description": "The location of something placed atop another labware.",
+      "type": "object",
+      "required": ["labwareId"],
+      "additionalProperties": false,
+      "properties": {
+        "labwareId": {
+          "description": "The ID of the labware this item is stacked on.",
+          "type": "string"
+        }
+      }
+    },
+    "LoadedLabwareLocation": {
+      "description": "Where loaded labware is located. Matches shared-data/command LoadedLabwareLocation.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["offDeck", "systemLocation", "wasteChuteLocation"]
+        },
+        {
+          "$ref": "#/$defs/InStackerHopperLocation"
+        },
+        {
+          "$ref": "#/$defs/DeckSlotLocation"
+        },
+        {
+          "$ref": "#/$defs/ModuleLocation"
+        },
+        {
+          "$ref": "#/$defs/OnLabwareLocation"
+        },
+        {
+          "$ref": "#/$defs/AddressableAreaLocation"
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$otSharedSchema",
+    "schemaVersion",
+    "metadata",
+    "robotType",
+    "labwareDefinitionSchemaId",
+    "customLabwareDefinitions",
+    "liquidSchemaId",
+    "commands",
+    "commandSchemaId",
+    "liquids",
+    "ingredLocations",
+    "labware",
+    "modules",
+    "pipettes",
+    "wasteChuteLocation",
+    "trashBinLocations",
+    "stagingAreaLocations"
+  ],
+  "properties": {
+    "$otSharedSchema": {
+      "description": "The path to a valid OpentronsAI intermediate representation schema relative to the shared-data directory, without its extension.",
+      "enum": ["#/opentronsAI/ir/schemas/1"]
+    },
+    "schemaVersion": {
+      "description": "Schema version of the intermediate representation output is a single integer",
+      "enum": [1]
+    },
+    "metadata": {
+      "description": "Metadata about the intermediate representation to generate a protocol",
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "description": "A short, human-readable name for the protocol",
+          "type": "string"
+        },
+        "author": {
+          "description": "The author or organization who created the protocol",
+          "type": "string"
+        },
+        "description": {
+          "description": "A text description of the protocol.",
+          "type": ["string", "null"]
+        },
+        "created": {
+          "description": "UNIX timestamp when this file was created",
+          "type": "number"
+        },
+        "lastModified": {
+          "description": "UNIX timestamp when this file was last modified",
+          "type": ["number", "null"]
+        }
+      }
+    },
+    "robotType": {
+      "description": "Robot model and deck configuration",
+      "type": "object",
+      "required": ["model", "deckId"],
+      "properties": {
+        "model": {
+          "description": "Model of the robot this protocol is written for",
+          "type": "string",
+          "enum": ["OT-2 Standard", "OT-3 Standard"]
+        },
+        "deckId": {
+          "description": "Identifier of physical deck this protocol is written for. This should match a definition in the shared-data deck directory.",
+          "type": "string",
+          "enum": ["ot2_standard", "ot3_standard"]
+        }
+      }
+    },
+    "labwareDefinitionSchemaId": {
+      "description": "The schema to use for labware definitions.",
+      "type": "string",
+      "enum": ["opentronsLabwareSchemaV2"]
+    },
+    "customLabwareDefinitions": {
+      "description": "All custom labware definitions used by labware in this protocol, keyed by labwareDefURI",
+      "type": "object",
+      "patternProperties": {
+        ".+": { "type": "object" }
+      }
+    },
+    "liquidSchemaId": {
+      "description": "The schema to use for liquid definitions.",
+      "type": "string",
+      "enum": ["opentronsLiquidSchemaV1"]
+    },
+    "liquids": {
+      "description": "All liquids used in this protocol, keyed by a unique identifier (liquidId)",
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "properties": {
+            "liquidGroupId": {
+              "description": "Liquid id used to identify the liquid group",
+              "type": "string"
+            },
+            "displayName": {
+              "description": "The name of the liquid",
+              "type": "string"
+            },
+            "displayColor": {
+              "description": "The display color of the liquid in hexcode",
+              "type": "string"
+            },
+            "description": {
+              "description": "Optional description of the liquid.",
+              "type": "string"
+            },
+            "liquidClass": {
+              "description": "Optional liquid class name assigned to the liquid.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ingredLocations": {
+      "description": "All instances of where liquids and their amounts are located at the start of the protocol, keyed by labwareId",
+      "type": "object",
+      "patternProperties": {
+        ".+": { "type": "object" }
+      }
+    },
+    "pipettes": {
+      "description": "Pipettes needed in the protocol, keyed by pipette id",
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "required": ["name", "mount"],
+          "properties": {
+            "name": {
+              "description": "The pipette name of the pipette",
+              "type": "string"
+            },
+            "mount": {
+              "description": "The mount on which the pipette is located",
+              "type": "string",
+              "enum": ["left", "right"]
+            },
+            "tiprackDefURIs": {
+              "description": "The tiprackDefURIs that the pipette uses",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "labware": {
+      "description": "Labware needed in the protocol, keyed by labware id",
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "required": ["labwareDefURI"],
+          "properties": {
+            "labwareDefURI": {
+              "description": "The labwareDefURI needed to properly identify the labware via its loadName, namespace and version",
+              "type": "string"
+            },
+            "stackedOnNode": {
+              "description": "Where this labware is located on the deck, on another labware, in a module, or in a stacker hopper.",
+              "$ref": "#/$defs/LoadedLabwareLocation"
+            }
+          }
+        }
+      }
+    },
+    "modules": {
+      "description": "Modules needed in the protocol, keyed by module id",
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "required": ["type", "model"],
+          "properties": {
+            "type": {
+              "description": "The module type",
+              "type": "string"
+            },
+            "model": {
+              "description": "The module model",
+              "type": "string"
+            },
+            "location": {
+              "description": "Deck slot or addressable area where the module is located",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "wasteChuteLocation": {
+      "description": "The location of a waste chute if it exists in the protocol",
+      "type": ["string", "null"]
+    },
+    "trashBinLocations": {
+      "description": "The locations of the trash bins in the protocol",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stagingAreaLocations": {
+      "description": "The locations of staging area slots in the protocol",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commandSchemaId": {
+      "description": "The schema to which the commands adhere.",
+      "type": "string",
+      "enum": ["opentronsAICommandSchemaV1"]
+    },
+    "commands": {
+      "description": "An array of command objects representing steps to be executed on the robot.",
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  }
+}
