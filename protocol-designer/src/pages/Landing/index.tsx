@@ -147,7 +147,6 @@ export function Landing(): JSX.Element {
             height="132px"
             width="548px"
             aria-label="welcome image"
-            fetchPriority="high"
           />
           <div className={styles.text_container}>
             <StyledText desktopStyle="headingLargeBold" as="h1">

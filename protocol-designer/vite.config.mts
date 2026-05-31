@@ -151,26 +151,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
       }),
 
       {
-        // Inject <link rel="preload"> for the LCP image (welcome_page.png) so
-        // the browser can start downloading it before JS executes
-        name: 'preload-lcp-image',
-        transformIndexHtml: {
-          order: 'post',
-          handler(html, { bundle }) {
-            if (!bundle) return html
-            const welcomeAsset = Object.values(bundle).find(chunk =>
-              chunk.fileName.match(/welcome_page.*\.png$/)
-            )
-            if (!welcomeAsset) return html
-            return html.replace(
-              '</head>',
-              `  <link rel="preload" as="image" fetchpriority="high" href="./${welcomeAsset.fileName}">\n</head>`
-            )
-          },
-        },
-      },
-
-      {
         name: 'build-info-generator',
         closeBundle: async () => {
           const outputPath = path.resolve(
