@@ -3544,7 +3544,7 @@ def test_get_next_drop_tip_location(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
-            available_volume_modes_min_vol={},
+            available_volume_modes_min_and_max_vol={},
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)

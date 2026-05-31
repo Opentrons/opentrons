@@ -108,6 +108,11 @@ VACUUM_MODULE_START_SET_VACUUM_POWER: Final = (
     "command.VACUUM_MODULE_START_SET_VACUUM_POWER"
 )
 VACUUM_MODULE_STOP_VACUUM: Final = "command.VACUUM_MODULE_STOP_VACUUM"
+VACUUM_MODULE_START_EXECUTE_PROFILE: Final = (
+    "command.VACUUM_MODULE_START_EXECUTE_PROFILE"
+)
+VACUUM_MODULE_OPEN_VENT: Final = "command.VACUUM_MODULE_OPEN_VENT"
+VACUUM_MODULE_CLOSE_VENT: Final = "command.VACUUM_MODULE_CLOSE_VENT"
 
 # Robot #
 ROBOT_MOVE_TO: Final = "command.ROBOT_MOVE_TO"
@@ -471,6 +476,21 @@ class VacuumModuleStartSetVacuumPowerCommand(TypedDict):
 
 class VacuumModuleStopVacuumCommand(TypedDict):
     name: Literal["command.VACUUM_MODULE_STOP_VACUUM"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStartExecuteProfileCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_START_EXECUTE_PROFILE"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleOpenVentCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_OPEN_VENT"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleCloseVentCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_CLOSE_VENT"]
     payload: TextOnlyPayload
 
 
@@ -911,6 +931,9 @@ Command = Union[
     VacuumModuleStartSetVacuumPressureCommand,
     VacuumModuleStartSetVacuumPowerCommand,
     VacuumModuleStopVacuumCommand,
+    VacuumModuleStartExecuteProfileCommand,
+    VacuumModuleOpenVentCommand,
+    VacuumModuleCloseVentCommand,
     # Task commands
     WaitForTasksCommand,
     CreateTimerCommand,

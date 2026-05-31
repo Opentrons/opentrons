@@ -1,7 +1,6 @@
 import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
 
-import { type DocumentationState } from '../access_control/types'
-import { useDocumentedMutation } from '../access_control/useDocumentedMutation'
+import { useDocumentedMutation } from '../access_control'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -11,6 +10,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { RunAction } from '@opentrons/api-client'
+import type { DocumentationState } from '../access_control'
 
 export type UsePlayRunMutationResult = UseMutationResult<
   RunAction,

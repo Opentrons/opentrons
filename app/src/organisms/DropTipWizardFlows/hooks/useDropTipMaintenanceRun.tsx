@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
@@ -9,6 +10,7 @@ import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteData } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 
@@ -21,6 +23,7 @@ export type UseDropTipMaintenanceRunParams = Omit<
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   instrumentModelSpecs?: PipetteModelSpecs
   mount?: PipetteData['mount']
+  commandDocState: DocumentationState
 }
 
 // Manages the maintenance run state if the flow is utilizing "setup" type commands.
@@ -30,6 +33,7 @@ export function useDropTipMaintenanceRun({
   instrumentModelSpecs,
   setErrorDetails,
   closeFlow,
+  commandDocState,
 }: UseDropTipMaintenanceRunParams): string | null {
   const isMaintenanceRunType = issuedCommandsType === 'setup'
 
@@ -49,6 +53,7 @@ export function useDropTipMaintenanceRun({
     instrumentModelName: instrumentModelSpecs?.name,
     setErrorDetails,
     setCreatedMaintenanceRunId,
+    commandDocState,
   })
 
   useMonitorMaintenanceRunForDeletion({
@@ -67,6 +72,7 @@ type UseCreateDropTipMaintenanceRunParams = Omit<
 > & {
   setCreatedMaintenanceRunId: (id: string) => void
   instrumentModelName?: PipetteModelSpecs['name']
+  commandDocState: DocumentationState
 }
 
 // Handles the creation of the maintenance run for "setup" command type drop tip flows, including the loading of the pipette.
@@ -76,11 +82,14 @@ function useCreateDropTipMaintenanceRun({
   instrumentModelName,
   setErrorDetails,
   setCreatedMaintenanceRunId,
+  commandDocState,
 }: UseCreateDropTipMaintenanceRunParams): void {
-  const { chainRunCommands } = useChainMaintenanceCommands()
+  const { chainRunCommands } = useChainMaintenanceCommands(commandDocState)
+
+  const docState = useGuardedAction()
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(docState, {
       onSuccess: response => {
         // The type assertions here are safe, since we only use this command after asserting these
         const loadPipetteCommand = buildLoadPipetteCommand(

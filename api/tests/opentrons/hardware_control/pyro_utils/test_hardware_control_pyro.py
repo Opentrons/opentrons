@@ -62,8 +62,9 @@ from opentrons.hardware_control.types import (
 )
 from opentrons.types import Mount, Point
 from opentrons.util.pyro.pyro_client_async_adapter import (
+    AsyncClientPyroFunctionWrapper,
     AsyncClientPyroObject,
-    AsyncPyroFunctionWrapper,
+    ClientPyroFunctionWrapper,
 )
 from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
@@ -458,6 +459,7 @@ async def test_pyro_module_properties(
     assert async_remote_tc.live_data == tc.live_data
     assert async_remote_tc.hopper_door_state is None
     assert async_remote_tc.bundled_fw == tc.bundled_fw
+    assert async_remote_tc.name() == "thermocycler"
 
     ot3_proxy._pyroRelease()  # type: ignore
 
@@ -574,11 +576,14 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     # Verify that async calls work on the thermocycler right away
     assert await async_remote_tc.open() == "open"
 
+    async_uploader = async_remote_tc.bootloader()
+    assert isinstance(async_uploader, AsyncClientPyroFunctionWrapper)
+
     # Test registering an outbound function from one remote resource with another remote resouce
     result = ot3api.register_callback(cb=door_async.cool_hardware_event())  # type: ignore
 
     # Verify the resulting callback proxy (which is wrapped automagically) is wrapped and callable
-    assert isinstance(result, AsyncPyroFunctionWrapper)
+    assert isinstance(result, ClientPyroFunctionWrapper)
     result()
 
     assert (

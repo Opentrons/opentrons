@@ -60,17 +60,16 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -
             checkpoint_name="Pipette Configuration Saved",
             target=eyes.Target.window().fully(),
         )
-    # Module Configuration
+    # Basics configuration (pipette + gripper)
     module_config = ModuleConfigPage(page)
     module_config.select_gripper(True)
-    module_config.select_thermocycler(True)
-    module_config.select_waste_chute(True)
-    print("✓ Pipette and modules configured")
+    print("✓ Pipette and gripper configured")
 
     module_config.confirm_module_selection()
 
     # Deck Configuration
     deck_config = DeckConfigPage(page)
+    deck_config.configure_initial_deck_hardware(tc=True, waste_chute=True)
 
     # Add Heater-Shaker to C1
     deck_config.select_slot("C1")

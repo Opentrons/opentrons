@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
+  VACUUM_MODULE_A3_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
@@ -47,11 +48,12 @@ export function SlotDetailsContainer(
   }
   const isSlotAHopper = getIsSlotAHopper(slot)
   const isSlotAVacuumDock = getIsSlotAVacuumDock(slot)
+  const isVacuumModuleMainArea = slot === VACUUM_MODULE_A3_ADDRESSABLE_AREA
   let adjustedSlotToFindModule = slot
   if (isSlotAHopper) {
     adjustedSlotToFindModule =
       FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-  } else if (isSlotAVacuumDock) {
+  } else if (isSlotAVacuumDock || isVacuumModuleMainArea) {
     adjustedSlotToFindModule = VACUUM_MODULE_SLOT
   }
 
@@ -78,7 +80,9 @@ export function SlotDetailsContainer(
   )
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),
-    slot,
+    // need to special case this for now, since the main vacuum addressable area maps to slot A3 for stack logic
+    // this will not be necessary once addressable areas are the source of truth in an upcoming large-scale refactor
+    isVacuumModuleMainArea ? VACUUM_MODULE_SLOT : slot,
     isSlotAHopper,
     isSlotAVacuumDock
   )

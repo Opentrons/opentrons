@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   VACUUM_MAX_PRESSURE_MBAR,
   VACUUM_MIN_PRESSURE_MBAR,
-} from '@opentrons/step-generation'
+} from '@opentrons/shared-data'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 
