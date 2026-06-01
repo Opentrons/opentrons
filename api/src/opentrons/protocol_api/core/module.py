@@ -553,6 +553,14 @@ class AbstractVacuumModuleCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
+    def get_max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+
+    @abstractmethod
+    def get_min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+
+    @abstractmethod
     def start_set_vacuum_pressure(
         self,
         gauge_pressure_mbar: float,

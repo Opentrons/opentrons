@@ -65,6 +65,9 @@ if TYPE_CHECKING:
 # Valid wavelength range for absorbance reader
 ABS_WAVELENGTH_MIN = 350
 ABS_WAVELENGTH_MAX = 1000
+# Gauge pressure range for vacuum module
+MAX_GAUGE_PRESSURE_MBAR = 0
+MIN_GAUGE_PRESSURE_MBAR = -800
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -122,6 +125,14 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         return self._engine_client.state.modules.get_definition(
             self.module_id
         ).displayName
+
+    def get_max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+        return MAX_GAUGE_PRESSURE_MBAR
+
+    def get_min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+        return MIN_GAUGE_PRESSURE_MBAR
 
 
 class NonConnectedModuleCore(AbstractModuleCore[LabwareCore]):

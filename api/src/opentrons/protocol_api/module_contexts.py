@@ -1872,6 +1872,18 @@ class VacuumModuleContext(ModuleContext):
 
     @property
     @requires_version(2, 28)
+    def max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+        return self._core.get_max_gauge_pressure_mbar()
+
+    @property
+    @requires_version(2, 28)
+    def min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+        return self._core.get_min_gauge_pressure_mbar()
+
+    @property
+    @requires_version(2, 28)
     def manifold_dock(self) -> ModuleFixtureLocation:
         base_slot = self._core.get_deck_slot().id
         area_name = f"{self.model}Dock{base_slot[0]}4"
@@ -2005,7 +2017,11 @@ class VacuumModuleContext(ModuleContext):
             vent_after: wheter to open the vent after the step is complete
         """
         repetitions = validation.ensure_profile_repetition_count(repetitions)
-        validated_steps = validation.ensure_vacuum_module_profile(steps)
+        validated_steps = validation.ensure_vacuum_module_profile(
+            steps=steps,
+            max_pressure=self.max_gauge_pressure_mbar,
+            min_pressure=self.min_gauge_pressure_mbar,
+        )
         task = self._core.start_execute_profile(
             steps=validated_steps, repetitions=repetitions, vent_after=vent_after
         )

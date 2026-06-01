@@ -489,7 +489,11 @@ def test_ensure_vacuum_module_profile_steps(
     steps: List[VacuumModuleStep], expected: List[VacuumModuleStep]
 ) -> None:
     """It should ensure vacuum module profile steps are valid and hold time is expressed in seconds only."""
-    result = subject.ensure_vacuum_module_profile(steps)
+    max_pressure = 0
+    min_pressure = -800
+    result = subject.ensure_vacuum_module_profile(
+        steps=steps, max_pressure=max_pressure, min_pressure=min_pressure
+    )
     assert result == expected
 
 

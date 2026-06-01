@@ -542,7 +542,9 @@ def _check_vm_step_base_values(step: VacuumModuleStep) -> None:
         raise ValueError("ramp rate must be between 0 and 400 mbar/sec")
 
 
-def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
+def _ensure_vacuum_module_step(
+    step: VacuumModuleStep, max_pressure: int, min_pressure: int
+) -> VacuumModuleStep:
     unverified_enable_pump = step.get("enable_pump")
     ramp_rate = step.get("ramp_rate")
     timeout_s = step.get("timeout_seconds")
@@ -598,7 +600,7 @@ def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
                 "gauge_pressure_mbar"
             )
             assert gauge_pressure_mbar is not None
-            if gauge_pressure_mbar > 0 or gauge_pressure_mbar < -800:
+            if gauge_pressure_mbar > max_pressure or gauge_pressure_mbar < min_pressure:
                 raise ValueError("gauge pressure should be between 0 and -800 mbar")
         else:
             gauge_pressure_mbar = unverified_gauge_pressure_mbar
@@ -613,13 +615,19 @@ def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
 
 
 def ensure_vacuum_module_profile(
-    steps: List[VacuumModuleStep],
+    steps: List[VacuumModuleStep], max_pressure: int, min_pressure: int
 ) -> List[VacuumModuleStep]:
     """Ensure vacuum module steps are valid and hold time is expressed in seconds only."""
     # HAVE TO HAVE PE COMMAND TAKE IN ONLY SECONDS
     validated_profile: List[VacuumModuleStep] = []
     for step in steps:
-        validated_profile.append(_ensure_vacuum_module_step(step))
+        validated_profile.append(
+            _ensure_vacuum_module_step(
+                step=step,
+                max_pressure=max_pressure,
+                min_pressure=min_pressure,
+            )
+        )
     return validated_profile
 
 
