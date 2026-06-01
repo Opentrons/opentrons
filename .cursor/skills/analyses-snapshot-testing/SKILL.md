@@ -16,6 +16,8 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 
 This repository is **Flex-only**. All protocols must target Flex (or OT-3) robots.
 
+A standalone OT-2 compatibility test (`tests/test_ot2_compatibility.py`) runs via `make ot2-compatibility-test`. It uses a fixture protocol in `tests/fixtures/` and is **not** part of chunk generation, `protocols.py`, or syrupy snapshots. CI runs it in `analyses-snapshot-test.yaml` (not the lint workflow).
+
 ## Architecture
 
 ### Core Components
@@ -118,6 +120,8 @@ make teardown                 # Remove virtual environment
 make snapshot-test            # Run all snapshot tests
 make snapshot-test-update     # Update all snapshots
 make snapshot-audit-test      # Validate snapshot audit metadata
+make ot2-compatibility-test # Standalone OT-2 rejection test (not in snapshot battery)
+make snapshot-validation    # snapshot-audit-test + ot2-compatibility-test
 
 # Protocol Management
 make prep                     # Regenerate protocol registry

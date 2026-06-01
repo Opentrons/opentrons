@@ -2,6 +2,8 @@
 
 Flex-only protocol analysis snapshot testing for this repository.
 
+OT-2 compatibility is covered separately by `tests/test_ot2_compatibility.py`. It runs in the `analyses-snapshot-test` CI workflow via `make ot2-compatibility-test` and is not part of the snapshot generation battery.
+
 ## Setup
 
 1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md) for javascript

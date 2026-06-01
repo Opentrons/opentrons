@@ -68,6 +68,14 @@ snapshot-audit-test:
 	@echo "validate that analysis outcome matches the test intention"
 	uv run python -m pytest -k audit_snapshot_test -v --tb=line
 
+.PHONY: ot2-compatibility-test
+ot2-compatibility-test:
+	@echo "verify OT-2 protocols are rejected with a compatibility error"
+	uv run python -m pytest tests/test_ot2_compatibility.py -v --tb=line
+
+.PHONY: snapshot-validation
+snapshot-validation: snapshot-audit-test ot2-compatibility-test
+
 .PHONY: snapshot-test-update
 snapshot-test-update:
 	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
