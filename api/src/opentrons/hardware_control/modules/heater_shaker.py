@@ -345,8 +345,6 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     async def attempt_reconnect(self) -> None:
         """Attempt to reestablish connections."""
-        if not IS_ROBOT:
-            return
         try:
             if not await self._driver.is_connected():
                 await self._cleanup()
