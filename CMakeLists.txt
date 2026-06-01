@@ -16,9 +16,9 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
     cmake_policy(SET CMP0169 OLD)
 endif()
 
-# if (NOT DEFINED ENV{PRESET_IN_USE})
-#     message(FATAL_ERROR "Use a preset. Use cmake --list-presets to show available presets.")
-# endif ()
+if (NOT DEFINED ENV{PRESET_IN_USE})
+    message(FATAL_ERROR "Use a preset. Use cmake --list-presets to show available presets.")
+endif ()
 
 project("OT3Firmware"
         LANGUAGES CXX C ASM

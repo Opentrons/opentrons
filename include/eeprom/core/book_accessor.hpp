@@ -405,14 +405,22 @@ class BookAccessor
         std::memcpy(&read2, &all_reads[2][2], sizeof(read2));
         std::memcpy(&read3, &all_reads[3][2], sizeof(read3));
 
+        // quickly zero out all reads that are xFFFF
+        if (read0 == 0xFFFF) {
+            read0 = 0x0000;
+        }
+        if (read1 == 0xFFFF) {
+            read1 = 0x0000;
+        }
+        if (read2 == 0xFFFF) {
+            read2 = 0x0000;
+        }
+        if (read3 == 0xFFFF) {
+            read3 = 0x0000;
+        }
+
         // find maximum value
         std::array<uint16_t, 4> reads = {read0, read1, read2, read3};
-
-        for (auto& read : reads) {
-            if (read == 0xFFFF) {
-                read = 0x0000;
-            }
-        }
 
         // sort reads from largest to smallest
         std::sort(reads.begin(), reads.end(), std::greater<uint16_t>());
