@@ -236,21 +236,24 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       }
       return acc
     }, {})
-  const inaccessiblePartialWells = useMemo(
-    () => {
-      if (!isPartialNozzle || selectedWells.length === 0) return []
+  const inaccessiblePartialWells = useMemo(() => {
+    if (!isPartialNozzle || selectedWells.length === 0) {
+      return []
+    }
 
-      return getInaccessibleWellsForPartialNozzleRowMap(
-        selectedWells,
-        labwareDef.ordering,
-        allWellsWithState,
-        PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-      )
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering]
-  )
+    return getInaccessibleWellsForPartialNozzleRowMap(
+      selectedWells,
+      labwareDef.ordering,
+      allWellsWithState,
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+    )
+  }, [
+    selectedWells,
+    isPartialNozzle,
+    primaryNozzle,
+    labwareDef.ordering,
+    allWellsWithState,
+  ])
 
   const deckDef = getDeckDefFromRobotType(robotType)
   const viewBox = getViewboxFromSelectedLabware(
@@ -283,7 +286,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     }
     return highlightedWells
   }
-
   const handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
@@ -308,7 +310,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         const allAlreadySelected = wellsUnderRect.every(group =>
           group.every(well => selectedFlat.has(well))
         )
-
         let updated: string[][]
         // Remove all wells if the entire selection is already selected
         if (allAlreadySelected) {

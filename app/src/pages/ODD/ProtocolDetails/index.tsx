@@ -27,6 +27,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getQueryKey,
   useCreateRunMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
@@ -346,9 +347,11 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
+      queryClient
+        .invalidateQueries(getQueryKey(host, 'runs'))
+        .catch((e: Error) => {
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        })
     },
   })
 

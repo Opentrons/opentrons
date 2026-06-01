@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -17,6 +17,7 @@ import { getTiprackOptions } from '../utils'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { WizardFormState } from '/protocol-designer/components/organisms'
+import type { BaseState } from '/protocol-designer/types'
 import type { WizardTileProps } from '../types'
 
 vi.mock('/protocol-designer/labware-defs/selectors')
@@ -35,8 +36,11 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 
 const render = (props: ComponentProps<typeof SelectBasics>) => {
+  const initialState = {} as Partial<BaseState> as BaseState
+
   return renderWithProviders(<SelectBasics {...props} />, {
     i18nInstance: i18n,
+    initialState,
   })[0]
 }
 
@@ -61,10 +65,21 @@ const values = {
   hasWasteChute: false,
 } as WizardFormState
 
+const makeWatchMock = (
+  formValues: WizardFormState
+): WizardTileProps['watch'] => {
+  return vi.fn((name?: keyof WizardFormState) => {
+    if (name == null) {
+      return formValues
+    }
+    return formValues[name]
+  }) as unknown as WizardTileProps['watch']
+}
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
   proceed: vi.fn(),
   setValue: vi.fn(),
-  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  watch: makeWatchMock(values),
 }
 
 describe('SelectBasics', () => {
@@ -85,17 +100,25 @@ describe('SelectBasics', () => {
     })
   })
 
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('renders all the text and buttons for selecting the basics', () => {
     render(props)
     screen.getByText('Step 1')
     screen.getByText('Let’s start with the basics')
-    // add robot
-    screen.getByText('What kind of robot do you have?')
-    fireEvent.click(screen.getByRole('label', { name: 'Opentrons OT-2' }))
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('label', { name: 'Opentrons Flex' }))
-    expect(props.setValue).toHaveBeenCalled()
+    expect(
+      screen.queryByText('What kind of robot do you have?')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('label', { name: 'Opentrons OT-2' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('label', { name: 'Opentrons Flex' })
+    ).not.toBeInTheDocument()
     //  pipette
+    screen.getByText('Your pipettes')
     fireEvent.click(screen.getByText('Add a pipette'))
 
     // gripper
@@ -106,20 +129,6 @@ describe('SelectBasics', () => {
     fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[0])
     expect(props.setValue).toHaveBeenCalled()
     fireEvent.click(screen.getAllByRole('label', { name: 'No' })[0])
-    expect(props.setValue).toHaveBeenCalled()
-
-    // thermocycler
-    screen.getByText('Are you using a Thermocycler in your protocol?')
-    fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[1])
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getAllByRole('label', { name: 'No' })[1])
-    expect(props.setValue).toHaveBeenCalled()
-
-    // wasteChute
-    screen.getByText('Are you using a waste chute in your protocol?')
-    fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[2])
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getAllByRole('label', { name: 'No' })[2])
     expect(props.setValue).toHaveBeenCalled()
 
     //  confirm

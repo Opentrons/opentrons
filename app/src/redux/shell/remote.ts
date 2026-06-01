@@ -149,11 +149,17 @@ remote.ipcRenderer.on(
   }
 )
 
-export async function tryInstallRobotCertificate(props: {
+export async function tryInstallEncryptedRobotCertificate(props: {
   certificateData: string
   password: string
   salt: string
   iterations: number
 }): Promise<boolean> {
-  return await remote.ipcRenderer.invoke('robot-cert:install', props)
+  return await remote.ipcRenderer.invoke('robot-cert:install-encrypted', props)
+}
+
+export async function tryInstallPlaintextRobotCertificate(props: {
+  certificateData: string
+}): Promise<boolean> {
+  return await remote.ipcRenderer.invoke('robot-cert:install-plaintext', props)
 }

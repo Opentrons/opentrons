@@ -52,14 +52,13 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from ..data import get_git_description, csv_report
-from .types import (
-    GantryLoad,
-    PerPipetteAxisSettings,
+from opentrons.config.types import GantryLoad, PerPipetteAxisSettings
+from opentrons.hardware_control.types import (
     Axis,
     OT3Mount,
-    Point,
     CriticalPoint,
 )
+from opentrons.types import Point
 
 
 # Supress logging.exception messages as they can be confusing when running scripts.

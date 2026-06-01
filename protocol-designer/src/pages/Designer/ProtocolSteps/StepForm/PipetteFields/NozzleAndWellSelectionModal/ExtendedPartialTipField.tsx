@@ -73,36 +73,47 @@ export function ExtendedPartialTipField(
   }
   // if deck setup changes and selected wells are now inaccessible - unselect them so that an error is raised
   interface WellCheckConfig {
-    wells: string[]
+    wells: string[][]
+    selectedWells: string[]
     labwareId: string | null
     fieldKey: keyof FieldPropsByName
   }
-
   const wellConfigs: WellCheckConfig[] = []
+  const addWellConfig = (
+    labwareId: string,
+    selectedWells: string[] | undefined,
+    fieldKey: keyof FieldPropsByName
+  ): void => {
+    const wells =
+      invariantContext.labwareEntities[labwareId]?.def.ordering ?? []
 
-  if (stepType === 'mix') {
     wellConfigs.push({
-      wells: (propsForFields.wells?.value as string[]) ?? [],
-      labwareId: propsForFields.labware.value as string,
-      fieldKey: 'wells',
+      wells,
+      selectedWells: selectedWells ?? [],
+      labwareId,
+      fieldKey,
     })
   }
-
+  if (stepType === 'mix') {
+    addWellConfig(
+      propsForFields.labware.value as string,
+      propsForFields.wells?.value as string[],
+      'wells'
+    )
+  }
   if (stepType === 'transfer') {
-    wellConfigs.push({
-      wells: (propsForFields.aspirate_wells?.value as string[]) ?? [],
-      labwareId: propsForFields.aspirate_labware.value as string,
-      fieldKey: 'aspirate_wells',
-    })
-
-    wellConfigs.push({
-      wells: (propsForFields.dispense_wells?.value as string[]) ?? [],
-      labwareId: propsForFields.dispense_labware.value as string,
-      fieldKey: 'dispense_wells',
-    })
+    addWellConfig(
+      propsForFields.aspirate_labware.value as string,
+      propsForFields.aspirate_wells?.value as string[],
+      'aspirate_wells'
+    )
+    addWellConfig(
+      propsForFields.dispense_labware.value as string,
+      propsForFields.dispense_wells?.value as string[],
+      'dispense_wells'
+    )
   }
   const tiprackLabwareDefURI = propsForFields.tipRack.value as string
-
   const tiprackId = Object.values(deckSetup.labware).find(
     labware => labware.labwareDefURI === tiprackLabwareDefURI
   )?.id
@@ -113,7 +124,7 @@ export function ExtendedPartialTipField(
       }
 
       const status = getAllWellsSafetyStatus({
-        allWells: [config.wells],
+        allWells: config.wells,
         robotState,
         invariantContext,
         pipetteId: propsForFields.pipette.value as string,
@@ -123,7 +134,9 @@ export function ExtendedPartialTipField(
         tiprackId,
       })
 
-      const hasInaccessibleWell = config.wells.some(well => status[well] !== 0)
+      const hasInaccessibleWell = config.selectedWells.some(
+        well => status[well] !== 0
+      )
 
       return hasInaccessibleWell ? config.fieldKey : null
     })

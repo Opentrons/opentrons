@@ -96,6 +96,13 @@
   gap: var(--spacing-8);
 }
 
+.ending_hold_field {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
 .ending_hold_row {
   display: flex;
   width: 100%;

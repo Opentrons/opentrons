@@ -68,4 +68,37 @@ describe('StepGroup', () => {
 
     expect(props.handleClick).not.toHaveBeenCalled()
   })
+
+  it('does not trigger handleClick when clicking headerTrailing (stopPropagation)', () => {
+    render({
+      ...props,
+      headerTrailing: <button type="button">trailing action</button>,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'trailing action' }))
+
+    expect(props.handleClick).not.toHaveBeenCalled()
+  })
+
+  it('does not trigger handleClick when clicking headerLeading (stopPropagation)', () => {
+    render({
+      ...props,
+      headerLeading: <button type="button">leading action</button>,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'leading action' }))
+
+    expect(props.handleClick).not.toHaveBeenCalled()
+  })
+
+  it('does not trigger handleClick when clicking headerPrefixIcon (stopPropagation)', () => {
+    render({
+      ...props,
+      headerPrefixIcon: <button type="button">prefix action</button>,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'prefix action' }))
+
+    expect(props.handleClick).not.toHaveBeenCalled()
+  })
 })

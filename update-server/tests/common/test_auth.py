@@ -41,7 +41,7 @@ async def test_bearer_token_extraction_passed_to_checker(
     client, mock_checker = auth_test_cli
     decoy.when(
         await mock_checker.check(matchers.Anything(), matchers.Anything())
-    ).then_return(AuthorizedResult())
+    ).then_return(AuthorizedResult(username="test-username"))
 
     # An arbitrary endpoint that requires authorization.
     await client.post(
@@ -59,7 +59,7 @@ async def test_authorized_result(
     """When the AuthorizationChecker returns an AuthorizedResult, the request handler should run as normal."""
     client, mock_checker = auth_test_cli
     decoy.when(await mock_checker.check(None, matchers.Anything())).then_return(
-        AuthorizedResult()
+        AuthorizedResult(username="test-username")
     )
 
     # An arbitrary endpoint that requires authorization.

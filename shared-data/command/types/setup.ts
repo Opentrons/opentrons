@@ -344,6 +344,7 @@ export type PrimaryNozzleConfigurationStyle =
 
 export interface NozzleConfigurationParams {
   primaryNozzle?: PrimaryNozzleConfigurationStyle
+  backLeftNozzle?: PartialPrimaryNozzles
   style: NozzleConfigurationStyle
 }
 

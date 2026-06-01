@@ -22,6 +22,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.vent_state = VentState.OPENED
         self.vacuum_on = False
         self.pump_enabled = False
+        self.duration = 0
         self.pressure_sensor_enabled = False
         self.target_pressure = 0.0
         self.current_pressure = 0.0
@@ -97,6 +98,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         """Engage or release the vacuum until a desired internal pressure is reached."""
         self.vacuum_on = enable_vacuum
         self.target_pressure = gauge_pressure_mbar or self.target_pressure
+        self.duration = duration_s or 0
 
     async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
@@ -107,6 +109,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
             0,
             0,
             self.vacuum_on,
+            self.duration,
             self.vent_state,
         )
 
@@ -115,6 +118,10 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         start_pump: bool,
         target_rpm: Optional[int] = None,
         duty_cycle: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Start or the stop the pump at a given rpm or duty cycle."""
         self.pump_enabled = start_pump

@@ -4,7 +4,7 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import { SetWifiCred } from '../../NetworkSettings/SetWifiCred'
+import { WifiPasswordInput } from '../../NetworkSettings/WifiPasswordInput'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { SetSettingOption } from '../types'
@@ -37,7 +37,7 @@ export function RobotSettingsSetWifiCred({
         }}
         onClickButton={handleConnect}
       />
-      <SetWifiCred password={password} setPassword={setPassword} />
+      <WifiPasswordInput password={password} setPassword={setPassword} />
     </Flex>
   )
 }

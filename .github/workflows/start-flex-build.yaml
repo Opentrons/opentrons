@@ -6,6 +6,8 @@ on:
       - '*internal-release*'
       - 'release*'
       - 'chore_release*'
+      # PD-only release branches do not ship Flex OS; do not dispatch oe-core.
+      - '!chore_release-pd*'
     tags:
       - ot3@*
       - v*

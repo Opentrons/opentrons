@@ -65,6 +65,7 @@ describe('BeforeBeginning', () => {
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
       deckConfig: mockDeckConfig,
+      documentationState: { accessControlEnabled: false },
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
@@ -77,9 +78,14 @@ describe('BeforeBeginning', () => {
     it('returns the correct information for calibrate flow', async () => {
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
@@ -154,9 +160,14 @@ describe('BeforeBeginning', () => {
       }
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
@@ -199,9 +210,14 @@ describe('BeforeBeginning', () => {
       }
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
@@ -249,9 +265,14 @@ describe('BeforeBeginning', () => {
       }
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByAltText('2.5 mm Hex Screwdriver')
       screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
@@ -295,9 +316,14 @@ describe('BeforeBeginning', () => {
       }
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
@@ -320,7 +346,7 @@ describe('BeforeBeginning', () => {
           { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { maintenancePosition: 'attachPlate', mount: RIGHT },
+            params: { motionModifier: 'lowerZAxesSequentially', mount: RIGHT },
           },
         ],
         false
@@ -341,9 +367,14 @@ describe('BeforeBeginning', () => {
       }
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
@@ -394,9 +425,14 @@ describe('BeforeBeginning', () => {
       }
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
@@ -452,9 +488,14 @@ describe('BeforeBeginning', () => {
       }
       render(props)
       screen.getByText('Before you begin')
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
@@ -511,9 +552,14 @@ describe('BeforeBeginning', () => {
       screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
     })
 
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
@@ -528,9 +574,14 @@ describe('BeforeBeginning', () => {
       screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      screen.getByText(
-        'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
-      )
+      expect(
+        screen.getByText(
+          (_, element) =>
+            element?.tagName === 'P' &&
+            element?.textContent ===
+              'To get started, remove all labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+        )
+      ).toBeInTheDocument()
       screen.getByAltText('2.5 mm Hex Screwdriver')
       const proceedBtn = screen.getByRole('button', {
         name: 'Move gantry to front',

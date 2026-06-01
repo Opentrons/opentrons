@@ -159,6 +159,7 @@ describe('getSlotInformation', () => {
       createdFixtureForSlots: [],
       slotPosition: null,
       isSlotAHopper: false,
+      isSlotAVacuumDock: false,
     })
   })
   it('renders only a labware for ot-2 on slot 2', () => {
@@ -171,6 +172,7 @@ describe('getSlotInformation', () => {
       slotPosition: null,
       createdStackForSlot: [],
       isSlotAHopper: false,
+      isSlotAVacuumDock: false,
     })
   })
   it('renders no items on the slot for a flex', () => {
@@ -188,6 +190,7 @@ describe('getSlotInformation', () => {
       createdFixtureForSlots: [],
       createdStackForSlot: [],
       isSlotAHopper: false,
+      isSlotAVacuumDock: false,
     })
   })
   it('renders the slot as a hopper', () => {
@@ -205,6 +208,7 @@ describe('getSlotInformation', () => {
       createdFixtureForSlots: [],
       createdStackForSlot: [],
       isSlotAHopper: true,
+      isSlotAVacuumDock: false,
     })
   })
   it('renders a trashbin for a Flex on slot A3', () => {
@@ -217,6 +221,7 @@ describe('getSlotInformation', () => {
       preSelectedFixture: 'trashBin',
       createdStackForSlot: [],
       isSlotAHopper: false,
+      isSlotAVacuumDock: false,
     })
   })
   it('renders a h-s, labware and nested labware for a Flex on slot D1', () => {
@@ -230,6 +235,7 @@ describe('getSlotInformation', () => {
       createdStackForSlot: [mockLabOnDeck2Flex.id],
       createdFixtureForSlots: [],
       isSlotAHopper: false,
+      isSlotAVacuumDock: false,
     })
   })
   it('renders the waste chute and staging area for slot D3 for Flex', () => {
@@ -242,6 +248,7 @@ describe('getSlotInformation', () => {
       preSelectedFixture: 'wasteChuteAndStagingArea',
       createdStackForSlot: [],
       isSlotAHopper: false,
+      isSlotAVacuumDock: false,
     })
   })
   it('renders the staging area with waste chute and labware in slot D4 for flex', () => {
@@ -254,6 +261,7 @@ describe('getSlotInformation', () => {
       createdFixtureForSlots: [mockWasteChute, mockStagingArea],
       preSelectedFixture: 'wasteChuteAndStagingArea',
       isSlotAHopper: false,
+      isSlotAVacuumDock: false,
     })
   })
 })
@@ -361,5 +369,26 @@ describe('getUnoccupiedStackOptions', () => {
         t: mockT,
       })
     ).toEqual([])
+  })
+  it('renders the slot as a vacuum dock', () => {
+    const mockDeckSetup: AllTemporalPropertiesForTimelineFrame = {
+      labware: {},
+      pipettes: {},
+      modules: {},
+      additionalEquipmentOnDeck: {},
+    }
+    expect(
+      getSlotInformation({
+        deckSetup: mockDeckSetup,
+        slot: 'vacuumModuleV1DockA4',
+      })
+    ).toEqual({
+      matchingLabwareFor4thColumn: null,
+      slotPosition: null,
+      createdFixtureForSlots: [],
+      createdStackForSlot: [],
+      isSlotAHopper: false,
+      isSlotAVacuumDock: true,
+    })
   })
 })

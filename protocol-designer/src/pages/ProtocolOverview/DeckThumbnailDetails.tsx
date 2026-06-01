@@ -6,12 +6,19 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getModuleDef,
+  getPositionFromAddressableAreaId,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_A3_ADDRESSABLE_AREA,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  VACUUM_DOCK_LOCATION,
+} from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
@@ -29,6 +36,7 @@ import { SlotHover } from './SlotHover'
 import type { Dispatch, SetStateAction } from 'react'
 import type {
   CutoutId,
+  DeckConfiguration,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
@@ -41,6 +49,7 @@ interface DeckSetupDetailsProps {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   robotType: RobotType
+  deckConfig: DeckConfiguration
 }
 
 export const DeckThumbnailDetails = (
@@ -53,6 +62,7 @@ export const DeckThumbnailDetails = (
     robotType,
     hover,
     setHover,
+    deckConfig,
   } = props
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     initialDeckSetup,
@@ -73,6 +83,7 @@ export const DeckThumbnailDetails = (
           return null
         }
         const moduleDef = getModuleDef(model)
+        const { type: moduleType } = moduleState
         const { topMostId, rightBelowTopId, hopperTopMostId } =
           getLabwaresOnModuleFromStack(id, allLabware)
         return (
@@ -127,20 +138,66 @@ export const DeckThumbnailDetails = (
                   hover={hover}
                   setHover={setHover}
                   slotPosition={[0, 0, 0]}
-                  slotId={slotId}
+                  slotId={
+                    moduleState.type === VACUUM_MODULE_TYPE
+                      ? VACUUM_MODULE_A3_ADDRESSABLE_AREA
+                      : slotId
+                  }
                 />
-                <SlotHover
-                  robotType={robotType}
-                  hover={hover}
-                  setHover={setHover}
-                  slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
-                  slotId={`hopper${slotId}`}
-                />
+                {moduleType === FLEX_STACKER_MODULE_TYPE ? (
+                  <SlotHover
+                    robotType={robotType}
+                    hover={hover}
+                    setHover={setHover}
+                    slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                    slotId={`hopper${slotId}`}
+                  />
+                ) : null}
               </>
             </Module>
           </Fragment>
         )
       })}
+      {/* vacuum dock labware rendered at addressable area position rather than within module */}
+      {allModules
+        .filter(module => module.type === VACUUM_MODULE_TYPE)
+        .map(vacuumModule => {
+          const dockSlotPosition = getPositionFromAddressableAreaId({
+            addressableAreaId: VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+            deckDef,
+            deckConfiguration: deckConfig,
+          })
+          if (dockSlotPosition == null) {
+            return null
+          }
+          const dockLabware = allLabware
+            .filter(
+              lw =>
+                lw.stack.includes(vacuumModule.id) &&
+                lw.stack.includes(VACUUM_DOCK_LOCATION)
+            )
+            .sort((a, b) => a.stack.length - b.stack.length)
+          return (
+            <Fragment key={`${vacuumModule.id}_dock`}>
+              {dockLabware.map(lw => (
+                <LabwareOnDeck
+                  key={lw.id}
+                  x={dockSlotPosition[0]}
+                  y={dockSlotPosition[1]}
+                  labwareOnDeck={lw}
+                />
+              ))}
+              {/* SlotHover rendered after labware so it appears on top in SVG */}
+              <SlotHover
+                robotType={robotType}
+                hover={hover}
+                setHover={setHover}
+                slotPosition={dockSlotPosition}
+                slotId={VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}
+              />
+            </Fragment>
+          )
+        })}
       {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
         if (

@@ -32,7 +32,7 @@ from opentrons.protocol_reader import (
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
@@ -81,6 +81,7 @@ from robot_server.data_files.dependencies import (
 )
 from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFoundError
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from robot_server.hardware import get_robot_type
 from robot_server.service.dependencies import get_current_time, get_unique_id
 
@@ -234,6 +235,7 @@ async def create_protocol(  # noqa: C901
     maximum_quick_transfer_protocols: Annotated[
         int, Depends(get_maximum_quick_transfer_protocols)
     ],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
@@ -304,7 +306,20 @@ async def create_protocol(  # noqa: C901
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
+        audit_logger: Records the upload for audit when auth-server requires
+            ``Opentrons-User-Notes``.
     """
+    await audit_logger.log(
+        resource_id=protocol_id,
+        request_data={
+            "uploadedFileNames": [f.filename for f in files],
+            "key": key,
+            "protocolKind": protocol_kind,
+            "runTimeParameterValues": run_time_parameter_values,
+            "runTimeParameterFiles": run_time_parameter_files,
+        },
+    )
+
     # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
     #  so we can validate the data contents and return a better error response.
     parsed_rtp_values = (
@@ -689,12 +704,15 @@ async def get_protocol_by_id(
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete an uploaded protocol by ID.
 
     Arguments:
         protocolId: Protocol identifier to delete, pulled from URL.
         protocol_store: In-memory database of protocol resources.
+        audit_logger: Records the deletion for audit when auth-server requires
+            ``Opentrons-User-Notes``.
     """
     try:
         protocol_store.remove(protocol_id=protocolId)
@@ -704,6 +722,11 @@ async def delete_protocol_by_id(
 
     except ProtocolUsedByRunError as e:
         raise ProtocolUsedByRun(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+
+    await audit_logger.log(
+        resource_id=protocolId,
+        request_data={"protocolId": protocolId},
+    )
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),
@@ -737,6 +760,7 @@ async def create_protocol_analysis(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
@@ -787,6 +811,12 @@ async def create_protocol_analysis(
         raise LastAnalysisPending(detail=str(error)).as_error(
             status.HTTP_503_SERVICE_UNAVAILABLE
         ) from error
+
+    await audit_logger.log(
+        resource_id=protocolId,
+        request_data=request_body.data if request_body is not None else {},
+    )
+
     return await PydanticResponse.create(
         content=SimpleMultiBody.model_construct(
             data=analysis_summaries,

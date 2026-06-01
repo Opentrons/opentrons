@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { setLights } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -34,7 +34,7 @@ export function useSetLightsMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<Lights, AxiosError, SetLightsData>(
-    [host, 'robot', 'lights'],
+    getQueryKey(host, 'robot', 'lights'),
     setLightsData =>
       setLights(host!, setLightsData)
         .then(response => response.data)
