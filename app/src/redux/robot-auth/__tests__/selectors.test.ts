@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getAuthStateForRobot,
+  getCurrentUserForLocalRobot,
   getIsLoggedInToLocalRobot,
   getLocalRobotAuthState,
   getMostRecentRobotName,
@@ -25,6 +26,7 @@ describe('robot auth selectors', () => {
     perRobotAuthStates: {
       robotA: {
         username: 'alice',
+        resetPassword: false,
         accessToken: 'token-a',
         refreshToken: null,
         expiresAt: 1234,
@@ -46,6 +48,7 @@ describe('robot auth selectors', () => {
     it('returns per-robot auth when present', () => {
       expect(getAuthStateForRobot(stateWithRobotA, 'robotA')).toEqual({
         username: 'alice',
+        resetPassword: false,
         accessToken: 'token-a',
         refreshToken: null,
         expiresAt: 1234,
@@ -69,6 +72,7 @@ describe('robot auth selectors', () => {
       refreshToken: 'refresh-token',
       expiresAt: 1234,
       username: 'george_clooney',
+      resetPassword: false,
     }
 
     it('returns data when the local robot has auth state', () => {
@@ -119,6 +123,28 @@ describe('robot auth selectors', () => {
 
       expect(getLocalRobotAuthState(state)).toStrictEqual(null)
       expect(getIsLoggedInToLocalRobot(state)).toStrictEqual(false)
+    })
+
+    it('returns username and reset-password flag for the local robot', () => {
+      const state = {
+        discovery: {
+          scanning: false,
+          robotsByName: {
+            [localRobot.name]: localRobot,
+          },
+        },
+        robotAuth: {
+          perRobotAuthStates: {
+            [localRobot.name]: { ...authState, resetPassword: true },
+          },
+          mostRecentRobotName: null,
+        },
+      } satisfies Partial<State> as State
+
+      expect(getCurrentUserForLocalRobot(state)).toStrictEqual({
+        username: 'george_clooney',
+        resetPasswordRequired: true,
+      })
     })
   })
 

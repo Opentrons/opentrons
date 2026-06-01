@@ -9,7 +9,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import {
-  getCurrentUsernameForLocalRobot,
+  getCurrentUserForLocalRobot,
   getIsLoggedInToLocalRobot,
 } from '/app/redux/robot-auth'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
@@ -31,8 +31,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [loginError, setLoginError] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
 
+  const { username: currentUsername } = useSelector(getCurrentUserForLocalRobot)
   const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
-  const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
   const accessControlEnabled =
     accessControlEnabledQuery.data?.data?.accessControlEnabled ?? false

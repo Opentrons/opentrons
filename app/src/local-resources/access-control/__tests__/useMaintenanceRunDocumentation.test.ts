@@ -33,7 +33,10 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    getCurrentUsernameForLocalRobot: vi.fn(() => null),
+    getCurrentUserForLocalRobot: vi.fn(() => ({
+      username: null,
+      resetPasswordRequired: false,
+    })),
   }
 })
 

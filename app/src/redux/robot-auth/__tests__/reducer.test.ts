@@ -6,6 +6,7 @@ import {
   logOut,
   refreshLogin,
   robotAuthReducer,
+  setLocalRobotResetPasswordRequired,
 } from '../slice'
 
 import type { RobotAuthState } from '../slice'
@@ -38,6 +39,7 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserA',
+          resetPassword: false,
           accessToken: 'testAccessTokenA',
           refreshToken: 'testRefreshTokenA',
           expiresAt: 1234,
@@ -61,12 +63,14 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserA',
+          resetPassword: false,
           accessToken: 'testAccessTokenA',
           refreshToken: 'testRefreshTokenA',
           expiresAt: 1234,
         },
         testRobotNameB: {
           username: 'testUserB',
+          resetPassword: false,
           accessToken: 'testAccessTokenB',
           refreshToken: null,
           expiresAt: 5678,
@@ -90,12 +94,14 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserARefreshed',
+          resetPassword: false,
           accessToken: 'testAccessTokenARefreshed',
           refreshToken: 'testRefreshTokenARefreshed',
           expiresAt: 4321,
         },
         testRobotNameB: {
           username: 'testUserB',
+          resetPassword: false,
           accessToken: 'testAccessTokenB',
           refreshToken: null,
           expiresAt: 5678,
@@ -110,12 +116,14 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserA',
+          resetPassword: false,
           accessToken: 'testAccessTokenA',
           refreshToken: 'testRefreshTokenA',
           expiresAt: 1234,
         },
         testRobotNameB: {
           username: 'testUserB',
+          resetPassword: false,
           accessToken: 'testAccessTokenB',
           refreshToken: 'testRefreshTokenB',
           expiresAt: 5678,
@@ -136,5 +144,31 @@ describe('robotAuthReducer', () => {
       },
       mostRecentRobotName: 'testRobotNameB',
     } satisfies typeof newState)
+  })
+
+  it('handles setLocalRobotResetPasswordRequired', () => {
+    const initialState: RobotAuthState = {
+      perRobotAuthStates: {
+        testRobotNameA: {
+          username: 'testUserA',
+          resetPassword: false,
+          accessToken: 'testAccessTokenA',
+          refreshToken: 'testRefreshTokenA',
+          expiresAt: 1234,
+        },
+      },
+      mostRecentRobotName: 'testRobotNameA',
+    }
+
+    const newState = robotAuthReducer(
+      initialState,
+      setLocalRobotResetPasswordRequired({
+        robotName: 'testRobotNameA',
+        resetPassword: true,
+      })
+    )
+    expect(
+      newState.perRobotAuthStates.testRobotNameA?.resetPassword
+    ).toStrictEqual(true)
   })
 })
