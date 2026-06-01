@@ -903,22 +903,22 @@ def get_logs(storage_directory: Path, ip: str) -> str:
         {"log type": "touchscreen.log", "records": 10000},
     ]
     collected_files: List[str] = []
-    discovery_data_path = "/data/ODD/discovery.json"
-    if os.path.exists(discovery_data_path):
-        save_path = discovery_data_path
-    else:
-        save_dir = Path(f"{storage_directory}")
-        command = ["scp", "-r", f"root@{ip}:{discovery_data_path}", storage_directory]
-        try:
-            subprocess.run(command, check=True)  # type: ignore
-            save_path = os.path.join(save_dir, "discovery.json")
-        except subprocess.CalledProcessError as e:
-            print(f"Error during file transfer: {e}")
-            return ""
-    with open(save_path) as f:
-        discovery_data = json.load(f)
-    robot_name = discovery_data["robots"][0].get("name", "unknown")
-    sw_version = discovery_data["robots"][0]["health"].get("api_version", "unknown")
+
+    # Grab robot info through HTTP
+    try:
+        health_resp = requests.get(
+            f"http://{ip}:31950/health", headers={"opentrons-version": "*"}
+        )
+        health_resp.raise_for_status()
+        health_data = health_resp.json()
+        robot_name = health_data.get("name", "unknown")
+        sw_version = health_data.get("api_version", "unknown")
+    except Exception as e:
+        print(f"Failed to get robot health info: {e}")
+        robot_name = "unknown"
+        sw_version = "unknown"
+
+    # Grab the system logs via HTTP
     for log_type in log_types:
         try:
             log_type_name: str = log_type["log type"]
@@ -932,26 +932,32 @@ def get_logs(storage_directory: Path, ip: str) -> str:
             log_data: str = response.text
             log_name: str = f"{robot_name}_{log_type_name.split('.')[0]}.log"
             file_path: str = os.path.join(storage_directory, log_name)
+            
             with open(file_path, mode="w", encoding="utf-8") as f:
                 f.write(log_data)
+                
             collected_files.append(file_path)
         except Exception as e:
             print(f"Failed to fetch {log_type['log type']}: {e}")
             continue
 
-    # Get weston.log using scp
+    # Get weston.log using your existing SCP helper function
     collected_files = fetch_weston_log(
         ip, storage_directory, collected_files, robot_name
     )
+    
     timestamp = datetime.now().strftime("%Y-%m-%d")
+    
     # Create a ZIP archive with all collected files
     zip_filename: str = os.path.join(
         storage_directory, f"{robot_name}_{timestamp}_{sw_version}_logs.zip"
     )
+    
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file_path in collected_files:
             arcname: str = os.path.basename(file_path)  # ✅ always str
             zipf.write(file_path, arcname=arcname)
+
     for file_path in collected_files:
         try:
             os.remove(file_path)
@@ -964,23 +970,30 @@ def get_logs(storage_directory: Path, ip: str) -> str:
 def fetch_weston_log(
     ip: str, storage_directory: Path, collected_files: list, robot_name: str
 ) -> list[str]:
-    """Get weston log using scp or local copy, saved with robot name."""
-    local_log_path = Path("/var/log/weston.log")
+    """Get weston log via SSH journalctl, saved with robot name."""
     destination_path = Path(storage_directory) / f"{robot_name}_weston.log"
+    key_path = Path(storage_directory) / "robot_key"
 
-    if local_log_path.exists():
-        try:
-            with open(local_log_path, "rb") as src:
-                with open(destination_path, "wb") as dst:
-                    dst.write(src.read())
-            collected_files.append(str(destination_path))
-        except Exception as e:
-            print(f"Error copying local weston.log: {e}")
-    else:
-        remote_path = f"root@{ip}:/var/log/weston.log"
-        try:
-            subprocess.run(["scp", remote_path, str(destination_path)], check=True)
-            collected_files.append(str(destination_path))
-        except subprocess.CalledProcessError as e:
-            print(f"Error during file transfer: {e}")
+    try:
+        result = subprocess.run(
+            [
+                "ssh",
+                "-i", str(key_path),
+                "-o", "StrictHostKeyChecking=no",
+                "-o", "BatchMode=yes",
+                f"root@{ip}",
+                "journalctl", "_COMM=weston", "--no-pager",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        destination_path.write_text(result.stdout)
+        collected_files.append(str(destination_path))
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to fetch weston log for {robot_name}: {e}")
+    except subprocess.TimeoutExpired:
+        print(f"Weston log fetch timed out for {robot_name}")
+
     return collected_files

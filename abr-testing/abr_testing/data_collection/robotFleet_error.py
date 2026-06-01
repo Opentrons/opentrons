@@ -3,7 +3,7 @@ from typing import List, Tuple, Any, Dict, Optional
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
-from abr_testing.automation import jira_tool, google_sheets_tool, google_drive_tool
+from abr_testing.automation import jira_tool
 import shutil
 import os
 import subprocess
@@ -16,6 +16,7 @@ from pathlib import Path
 import pandas as pd
 from statistics import mean, StatisticsError
 from abr_testing.tools import plate_reader
+
 
 
 def open_folder(path: str) -> None:
@@ -36,7 +37,8 @@ def retrieve_version_file(
     """Retrieve Version file."""
     version_file_path = "/etc/VERSION.json"
     save_dir = Path(f"{storage}")
-    command = ["scp", "-r", f"root@{robot_ip}:{version_file_path}", save_dir]
+    key_path = Path(storage)/"robot_key"
+    command = ["scp", "-i", str(key_path), "-r", f"root@{robot_ip}:{version_file_path}", save_dir]
     try:
         subprocess.run(command, check=True)  # type: ignore
         return os.path.join(save_dir, "VERSION.json")
@@ -192,7 +194,7 @@ def match_error_to_component(
 
 
 def get_parent_key(url: str, api_token: str, email: str, project_key: str, parent_name: str) -> str:
-    """Resolve a parent issue's key from its summary name."""
+    """Find a project key from a name"""
     jql = f'project = {project_key} AND summary ~ "{parent_name}"'
     response = requests.post(
         f"{url}/rest/api/3/search/jql",
@@ -202,10 +204,28 @@ def get_parent_key(url: str, api_token: str, email: str, project_key: str, paren
     response.raise_for_status()
     matches = [i for i in response.json()["issues"] if i["fields"]["summary"].strip().lower() == parent_name.strip().lower()]
     if not matches:
-        raise ValueError(f"No issue named '{parent_name}' in {project_key}")
+        print(f"No issue named '{parent_name}' in {project_key}")
+        return
     return matches[0]["key"]
 
+def cleanup_report_folders(storage_directory: str, keep_count: int = 3) -> None:
+    """Cleans up report folder, keeping only the _ (default 3) 
+    newest reports to conserve storage space"""
+    storage_path = Path(storage_directory)
+    folders = [f for f in storage_path.iterdir() if f.is_dir()]
+    folders.sort(key=lambda f: f.stat().st_mtime)
+    # get folders, then sort by modification time
 
+    # if we have more folders than we want, we cut the oldest ones we don't want
+    if len(folders) > keep_count:
+        folders_to_delete = folders[:-keep_count]
+
+        for folder in folders_to_delete:
+            try:
+                shutil.rmtree(folder)
+                print(f"Deleted folder: {folder.name}")
+            except Exception as e:
+                print(f"Failed to delete {folder.name}: {e}")
 
 def get_user_id(user_file_path: str, assignee_name: str) -> str:
     """Get assignee account id."""
@@ -285,15 +305,13 @@ def get_robot_state(
     components.append("flex internal release")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
-    print(f"components: {str(components)}")
+    #print(f"components: {str(components)}")
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
     parent_name = affects_version + " Bugs" #fix
-    print("test")
     parent = get_parent_key(url, api_token, email, project_key, parent_name)
-    print(f"parent: {parent}")
-
+    #print(f"parent: {parent}")
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -377,6 +395,7 @@ def get_run_error_info_from_robot(
     description["left_mount"] = results.get("left", "No attachment")
     description["gripper"] = results.get("extension", "No attachment")
     all_modules = abr_google_drive.get_modules(results)
+    print(f"all modules: {str(all_modules)}")
     whole_description = {**description, **all_modules}
     whole_description_str = (
         "{"
@@ -521,11 +540,11 @@ if __name__ == "__main__":
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
     error_files = [
-        saved_file_path_calibration,
-        run_log_file_path,
-        protocol_file_path,
-        version_file_path,
-        log_zip_path,
+        saved_file_path_calibration, #works
+        run_log_file_path, #only when errored
+        protocol_file_path, #only when errored
+        version_file_path, #works
+        log_zip_path, #works
         image_files,
     ]
     error_folder_path = os.path.join(storage_directory, issue_key)
@@ -545,3 +564,6 @@ if __name__ == "__main__":
         ticket.post_attachment_to_ticket(issue_key, file_to_attach)
     # ADD ERROR COMMENTS TO TICKET
     read_each_log(error_folder_path, raw_issue_url)
+
+    # Cleanup error folder
+    cleanup_report_folders(storage_directory)
