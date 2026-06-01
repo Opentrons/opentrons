@@ -14,8 +14,6 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
 
 log = logging.getLogger(__name__)
 
-PYRO_TIMEOUT = 100
-
 
 def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None:  # type: ignore
     """Function to create a Pyro Daemon request loop servicing a given resource.
@@ -27,7 +25,6 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     registry()
 
     # Handle Pyro registration and publication of our synchronized object
-    pyro.config.COMMTIMEOUT = PYRO_TIMEOUT
     with pyro.Daemon() as daemon:  # type: ignore
         utility = DaemonUtility(daemon)
         # Create a guaranteed synchronous adapted alias to the resource
@@ -47,9 +44,7 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
                 finally:
                     ns.remove(name=pyroname)
         except (errors.NamingError, errors.CommunicationError, socket.timeout):
-            raise errors.CommunicationError(
-                f"Opentrons Pyro5 Nameserver not found within {PYRO_TIMEOUT} seconds."
-            )
+            raise errors.CommunicationError("Opentrons Pyro5 Nameserver not found.")
         finally:
             utility.remove_PSO(pyro_object)
             daemon.close()
