@@ -16,7 +16,7 @@ This release is designed specifically for use with Opentrons Flex, and includes 
 
 ### Improvements
 
-- When Protocol Designer detects a collision risk, the error message specifies the deck slot containing labware, modules, or fixtures at risk. To resolve the error, remove the items from the deck slot.
+- When Protocol Designer detects a collision risk, the error message specifies the deck slot containing labware, modules, or fixtures at risk. To resolve the error, remove the items or move them to a new deck slot.
 - In every Protocol Designer step, pipettes must be able to safely pick up accessible tips from their tip rack. Improvements in this release can help you troubleshoot accessible tip errors:
   - Warnings let you know when your deck setup or tip pickup settings present a collision risk with other tips or labware.
   - In a transfer or mix step form, click **Manual tip tracking**, then click to select tips. This form can show you which tips are inaccessible and could cause a collision.
