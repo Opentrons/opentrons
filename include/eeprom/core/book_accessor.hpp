@@ -450,137 +450,148 @@ class BookAccessor
             }
         }
         if (action_cmd_m.action == TableAction::READ) {
-            // change action_cmd_m.len to the length of the data stored in the
-            // page. This information is in bytes 4 and 5 of the header
-            uint16_t data_len = 0;
-            std::memcpy(&data_len, &all_reads[0][4], sizeof(data_len));
-            action_cmd_m.len = data_len;
-
-            // set most recent index and most recent valid again
-            most_recent_index = 0;
-            size_t all_reads_index = 0;
-            most_recent_valid = reads[most_recent_index];
-
-            bool crc_valid = false;
-
-            while (!crc_valid) {
-                // This while loop will keep looping through pages read
-                // until it finds one whose written CRC matches the one
-                // calcluated breaks if it has tried more than 4 times (the
-                // number of pages in a book)
-                if (most_recent_index >= 4) {
-                    std::array<uint8_t, BUFFER_SIZE> error{};
-                    error.fill(0xAA);
-                    // writes an error to the buffer
-                    // TODO: ? maybe come up with a way to recover the data
-                    // when this happens?
-
-                    std::copy_n(error.begin(), error.size(),
-                                this->buffer.begin());
-
-                    // tell object that called that the read is abailable, even
-                    // though it's just an error message, to avoid leaving it
-                    // hanging indefinitely or passing the wrong data
-                    read_listener.read_complete(message_index);
-                    return;
-                }
-
-                most_recent_valid = reads[most_recent_index];
-
-                if (most_recent_valid == read0) {
-                    crc_valid = check_crc(all_reads[0]);
-                    all_reads_index = 0;
-
-                } else if (most_recent_valid == read1) {
-                    crc_valid = check_crc(all_reads[1]);
-                    all_reads_index = 1;
-
-                } else if (most_recent_valid == read2) {
-                    crc_valid = check_crc(all_reads[2]);
-                    all_reads_index = 2;
-
-                } else if (most_recent_valid == read3) {
-                    crc_valid = check_crc(all_reads[3]);
-                    all_reads_index = 3;
-                }
-
-                most_recent_index++;
-            }
-
-            std::array<uint8_t, types::page_length>& relevant_page =
-                all_reads[all_reads_index];
-
-            std::copy_n(relevant_page.begin() + types::book_header_length,
-                        BUFFER_SIZE, this->buffer.begin());
-            // cache the key that was just read so that if we need to do a write
-            // right after we can bypass the read and just write to the same
-            // place
-            cached_key = action_cmd_m.key;
-
-            // tell object that called the read that the read is avaiable
-            read_listener.read_complete(message_index);
+            find_most_recent(message_index, reads, read0, read1, read2, read3);
         }
 
         else if (action_cmd_m.action == TableAction::READ_BEFORE_WRITE) {
-            // create a new eeprom message to send to table_action_callback
-
-            message::EepromMessage write_msg;
-
-            // because all_reads contains 4 pages in the order they were
-            // read (00, 01, 11, 10), we can use the most_recent_valid
-            // variable to determine where to write the new data
-            types::address read0_offset = 0;
-            types::address read1_offset = types::page_length;
-            types::address read2_offset = types::page_length * 2;
-            types::address read3_offset = types::page_length * 3;
-
-            // because of the wraparound counter logic, we can be assured
-            // that the last page is the least recently written page, so we
-            // can use that to determine where to write the new data
-            uint16_t least_recent = reads[least_recent_index];
-
-            types::address page_address = current_book_address;
-
-            // NOTE: this logic will break once a location eventually wears
-            // out. It does not prevent writes to that location.
-
-            if (least_recent == read0) {
-                page_address += read0_offset;
-            } else if (least_recent == read1) {
-                page_address += read1_offset;
-            } else if (least_recent == read2) {
-                page_address += read2_offset;
-            } else if (least_recent == read3) {
-                page_address += read3_offset;
-            }
-
-            // clear write_msg.data just in case
-            write_msg.data.fill(0x00);
-            // storing this in data instead of memory address because table
-            // action callback cheks data to determine write location
-            uint8_t* write_iter = write_msg.data.begin();
-            // copy page address into first 2 bytes of data
-            write_iter = bit_utils::int_to_bytes(page_address, write_iter,
-                                                 write_iter + conf.addr_bytes);
-            // copy new counter value into next 2 bytes of data
-            uint16_t new_counter = reads[0] + 1;
-            if (new_counter > 65000) {
-                // reset counter to avoid overflow, this will cause some
-                // confusion in determining the most recent page, but it is
-                // necessary to avoid counter overflow
-                new_counter = 0;
-            }
-            write_iter = bit_utils::int_to_bytes(new_counter, write_iter,
-                                                 write_iter + conf.addr_bytes);
-            write_msg.length = conf.addr_bytes;
-            // just fill memory address with beginning of lookup table tail
-            write_msg.memory_address = addresses::lookup_table_tail_begin;
-
-            // set table action to write
-            action_cmd_m.action = TableAction::WRITE;
-
-            table_action_callback(write_msg);
+            find_next_write(reads, read0, read1, read2, read3);
         }
+    }
+
+    void find_most_recent(uint16_t message_index,
+                          std::array<uint16_t, 4>& reads, uint16_t read0,
+                          uint16_t read1, uint16_t read2, uint16_t read3) {
+        // change action_cmd_m.len to the length of the
+        // data stored in the
+        // page. This information is in bytes 4 and 5 of the header
+        uint16_t data_len = 0;
+        std::memcpy(&data_len, &all_reads[0][4], sizeof(data_len));
+        action_cmd_m.len = data_len;
+
+        // set most recent index and most recent valid again
+        most_recent_index = 0;
+        size_t all_reads_index = 0;
+        most_recent_valid = reads[most_recent_index];
+
+        bool crc_valid = false;
+
+        while (!crc_valid) {
+            // This while loop will keep looping through pages read
+            // until it finds one whose written CRC matches the one
+            // calcluated breaks if it has tried more than 4 times (the
+            // number of pages in a book)
+            if (most_recent_index >= 4) {
+                std::array<uint8_t, BUFFER_SIZE> error{};
+                error.fill(0xAA);
+                // writes an error to the buffer
+                // TODO: ? maybe come up with a way to recover the data
+                // when this happens?
+
+                std::copy_n(error.begin(), error.size(), this->buffer.begin());
+
+                // tell object that called that the read is abailable, even
+                // though it's just an error message, to avoid leaving it
+                // hanging indefinitely or passing the wrong data
+                read_listener.read_complete(message_index);
+                return;
+            }
+
+            most_recent_valid = reads[most_recent_index];
+
+            if (most_recent_valid == read0) {
+                crc_valid = check_crc(all_reads[0]);
+                all_reads_index = 0;
+
+            } else if (most_recent_valid == read1) {
+                crc_valid = check_crc(all_reads[1]);
+                all_reads_index = 1;
+
+            } else if (most_recent_valid == read2) {
+                crc_valid = check_crc(all_reads[2]);
+                all_reads_index = 2;
+
+            } else if (most_recent_valid == read3) {
+                crc_valid = check_crc(all_reads[3]);
+                all_reads_index = 3;
+            }
+
+            most_recent_index++;
+        }
+
+        std::array<uint8_t, types::page_length>& relevant_page =
+            all_reads[all_reads_index];
+
+        std::copy_n(relevant_page.begin() + types::book_header_length,
+                    BUFFER_SIZE, this->buffer.begin());
+        // cache the key that was just read so that if we need to do a write
+        // right after we can bypass the read and just write to the same
+        // place
+        cached_key = action_cmd_m.key;
+
+        // tell object that called the read that the read is avaiable
+        read_listener.read_complete(message_index);
+    }
+
+    void find_next_write(std::array<uint16_t, 4>& reads, uint16_t read0,
+                         uint16_t read1, uint16_t read2, uint16_t read3) {
+        // create a new eeprom message to send to table_action_callback
+
+        message::EepromMessage write_msg;
+
+        // because all_reads contains 4 pages in the order they were
+        // read (00, 01, 11, 10), we can use the most_recent_valid
+        // variable to determine where to write the new data
+        types::address read0_offset = 0;
+        types::address read1_offset = types::page_length;
+        types::address read2_offset = types::page_length * 2;
+        types::address read3_offset = types::page_length * 3;
+
+        // because of the wraparound counter logic, we can be assured
+        // that the last page is the least recently written page, so we
+        // can use that to determine where to write the new data
+        uint16_t least_recent = reads[reads.size() - 1];
+
+        types::address page_address = current_book_address;
+
+        // NOTE: this logic will break once a location eventually wears
+        // out. It does not prevent writes to that location.
+
+        if (least_recent == read0) {
+            page_address += read0_offset;
+        } else if (least_recent == read1) {
+            page_address += read1_offset;
+        } else if (least_recent == read2) {
+            page_address += read2_offset;
+        } else if (least_recent == read3) {
+            page_address += read3_offset;
+        }
+
+        // clear write_msg.data just in case
+        write_msg.data.fill(0x00);
+        // storing this in data instead of memory address because table
+        // action callback cheks data to determine write location
+        uint8_t* write_iter = write_msg.data.begin();
+        // copy page address into first 2 bytes of data
+        write_iter = bit_utils::int_to_bytes(page_address, write_iter,
+                                             write_iter + conf.addr_bytes);
+        // copy new counter value into next 2 bytes of data
+        uint16_t new_counter = reads[0] + 1;
+        if (new_counter > 65000) {
+            // reset counter to avoid overflow, this will cause some
+            // confusion in determining the most recent page, but it is
+            // necessary to avoid counter overflow
+            new_counter = 0;
+        }
+        write_iter = bit_utils::int_to_bytes(new_counter, write_iter,
+                                             write_iter + conf.addr_bytes);
+        write_msg.length = conf.addr_bytes;
+        // just fill memory address with beginning of lookup table tail
+        write_msg.memory_address = addresses::lookup_table_tail_begin;
+
+        // set table action to write
+        action_cmd_m.action = TableAction::WRITE;
+
+        table_action_callback(write_msg);
     }
 
     void config_req_callback(const message::ConfigResponseMessage& m) {
