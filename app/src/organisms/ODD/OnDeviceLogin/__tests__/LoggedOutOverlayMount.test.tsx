@@ -65,7 +65,9 @@ describe('LoggedOutOverlayMount', () => {
   it('renders the logged-out overlay when the user is logged out', () => {
     render()
 
-    expect(screen.getByRole('dialog', { name: 'Logged out' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('dialog', { name: 'Logged out' })
+    ).toBeInTheDocument()
   })
 
   it('renders the logged-out overlay when the user must reset their password', () => {
@@ -76,7 +78,9 @@ describe('LoggedOutOverlayMount', () => {
 
     render()
 
-    expect(screen.getByRole('dialog', { name: 'Logged out' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('dialog', { name: 'Logged out' })
+    ).toBeInTheDocument()
   })
 
   it('opens the login modal when the overlay is clicked', () => {

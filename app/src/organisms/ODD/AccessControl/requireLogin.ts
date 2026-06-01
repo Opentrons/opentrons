@@ -25,8 +25,7 @@ export async function requireLogin(
   hostConfig?: HostConfig | null
 ): Promise<RequireLoginResult | null> {
   const shouldShowLogin =
-    currentUsername == null ||
-    (await isPasswordResetRequired(hostConfig))
+    currentUsername == null || (await isPasswordResetRequired(hostConfig))
 
   if (!shouldShowLogin) {
     return { username: currentUsername }

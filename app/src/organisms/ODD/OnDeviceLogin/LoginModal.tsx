@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -8,11 +8,11 @@ import {
   useSelfQuery,
 } from '@opentrons/react-api-client'
 
-import { useOAuth2PasswordLogin } from '/app/resources/auth'
 import {
   getCurrentUsernameForLocalRobot,
   getIsLoggedInToLocalRobot,
 } from '/app/redux/robot-auth'
+import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
@@ -70,7 +70,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   }
 
   const initialUsername =
-    isPasswordResetRequired && currentUsername != null ? currentUsername : undefined
+    isPasswordResetRequired && currentUsername != null
+      ? currentUsername
+      : undefined
 
   return (
     <div className={styles.overlay}>

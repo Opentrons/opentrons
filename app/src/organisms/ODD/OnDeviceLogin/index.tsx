@@ -51,9 +51,9 @@ export function OnDeviceLogin({
   onClearLoginError,
 }: OnDeviceLoginProps): JSX.Element {
   const { t } = useTranslation(['shared', 'device_settings'])
-  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(
-    null
-  )
+  const [confirmPasswordError, setConfirmPasswordError] = useState<
+    string | null
+  >(null)
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',

@@ -75,9 +75,9 @@ describe('requireLogin', () => {
       },
     } as Awaited<ReturnType<typeof getSelf>>)
     vi.mocked(store.getState).mockReturnValue({})
-    vi.mocked(getLocalRobot).mockReturnValue({ name: 'odd-robot' } as ReturnType<
-      typeof getLocalRobot
-    >)
+    vi.mocked(getLocalRobot).mockReturnValue({
+      name: 'odd-robot',
+    } as ReturnType<typeof getLocalRobot>)
     vi.mocked(showLoginModal).mockResolvedValue({ username: 'alice' })
 
     const result = await requireLogin('alice', HOST_CONFIG)
@@ -110,9 +110,9 @@ describe('requireLogin', () => {
   it('opens the login modal when the self user request fails', async () => {
     vi.mocked(getSelf).mockRejectedValue(new Error('unauthorized'))
     vi.mocked(store.getState).mockReturnValue({})
-    vi.mocked(getLocalRobot).mockReturnValue({ name: 'odd-robot' } as ReturnType<
-      typeof getLocalRobot
-    >)
+    vi.mocked(getLocalRobot).mockReturnValue({
+      name: 'odd-robot',
+    } as ReturnType<typeof getLocalRobot>)
     vi.mocked(showLoginModal).mockResolvedValue({ username: 'alice' })
 
     const result = await requireLogin('alice', HOST_CONFIG)
