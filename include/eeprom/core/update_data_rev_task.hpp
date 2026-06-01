@@ -25,8 +25,7 @@ struct MigrateDataMessage {
 
 struct OTLibraryUpdateMessage {
     uint16_t data_rev;
-    std::vector<std::pair<types::book_address, types::data_length>>
-        ot_library_table;
+    std::vector<std::pair<types::address, types::data_length>> ot_library_table;
 };
 
 using TaskMessage = std::variant<std::monostate, DataTableUpdateMessage,

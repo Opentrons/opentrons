@@ -70,6 +70,7 @@ struct OTLibraryBookMessage {
     auto operator==(const OTLibraryBookMessage&) const -> bool = default;
 };
 
+// TODO: Looks like we won't be using this, so get rid of it
 struct OTLibraryPageMessage {
     uint32_t message_index;
     eeprom::types::address memory_address;

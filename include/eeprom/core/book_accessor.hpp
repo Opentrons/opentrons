@@ -25,23 +25,6 @@ using DataTailType =
 using TableAction = dev_data::TableAction;
 using table_entry_action = dev_data::table_entry_action;
 
-/*
- * The PageType represents a page on which data will exist. It will be used
- * to organise data during reads and writes.
- * */
-template <size_t SIZE>
-struct PageType {
-    std::array<uint8_t, 2> crc;
-    uint8_t length;
-    DataBufferType<SIZE> data;
-    uint16_t counter;
-
-    struct checkValid {
-        uint8_t errors;
-        uint8_t retire;
-    };
-};
-
 struct BookAccessorIntermediate {
   protected:
     DataBufferType<static_cast<size_t>(types::page_length * 4)>
@@ -65,7 +48,7 @@ class BookAccessor
         DataBufferType<SIZE>& buffer,
         dev_data::DevDataTailAccessor<EEpromTaskClient>& tail_accessor,
         eeprom::CRC16Base& crc16)
-        : BookAccessorIntermediate(),
+        : BookAccessorIntermediate{},
           accessor::EEPromAccessor<EEpromTaskClient,
                                    addresses::ot_library_begin>(
               eeprom_client, *this,
@@ -79,10 +62,101 @@ class BookAccessor
             message::ConfigRequestMessage{config_req_callback, this});
     }
 
-    // void create_new_data_part(uint8_t key, uint16_t len,
-    //                           std::array<uint8_t, SIZE> data) {
-    //     std::ignore = key, len, data;
-    // }
+    template <size_t NUM_BYTES>
+    void create_data_part(uint16_t key, uint16_t len,
+                          std::array<uint8_t, NUM_BYTES>& data) {
+        // "page_data" is what will be written to the EEPROM. Just data with the
+        // header and some extra bytes afterwards to fill the page.
+        std::array<uint8_t, types::page_length> page_data{0};
+
+        if (!data.empty()) {
+            if (data.size() > types::book_data_length) {
+                LOG("Warning, sent too much data to initalize, "
+                    "truncating to %d",
+                    types::book_data_length);
+            }
+            uint16_t counter = 1;
+            // move data to larger container
+            std::array<uint8_t, types::book_data_length> data_container{};
+            std::copy_n(data.begin(), data.size(), data_container.begin());
+            std::array<uint8_t, 2> crc = calc_crc(data_container);
+
+            // make CRC the first two bytes of the page
+            std::copy_n(crc.begin(), 2, page_data.begin());
+            // make Counter the next two bytes of the page
+            std::memcpy(page_data.data() + 2, &counter, sizeof(counter));
+            // make the data the rest of the page
+            std::copy_n(data_container.begin(), data_container.size(),
+                        page_data.begin() + types::book_header_length + 1);
+        }
+        if (table_ready()) {
+            //  if the key is zero we don't need to read the former address
+            if (key == 0) {
+                // double check if this is writig to the data_table
+                message::WriteEepromMessage write;
+                write.memory_address = addresses::data_address_begin;
+                write.length = 2 * conf.addr_bytes;
+                // data pointers are offsets from the start of the data section
+                // of the eeprom, so we subtract ot_library_begin here to
+                // store the right value
+
+                // new in OT library, subtract from ot_library_end to cut off
+                // stale addresses
+                types::address new_ptr = addresses::ot_library_end -
+                                         types::page_length -
+                                         addresses::ot_library_begin;
+
+                // drop second byte (first byte is pre-aligned to 4 pages);
+                new_ptr &= 0xFF00;
+
+                auto* data_iter = write.data.begin();
+                data_iter = bit_utils::int_to_bytes(
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                    new_ptr, data_iter, data_iter + conf.addr_bytes);
+                data_iter = bit_utils::int_to_bytes(
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                    len, data_iter, data_iter + conf.addr_bytes);
+                this->eeprom_client.send_eeprom_queue(write);
+
+                tail_accessor.increase_data_tail(2 * conf.addr_bytes);
+
+                if (!data.empty()) {
+                    this->write_at_offset(
+                        accessor::AccessorBuffer(page_data.begin(),
+                                                 page_data.end()),
+                        new_ptr, types::page_length, 0);
+                }
+            } else {
+                action_cmd_m.offset = 0;
+                action_cmd_m.len = len;
+                action_cmd_m.action = TableAction::CREATE;
+                if (!data.empty()) {
+                    std::copy_n(page_data.begin(), page_data.size(),
+                                this->type_data.begin());
+                    action_cmd_m.action = TableAction::INITALIZE;
+                }
+                // call a read to the previous table entry so we know where
+                // to put the data
+                tail_accessor.start_update();
+
+                this->eeprom_client.send_eeprom_queue(
+                    message::ReadEepromMessage{
+                        .memory_address = calculate_table_entry_start(key - 1),
+                        .length = static_cast<types::data_length>(
+                            2 * conf.addr_bytes),
+                        .callback = table_action_callback,
+                        .callback_param = this});
+            }
+        } else {
+            LOG("ERROR, attempting to create data part before driver "
+                "initalized");
+        }
+    }
+
+    void create_data_part(uint16_t key, uint16_t len) {
+        auto dummy = std::array<uint8_t, 0>{};
+        create_data_part(key, len, dummy);
+    }
     //
     // void write_data(uint8_t key, uint16_t len,
     //                 std::array<uint8_t, SIZE> data) {
@@ -99,6 +173,7 @@ class BookAccessor
                 LOG("Error, attemping to read uninitalized value");
                 return;
             }
+
             action_cmd_m = table_entry_action{.key = key,
                                               .offset = offset,
                                               .len = len,
@@ -116,12 +191,12 @@ class BookAccessor
     }
 
     auto read_write_ready() -> bool {
-        return true;
-        // return table_ready() && tail_accessor.data_rev_complete();
+        return table_ready() && tail_accessor.data_rev_complete();
     }
 
     auto table_ready() -> bool {
         return config_updated && tail_accessor.get_tail_updated();
+        // return true;
     }
 
     void read_complete(uint32_t message_index) override {
@@ -130,7 +205,7 @@ class BookAccessor
             // 1. save what's in buffer to all_reads
             std::copy_n((intermediate_buffer.begin() +
                          (static_cast<ptrdiff_t>(types::page_length * i))),
-                        types::page_length, all_reads[i].begin());
+                        types::page_length, all_reads.at(i).begin());
         }
         read_final(message_index);
     }
@@ -145,8 +220,8 @@ class BookAccessor
     bool config_updated{false};
     table_entry_action action_cmd_m = dev_data::table_entry_action{};
     ReadListener& read_listener;
-    DataBufferType<SIZE>& buffer;
     std::array<std::array<uint8_t, types::page_length>, 4> all_reads{};
+    DataBufferType<SIZE>& buffer;
 
     template <size_t num_bytes>
     auto calc_crc(std::array<uint8_t, num_bytes> data)
@@ -313,14 +388,55 @@ class BookAccessor
             data_len = data_len >> hardware_iface::ADDR_BITS_DIFFERENCE;
         }
 
+        bool do_initalize = false;
         switch (action_cmd_m.action) {
             case TableAction::INITALIZE:
+                do_initalize = true;
+                // don't break this is just an extension of create
                 [[fallthrough]];
             case TableAction::CREATE:
-                [[fallthrough]];
+                // TODO: calculate new start address
+                if (tail_accessor.get_data_tail() + types::page_length +
+                        (2 * conf.addr_bytes) >
+                    data_addr) {
+                    LOG("Error attempted to initialize value too large for "
+                        "memory");
+                } else {
+                    // First write the new table entry
+                    message::WriteEepromMessage write;
+                    write.memory_address = tail_accessor.get_data_tail();
+                    write.length = 2 * conf.addr_bytes;
+                    auto* write_iter = write.data.begin();
+                    write_iter = bit_utils::int_to_bytes(
+                        uint16_t(data_addr - (types::page_length * 4)) & 0xFF00,
+                        write_iter,
+                        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                        (write_iter + conf.addr_bytes));
+                    write_iter = bit_utils::int_to_bytes(
+                        action_cmd_m.len, write_iter,
+                        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                        write_iter + conf.addr_bytes);
+                    this->eeprom_client.send_eeprom_queue(write);
+
+                    // After writing the table entry use the tail accessor to
+                    // update the tail
+                    tail_accessor.increase_data_tail(2 * conf.addr_bytes);
+
+                    // If we passed data into the create write that data into
+                    // the memory
+                    if (do_initalize) {
+                        this->write_at_offset(
+                            this->type_data,
+                            (data_addr - (types::page_length * 4)) & 0xFF00,
+                            types::page_length, m.message_index);
+                    }
+                }
+                break;
             case TableAction::WRITE:
                 [[fallthrough]];
             case TableAction::READ:
+                // TODO: ask Ryan if this is unnecessary
+                // action_cmd_m.len = data_len;
                 data_addr += action_cmd_m.offset;
                 // read all 4 whole pages at the same time
                 this->OT_start_read_at_offset(

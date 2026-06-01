@@ -17,9 +17,6 @@ using EepromData = std::array<uint8_t, max_data_length>;
 
 // OT-LIBRARY
 
-// 0-64
-using book_address = uint8_t;
-
 // in the OT-LIBRARY data_length can be up to 56
 // TODO update hard coded values in book_accessor
 constexpr data_length book_data_length = 56;
