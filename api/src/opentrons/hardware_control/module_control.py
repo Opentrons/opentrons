@@ -43,8 +43,7 @@ if TYPE_CHECKING:
     from .api import API
     from .ot3api import OT3API
 
-
-RECONNECT_ATTEMPTS = 3
+CLEANUP_DELAY_S = 3.0
 
 log = logging.getLogger(__name__)
 
@@ -257,13 +256,10 @@ class AttachedModulesControl:
             self._recently_removed_modules.remove(old_mod)
             await old_mod.cleanup()
 
-    async def _reconnect_patch(self, attempts_left: int) -> None:
-        await asyncio.sleep(1)
+    async def _reconnect_patch(self) -> None:
         try:
             for old_mod in self._recently_removed_modules:
-                log.info(
-                    f"Attempting to find and reconect {old_mod.serial_number} attempt {RECONNECT_ATTEMPTS - attempts_left + 1}"
-                )
+                log.info(f"Attempting to find and reconect {old_mod.serial_number}")
                 for attached_mod in self._available_modules:
                     if attached_mod.serial_number == old_mod.serial_number:
                         log.info(f"Found {old_mod.serial_number} was reconnected")
@@ -285,13 +281,6 @@ class AttachedModulesControl:
                         )
         except BaseException:
             log.exception("Encountered an error during reconnect attempt.")
-        if len(self._recently_removed_modules) > 0:
-            if attempts_left == 1:
-                # if the module isn't back then remove it
-                await self._clear_old_modules()
-                return
-            else:
-                await self._reconnect_patch(attempts_left - 1)
 
     async def unregister_devices(  # noqa: C901
         self,
@@ -305,7 +294,7 @@ class AttachedModulesControl:
         Remove any modules that are no longer found by aionotify.
         """
         removed_devices = []
-        start_reconnect_task = False
+        start_cleanup_task = False
         for dev in devices_at_ports:
             for attached_dev in self._available_modules + self.available_peripherals:
                 if (
@@ -320,7 +309,7 @@ class AttachedModulesControl:
                 ):
                     self._recently_removed_modules.append(removed_dev)
                     self._available_modules.remove(removed_dev)
-                    start_reconnect_task = True
+                    start_cleanup_task = True
                 if removed_dev in self._available_peripherals and isinstance(
                     removed_dev, peripherals.AbstractPeripheral
                 ):
@@ -344,11 +333,11 @@ class AttachedModulesControl:
         self._available_peripherals = sorted(
             self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
         )
-        if start_reconnect_task:
-            if self._api.is_simulator:
-                await self._clear_old_modules()
-            else:
-                self._api.loop.create_task(self._reconnect_patch(RECONNECT_ATTEMPTS))
+        if start_cleanup_task:
+            delay = 0.1 if self._api.is_simulator else CLEANUP_DELAY_S
+            self._api.loop.call_later(
+                delay, lambda: asyncio.create_task(self._clear_old_modules())
+            )
 
     async def register_devices(
         self,
@@ -398,6 +387,7 @@ class AttachedModulesControl:
                 log.exception(
                     f"Failed to build device {device.name} at port {device.port}: {e}"
                 )
+        await self._reconnect_patch()
         self._available_peripherals = sorted(
             self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
         )

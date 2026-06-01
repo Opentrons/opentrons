@@ -12,7 +12,6 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control import types
 from opentrons.hardware_control.abstract_device import AbstractDevice
 from opentrons.hardware_control.module_control import (
-    RECONNECT_ATTEMPTS,
     AttachedModulesControl,
 )
 from opentrons.hardware_control.modules import AbstractModule
@@ -302,11 +301,9 @@ async def test_unregister_modules(
     assert subject.available_modules == [module_1]
     assert subject._available_modules == []
     assert subject._recently_removed_modules == [module_1]
-    decoy.verify(loop.create_task(matchers.Anything()), times=1)
-
-    # Test a module gets removed after reconnect patch and it doesn't infinite recurse
-    async with asyncio.timeout(RECONNECT_ATTEMPTS + 1):
-        await subject._reconnect_patch(RECONNECT_ATTEMPTS)
+    decoy.verify(loop.call_later(matchers.IsA(float), matchers.Anything()), times=1)
+    # loop is a mock so we need to call clear modules ourselves.
+    await subject._clear_old_modules()
     assert subject._recently_removed_modules == []
 
     # Test a module gets reconnected when it reappers on a new port
@@ -321,7 +318,6 @@ async def test_unregister_modules(
     decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
     await subject.register_devices(new_devices_at_ports=new_mods_at_ports)
     # reconnect gets called and module 1 gets reconnected
-    await subject._reconnect_patch(RECONNECT_ATTEMPTS)
     assert subject.available_modules == [module_1]
     assert subject._available_modules == [module_1]
     assert subject._recently_removed_modules == []
