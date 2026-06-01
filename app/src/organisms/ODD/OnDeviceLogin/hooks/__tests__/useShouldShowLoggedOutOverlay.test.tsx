@@ -3,9 +3,12 @@ import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useSelfQuery,
+} from '@opentrons/react-api-client'
 
-import { useLocalRobotAuthSelf } from '/app/resources/auth'
+import { getIsLoggedInToLocalRobot } from '/app/redux/robot-auth'
 
 import { useShouldShowLoggedOutOverlay } from '../useShouldShowLoggedOutOverlay'
 
@@ -15,13 +18,22 @@ import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
+  useSelfQuery: vi.fn(),
 }))
 
-vi.mock('/app/resources/auth', async importOriginal => {
-  const actual = await importOriginal()
+vi.mock('/app/redux/robot-auth', async importOriginal => {
+  const actual = await importOriginal<typeof import('/app/redux/robot-auth')>()
   return {
-    ...(actual as object),
-    useLocalRobotAuthSelf: vi.fn(),
+    ...actual,
+    getIsLoggedInToLocalRobot: vi.fn(),
+  }
+})
+
+vi.mock('react-redux', async importOriginal => {
+  const actual = await importOriginal<typeof import('react-redux')>()
+  return {
+    ...actual,
+    useSelector: vi.fn((selector: (state: State) => unknown) => selector({} as State)),
   }
 })
 
@@ -37,18 +49,20 @@ const mockAccessControlEnabled = (enabled: boolean): void => {
   } as ReturnType<typeof useAccessControlEnabledQuery>)
 }
 
+const mockSelfQuery = (resetPassword: boolean): void => {
+  vi.mocked(useSelfQuery).mockReturnValue({
+    data: { data: { resetPassword } },
+  } as ReturnType<typeof useSelfQuery>)
+}
+
 describe('useShouldShowLoggedOutOverlay', () => {
   afterEach(() => {
     vi.resetAllMocks()
   })
 
   beforeEach(() => {
-    vi.mocked(useLocalRobotAuthSelf).mockReturnValue({
-      username: null,
-      isLoggedIn: false,
-      resetPasswordRequired: false,
-      locked: false,
-    })
+    vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
+    mockSelfQuery(false)
   })
 
   it('returns true when access control is enabled, the user is logged out, and the login modal is closed', () => {
@@ -71,12 +85,8 @@ describe('useShouldShowLoggedOutOverlay', () => {
 
   it('returns false when the user is logged in', () => {
     mockAccessControlEnabled(true)
-    vi.mocked(useLocalRobotAuthSelf).mockReturnValue({
-      username: 'alice',
-      isLoggedIn: true,
-      resetPasswordRequired: false,
-      locked: false,
-    })
+    vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(true)
+    mockSelfQuery(false)
 
     const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
       wrapper,
@@ -86,12 +96,8 @@ describe('useShouldShowLoggedOutOverlay', () => {
 
   it('returns true when the user must reset their password', () => {
     mockAccessControlEnabled(true)
-    vi.mocked(useLocalRobotAuthSelf).mockReturnValue({
-      username: 'alice',
-      isLoggedIn: true,
-      resetPasswordRequired: true,
-      locked: false,
-    })
+    vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(true)
+    mockSelfQuery(true)
 
     const { result } = renderHook(() => useShouldShowLoggedOutOverlay(false), {
       wrapper,
