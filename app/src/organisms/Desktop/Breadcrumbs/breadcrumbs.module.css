@@ -1,8 +1,9 @@
 .root_container {
   display: flex;
+  height: 2.75rem;
   flex-direction: row;
-  align-items: flex-start;
-  padding: var(--spacing-4) 0 var(--spacing-4) var(--spacing-8);
+  align-items: center;
+  padding: 0 var(--spacing-8);
   border-bottom: 1px solid var(--grey-30);
   background-color: var(--white);
 }
