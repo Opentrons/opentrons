@@ -15,7 +15,6 @@ from .errors import (
     NoResponse,
     UnhandledGcode,
 )
-from opentrons.config import IS_ROBOT
 from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
@@ -662,7 +661,7 @@ class AsyncResponseSerialConnection(SerialConnection):
 
             except BaseException as e:
                 log.error(f"Got an error during send {e}")
-                if retry < retries and IS_ROBOT:
+                if retry < retries:
                     pass
                 else:
                     raise
