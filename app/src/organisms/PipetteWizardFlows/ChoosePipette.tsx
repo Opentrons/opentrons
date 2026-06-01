@@ -128,7 +128,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const [showExitConfirmation, setShowExitConfirmation] =
     useState<boolean>(false)
 
-  const initialDocstate = usePromptForInteractionReason()
+  const initialDocstate = usePromptForInteractionReason(['attach_pipette'])
   const isWaitingForDocumentation = !isDocumentationProvided(initialDocstate)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)

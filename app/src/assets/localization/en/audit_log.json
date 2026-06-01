@@ -1,7 +1,14 @@
 {
-  "detach_pipette": "Detach pipette",
-  "stop_run": "Stop run",
-  "play_run": "Play run",
-  "end_maintenance_run": "End maintenance run",
-  "start_maintenance_run": "Start maintenance run"
+  "stop_run": "Stopping protocol run",
+  "play_run": "Playing protocol",
+  "place_plate_reader_lid": "Placing plate reader lid",
+  "home_pipettes": "Homing pipettes",
+  "attach_gripper": "Attaching gripper",
+  "detach_gripper": "Detaching gripper",
+  "recalibrate_gripper": "Recalibrating gripper",
+  "lpc_flow": "Launching labware position check",
+  "drop_tips": "Dropping tips",
+  "end_calibration": "Ending calibration",
+  "add_module": "Adding module to deck configuration",
+  "attach_pipette": "Launching attach pipette flow"
 }

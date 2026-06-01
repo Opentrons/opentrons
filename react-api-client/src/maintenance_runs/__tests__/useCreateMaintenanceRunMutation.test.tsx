@@ -39,7 +39,10 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     vi.mocked(createMaintenanceRun).mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      () => useCreateMaintenanceRunMutation({ accessControlEnabled: false }),
+      () =>
+        useCreateMaintenanceRunMutation({ accessControlEnabled: false }, [
+          'lpc_flow',
+        ]),
       {
         wrapper,
       }
@@ -65,7 +68,10 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     } as Response<MaintenanceRun>)
 
     const { result } = renderHook(
-      () => useCreateMaintenanceRunMutation({ accessControlEnabled: false }),
+      () =>
+        useCreateMaintenanceRunMutation({ accessControlEnabled: false }, [
+          'lpc_flow',
+        ]),
       {
         wrapper,
       }

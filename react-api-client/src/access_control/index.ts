@@ -1,2 +1,6 @@
-export type { DocumentationReport, DocumentationState } from './types'
+export type {
+  DocumentationReport,
+  DocumentationState,
+  DocumentedAction,
+} from './types'
 export { useDocumentedMutation } from './useDocumentedMutation'

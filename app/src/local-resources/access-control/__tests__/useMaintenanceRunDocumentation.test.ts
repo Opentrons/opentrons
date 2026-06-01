@@ -82,9 +82,12 @@ describe('useMaintenanceRunDocumentation', () => {
   })
 
   it('auto-prompts for command documentation but not for deletion', async () => {
-    const { result } = renderHook(() => useMaintenanceRunDocumentation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useMaintenanceRunDocumentation('lpc_flow'),
+      {
+        wrapper,
+      }
+    )
 
     await waitFor(() => {
       expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
@@ -110,9 +113,12 @@ describe('useMaintenanceRunDocumentation', () => {
   })
 
   it('prompts for deletion documentation only when askForDocumentation is invoked', async () => {
-    const { result } = renderHook(() => useMaintenanceRunDocumentation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useMaintenanceRunDocumentation('lpc_flow'),
+      {
+        wrapper,
+      }
+    )
 
     await waitFor(() => {
       expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
@@ -123,7 +129,9 @@ describe('useMaintenanceRunDocumentation', () => {
         result.current.deletionDocState.accessControlEnabled &&
         result.current.deletionDocState.docreport == null
       ) {
-        await result.current.deletionDocState.askForDocumentation()
+        await result.current.deletionDocState.askForDocumentation(
+          result.current.actionsToDocument
+        )
       }
     })
 

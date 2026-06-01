@@ -2,12 +2,13 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 
 import type { MaintenanceRun, Mount } from '@opentrons/api-client'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export interface PipetteDetails {
@@ -32,6 +33,7 @@ export interface UseRobotControlCommandsProps {
   continuePastCommandFailure: boolean
   /* An onSettled callback executed after the deletion of the maintenance run. */
   onSettled?: () => void
+  runName: DocumentedAction
 }
 // Issue commands to the robot, creating an on-the-fly maintenance run for the duration of the issued commands, loading
 // the relevant pipette if necessary. Commands are then executed, and regardless of the success status of those commands,
@@ -41,17 +43,29 @@ export function useRobotControlCommands({
   commands,
   continuePastCommandFailure,
   onSettled,
+  runName,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
   const [isExecuting, setIsExecuting] = useState(false)
 
-  const docState = usePromptForInteractionReason()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation(runName)
 
-  const { chainRunCommands } = useChainMaintenanceCommands(docState)
-  const { mutateAsync: deleteMaintenanceRun } =
-    useDeleteMaintenanceRunMutation(docState)
+  const { chainRunCommands } = useChainMaintenanceCommands(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+  const { mutateAsync: deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    actionsToDocument
+  )
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation(docState, {
+    useCreateTargetedMaintenanceRunMutation(commandDocState, [runName], {
       onSuccess: response => {
         const runId = response.data.id as string
 

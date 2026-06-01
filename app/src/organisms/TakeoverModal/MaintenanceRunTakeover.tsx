@@ -43,10 +43,13 @@ export function MaintenanceRunTakeoverModal(
   const desktopMaintenanceRunInProgress =
     isMaintenanceRunCurrent && oddRunId !== currentRunId
 
+  // TODO(jj): This needs to access the docstate and actions for the current maintenance run.
   const docState = useGuardedAction()
 
-  const { deleteMaintenanceRun, reset } =
-    useDeleteMaintenanceRunMutation(docState)
+  const { deleteMaintenanceRun, reset } = useDeleteMaintenanceRunMutation(
+    docState,
+    ['end_calibration']
+  )
 
   const handleCloseAndTerminate = (): void => {
     if (currentRunId != null) {

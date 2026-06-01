@@ -4,10 +4,13 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 export type DocumentationReport = string & {
   readonly _brand: 'DocumentationReport'
 }
+
 /**
  * Documentation state to be passed to the useDocumentedMutation hook.
  *
@@ -21,7 +24,9 @@ export type DocumentationState =
   | {
       accessControlEnabled: true
       docreport: null
-      askForDocumentation: () => Promise<DocumentationReport>
+      askForDocumentation: (
+        actionsToDocument: DocumentedAction[]
+      ) => Promise<DocumentationReport>
     }
 
 /**
@@ -33,14 +38,41 @@ export type DocumentationState =
 export interface UseDocumentedMutation {
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
+    actionsToDocument: DocumentedAction[],
     mutationFn: MutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
+    actionsToDocument: DocumentedAction[],
     mutationKey: MutationKey,
     mutationFn: MutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 }
+
+export type PipetteWizardFlowName = string & {
+  readonly _brand: 'PipetteWizardFlow'
+}
+
+export type AttachingModule = AttachedModule & {
+  readonly _brand: 'Attaching'
+}
+
+export type DocumentedAction =
+  | 'stop_run'
+  | 'play_run'
+  | 'place_plate_reader_lid'
+  | 'home_pipettes'
+  | 'attach_gripper'
+  | 'detach_gripper'
+  | 'recalibrate_gripper'
+  | 'lpc_flow'
+  | 'drop_tips'
+  | 'end_calibration'
+  | 'add_module'
+  | 'attach_pipette'
+  | RunTimeCommand
+  | PipetteWizardFlowName
+  | AttachingModule

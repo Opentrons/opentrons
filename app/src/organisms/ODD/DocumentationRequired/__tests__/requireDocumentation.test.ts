@@ -4,13 +4,10 @@ import { showDocumentationRequiredModal } from '../DocumentationRequiredModal'
 import { requireDocumentation } from '../requireDocumentation'
 
 import type { DocumentationReport } from '@opentrons/react-api-client'
-import type { DocumentedActionKind } from '/app/local-resources/access-control/types'
 
 vi.mock('../DocumentationRequiredModal', () => ({
   showDocumentationRequiredModal: vi.fn(),
 }))
-
-const ACTIONS_TO_DOCUMENT: DocumentedActionKind[] = [{ kind: 'PROTOCOL_PLAY' }]
 
 describe('requireDocumentation', () => {
   afterEach(() => {
@@ -22,7 +19,7 @@ describe('requireDocumentation', () => {
       'starting calibration' as DocumentationReport
     )
 
-    const result = await requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
+    const result = await requireDocumentation('alice', [])
 
     expect(result).toEqual('starting calibration' as DocumentationReport)
     expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice')
@@ -33,8 +30,8 @@ describe('requireDocumentation', () => {
       '' as DocumentationReport
     )
 
-    await expect(
-      requireDocumentation(ACTIONS_TO_DOCUMENT, 'alice')
-    ).rejects.toThrow(`No documentation provided for action: `)
+    await expect(requireDocumentation('alice', [])).rejects.toThrow(
+      `No documentation provided for action: `
+    )
   })
 })

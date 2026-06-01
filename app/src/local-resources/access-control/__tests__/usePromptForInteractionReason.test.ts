@@ -55,18 +55,24 @@ describe('usePromptForInteractionReason', () => {
       data: { data: { accessControlEnabled: false } },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
 
-    const { result } = renderHook(() => usePromptForInteractionReason(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePromptForInteractionReason(['lpc_flow']),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.accessControlEnabled).toBe(false)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
 
   it('prompts for documentation when access control is enabled', async () => {
-    const { result } = renderHook(() => usePromptForInteractionReason(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePromptForInteractionReason(['lpc_flow']),
+      {
+        wrapper,
+      }
+    )
 
     await waitFor(() => {
       expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)

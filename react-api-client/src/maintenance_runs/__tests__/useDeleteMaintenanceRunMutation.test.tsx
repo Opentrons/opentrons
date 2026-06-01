@@ -35,7 +35,8 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     vi.mocked(deleteMaintenanceRun).mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      () => useDeleteMaintenanceRunMutation({ accessControlEnabled: false }),
+      () =>
+        useDeleteMaintenanceRunMutation({ accessControlEnabled: false }, []),
       {
         wrapper,
       }
@@ -55,7 +56,8 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     } as Response<EmptyResponse>)
 
     const { result } = renderHook(
-      () => useDeleteMaintenanceRunMutation({ accessControlEnabled: false }),
+      () =>
+        useDeleteMaintenanceRunMutation({ accessControlEnabled: false }, []),
       {
         wrapper,
       }

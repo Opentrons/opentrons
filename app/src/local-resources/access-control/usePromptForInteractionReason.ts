@@ -5,6 +5,7 @@ import { useGuardedAction } from './useGuardedAction'
 import type {
   DocumentationReport,
   DocumentationState,
+  DocumentedAction,
 } from '@opentrons/react-api-client'
 
 /**
@@ -19,6 +20,7 @@ import type {
  *
  */
 export const usePromptForInteractionReason = (
+  actionsToDocument: DocumentedAction[],
   initialDocstate?: DocumentationState
 ): DocumentationState => {
   const [docReport, setDocReport] = useState<DocumentationReport>()
@@ -34,7 +36,7 @@ export const usePromptForInteractionReason = (
         if (docState.docreport == null && !promptInFlight.current) {
           promptInFlight.current = true
           await docState
-            .askForDocumentation()
+            .askForDocumentation(actionsToDocument)
             .then(setDocReport)
             .finally(() => {
               promptInFlight.current = false
@@ -43,7 +45,7 @@ export const usePromptForInteractionReason = (
       }
     }
     void promptForDocumentation()
-  }, [docReport, docState])
+  }, [actionsToDocument, docReport, docState])
 
   return docState
 }

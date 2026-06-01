@@ -32,6 +32,7 @@ describe('useDocumentedMutation', () => {
       () =>
         useDocumentedMutation<number, AxiosError, number>(
           { accessControlEnabled: false },
+          ['play_run'],
           testMutationKey,
           (n: number) => mutationFn(n),
           {}
@@ -59,6 +60,7 @@ describe('useDocumentedMutation', () => {
             accessControlEnabled: true,
             docreport: MOCK_REPORT,
           },
+          ['play_run'],
           testMutationKey,
           (x: number) => mutationFn(x),
           {}
@@ -88,6 +90,7 @@ describe('useDocumentedMutation', () => {
             docreport: null,
             askForDocumentation,
           },
+          ['play_run'],
           testMutationKey,
           (s: string) => mutationFn(s),
           {}
@@ -116,6 +119,7 @@ describe('useDocumentedMutation', () => {
             docreport: null,
             askForDocumentation,
           },
+          ['play_run'],
           testMutationKey,
           (s: string) => mutationFn(s),
           {}

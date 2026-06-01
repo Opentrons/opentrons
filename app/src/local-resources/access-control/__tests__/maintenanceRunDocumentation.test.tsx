@@ -99,12 +99,31 @@ const useFakeMaintenanceRun = (): {
   moveCommand: ReturnType<typeof useCreateMaintenanceCommandMutation>
   deleteRun: ReturnType<typeof useDeleteMaintenanceRunMutation>
 } => {
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation('lpc_flow')
 
-  const createRun = useCreateMaintenanceRunMutation(commandDocState)
-  const homeCommand = useCreateMaintenanceCommandMutation(commandDocState)
-  const moveCommand = useCreateMaintenanceCommandMutation(commandDocState)
-  const deleteRun = useDeleteMaintenanceRunMutation(deletionDocState)
+  const createRun = useCreateMaintenanceRunMutation(
+    commandDocState,
+    actionsToDocument
+  )
+  const homeCommand = useCreateMaintenanceCommandMutation(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+  const moveCommand = useCreateMaintenanceCommandMutation(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+  const deleteRun = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    actionsToDocument
+  )
 
   return {
     commandDocState,

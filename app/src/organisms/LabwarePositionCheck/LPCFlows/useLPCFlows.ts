@@ -73,7 +73,12 @@ export function useLPCFlows({
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation('lpc_flow')
 
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -134,11 +139,11 @@ export function useLPCFlows({
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation(commandDocState)
+    useCreateTargetedMaintenanceRunMutation(commandDocState, ['lpc_flow'])
   const { createLabwareDefinition } =
-    useCreateMaintenanceRunLabwareDefinitionMutation()
+    useCreateMaintenanceRunLabwareDefinitionMutation(commandDocState)
   const { deleteMaintenanceRun, isLoading: isClosing } =
-    useDeleteMaintenanceRunMutation(deletionDocState)
+    useDeleteMaintenanceRunMutation(deletionDocState, actionsToDocument)
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(
@@ -226,6 +231,9 @@ export function useLPCFlows({
           maintenanceRunId,
           ot2Offsets,
           analytics,
+          commandDocState,
+          actionsToDocument,
+          addActionToDocument,
         },
       }
     : {

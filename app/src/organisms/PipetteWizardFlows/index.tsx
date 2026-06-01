@@ -50,6 +50,7 @@ import { UnskippableModal } from './UnskippableModal'
 
 import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
+import type { PipetteWizardFlowName } from '@opentrons/react-api-client/src/access_control/types'
 import type {
   CreateCommand,
   LoadedPipette,
@@ -184,15 +185,27 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
-  const { commandDocState, deletionDocState } =
-    useMaintenanceRunDocumentation(initialDocstate)
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation(
+    wizardTitle as PipetteWizardFlowName,
+    initialDocstate
+  )
 
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands(commandDocState)
+    useChainMaintenanceCommands(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
       commandDocState,
+      [wizardTitle as PipetteWizardFlowName],
       {
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)
@@ -250,7 +263,7 @@ export const PipetteWizardFlows = (
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation(deletionDocState, {
+    useDeleteMaintenanceRunMutation(deletionDocState, actionsToDocument, {
       onSuccess: () => {
         closeFlow()
       },

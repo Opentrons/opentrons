@@ -20,6 +20,7 @@ import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 import type { SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
+import type { AttachingModule } from '@opentrons/react-api-client/src/access_control/types'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/redux/pipettes'
 import type { ModuleSetupWizardStep } from './types'
@@ -93,19 +94,32 @@ export function useModuleSetupWizard(
   }
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
 
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation('add_module')
 
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands(commandDocState)
+    useChainMaintenanceCommands(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation(commandDocState, {
-      onSuccess: (response: {
-        data: { id: SetStateAction<string | null> }
-      }) => {
-        setMaintenanceRunId(response.data.id)
-      },
-    })
+    useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
+      actionsToDocument,
+      {
+        onSuccess: (response: {
+          data: { id: SetStateAction<string | null> }
+        }) => {
+          setMaintenanceRunId(response.data.id)
+        },
+      }
+    )
 
   useMonitorMaintenanceRunForDeletion({
     maintenanceRunId,
@@ -130,6 +144,7 @@ export function useModuleSetupWizard(
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
     deletionDocState,
+    actionsToDocument,
     {
       onSuccess: () => {
         setMaintenanceRunId(null)
@@ -221,6 +236,7 @@ export function useModuleSetupWizard(
   const buildFlowForSelectedModule = (
     selectedModuleToBuildFlow: AttachedModule
   ): void => {
+    addActionToDocument(selectedModuleToBuildFlow as AttachingModule)
     dispatch({
       type: ACTIONS.BUILD_FLOW,
       attachedModule: selectedModuleToBuildFlow,

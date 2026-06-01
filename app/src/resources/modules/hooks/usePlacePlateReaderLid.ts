@@ -49,6 +49,7 @@ export function usePlacePlateReaderLid(
     pipetteInfo: null,
     commands: commandsToExecute,
     continuePastCommandFailure: true,
+    runName: 'place_plate_reader_lid',
   })
 
   const handlePlaceReaderLid = (): Promise<void> => {

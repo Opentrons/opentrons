@@ -16,7 +16,7 @@ import type {
   HostConfig,
   MaintenanceRun,
 } from '@opentrons/api-client'
-import type { DocumentationState } from '../access_control'
+import type { DocumentationState, DocumentedAction } from '../access_control'
 
 export type CreateMaintenanceRunType = UseMutateAsyncFunction<
   MaintenanceRun,
@@ -40,6 +40,7 @@ export type UseCreateMaintenanceRunMutationOptions = UseMutationOptions<
 
 export function useCreateMaintenanceRunMutation(
   documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
   options: UseCreateMaintenanceRunMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCreateMaintenanceRunMutationResult {
@@ -53,7 +54,7 @@ export function useCreateMaintenanceRunMutation(
     CreateMaintenanceRunData
   >(
     documentationState,
-    getQueryKey(host, 'maintenance_runs'),
+    actionsToDocument,
     (createMaintenanceRunData = {}) =>
       createMaintenanceRun(host!, createMaintenanceRunData)
         .then(response => response.data)

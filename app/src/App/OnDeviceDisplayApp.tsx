@@ -61,7 +61,7 @@ import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
-import { showDocumentationRequiredModal } from '../organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
+import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
@@ -260,7 +260,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     ) : null}
                     <NiceModal.Provider>
                       <DocumentationRequiredModalContext.Provider
-                        value={{ showDocumentationRequiredModal }}
+                        value={{
+                          showDocumentationRequiredModal: requireDocumentation,
+                        }}
                       >
                         <RobotEncryptionKeyTakeover>
                           <ToasterOven>

@@ -9,7 +9,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { RunAction } from '@opentrons/api-client'
-import type { DocumentationState } from '../access_control'
+import type { DocumentationState, DocumentedAction } from '../access_control'
 
 export type UseStopRunMutationResult = UseMutationResult<
   RunAction,
@@ -27,11 +27,14 @@ export type UseStopRunMutationOptions = UseMutationOptions<
 
 export const useStopRunMutation = (
   documentationState: DocumentationState,
+  actionsToDocument?: DocumentedAction[],
   options?: UseStopRunMutationOptions
 ): UseStopRunMutationResult => {
   const host = useHost()
+  const actions: DocumentedAction[] = [...(actionsToDocument ?? []), 'stop_run']
   const mutation = useDocumentedMutation<RunAction, unknown, string>(
     documentationState,
+    actions,
     getQueryKey(host, 'runs', RUN_ACTION_TYPE_STOP),
     (runId: string) =>
       createRunAction(host!, runId, {

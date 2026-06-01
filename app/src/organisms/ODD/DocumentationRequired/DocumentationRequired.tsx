@@ -9,14 +9,18 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './documentationrequired.module.css'
 
+import type { DocumentedAction } from '@opentrons/react-api-client'
+
 interface DocumentationRequiredProps {
   username: string
+  actionsToDocument: DocumentedAction[]
   onConfirm: (note: string) => void
   onBack: () => void
 }
 
 export function DocumentationRequired({
   username,
+  actionsToDocument,
   onConfirm,
   onBack,
 }: DocumentationRequiredProps): JSX.Element {

@@ -12,7 +12,7 @@ import type {
 } from 'react-query'
 import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { DocumentationState } from '../access_control'
+import type { DocumentationState, DocumentedAction } from '../access_control'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
   maintenanceRunId: string
@@ -40,7 +40,9 @@ export type UseCreateMaintenanceCommandMutationOptions = UseMutationOptions<
 >
 
 export function useCreateMaintenanceCommandMutation(
-  documentationState: DocumentationState
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void
 ): UseCreateMaintenanceCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
@@ -51,6 +53,7 @@ export function useCreateMaintenanceCommandMutation(
     CreateMaintenanceCommandMutateParams
   >(
     documentationState,
+    actionsToDocument,
     ({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
       createMaintenanceCommand(host!, maintenanceRunId, command, {
         waitUntilComplete,
@@ -64,6 +67,8 @@ export function useCreateMaintenanceCommandMutation(
                 `error invalidating maintenance runs query: ${e.message}`
               )
             })
+
+          addActionToDocument(response.data.data)
           return response.data
         })
         .catch((e: any) => {

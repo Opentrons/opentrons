@@ -10,7 +10,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { RunAction } from '@opentrons/api-client'
-import type { DocumentationState } from '../access_control'
+import type { DocumentationState, DocumentedAction } from '../access_control'
 
 export type UsePlayRunMutationResult = UseMutationResult<
   RunAction,
@@ -28,11 +28,14 @@ export type UsePlayRunMutationOptions = UseMutationOptions<
 
 export const usePlayRunMutation = (
   documentationState: DocumentationState,
+  actionsToDocument?: DocumentedAction[],
   options: UsePlayRunMutationOptions = {}
 ): UsePlayRunMutationResult => {
   const host = useHost()
+  const actions: DocumentedAction[] = [...(actionsToDocument ?? []), 'play_run']
   const mutation = useDocumentedMutation<RunAction, AxiosError, string>(
     documentationState,
+    actions,
     getQueryKey(host, 'runs', RUN_ACTION_TYPE_PLAY),
     (runId: string) =>
       createRunAction(host!, runId, {

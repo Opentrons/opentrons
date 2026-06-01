@@ -11,6 +11,7 @@ import { isDocumentationReportValid } from './utils'
 import type {
   DocumentationReport,
   DocumentationState,
+  DocumentedAction,
 } from '@opentrons/react-api-client'
 
 /**
@@ -37,10 +38,16 @@ export function useGuardedAction(
     DocumentationRequiredModalContext
   )
 
-  const showDocumentationModal = useCallback(async () => {
-    const docResult = await requireDocumentation(currentUsername ?? '')
-    return docResult
-  }, [currentUsername, requireDocumentation])
+  const showDocumentationModal = useCallback(
+    async (actionsToDocument: DocumentedAction[]) => {
+      const docResult = await requireDocumentation(
+        currentUsername ?? '',
+        actionsToDocument
+      )
+      return docResult
+    },
+    [currentUsername, requireDocumentation]
+  )
 
   const docState: DocumentationState = useMemo(() => {
     if (!accessControlEnabled) {
