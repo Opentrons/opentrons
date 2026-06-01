@@ -113,12 +113,6 @@ run-flex:
 	@echo "If you want to run a different version, run 'make run-flex OPENTRONS_VERSION=chore_release-8.0.0'"
 	docker run -p 31950:31950 --env-file ../robot-server/dev-flex.env opentrons-robot-server:$(OPENTRONS_VERSION)
 
-.PHONY: run-ot2
-run-ot2:
-	@echo "Running opentrons-robot-server:$(OPENTRONS_VERSION)"
-	@echo "If you want to run a different version, run 'make run-ot2 OPENTRONS_VERSION=chore_release-8.0.0'"
-	docker run -p 31950:31950 --env-file ../robot-server/dev.env opentrons-robot-server:$(OPENTRONS_VERSION)
-
 LIMIT ?= 10
 .PHONY: analyze
 analyze:

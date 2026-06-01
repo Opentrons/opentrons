@@ -1,11 +1,13 @@
 # Analyses Generation and Snapshot Testing
 
+Flex-only protocol analysis snapshot testing for this repository.
+
 ## Setup
 
 1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md) for javascript
 1. `cd analyses-snapshot-testing`
 1. have uv installed
-1. `make setup`
+1. `make setup` (creates a Python 3.12 virtual environment)
 
 ## Concepts
 
@@ -74,7 +76,7 @@ These are the property names in `protocols.py` and `protocols_with_overrides.py`
 
 ### Naming Convention in order
 
-- Robot (Flex)
+- Robot (Flex only)
 - Success (S) or Failure (X)
 - PD or API version
 - _PL_ = Protocol Library - (if applicable)
