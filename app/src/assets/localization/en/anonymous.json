@@ -37,6 +37,7 @@
   "flex_stacker_set_stored_labware_with_quantity_and_location": "Configure robot {{stackerColumn}} with {{quantity}} {{labwareAndLidDisplayNames}}",
   "flex_stacker_store": "Store into robot Stacker",
   "general_error_message": "If you keep getting this message, try restarting your app and robot. If this does not resolve the issue, contact support.",
+  "get_the_app": "Get the app",
   "gripper": "Gripper",
   "gripper_still_attached": "Gripper still attached",
   "gripper_successfully_attached_and_calibrated": "Gripper successfully attached and calibrated",

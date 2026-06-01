@@ -8,13 +8,10 @@ import {
 
 describe('branded copy', () => {
   it('branded and anonymous resources contain the same translation keys', () => {
-    const brandedKeys = Object.keys(resources.en[BRANDED_RESOURCE])
-    const anonymousKeys = Object.keys(resources.en[ANONYMOUS_RESOURCE])
+    const brandedKeys = Object.keys(resources.en[BRANDED_RESOURCE]).sort()
+    const anonymousKeys = Object.keys(resources.en[ANONYMOUS_RESOURCE]).sort()
 
-    brandedKeys.forEach((brandedKey, i) => {
-      const anonymousKey = anonymousKeys[i]
-      expect(brandedKey).toEqual(anonymousKey)
-    })
+    expect(anonymousKeys).toEqual(brandedKeys)
   })
 
   it('non-branded copy does not contain "Opentrons" or "Flex"', () => {
