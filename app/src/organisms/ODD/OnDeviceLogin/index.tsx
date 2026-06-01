@@ -142,12 +142,9 @@ export function OnDeviceLogin({
         ? loginError
         : null
 
-  const header =
-    step === 'confirmPassword'
-      ? t('on_device_login_confirm_password', { ns: 'device_settings' })
-      : isPasswordResetRequired
-        ? t('on_device_login_new_password', { ns: 'device_settings' })
-        : t('on_device_login', { ns: 'device_settings' })
+  const header = isPasswordResetRequired
+    ? t('on_device_login_new_password', { ns: 'device_settings' })
+    : t('on_device_login', { ns: 'device_settings' })
 
   const primaryButtonLabel =
     step === 'username' || (step === 'password' && isPasswordResetRequired)
