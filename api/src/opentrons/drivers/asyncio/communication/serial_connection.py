@@ -665,7 +665,7 @@ class AsyncResponseSerialConnection(SerialConnection):
                 if retry < retries and IS_ROBOT:
                     pass
                 else:
-                    raise e
+                    raise
 
             await self.on_retry()
         raise NoResponse(port=self._port, command=data)
