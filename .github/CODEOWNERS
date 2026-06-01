@@ -14,3 +14,4 @@
 /shared-data/python @Opentrons/py
 /shared-data/python_tests @Opentrons/py
 /shared-data/**/*.py @Opentrons/py
+/hardware-testing/** @Opentrons/hw-testing-reviewers

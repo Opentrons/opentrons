@@ -15,7 +15,8 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, OT3AxisKind
+from opentrons.hardware_control.types import OT3Mount, Axis, OT3AxisKind
+from opentrons.types import Point
 
 SLOT_MOUNT_TEST = 5
 Z_AXIS_TRAVEL_DISTANCE = 150.0

@@ -1,15 +1,16 @@
 import * as React from 'react'
+import { action } from 'storybook/actions'
 
 import {
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  LegacyStyledText,
+  DISPLAY_FLEX,
   PrimaryButton,
   SPACING,
+  StyledText,
   useLongPress,
 } from '@opentrons/components'
 
+import { AccountIconButton } from './AccountIconButton'
 import {
   QuaternaryButton,
   SubmitPrimaryButton,
@@ -29,42 +30,48 @@ export default {
 const TertiaryButtonTemplate: Story<
   ComponentProps<typeof TertiaryButton>
 > = args => {
-  const { children } = args
+  const { children, onClick } = args
   return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-      <TertiaryButton>{children}</TertiaryButton>
-    </Flex>
+    <div style={{ padding: SPACING.spacing16 }}>
+      <TertiaryButton onClick={onClick}>{children}</TertiaryButton>
+    </div>
   )
 }
 
 export const Tertiary = TertiaryButtonTemplate.bind({})
 Tertiary.args = {
   children: 'tertiary button',
+  onClick: () => {
+    action('tertiary button clicked')()
+  },
 }
 
 const QuaternaryButtonTemplate: Story<
   ComponentProps<typeof QuaternaryButton>
 > = args => {
-  const { children } = args
+  const { children, onClick } = args
   return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-      <QuaternaryButton>{children}</QuaternaryButton>
-    </Flex>
+    <div style={{ padding: SPACING.spacing16 }}>
+      <QuaternaryButton onClick={onClick}>{children}</QuaternaryButton>
+    </div>
   )
 }
 
 export const Quaternary = QuaternaryButtonTemplate.bind({})
 Quaternary.args = {
   children: 'quaternary button',
+  onClick: () => {
+    action('quaternary button clicked')()
+  },
 }
 
 const SubmitPrimaryButtonTemplate: Story<
   ComponentProps<typeof SubmitPrimaryButton>
 > = args => {
   return (
-    <Flex flexDirection={DIRECTION_ROW} width="15rem">
+    <div style={{ padding: SPACING.spacing16, width: '15rem' }}>
       <SubmitPrimaryButton {...args} />
-    </Flex>
+    </div>
   )
 }
 
@@ -73,7 +80,7 @@ SubmitPrimary.args = {
   form: 'storybook-form',
   value: 'submit primary button',
   onClick: () => {
-    console.log('submit primary button clicked')
+    action('submit primary button clicked')()
   },
   disabled: false,
 }
@@ -82,9 +89,9 @@ const TouchControlButtonTemplate: Story<
   ComponentProps<typeof TouchControlButton>
 > = args => {
   return (
-    <Flex>
+    <div style={{ padding: SPACING.spacing16 }}>
       <TouchControlButton {...args} />
-    </Flex>
+    </div>
   )
 }
 
@@ -95,7 +102,7 @@ TouchControl.args = {
   isActive: true,
   isOnDevice: false,
   onClick: () => {
-    console.log('touch control button clicked')
+    action('touch control button clicked')()
   },
 }
 
@@ -108,9 +115,9 @@ const ToggleButtonTemplate: Story<
     setIsToggled(currentIsToggled => !currentIsToggled)
   }
   return (
-    <Flex>
+    <div style={{ padding: SPACING.spacing16 }}>
       <ToggleButton {...rest} toggledOn={isToggled} onClick={handleClick} />
-    </Flex>
+    </div>
   )
 }
 
@@ -143,16 +150,19 @@ const LongPressButtonTemplate: Story<
   }, [longPress, longPress.isLongPressed])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+    <div
+      style={{
+        display: DISPLAY_FLEX,
+        flexDirection: DIRECTION_COLUMN,
+        padding: SPACING.spacing16,
+        gap: SPACING.spacing16,
+      }}
+    >
       <PrimaryButton ref={longPress.ref} width="16rem" onClick={handlePress}>
         {children}
       </PrimaryButton>
-      {
-        <LegacyStyledText
-          marginTop={SPACING.spacing16}
-        >{`You tapped ${tapCount} times`}</LegacyStyledText>
-      }
-    </Flex>
+      <StyledText>{`You tapped ${tapCount} times`}</StyledText>
+    </div>
   )
 }
 
@@ -176,3 +186,19 @@ const TextOnlyButtonTemplate: Story<
 }
 
 export const TextOnly = TextOnlyButtonTemplate.bind({})
+
+const AccountIconButtonTemplate: Story<
+  ComponentProps<typeof AccountIconButton>
+> = args => {
+  return (
+    <div>
+      <AccountIconButton {...args} />
+    </div>
+  )
+}
+
+export const AccountIcon = AccountIconButtonTemplate.bind({})
+AccountIcon.args = {
+  initial: 'F',
+  onClick: action('account icon button clicked'),
+}

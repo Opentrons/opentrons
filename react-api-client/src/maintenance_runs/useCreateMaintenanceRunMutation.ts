@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createMaintenanceRun } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../access_control'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -15,6 +16,7 @@ import type {
   HostConfig,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../access_control'
 
 export type CreateMaintenanceRunType = UseMutateAsyncFunction<
   MaintenanceRun,
@@ -37,6 +39,7 @@ export type UseCreateMaintenanceRunMutationOptions = UseMutationOptions<
 >
 
 export function useCreateMaintenanceRunMutation(
+  documentationState: DocumentationState,
   options: UseCreateMaintenanceRunMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCreateMaintenanceRunMutationResult {
@@ -44,11 +47,12 @@ export function useCreateMaintenanceRunMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     MaintenanceRun,
     AxiosError,
     CreateMaintenanceRunData
   >(
+    documentationState,
     getQueryKey(host, 'maintenance_runs'),
     (createMaintenanceRunData = {}) =>
       createMaintenanceRun(host!, createMaintenanceRunData)

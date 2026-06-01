@@ -43,6 +43,7 @@ import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import type { HostConfig } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
+import type { State } from '/app/redux/types'
 import type { LocalizationProviderProps } from '../../LocalizationProvider'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -97,11 +98,16 @@ const mockSettings = {
 } as OnDeviceDisplaySettings
 
 const render = (path = '/') => {
-  return renderWithProviders(
+  return renderWithProviders<State>(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <OnDeviceDisplayApp />
     </MemoryRouter>,
-    { i18nInstance: i18n }
+    {
+      initialState: {
+        robotAuth: { mostRecentRobotName: null, perRobotAuthStates: {} },
+      } satisfies Partial<State> as State,
+      i18nInstance: i18n,
+    }
   )
 }
 

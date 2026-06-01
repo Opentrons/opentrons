@@ -28,10 +28,15 @@ import {
   OT2_ROBOT_TYPE,
   STAGING_AREA_CUTOUTS,
   TRASH_BIN_ADAPTER_FIXTURE,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import {
+  getDeckConfiguration,
+  getInitialDeckSetup,
+} from '../../step-forms/selectors'
+import { useUpdateDeckConfigurationFromStartingDeck } from '../Designer/DeckSetup/hooks/useUpdateDeckConfigurationFromStartingDeck'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -64,6 +69,11 @@ interface DeckThumbnailProps {
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { hoverSlot, setHoverSlot, robotType } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const { deckConfig } = useSelector(getDeckConfiguration)
+  useUpdateDeckConfigurationFromStartingDeck({
+    activeDeckSetup: initialDeckSetup,
+    robotType,
+  })
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const trash = Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
@@ -103,6 +113,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
 
   const hasFlexStacker = Object.values(initialDeckSetup.modules).some(
     module => getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE
+  )
+  const hasVacuumModule = Object.values(initialDeckSetup.modules).some(
+    module => getModuleType(module.model) === VACUUM_MODULE_TYPE
   )
   const flexStackerLocations = Object.values(initialDeckSetup.modules)
     .filter(stacker => stacker.type === FLEX_STACKER_MODULE_TYPE)
@@ -216,12 +229,20 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     )
                   : null}
                 {wasteChuteFixtures.map(fixture => (
-                  <WasteChuteFixture
-                    key={fixture.id}
-                    cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-                    deckDefinition={deckDef}
-                    fixtureBaseColor={lightFill}
-                  />
+                  <Fragment key={fixture.id}>
+                    <SingleSlotFixture
+                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                      deckDefinition={deckDef}
+                      slotClipColor={COLORS.transparent}
+                      fixtureBaseColor={lightFill}
+                      showSlotClips={false}
+                    />
+                    <WasteChuteFixture
+                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                      deckDefinition={deckDef}
+                      fixtureBaseColor={lightFill}
+                    />
+                  </Fragment>
                 ))}
                 {wasteChuteStagingAreaFixtures.map(fixture => (
                   <WasteChuteStagingAreaFixture
@@ -243,13 +264,14 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               stagingAreaCutoutIds={stagingAreaFixturesAndStacker.map(
                 areas => areas.location as CutoutId
               )}
+              deckConfig={deckConfig}
               {...{
                 deckDef,
               }}
             />
             <SlotLabels
               robotType={robotType}
-              show4thColumn={stagingAreaFixtures.length > 0}
+              show4thColumn={stagingAreaFixtures.length > 0 || hasVacuumModule}
             />
           </>
         )}

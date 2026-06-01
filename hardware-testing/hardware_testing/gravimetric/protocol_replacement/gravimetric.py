@@ -468,6 +468,7 @@ class FixtureSettings(CSVSettings):
             trials=csv_settings.trials,
             name=csv_settings.name,
             run_id=run_id,
+            blank_trials=csv_settings.blank_trials,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
         )
@@ -1191,6 +1192,7 @@ def aspirate_with_liquid_class(
                 air_gap=0,
             )
         ],
+        max_pipette_and_tip_volume=tip,
         volume_for_pipette_mode_configuration=None,
     )
     fixture_settings.recorder.clear_sample_tag()

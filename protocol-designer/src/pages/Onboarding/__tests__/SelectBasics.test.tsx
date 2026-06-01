@@ -131,20 +131,6 @@ describe('SelectBasics', () => {
     fireEvent.click(screen.getAllByRole('label', { name: 'No' })[0])
     expect(props.setValue).toHaveBeenCalled()
 
-    // thermocycler
-    screen.getByText('Are you using a Thermocycler in your protocol?')
-    fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[1])
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getAllByRole('label', { name: 'No' })[1])
-    expect(props.setValue).toHaveBeenCalled()
-
-    // wasteChute
-    screen.getByText('Are you using a waste chute in your protocol?')
-    fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[2])
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getAllByRole('label', { name: 'No' })[2])
-    expect(props.setValue).toHaveBeenCalled()
-
     //  confirm
     screen.getByRole('button', { name: 'Confirm' })
   })

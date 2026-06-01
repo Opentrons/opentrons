@@ -144,6 +144,15 @@ class MaintenanceRunOrchestratorStore:
         assert self._created_at is not None, "Run not yet created."
         return self._created_at
 
+    def maintenance_run_door_watcher_callback_route_for_proxy(
+        self, event: HardwareEvent
+    ) -> None:
+        """Callback to expose the maintenance run door watcher callback to a remote processes."""
+        assert self._run_orchestrator is not None
+        self._run_orchestrator._protocol_engine._door_watcher._handle_proxy_hardware_door_event(
+            event
+        )
+
     async def create(
         self,
         run_id: str,
@@ -151,6 +160,7 @@ class MaintenanceRunOrchestratorStore:
         labware_offsets: Sequence[LegacyLabwareOffsetCreate | LabwareOffsetCreate],
         notify_publishers: Callable[[], None],
         deck_configuration: Optional[DeckConfigurationType] = [],
+        proxy_of_callback_for_handling_door_events: HardwareEventHandler | None = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -160,6 +170,7 @@ class MaintenanceRunOrchestratorStore:
             labware_offsets: Labware offsets to create the run with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             deck_configuration: The deck configuration to use.
+            proxy_of_callback_for_handling_door_events: The proxy-safe door watcher callback to be used when operating in subprocess mode.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -184,6 +195,10 @@ class MaintenanceRunOrchestratorStore:
             error_recovery_policy=error_recovery_policy.never_recover,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
+            proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
+            # Maintenance runs do not spin up subprocesses for "protocol execution", even in subprocess mode.
+            # However, they still need to register a proxy-friendly callback with the hardware api subprocess,
+            # to support this an optional proxy-safe callback is provided.
         )
         self._run_orchestrator = RunOrchestrator.build_orchestrator(
             run_id=run_id,

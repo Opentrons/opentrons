@@ -5,18 +5,15 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
-from server_utils.fastapi_utils.models.json_api.request import RequestModel
+from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
+from robot_server.fastapi_dependencies import AuditLogger
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
-from robot_server.runs.action_models import (
-    RunAction,
-    RunActionCreate,
-    RunActionType,
-)
+from robot_server.runs.action_models import RunAction, RunActionCreate, RunActionType
 from robot_server.runs.router.actions_router import create_run_action
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
@@ -28,9 +25,16 @@ def mock_run_controller(decoy: Decoy) -> RunController:
     return decoy.mock(cls=RunController)
 
 
+@pytest.fixture
+def mock_audit_logger(decoy: Decoy) -> AuditLogger:
+    """Get a fake AuditLogger dependency."""
+    return decoy.mock(cls=AuditLogger)
+
+
 async def test_create_run_action(
     decoy: Decoy,
     mock_run_controller: RunController,
+    mock_audit_logger: AuditLogger,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
@@ -39,7 +43,9 @@ async def test_create_run_action(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = RequestModel[RunActionCreate](
+        data=RunActionCreate(actionType=action_type),
+    )
     expected_result = RunAction(
         id="some-action-id",
         createdAt=created_at,
@@ -61,6 +67,7 @@ async def test_create_run_action(
     result = await create_run_action(
         runId=run_id,
         request_body=request_body,
+        audit_logger=mock_audit_logger,
         run_controller=mock_run_controller,
         action_id=action_id,
         created_at=created_at,
@@ -69,6 +76,10 @@ async def test_create_run_action(
         check_estop=True,
     )
 
+    decoy.verify(
+        await mock_audit_logger.log(resource_id=run_id, request_data=request_body.data),
+        times=1,
+    )
     assert result.content.data == expected_result
     assert result.status_code == 201
 
@@ -76,6 +87,7 @@ async def test_create_run_action(
 async def test_play_action_clears_maintenance_run(
     decoy: Decoy,
     mock_run_controller: RunController,
+    mock_audit_logger: AuditLogger,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
@@ -84,7 +96,9 @@ async def test_play_action_clears_maintenance_run(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = RequestModel[RunActionCreate](
+        data=RunActionCreate(actionType=action_type),
+    )
     expected_result = RunAction(
         id="some-action-id",
         createdAt=created_at,
@@ -108,6 +122,7 @@ async def test_play_action_clears_maintenance_run(
     result = await create_run_action(
         runId=run_id,
         request_body=request_body,
+        audit_logger=mock_audit_logger,
         run_controller=mock_run_controller,
         action_id=action_id,
         created_at=created_at,
@@ -131,6 +146,7 @@ async def test_play_action_clears_maintenance_run(
 async def test_create_play_action_not_allowed(
     decoy: Decoy,
     mock_run_controller: RunController,
+    mock_audit_logger: AuditLogger,
     exception: Exception,
     expected_error_id: str,
     expected_status_code: int,
@@ -142,7 +158,9 @@ async def test_create_play_action_not_allowed(
     action_id = "some-action-id"
     created_at = datetime(year=2021, month=1, day=1)
     action_type = RunActionType.PLAY
-    request_body = RequestModel(data=RunActionCreate(actionType=action_type))
+    request_body = RequestModel[RunActionCreate](
+        data=RunActionCreate(actionType=action_type),
+    )
 
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
@@ -161,6 +179,7 @@ async def test_create_play_action_not_allowed(
         await create_run_action(
             runId=run_id,
             request_body=request_body,
+            audit_logger=mock_audit_logger,
             run_controller=mock_run_controller,
             action_id=action_id,
             created_at=created_at,

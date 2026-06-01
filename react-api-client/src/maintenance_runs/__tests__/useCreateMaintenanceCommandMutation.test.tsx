@@ -35,9 +35,13 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       data: 'something',
     } as any)
 
-    const { result } = renderHook(() => useCreateMaintenanceCommandMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateMaintenanceCommandMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {
@@ -58,9 +62,13 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       data: 'something',
     } as any)
 
-    const { result } = renderHook(() => useCreateMaintenanceCommandMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateMaintenanceCommandMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {
