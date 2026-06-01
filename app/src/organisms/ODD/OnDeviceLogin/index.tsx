@@ -29,6 +29,8 @@ export interface OnDeviceLoginProps {
   submitPassword: (username: string, password: string) => void
   isAuthLoading: boolean
   onCancel: () => void
+  isPasswordResetRequired?: boolean
+  initialUsername?: string
   /** Shown under the password field with error styling when login fails */
   loginError?: string | null
   onClearLoginError?: () => void
@@ -40,16 +42,24 @@ export function OnDeviceLogin({
   submitPassword,
   isAuthLoading,
   onCancel,
+  isPasswordResetRequired = false,
+  initialUsername,
   loginError = null,
   onClearLoginError,
 }: OnDeviceLoginProps): JSX.Element {
   const { t } = useTranslation(['shared', 'device_settings'])
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
     defaultValues: {
-      username: '',
+      username: initialUsername ?? '',
       password: '',
     },
   })
+
+  useEffect(() => {
+    if (initialUsername != null && initialUsername !== '') {
+      setValue('username', initialUsername)
+    }
+  }, [initialUsername, setValue])
   const [showKeyboard, setShowKeyboard] = useState(false)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
@@ -88,7 +98,8 @@ export function OnDeviceLogin({
     <>
       <div className={styles.container}>
         <ChildNavigation
-          header={t('on_device_login', { ns: 'device_settings' })}
+          header={t('on_device_login', { ns: 'device_settings' })
+          }
           buttonText={
             step === 'username'
               ? t('next', { ns: 'shared' })
@@ -96,7 +107,7 @@ export function OnDeviceLogin({
           }
           buttonIsDisabled={primaryDisabled}
           onClickBack={
-            step === 'password'
+            step === 'password' && !isPasswordResetRequired
               ? () => {
                   onClearLoginError?.()
                   onStepChange('username')
@@ -121,6 +132,7 @@ export function OnDeviceLogin({
                   field={field}
                   step={step}
                   t={t}
+                  isPasswordResetRequired={isPasswordResetRequired}
                   loginError={passwordLabelHasError ? loginError : null}
                   onClearLoginError={onClearLoginError}
                   onFocus={() => {
@@ -154,6 +166,7 @@ export function OnDeviceLogin({
 interface LoginFieldInputProps {
   field: ControllerRenderProps<LoginFormValues, 'username' | 'password'>
   step: LoginStep
+  isPasswordResetRequired: boolean
   loginError: string | null
   t: TFunction
   onClearLoginError?: () => void
@@ -168,6 +181,7 @@ interface LoginFieldInputProps {
 function LoginFieldInput({
   field,
   step,
+  isPasswordResetRequired,
   loginError,
   onClearLoginError,
   onFocus,
@@ -186,7 +200,9 @@ function LoginFieldInput({
   const label =
     step === 'username'
       ? t('device_settings:username')
-      : t('device_settings:password')
+      : isPasswordResetRequired
+        ? t('device_settings:on_device_login_new_password')
+        : t('device_settings:password')
 
   const inputField = (
     <TouchInputField

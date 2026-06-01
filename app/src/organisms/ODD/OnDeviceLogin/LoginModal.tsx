@@ -1,8 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import {
+  useAccessControlEnabledQuery,
+  useSelfQuery,
+} from '@opentrons/react-api-client'
+
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
+import {
+  getCurrentUsernameForLocalRobot,
+  getIsLoggedInToLocalRobot,
+} from '/app/redux/robot-auth'
 
 import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
@@ -20,6 +30,26 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
+
+  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
+  const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
+  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const accessControlEnabled =
+    accessControlEnabledQuery.data?.data?.accessControlEnabled ?? false
+  const selfQuery = useSelfQuery({
+    enabled: accessControlEnabled && isLoggedIn,
+  })
+  const isPasswordResetRequired = selfQuery.data?.data.resetPassword ?? false
+
+  useEffect(() => {
+    if (
+      isPasswordResetRequired &&
+      currentUsername != null &&
+      currentUsername !== ''
+    ) {
+      setStep('password')
+    }
+  }, [isPasswordResetRequired, currentUsername])
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (username, response) => {
@@ -39,6 +69,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     modal.remove()
   }
 
+  const initialUsername =
+    isPasswordResetRequired && currentUsername != null ? currentUsername : undefined
+
   return (
     <div className={styles.overlay}>
       <OnDeviceLogin
@@ -46,6 +79,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         onStepChange={setStep}
         submitPassword={submitPassword}
         isAuthLoading={isAuthLoading}
+        isPasswordResetRequired={isPasswordResetRequired}
+        initialUsername={initialUsername}
         loginError={loginError}
         onClearLoginError={() => {
           setLoginError(null)

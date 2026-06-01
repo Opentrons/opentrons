@@ -74,3 +74,13 @@ export const WithLoginError: Story = {
     onClearLoginError: action('onClearLoginError'),
   },
 }
+
+/** Shown when the server has set resetPassword on the logged-in user. */
+export const PasswordResetRequired: Story = {
+  args: {
+    ...Default.args,
+    step: 'password',
+    isPasswordResetRequired: true,
+    initialUsername: 'alice',
+  },
+}
