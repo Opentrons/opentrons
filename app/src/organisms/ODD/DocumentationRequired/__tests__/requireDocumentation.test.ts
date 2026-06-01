@@ -22,7 +22,7 @@ describe('requireDocumentation', () => {
     const result = await requireDocumentation('alice', [])
 
     expect(result).toEqual('starting calibration' as DocumentationReport)
-    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice')
+    expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice', [])
   })
 
   it('returns empty string when the user backs out of the modal', async () => {
