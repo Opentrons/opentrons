@@ -2,27 +2,23 @@ import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  useAccessControlEnabledQuery,
-  useSelfQuery,
-} from '@opentrons/react-api-client'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { getIsLoggedInToLocalRobot } from '/app/redux/robot-auth'
+import { useLocalRobotAuthSelf } from '/app/resources/auth'
 
 import { LoggedOutOverlayMount } from '../LoggedOutOverlayMount'
 import { showLoginModal } from '../LoginModal'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
-  useSelfQuery: vi.fn(),
 }))
 
-vi.mock('/app/redux/robot-auth', async importOriginal => {
+vi.mock('/app/resources/auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as object),
-    getIsLoggedInToLocalRobot: vi.fn(),
+    useLocalRobotAuthSelf: vi.fn(),
   }
 })
 
@@ -51,10 +47,12 @@ const mockAccessControlEnabled = (enabled: boolean): void => {
 describe('LoggedOutOverlayMount', () => {
   beforeEach(() => {
     mockAccessControlEnabled(true)
-    vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
-    vi.mocked(useSelfQuery).mockReturnValue({
-      data: { data: { resetPassword: false } },
-    } as ReturnType<typeof useSelfQuery>)
+    vi.mocked(useLocalRobotAuthSelf).mockReturnValue({
+      username: null,
+      isLoggedIn: false,
+      resetPasswordRequired: false,
+      locked: false,
+    })
     vi.mocked(showLoginModal).mockResolvedValue({ username: 'alice' })
   })
 
@@ -71,10 +69,12 @@ describe('LoggedOutOverlayMount', () => {
   })
 
   it('renders the logged-out overlay when the user must reset their password', () => {
-    vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(true)
-    vi.mocked(useSelfQuery).mockReturnValue({
-      data: { data: { resetPassword: true } },
-    } as ReturnType<typeof useSelfQuery>)
+    vi.mocked(useLocalRobotAuthSelf).mockReturnValue({
+      username: 'alice',
+      isLoggedIn: true,
+      resetPasswordRequired: true,
+      locked: false,
+    })
 
     render()
 

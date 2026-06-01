@@ -1,18 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
-  useAccessControlEnabledQuery,
-  useSelfQuery,
-} from '@opentrons/react-api-client'
-
-import {
-  getCurrentUserForLocalRobot,
-  getIsLoggedInToLocalRobot,
-} from '/app/redux/robot-auth'
-import { useOAuth2PasswordLogin } from '/app/resources/auth'
+  useLocalRobotAuthSelf,
+  useOAuth2PasswordLogin,
+} from '/app/resources/auth'
 
 import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
@@ -31,25 +24,18 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [loginError, setLoginError] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
 
-  const { username: currentUsername } = useSelector(getCurrentUserForLocalRobot)
-  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
-  const accessControlEnabledQuery = useAccessControlEnabledQuery()
-  const accessControlEnabled =
-    accessControlEnabledQuery.data?.data?.accessControlEnabled ?? false
-  const selfQuery = useSelfQuery({
-    enabled: accessControlEnabled && isLoggedIn,
-  })
-  const isPasswordResetRequired = selfQuery.data?.data.resetPassword ?? false
+  const { username: currentUsername, resetPasswordRequired } =
+    useLocalRobotAuthSelf()
 
   useEffect(() => {
     if (
-      isPasswordResetRequired &&
+      resetPasswordRequired &&
       currentUsername != null &&
       currentUsername !== ''
     ) {
       setStep('password')
     }
-  }, [isPasswordResetRequired, currentUsername])
+  }, [resetPasswordRequired, currentUsername])
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (username, response) => {
@@ -70,7 +56,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   }
 
   const initialUsername =
-    isPasswordResetRequired && currentUsername != null
+    resetPasswordRequired && currentUsername != null
       ? currentUsername
       : undefined
 
@@ -81,7 +67,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         onStepChange={setStep}
         submitPassword={submitPassword}
         isAuthLoading={isAuthLoading}
-        isPasswordResetRequired={isPasswordResetRequired}
+        isPasswordResetRequired={resetPasswordRequired}
         initialUsername={initialUsername}
         loginError={loginError}
         onClearLoginError={() => {

@@ -22,9 +22,6 @@ interface PerRobotAuthState {
   /** The username that we're currently logged in as. */
   username: string
 
-  /**Whether the server requires this user to set a new password before continuing.*/
-  resetPassword: boolean
-
   /** The OAuth 2 access token, for making robot API requests. */
   accessToken: string
 
@@ -53,17 +50,11 @@ interface LogInOrRefreshPayload {
   accessToken: string
   refreshToken: string | null
   expiresAt: number | null
-  resetPassword?: boolean
 }
 
 /** Stores the result of logging out of a robot, or of a login naturally timing out. */
 interface LogOutOrTimeOutPayload {
   robotName: string
-}
-
-interface SetLocalRobotResetPasswordPayload {
-  robotName: string
-  resetPassword: boolean
 }
 
 const robotAuthSlice = createSlice({
@@ -88,17 +79,6 @@ const robotAuthSlice = createSlice({
     ) => {
       logOutOrTimeOut(stateDraft, action.payload)
     },
-    /** Updates whether the given robot requires a password reset. */
-    setLocalRobotResetPasswordRequired: (
-      stateDraft,
-      action: PayloadAction<SetLocalRobotResetPasswordPayload>
-    ) => {
-      const { robotName, resetPassword } = action.payload
-      const robotAuthState = stateDraft.perRobotAuthStates[robotName]
-      if (robotAuthState != null) {
-        robotAuthState.resetPassword = resetPassword
-      }
-    },
   },
 })
 
@@ -107,10 +87,7 @@ function logInOrRefresh(
   payload: LogInOrRefreshPayload
 ): void {
   const { robotName, ...perRobotAuth } = payload
-  stateDraft.perRobotAuthStates[robotName] = {
-    resetPassword: false,
-    ...perRobotAuth,
-  }
+  stateDraft.perRobotAuthStates[robotName] = perRobotAuth
   stateDraft.mostRecentRobotName = robotName
 }
 
@@ -125,13 +102,8 @@ function logOutOrTimeOut(
 
 export const robotAuthReducer = robotAuthSlice.reducer
 
-export const {
-  logIn,
-  refreshLogin,
-  logOut,
-  timeOutLogin,
-  setLocalRobotResetPasswordRequired,
-} = robotAuthSlice.actions
+export const { logIn, refreshLogin, logOut, timeOutLogin } =
+  robotAuthSlice.actions
 
 export type RobotAuthAction = ActionTypesFromSlice<
   typeof robotAuthSlice.actions
@@ -188,22 +160,18 @@ export const getIsLoggedInToLocalRobot = createSelector(
     localRobotAuthState != null
 )
 
-export interface CurrentUserForLocalRobot {
-  username: string | null
-  resetPasswordRequired: boolean
-}
-
 /**
- * On the on-device display, this returns the username and password-reset flag
- * for the user currently logged in to the local robot. On the desktop app, this
- * is not meaningful.
+ * On the on-device display, this returns the username of the user currently
+ * logged in to the local robot, or null if not logged in. On the desktop app,
+ * this is not meaningful.
+ *
+ * For server-driven flags such as `resetPassword`, use `useLocalRobotAuthSelf`
+ * from `/app/resources/auth`.
  */
-export const getCurrentUserForLocalRobot = createSelector(
+export const getCurrentUsernameForLocalRobot = createSelector(
   getLocalRobotAuthState,
-  (localRobotAuthState): CurrentUserForLocalRobot => ({
-    username: localRobotAuthState?.username ?? null,
-    resetPasswordRequired: localRobotAuthState?.resetPassword ?? false,
-  })
+  (localRobotAuthState): string | null =>
+    localRobotAuthState?.username ?? null
 )
 
 interface GetNextExpirationResult {

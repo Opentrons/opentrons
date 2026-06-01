@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-import { getCurrentUserForLocalRobot } from '/app/redux/robot-auth'
+import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isDocumentationReportValid } from './utils'
@@ -29,7 +29,7 @@ export function useGuardedAction(
   docreport?: DocumentationReport
 ): DocumentationState {
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
-  const { username: currentUsername } = useSelector(getCurrentUserForLocalRobot)
+  const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
 
