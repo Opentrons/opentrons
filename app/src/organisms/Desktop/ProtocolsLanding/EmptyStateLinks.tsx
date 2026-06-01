@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 
 const PROTOCOL_LIBRARY_URL = 'https://library.opentrons.com'
-const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
+const PROTOCOL_DESIGNER_URL = 'https://ot2.designer.opentrons.com'
 const API_DOCS_URL = 'https://docs.opentrons.com/v2/'
 
 interface Props {

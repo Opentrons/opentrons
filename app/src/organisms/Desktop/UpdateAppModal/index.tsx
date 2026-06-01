@@ -60,7 +60,7 @@ const PlaceholderError = ({
   )
 }
 export const RELEASE_NOTES_URL_BASE =
-  'https://github.com/Opentrons/opentrons/releases/tag/v'
+  'https://github.com/Opentrons/opentrons-ot2/releases/tag/v'
 const UPDATE_ERROR = 'Update Error'
 
 const UpdateAppBanner = styled(Banner)`
