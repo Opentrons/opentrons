@@ -84,3 +84,13 @@ export const PasswordResetRequired: Story = {
     initialUsername: 'alice',
   },
 }
+
+/** Confirm-password step in the reset-password flow. */
+export const PasswordResetConfirmPassword: Story = {
+  args: {
+    ...Default.args,
+    step: 'confirmPassword',
+    isPasswordResetRequired: true,
+    initialUsername: 'alice',
+  },
+}

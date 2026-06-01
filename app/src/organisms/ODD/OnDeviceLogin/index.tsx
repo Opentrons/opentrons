@@ -16,12 +16,15 @@ import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
-export type LoginStep = 'username' | 'password'
+export type LoginStep = 'username' | 'password' | 'confirmPassword'
 
 interface LoginFormValues {
   username: string
   password: string
+  confirmPassword: string
 }
+
+type LoginFieldName = keyof LoginFormValues
 
 export interface OnDeviceLoginProps {
   step: LoginStep
@@ -48,10 +51,14 @@ export function OnDeviceLogin({
   onClearLoginError,
 }: OnDeviceLoginProps): JSX.Element {
   const { t } = useTranslation(['shared', 'device_settings'])
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(
+    null
+  )
   const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
       password: '',
+      confirmPassword: '',
     },
   })
 
@@ -60,59 +67,113 @@ export function OnDeviceLogin({
       setValue('username', initialUsername)
     }
   }, [initialUsername, setValue])
+
   const [showKeyboard, setShowKeyboard] = useState(false)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
   const username = watch('username')
   const password = watch('password')
+  const confirmPassword = watch('confirmPassword')
+
+  const activeFieldName: LoginFieldName =
+    step === 'confirmPassword'
+      ? 'confirmPassword'
+      : step === 'username'
+        ? 'username'
+        : 'password'
+
+  const keyboardFieldValue =
+    activeFieldName === 'username'
+      ? username
+      : activeFieldName === 'confirmPassword'
+        ? confirmPassword
+        : password
 
   // reset keyboard input when switching steps
   useEffect(() => {
     if (!showKeyboard) return
     const kb = keyboardRef.current
     if (kb == null) return
-    kb.setInput(step === 'username' ? username : password)
-  }, [step, showKeyboard, username, password])
+    kb.setInput(keyboardFieldValue)
+  }, [step, showKeyboard, keyboardFieldValue])
 
   const handleNext = (): void => {
-    const { username, password } = getValues()
+    const { username, password, confirmPassword: confirm } = getValues()
     if (step === 'username') {
       if (username.trim() === '') return
       onStepChange('password')
       return
     }
-    if (password.trim() === '') return
+    if (step === 'password') {
+      if (password.trim() === '') return
+      if (isPasswordResetRequired) {
+        setConfirmPasswordError(null)
+        onStepChange('confirmPassword')
+        return
+      }
+      submitPassword(username, password)
+      return
+    }
+    if (confirm.trim() === '') return
+    if (confirm !== password) {
+      setConfirmPasswordError(
+        t('on_device_login_password_mismatch', { ns: 'device_settings' })
+      )
+      return
+    }
+    setConfirmPasswordError(null)
     submitPassword(username, password)
   }
 
   const primaryDisabled =
     step === 'username'
       ? username.trim() === ''
-      : password.trim() === '' || isAuthLoading
+      : step === 'password'
+        ? password.trim() === '' || isAuthLoading
+        : confirmPassword.trim() === '' || isAuthLoading
 
-  const activeFieldName = step === 'username' ? 'username' : 'password'
   const passwordLabelHasError =
     step === 'password' && loginError != null && loginError !== ''
+
+  const fieldError =
+    step === 'confirmPassword'
+      ? confirmPasswordError
+      : passwordLabelHasError
+        ? loginError
+        : null
+
+  const header =
+    step === 'confirmPassword'
+      ? t('on_device_login_confirm_password', { ns: 'device_settings' })
+      : isPasswordResetRequired
+        ? t('on_device_login_new_password', { ns: 'device_settings' })
+        : t('on_device_login', { ns: 'device_settings' })
+
+  const primaryButtonLabel =
+    step === 'username' || (step === 'password' && isPasswordResetRequired)
+      ? t('next', { ns: 'shared' })
+      : t('confirm', { ns: 'shared' })
 
   return (
     <>
       <div className={styles.container}>
         <ChildNavigation
-          header={t('on_device_login', { ns: 'device_settings' })
-          }
-          buttonText={
-            step === 'username'
-              ? t('next', { ns: 'shared' })
-              : t('confirm', { ns: 'shared' })
-          }
+          header={header}
+          buttonText={primaryButtonLabel}
           buttonIsDisabled={primaryDisabled}
           onClickBack={
-            step === 'password' && !isPasswordResetRequired
+            step === 'confirmPassword'
               ? () => {
+                  setConfirmPasswordError(null)
                   onClearLoginError?.()
-                  onStepChange('username')
+                  onStepChange('password')
                 }
-              : undefined
+              : step === 'password' && !isPasswordResetRequired
+                ? () => {
+                    onClearLoginError?.()
+                    onStepChange('username')
+                  }
+                : undefined
           }
           secondaryButtonProps={{
             buttonText: t('cancel', { ns: 'shared' }),
@@ -133,8 +194,11 @@ export function OnDeviceLogin({
                   step={step}
                   t={t}
                   isPasswordResetRequired={isPasswordResetRequired}
-                  loginError={passwordLabelHasError ? loginError : null}
-                  onClearLoginError={onClearLoginError}
+                  loginError={fieldError}
+                  onClearLoginError={() => {
+                    setConfirmPasswordError(null)
+                    onClearLoginError?.()
+                  }}
                   onFocus={() => {
                     setShowKeyboard(true)
                   }}
@@ -149,7 +213,7 @@ export function OnDeviceLogin({
           <AccordionKeyboard isOpen={showKeyboard} onToggle={() => {}}>
             <FullKeyboard
               onChange={(input: string) => {
-                setValue(step === 'username' ? 'username' : 'password', input, {
+                setValue(activeFieldName, input, {
                   shouldDirty: true,
                   shouldTouch: true,
                 })
@@ -164,7 +228,7 @@ export function OnDeviceLogin({
 }
 
 interface LoginFieldInputProps {
-  field: ControllerRenderProps<LoginFormValues, 'username' | 'password'>
+  field: ControllerRenderProps<LoginFormValues, LoginFieldName>
   step: LoginStep
   isPasswordResetRequired: boolean
   loginError: string | null
@@ -189,7 +253,8 @@ function LoginFieldInput({
 }: LoginFieldInputProps): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const isPasswordHidden = step === 'password' && !showPassword
+  const isPasswordField = step === 'password' || step === 'confirmPassword'
+  const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
   const togglePasswordVisibility = (): void => {
@@ -200,14 +265,16 @@ function LoginFieldInput({
   const label =
     step === 'username'
       ? t('device_settings:username')
-      : isPasswordResetRequired
-        ? t('device_settings:on_device_login_new_password')
-        : t('device_settings:password')
+      : step === 'confirmPassword'
+        ? t('device_settings:on_device_login_confirm_password')
+        : isPasswordResetRequired
+          ? t('device_settings:on_device_login_new_password')
+          : t('device_settings:password')
 
   const inputField = (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
-      autoFocus={step === 'password'}
+      autoFocus={isPasswordField}
       type={inputType}
       label={label}
       error={loginError}
@@ -223,7 +290,7 @@ function LoginFieldInput({
     />
   )
 
-  if (step !== 'password') return inputField
+  if (!isPasswordField) return inputField
 
   return (
     <div className={styles.password_field_row}>
