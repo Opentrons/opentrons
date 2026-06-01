@@ -2,14 +2,15 @@
 import argparse
 import asyncio
 
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
-TIP_POS = types.Point(x=100, y=100, z=100)
+TIP_POS = Point(x=100, y=100, z=100)
 
 
 async def _main(is_simulating: bool) -> None:
-    mount = types.OT3Mount.LEFT
+    mount = OT3Mount.LEFT
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, pipette_left="p1000_single_v3.3"
     )
@@ -25,7 +26,7 @@ async def _main(is_simulating: bool) -> None:
     # drop the tip (in place)
     await api.drop_tip(mount)
     # disengage XY axes when done
-    await api.disengage_axes([types.Axis.X, types.Axis.Y])
+    await api.disengage_axes([Axis.X, Axis.Y])
 
 
 if __name__ == "__main__":

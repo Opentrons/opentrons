@@ -50,11 +50,8 @@ from .pressure import (  # type: ignore[import]
     PRESSURE_ASPIRATE_DELTA_SPEC,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import (
-    OT3Mount,
-    Point,
-    Axis,
-)
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 
 
 DEFAULT_SLOT_TIP_RACK_1000 = 7
