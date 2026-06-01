@@ -13,7 +13,8 @@ from opentrons.hardware_control.modules import FlexStacker, PlatformState
 from opentrons.hardware_control.modules.types import HopperDoorState
 
 from hardware_testing import data
-from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction, TOFSensor
 from opentrons.drivers.flex_stacker.utils import NUMBER_OF_BINS

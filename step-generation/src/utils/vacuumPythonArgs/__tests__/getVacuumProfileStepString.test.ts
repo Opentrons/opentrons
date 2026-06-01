@@ -17,7 +17,7 @@ describe('getVacuumProfileStepString', () => {
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[
     {
-        "gauge_pressure": 55,
+        "gauge_pressure_mbar": 55,
         "hold_time_seconds": 12,
         "vent_after": False,
     }
@@ -33,7 +33,7 @@ describe('getVacuumProfileStepString', () => {
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[
     {
-        "power_percent": 30,
+        "percent_power": 30,
         "hold_time_seconds": 5,
         "vent_after": False,
     }
@@ -59,7 +59,7 @@ describe('getVacuumProfileStepString', () => {
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[
     {
-        "gauge_pressure": 30,
+        "gauge_pressure_mbar": 30,
         "hold_time_seconds": 5,
         "vent_after": False,
     }
@@ -86,12 +86,12 @@ describe('getVacuumProfileStepString', () => {
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[
     {
-        "gauge_pressure": 10,
+        "gauge_pressure_mbar": 10,
         "hold_time_seconds": 1,
         "vent_after": False,
     },
     {
-        "gauge_pressure": 20,
+        "gauge_pressure_mbar": 20,
         "hold_time_seconds": 2,
         "vent_after": False,
     }
@@ -123,17 +123,17 @@ describe('getVacuumProfileStepString', () => {
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[
     {
-        "gauge_pressure": 100,
+        "gauge_pressure_mbar": 100,
         "hold_time_seconds": 1,
         "vent_after": False,
     },
     {
-        "power_percent": 30,
+        "percent_power": 30,
         "hold_time_seconds": 5,
         "vent_after": False,
     },
     {
-        "power_percent": 30,
+        "percent_power": 30,
         "hold_time_seconds": 5,
         "vent_after": False,
     }
@@ -165,12 +165,12 @@ describe('getVacuumProfileStepString', () => {
     expect(getVacuumProfileStepString(profile)).toEqual([
       `profile=[
     {
-        "gauge_pressure": 1,
+        "gauge_pressure_mbar": 1,
         "hold_time_seconds": 1,
         "vent_after": False,
     },
     {
-        "power_percent": 50,
+        "percent_power": 50,
         "hold_time_seconds": 2,
         "vent_after": True,
     }

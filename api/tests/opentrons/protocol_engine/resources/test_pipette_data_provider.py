@@ -91,7 +91,9 @@ def test_get_virtual_pipette_static_config(
         shaft_ul_per_mm=0.785,
         available_sensors=AvailableSensorDefinition(sensors=[]),
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={VolumeModes.default: 1.0},
+        available_volume_modes_min_and_max_vol={
+            VolumeModes.default: {"min_volume": 1.0, "max_volume": 20.0}
+        },
     )
 
 
@@ -134,9 +136,9 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 0.5,
+        available_volume_modes_min_and_max_vol={
+            VolumeModes.default: {"min_volume": 5.0, "max_volume": 50.0},
+            VolumeModes.lowVolumeDefault: {"min_volume": 0.5, "max_volume": 30.0},
         },
     )
     subject_instance.configure_virtual_pipette_for_volume(
@@ -176,9 +178,9 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 0.5,
+        available_volume_modes_min_and_max_vol={
+            VolumeModes.default: {"min_volume": 5.0, "max_volume": 50.0},
+            VolumeModes.lowVolumeDefault: {"min_volume": 0.5, "max_volume": 30.0},
         },
     )
 
@@ -219,8 +221,8 @@ def test_load_virtual_pipette_by_model_string(
         shaft_ul_per_mm=9.621,
         available_sensors=AvailableSensorDefinition(sensors=[]),
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={
-            VolumeModes.default: 20.0,
+        available_volume_modes_min_and_max_vol={
+            VolumeModes.default: {"min_volume": 20.0, "max_volume": 300.0},
         },
     )
 
@@ -376,7 +378,7 @@ def test_get_pipette_static_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
-        available_volume_modes_min_vol={},
+        available_volume_modes_min_and_max_vol={},
     )
 
 
