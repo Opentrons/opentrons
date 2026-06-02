@@ -93,6 +93,7 @@ jobs:
         with:
           pattern: frontend-unit-test-result-shard-*
           merge-multiple: true
+          path: .vitest-reports
       - name: 'Merge frontend test report shards'
         run: pnpm vitest --merge-reports
 
