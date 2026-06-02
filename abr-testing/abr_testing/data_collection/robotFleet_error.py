@@ -38,7 +38,14 @@ def retrieve_version_file(
     version_file_path = "/etc/VERSION.json"
     save_dir = Path(f"{storage}")
     key_path = Path(storage)/"robot_key"
-    command = ["scp", "-i", str(key_path), "-r", f"root@{robot_ip}:{version_file_path}", save_dir]
+    command = [
+        "scp",
+        "-i", str(key_path),
+        "-o", "StrictHostKeyChecking=no",
+        "-r",
+        f"root@{robot_ip}:{version_file_path}",
+        save_dir,
+    ]
     try:
         subprocess.run(command, check=True)  # type: ignore
         return os.path.join(save_dir, "VERSION.json")
@@ -50,19 +57,27 @@ def retrieve_version_file(
 def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
     """Save all capture images for a run."""
     save_dir = Path(f"{storage}")
-    new_save_dir = Path(f"{storage}/{run_id}")
-    command = ["scp", "-r", f"root@{robot_ip}:/data/images/{run_id}/", save_dir]
-    zip_path = f"storage_directory/{run_id}_images.zip"
+    new_save_dir = save_dir / run_id
+    key_path = save_dir / "robot_key"
+    zip_path = save_dir / f"{run_id}_images"
+    command = [
+        "scp",
+        "-i", str(key_path),
+        "-o", "StrictHostKeyChecking=no",
+        "-r",
+        f"root@{robot_ip}:/data/images/{run_id}/",
+        save_dir,
+    ]
     try:
         subprocess.run(command, check=True)  # type: ignore
         shutil.make_archive(
-            base_name=str(zip_path).replace(".zip", ""),
+            base_name=str(zip_path),
             format="zip",
-            root_dir=save_dir,
+            root_dir=new_save_dir,
         )
         subprocess.run(["rm", "-r", new_save_dir], check=True)
         print("Image folder transfered successful!")
-        return str(zip_path)
+        return str(zip_path) + ".zip"
     except subprocess.CalledProcessError as e:
         print(f"Error during file transfer: {e}")
     return ""
@@ -73,6 +88,8 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
     # List folders in the robot's directory
     list_folder_command = [
         "ssh",
+        "-i", str(Path(storage) / "robot_key"),
+        "-o", "StrictHostKeyChecking=no",
         f"root@{robot_ip}",
         "ls /var/lib/opentrons-robot-server",
     ]
@@ -111,7 +128,15 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
 
     # Copy protocol file found in robot onto host computer
     save_dir = Path(f"{storage}")
-    command = ["scp", "-r", f"root@{robot_ip}:{protocol_dir}", save_dir]
+    key_path = Path(storage) / "robot_key"
+    command = [
+        "scp",
+        "-i", str(key_path),
+        "-o", "StrictHostKeyChecking=no",
+        "-r",
+        f"root@{robot_ip}:{protocol_dir}",
+        save_dir,
+    ]
     try:
         # If file found and copied return path to file
         subprocess.run(command, check=True)  # type: ignore
@@ -195,7 +220,7 @@ def match_error_to_component(
 
 def get_parent_key(url: str, api_token: str, email: str, project_key: str, parent_name: str) -> str:
     """Find a project key from a name"""
-    jql = f'project = {project_key} AND summary ~ "{parent_name}"'
+    jql = f'project = {project_key} AND summary ~ "{parent_name}"' #we can make this hit everything not just the project
     response = requests.post(
         f"{url}/rest/api/3/search/jql",
         json={"jql": jql, "fields": ["summary"], "maxResults": 50},
@@ -309,9 +334,13 @@ def get_robot_state(
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    parent_name = affects_version + " Bugs" #fix
-    parent = get_parent_key(url, api_token, email, project_key, parent_name)
-    #print(f"parent: {parent}")
+    if project_key == 826: #217 is ABR
+        parent_name = affects_version + " Bugs"
+        parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    else:
+        parent_name = robot
+        parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    print(f"parent: {parent}")
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -354,8 +383,6 @@ def get_run_error_info_from_robot(
     #components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, str(error_type), components)
     affects_version = results["API_Version"]
-    if affects_version == "9.0.0":
-        affects_version = "9.0.0-alpha.16"
     #if "alpha" in affects_version:
     components.append("flex internal release")
     if "flexStacker" in str(description):
@@ -364,8 +391,13 @@ def get_run_error_info_from_robot(
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    parent_name = affects_version + " Bugs"
-    parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    if project_key == 826: #217 is ABR
+        parent_name = affects_version + " Bugs"
+        parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    else:
+        parent_name = robot
+        parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    print(f"parent: {parent}")
 
     summary = robot + "_" + str(one_run) + "_" + str(error_code) + "_" + error_type
     # Description of error
