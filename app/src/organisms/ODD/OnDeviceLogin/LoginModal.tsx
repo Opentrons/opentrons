@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
