@@ -1239,7 +1239,6 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
 
             protocol.comment("--> Wash 1")
-            # TWBMaxVol = 12
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
             p200.flow_rate.dispense = p200_flow_rate_dispense_default
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
@@ -1320,7 +1319,6 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
 
             protocol.comment("--> Wash 2")
-            # TWBMaxVol = 3
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
             p200.flow_rate.dispense = p200_flow_rate_dispense_default
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
@@ -1398,7 +1396,6 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
 
             protocol.comment("--> Wash 3")
-            # TWBMaxVol = 10
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
             p200.flow_rate.dispense = p200_flow_rate_dispense_default
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
@@ -2134,7 +2131,6 @@ def run(protocol: ProtocolContext) -> None:
                 thermocycler.close_lid()
 
             protocol.comment("--> ADDING SMB")
-            # SMBVol = 7.0
             SampleVol = 7
             # SMBPremix = 3 if DRYRUN is False else 1
             p200.flow_rate.aspirate = p50_flow_rate_aspirate_default * 0.5

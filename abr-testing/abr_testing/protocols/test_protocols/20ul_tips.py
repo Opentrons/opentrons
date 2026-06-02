@@ -39,9 +39,9 @@ def run(protocol: ProtocolContext) -> None:
 
     # instruments and waste chute
     p200 = protocol.load_instrument("flex_96channel_200", "left")
-    # p200_flow_rate_aspirate_default = 20
-    # p200_flow_rate_dispense_default = 20
-    # p200_flow_rate_blow_out_default = 40
+    p200_flow_rate_aspirate_default = 20  # noqa: F841
+    p200_flow_rate_dispense_default = 20  # noqa: F841
+    p200_flow_rate_blow_out_default = 40  # noqa: F841
     p200.configure_nozzle_layout(style=ALL)
 
     trash = protocol.load_waste_chute()
