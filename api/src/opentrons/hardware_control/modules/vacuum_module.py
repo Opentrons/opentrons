@@ -522,6 +522,8 @@ class VacuumModule(mod_abc.AbstractModule):
     async def _wait_for_target(self) -> None:
         if self._reader.operation_mode == VacuumModuleOperationMode.POWER:
             await self._reader.update_pump_state()
+            if not self._reader.pump_state.pump_running:
+                return
             # should there be a tolerance here?
             while (
                 self._reader.pump_state.current_pwm
@@ -530,6 +532,8 @@ class VacuumModule(mod_abc.AbstractModule):
                 await self._poller.wait_next_poll()
         elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
             await self._reader.update_vacuum_state()
+            if not self._reader.vacuum_state.vacuum_enabled:
+                return
             while (
                 self._reader.vacuum_state.current_gauge_pressure
                 != self._reader.vacuum_state.target_gauge_pressure
