@@ -177,7 +177,7 @@ Continue to unpack the Flex and get it off the crate base.
 
     ![Shipping bag being removed from the Flex robot.](../images/unboxing/8-shipping-bag.svg "Unboxing step 8")
 
-9. Using a team with sufficient personnel to move the Flex safely, grab the handholds in the orange shipping frames on either side of the base, lift the robot off the crate, and set it down on the floor."
+9. Using a team with sufficient personnel to move the Flex safely, grab the handholds in the orange shipping frames on either side of the base, lift the robot off the crate, and set it down on the floor.
 
     ![Location of handholds for lifting the Flex robot.](../images/unboxing/9-lift-off-base.svg "Unboxing step 9")
 
