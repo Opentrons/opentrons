@@ -7,7 +7,7 @@ from statistics import mean
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api.types import Axis, OT3Mount
+from opentrons.hardware_control.types import Axis, OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.data import ui
 
