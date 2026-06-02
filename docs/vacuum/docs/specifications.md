@@ -15,18 +15,18 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 <div class="parts-list align-top" markdown>
 
 <figure markdown>
-![Short vacuum collar](images/image-placeholder.png "Short vacuum collar")
-<figcaption>(1) Short vacuum collar</figcaption>
+![Short vacuum collar](images/short-collar.jpg "Short vacuum collar")
+<figcaption>(1) Short (42 mm) vacuum collar </figcaption>
 </figure>
 
 <figure markdown>
-![Tall vacuum collar](images/image-placeholder.png "Tall vacuum collar")
-<figcaption>(1) Tall vacuum collar</figcaption>
+![Tall vacuum collar](images/tall-collar.jpg "Tall vacuum collar")
+<figcaption>(1) Tall (72 mm) vacuum collar</figcaption>
 </figure>
 
 <figure markdown>
-![Vacuum collar gasket](images/image-placeholder.png "Vacuum collar gasket")
-<figcaption>(1) Collar gasket</figcaption>
+![xx mm and yy mm spacers](images/spacers.png "xx mm and yy mmspacers")
+<figcaption>(2) 14 mm and 17 mm spacers</figcaption>
 </figure>
 
 <figure markdown>
@@ -43,7 +43,7 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 <div class="parts-list align-top" markdown>
 
 <figure markdown>
-![Control Box, vacuum pump and electronics](images/image-placeholder.png "Control Box includes pump and electronics")
+![Control Box, vacuum pump and electronics](images/pump-unit.png "Control Box includes pump and electronics")
 <figcaption>(1) Control Box</figcaption>
 </figure>
 
@@ -80,12 +80,12 @@ Unnamed box 3 includes items that connect the manifold to the waste collection c
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Glass carboy and cap, for waste collection](images/waste-jar2.png "Glass carboy and cap, for waste collection")
+![Glass carboy and cap, for waste collection](images/carboy.png "Glass carboy and cap, for waste collection"){ width="70%" }
 <figcaption>(1) Carboy and cap</figcaption>
 </figure>
 
 <figure markdown>
-![Carboy cradle](images/image-placeholder.png "Carboy cradle")
+![Carboy cradle](images/carboy-cradle.png "Carboy cradle")
 <figcaption>(1) Carboy cradle</figcaption>
 </figure>
 
