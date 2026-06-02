@@ -61,7 +61,7 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                                     console.print(f"{w[key]}")
                         files_with_unexpected_errors.append(file_path)
                 else:
-                    # OT2 protocols are expected to fail with an OT-2 compatibility error
+                    # Flex_X and other failure-case protocols are expected to have errors
                     if not errors_present and not has_error_key:
                         files_missing_expected_errors.append(file_path)
 
