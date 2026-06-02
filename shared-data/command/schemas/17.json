@@ -6693,6 +6693,12 @@
           "default": null,
           "description": "The id of the profile task",
           "title": "Taskid"
+        },
+        "ventAfter": {
+          "default": false,
+          "description": "Whether to open the vent after the profile is complete.",
+          "title": "Ventafter",
+          "type": "boolean"
         }
       },
       "required": ["moduleId", "profile"],
