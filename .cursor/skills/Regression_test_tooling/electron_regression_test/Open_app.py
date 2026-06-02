@@ -1,3 +1,5 @@
+"""Launch the Opentrons desktop app and attach Playwright over CDP."""
+
 from __future__ import annotations
 
 import os
@@ -6,6 +8,7 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
+
 from playwright.sync_api import Browser, Page, Playwright, sync_playwright
 
 from automation.helpers.app_readiness import dismiss_blocking_ui
@@ -43,7 +46,7 @@ def _wait_for_cdp(debug_port: int, timeout: float = 30.0) -> None:
 
 
 def launch_app(*, debug_port: int = DEBUG_PORT, quiet: bool = True) -> subprocess.Popen:
-    """Launch Opentrons with remote debugging. Returns immediately once CDP is up."""
+    """Launch Opentrons with remote debugging. Returns once CDP is up."""
     app_path = get_opentrons_path()
     print(f"Launching Opentrons from: {app_path}")
 
@@ -84,7 +87,7 @@ def _find_app_page(context) -> Page:
 
 
 def connect_playwright(*, debug_port: int = DEBUG_PORT) -> tuple[Playwright, Browser, Page]:
-    """Connect Playwright to a running Opentrons app. Caller must keep Playwright alive."""
+    """Connect Playwright to a running Opentrons app. Caller must stop Playwright."""
     playwright = sync_playwright().start()
     cdp_url = f"http://127.0.0.1:{debug_port}"
     print(f"Connecting Playwright to {cdp_url}...")
@@ -103,18 +106,11 @@ def launch_and_connect(
     return process, playwright, browser, page
 
 
-_app_process: subprocess.Popen | None = None
-_playwright: Playwright | None = None
-_browser: Browser | None = None
-page: Page | None = None
-
-
-def init(*, debug_port: int = DEBUG_PORT, quiet: bool = True) -> Page:
-    """Launch the app, connect Playwright, and expose the active page."""
-    global _app_process, _playwright, _browser, page
-    _app_process, _playwright, _browser, page = launch_and_connect(
-        debug_port=debug_port,
-        quiet=quiet,
-    )
+def prepare_app_page(page: Page) -> Page:
+    """Dismiss blocking UI after attach."""
     dismiss_blocking_ui(page)
     return page
+
+
+def should_attach_only() -> bool:
+    return os.environ.get("ATTACH", "").strip().lower() in ("1", "true", "yes")
