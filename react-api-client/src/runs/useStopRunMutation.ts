@@ -28,7 +28,8 @@ export type UseStopRunMutationOptions = UseMutationOptions<
 export const useStopRunMutation = (
   documentationState: DocumentationState,
   actionsToDocument?: DocumentedAction[],
-  options?: UseStopRunMutationOptions
+  options?: UseStopRunMutationOptions,
+  userNotes?: string
 ): UseStopRunMutationResult => {
   const host = useHost()
   const actions: DocumentedAction[] = [...(actionsToDocument ?? []), 'stop_run']
@@ -37,9 +38,14 @@ export const useStopRunMutation = (
     actions,
     getQueryKey(host, 'runs', RUN_ACTION_TYPE_STOP),
     (runId: string) =>
-      createRunAction(host!, runId, {
-        actionType: RUN_ACTION_TYPE_STOP,
-      }).then(response => response.data),
+      createRunAction(
+        host!,
+        runId,
+        {
+          actionType: RUN_ACTION_TYPE_STOP,
+        },
+        userNotes
+      ).then(response => response.data),
     options
   )
   return {

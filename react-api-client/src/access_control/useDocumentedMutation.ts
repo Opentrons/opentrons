@@ -10,6 +10,7 @@ import type {
   DocumentationReport,
   DocumentationState,
   DocumentedAction,
+  DocumentedMutationFunction,
   UseDocumentedMutation,
 } from './types'
 
@@ -39,7 +40,7 @@ export const useDocumentedMutation: UseDocumentedMutation = (
   arg3?
 ) => {
   const hasKey = typeof arg1 !== 'function'
-  const mutationFn = (hasKey ? arg2 : arg1) as MutationFunction
+  const mutationFn = (hasKey ? arg2 : arg1) as DocumentedMutationFunction
   const options = (hasKey ? arg3 : arg2) as UseMutationOptions | undefined
 
   const wrappedMutationFn = useWrappedMutationFn(
@@ -59,7 +60,7 @@ const checkDocumentationReport = async (
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[]
 ): Promise<DocumentationReport | null> => {
-  if (!documentationState.accessControlEnabled) {
+  if (!documentationState.reasonForInteractionRequired) {
     return null
   }
   if (documentationState.docreport != null) {
@@ -69,22 +70,20 @@ const checkDocumentationReport = async (
 }
 
 function useWrappedMutationFn<TData, TVariables>(
-  mutationFn: MutationFunction<TData, TVariables>,
+  mutationFn: DocumentedMutationFunction<TData, TVariables>,
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[]
 ): MutationFunction<TData, TVariables> {
   const wrappedMutationFn = useCallback(
-    async (args: TVariables) => {
+    async (variables: TVariables) => {
       const docreport = await checkDocumentationReport(
         documentationState,
         actionsToDocument
       )
-      // TODO(jj): actually use the docreport
-      console.log(`reason for interaction: ${docreport}`)
       if (docreport == null) {
         console.error('No documentation report provided')
       }
-      return await mutationFn(args)
+      return await mutationFn(variables, docreport ?? '')
     },
     [actionsToDocument, documentationState, mutationFn]
   )

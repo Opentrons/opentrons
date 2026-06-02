@@ -54,11 +54,17 @@ export function useCreateMaintenanceCommandMutation(
   >(
     documentationState,
     actionsToDocument,
-    ({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
-      createMaintenanceCommand(host!, maintenanceRunId, command, {
-        waitUntilComplete,
-        timeout,
-      })
+    ({ maintenanceRunId, command, waitUntilComplete, timeout }, userNotes) =>
+      createMaintenanceCommand(
+        host!,
+        maintenanceRunId,
+        command,
+        {
+          waitUntilComplete,
+          timeout,
+        },
+        userNotes
+      )
         .then(response => {
           queryClient
             .invalidateQueries(getQueryKey(host, 'maintenance_runs'))

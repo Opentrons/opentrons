@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { useGuardedAction } from '../useGuardedAction'
 import {
@@ -13,7 +13,7 @@ import type ReactRedux from 'react-redux'
 import type { DocumentationReport } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
-  useAccessControlEnabledQuery: vi.fn(),
+  useAuthSettingsQuery: vi.fn(),
 }))
 
 vi.mock('react-redux', async importOriginal => {
@@ -37,9 +37,15 @@ const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('useGuardedAction', () => {
   beforeEach(() => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+          requireReasonForInteraction: true,
+          minLengthOfReasonForInteraction: 10,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
   })
 
   afterEach(() => {
@@ -47,13 +53,21 @@ describe('useGuardedAction', () => {
   })
 
   it('skips both guards when access control is disabled', async () => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: false } },
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: false,
+          requireReasonForInteraction: false,
+          minLengthOfReasonForInteraction: 10,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
 
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
-    const currentResult = await act(() => !result.current.accessControlEnabled)
+    const currentResult = await act(
+      () => !result.current.reasonForInteractionRequired
+    )
     expect(currentResult).toBe(true)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
@@ -65,21 +79,21 @@ describe('useGuardedAction', () => {
       wrapper,
     })
 
-    expect(result.current.accessControlEnabled).toBe(true)
+    expect(result.current.reasonForInteractionRequired).toBe(true)
     expect(
-      result.current.accessControlEnabled && result.current.docreport
+      result.current.reasonForInteractionRequired && result.current.docreport
     ).toBe(docreport)
   })
 
   it('returns callback to open modal when documentation is not provided', async () => {
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
-    expect(result.current.accessControlEnabled).toBe(true)
+    expect(result.current.reasonForInteractionRequired).toBe(true)
     expect(
-      result.current.accessControlEnabled && result.current.docreport
+      result.current.reasonForInteractionRequired && result.current.docreport
     ).toBeNull()
     expect(
-      result.current.accessControlEnabled &&
+      result.current.reasonForInteractionRequired &&
         result.current.docreport == null &&
         result.current.askForDocumentation
     ).toBeDefined()

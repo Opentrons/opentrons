@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
 import { isDocumentationProvided } from '../utils'
@@ -17,7 +17,7 @@ import type {
 } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
-  useAccessControlEnabledQuery: vi.fn(),
+  useAuthSettingsQuery: vi.fn(),
 }))
 
 vi.mock('react-redux', async importOriginal => {
@@ -42,14 +42,14 @@ const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('isDocumentationProvided', () => {
   it('returns true when access control is disabled', () => {
-    const state: DocumentationState = { accessControlEnabled: false }
+    const state: DocumentationState = { reasonForInteractionRequired: false }
 
     expect(isDocumentationProvided(state)).toBe(true)
   })
 
   it('returns true when documentation is provided', () => {
     const state: DocumentationState = {
-      accessControlEnabled: true,
+      reasonForInteractionRequired: true,
       docreport: mockDocreport,
     }
 
@@ -58,7 +58,7 @@ describe('isDocumentationProvided', () => {
 
   it('returns false when access control is enabled and documentation is missing', () => {
     const state: DocumentationState = {
-      accessControlEnabled: true,
+      reasonForInteractionRequired: true,
       docreport: null,
       askForDocumentation: vi.fn(),
     }
@@ -69,9 +69,15 @@ describe('isDocumentationProvided', () => {
 
 describe('useMaintenanceRunDocumentation', () => {
   beforeEach(() => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+          requireReasonForInteraction: true,
+          minLengthOfReasonForInteraction: 10,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
     vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
       mockDocreport
     )
@@ -95,18 +101,20 @@ describe('useMaintenanceRunDocumentation', () => {
 
     await waitFor(() => {
       expect(
-        result.current.commandDocState.accessControlEnabled &&
+        result.current.commandDocState.reasonForInteractionRequired &&
           result.current.commandDocState.docreport
       ).toEqual(mockDocreport)
     })
 
-    expect(result.current.deletionDocState.accessControlEnabled).toBe(true)
+    expect(result.current.deletionDocState.reasonForInteractionRequired).toBe(
+      true
+    )
     expect(
-      result.current.deletionDocState.accessControlEnabled &&
+      result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport
     ).toBeNull()
     expect(
-      result.current.deletionDocState.accessControlEnabled &&
+      result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport == null &&
         result.current.deletionDocState.askForDocumentation
     ).toBeDefined()
@@ -126,7 +134,7 @@ describe('useMaintenanceRunDocumentation', () => {
 
     await act(async () => {
       if (
-        result.current.deletionDocState.accessControlEnabled &&
+        result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport == null
       ) {
         await result.current.deletionDocState.askForDocumentation(

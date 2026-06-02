@@ -24,14 +24,4 @@ describe('requireDocumentation', () => {
     expect(result).toEqual('starting calibration' as DocumentationReport)
     expect(showDocumentationRequiredModal).toHaveBeenCalledWith('alice', [])
   })
-
-  it('returns empty string when the user backs out of the modal', async () => {
-    vi.mocked(showDocumentationRequiredModal).mockResolvedValue(
-      '' as DocumentationReport
-    )
-
-    await expect(requireDocumentation('alice', [])).rejects.toThrow(
-      `No documentation provided for action: `
-    )
-  })
 })

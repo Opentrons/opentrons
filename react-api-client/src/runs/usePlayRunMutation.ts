@@ -29,7 +29,8 @@ export type UsePlayRunMutationOptions = UseMutationOptions<
 export const usePlayRunMutation = (
   documentationState: DocumentationState,
   actionsToDocument?: DocumentedAction[],
-  options: UsePlayRunMutationOptions = {}
+  options: UsePlayRunMutationOptions = {},
+  userNotes?: string
 ): UsePlayRunMutationResult => {
   const host = useHost()
   const actions: DocumentedAction[] = [...(actionsToDocument ?? []), 'play_run']
@@ -38,9 +39,14 @@ export const usePlayRunMutation = (
     actions,
     getQueryKey(host, 'runs', RUN_ACTION_TYPE_PLAY),
     (runId: string) =>
-      createRunAction(host!, runId, {
-        actionType: RUN_ACTION_TYPE_PLAY,
-      })
+      createRunAction(
+        host!,
+        runId,
+        {
+          actionType: RUN_ACTION_TYPE_PLAY,
+        },
+        userNotes
+      )
         .then(response => response.data)
         .catch(e => {
           throw e

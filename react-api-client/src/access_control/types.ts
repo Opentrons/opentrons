@@ -1,5 +1,4 @@
 import type {
-  MutationFunction,
   MutationKey,
   UseMutationOptions,
   UseMutationResult,
@@ -19,15 +18,20 @@ export type DocumentationReport = string & {
  * @param askForDocumentation - a function that opens the documentation modal and returns the documentation report
  */
 export type DocumentationState =
-  | { accessControlEnabled: false }
-  | { accessControlEnabled: true; docreport: DocumentationReport }
+  | { reasonForInteractionRequired: false }
+  | { reasonForInteractionRequired: true; docreport: DocumentationReport }
   | {
-      accessControlEnabled: true
+      reasonForInteractionRequired: true
       docreport: null
       askForDocumentation: (
         actionsToDocument: DocumentedAction[]
       ) => Promise<DocumentationReport>
     }
+
+export type DocumentedMutationFunction<TData = unknown, TVariables = void> = (
+  variables: TVariables,
+  userNotes: string
+) => Promise<TData>
 
 /**
  * Call signatures for useDocumentedMutation — mirrors the `useMutation`
@@ -39,7 +43,7 @@ export interface UseDocumentedMutation {
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
     actionsToDocument: DocumentedAction[],
-    mutationFn: MutationFunction<TData, TVariables>,
+    mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 
@@ -47,7 +51,7 @@ export interface UseDocumentedMutation {
     documentationState: DocumentationState,
     actionsToDocument: DocumentedAction[],
     mutationKey: MutationKey,
-    mutationFn: MutationFunction<TData, TVariables>,
+    mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 }

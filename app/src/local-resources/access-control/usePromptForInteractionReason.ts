@@ -24,7 +24,7 @@ export const usePromptForInteractionReason = (
   initialDocstate?: DocumentationState
 ): DocumentationState => {
   const [docReport, setDocReport] = useState<DocumentationReport>()
-  const docStateToUse = initialDocstate?.accessControlEnabled
+  const docStateToUse = initialDocstate?.reasonForInteractionRequired
     ? initialDocstate.docreport
     : docReport
   const docState = useGuardedAction(docStateToUse ?? undefined)
@@ -32,7 +32,7 @@ export const usePromptForInteractionReason = (
 
   useEffect(() => {
     const promptForDocumentation = async (): Promise<void> => {
-      if (docState.accessControlEnabled) {
+      if (docState.reasonForInteractionRequired) {
         if (docState.docreport == null && !promptInFlight.current) {
           promptInFlight.current = true
           await docState

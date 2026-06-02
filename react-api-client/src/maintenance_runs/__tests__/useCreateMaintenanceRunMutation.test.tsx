@@ -40,9 +40,10 @@ describe('useCreateMaintenanceRunMutation hook', () => {
 
     const { result } = renderHook(
       () =>
-        useCreateMaintenanceRunMutation({ accessControlEnabled: false }, [
-          'lpc_flow',
-        ]),
+        useCreateMaintenanceRunMutation(
+          { reasonForInteractionRequired: false },
+          ['lpc_flow']
+        ),
       {
         wrapper,
       }
@@ -69,9 +70,10 @@ describe('useCreateMaintenanceRunMutation hook', () => {
 
     const { result } = renderHook(
       () =>
-        useCreateMaintenanceRunMutation({ accessControlEnabled: false }, [
-          'lpc_flow',
-        ]),
+        useCreateMaintenanceRunMutation(
+          { reasonForInteractionRequired: false },
+          ['lpc_flow']
+        ),
       {
         wrapper,
       }

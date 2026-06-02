@@ -51,21 +51,25 @@ export function useCreateMaintenanceRunLabwareDefinitionMutation(
     LabwareDefinitionSummary,
     unknown,
     CreateMaintenanceRunLabwareDefinitionMutateParams
-  >(documentationState, ['lpc_flow'], ({ maintenanceRunId, labwareDef }) =>
-    createMaintenanceRunLabwareDefinition(
-      host!,
-      maintenanceRunId,
-      labwareDef
-    ).then(response => {
-      queryClient
-        .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
-        .catch((e: Error) => {
-          console.error(
-            `error invalidating maintenance runs query: ${e.message}`
-          )
-        })
-      return response.data
-    })
+  >(
+    documentationState,
+    ['lpc_flow'],
+    ({ maintenanceRunId, labwareDef }, userNotes) =>
+      createMaintenanceRunLabwareDefinition(
+        host!,
+        maintenanceRunId,
+        labwareDef,
+        userNotes
+      ).then(response => {
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
+          .catch((e: Error) => {
+            console.error(
+              `error invalidating maintenance runs query: ${e.message}`
+            )
+          })
+        return response.data
+      })
   )
 
   return {

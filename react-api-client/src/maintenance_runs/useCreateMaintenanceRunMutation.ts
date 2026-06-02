@@ -42,7 +42,8 @@ export function useCreateMaintenanceRunMutation(
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[],
   options: UseCreateMaintenanceRunMutationOptions = {},
-  hostOverride?: HostConfig | null
+  hostOverride?: HostConfig | null,
+  userNotes?: string
 ): UseCreateMaintenanceRunMutationResult {
   const contextHost = useHost()
   const host =
@@ -56,7 +57,7 @@ export function useCreateMaintenanceRunMutation(
     documentationState,
     actionsToDocument,
     (createMaintenanceRunData = {}) =>
-      createMaintenanceRun(host!, createMaintenanceRunData)
+      createMaintenanceRun(host!, createMaintenanceRunData, userNotes)
         .then(response => response.data)
         .catch(e => {
           queryClient.invalidateQueries(

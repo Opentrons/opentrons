@@ -36,7 +36,10 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
 
     const { result } = renderHook(
       () =>
-        useDeleteMaintenanceRunMutation({ accessControlEnabled: false }, []),
+        useDeleteMaintenanceRunMutation(
+          { reasonForInteractionRequired: false },
+          []
+        ),
       {
         wrapper,
       }
@@ -57,7 +60,10 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
 
     const { result } = renderHook(
       () =>
-        useDeleteMaintenanceRunMutation({ accessControlEnabled: false }, []),
+        useDeleteMaintenanceRunMutation(
+          { reasonForInteractionRequired: false },
+          []
+        ),
       {
         wrapper,
       }

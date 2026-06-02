@@ -30,7 +30,8 @@ export type UseDeleteMaintenanceRunMutationOptions = UseMutationOptions<
 export function useDeleteMaintenanceRunMutation(
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[],
-  options: UseDeleteMaintenanceRunMutationOptions = {}
+  options: UseDeleteMaintenanceRunMutationOptions = {},
+  userNotes?: string
 ): UseDeleteMaintenanceRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
@@ -38,19 +39,21 @@ export function useDeleteMaintenanceRunMutation(
     documentationState,
     actionsToDocument,
     (maintenanceRunId: string) =>
-      deleteMaintenanceRun(host!, maintenanceRunId).then(response => {
-        queryClient.removeQueries(
-          getQueryKey(host, 'maintenance_runs', maintenanceRunId)
-        )
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
-          .catch((e: Error) => {
-            console.error(
-              `error invalidating maintenance_runs query: ${e.message}`
-            )
-          })
-        return response.data
-      }),
+      deleteMaintenanceRun(host!, maintenanceRunId, userNotes).then(
+        response => {
+          queryClient.removeQueries(
+            getQueryKey(host, 'maintenance_runs', maintenanceRunId)
+          )
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
+            .catch((e: Error) => {
+              console.error(
+                `error invalidating maintenance_runs query: ${e.message}`
+              )
+            })
+          return response.data
+        }
+      ),
     options
   )
 

@@ -8,7 +8,7 @@ import {
   deleteMaintenanceRun,
 } from '@opentrons/api-client'
 import {
-  useAccessControlEnabledQuery,
+  useAuthSettingsQuery,
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
@@ -41,7 +41,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
-    useAccessControlEnabledQuery: vi.fn(),
+    useAuthSettingsQuery: vi.fn(),
     useHost: vi.fn(),
   }
 })
@@ -140,9 +140,15 @@ describe('maintenance run documentation flow', () => {
 
   beforeEach(() => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+          requireReasonForInteraction: true,
+          minLengthOfReasonForInteraction: 10,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
     vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
       MOCK_DOCREPORT
     )
@@ -177,20 +183,22 @@ describe('maintenance run documentation flow', () => {
     })
     await waitFor(() => {
       expect(
-        result.current.commandDocState.accessControlEnabled &&
+        result.current.commandDocState.reasonForInteractionRequired &&
           result.current.commandDocState.docreport
       ).toEqual(MOCK_DOCREPORT)
     })
 
     // The deletion gate is in place but has NOT prompted yet — it is set up
     // to prompt only when the deletion mutation actually runs.
-    expect(result.current.deletionDocState.accessControlEnabled).toBe(true)
+    expect(result.current.deletionDocState.reasonForInteractionRequired).toBe(
+      true
+    )
     expect(
-      result.current.deletionDocState.accessControlEnabled &&
+      result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport
     ).toBeNull()
     expect(
-      result.current.deletionDocState.accessControlEnabled &&
+      result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport == null &&
         result.current.deletionDocState.askForDocumentation
     ).toBeDefined()
@@ -220,7 +228,7 @@ describe('maintenance run documentation flow', () => {
     // commandDocState's report rather than asking the user again.
     expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     expect(
-      result.current.commandDocState.accessControlEnabled &&
+      result.current.commandDocState.reasonForInteractionRequired &&
         result.current.commandDocState.docreport
     ).toEqual(MOCK_DOCREPORT)
 
