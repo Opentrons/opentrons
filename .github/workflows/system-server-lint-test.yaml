@@ -71,7 +71,3 @@ jobs:
           project: 'system-server'
       - name: Test
         run: make -C system-server test
-      - uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./system-server/coverage.xml
-          flags: system-server
