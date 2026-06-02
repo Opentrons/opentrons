@@ -469,9 +469,9 @@ class BookAccessor
         action_cmd_m.len = data_len;
 
         // set most recent index and most recent valid again
-        most_recent_index = 0;
+        uint16_t most_recent_index = 0;
         size_t all_reads_index = 0;
-        most_recent_valid = reads[most_recent_index];
+        uint16_t most_recent_valid = reads[most_recent_index];
 
         bool crc_valid = false;
 
@@ -538,9 +538,6 @@ class BookAccessor
 
         message::EepromMessage write_msg;
 
-        // because all_reads contains 4 pages in the order they were
-        // read (00, 01, 11, 10), we can use the most_recent_valid
-        // variable to determine where to write the new data
         types::address read0_offset = 0;
         types::address read1_offset = types::page_length;
         types::address read2_offset = types::page_length * 2;
