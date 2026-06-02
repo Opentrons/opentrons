@@ -16,6 +16,9 @@ from pathlib import Path
 import pandas as pd
 from statistics import mean, StatisticsError
 from abr_testing.tools import plate_reader
+import time
+import base64
+import websocket
 
 
 
@@ -82,33 +85,98 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
         print(f"Error during file transfer: {e}")
     return ""
 
-# def retrieve_live_image(run_id: str, robot_ip: str, storage: str) -> str:
-#     """Save all capture images for a run."""
-#     save_dir = Path(f"{storage}")
-#     new_save_dir = save_dir / run_id
-#     key_path = save_dir / "robot_key"
-#     zip_path = save_dir / f"{run_id}_images"
-#     command = [
-#         "scp",
-#         "-i", str(key_path),
-#         "-o", "StrictHostKeyChecking=no",
-#         "-r",
-#         f"root@{robot_ip}:/data/images/{run_id}/",
-#         save_dir,
-#     ]
-#     try:
-#         subprocess.run(command, check=True)  # type: ignore
-#         shutil.make_archive(
-#             base_name=str(zip_path),
-#             format="zip",
-#             root_dir=new_save_dir,
-#         )
-#         subprocess.run(["rm", "-r", new_save_dir], check=True)
-#         print("Image folder transfered successful!")
-#         return str(zip_path) + ".zip"
-#     except subprocess.CalledProcessError as e:
-#         print(f"Error during file transfer: {e}")
-#     return ""
+def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
+    """Capture a live camera image and ODD screenshot, return path to zip."""
+    save_dir = Path(storage)
+    key_path = save_dir / "robot_key"
+    # grabbing the camera image
+    ssh_command = [
+        "ssh", "-i", str(key_path), "-o", "StrictHostKeyChecking=no",
+        f"root@{robot_ip}",
+    ]
+    captured = []
+    update_camera_status("ON", robot_ip, key_path)
+    time.sleep(3)
+    # grab one frame from camera live stream
+    camera_path = save_dir / f"{robot_name}_camera.jpg"
+    stream_url = f"http://{robot_ip}:31950/hls/stream.m3u8"
+    try:
+        subprocess.run(
+            ["ffmpeg", "-i", stream_url, "-frames:v", "1", str(camera_path), "-y"],
+            check=True, capture_output=True, timeout=30,
+        )
+        captured.append(camera_path)
+        print(f"Camera image saved: {camera_path}")
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+        print(f"Failed to capture camera image for {robot_name}: {e}")
+    update_camera_status("OFF", robot_ip, key_path)
+    # ODD screenshot via Chrome DevTools Protocol (port 9222 on robot)
+    odd_path = save_dir / f"{robot_name}_odd.png"
+    try:
+        # Get the CDP websocket URL
+        targets = requests.get(f"http://{robot_ip}:9223/json", timeout=5).json()
+        ws_url = targets[0]["webSocketDebuggerUrl"].replace("localhost", robot_ip)
+        # Connect and send Page.captureScreenshot
+        ws = websocket.create_connection(ws_url, timeout=10)
+        ws.send(json.dumps({"id": 1, "method": "Page.captureScreenshot", "params": {"format": "png"}}))
+        result = json.loads(ws.recv())
+        ws.close()
+        image_data = base64.b64decode(result["result"]["data"])
+        odd_path.write_bytes(image_data)
+        captured.append(odd_path)
+        print(f"ODD screenshot saved: {odd_path}")
+    except Exception as e:
+        print(f"Failed to capture ODD screenshot for {robot_name}: {e}")
+
+    if not captured:
+        return ""
+
+    # Zip both images together into a temp subfolder then archive it
+    zip_base = str(save_dir / f"{robot_name}_live_images")
+    tmp_dir = save_dir / f"{robot_name}_live_images_tmp"
+    tmp_dir.mkdir(exist_ok=True)
+    for f in captured:
+        shutil.copy(f, tmp_dir / f.name)
+    shutil.make_archive(zip_base, "zip", tmp_dir)
+    shutil.rmtree(tmp_dir)
+    for f in captured:
+        try:
+            os.remove(f)
+        except OSError:
+            pass
+
+    return zip_base + ".zip"
+
+import subprocess
+
+def update_camera_status(status: str, robot_ip: str, key_path: str):
+    username = "root"                         # Opentrons default
+    status_upper = str(status).upper()
+    # sed command
+    remote_command = f"sed -i 's/^STATUS=.*/STATUS={status_upper}/' /data/opentrons-live-stream.env && systemctl restart opentrons-live-stream"
+    # ssh command
+    ssh_command = [
+        "ssh",
+        "-i", key_path,
+        "-o", "StrictHostKeyChecking=no",
+        f"{username}@{robot_ip}",
+        remote_command
+    ]
+    try:
+        # Run the command and capture output
+        result = subprocess.run(
+            ssh_command, 
+            capture_output=True, 
+            text=True, 
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed with exit code {e.returncode}.")
+        if e.stderr:
+            print(f"Error details: {e.stderr.strip()}")
+            
+    except FileNotFoundError:
+        print("Error: The 'ssh' command was not found on this system.")
 
 
 def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Path | str:
@@ -343,7 +411,8 @@ def get_robot_state(
 
     instrument_data = response.json()
     for instrument in instrument_data["data"]:
-        description[instrument["mount"]] = instrument
+        key = instrument.get("mount") or instrument.get("instrumentType") or instrument.get("subsystem", "unknown")
+        description[key] = instrument
     # Get modules attached to robot
     response = requests.get(
         f"http://{ip}:31950/modules", headers={"opentrons-version": "*"}
@@ -362,7 +431,7 @@ def get_robot_state(
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    if project_key == 826: #217 is ABR
+    if project_key == "RQA": #217 is ABR
         parent_name = affects_version + " Bugs"
         parent = get_parent_key(url, api_token, email, project_key, parent_name)
     else:
@@ -419,7 +488,7 @@ def get_run_error_info_from_robot(
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    if project_key == 826: #217 is ABR
+    if project_key == "RQA": #217 is ABR
         parent_name = affects_version + " Bugs"
         parent = get_parent_key(url, api_token, email, project_key, parent_name)
     else:
@@ -593,8 +662,15 @@ if __name__ == "__main__":
     image_files = ""
     if len(run_or_other) < 1:
         image_files = retrieve_protocol_images(one_run, ip, storage_directory)
-    # else:
-    #     image_files = retrieve_live_image(issue_key, ip, storage_directory)
+    else:
+        try:
+            health = requests.get(
+                f"http://{ip}:31950/health", headers={"opentrons-version": "*"}, timeout=10
+            )
+            robot_name = health.json().get("name", ip)
+        except Exception:
+            robot_name = ip
+        image_files = retrieve_live_image(ip, storage_directory, robot_name)
 
     # Link Tickets - TODO: FIX THIS TO WORK
     to_link = ticket.match_issues(all_issues, summary)
