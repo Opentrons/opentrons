@@ -54,6 +54,26 @@ curl -s -H "Opentrons-Version: *" "http://10.14.19.233:31950/server/update/healt
 | `scripts/update_robot_phases.py` | Shared stderr labels for the post-restart **readiness state machine** (numbered phases + ✓ / ◌). |
 | `scripts/update_robot_errors.py` | Shared stderr helpers and state tables on failure. |
 
+## Step grouping MRE protocols
+
+Minimal Flex protocols (`apiLevel` **2.29**) under `step_grouping_mre/` for testing command annotations / run-preview groups.
+
+| Protocol | Expected |
+|----------|----------|
+| `nested_with_should_error.py` | `ValueError` on nested `group_steps` |
+| `overlapping_create_should_error.py` | `ValueError` on second `create_and_start_step_group` |
+| `mixed_api_should_error.py` | `ValueError` on `group_steps` while manual group open |
+| `early_end_group_ungrouped_loads.py` | OK — only first `load_liquid` grouped |
+| `sequential_groups_ok.py` | OK — two groups, no overlap |
+
+See `step_grouping_mre/README.md` for simulate commands and App testing notes.
+
+```bash
+cd api
+python -m opentrons.simulate -l info \
+  "../.cursor/skills/Regression_test_tooling/step_grouping_mre/nested_with_should_error.py"
+```
+
 ### Python deps (macOS / multiple interpreters)
 
 Install packages into the **same** interpreter you use to run the script:
