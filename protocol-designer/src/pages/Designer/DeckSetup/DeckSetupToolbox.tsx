@@ -149,14 +149,11 @@ export function DeckSetupToolbox(
     hasVacuumModuleCreated &&
     getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware)
 
-  // Check if vacuum dock is full by checking both stack and adapter for collar
-  // The dock and main module areas are independently managed
-  // Note: The collar might be in createdAdapterForSlot instead of createdStackForSlot
+  // Dock is full when it has both a collar (as adapter) and a well plate (in stack)
   const isVacuumDockFull =
     isVacuumDockSlot &&
-    (getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware) ||
-      (createdAdapterForSlot != null &&
-        getIsVacuumModuleFull([createdAdapterForSlot.id], deckSetup.labware)))
+    createdAdapterForSlot != null &&
+    createdStackForSlot.length > 0
 
   const slotFull =
     ((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
@@ -213,10 +210,28 @@ export function DeckSetupToolbox(
       (createdAdapterForSlot != null || createdStackForSlot.length > 0)
 
     //  handle clear for if you are changing the adapter/labware combo
-    // For vacuum modules, use additive behavior (never clear)
-    if (!isOffDeck && !isVacuumModule) {
+    // For vacuum modules and the vacuum dock, use additive behavior (never clear)
+    if (!isOffDeck && !isVacuumModule && !isVacuumDockSlot) {
       handleClear()
     }
+
+    // For the vacuum dock, when collar is present and user is adding a well plate,
+    // stack it on top of the collar rather than at the raw dock slot
+    if (
+      isVacuumDockSlot &&
+      createdAdapterForSlot != null &&
+      selectedTopLabware.labwareDefURI != null
+    ) {
+      dispatch(
+        createContainer({
+          slot: createdAdapterForSlot.id,
+          labwareDefURIStack: [selectedTopLabware.labwareDefURI],
+        })
+      )
+      setShowSelectLabwareModal(false)
+      return
+    }
+
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
     if (hasModule && !vacuumModuleHasLabware) {
       let flexStackerInfo: CreateContainerAboveModuleArgs['stackerInfo']

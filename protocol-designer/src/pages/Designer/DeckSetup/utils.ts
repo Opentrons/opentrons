@@ -70,8 +70,8 @@ export type ModuleModelExtended = ModuleModel | 'stagingAreaAndMagneticBlock'
 export function getIsVacuumCollar(labwareDef: LabwareDefinition2): boolean {
   const loadName = labwareDef.parameters.loadName
   return (
-    loadName === 'opentrons_vacuum_module_gen1_collar_tall' ||
-    loadName === 'opentrons_vacuum_module_gen1_collar_short'
+    loadName === 'opentrons_vacuum_manifold_collar_tall' ||
+    loadName === 'opentrons_vacuum_manifold_collar_short'
   )
 }
 
@@ -189,9 +189,9 @@ export const getLabwareIsRecommended = (
       // Show collars and wellplates when module already has labware
       return (
         def.parameters.loadName ===
-          'opentrons_vacuum_module_gen1_collar_tall' ||
+          'opentrons_vacuum_manifold_collar_tall' ||
         def.parameters.loadName ===
-          'opentrons_vacuum_module_gen1_collar_short' ||
+          'opentrons_vacuum_manifold_collar_short' ||
         def.parameters.loadName ===
           'opentrons_96_wellplate_200ul_pcr_full_skirt'
       )
@@ -235,8 +235,8 @@ export const getIsVacuumModuleFull = (
   return labwareStack.some(labwareId => {
     const loadName = deckSetupLabware[labwareId]?.def.parameters.loadName
     return (
-      loadName === 'opentrons_vacuum_module_gen1_collar_tall' ||
-      loadName === 'opentrons_vacuum_module_gen1_collar_short'
+      loadName === 'opentrons_vacuum_manifold_collar_tall' ||
+      loadName === 'opentrons_vacuum_manifold_collar_short'
     )
   })
 }

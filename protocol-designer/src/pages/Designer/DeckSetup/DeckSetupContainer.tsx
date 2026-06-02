@@ -52,7 +52,6 @@ import { DeckSetupToolbox } from './DeckSetupToolbox'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
-  getIsVacuumModuleFull,
   getSVGContainerWidth,
   zoomInOnCoordinate,
 } from './utils'
@@ -183,15 +182,13 @@ export function DeckSetupContainer(
     // Check if vacuum dock is full before opening toolbox
     const isVacuumDockSlot = getIsSlotAVacuumDock(location)
     if (isVacuumDockSlot) {
-      const { createdStackForSlot } = getSlotInformation({
+      const { createdStackForSlot, createdAdapterForSlot } = getSlotInformation({
         deckSetup: activeDeckSetup,
         slot: location,
         deckDef,
       })
-      const isDockFull = getIsVacuumModuleFull(
-        createdStackForSlot,
-        activeDeckSetup.labware
-      )
+      const isDockFull =
+        createdAdapterForSlot != null && createdStackForSlot.length > 0
       if (isDockFull) {
         makeSnackbar('Labware limit reached for this slot')
         return

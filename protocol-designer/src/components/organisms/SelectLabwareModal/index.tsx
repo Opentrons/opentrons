@@ -130,7 +130,7 @@ export function SelectLabwareModal(
     zoomedInSlotInfo
 
   const hasNoLabware =
-    selectedTopLabware == null && selectedAdapterDefURI == null
+    selectedTopLabware?.labwareDefURI == null && selectedAdapterDefURI == null
   const createCategoryState = (state: boolean): Record<string, boolean> =>
     Object.fromEntries(ALL_ORDERED_CATEGORIES.map(cat => [cat, state]))
 
@@ -186,6 +186,16 @@ export function SelectLabwareModal(
       const isCollar = getIsVacuumCollar(labware.def)
       return isOnDock && isCollar
     })
+
+  useEffect(() => {
+    if (isOnVacuumDock) {
+      if (!dockHasCollar) {
+        setUserCategoryExpandState(prev => ({ ...prev, adapter: true }))
+      } else {
+        setUserCategoryExpandState(prev => ({ ...prev, wellPlate: true }))
+      }
+    }
+  }, [isOnVacuumDock, dockHasCollar])
 
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
