@@ -329,10 +329,6 @@ test-js-internal:
 test-js-%:
 	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
-.PHONY: validate-codecov-yml
-validate-codecov-yml:
-	curl --data-binary @.codecov.yml https://codecov.io/validate
-
 # Convenience commands for running all of our servers in dev mode, together,
 # behind a reverse proxy listening on port 31950.
 #

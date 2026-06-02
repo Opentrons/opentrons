@@ -663,6 +663,26 @@ def _bundled_fw_dict_to_class(  # type: ignore
     )
 
 
+# ABSMeasurementConfig registry
+def _ABSMeasurementConfig_class_to_dict(obj) -> Dict:  # type: ignore
+    return {
+        "__class__": "opentrons.drivers.types.ABSMeasurementConfig",
+        "measure_mode": obj.measure_mode.value,
+        "sample_wavelengths": obj.sample_wavelengths,
+        "reference_wavelength": obj.reference_wavelength,
+    }
+
+
+def _ABSMeasurementConfig_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.drivers.types.ABSMeasurementConfig:
+    return opentrons.drivers.types.ABSMeasurementConfig(
+        measure_mode=opentrons.drivers.types.ABSMeasurementMode(d["measure_mode"]),
+        sample_wavelengths=d["sample_wavelengths"],
+        reference_wavelength=d["reference_wavelength"],
+    )
+
+
 # Handy function to map all registries for the Hardware controller
 def register_hardware_types() -> None:
     """Registers serialize and deserialize behavior for Opentrons Hardware types and classes.
@@ -824,6 +844,13 @@ def register_hardware_types() -> None:
         class_type=opentrons.hardware_control.modules.module_calibration.ModuleCalibrationOffset,
         dict_to_class=_ModuleCalibrationOffset_dict_to_class,
         class_to_dict=_ModuleCalibrationOffset_class_to_dict,
+    )
+
+    # ABSMeasurementConfig registration
+    register_type_to_serpent(
+        class_type=opentrons.drivers.types.ABSMeasurementConfig,
+        dict_to_class=_ABSMeasurementConfig_dict_to_class,
+        class_to_dict=_ABSMeasurementConfig_class_to_dict,
     )
 
     # handle Typed Dicts for the hardware controller
