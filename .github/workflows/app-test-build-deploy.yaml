@@ -69,19 +69,15 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/js/setup
       - name: 'Test frontend packages ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
-        # The run produces 2 outputs that we'll upload to temporary storage on Github:
-        # the vitest report in .vitest-reports/ and the coverage report in coverage/
+        # The run produces a vitest report in .vitest-reports/ that we'll upload to temporary storage on Github.
         run: |
-          make -C app test-cov test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
-          mv coverage/lcov.info coverage/lcov-shard-${{matrix.shard}}.info
+          make -C app test test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
       - name: 'Upload frontend test shard result ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
         if: ${{ !cancelled() }} # Make sure we forward along the report even if there were test failures.
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: frontend-unit-test-result-shard-${{matrix.shard}}
-          path: |
-            .vitest-reports/*
-            coverage/lcov-shard-*.info
+          path: .vitest-reports/*
           include-hidden-files: true
           retention-days: 1
 
@@ -99,14 +95,6 @@ jobs:
           merge-multiple: true
       - name: 'Merge frontend test report shards'
         run: pnpm vitest --merge-reports
-      - name: 'Merge frontend test coverage shards'
-        run: cat ./coverage/lcov-shard-*.info > ./coverage/lcov.info
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./coverage/lcov.info
-          flags: app
-          token: ${{ secrets.CODECOV_TOKEN }}
 
   backend-unit-test:
     strategy:
@@ -130,12 +118,7 @@ jobs:
       - name: check make version
         run: make --version
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="${{matrix.shell}}/src" cov_opts="--coverage=true"
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./coverage/lcov.info
-          flags: app
+        run: make test-js-internal tests="${{matrix.shell}}/src"
 
   determine-build-type:
     runs-on: 'ubuntu-latest'
