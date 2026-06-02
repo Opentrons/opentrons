@@ -66,13 +66,15 @@ from opentrons.util.pyro.pyro_client_async_adapter import (
     AsyncClientPyroObject,
     ClientPyroFunctionWrapper,
 )
-from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
     PyroSynchronousObject,
     convert_result_to_proxy,
     pyro_behavior,
 )
+
+TEST_PYRO_TIMEOUT = 5
 
 OT3_PIP_CAL = ot3_calibration.PipetteOffsetByPipetteMount(
     offset=Point(0, 0, 0),
@@ -282,7 +284,7 @@ async def test_pyro_behavior_ot3api_dicts_with_non_builtin_keys(
 
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -293,7 +295,7 @@ async def test_pyro_behavior_ot3api_dicts_with_non_builtin_keys(
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0
@@ -421,7 +423,7 @@ async def test_pyro_module_properties(
 
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -432,7 +434,7 @@ async def test_pyro_module_properties(
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0
@@ -503,7 +505,7 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
 
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
 
     class cool_door_class:
@@ -532,7 +534,7 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
 
         cool_door_instance = cool_door_class(new_loop)
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         try:
             create_pyro_daemon("cool_door", cool_door_instance, register_hardware_types)
         finally:
@@ -549,7 +551,7 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0
@@ -632,7 +634,7 @@ async def test_pipette_proxy_dictionary(
 
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", managed, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -643,7 +645,7 @@ async def test_pipette_proxy_dictionary(
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0
