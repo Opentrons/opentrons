@@ -133,6 +133,7 @@ class SerialConnection:
         self._error_keyword = error_keyword.lower()
         self._alarm_keyword = alarm_keyword.lower()
         self._error_codes = error_codes
+        self._closed_on_purpose = False
 
     async def send_command(
         self, command: CommandBuilder, retries: int = 0, timeout: float | None = None
@@ -228,10 +229,12 @@ class SerialConnection:
 
     async def open(self) -> None:
         """Open the connection."""
+        self._closed_on_purpose = False
         await self._serial.open()
 
     async def close(self) -> None:
         """Close the connection."""
+        self._closed_on_purpose = True
         await self._serial.close()
 
     async def is_open(self) -> bool:
@@ -659,9 +662,9 @@ class AsyncResponseSerialConnection(SerialConnection):
                     return responses
                 log.info(f"{self._name}: retry number {retry}/{retries}")
 
-            except BaseException as e:
-                log.error(f"Got an error during send {e}")
-                if retry < retries:
+            except BaseException:
+                log.exception("Got an error during send")
+                if retry < retries and not self._closed_on_purpose:
                     pass
                 else:
                     raise
