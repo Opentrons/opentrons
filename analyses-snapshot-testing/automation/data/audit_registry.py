@@ -123,7 +123,7 @@ def add_missing_protocols_to_class_ast(missing, file_stem_set):  # noqa: C901
             new_assignments = [stmt for stmt in node.body if is_valid_protocol_assign(stmt, file_stem_set)]
             # Add new missing assignments
             for stem, ext in sorted(missing):
-                robot = "Flex"
+                robot = "OT2"
                 prop_name = make_valid_identifier(stem)
                 folder_value = get_folder_value(prop_name, ext)
                 assign = ast.AnnAssign(
@@ -163,7 +163,7 @@ def add_missing_protocols_to_class_ast(missing, file_stem_set):  # noqa: C901
 
 
 def extract_stem_from_snapshot(filename):
-    # Example: test_analysis_snapshot[0160301f8a][Flex_S_v2_24_96_HappyPath_Overrides_transfer_liquid_Override_200_filter].json
+    # Example: test_analysis_snapshot[54b0b509cd][OT2_X_v2_20_8_Overrides_InvalidConfigs_Override_eight_partial_column_no_end].json
     match = re.match(r"test_analysis_snapshot\[[^\]]+\]\[([^\]]+)\]\\.json", filename)
     if not match:
         match = re.match(r"test_analysis_snapshot\[[^\]]+\]\[([^\]]+)\]\.json", filename)

@@ -6,10 +6,13 @@ OVERRIDE_PROTOCOL_NAMES ?= all
 LOCAL_IMAGE_TAG ?= local
 ANALYZER_IMAGE_NAME ?= opentrons-analysis
 VENV_DIR ?= .venv
+UV_PY ?= 3.12
 
 export ANALYSIS_REF # tag, branch or commit for the opentrons repository. Used as the image tag for the analyzer image
 export PROTOCOL_NAMES # tell the test which protocols to run
 export OVERRIDE_PROTOCOL_NAMES # tell the test which override protocols to run
+export UV_PY # Python version for uv venv creation (default 3.12)
+export UV_PYTHON := $(UV_PY)
 
 .PHONY: ruff
 ruff:
@@ -39,7 +42,8 @@ test-protocol-analysis:
 .PHONY: setup
 setup:
 	@echo "You must have uv installed to run this Makefile"
-	uv run python bootstrap_uv_env.py
+	@echo "Using Python $(UV_PY)"
+	uv run --python $(UV_PY) python bootstrap_uv_env.py
 
 .PHONY: teardown
 teardown:
@@ -53,7 +57,7 @@ teardown:
 
 .PHONY: format-readme
 format-readme:
-	pnpm run prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
+	cd .. && pnpm exec prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
 
 
 .PHONY: snapshot-test
@@ -106,12 +110,6 @@ build-rs:
 	@echo "Cache is always busted to ensure latest version of the code is used"
 	@echo "If you want to build a different version, run 'make build-rs OPENTRONS_VERSION=chore_release-8.0.0'"
 	docker build --build-arg BASE_IMAGE_NAME=$(BASE_IMAGE_NAME) --build-arg OPENTRONS_VERSION=$(OPENTRONS_VERSION) --build-arg CACHEBUST=$(CACHEBUST) -t opentrons-robot-server:$(OPENTRONS_VERSION) -f citools/Dockerfile.server .
-
-.PHONY: run-flex
-run-flex:
-	@echo "Running opentrons-robot-server:$(OPENTRONS_VERSION)"
-	@echo "If you want to run a different version, run 'make run-flex OPENTRONS_VERSION=chore_release-8.0.0'"
-	docker run -p 31950:31950 --env-file ../robot-server/dev-flex.env opentrons-robot-server:$(OPENTRONS_VERSION)
 
 .PHONY: run-ot2
 run-ot2:

@@ -28,16 +28,15 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
 
     console.print(Panel(f"Found [info]{len(snapshot_json_files)}[/] JSON files in [path]{snapshot_path}[/]"))
     ignored_files = [
-        "test_analysis_snapshot[ac886d7768][Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IDTXgen96Part1to3].json",
-        "test_analysis_snapshot[f24bb0b4d9][Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3].json",
-        # https://opentrons.atlassian.net/browse/RQA-4264
-        "test_analysis_snapshot[0ea9d4ab9b][Flex_S_2_16_MPL_sample_dilution_with_96_channel_pipette].json",
-        "test_analysis_snapshot[0161fbd0a6][Flex_S_2_15_MPL_langone_ribo_pt1_ramp].json",
-        "test_analysis_snapshot[2791b57a2c][Flex_S_v2_24_P50_P1000_HappyPath_alter_lc].json",
-        # TODO: These protocols require RTP CSV files and succeed manually.
-        # Add this capability to the analysis flow.
-        "test_analysis_snapshot[13c4a34603][Flex_S_v2_20_PL_cherry].json",
-        "test_analysis_snapshot[b3d58bf433][Flex_S_v2_20_PL_protein_normal].json",
+        "test_analysis_snapshot[0330dc472b][OT2_S_v2_20_P50_touch_tip].json",
+        "test_analysis_snapshot[21eaee0bbe][OT2_S_v2_13_PL_Magazorb_DNA_OT2].json",
+        "test_analysis_snapshot[47faf6c3ae][OT2_S_v2_12_PL_6d901d].json",
+        "test_analysis_snapshot[79ef0c5304][OT2_S_v2_13_PL_Quick-RNA_OT2].json",
+        "test_analysis_snapshot[7d4f5e2cfb][OT2_S_v2_13_PL_HDQ_DNA_OT2-Cells].json",
+        "test_analysis_snapshot[aee7ffcf1d][OT2_S_v2_13_PL_HDQ_DNA_OT2-Saliva].json",
+        "test_analysis_snapshot[ce45da67d5][OT2_S_v2_15_PL_flex-custom-parameters-cherrypicking].json",
+        "test_analysis_snapshot[d50ea72948][OT2_S_v2_2_PL_omega_biotek_magbind_totalpure_ngs].json",
+        "test_analysis_snapshot[ff4a494935][OT2_S_v2_4_PL_nucleic_acid_purification_with_magnetic_beads].json",
     ]
     console.print(Panel("\n".join([f"  • [path]{escape(f)}[/]" for f in ignored_files]), title=f"Ignoring {len(ignored_files)} files"))
     snapshot_json_files = [f for f in snapshot_json_files if f.name not in ignored_files]
@@ -49,10 +48,8 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                     data = json.load(f)
                 errors_present = data.get("errors") != []
                 file_path_str = str(file_path)
-                # Check for error key at the top level of the JSON
-                # This happens when things are not found
                 has_error_key = "error" in data
-                if "Flex_S" in file_path_str:
+                if "OT2_S" in file_path_str:
                     if errors_present or has_error_key:
                         console.print(f"Error in {file_path}")
                         for e in data.get("errors", []):
@@ -61,7 +58,6 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                                     console.print(f"{w[key]}")
                         files_with_unexpected_errors.append(file_path)
                 else:
-                    # OT2 protocols are expected to fail with an OT-2 compatibility error
                     if not errors_present and not has_error_key:
                         files_missing_expected_errors.append(file_path)
 

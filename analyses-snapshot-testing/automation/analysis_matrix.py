@@ -52,9 +52,9 @@ def determine_expect_no_errors(filename: str) -> bool:
         filename: The name of the file.
 
     Returns:
-        True if filename starts with 'Flex_S', 'OT2_S', or 'pl_', else False.
+        True if filename starts with 'OT2_S', else False.
     """
-    return filename.startswith("Flex_S") or filename.startswith("OT2_S")
+    return filename.startswith("OT2_S")
 
 
 @dataclass
@@ -65,7 +65,7 @@ class ProtocolInfo:
     Attributes:
         filepath: Path to the protocol file.
         filename: Name of the file.
-        expect_no_errors: True if the filename starts with 'Flex_S', 'OT2_S', or 'pl_'.
+        expect_no_errors: True if the filename starts with 'OT2_S'.
         api_level: The API level extracted either from requirements or metadata.
         pd_version: The designer application version from a JSON file (if applicable).
         robot: The robot type extracted either from the file's requirements, metadata, or JSON.

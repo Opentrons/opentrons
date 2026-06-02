@@ -5,7 +5,7 @@
   },
   "commands": [
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -18,7 +18,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1185,7 +1185,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1205,7 +1205,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1224,7 +1224,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2413,7 +2413,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3602,7 +3602,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3636,7 +3636,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3671,7 +3671,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3706,7 +3706,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3741,7 +3741,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3771,7 +3771,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3786,7 +3786,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3820,7 +3820,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3855,7 +3855,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3890,7 +3890,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3920,7 +3920,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3935,7 +3935,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3969,7 +3969,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4004,7 +4004,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4039,7 +4039,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4074,7 +4074,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4104,7 +4104,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "blowOutInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4120,7 +4120,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4150,7 +4150,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4165,7 +4165,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4199,7 +4199,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4233,7 +4233,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4263,7 +4263,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4278,7 +4278,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4312,7 +4312,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4330,7 +4330,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4360,7 +4360,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4375,7 +4375,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4409,7 +4409,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4442,7 +4442,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4477,7 +4477,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4513,7 +4513,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4548,7 +4548,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4584,7 +4584,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4619,7 +4619,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4655,7 +4655,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4690,7 +4690,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4726,7 +4726,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4761,7 +4761,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4797,7 +4797,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4832,7 +4832,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4868,7 +4868,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4903,7 +4903,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4939,7 +4939,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4974,7 +4974,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5010,7 +5010,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5045,7 +5045,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5081,7 +5081,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5116,7 +5116,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5151,7 +5151,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5184,7 +5184,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5217,7 +5217,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5232,7 +5232,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5265,7 +5265,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5300,7 +5300,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5335,7 +5335,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5365,7 +5365,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5380,7 +5380,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -5399,7 +5399,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6588,7 +6588,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6622,7 +6622,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6657,7 +6657,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6692,7 +6692,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6727,7 +6727,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6757,7 +6757,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6772,7 +6772,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6806,7 +6806,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6841,7 +6841,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6876,7 +6876,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6906,7 +6906,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6921,7 +6921,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6955,7 +6955,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6990,7 +6990,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7025,7 +7025,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7060,7 +7060,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7090,7 +7090,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "blowOutInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7106,7 +7106,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7136,7 +7136,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7151,7 +7151,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7185,7 +7185,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "touchTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7219,7 +7219,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7249,7 +7249,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7264,7 +7264,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7298,7 +7298,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7316,7 +7316,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7346,7 +7346,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7361,7 +7361,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7395,7 +7395,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7428,7 +7428,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7463,7 +7463,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7499,7 +7499,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7534,7 +7534,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7570,7 +7570,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7605,7 +7605,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7641,7 +7641,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7676,7 +7676,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7712,7 +7712,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7747,7 +7747,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7783,7 +7783,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7818,7 +7818,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7854,7 +7854,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7889,7 +7889,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7925,7 +7925,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7960,7 +7960,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7996,7 +7996,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8031,7 +8031,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8067,7 +8067,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8102,7 +8102,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8137,7 +8137,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8170,7 +8170,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "blowout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8203,7 +8203,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "prepareToAspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8218,7 +8218,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8251,7 +8251,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8286,7 +8286,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8321,7 +8321,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "moveToAddressableAreaForDropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8351,7 +8351,7 @@
       "status": "succeeded"
     },
     {
-      "commandAnnotations": [],
+      "commandAnnotationIds": [],
       "commandType": "dropTipInPlace",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8414,6 +8414,7 @@
       }
     }
   ],
+  "labwareOffsets": [],
   "liquidClasses": [],
   "liquids": [],
   "metadata": {

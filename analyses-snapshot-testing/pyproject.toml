@@ -3,7 +3,7 @@ name = "analyses-snapshot-testing"
 version = "0.0.0"
 description = "Snapshot Testing of Opentrons Protocols"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
   "anyio>=4.9.0,<5",
   "docker>=7.1.0",

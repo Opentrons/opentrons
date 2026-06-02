@@ -10,7 +10,7 @@ description: Conventions for the analyses snapshot testing framework in analyses
 The `analyses-snapshot-testing` directory validates that protocol analysis output remains consistent across code changes by comparing JSON results against committed snapshots.
 
 - **Regression testing**: Detect unintended changes in protocol analysis behavior
-- **Protocol validation**: Ensure protocols analyze correctly for Flex
+- **Protocol validation**: Ensure protocols analyze correctly for OT-2
 - **CI/CD**: Automated testing in GitHub Actions with matrix-based parallel execution
 - **Snapshot management**: Track expected output and flag deviations
 
@@ -22,7 +22,7 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 2. **Analysis Engine** (`automation/analyze.py`) — runs protocol analysis in subprocess, 120-second timeout, JSON output
 3. **Snapshot Storage** (`tests/__snapshots__/`) — committed JSON snapshots managed by `syrupy` with custom JSON extension
 4. **Test Suite** (`tests/`) — `analyses_snapshot_test.py` (main), `audit_snapshot_test.py` (audit), `custom_json_snapshot_extension.py` (serialization)
-5. **Audit** (`automation/audit_snapshots.py`) — validates snapshots: `Flex_S` protocols must have zero errors; non-Flex (i.e., OT2) protocols are expected to have errors
+5. **Audit** (`automation/audit_snapshots.py`) — validates snapshots: `OT2_S` protocols must have zero errors; `OT2_X` protocols are expected to have errors
 6. **Protocol Registry** (`automation/data/`) — `protocols.py` (auto-generated), `protocols_with_overrides.py` (manual), `protocol_registry.py` (combined)
 7. **CI/CD** (`citools/`, `.github/workflows/`) — matrix-based parallel execution via Docker
 
@@ -32,7 +32,7 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 {Robot}_{Status}_{Version}_{Source}_{Pipettes}_{Modules}_{Overrides}\_{Description}
 ```
 
-- **Robot**: `Flex` (one legacy `OT2` protocol is kept to verify it properly fails with an OT-2 compatibility error)
+- **Robot**: `OT2`
 - **Status**: `S` (Success) or `X` (Failure expected)
 - **Version**: API version (e.g., `v2_19`) or `PD` (Protocol Designer)
 - **Source** (optional): `PL_` (Protocol Library) or `MPL_` (Manual Protocol Library)
@@ -41,7 +41,7 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 - **Overrides**: `Overrides` if protocol has parameter overrides
 - **Description**: Max 25 characters
 
-Example: `Flex_S_v2_19_P1000M_GRIP_HS_TM_MB_KAPALibraryQuant.py`
+Example: `OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py`
 
 ## Development Workflow
 
@@ -70,7 +70,7 @@ make snapshot-test-update PROTOCOL_NAMES="P1,P2" OVERRIDE_PROTOCOL_NAMES=none  #
 
 ```bash
 make snapshot-test                                                   # All (reduced verbosity)
-make snapshot-test PROTOCOL_NAMES=Flex_S_v2_19_Example OVERRIDE_PROTOCOL_NAMES=none  # Specific
+make snapshot-test PROTOCOL_NAMES=OT2_S_v2_7_P20S_None_Walkthrough OVERRIDE_PROTOCOL_NAMES=none  # Specific
 uv run python -m pytest -k analyses_snapshot_test -vv --tb=short    # Verbose debugging
 ```
 
@@ -96,7 +96,7 @@ uv run python -m pytest -k analyses_snapshot_test -vv --tb=short    # Verbose de
 
 ## Environment Setup
 
-**Prerequisites**: Python 3.10+, **uv**, Node.js/pnpm (for prettier)
+**Prerequisites**: Python 3.12, **uv**, Node.js/pnpm (for prettier)
 
 ```bash
 cd analyses-snapshot-testing

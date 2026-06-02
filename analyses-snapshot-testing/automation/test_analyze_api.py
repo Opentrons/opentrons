@@ -22,12 +22,7 @@ if __name__ == "__main__":
         if "Overrides" not in file.name and "_X_" not in file.name
     ]
 
-    ignored_files = {
-        "Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IDTXgen96Part1to3.py",
-        "Flex_S_v2_15_P1000_96_GRIP_HS_MB_TC_TM_IlluminaDNAPrep96PART3.py",
-        "pl_sample_dilution_with_96_channel_pipette.py",
-        "pl_langone_ribo_pt1_ramp.py",
-    }
+    ignored_files: set[str] = set()
     protocol_files = [f for f in protocol_files if f.name not in ignored_files]
 
     if args.limit is not None and len(protocol_files) > args.limit:

@@ -7,7 +7,7 @@ It will:
   3) Install ../api and ../shared-data themselves editable into the same venv.
 
 Environment variables:
-  - UV_PY (default: 3.10)
+  - UV_PY (default: 3.12)
   - API_DIR (default: ../api)
   - SHARED_DATA_DIR (default: ../shared-data)
 """
@@ -124,18 +124,40 @@ def uv_python_version() -> str:
         return f"Python {sys.version.split()[0]}"
 
 
+def venv_python_version(venv_path: Path) -> Optional[str]:
+    """Return major.minor Python version for an existing venv, if detectable."""
+    py_bin = venv_path / "bin" / "python"
+    if not py_bin.is_file():
+        py_bin = venv_path / "Scripts" / "python.exe"
+    if not py_bin.is_file():
+        return None
+    try:
+        out = subprocess.check_output(
+            [str(py_bin), "-c", "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"],
+            text=True,
+        ).strip()
+        return out
+    except Exception:
+        return None
+
+
 def ensure_uv_venv_and_sync(python: str) -> None:
     """Ensure uv venv exists with the given Python version, then run `uv sync`.
 
     Args:
-        python: Python version string, e.g., "3.10".
+        python: Python version string, e.g., "3.12".
     """
     venv_path = Path(".venv")
+    if venv_path.exists():
+        current = venv_python_version(venv_path)
+        if current and current != python:
+            _print(f"[plan] Existing venv uses Python {current}, recreating with Python {python}")
+            shutil.rmtree(venv_path)
     if not venv_path.exists():
         _print(f"[plan] Creating uv venv at {venv_path} with Python {python}")
         run_cmd(["uv", "venv", "--python", python, str(venv_path)])
-    _print("[plan] Syncing project dependencies via `uv sync`")
-    run_cmd(["uv", "sync"])  # uses pyproject in CWD
+    _print(f"[plan] Syncing project dependencies via `uv sync --python {python}`")
+    run_cmd(["uv", "sync", "--python", python])
 
 
 def _pin_from_table(name: str, table: dict) -> Optional[Pin]:
@@ -212,7 +234,7 @@ def main() -> int:
     ensure_cwd_has_pyproject()
     ensure_uv_available()
 
-    uv_py = os.environ.get("UV_PY", "3.10")
+    uv_py = os.environ.get("UV_PY", "3.12")
     api_dir = Path(os.environ.get("API_DIR", "../api"))
     sd_dir = Path(os.environ.get("SHARED_DATA_DIR", "../shared-data"))
 
