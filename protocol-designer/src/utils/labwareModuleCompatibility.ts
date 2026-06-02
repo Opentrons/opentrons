@@ -89,14 +89,14 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
   [VACUUM_MODULE_TYPE]: [
     'opentrons_vacuum_module_spacer_thingamajig',
-    'opentrons_vacuum_module_gen1_collar_tall',
-    'opentrons_vacuum_module_gen1_collar_short',
+    'opentrons_vacuum_manifold_collar_tall',
+    'opentrons_vacuum_manifold_collar_short',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
   [VACUUM_MODULE_TYPE_WITH_LABWARE]: [
-    'opentrons_vacuum_module_gen1_collar_tall',
-    'opentrons_vacuum_module_gen1_collar_short',
+    'opentrons_vacuum_manifold_collar_tall',
+    'opentrons_vacuum_manifold_collar_short',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
 }
