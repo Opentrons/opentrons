@@ -4,6 +4,7 @@ import logging
 import socket
 from typing import Any, Callable
 
+import Pyro5
 from Pyro5 import api as pyro
 from Pyro5 import errors
 
@@ -25,6 +26,7 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
     registry()
 
     # Handle Pyro registration and publication of our synchronized object
+    Pyro5.config.THREADPOOL_SIZE = 100  # type: ignore
     with pyro.Daemon() as daemon:  # type: ignore
         utility = DaemonUtility(daemon)
         # Create a guaranteed synchronous adapted alias to the resource
