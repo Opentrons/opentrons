@@ -384,9 +384,9 @@ def test_vacuum_module_start_execute_profile(
         ),
     ]
     repetitions = 2
-    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(0) 
-    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(-800) 
-    
+    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(0)
+    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(-800)
+
     subject.start_execute_profile(steps=profile_steps, repetitions=repetitions)
 
     decoy.verify(
