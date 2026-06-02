@@ -1,10 +1,24 @@
 .root_container {
   display: flex;
+  height: 2.75rem;
   flex-direction: row;
-  align-items: flex-start;
-  padding: var(--spacing-4) 0 var(--spacing-4) var(--spacing-8);
+  justify-content: space-between;
+  padding: 0 var(--spacing-8);
   border-bottom: 1px solid var(--grey-30);
   background-color: var(--white);
+  gap: var(--spacing-24);
+}
+
+.left_container {
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.right_container {
+  display: flex;
+  height: 100%;
+  align-items: center;
 }
 
 .crumb_container {
@@ -16,10 +30,7 @@
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  font-size: var(--font-size-p);
-  font-weight: var(--font-weight-regular);
   -webkit-line-clamp: 1;
-  line-height: var(--line-height-16);
   overflow-wrap: anywhere;
   text-overflow: ellipsis;
   word-break: normal;
@@ -43,19 +54,24 @@
   opacity: 1;
 }
 
-.crumb_active {
+.crumb_and_separator {
   display: flex;
   align-items: center;
+  gap: var(--spacing-4);
+}
+
+.crumb_active {
   color: var(--blue-50);
 }
 
 .crumb_inactive {
-  display: flex;
-  align-items: center;
   color: var(--grey-50);
 }
 
-.crumb_name {
-  padding-right: var(--spacing-4);
-  text-transform: none;
+.separator {
+  flex: none;
+}
+
+.account_popover_menu_container {
+  position: relative;
 }
