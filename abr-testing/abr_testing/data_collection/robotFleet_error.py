@@ -82,6 +82,34 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
         print(f"Error during file transfer: {e}")
     return ""
 
+# def retrieve_live_image(run_id: str, robot_ip: str, storage: str) -> str:
+#     """Save all capture images for a run."""
+#     save_dir = Path(f"{storage}")
+#     new_save_dir = save_dir / run_id
+#     key_path = save_dir / "robot_key"
+#     zip_path = save_dir / f"{run_id}_images"
+#     command = [
+#         "scp",
+#         "-i", str(key_path),
+#         "-o", "StrictHostKeyChecking=no",
+#         "-r",
+#         f"root@{robot_ip}:/data/images/{run_id}/",
+#         save_dir,
+#     ]
+#     try:
+#         subprocess.run(command, check=True)  # type: ignore
+#         shutil.make_archive(
+#             base_name=str(zip_path),
+#             format="zip",
+#             root_dir=new_save_dir,
+#         )
+#         subprocess.run(["rm", "-r", new_save_dir], check=True)
+#         print("Image folder transfered successful!")
+#         return str(zip_path) + ".zip"
+#     except subprocess.CalledProcessError as e:
+#         print(f"Error during file transfer: {e}")
+#     return ""
+
 
 def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Path | str:
     """Find and copy protocol file on robot with error handling."""
@@ -545,9 +573,6 @@ if __name__ == "__main__":
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
-    image_files = ""
-    if len(run_or_other) < 1:
-        image_files = retrieve_protocol_images(one_run, ip, storage_directory)
 
     print(f"Making ticket for {summary}.")
     all_issues = ticket.issues_on_board(project_key)
@@ -565,6 +590,12 @@ if __name__ == "__main__":
         labels,
         parent,
     )
+    image_files = ""
+    if len(run_or_other) < 1:
+        image_files = retrieve_protocol_images(one_run, ip, storage_directory)
+    # else:
+    #     image_files = retrieve_live_image(issue_key, ip, storage_directory)
+
     # Link Tickets - TODO: FIX THIS TO WORK
     to_link = ticket.match_issues(all_issues, summary)
     ticket.link_issues(to_link, issue_key)
