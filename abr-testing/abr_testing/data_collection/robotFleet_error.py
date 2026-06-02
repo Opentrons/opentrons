@@ -542,6 +542,111 @@ def get_run_error_info_from_robot(
         saved_file_path,
     )
 
+def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
+    """Fetch latest run and SCP protocol into storage_directory (needs robot_key there)."""
+    storage = Path(storage_directory)
+    ssh_key = storage / "robot_key"
+
+    response = requests.get(
+        f"http://{robot_ip}:31950/runs",
+        headers={"opentrons-version": "*"},
+        timeout=10,
+    )
+    response.raise_for_status()
+
+    run_list = response.json().get("data") or []
+    if not run_list:
+        print("No runs found on robot.")
+        return ""
+
+    latest_run = run_list[-1]
+    protocol_id = latest_run.get("protocolId")
+    if not protocol_id:
+        return ""
+
+    try:
+        result = subprocess.run(
+            [
+                "ssh",
+                "-i",
+                str(ssh_key),
+                "-o",
+                "StrictHostKeyChecking=no",
+                f"root@{robot_ip}",
+                "ls /var/lib/opentrons-robot-server",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        version_dirs = []
+        for line in result.stdout.splitlines():
+            try:
+                num = float(line)
+                version_dirs.append(int(num) if num.is_integer() else int(num))
+            except ValueError:
+                pass
+        version_dirs.sort(reverse=True)
+    except (subprocess.CalledProcessError, ValueError) as e:
+        print(f"Could not find robot-server data folder: {e}")
+        return ""
+
+    remote = None
+    for folder_num in version_dirs:
+        candidate = (
+            f"/var/lib/opentrons-robot-server/{folder_num}/protocols/{protocol_id}"
+        )
+        check = subprocess.run(
+            [
+                "ssh",
+                "-i",
+                str(ssh_key),
+                "-o",
+                "StrictHostKeyChecking=no",
+                f"root@{robot_ip}",
+                f"test -d {candidate}",
+            ],
+            capture_output=True,
+        )
+        if check.returncode == 0:
+            remote = candidate
+            break
+
+    if not remote:
+        return ""
+
+    try:
+        subprocess.run(
+            [
+                "scp",
+                "-i",
+                str(ssh_key),
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-r",
+                f"root@{robot_ip}:{remote}",
+                str(storage),
+            ],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error copying protocol from robot: {e}")
+        return ""
+
+    protocol_folder = storage / protocol_id
+
+    for ext in (".py", ".json"):
+        for name in os.listdir(protocol_folder):
+            if name.endswith(ext):
+                dest = storage / name
+                shutil.move(str(protocol_folder / name), str(dest))
+                shutil.rmtree(protocol_folder, ignore_errors=True)
+                print(f"protocol_file: {dest}")
+                return dest
+
+    shutil.rmtree(protocol_folder, ignore_errors=True)
+    return ""
+
 
 if __name__ == "__main__":
     """Create ticket for specified robot."""
@@ -630,6 +735,7 @@ if __name__ == "__main__":
             ip, one_run, storage_directory, protocol_found, project_key
         )
     else:
+        protocol_file_path = save_latest_protocol(ip, storage_directory)
         (
             summary,
             parent,
