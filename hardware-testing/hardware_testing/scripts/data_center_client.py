@@ -137,8 +137,8 @@ def get_base_url():
     print("Warning: Could not find server, using default URL")
     BASE_URL = DEFAULT_BASE_URL
     return BASE_URL
-def delete_folder(folder_path):
-    """删除文件夹`
+def _delete_local_folder(folder_path):
+    """删除本地文件夹。
 
     Args:
         folder_path (str): 要删除的文件夹路径
@@ -242,8 +242,7 @@ def upload_data_to_google_drive(csv_file_path, delete_folder=False, pull_method=
 
     Args:
         csv_file_path (str): CSV文件的本地路径, 用于上传到服务器
-        folder_name (str): 从机器人拉取的文件夹名称
-        delete_folder (bool): 是否删除的文件夹，默认 False
+        delete_folder (bool): 上传成功后是否删除本地文件夹，默认 False
         pull_method (str): 拉取方式 (sftp 或 scp)，默认 sftp
 
     Returns:
@@ -287,7 +286,7 @@ def upload_data_to_google_drive(csv_file_path, delete_folder=False, pull_method=
     )
     result = upload_response.get("success")
     if result and delete_folder:
-        delete_folder(folder_name)
+        _delete_local_folder(folder_name)
     if result:
         print(f"Data uploaded successfully, Result is {result}")
     else:
