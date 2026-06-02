@@ -217,9 +217,9 @@ class AbstractModule(AbstractDevice):
                 t = self._loop.create_task(task_function())
                 self.make_cancellable(t)
                 await t
-            except BaseException as e:
-                mod_log.info(
-                    f"error in fault tollerant module call {e} debounce {debounce_count}"
+            except BaseException:
+                mod_log.exception(
+                    f"error in fault tollerant module call debounce {debounce_count}"
                 )
                 debounce_count -= 1
                 await asyncio.sleep(1)

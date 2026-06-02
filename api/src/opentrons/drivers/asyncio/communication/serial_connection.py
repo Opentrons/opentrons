@@ -662,12 +662,15 @@ class AsyncResponseSerialConnection(SerialConnection):
                     return responses
                 log.info(f"{self._name}: retry number {retry}/{retries}")
 
-            except BaseException:
+            except Exception:
                 log.exception("Got an error during send")
                 if retry < retries and not self._closed_on_purpose:
                     pass
                 else:
                     raise
+            except asyncio.CancelledError:
+                log.exception("Asyncio canceled")
+                raise
 
             await self.on_retry()
         raise NoResponse(port=self._port, command=data)
