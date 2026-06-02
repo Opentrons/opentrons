@@ -121,7 +121,7 @@ function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
           setIsMenuOpen(current => !current)
         }}
       />
-      {isMenuOpen && (
+      {isMenuOpen ? (
         // todo(mm, 2026-05-28): This MenuList is rendering too far away from the button.
         // MenuList hard-codes an offset that's wrong here (and perhaps wrong everywhere),
         // and doesn't give us a way to override it.
@@ -132,7 +132,7 @@ function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
           <MenuItem>{t('account_settings')}</MenuItem>
           <MenuItem onClick={logOut}>{t('log_out')}</MenuItem>
         </MenuList>
-      )}
+      ) : null}
     </div>
   )
 }
