@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import re
 from glob import glob
-from typing import TYPE_CHECKING, Callable, List, Optional, Union
+from typing import TYPE_CHECKING, AsyncGenerator, Callable, List, Optional, Union
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
@@ -91,6 +92,7 @@ class AttachedModulesControl:
         self._api = api
         self._usb = usb
         self._event_callback = event_callback
+        self._reconnect_lock: Optional["asyncio.Lock"] = None
         if not IS_ROBOT and not api.is_simulator:
             # Start task that registers emulated modules.
             self._emulation_listen_task: asyncio.Task[None] | None = (
@@ -246,15 +248,23 @@ class AttachedModulesControl:
                 f"Async error callback for module {model} {serial} at {port} for exc {exc} failed"
             )
 
+    @contextlib.asynccontextmanager
+    async def _use_reconnect_lock(self) -> AsyncGenerator[None, None]:
+        self._reconnect_lock = self._reconnect_lock or asyncio.Lock()
+
+        async with self._reconnect_lock:
+            yield
+
     async def _clear_old_modules(self) -> None:
-        for old_mod in self._recently_removed_modules:
-            # Important: this wants to be after the remove because this may trigger
-            # recursion back to here; we therefore want the module to already be
-            # removed so that the recursion terminates next loop
-            old_mod.disconnected_callback()
-            log.info(f"did not find {old_mod.serial_number}")
-            self._recently_removed_modules.remove(old_mod)
-            await old_mod.cleanup()
+        async with self._use_reconnect_lock():
+            for old_mod in self._recently_removed_modules:
+                # Important: this wants to be after the remove because this may trigger
+                # recursion back to here; we therefore want the module to already be
+                # removed so that the recursion terminates next loop
+                old_mod.disconnected_callback()
+                log.info(f"did not find {old_mod.serial_number}")
+                self._recently_removed_modules.remove(old_mod)
+                await old_mod.cleanup()
 
     async def _reconnect_patch(self) -> None:
         try:
@@ -264,7 +274,8 @@ class AttachedModulesControl:
                     if attached_mod.serial_number == old_mod.serial_number:
                         log.info(f"Found {old_mod.serial_number} was reconnected")
                         # module reattached to a new virtual port, create a symlink to it
-                        await attached_mod.cleanup()
+                        await attached_mod.soft_cleanup()
+                        await old_mod.soft_cleanup()
                         if attached_mod.port != old_mod.port:
                             log.info(
                                 f"module moved from {old_mod.port} to {attached_mod.port}"
@@ -387,7 +398,9 @@ class AttachedModulesControl:
                 log.exception(
                     f"Failed to build device {device.name} at port {device.port}: {e}"
                 )
-        await self._reconnect_patch()
+        if len(new_devices_at_ports) > 0:
+            async with self._use_reconnect_lock():
+                await self._reconnect_patch()
         self._available_peripherals = sorted(
             self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
         )

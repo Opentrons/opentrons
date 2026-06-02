@@ -6,7 +6,6 @@ from typing import AsyncGenerator, List, Optional
 
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
-from opentrons.config import IS_ROBOT
 from opentrons.drivers.asyncio.communication.errors import SerialException
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 
@@ -111,13 +110,9 @@ class Poller:
         try:
             async with self._use_read_lock():
                 await self._reader.read()
-        except asyncio.CancelledError as ce:
-            if not IS_ROBOT:
-                raise
-            log.error(f"canceled error: {ce}")
-            # cancelled error does not inherit from Exception so lets re-wrap it
-            new_exception = RuntimeError(str(ce)).with_traceback(ce.__traceback__)
-            self._error_callback(new_exception)
+        except asyncio.CancelledError:
+            log.exception("poller canceled.")
+            raise
         except AbsorbanceReaderDisconnectedError as e:
             self._error_callback(e)
             self._complete_all(e, previous_waiters)

@@ -175,12 +175,16 @@ class Thermocycler(mod_abc.AbstractModule):
             self._enter_error_state
         )
 
-    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
-    async def cleanup(self) -> None:
+    async def soft_cleanup(self) -> None:
         """Stop the poller task."""
         self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
+
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self.soft_cleanup()
 
     @classmethod
     def name(cls) -> str:
