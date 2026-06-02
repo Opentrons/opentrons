@@ -39,6 +39,7 @@ nav:
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
       - Updating the Robot: opentrons-app/update.md
+      - Downgrading the Robot: opentrons-app/ot2-downgrade.md
       - Resetting the Robot: opentrons-app/reset.md
       - App Features Summary: opentrons-app/features-summary.md
   - Advanced Operations:
