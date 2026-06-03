@@ -8,9 +8,6 @@
 #include <cstring>
 #include <unordered_map>
 
-#pragma GCC push_options
-#pragma GCC optimize("O0")
-
 #include "accessor.hpp"
 #include "addresses.hpp"
 #include "common/core/bit_utils.hpp"
@@ -724,4 +721,3 @@ class BookAccessor
 
 }  // namespace book_accessor
 }  // namespace eeprom
-#pragma GCC pop_options
