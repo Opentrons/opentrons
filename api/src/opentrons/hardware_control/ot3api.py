@@ -3359,7 +3359,10 @@ class OT3API(
         return s_data if s_data else 0.0
 
     async def read_instrument_capacitance(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True, timeout: int = 1,
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        primary: bool = True,
+        timeout: int = 1,
     ) -> float:
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)

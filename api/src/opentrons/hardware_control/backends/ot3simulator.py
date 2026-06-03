@@ -466,9 +466,9 @@ class OT3Simulator(FlexBackend):
             mount, cast(PipetteSpec, init_instr), expected_instr
         )
         if pipette["config"]:
-            self._present_axes.update((Axis.of_plunger(mount)))
+            self._present_axes.update([Axis.of_plunger(mount.to_mount())])
         else:
-            self._present_axes.discard(Axis.of_plunger(mount))
+            self._present_axes.discard(Axis.of_plunger(mount.to_mount()))
         return pipette
 
     def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
