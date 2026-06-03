@@ -360,9 +360,14 @@ def get_user_id(user_file_path: str, assignee_name: str) -> str:
 
 
 def get_error_runs_from_robot(ip: str) -> Tuple[List[str], List[str]]:
-    """Get runs that have errors from robot."""
-    error_run_ids = []
-    protocol_ids = []
+    """Get runs that have errors from robot. Now including error recovery!"""
+    error_run_ids: List[str] = []
+    protocol_ids: List[str] = []
+    recovery_statuses = {
+        "awaiting-recovery",
+        "awaiting-recovery-paused",
+        "awaiting-recovery-blocked-by-open-door",
+    }
     response = requests.get(
         f"http://{ip}:31950/runs", headers={"opentrons-version": "*"}
     )
@@ -370,11 +375,17 @@ def get_error_runs_from_robot(ip: str) -> Tuple[List[str], List[str]]:
     run_list = run_data.get("data", [])
     for run in run_list:
         run_id = run["id"]
-        protocol_id = run["protocolId"]
-        num_of_errors = len(run["errors"])
-        if not run["current"] and num_of_errors > 0:
+        protocol_id = run.get("protocolId")
+        if not protocol_id:
+            continue
+        status = run.get("status", "")
+        num_of_errors = len(run.get("errors") or [])
+        in_recovery = status in recovery_statuses
+        terminal_error = status in ("failed", "stopped") or (
+            not run.get("current") and num_of_errors > 0
+        )
+        if in_recovery or terminal_error:
             error_run_ids.append(run_id)
-            # Protocol ID will identify the correct folder on the robot of the protocol file
             protocol_ids.append(protocol_id)
     return (error_run_ids, protocol_ids)
 
@@ -647,6 +658,14 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
     shutil.rmtree(protocol_folder, ignore_errors=True)
     return ""
 
+def make_json_file(storage_directory: str, whole_description_str: str):
+    save_dir = Path(storage_directory)
+    file_path = save_dir / "status.json"
+    with open(file_path, "w") as json_file:
+        json.dump(whole_description_str, json_file, indent=4)
+    absolute_filepath = file_path.resolve()
+    return str(absolute_filepath)
+
 
 if __name__ == "__main__":
     """Create ticket for specified robot."""
@@ -702,13 +721,12 @@ if __name__ == "__main__":
     version_file_path = os.path.join(storage_directory, version_file_dir)
     #Nick Check
     protocol_file_path = ""
-    if len(run_or_other) < 1:
-        # Retrieve the most recently run protocol file
+    one_run = ""
+    if len(run_or_other) < 1 and error_runs and protocol_ids:
         protocol_folder = retrieve_protocol_file(
             protocol_ids[-1], ip, storage_directory
         )
         protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
-        # Path to protocol folder
         try:
             protocol_file_path = next(
                 os.path.join(protocol_folder_path, f)
@@ -718,11 +736,9 @@ if __name__ == "__main__":
         except (FileNotFoundError, StopIteration):
             print(f"No .py file found or folder not found: {protocol_folder_path}")
 
-        # Set protocol_found to true if python protocol was successfully copied over
         if protocol_file_path:
             protocol_found = True
-        one_run = error_runs[-1]  # Most recent run with error.
-        #Nick check
+        one_run = error_runs[-1]
         (
             summary,
             parent,
@@ -735,6 +751,13 @@ if __name__ == "__main__":
             ip, one_run, storage_directory, protocol_found, project_key
         )
     else:
+        if len(run_or_other) < 1:
+            print("No failed/recovery runs matched filters.")
+            run_or_other = str(
+                input(
+                    "Type short summary of error: "
+                )
+            ).strip()
         protocol_file_path = save_latest_protocol(ip, storage_directory)
         (
             summary,
@@ -748,14 +771,16 @@ if __name__ == "__main__":
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
-
+    # make description replacement file
+    status_path = make_json_file(storage_directory, whole_description_str)
     print(f"Making ticket for {summary}.")
     all_issues = ticket.issues_on_board(project_key)
     # CREATE TICKET
     #TODO: for pyro, add pyro filter as HIGH priority
+    description = ""
     issue_key, raw_issue_url = ticket.create_ticket(
         summary,
-        whole_description_str,
+        description,
         project_key,
         "-1",
         "Bug",
@@ -790,7 +815,8 @@ if __name__ == "__main__":
         protocol_file_path, #only when errored
         version_file_path, #works
         log_zip_path, #works
-        image_files,
+        image_files, #works
+        status_path, 
     ]
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
