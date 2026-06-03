@@ -8,7 +8,7 @@ import shutil
 import os
 import subprocess
 import platform
-from datetime import datetime, timedelta
+from datetime import datetime
 import sys
 import json
 import re
@@ -71,6 +71,22 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
         f"root@{robot_ip}:/data/images/{run_id}/",
         save_dir,
     ]
+    new_save_dir.mkdir(parents=True, exist_ok=True)
+    odd_path = new_save_dir / f"{robot_ip}_odd.png"
+    try:
+        # Get the CDP websocket URL
+        targets = requests.get(f"http://{robot_ip}:9223/json", timeout=5).json()
+        ws_url = targets[0]["webSocketDebuggerUrl"].replace("localhost", robot_ip)
+        # Connect and send Page.captureScreenshot
+        ws = websocket.create_connection(ws_url, timeout=10)
+        ws.send(json.dumps({"id": 1, "method": "Page.captureScreenshot", "params": {"format": "png"}}))
+        result = json.loads(ws.recv())
+        ws.close()
+        image_data = base64.b64decode(result["result"]["data"])
+        odd_path.write_bytes(image_data)
+        print(f"ODD screenshot saved: {odd_path}")
+    except Exception as e:
+        print(f"Failed to capture ODD screenshot: {e}")
     try:
         subprocess.run(command, check=True)  # type: ignore
         shutil.make_archive(
@@ -181,7 +197,6 @@ def update_camera_status(status: str, robot_ip: str, key_path: str):
 
 def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Path | str:
     """Find and copy protocol file on robot with error handling."""
-    # List folders in the robot's directory
     list_folder_command = [
         "ssh",
         "-i", str(Path(storage) / "robot_key"),
@@ -193,54 +208,43 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
         result = subprocess.run(
             list_folder_command, check=True, capture_output=True, text=True
         )
-        folders = result.stdout.splitlines()
-
-        def convert_to_floats(data: List) -> List:
-            """Convert list to floats."""
-            float_list = []
-            for item in data:
-                try:
-                    float_value = float(item)
-                    float_list.append(float_value)
-                except ValueError:
-                    pass  # Ignore items that cannot be converted to float
-            return float_list
-
-        folders_float = convert_to_floats(folders)
-        if not folders_float:
-            print("No folders found.")
-            return ""
-        folder_num = max(
-            folders_float
-        )  # Assuming the highest folder number is the latest
-        if folder_num.is_integer():
-            folder_num = int(folder_num)
+        folders = []
+        for line in result.stdout.splitlines():
+            try:
+                num = float(line)
+                folders.append(int(num) if num.is_integer() else int(num))
+            except ValueError:
+                pass
+        folders.sort(reverse=True)
     except subprocess.CalledProcessError:
         print("Could not find folder.")
         return ""
-    protocol_dir = (
-        f"/var/lib/opentrons-robot-server/{folder_num}/protocols/{protocol_id}"
-    )
 
-    # Copy protocol file found in robot onto host computer
-    save_dir = Path(f"{storage}")
-    key_path = Path(storage) / "robot_key"
-    command = [
-        "scp",
-        "-i", str(key_path),
-        "-o", "StrictHostKeyChecking=no",
-        "-r",
-        f"root@{robot_ip}:{protocol_dir}",
-        save_dir,
-    ]
-    try:
-        # If file found and copied return path to file
-        subprocess.run(command, check=True)  # type: ignore
-        print("File transfer successful!")
-        return save_dir
-    except subprocess.CalledProcessError as e:
-        print(f"Error during file transfer: {e}")
-        # Return empty string if file can't be copied
+    if not folders:
+        print("No folders found.")
+        return ""
+
+    save_dir = Path(storage)
+    key_path = save_dir / "robot_key"
+
+    for folder_num in folders:
+        protocol_dir = f"/var/lib/opentrons-robot-server/{folder_num}/protocols/{protocol_id}"
+        command = [
+            "scp",
+            "-i", str(key_path),
+            "-o", "StrictHostKeyChecking=no",
+            "-r",
+            f"root@{robot_ip}:{protocol_dir}",
+            save_dir,
+        ]
+        try:
+            subprocess.run(command, check=True)
+            print("File transfer successful!")
+            return save_dir
+        except subprocess.CalledProcessError:
+            continue  # try next version folder
+
+    print(f"Error during file transfer: protocol not found in versions {folders}")
     return ""
 
 
@@ -515,16 +519,6 @@ def get_run_error_info_from_robot(
 
     # If Protocol was successfully retrieved from the robot
     description["protocol_found_on_robot"] = protocol_found
-    # Get start and end time of run
-    start_time = datetime.strptime(
-        results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
-    )
-    adjusted_start_time = start_time - timedelta(hours=4)
-    complete_time = datetime.strptime(
-        results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
-    )
-    adjusted_complete_time = complete_time - timedelta(hours=4)
-
     # Build ticket description: error summary, last protocol step, mount/gripper attachments, and module info
     description["error"] = " ".join([error_code, error_type, error_instrument])
     protocol_step = list(results["commands"])[-1]
@@ -660,7 +654,7 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
 
 def make_json_file(storage_directory: str, whole_description_str: str):
     save_dir = Path(storage_directory)
-    file_path = save_dir / "status.json"
+    file_path = save_dir / "health.json"
     with open(file_path, "w") as json_file:
         json.dump(whole_description_str, json_file, indent=4)
     absolute_filepath = file_path.resolve()
@@ -817,7 +811,7 @@ if __name__ == "__main__":
         version_file_path, #works
         log_zip_path, #works
         image_files, #works
-        status_path, 
+        status_path, #works
     ]
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
