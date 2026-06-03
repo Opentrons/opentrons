@@ -53,7 +53,9 @@ export function DocumentationRequired({
             buttonType: 'tertiaryHighLight',
             iconName: 'information',
             iconPlacement: 'startIcon',
-            onClick: () => {},
+            onClick: () => {
+              console.log('actions to document:', actionsToDocument)
+            },
           }}
           onClickBack={onBack}
         />

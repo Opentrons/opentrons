@@ -34,7 +34,7 @@ describe('useDocumentedMutation', () => {
           { reasonForInteractionRequired: false },
           ['play_run'],
           testMutationKey,
-          (n: number) => mutationFn(n),
+          ({ variables: n }) => mutationFn(n),
           {}
         ),
       { wrapper }
@@ -62,7 +62,7 @@ describe('useDocumentedMutation', () => {
           },
           ['play_run'],
           testMutationKey,
-          (x: number) => mutationFn(x),
+          ({ variables: x }) => mutationFn(x),
           {}
         ),
       { wrapper }
@@ -92,7 +92,7 @@ describe('useDocumentedMutation', () => {
           },
           ['play_run'],
           testMutationKey,
-          (s: string) => mutationFn(s),
+          ({ variables: s }) => mutationFn(s),
           {}
         ),
       { wrapper }
@@ -121,7 +121,7 @@ describe('useDocumentedMutation', () => {
           },
           ['play_run'],
           testMutationKey,
-          (s: string) => mutationFn(s),
+          ({ variables: s }) => mutationFn(s),
           {}
         ),
       { wrapper }

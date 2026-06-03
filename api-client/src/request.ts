@@ -53,7 +53,12 @@ export function request<ResData, ReqData = null>(
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
   const userNotesHeader =
     userNotes != null ? { 'Opentrons-User-Notes': userNotes } : {}
-  const headers = { ...DEFAULT_HEADERS, ...tokenHeader, ...userNotesHeader }
+  const headers = {
+    ...DEFAULT_HEADERS,
+    ...tokenHeader,
+    ...userNotesHeader,
+    ...axiosConfig?.headers,
+  }
 
   const protocol = (secure ?? false) ? 'https' : 'http'
   const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
@@ -61,11 +66,11 @@ export function request<ResData, ReqData = null>(
   const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
 
   return requestor<ResData>({
-    headers,
     method,
     baseURL,
     url,
     data,
     ...axiosConfig,
+    headers,
   })
 }

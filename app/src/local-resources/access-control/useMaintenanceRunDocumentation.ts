@@ -39,12 +39,10 @@ export const useMaintenanceRunDocumentation = (
   )
   const deletionDocState = useGuardedAction()
 
-  const addActionToDocument = useCallback(
-    (action: DocumentedAction) => {
-      setActionsToDocument([...actionsToDocument, action])
-    },
-    [actionsToDocument]
-  )
+  const addActionToDocument = useCallback((action: DocumentedAction) => {
+    console.log('adding action to document:', action)
+    setActionsToDocument(prev => [...prev, action])
+  }, [])
 
   return {
     commandDocState,

@@ -144,7 +144,7 @@ export function useModuleSetupWizard(
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
     deletionDocState,
-    actionsToDocument,
+    [...actionsToDocument, 'end_module_setup'],
     {
       onSuccess: () => {
         setMaintenanceRunId(null)

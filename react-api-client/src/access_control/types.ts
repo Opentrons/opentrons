@@ -28,9 +28,13 @@ export type DocumentationState =
       ) => Promise<DocumentationReport>
     }
 
-export type DocumentedMutationFunction<TData = unknown, TVariables = void> = (
-  variables: TVariables,
+export interface DocumentedMutationParameters<TVariables = void> {
   userNotes: string
+  variables: TVariables
+}
+
+export type DocumentedMutationFunction<TData = unknown, TVariables = void> = (
+  parameters: DocumentedMutationParameters<TVariables>
 ) => Promise<TData>
 
 /**
@@ -68,7 +72,9 @@ export type DocumentedAction =
   | 'stop_run'
   | 'play_run'
   | 'place_plate_reader_lid'
+  | 'end_plate_reader_lid'
   | 'home_pipettes'
+  | 'end_home_pipettes'
   | 'attach_gripper'
   | 'detach_gripper'
   | 'recalibrate_gripper'
@@ -77,6 +83,10 @@ export type DocumentedAction =
   | 'end_calibration'
   | 'add_module'
   | 'attach_pipette'
+  | 'end_module_setup'
+  | 'end_lpc_flow'
+  | 'end_gripper_wizard'
+  | 'end_drop_tips'
   | RunTimeCommand
   | PipetteWizardFlowName
   | AttachingModule

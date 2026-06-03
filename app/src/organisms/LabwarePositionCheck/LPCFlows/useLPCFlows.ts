@@ -143,7 +143,10 @@ export function useLPCFlows({
   const { createLabwareDefinition } =
     useCreateMaintenanceRunLabwareDefinitionMutation(commandDocState)
   const { deleteMaintenanceRun, isLoading: isClosing } =
-    useDeleteMaintenanceRunMutation(deletionDocState, actionsToDocument)
+    useDeleteMaintenanceRunMutation(deletionDocState, [
+      ...actionsToDocument,
+      'end_lpc_flow',
+    ])
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(

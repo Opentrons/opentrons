@@ -42,8 +42,7 @@ export function useCreateMaintenanceRunMutation(
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[],
   options: UseCreateMaintenanceRunMutationOptions = {},
-  hostOverride?: HostConfig | null,
-  userNotes?: string
+  hostOverride?: HostConfig | null
 ): UseCreateMaintenanceRunMutationResult {
   const contextHost = useHost()
   const host =
@@ -56,7 +55,7 @@ export function useCreateMaintenanceRunMutation(
   >(
     documentationState,
     actionsToDocument,
-    (createMaintenanceRunData = {}) =>
+    ({ variables: createMaintenanceRunData, userNotes }) =>
       createMaintenanceRun(host!, createMaintenanceRunData, userNotes)
         .then(response => response.data)
         .catch(e => {

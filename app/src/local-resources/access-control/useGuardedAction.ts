@@ -1,7 +1,10 @@
 import { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
-import { useAuthSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useAuthSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
 
@@ -30,9 +33,11 @@ export function useGuardedAction(
   docreport?: DocumentationReport
 ): DocumentationState {
   const authSettingsQuery = useAuthSettingsQuery()
+  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+
   const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
   const accessControlEnabled =
-    authSettingsQuery?.data?.data?.accessControlEnabled ?? false
+    accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
   const requireReasonForInteraction =
     authSettingsQuery?.data?.data?.requireReasonForInteraction ?? false
   const minLengthOfReasonForInteraction =
@@ -76,9 +81,9 @@ export function useGuardedAction(
       askForDocumentation: showDocumentationModal,
     }
   }, [
-    reasonForInteractionRequired,
     docreport,
     minLengthOfReasonForInteraction,
+    reasonForInteractionRequired,
     showDocumentationModal,
   ])
 

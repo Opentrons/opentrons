@@ -13,6 +13,7 @@ import type {
 import type { LabwareDefinitionSummary } from '@opentrons/api-client'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { DocumentationState } from '../access_control'
+import type { DocumentedMutationParameters } from '../access_control/types'
 
 interface CreateMaintenanceRunLabwareDefinitionMutateParams {
   maintenanceRunId: string
@@ -54,7 +55,10 @@ export function useCreateMaintenanceRunLabwareDefinitionMutation(
   >(
     documentationState,
     ['lpc_flow'],
-    ({ maintenanceRunId, labwareDef }, userNotes) =>
+    ({
+      variables: { maintenanceRunId, labwareDef },
+      userNotes,
+    }: DocumentedMutationParameters<CreateMaintenanceRunLabwareDefinitionMutateParams>) =>
       createMaintenanceRunLabwareDefinition(
         host!,
         maintenanceRunId,

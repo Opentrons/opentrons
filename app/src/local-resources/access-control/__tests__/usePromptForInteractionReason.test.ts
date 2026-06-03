@@ -1,7 +1,10 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAuthSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useAuthSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { usePromptForInteractionReason } from '../usePromptForInteractionReason'
 import {
@@ -14,6 +17,7 @@ import type { DocumentationReport } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAuthSettingsQuery: vi.fn(),
+  useAccessControlEnabledQuery: vi.fn(),
 }))
 
 vi.mock('react-redux', async importOriginal => {
@@ -41,12 +45,18 @@ describe('usePromptForInteractionReason', () => {
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: {
         data: {
-          accessControlEnabled: true,
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
       mockDocreport
     )
@@ -60,12 +70,18 @@ describe('usePromptForInteractionReason', () => {
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: {
         data: {
-          accessControlEnabled: false,
-          requireReasonForInteraction: false,
+          requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: false,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
 
     const { result } = renderHook(
       () => usePromptForInteractionReason(['lpc_flow']),
@@ -78,6 +94,31 @@ describe('usePromptForInteractionReason', () => {
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
 
+  it('does not prompt when access control is enabled but require reason for interaction is disabled', () => {
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          requireReasonForInteraction: false,
+          minLengthOfReasonForInteraction: 10,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
+    const { result } = renderHook(
+      () => usePromptForInteractionReason(['lpc_flow']),
+      {
+        wrapper,
+      }
+    )
+    expect(result.current.reasonForInteractionRequired).toBe(false)
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+  })
   it('prompts for documentation when access control is enabled', async () => {
     const { result } = renderHook(
       () => usePromptForInteractionReason(['lpc_flow']),

@@ -13,6 +13,7 @@ import type {
 import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DocumentationState, DocumentedAction } from '../access_control'
+import type { DocumentedMutationParameters } from '../access_control/types'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
   maintenanceRunId: string
@@ -54,7 +55,10 @@ export function useCreateMaintenanceCommandMutation(
   >(
     documentationState,
     actionsToDocument,
-    ({ maintenanceRunId, command, waitUntilComplete, timeout }, userNotes) =>
+    ({
+      variables: { maintenanceRunId, command, waitUntilComplete, timeout },
+      userNotes,
+    }: DocumentedMutationParameters<CreateMaintenanceCommandMutateParams>) =>
       createMaintenanceCommand(
         host!,
         maintenanceRunId,

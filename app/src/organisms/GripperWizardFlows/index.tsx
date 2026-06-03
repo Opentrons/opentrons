@@ -151,14 +151,18 @@ export function GripperWizardFlows(
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation(deletionDocState, actionsToDocument, {
-      onSuccess: () => {
-        closeFlow()
-      },
-      onError: () => {
-        closeFlow()
-      },
-    })
+    useDeleteMaintenanceRunMutation(
+      deletionDocState,
+      [...actionsToDocument, 'end_gripper_wizard'],
+      {
+        onSuccess: () => {
+          closeFlow()
+        },
+        onError: () => {
+          closeFlow()
+        },
+      }
+    )
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)

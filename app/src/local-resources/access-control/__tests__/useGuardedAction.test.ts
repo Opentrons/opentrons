@@ -1,7 +1,10 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAuthSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useAuthSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { useGuardedAction } from '../useGuardedAction'
 import {
@@ -14,6 +17,7 @@ import type { DocumentationReport } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAuthSettingsQuery: vi.fn(),
+  useAccessControlEnabledQuery: vi.fn(),
 }))
 
 vi.mock('react-redux', async importOriginal => {
@@ -40,12 +44,18 @@ describe('useGuardedAction', () => {
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: {
         data: {
-          accessControlEnabled: true,
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
   })
 
   afterEach(() => {
@@ -53,10 +63,41 @@ describe('useGuardedAction', () => {
   })
 
   it('skips both guards when access control is disabled', async () => {
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {
           accessControlEnabled: false,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          requireReasonForInteraction: true,
+          minLengthOfReasonForInteraction: 10,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
+
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    const currentResult = await act(
+      () => !result.current.reasonForInteractionRequired
+    )
+    expect(currentResult).toBe(true)
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+  })
+  it('skips both guards when access control is enabled but require reason for interaction is disabled', async () => {
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
           requireReasonForInteraction: false,
           minLengthOfReasonForInteraction: 10,
         },

@@ -263,14 +263,18 @@ export const PipetteWizardFlows = (
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation(deletionDocState, actionsToDocument, {
-      onSuccess: () => {
-        closeFlow()
-      },
-      onError: () => {
-        closeFlow()
-      },
-    })
+    useDeleteMaintenanceRunMutation(
+      deletionDocState,
+      [...actionsToDocument, 'end_calibration'],
+      {
+        onSuccess: () => {
+          closeFlow()
+        },
+        onError: () => {
+          closeFlow()
+        },
+      }
+    )
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()
