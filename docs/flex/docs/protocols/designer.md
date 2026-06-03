@@ -59,16 +59,17 @@ Click **Edit protocol** to add labware, liquids, and additional hardware to your
 
 You can fully customize the Flex deck in Protocol Designer by adding compatible modules, staging areas, the waste chute, and custom labware. Click any open slot to add or edit hardware or labware. Click, drag, and drop to move labware and tips racks on the deck. 
 
-Click **Liquids** in the upper right to add liquids in your protocol. You can also define your liquids as Opentrons-verified [liquid class](../../../python-api/docs/liquid-classes/liquid-classes.md) to apply optimized pipetting settings. Then, click on any labware and choose **Edit labware** to assign liquid locations and volumes on the protocol starting deck. 
+Click **Liquids** in the upper right to add liquids in your protocol. You can also define your liquids as Opentrons-verified [liquid class](../../../python-api/liquid-classes/liquid-classes.md) to apply optimized pipetting settings. Then, click on any labware and choose **Edit labware** to assign liquid locations and volumes on the protocol starting deck. 
 
 The protocol timeline on the left side of the screen shows the steps the Flex will perform. Click **Add step** to add transfer, move, mix, pause, or module-specific steps in your protocol.
 
 
 * **Transfer steps** move liquid from one well or group of wells to another. First, specify the basics: source and destination, pipette nozzles and wells to use for the transfer, the pipette path, and transfer volume. Next, choose whether to apply liquid class settings in the transfer step. 
 
+
     You can further customize your transfer steps with advanced settings in Protocol Designer, including: 
 
-    * **[Partial tip pickup](../../../protocol-designer/docs/steps/transfer.md#partial-tip-pickup)**: using less tips than a multi-channel pipette can use at once to complete the transfer.  
+    * **[Partial tip pickup](../../protocol-designer/steps/transfer.md#partial-tip-pickup)**: using less tips than a multi-channel pipette can use at once to complete the transfer.  
     * **Flow rate**: the speed the Flex aspirates or dispenses liquid at.
     * **Tip position**: where the Flex aspirates or dispenses in your labware. 
     * Additional advanced settings like pre-wet, touch tip, mix, delay, blowout, and air gap.
