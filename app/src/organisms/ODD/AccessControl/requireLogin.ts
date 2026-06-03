@@ -70,6 +70,6 @@ async function isPasswordResetRequired(
     const response = await getSelf(host)
     return response.data.data.resetPassword
   } catch {
-    return true
+    return false
   }
 }

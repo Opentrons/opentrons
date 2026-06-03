@@ -108,21 +108,14 @@ describe('requireLogin', () => {
     expect(result).toBeNull()
   })
 
-  it('opens the login modal when the self user request fails', async () => {
+  it('resolves with the current username when the self user request fails', async () => {
     vi.mocked(getSelf).mockRejectedValue(new Error('unauthorized'))
-    vi.mocked(store.getState).mockReturnValue({} as State)
-    vi.mocked(getLocalRobot).mockReturnValue({
-      name: 'odd-robot',
-    } as ReturnType<typeof getLocalRobot>)
-    vi.mocked(showLoginModal).mockResolvedValue({ username: 'alice' })
 
     const result = await requireLogin('alice', HOST_CONFIG)
 
     expect(result).toEqual({ username: 'alice' })
-    expect(store.dispatch).toHaveBeenCalledWith(
-      logOut({ robotName: 'odd-robot' })
-    )
-    expect(showLoginModal).toHaveBeenCalledOnce()
+    expect(showLoginModal).not.toHaveBeenCalled()
+    expect(store.dispatch).not.toHaveBeenCalled()
   })
 
   it('uses the local robot host config when none is passed', async () => {
