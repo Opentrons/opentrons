@@ -38,10 +38,9 @@ PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $
 # documentation
 BUILD_NUMBER ?=
 
-# watch, coverage, update snapshot, and warning suppresion variables for tests and linting
+# watch, coverage, and warning suppresion variables for tests and linting
 watch ?= false
 cover ?= true
-updateSnapshot ?= false
 quiet ?= false
 
 FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
