@@ -18,7 +18,7 @@ namespace task {
 
 using TaskMessage =
     std::variant<message::WriteEepromMessage, message::ReadEepromMessage,
-                 message::ConfigRequestMessage,
+                 message::OTLibraryReadMessage, message::ConfigRequestMessage,
                  i2c::messages::TransactionResponse, std::monostate>;
 
 template <class I2CQueueWriter, class OwnQueue>
@@ -222,6 +222,63 @@ class EEPromMessageHandler {
             // The writer cannot accept this message. Remove it from the id_map.
             id_map.remove(token.value());
         }
+    }
+
+    void visit(message::OTLibraryReadMessage &m) {
+        LOG("Received request to read %d bytes from address %d", m.length,
+            m.memory_address);
+
+        if (m.length <= 0) {
+            return;
+        }
+
+        if (m.memory_address > hw_iface.get_eeprom_mem_size()) {
+            LOG("ERROR attempting to read to an eeprom address that exceeds "
+                "device storage");
+            return;
+        }
+
+        // auto token = id_map.add(m);
+        // if (!token) {
+        //     LOG("No space in the id map.");
+        //     // TODO (amit, 2022-05-04): Should we re-enqueue the message?
+        //     return;
+        // }
+
+        // The transaction will write the memory address, then read the
+        // data.
+        auto write_buffer = i2c::messages::MaxMessageBuffer{};
+        auto *iter = write_buffer.begin();
+
+        // Older boards use 1 byte addresses, if we're on an older board we
+        // need to drop the higher byte of the memory address when sending the
+        // the message over i2c
+        if (hw_iface.get_eeprom_addr_bytes() ==
+            static_cast<size_t>(
+                hardware_iface::EEPromAddressType::EEPROM_ADDR_8_BIT)) {
+            m.memory_address = m.memory_address
+                               << hardware_iface::ADDR_BITS_DIFFERENCE;
+        }
+
+        iter = bit_utils::int_to_bytes(
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            m.memory_address, iter, (iter + hw_iface.get_eeprom_addr_bytes()));
+
+        // auto transaction = i2c::messages::Transaction{
+        //     .message_index = m.message_index,
+        //     .address = hw_iface.get_eeprom_address(),
+        //     .bytes_to_read = m.length,
+        //     .bytes_to_write =
+        //         static_cast<std::size_t>(iter - write_buffer.begin()),
+        //     .write_buffer{write_buffer}};
+        // // The transaction identifier uses the token returned from id_map.add
+        // auto transaction_id =
+        //     i2c::messages::TransactionIdentifier{.token = token.value()};
+
+        // if (!writer.transact(transaction, transaction_id, own_queue)) {
+        //     // The writer cannot accept this message. Remove it from the
+        //     id_map. id_map.remove(token.value());
+        // }
     }
 
     void visit(message::ConfigRequestMessage &m) {
