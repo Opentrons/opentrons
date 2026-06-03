@@ -1,47 +1,13 @@
-# Run tests, build the app, and deploy it cross platform
+# Build and deploy the Opentrons app without running unit tests.
+# Use this workflow (workflow_dispatch) when you need a build on demand.
 
-name: 'App test, build, and deploy'
+name: 'App build and deploy'
 
 on:
-  push:
-    paths:
-      - 'Makefile'
-      - 'app/**'
-      - 'app-shell/**'
-      - 'app-shell-odd/**'
-      - 'components/**'
-      - 'shared-data/**'
-      - 'discovery-client/**'
-      - '*.js'
-      - 'scripts/**'
-      - '*.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/app-test-build-deploy.yaml'
-      - '.github/workflows/app-build-deploy.yaml'
-      - '.github/workflows/utils.js'
-      - 'vitest.config.*'
-    branches:
-      - '**'
-    tags:
-      - 'v*'
-      - 'ot3@*'
-  pull_request:
-    paths:
-      - 'Makefile'
-      - 'app/**'
-      - 'app-shell/**'
-      - 'app-shell-odd/**'
-      - 'components/**'
-      - 'shared-data/**'
-      - 'discovery-client/**'
-      - '*.js'
-      - '*.json'
-      - 'pnpm-lock.yaml'
-      - 'scripts/**'
-      - '.vitest.config.*'
+  workflow_dispatch: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
   cancel-in-progress: true
 
 env:
@@ -52,93 +18,17 @@ env:
   _APP_DEPLOY_FOLDER_OT3: app
 
 jobs:
-  js-unit-test-shards:
-    # unit tests for the app's view layer (not the node layer)
-    runs-on: 'ubuntu-22.04'
-    name: 'app frontend unit tests'
-    # these tests take > 30 minutes with a single runner, so split into multiple shards
-    # https://vitest.dev/guide/improving-performance.html#sharding
-    strategy:
-      matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
-    env:
-      SHARD_TOTAL: 8
-    timeout-minutes: 15 # if tests take longer than this, add more shards
-    continue-on-error: true # We want to see all test failures, so keep running all shards even after one fails.
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: ./.github/actions/js/setup
-      - name: 'Test frontend packages ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
-        # The run produces a vitest report in .vitest-reports/ that we'll upload to temporary storage on Github.
-        run: |
-          make -C app test test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
-      - name: 'Upload frontend test shard result ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
-        if: ${{ !cancelled() }} # Make sure we forward along the report even if there were test failures.
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: frontend-unit-test-result-shard-${{matrix.shard}}
-          path: .vitest-reports
-          include-hidden-files: true
-          retention-days: 1
-
-  js-unit-test:
-    needs: [js-unit-test-shards]
-    runs-on: 'ubuntu-22.04'
-    name: 'app frontend unit test merge shard results'
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: ./.github/actions/js/setup
-      - name: 'Download frontend test result shards'
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          pattern: frontend-unit-test-result-shard-*
-          merge-multiple: true
-          path: .vitest-reports
-      - name: 'Merge frontend test report shards'
-        run: pnpm vitest --merge-reports
-
-  backend-unit-test:
-    strategy:
-      matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
-        shell: ['app-shell', 'app-shell-odd', 'discovery-client']
-        exclude:
-          - os: 'windows-2022'
-            shell: 'app-shell-odd'
-    name: '${{matrix.shell}} unit tests on ${{matrix.os}}'
-    timeout-minutes: 60
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/js/setup
-      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
-        with:
-          python-version: '3.12'
-      - name: check make version
-        run: make --version
-      - name: 'test native(er) packages'
-        run: make test-js-internal tests="${{matrix.shell}}/src"
-
   determine-build-type:
     runs-on: 'ubuntu-latest'
     name: 'Determine build variant and type'
-    permissions:
-      actions: read
-      contents: read
     outputs:
       variants: ${{steps.determine-build-type.outputs.variants}}
       type: ${{steps.determine-build-type.outputs.type}}
     steps:
       - id: determine-build-type
         run: |
-          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
-            echo "No builds for pull requests"
-            echo 'variants=[]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ] ; then
+          echo "Determining build type for event ${{github.event_name}} and ref ${{github.ref}}"
+          if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ] ; then
             echo "internal-release release builds for ot3 tags"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=release' >> $GITHUB_OUTPUT
@@ -155,33 +45,10 @@ jobs:
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
-            # Edge pushes: at most one full develop build (robot-stack + ot3) per UTC day.
-            # First push that day runs build+deploy; later pushes still run unit tests only.
-            # For manual builds without tests, use the "App build and deploy" workflow.
-            TODAY="$(date -u +%Y-%m-%d)"
-            RUN_ID="${{ github.run_id }}"
-            API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/app-test-build-deploy.yaml/runs?branch=edge&event=push&per_page=50"
-            if ! RESP="$(curl -fsS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "${API_URL}")"; then
-              echo "⚠️ Could not list workflow runs; allowing develop build (fail open)"
-              EARLIER=0
-            else
-              EARLIER="$(echo "${RESP}" | jq --arg today "${TODAY}" --argjson rid "${RUN_ID}" '[.workflow_runs[] | select(.created_at | startswith($today)) | select(.id < $rid)] | length')"
-            fi
-            if ! [[ "${EARLIER}" =~ ^[0-9]+$ ]]; then
-              echo "⚠️ Unexpected API response; allowing develop build (fail open)"
-              EARLIER=0
-            fi
-            if [ "${EARLIER}" -gt 0 ]; then
-              echo "edge push: another workflow run for this workflow on edge already started earlier today (UTC); skipping develop build"
-              echo 'variants=[]' >> $GITHUB_OUTPUT
-              echo 'type=develop' >> $GITHUB_OUTPUT
-            else
-              echo "edge push: develop build (first push today in UTC, or no earlier run detected)"
-              echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-              echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
+            echo "both develop builds for edge (manual)"
+            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', contains(github.ref, 'app-build-internal')) }}" = "true" ] ; then
-
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
             if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
                echo "internal-release as-release builds for app-build-internal + as-release suffixes"
@@ -200,17 +67,16 @@ jobs:
                echo 'type=develop' >> $GITHUB_OUTPUT
             fi
           elif [ "${{ format('{0}', contains(github.ref, 'app-build-both')) }}" = "true" ] ; then
-
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
                echo "Both as-release builds for app-build-both + as-release suffixes"
                echo 'type=as-release' >> $GITHUB_OUTPUT
             else
-               echo "Both develop builds for app-build-both + as-release suffixes"
+               echo "Both develop builds for app-build-both suffixes"
                echo 'type=develop' >> $GITHUB_OUTPUT
             fi
           else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
+            echo "No build for ref ${{github.ref}} and event ${{github.event_name}}"
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           fi
@@ -296,7 +162,6 @@ jobs:
           smksp_cert_sync.exe
           smctl.exe healthcheck --all
 
-      # Do the frontend dist bundle
       - name: 'bundle ${{matrix.variant}} frontend'
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
@@ -308,7 +173,6 @@ jobs:
         run: |
           make -C app dist
 
-      # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
         if: matrix.target == 'desktop'
         timeout-minutes: 60
@@ -325,7 +189,7 @@ jobs:
           WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
-          APPLE_ID: ${{ vars.OT_APP_APPLE_ID_V2 }}
+          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD_V2 }}
           APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID_V2 }}
           HOST_PYTHON: python
@@ -345,7 +209,6 @@ jobs:
           name: 'opentrons-${{matrix.variant}}-${{ matrix.os }}'
           path: app-shell/dist/publish
 
-      # build the ODD app
       - if: matrix.target == 'odd'
         name: 'build ${{matrix.variant}} ODD app'
         timeout-minutes: 60
@@ -360,8 +223,7 @@ jobs:
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
-    needs:
-      ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
+    needs: ['build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     permissions:
       id-token: write
@@ -462,14 +324,12 @@ jobs:
 
       - name: 'backup upload folders before checkout'
         run: |
-          # Move upload folders to temp location to preserve them during checkout
           mkdir -p ${{ runner.temp }}/upload_backup
           mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: 'restore upload folders after checkout'
         run: |
-          # Restore upload folders from temp location
           mv ${{ runner.temp }}/upload_backup/to_upload_* ./ 2>/dev/null || true
       - uses: ./.github/actions/js/setup
       - name: 'print upload folders contents'
@@ -491,94 +351,15 @@ jobs:
           node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
           aws s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
 
-  # Notification jobs for tagged builds
-  notify-success:
-    name: 'Notify Build Success'
-    runs-on: 'ubuntu-latest'
-    needs:
-      [
-        js-unit-test,
-        backend-unit-test,
-        build-app,
-        deploy-release-app,
-        determine-build-type,
-      ]
-    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      - name: 'Send success alert'
-        uses: ./.github/actions/simple-build-alert
-        continue-on-error: true
-        with:
-          status: 'success'
-          workflow_name: 'App test, build, and deploy'
-          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
-
-  notify-failure:
-    name: 'Notify Build Failure'
-    runs-on: 'ubuntu-latest'
-    needs:
-      [
-        js-unit-test,
-        backend-unit-test,
-        build-app,
-        deploy-release-app,
-        determine-build-type,
-      ]
-    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      - name: 'Determine failed jobs'
-        id: failed-jobs
-        shell: bash
+      - name: 'invalidate CloudFront cache (builds.opentrons.com)'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') && vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID != ''
         run: |
-          failed_jobs=()
-          if [[ "${{ needs.js-unit-test.result }}" == "failure" ]]; then
-            failed_jobs+=("js-unit-test")
-          fi
-          if [[ "${{ needs.backend-unit-test.result }}" == "failure" ]]; then
-            failed_jobs+=("backend-unit-test")
-          fi
-          if [[ "${{ needs.build-app.result }}" == "failure" ]]; then
-            failed_jobs+=("build-app")
-          fi
-          if [[ "${{ needs.deploy-release-app.result }}" == "failure" ]]; then
-            failed_jobs+=("deploy-release-app")
-          fi
-
-          IFS=','
-          echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
-
-      - name: 'Send failure alert'
-        uses: ./.github/actions/simple-build-alert
-        continue-on-error: true
-        with:
-          status: 'failure'
-          workflow_name: 'App test, build, and deploy'
-          failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
-          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
-
-  notify-cancelled:
-    name: 'Notify Build Cancelled'
-    runs-on: 'ubuntu-latest'
-    needs:
-      [
-        js-unit-test,
-        backend-unit-test,
-        build-app,
-        deploy-release-app,
-        determine-build-type,
-      ]
-    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      - name: 'Send cancelled alert'
-        uses: ./.github/actions/simple-build-alert
-        continue-on-error: true
-        with:
-          status: 'cancelled'
-          workflow_name: 'App test, build, and deploy'
-          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          set -euo pipefail
+          INVALIDATION_ID="$(
+            aws cloudfront create-invalidation \
+              --distribution-id '${{ vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID }}' \
+              --paths '/app/*' \
+              --output text \
+              --query 'Invalidation.Id'
+          )"
+          echo "Started CloudFront invalidation: ${INVALIDATION_ID}"
