@@ -10,6 +10,7 @@ import { store } from '/app/redux/store'
 import { requireLogin } from '../requireLogin'
 
 import type { HostConfig } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/api-client', () => ({
   getSelf: vi.fn(),
@@ -74,7 +75,7 @@ describe('requireLogin', () => {
         },
       },
     } as Awaited<ReturnType<typeof getSelf>>)
-    vi.mocked(store.getState).mockReturnValue({})
+    vi.mocked(store.getState).mockReturnValue({} as State)
     vi.mocked(getLocalRobot).mockReturnValue({
       name: 'odd-robot',
     } as ReturnType<typeof getLocalRobot>)
@@ -109,7 +110,7 @@ describe('requireLogin', () => {
 
   it('opens the login modal when the self user request fails', async () => {
     vi.mocked(getSelf).mockRejectedValue(new Error('unauthorized'))
-    vi.mocked(store.getState).mockReturnValue({})
+    vi.mocked(store.getState).mockReturnValue({} as State)
     vi.mocked(getLocalRobot).mockReturnValue({
       name: 'odd-robot',
     } as ReturnType<typeof getLocalRobot>)
@@ -125,7 +126,7 @@ describe('requireLogin', () => {
   })
 
   it('uses the local robot host config when none is passed', async () => {
-    vi.mocked(store.getState).mockReturnValue({})
+    vi.mocked(store.getState).mockReturnValue({} as State)
     vi.mocked(getLocalRobotAccessToken).mockReturnValue('stored-token')
     vi.mocked(getSelf).mockResolvedValue({
       data: {

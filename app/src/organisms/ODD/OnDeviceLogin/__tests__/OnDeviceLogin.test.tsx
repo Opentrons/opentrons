@@ -31,13 +31,8 @@ function renderLogin(
   const submitPassword = vi.fn()
   const onCancel = vi.fn()
   const onClearLoginError = vi.fn()
-  const {
-    initialStep = 'username',
-    onStepChange: onStepChangeProp,
-    ...rest
-  } = props
-
-  const onStepChange = onStepChangeProp ?? vi.fn()
+  const { initialStep = 'username', ...rest } = props
+  const onStepChange = vi.fn()
 
   function Wrapper(): JSX.Element {
     const [step, setStep] = useState<LoginStep>(initialStep)
