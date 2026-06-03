@@ -24,7 +24,6 @@ export function getMergedDivergingStacks2(
   if (stacks.length === 0) {
     return []
   }
-  console.log(stacks)
 
   const sharedParent = stacks[0][stacks[0].length - 1] ?? null
 
