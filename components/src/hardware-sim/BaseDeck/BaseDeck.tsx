@@ -638,8 +638,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ({ moduleModel, moduleLocation, stacked = false }) => {
             const moduleDef = getModuleDef(moduleModel)
             const parentSlotName =
-              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE ||
-              moduleDef.moduleType === VACUUM_MODULE_TYPE
+              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
                 ? getStagingColumnSlotName(moduleLocation.slotName)
                 : moduleLocation.slotName
             const parentSlotPosition = getPositionFromSlotId(
