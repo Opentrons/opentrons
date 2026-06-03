@@ -810,6 +810,10 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                 results_path,
                 True,
             )
+            upload_data_to_google_drive(
+                recorder_path,
+                True,
+            )
             if api.is_simulator:
                 break
 
