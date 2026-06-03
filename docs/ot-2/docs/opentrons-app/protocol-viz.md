@@ -21,7 +21,7 @@ The visualization screen shown above includes protocol steps on the left, a view
 
 Choose how to visualize your OT-2 protocol's steps: 
 
-- Click the play button :material-play-circle: at the top of the page to play your protocol, and choose a playback speed (seconds per step).
+- Click the play button :material-play-circle: at the top of the page to play your protocol, and click the playback speed on the right (seconds per step) to choose another option.
 - Click and drag the blue bar to move through the protocol steps. 
 - Scroll the timeline on the left and click on any protocol step to view it.
 
