@@ -86,7 +86,7 @@ export function useDropTipCommands({
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
     deletionDocState,
-    actionsToDocument
+    [...actionsToDocument, 'end_drop_tips']
   )
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
