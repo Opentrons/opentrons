@@ -30,6 +30,7 @@ from opentrons.hardware_control.types import (
     GripperJawState,
     InstrumentProbeType,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_shared_data.errors.exceptions import (
     CommandTimedOutError,
     CalibrationStructureNotFoundError,
@@ -457,11 +458,82 @@ def test_probe(
 # -----------------   TEST Width   ----------------
 
 
+def _get_width_test_tag(width: float, force: float) -> str:
+    return f"{width}mm-{force}N"
+
+
+def _get_width_hover_and_grip_positions(
+    api: SyncHardwareAPI, slot: int
+) -> Tuple[Point, Point]:
+    grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+    grip_pos += Point(z=GRIP_HEIGHT_MM)
+    hover_pos = grip_pos._replace(z=GAUGE_HEIGHT_MM + 15)
+    return hover_pos, grip_pos
+
+
 def test_width(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper width."""
-    pass
+    z_ax = Axis.Z_G
+    g_ax = Axis.G
+    mount = OT3Mount.GRIPPER
+    gripper = api._gripper_handler.get_gripper()
+    max_width = gripper.config.geometry.jaw_width["max"]
+
+    _error_when_gripping_itself = 0.0
+
+    def _save_result(_width: float, _force: float, _cache_error: bool) -> float:
+        nonlocal _error_when_gripping_itself
+        # fake the encoder to be in the right place, during simulation
+        if api.is_simulator:
+            sim_enc_pox = (max_width - width) / 2.0
+            api._backend._encoder_position[NodeId.gripper_g] = sim_enc_pox
+            api.refresh_positions()
+        _width_actual = api._gripper_handler.get_gripper().jaw_width
+        assert _width_actual is not None
+        _width_error = _width_actual - _width
+        if _cache_error and not _error_when_gripping_itself:
+            _error_when_gripping_itself = _width_error
+        _width_error_adjusted = _width_error - _error_when_gripping_itself
+        # should always fail in the negative direction
+        result = CSVResult.from_bool(0 >= _width_error_adjusted >= FAILURE_THRESHOLD_MM)
+        tag = _get_width_test_tag(_width, _force)
+        report(section, f"{tag}-force", [_force])
+        report(section, f"{tag}-width", [_width])
+        report(section, f"{tag}-width-actual", [_width_actual])
+        report(section, f"{tag}-width-error", [_width_error])
+        report(section, f"{tag}-width-error-adjusted", [_width_error_adjusted])
+        report(section, f"{tag}-result", [result])
+        return _width_error
+
+    # HOME
+    api.home([z_ax, g_ax])
+
+    # LOOP THROUGH WIDTHS
+    for width, slot in zip(TEST_WIDTHS_MM, SLOT_WIDTH_GAUGE):
+        api.ungrip()
+        if slot is not None:
+            hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
+            # MOVE TO SLOT
+            helpers_ot3.move_to_arched_ot3_sync(api, mount, hover_pos)
+            # OPERATOR SETS UP GAUGE
+            ctx.pause(f"add {width} mm wide gauge to slot {slot}")
+            # GRIPPER MOVES TO GAUGE
+            api.move_to(mount, target_pos)
+            ctx.pause(f"prepare to grip {width} mm")
+            # grip once to center the thing
+            api.grip(20)
+            api.ungrip()
+        # LOOP THROUGH FORCES
+
+        for force in GRIP_FORCES_NEWTON_WIDTH:
+            # GRIP AND MEASURE WIDTH
+            api.grip(force)
+            _save_result(width, force, _cache_error=(slot is None))
+            api.ungrip()
+        # RETRACT
+        api.retract(OT3Mount.GRIPPER)
 
 
 # -----------------   TEST Force   ----------------
@@ -689,14 +761,10 @@ def build_test_probe_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 def build_test_width_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-
-    def _get_test_tag(width: float, force: float) -> str:
-        return f"{width}mm-{force}N"
-
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
     for width in TEST_WIDTHS_MM:
         for force in GRIP_FORCES_NEWTON_WIDTH:
-            tag = _get_test_tag(width, force)
+            tag = _get_width_test_tag(width, force)
             lines.append(CSVLine(f"{tag}-force", [float]))
             lines.append(CSVLine(f"{tag}-width", [float]))
             lines.append(CSVLine(f"{tag}-width-actual", [float]))
