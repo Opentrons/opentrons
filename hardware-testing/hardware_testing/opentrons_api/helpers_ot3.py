@@ -405,14 +405,13 @@ def get_gantry_per_axis_setting_ot3(
             return settings.low_throughput[axis_kind]
 
 
-async def set_gantry_load_per_axis_current_settings_ot3(
-    api: OT3API,
+def _set_gantry_load_per_axis_current_settings_common(
+    api: Union[OT3API, SyncHardwareAPI],
     axis: Axis,
     load: Optional[GantryLoad] = None,
     hold_current: Optional[float] = None,
     run_current: Optional[float] = None,
-) -> None:
-    """Update an OT3 axis current settings."""
+) -> GantryLoad:
     if load is None:
         load = api.gantry_load
     if hold_current is not None:
@@ -429,20 +428,48 @@ async def set_gantry_load_per_axis_current_settings_ot3(
             load=load,
             value=run_current,
         )
-    # make sure new currents are sent to hardware controller
-    await api.set_gantry_load(load)
+    return load
 
 
-async def set_gantry_load_per_axis_motion_settings_ot3(
+async def set_gantry_load_per_axis_current_settings_ot3(
     api: OT3API,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    hold_current: Optional[float] = None,
+    run_current: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis current settings."""
+    checked_load = _set_gantry_load_per_axis_current_settings_common(
+        api, axis, load, hold_current, run_current
+    )
+    # make sure new currents are sent to hardware controller
+    await api.set_gantry_load(checked_load)
+
+
+def set_gantry_load_per_axis_current_settings_ot3_sync(
+    api: SyncHardwareAPI,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    hold_current: Optional[float] = None,
+    run_current: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis current settings."""
+    checked_load = _set_gantry_load_per_axis_current_settings_common(
+        api, axis, load, hold_current, run_current
+    )
+    # make sure new currents are sent to hardware controller
+    api.set_gantry_load(checked_load)
+
+
+def _set_gantry_load_per_axis_motion_settings_ot3_common(
+    api: Union[OT3API, SyncHardwareAPI],
     axis: Axis,
     load: Optional[GantryLoad] = None,
     default_max_speed: Optional[float] = None,
     acceleration: Optional[float] = None,
     max_speed_discontinuity: Optional[float] = None,
     direction_change_speed_discontinuity: Optional[float] = None,
-) -> None:
-    """Update an OT3 axis motion settings."""
+) -> GantryLoad:
     if load is None:
         load = api.gantry_load
     if default_max_speed is not None:
@@ -473,8 +500,53 @@ async def set_gantry_load_per_axis_motion_settings_ot3(
             load=load,
             value=direction_change_speed_discontinuity,
         )
+    return load
+
+
+async def set_gantry_load_per_axis_motion_settings_ot3(
+    api: OT3API,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    default_max_speed: Optional[float] = None,
+    acceleration: Optional[float] = None,
+    max_speed_discontinuity: Optional[float] = None,
+    direction_change_speed_discontinuity: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis motion settings."""
+    checked_load = _set_gantry_load_per_axis_motion_settings_ot3_common(
+        api,
+        axis,
+        load,
+        default_max_speed,
+        acceleration,
+        max_speed_discontinuity,
+        direction_change_speed_discontinuity,
+    )
     # make sure new currents are sent to hardware controller
-    await api.set_gantry_load(load)
+    await api.set_gantry_load(checked_load)
+
+
+def set_gantry_load_per_axis_motion_settings_ot3_sync(
+    api: SyncHardwareAPI,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    default_max_speed: Optional[float] = None,
+    acceleration: Optional[float] = None,
+    max_speed_discontinuity: Optional[float] = None,
+    direction_change_speed_discontinuity: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis motion settings."""
+    checked_load = _set_gantry_load_per_axis_motion_settings_ot3_common(
+        api,
+        axis,
+        load,
+        default_max_speed,
+        acceleration,
+        max_speed_discontinuity,
+        direction_change_speed_discontinuity,
+    )
+    # make sure new currents are sent to hardware controller
+    api.set_gantry_load(checked_load)
 
 
 @dataclass
@@ -490,7 +562,7 @@ class GantryLoadSettings:
 
 
 def get_gantry_load_per_axis_motion_settings_ot3(
-    api: OT3API,
+    api: Union[OT3API, SyncHardwareAPI],
     axis: Axis,
     load: Optional[GantryLoad] = None,
 ) -> GantryLoadSettings:
