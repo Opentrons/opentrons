@@ -1001,7 +1001,7 @@
   ],
   "parameters": {
     "format": "irregular",
-    "quirks": [],
+    "quirks": ["filterPlate"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "invitroven_filter_plate"
@@ -1016,6 +1016,11 @@
     "z": 0
   },
   "stackingOffsetWithLabware": {
+    "default": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    },
     "millipore_vacuum_manifold_collar_tall": {
       "x": 0,
       "y": 0,
@@ -1024,14 +1029,13 @@
     "opentrons_vacuum_manifold_collar_tall": {
       "x": 0,
       "y": 0,
-      "z": 22.38
+      "z": 0
+    },
+    "opentrons_vacuum_manifold_collar_short": {
+      "x": 0,
+      "y": 0,
+      "z": 0
     }
   },
-  "gripperOffsets": {
-    "default": {
-      "pickUpOffset": { "x": -36, "y": 0, "z": 0 },
-      "dropOffset": { "x": -36, "y": 0, "z": 0 }
-    }
-  },
-  "gripHeightFromLabwareBottom": 6
+  "gripHeightFromLabwareBottom": 11
 }

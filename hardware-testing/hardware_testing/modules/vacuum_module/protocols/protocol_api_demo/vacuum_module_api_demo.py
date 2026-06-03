@@ -7,7 +7,7 @@ from opentrons.protocol_api import (
 
 
 metadata = {
-    "protocolName": "Vacuum Module API Demo",
+    "protocolName": "Vacuum Module Opentrons API Demo",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
@@ -19,6 +19,8 @@ requirements = {
 """
 
 # --------------------Vacuum Module API --------------------
+
+apiLevel: 2.28
 
 1.
     vm_mod.close_vent()
@@ -100,14 +102,13 @@ def run(ctx: ProtocolContext) -> None:
     )
 
     # Load Labware
-    manifold_collar = ctx.load_adapter("opentrons_vacuum_manifold_collar_tall", vm_mod.manifold_dock)  # type: ignore[attr-defined]
-
+    # NOTE: You cant load collar to module right now with this syntax
+    # manifold_collar = ctx.load_adapter("millipore_vacuum_manifold_collar_tall", vm_mod)  # type: ignore[attr-defined]
+    manifold_collar = vm_mod.load_adapter_to_dock("opentrons_vacuum_manifold_collar_short")  # type: ignore[attr-defined]
     white_filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
-    black_flat_plate = ctx.load_labware(
-        "corning_96_wellplate_360ul_flat", "B2", lid="opentrons_tough_universal_lid"
-    )
+    black_flat_plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "B2")
     deep_well_plate = ctx.load_labware(
-        "nest_96_wellplate_2ml_deep", "C4", lid="opentrons_tough_universal_lid"
+        "nest_96_wellplate_2ml_deep", "B1", lid="opentrons_tough_universal_lid"
     )
     reservoir_1 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C2")
     reservoir_2 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C3")
@@ -116,13 +117,62 @@ def run(ctx: ProtocolContext) -> None:
 
     # Load Instruments + Trash
     pip = ctx.load_instrument(
-        "flex_96channel_1000", tip_racks=[tiprack_200, tiprack_1000]
+        "flex_1channel_1000", "left", tip_racks=[tiprack_200, tiprack_1000]
     )
     ctx.load_trash_bin("A1")
 
     # Protocol Start
     # ------------------------------------------------------
     ctx.home()
+
+    # ------------------ Pipetting positional checks ----------------
+
+    # Baseline:
+    # B2: Deck + Flat plate
+    pip.pick_up_tip(tiprack_1000)
+    pip.move_to(black_flat_plate["A1"].top())
+    ctx.pause()
+
+    # A3: Deck + Module + Flat plate
+    # A4: Deck + Dock + Collar + Filter plate
+    ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
+    pip.move_to(black_flat_plate["A1"].top())
+    ctx.pause()
+
+    # A3: Deck + Module + Flat plate + Filter plate
+    # A4: Deck + Dock + Collar
+    ctx.move_labware(white_filter_plate, black_flat_plate, use_gripper=True)
+    pip.move_to(white_filter_plate["A1"].top())
+    ctx.pause()
+
+    # A3: Deck + Module + Flat plate + Filter plate + Collar
+    # A4: Deck + Dock
+    ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
+    pip.move_to(white_filter_plate["A1"].top())
+    ctx.pause()
+
+    # Unstacking
+    # A3: Deck + Module + Flat plate + Filter plate
+    # A4: Deck + Dock + Collar
+    ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
+    # A3: Deck + Module + Flat plate
+    # A4: Deck + Dock + Collar + Filter plate
+    ctx.move_labware(white_filter_plate, manifold_collar, use_gripper=True)
+    # A3: Deck + Module + Flat plate + Collar + Filter plate
+    # A4: Deck + Dock
+    ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
+    pip.move_to(white_filter_plate["A1"].top())
+    ctx.pause()
+
+    # A3: Deck + Module + Flat plate
+    # A4: Deck + Dock + Collar + Filter plate
+    ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
+    ctx.move_labware(black_flat_plate, "B2", use_gripper=True)
+    pip.return_tip()
+
+    # ------------------ Pipetting positional checks ----------------
+
+    # ------------------ Vacuum Module API Demo  --------------------
 
     # You can move the collar with the plate ontop from the dock to the module
     ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
@@ -152,25 +202,24 @@ def run(ctx: ProtocolContext) -> None:
     ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
 
     # Remove the lids from the flat and deep well plates
-    ctx.move_lid(black_flat_plate, lid_stack, use_gripper=True)
     ctx.move_lid(deep_well_plate, lid_stack, use_gripper=True)
 
     # ‼️ NOTE: New Containment behavior
     # Modules / Labware can now share multiple children in the same location
     # As long as their geometries dont collide.
     #
-    # Below we move the `deep_well_plate` ontop of the vacuum module
+    # Below we move the `black_flat_plate` ontop of the vacuum module
     # Then we move the `manifold_collar` ontop of the vacuuum module
-    # Since there is space within the `collar`, the `deep_well_plate`
+    # Since there is space within the `collar`, the `black_flat_plate`
     # does not collide with the collar and is considered `contained` by the collar.
 
-    # Move the deep well plate into the vacuum module
-    ctx.move_labware(deep_well_plate, vm_mod, use_gripper=True)
-    # Move collar with filter plate back to the vacuum module base
+    # Move the black flat plate onto the vacuum module
+    ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
+    # Move collar with filter plate to the vacuum module base
     ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
-    # The above action would have failed before, since the `deep_well_plate`
+    # The above action would have failed before, since the `black_flat_plate`
     # would have occupied the `vm_mod` location, it now is acceptable because
-    # of containment. Therefore the `vm_mod` not has multiple `children` and
+    # of containment. Therefore the `vm_mod` now has multiple `children` and
     # conversely the children now have the same `parent`.
 
     # Aspirate 150ul with 200ul tips from reservoir1 onto filter plate
@@ -188,7 +237,7 @@ def run(ctx: ProtocolContext) -> None:
     vm_mod.open_vent()
 
     # Move the collar with filter plate to the dock
-    ctx.move_labware(manifold_collar, "A2", use_gripper=True)
+    ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
 
     # Aspirate 150ml from the deep well onto the flat plate
     pip.pick_up_tip(tiprack_200)
