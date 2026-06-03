@@ -592,8 +592,8 @@ def _ensure_vacuum_module_step(step: VacuumModuleStep) -> VacuumModuleStep:
                 "gauge_pressure_mbar"
             )
             assert gauge_pressure_mbar is not None
-            if gauge_pressure_mbar > 0 or gauge_pressure_mbar < -150:
-                raise ValueError("gauge pressure should be between 0 and -150 mbar")
+            if gauge_pressure_mbar > 0 or gauge_pressure_mbar < -800:
+                raise ValueError("gauge pressure should be between 0 and -800 mbar")
         else:
             gauge_pressure_mbar = unverified_gauge_pressure_mbar
         return VacuumModulePressureStep(
