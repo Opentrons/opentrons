@@ -189,7 +189,9 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.vacuumCloseVentStartProfile,
         args
       )
+    default:
+      return null
   }
-
-  args satisfies never // Make sure we handle every commandCreatorFnName.
+  // commenting this out until we make the rest of the commandCreatorFnNames
+  // args satisfies never // Make sure we handle every commandCreatorFnName.
 }
