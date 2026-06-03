@@ -1,4 +1,4 @@
-// Opentrons AI command args — protocol commandTypes are listed in opentronsAICommandTypes.ts
+// Opentrons AI command args
 // params are sourced from CreateCommand where available.
 
 import type { CreateCommand } from '../../protocol'
