@@ -170,8 +170,7 @@ export const getIsLoggedInToLocalRobot = createSelector(
  */
 export const getCurrentUsernameForLocalRobot = createSelector(
   getLocalRobotAuthState,
-  (localRobotAuthState): string | null =>
-    localRobotAuthState?.username ?? null
+  (localRobotAuthState): string | null => localRobotAuthState?.username ?? null
 )
 
 interface GetNextExpirationResult {

@@ -88,6 +88,41 @@ describe('OnDeviceLogin', () => {
     ).toBeInTheDocument()
   })
 
+  it('submits credentials from the password step when username is prefilled', () => {
+    const { submitPassword } = renderLogin({
+      initialStep: 'password',
+      initialUsername: 'alice',
+    })
+
+    fillField('device_settings:password', 'temp-pass')
+    clickPrimary('confirm')
+
+    expect(submitPassword).toHaveBeenCalledWith('alice', 'temp-pass')
+  })
+
+  it('shows the back button on the password step when username is prefilled', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      initialUsername: 'alice',
+    })
+
+    expect(
+      screen.getByRole('button', { name: 'Back to previous page' })
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+
+    expect(onStepChange).toHaveBeenCalledWith('username')
+  })
+
+  it('shows the back button on the password step during a normal login', () => {
+    renderLogin({ initialStep: 'password' })
+
+    expect(
+      screen.getByRole('button', { name: 'Back to previous page' })
+    ).toBeInTheDocument()
+  })
+
   it('shows the new-password header when reset is required', () => {
     renderLogin({
       initialStep: 'password',

@@ -75,7 +75,7 @@ export const WithLoginError: Story = {
   },
 }
 
-/** Shown when the server has set resetPassword on the logged-in user. */
+/** Choose a new password after signing in with a temporary password. */
 export const PasswordResetRequired: Story = {
   args: {
     ...Default.args,

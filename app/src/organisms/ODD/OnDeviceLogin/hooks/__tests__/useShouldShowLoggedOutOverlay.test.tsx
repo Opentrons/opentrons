@@ -33,7 +33,9 @@ vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal<typeof import('react-redux')>()
   return {
     ...actual,
-    useSelector: vi.fn((selector: (state: State) => unknown) => selector({} as State)),
+    useSelector: vi.fn((selector: (state: State) => unknown) =>
+      selector({} as State)
+    ),
   }
 })
 

@@ -32,6 +32,7 @@ export interface OnDeviceLoginProps {
   submitPassword: (username: string, password: string) => void
   isAuthLoading: boolean
   onCancel: () => void
+  /** New-password + confirm step after temporary-password login. */
   isPasswordResetRequired?: boolean
   initialUsername?: string
   /** Shown under the password field with error styling when login fails */
