@@ -25,12 +25,12 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 </figure>
 
 <figure markdown>
-![xx mm and yy mm spacers](images/spacers.png "xx mm and yy mmspacers")
+![xx mm and yy mm spacers](images/image-placeholder.png "xx mm and yy mmspacers")
 <figcaption>(2) 14 mm and 17 mm spacers</figcaption>
 </figure>
 
 <figure markdown>
-![Vacuum manifold base](images/image-placeholder.png "Manifold base")
+![Vacuum manifold base](images/mainifold-base-test4.svg "Manifold base")
 <figcaption>(1) Vacuum manifold base</figcaption>
 </figure>
 
