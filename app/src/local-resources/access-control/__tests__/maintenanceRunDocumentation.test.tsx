@@ -8,6 +8,7 @@ import {
   deleteMaintenanceRun,
 } from '@opentrons/api-client'
 import {
+  useAccessControlEnabledQuery,
   useAuthSettingsQuery,
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
@@ -42,6 +43,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useAuthSettingsQuery: vi.fn(),
+    useAccessControlEnabledQuery: vi.fn(),
     useHost: vi.fn(),
   }
 })
@@ -143,12 +145,18 @@ describe('maintenance run documentation flow', () => {
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: {
         data: {
-          accessControlEnabled: true,
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
       MOCK_DOCREPORT
     )

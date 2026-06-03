@@ -1,7 +1,10 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAuthSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useAuthSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
 import { isDocumentationProvided } from '../utils'
@@ -18,6 +21,7 @@ import type {
 
 vi.mock('@opentrons/react-api-client', () => ({
   useAuthSettingsQuery: vi.fn(),
+  useAccessControlEnabledQuery: vi.fn(),
 }))
 
 vi.mock('react-redux', async importOriginal => {
@@ -72,12 +76,18 @@ describe('useMaintenanceRunDocumentation', () => {
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: {
         data: {
-          accessControlEnabled: true,
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: {
+        data: {
+          accessControlEnabled: true,
+        },
+      },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
       mockDocreport
     )
