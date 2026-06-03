@@ -183,7 +183,7 @@ def run(ctx: ProtocolContext) -> None:
     ctx.load_trash_bin("A3")
     tipracks = []
     adapter: Optional[str] = None
-    if ctx.params.layout == "Full":
+    if ctx.params.layout == "Full":  # type: ignore [attr-defined]
         adapter = "opentrons_flex_96_tiprack_adapter"  # type: ignore [attr-defined]
     for slot in LAYOUT_TO_RACK_SLOTS[ctx.params.layout]:  # type: ignore [attr-defined]
         tipracks.append(ctx.load_labware(f"opentrons_flex_96_{ctx.params.tip_type}", slot, adapter=adapter))  # type: ignore [attr-defined]
