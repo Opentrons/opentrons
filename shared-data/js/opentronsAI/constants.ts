@@ -7,7 +7,6 @@ export const COMMAND_CREATOR_ARGS_FOR_OAI = [
   'blowout',
   'configureNozzleLayout',
   'configureForVolume',
-  'custom',
   'dispense',
   'dispenseInPlace',
   'dispenseWhileTracking',

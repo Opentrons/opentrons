@@ -155,7 +155,7 @@ export const getHoveredStepLabware = createSelector(
     if ('moduleId' in stepArgs) {
       const labware = getLabwareOnModule(
         initialDeckState,
-        (stepArgs.moduleId as string) ?? ''
+        stepArgs.moduleId ?? ''
       )
       return labware ? [labware.id] : []
     }

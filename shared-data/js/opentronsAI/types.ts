@@ -35,7 +35,6 @@ export interface BlowOutInPlaceArgs extends OpentronsAIBaseArgs<'blowOutInPlace'
 export interface BlowoutArgs extends OpentronsAIBaseArgs<'blowout'> {}
 export interface ConfigureForVolumeArgs extends OpentronsAIBaseArgs<'configureForVolume'> {}
 export interface ConfigureNozzleLayoutArgs extends OpentronsAIBaseArgs<'configureNozzleLayout'> {}
-export interface CustomArgs extends OpentronsAIBaseArgs<'custom'> {}
 export interface DispenseArgs extends OpentronsAIBaseArgs<'dispense'> {}
 export interface DispenseInPlaceArgs extends OpentronsAIBaseArgs<'dispenseInPlace'> {}
 export interface DispenseWhileTrackingArgs extends OpentronsAIBaseArgs<'dispenseWhileTracking'> {}
@@ -63,7 +62,6 @@ export type OpentronsAIArgs =
   | BlowoutArgs
   | ConfigureForVolumeArgs
   | ConfigureNozzleLayoutArgs
-  | CustomArgs
   | DispenseArgs
   | DispenseInPlaceArgs
   | DispenseWhileTrackingArgs

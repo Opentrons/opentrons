@@ -36,6 +36,7 @@ export const NON_PROTOCOL_COMMAND_TYPES = [
   'calibration/calibrateModule',
   'calibration/calibratePipette',
   'calibration/moveToMaintenancePosition',
+  'custom',
   'createCSV',
   'csvWriteRow',
   'getNextTip',
