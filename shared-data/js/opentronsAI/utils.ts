@@ -42,13 +42,6 @@ export const NON_PROTOCOL_COMMAND_TYPES = [
   'getTipPresence',
   'identifyModule',
   'liquidProbe',
-  'loadLabware',
-  'loadLid',
-  'loadLidStack',
-  'loadLiquid',
-  'loadLiquidClass',
-  'loadModule',
-  'loadPipette',
   'pressureDispense',
   'reloadLabware',
   'retractAxis',
@@ -61,7 +54,6 @@ export const NON_PROTOCOL_COMMAND_TYPES = [
   'setRailLights',
   'setStatusBar',
   'setTipState',
-  'tryLiquidProbe',
   'unsafe/blowOutInPlace',
   'unsafe/dropTipInPlace',
   'unsafe/engageAxes',
@@ -73,8 +65,14 @@ export const NON_PROTOCOL_COMMAND_TYPES = [
   'unsafe/ungripLabware',
   'unsafe/updatePositionEstimators',
   'unsealPipetteFromTip',
-  'verifyTipPresence',
-  'waitForResume',
+  // NOTE: the load commands are generated separately from commandCreators
+  'loadLabware',
+  'loadLid',
+  'loadLidStack',
+  'loadLiquid',
+  'loadLiquidClass',
+  'loadModule',
+  'loadPipette',
 ] as const satisfies readonly LatestCommandSchemaCommandType[]
 
 export type NonProtocolCommandType = (typeof NON_PROTOCOL_COMMAND_TYPES)[number]
@@ -128,9 +126,9 @@ export function getLatestCommandSchemaCommandTypes(): string[] {
 
 const nonProtocolCommandTypeSet = new Set<string>(NON_PROTOCOL_COMMAND_TYPES)
 
-/** command types in the latest schema that may appear in user protocols. 
+/** command types in the latest schema that may appear in user protocols.
  * this is needed for a test
-*/
+ */
 export function getProtocolCommandTypesFromLatestSchema(): string[] {
   return getLatestCommandSchemaCommandTypes().filter(
     commandType => !nonProtocolCommandTypeSet.has(commandType)
