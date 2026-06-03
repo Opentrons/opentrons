@@ -2,7 +2,7 @@ import { getSelf } from '@opentrons/api-client'
 
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getLocalRobotAccessToken, logOut } from '/app/redux/robot-auth'
+import { logOut } from '/app/redux/robot-auth'
 import { store } from '/app/redux/store'
 
 import type { HostConfig } from '@opentrons/api-client'
@@ -22,7 +22,7 @@ export interface RequireLoginResult {
  */
 export async function requireLogin(
   currentUsername: string | null,
-  hostConfig?: HostConfig | null
+  hostConfig: HostConfig | null
 ): Promise<RequireLoginResult | null> {
   const shouldShowLogin =
     currentUsername == null || (await isPasswordResetRequired(hostConfig))
@@ -40,16 +40,6 @@ export async function requireLogin(
   return { username: result.username }
 }
 
-function getHostConfigForLocalRobot(): HostConfig | null {
-  const state = store.getState()
-  const token = getLocalRobotAccessToken(state)
-  if (token == null) return null
-  return {
-    hostname: _ODD_IP_ ?? 'localhost',
-    token,
-  }
-}
-
 function clearLocalLoginState(): void {
   const state = store.getState()
   const localRobotName = getLocalRobot(state)?.name ?? null
@@ -61,13 +51,12 @@ function clearLocalLoginState(): void {
 }
 
 async function isPasswordResetRequired(
-  hostConfig?: HostConfig | null
+  hostConfig: HostConfig | null
 ): Promise<boolean> {
-  const host = hostConfig ?? getHostConfigForLocalRobot()
-  if (host?.token == null) return false
+  if (hostConfig?.token == null) return false
 
   try {
-    const response = await getSelf(host)
+    const response = await getSelf(hostConfig)
     return response.data.data.resetPassword
   } catch {
     return false

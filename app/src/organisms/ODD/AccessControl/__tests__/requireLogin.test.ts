@@ -4,7 +4,7 @@ import { getSelf } from '@opentrons/api-client'
 
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getLocalRobotAccessToken, logOut } from '/app/redux/robot-auth'
+import { logOut } from '/app/redux/robot-auth'
 import { store } from '/app/redux/store'
 
 import { requireLogin } from '../requireLogin'
@@ -32,7 +32,6 @@ vi.mock('/app/redux/discovery', () => ({
 }))
 
 vi.mock('/app/redux/robot-auth', () => ({
-  getLocalRobotAccessToken: vi.fn(),
   logOut: vi.fn((payload: { robotName: string }) => ({
     type: 'logOut',
     payload,
@@ -93,7 +92,7 @@ describe('requireLogin', () => {
   it('opens the login modal when logged out, and resolves with the new username on success', async () => {
     vi.mocked(showLoginModal).mockResolvedValue({ username: 'bob' })
 
-    const result = await requireLogin(null)
+    const result = await requireLogin(null, null)
 
     expect(result).toEqual({ username: 'bob' })
     expect(showLoginModal).toHaveBeenCalledOnce()
@@ -103,7 +102,7 @@ describe('requireLogin', () => {
   it('returns null when the user dismisses the login modal', async () => {
     vi.mocked(showLoginModal).mockResolvedValue(null)
 
-    const result = await requireLogin(null)
+    const result = await requireLogin(null, null)
 
     expect(result).toBeNull()
   })
@@ -116,25 +115,5 @@ describe('requireLogin', () => {
     expect(result).toEqual({ username: 'alice' })
     expect(showLoginModal).not.toHaveBeenCalled()
     expect(store.dispatch).not.toHaveBeenCalled()
-  })
-
-  it('uses the local robot host config when none is passed', async () => {
-    vi.mocked(store.getState).mockReturnValue({} as State)
-    vi.mocked(getLocalRobotAccessToken).mockReturnValue('stored-token')
-    vi.mocked(getSelf).mockResolvedValue({
-      data: {
-        data: {
-          username: 'alice',
-          resetPassword: false,
-        },
-      },
-    } as Awaited<ReturnType<typeof getSelf>>)
-
-    await requireLogin('alice')
-
-    expect(getSelf).toHaveBeenCalledWith({
-      hostname: _ODD_IP_ ?? 'localhost',
-      token: 'stored-token',
-    })
   })
 })
