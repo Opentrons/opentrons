@@ -163,15 +163,30 @@ export const commandCreatorFromStepArgs = (
         args
       )
 
-    case 'vacuumSetPumpProfile':
+    case 'vacuumStartRunProfile':
       return StepGeneration.curryCommandCreator(
-        StepGeneration.vacuumSetPumpProfile,
+        StepGeneration.vacuumStartRunProfile,
         args
       )
 
     case 'vacuumStopPump':
       return StepGeneration.curryCommandCreator(
         StepGeneration.vacuumStopPump,
+        args
+      )
+    case 'vacuumCloseVentSetPumpPressure':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumCloseVentSetPumpPressure,
+        args
+      )
+    case 'vacuumCloseVentSetPumpPower':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumCloseVentSetPumpPower,
+        args
+      )
+    case 'vacuumCloseVentStartProfile':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.vacuumCloseVentStartProfile,
         args
       )
   }

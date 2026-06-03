@@ -31,9 +31,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should return resumeRecovery and isResumeRecoveryLoading', () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        { accessControlEnabled: false }
+      )
     )
 
     expect(result.current).toHaveProperty('resumeRecovery')
@@ -43,9 +47,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should return updated isResumeRecoveryLoading when it changes', () => {
     const { result, rerender } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        { accessControlEnabled: false }
+      )
     )
 
     expect(result.current.isResumeRecoveryLoading).toBe(false)
@@ -63,9 +71,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should call mutateAsync with runId when resumeRecovery is called', async () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        { accessControlEnabled: false }
+      )
     )
 
     mockMutateAsync.mockResolvedValue('MOCK_RESULT')
@@ -77,9 +89,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should handle error and proceed to error route when resumeRecovery fails', async () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        { accessControlEnabled: false }
+      )
     )
 
     mockMutateAsync.mockRejectedValue(new Error('MOCK_ERROR'))

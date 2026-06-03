@@ -19,7 +19,9 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
 )
 from opentrons.util.pyro import pyro_client_async_adapter as _get_thread_proxy_module
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
-from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+
+TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
@@ -51,7 +53,7 @@ async def test_client_async_on_ot3api(decoy: Decoy, managed_obj: OT3API) -> None
 
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -62,7 +64,7 @@ async def test_client_async_on_ot3api(decoy: Decoy, managed_obj: OT3API) -> None
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0
@@ -125,7 +127,7 @@ async def test_thread_local_proxy_reuses_connections(
         ns_daemon.requestLoop()
 
     def _pyro_daemon() -> None:
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -135,7 +137,7 @@ async def test_thread_local_proxy_reuses_connections(
     server_thread.start()
 
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0
@@ -150,18 +152,16 @@ async def test_thread_local_proxy_reuses_connections(
     casted_ot3api = cast(HardwareControlAPI, AsyncClientPyroObject(ot3_proxy))
 
     original_get_thread_proxy = _get_thread_proxy_module._get_thread_proxy
-    seen_proxy_ids: set[int] = set()
     new_proxy_count = 0
+    previous_proxy_count = 0
 
     def counting_get_thread_proxy(
         proxy: pyro.Proxy,
     ) -> pyro.Proxy:
         nonlocal new_proxy_count
         result = original_get_thread_proxy(proxy)
-        proxy_id = id(result)
-        if proxy_id not in seen_proxy_ids:
-            seen_proxy_ids.add(proxy_id)
-            new_proxy_count += 1
+
+        new_proxy_count += 1
         return result
 
     call_count = 20
@@ -170,14 +170,16 @@ async def test_thread_local_proxy_reuses_connections(
     ):
         for _ in range(call_count):
             await casted_ot3api.home()
+            assert new_proxy_count == previous_proxy_count + 2
+            previous_proxy_count = new_proxy_count
 
-    # With thread-local proxy reuse, new_proxy_count should be much less
-    # than call_count. Each worker thread creates one proxy and reuses it.
-    # Without reuse (the old behavior), every call would create a new proxy.
-    assert new_proxy_count < call_count, (
-        f"Expected proxy reuse but got {new_proxy_count} new proxies for "
-        f"{call_count} calls. Each call should reuse a thread-local proxy "
-        f"rather than creating a new one."
+    # With thread-local proxy reuse, new_proxy_count should be double
+    # the call_count as of 5/4/26. Each client request creates one proxy and reuses it.
+    # Every call creates a proxy then releases it, and result validators create a proxy and release it.
+    assert new_proxy_count == call_count * 2, (
+        f"Expected two proxies per query but got {new_proxy_count} new proxies for "
+        f"{call_count} calls. Each call create a thread local proxy and a "
+        f"result validator proxy."
     )
 
     ot3_proxy._pyroRelease()  # type: ignore

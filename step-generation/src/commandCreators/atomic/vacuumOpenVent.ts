@@ -1,5 +1,6 @@
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import { vacuumModuleStateGetter } from '../../robotStateSelectors'
+import { getModuleHasLiveTask, uuid } from '../../utils'
 
 import type { VacuumModuleOpenVentCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
@@ -10,14 +11,21 @@ export const vacuumOpenVent: CommandCreator<
 > = (args, invariantContext, prevRobotState) => {
   const { moduleId } = args
   const module = invariantContext.moduleEntities[moduleId]
+  const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
 
-  if (module == null) {
+  if (module == null || moduleState == null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
 
-  // TODO: (nd, 2026-04-20) implement Python emission
+  const hasLiveTask = getModuleHasLiveTask(moduleState)
+  if (hasLiveTask) {
+    return {
+      errors: [errorCreators.liveTaskError()],
+    }
+  }
+  const python = `${module.pythonName}.open_vent()`
   return {
     commands: [
       {
@@ -28,5 +36,6 @@ export const vacuumOpenVent: CommandCreator<
         },
       },
     ],
+    python,
   }
 }

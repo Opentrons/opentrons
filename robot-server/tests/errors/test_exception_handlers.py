@@ -8,6 +8,13 @@ from fastapi import FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
+from server_utils.auth.resource_server.authorization_checker import (
+    MissingUserNotesError,
+    NotAnActiveTokenResult,
+)
+from server_utils.auth.resource_server.fastapi import AuthorizationError
+from server_utils.auth.scopes import Scope
+
 from robot_server.constants import V1_TAG
 from robot_server.errors.error_responses import ApiError
 from robot_server.errors.exception_handlers import exception_handlers
@@ -201,6 +208,31 @@ def test_handles_query_validation_error(app: FastAPI, client: TestClient) -> Non
     }
 
 
+def test_handles_missing_user_notes(app: FastAPI, client: TestClient) -> None:
+    """It should map MissingUserNotesError to a 422 with the header in source."""
+
+    @app.post("/items")
+    def create_item() -> None:
+        raise MissingUserNotesError(
+            "Opentrons-User-Notes is required when require-reason-for-interaction is enabled."
+        )
+
+    response = client.post("/items")
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json() == {
+        "errors": [
+            {
+                "errorCode": "4000",
+                "id": "InvalidRequest",
+                "title": "Invalid Request",
+                "detail": "Opentrons-User-Notes is required when require-reason-for-interaction is enabled.",
+                "source": {"header": "Opentrons-User-Notes"},
+            },
+        ]
+    }
+
+
 def test_handles_header_validation_error(app: FastAPI, client: TestClient) -> None:
     """It should properly format header validation errors."""
 
@@ -245,4 +277,32 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
             "string as an integer; body.array_field.0: Input should be a valid "
             "boolean, unable to interpret input"
         ),
+    }
+
+
+def test_handles_authorization_error(app: FastAPI, client: TestClient) -> None:
+    """It should properly format authorization errors.
+
+    We won't test every kind of authorization error here, since that's the
+    responsibility of server-utils. Just enough to make sure that the exceptions
+    don't become HTTP 500 errors.
+    """
+
+    @app.post("/trigger-auth-error")
+    def trigger_auth_error() -> None:
+        raise AuthorizationError(
+            authorization_error=NotAnActiveTokenResult(),
+            required_scopes={Scope.ROBOT_CONTROL_WRITE},
+        )
+
+    response = client.post(
+        "/trigger-auth-error",
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.headers["WWW-Authenticate"] == 'Bearer error="invalid_token"'
+    assert response.json() == {
+        "debugMessage": "The access token provided by the request is bogus or expired.",
+        "providedScopes": [],
+        "requiredScopes": [Scope.ROBOT_CONTROL_WRITE.api_name],
     }

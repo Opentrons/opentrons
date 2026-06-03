@@ -7,9 +7,8 @@ import {
 } from '../../errorCreators'
 import {
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsSafePickupWithinTiprack,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   uuid,
 } from '../../utils'
@@ -46,7 +45,7 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   } = args
   const errors: CommandCreatorError[] = []
   const channels = invariantContext.pipetteEntities[pipetteId].spec.channels
-  const isSafePipetteMovement = getIsSafePipetteMovement({
+  const pipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
     robotState: prevRobotState,
     invariantContext,
     pipetteId,
@@ -60,16 +59,19 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
 
   const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
     tipState: prevRobotState.tipState.tipracks[labwareId],
-    primaryNozzle:
-      primaryNozzle ?? getDefaultPrimaryNozzle({ channels, nozzles }),
+    primaryNozzle,
     channels,
     nozzleConfiguration: nozzles,
     wellName,
     tiprackDef: invariantContext.labwareEntities[labwareId].def,
   })
 
-  if (!isSafePipetteMovement) {
-    errors.push(possiblePipetteCollision())
+  if (!pipetteMovementSafetyStatus.isSafe) {
+    errors.push(
+      possiblePipetteCollision({
+        unsafePipetteMovementReason: pipetteMovementSafetyStatus.reason,
+      })
+    )
   }
 
   if (!isSafeWithinTiprack.isSafe) {

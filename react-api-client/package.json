@@ -7,13 +7,14 @@
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
   "peerDependencies": {
-    "react": "18.2.0"
+    "react": "catalog:react18"
   },
   "dependencies": {
-    "@opentrons/api-client": "link:../api-client",
-    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/api-client": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
+    "@types/lodash": "catalog:",
     "axios": "^0.21.1",
-    "lodash": "4.18.1",
+    "lodash": "catalog:",
     "react-query": "3.35.0"
   }
 }

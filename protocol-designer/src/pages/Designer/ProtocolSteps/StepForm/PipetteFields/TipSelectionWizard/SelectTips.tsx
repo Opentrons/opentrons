@@ -17,15 +17,7 @@ import {
   TIP,
   USED,
 } from '@opentrons/components'
-import {
-  ALL,
-  COLUMN,
-  getPositionFromSlotId,
-  PARTIAL_COLUMN,
-  PARTIAL_NOZZLE_MAP,
-  ROW,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { getPositionFromSlotId } from '@opentrons/shared-data'
 import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
@@ -36,32 +28,25 @@ import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors
 import { getCollidingWells } from '/protocol-designer/utils/index'
 
 import {
-  INACCESSIBLE_PARTIAL_TIP,
-  INACCESSIBLE_WELL_SPACING_MISMATCH,
-} from '../NozzleAndWellSelectionModal/constants'
-import { getEntireWellSelection } from '../NozzleAndWellSelectionModal/utils'
+  getEntireWellSelection,
+  getWellNameAtClientPoint,
+} from '../NozzleAndWellSelectionModal/utils'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import {
   INACCESSIBLE_COLLISION,
   INACCESSIBLE_INCOMPLETE,
-  INACCESSIBLE_TOO_MANY_PICKUPS,
   TIP_STATE_TO_TIP_TYPE,
 } from './constants'
 import { DeckOverlay } from './DeckOverlay'
 import { PipetteShadow } from './PipetteShadows/PipetteShadow'
 import { SelectionLegend } from './SelectionLegend'
 import styles from './tipselectionwizard.module.css'
-import {
-  getAllWellsInColumn,
-  getAllWellsInRow,
-  getViewboxFromSelectedLabware,
-} from './utils'
+import { getViewboxFromSelectedLabware } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
-  PartialPrimaryNozzles,
   PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
@@ -106,7 +91,7 @@ export function SelectTips(
   } = props
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
   const robotState = useSelector(getRobotStateAtActiveItem)
-
+  const [wellShadow, setWellShadow] = useState<string | null>(null)
   const viewBox =
     selectedTiprackId != null
       ? getViewboxFromSelectedLabware(
@@ -130,41 +115,75 @@ export function SelectTips(
     selectedTiprackId != null
       ? (tipAccessibilityStatus[selectedTiprackId] ?? {})
       : {}
+  // Flat lookup: well mapped to status of the primary or primaries covering it.
+  // Accessible primaries take precedence so cascading members of an accessible
+  // group are not incorrectly shown as inaccessible.
+  const wellToPrimaryStatus = Object.entries(
+    tipAccessibileStatusByWellName
+  ).reduce<Record<string, AccessibilityStatus>>((acc, [, status]) => {
+    status.affectedWells.forEach(well => {
+      const existing = acc[well]
+      if (existing == null || (!existing.isAccessible && status.isAccessible)) {
+        acc[well] = status
+      }
+    })
+    return acc
+  }, {})
 
   const allWellsAffectedByHover = hoveredWells ?? []
+  // The primary (first) well is where the primary nozzle lands. Cascading wells
+  // should not be used as the basis for accessibility since their individual isSafe
+  // checks would incorrectly flag them as blocked by the primary well's tip.
+  const primaryHoveredWell = allWellsAffectedByHover[0] ?? null
+  const primaryHoveredWellStatus =
+    primaryHoveredWell != null
+      ? tipAccessibileStatusByWellName[primaryHoveredWell]
+      : null
 
-  const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
-    well =>
-      tipAccessibileStatusByWellName[well].isAccessible &&
-      tipState?.[well] !== EMPTY
+  const allGroupWellsHaveTips = allWellsAffectedByHover.every(
+    well => tipState?.[well] !== EMPTY
   )
 
-  // lower index means higher priority
-  const inaccessibilityPriority = [
-    INACCESSIBLE_COLLISION,
-    INACCESSIBLE_INCOMPLETE,
-    INACCESSIBLE_TOO_MANY_PICKUPS,
-    INACCESSIBLE_PARTIAL_TIP,
-    INACCESSIBLE_WELL_SPACING_MISMATCH,
-  ]
+  const isHoveringSelectedGroup =
+    primaryHoveredWell != null &&
+    selectedTips.some(group => group[0] === primaryHoveredWell)
 
-  const hoveredWellsInaccessibilityStatus =
-    allWellsAffectedByHover.reduce<InaccessibleReason | null>((acc, well) => {
-      const { isAccessible, inaccessibleReason } =
-        tipAccessibileStatusByWellName[well]
-      if (isAccessible || inaccessibleReason == null) {
-        return acc
-      }
-      if (acc == null) {
-        return inaccessibleReason
-      }
-      return inaccessibilityPriority.indexOf(inaccessibleReason) <
-        inaccessibilityPriority.indexOf(acc)
-        ? inaccessibleReason
-        : acc
-    }, null)
+  const areAllHoveredWellsAccessibleAndOccupied =
+    isHoveringSelectedGroup ||
+    ((primaryHoveredWellStatus?.isAccessible ?? false) && allGroupWellsHaveTips)
+
+  const hoveredWellsInaccessibilityStatus: InaccessibleReason | null = (() => {
+    if (isHoveringSelectedGroup) {
+      return null
+    }
+    // A null status means the well isn't a registered primary tip.
+    if (primaryHoveredWellStatus == null) {
+      return INACCESSIBLE_INCOMPLETE
+    }
+    if (!primaryHoveredWellStatus.isAccessible) {
+      return primaryHoveredWellStatus.inaccessibleReason
+    }
+    if (!allGroupWellsHaveTips) {
+      return INACCESSIBLE_INCOMPLETE
+    }
+    return null
+  })()
+
   const numPickupsRemaining = numTotalPickups - selectedTips.length
   const hasPickupsRemaining = numPickupsRemaining > 0
+
+  // Flat set of all wells currently selected (primary + cascading for each group).
+  const flatSelected = new Set(selectedTips.flat())
+
+  const selectedWellToPrimary: Record<string, string> = selectedTips.reduce<
+    Record<string, string>
+  >((acc, group) => {
+    const primary = group[0]
+    group.forEach(tip => {
+      acc[tip] = primary
+    })
+    return acc
+  }, {})
 
   const _getWellsFromRect: (rect: GenericRect) => string[][] = rect => {
     const wellsInRect = getCollidingWells(rect)
@@ -182,108 +201,74 @@ export function SelectTips(
     return highlightedWells
   }
 
-  const handleUnselectWell = (unselectIndex: number): void => {
-    setSelectedTips(selectedTips.slice(0, unselectIndex))
-  }
-
   const handleClickWell = (wellName: string): void => {
-    const prevSelectedTipsByIndex = selectedTips.reduce<Record<string, number>>(
-      (acc, tipList, index) => {
-        const innerAcc = tipList.reduce((acc, tip) => {
-          return { ...acc, [tip]: index }
-        }, {})
-        return { ...acc, ...innerAcc }
-      },
-      {}
-    )
-    if (
-      // always allow tip unselection
-      !(wellName in prevSelectedTipsByIndex) &&
-      (tipState?.[wellName] === 'EMPTY' ||
-        !tipAccessibileStatusByWellName[wellName].isAccessible ||
-        (allWellsAffectedByHover.includes(wellName) &&
-          !areAllHoveredWellsAccessibleAndOccupied))
-    ) {
+    // If this well belongs to an already-selected group, deselect that group.
+    const owningPrimary = selectedWellToPrimary[wellName]
+    if (owningPrimary != null) {
+      setShowErrorBanner(false)
+      const groupIndex = selectedTips.findIndex(g => g[0] === owningPrimary)
+      setSelectedTips(selectedTips.slice(0, groupIndex))
       return
     }
-    setShowErrorBanner(false)
 
-    if (channels === 1 || nozzles === SINGLE) {
-      if (wellName in prevSelectedTipsByIndex) {
-        const indexToUnselect = prevSelectedTipsByIndex[wellName]
-        handleUnselectWell(indexToUnselect)
-      } else if (hasPickupsRemaining) {
-        setSelectedTips(prevTips => [...prevTips, [wellName]])
-      }
-    } else if (nozzles === PARTIAL_COLUMN) {
-      if (wellName in prevSelectedTipsByIndex) {
-        const indexToUnselect = prevSelectedTipsByIndex[wellName]
-        handleUnselectWell(indexToUnselect)
-      } else if (hasPickupsRemaining) {
-        const totalTipSelection =
-          PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles] ?? 0
-        const allWellsinColumn = getAllWellsInColumn(wellName, labwareDef)
-        const lengthOfColumn = allWellsinColumn.length
-        const allWellsInPartialColumn = allWellsinColumn.slice(
-          0,
-          lengthOfColumn - totalTipSelection
-        )
-        setSelectedTips(prevTips => [...prevTips, allWellsInPartialColumn])
-      }
-    } else if (
-      (channels === 8 && nozzles === ALL) ||
-      (channels === 96 && nozzles === COLUMN)
-    ) {
-      if (wellName in prevSelectedTipsByIndex) {
-        const indexToUnselect = prevSelectedTipsByIndex[wellName]
-        handleUnselectWell(indexToUnselect)
-      } else if (hasPickupsRemaining) {
-        const allWellsInColumn = getAllWellsInColumn(wellName, labwareDef)
-        setSelectedTips(prevTips => {
-          const newTips = [...prevTips]
-          newTips.push(allWellsInColumn)
-          return newTips
-        })
-      }
-    } else if (channels === 96 && nozzles === ROW) {
-      if (wellName in prevSelectedTipsByIndex) {
-        const indexToUnselect = prevSelectedTipsByIndex[wellName]
-        handleUnselectWell(indexToUnselect)
-      } else if (hasPickupsRemaining) {
-        const allWellsInRow = getAllWellsInRow(wellName, labwareDef)
-        setSelectedTips(prevTips => {
-          const newTips = [...prevTips]
-          newTips.push(allWellsInRow)
-          return newTips
-        })
-      }
-    } else if (channels === 96 && nozzles === ALL) {
-      const allWells = Object.keys(labwareDef.wells)
-      if (wellName in prevSelectedTipsByIndex) {
-        const indexToUnselect = prevSelectedTipsByIndex[wellName]
-        handleUnselectWell(indexToUnselect)
-      } else if (hasPickupsRemaining) {
-        setSelectedTips(prevTips => [...prevTips, allWells])
-      }
+    // for new selections, lookup primary first
+    // fall back to the covering-primary map for cascading (non-primary) wells.
+    const status =
+      tipAccessibileStatusByWellName[wellName] ?? wellToPrimaryStatus[wellName]
+
+    if (!(status?.isAccessible === true)) {
+      return
     }
+    const affectedWells = [...status.affectedWells]
+    if (affectedWells.some(w => tipState?.[w] === EMPTY)) {
+      return
+    }
+    if (!hasPickupsRemaining) {
+      return
+    }
+
+    setShowErrorBanner(false)
+    setSelectedTips([...selectedTips, affectedWells])
   }
 
   const handleHoverWell = (e: WellMouseEvent): void => {
     const { wellName } = e
-    const allHoveredWells = getEntireWellSelection(
-      wellName,
-      labwareDef.ordering,
-      nozzles,
-      primaryNozzle,
-      channels
-    )
+
+    // determine hover group using pre-computed data:
+    // 1. If the well is part of a selected group, show that group (deselect).
+    // 2. If the well is a valid primary, use its pre-computed affectedWells from
+    // useEMemoizedTipAccessibilityByTipraackIdByWellName.
+    // 3. If the well is a cascading member of some primary whose shadow would fall
+    // outside the current selection, use that primary's group.
+    // 4. Fall back to the single well (renders as INACCESSIBLE_INCOMPLETE via null status).
+    const owningPrimary = selectedWellToPrimary[wellName] ?? null
+    let allHoveredWells: string[]
+
+    if (owningPrimary != null) {
+      allHoveredWells = selectedTips.find(
+        group => group[0] === owningPrimary
+      ) ?? [wellName]
+    } else {
+      const directStatus = tipAccessibileStatusByWellName[wellName]
+      if (directStatus != null) {
+        allHoveredWells = directStatus.affectedWells
+      } else {
+        const coveringAccessibilityStatus = wellToPrimaryStatus[wellName]
+        const coveringFirst = coveringAccessibilityStatus?.affectedWells[0]
+        allHoveredWells =
+          coveringAccessibilityStatus != null &&
+          !flatSelected.has(coveringFirst)
+            ? coveringAccessibilityStatus.affectedWells
+            : [wellName]
+      }
+    }
 
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current)
       leaveTimeoutRef.current = null
     }
     setHoveredWells(allHoveredWells)
-    currentHoveredWellRef.current = allHoveredWells
+    setWellShadow(allHoveredWells[0])
   }
 
   const handleLeaveWell = (_: WellMouseEvent): void => {
@@ -291,70 +276,88 @@ export function SelectTips(
       clearTimeout(leaveTimeoutRef.current)
     }
     leaveTimeoutRef.current = setTimeout(() => {
+      setWellShadow(null)
       setHoveredWells(null)
       currentHoveredWellRef.current = null
 
       leaveTimeoutRef.current = null
     }, 300)
   }
+
   const selectedWellsByIndex = selectedTips.reduce<Record<string, number>>(
-    (acc, tipList, index) => {
-      const innerAcc = tipList.reduce<Record<string, number>>(
-        (acc, tip) => ({ ...acc, [tip]: index }),
-        {}
-      )
-      return { ...acc, ...innerAcc }
-    },
+    (acc, group, index) => ({
+      ...acc,
+      ...Object.fromEntries(group.map(w => [w, index])),
+    }),
     {}
   )
+
   const handleSelectionMove = (e: MouseEvent, rect: GenericRect): void => {
     if (!e.shiftKey) {
       const wellsUnderRect = _getWellsFromRect(rect)
       const flat = [...new Set(wellsUnderRect.flat())]
       setHoveredWells(flat)
+      const wellUnderMouse = getWellNameAtClientPoint(e.clientX, e.clientY)
+      if (wellUnderMouse) {
+        setWellShadow(wellUnderMouse)
+      }
     }
   }
+
   const handleSelectionDone = (e: MouseEvent, rect: GenericRect): void => {
     if (!e.shiftKey) {
       const wellsUnderRect = _getWellsFromRect(rect)
-      const filteredWellsUnderRect = wellsUnderRect.filter(wellGroup =>
-        wellGroup.every(
-          wellName =>
-            tipAccessibileStatusByWellName[wellName].isAccessible &&
-            hasPickupsRemaining
-        )
-      )
-      setSelectedTips(prev => {
-        const next = [...prev]
-        const selectedFlat = new Set(prev.flat())
-        const allAlreadySelected = filteredWellsUnderRect.every(group =>
-          group.every(well => selectedFlat.has(well))
-        )
 
-        let updated: string[][]
-        // Remove all wells if the entire selection is already selected
-        if (allAlreadySelected) {
-          const keysToRemove = new Set(wellsUnderRect.map(g => g[0]))
-          updated = next.filter(group => !keysToRemove.has(group[0]))
-        } else {
-          // Add additional selected wells if there is a mixture of selected and unselected
-          updated = [...next]
-          wellsUnderRect.forEach(wellGroup => {
-            const primaryWellInGroup = wellGroup[0]
-            const exists = updated.some(
-              wellGroup => wellGroup[0] === primaryWellInGroup
-            )
-            // Add to update list if the well does not currently exist in the list and is accessible
-            if (!exists && selectedWellsByIndex[primaryWellInGroup] !== 1) {
-              updated.push(wellGroup)
-            }
-          })
+      // single clicks call handleClickWell directly.
+      if (rect.x0 === rect.x1 && rect.y0 === rect.y1) {
+        const actualClickedWell =
+          Object.keys(getCollidingWells(rect))[0] ?? null
+        if (actualClickedWell != null) {
+          handleClickWell(actualClickedWell)
         }
-        return updated
+        return
+      }
+
+      // For drag selections, filter to accessible primaries only.
+      const filteredWellsUnderRect = wellsUnderRect.filter(wellGroup => {
+        const primaryWell = wellGroup[0]
+        return (
+          (tipAccessibileStatusByWellName[primaryWell]?.isAccessible ??
+            false) &&
+          hasPickupsRemaining
+        )
       })
+      const primaryWellsInRect = filteredWellsUnderRect.map(group => group[0])
+      const selectedPrimarySet = new Set(selectedTips.map(group => group[0]))
+
+      const allAlreadySelected =
+        primaryWellsInRect.length > 0 &&
+        primaryWellsInRect.every(p => selectedPrimarySet.has(p))
+
+      setSelectedTips(prev => {
+        const prevPrimaries = prev.map(g => g[0])
+        let newPrimaries: string[]
+
+        if (allAlreadySelected) {
+          const toRemove = new Set(primaryWellsInRect)
+          newPrimaries = prevPrimaries.filter(primary => !toRemove.has(primary))
+        } else {
+          const toAdd = primaryWellsInRect.filter(
+            primary => !selectedPrimarySet.has(primary)
+          )
+          newPrimaries = [...prevPrimaries, ...toAdd]
+        }
+
+        return newPrimaries.map(primary => {
+          const aff = tipAccessibileStatusByWellName[primary]?.affectedWells
+          return aff != null ? [...aff] : [primary]
+        })
+      })
+
       setHoveredWells(null)
     }
   }
+
   let controls: JSX.Element = <></>
   const labware = activeDeckSetup.labware[selectedTiprackId ?? '']
   const slot = getSlotInLocationStack(labware.stack)
@@ -370,35 +373,55 @@ export function SelectTips(
     const tipStatusByWellName =
       tipState != null
         ? Object.entries(tipState).reduce<Record<string, TipType>>(
-            (acc, [wellName, state]) => {
+            (acc, [tipName, state]) => {
               const rawState = TIP_STATE_TO_TIP_TYPE[state]
+              const primaryStatus = wellToPrimaryStatus[tipName]
               let status = rawState
-              if (!tipAccessibileStatusByWellName[wellName].isAccessible) {
+
+              if (!primaryStatus?.isAccessible) {
                 status = rawState === NO ? NO : INACCESSIBLE
               }
-              if (selectedTips.flat().some(tip => tip === wellName)) {
-                const isAccessible =
-                  tipAccessibileStatusByWellName[wellName].isAccessible
-                if (!isAccessible) {
-                  status = SELECTED_ERROR
-                } else {
-                  status = rawState === USED ? SELECTED_USED : SELECTED
-                }
-              } else if (allWellsAffectedByHover.includes(wellName)) {
-                if (
-                  areAllHoveredWellsAccessibleAndOccupied &&
-                  hasPickupsRemaining
-                ) {
-                  status = rawState === USED ? SELECTED_USED : SELECTED
-                } else {
-                  status = SELECTED_ERROR
-                }
+
+              if (flatSelected.has(tipName)) {
+                // Find the primary of the group this selected well belongs to.
+                const groupContainingWell = selectedTips.find(group =>
+                  group.includes(tipName)
+                )
+                const primaryOfGroup = groupContainingWell?.[0] ?? tipName
+                const primaryStatus =
+                  tipAccessibileStatusByWellName[primaryOfGroup]
+                // Use physical tip state to account for tipsToIgnore
+                const affectedWells = primaryStatus?.affectedWells ??
+                  groupContainingWell ?? [tipName]
+                const hasPhysicallyEmptyWell = affectedWells.some(
+                  w => tipState?.[w] === EMPTY
+                )
+                const isGroupInError =
+                  (primaryStatus != null &&
+                    !primaryStatus.isAccessible &&
+                    primaryStatus.inaccessibleReason ===
+                      INACCESSIBLE_COLLISION) ||
+                  hasPhysicallyEmptyWell
+                status = isGroupInError
+                  ? SELECTED_ERROR
+                  : rawState === USED
+                    ? SELECTED_USED
+                    : SELECTED
+              } else if (allWellsAffectedByHover.includes(tipName)) {
+                status =
+                  areAllHoveredWellsAccessibleAndOccupied && hasPickupsRemaining
+                    ? rawState === USED
+                      ? SELECTED_USED
+                      : SELECTED
+                    : SELECTED_ERROR
               }
-              return { ...acc, [wellName]: status }
+
+              return { ...acc, [tipName]: status }
             },
             {}
           )
         : {}
+
     controls = (
       <>
         <DeckOverlay deckDef={deckDef} />
@@ -407,7 +430,6 @@ export function SelectTips(
           x={slotPosition[0]}
           y={slotPosition[1]}
           showHighlightedWells={false}
-          handleClickWell={handleClickWell}
           onMouseEnterWell={handleHoverWell}
           onMouseLeaveWell={handleLeaveWell}
           selectedTipsByIndex={selectedWellsByIndex}
@@ -420,17 +442,15 @@ export function SelectTips(
           borderStroke={COLORS.yellow40}
           ignoreMissingTips
         />
-        {hoveredWells != null ? (
+        {wellShadow ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
-            hoveredWell={hoveredWells[0]}
+            hoveredWell={wellShadow ?? ''}
             selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
-            isHoveredWellSelected={selectedTips
-              .flat()
-              .some(tip => tip === hoveredWells[0])}
+            isHoveredWellSelected={flatSelected.has(wellShadow)}
             hasPickupsRemaining={hasPickupsRemaining}
             isAccessible={hoveredWellsInaccessibilityStatus == null}
             inaccessibleReason={hoveredWellsInaccessibilityStatus ?? null}

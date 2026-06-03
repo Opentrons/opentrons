@@ -14,15 +14,21 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
-import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import {
+  HOPPER_LABWARE_X_OFFSET,
+  VACUUM_DOCK_DISPLAY_LOCATION,
+  VACUUM_DOCK_LABWARE_X_OFFSET,
+} from '/protocol-designer/constants'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
@@ -33,6 +39,7 @@ import {
   getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
+import { getIsVacuumCollar } from './DeckSetup/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -73,6 +80,7 @@ interface SlotInformation {
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
   isSlotAHopper: boolean
+  isSlotAVacuumDock: boolean
   createdModuleForSlot?: ModuleOnDeck
   createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
@@ -89,6 +97,33 @@ interface SlotInformationProps {
 
 const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
 const FOURTH_COLUMN_CONVERSION = { A4: 'A3', B4: 'B3', C4: 'C3', D4: 'D3' }
+
+const _getAdjustedSlot = (
+  slot: DeckSlot,
+  isSlotAVacuumDock: boolean,
+  isSlotAHopper: boolean
+): string => {
+  if (isSlotAVacuumDock) {
+    return slot
+  }
+  if (isSlotAHopper) {
+    return FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  }
+  return slot
+}
+const _getOffsetFromSlot = (
+  slot: DeckSlot,
+  isSlotAVacuumDock: boolean,
+  isSlotAHopper: boolean
+): number => {
+  if (isSlotAVacuumDock) {
+    return VACUUM_DOCK_LABWARE_X_OFFSET
+  }
+  if (isSlotAHopper) {
+    return HOPPER_LABWARE_X_OFFSET
+  }
+  return 0
+}
 
 export const getSlotInformation = (
   props: SlotInformationProps
@@ -109,16 +144,15 @@ export const getSlotInformation = (
     .filter(def => def.allowedRoles?.includes('lid'))
     ?.map(def => def.parameters.loadName)
   const offDeckLabware = deckSetupLabware[slot]
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(slot)
   const isSlotAHopper = getIsSlotAHopper(slot)
-  const adjustedSlot = isSlotAHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+  const adjustedSlot = _getAdjustedSlot(slot, isSlotAVacuumDock, isSlotAHopper)
   const slotPosition =
     deckDef != null && offDeckLabware == null
       ? getPositionFromSlotId(
-          adjustedSlot as string,
+          adjustedSlot,
           deckDef,
-          ...(isSlotAHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
+          _getOffsetFromSlot(slot, isSlotAVacuumDock, isSlotAHopper)
         )
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
@@ -132,7 +166,8 @@ export const getSlotInformation = (
     : getFullStackFromLabwaresOnDeck(
         Object.values(deckSetupLabware),
         slot,
-        isSlotAHopper
+        isSlotAHopper,
+        isSlotAVacuumDock
       )
   const labwareStackOnSlot =
     fullStackFromLabwares?.filter(
@@ -167,11 +202,15 @@ export const getSlotInformation = (
       : deckSetupLabware[id]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
   )
 
+  // For vacuum module, don't separate adapters from the stack since multiple adapters can be stacked
+  const isVacuumModule = createdModuleForSlot?.type === VACUUM_MODULE_TYPE
+
   const bottomMostLabware =
     deckSetupLabware[
       labwareIdsFromFullStack[labwareIdsFromFullStack.length - 1]
     ]
   const createdAdapterForSlot =
+    !isVacuumModule &&
     bottomMostLabware != null &&
     bottomMostLabware.def.allowedRoles?.includes('adapter')
       ? bottomMostLabware
@@ -220,6 +259,7 @@ export const getSlotInformation = (
     preSelectedFixture,
     slotPosition: slotPosition,
     isSlotAHopper,
+    isSlotAVacuumDock,
     matchingLabwareFor4thColumn: matchingLabware,
     createdStackForSlot:
       slot === 'offDeck'
@@ -287,10 +327,22 @@ const getLabwareInfo = (
 ): { nickName: string; latestSlot: string } => {
   const { modules } = activeDeckSetup
   const stack = activeDeckSetup.labware[labwareId]?.stack
-  const latestSlot =
-    stack != null
-      ? resolveSlotLocation(modules, stack, robotType)
-      : 'unknown slot'
+  let latestSlot: string = ''
+
+  // resolve the slot from the stack
+  if (stack != null) {
+    latestSlot = resolveSlotLocation(modules, stack, robotType)
+  } else {
+    console.warn(`Could not find slot for labware ${labwareId}`)
+    latestSlot = 'unknown slot'
+  }
+
+  // check if it's a vacuum dock and transform to display location
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(latestSlot)
+  if (isSlotAVacuumDock) {
+    latestSlot = VACUUM_DOCK_DISPLAY_LOCATION
+  }
+
   const name = nicknamesById[labwareId]
   let nickName: string = name
   if (latestSlot != null && latestSlot !== 'offDeck') {
@@ -351,6 +403,7 @@ export const useLabwareDropdownOptions = (
         deckSlot === 'fixedTrash'
 
       const isAdapter = def.allowedRoles?.includes('adapter') ?? false
+      const isVacuumCollar = getIsVacuumCollar(def)
       const { nickName, latestSlot } = getLabwareInfo(
         nicknamesById,
         activeDeckSetup,
@@ -365,29 +418,29 @@ export const useLabwareDropdownOptions = (
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
       //  TODO: refactor this to be easier to read
-      const options: DropdownOption[] =
+      const shouldExclude =
         isInaccessible ||
         (type === 'labware' && isOnStacker) ||
-        isAdapter ||
+        (isAdapter && !isVacuumCollar) ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
-        (type === 'moveLabware' && !isTopOfStack && !isLabwareLidCombo) ||
+        (type === 'moveLabware' &&
+          !isTopOfStack &&
+          !isVacuumCollar &&
+          !isLabwareLidCombo) ||
         (type === 'labware' && !isTopOfStack)
-          ? acc
-          : [
-              ...acc,
-              {
-                name: nickName,
-                value: labwareId,
-                deckLabel: latestSlot,
-              },
-            ]
-
-      //  filter out moving adapters, and labware in
-      //  waste chute for moveLabware, labware off-deck and
-      //  labware that is a tiprack for the labware dropdown only
-      return options
+      if (shouldExclude) {
+        return acc
+      }
+      return [
+        ...acc,
+        {
+          name: nickName,
+          value: labwareId,
+          deckLabel: latestSlot,
+        },
+      ]
     },
     []
   )

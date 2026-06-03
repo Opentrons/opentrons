@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  container-name: tip-pickup-slot-container;
+  container-type: inline-size;
+  gap: var(--spacing-8);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subheader {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main_content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+}
+
+.footer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Width 172px up to 299px */
+@container tip-pickup-slot-container (min-width: 172px) and (max-width: 299px) {
+  .main_content {
+    padding: var(--spacing-12);
+  }
+}
+
+/* Width 300px up to 449px */
+@container tip-pickup-slot-container (min-width: 300px) and (max-width: 449px) {
+  .main_content {
+    padding: var(--spacing-20);
+  }
+}
+
+/* Width 450px up to 599px */
+@container tip-pickup-slot-container (min-width: 450px) and (max-width: 599px) {
+  .main_content {
+    padding: var(--spacing-32);
+  }
+}
+
+/* Width 600px and up */
+@container tip-pickup-slot-container (min-width: 600px) {
+  .main_content {
+    padding: var(--spacing-40);
+  }
+}

@@ -13,10 +13,10 @@ Congratulations! Your Opentrons Flex has arrived and you've prepared a space for
 
 ## Effort and time required
 
-You'll want to ask a lab partner to assist with the unboxing, lifting, moving, and assembly process. You'll need to budget about 30 minutes to an hour for this effort.
+You'll want to ask for assistance with unboxing, lifting, moving, and assembling the robot. You'll need to budget about 30 minutes to an hour for this effort.
 
-!!! note
-    The Flex requires two people to lift it properly. Also, lifting and carrying the Flex by its handles is the best way to move the robot.
+!!! warning
+    Flex weighs 88.5 kg (195 lbs). As a result, moving or lifting it requires a team with sufficient personnel to ensure safe handling.
 
 ## Crate and packing material
 
@@ -177,9 +177,9 @@ Continue to unpack the Flex and get it off the crate base.
 
     ![Shipping bag being removed from the Flex robot.](../images/unboxing/8-shipping-bag.svg "Unboxing step 8")
 
-9. With help from your lab partner, grab the handholds in the orange shipping frames on either side of the robot's base, lift the Flex off the crate base, and set it down on the floor. Save or discard the crate base and shipping frame.
+9. Using a team with sufficient personnel to move the Flex safely, grab the handholds in the orange shipping frames on either side of the base, lift the robot off the crate, and set it down on the floor.
 
-    ![Location of handholds for lifting the Flex robot, with icon showing two people required to safely lift it.](../images/unboxing/9-lift-off-base.svg "Unboxing step 9")
+    ![Location of handholds for lifting the Flex robot.](../images/unboxing/9-lift-off-base.svg "Unboxing step 9")
 
 10. Using the 12 mm hex L-key from the User Kit, remove the four bolts holding the shipping frames to the Flex. Save or discard the frames and bolts.
 
@@ -189,7 +189,7 @@ Continue to unpack the Flex and get it off the crate base.
 
     ![Location of the four handles with arrow showing clockwise attachment motion.](../images/unboxing/11-attach-handles.svg "Unboxing step 11")
 
-12. With help from your lab partner, lift the Flex by its carrying handles and move it to a workbench for final assembly.
+12. Using a team with sufficient personnel to move the Flex safely, lift it by its *carrying handles* and move it to a workbench for final assembly.
 
     ![Flex robot on top of a workbench.](../images/unboxing/12-flex-on-bench.svg "Unboxing step 12")
 
@@ -201,7 +201,7 @@ After moving the Flex to a temporary work area, or its permanent home, it's time
 
 <div class="instruction-list" markdown>
 
-13. If you have moved the robot to its final, working location, remove the carrying handles and replace them with the finishing caps. The caps close the handle openings in the frame and give the robot a clean appearance. Return the handles to the User Kit for storage.
+13. If you have moved the robot to its final, working location, remove the carrying handles and replace them with the *finishing caps*. The caps close the handle openings in the frame and give the robot a clean appearance. Return the handles to the User Kit for storage.
 
     ![Location of finishing caps, with inset showing clockwise attachment with the hex key.](../images/unboxing/13-finishing-caps.svg "Unboxing step 13")
 

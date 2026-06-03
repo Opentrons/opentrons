@@ -104,7 +104,7 @@ def test_flex_onboarding_workflow(page: Page, pd_base_url: str) -> None:
     landing = LandingPage(page)
     landing.wait_for_page_load()
     landing.confirm_welcome_modal()
-    # Click "Create a protocol" to start onboarding
+    # Click "Create a Flex protocol" to start onboarding
     landing.click_create_protocol()
     # Part 1: Add pipette - Click "Add a pipette" to open selector
     page.get_by_text("Add a pipette").click()
@@ -118,9 +118,6 @@ def test_flex_onboarding_workflow(page: Page, pd_base_url: str) -> None:
     page.get_by_role("button", name="Save").click()
     # Part 2: Gripper question - "Do you want to move labware automatically with the gripper?"
     page.get_by_text("Yes", exact=True).click()
-    # Part 3: Thermocycler question - "Are you using a Thermocycler in your protocol?"
-    page.get_by_test_id("BasicsButtons_thermocycler_no").get_by_text("No").click()
-    page.get_by_test_id("BasicsButtons_wasteChute_no").get_by_text("No").click()
-    # Now Confirm button should be enabled - click to proceed to Step 2
+    # Confirm basics and proceed to deck hardware configuration
     confirm_button = page.get_by_role("button", name="Confirm")
     confirm_button.click()

@@ -28,10 +28,15 @@ import {
   OT2_ROBOT_TYPE,
   STAGING_AREA_CUTOUTS,
   TRASH_BIN_ADAPTER_FIXTURE,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import {
+  getDeckConfiguration,
+  getInitialDeckSetup,
+} from '../../step-forms/selectors'
+import { useUpdateDeckConfigurationFromStartingDeck } from '../Designer/DeckSetup/hooks/useUpdateDeckConfigurationFromStartingDeck'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -64,6 +69,11 @@ interface DeckThumbnailProps {
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const { hoverSlot, setHoverSlot, robotType } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const { deckConfig } = useSelector(getDeckConfiguration)
+  useUpdateDeckConfigurationFromStartingDeck({
+    activeDeckSetup: initialDeckSetup,
+    robotType,
+  })
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const trash = Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
@@ -88,7 +98,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea'
   )
-
   const wasteChuteStagingAreaFixtures = Object.values(
     initialDeckSetup.additionalEquipmentOnDeck
   ).filter(
@@ -105,8 +114,27 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const hasFlexStacker = Object.values(initialDeckSetup.modules).some(
     module => getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE
   )
+  const hasVacuumModule = Object.values(initialDeckSetup.modules).some(
+    module => getModuleType(module.model) === VACUUM_MODULE_TYPE
+  )
+  const flexStackerLocations = Object.values(initialDeckSetup.modules)
+    .filter(stacker => stacker.type === FLEX_STACKER_MODULE_TYPE)
+    .map(({ slot: location, ...rest }) => ({ ...rest, location }))
+  flexStackerLocations.forEach(
+    stacker => (stacker.location = `cutout${stacker.location.slice(0, 1)}3`)
+  )
+  const stagingAreaFixturesAndStacker = [
+    ...stagingAreaFixtures,
+    ...flexStackerLocations,
+  ]
+  const stagingAreaCutoutIds = stagingAreaFixturesAndStacker.map(
+    stagingArea => stagingArea.location.split('cutout')[1]
+  )
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
-    aa => isAddressableAreaStandardSlot(aa.id, deckDef)
+    aa =>
+      isAddressableAreaStandardSlot(aa.id, deckDef) &&
+      !stagingAreaCutoutIds.includes(aa.id) &&
+      (!hasWasteChute || aa.id !== 'D3')
   )
   const hasRightColumnFixtures =
     stagingAreaFixtures.length + wasteChuteFixtures.length > 0 || hasFlexStacker
@@ -165,16 +193,18 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                       showExpansion={cutoutId === 'cutoutA1'}
                       fixtureBaseColor={lightFill}
                       slotClipColor={darkFill}
+                      showSlotClips={false}
                     />
                   ) : null
                 })}
-                {stagingAreaFixtures.map(fixture => (
+                {stagingAreaFixturesAndStacker.map(fixture => (
                   <StagingAreaFixture
                     key={fixture.id}
                     cutoutId={fixture.location as StagingAreaLocation}
                     deckDefinition={deckDef}
                     fixtureBaseColor={lightFill}
                     slotClipColor={darkFill}
+                    showSlotClips={false}
                   />
                 ))}
                 {trash != null
@@ -186,6 +216,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                             deckDefinition={deckDef}
                             slotClipColor={COLORS.transparent}
                             fixtureBaseColor={lightFill}
+                            showSlotClips={false}
                           />
                           <FlexTrash
                             robotType={robotType}
@@ -198,12 +229,20 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     )
                   : null}
                 {wasteChuteFixtures.map(fixture => (
-                  <WasteChuteFixture
-                    key={fixture.id}
-                    cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-                    deckDefinition={deckDef}
-                    fixtureBaseColor={lightFill}
-                  />
+                  <Fragment key={fixture.id}>
+                    <SingleSlotFixture
+                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                      deckDefinition={deckDef}
+                      slotClipColor={COLORS.transparent}
+                      fixtureBaseColor={lightFill}
+                      showSlotClips={false}
+                    />
+                    <WasteChuteFixture
+                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                      deckDefinition={deckDef}
+                      fixtureBaseColor={lightFill}
+                    />
+                  </Fragment>
                 ))}
                 {wasteChuteStagingAreaFixtures.map(fixture => (
                   <WasteChuteStagingAreaFixture
@@ -212,6 +251,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     deckDefinition={deckDef}
                     fixtureBaseColor={lightFill}
                     slotClipColor={darkFill}
+                    showSlotClips={false}
                   />
                 ))}
               </>
@@ -221,16 +261,17 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               hover={hoverSlot}
               setHover={setHoverSlot}
               initialDeckSetup={initialDeckSetup}
-              stagingAreaCutoutIds={stagingAreaFixtures.map(
+              stagingAreaCutoutIds={stagingAreaFixturesAndStacker.map(
                 areas => areas.location as CutoutId
               )}
+              deckConfig={deckConfig}
               {...{
                 deckDef,
               }}
             />
             <SlotLabels
               robotType={robotType}
-              show4thColumn={stagingAreaFixtures.length > 0}
+              show4thColumn={stagingAreaFixtures.length > 0 || hasVacuumModule}
             />
           </>
         )}

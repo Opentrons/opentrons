@@ -143,6 +143,7 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_dict_of_proxies,
     convert_result_to_proxy,
     convert_result_to_wrapped_dict,
     convert_result_to_wrapped_typed_dict,
@@ -2377,7 +2378,9 @@ class OT3API(
         real_mount = OT3Mount.from_mount(mount)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
-            raise FailedTipStateCheck(expected, status)
+            raise FailedTipStateCheck(
+                f"Expected tip state {expected}, but received {status}."
+            )
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
@@ -2549,6 +2552,7 @@ class OT3API(
             )
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
         # TODO (lc 12-5-2022) We should have ONE entry point into knowing
         # what pipettes are attached from the hardware controller.
@@ -2565,6 +2569,7 @@ class OT3API(
         return self._gripper_handler.get_gripper()
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching

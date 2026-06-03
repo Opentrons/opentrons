@@ -83,7 +83,7 @@ export function SlotOverlay(props: SlotOverlayProps): JSX.Element | null {
           hasTCOnSlot != null,
           slotPosition
         )
-      : getOT2HoverDimensions(hasTCOnSlot != null, slotPosition)
+      : getOT2HoverDimensions(hasTCOnSlot != null, slotPosition, false)
 
   return (
     <RobotCoordsForeignObject

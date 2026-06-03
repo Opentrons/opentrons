@@ -36,7 +36,9 @@ describe('AnnotatedGroup', () => {
     props = {
       scrollTargetId: 'mockTargetId',
       listElement: null,
+      listViewportHeight: 0,
       annotationType: 'mockAnnotationType',
+      annotationDescription: 'mockAnnotationDescription',
       subCommands: [],
       analysis: {} as any,
       allRunDefs: [] as any,
@@ -52,11 +54,10 @@ describe('AnnotatedGroup', () => {
   it('should render text and icon', () => {
     render(props)
     screen.getByText('mockAnnotationType')
-    screen.getByTestId('chevron-down')
     expect(screen.queryByText('mockIndividualCommand')).toBeNull()
   })
 
-  it('should render individualcommand component', () => {
+  it('should render individual command component', () => {
     props = {
       ...props,
       subCommands: [
@@ -67,7 +68,6 @@ describe('AnnotatedGroup', () => {
       ],
     }
     render(props)
-    screen.getByTestId('chevron-up')
     screen.getByText('mockIndividualCommand')
   })
 })

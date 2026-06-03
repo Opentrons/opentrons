@@ -22,15 +22,23 @@ import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
-  border-collapse: separate
+  border-collapse: separate;
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing8};
-  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
-  padding: ${SPACING.spacing4};
+  padding: 0 0 0 ${SPACING.spacing24};
+
+  &:first-child {
+    width: 100%;
+  }
+
+  &:last-child {
+    padding: 0 ${SPACING.spacing24} 0 0;
+    text-align: ${TYPOGRAPHY.textAlignRight};
+  }
 `
 
 const TableRow = styled('tr')`
@@ -48,6 +56,8 @@ const TableDatum = styled('td')`
     border-bottom-left-radius: ${BORDERS.borderRadius16};
   }
   &:last-child {
+    padding-right: ${SPACING.spacing24};
+    text-align: ${TYPOGRAPHY.textAlignCenter};
     border-top-right-radius: ${BORDERS.borderRadius16};
     border-bottom-right-radius: ${BORDERS.borderRadius16};
   }
@@ -65,24 +75,12 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <StyledText
-              color={COLORS.grey60}
-              fontSize={TYPOGRAPHY.fontSize20}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              paddingLeft={SPACING.spacing24}
-            >
+            <StyledText color={COLORS.grey60} oddStyle="smallBodyTextSemiBold">
               {i18n.format(t('labware_name'), 'titleCase')}
             </StyledText>
           </TableHeader>
           <TableHeader>
-            <StyledText
-              alignItems={ALIGN_CENTER}
-              color={COLORS.grey60}
-              fontSize={TYPOGRAPHY.fontSize20}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              paddingRight={SPACING.spacing12}
-              textAlign={TYPOGRAPHY.textAlignCenter}
-            >
+            <StyledText color={COLORS.grey60} oddStyle="smallBodyTextSemiBold">
               {i18n.format(t('quantity'), 'sentenceCase')}
             </StyledText>
           </TableHeader>
@@ -133,11 +131,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                 </Flex>
               </TableDatum>
               <TableDatum>
-                <StyledText
-                  oddStyle="bodyTextSemiBold"
-                  alignItems={ALIGN_CENTER}
-                  textAlign={TYPOGRAPHY.textAlignCenter}
-                >
+                <StyledText oddStyle="bodyTextSemiBold">
                   {labware.quantity}
                 </StyledText>
               </TableDatum>

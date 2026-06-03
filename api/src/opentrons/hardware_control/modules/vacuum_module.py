@@ -2,13 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Mapping,
-    Optional,
-)
+from typing import Any, Awaitable, Callable, List, Mapping, Optional, Union
+
+from typing_extensions import cast
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
@@ -31,13 +27,18 @@ from opentrons.hardware_control.modules.types import (
     ModuleErrorCallback,
     ModuleType,
     UploadFunction,
+    VacuumModuleCycle,
     VacuumModuleData,
     VacuumModuleOperationMode,
+    VacuumModulePowerStep,
+    VacuumModulePressureStep,
     VacuumModuleStatus,
+    VacuumModuleStep,
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -149,6 +150,11 @@ class VacuumModule(mod_abc.AbstractModule):
             self._initialized_callback
         )
         self._unsubscribe_error = reader.set_error_callback(self._async_error_callback)
+        self._total_cycle_count: Optional[int] = None
+        self._current_cycle_index: Optional[int] = None
+        self._total_step_count: Optional[int] = None
+        self._current_step_index: Optional[int] = None
+        self._error: Optional[str] = None
 
     async def _initialized_callback(self) -> None:
         """Called by the reader once the module is initialized."""
@@ -238,6 +244,29 @@ class VacuumModule(mod_abc.AbstractModule):
             or self._reader.vacuum_state.vacuum_enabled
         )
 
+    @property
+    def total_cycle_count(self) -> Optional[int]:
+        return self._total_cycle_count
+
+    @property
+    def current_cycle_index(self) -> Optional[int]:
+        return self._current_cycle_index
+
+    @property
+    def total_step_count(self) -> Optional[int]:
+        return self._total_step_count
+
+    @property
+    def current_step_index(self) -> Optional[int]:
+        return self._current_step_index
+
+    def _clear_cycle_counters(self) -> None:
+        """Clear the cycle counters."""
+        self._total_cycle_count = None
+        self._current_cycle_index = None
+        self._total_step_count = None
+        self._current_step_index = None
+
     async def prep_for_update(self) -> str:
         await self._poller.stop()
         await self._driver.set_vacuum_state(False)
@@ -246,6 +275,7 @@ class VacuumModule(mod_abc.AbstractModule):
         dfu_info = await update.find_dfu_device(pid=DFU_PID, expected_device_count=3)
         return dfu_info
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 
@@ -356,13 +386,127 @@ class VacuumModule(mod_abc.AbstractModule):
         start_pump: bool,
         target_rpm: Optional[int] = None,
         duty_cycle: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
         self._reader.set_operation_mode(VacuumModuleOperationMode.POWER)
+
         await self._driver.set_vacuum_state(enable_vacuum=False)
         await self._driver.set_pump_state(
-            start_pump=start_pump, target_rpm=target_rpm, duty_cycle=duty_cycle
+            start_pump=start_pump,
+            target_rpm=target_rpm,
+            duty_cycle=duty_cycle,
+            duration_s=duration_s,
+            timeout_s=timeout_s,
+            rate=rate,
+            vent_after=vent_after,
         )
+
+    async def _execute_cycle_step(self, step: VacuumModuleStep) -> None:
+        enable_pump = step["enable_pump"]
+        hold_time_seconds = (
+            step["hold_time_seconds"] if step["hold_time_seconds"] else 0
+        )
+        hold_time_minutes = step["hold_time_minutes"]
+        ramp_rate = step["ramp_rate"]
+        timeout_seconds = step["timeout_seconds"]
+        vent_after = step["vent_after"]
+        # this gives users the ability to not specify a duration at all if
+        # they want the pump to run indefinitely
+        if hold_time_minutes is not None and hold_time_seconds is not None:
+            hold_time_seconds += hold_time_minutes * 60
+        elif hold_time_minutes is not None and hold_time_seconds is None:
+            hold_time_seconds = hold_time_minutes * 60
+        if "percent_power" in step:
+            percent_power = cast(VacuumModulePowerStep, step)["percent_power"]
+            await self.set_pump_state(
+                start_pump=enable_pump,
+                duty_cycle=percent_power,
+                duration_s=hold_time_seconds,
+                timeout_s=timeout_seconds,
+                rate=ramp_rate,
+                vent_after=vent_after,
+            )
+        if "gauge_pressure_mbar" in step:
+            gauge_pressure_mbar = cast(VacuumModulePressureStep, step)[
+                "gauge_pressure_mbar"
+            ]
+            await self.set_vacuum_state(
+                enable_vacuum=enable_pump,
+                gauge_pressure_mbar=gauge_pressure_mbar,
+                duration_s=hold_time_seconds,
+                timeout_s=timeout_seconds,
+                rate=ramp_rate,
+                vent_after=vent_after,
+            )
+
+    async def _execute_profile(
+        self,
+        profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
+        vent_after: bool = False,
+    ) -> None:
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            self._current_cycle_index += 1
+            if "repetitions" in step_or_cycle:
+                this_cycle = cast(VacuumModuleCycle, step_or_cycle)
+                # basically https://github.com/python/mypy/issues/14766
+                for rep in range(this_cycle["repetitions"]):
+                    for step in this_cycle["steps"]:
+                        self._current_step_index += 1
+                        await self._execute_cycle_step(step)
+                        await self.wait_for_command_duration()
+                if this_cycle["vent_after"] is not None:
+                    await self.set_vent_state(
+                        vent_state=VentState(this_cycle["vent_after"])
+                    )
+            else:
+                await self._execute_cycle_step(step_or_cycle)
+                await self.wait_for_command_duration()
+        if vent_after:
+            await self.set_vent_state(VentState.OPENED)
+
+    # TODO: implement a wait_for in running profiles
+    async def execute_profile(
+        self,
+        profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
+        vent_after: bool = False,
+    ) -> None:
+        await self.wait_for_is_running()
+        self._total_cycle_count = 0
+        self._total_step_count = 0
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            if "steps" in step_or_cycle:
+                this_cycle = cast(VacuumModuleCycle, step_or_cycle)
+                self._total_cycle_count += this_cycle["repetitions"]
+                self._total_step_count += (
+                    len(this_cycle["steps"]) * this_cycle["repetitions"]
+                )
+            else:
+                self._total_step_count += 1
+                self._total_cycle_count += 1
+        task = self._loop.create_task(self._execute_profile(profile))
+        self.make_cancellable(task)
+        await task
+
+    async def _wait_for_command_duration(self) -> None:
+        await self._reader.update_vacuum_state()
+
+        while self.vacuum_state.vacuum_duration > 0:
+            await self._poller.wait_next_poll()
+
+    async def wait_for_command_duration(self) -> None:
+        await self.wait_for_is_running()
+
+        task = self._loop.create_task(self._wait_for_command_duration())
+        self.make_cancellable(task)
+        await task
 
 
 class VacuumModuleReader(Reader):
@@ -377,6 +521,7 @@ class VacuumModuleReader(Reader):
             pressure_abs_b=0,
             pressure_atm=0,
             vacuum_enabled=False,
+            vacuum_duration=0,
             vent_state=VentState.CLOSED,
         )
         self.pump_state: PumpState = PumpState(

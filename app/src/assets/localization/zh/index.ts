@@ -1,5 +1,6 @@
 import { shared_zh_resources } from '@opentrons/components'
 
+import access_control from './access_control.json'
 import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
 import branded from './branded.json'
@@ -31,6 +32,7 @@ import shared from './shared.json'
 import top_navigation from './top_navigation.json'
 
 export const zh = {
+  access_control,
   anonymous,
   app_settings,
   branded,

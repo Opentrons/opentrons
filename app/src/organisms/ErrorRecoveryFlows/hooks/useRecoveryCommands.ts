@@ -121,7 +121,9 @@ export function useRecoveryCommands({
     useResumeRunFromRecoveryMutation()
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
     useResumeRunFromRecoveryAssumingFalsePositiveMutation()
-  const { stopRun } = useStopRunMutation()
+
+  // TODO(jj): add doc state to desktop app
+  const { stopRun } = useStopRunMutation({ accessControlEnabled: false })
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(

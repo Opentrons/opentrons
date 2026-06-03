@@ -96,3 +96,29 @@ export async function latestLabwareVersions(appVersion) {
     return acc
   }, {})
 }
+
+async function gitRaw(args) {
+  try {
+    return (await monorepoGit().raw(args)).trim()
+  } catch (error) {
+    console.error(
+      `Could not get git build details: git ${args.join(' ')} failed:`,
+      error
+    )
+    return undefined
+  }
+}
+
+/** Short hash and branch name for tracking in the ODD */
+export async function getGitBuildDetails() {
+  const commitHash = (await gitRaw(['rev-parse', '--short', 'HEAD'])) ?? ''
+
+  // Backup environment variables set by CI
+  const branchName =
+    (await gitRaw(['branch', '--show-current'])) ??
+    process.env.GITHUB_HEAD_REF ??
+    process.env.GITHUB_REF_NAME ??
+    ''
+
+  return { commitHash, branchName }
+}

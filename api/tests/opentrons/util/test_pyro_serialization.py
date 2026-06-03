@@ -5,10 +5,19 @@ import enum
 import pytest
 from pydantic import BaseModel
 
+from opentrons_shared_data.errors.exceptions import (
+    PythonException,
+    RobotInUseError,
+)
+
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
-from opentrons.util.pyro.pyro_serialization import OpentronsPyroSerializer
+from opentrons.util.pyro.pyro_serialization import (
+    OpentronsPyroSerializer,
+    _enumerated_error_class_to_dict,
+    _enumerated_error_dict_to_class,
+)
 
 
 class NestedTest(BaseModel):
@@ -89,3 +98,24 @@ def test_pydantic_serialization() -> None:
         test_dict,
     )
     assert result == test_model
+
+
+def test_enumerated_error_serialization() -> None:
+    """It should serialize and deserialize the error."""
+    test_error = RobotInUseError(
+        message="Uh oh",
+        detail={"ruh": "roh"},
+        wrapping=[PythonException(exc=RuntimeError("foo"))],
+    )
+
+    test_dict = _enumerated_error_class_to_dict(test_error)
+
+    assert test_dict.get("bytes") is not None
+    assert (
+        test_dict["__class__"]
+        == "opentrons_shared_data.errors.exceptions.EnumeratedError"
+    )
+
+    result = _enumerated_error_dict_to_class("", test_dict)
+
+    assert result == test_error

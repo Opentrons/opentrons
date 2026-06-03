@@ -10,11 +10,11 @@ description: "Frame, gantry, deck, working area, and visual indicators of the Fl
 
 ## Frame and enclosure
 
-The *frame* of the Opentrons Flex robot provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems are situated on and mounted to the main frame. The frame is constructed primarily of sheet metal and aluminum extrusions.
+The *frame* of the Opentrons Flex robot provides rigidity and structural support for its *deck* and *gantry*. All of the mechanical subsystems are situated on and mounted to the main frame. The frame is constructed primarily of sheet metal and aluminum extrusions.
 
-The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
+The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach *instruments*, *modules*, and *deck fixtures*; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
 
-White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can [photograph the deck](../opentrons-app/camera.md#camera-features-and-controls) and working area for recording and tracking protocol execution.
+White LED strips on the inside top edges of the frame provide software-controllable *ambient lighting*. A 2-megapixel camera can [photograph the deck](../opentrons-app/camera.md) and working area for recording and tracking protocol execution.
 
 ## Deck and working area
 
@@ -29,7 +29,7 @@ The *working area* is the physical space above the deck that is accessible for p
 
 Opentrons Flex comes with *removable deck slots* for all 12 positions in the working area. Each deck slot has corner *labware clips* for securely placing labware on the deck.
 
-You can reconfigure the deck by replacing slots with other *deck fixtures*, including the *movable trash, waste chute,* and *module caddies*. The *expansion slot* behind A1 is only used to make additional room for the Thermocycler Module, which occupies slots A1 and B1.
+You can reconfigure the deck by replacing slots with other deck fixtures, including the *movable trash*, *waste chute*, and *module caddies*. The *expansion slot* behind A1 is only used to make additional room for the Thermocycler Module, which occupies slots A1 and B1.
 
 !!! note
     Deck slots are interchangeable within a column (1, 2, or 3) but not across columns; column 1 and column 3 slots are distinct pieces despite their similar size. You can tell which column a slot goes in by orienting the blue labware clip to the back left.
@@ -61,13 +61,13 @@ Fixtures are hardware items that replace standard deck slots. They let you custo
 | Waste chute                        | D3 only           |
 | Waste chute with staging area slot | D3 and D4         |
 
-Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
+Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the *deck configuration* feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
 You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section](../touchscreen/deck-config.md) of the Touchscreen chapter for more information.
 
 ## Camera
 
-The camera is mounted on the interior frame of the robot, in the upper corner of the enclosure near the front door.
+The *camera* is mounted on the interior frame of the robot, in the upper corner of the enclosure near the front door.
 
 ![Image showing robot front and interior camera](../images/camera-location.png)
 
@@ -75,7 +75,7 @@ This fixed location gives you a wide-angle field of view of attached instruments
 
 ![Default camera view](../images/camera-default.png)
 
-For information about using the camera, see [Camera features and controls](../opentrons-app/camera.md#camera-features-and-controls).
+For information about using the camera, see [Using the Camera](../opentrons-app/camera.md).
 
 ## Waste chute
 
@@ -88,7 +88,7 @@ The Opentrons Flex Waste Chute transfers liquids, tips, tip racks, and well plat
 
 ## Staging area slots
 
-_Staging area slots_ are ANSI/SLAS compatible deck pieces that replace standard slots in column 3 to create new slots in the [staging area](#staging-area) (column 4). You can install a single slot or a maximum of four slots to create new location coordinates (A4 to D4) along the right side of the deck. Note, however, that replacing deck slot A3 requires moving the trash bin. By adding staging area slots to the deck, your Flex robot can store more labware and operate more efficiently.
+*Staging area slots* are ANSI/SLAS compatible deck pieces that replace standard slots in column 3 to create new slots in the [staging area](#staging-area) (column 4). You can install a single slot or a maximum of four slots to create new location coordinates (A4 to D4) along the right side of the deck. Note, however, that replacing deck slot A3 requires moving the trash bin. By adding staging area slots to the deck, your Flex robot can store more labware and operate more efficiently.
 
 <figure markdown>
 ![Flex staging area slot.](../images/staging-slot.png "Flex staging area slot")
@@ -117,7 +117,7 @@ Staging area slots are compatible with the Flex instruments, modules, and labwar
 
 ## Gantry
 
-Attached to the frame is the *gantry*, which is the robot's movement and positioning system.
+Attached to the frame is the gantry, which is the robot's movement and positioning system.
 
 The gantry moves separately along the x- and y-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along these axes is precise to the nearest 0.1 mm. The gantry is controlled by 36 VDC hybrid bipolar stepper motors.
 

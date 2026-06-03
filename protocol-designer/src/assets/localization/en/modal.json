@@ -288,6 +288,12 @@
   "pipette_type": "Pipette Type",
   "protocol_name_and_description": "Protocol name and description",
   "protocol_name": "Protocol Name",
+  "redirect_to_ot2_pd": {
+    "body": "This protocol is for the OT-2. Import and edit it in OT-2 Protocol Designer.",
+    "cancel": "Cancel",
+    "open_ot2_pd": "Open OT-2 Protocol Designer",
+    "title": "OT-2 protocol detected"
+  },
   "release_notes": "Release notes",
   "review_file_details": "Review file details",
   "robot_type": "Robot Type",

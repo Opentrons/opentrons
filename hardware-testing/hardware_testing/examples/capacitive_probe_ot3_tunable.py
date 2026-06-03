@@ -5,7 +5,8 @@ import asyncio
 from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 # distance added to the pipette shaft
@@ -25,8 +26,8 @@ CAP_REL_THRESHOLD_PF = 10.0
 # The Z is different from the XY probing location
 # because the pipette cannot reach the bottom of the
 # cutout, so we cannot probe the Z inside the cutout
-ASSUMED_Z_LOCATION = types.Point(x=228, y=150, z=80)  # C2 slot center
-ASSUMED_XY_LOCATION = types.Point(x=228, y=150, z=ASSUMED_Z_LOCATION.z)
+ASSUMED_Z_LOCATION = Point(x=228, y=150, z=80)  # C2 slot center
+ASSUMED_XY_LOCATION = Point(x=228, y=150, z=ASSUMED_Z_LOCATION.z)
 
 # configure how the probing motion behaves
 # capacitive_probe will always automatically do the following:
@@ -54,8 +55,8 @@ PROBE_SETTINGS_Z_AXIS_OUTPUT = CapacitivePassSettings(
 )
 
 
-async def _probe_sequence(api: OT3API, mount: types.OT3Mount, stable: bool) -> float:
-    z_ax = types.Axis.by_mount(mount)
+async def _probe_sequence(api: OT3API, mount: OT3Mount, stable: bool) -> float:
+    z_ax = Axis.by_mount(mount)
 
     print("Align the XY axes above Z probe location...")
     home_pos_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
@@ -76,7 +77,7 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, pipette_left="p1000_single_v3.3"
     )
-    mount = types.OT3Mount.LEFT
+    mount = OT3Mount.LEFT
     if not api.hardware_pipettes[mount.to_mount()]:
         raise RuntimeError("No pipette attached")
 
@@ -89,11 +90,11 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
         await _probe_sequence(api, mount, stable)
 
     # move up, "remove" the probe, then disengage the XY motors when done
-    z_ax = types.Axis.by_mount(mount)
+    z_ax = Axis.by_mount(mount)
     top_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
     await api.move_to(mount, ASSUMED_XY_LOCATION._replace(z=top_z))
     api.remove_tip(mount)
-    await api.disengage_axes([types.Axis.X, types.Axis.Y])
+    await api.disengage_axes([Axis.X, Axis.Y])
 
 
 if __name__ == "__main__":

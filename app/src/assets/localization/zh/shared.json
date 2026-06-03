@@ -9,6 +9,7 @@
   "cancel": "取消",
   "change_protocol": "更改协议",
   "change_robot": "更换工作站",
+  "character_not_supported": "不支持字符 '{{char}}'",
   "clear_data": "清除数据",
   "close": "关闭",
   "close_robot_door": "开始运行前请关闭工作站前门。",

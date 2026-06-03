@@ -1,8 +1,7 @@
 {
-  "__dev_internal__accessControlMode": "Enable frontend for access control mode",
+  "__dev_internal__accessControlMode": "Enable frontend for Compliance Ready Software (access control mode)",
   "__dev_internal__enableLabwareCreator": "Enable App Labware Creator",
   "__dev_internal__enableRunNotes": "Display Notes During a Protocol Run",
-  "__dev_internal__externalKeyboardTest": "Enable External Keyboard Test screen",
   "__dev_internal__forceHttpPolling": "Poll all network requests instead of using MQTT",
   "__dev_internal__ignoreOT2App": "Deprecate old robot in app",
   "__dev_internal__lpcRedesign": "LPC Redesign",
@@ -12,6 +11,8 @@
   "__dev_internal__quickTransferProtocolContentsLog": "Enable QT Protocol Contents Logging",
   "__dev_internal__reactQueryDevtools": "Enable React Query Devtools",
   "__dev_internal__reactScan": "Enable React Scan",
+  "__dev_internal__robotSearchBar": "Adds a robot search bar on select pages",
+  "__dev_internal__showGitDetails": "Show git commit details in Robot System Version",
   "add_folder_button": "Add labware source folder",
   "add_ip_button": "Add",
   "add_ip_error": "Enter an IP Address or Hostname",
