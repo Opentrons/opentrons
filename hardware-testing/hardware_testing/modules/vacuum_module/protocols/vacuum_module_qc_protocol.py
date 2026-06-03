@@ -1,4 +1,4 @@
-"""Vacuum Module PAPI Demo Protocol."""
+"""Vacuum Module QC Protocol."""
 from typing import cast
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -8,78 +8,13 @@ from opentrons.protocol_api import (
 
 
 metadata = {
-    "protocolName": "Vacuum Module Opentrons API Demo",
+    "protocolName": "Vacuum Module DVT QC Protocol V0.1",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
     "robotType": "Flex",
     "apiLevel": "2.28",
 }
-
-
-"""
-
-# --------------------Vacuum Module API --------------------
-
-apiLevel: 2.28
-
-1.
-    vm_mod.close_vent()
-    # Closes the vent, this should run first if you intend to go under vacuum
-2.
-    vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
-
-    # Concurrent command to set the vacuum gauge pressure
-    # pressure: -800 - 0: The lower the number the higher the pressure
-    # duration: 0-3500: Time in seconds to hold the given pressure, indefinte if None
-    # vent_after: Close / Open the vent AFTER the duration timeout
-
-3.
-    vm_mod.start_set_vacuum_power(50)
-    # Concurrent command to the set vacuum power percentage
-
-4.
-    vm_mod.open_vent()
-    # Open the vent
-
-5.
-    vm_mod.stop_vacuum_pump()
-    # Stops the vacuum pump and opens the vent
-
-6.
-    task1 = vm_mod.start_execute_profile(
-        steps = [
-            {
-                "enable_pump": True,
-                "gauge_pressure_mbar": -100,
-                "hold_time_seconds": 30,
-                "vent_after": False
-            },
-            {
-                "enable_pump": True,
-                "percent_power": 30,
-            }
-        ],
-        repetitions=2,
-        vent_after=True
-    )
-
-    # Concurrent command to run profiles, args are same as `start_set_vacuum_pressure`
-    # and `start_set_vacuum_power`.
-    # You can set the vent state after every step, but you can also set the
-    # final vent state with outter `vent_after` arg.
-    # Note: When running concurently this will wait `hold_time_seconds` and
-    # `hold_time_minutes` before moving on to the next step.
-    #
-    # ⚠️ NOTE: If you want to WAIT for the profile to finish before moving
-    # on to the next protocol command, then use the `ProtocolContext.wait_for_tasks`
-    # api as seen below.
-    #
-    # ctx.wait_for_tasks([task1])
-
---------------------Vacuum Module API --------------------
-
-"""
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -116,18 +51,6 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
         ],
     )
-    parameters.add_bool(
-        display_name="Enable Confirm Position",
-        variable_name="enable_position_confirm",
-        description="Pause the protocol to visually inspect pipette position with different labware stackups.",
-        default=False,
-    )
-
-
-def confirm_position(ctx: ProtocolContext) -> None:
-    """Pause the protocol if enable_position_confirm is True."""
-    if ctx.params.enable_position_confirm:  # type: ignore[attr-defined]
-        ctx.pause("Checking pipette position above well.")
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -160,7 +83,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # Load Instruments + Trash
     pip = ctx.load_instrument(
-        "flex_1channel_1000", "left", tip_racks=[tiprack_200, tiprack_1000]
+        "flex_96channel_1000", "left", tip_racks=[tiprack_200, tiprack_1000]
     )
     ctx.load_trash_bin("A1")
 
@@ -171,52 +94,6 @@ def run(ctx: ProtocolContext) -> None:
     # ------------------ Pipetting positional checks ----------------
     for cycle in range(ctx.params.cycles):  # type: ignore[attr-defined]
         ctx.comment(f"Cycle #{cycle}")
-        # Baseline:
-        # B2: Deck + Flat plate
-        pip.pick_up_tip(tiprack_1000)
-        pip.move_to(black_flat_plate["A1"].top())
-        confirm_position(ctx)
-
-        # A3: Deck + Module + Flat plate
-        # A4: Deck + Dock + Collar + Filter plate
-        ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
-        pip.move_to(black_flat_plate["A1"].top())
-        confirm_position(ctx)
-
-        # A3: Deck + Module + Flat plate + Filter plate
-        # A4: Deck + Dock + Collar
-        ctx.move_labware(white_filter_plate, black_flat_plate, use_gripper=True)
-        pip.move_to(white_filter_plate["A1"].top())
-        confirm_position(ctx)
-
-        # A3: Deck + Module + Flat plate + Filter plate + Collar
-        # A4: Deck + Dock
-        ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
-        pip.move_to(white_filter_plate["A1"].top())
-        confirm_position(ctx)
-
-        # Unstacking
-        # A3: Deck + Module + Flat plate + Filter plate
-        # A4: Deck + Dock + Collar
-        ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
-        # A3: Deck + Module + Flat plate
-        # A4: Deck + Dock + Collar + Filter plate
-        ctx.move_labware(white_filter_plate, manifold_collar, use_gripper=True)
-        # A3: Deck + Module + Flat plate + Collar + Filter plate
-        # A4: Deck + Dock
-        ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
-        pip.move_to(white_filter_plate["A1"].top())
-        confirm_position(ctx)
-
-        # A3: Deck + Module + Flat plate
-        # A4: Deck + Dock + Collar + Filter plate
-        ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
-        ctx.move_labware(black_flat_plate, "B2", use_gripper=True)
-        pip.return_tip()
-
-        # ------------------ Pipetting positional checks ----------------
-
-        # ------------------ Vacuum Module API Demo  --------------------
 
         # You can move the collar with the plate ontop from the dock to the module
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
@@ -238,30 +115,11 @@ def run(ctx: ProtocolContext) -> None:
         ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
 
         # Move the collar with filter plate to the dock
-        # ‼️ NOTE: The vacuum module has 2 locations
-        # - vm_mod -> main location
-        # - vm_mod.manifold_dock -> dock location
-        # You can use the .manifold_dock to address the dock location for moving, etc
-        # Like usual you need the `use_gripper=True` if to move the collar with the gripper
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
-
-        # ‼️ NOTE: New Containment behavior
-        # Modules / Labware can now share multiple children in the same location
-        # As long as their geometries dont collide.
-        #
-        # Below we move the `black_flat_plate` ontop of the vacuum module
-        # Then we move the `manifold_collar` ontop of the vacuuum module
-        # Since there is space within the `collar`, the `black_flat_plate`
-        # does not collide with the collar and is considered `contained` by the collar.
-
         # Move the black flat plate onto the vacuum module
         ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
         # Move collar with filter plate to the vacuum module base
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
-        # The above action would have failed before, since the `black_flat_plate`
-        # would have occupied the `vm_mod` location, it now is acceptable because
-        # of containment. Therefore the `vm_mod` now has multiple `children` and
-        # conversely the children now have the same `parent`.
 
         # Aspirate 150ul with 200ul tips from reservoir1 onto filter plate
         pip.pick_up_tip(tiprack_200)
@@ -277,9 +135,6 @@ def run(ctx: ProtocolContext) -> None:
         # Manually open the vent
         vm_mod.open_vent()
 
-        # ⚠️ Stopping the vacuum module, note this automatically opens the vent
-        vm_mod.stop_vacuum_pump()
-
         # Move the collar with filter plate to the dock
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
 
@@ -290,8 +145,8 @@ def run(ctx: ProtocolContext) -> None:
         pip.return_tip()
         tiprack_200.reset()
 
-        # Move plate back to original position
-        ctx.move_labware(black_flat_plate, "B2", use_gripper=True)
+        # ⚠️ Stopping the vacuum module, note this automatically opens the vent
+        vm_mod.stop_vacuum_pump()
 
         # ------------- Running profiles -------------
         vm_mod.close_vent()
@@ -306,19 +161,19 @@ def run(ctx: ProtocolContext) -> None:
                 {
                     "enable_pump": True,
                     "gauge_pressure_mbar": -300,
-                    "hold_time_seconds": 10,
+                    "hold_time_seconds": 20,
                     "vent_after": False,
                 },
                 {
                     "enable_pump": True,
                     "gauge_pressure_mbar": -500,
-                    "hold_time_seconds": 10,
+                    "hold_time_seconds": 40,
                     "vent_after": False,
                 },
                 {
                     "enable_pump": True,
                     "gauge_pressure_mbar": -800,
-                    "hold_time_seconds": 10,
+                    "hold_time_seconds": 120,
                     "vent_after": True,
                 },
             ],
@@ -328,3 +183,4 @@ def run(ctx: ProtocolContext) -> None:
 
         # Turn off the pump after the profile is done
         vm_mod.stop_vacuum_pump()
+
