@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
@@ -30,6 +30,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       modal.remove()
     },
     onError: () => {
+      // todo(mm, 2026-06-02): This needs to show the actual error (e.g. a network error),
+      // and show the number of attempts remaining before lockout.
       setLoginError(t('on_device_login_error_incorrect') as string)
     },
   })

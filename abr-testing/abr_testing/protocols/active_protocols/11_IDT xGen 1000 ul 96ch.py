@@ -202,38 +202,8 @@ def run(protocol: ProtocolContext) -> None:
     Reagent_Vol_Adapter = 5
     Reagent_Vol_LIG = 25
 
-    Row_Quadrant12 = ["A", "C", "E", "G", "I", "K", "M", "O"]
-    Row_Quadrant34 = ["B", "D", "F", "H", "J", "L", "N", "P"]
     Row_96 = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
-    Column_Quadrant13 = [
-        "1",
-        "3",
-        "5",
-        "7",
-        "9",
-        "11",
-        "13",
-        "15",
-        "17",
-        "19",
-        "21",
-        "23",
-    ]
-    Column_Quadrant24 = [
-        "2",
-        "4",
-        "6",
-        "8",
-        "10",
-        "12",
-        "14",
-        "16",
-        "18",
-        "20",
-        "22",
-        "24",
-    ]
     Column_96 = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
 
     # ======== DEFINING LIQUIDS =======

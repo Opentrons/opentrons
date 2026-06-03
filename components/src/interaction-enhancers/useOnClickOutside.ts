@@ -6,6 +6,7 @@ export interface UseOnClickOutsideOptions {
   onClickOutside?: (e: MouseEvent) => unknown
 }
 
+// todo(mm, 2026-05-28): When should this be used vs. useMenuHandleClickOutside()?
 export const useOnClickOutside = <E extends Element>(
   options: UseOnClickOutsideOptions
 ): RefObject<E> => {

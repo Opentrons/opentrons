@@ -20,6 +20,7 @@ from ..types import (
     HeaterShakerMovementRestrictors,
     LabwareLocation,
     ModuleLocation,
+    ModuleModel,
 )
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_slots,
@@ -139,10 +140,10 @@ class HeaterShakerMovementFlagger:
             # Different module types have different keys under .device_info.
             # Heater-Shaker should always have .device_info["serial"].
             if (
-                isinstance(module, HardwareHeaterShaker)
+                module.model() == ModuleModel.HEATER_SHAKER_MODULE_V1
                 and module.device_info["serial"] == serial_number
             ):
-                return module
+                return module  # type: ignore[return-value]
         return None
 
     def raise_if_movement_restricted(

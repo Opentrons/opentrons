@@ -37,9 +37,3 @@ jobs:
         run: make -C protocol-visualization test-cov
       - name: 'vite lib build'
         run: make -C protocol-visualization lib
-      - name: 'Upload coverage report'
-        if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
-        with:
-          files: ./coverage/lcov.info
-          flags: protocol-visualization
