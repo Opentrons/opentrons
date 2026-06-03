@@ -59,40 +59,5 @@ struct ConfigRequestMessage {
     void* callback_param;
 };
 
-// EEpromMessage to OT Library
-// Write messages
-struct OTLibraryBookMessage {
-    uint32_t message_index;
-    eeprom::types::address memory_address;
-    eeprom::types::data_length length;
-    eeprom::types::OTLibraryData<types::DataSize::BOOK> data;
-
-    auto operator==(const OTLibraryBookMessage&) const -> bool = default;
-};
-
-// TODO: Looks like we won't be using this, so get rid of it
-struct OTLibraryPageMessage {
-    uint32_t message_index;
-    eeprom::types::address memory_address;
-    eeprom::types::data_length length;
-    eeprom::types::OTLibraryData<types::DataSize::PAGE> data;
-
-    auto operator==(const OTLibraryPageMessage&) const -> bool = default;
-};
-
-using EepromDataMessage =
-    std::variant<OTLibraryBookMessage, OTLibraryPageMessage>;
-
-// Read Messages
-using OTReadResponseCallback = void (*)(const EepromDataMessage&, void*);
-
-struct OTLibraryReadMessage {
-    uint32_t message_index;
-    eeprom::types::address memory_address;
-    eeprom::types::data_length length;
-    OTReadResponseCallback callback;
-    void* callback_param;
-};
-
 }  // namespace message
 }  // namespace eeprom

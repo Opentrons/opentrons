@@ -389,9 +389,9 @@ SCENARIO("Book Accessor can write data to EEPROM") {
             auto data = write_message.data;
             const auto* data_iter = data.begin();
 
-            // check that counter value is correct (get_data should have
-            // current counter value of 4 because of the valid read_option,
-            // so the counter value should be 5 when we write)
+            // check that counter value is correct (get_data should have current
+            // counter value of 4 because of the valid read_option, so the
+            // counter value should be 5 when we write)
             uint16_t counter_value = 0;
             data_iter = bit_utils::bytes_to_int(data_iter + 2, data_iter + 4,
                                                 counter_value);
@@ -399,12 +399,17 @@ SCENARIO("Book Accessor can write data to EEPROM") {
 
             // check that addres being written is correct
 
-            // expected: 16384 (final adress of EEPROM) - 64 (page length)
-            // to find the book location. the page with the lowest address
-            // in the "VALID" case of the read is the 4th and final page.
-            // the address of this page is 16384 - 64 - 64 = 16256
+            // expected: 16384 (final adress of EEPROM) - 64 (page length) to
+            // find the book location. the page with the lowest address in the
+            // "VALID" case of the read is the 4th and final page. the address
+            // of this page is 16384 - 64 - 64 = 16256
             uint16_t address_written = write_message.memory_address;
             REQUIRE(address_written == 16256);
+
+            // check that the value written is correct
+            // REQUIRE(
+            //     mock_client.backing[eeprom::addresses::data_address_begin] ==
+            //     0b00000101);
         }
     }
 }

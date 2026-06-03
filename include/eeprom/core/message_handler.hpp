@@ -12,8 +12,6 @@ namespace message_handler {
 using MessageType =
     std::variant<std::monostate, can::messages::WriteToEEPromRequest,
                  can::messages::ReadFromEEPromRequest>;
-// TODO: modify this module to accept the new messages in addition to the old
-// ones
 
 template <eeprom::task::TaskClient EEPromTaskClient,
           can::message_writer_task::TaskClient CanClient>

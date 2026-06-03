@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <unordered_map>
 
 #include "accessor.hpp"
 #include "addresses.hpp"
@@ -183,6 +184,11 @@ class BookAccessor
     void create_data_part(uint16_t key, uint16_t len,
                           std::array<uint8_t, NUM_BYTES>& data) {
         create_data_part(key, len, data, false);
+    }
+
+    void create_data_part(uint16_t key, uint16_t len) {
+        auto dummy = std::array<uint8_t, 0>{};
+        create_data_part(key, len, dummy);
     }
 
     template <std::size_t NUM_BYTES>
