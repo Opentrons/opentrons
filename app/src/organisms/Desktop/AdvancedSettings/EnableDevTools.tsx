@@ -13,9 +13,9 @@ import {
 
 import { ToggleButton } from '/app/atoms/buttons'
 import {
+  clearDevInternalFlags,
   getDevtoolsEnabled,
   toggleDevtools,
-  updateConfigValue,
 } from '/app/redux/config'
 
 import type { Dispatch } from '/app/redux/types'
@@ -26,7 +26,7 @@ export function EnableDevTools(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const toggleDevTools = (): void => {
     if (devToolsOn) {
-      dispatch(updateConfigValue('devInternal', {}))
+      dispatch(clearDevInternalFlags())
     }
     dispatch(toggleDevtools())
   }
