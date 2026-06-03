@@ -30,6 +30,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       modal.remove()
     },
     onError: () => {
+      // todo(mm, 2026-06-02): This needs to show the actual error (e.g. a network error),
+      // and show the number of attempts remaining before lockout.
       setLoginError(t('on_device_login_error_incorrect') as string)
     },
   })
