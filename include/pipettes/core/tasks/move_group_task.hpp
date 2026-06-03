@@ -119,7 +119,7 @@ class MoveGroupMessageHandler {
  * The task type.
  */
 template <template <class> class QueueImpl>
-requires MessageQueue<QueueImpl<TaskMessage>, TaskMessage>
+    requires MessageQueue<QueueImpl<TaskMessage>, TaskMessage>
 class MoveGroupTask {
   public:
     using Messages = TaskMessage;
@@ -161,7 +161,7 @@ class MoveGroupTask {
  */
 template <typename Client>
 concept TaskClient = requires(Client client, const TaskMessage& m) {
-    {client.send_move_group_queue(m)};
+    { client.send_move_group_queue(m) };
 };
 
 }  // namespace move_group_task

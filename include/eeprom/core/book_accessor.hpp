@@ -424,12 +424,9 @@ class BookAccessor
 
         // sort reads from largest to smallest
         std::sort(reads.begin(), reads.end(), std::greater<uint16_t>());
-        uint16_t most_recent_index = 0;
-        uint16_t least_recent_index = reads.size() - 1;
-        uint16_t most_recent_valid = reads[most_recent_index];
 
         // handle counter wraparound
-        if (most_recent_index == 0 && most_recent_valid >= 65000) {
+        if (reads[0] >= 65000) {
             // keep track of previous value to compute difference
             uint16_t prev = reads[0];
 
