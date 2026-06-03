@@ -907,7 +907,7 @@ class OT3Simulator(FlexBackend):
         return 0.0
 
     async def read_capacitive_sensor(
-        self, mount: OT3Mount, primary: bool
+        self, mount: OT3Mount, primary: bool, timeout: int = 1
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         return 0.0

@@ -12,6 +12,11 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_MAX_SPEEDS,
     DEFAULT_RUN_CURRENT,
 )
+from opentrons.hardware_control.ot3_calibration import (
+    calibrate_gripper,
+    calibrate_gripper_jaw,
+)
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3simulator import (
     _sanitize_attached_instrument,
 )
@@ -19,9 +24,16 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import (
     GripperProbe,
     OT3AxisKind,
+    OT3AxisMap,
     OT3Mount,
     Axis,
     GripperJawState,
+    InstrumentProbeType,
+)
+from opentrons_shared_data.errors.exceptions import (
+    CommandTimedOutError,
+    CalibrationStructureNotFoundError,
+    EdgeNotFoundError,
 )
 
 # ------ TODO remove and move necessary libraries into a standard release library. ----
@@ -152,6 +164,52 @@ class TestConfig:
     increment: bool
 
 
+# -------- Async monkey patches ------
+
+
+async def _calibrate_gripper(
+    self, offset_front: Point, offset_rear: Point  # noqa: ANN001
+) -> Point:
+    try:
+        offset = await calibrate_gripper(self, offset_front, offset_rear)  # type: ignore[arg-type]
+    except CalibrationStructureNotFoundError as e:
+        if not self.is_simulator:
+            raise e
+        offset = Point(x=0, y=0, z=0)
+    except EdgeNotFoundError:
+        if not self.is_simulator:
+            raise
+        offset = Point(x=0, y=0, z=0)
+    finally:
+        await self.retract(OT3Mount.GRIPPER)
+    return offset
+
+
+async def _calibrate_gripper_jaw(self, probe: GripperProbe) -> Point:  # noqa: ANN001
+    try:
+        offset = await calibrate_gripper_jaw(self, probe)  # type: ignore[arg-type]
+    except CalibrationStructureNotFoundError:
+        if not self.is_simulator:
+            raise
+        offset = Point(x=0, y=0, z=0)
+    except EdgeNotFoundError:
+        if not self.is_simulator:
+            raise
+        offset = Point(x=0, y=0, z=0)
+    finally:
+        await self.retract(OT3Mount.GRIPPER)
+    return offset
+
+
+async def _set_active_current(
+    self, axis_currents: OT3AxisMap[float]  # noqa: ANN001
+) -> None:
+    await self._backend.set_active_current(axis_currents)
+
+
+# -------- END Async monkey patches ------
+
+
 # -----------------   TEST Mount   ----------------
 
 
@@ -212,7 +270,7 @@ def test_mount(
             helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
                 api, z_ax, default_max_speed=speed
             )
-            api._backend.set_active_current({z_ax: current})
+            api._set_active_current({z_ax: current})
             # MOVE DOWN
             _save_result(
                 _get_mount_test_tag(current, speed, "down", "start"),
@@ -265,11 +323,135 @@ def test_mount(
 # -----------------   TEST Probe   ----------------
 
 
+def _get_probe_test_tag(probe: GripperProbe) -> str:
+    return f"{probe.name}-probe"
+
+
+def read_once(api: SyncHardwareAPI, probe: GripperProbe, timeout: int) -> float:
+    """Get the capacitance reading from a gripper."""
+    data = api.read_instrument_capacitance(
+        OT3Mount.GRIPPER, probe.to_type == InstrumentProbeType.PRIMARY, timeout
+    )
+    return data
+
+
+def _read_from_sensor(
+    api: SyncHardwareAPI,
+    probe: GripperProbe,
+    timeout: int,
+    num_readings: int = 10,
+) -> float:
+    readings: List[float] = []
+    while len(readings) != num_readings:
+        try:
+            r = read_once(api, probe, timeout)
+            readings.append(r)
+        except CommandTimedOutError:
+            continue
+    return sum(readings) / num_readings
+
+
+def _get_hover_and_probe_pos(api: SyncHardwareAPI) -> Tuple[Point, Point]:
+    probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_PROBE_TEST)
+    probe_pos += PROBE_POS_OFFSET
+    hover_pos = probe_pos._replace(z=api.get_instrument_max_height(OT3Mount.GRIPPER))
+    return hover_pos, probe_pos
+
+
 def test_probe(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the grippers probes."""
-    pass
+    """Run."""
+    z_ax = Axis.Z_G
+    g_ax = Axis.G
+    mount = OT3Mount.GRIPPER
+
+    pass_settings = api.config.calibration.z_offset.pass_settings
+    hover_pos, probe_pos = _get_hover_and_probe_pos(api)
+    z_limit = probe_pos.z - pass_settings.max_overrun_distance_mm
+
+    for probe in GripperProbe:
+        api.home([z_ax, g_ax])
+
+        # move to position and grip
+        helpers_ot3.move_to_arched_ot3_sync(api, mount, hover_pos)
+        if not api._gripper_handler.get_gripper().attached_probe:
+            api.add_gripper_probe(probe)
+        api.grip(15)
+
+        # take reading for baseline (1)
+        open_air_pf = _read_from_sensor(api, probe, 10)
+
+        # take reading for baseline with pin attached (2)
+        ctx.pause(f"place calibration pin in the {probe.name}")
+        # add pin to update critical point
+        probe_pf = _read_from_sensor(api, probe, 10)
+
+        # begins probing
+        ctx.pause("about to probe the deck")
+        helpers_ot3.move_to_arched_ot3_sync(api, mount, hover_pos)
+        # move to 5 mm above the deck
+        api.move_to(mount, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
+        z_ax = Axis.by_mount(mount)
+        found_pos, _ = api.capacitive_probe(mount, z_ax, probe_pos.z, pass_settings)
+
+        # check against max overrun
+        valid_height = found_pos >= z_limit
+        deck_pf = 0.0
+        if valid_height:
+            ctx.pause("about to press into the deck")
+            api.move_to(mount, probe_pos._replace(z=found_pos))
+            deck_pf = _read_from_sensor(api, probe, 10)
+
+        result = (
+            open_air_pf < probe_pf < PROBE_PF_MAX < DECK_PF_MIN < deck_pf < DECK_PF_MAX
+        )
+        _tag = _get_probe_test_tag(probe)
+        report(section, f"{_tag}-open-air-pf", [open_air_pf])
+        report(section, f"{_tag}-probe-pf", [probe_pf])
+        report(section, f"{_tag}-probe-pf-max-allowed", [PROBE_PF_MAX])
+        report(section, f"{_tag}-deck-pf", [deck_pf])
+        report(section, f"{_tag}-deck-pf-min-max-allowed", [DECK_PF_MIN, DECK_PF_MAX])
+        report(section, f"{_tag}-result", [CSVResult.from_bool(result)])
+        api.home_z()
+        api.ungrip()
+
+        ctx.pause(f"remove calibration pin in the {probe.name}")
+        api.remove_gripper_probe()
+
+    def _calibrate_jaw(_p: GripperProbe) -> Point:
+        api.retract(OT3Mount.GRIPPER)
+        ctx.pause(f"attach probe to {_p.name}")
+        ret = api._calibrate_gripper_jaw(_p)
+        api.retract(OT3Mount.GRIPPER)
+        ctx.pause(f"remove probe from {_p.name}")
+        report(section, f"jaw-probe-{_p.name.lower()}-xyz", [ret.x, ret.y, ret.z])
+        return ret
+
+    _offsets = {probe: _calibrate_jaw(probe) for probe in GripperProbe}
+    _diff_x = abs(_offsets[GripperProbe.FRONT].x - _offsets[GripperProbe.REAR].x)
+    _diff_z = abs(_offsets[GripperProbe.FRONT].z - _offsets[GripperProbe.REAR].z)
+    # We don't use this so why are we doing it? before we were just printing it out
+    api._calibrate_gripper(
+        offset_front=_offsets[GripperProbe.FRONT],
+        offset_rear=_offsets[GripperProbe.REAR],
+    )
+    report(section, "jaw-alignment-x-spec", [JAW_ALIGNMENT_MM_X])
+    report(section, "jaw-alignment-x-actual", [_diff_x])
+    report(
+        section,
+        "jaw-alignment-x-result",
+        [CSVResult.from_bool(_diff_x <= JAW_ALIGNMENT_MM_X)],
+    )
+    report(section, "jaw-alignment-z-spec", [JAW_ALIGNMENT_MM_Z])
+    report(section, "jaw-alignment-z-actual", [_diff_z])
+    report(
+        section,
+        "jaw-alignment-z-result",
+        [CSVResult.from_bool(_diff_z <= JAW_ALIGNMENT_MM_Z)],
+    )
+    api.retract(OT3Mount.GRIPPER)
 
 
 # -----------------   TEST Width   ----------------
@@ -487,13 +669,9 @@ def build_test_mount_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 def build_test_probe_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-
-    def _get_test_tag(probe: GripperProbe) -> str:
-        return f"{probe.name}-probe"
-
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
     for p in GripperProbe:
-        tag = _get_test_tag(p)
+        tag = _get_probe_test_tag(p)
         lines.append(CSVLine(f"{tag}-open-air-pf", [float]))
         lines.append(CSVLine(f"{tag}-probe-pf", [float]))
         lines.append(CSVLine(f"{tag}-probe-pf-max-allowed", [float]))
@@ -584,6 +762,12 @@ def run(ctx: ProtocolContext) -> None:
             for m in OT3Mount
         }
         api.reset()
+
+    # Apply monkey patches
+    OT3API._calibrate_gripper = _calibrate_gripper  # type: ignore[attr-defined]
+    OT3API._calibrate_gripper_jaw = _calibrate_gripper_jaw  # type: ignore[attr-defined]
+    OT3API._set_active_current = _set_active_current  # type: ignore[attr-defined]
+
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.GRIPPER
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
