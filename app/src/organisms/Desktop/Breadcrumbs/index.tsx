@@ -137,21 +137,18 @@ function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
 function LoginLink(): JSX.Element {
   const { t } = useTranslation('top_navigation')
   const host = useHost()
+  const handleClick = useCallback(() => {
+    if (host == null) {
+      console.error(
+        "Couldn't determine the host for a login modal. Is a provider missing?"
+      )
+    } else {
+      showLoginModal({ host })
+    }
+  }, [host])
 
   return (
-    <BasicButton
-      type="button"
-      onClick={() => {
-        if (host == null) {
-          console.error(
-            "Couldn't determine the host for a login modal. Is a provider missing?"
-          )
-        } else {
-          showLoginModal({ host })
-        }
-      }}
-      underLine
-    >
+    <BasicButton type="button" onClick={handleClick} underLine>
       {t('log_in')}
     </BasicButton>
   )
