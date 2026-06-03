@@ -4,6 +4,10 @@
 # from accessing these files. We want agents to be able to e.g. run tests that write
 # to the ignored `coverage` directory.
 
+# Chinese localization data. LLMs will "helpfully" try to keep this in sync with the
+# English data, but we want to do it ourselves.
+**/zh/**.json
+
 # Generated files for local API server config paths
 api/.env
 api/index.json
