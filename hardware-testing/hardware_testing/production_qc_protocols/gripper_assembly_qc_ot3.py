@@ -155,11 +155,111 @@ class TestConfig:
 # -----------------   TEST Mount   ----------------
 
 
+def _get_mount_test_tag(
+    current: float, speed: float, direction: str, start_or_end: str
+) -> str:
+    return f"current-{current}-speed-{speed}-{direction}-{start_or_end}"
+
+
+def _is_z_axis_still_aligned_with_encoder(
+    api: SyncHardwareAPI, target_z: float
+) -> Tuple[float, bool]:
+    enc_pos = api.encoder_current_position_ot3(OT3Mount.GRIPPER)
+    z_enc = enc_pos[Axis.Z_G]
+    is_aligned = abs(target_z - z_enc) < Z_MAX_SKIP_MM
+    return z_enc, is_aligned
+
+
 def test_mount(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper mount."""
-    pass
+    z_ax = Axis.Z_G
+    g_ax = Axis.G
+    mount = OT3Mount.GRIPPER
+    settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, z_ax)
+    default_z_current = settings.run_current
+    default_z_speed = settings.max_speed
+
+    api.home([z_ax, g_ax])
+    home_pos = api.gantry_position(OT3Mount.GRIPPER)
+    target_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_MOUNT_TEST)
+    target_pos = target_pos._replace(z=home_pos.z)
+    helpers_ot3.move_to_arched_ot3_sync(api, OT3Mount.GRIPPER, target_pos)
+
+    def _save_result(tag: str, target_z: float, include_pass_fail: bool) -> bool:
+        z_enc, z_aligned = _is_z_axis_still_aligned_with_encoder(api, target_z)
+        result = CSVResult.from_bool(z_aligned)
+        if include_pass_fail:
+            report(section, tag, [target_z, z_enc, result])
+        else:
+            report(section, tag, [target_z, z_enc])
+        return z_aligned
+
+    # LOOP THROUGH CURRENTS + SPEEDS
+    currents = list(CURRENTS_SPEEDS.keys())
+    for current in sorted(currents, reverse=True):
+        speeds = CURRENTS_SPEEDS[current]
+        for speed in sorted(speeds, reverse=False):
+            include_pass_fail = current >= MIN_PASS_CURRENT
+            # HOME
+            api.home([z_ax])
+            home_pos = api.gantry_position(OT3Mount.GRIPPER)
+            # LOWER CURRENT
+            helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
+                api, z_ax, run_current=current
+            )
+            helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
+                api, z_ax, default_max_speed=speed
+            )
+            api._backend.set_active_current({z_ax: current})
+            # MOVE DOWN
+            _save_result(
+                _get_mount_test_tag(current, speed, "down", "start"),
+                target_z=home_pos.z,
+                include_pass_fail=include_pass_fail,
+            )
+            api.move_rel(
+                mount,
+                Point(z=-Z_AXIS_TRAVEL_DISTANCE),
+                speed=speed,
+                expect_stalls=True,
+            )
+            down_end_passed = _save_result(
+                _get_mount_test_tag(current, speed, "down", "end"),
+                target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
+                include_pass_fail=include_pass_fail,
+            )
+            if down_end_passed:
+                # MOVE UP
+                _save_result(
+                    _get_mount_test_tag(current, speed, "up", "start"),
+                    target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
+                    include_pass_fail=include_pass_fail,
+                )
+                api.move_rel(
+                    mount,
+                    Point(z=Z_AXIS_TRAVEL_DISTANCE),
+                    speed=speed,
+                    expect_stalls=True,
+                )
+                up_end_passed = _save_result(
+                    _get_mount_test_tag(current, speed, "up", "end"),
+                    target_z=home_pos.z,
+                    include_pass_fail=include_pass_fail,
+                )
+            else:
+                up_end_passed = False
+            # RESET CURRENTS AND HOME
+            helpers_ot3.set_gantry_load_per_axis_current_settings_ot3_sync(
+                api, z_ax, run_current=default_z_current
+            )
+            helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
+                api, z_ax, default_max_speed=default_z_speed
+            )
+            api.home([z_ax])
+            if not down_end_passed or not up_end_passed and not api.is_simulator:
+                break
 
 
 # -----------------   TEST Probe   ----------------
@@ -370,12 +470,6 @@ def build_test_force_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 def build_test_mount_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-
-    def _get_test_tag(
-        current: float, speed: float, direction: str, start_or_end: str
-    ) -> str:
-        return f"current-{current}-speed-{speed}-{direction}-{start_or_end}"
-
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
     currents = list(CURRENTS_SPEEDS.keys())
     for current in sorted(currents):
@@ -383,7 +477,7 @@ def build_test_mount_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
         for speed in sorted(speeds):
             for dir in ["down", "up"]:
                 for step in ["start", "end"]:
-                    tag = _get_test_tag(current, speed, dir, step)
+                    tag = _get_mount_test_tag(current, speed, dir, step)
                     if current < MIN_PASS_CURRENT:
                         lines.append(CSVLine(tag, [float, float]))
                     else:
