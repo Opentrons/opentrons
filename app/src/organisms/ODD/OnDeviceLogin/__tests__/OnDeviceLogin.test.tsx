@@ -8,10 +8,11 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { OnDeviceLogin } from '..'
 
 import type { ComponentProps } from 'react'
+import type * as ReactI18next from 'react-i18next'
 import type { LoginStep } from '..'
 
 vi.mock('react-i18next', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-i18next')>()
+  const actual = await importOriginal<typeof ReactI18next>()
   return {
     ...actual,
     useTranslation: vi.fn(),

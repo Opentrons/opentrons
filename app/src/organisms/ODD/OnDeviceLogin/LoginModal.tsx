@@ -17,6 +17,7 @@ import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
+import type { QueryKey } from 'react-query'
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
 import type { LoginStep } from './index'
 
@@ -72,7 +73,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const invalidateSelfQuery = useCallback((): void => {
     if (host == null) return
     void queryClient.invalidateQueries(
-      getQueryKey(host, 'auth', 'users', 'self')
+      getQueryKey(host, 'auth', 'users', 'self') as QueryKey
     )
   }, [host, queryClient])
 
@@ -92,7 +93,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       invalidateSelfQuery()
 
       try {
-        const self = await fetchSelfAfterLogin(response.access_token)
+        const self = await fetchSelfAfterLogin(response.access_token as string)
 
         if (self.resetPassword) {
           setLoggedInUsername(username)
@@ -117,7 +118,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       invalidateSelfQuery()
 
       try {
-        const self = await fetchSelfAfterLogin(response.access_token)
+        const self = await fetchSelfAfterLogin(response.access_token as string)
 
         if (self.resetPassword) {
           setLoginError(t('on_device_login_error_incorrect') as string)

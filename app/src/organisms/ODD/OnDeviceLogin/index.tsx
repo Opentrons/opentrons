@@ -118,7 +118,9 @@ export function OnDeviceLogin({
     if (confirm.trim() === '') return
     if (confirm !== password) {
       setConfirmPasswordError(
-        t('on_device_login_password_mismatch', { ns: 'device_settings' })
+        t('on_device_login_password_mismatch', {
+          ns: 'device_settings',
+        }) as string
       )
       return
     }

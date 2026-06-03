@@ -14,6 +14,8 @@ import { useShouldShowLoggedOutOverlay } from '../useShouldShowLoggedOutOverlay'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
+import type * as ReactRedux from 'react-redux'
+import type * as RobotAuth from '/app/redux/robot-auth'
 import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client', () => ({
@@ -22,7 +24,7 @@ vi.mock('@opentrons/react-api-client', () => ({
 }))
 
 vi.mock('/app/redux/robot-auth', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/robot-auth')>()
+  const actual = await importOriginal<typeof RobotAuth>()
   return {
     ...actual,
     getIsLoggedInToLocalRobot: vi.fn(),
@@ -30,7 +32,7 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
 })
 
 vi.mock('react-redux', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-redux')>()
+  const actual = await importOriginal<typeof ReactRedux>()
   return {
     ...actual,
     useSelector: vi.fn((selector: (state: State) => unknown) =>

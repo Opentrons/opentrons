@@ -13,13 +13,16 @@ import { getIsLoggedInToLocalRobot } from '/app/redux/robot-auth'
 import { LoggedOutOverlayMount } from '../LoggedOutOverlayMount'
 import { showLoginModal, useIsLoginModalOpen } from '../LoginModal'
 
+import type * as ReactRedux from 'react-redux'
+import type * as RobotAuth from '/app/redux/robot-auth'
+
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
   useSelfQuery: vi.fn(),
 }))
 
 vi.mock('/app/redux/robot-auth', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/robot-auth')>()
+  const actual = await importOriginal<typeof RobotAuth>()
   return {
     ...actual,
     getIsLoggedInToLocalRobot: vi.fn(),
@@ -27,21 +30,17 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
 })
 
 vi.mock('react-redux', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-redux')>()
+  const actual = await importOriginal<typeof ReactRedux>()
   return {
     ...actual,
     useSelector: vi.fn((selector: (state: unknown) => unknown) => selector({})),
   }
 })
 
-vi.mock('../LoginModal', async importOriginal => {
-  const actual = await importOriginal<typeof import('../LoginModal')>()
-  return {
-    ...actual,
-    showLoginModal: vi.fn(),
-    useIsLoginModalOpen: vi.fn(() => false),
-  }
-})
+vi.mock('../LoginModal', () => ({
+  showLoginModal: vi.fn(),
+  useIsLoginModalOpen: vi.fn(() => false),
+}))
 
 const render = (): ReturnType<typeof renderWithProviders>[0] =>
   renderWithProviders(
