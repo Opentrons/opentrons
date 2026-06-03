@@ -88,8 +88,9 @@ function _getSelectedWellsForStep(
   if (!pipetteEntity || !labwareEntity) {
     return []
   }
-  const nozzles = 'nozzles' in stepArgs ? stepArgs.nozzles : ALL
-  const primaryNozzle =
+  const nozzles: NozzleConfigurationStyle =
+    'nozzles' in stepArgs ? stepArgs.nozzles : ALL
+  const primaryNozzle: PrimaryNozzleConfigurationStyle =
     'primaryNozzle' in stepArgs ? stepArgs.primaryNozzle : A1_NOZZLE
 
   const getWells = (wells: string[]): string[] =>

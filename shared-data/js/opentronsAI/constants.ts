@@ -1,7 +1,7 @@
 export const COMMAND_CREATOR_ARGS_FOR_OAI = [
   'airGapInPlace',
   'aspirate',
-  "aspirateInPlace",
+  'aspirateInPlace',
   'aspirateWhileTracking',
   'blowOutInPlace',
   'blowout',
