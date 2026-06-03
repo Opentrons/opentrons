@@ -38,7 +38,7 @@ tests: List[Union[TestHelp, TestSimulate]] = [
     TestSimulate(
         test_key="OT2_v2_20_expect_error",
         test_helper="simulate",
-        protocol_path="../analyses-snapshot-testing/files/protocols/OT2_S_v2_20_P50_touch_tip.py",
+        protocol_path="../analyses-snapshot-testing/tests/fixtures/OT2_S_v2_20_P50_touch_tip.py",
         expected_return_code="1",
     ),
     TestSimulate(
