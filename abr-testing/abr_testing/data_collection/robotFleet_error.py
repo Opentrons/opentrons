@@ -412,7 +412,7 @@ def get_robot_state(
     robot = health_data.get("name", "")
     # Create summary name
     description["robot_name"] = robot
-    summary = robot + "_" + reported_string
+    summary = robot + ": " + reported_string
     affects_version = health_data.get("api_version", "")
     description["affects_version"] = affects_version
     # Instruments Attached
@@ -698,10 +698,10 @@ if __name__ == "__main__":
             print("Invalid input, try again.")
     #TODO: auto grab from fleet
     ip = str(input("Enter Robot IP: "))
-    #TODO: fix assignee, low priority
     run_or_other = str(
         input(
-            "Press ENTER to report run error. If not a run error, type short summary of error: "
+            "Press ENTER to report run error. If not, please format title as:\n"
+            "feature, brief summary\n> "
         )
     )
     url = "https://opentrons.atlassian.net"
@@ -755,7 +755,8 @@ if __name__ == "__main__":
             print("No failed/recovery runs matched filters.")
             run_or_other = str(
                 input(
-                    "Type short summary of error: "
+                    "Please format title as:\n"
+                    "feature, brief summary\n> "
                 )
             ).strip()
         protocol_file_path = save_latest_protocol(ip, storage_directory)
@@ -777,7 +778,7 @@ if __name__ == "__main__":
     all_issues = ticket.issues_on_board(project_key)
     # CREATE TICKET
     #TODO: for pyro, add pyro filter as HIGH priority
-    description = ""
+    description = "Error recreation steps: (PLEASE FILL)"
     issue_key, raw_issue_url = ticket.create_ticket(
         summary,
         description,
