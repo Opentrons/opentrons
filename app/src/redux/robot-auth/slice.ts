@@ -86,8 +86,8 @@ function logInOrRefresh(
   stateDraft: Draft<RobotAuthState>,
   payload: LogInOrRefreshPayload
 ): void {
-  const { robotName, ...perRobotAuth } = payload
-  stateDraft.perRobotAuthStates[robotName] = perRobotAuth
+  const { robotName, ...robotAuthState } = payload
+  stateDraft.perRobotAuthStates[robotName] = robotAuthState
   stateDraft.mostRecentRobotName = robotName
 }
 
@@ -164,13 +164,14 @@ export const getIsLoggedInToLocalRobot = createSelector(
  * On the on-device display, this returns the username of the user currently
  * logged in to the local robot, or null if not logged in. On the desktop app,
  * this is not meaningful.
- *
- * For server-driven flags such as `resetPassword`, use `useLocalRobotAuthSelf`
- * from `/app/resources/auth`.
  */
 export const getCurrentUsernameForLocalRobot = createSelector(
-  getLocalRobotAuthState,
-  (localRobotAuthState): string | null => localRobotAuthState?.username ?? null
+  (state: State) => state,
+  (state: State) => getLocalRobot(state)?.name ?? null,
+  (state: State, localRobotName: string | null): string | null => {
+    if (localRobotName == null) return null
+    return getAuthStateForRobot(state, localRobotName)?.username ?? null
+  }
 )
 
 interface GetNextExpirationResult {

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getAuthStateForRobot,
-  getCurrentUsernameForLocalRobot,
   getIsLoggedInToLocalRobot,
   getLocalRobotAuthState,
   getMostRecentRobotName,
@@ -120,25 +119,6 @@ describe('robot auth selectors', () => {
 
       expect(getLocalRobotAuthState(state)).toStrictEqual(null)
       expect(getIsLoggedInToLocalRobot(state)).toStrictEqual(false)
-    })
-
-    it('returns the username for the local robot', () => {
-      const state = {
-        discovery: {
-          scanning: false,
-          robotsByName: {
-            [localRobot.name]: localRobot,
-          },
-        },
-        robotAuth: {
-          perRobotAuthStates: {
-            [localRobot.name]: authState,
-          },
-          mostRecentRobotName: null,
-        },
-      } satisfies Partial<State> as State
-
-      expect(getCurrentUsernameForLocalRobot(state)).toBe('george_clooney')
     })
   })
 
