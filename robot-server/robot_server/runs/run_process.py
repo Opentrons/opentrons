@@ -62,7 +62,9 @@ from opentrons.util.pyro.pyro_serialization import (
     serpent_enum_registration,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_dict_of_proxies,
     convert_result_to_proxy,
+    convert_result_to_wrapped_dict,
     pyro_behavior,
 )
 from opentrons_shared_data.labware.labware_definition import (
@@ -120,6 +122,7 @@ def register_process_types() -> None:
         ProtocolResource,
         RunResult,
         StateSummary,
+        FlexStackerSubState,
     ]:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_model)  # type: ignore[arg-type]
     for rtp in get_args(RunTimeParameter):
@@ -548,6 +551,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         """Get engine deck type."""
         return self._deck_type
 
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get current nozzle maps keyed by pipette id."""
         return self._guaranteed_run_orchestrator.get_nozzle_maps()
@@ -567,6 +571,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         )
         self._guaranteed_run_orchestrator.set_error_recovery_policy(policy)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get current (if any) Flex Stacker Substates keyed by module id."""
         return self._guaranteed_run_orchestrator.get_flex_stacker_substate()

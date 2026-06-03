@@ -59,27 +59,40 @@ class NozzleMap(BaseModel):
     channel be H1.
     """
 
-    starting_nozzle: str
-    #: The nozzle that automated operations that count nozzles should start at
-    # these are really ordered dicts but you can't say that even in quotes because pydantic needs to
-    # evaluate them to generate serdes code so please only use ordered dicts here
-    map_store: Dict[str, Point]
-    #: A map of all of the nozzles active in this configuration
-    valid_map_key: str
-    #: A key indicating which valid nozzle map from the pipette definition represents this configuration
-    rows: Dict[str, List[str]]
-    #: A map of all the rows active in this configuration
-    columns: Dict[str, List[str]]
-    #: A map of all the columns active in this configuration
-    configuration: NozzleConfigurationType
-    #: The kind of configuration this is
+    def __init__(
+        self,
+        starting_nozzle: str,
+        map_store: Dict[str, Point],
+        valid_map_key: str,
+        rows: Dict[str, List[str]],
+        columns: Dict[str, List[str]],
+        configuration: NozzleConfigurationType,
+        full_instrument_map_store: Dict[str, Point],
+        full_instrument_rows: Dict[str, List[str]],
+        full_instrument_columns: Dict[str, List[str]],
+    ) -> None:
+        """Build a NozzleMap."""
+        self._starting_nozzle = starting_nozzle
+        #: The nozzle that automated operations that count nozzles should start at
+        # these are really ordered dicts but you can't say that even in quotes because pydantic needs to
+        # evaluate them to generate serdes code so please only use ordered dicts here
+        self._map_store = map_store
+        #: A map of all of the nozzles active in this configuration
+        self._valid_map_key = valid_map_key
+        #: A key indicating which valid nozzle map from the pipette definition represents this configuration
+        self._rows = rows
+        #: A map of all the rows active in this configuration
+        self._columns = columns
+        #: A map of all the columns active in this configuration
+        self._configuration = configuration
+        #: The kind of configuration this is
 
-    full_instrument_map_store: Dict[str, Point]
-    #: A map of all of the nozzles of an instrument
-    full_instrument_rows: Dict[str, List[str]]
-    #: A map of all the rows of an instrument
-    full_instrument_columns: Dict[str, List[str]]
-    #: A map of all the columns of an instrument
+        self._full_instrument_map_store = full_instrument_map_store
+        #: A map of all of the nozzles of an instrument
+        self._full_instrument_rows = full_instrument_rows
+        #: A map of all the rows of an instrument
+        self._full_instrument_columns = full_instrument_columns
+        #: A map of all the columns of an instrument
 
     @classmethod
     def determine_nozzle_configuration(
@@ -131,7 +144,7 @@ class NozzleMap(BaseModel):
         Note: This value represents the back left nozzle of the underlying physical pipette. For instance,
         the back-left nozzle of a 96-Channel pipette is A1.
         """
-        return next(iter(self.full_instrument_rows.values()))[0]
+        return next(iter(self._full_instrument_rows.values()))[0]
 
     @property
     def full_instrument_front_right(self) -> str:
@@ -139,12 +152,12 @@ class NozzleMap(BaseModel):
 
         Note: This value represents the front right nozzle of the physical pipette. See the note on full_instrument_back_left.
         """
-        return next(reversed(list(self.full_instrument_rows.values())))[-1]
+        return next(reversed(list(self._full_instrument_rows.values())))[-1]
 
     @property
     def starting_nozzle_offset(self) -> Point:
         """The position of the starting nozzle."""
-        return self.map_store[self.starting_nozzle]
+        return self._map_store[self.starting_nozzle]
 
     @property
     def xy_center_offset(self) -> Point:
@@ -152,8 +165,8 @@ class NozzleMap(BaseModel):
 
         Note: This is the value relevant for this configuration, not the physical pipette. See the note on back_left.
         """
-        difference = self.map_store[self.front_right] - self.map_store[self.back_left]
-        return self.map_store[self.back_left] + Point(
+        difference = self._map_store[self.front_right] - self._map_store[self.back_left]
+        return self._map_store[self.back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
         )
 
@@ -165,10 +178,10 @@ class NozzleMap(BaseModel):
         This would be the same as a full configuration.
         """
         difference = (
-            self.full_instrument_map_store[self.full_instrument_front_right]
-            - self.full_instrument_map_store[self.full_instrument_back_left]
+            self._full_instrument_map_store[self.full_instrument_front_right]
+            - self._full_instrument_map_store[self.full_instrument_back_left]
         )
-        return self.full_instrument_map_store[self.full_instrument_back_left] + Point(
+        return self._full_instrument_map_store[self.full_instrument_back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
         )
 
@@ -176,8 +189,8 @@ class NozzleMap(BaseModel):
     def y_center_offset(self) -> Point:
         """The position in the center of the primary column of the map."""
         front_left = next(reversed(list(self.rows.values())))[0]
-        difference = self.map_store[front_left] - self.map_store[self.back_left]
-        return self.map_store[self.back_left] + Point(0, difference[1] / 2, 0)
+        difference = self._map_store[front_left] - self._map_store[self.back_left]
+        return self._map_store[self.back_left] + Point(0, difference[1] / 2, 0)
 
     @property
     def front_nozzle_offset(self) -> Point:
@@ -185,36 +198,81 @@ class NozzleMap(BaseModel):
         # front left-most nozzle of the 96 channel in a given configuration
         # and front nozzle of the 8 channel
         front_left = next(iter(self.columns.values()))[-1]
-        return self.map_store[front_left]
+        return self._map_store[front_left]
 
     @property
     def front_right_nozzle_offset(self) -> Point:
         """The offset for the front_right nozzle."""
         # Front-right-most nozzle of the 96 channel in a given configuration
         # and Front-most nozzle of the 8-channel
-        return self.map_store[self.front_right]
+        return self._map_store[self.front_right]
 
     @property
     def back_left_nozzle_offset(self) -> Point:
         """The offset for the back_left nozzle."""
         # Back-left-most nozzle of the 96-channel in a given configuration
         # and back-most nozzle of the 8-channel
-        return self.map_store[self.back_left]
+        return self._map_store[self.back_left]
 
     @property
     def tip_count(self) -> int:
         """The total number of active nozzles in the configuration, and thus the number of tips that will be picked up."""
-        return len(self.map_store)
+        return len(self._map_store)
 
     @property
     def physical_nozzle_count(self) -> int:
         """The number of physical nozzles, regardless of configuration."""
-        return len(self.full_instrument_map_store)
+        return len(self._full_instrument_map_store)
 
     @property
     def active_nozzles(self) -> list[str]:
         """An unstructured list of all nozzles active in the configuration."""
-        return list(self.map_store.keys())
+        return list(self._map_store.keys())
+
+    @property
+    def starting_nozzle(self) -> str:
+        """The nozzle that automated operations that count nozzles should start at."""
+        return self._starting_nozzle
+
+    @property
+    def rows(self) -> dict[str, list[str]]:
+        """A map of all the rows active in this configuration."""
+        return self._rows
+
+    @property
+    def columns(self) -> dict[str, list[str]]:
+        """A map of all the columns active in this configuration."""
+        return self._columns
+
+    @property
+    def configuration(self) -> NozzleConfigurationType:
+        """The kind of configuration represented by this nozzle map."""
+        return self._configuration
+
+    @property
+    def map_store(self) -> Dict[str, Point]:
+        """The map store of this nozzle map."""
+        return self._map_store
+
+    @property
+    def valid_map_key(self) -> str:
+        """Indicates which valid nozzle map from the pipette definition represents this configuration"""
+        return self._valid_map_key
+
+    @property
+    def full_instrument_map_store(self) -> Dict[str, Point]:
+        """A map of all of the nozzles of an instrument."""
+        return self._full_instrument_map_store
+
+    @property
+    def full_instrument_rows(self) -> Dict[str, List[str]]:
+        """A map of all of the nozzles of an instrument."""
+        return self._full_instrument_rows
+
+    @property
+    def full_instrument_columns(self) -> Dict[str, List[str]]:
+        """A map of all of the nozzles of an instrument."""
+        return self._full_instrument_columns
 
     @classmethod
     def build(  # noqa: C901
