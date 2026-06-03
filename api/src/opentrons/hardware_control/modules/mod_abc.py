@@ -219,7 +219,7 @@ class AbstractModule(AbstractDevice):
                 await t
             except BaseException:
                 mod_log.exception(
-                    f"error in fault tollerant module call debounce {debounce_count}"
+                    f"error in fault tolerant module call debounce {debounce_count}"
                 )
                 debounce_count -= 1
                 await asyncio.sleep(1)
