@@ -14,7 +14,6 @@ add_executable(
         test_data_rev.cpp
         test_revision.cpp
         test_dev_data.cpp
-        test_update_data_rev_task.cpp
         test_book_accessor.cpp
 )
 

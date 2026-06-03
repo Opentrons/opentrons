@@ -14,7 +14,7 @@ template <std::size_t SIZE>
 using DataBufferType = std::array<uint8_t, SIZE>;
 using DataTailType = std::array<uint8_t, addresses::lookup_table_tail_length>;
 
-enum TableAction { READ, WRITE, CREATE, INITALIZE };
+enum TableAction { READ, WRITE, CREATE, INITALIZE, READ_BEFORE_WRITE };
 
 struct table_entry_action {
     uint16_t key;
@@ -453,6 +453,9 @@ class DevDataAccessor
                     }
                 }
                 break;
+            case TableAction::READ_BEFORE_WRITE:
+                // introduced for BookAccessor
+                [[fallthrough]];
             case TableAction::READ:
                 data_addr += action_cmd_m.offset;
                 // if the read action has length 0, read the whole value else

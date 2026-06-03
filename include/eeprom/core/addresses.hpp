@@ -111,7 +111,7 @@ constexpr types::address data_address_begin = lookup_table_tail_end;
 constexpr types::address ot_library_begin = types::page_length * 3;
 constexpr types::address ot_library_end =
     static_cast<types::address>(hardware_iface::EEpromMemorySize::ST_16_KBYTE) -
-    64;
+    types::page_length;
 
 /*
  *Wrapper class for ot_library_end and ot_library_begin

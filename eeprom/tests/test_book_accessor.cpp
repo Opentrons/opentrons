@@ -195,14 +195,15 @@ struct BMockEEpromTaskClient {
     }
 };
 
-SCENARIO("Creating a data partition") { /* NOTE: This feature is very similar to
-    what we have in dev data, so we
-     * are not testing it as extensively here, just making sure that the
-     * book accessor can call create data without error and that it sends
-     * the correct message to the EEPROM client. We will rely on the more
-     * extensive testing of create data in dev data to make sure that
-     create
-     * data is working properly. */
+SCENARIO("Creating a data partition") {
+    /* NOTE: This feature is very similar to
+       * what we have in dev data, so we
+       * are not testing it as extensively here, just making sure that the
+       * book accessor can call create data without error and that it sends
+       * the correct message to the EEPROM client. We will rely on the more
+       * extensive testing of create data in dev data to make sure that
+       create
+       * data is working properly. */
 
     auto mock_listener = MockListener{};
     auto buffer = eeprom::book_accessor::DataBufferType<1>();
@@ -336,6 +337,76 @@ SCENARIO("Book Accessor can read data from EEPROM") {
             test_book_accessor.get_data(key, len, offset, message_index);
             // check that the value read is correct
             REQUIRE(buffer[0] == 0b00000000);
+        }
+    }
+}
+
+SCENARIO("Book Accessor can write data to EEPROM") {
+    auto mock_listener = MockListener{};
+    auto buffer = eeprom::book_accessor::DataBufferType<1>();
+    auto mock_crc = MockCRC{};
+
+    auto mock_client =
+        BMockEEpromTaskClient<i2c::writer::Writer<test_mocks::MockMessageQueue>,
+                              test_mocks::MockI2CResponseQueue>{};
+    auto tail_accessor = eeprom::dev_data::DevDataTailAccessor<
+        BMockEEpromTaskClient<i2c::writer::Writer<test_mocks::MockMessageQueue>,
+                              test_mocks::MockI2CResponseQueue>>{mock_client};
+    auto test_book_accessor = book_accessor::BookAccessor<
+        BMockEEpromTaskClient<i2c::writer::Writer<test_mocks::MockMessageQueue>,
+                              test_mocks::MockI2CResponseQueue>,
+        1>{mock_client, mock_listener, buffer, tail_accessor, mock_crc};
+
+    tail_accessor.finish_data_rev();
+    uint16_t key = 0;
+    uint16_t len = 1;
+    uint16_t offset = 0;
+    // uint32_t message_index = 0;
+
+    std::array<uint8_t, 0> empty_data{};
+    GIVEN(
+        "Data Partition is successfully created and reads are "
+        "operational") {
+        test_book_accessor.create_data_part<0>(key, len, empty_data);
+        // make sure to set read_option to valid
+        mock_client.read_option = ReadOption::VALID;
+
+        THEN("Write data properly") {
+            mock_client.messages_received.clear();
+            std::array<uint8_t, 1> data_to_write{0b00000101};
+            test_book_accessor.write_data(key, len, offset, data_to_write);
+
+            // Get_data sends a few messages to the EEPROM client before the
+            // write that we care about
+            auto message = mock_client.messages_received[3];
+            REQUIRE(std::holds_alternative<eeprom::message::WriteEepromMessage>(
+                message));
+
+            auto write_message =
+                std::get<eeprom::message::WriteEepromMessage>(message);
+
+            // make sure the counter value is correct in the data that is
+            // being written
+
+            auto data = write_message.data;
+            const auto* data_iter = data.begin();
+
+            // check that counter value is correct (get_data should have
+            // current counter value of 4 because of the valid read_option,
+            // so the counter value should be 5 when we write)
+            uint16_t counter_value = 0;
+            data_iter = bit_utils::bytes_to_int(data_iter + 2, data_iter + 4,
+                                                counter_value);
+            REQUIRE(counter_value == 5);
+
+            // check that addres being written is correct
+
+            // expected: 16384 (final adress of EEPROM) - 64 (page length)
+            // to find the book location. the page with the lowest address
+            // in the "VALID" case of the read is the 4th and final page.
+            // the address of this page is 16384 - 64 - 64 = 16256
+            uint16_t address_written = write_message.memory_address;
+            REQUIRE(address_written == 16256);
         }
     }
 }
