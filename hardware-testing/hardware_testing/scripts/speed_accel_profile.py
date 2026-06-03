@@ -10,12 +10,9 @@ from typing import Tuple, Dict
 from abr_testing.automation import jira_tool  # type: ignore[import]
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
-from hardware_testing.opentrons_api.types import (
-    GantryLoad,
-    OT3Mount,
-    Axis,
-    Point,
-)
+from opentrons.config.types import GantryLoad
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
     GantryLoadSettings,

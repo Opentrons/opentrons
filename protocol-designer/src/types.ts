@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import type { FC, LazyExoticComponent } from 'react'
 import type {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -60,7 +60,7 @@ export interface RouteProps {
   /** the component rendered by a route match
    * drop developed components into slots held by placeholder div components
    * */
-  Component: FC
+  Component: FC | LazyExoticComponent<FC>
   /** a route/page name to render in the nav bar
    */
   name: string

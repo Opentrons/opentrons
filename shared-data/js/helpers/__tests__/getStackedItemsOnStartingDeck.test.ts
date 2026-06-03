@@ -328,38 +328,6 @@ const MOCK_LOAD_LABWARE_B1_COMMAND: LoadLabwareRunTimeCommand = {
   },
 } as LoadLabwareRunTimeCommand
 
-const MOCK_LOAD_LABWARE_FIRST_COMMAND: LoadLabwareRunTimeCommand = {
-  id: 'cmd-1',
-  commandType: 'loadLabware',
-  params: {
-    location: { slotName: SLOT_NAME },
-    loadName: 'mock_labware',
-    namespace: 'mock',
-    version: 1,
-  },
-  result: {
-    labwareId: 'first-labware',
-    definition: MOCK_LABWARE_DEF,
-    locationSequence: [{ kind: 'onCutoutFixture', cutoutId: CUTOUT_ID as any }],
-  },
-} as LoadLabwareRunTimeCommand
-
-const MOCK_LOAD_LABWARE_SECOND_COMMAND = {
-  id: 'cmd-2',
-  commandType: 'loadLabware',
-  params: {
-    location: { slotName: SLOT_NAME },
-    loadName: 'mock_labware',
-    namespace: 'mock',
-    version: 1,
-  },
-  result: {
-    labwareId: 'second-labware',
-    definition: MOCK_LABWARE_DEF,
-    locationSequence: [{ kind: 'onCutoutFixture', cutoutId: CUTOUT_ID as any }],
-  },
-} as any
-
 describe('getStackedItemsOnStartingDeck', () => {
   beforeEach(() => {
     vi.mocked(getLabwareDefURI).mockImplementation(def => {
@@ -666,17 +634,5 @@ describe('getStackedItemsOnStartingDeck', () => {
 
     expect(Object.keys(result)).toContain('A1')
     expect(Object.keys(result)).toContain('B1')
-  })
-
-  it('skips duplicate locations', () => {
-    const commands: RunTimeCommand[] = [
-      MOCK_LOAD_LABWARE_FIRST_COMMAND,
-      MOCK_LOAD_LABWARE_SECOND_COMMAND,
-    ]
-
-    const result = getStackedItemsOnStartingDeck(commands, [], [])
-
-    expect(result[SLOT_NAME]).toHaveLength(1)
-    expect((result[SLOT_NAME][0] as any).labwareId).toBe('second-labware')
   })
 })

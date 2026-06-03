@@ -337,7 +337,7 @@ def test_vacuum_module_start_execute_profile(
             ramp_rate=2.2,
             timeout_seconds=200,
             vent_after=True,
-            gauge_pressure_mbar=-10,
+            gauge_pressure_mbar=None,
         ),
         VacuumModulePowerStep(
             enable_pump=True,
@@ -372,7 +372,7 @@ def test_vacuum_module_start_execute_profile(
             ramp_rate=2.2,
             timeout_seconds=200,
             vent_after=True,
-            gauge_pressure_mbar=-10,
+            gauge_pressure_mbar=None,
         ),
         VacuumModulePowerStep(
             enable_pump=True,
@@ -384,11 +384,27 @@ def test_vacuum_module_start_execute_profile(
         ),
     ]
     repetitions = 2
+    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(0)
+    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(-800)
 
     subject.start_execute_profile(steps=profile_steps, repetitions=repetitions)
 
     decoy.verify(
         mock_core.start_execute_profile(
-            steps=expected_core_steps, repetitions=repetitions
+            steps=expected_core_steps, repetitions=repetitions, vent_after=False
         )
     )
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+)
+def test_vacuum_wait_for_target(
+    decoy: Decoy,
+    subject: VacuumModuleContext,
+    mock_core: VacuumModuleCore,
+) -> None:
+    """Make sure the the protocol engine function gets called correctly."""
+    subject.wait_for_target()
+
+    decoy.verify(mock_core.wait_for_target())
