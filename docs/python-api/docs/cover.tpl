@@ -7,5 +7,5 @@
 
 <p><strong>Opentrons Labworks Inc.</strong></p>
 
-<p>May 2026</p>
+<p>June 2026</p>
 </div>
