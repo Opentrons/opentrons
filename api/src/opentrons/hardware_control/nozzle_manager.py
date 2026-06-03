@@ -72,6 +72,7 @@ class NozzleMap(BaseModel):
         full_instrument_columns: Dict[str, List[str]],
     ) -> None:
         """Build a NozzleMap."""
+        super().__init__()
         self._starting_nozzle = starting_nozzle
         #: The nozzle that automated operations that count nozzles should start at
         # these are really ordered dicts but you can't say that even in quotes because pydantic needs to
