@@ -172,7 +172,7 @@ class JiraTicket:
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
         file = {
-            "file": (attachment_path, open(attachment_path, "rb"), "application-type")
+            "file": (os.path.basename(attachment_path), open(attachment_path, "rb"), "application-type")
         }
         JSON_headers = {"Accept": "application/json", "X-Atlassian-Token": "no-check"}
         attachment_url = f"{self.url}/rest/api/3/issue/{issue_id}/attachments"
