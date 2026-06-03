@@ -462,18 +462,26 @@ class OT3Simulator(FlexBackend):
         init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         if mount is OT3Mount.GRIPPER:
             return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
-        return self._attached_pipette_to_mount(
+        pipette = self._attached_pipette_to_mount(
             mount, cast(PipetteSpec, init_instr), expected_instr
         )
+        if pipette["config"]:
+            self._present_axes.update((Axis.of_plunger(mount)))
+        else:
+            self._present_axes.discard(Axis.of_plunger(mount))
+        return pipette
 
     def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
         found_model = init_instr["model"]
         if found_model:
+            self._present_axes.update((Axis.G, Axis.Z_G))
             return {
                 "config": gripper_config.load(GripperModel.v1),
                 "id": init_instr["id"],
             }
         else:
+            self._present_axes.discard(Axis.G)
+            self._present_axes.discard(Axis.Z_G)
             return {"config": None, "id": None}
 
     def _attached_pipette_to_mount(
