@@ -299,6 +299,29 @@ class SerialConnection:
             # If no specific error code was found, raise a generic ErrorResponse
             raise ErrorResponse(port=self._port, response=response)
 
+    async def update_port(self, new_port: str) -> None:
+        """Try to change the underling port path.
+
+        This should only be used temporarily, it is triggered during the reconnect patch in module_control
+        to allow the on_retry method to connect to the new port so it has a chance at successfully retrying
+        to send a command. Module control can't clean up this instance until that retry loop has succeeded or
+        hit its limit. Module Control then tears down this instance on success or failure and rebuilds a new
+        driver."""
+        log.info(
+            f"Changing port from {self._port} to {new_port} while open({await self._serial.is_open()})"
+        )
+
+        if await self._serial.is_open():
+            await self._serial.close()
+        self._serial = await self._build_serial(
+            port=new_port,
+            baud_rate=self._serial._baud_rate,
+            timeout=self._serial.get_timeout("timeout"),
+            loop=self._serial._loop,
+            reset_buffer_before_write=self._serial._reset_buffer_before_write,
+        )
+        self._port = new_port
+
     async def on_retry(self) -> None:
         """
         Opportunity for derived classes to perform action between retries. Default

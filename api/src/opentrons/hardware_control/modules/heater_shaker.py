@@ -342,6 +342,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def move_port(self, port: str, usb_port: USBPort) -> None:
         self._port = port
         self._usb_port = usb_port
+        await self._driver.move_port(port)
 
     async def attempt_reconnect(self) -> None:
         """Attempt to reestablish connections."""

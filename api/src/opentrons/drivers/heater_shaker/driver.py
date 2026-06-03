@@ -215,3 +215,7 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
             ),
             acks=2,
         )
+
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underling connection."""
+        await self._connection.update_port(new_port)

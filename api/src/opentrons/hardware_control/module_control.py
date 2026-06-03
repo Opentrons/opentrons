@@ -273,9 +273,11 @@ class AttachedModulesControl:
                 for attached_mod in self._available_modules:
                     if attached_mod.serial_number == old_mod.serial_number:
                         log.info(f"Found {old_mod.serial_number} was reconnected")
-                        # module reattached to a new virtual port, create a symlink to it
-                        await attached_mod.soft_cleanup()
-                        await old_mod.soft_cleanup()
+                        # Move the port before cleaning up the old instance.
+                        # this will give it a chance to successfully retry sending whatever command
+                        # if it was disconnected in the middle of sending a command.
+                        # if it was in the middle of sending a command, it cant cleanup until that retry loop
+                        # succeeds or hits its limit
                         if attached_mod.port != old_mod.port:
                             log.info(
                                 f"module moved from {old_mod.port} to {attached_mod.port}"
@@ -283,6 +285,8 @@ class AttachedModulesControl:
                             await old_mod.move_port(
                                 attached_mod.port, attached_mod.usb_port
                             )
+                        await attached_mod.soft_cleanup()
+                        await old_mod.soft_cleanup()
                         await old_mod.attempt_reconnect()
                         self._available_modules.remove(attached_mod)
                         self._available_modules.append(old_mod)
