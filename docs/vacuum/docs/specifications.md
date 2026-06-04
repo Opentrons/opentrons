@@ -68,8 +68,8 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 </figure>
 
 <figure markdown>
-![Spare deck plate screws, M4 x 10](images/deck-screws.png "Spare deck plate screws"){ width="75%" }
-<figcaption>(2) Deck adapter screws</figcaption>
+![Spare deck plate screws, M4 x 10](images/deck-screws.png "Spare deck plate screws"){ width="50%" }
+<figcaption>(2) Deck adapter screws, M4x10</figcaption>
 </figure>
 
 </div>
@@ -82,7 +82,7 @@ Unnamed box 3 includes items that connect the manifold to the waste collection c
 
 <figure markdown>
 ![Glass carboy and cap, for waste collection](images/carboy.png "Glass carboy and cap, for waste collection"){ width="70%" }
-<figcaption>(1) Carboy and cap</figcaption>
+<figcaption>(1) Carboy and cap, 2 liter</figcaption>
 </figure>
 
 <figure markdown>
@@ -90,9 +90,13 @@ Unnamed box 3 includes items that connect the manifold to the waste collection c
 <figcaption>(1) Carboy cradle</figcaption>
 </figure>
 
+</div>
+
+<div class="parts-list" markdown>
+
 <figure markdown>
 ![Vacuum 6 mm and 9.5 mm diameter vacuum hoses hoses](images/hoses5.png "6 mm and 9.5 mm diameter vacuum hoses")
-<figcaption>(2) Vacuum hoses</figcaption>
+<figcaption>(2) Vacuum hoses, 6 mm and 9.5 mm</figcaption>
 </figure>
 
 <figure markdown>
