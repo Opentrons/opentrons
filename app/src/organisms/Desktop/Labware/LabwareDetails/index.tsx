@@ -15,7 +15,6 @@ import {
   LegacyStyledText,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
-  SIZE_1,
   SPACING,
   Tooltip,
   TOOLTIP_TOP_START,
@@ -159,13 +158,19 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           onClick={handleCopy}
           role="button"
           aria-label="copy"
+          style={{ whiteSpace: 'normal' }}
         >
-          <Flex overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
+          <Flex width="100%">
+            <Box
+              fontSize={TYPOGRAPHY.fontSizeP}
+              color={COLORS.black90}
+              minWidth="0"
+              overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+            >
               {apiName}
               <span {...targetProps}>
                 <Icon
-                  size={SIZE_1}
+                  size="1rem"
                   name="copy-text"
                   className={styles.copy_icon}
                 />
