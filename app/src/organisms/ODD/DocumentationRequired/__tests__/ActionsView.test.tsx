@@ -11,7 +11,6 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { ActionsView } from '../ActionsView'
 
 import type { DocumentedAction } from '@opentrons/react-api-client'
-import type { PipetteWizardFlowName } from '@opentrons/react-api-client/src/access_control/types'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/maintenance_runs')
@@ -80,9 +79,32 @@ describe('ActionsView', () => {
     screen.getByText('Stopping protocol run')
   })
 
-  it('renders pipette wizard flow names as raw text when pipette wizard flow', () => {
-    renderWithModal(['Attach pipette to left mount' as PipetteWizardFlowName])
-    screen.getByText('Attach pipette to left mount')
+  it('renders pipette wizard flow with pipette category when pipetteInfo is null', () => {
+    renderWithModal([
+      {
+        type: 'pipette_wizard_flow',
+        mount: 'left',
+        pipette: '96-Channel',
+        flowType: 'ATTACH',
+        pipetteInfo: null,
+      },
+    ])
+    screen.getByText('Attaching 96 channel pipette on left mount')
+  })
+
+  it('renders pipette wizard flow with pipette display name when pipetteInfo is provided', () => {
+    renderWithModal([
+      {
+        type: 'pipette_wizard_flow',
+        mount: 'right',
+        pipette: 'Single-Channel_and_8-Channel',
+        flowType: 'CALIBRATE',
+        pipetteInfo: { displayName: 'Flex 1-Channel 1000 µL' },
+      },
+    ])
+    screen.getByText(
+      'Calibrating Flex 1-Channel 1000 µL pipette on right mount'
+    )
   })
 
   it('renders command text for runtime commands when maintenance run data is available', () => {

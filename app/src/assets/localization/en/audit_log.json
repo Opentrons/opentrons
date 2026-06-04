@@ -16,5 +16,13 @@
   "end_module_setup": "Finishing module setup",
   "end_lpc_flow": "Finishing labware position check",
   "end_gripper_wizard": "Finishing gripper setup",
-  "end_drop_tips": "Finishing dropping tips"
+  "end_drop_tips": "Finishing dropping tips",
+  "pipette_wizard_flow": "{{flowtype}} {{pipette}} pipette on {{mount}}",
+  "attach": "Attaching",
+  "detach": "Detaching",
+  "calibrate": "Calibrating",
+  "96_channel": "96 channel",
+  "single_channel_and_8_channel": "single channel or 8 channel",
+  "left_mount": "left mount",
+  "right_mount": "right mount"
 }

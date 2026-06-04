@@ -3,7 +3,7 @@ import audit_log from '/app/assets/localization/en/audit_log.json'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type {
   AttachingModule,
-  PipetteWizardFlowName,
+  PipetteWizardFlowAction,
 } from '@opentrons/react-api-client/src/access_control/types'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
@@ -15,8 +15,20 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 
 type DocumentedActionStrings = Exclude<
   DocumentedAction,
-  RunTimeCommand | PipetteWizardFlowName | AttachingModule
+  RunTimeCommand | AttachingModule | PipetteWizardFlowAction
 >
+
+// specific strings for pipette wizard flow actions
+type PipetteWizardFlowActionStrings =
+  | 'attach'
+  | 'detach'
+  | 'calibrate'
+  | 'left_mount'
+  | 'right_mount'
+  | 'pipette_wizard_flow'
+  | '96_channel'
+  | 'single_channel_and_8_channel'
+
 // compile time assertion that the audit_log keys match the DocumentedAction enum
 audit_log satisfies Record<DocumentedActionStrings, string>
 
@@ -24,4 +36,9 @@ type AuditLogKey = keyof typeof audit_log
 
 // asserts that there are no keys missing from the DocumentedAction enum
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _noExtraKeys: AuditLogKey extends DocumentedAction ? true : never = true
+const _noExtraKeys: Exclude<
+  AuditLogKey,
+  PipetteWizardFlowActionStrings
+> extends DocumentedAction
+  ? true
+  : never = true

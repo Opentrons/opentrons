@@ -4,7 +4,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { AttachedModule } from '@opentrons/api-client'
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { PipetteMount, RunTimeCommand } from '@opentrons/shared-data'
 
 export type DocumentationReport = string & {
   readonly _brand: 'DocumentationReport'
@@ -59,9 +59,16 @@ export interface UseDocumentedMutation {
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 }
+export interface PipetteWizardFlowAction {
+  type: 'pipette_wizard_flow'
+  mount: PipetteMount
+  pipette: '96-Channel' | 'Single-Channel_and_8-Channel'
+  flowType: string
+  pipetteInfo: PipetteInformation | null
+}
 
-export type PipetteWizardFlowName = string & {
-  readonly _brand: 'PipetteWizardFlow'
+interface PipetteInformation {
+  displayName: string
 }
 
 export type AttachingModule = AttachedModule & {
@@ -88,5 +95,5 @@ export type DocumentedAction =
   | 'end_gripper_wizard'
   | 'end_drop_tips'
   | RunTimeCommand
-  | PipetteWizardFlowName
+  | PipetteWizardFlowAction
   | AttachingModule

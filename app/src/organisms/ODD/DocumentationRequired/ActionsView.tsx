@@ -7,14 +7,15 @@ import {
   useCommandTextString,
 } from '@opentrons/components'
 
-import audit_log from '/app/assets/localization/en/audit_log.json'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import styles from './documentationrequired.module.css'
 
+import type { TFunction } from 'i18next'
 import type { CommandTextData, IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
+import type { PipetteWizardFlowAction } from '@opentrons/react-api-client/src/access_control/types'
 import type { LabwareDefinition, RunTimeCommand } from '@opentrons/shared-data'
 
 const ActionsViewImpl = ({
@@ -77,11 +78,7 @@ const ActionItem = ({
   const { t } = useTranslation(['audit_log'])
   if (typeof action === 'string') {
     // AuditLog
-    if (action in audit_log) {
-      return <div className={styles.action}>{t(action)}</div>
-    }
-    // PipetteWizardFlow
-    return <div className={styles.action}>{action}</div>
+    return <div className={styles.action}>{t(action)}</div>
   }
   // RunTimeCommand
   if ('commandType' in action && commandTextData != null) {
@@ -93,7 +90,10 @@ const ActionItem = ({
       />
     )
   }
-
+  // PipetteWizardFlow
+  if ('type' in action && action.type === 'pipette_wizard_flow') {
+    return <PipetteFlowText action={action} t={t} />
+  }
   return <div className={styles.action}>{JSON.stringify(action)}</div>
 }
 
@@ -118,6 +118,39 @@ function DocumentedCommandText({
 
 function isRunTimeCommand(action: DocumentedAction): action is RunTimeCommand {
   return typeof action === 'object' && 'commandType' in action
+}
+
+function PipetteFlowText({
+  action,
+  t,
+}: {
+  action: PipetteWizardFlowAction
+  t: TFunction
+}): JSX.Element {
+  const { flowType, pipette, mount, pipetteInfo } = action
+  const mountName = mount === 'left' ? t('left_mount') : t('right_mount')
+  const flowTypeText =
+    flowType === 'ATTACH'
+      ? t('attach')
+      : flowType === 'DETACH'
+        ? t('detach')
+        : t('calibrate')
+  const pipetteCategoryText =
+    pipette === '96-Channel'
+      ? t('96_channel')
+      : t('single_channel_and_8_channel')
+
+  const pipetteNameText = pipetteInfo?.displayName
+
+  const text = t('pipette_wizard_flow', {
+    flowtype: flowTypeText,
+    pipette: pipetteNameText || pipetteCategoryText,
+    mount: mountName,
+  })
+
+  console.log('pipette info', pipetteInfo)
+
+  return <div className={styles.action}>{text}</div>
 }
 
 export const ActionsView = NiceModal.create(ActionsViewImpl)
