@@ -22,7 +22,7 @@ Python protocols generally follow the same basic structure:
 
     - Locations of [modules](../../python-api/modules/index.md), [labware](../../python-api/labware.md), and [deck fixtures](../../python-api/deck-slots.md#deck-configuration).
 
-    - Liquid [classes](../../python-api/liquid-classes.md) or [types and locations](../../python-api/labware.md#labeling-liquids-in-labware) (optional).
+    - Liquid [classes](../../python-api/liquid-classes/liquid-classes.md) or [types and locations](../../python-api/labware.md#labeling-liquids-in-labware) (optional).
 
     - Commands the system will physically execute (e.g., [simple](../../python-api/building-block-commands/index.md) or [complex](../../python-api/complex-commands/index.md) liquid
     handling commands, [module](../../python-api/modules/index.md) commands, or [movement](../../python-api/robot-position.md) commands).
@@ -61,20 +61,6 @@ However, one of the advanced features of the Python API is to control a robot ou
 ## Python-exclusive features
 
 Certain features are only available in Python protocols, either because they are part of the API or because of the inherent flexibility of Python code.
-
-### Partial tip pickup
-
-The Python API supports the most partial tip pickup configurations. The `InstrumentContext.configure_nozzle_layout()` method supports multiple layouts:
-
-- Row pickup with the 96-channel pipette.
-
-- Partial column pickup with 8-channel pipettes.
-
-- Single tip pickup with all multi-channel pipettes.
-
-Certain configurations allow changing which nozzles are used. For example, you can pick up a column of tips with either the left or right edge of the 96-channel pipette.
-
-Protocol Designer supports some partial tip use, like single tip pickup and 96-channel column pickup, but doesn't let you change which nozzles are used.
 
 ### Runtime parameters
 
