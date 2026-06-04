@@ -97,6 +97,7 @@ from .exceptions import (
     TouchTipIncompatibleArgumentsError,
     UnexpectedProtocolError,
     UnsupportedLabwareForActionError,
+    VolumeModeDoesNotExistError,
     WellDoesNotExistError,
     WrongModuleTypeError,
 )
@@ -196,6 +197,7 @@ __all__ = [
     "IncompleteWellDefinitionError",
     "OperationLocationNotInWellError",
     "InvalidDispenseVolumeError",
+    "VolumeModeDoesNotExistError",
     "StorageLimitReachedError",
     "FileNameInvalidError",
     "LiquidClassDoesNotExistError",

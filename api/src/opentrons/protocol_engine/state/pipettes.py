@@ -113,7 +113,7 @@ class StaticPipetteConfig:
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
     volume_mode: VolumeModes
-    available_volume_modes_min_vol: Dict[VolumeModes, float]
+    available_volume_modes_min_and_max_vol: Dict[VolumeModes, Dict[str, float]]
 
 
 @dataclasses.dataclass
@@ -320,7 +320,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     shaft_ul_per_mm=config.shaft_ul_per_mm,
                     available_sensors=config.available_sensors,
                     volume_mode=config.volume_mode,
-                    available_volume_modes_min_vol=config.available_volume_modes_min_vol,
+                    available_volume_modes_min_and_max_vol=config.available_volume_modes_min_and_max_vol,
                 )
             )
             self._state.flow_rates_by_id[state_update.pipette_config.pipette_id] = (
@@ -884,16 +884,14 @@ class PipetteView:
         self, pipette_id: str, volume: float
     ) -> VolumeModes:
         """Get the volume mode for the given pipette and volume quantity."""
-        available_volume_modes_min_vol = self.get_config(
+        available_volume_modes = self.get_config(
             pipette_id
-        ).available_volume_modes_min_vol
-        has_low_volume_mode = (
-            VolumeModes.lowVolumeDefault in available_volume_modes_min_vol
-        )
+        ).available_volume_modes_min_and_max_vol
+        has_low_volume_mode = VolumeModes.lowVolumeDefault in available_volume_modes
 
         if not has_low_volume_mode:
             return VolumeModes.default
-        if volume >= available_volume_modes_min_vol[VolumeModes.default]:
+        if volume >= available_volume_modes[VolumeModes.default]["min_volume"]:
             return VolumeModes.default
         return VolumeModes.lowVolumeDefault
 
@@ -903,6 +901,24 @@ class PipetteView:
             self.get_volume_mode_from_volume(pipette_id, volume)
             != self.get_config(pipette_id).volume_mode
         )
+
+    def get_max_volume_for_volume_mode(
+        self, pipette_id: str, volume_mode: VolumeModes
+    ) -> float:
+        """Get the maximum pipette volume defined for the given volume mode.
+
+        Note: This merely returns the maxVolume value from the definition of the specific volume mode,
+        without taking attached tip volume into consideration.
+        """
+        try:
+            volume = self.get_config(pipette_id).available_volume_modes_min_and_max_vol[
+                volume_mode
+            ]["max_volume"]
+        except KeyError as e:
+            raise errors.VolumeModeDoesNotExistError(
+                f"Volume mode {volume_mode} does not exist for pipette {pipette_id}."
+            ) from e
+        return volume
 
     def lookup_volume_to_mm_conversion(
         self, pipette_id: str, volume: float, action: str
