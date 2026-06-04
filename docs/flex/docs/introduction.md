@@ -20,7 +20,7 @@ Opentrons Flex includes advanced features to help you automate any workflow, ava
 | **Module caddies** | Flex modules fit into caddies that occupy space below the deck. Caddies place your labware closer to the deck surface and allow for below-deck cable routing. Caddies enable even more module and labware configurations on the deck. |
 | **Moveable trash** | The trash bin can go in multiple deck locations on Flex. The default location (slot A3) is the recommended position. You can also use the gripper to dispose of trash in the optional waste chute. |
 | **Liquid detection** | Pressure sensors in Flex pipettes detect liquid in wells, including tip contact and liquid level. This feature lets you control the Flex's pipetting relative to a liquid meniscus, and alerts you if wells are empty. |
-| **Liquid classes** | Use [liquid class settings](../python-api/liquid-classes.md) to optimize Flex's pipetting behavior for your liquids, including fine-tuned control of pipette actions like flow rate and submerge speed. You can easily apply Opentrons-verified settings for aqueous, viscous, or volatile liquids using Python commands, in a quick transfer, or in Protocol Designer. |
+| **Liquid classes** | Use [liquid class settings](../python-api/liquid-classes/liquid-classes.md) to optimize Flex's pipetting behavior for your liquids, including fine-tuned control of pipette actions like flow rate and submerge speed. You can easily apply Opentrons-verified settings for aqueous, viscous, or volatile liquids using Python commands, in a quick transfer, or in Protocol Designer. |
 
 ## Flex and OT-2
 
