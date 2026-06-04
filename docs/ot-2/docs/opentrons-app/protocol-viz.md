@@ -1,9 +1,9 @@
 ---
 title: "Opentrons OT-2: Protocol Visualization"
-description: "Visualize protocol steps in the Opentrons App to test, edit, and troubleshoot OT-2 protocols."
+description: "Visualize protocol steps in the Opentrons OT-2 App to test, edit, and troubleshoot OT-2 protocols."
 ---
 
-Test new protocols in the Opentrons App before running them on your OT-2. Use protocol visualization to: 
+Test new protocols in the Opentrons OT-2 App before running them on your OT-2. Use protocol visualization to: 
 
 - See protocol steps, including labware and liquid changes, even while offline and disconnected from the OT-2. 
 - Detect and fix protocol errors before the first run. 
@@ -61,12 +61,12 @@ At any point in your protocol, hover over labware on the deck to see labware nam
 
 Open a slot spotlight to see changes over the course of your protocol. For example, spotlight a slot with a tip rack and drag the blue bar to see how quickly tips from that rack are used. Or spotlight a slot with a module to see changes in temperature, lid position, or other status.
 
-## Editing errors
+## Visualizing errors
 
-When you import any protocol, the Opentrons App analyzes it for errors. You can still visualize a protocol with errors, but you won't be able to see step details past the error. 
+When you import any protocol, the Opentrons OT-2 App analyzes it for errors. You can still visualize a protocol with errors, but you won't be able to see step details past the error. 
 
 <figure class="screenshot" markdown>
 ![Image showing protocol visualization details for tips, labware, wells, and more.](../images/viz-error.png)
 </figure>
 
-In this example serial dilution protocol, the tip rack would run out of tips before the robot can complete the final transfer step. The visualization screen includes the number of errors at the top of the screen. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details.
+In this example serial dilution protocol, the tip rack would run out of tips before the robot can complete the final transfer step. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details.
