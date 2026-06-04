@@ -65,7 +65,7 @@ def get_current_run_details_from_robot(
                         if (len(past_run_status_list) == 0) or not (
                             "awaiting-recovery" in past_run_status_list[-1]
                         ):
-                            slack_bot.send_slack_message(message)
+                            slack_bot.send_slack_message(message, ["/data/testing_data/livestream_video.mp4"]);
                     else:
                         slack_bot.send_slack_message(message)
                         completed_robots.append(robot_name)
