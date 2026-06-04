@@ -5,6 +5,8 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+  VACUUM_MODULE_TYPE,
 } from '../constants'
 import { getCutoutDisplayName } from '../fixtures'
 import { getModuleType } from '../modules'
@@ -12,6 +14,7 @@ import { getSlotDisplayNameFromAAWithFakes } from './deckConfiguration/getVisual
 import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
 import { getLabwareDefURI } from './getLabwareDefURI'
 import { getLiquidsByIdForLabware } from './getLiquidsByIdForLabware'
+import { getMergedDivergingStacks } from './getMergedDivergingStacks'
 import { locationIsOnLabware } from './symbolicPositionHelpers'
 
 import type { CutoutId } from '../../deck'
@@ -26,7 +29,12 @@ import type {
   OnCutoutFixtureLocationSequenceComponent,
   RunTimeCommand,
 } from '../../protocol'
-import type { LoadedLabware, LoadedModule, ModuleModel } from '../types'
+import type {
+  LabwareDefinition,
+  LoadedLabware,
+  LoadedModule,
+  ModuleModel,
+} from '../types'
 import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
 
 export interface LabwareInStack {
@@ -62,6 +70,41 @@ export interface LabwareLiquidRenderInfo extends LabwareInStack {
   liquids: number
 }
 
+interface InternalStackEntry {
+  location: string
+  stack: StackItem[]
+}
+interface InternalStackAccumulator {
+  [uniqueKey: string]: InternalStackEntry
+}
+
+/**
+ * Groups the internal accumulator entries by location and applies
+ * getMergedDivergingStacks wherever multiple stacks share a location.
+ * Off-deck items are flattened directly with no folding.
+ */
+const applyDivergingStacksMerge = (
+  rawStacks: InternalStackAccumulator,
+  labwareDefinitions: { [definitionUri: string]: LabwareDefinition }
+): StackedItemsOnDeck => {
+  const byLocation = new Map<string, StackItem[][]>()
+  for (const { location, stack } of Object.values(rawStacks)) {
+    const existing = byLocation.get(location) ?? []
+    byLocation.set(location, [...existing, stack])
+  }
+  const result: StackedItemsOnDeck = {}
+  for (const [location, stacks] of byLocation) {
+    if (location === 'offDeck') {
+      result.offDeck = stacks.flat()
+    } else if (stacks.length === 1) {
+      result[location] = stacks[0]
+    } else {
+      result[location] = getMergedDivergingStacks(stacks, labwareDefinitions)
+    }
+  }
+  return result
+}
+
 export function getStackerLocationFromSlotName(slotName: string): string {
   return `STACKER ${slotName.charAt(0)}`
 }
@@ -88,7 +131,10 @@ export function getStackedItemsOnStartingDeck(
       command.commandType === 'loadLid' &&
       locationIsOnLabware(command.params.location)
   )
-  const labwareAndLidOnDeck = commands
+
+  // Accumulate every stack with a unique key. Diverging stacks at the
+  // same location each get their own entry, and we merge if necessary.
+  const rawStacks = commands
     .filter(
       (
         command
@@ -96,7 +142,7 @@ export function getStackedItemsOnStartingDeck(
         ['loadLabware', 'loadLidStack'].includes(command.commandType)
     )
     .toReversed()
-    .reduce<StackedItemsOnDeck>((acc, command) => {
+    .reduce<InternalStackAccumulator>((acc, command) => {
       let stackFromCommand: StackItem[] = []
       let location = ''
       if (command.params.location === 'systemLocation') return acc
@@ -104,9 +150,7 @@ export function getStackedItemsOnStartingDeck(
         command.params.location === 'offDeck' &&
         command.result != null
       ) {
-        const offDeckArray = Object.keys(acc).includes('offDeck')
-          ? acc.offDeck
-          : []
+        const existingItems = acc.offDeck?.stack ?? []
         if (command.commandType === 'loadLabware') {
           const offDeckItem: LabwareInStack = {
             labwareId: command.result.labwareId,
@@ -125,22 +169,31 @@ export function getStackedItemsOnStartingDeck(
               : undefined
           offDeckItem.lidId =
             lidCommand?.result != null ? lidCommand.result.labwareId : undefined
-          offDeckArray.push(offDeckItem)
+          return {
+            ...acc,
+            offDeck: {
+              location: 'offDeck',
+              stack: [...existingItems, offDeckItem],
+            },
+          }
         } else if (
           command.commandType === 'loadLidStack' &&
           command.result?.definition != null
         ) {
-          command.result.labwareIds.forEach(labwareId => {
-            const offDeckItem = {
-              labwareId: labwareId,
-              definitionUri: getLabwareDefURI(command.result?.definition!),
-              displayName:
-                command.result?.definition?.metadata.displayName ?? '',
-            }
-            offDeckArray.push(offDeckItem)
-          })
+          const newLids = command.result.labwareIds.map(labwareId => ({
+            labwareId,
+            definitionUri: getLabwareDefURI(command.result?.definition!),
+            displayName: command.result?.definition?.metadata.displayName ?? '',
+          }))
+          return {
+            ...acc,
+            offDeck: {
+              location: 'offDeck',
+              stack: [...existingItems, ...newLids],
+            },
+          }
         }
-        return { ...acc, offDeck: offDeckArray }
+        return acc
       } else if (
         command.commandType === 'loadLabware' &&
         command.result?.locationSequence != null
@@ -163,8 +216,6 @@ export function getStackedItemsOnStartingDeck(
           addressableArea != null
             ? getSlotDisplayNameFromAAWithFakes(addressableArea)
             : getCutoutDisplayName(cutoutId as CutoutId)
-
-        if (Object.keys(acc).includes(location)) return acc
 
         const topLabware: LabwareInStack = {
           labwareId: command.result.labwareId,
@@ -213,7 +264,11 @@ export function getStackedItemsOnStartingDeck(
               const module = loadedModules.find(
                 lm =>
                   lm.id === sequenceItem.moduleId &&
-                  getModuleType(lm.model) !== FLEX_STACKER_MODULE_TYPE
+                  getModuleType(lm.model) !== FLEX_STACKER_MODULE_TYPE &&
+                  !(
+                    getModuleType(lm.model) === VACUUM_MODULE_TYPE &&
+                    addressableArea === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
+                  )
               )
               if (module == null) return sequenceAcc
               const moduleSlotName =
@@ -295,8 +350,22 @@ export function getStackedItemsOnStartingDeck(
           return sequenceAcc
         }, lidsArray)
       }
-      return { ...acc, [location]: stackFromCommand }
+      if (location === '') return acc
+      const count = Object.values(acc).filter(
+        ({ location: accumulatedLocation }) => accumulatedLocation === location
+      ).length
+      return {
+        ...acc,
+        [`${location}_${count}`]: { location, stack: stackFromCommand },
+      }
     }, {})
+
+  // fold together diverging stacks at the same location into a single ordered
+  // array using getMergedDivergingStacks, then hand back
+  const labwareAndLidOnDeck = applyDivergingStacksMerge(
+    rawStacks,
+    labwareDefinitions
+  )
 
   // add stacker labware after as we don't want the order of these commands reversed
   const allLabwareOnDeck = commands

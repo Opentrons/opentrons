@@ -459,7 +459,12 @@ class VacuumModule(mod_abc.AbstractModule):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
                         await self._execute_cycle_step(step)
-                        await self.wait_for_command_duration()
+                        await self.wait_for_target()
+                        if (
+                            step["hold_time_minutes"] is not None
+                            or step["hold_time_seconds"] is not None
+                        ):
+                            await self.wait_for_command_duration()
                 if this_cycle["vent_after"] is not None:
                     await self.set_vent_state(
                         vent_state=VentState(this_cycle["vent_after"])
@@ -470,7 +475,6 @@ class VacuumModule(mod_abc.AbstractModule):
         if vent_after:
             await self.set_vent_state(VentState.OPENED)
 
-    # TODO: implement a wait_for in running profiles
     async def execute_profile(
         self,
         profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
@@ -507,6 +511,36 @@ class VacuumModule(mod_abc.AbstractModule):
         task = self._loop.create_task(self._wait_for_command_duration())
         self.make_cancellable(task)
         await task
+
+    async def wait_for_target(self) -> None:
+        await self.wait_for_is_running()
+
+        task = self._loop.create_task(self._wait_for_target())
+        self.make_cancellable(task)
+        await task
+
+    async def _wait_for_target(self) -> None:
+        if self._reader.operation_mode == VacuumModuleOperationMode.POWER:
+            await self._reader.update_pump_state()
+            if not self._reader.pump_state.pump_running:
+                return
+            # should there be a tolerance here?
+            while (
+                self._reader.pump_state.current_pwm
+                != self._reader.pump_state.target_pwm
+            ):
+                await self._poller.wait_next_poll()
+        elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
+            await self._reader.update_vacuum_state()
+            if not self._reader.vacuum_state.vacuum_enabled:
+                return
+            while (
+                self._reader.vacuum_state.current_gauge_pressure
+                != self._reader.vacuum_state.target_gauge_pressure
+            ):
+                await self._poller.wait_next_poll()
+        else:
+            raise ValueError("Vacuum module target invalid.")
 
 
 class VacuumModuleReader(Reader):

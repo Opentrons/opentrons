@@ -2038,3 +2038,11 @@ class VacuumModuleContext(ModuleContext):
     def close_vent(self) -> None:
         """Closes the vent."""
         self._core.close_vent()
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_wait_for_target)
+    def wait_for_target(self) -> None:
+        """Delays protocol execution until the vacuum module has reached either target
+        pressure or target pwm.
+        """
+        self._core.wait_for_target()

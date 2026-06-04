@@ -1,4 +1,4 @@
-"""Protocol to test tip overlap in the 8 channel."""
+"""Protocol to test tip overlap in the 96 channel."""
 from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.types import Point
 from opentrons.config import IS_ROBOT
@@ -124,19 +124,19 @@ LAYOUT_TO_START: Dict[str, Optional[str]] = {
     "SingleH12": "H12",
     "Column1": "A1",
     "Column12": "A12",
-    "RowA": "A12",
-    "RowH": "H12",
+    "RowA": "A1",
+    "RowH": "H1",
     "Full": None,
 }
 LAYOUT_TO_END: Dict[str, Optional[str]] = {
-    "SingleA1": "A1",
-    "SingleH1": "H1",
-    "SingleA12": "A12",
-    "SingleH12": "H12",
-    "Column1": "H1",
-    "Column12": "H12",
-    "RowA": "A12",
-    "RowH": "H12",
+    "SingleA1": None,
+    "SingleH1": None,
+    "SingleA12": None,
+    "SingleH12": None,
+    "Column1": None,
+    "Column12": None,
+    "RowA": None,
+    "RowH": None,
     "Full": None,
 }
 
@@ -161,13 +161,13 @@ def offset_for_channel(channel: int, layout: str) -> Point:
         return Point(0, 0, 0)
     elif layout in ["Column1", "RowA", "Full"]:
         # channel 0 is the critical point
-        return Point(x=column * 9, y=row * 9, z=0)
+        return Point(x=column * -9, y=row * 9, z=0)
     elif layout in ["Column12"]:
         # channel 11 is the critical point
         return Point(x=0, y=row * 9, z=0)
     elif layout in ["RowH"]:
         # channel 84 is the critical point
-        return Point(x=column * 9, y=0, z=0)
+        return Point(x=column * -9, y=0, z=0)
     else:
         raise RuntimeError("unknown layout")
 
@@ -182,8 +182,11 @@ def run(ctx: ProtocolContext) -> None:
         assert dial is not None, "could not find dial"
     ctx.load_trash_bin("A3")
     tipracks = []
+    adapter: Optional[str] = None
+    if ctx.params.layout == "Full":  # type: ignore [attr-defined]
+        adapter = "opentrons_flex_96_tiprack_adapter"  # type: ignore [attr-defined]
     for slot in LAYOUT_TO_RACK_SLOTS[ctx.params.layout]:  # type: ignore [attr-defined]
-        tipracks.append(ctx.load_labware(f"opentrons_flex_96_{ctx.params.tip_type}", slot, adapter="opentrons_flex_96_tiprack_adapter"))  # type: ignore [attr-defined]
+        tipracks.append(ctx.load_labware(f"opentrons_flex_96_{ctx.params.tip_type}", slot, adapter=adapter))  # type: ignore [attr-defined]
     pipette = ctx.load_instrument(
         f"flex_96channel_{ctx.params.pipette_volume}", "left", tip_racks=tipracks  # type: ignore [attr-defined]
     )
