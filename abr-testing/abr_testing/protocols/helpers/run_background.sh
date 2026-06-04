@@ -18,7 +18,7 @@ fi
 pkill -f "background_helpers"
 
 VIDEO_LENGTH=35
-(python3 -c "from background_helpers import change_video_length; change_video_length($VIDEO_LENGTH)" &)
+(python3 -c "from background_helpers import change_video_length; change_video_length($VIDEO_LENGTH)")
 
 (python3 -c "from background_helpers import detect_robot_status; detect_robot_status('$IP_ADDRESS')" &)
 sleep 0.5
