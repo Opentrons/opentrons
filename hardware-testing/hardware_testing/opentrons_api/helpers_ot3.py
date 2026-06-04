@@ -156,10 +156,15 @@ def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[s
         case "p200":
             size = "P2H"
             version = 30
-    channels = "S" if items[1] == "single" else "M"
+    if items[1] == "single":
+        channels = "S"
+    elif items[1] == "multi":
+        channels = "M"
+    else:
+        channels = "H"
     date = datetime.now().strftime("%y%m%d")
     unique_number = 1 if mount == OT3Mount.LEFT else 2
-    return f"{size}{channels}{version}{date}A0{unique_number}"
+    return f"{size}{channels}V{version}{date}A0{unique_number}"
 
 
 def _create_attached_instruments_dict(
