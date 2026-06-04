@@ -190,7 +190,8 @@ class OpentronsPyroSerializer:
             # A dictionary of proxies requires specialized serializaiton
             model_dict = model.model_dump(mode="python", by_alias=True)
             model_dict["dictionary"] = {
-                key.value: value for key, value in model_dict["dictionary"].items()
+                key if type(key).__module__ == "builtins" else key.value: value
+                for key, value in model_dict["dictionary"].items()
             }
             model_dict["__class__"] = ".".join(
                 (model.__module__, model.__class__.__name__)

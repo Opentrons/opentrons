@@ -117,7 +117,7 @@ describe('LoginModal', () => {
       ({ onError }) =>
         ({
           submitPassword: () => {
-            onError('Invalid credentials')
+            onError('Test error message')
           },
           isAuthLoading: false,
         }) as ReturnType<typeof useOAuth2PasswordLogin>
@@ -133,7 +133,7 @@ describe('LoginModal', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
-    screen.getByText('Incorrect username or password.')
+    screen.getByText('Test error message')
     screen.getByText('Compliance Ready Software Login')
   })
 })

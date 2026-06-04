@@ -62,11 +62,8 @@ function LoginModalImpl(): JSX.Element {
       storeLoginState(successfulUsername, response)
       modal.remove()
     },
-    onError: () => {
-      // todo(mm, 2026-06-02): This is copied from the ODD logic, but it needs to be
-      // reworked to show the actual error (e.g. a network error), and to show the
-      // number of attempts remaining before lockout.
-      setLoginError(t('access_control:login_error_incorrect') as string)
+    onError: message => {
+      setLoginError(message)
     },
   })
 
