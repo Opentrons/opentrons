@@ -1868,18 +1868,6 @@ class VacuumModuleContext(ModuleContext):
 
     @property
     @requires_version(2, 30)
-    def max_gauge_pressure_mbar(self) -> int:
-        """Get the max allowed gauge pressure in mbar."""
-        return self._core.get_max_gauge_pressure_mbar()
-
-    @property
-    @requires_version(2, 30)
-    def min_gauge_pressure_mbar(self) -> int:
-        """Get the min allowed gauge pressure in mbar."""
-        return self._core.get_min_gauge_pressure_mbar()
-
-    @property
-    @requires_version(2, 30)
     def manifold_dock(self) -> ModuleFixtureLocation:
         base_slot = self._core.get_deck_slot().id
         area_name = f"{self.model}Dock{base_slot[0]}4"
@@ -1984,61 +1972,3 @@ class VacuumModuleContext(ModuleContext):
     @publish(command=cmds.vacuum_module_stop_vacuum)
     def stop_vacuum_pump(self) -> None:
         self._core.stop_vacuum()
-
-    @requires_version(2, 30)
-    @publish(command=cmds.vacuum_module_start_execute_profile)
-    def start_execute_profile(
-        self,
-        steps: List[VacuumModuleStep],
-        repetitions: int = 1,
-        vent_after: bool = False,
-    ) -> Task:
-        """
-        Starts a defined Vacuum Module profile and returns a [`Task`][opentrons.protocol_api.Task] representing its concurrent execution.
-        Profile is defined as a cycle of `steps`, for a given number of `repetitions`.
-
-        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the profile to complete.
-
-        Args:
-            steps: List of steps that make up a single cycle.
-            repetitions: How many times to perform the entire profile.
-                The dictionary's keys must be
-            enable_pump: whether to enable the pump motor
-                Optional arguments are:
-            hold_time_seconds: time in seconds to hold pressure/power for after target is reached
-            hold_time_minutes: time in minutes to hold pressure/power for after target is reached
-            ramp_rate: rate to increase the motor power at (get unit for this)
-            timeout_seconds: the time to wait for target pressure/power before throwing an error
-            vent_after: wheter to open the vent after the step is complete
-        """
-        repetitions = validation.ensure_profile_repetition_count(repetitions)
-        validated_steps = validation.ensure_vacuum_module_profile(
-            steps=steps,
-            max_pressure=self.max_gauge_pressure_mbar,
-            min_pressure=self.min_gauge_pressure_mbar,
-        )
-        task = self._core.start_execute_profile(
-            steps=validated_steps, repetitions=repetitions, vent_after=vent_after
-        )
-        return Task(api_version=self._api_version, core=task)
-
-    @requires_version(2, 30)
-    @publish(command=cmds.vacuum_module_open_vent)
-    def open_vent(self) -> None:
-        """Opens the vent."""
-        self._core.open_vent()
-
-    @requires_version(2, 30)
-    @publish(command=cmds.vacuum_module_close_vent)
-    def close_vent(self) -> None:
-        """Closes the vent."""
-        self._core.close_vent()
-
-    @requires_version(2, 30)
-    @publish(command=cmds.vacuum_module_wait_for_target)
-    def wait_for_target(self) -> None:
-        """Delays protocol execution until the vacuum module has reached either target
-        pressure or target pwm.
-        """
-        self._core.wait_for_target()

@@ -32,10 +32,12 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V3"}
-requirements = {"robotType": "Flex", "apiLevel": "2.30"}
-
-SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
+# ------ TODO remove and move necessary libraries into a standard release library. ----
+import importlib
+import os
+from opentrons.config import infer_config_base_dir
+from opentrons import version
+import sys
 
 
 def _download_and_extract(version_str: str, base_dir: str) -> None:
