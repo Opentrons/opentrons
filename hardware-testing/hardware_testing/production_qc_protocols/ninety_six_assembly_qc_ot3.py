@@ -99,6 +99,14 @@ def get_user_answer(prompt: str) -> bool:
     return True
 
 
+def get_input_number(
+    ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str, default: Union[int, float]
+) -> Union[int, float]:
+    """Have the user input a value."""
+    ctx.pause(f"Use Scanner: {prompt}")
+    return default
+
+
 # ----------- Monkey patches -----------
 
 
@@ -607,22 +615,25 @@ def check_value(
 
 
 def calibrate_to_pressue_fixture(
-    api: SyncHardwareAPI, sensor: SealedPressureDriver, fixture_pos: Point
+    api: SyncHardwareAPI,
+    sensor: SealedPressureDriver,
+    fixture_pos: Point,
+    ctx: ProtocolContext,
 ) -> None:
     """Move to suitable height for reading air pressure."""
     api.move_to(OT3Mount.LEFT, fixture_pos)
 
-    # TODO complicated input
-    # if api.is_simulator:
-    #    debug_target = f"{SET_PRESSURE_TARGET}"
-    # else:
-    #    debug_target = input(
-    #        f"Setting target pressure (default: {SET_PRESSURE_TARGET}g): "
-    #    )
-    # if debug_target.strip() == "":
-    #    debug_target = f"{SET_PRESSURE_TARGET}"
+    if api.is_simulator:
+        debug_target = f"{SET_PRESSURE_TARGET}"
+    else:
+        target_input = get_input_number(
+            ctx,
+            api,
+            f"Setting target pressure (default: {SET_PRESSURE_TARGET}g): ",
+            SET_PRESSURE_TARGET,
+        )
+        debug_target = f"{target_input}"
 
-    debug_target = f"{SET_PRESSURE_TARGET}"
     while True:
         force_pressure = sensor.get_pressure()
         # step = -0.06 if abs(float(force_pressure)) > 0.1 else -0.1
@@ -724,7 +735,7 @@ def test_pressure(  # noqa: C901
                 )
                 ctx.pause("Ready for moving to sealed fixture")
                 if USE_SEALED_FIXTURE:
-                    calibrate_to_pressue_fixture(api, pressure_sensor, fixture_pos)
+                    calibrate_to_pressue_fixture(api, pressure_sensor, fixture_pos, ctx)
                 else:
                     helpers_ot3.move_to_arched_ot3_sync(api, OT3Mount.LEFT, fixture_pos)
 
