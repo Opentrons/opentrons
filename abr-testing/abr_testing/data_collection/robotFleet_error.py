@@ -33,29 +33,6 @@ def open_folder(path: str) -> None:
         raise OSError("Unsupported operating system")
 
 
-def retrieve_version_file(
-    robot_ip: str,
-    storage: str,
-) -> Path | str:
-    """Retrieve Version file."""
-    version_file_path = "/etc/VERSION.json"
-    save_dir = Path(f"{storage}")
-    key_path = Path(storage)/"robot_key"
-    command = [
-        "scp",
-        "-i", str(key_path),
-        "-o", "StrictHostKeyChecking=no",
-        "-r",
-        f"root@{robot_ip}:{version_file_path}",
-        save_dir,
-    ]
-    try:
-        subprocess.run(command, check=True)  # type: ignore
-        return os.path.join(save_dir, "VERSION.json")
-    except subprocess.CalledProcessError as e:
-        print(f"Error during file transfer: {e}")
-        return ""
-
 
 def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
     """Save all capture images for a run."""
@@ -72,7 +49,7 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
         save_dir,
     ]
     new_save_dir.mkdir(parents=True, exist_ok=True)
-    odd_path = new_save_dir / f"{robot_ip}_odd.png"
+    odd_path = new_save_dir / "odd_pic.png"
     try:
         # Get the CDP websocket URL
         targets = requests.get(f"http://{robot_ip}:9223/json", timeout=5).json()
@@ -114,7 +91,7 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     update_camera_status("ON", robot_ip, key_path)
     time.sleep(3)
     # grab one frame from camera live stream
-    camera_path = save_dir / f"{robot_name}_camera.jpg"
+    camera_path = save_dir / "robot_pic.jpg"
     stream_url = f"http://{robot_ip}:31950/hls/stream.m3u8"
     try:
         subprocess.run(
@@ -127,7 +104,7 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
         print(f"Failed to capture camera image for {robot_name}: {e}")
     update_camera_status("OFF", robot_ip, key_path)
     # ODD screenshot via Chrome DevTools Protocol (port 9222 on robot)
-    odd_path = save_dir / f"{robot_name}_odd.png"
+    odd_path = save_dir / "odd_pic.png"
     try:
         # Get the CDP websocket URL
         targets = requests.get(f"http://{robot_ip}:9223/json", timeout=5).json()
@@ -711,8 +688,6 @@ if __name__ == "__main__":
         print("Invalid IP address.")
         sys.exit()
     #Nick Check
-    version_file_dir = retrieve_version_file(robot_ip=ip, storage=storage_directory)
-    version_file_path = os.path.join(storage_directory, version_file_dir)
     #Nick Check
     protocol_file_path = ""
     one_run = ""
@@ -762,10 +737,7 @@ if __name__ == "__main__":
             labels,
             whole_description_str,
         ) = get_robot_state(ip, run_or_other, project_key)
-    # Get Calibration Data
-    saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
-        ip, storage_directory
-    )
+
     # make description replacement file
     status_path = make_json_file(storage_directory, whole_description_str)
     print(f"Making ticket for {summary}.")
@@ -805,23 +777,24 @@ if __name__ == "__main__":
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
     error_files = [
-        saved_file_path_calibration, #works
-        run_log_file_path, #only when errored
-        protocol_file_path, #only when errored
-        version_file_path, #works
-        log_zip_path, #works
-        image_files, #works
-        status_path, #works
+        run_log_file_path, # run-error path only
+        protocol_file_path, # run-error path only
+        log_zip_path,
+        image_files,
+        status_path,
     ]
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:
+        if not source_file:
+            continue
         try:
             destination_file = os.path.join(
                 error_folder_path, os.path.basename(source_file)
             )
             shutil.move(source_file, destination_file)
-        except shutil.Error:
+        except (shutil.Error, FileNotFoundError) as e:
+            print(f"Could not move {source_file}: {e}")
             continue
     # POST ALL FILES TO TICKET
     list_of_files = os.listdir(error_folder_path)

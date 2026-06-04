@@ -16,6 +16,7 @@ import requests
 from pathlib import Path
 import zipfile
 from abr_testing.tools import plate_reader
+from abr_testing.data_collection import get_run_logs
 
 
 def lpc_data(
@@ -808,9 +809,10 @@ def save_run_log_to_json(
     ip: str, results: Dict[str, Any], storage_directory: Path
 ) -> str:
     """Save run log to local json file."""
-    data_file_name = ip + "_" + results["run_id"] + ".json"
+    data_file_name = "run_log.json"
     saved_file_path = os.path.join(storage_directory, data_file_name)
-    json.dump(results, open(saved_file_path, mode="w"))
+    with open(saved_file_path, mode="w") as f:
+        json.dump(results, f, indent=2)
     return saved_file_path
 
 
@@ -842,8 +844,8 @@ def write_to_sheets(
 
 
 def get_calibration_offsets(
-    ip: str, storage_directory: Path
-) -> Tuple[str, Dict[str, Any]]:
+    ip: str, storage_directory: Path, collected_files: list
+) -> list:
     """Connect to robot via ip and get calibration data."""
     calibration = dict()
     # Robot Information [Name, Software Version]
@@ -852,10 +854,10 @@ def get_calibration_offsets(
             f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
         )
         print(f"Connected to {ip}")
+        health_data = response.json()
     except Exception:
         print(f"ERROR: Failed to read IP address: {ip}")
-        pass
-    health_data = response.json()
+        return collected_files
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
     pull_date_timestamp = datetime.now()
@@ -888,11 +890,37 @@ def get_calibration_offsets(
     )
     deck: Dict[str, Any] = response.json()
     calibration["Deck"] = deck.get("deckCalibration", "")
-    save_name = ip + "_calibration.json"
-    saved_file_path = os.path.join(storage_directory, save_name)
-    json.dump(calibration, open(saved_file_path, mode="w"))
-    return saved_file_path, calibration
 
+
+    save_name = "calibration.json"
+    saved_file_path = os.path.join(storage_directory, save_name)
+    with open(saved_file_path, mode="w") as f:
+        json.dump(calibration, f, indent=2)
+    collected_files.append(str(saved_file_path))
+    return collected_files
+
+def retrieve_version_file(
+    robot_ip: str,
+    storage: str,
+) -> Path | str:
+    """Retrieve Version file."""
+    version_file_path = "/etc/VERSION.json"
+    save_dir = Path(f"{storage}")
+    key_path = Path(storage)/"robot_key"
+    command = [
+        "scp",
+        "-i", str(key_path),
+        "-o", "StrictHostKeyChecking=no",
+        "-r",
+        f"root@{robot_ip}:{version_file_path}",
+        save_dir,
+    ]
+    try:
+        subprocess.run(command, check=True)  # type: ignore
+        return os.path.join(save_dir, "VERSION.json")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during file transfer: {e}")
+        return ""
 
 def get_logs(storage_directory: Path, ip: str) -> str:
     """Get Robot logs and return a zip file path containing them."""
@@ -930,7 +958,7 @@ def get_logs(storage_directory: Path, ip: str) -> str:
             )
             response.raise_for_status()
             log_data: str = response.text
-            log_name: str = f"{robot_name}_{log_type_name.split('.')[0]}.log"
+            log_name: str = log_type_name
             file_path: str = os.path.join(storage_directory, log_name)
             
             with open(file_path, mode="w", encoding="utf-8") as f:
@@ -945,7 +973,33 @@ def get_logs(storage_directory: Path, ip: str) -> str:
     collected_files = fetch_weston_log(
         ip, storage_directory, collected_files, robot_name
     )
-    
+
+    # Get Calibration and version Data
+    collected_files = get_calibration_offsets(
+        ip, storage_directory, collected_files
+    )
+
+    version_file_path = retrieve_version_file(robot_ip=ip, storage=storage_directory)
+    if version_file_path:
+        collected_files.append(str(version_file_path))
+
+    # Get latest run log
+    try:
+        runs_resp = requests.get(
+            f"http://{ip}:31950/runs", headers={"opentrons-version": "*"}, timeout=10
+        )
+        runs_resp.raise_for_status()
+        run_list = runs_resp.json().get("data") or []
+        if run_list:
+            latest_run_id = run_list[-1]["id"]
+            run_results = get_run_logs.get_run_data(latest_run_id, ip)
+            run_log_path = save_run_log_to_json(ip, run_results, storage_directory)
+            if run_log_path:
+                collected_files.append(run_log_path)
+                print(f"Run log saved: {run_log_path}")
+    except Exception as e:
+        print(f"Failed to fetch run log: {e}")
+
     timestamp = datetime.now().strftime("%Y-%m-%d")
     
     # Create a ZIP archive with all collected files
@@ -971,7 +1025,7 @@ def fetch_weston_log(
     ip: str, storage_directory: Path, collected_files: list, robot_name: str
 ) -> list[str]:
     """Get weston log via SSH journalctl, saved with robot name."""
-    destination_path = Path(storage_directory) / f"{robot_name}_weston.log"
+    destination_path = Path(storage_directory) / "weston.log"
     key_path = Path(storage_directory) / "robot_key"
 
     try:
