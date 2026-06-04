@@ -1,7 +1,13 @@
 // Opentrons AI command args
 // params are sourced from CreateCommand where available.
 
-import type { CreateCommand } from '../../protocol'
+import type {
+  AddressableOffsetVector,
+  CreateCommand,
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+  WellLocation,
+} from '../../protocol'
 import type { LatestCommandSchemaCommandType } from './utils'
 
 type ParamsForOpentronsAICommand<T extends LatestCommandSchemaCommandType> =
@@ -35,23 +41,70 @@ export interface BlowOutInPlaceArgs extends OpentronsAIBaseArgs<'blowOutInPlace'
 export interface BlowoutArgs extends OpentronsAIBaseArgs<'blowout'> {}
 export interface ConfigureForVolumeArgs extends OpentronsAIBaseArgs<'configureForVolume'> {}
 export interface ConfigureNozzleLayoutArgs extends OpentronsAIBaseArgs<'configureNozzleLayout'> {}
-export interface DispenseArgs extends OpentronsAIBaseArgs<'dispense'> {}
 export interface DispenseInPlaceArgs extends OpentronsAIBaseArgs<'dispenseInPlace'> {}
 export interface DispenseWhileTrackingArgs extends OpentronsAIBaseArgs<'dispenseWhileTracking'> {}
-export interface DropTipArgs extends OpentronsAIBaseArgs<'dropTip'> {}
 export interface DropTipInPlaceArgs extends OpentronsAIBaseArgs<'dropTipInPlace'> {}
 export interface HomeArgs extends OpentronsAIBaseArgs<'home'> {}
 export interface MoveRelativeArgs extends OpentronsAIBaseArgs<'moveRelative'> {}
-export interface MoveToAddressableAreaArgs extends OpentronsAIBaseArgs<'moveToAddressableArea'> {}
 export interface MoveToAddressableAreaForDropTipArgs extends OpentronsAIBaseArgs<'moveToAddressableAreaForDropTip'> {}
 export interface MoveToCoordinatesArgs extends OpentronsAIBaseArgs<'moveToCoordinates'> {}
 export interface MoveToWellArgs extends OpentronsAIBaseArgs<'moveToWell'> {}
-export interface PickUpTipArgs extends OpentronsAIBaseArgs<'pickUpTip'> {}
 export interface PrepareToAspirateArgs extends OpentronsAIBaseArgs<'prepareToAspirate'> {}
-export interface SavePositionArgs extends OpentronsAIBaseArgs<'savePosition'> {}
-export interface TouchTipArgs extends OpentronsAIBaseArgs<'touchTip'> {}
 export interface TryLiquidProbeArgs extends OpentronsAIBaseArgs<'tryLiquidProbe'> {}
 export interface VerifyTipPresenceArgs extends OpentronsAIBaseArgs<'verifyTipPresence'> {}
+
+// the following args have additional args in the commandCreators
+// which are needed for the timeline errors
+// tht don't match the command's params
+export interface DispenseArgs extends CommonArgs {
+  commandCreatorFnName: 'dispense'
+  pipetteId: string
+  volume: number
+  labwareId: string
+  wellName: string
+  flowRate: number
+  tipRack: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
+  pushOut?: number
+  wellLocation?: WellLocation
+  isAirGap?: boolean
+}
+
+export interface DropTipArgs extends CommonArgs {
+  commandCreatorFnName: 'dropTip'
+  pipette: string
+  dropTipLocation?: string
+  wellName?: string
+  isReturnTip?: boolean
+}
+
+export interface MoveToAddressableAreaArgs extends CommonArgs {
+  commandCreatorFnName: 'moveToAddressableArea'
+  pipetteId: string
+  fixtureId: string
+  offset: AddressableOffsetVector
+}
+
+export interface PickUpTipArgs extends CommonArgs {
+  commandCreatorFnName: 'pickUpTip'
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzles: NozzleConfigurationStyle
+  tipTrackingOption?: 'automatic' | 'manual'
+}
+
+export interface TouchTipArgs extends CommonArgs {
+  commandCreatorFnName: 'touchTip'
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  zOffsetFromTop: number
+  speed?: number
+  mmFromEdge?: number
+}
 
 export type OpentronsAIArgs =
   | AirGapInPlaceArgs
@@ -75,6 +128,5 @@ export type OpentronsAIArgs =
   | MoveToWellArgs
   | PickUpTipArgs
   | PrepareToAspirateArgs
-  | SavePositionArgs
   | TouchTipArgs
   | TryLiquidProbeArgs
