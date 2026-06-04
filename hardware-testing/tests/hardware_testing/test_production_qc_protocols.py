@@ -41,9 +41,7 @@ def _get_analysis_result(
     """
     print(f"{protocol_files}")
     with tempfile.TemporaryDirectory() as temp_dir:
-        print("1")
         analysis_output_file = Path(temp_dir) / "analysis_output.json"
-        print("2")
         args = [
             "python",
             "-m",
@@ -52,25 +50,18 @@ def _get_analysis_result(
             output_type,
             str(analysis_output_file),
         ]
-        print("3")
         if rtp_values is not None:
             args.extend(["--rtp-values", rtp_values])
-        print("4")
         if rtp_files is not None:
             args.extend(["--rtp-files", rtp_files])
-        print("5")
         args.extend([str(p.resolve()) for p in protocol_files])
-        print("6")
         if check:
             args.append("--check")
-        print("7")
         process = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        print("8")
         if analysis_output_file.exists():
             json_output = json.loads(analysis_output_file.read_bytes())
         else:
             json_output = None
-        print("9")
         return _AnalysisCLIResult(
             exit_code=process.returncode,
             json_output=json_output,
@@ -82,6 +73,7 @@ def _get_analysis_result(
     "protocol",
     [
         pytest.param("belt_calibration_ot3.py"),
+        pytest.param("gripper_assembly_qc_ot3.py"),
     ],
 )
 def test_production_protocol(protocol: str) -> None:
@@ -91,6 +83,7 @@ def test_production_protocol(protocol: str) -> None:
         "--json-output",
         check=True,
     )
-    print(result)
-    print(result.json_output)
+    # print(result)
+    print(result.stdout_stderr.decode())
+    print(json.dumps(result.json_output, indent=4))
     assert result.exit_code == 0
