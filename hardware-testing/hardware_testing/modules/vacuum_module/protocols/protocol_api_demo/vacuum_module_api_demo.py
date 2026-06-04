@@ -13,7 +13,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.28",
+    "apiLevel": "2.30",
 }
 
 
@@ -21,7 +21,7 @@ requirements = {
 
 # --------------------Vacuum Module API --------------------
 
-apiLevel: 2.28
+apiLevel: 2.30
 
 1.
     vm_mod.close_vent()
