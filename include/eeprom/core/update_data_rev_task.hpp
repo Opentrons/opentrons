@@ -44,7 +44,8 @@ template <task::TaskClient EEPromClient>
 class UpdateDataRevHandler : accessor::ReadListener {
   public:
     UpdateDataRevHandler(const UpdateDataRevHandler&) = delete;
-    UpdateDataRevHandler& operator=(const UpdateDataRevHandler&) = delete;
+    auto operator=(const UpdateDataRevHandler&)
+        -> UpdateDataRevHandler& = delete;
 
     UpdateDataRevHandler(
         EEPromClient& eeprom_client,

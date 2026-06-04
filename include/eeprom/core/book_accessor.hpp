@@ -221,8 +221,7 @@ class BookAccessor
             // make CRC the first two bytes of the page
             std::memcpy(page_data.data(), &crc, 2);
             // make Counter the next two bytes of the page
-            std::copy_n(reinterpret_cast<uint8_t*>(&counter), sizeof(counter),
-                        page_data.begin() + 2);
+            std::memcpy(page_data.data() + 2, &counter, sizeof(counter));
             // make the length the next two bytes of the page
             std::memcpy(page_data.data() + 4, &len, sizeof(len));
 
@@ -420,7 +419,7 @@ class BookAccessor
         std::array<uint16_t, 4> reads = {read0, read1, read2, read3};
 
         // sort reads from largest to smallest
-        std::sort(reads.begin(), reads.end(), std::greater<uint16_t>());
+        std::sort(reads.begin(), reads.end(), std::greater<>());
 
         // handle counter wraparound
         if (reads[0] >= 65000) {
@@ -465,7 +464,7 @@ class BookAccessor
         // set most recent index and most recent valid again
         uint16_t most_recent_index = 0;
         size_t all_reads_index = 0;
-        uint16_t most_recent_valid = reads[most_recent_index];
+        uint16_t most_recent_valid = reads.at(most_recent_index);
 
         bool crc_valid = false;
 
@@ -513,7 +512,7 @@ class BookAccessor
         }
 
         std::array<uint8_t, types::page_length>& relevant_page =
-            all_reads[all_reads_index];
+            all_reads.at(all_reads_index);
 
         std::copy_n(relevant_page.begin() + types::book_header_length,
                     BUFFER_SIZE, this->buffer.begin());
@@ -530,7 +529,7 @@ class BookAccessor
                          uint16_t read1, uint16_t read2, uint16_t read3) {
         // create a new eeprom message to send to table_action_callback
 
-        message::EepromMessage write_msg;
+        message::EepromMessage write_msg{};
 
         types::address read0_offset = 0;
         types::address read1_offset = types::page_length;
@@ -540,7 +539,7 @@ class BookAccessor
         // because of the wraparound counter logic, we can be assured
         // that the last page is the least recently written page, so we
         // can use that to determine where to write the new data
-        uint16_t least_recent = reads[reads.size() - 1];
+        uint16_t least_recent = reads.at(reads.size() - 1);
 
         types::address page_address = current_book_address;
 
@@ -563,8 +562,10 @@ class BookAccessor
         // action callback cheks data to determine write location
         uint8_t* write_iter = write_msg.data.begin();
         // copy page address into first 2 bytes of data
-        write_iter = bit_utils::int_to_bytes(page_address, write_iter,
-                                             write_iter + conf.addr_bytes);
+        write_iter = bit_utils::int_to_bytes(
+            page_address, write_iter,
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            write_iter + conf.addr_bytes);
         // copy new counter value into next 2 bytes of data
         uint16_t new_counter = reads[0] + 1;
         if (new_counter > 65000) {
@@ -573,8 +574,10 @@ class BookAccessor
             // necessary to avoid counter overflow
             new_counter = 0;
         }
-        write_iter = bit_utils::int_to_bytes(new_counter, write_iter,
-                                             write_iter + conf.addr_bytes);
+        write_iter = bit_utils::int_to_bytes(
+            new_counter, write_iter,
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            write_iter + conf.addr_bytes);
         write_msg.length = conf.addr_bytes;
         // just fill memory address with beginning of lookup table tail
         write_msg.memory_address = addresses::lookup_table_tail_begin;
