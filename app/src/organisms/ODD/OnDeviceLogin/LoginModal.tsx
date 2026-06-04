@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
@@ -16,7 +15,6 @@ export interface LoginModalResult {
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
-  const { t } = useTranslation('device_settings')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
@@ -29,10 +27,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       modal.resolve(result)
       modal.remove()
     },
-    onError: () => {
-      // todo(mm, 2026-06-02): This needs to show the actual error (e.g. a network error),
-      // and show the number of attempts remaining before lockout.
-      setLoginError(t('on_device_login_error_incorrect') as string)
+    onError: message => {
+      setLoginError(message)
     },
   })
 

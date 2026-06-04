@@ -719,6 +719,7 @@ def register_hardware_types() -> None:
             opentrons.hardware_control.nozzle_manager,
             opentrons_shared_data.gripper.gripper_definition,
             opentrons.calibration_storage.ot3.models.v1,
+            opentrons.hardware_control.nozzle_manager,
         ]
     )
     for pydantic_type in opentrons_pydantic_types:

@@ -47,6 +47,13 @@ from .stop_vacuum import (
     StopVacuumParams,
     StopVacuumResult,
 )
+from .wait_for_target import (
+    WaitForTarget,
+    WaitForTargetCommandType,
+    WaitForTargetCreate,
+    WaitForTargetParams,
+    WaitForTargetResult,
+)
 
 __all__ = [
     # Stop vacuum command models
@@ -90,4 +97,10 @@ __all__ = [
     "VacuumModuleProfilePressureStep",
     "ProfileType",
     "StartRunProfileStepParams",
+    # wait for target command models
+    "WaitForTarget",
+    "WaitForTargetCommandType",
+    "WaitForTargetCreate",
+    "WaitForTargetParams",
+    "WaitForTargetResult",
 ]

@@ -66,6 +66,7 @@ interface LabwareListItemProps {
   labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
   definitionsByURI?: LabwareDefinitionsByURI
+  moduleTypeOverride?: ModuleType
 }
 
 export function LabwareListItem(
@@ -81,6 +82,7 @@ export function LabwareListItem(
     labwareByLiquidId,
     showLabwareSVG,
     definitionsByURI,
+    moduleTypeOverride,
     onClick,
   } = props
   const moduleInStack = getModuleFromStack(stackedItems)
@@ -223,6 +225,8 @@ export function LabwareListItem(
     hsLatchText = t('opening')
   }
 
+  const moduleComputedWithPotentialOverride = moduleType ?? moduleTypeOverride
+
   return (
     <ListButton
       onClick={onClick}
@@ -242,8 +246,12 @@ export function LabwareListItem(
             {slotInfo}
           </StyledText>
         )}
-        {moduleType != null ? (
-          <RobotInfoLabel iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]} />
+        {moduleComputedWithPotentialOverride != null ? (
+          <RobotInfoLabel
+            iconName={
+              MODULE_ICON_NAME_BY_TYPE[moduleComputedWithPotentialOverride]
+            }
+          />
         ) : null}
         {isStacked ? <RobotInfoLabel iconName="stacked" /> : null}
       </Flex>
