@@ -670,7 +670,20 @@ def test_force_increment(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper force increment."""
-    pass
+    gauge = _setup(api, ctx)
+
+    # LOOP THROUGH DUTY-CYCLES
+    for duty_cycle in GRIP_DUTY_CYCLES:
+        # GRIP AND MEASURE FORCE
+        for trial in range(NUM_DUTY_CYCLE_TRIALS):
+            actual_forces = _grip_and_read_forces(api, gauge, duty=duty_cycle)
+            avg_force = sum(actual_forces) / len(actual_forces)
+            tag = _get_force_test_tag(trial, duty_cycle=duty_cycle)
+            report(section, f"{tag}-data", actual_forces)
+            report(section, f"{tag}-average", [avg_force])
+            report(section, f"{tag}-duty-cycle", [duty_cycle])
+
+    api.retract(OT3Mount.GRIPPER)
 
 
 TESTS = [
