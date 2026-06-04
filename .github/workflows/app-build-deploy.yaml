@@ -25,6 +25,7 @@ jobs:
       variants: ${{ steps.determine-build-type.outputs.variants }}
       type: ${{ steps.determine-build-type.outputs.type }}
     steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: ./.github/actions/app/determine-build-type
         id: determine-build-type
         with:
