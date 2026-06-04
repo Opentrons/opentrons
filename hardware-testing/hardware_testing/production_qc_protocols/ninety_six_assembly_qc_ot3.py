@@ -3,13 +3,16 @@ import asyncio
 from dataclasses import dataclass
 import enum
 from time import sleep, monotonic
-from typing import Dict, Callable, cast, List, Union, Tuple, Literal, Optional
-from opentrons.protocol_api import ParameterContext, ProtocolContext
+from typing import Dict, Callable, cast, List, Union, Tuple, Literal
+from opentrons.protocol_api import ParameterContext, ProtocolContext, OFF_DECK
 from opentrons.types import Point
 
 from opentrons.config import IS_ROBOT
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
+from opentrons.hardware_control.backends.ot3simulator import (
+    _sanitize_attached_instrument,
+)
 from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 from opentrons.hardware_control.types import (
     InstrumentProbeType,
@@ -89,6 +92,7 @@ from hardware_testing.drivers.sealed_pressure_fixture import (  # noqa: E402
 )
 from hardware_testing.opentrons_api import helpers_ot3  # noqa: E402
 
+
 # TODO Barcode scanner?
 def get_user_answer(prompt: str) -> bool:
     """Have the user answer a yes/no question."""
@@ -99,7 +103,7 @@ def get_user_answer(prompt: str) -> bool:
 
 
 async def _partial_pick_up_z_motion_patch(
-    self, current: float, distance: float, speed: float
+    self, current: float, distance: float, speed: float  # noqa: ANN001
 ) -> None:
     async with self._backend.motor_current(run_currents={Axis.Z_L: current}):
         target_down = target_position_from_relative(
@@ -113,7 +117,7 @@ async def _partial_pick_up_z_motion_patch(
     await self._update_position_estimation([Axis.Z_L])
 
 
-async def _get_tip_status_patch(self) -> bool:
+async def _get_tip_status_patch(self) -> bool:  # noqa: ANN001
     """Get the tip status for the 96 channel."""
     can_messenger = cast(OT3Controller, self._backend)._messenger
     node: NodeId = NodeId.pipette_left
@@ -128,7 +132,7 @@ async def _get_tip_status_patch(self) -> bool:
                 raise RuntimeError(str(message))
             assert originator == node
             assert message.message_id == MessageId.tip_presence_notification
-        except (RuntimeError, AssertionError, ValueError) as e:
+        except (RuntimeError, AssertionError, ValueError):
             pass
         else:
             value = cast(
@@ -628,7 +632,6 @@ def calibrate_to_pressue_fixture(
             api.move_rel(OT3Mount.LEFT, Point(x=0, y=0, z=step))
             sleep(3)
         else:
-            REACHED_PRESSURE = sensor.get_pressure()
             break
 
 
@@ -653,7 +656,7 @@ def _partial_pick_up(api: SyncHardwareAPI, position: Point, current: float) -> N
     api.home_z(OT3Mount.LEFT)
 
 
-def test_pressure(
+def test_pressure(  # noqa: C901
     api: SyncHardwareAPI,
     report: CSVReport,
     section: str,
@@ -672,17 +675,12 @@ def test_pressure(
 
     # move to slot
     ctx.pause(f"Place tip tack 50ul at slot - {SLOT_FOR_PICK_UP_TIP}")
-
-    tip_rack_pos = helpers_ot3.get_theoretical_a1_position(
-        SLOT_FOR_PICK_UP_TIP, TIP_RACK_FOR_PICK_UP_TIP
-    )
-    helpers_ot3.move_to_arched_ot3_sync(api, OT3Mount.LEFT, tip_rack_pos + Point(z=30))
-    await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
-    tip_rack_actual_pos = api.gantry_position(OT3Mount.LEFT)
+    tiprack = ctx.load_labware("opentrons_flex_96_tiprack_50uL", SLOT_FOR_PICK_UP_TIP)
+    tip_rack_actual_pos = tiprack["A1"].top().point
 
     for probe in PROBE_POSITIONS:
         helpers_ot3.move_to_arched_ot3_sync(
-            api, OT3Mount.LEFT, tip_rack_pos + Point(z=50)
+            api, OT3Mount.LEFT, tip_rack_actual_pos + Point(z=50)
         )
         sensor_id = sensor_id_for_instrument(probe)
 
@@ -691,7 +689,7 @@ def test_pressure(
         if not api.is_simulator:
             try:
                 open_pa = _read_from_sensor(api, sensor_id, NUM_PRESSURE_READINGS)
-            except:
+            except Exception:
                 ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
                 continue
         open_result = check_value(open_pa, "open-pa", pipette)
@@ -822,7 +820,6 @@ def test_environmental_sensor(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test environmental sensor."""
-
     api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = api.gantry_position(OT3Mount.LEFT)
@@ -913,12 +910,10 @@ DEPTH_INTO_RESERVOIR_FOR_DISPENSE = DEPTH_INTO_RESERVOIR_FOR_ASPIRATE
 RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
 
 TIP_RACK_96_SLOT = 4
-TIP_RACK_PARTIAL_SLOT = 5
 RESERVOIR_SLOT = 2
 TRASH_SLOT = 12
 
 TRASH_HEIGHT = 40  # DVT trash
-TIP_RACK_96_ADAPTER_HEIGHT = 11  # DVT adapter
 
 # X moves negative (to left), Y moves positive (to rear)
 # move to same spot over labware, regardless of number of tips attached
@@ -960,32 +955,6 @@ def get_trash_nominal() -> Point:
     # center the 96ch of the 1-well labware
     trash_nominal += OFFSET_FOR_1_WELL_LABWARE
     return trash_nominal
-
-
-def get_reservoir_nominal() -> Point:
-    """Get nominal reservoir position."""
-    reservoir_a1_nominal = helpers_ot3.get_theoretical_a1_position(
-        RESERVOIR_SLOT, RESERVOIR_LABWARE
-    )
-    # center the 96ch of the 1-well labware
-    reservoir_a1_nominal += OFFSET_FOR_1_WELL_LABWARE
-    return reservoir_a1_nominal
-
-
-def get_tiprack_96_nominal(pipette: Literal[200, 1000]) -> Point:
-    """Get nominal tiprack position for 96-tip pick-up."""
-    tip_rack_a1_nominal = helpers_ot3.get_theoretical_a1_position(
-        TIP_RACK_96_SLOT, f"opentrons_flex_96_tiprack_{pipette}ul"
-    )
-    return tip_rack_a1_nominal + Point(z=TIP_RACK_96_ADAPTER_HEIGHT)
-
-
-def get_tiprack_partial_nominal(pipette: Literal[200, 1000]) -> Point:
-    """Get nominal tiprack position for partial-tip pick-up."""
-    tip_rack_a1_nominal = helpers_ot3.get_theoretical_a1_position(
-        TIP_RACK_PARTIAL_SLOT, f"opentrons_flex_96_tiprack_{pipette}ul"
-    )
-    return tip_rack_a1_nominal
 
 
 def aspirate_and_wait(
@@ -1032,51 +1001,32 @@ def test_droplets(
 ) -> None:
     """Test Droplets."""
     # GATHER NOMINAL POSITIONS
+    reservoir = ctx.load_labware("nest_1_reservoir_195ml", RESERVOIR_SLOT)
+    adapter = ctx.load_adapter("opentrons_flex_96_tiprack_adapter", TIP_RACK_96_SLOT)
     trash_nominal = get_trash_nominal()
-    tip_rack_96_a1_nominal = get_tiprack_96_nominal(pipette)
-    reservoir_a1_nominal = get_reservoir_nominal()
-    reservoir_a1_actual: Optional[Point] = None
-
-    def _find_reservoir_pos() -> None:
-        nonlocal reservoir_a1_actual
-        if reservoir_a1_actual:
-            return
-        # SAVE RESERVOIR POSITION
-        print("jog tips to the TOP of the RESERVOIR")
-        helpers_ot3.move_to_arched_ot3_sync(
-            api, OT3Mount.LEFT, reservoir_a1_nominal + Point(z=10)
-        )
-        await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
-        reservoir_a1_actual = api.gantry_position(OT3Mount.LEFT)
 
     # PICK-UP 96 TIPS
     droplets_result = True
     for trial in range(2):
-        # JOG to 96-Tip RACK
         if trial == 0:
             tip_rack: int = pipette
             test_volume: int = pipette
         else:
             tip_rack = 50
             test_volume = 1 if pipette == 200 else 5
-        if not api.is_simulator:
-            ctx.pause(f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}")
+        ctx.pause(f"ADD 96 tip-rack-{tip_rack}ul to slot #{TIP_RACK_96_SLOT}")
+        if adapter.child:
+            ctx.move_labware(adapter.child, OFF_DECK, use_gripper=False)
+        tiprack = adapter.load_labware(f"opentrons_flex_96_tiprack_{tip_rack}uL")
         helpers_ot3.move_to_arched_ot3_sync(
-            api, OT3Mount.LEFT, tip_rack_96_a1_nominal + Point(z=30)
+            api, OT3Mount.LEFT, tiprack["A1"].top().point
         )
-        await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
         api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(tip_rack))
         api.home_z(OT3Mount.LEFT)
-        if reservoir_a1_actual is None:
-            if not api.is_simulator:
-                ctx.pause("about to move to RESERVOIR")
 
-            # TEST DROPLETS for 96 TIPS
-            _find_reservoir_pos()
-        assert reservoir_a1_actual
         result, duration = aspirate_and_wait(
             api,
-            reservoir_a1_actual,
+            reservoir["A1"].top().move(OFFSET_FOR_1_WELL_LABWARE).point,
             test_volume,
             seconds=NUM_SECONDS_TO_WAIT,
         )
@@ -1132,13 +1082,7 @@ def test_encoder(
     api.home_plunger(mount)
 
     top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    pipette_ax = Axis.of_main_tool_actuator(mount)
-
     helpers_ot3.move_plunger_absolute_ot3_sync(api, mount, bottom_pos)
-
-    init_pos = api.current_position_ot3(mount, refresh=True)
-
-    init_encoder_pos = api.encoder_current_position_ot3(mount, refresh=True)
 
     cumulative_error = 0.0
     abs_error = 0.0
@@ -1154,7 +1098,7 @@ def test_encoder(
             cumulative_error += top_diff
             abs_error += abs(top_diff)
             completed_moves += 1
-        except StallOrCollisionDetectedError as e:
+        except StallOrCollisionDetectedError:
             stall = True
             break
 
@@ -1164,7 +1108,7 @@ def test_encoder(
             cumulative_error += bot_diff
             abs_error += abs(bot_diff)
             completed_moves += 1
-        except StallOrCollisionDetectedError as e:
+        except StallOrCollisionDetectedError:
             stall = True
             break
         cycle_count += 1
@@ -1268,10 +1212,20 @@ def add_parameters(parameters: ParameterContext) -> None:
     for s in TestSection:
         parameters.add_bool(
             display_name=f"Skip {s.value.lower()}",
-            variable_name=f"skip_{s.value.lower()}",
+            variable_name=f"skip_{s.value.lower().replace('-', '_')}",
             default=False,
             description=f"When this is true the robot will not test {s.value.lower()}",
         )
+    parameters.add_str(
+        display_name="Pipette Size",
+        variable_name="pip_size",
+        default="1000",
+        choices=[
+            {"display_name": "1000", "value": "1000"},
+            {"display_name": "200", "value": "200"},
+        ],
+        description="Which pipette size this is.",
+    )
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -1279,4 +1233,38 @@ def run(ctx: ProtocolContext) -> None:
     # apply monkey patch
     OT3API._partial_pick_up_z_motion = _partial_pick_up_z_motion_patch  # type: ignore[attr-defined]
     OT3API._get_tip_status = _get_tip_status_patch  # type: ignore[attr-defined]
-    pass
+    api = ctx._core.get_hardware()
+
+    if ctx.is_simulating():
+        sim_backend = api._backend
+        if ctx.params.pip_size == "1000":  # type: ignore[attr-defined]
+            model = "p1000_96_v3.5"
+        else:
+            model = "p200_96_v3.0"
+        sim_backend._attached_instruments = {
+            m: _sanitize_attached_instrument(
+                m,
+                helpers_ot3._create_attached_instruments_dict(pipette_left=model).get(
+                    m
+                ),
+            )
+            for m in OT3Mount
+        }
+        api.reset()
+
+    test_name = "ninety-six-assembly-qc-ot3"
+    report = build_report(test_name)
+    dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
+    args = ctx.params.get_all()
+    t_sections = {
+        s: f for s, f in TESTS if not args[f"skip_{s.value.lower().replace('-', '_')}"]
+    }
+    config = TestConfig(
+        simulate=ctx.is_simulating(), tests=t_sections, pipette=int(ctx.params.pip_size)  # type: ignore[arg-type, attr-defined]
+    )
+    for section, test_run in config.tests.items():
+        test_run(api, report, section.value, ctx, pipette=int(ctx.params.pip_size))  # type: ignore[arg-type, attr-defined]
+
+    # SAVE REPORT
+    report.save_to_disk()

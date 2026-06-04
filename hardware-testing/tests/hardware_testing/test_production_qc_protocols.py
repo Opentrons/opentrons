@@ -74,6 +74,7 @@ def _get_analysis_result(
     [
         pytest.param("belt_calibration_ot3.py"),
         pytest.param("gripper_assembly_qc_ot3.py"),
+        pytest.param("ninety_six_assembly_qc_ot3.py"),
     ],
 )
 def test_production_protocol(protocol: str) -> None:
