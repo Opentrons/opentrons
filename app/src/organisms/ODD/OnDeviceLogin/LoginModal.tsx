@@ -7,19 +7,19 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { getSelf } from '@opentrons/api-client'
 import { getQueryKey, useHost, useSelfQuery } from '@opentrons/react-api-client'
 
+import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
   getCurrentUsernameForLocalRobot,
   getIsLoggedInToLocalRobot,
   logOut,
 } from '/app/redux/robot-auth'
+import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
   useUpdateNewPassword,
 } from '/app/resources/auth'
-import { useToaster } from '/app/organisms/ToasterOven'
 
-import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
@@ -172,8 +172,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       onSuccess: (username, response) => {
         void handleLoginSuccess(username, response)
       },
-      onError: () => {
-        setLoginError(t('on_device_login_error_incorrect') as string)
+      onError: message => {
+        setLoginError(message)
       },
     })
 
@@ -202,7 +202,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
           isChoosingNewPassword ? updateNewPassword : submitPassword
         }
         isAuthLoading={
-          isChoosingNewPassword ? isUpdateNewPasswordLoading : isLoginAuthLoading
+          isChoosingNewPassword
+            ? isUpdateNewPasswordLoading
+            : isLoginAuthLoading
         }
         isPasswordResetRequired={isChoosingNewPassword}
         initialUsername={initialUsername}

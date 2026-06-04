@@ -1,7 +1,10 @@
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
-import { useHost, useResetSelfPasswordMutation } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useResetSelfPasswordMutation,
+} from '@opentrons/react-api-client'
 
 import { getLocalRobotAccessToken } from '/app/redux/robot-auth'
 

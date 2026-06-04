@@ -4,13 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useLogOut } from '/app/resources/access-control/useLogOut'
 
 import { Account } from '..'
-import { useAccountInfo, useLogOut } from '../hooks'
+import { useAccountInfo } from '../hooks'
 
+vi.mock('/app/resources/access-control/useLogOut')
 vi.mock('../hooks', () => ({
   useAccountInfo: vi.fn(),
-  useLogOut: vi.fn(),
 }))
 
 const mockNavigate = vi.fn()

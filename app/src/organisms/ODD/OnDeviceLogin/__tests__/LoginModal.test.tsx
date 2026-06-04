@@ -14,13 +14,13 @@ import {
 import { useStoreLoginState } from '../hooks'
 import { showLoginModal } from '../LoginModal'
 
+import type * as ReactI18next from 'react-i18next'
 import type { UseQueryResult } from 'react-query'
 import type {
   AuthUser,
   AuthUserResponse,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
-import type * as ReactI18next from 'react-i18next'
 
 vi.mock('react-i18next', async importOriginal => {
   const actual = await importOriginal<typeof ReactI18next>()
