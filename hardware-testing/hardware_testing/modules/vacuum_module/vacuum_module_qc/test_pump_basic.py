@@ -14,7 +14,8 @@ from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 from opentrons.drivers.vacuum_module.types import VentState
 
 
-DUTY_TEST = [0, 10, 20, 30, 40, 50, 80, 95]
+# duty cycle incremental test + harsh stop/start at the end
+DUTY_TEST = [0, 10, 20, 30, 40, 50, 80, 100, 0, 100, 0, 100]
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -45,7 +46,7 @@ async def test_pump_motor(
 
     # Set the duty cycle
     await vacuum.set_pump_state(True, duty_cycle=duty_cycle)
-    await asyncio.sleep(2)  # wait n seconds
+    await asyncio.sleep(5)  # wait n seconds
 
     # verify duty cycle
     await vacuum._reader.update_pump_state()
@@ -53,7 +54,7 @@ async def test_pump_motor(
     pwm = vacuum.pump_state.current_pwm
     rpm = vacuum.pump_state.current_rpm
     print(f"Current PWM: {pwm} Current RPM: {rpm}")
-    passed = rpm > 0 if duty_cycle > 0 else True
+    passed = rpm > 0 if duty_cycle > 0 else pwm == 0
     report(
         section,
         f"pump-duty-cycle-{duty_cycle}",
