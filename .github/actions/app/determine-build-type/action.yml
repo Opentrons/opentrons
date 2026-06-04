@@ -40,7 +40,7 @@ runs:
   steps:
     - name: 'Determine build variant and type'
       id: determine
-      uses: actions/github-script@ed597411d8f9247a5bcfaa9a988fbbce212282a # v8.0.0
+      uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
       env:
         EDGE_BUILD_POLICY: ${{ inputs.edge-build-policy }}
         SKIP_PULL_REQUESTS: ${{ inputs.skip-pull-requests }}
