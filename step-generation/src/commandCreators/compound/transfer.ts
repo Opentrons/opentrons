@@ -1302,8 +1302,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               break
           }
           const returnTipCommands: CurriedCommandCreator[] =
-            isReturnTip &&
-            (pairIdx === sourceDestPairs.length - 1 || changeTip === 'always')
+            isReturnTip && (isUltimateSubtransfer || changeTip === 'always')
               ? [
                   curryWithoutPython(dropTip, {
                     pipette,
