@@ -670,6 +670,7 @@ def get_livestream_video(length: int) -> str:
     video_path = "/var/www/localhost/html/stream/hls/stream.m3u8"
     new_video_path = "/data/testing_data/livestream_video.mp4"
     convert_m3u8_to_mp4(video_path, new_video_path, length)
+    print(datetime.now())
     return new_video_path
 
 
@@ -691,6 +692,7 @@ def send_slack_error_message_with_attachments(
 ) -> None:
     """Send error slack message with log files and video clip attached."""
     log_path, ip = create_robot_log_zip()
+    print(datetime.now())
     video_path = get_livestream_video(length)
     slack_bot.send_error_message(protocol_name, error_str, ip, [log_path, video_path])
 

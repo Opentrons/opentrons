@@ -8,6 +8,7 @@ from abr_testing.protocols.helpers import run_helpers
 import configparser
 import os
 from typing import List, Dict, Any, Tuple
+import datetime
 
 
 
@@ -58,7 +59,7 @@ def get_current_run_details_from_robot(
                     _enable_print_to_terminal(
                         print_terminal, f"Run Status of {robot_name}: {run_status}"
                     )
-                    message = f"⚠️ {robot_name} is in error recovery mode ⚠️"
+                    message = f"⚠️ {robot_name} is in error recovery mode at {datetime.now()} ⚠️"
 
                     # Check most recent run status isn't the same as current before slack update
                     if on_robot:
