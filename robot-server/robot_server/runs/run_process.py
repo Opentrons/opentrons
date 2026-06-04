@@ -553,7 +553,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
     def get_nozzle_maps(self) -> Mapping[str, NozzleMap]:
         """Get current nozzle maps keyed by pipette id."""
         # NOTE: For the sake of Pyro compatibility this method returns NozzleMap, a serializable type
-        return self._guaranteed_run_orchestrator.get_nozzle_maps()
+        return self._guaranteed_run_orchestrator.get_nozzle_maps()  # type: ignore
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
