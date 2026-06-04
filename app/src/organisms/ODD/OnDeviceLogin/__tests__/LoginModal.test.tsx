@@ -6,25 +6,23 @@ import { getSelf } from '@opentrons/api-client'
 import { useHost, useSelfQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
   useUpdateNewPassword,
 } from '/app/resources/auth'
 
-import { useToaster } from '/app/organisms/ToasterOven'
-import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import { showLoginModal } from '../LoginModal'
 
-import type * as ReactI18next from 'react-i18next'
 import type {
   AuthUser,
   AuthUserResponse,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 vi.mock('react-i18next', async importOriginal => {
-  const actual = await importOriginal<typeof ReactI18next>()
+  const actual = await importOriginal<typeof import('react-i18next')>()
   return {
     ...actual,
     useTranslation: () => ({
@@ -40,6 +38,10 @@ vi.mock('/app/redux/robot-auth', () => ({
   getIsLoggedInToLocalRobot: () => mockIsLoggedIn,
   getCurrentUsernameForLocalRobot: () => mockCurrentUsername,
   logOut: vi.fn(),
+}))
+
+vi.mock('/app/redux/discovery', () => ({
+  getLocalRobot: vi.fn(() => null),
 }))
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -73,10 +75,6 @@ vi.mock('/app/organisms/ToasterOven', () => ({
   useToaster: vi.fn(),
 }))
 
-const LOGIN_MODAL_INITIAL_STATE = {
-  discovery: { robotsByName: {}, scanning: false },
-} satisfies Partial<State> as State
-
 const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
   access_token: 'access-token',
@@ -103,24 +101,17 @@ function mockGetSelfResponse(user: AuthUser): void {
   } as Awaited<ReturnType<typeof getSelf>>)
 }
 
-function renderLoginModalProvider(): void {
+function openLoginModal(): ReturnType<typeof showLoginModal> {
   renderWithProviders(
     <NiceModal.Provider>
       <div />
-    </NiceModal.Provider>,
-    { initialState: LOGIN_MODAL_INITIAL_STATE }
+    </NiceModal.Provider>
   )
-}
-
-async function openLoginModal(): Promise<ReturnType<typeof showLoginModal>> {
-  renderLoginModalProvider()
 
   let resultPromise!: ReturnType<typeof showLoginModal>
-  await act(async () => {
+  act(() => {
     resultPromise = showLoginModal()
   })
-
-  await screen.findByLabelText('device_settings:username')
 
   return resultPromise
 }
@@ -173,8 +164,8 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name }))
   }
 
-  it('opens on the username step', async () => {
-    await openLoginModal()
+  it('opens on the username step', () => {
+    openLoginModal()
 
     expect(
       screen.getByLabelText('device_settings:username')
@@ -182,7 +173,7 @@ describe('LoginModal', () => {
   })
 
   it('resolves with the username after a successful login', async () => {
-    const resultPromise = await openLoginModal()
+    const resultPromise = openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -194,7 +185,7 @@ describe('LoginModal', () => {
   })
 
   it('resolves with null when cancel is clicked', async () => {
-    const resultPromise = await openLoginModal()
+    const resultPromise = openLoginModal()
 
     fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
 
@@ -204,7 +195,7 @@ describe('LoginModal', () => {
   it('switches to the new-password flow when login requires a password reset', async () => {
     mockGetSelfResponse(mockSelfUser({ resetPassword: true }))
 
-    const resultPromise = await openLoginModal()
+    const resultPromise = openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -218,7 +209,7 @@ describe('LoginModal', () => {
     })
 
     let modalResolved = false
-    void resultPromise.then(() => {
+    void Promise.resolve(resultPromise).then(() => {
       modalResolved = true
     })
     await new Promise(resolve => setTimeout(resolve, 50))
@@ -232,8 +223,12 @@ describe('LoginModal', () => {
       data: { data: { resetPassword: true } },
     } as ReturnType<typeof useSelfQuery>)
 
-    renderLoginModalProvider()
-    await act(async () => {
+    renderWithProviders(
+      <NiceModal.Provider>
+        <div />
+      </NiceModal.Provider>
+    )
+    act(() => {
       showLoginModal()
     })
 
@@ -247,7 +242,7 @@ describe('LoginModal', () => {
   it('completes the new-password flow and resolves the modal', async () => {
     mockGetSelfResponse(mockSelfUser({ resetPassword: true }))
 
-    const resultPromise = await openLoginModal()
+    const resultPromise = openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -278,15 +273,13 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    await openLoginModal()
+    openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
     fillField('device_settings:password', 'wrong')
     clickPrimary('confirm')
 
-    await waitFor(() => {
-      expect(screen.getByText('Login failed')).toBeInTheDocument()
-    })
+    expect(screen.getByText('Login failed')).toBeInTheDocument()
   })
 })
