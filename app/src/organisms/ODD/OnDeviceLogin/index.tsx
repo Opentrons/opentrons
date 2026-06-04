@@ -171,11 +171,15 @@ export function OnDeviceLogin({
                   }
                 : undefined
           }
-          secondaryButtonProps={{
-            buttonText: t('cancel', { ns: 'shared' }),
-            buttonType: 'tertiaryLowLight',
-            onClick: onCancel,
-          }}
+          secondaryButtonProps={
+            isPasswordResetRequired
+              ? undefined
+              : {
+                  buttonText: t('cancel', { ns: 'shared' }),
+                  buttonType: 'tertiaryLowLight',
+                  onClick: onCancel,
+                }
+          }
           onClickButton={handleNext}
         />
         <div className={styles.content_container}>

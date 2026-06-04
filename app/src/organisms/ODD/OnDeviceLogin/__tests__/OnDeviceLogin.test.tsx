@@ -238,6 +238,17 @@ describe('OnDeviceLogin', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('hides cancel when a new password is required', () => {
+    renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+    })
+
+    expect(
+      screen.queryByTestId('ChildNavigation_Secondary_Button')
+    ).not.toBeInTheDocument()
+  })
+
   it('shows the back button on the confirm-password step', () => {
     renderLogin({
       initialStep: 'confirmPassword',

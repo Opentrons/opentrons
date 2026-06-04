@@ -46,18 +46,26 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   })
   const resetPasswordRequired = selfQuery.data?.data.resetPassword ?? false
 
-  const isTemporaryPasswordLogin = phase === 'login' && resetPasswordRequired
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
+  const shouldSkipToChooseNewPassword =
+    resetPasswordRequired &&
+    isLoggedIn &&
+    currentUsername != null &&
+    currentUsername !== '' &&
+    phase === 'login'
+
+  // Already logged in with a temp password — skip straight to choosing a new one.
   useEffect(() => {
-    if (
-      isTemporaryPasswordLogin &&
-      currentUsername != null &&
-      currentUsername !== ''
-    ) {
-      setStep('password')
+    if (!shouldSkipToChooseNewPassword) {
+      return
     }
-  }, [isTemporaryPasswordLogin, currentUsername])
+
+    setLoggedInUsername(currentUsername)
+    setPhase('chooseNewPassword')
+    setStep('password')
+    setFormKey(key => key + 1)
+  }, [shouldSkipToChooseNewPassword, currentUsername])
 
   const fetchSelfAfterLogin = useCallback(
     async (accessToken: string) => {
@@ -153,10 +161,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const initialUsername =
     phase === 'chooseNewPassword'
-      ? (loggedInUsername ?? undefined)
-      : isTemporaryPasswordLogin && currentUsername != null
-        ? currentUsername
-        : undefined
+      ? (loggedInUsername ?? currentUsername ?? undefined)
+      : undefined
 
   return (
     <div className={styles.overlay}>
