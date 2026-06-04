@@ -246,7 +246,7 @@ async def get_self(  # noqa: D103
 )
 async def reset_self_password(
     authorization_details: Annotated[
-        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_WRITE))
+        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF))
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
