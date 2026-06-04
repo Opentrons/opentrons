@@ -11,6 +11,7 @@ import {
   useUpdateNewPassword,
 } from '/app/resources/auth'
 
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import { showLoginModal } from '../LoginModal'
 
@@ -20,6 +21,7 @@ import type {
   AuthUserResponse,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 
 vi.mock('react-i18next', async importOriginal => {
   const actual = await importOriginal<typeof ReactI18next>()
@@ -37,6 +39,7 @@ let mockCurrentUsername: string | null = null
 vi.mock('/app/redux/robot-auth', () => ({
   getIsLoggedInToLocalRobot: () => mockIsLoggedIn,
   getCurrentUsernameForLocalRobot: () => mockCurrentUsername,
+  logOut: vi.fn(),
 }))
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -62,9 +65,17 @@ vi.mock('/app/resources/auth', () => ({
   useUpdateNewPassword: vi.fn(),
 }))
 
-vi.mock('../hooks', () => ({
+vi.mock('/app/resources/access-control/useStoreLoginState', () => ({
   useStoreLoginState: vi.fn(),
 }))
+
+vi.mock('/app/organisms/ToasterOven', () => ({
+  useToaster: vi.fn(),
+}))
+
+const LOGIN_MODAL_INITIAL_STATE = {
+  discovery: { robotsByName: {}, scanning: false },
+} satisfies Partial<State> as State
 
 const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
@@ -92,24 +103,24 @@ function mockGetSelfResponse(user: AuthUser): void {
   } as Awaited<ReturnType<typeof getSelf>>)
 }
 
-async function openLoginModal(): Promise<ReturnType<typeof showLoginModal>> {
+function renderLoginModalProvider(): void {
   renderWithProviders(
     <NiceModal.Provider>
       <div />
-    </NiceModal.Provider>
+    </NiceModal.Provider>,
+    { initialState: LOGIN_MODAL_INITIAL_STATE }
   )
+}
+
+async function openLoginModal(): Promise<ReturnType<typeof showLoginModal>> {
+  renderLoginModalProvider()
 
   let resultPromise!: ReturnType<typeof showLoginModal>
   await act(async () => {
     resultPromise = showLoginModal()
   })
 
-  await waitFor(() => {
-    const modalReady =
-      screen.queryByText('on_device_login') != null ||
-      screen.queryByText('on_device_login_new_password') != null
-    expect(modalReady).toBe(true)
-  })
+  await screen.findByLabelText('device_settings:username')
 
   return resultPromise
 }
@@ -123,6 +134,11 @@ describe('LoginModal', () => {
     // useSelfQuery is only enabled when logged in; keep a safe default for logged-out tests.
 
     vi.mocked(useHost).mockReturnValue({ hostname: 'localhost' })
+    vi.mocked(useToaster).mockReturnValue({
+      makeSnackbar: vi.fn(),
+      makeToast: vi.fn(),
+      eatToast: vi.fn(),
+    })
     vi.mocked(useStoreLoginState).mockReturnValue(mockStoreLoginState)
     vi.mocked(useSelfQuery).mockReturnValue({
       data: { data: { resetPassword: false } },
@@ -188,7 +204,7 @@ describe('LoginModal', () => {
   it('switches to the new-password flow when login requires a password reset', async () => {
     mockGetSelfResponse(mockSelfUser({ resetPassword: true }))
 
-    const resultPromise = openLoginModal()
+    const resultPromise = await openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -216,11 +232,7 @@ describe('LoginModal', () => {
       data: { data: { resetPassword: true } },
     } as ReturnType<typeof useSelfQuery>)
 
-    renderWithProviders(
-      <NiceModal.Provider>
-        <div />
-      </NiceModal.Provider>
-    )
+    renderLoginModalProvider()
     await act(async () => {
       showLoginModal()
     })
@@ -274,9 +286,7 @@ describe('LoginModal', () => {
     clickPrimary('confirm')
 
     await waitFor(() => {
-      expect(
-        screen.getByText('on_device_login_error_incorrect')
-      ).toBeInTheDocument()
+      expect(screen.getByText('Login failed')).toBeInTheDocument()
     })
   })
 })
