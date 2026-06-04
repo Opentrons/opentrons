@@ -12,25 +12,30 @@ The Vacuum Module ships in three separate boxes.
 
 Unnamed box 1 includes deck components that hold labware and other components for vacuum-rated applications.
 
-<div class="parts-list align-top" markdown>
+<div class="parts-list" markdown>
 
 <figure markdown>
-![Short vacuum collar](images/short-collar.jpg "Short vacuum collar")
-<figcaption>(1) Short (42 mm) vacuum collar </figcaption>
+![Short vacuum collar](images/collar-short.png "Short vacuum collar")  
+<figcaption>(1) Short collar, 42 mm </figcaption>
 </figure>
 
 <figure markdown>
-![Tall vacuum collar](images/tall-collar.jpg "Tall vacuum collar")
-<figcaption>(1) Tall (72 mm) vacuum collar</figcaption>
+![Tall vacuum collar](images/collar-tall.png "Tall vacuum collar")
+<figcaption>(1) Tall collar, 72 mm</figcaption>
 </figure>
 
 <figure markdown>
-![xx mm and yy mm spacers](images/image-placeholder.png "xx mm and yy mmspacers")
-<figcaption>(2) 14 mm and 17 mm spacers</figcaption>
+![Short spacer, 27 mm](images/spacer-short.png "Short spacer, 27 mm")
+<figcaption>(1) Short spacer, 27 mm</figcaption>
 </figure>
 
 <figure markdown>
-![Vacuum manifold base](images/mainifold-base-test4.svg "Manifold base")
+![Tall spacer, 34 mm](images/spacer-tall.png "Tall spacer, 34 mm")
+<figcaption>(1) Tall spacer, 34 mm</figcaption>
+</figure>
+
+<figure markdown>
+![Vacuum manifold base](images/mainifold-base-test2.svg "Manifold base")
 <figcaption>(1) Vacuum manifold base</figcaption>
 </figure>
 
@@ -40,7 +45,7 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 
 Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and data cables.
 
-<div class="parts-list align-top" markdown>
+<div class="parts-list" markdown>
 
 <figure markdown>
 ![Control Box, vacuum pump and electronics](images/pump-unit.png "Control Box includes pump and electronics")
@@ -57,10 +62,6 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 <figcaption>(1) IEC power cable</figcaption>
 </figure>
 
-</div>
-
-<div class="parts-list align-top" markdown>
-
 <figure markdown>
 ![Deck plate adapter](images/deck-adapter-3.png" Deck plate adapter")
 <figcaption>(1) Deck adapter</figcaption>
@@ -68,7 +69,7 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 
 <figure markdown>
 ![Spare deck plate screws, M4 x 10](images/deck-screws.png "Spare deck plate screws"){ width="75%" }
-<figcaption>(2) Deck plate screws (M4 x 10)</figcaption>
+<figcaption>(2) Deck adapter screws</figcaption>
 </figure>
 
 </div>
