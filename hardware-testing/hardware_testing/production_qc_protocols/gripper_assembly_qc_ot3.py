@@ -868,4 +868,3 @@ def run(ctx: ProtocolContext) -> None:
 
     # SAVE REPORT
     report.save_to_disk()
-    report.print_results()
