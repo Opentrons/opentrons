@@ -17,7 +17,7 @@ fi
 # check what already exists and kill it
 pkill -f "background_helpers"
 
-VIDEO_LENGTH=30
+VIDEO_LENGTH=35
 (python3 -c "from background_helpers import change_video_length; change_video_length($VIDEO_LENGTH)" &)
 
 (python3 -c "from background_helpers import detect_robot_status; detect_robot_status('$IP_ADDRESS')" &)
@@ -31,4 +31,3 @@ if kill -0 "$processID" 2>/dev/null; then
 else
   echo "background process failed to launch"
 fi
-
