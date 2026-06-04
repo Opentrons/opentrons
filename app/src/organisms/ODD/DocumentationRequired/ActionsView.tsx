@@ -7,6 +7,7 @@ import {
   useCommandTextString,
 } from '@opentrons/components'
 
+import { i18n } from '/app/i18n'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
@@ -127,7 +128,7 @@ function PipetteFlowText({
   action: PipetteWizardFlowAction
   t: TFunction
 }): JSX.Element {
-  const { flowType, pipette, mount, pipetteInfo } = action
+  const { flowType, pipette, mount, pipetteInfo, step } = action
   const mountName = mount === 'left' ? t('left_mount') : t('right_mount')
   const flowTypeText =
     flowType === 'ATTACH'
@@ -142,15 +143,17 @@ function PipetteFlowText({
 
   const pipetteNameText = pipetteInfo?.displayName
 
+  const endText = step === 'end' ? t('end') + ' ' : ''
+
   const text = t('pipette_wizard_flow', {
     flowtype: flowTypeText,
     pipette: pipetteNameText || pipetteCategoryText,
     mount: mountName,
   })
 
-  console.log('pipette info', pipetteInfo)
+  const textToUse = endText ? endText + i18n.format(text, 'lowerCase') : text
 
-  return <div className={styles.action}>{text}</div>
+  return <div className={styles.action}>{textToUse}</div>
 }
 
 export const ActionsView = NiceModal.create(ActionsViewImpl)

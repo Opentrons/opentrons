@@ -87,6 +87,7 @@ describe('ActionsView', () => {
         pipette: '96-Channel',
         flowType: 'ATTACH',
         pipetteInfo: null,
+        step: 'start',
       },
     ])
     screen.getByText('Attaching 96 channel pipette on left mount')
@@ -100,6 +101,7 @@ describe('ActionsView', () => {
         pipette: 'Single-Channel_and_8-Channel',
         flowType: 'CALIBRATE',
         pipetteInfo: { displayName: 'Flex 1-Channel 1000 µL' },
+        step: 'end',
       },
     ])
     screen.getByText(

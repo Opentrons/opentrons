@@ -194,6 +194,18 @@ export const PipetteWizardFlows = (
       flowType,
       pipette: selectedPipette,
       pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'start',
+    }
+  }, [mount, flowType, selectedPipette, attachedPipettes])
+
+  const deleteRunAction: DocumentedAction = useMemo(() => {
+    return {
+      type: 'pipette_wizard_flow',
+      mount,
+      flowType,
+      pipette: selectedPipette,
+      pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'end',
     }
   }, [mount, flowType, selectedPipette, attachedPipettes])
 
@@ -274,7 +286,7 @@ export const PipetteWizardFlows = (
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
     useDeleteMaintenanceRunMutation(
       deletionDocState,
-      [...actionsToDocument, 'end_calibration'],
+      [...actionsToDocument, deleteRunAction],
       {
         onSuccess: () => {
           closeFlow()

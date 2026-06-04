@@ -65,6 +65,7 @@ export interface PipetteWizardFlowAction {
   pipette: '96-Channel' | 'Single-Channel_and_8-Channel'
   flowType: string
   pipetteInfo: PipetteInformation | null
+  step: 'start' | 'end'
 }
 
 interface PipetteInformation {
