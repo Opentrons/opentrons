@@ -183,4 +183,3 @@ def run(ctx: ProtocolContext) -> None:
 
         # Turn off the pump after the profile is done
         vm_mod.stop_vacuum_pump()
-
