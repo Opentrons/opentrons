@@ -196,13 +196,13 @@ async function countEarlierEdgeRunsToday({
 
     const data = await response.json()
     const earlier = (data.workflow_runs ?? []).filter(
-      run =>
-        run.created_at.startsWith(today) &&
-        run.id < runId
+      run => run.created_at.startsWith(today) && run.id < runId
     ).length
 
     if (!Number.isInteger(earlier)) {
-      console.log('⚠️ Unexpected API response; allowing develop build (fail open)')
+      console.log(
+        '⚠️ Unexpected API response; allowing develop build (fail open)'
+      )
       return 0
     }
 
