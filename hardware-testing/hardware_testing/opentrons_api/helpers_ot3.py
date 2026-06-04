@@ -774,7 +774,7 @@ def move_plunger_absolute_ot3_sync(
     """Move OT3 plunger position to an absolute position."""
     OT3API._move_plunger_absolute_ot3 = _move_plunger_absolute_ot3_patch  # type: ignore[attr-defined]
 
-    api.move_plunger_absolute_ot3(mount, position, motor_current, speed, expect_stalls)
+    api._move_plunger_absolute_ot3(mount, position, motor_current, speed, expect_stalls)
 
 
 async def home_tip_motors(api: OT3API, back_off: bool = True) -> None:
@@ -789,8 +789,9 @@ async def _home_tip_motors_patch(self, back_off: bool = True) -> None:  # noqa: 
 
 def home_tip_motors_sync(api: SyncHardwareAPI, back_off: bool = True) -> None:
     """Homes the tip motors with backoff option broken out."""
-    OT3API._home_tip_motors = _home_tip_motors_patch  # type: ignore[attr-defined]
-    api._backend._home_tip_motors(back_off)
+    if not api.is_simulator:
+        OT3API._home_tip_motors = _home_tip_motors_patch  # type: ignore[attr-defined]
+        api._backend._home_tip_motors(back_off)
 
 
 async def move_tip_motor_relative_ot3(
