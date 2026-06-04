@@ -25,7 +25,7 @@ def detect_robot_status(ip: str) -> None:
 
     # Process will be constantly running
     while True:
-        time.sleep(30)
+        time.sleep(1)
 
         # Reset running_robot and completed_robot information to prevent possible data corruption
         running_robots: List[str] = []
@@ -57,6 +57,7 @@ def change_robot_video_length(time: str, ip: str) -> None:
         print(f"Successfully updated livestream length on {ip}")
     except subprocess.CalledProcessError as e:
         print(f"Failed to update {ip}: {e}")
+
 
 def launch_background_tasks() -> None:
     """Launches background processes."""
