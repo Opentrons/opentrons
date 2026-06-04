@@ -41,12 +41,14 @@ export function getCalibrationCommandText({
       const labware = commandTextData?.labware.find(
         labware => labware.id === labwareId
       )
+      const slotName = module?.location.slotName ?? 'unknown slot'
       const labwareName = labware?.displayName ?? 'unknown labware'
       const mountName = gantryMountName(mount, t)
       return t('calibrate_module', {
         module: moduleName,
         labware: labwareName,
         mount: mountName,
+        slot: slotName,
       })
     }
     case 'calibration/moveToMaintenancePosition': {

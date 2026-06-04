@@ -15,7 +15,7 @@
   "blowout_in_place": "Blowing out in place at {{flow_rate}} µL/sec",
   "calibrate_pipette": "Calibrating {{pipette}} on {{mount}}",
   "calibrate_gripper": "Calibrating gripper {{jaw}} jaw",
-  "calibrate_module": "Calibrating {{module}} in slot {{slot_name}} using adapter {{labware}}",
+  "calibrate_module": "Calibrating {{module}} in slot {{slot}} using adapter {{labware}} on {{mount}}",
   "capture_image_brightness": "{{brightness}}% brightness",
   "capture_image_contrast": "{{contrast}}% contrast",
   "capture_image_list_separator": ", ",
