@@ -1,0 +1,1663 @@
+{
+  "samples": [
+    {
+      "id": "P1KHV3620250624A04",
+      "status": "Finish",
+      "records": [
+        {
+          "row": 3,
+          "cycles": 0.0,
+          "life": 0.0,
+          "cv": 0.7066474384,
+          "plates": [
+            0.4710512674,
+            0.3064434666,
+            0.4247674327,
+            0.3106965138,
+            0.3467191065
+          ],
+          "worst": 1.227993029,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 4,
+          "cycles": 65000.0,
+          "life": 0.25,
+          "cv": 0.9162115635,
+          "plates": [
+            0.8966546568,
+            0.6588742707,
+            0.6538213734,
+            0.5533888674,
+            0.5511805838
+          ],
+          "worst": 2.576745401,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 5,
+          "cycles": 100000.0,
+          "life": "Lifetest Spec",
+          "cv": 1.171191897,
+          "plates": [
+            0.596967125,
+            1.142649114,
+            0.6917881859,
+            0.662501634,
+            1.874058797
+          ],
+          "worst": 7.849809357,
+          "note": "F1 LOW %D in plate5",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 6,
+          "cycles": 130000.0,
+          "life": 0.5,
+          "cv": 0.5774353128,
+          "plates": [
+            0.5588175196,
+            0.4416163067,
+            0.4561631718,
+            0.5754023185,
+            0.4611904386
+          ],
+          "worst": 1.347177656,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 7,
+          "cycles": 195000.0,
+          "life": 0.75,
+          "cv": 4.160891903,
+          "plates": [
+            0.6402860798,
+            0.5866531659,
+            0.5823396558,
+            0.5600428581,
+            1.678020428
+          ],
+          "worst": 8.035812772,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 8,
+          "cycles": 260000.0,
+          "life": 1.0,
+          "cv": 4.214223718,
+          "plates": [
+            0.3184939262,
+            0.4394942585,
+            0.3522059165,
+            1.413300274,
+            0.4020435041
+          ],
+          "worst": 5.447889388,
+          "note": "A5 LOW %D plate4",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 10,
+          "cycles": 325000.0,
+          "life": 1.25,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 11,
+          "cycles": 390000.0,
+          "life": 1.5,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 12,
+          "cycles": 455000.0,
+          "life": 1.75,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 13,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 5.641906614,
+          "plates": [
+            1.952587218,
+            2.703889853,
+            0.8673227297,
+            2.581459473,
+            0.7892028297
+          ],
+          "worst": 11.20435441,
+          "note": "取针管报错丢步或撞击：漏油，背板内都是油，造成传感器报错",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 14,
+          "cycles": 620000.0,
+          "life": 2.384615385,
+          "cv": 1.134287397,
+          "plates": [
+            0.4178970962,
+            0.4819038084,
+            0.5860874767,
+            0.7719602431,
+            0.4710310773
+          ],
+          "worst": 1.581097326,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 15,
+          "cycles": 720000.0,
+          "life": 2.769230769,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 16,
+          "cycles": 820000.0,
+          "life": 3.153846154,
+          "cv": 0.7471856508,
+          "plates": [
+            0.35760581,
+            0.3584611676,
+            0.3714875975,
+            0.3655127228,
+            0.3964037005
+          ],
+          "worst": 1.112547655,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 17,
+          "cycles": 920000.0,
+          "life": 3.538461538,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 18,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 4.379401987,
+          "plates": [
+            4.323508777,
+            4.35176785,
+            4.447136514,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 1.584528671,
+          "note": "光学新测试标准，只测3盘",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        }
+      ],
+      "notes": [
+        {
+          "cycles": 100000.0,
+          "life": "Lifetest Spec",
+          "note": "F1 LOW %D in plate5",
+          "failed_channels": ""
+        },
+        {
+          "cycles": 260000.0,
+          "life": 1.0,
+          "note": "A5 LOW %D plate4",
+          "failed_channels": ""
+        },
+        {
+          "cycles": 520000.0,
+          "life": 2.0,
+          "note": "取针管报错丢步或撞击：漏油，背板内都是油，造成传感器报错",
+          "failed_channels": ""
+        },
+        {
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "note": "光学新测试标准，只测3盘",
+          "failed_channels": ""
+        }
+      ],
+      "fails": [],
+      "summary": {
+        "latest": {
+          "row": 18,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 4.379401987,
+          "plates": [
+            4.323508777,
+            4.35176785,
+            4.447136514,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 1.584528671,
+          "note": "光学新测试标准，只测3盘",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        },
+        "max_cv": {
+          "row": 13,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 5.641906614,
+          "plates": [
+            1.952587218,
+            2.703889853,
+            0.8673227297,
+            2.581459473,
+            0.7892028297
+          ],
+          "worst": 11.20435441,
+          "note": "取针管报错丢步或撞击：漏油，背板内都是油，造成传感器报错",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "max_worst": {
+          "row": 13,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 5.641906614,
+          "plates": [
+            1.952587218,
+            2.703889853,
+            0.8673227297,
+            2.581459473,
+            0.7892028297
+          ],
+          "worst": 11.20435441,
+          "note": "取针管报错丢步或撞击：漏油，背板内都是油，造成传感器报错",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "avg_cv": 2.3649383481500004,
+        "records_with_cv": 10
+      }
+    },
+    {
+      "id": "P1KHV3620241217A05",
+      "status": "Finish",
+      "records": [
+        {
+          "row": 21,
+          "cycles": 0.0,
+          "life": 0.0,
+          "cv": 0.6794201442,
+          "plates": [
+            0.5779346179,
+            0.5670947446,
+            0.5737689922,
+            0.524454542,
+            0.4220501546
+          ],
+          "worst": 0.9287713795,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 22,
+          "cycles": 65000.0,
+          "life": 0.25,
+          "cv": 0.7962331939,
+          "plates": [
+            0.4876251184,
+            0.5317120098,
+            0.916070047,
+            1.1585211,
+            0.5262561223
+          ],
+          "worst": 5.044371625,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 23,
+          "cycles": 100000.0,
+          "life": "Lifetest Spec",
+          "cv": 0.7307039837,
+          "plates": [
+            0.6271156764,
+            0.6000856385,
+            0.7824452213,
+            0.5578068849,
+            0.6124432403
+          ],
+          "worst": 1.908121642,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 24,
+          "cycles": 130000.0,
+          "life": 0.5,
+          "cv": 0.5900024331,
+          "plates": [
+            0.5128272766,
+            0.5302519225,
+            0.4870118379,
+            0.5753188558,
+            0.5291987419
+          ],
+          "worst": 1.314631964,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 25,
+          "cycles": 195000.0,
+          "life": 0.75,
+          "cv": 0.9925174827,
+          "plates": [
+            0.7826165901,
+            0.5605716221,
+            0.6714180805,
+            0.5833197948,
+            0.5510659651
+          ],
+          "worst": 1.093827941,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 26,
+          "cycles": 260000.0,
+          "life": 1.0,
+          "cv": 0.9319176819,
+          "plates": [
+            0.4399259223,
+            0.410062193,
+            0.447726288,
+            0.3743515941,
+            0.4650838523
+          ],
+          "worst": 1.424133668,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 28,
+          "cycles": 325000.0,
+          "life": 1.25,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 29,
+          "cycles": 390000.0,
+          "life": 1.5,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 30,
+          "cycles": 455000.0,
+          "life": 1.75,
+          "cv": "fail",
+          "plates": [
+            "PASS",
+            "PASS",
+            "fail",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "fail",
+          "note": "C5 C7 2个通道吸水少",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 31,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 6.194788123,
+          "plates": [
+            0.4825337731,
+            0.5301289914,
+            0.7437649864,
+            0.5005560356,
+            0.6243085233
+          ],
+          "worst": 7.419216174,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 32,
+          "cycles": 620000.0,
+          "life": 2.384615385,
+          "cv": 1.264232586,
+          "plates": [
+            0.4175053987,
+            0.4490831808,
+            0.5391689479,
+            0.4751134243,
+            0.4250621466
+          ],
+          "worst": 1.599532284,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 33,
+          "cycles": 720000.0,
+          "life": 2.769230769,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 34,
+          "cycles": 820000.0,
+          "life": 3.153846154,
+          "cv": 1.867518778,
+          "plates": [
+            0.4443934526,
+            0.3970778677,
+            0.3766950278,
+            0.38674185,
+            0.5158794053
+          ],
+          "worst": 2.33831974,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 35,
+          "cycles": 920000.0,
+          "life": 3.538461538,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 36,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 1.486650982,
+          "plates": [
+            0.5622965911,
+            0.5436419851,
+            0.4503377951,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 2.308192358,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        }
+      ],
+      "notes": [
+        {
+          "cycles": 455000.0,
+          "life": 1.75,
+          "note": "C5 C7 2个通道吸水少",
+          "failed_channels": ""
+        }
+      ],
+      "fails": [
+        {
+          "row": 30,
+          "cycles": 455000.0,
+          "life": 1.75,
+          "cv": "fail",
+          "plates": [
+            "PASS",
+            "PASS",
+            "fail",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "fail",
+          "note": "C5 C7 2个通道吸水少",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        }
+      ],
+      "summary": {
+        "latest": {
+          "row": 36,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 1.486650982,
+          "plates": [
+            0.5622965911,
+            0.5436419851,
+            0.4503377951,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 2.308192358,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        },
+        "max_cv": {
+          "row": 31,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 6.194788123,
+          "plates": [
+            0.4825337731,
+            0.5301289914,
+            0.7437649864,
+            0.5005560356,
+            0.6243085233
+          ],
+          "worst": 7.419216174,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "max_worst": {
+          "row": 31,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 6.194788123,
+          "plates": [
+            0.4825337731,
+            0.5301289914,
+            0.7437649864,
+            0.5005560356,
+            0.6243085233
+          ],
+          "worst": 7.419216174,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "avg_cv": 1.55339853885,
+        "records_with_cv": 10
+      }
+    },
+    {
+      "id": "P1KHV3620250311A04",
+      "status": "Finish",
+      "records": [
+        {
+          "row": 39,
+          "cycles": 0.0,
+          "life": 0.0,
+          "cv": 1.957126623,
+          "plates": [
+            0.4901559105,
+            0.3373397958,
+            0.3150291608,
+            0.2628788451,
+            0.3470582623
+          ],
+          "worst": 2.502214001,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 40,
+          "cycles": 65000.0,
+          "life": 0.25,
+          "cv": 0.7012883112,
+          "plates": [
+            0.3912712832,
+            0.3780761775,
+            0.390051407,
+            0.445815989,
+            0.573762805
+          ],
+          "worst": 1.204521769,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 41,
+          "cycles": 100000.0,
+          "life": "Lifetest Spec",
+          "cv": 1.176158712,
+          "plates": [
+            0.4420945472,
+            0.4105567609,
+            0.3990401309,
+            0.4792394726,
+            0.6286746015
+          ],
+          "worst": 2.181252404,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 42,
+          "cycles": 130000.0,
+          "life": 0.5,
+          "cv": 0.5520236748,
+          "plates": [
+            0.3950703432,
+            0.4112626404,
+            0.3664966008,
+            0.3746110166,
+            0.3753236966
+          ],
+          "worst": 0.8193260231,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 43,
+          "cycles": 195000.0,
+          "life": 0.75,
+          "cv": 1.041427569,
+          "plates": [
+            0.6898440052,
+            1.083258294,
+            0.5642029941,
+            0.5194542967,
+            0.7053772802
+          ],
+          "worst": 3.157942052,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 44,
+          "cycles": 260000.0,
+          "life": 1.0,
+          "cv": 0.6356042897,
+          "plates": [
+            0.3373478426,
+            0.3123332986,
+            0.3404684891,
+            0.3921325947,
+            0.4034091372
+          ],
+          "worst": 1.00943438,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 46,
+          "cycles": 325000.0,
+          "life": 1.25,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 47,
+          "cycles": 390000.0,
+          "life": 1.5,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 48,
+          "cycles": 455000.0,
+          "life": 1.75,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 49,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 1.042552055,
+          "plates": [
+            0.4190207749,
+            0.447109935,
+            0.445707591,
+            0.4950158726,
+            0.4095728348
+          ],
+          "worst": 1.366928469,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 50,
+          "cycles": 620000.0,
+          "life": 2.384615385,
+          "cv": 0.8953384981,
+          "plates": [
+            0.5987510351,
+            0.6230708394,
+            0.5226060195,
+            0.4772699178,
+            0.4684538364
+          ],
+          "worst": 1.496544359,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 51,
+          "cycles": 720000.0,
+          "life": 2.769230769,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 52,
+          "cycles": 820000.0,
+          "life": 3.153846154,
+          "cv": 0.5615650328,
+          "plates": [
+            0.5510522153,
+            0.582406538,
+            0.6229429217,
+            0.4031578114,
+            0.50809843
+          ],
+          "worst": 0.8410334948,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 53,
+          "cycles": 920000.0,
+          "life": 3.538461538,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 54,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 0.6773949571,
+          "plates": [
+            0.5487188772,
+            0.5707831517,
+            0.5769729777,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 1.052155001,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        }
+      ],
+      "notes": [],
+      "fails": [],
+      "summary": {
+        "latest": {
+          "row": 54,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 0.6773949571,
+          "plates": [
+            0.5487188772,
+            0.5707831517,
+            0.5769729777,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 1.052155001,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        },
+        "max_cv": {
+          "row": 39,
+          "cycles": 0.0,
+          "life": 0.0,
+          "cv": 1.957126623,
+          "plates": [
+            0.4901559105,
+            0.3373397958,
+            0.3150291608,
+            0.2628788451,
+            0.3470582623
+          ],
+          "worst": 2.502214001,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "max_worst": {
+          "row": 43,
+          "cycles": 195000.0,
+          "life": 0.75,
+          "cv": 1.041427569,
+          "plates": [
+            0.6898440052,
+            1.083258294,
+            0.5642029941,
+            0.5194542967,
+            0.7053772802
+          ],
+          "worst": 3.157942052,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "avg_cv": 0.92404797227,
+        "records_with_cv": 10
+      }
+    },
+    {
+      "id": "P1KHV3620250624A01",
+      "status": "Finish",
+      "records": [
+        {
+          "row": 58,
+          "cycles": 0.0,
+          "life": 0.0,
+          "cv": 0.6057049568,
+          "plates": [
+            0.3574997868,
+            0.4296037629,
+            0.4713955751,
+            0.5236273526,
+            0.4736864589
+          ],
+          "worst": 0.9685916872,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 59,
+          "cycles": 65000.0,
+          "life": 0.25,
+          "cv": 4.756620883,
+          "plates": [
+            0.393062756,
+            0.7347628607,
+            1.164584197,
+            1.500921435,
+            2.045657565
+          ],
+          "worst": 6.824399976,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 60,
+          "cycles": 100000.0,
+          "life": "Lifetest Spec",
+          "cv": 2.921317225,
+          "plates": [
+            0.4581095027,
+            0.4992498122,
+            0.4645060118,
+            0.4545580578,
+            0.7269274105
+          ],
+          "worst": 4.679463847,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 61,
+          "cycles": 130000.0,
+          "life": 0.5,
+          "cv": 5.423922668,
+          "plates": [
+            0.449963499,
+            0.4533905299,
+            0.4101134333,
+            0.3941056804,
+            0.3674800989
+          ],
+          "worst": 6.2548659,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 62,
+          "cycles": 195000.0,
+          "life": 0.75,
+          "cv": 7.933952856,
+          "plates": [
+            0.7480134115,
+            1.642337341,
+            3.280027813,
+            2.141007897,
+            0.5078849435
+          ],
+          "worst": 13.39652583,
+          "note": "H1 LOW %D in plate2 G12 LOW %D in plate3",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 63,
+          "cycles": 260000.0,
+          "life": 1.0,
+          "cv": 6.732934853,
+          "plates": [
+            0.4412262553,
+            0.4515602723,
+            0.4025759708,
+            0.6858978455,
+            0.4739861397
+          ],
+          "worst": 7.663398119,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 65,
+          "cycles": 325000.0,
+          "life": 1.25,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 66,
+          "cycles": 390000.0,
+          "life": 1.5,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 67,
+          "cycles": 455000.0,
+          "life": 1.75,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 68,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 8.405541472,
+          "plates": [
+            0.4257512705,
+            0.4366447762,
+            0.4580266215,
+            0.3922431241,
+            0.4471199064
+          ],
+          "worst": 9.688668647,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 69,
+          "cycles": 620000.0,
+          "life": 2.384615385,
+          "cv": 4.485474946,
+          "plates": [
+            0.8117927292,
+            0.4831703843,
+            0.5370426061,
+            0.8336318016,
+            0.9717503783
+          ],
+          "worst": 5.904556467,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 70,
+          "cycles": 720000.0,
+          "life": 2.769230769,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 71,
+          "cycles": 820000.0,
+          "life": 3.153846154,
+          "cv": 1.944007797,
+          "plates": [
+            0.6556393022,
+            0.6994467017,
+            0.6023904213,
+            0.4747629627,
+            0.5177447294
+          ],
+          "worst": 2.64841382,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 72,
+          "cycles": 920000.0,
+          "life": 3.538461538,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "光学",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 73,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 1.632700671,
+          "plates": [
+            0.4479677161,
+            0.8601767449,
+            0.4536081076,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 3.046243007,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        }
+      ],
+      "notes": [
+        {
+          "cycles": 195000.0,
+          "life": 0.75,
+          "note": "H1 LOW %D in plate2 G12 LOW %D in plate3",
+          "failed_channels": ""
+        },
+        {
+          "cycles": 920000.0,
+          "life": 3.538461538,
+          "note": "光学",
+          "failed_channels": ""
+        },
+        {
+          "cycles": null,
+          "life": null,
+          "note": "光学",
+          "failed_channels": ""
+        }
+      ],
+      "fails": [],
+      "summary": {
+        "latest": {
+          "row": 73,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 1.632700671,
+          "plates": [
+            0.4479677161,
+            0.8601767449,
+            0.4536081076,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 3.046243007,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        },
+        "max_cv": {
+          "row": 68,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 8.405541472,
+          "plates": [
+            0.4257512705,
+            0.4366447762,
+            0.4580266215,
+            0.3922431241,
+            0.4471199064
+          ],
+          "worst": 9.688668647,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "max_worst": {
+          "row": 62,
+          "cycles": 195000.0,
+          "life": 0.75,
+          "cv": 7.933952856,
+          "plates": [
+            0.7480134115,
+            1.642337341,
+            3.280027813,
+            2.141007897,
+            0.5078849435
+          ],
+          "worst": 13.39652583,
+          "note": "H1 LOW %D in plate2 G12 LOW %D in plate3",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "avg_cv": 4.484217832779999,
+        "records_with_cv": 10
+      }
+    },
+    {
+      "id": "P1KHV3620250624A05",
+      "status": "Finish",
+      "records": [
+        {
+          "row": 77,
+          "cycles": 0.0,
+          "life": 0.0,
+          "cv": 0.8602485457,
+          "plates": [
+            0.4375526323,
+            0.4785014381,
+            0.3429663795,
+            0.5153875963,
+            0.4079947846
+          ],
+          "worst": 1.212418614,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 78,
+          "cycles": 65000.0,
+          "life": 0.25,
+          "cv": 1.051330965,
+          "plates": [
+            0.5244872642,
+            0.7998981795,
+            1.132569936,
+            0.5203748714,
+            0.498430181
+          ],
+          "worst": 4.608650207,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 79,
+          "cycles": 100000.0,
+          "life": "Lifetest Spec",
+          "cv": 1.30012746,
+          "plates": [
+            0.9195109296,
+            0.5868854806,
+            2.111406884,
+            0.6179587678,
+            0.9209024984
+          ],
+          "worst": 8.334339746,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 80,
+          "cycles": 130000.0,
+          "life": 0.5,
+          "cv": 0.6411317429,
+          "plates": [
+            0.5684339852,
+            0.542168878,
+            0.6100602648,
+            0.6096754811,
+            0.5838005415
+          ],
+          "worst": 1.037476962,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 81,
+          "cycles": 195000.0,
+          "life": 0.75,
+          "cv": 0.9148366703,
+          "plates": [
+            0.8232890341,
+            1.135357315,
+            0.7102670307,
+            0.7211322885,
+            0.4876070541
+          ],
+          "worst": 4.361836546,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 82,
+          "cycles": 260000.0,
+          "life": 1.0,
+          "cv": 0.6022587994,
+          "plates": [
+            0.4788477225,
+            0.4751322071,
+            0.4873451147,
+            0.515753951,
+            0.5159417043
+          ],
+          "worst": 1.060523283,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 84,
+          "cycles": 325000.0,
+          "life": 1.25,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 85,
+          "cycles": 390000.0,
+          "life": 1.5,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 86,
+          "cycles": 455000.0,
+          "life": 1.75,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 87,
+          "cycles": 520000.0,
+          "life": 2.0,
+          "cv": 0.7479862843,
+          "plates": [
+            0.5664893036,
+            0.4896233557,
+            0.5194858754,
+            0.5189064214,
+            0.4671562136
+          ],
+          "worst": 1.38712096,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 88,
+          "cycles": 620000.0,
+          "life": 2.384615385,
+          "cv": 0.6562592109,
+          "plates": [
+            0.6126646232,
+            0.5152691435,
+            0.5131274304,
+            0.606136415,
+            0.6069788425
+          ],
+          "worst": 0.9205330905,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 89,
+          "cycles": 720000.0,
+          "life": 2.769230769,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 90,
+          "cycles": 820000.0,
+          "life": 3.153846154,
+          "cv": 0.5467509006,
+          "plates": [
+            0.3738670122,
+            0.3884011695,
+            0.3793411055,
+            0.4095115943,
+            0.4627077839
+          ],
+          "worst": 1.253452101,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        {
+          "row": 91,
+          "cycles": 920000.0,
+          "life": 3.538461538,
+          "cv": "PASS",
+          "plates": [
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS",
+            "PASS"
+          ],
+          "worst": "PASS",
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 0
+        },
+        {
+          "row": 92,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 6.839045536,
+          "plates": [
+            6.743178271,
+            6.944301737,
+            6.898319595,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 3.149818202,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        }
+      ],
+      "notes": [],
+      "fails": [],
+      "summary": {
+        "latest": {
+          "row": 92,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 6.839045536,
+          "plates": [
+            6.743178271,
+            6.944301737,
+            6.898319595,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 3.149818202,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        },
+        "max_cv": {
+          "row": 92,
+          "cycles": 1020000.0,
+          "life": 3.923076923,
+          "cv": 6.839045536,
+          "plates": [
+            6.743178271,
+            6.944301737,
+            6.898319595,
+            "#DIV/0!",
+            "#DIV/0!"
+          ],
+          "worst": 3.149818202,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 3
+        },
+        "max_worst": {
+          "row": 79,
+          "cycles": 100000.0,
+          "life": "Lifetest Spec",
+          "cv": 1.30012746,
+          "plates": [
+            0.9195109296,
+            0.5868854806,
+            2.111406884,
+            0.6179587678,
+            0.9209024984
+          ],
+          "worst": 8.334339746,
+          "note": "",
+          "failed_channels": "",
+          "numeric_plate_count": 5
+        },
+        "avg_cv": 1.4159976115100001,
+        "records_with_cv": 10
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+/Users/yew/opentrons/oring_data_google_slides/slide01.png
+/Users/yew/opentrons/oring_data_google_slides/slide02.png
+/Users/yew/opentrons/oring_data_google_slides/slide03.png
+/Users/yew/opentrons/oring_data_google_slides/slide04.png
+/Users/yew/opentrons/oring_data_google_slides/slide05.png
+/Users/yew/opentrons/oring_data_google_slides/slide06.png
+/Users/yew/opentrons/oring_data_google_slides/slide07.png
+/Users/yew/opentrons/oring_data_google_slides/slide08.png
+/Users/yew/opentrons/oring_data_google_slides/slide09.png
+/Users/yew/opentrons/oring_data_google_slides/slide10.png
+/Users/yew/opentrons/oring_data_google_slides/slide11.png
+/Users/yew/opentrons/oring_data_google_slides/slide12.png
+/Users/yew/opentrons/oring_data_google_slides/slide13.png

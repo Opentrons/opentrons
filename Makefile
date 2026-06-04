@@ -157,6 +157,10 @@ PUSH_HELPER := abr-testing/abr_testing/tools/make_push.py
 push-folder:
 	$(OT_PYTHON) $(PUSH_HELPER)
 
+.PHONY: push-ot3-factory-many
+push-ot3-factory-many:
+	$(OT_PYTHON) scripts/push_ot3_factory_many.py $(push_args) $(hosts)
+
 .PHONY: push-ot3
 push-ot3:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
