@@ -69,10 +69,10 @@ The protocol timeline on the left side of the screen shows the steps the Flex wi
 
     You can further customize your transfer steps with advanced settings in Protocol Designer, including: 
 
-    * **[Partial tip pickup](../../protocol-designer/steps/transfer.md#partial-tip-pickup)**: using less tips than a multi-channel pipette can use at once to complete the transfer.  
+    * **Partial tip pickup**: using less tips than a multi-channel pipette can use at once to complete the transfer.  
     * **Flow rate**: the speed at which the Flex aspirates or dispenses liquid.
     * **Tip position**: where the Flex aspirates or dispenses in your labware. 
-    * Additional advanced settings like pre-wet, touch tip, mix, delay, blowout, and air gap.
+    * **Additional advanced settings**: pre-wet, touch tip, mix, delay, blowout, and air gap.
     * **Manual tip tracking**: manually select tips to use in your transfer, including previously used tips.
     
 
@@ -80,9 +80,9 @@ The protocol timeline on the left side of the screen shows the steps the Flex wi
 
     Choose how much liquid to mix with, the number of mixing repetitions, which wells will be mixed, and tip management settings for your workflow. You can also choose to apply other advanced settings, like Opentrons-verified liquid class settings, to the mix. 
 
-* **Move steps** let you control the Flex Gripper or move labware around the deck manually. By default, move steps use a gripper if added in your protocol. You need to use the gripper to dispose of labware when moving it into the waste chute, or when moving the lid off the Absorbance Plate Reader Module. 
+* **Move steps** let you control the Flex Gripper or move labware around the deck manually. By default, move steps use a gripper if added in your protocol. You'll need to use the gripper to dispose of labware when moving it into the waste chute, or when moving the lid off the Absorbance Plate Reader Module. 
 
-    You need to manually move labware off-deck. During a manual move step, the protocol pauses. Confirm your labware move to resume the protocol.
+    A manual move is used to move labware off-deck. During a manual move step, the protocol pauses. Confirm your labware move to resume the protocol.
 
 * **Module steps** let you control Flex modules during a protocol. Protocol Designer includes different customizable options for each module. 
 
