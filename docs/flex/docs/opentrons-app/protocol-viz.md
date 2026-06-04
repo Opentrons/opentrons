@@ -77,9 +77,11 @@ You can create [step groups](../../python-api/groups.md) in your Python protocol
 
 <figure class="screenshot" markdown>
 ![Image showing grouped steps in the timeline on the left.](../images/step-groups.png)
-<figcaption>A group of steps to assemble master mix reagents in the timeline on the left.
+<figcaption>A group of steps to assemble master mix reagents in the timeline on the left.</figcaption>
 </figure>
 
 Step groups appear in the protocol timeline on the left. In the example above, three groups combine related steps, like transferring all the required reagents to assemble a PCR master mix. Click the arrow to expand each group and view its steps. 
 
-You can customize group names (like "Prepare Modules") and descriptions when you create step groups in your Python protocol. Not a Python user? You still add custom step names and descriptions by [renaming steps](../protocols/designer.md#edit-steps) in Protocol Designer.
+You can customize group names (like "Prepare Modules") and descriptions when creating step groups in your Python protocol. 
+
+Not a Python user? You still add custom step names and descriptions by [renaming steps](../protocols/designer.md#edit-steps) in Protocol Designer.

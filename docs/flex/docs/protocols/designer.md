@@ -70,7 +70,7 @@ The protocol timeline on the left side of the screen shows the steps the Flex wi
     You can further customize your transfer steps with advanced settings in Protocol Designer, including: 
 
     * **[Partial tip pickup](../../protocol-designer/steps/transfer.md#partial-tip-pickup)**: using less tips than a multi-channel pipette can use at once to complete the transfer.  
-    * **Flow rate**: the speed the Flex aspirates or dispenses liquid at.
+    * **Flow rate**: the speed at which the Flex aspirates or dispenses liquid.
     * **Tip position**: where the Flex aspirates or dispenses in your labware. 
     * Additional advanced settings like pre-wet, touch tip, mix, delay, blowout, and air gap.
     * **Manual tip tracking**: manually select tips to use in your transfer, including previously used tips.
