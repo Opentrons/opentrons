@@ -8,10 +8,6 @@ import type {
   DocumentedAction,
 } from '@opentrons/react-api-client'
 
-export interface DocumentationRequiredModalArgs {
-  username: string
-}
-
 const DocumentationRequiredModalImpl = NiceModal.create(
   ({
     username,

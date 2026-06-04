@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import NiceModal from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
@@ -7,6 +8,7 @@ import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { TouchTextAreaField } from '/app/molecules/TouchTextAreaField'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { ActionsView } from './ActionsView'
 import styles from './documentationrequired.module.css'
 
 import type { DocumentedAction } from '@opentrons/react-api-client'
@@ -40,6 +42,12 @@ export function DocumentationRequired({
     onConfirm(trimmedNote)
   }
 
+  const handleViewActions = async (): Promise<void> => {
+    await NiceModal.show(ActionsView, {
+      actionsToDocument,
+    })
+  }
+
   return (
     <>
       <div className={styles.container}>
@@ -53,9 +61,7 @@ export function DocumentationRequired({
             buttonType: 'tertiaryHighLight',
             iconName: 'information',
             iconPlacement: 'startIcon',
-            onClick: () => {
-              console.log('actions to document:', actionsToDocument)
-            },
+            onClick: handleViewActions,
           }}
           onClickBack={onBack}
         />

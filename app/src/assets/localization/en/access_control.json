@@ -1,6 +1,7 @@
 {
   "access_control_note": "Note for robot audit log by {{user}}",
   "documentation_required": "Documentation Required",
+  "actions_requiring_documentation": "Actions requiring documentation",
   "legal_name": "Legal Name",
   "log_out": "Log out",
   "username": "Username",

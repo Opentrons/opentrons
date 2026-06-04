@@ -365,6 +365,18 @@ export function useCommandTextString(
       }
     }
 
+    case 'calibration/calibratePipette':
+    case 'calibration/calibrateGripper':
+    case 'calibration/calibrateModule':
+    case 'calibration/moveToMaintenancePosition':
+      return {
+        kind: 'generic',
+        commandText: utils.getCalibrationCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
     case undefined:
     case null:
       return { kind: 'generic', commandText: '' }
