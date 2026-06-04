@@ -11,11 +11,10 @@ import {
   useUpdateNewPassword,
 } from '/app/resources/auth'
 
-import { useStoreLoginState } from '../hooks'
+import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import { showLoginModal } from '../LoginModal'
 
 import type * as ReactI18next from 'react-i18next'
-import type { UseQueryResult } from 'react-query'
 import type {
   AuthUser,
   AuthUserResponse,
@@ -127,7 +126,7 @@ describe('LoginModal', () => {
     vi.mocked(useStoreLoginState).mockReturnValue(mockStoreLoginState)
     vi.mocked(useSelfQuery).mockReturnValue({
       data: { data: { resetPassword: false } },
-    } as UseQueryResult<AuthUserResponse>)
+    } as ReturnType<typeof useSelfQuery>)
 
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
@@ -189,7 +188,7 @@ describe('LoginModal', () => {
   it('switches to the new-password flow when login requires a password reset', async () => {
     mockGetSelfResponse(mockSelfUser({ resetPassword: true }))
 
-    const resultPromise = await openLoginModal()
+    const resultPromise = openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -215,7 +214,7 @@ describe('LoginModal', () => {
     mockCurrentUsername = 'alice'
     vi.mocked(useSelfQuery).mockReturnValue({
       data: { data: { resetPassword: true } },
-    } as UseQueryResult<AuthUserResponse>)
+    } as ReturnType<typeof useSelfQuery>)
 
     renderWithProviders(
       <NiceModal.Provider>

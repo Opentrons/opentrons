@@ -13,18 +13,18 @@ import type {
 import type {
   AuthUserResponse,
   HostConfig,
-  ResetSelfPasswordRequest,
+  UpdateSelfPasswordRequest,
 } from '@opentrons/api-client'
 
 export type UseResetSelfPasswordMutationResult = UseMutationResult<
   AuthUserResponse,
   AxiosError,
-  ResetSelfPasswordRequest
+  UpdateSelfPasswordRequest
 > & {
   resetSelfPassword: UseMutateAsyncFunction<
     AuthUserResponse,
     AxiosError,
-    ResetSelfPasswordRequest
+    UpdateSelfPasswordRequest
   >
 }
 
@@ -32,7 +32,7 @@ export function useResetSelfPasswordMutation(
   options: UseMutationOptions<
     AuthUserResponse,
     AxiosError,
-    ResetSelfPasswordRequest
+    UpdateSelfPasswordRequest
   > = {},
   hostOverride?: HostConfig | null
 ): UseResetSelfPasswordMutationResult {
@@ -42,7 +42,7 @@ export function useResetSelfPasswordMutation(
 
   const mutation = useMutation(
     getQueryKey(host, 'auth', 'users', 'self', 'resetPassword'),
-    (body: ResetSelfPasswordRequest) =>
+    (body: UpdateSelfPasswordRequest) =>
       resetSelfPassword(host!, body).then(response => response.data),
     options
   )
