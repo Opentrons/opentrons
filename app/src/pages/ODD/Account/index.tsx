@@ -10,9 +10,10 @@ import {
 } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useLogOut } from '/app/resources/access-control/useLogOut'
 
 import styles from './account.module.css'
-import { useAccountInfo, useLogOut } from './hooks'
+import { useAccountInfo } from './hooks'
 
 export function Account(): JSX.Element {
   const { t } = useTranslation()

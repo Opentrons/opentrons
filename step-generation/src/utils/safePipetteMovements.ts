@@ -16,6 +16,7 @@ import {
   OT2_ROBOT_TYPE,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
+  QUADRANT,
   ROW,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
@@ -294,7 +295,6 @@ const getWellPosition = (
   labwareEntity: LabwareEntity,
   wellName: string,
   wellLocationOffset: Point,
-  addressableAreaOffset: CoordinateTuple,
   hasTip: boolean
 ): Point => {
   const { wells } = labwareEntity.def
@@ -302,12 +302,10 @@ const getWellPosition = (
   //  note: api includes calibration data here which PD does not have knowledge of at the moment
   const wellDef = wells[wellName]
   return {
-    x: wellDef.x + wellLocationOffset.x + (addressableAreaOffset?.[0] ?? 0),
-    y: wellDef.y + wellLocationOffset.y + (addressableAreaOffset?.[1] ?? 0),
+    x: wellDef.x + wellLocationOffset.x,
+    y: wellDef.y + wellLocationOffset.y,
     z: hasTip
-      ? wellDef.z +
-        (wellLocationOffset.z ?? 0) +
-        (addressableAreaOffset?.[2] ?? 0)
+      ? wellDef.z + (wellLocationOffset.z ?? 0)
       : labwareEntity.def.dimensions.zDimension,
   }
 }
@@ -405,16 +403,35 @@ export const getPipetteMovementSafetyStatus = (args: {
         addressableArea => addressableArea.id === THERMOCYCLER_MODULE_V2
       )?.offsetFromCutoutFixture ?? [0, 0, 0])
     : [0, 0, 0]
-  const fullOffset = [
-    thermocyclerOffset[0] + addressableAreaOffset[0],
-    thermocyclerOffset[1] + addressableAreaOffset[1],
-    thermocyclerOffset[2] + addressableAreaOffset[2],
-  ]
+  const fullOffsetForThermocyclerAndAA: Point = {
+    x: thermocyclerOffset[0] + addressableAreaOffset[0],
+    y: thermocyclerOffset[1] + addressableAreaOffset[1],
+    z: thermocyclerOffset[2] + addressableAreaOffset[2],
+  }
+  const { def: labwareDef } = labwareEntities[labwareId]
+  const centeringOffset = getPipetteCenteringFullOffset({
+    wellTargetName,
+    primaryNozzle,
+    nozzleConfiguration,
+    specs: pipetteSpecs,
+    labwareDef,
+  })
+  const fullWellLocationOffset = {
+    x:
+      wellLocationOffset.x +
+      centeringOffset.x +
+      fullOffsetForThermocyclerAndAA.x,
+    y:
+      wellLocationOffset.y +
+      centeringOffset.y +
+      fullOffsetForThermocyclerAndAA.y,
+    z: (wellLocationOffset.z ?? 0) + (fullOffsetForThermocyclerAndAA.z ?? 0),
+  }
+
   const wellTargetPoint = getWellPosition(
     labwareEntities[labwareId],
     wellTargetName,
-    wellLocationOffset,
-    fullOffset as CoordinateTuple,
+    fullWellLocationOffset,
     pipetteHasTip
   )
 
@@ -442,6 +459,7 @@ export const getPipetteMovementSafetyStatus = (args: {
     boundingBox: pipetteBoundsAtWellLocation,
     robotType,
   })
+
   if (!isWithinPipetteExtents) {
     return { isSafe: false, reason: { type: 'outsidePipetteExtents' } }
   }
@@ -539,13 +557,31 @@ export const getIsSafePickupWithinTiprack = (args: {
       const targetWellIndex = tipColumnOrdered.indexOf(wellName)
       const targetWellLength =
         PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+      // Active nozzle positions in the (possibly reversed) column ordering.
+      // Reversed columns grow toward index 0 (H→G→F→...) so active wells are
+      // slice(targetWellIndex - count + 1, targetWellIndex + 1).
+      // Non-reversed (A1 primary) columns grow toward higher indices so active
+      // wells are slice(targetWellIndex, targetWellIndex + count).
+      const activeWells = shouldReverse
+        ? tipColumnOrdered.slice(
+            targetWellIndex - targetWellLength + 1,
+            targetWellIndex + 1
+          )
+        : tipColumnOrdered.slice(
+            targetWellIndex,
+            targetWellIndex + targetWellLength
+          )
       return {
         isSafe: tipColumnOrdered
-          .slice(targetWellIndex + targetWellLength, tipColumnOrdered.length)
+          .slice(targetWellIndex + 1)
           .every(
             well => tipState[well] === EMPTY || tipsToIgnore.includes(well)
           ),
-        isComplete: tipState[wellName] !== EMPTY,
+        // All active nozzle wells must have tips AND must not be claimed by an
+        // earlier selection in the same wizard session (tipsToIgnore).
+        isComplete: activeWells.every(
+          well => tipState[well] !== EMPTY && !tipsToIgnore.includes(well)
+        ),
       }
     }
     // 8 channel pickup, full column
@@ -805,4 +841,93 @@ const getIsMovementWithinDeckExtents = (args: {
     }
   }
   return true
+}
+
+// gets arbitrary span between two pipette nozzles, assuming constant grid spacing
+const getNozzleGapFromPipetteSpecs = (specs: PipetteV2Specs): number => {
+  const [nozzleX1, nozzleX2] = [0, 1].map(
+    index => Object.values(specs.nozzleMap)[index][0]
+  )
+  const nozzleGap = Math.abs(nozzleX1 - nozzleX2)
+  return nozzleGap
+}
+
+interface PipetteCenteringArgs {
+  wellTargetName: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzleConfiguration: NozzleConfigurationStyle
+  specs: PipetteV2Specs
+  labwareDef: LabwareDefinition
+}
+
+const getPipetteCenteringFullOffset = (args: PipetteCenteringArgs): Point => {
+  const centeringXOffset = getPipetteCenteringXOffset(args)
+  const centeringYOffset = getPipetteCenteringYOffset(args)
+  return {
+    x: centeringXOffset,
+    y: centeringYOffset,
+  }
+}
+
+const getPipetteCenteringXOffset = (args: PipetteCenteringArgs): number => {
+  const { primaryNozzle, nozzleConfiguration, specs, labwareDef } = args
+  const { channels } = specs
+  const { ordering } = labwareDef
+  const shouldCenterInX = ordering.length === 1 // labware is comprised of 1 column (row-format, as an 8-ch reservoir)
+  if (!shouldCenterInX) {
+    return 0
+  }
+  let numNozzleColumns: number
+  if (
+    (nozzleConfiguration === ALL && channels === 96) ||
+    nozzleConfiguration === ROW
+  ) {
+    numNozzleColumns = 12
+  } else if (nozzleConfiguration === QUADRANT) {
+    numNozzleColumns = 6
+  } else {
+    numNozzleColumns = 1
+  }
+  const directionForXOffset = getTipColumnName(primaryNozzle) === '12' ? 1 : -1
+  const nozzleGap = getNozzleGapFromPipetteSpecs(specs)
+  return shouldCenterInX
+    ? (((numNozzleColumns - 1) * nozzleGap) / 2) * directionForXOffset
+    : 0
+}
+
+const getPipetteCenteringYOffset = (args: PipetteCenteringArgs): number => {
+  const {
+    wellTargetName,
+    primaryNozzle,
+    nozzleConfiguration,
+    specs,
+    labwareDef,
+  } = args
+  const { channels } = specs
+  const { ordering } = labwareDef
+  const wellTargetColumnIndex = ordering.findIndex(column =>
+    column.includes(wellTargetName)
+  )
+  const wellTargetColumn = ordering[wellTargetColumnIndex]
+  const shouldCenterInY = wellTargetColumn.length === 1
+  if (!shouldCenterInY) {
+    return 0
+  }
+  let numNozzleRows: number
+  if (
+    nozzleConfiguration === COLUMN ||
+    (nozzleConfiguration === ALL && channels === 96) ||
+    channels === 8
+  ) {
+    numNozzleRows = 8
+  } else if (nozzleConfiguration === PARTIAL_COLUMN) {
+    numNozzleRows = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+  } else if (nozzleConfiguration === QUADRANT) {
+    numNozzleRows = 4
+  } else {
+    numNozzleRows = 1
+  }
+  const nozzleGap = getNozzleGapFromPipetteSpecs(specs)
+  const directionForYOffset = getTipRowName(primaryNozzle) === 'H' ? -1 : 1
+  return (((numNozzleRows - 1) * nozzleGap) / 2) * directionForYOffset
 }

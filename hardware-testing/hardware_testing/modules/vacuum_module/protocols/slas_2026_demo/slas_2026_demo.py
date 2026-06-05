@@ -15,7 +15,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.28",
+    "apiLevel": "2.30",
 }
 
 
@@ -105,9 +105,10 @@ def run(ctx: ProtocolContext) -> None:
         pip.return_tip()
         tiprack_1000.reset()
 
-        # Turn on vacuum for 10s and vent after
-        # vm_mod.start_set_vacuum(pressure=-400, duration=10, vent_after=True)
-        ctx.delay(10, msg="Start Vacuum -400 mbar for 10s")
+        # Turn on vacuum for 30s and vent after
+        vm_mod.close_vent()
+        vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
+        ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
 
         # Move the collar with filter plate to the dock
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
@@ -128,9 +129,10 @@ def run(ctx: ProtocolContext) -> None:
         pip.return_tip()
         tiprack_200.reset()
 
-        # Turn on vacuum for 10s and vent after
-        # vm_mod.start_set_vacuum(pressure=-400, duration=10, vent_after=True)
-        ctx.delay(10, msg="Start Vacuum -400 mbar for 10s")
+        # Turn on vacuum for 30s and vent after
+        vm_mod.close_vent()
+        vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
+        ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
 
         # Move the collar with filter plate to the dock
         ctx.move_labware(manifold_collar, "A2", use_gripper=True)

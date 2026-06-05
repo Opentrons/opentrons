@@ -4,7 +4,7 @@ from typing import Optional
 
 from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
 from ..state.state import StateStore
-from ..types import LabwareLocation, ModuleLocation
+from ..types import LabwareLocation, ModuleLocation, ModuleModel
 from .equipment import EquipmentHandler
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import HardwareControlAPI
@@ -176,10 +176,10 @@ class ThermocyclerMovementFlagger:
             # Different module types have different keys under .device_info.
             # Thermocyclers should always have .device_info["serial"].
             if (
-                isinstance(module, HardwareThermocycler)
-                and module.device_info["serial"] == serial_number
-            ):
-                return module
+                module.model() == ModuleModel.THERMOCYCLER_MODULE_V1
+                or module.model() == ModuleModel.THERMOCYCLER_MODULE_V2
+            ) and module.device_info["serial"] == serial_number:
+                return module  # type: ignore[return-value]
         return None
 
     class _HardwareThermocyclerMissingError(Exception):

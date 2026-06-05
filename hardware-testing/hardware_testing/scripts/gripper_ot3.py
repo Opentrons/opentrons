@@ -7,8 +7,8 @@ from typing import Optional, List, Any, Dict
 from opentrons.config.defaults_ot3 import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api import types
-from hardware_testing.opentrons_api.types import Point
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 # arbitrary safe distance for relative-movements upward
@@ -33,10 +33,10 @@ DROP_OFFSETS = {
 }
 
 # size of things we are using (NOTE: keep Y-Axis as negative)
-SLOT_SIZE = types.Point(x=128, y=-86, z=0)
-LABWARE_SIZE_ARMADILLO = types.Point(x=127.8, y=-85.55, z=16)
-LABWARE_SIZE_EVT_TIPRACK = types.Point(x=127.6, y=-85.8, z=93)
-LABWARE_SIZE_NEST_1_WELL_RESERVOIR = types.Point(x=127.4, y=-85.2, z=31)
+SLOT_SIZE = Point(x=128, y=-86, z=0)
+LABWARE_SIZE_ARMADILLO = Point(x=127.8, y=-85.55, z=16)
+LABWARE_SIZE_EVT_TIPRACK = Point(x=127.6, y=-85.8, z=93)
+LABWARE_SIZE_NEST_1_WELL_RESERVOIR = Point(x=127.4, y=-85.2, z=31)
 
 LABWARE_SIZE = {
     "plate": LABWARE_SIZE_ARMADILLO,
@@ -67,7 +67,7 @@ ADAPTER_OFFSETS = {
     "round-bottom": Point(),  # FIXME
 }
 
-PROBE_MOUNT = types.OT3Mount.LEFT
+PROBE_MOUNT = OT3Mount.LEFT
 ALUMINUM_SEAL_SETTINGS = CapacitivePassSettings(
     prep_distance_mm=5,
     max_overrun_distance_mm=1,
@@ -116,9 +116,7 @@ async def _finish(api: OT3API) -> None:
     exit()
 
 
-def _get_labware_grip_offset(
-    labware_key: str, is_grip: bool, has_clips: bool
-) -> types.Point:
+def _get_labware_grip_offset(labware_key: str, is_grip: bool, has_clips: bool) -> Point:
     slot_center = SLOT_SIZE * 0.5
     grip_height = LABWARE_GRIP_HEIGHT[labware_key]
     if is_grip and has_clips:
@@ -130,7 +128,7 @@ def _get_labware_grip_offset(
         x = slot_center.x
     y = slot_center.y
     z = grip_height
-    return types.Point(x=x, y=y, z=z)
+    return Point(x=x, y=y, z=z)
 
 
 def _get_labware_probe_corners(labware_key: str) -> List[Point]:
@@ -159,12 +157,12 @@ def _get_labware_probe_corners(labware_key: str) -> List[Point]:
 
 async def _do_gripper_action(
     api: OT3API,
-    pos: types.Point,
+    pos: Point,
     force: float,
     is_grip: bool,
     inspect: bool = False,
 ) -> None:
-    mount = types.OT3Mount.GRIPPER
+    mount = OT3Mount.GRIPPER
     current_pos = await api.gantry_position(mount)
     travel_height = max(current_pos.z, TRAVEL_HEIGHT)
     if is_grip:
@@ -182,7 +180,7 @@ async def _do_gripper_action(
         await _inspect(api)
     if is_grip:
         # keep bottom of plate >= travel height
-        await api.move_rel(mount, types.Point(z=TRAVEL_HEIGHT))
+        await api.move_rel(mount, Point(z=TRAVEL_HEIGHT))
     else:
         await api.move_to(mount, pos._replace(z=TRAVEL_HEIGHT))
     if inspect:
@@ -207,7 +205,7 @@ def _calculate_grip_position(
     slot: int,
     labware_key: str,
     deck_item: str,
-    offset: Optional[types.Point],
+    offset: Optional[Point],
 ) -> Point:
     labware_pos_top_left = _calculate_labware_position_on_deck(slot, deck_item)
     # relative position of labware, within a slot/module
@@ -246,8 +244,8 @@ async def _move_labware(
     dst_slot: int,
     src_deck_item: str,
     dst_deck_item: str,
-    src_offset: Optional[types.Point] = None,
-    dst_offset: Optional[types.Point] = None,
+    src_offset: Optional[Point] = None,
+    dst_offset: Optional[Point] = None,
     inspect: bool = True,
 ) -> None:
     if not force:
@@ -285,7 +283,7 @@ async def _probe_labware_corners(
     api: OT3API, labware_key: str, slot: int, deck_item: str
 ) -> List[float]:
     nominal_corners = _calculate_probe_positions(slot, labware_key, deck_item)
-    await api.home([types.Axis.by_mount(PROBE_MOUNT)])
+    await api.home([Axis.by_mount(PROBE_MOUNT)])
     api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
     found_heights: List[float] = list()
     for corner in nominal_corners:
@@ -293,12 +291,12 @@ async def _probe_labware_corners(
         await api.move_to(PROBE_MOUNT, corner._replace(z=current_pos.z))
         found_z, _ = await api.capacitive_probe(
             PROBE_MOUNT,
-            types.Axis.by_mount(PROBE_MOUNT),
+            Axis.by_mount(PROBE_MOUNT),
             corner.z,
             ALUMINUM_SEAL_SETTINGS,
         )
         found_heights.append(found_z)
-    await api.home([types.Axis.by_mount(PROBE_MOUNT)])
+    await api.home([Axis.by_mount(PROBE_MOUNT)])
     api.remove_tip(PROBE_MOUNT)
     print(f'\tLabware Corners ("{deck_item}" at slot {slot})')
     print(f"\t\tTop-Left = {found_heights[0]}")

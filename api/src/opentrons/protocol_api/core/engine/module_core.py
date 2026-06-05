@@ -65,6 +65,9 @@ if TYPE_CHECKING:
 # Valid wavelength range for absorbance reader
 ABS_WAVELENGTH_MIN = 350
 ABS_WAVELENGTH_MAX = 1000
+# Gauge pressure range for vacuum module
+MAX_GAUGE_PRESSURE_MBAR = 0
+MIN_GAUGE_PRESSURE_MBAR = -800
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -122,6 +125,14 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         return self._engine_client.state.modules.get_definition(
             self.module_id
         ).displayName
+
+    def get_max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+        return MAX_GAUGE_PRESSURE_MBAR
+
+    def get_min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+        return MIN_GAUGE_PRESSURE_MBAR
 
 
 class NonConnectedModuleCore(AbstractModuleCore[LabwareCore]):
@@ -1215,8 +1226,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         )
 
     def _convert_vm_profile_steps(
-        self,
-        steps: List[VacuumModuleStep],
+        self, steps: List[VacuumModuleStep], repetitions: int
     ) -> cmd.vacuum_module.ProfileType:
         protocol_engine_steps: cmd.vacuum_module.ProfileType = []
 
@@ -1250,22 +1260,23 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
                     gaugePressureMbar=gauge_pressure_mbar,
                 )
                 protocol_engine_steps.append(pe_pressure_step)
-
-        return protocol_engine_steps
+        return protocol_engine_steps * repetitions
 
     def start_execute_profile(
         self,
         steps: List[VacuumModuleStep],
         repetitions: int,
+        vent_after: bool = False,
     ) -> EngineTaskCore:
         """Start the execution of a vacuum module profile and return a task."""
         self._repetitions = repetitions
         self._step_count = len(steps)
-        engine_steps = self._convert_vm_profile_steps(steps)
+        engine_steps = self._convert_vm_profile_steps(
+            steps=steps, repetitions=repetitions
+        )
         result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartRunProfileParams(
-                moduleId=self.module_id,
-                profile=engine_steps,
+                moduleId=self.module_id, profile=engine_steps, ventAfter=vent_after
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
@@ -1273,3 +1284,22 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
             engine_client=self._engine_client, task_id=result.taskId
         )
         return start_execute_profile_result
+
+    def open_vent(self) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.OpenVentParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def close_vent(self) -> None:
+        self._engine_client.execute_command(
+            cmd.vacuum_module.CloseVentParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
+
+    def wait_for_target(self) -> None:
+        """Wait until the module's pressure or pwm is reached."""
+        self._engine_client.execute_command(
+            cmd.vacuum_module.WaitForTargetParams(moduleId=self.module_id),
+            command_annotations=self._protocol_core.annotation_ids,
+        )

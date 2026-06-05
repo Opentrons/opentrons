@@ -13,7 +13,8 @@ from hardware_testing.drivers.pressure_fixture import (
 from hardware_testing.data.csv_report import CSVReport, CSVSection, CSVLine
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import Point, OT3Mount
+from opentrons.hardware_control.types import OT3Mount
+from opentrons.types import Point
 
 
 SLOT_TIP_RACK = 3

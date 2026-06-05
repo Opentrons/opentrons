@@ -5,7 +5,7 @@ from pathlib import Path
 
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
 
 from .config import TestSection, TestConfig, build_report, TESTS, TESTS_INCREMENT
 
