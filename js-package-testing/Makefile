@@ -38,19 +38,19 @@ build-local-packages:
 	@echo "Creating pack directory..."
 	@mkdir -p $(PACK_DIR)
 	@echo "Building shared-data package..."
-	make -C ../shared-data pack
+	$(MAKE) -C ../shared-data pack
 	@echo "Moving shared-data package to pack directory..."
 	@mv ../shared-data/opentrons-shared-data-0.0.0-dev.tgz $(SHARED_DATA_PACK)
 	@echo "Building step-generation package..."
-	make -C ../step-generation pack
+	$(MAKE) -C ../step-generation pack
 	@echo "Moving step-generation package to pack directory..."
 	@mv ../step-generation/opentrons-step-generation-0.0.0-dev.tgz $(STEP_GENERATION_PACK)
 	@echo "Building components package..."
-	make -C ../components pack
+	$(MAKE) -C ../components pack
 	@echo "Moving components package to pack directory..."
 	@mv ../components/opentrons-components-0.0.0-dev.tgz $(COMPONENTS_PACK)
 	@echo "Building protocol-visualization package..."
-	make -C ../protocol-visualization pack
+	$(MAKE) -C ../protocol-visualization pack
 	@echo "Moving protocol-visualization package to pack directory..."
 	@mv ../protocol-visualization/opentrons-protocol-visualization-0.0.0-dev.tgz $(PROTOCOL_VISUALIZATION_PACK)
 	@echo "Extracting packages..."
