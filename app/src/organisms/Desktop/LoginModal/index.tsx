@@ -60,7 +60,7 @@ function LoginModalImpl(): JSX.Element {
     onSuccess: (
       successfulUsername,
       _accessToken,
-      _userMustSetNewPassword,
+      _user,
       response
     ) => {
       setLoginError(null)

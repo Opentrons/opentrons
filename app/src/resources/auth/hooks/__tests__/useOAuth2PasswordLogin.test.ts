@@ -6,6 +6,7 @@ import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useOAuth2PasswordLogin } from '../useOAuth2PasswordLogin'
 
 import type {
+  AuthUser,
   AuthUserResponse,
   OAuth2TokenResponse,
   Response,
@@ -97,18 +98,17 @@ describe('useOAuth2PasswordLogin', () => {
     })
   })
 
-  it('fetches self after OAuth success and reports whether a new password is required', async () => {
+  it('fetches self after OAuth success and passes the user to onSuccess', async () => {
+    const user: AuthUser = {
+      username: 'alice',
+      fullName: 'Alice',
+      accountType: 'user',
+      scopes: [],
+      locked: false,
+      resetPassword: true,
+    }
     vi.mocked(getSelf).mockResolvedValue({
-      data: {
-        data: {
-          username: 'alice',
-          fullName: 'Alice',
-          accountType: 'user',
-          scopes: [],
-          locked: false,
-          resetPassword: true,
-        },
-      } as AuthUserResponse,
+      data: { data: user } as AuthUserResponse,
     } as Awaited<ReturnType<typeof getSelf>>)
 
     renderHook(() => useOAuth2PasswordLogin({ onSuccess, onError }))
@@ -129,7 +129,7 @@ describe('useOAuth2PasswordLogin', () => {
     expect(onSuccess).toHaveBeenCalledWith(
       'alice',
       'access-token',
-      true,
+      user,
       TOKEN_RESPONSE
     )
     expect(onError).not.toHaveBeenCalled()

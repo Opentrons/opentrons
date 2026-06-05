@@ -12,7 +12,7 @@ import {
 
 import { showLoginModal } from '../LoginModal'
 
-import type { OAuth2TokenResponse } from '@opentrons/api-client'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('react-i18next', async importOriginal => {
   const actual = await importOriginal<typeof import('react-i18next')>()
@@ -52,6 +52,18 @@ const OAUTH_RESPONSE: OAuth2TokenResponse = {
   expires_in: 3600,
 }
 
+function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
+  return {
+    username: 'alice',
+    fullName: 'Alice',
+    accountType: 'user',
+    scopes: [],
+    locked: false,
+    resetPassword: false,
+    ...overrides,
+  }
+}
+
 function openLoginModal(): ReturnType<typeof showLoginModal> {
   renderWithProviders(
     <NiceModal.Provider>
@@ -80,7 +92,7 @@ describe('LoginModal', () => {
 
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
-        onSuccess(username, 'access-token', false, OAUTH_RESPONSE)
+        onSuccess(username, 'access-token', mockAuthUser(), OAUTH_RESPONSE)
       },
       isAuthLoading: false,
     }))
@@ -136,7 +148,12 @@ describe('LoginModal', () => {
   it('switches to the new-password flow when login requires a password reset', async () => {
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
-        onSuccess(username, 'access-token', true, OAUTH_RESPONSE)
+        onSuccess(
+          username,
+          'access-token',
+          mockAuthUser({ resetPassword: true }),
+          OAUTH_RESPONSE
+        )
       },
       isAuthLoading: false,
     }))
@@ -165,7 +182,12 @@ describe('LoginModal', () => {
   it('completes the new-password flow and resolves the modal', async () => {
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
-        onSuccess(username, 'access-token', true, OAUTH_RESPONSE)
+        onSuccess(
+          username,
+          'access-token',
+          mockAuthUser({ resetPassword: true }),
+          OAUTH_RESPONSE
+        )
       },
       isAuthLoading: false,
     }))

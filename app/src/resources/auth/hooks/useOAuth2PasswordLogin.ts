@@ -5,7 +5,7 @@ import axios from 'axios'
 import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation, useHost } from '@opentrons/react-api-client'
 
-import type { OAuth2TokenResponse } from '@opentrons/api-client'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 /**
  * Shape of an error response from `POST /auth/oauth2/token`: the standard
@@ -26,7 +26,7 @@ export interface UseOAuth2PasswordLoginOptions {
   onSuccess: (
     username: string,
     accessToken: string,
-    userMustSetNewPassword: boolean,
+    user: AuthUser,
     response: OAuth2TokenResponse
   ) => void
   /**
@@ -45,8 +45,7 @@ interface UseOAuth2PasswordLoginResult {
  * on the same base URL as the robot API (`ApiHostProvider` hostname/port).
  * Must run under `ApiHostProvider` so `useGetOAuth2TokenMutation` resolves the host.
  *
- * After a successful token response, fetches `GET /auth/users/self` to
- * determine whether the user must set a new password.
+ * After a successful token response, fetches `GET /auth/users/self`.
  */
 export function useOAuth2PasswordLogin(
   options: UseOAuth2PasswordLoginOptions
@@ -109,9 +108,8 @@ export function useOAuth2PasswordLogin(
 
       setIsFetchingSelf(true)
       void fetchSelfAfterLogin(accessToken)
-        .then(self => {
-          const userMustSetNewPassword = self.resetPassword ?? false
-          onSuccess(username, accessToken, userMustSetNewPassword, response)
+        .then(user => {
+          onSuccess(username, accessToken, user, response)
         })
         .catch(() => {
           onError(t('login_error_incorrect'))

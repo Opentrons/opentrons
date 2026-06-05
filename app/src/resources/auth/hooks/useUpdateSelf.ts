@@ -46,7 +46,7 @@ export function useUpdateSelf(
       onSuccess: (
         username,
         _accessToken,
-        _userMustSetNewPassword,
+        _user,
         response
       ) => {
         onSuccess(username, response)

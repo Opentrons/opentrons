@@ -19,7 +19,7 @@ import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
 import type { QueryKey } from 'react-query'
-import type { OAuth2TokenResponse } from '@opentrons/api-client'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
@@ -70,14 +70,14 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     (
       username: string,
       _accessToken: string,
-      userMustSetNewPassword: boolean,
+      user: AuthUser,
       response: OAuth2TokenResponse
     ): void => {
       setLoginError(null)
       storeLoginState(username, response)
       invalidateSelfQuery()
 
-      if (userMustSetNewPassword) {
+      if (user.resetPassword) {
         setLoggedInUsername(username)
         setPhase('chooseNewPassword')
         setStep('password')
