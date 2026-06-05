@@ -140,7 +140,7 @@ export function GripperCard({
             ) : null
           }
           isGripperAttached={attachedGripper != null}
-          label={t('shared:extension_mount')}
+          label={t('extension_mount')}
           menuOverlayItems={menuOverlayItems as MenuOverlayItemProps[]}
           isEstopNotDisengaged={isEstopNotDisengaged}
         />
