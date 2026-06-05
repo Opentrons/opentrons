@@ -145,15 +145,15 @@ function PipetteFlowText({
 
   const endText = step === 'end' ? t('end') + ' ' : ''
 
-  const text = t('pipette_wizard_flow', {
-    flowtype: flowTypeText,
-    pipette: pipetteNameText || pipetteCategoryText,
-    mount: mountName,
-  })
+  const text =
+    endText +
+    t('pipette_wizard_flow', {
+      flowtype: endText ? i18n.format(flowTypeText, 'lowerCase') : flowTypeText,
+      pipette: pipetteNameText || pipetteCategoryText,
+      mount: mountName,
+    })
 
-  const textToUse = endText ? endText + i18n.format(text, 'lowerCase') : text
-
-  return <div className={styles.action}>{textToUse}</div>
+  return <div className={styles.action}>{text}</div>
 }
 
 export const ActionsView = NiceModal.create(ActionsViewImpl)

@@ -104,9 +104,13 @@ export function useCommandTextString(
     case 'sealPipetteToTip':
     case 'unsealPipetteFromTip':
     case 'pressureDispense':
+    case 'verifyTipPresence':
       return {
         kind: 'generic',
-        commandText: utils.getPipettingCommandText(fullParams),
+        commandText: utils.getPipettingCommandText({
+          ...fullParams,
+          command,
+        }),
       }
 
     case 'loadLabware':

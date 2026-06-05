@@ -105,7 +105,7 @@ describe('ActionsView', () => {
       },
     ])
     screen.getByText(
-      'Calibrating Flex 1-Channel 1000 µL pipette on right mount'
+      'Finishing calibrating Flex 1-Channel 1000 µL pipette on right mount'
     )
   })
 

@@ -1,4 +1,5 @@
 {
+  "absent": "removed",
   "absorbance_reader_close_lid": "Closing Absorbance Reader lid",
   "absorbance_reader_initialize": "Initializing Absorbance Reader to perform {{mode}} measurement at {{wavelengths}}",
   "absorbance_reader_open_lid": "Opening Absorbance Reader lid",
@@ -98,6 +99,7 @@
   "pause_on": "Pause on {{robot_name}}",
   "pickup_tip": "Picking up tip(s) from {{well_range}} of {{labware}} in {{labware_location}}",
   "prepare_to_aspirate": "Preparing {{pipette}} to aspirate",
+  "present": "attached",
   "pressurizing_to_dispense": "Pressurize pipette to dispense {{volume}} µL from resin tip at {{flow_rate}} µL/sec",
   "quantity": "Quantity: {{count}}",
   "rear": "rear",
@@ -142,6 +144,7 @@
   "turning_rail_lights_on": "Turning rail lights on",
   "unlatching_hs_latch": "Unlatching labware on Heater-Shaker",
   "unsealing_from_location": "Unsealing from {{labware}} in {{location}}",
+  "verifying_tip_presence": "Verifying calibration tip is {{presence}} to {{pipette}} on {{mount}}",
   "wait_for_duration": "Pausing for {{seconds}} seconds. {{message}}",
   "wait_for_resume": "Pausing protocol",
   "wait_for_tasks": "Waiting for list of tasks to complete",
