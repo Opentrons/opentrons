@@ -22,68 +22,15 @@ jobs:
     runs-on: 'ubuntu-latest'
     name: 'Determine build variant and type'
     outputs:
-      variants: ${{steps.determine-build-type.outputs.variants}}
-      type: ${{steps.determine-build-type.outputs.type}}
+      variants: ${{ steps.determine-build-type.outputs.variants }}
+      type: ${{ steps.determine-build-type.outputs.type }}
     steps:
-      - id: determine-build-type
-        run: |
-          echo "Determining build type for event ${{github.event_name}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ] ; then
-            echo "internal-release release builds for ot3 tags"
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=release' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/v')) }}" = "true" ] ; then
-            echo "release release builds for v tags"
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=release' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/internal-release')) }}" = "true" ] ; then
-            echo "internal-release develop builds for internal-release branches"
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release')) }}" = "true" ] ; then
-            echo "Release develop builds for release branches"
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
-            echo "both develop builds for edge (manual)"
-            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build-internal')) }}" = "true" ] ; then
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "internal-release as-release builds for app-build-internal + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "internal-release develop builds for app-build-internal suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build')) }}" = "true" ] ; then
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "release as-release builds for app-build + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "release develop builds for app-build suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build-both')) }}" = "true" ] ; then
-            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "Both as-release builds for app-build-both + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "Both develop builds for app-build-both suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_name}}"
-            echo 'variants=[]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          fi
-
-      - name: set summary
-        run: |
-          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: ./.github/actions/app/determine-build-type
+        id: determine-build-type
+        with:
+          edge-build-policy: always
+          skip-pull-requests: 'false'
 
   build-app:
     needs: [determine-build-type]
