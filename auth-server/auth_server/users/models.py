@@ -85,8 +85,8 @@ class UpdateUser(BaseModel):
     ] = False
 
 
-class UpdateSelfPassword(BaseModel):
-    """Request body for the logged-in user to set a new password."""
+class UpdateSelf(BaseModel):
+    """Request body for updating the logged-in user."""
 
     password: Annotated[
         SecretStr,

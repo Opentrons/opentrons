@@ -20,7 +20,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from auth_server.users.dependencies import get_user_by_username, get_user_data_manager
 from auth_server.users.models import (
     ResetPasswordResponse,
-    UpdateSelfPassword,
+    UpdateSelf,
     UpdateUser,
     UserCreate,
     UserResponse,
@@ -234,11 +234,11 @@ async def get_self(  # noqa: D103
 
 @PydanticResponse.wrap_route(
     router.patch,
-    path="/auth/users/self/resetPassword",
-    summary="Update the currently logged-in user's password",
+    path="/auth/users/self",
+    summary="Update the currently logged-in user",
     description=(
-        "Set a new password for the currently authenticated user when resetPassword "
-        "is true."
+        "Update the currently authenticated user, for example to set a new password "
+        "when resetPassword is true."
     ),
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
@@ -246,8 +246,8 @@ async def get_self(  # noqa: D103
         fastapi.status.HTTP_401_UNAUTHORIZED: {},
     },
 )
-async def update_self_reset_password(
-    request_body: RequestModel[UpdateSelfPassword],
+async def update_self(
+    request_body: RequestModel[UpdateSelf],
     authorization_details: Annotated[
         RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF))
     ],
@@ -265,7 +265,7 @@ async def update_self_reset_password(
     try:
         result = user_data_manager.update_user(
             authorization_details.username,
-            request_body.data.password.get_secret_value(),
+            new_password=request_body.data.password.get_secret_value(),
         )
     except InvalidInputError as e:
         raise fastapi.HTTPException(
