@@ -12,7 +12,6 @@ export interface PatchAccessControlEnabledSettingsRequest {
 
 export interface AuthSettingsResponse {
   data: {
-    accessControlEnabled: boolean
     maxNumberOfLoginAttempts: number
     passwordResetTime: number
     passwordComplexityMinimumLength: number
