@@ -49,6 +49,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from ..data import get_git_description, csv_report
@@ -324,7 +325,9 @@ class DeviceUnderTest(Enum):
         return lookup[mount]
 
 
-def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
+def _get_serial_for_dut(
+    api: Union[OT3API, SyncHardwareAPI], dut: DeviceUnderTest
+) -> str:
     if dut == DeviceUnderTest.ROBOT:
         return get_robot_serial_ot3(api)
     elif dut == DeviceUnderTest.PIPETTE_LEFT or dut == DeviceUnderTest.PIPETTE_RIGHT:
@@ -343,7 +346,7 @@ def _get_serial_for_dut(api: OT3API, dut: DeviceUnderTest) -> str:
 
 
 def set_csv_report_meta_data_ot3(
-    api: OT3API,
+    api: Union[OT3API, SyncHardwareAPI],
     report: csv_report.CSVReport,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
@@ -402,14 +405,13 @@ def get_gantry_per_axis_setting_ot3(
             return settings.low_throughput[axis_kind]
 
 
-async def set_gantry_load_per_axis_current_settings_ot3(
-    api: OT3API,
+def _set_gantry_load_per_axis_current_settings_common(
+    api: Union[OT3API, SyncHardwareAPI],
     axis: Axis,
     load: Optional[GantryLoad] = None,
     hold_current: Optional[float] = None,
     run_current: Optional[float] = None,
-) -> None:
-    """Update an OT3 axis current settings."""
+) -> GantryLoad:
     if load is None:
         load = api.gantry_load
     if hold_current is not None:
@@ -426,20 +428,48 @@ async def set_gantry_load_per_axis_current_settings_ot3(
             load=load,
             value=run_current,
         )
-    # make sure new currents are sent to hardware controller
-    await api.set_gantry_load(load)
+    return load
 
 
-async def set_gantry_load_per_axis_motion_settings_ot3(
+async def set_gantry_load_per_axis_current_settings_ot3(
     api: OT3API,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    hold_current: Optional[float] = None,
+    run_current: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis current settings."""
+    checked_load = _set_gantry_load_per_axis_current_settings_common(
+        api, axis, load, hold_current, run_current
+    )
+    # make sure new currents are sent to hardware controller
+    await api.set_gantry_load(checked_load)
+
+
+def set_gantry_load_per_axis_current_settings_ot3_sync(
+    api: SyncHardwareAPI,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    hold_current: Optional[float] = None,
+    run_current: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis current settings."""
+    checked_load = _set_gantry_load_per_axis_current_settings_common(
+        api, axis, load, hold_current, run_current
+    )
+    # make sure new currents are sent to hardware controller
+    api.set_gantry_load(checked_load)
+
+
+def _set_gantry_load_per_axis_motion_settings_ot3_common(
+    api: Union[OT3API, SyncHardwareAPI],
     axis: Axis,
     load: Optional[GantryLoad] = None,
     default_max_speed: Optional[float] = None,
     acceleration: Optional[float] = None,
     max_speed_discontinuity: Optional[float] = None,
     direction_change_speed_discontinuity: Optional[float] = None,
-) -> None:
-    """Update an OT3 axis motion settings."""
+) -> GantryLoad:
     if load is None:
         load = api.gantry_load
     if default_max_speed is not None:
@@ -470,8 +500,53 @@ async def set_gantry_load_per_axis_motion_settings_ot3(
             load=load,
             value=direction_change_speed_discontinuity,
         )
+    return load
+
+
+async def set_gantry_load_per_axis_motion_settings_ot3(
+    api: OT3API,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    default_max_speed: Optional[float] = None,
+    acceleration: Optional[float] = None,
+    max_speed_discontinuity: Optional[float] = None,
+    direction_change_speed_discontinuity: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis motion settings."""
+    checked_load = _set_gantry_load_per_axis_motion_settings_ot3_common(
+        api,
+        axis,
+        load,
+        default_max_speed,
+        acceleration,
+        max_speed_discontinuity,
+        direction_change_speed_discontinuity,
+    )
     # make sure new currents are sent to hardware controller
-    await api.set_gantry_load(load)
+    await api.set_gantry_load(checked_load)
+
+
+def set_gantry_load_per_axis_motion_settings_ot3_sync(
+    api: SyncHardwareAPI,
+    axis: Axis,
+    load: Optional[GantryLoad] = None,
+    default_max_speed: Optional[float] = None,
+    acceleration: Optional[float] = None,
+    max_speed_discontinuity: Optional[float] = None,
+    direction_change_speed_discontinuity: Optional[float] = None,
+) -> None:
+    """Update an OT3 axis motion settings."""
+    checked_load = _set_gantry_load_per_axis_motion_settings_ot3_common(
+        api,
+        axis,
+        load,
+        default_max_speed,
+        acceleration,
+        max_speed_discontinuity,
+        direction_change_speed_discontinuity,
+    )
+    # make sure new currents are sent to hardware controller
+    api.set_gantry_load(checked_load)
 
 
 @dataclass
@@ -487,7 +562,7 @@ class GantryLoadSettings:
 
 
 def get_gantry_load_per_axis_motion_settings_ot3(
-    api: OT3API,
+    api: Union[OT3API, SyncHardwareAPI],
     axis: Axis,
     load: Optional[GantryLoad] = None,
 ) -> GantryLoadSettings:
@@ -708,7 +783,9 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
     await api.hold_jaw_width(int(delta))
 
 
-def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[Axis, float]:
+def get_endstop_position_ot3(
+    api: Union[OT3API, SyncHardwareAPI], mount: OT3Mount
+) -> Dict[Axis, float]:
     """Get the endstop's position per mount."""
     carriage_pos = api.get_deck_from_machine(api._backend.home_position())
     pos_at_home = api._effector_pos_from_carriage_pos(
@@ -888,6 +965,27 @@ async def move_to_arched_ot3(
     ]
     for p in points:
         await api.move_to(mount=mount, abs_position=p, speed=speed)
+
+
+def move_to_arched_ot3_sync(
+    api: SyncHardwareAPI,
+    mount: OT3Mount,
+    abs_position: Point,
+    speed: Optional[float] = None,
+    safe_height: float = -100.0,
+) -> None:
+    """Move OT3 gantry in an arched path."""
+    z_ax = Axis.by_mount(mount)
+    max_z = get_endstop_position_ot3(api, mount)[z_ax]
+    here = api.gantry_position(mount=mount, refresh=True)
+    arch_z = min(max(here.z, abs_position.z, safe_height), max_z)
+    points = [
+        here._replace(z=arch_z),
+        abs_position._replace(z=arch_z),
+        abs_position,
+    ]
+    for p in points:
+        api.move_to(mount=mount, abs_position=p, speed=speed)
 
 
 class SensorResponseBad(Exception):
@@ -1164,7 +1262,7 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     return f"P{volume}{channels}V{version}{id}"
 
 
-def get_robot_serial_ot3(api: OT3API) -> str:
+def get_robot_serial_ot3(api: Union[OT3API, SyncHardwareAPI]) -> str:
     """Get robot serial number."""
     if api.is_simulator:
         return "FLXA1000000000000"

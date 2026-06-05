@@ -136,6 +136,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
             ? 'local-dev'
             : (sentryReleaseEnv ?? OT_PD_VERSION),
           inject: false,
+          // set-commits --auto can hang on large monorepos (see sentry-cli set-commits).
+          // CI associates commits in getsentry/action-release after the build.
+          setCommits: false,
         },
         ...(enableSentrySourcemapUpload
           ? {

@@ -9,6 +9,7 @@ from . import mod_abc, types, update
 from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import (
+    DEFAULT_COMMAND_RETRIES,
     AbstractThermocyclerDriver,
     SimulatingDriver,
     ThermocyclerDriverFactory,
@@ -175,12 +176,16 @@ class Thermocycler(mod_abc.AbstractModule):
             self._enter_error_state
         )
 
-    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
-    async def cleanup(self) -> None:
+    async def soft_cleanup(self) -> None:
         """Stop the poller task."""
         self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
+
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self.soft_cleanup()
 
     @classmethod
     def name(cls) -> str:
@@ -355,10 +360,9 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._driver.set_plate_temperature(
             temp=temperature, hold_time=hold_time, volume=volume, ramp_rate=ramp_rate
         )
-
-        task = self._loop.create_task(self._wait_for_block_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_block_target, DEFAULT_COMMAND_RETRIES
+        )
 
     async def wait_for_block_target(self) -> None:
         """
@@ -372,9 +376,9 @@ class Thermocycler(mod_abc.AbstractModule):
         Returns: None
         """
         await self.wait_for_is_running()
-        task = self._loop.create_task(self._wait_for_block_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_block_target, DEFAULT_COMMAND_RETRIES
+        )
 
     async def cycle_temperatures(
         self,
@@ -437,18 +441,16 @@ class Thermocycler(mod_abc.AbstractModule):
         """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=temperature)
-
-        task = self._loop.create_task(self._wait_for_lid_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_lid_target, DEFAULT_COMMAND_RETRIES
+        )
 
     async def wait_for_lid_target(self) -> None:
         """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
-
-        task = self._loop.create_task(self._wait_for_lid_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_lid_target, DEFAULT_COMMAND_RETRIES
+        )
 
     # TODO(mc, 2022-04-25): de-duplicate with `set_temperature`
     async def set_target_block_temperature(
