@@ -5,17 +5,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
-import {
-  useOAuth2PasswordLogin,
-  useUpdateSelf,
-} from '/app/resources/auth'
+import { useOAuth2PasswordLogin, useUpdateSelf } from '/app/resources/auth'
 
 import { showLoginModal } from '../LoginModal'
 
+import type * as ReactI18next from 'react-i18next'
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('react-i18next', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-i18next')>()
+  const actual = await importOriginal<typeof ReactI18next>()
   return {
     ...actual,
     useTranslation: () => ({

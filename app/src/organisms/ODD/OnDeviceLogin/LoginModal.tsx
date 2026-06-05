@@ -10,10 +10,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
 import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
-import {
-  useOAuth2PasswordLogin,
-  useUpdateSelf,
-} from '/app/resources/auth'
+import { useOAuth2PasswordLogin, useUpdateSelf } from '/app/resources/auth'
 
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'

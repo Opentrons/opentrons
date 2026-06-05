@@ -43,12 +43,7 @@ export function useUpdateSelf(
 
   const { submitPassword, isAuthLoading: isOAuthLoading } =
     useOAuth2PasswordLogin({
-      onSuccess: (
-        username,
-        _accessToken,
-        _user,
-        response
-      ) => {
+      onSuccess: (username, _accessToken, _user, response) => {
         onSuccess(username, response)
       },
       onError,

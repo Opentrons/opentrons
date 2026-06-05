@@ -112,7 +112,7 @@ export function useOAuth2PasswordLogin(
           onSuccess(username, accessToken, user, response)
         })
         .catch(() => {
-          onError(t('login_error_incorrect'))
+          onError(t('login_error_incorrect') as string)
         })
         .finally(() => {
           setIsFetchingSelf(false)
