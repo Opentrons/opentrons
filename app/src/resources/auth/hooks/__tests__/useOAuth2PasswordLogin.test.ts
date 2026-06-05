@@ -5,7 +5,6 @@ import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 
 import { useOAuth2PasswordLogin } from '../useOAuth2PasswordLogin'
 
-import type * as ApiClient from '@opentrons/api-client'
 import type {
   AuthUser,
   AuthUserResponse,
@@ -44,7 +43,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 
 vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = await importOriginal<typeof ApiClient>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     getSelf: vi.fn(),
