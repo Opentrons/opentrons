@@ -3361,12 +3361,15 @@ class OT3API(
         s_data = await self._backend.read_pressure_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
-    async def read_stem_capacitance(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    async def read_instrument_capacitance(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        primary: bool = True,
+        timeout: int = 1,
     ) -> float:
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend.read_capacitive_sensor(realmount, primary)
+        s_data = await self._backend.read_capacitive_sensor(realmount, primary, timeout)
         return s_data if s_data else 0.0
 
     async def touch_probe(

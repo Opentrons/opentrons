@@ -303,6 +303,18 @@ class Protocols:
     Flex_S_2_28_P50S_20uLMeniscusHeight: Protocol = Protocol(
         file_stem="Flex_S_2_28_P50S_20uLMeniscusHeight", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
+    Flex_S_2_29_volume_mode_testing_in_transfer_w_liquid_class_20ul_tips: Protocol = Protocol(
+        file_stem="Flex_S_2_29_volume_mode_testing_in_transfer_w_liquid_class_20ul_tips",
+        file_extension="py",
+        robot="Flex",
+        folder=PROTOCOLS_FOLDER,
+    )
+    Flex_S_2_29_volume_mode_testing_in_transfer_w_liquid_class_50ul_tips: Protocol = Protocol(
+        file_stem="Flex_S_2_29_volume_mode_testing_in_transfer_w_liquid_class_50ul_tips",
+        file_extension="py",
+        robot="Flex",
+        folder=PROTOCOLS_FOLDER,
+    )
     Flex_S_2_7_96_channel_select_tips: Protocol = Protocol(
         file_stem="Flex_S_2_7_96_channel_select_tips", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
@@ -937,7 +949,4 @@ class Protocols:
         file_extension="json",
         robot="Flex",
         folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER,
-    )
-    OT2_S_v2_20_P50_touch_tip: Protocol = Protocol(
-        file_stem="OT2_S_v2_20_P50_touch_tip", file_extension="py", robot="OT2", folder=PROTOCOLS_FOLDER
     )

@@ -61,7 +61,22 @@ export default defineConfig(async (): Promise<UserConfig> => {
         output: {
           // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
           manualChunks(id) {
-            if (id.includes('node_modules')) return 'vendor'
+            // need to specify to avoid duplicated bundling
+            if (id.includes('/shared-data/js')) return 'opentrons-shared-data'
+            if (id.includes('/components/src')) return 'opentrons-components'
+            if (id.includes('/step-generation/src'))
+              return 'opentrons-step-generation'
+
+            if (id.includes('node_modules')) {
+              // plotly is only used in ByVolumeBuilder (inside the lazy Designer
+              // page) — keep it out of vendor so it doesn't load on every page
+              if (
+                id.includes('plotly.js-cartesian-dist') ||
+                id.includes('react-plotly.js')
+              )
+                return undefined
+              return 'vendor'
+            }
           },
         },
       },
@@ -121,6 +136,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
             ? 'local-dev'
             : (sentryReleaseEnv ?? OT_PD_VERSION),
           inject: false,
+          // set-commits --auto can hang on large monorepos (see sentry-cli set-commits).
+          // CI associates commits in getsentry/action-release after the build.
+          setCommits: false,
         },
         ...(enableSentrySourcemapUpload
           ? {

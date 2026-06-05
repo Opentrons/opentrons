@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import { logInOrRefresh } from '/app/redux/robot-auth'
+import { logIn } from '/app/redux/robot-auth'
 
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
@@ -33,7 +33,7 @@ export function useStoreLoginState(): (
       }
 
       dispatch(
-        logInOrRefresh({
+        logIn({
           username,
           robotName: localRobotName,
           accessToken: successfulLoginResponse.access_token,

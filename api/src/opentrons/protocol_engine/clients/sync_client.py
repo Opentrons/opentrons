@@ -202,6 +202,14 @@ class SyncClient:
     ) -> commands.CreateCSVResult:
         pass
 
+    @overload
+    def execute_command_without_recovery(
+        self,
+        params: commands.vacuum_module.StartRunProfileParams,
+        command_annotations: list[str],
+    ) -> commands.vacuum_module.StartRunProfileResult:
+        pass
+
     def execute_command_without_recovery(
         self,
         params: commands.CommandParams,

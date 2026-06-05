@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
+  getPositionFromAddressableAreaId,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   STANDARD_FLEX_SLOTS,
@@ -12,15 +13,20 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getIsSlotAVacuumDock,
+  getSlotInLocationStack,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+} from '@opentrons/step-generation'
 
 import {
   FLEX_STACKER_IN_HOPPER_ACTIONS,
   HOPPER_LABWARE_X_OFFSET,
 } from '/protocol-designer/constants'
+import { getDeckConfiguration } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
 
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
@@ -63,6 +69,7 @@ const SLOTS = [
   'C4',
   'D4',
   'cutoutD3',
+  VACUUM_DOCK_ADDRESSABLE_AREA,
 ]
 
 export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
@@ -73,6 +80,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
   )
   const hoveredItem = useSelector(getHoveredDropdownItem)
   const selectedDropdownItems = useSelector(getSelectedDropdownItem)
+  const { deckConfig } = useSelector(getDeckConfiguration)
 
   if (
     hoveredItem == null &&
@@ -132,7 +140,13 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     const tcModel = Object.values(modules).find(
       module => module.type === THERMOCYCLER_MODULE_TYPE
     )?.model
-    const position = getPositionFromSlotId(labwareSlot, deckDef)
+    const position = getIsSlotAVacuumDock(labwareSlot)
+      ? getPositionFromAddressableAreaId({
+          addressableAreaId: VACUUM_DOCK_ADDRESSABLE_AREA,
+          deckDef,
+          deckConfiguration: deckConfig,
+        })
+      : getPositionFromSlotId(labwareSlot, deckDef)
     if (position != null) {
       let tcPosition: CoordinateTuple = FLEX_TC_POSITION
       if (labwareSlot === '7') {
@@ -319,10 +333,18 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         return items
       }
 
+      const slotPosition = getIsSlotAVacuumDock(addressableArea.id)
+        ? getPositionFromAddressableAreaId({
+            addressableAreaId: VACUUM_DOCK_ADDRESSABLE_AREA,
+            deckDef,
+            deckConfiguration: deckConfig,
+          })
+        : getPositionFromSlotId(addressableArea.id, deckDef)
+
       items.push(
         <DeckItemHighlight
           slotBoundingBox={addressableArea.boundingBox}
-          slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
+          slotPosition={slotPosition}
           itemId={addressableArea.id}
         />
       )

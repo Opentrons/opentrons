@@ -5,16 +5,23 @@ import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getIsLid,
+  getModuleDisplayName,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
   getSlotInLocationStack,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+  VACUUM_DOCK_LOCATION,
 } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { VACUUM_MODULE_SLOT } from '/protocol-designer/constants'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getIsVacuumCollar } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import {
   getUnoccupiedStackOptions,
   TIPRACK_LID_LOADNAME,
@@ -129,9 +136,15 @@ export function LabwareLocationField(
             moduleEntities[value].model
           )
         } else if (value in labwareEntities) {
-          isCompatible = compatibleParentLoadNames.has(
+          const isCompatibleFromDefinition = compatibleParentLoadNames.has(
             labwareEntities[value].def.parameters.loadName
           )
+          const { def: defToMoveTo } = labwareEntities[value]
+          const isAllowedForUniversalLid =
+            def.parameters.loadName === 'opentrons_tough_universal_lid' &&
+            // moving to a non-lid is allowed implicitly
+            !getIsLid(defToMoveTo)
+          isCompatible = isCompatibleFromDefinition || isAllowedForUniversalLid
         }
         return isCompatible
       })
@@ -161,6 +174,65 @@ export function LabwareLocationField(
           robotState?.modules?.[value]?.moduleState.type !==
           FLEX_STACKER_MODULE_TYPE
       )
+  }
+
+  const isLabwareAVacuumCollar =
+    labwareEntities[labware] != null &&
+    getIsVacuumCollar(labwareEntities[labware].def)
+
+  // only vacuum collars can be moved directly to the vacuum dock
+  if (!isLabwareAVacuumCollar) {
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        ({ value }) => value !== VACUUM_DOCK_ADDRESSABLE_AREA
+      )
+  } else if (isLabwareAVacuumCollar && robotState != null) {
+    const vacuumModuleEntry = Object.entries(moduleEntities).find(
+      ([, entity]) => entity.type === VACUUM_MODULE_TYPE
+    )
+    if (vacuumModuleEntry != null) {
+      const [vacuumModuleId, vacuumModuleEntity] = vacuumModuleEntry
+      // labware physically on the main module slot ("A3")
+      const labwareOnModule = Object.entries(robotState.labware).filter(
+        ([, lw]) =>
+          lw.stack.includes(vacuumModuleId) &&
+          !lw.stack.includes(VACUUM_DOCK_LOCATION)
+      )
+      const vacuumModuleHasNoCollar = !labwareOnModule.some(([lwId]) => {
+        return (
+          labwareEntities[lwId] != null &&
+          getIsVacuumCollar(labwareEntities[lwId].def)
+        )
+      })
+
+      // offer the vacuum module as a destination when it has no collar yet
+      // (empty module is valid — collar can sit directly on the module)
+      // forMoveLabware will build the full stack including any existing module labware
+      if (vacuumModuleHasNoCollar) {
+        const isVacuumModuleAlreadyIncluded =
+          unoccupiedLabwareLocationsOptions.some(
+            ({ value }) => value === vacuumModuleId
+          )
+        if (!isVacuumModuleAlreadyIncluded) {
+          unoccupiedLabwareLocationsOptions = [
+            ...unoccupiedLabwareLocationsOptions,
+            {
+              name: getModuleDisplayName(vacuumModuleEntity.model),
+              value: vacuumModuleId,
+              deckLabel: VACUUM_MODULE_SLOT,
+            },
+          ]
+        }
+      }
+
+      // collar can only go to the vacuum dock or the vacuum module main area (when eligible)
+      unoccupiedLabwareLocationsOptions =
+        unoccupiedLabwareLocationsOptions.filter(
+          ({ value }) =>
+            value === VACUUM_DOCK_ADDRESSABLE_AREA ||
+            (vacuumModuleHasNoCollar && value === vacuumModuleId)
+        )
+    }
   }
 
   const optionsSorted =

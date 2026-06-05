@@ -49,8 +49,8 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-export const PAPI_VERSION = '2.28' // oldest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
-export const PD_APPLICATION_VERSION = '8.11.0' // latest PD version to insert into DESIGNER_APPLICATION blob
+export const PAPI_VERSION = '2.29' // oldest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
+export const PD_APPLICATION_VERSION = '9.0.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')

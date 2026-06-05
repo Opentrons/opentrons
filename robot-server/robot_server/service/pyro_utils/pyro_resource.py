@@ -163,6 +163,32 @@ class RobotServerPyroResource:
                 "Cannot provider a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
             )
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_maintenance_run_door_watcher_callback(self) -> HardwareEventHandler:
+        """Get a door watcher callback from a non-subprocess Maintenance Run."""
+        orchestrator_store = self._maintenance_run_orchestrator_store
+        if orchestrator_store is not None:
+            return (
+                orchestrator_store.maintenance_run_door_watcher_callback_route_for_proxy
+            )
+        else:
+            raise RuntimeError(
+                "Cannot provider a maintenance run door watcher from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_default_run_orchestrator_door_watcher_callback(
+        self,
+    ) -> HardwareEventHandler:
+        """Get a door watcher callback from a non-subprocess Default Run Orchestrator."""
+        orchestrator_store = self._run_orchestrator_store
+        if orchestrator_store is not None:
+            return orchestrator_store.default_run_orchestrator_door_watcher_callback_route_for_proxy
+        else:
+            raise RuntimeError(
+                "Cannot provider a default run orchestrator door watcher from the RobotServerPyroResource without a RunOrchestratorStore."
+            )
+
     async def get_deck_configuration(self) -> DeckConfigurationType:
         """Provide the current recognized DeckConfiguration of the robot server."""
 
