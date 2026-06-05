@@ -70,7 +70,7 @@
   "load_liquid_class": "Loading {{liquidClassDisplayName}} Liquid Class",
   "load_liquids_info_protocol_setup": "Load {{liquid}} into {{labware}}",
   "load_module_protocol_setup": "Load {{module}} in Slot {{slot_name}}",
-  "load_pipette_protocol_setup": "Load {{pipette_name}} in {{mount_name}} Mount",
+  "load_pipette_protocol_setup": "Load {{pipette_name}} on {{mount_name}}",
   "module_in_slot": "{{module}} in Slot {{slot_name}}",
   "module_in_slot_plural": "{{module}}",
   "move_labware": "Move Labware",
