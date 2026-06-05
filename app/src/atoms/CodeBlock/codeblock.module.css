@@ -1,4 +1,5 @@
 .container {
+  width: 100%;
   padding: var(--spacing-6) var(--spacing-12);
   border-radius: var(--border-radius-4);
   background-color: var(--grey-20);
