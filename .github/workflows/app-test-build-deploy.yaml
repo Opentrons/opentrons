@@ -119,7 +119,7 @@ jobs:
       - name: check make version
         run: make --version
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="${{matrix.shell}}/src"
+        run: make test-js-${{matrix.shell}}
 
   determine-build-type:
     runs-on: 'ubuntu-latest'

@@ -231,7 +231,12 @@ $(SHARED_DATA_DIR)-py-test:
 	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-js
-test-js: test-js-internal
+test-js:
+	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-js-%
+test-js-%:
+	pnpm vitest run --dir $* $(tests) $(test_opts) $(cov_opts)
 
 # lints and typechecks
 .PHONY: lint
@@ -320,15 +325,6 @@ circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
 
 %-circular-dependencies-js:
 	pnpm madge $(and $(CI),--no-spinner --no-color) --circular $*
-
-.PHONY: test-js-internal
-test-js-internal:
-	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
-
-
-.PHONY: test-js-%
-test-js-%:
-	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
 # Convenience commands for running all of our servers in dev mode, together,
 # behind a reverse proxy listening on port 31950.
