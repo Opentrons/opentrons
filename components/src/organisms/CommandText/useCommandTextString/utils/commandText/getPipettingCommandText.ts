@@ -233,7 +233,8 @@ export const getPipettingCommandText = ({
       const pipette = commandTextData?.pipettes.find(
         pipette => pipette.id === pipetteId
       )
-      const mount = pipette?.mount
+      const mount =
+        pipette?.mount === 'left' ? t('left_mount') : t('right_mount')
       const presence = !!command.params.expectedState
         ? t(command.params.expectedState)
         : ''

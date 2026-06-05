@@ -258,12 +258,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                         robotName={localRobot.name}
                       />
                     ) : null}
-                    <NiceModal.Provider>
-                      <DocumentationRequiredModalContext.Provider
-                        value={{
-                          showDocumentationRequiredModal: requireDocumentation,
-                        }}
-                      >
+                    <DocumentationRequiredModalContext.Provider
+                      value={{
+                        showDocumentationRequiredModal: requireDocumentation,
+                      }}
+                    >
+                      <NiceModal.Provider>
                         <RobotEncryptionKeyTakeover>
                           <ToasterOven>
                             <ProtocolReceiptToasts />
@@ -281,8 +281,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             <LoggedOutOverlayMount />
                           </ToasterOven>
                         </RobotEncryptionKeyTakeover>
-                      </DocumentationRequiredModalContext.Provider>
-                    </NiceModal.Provider>
+                      </NiceModal.Provider>
+                    </DocumentationRequiredModalContext.Provider>
                   </MaintenanceRunTakeover>
                 </>
               )}
