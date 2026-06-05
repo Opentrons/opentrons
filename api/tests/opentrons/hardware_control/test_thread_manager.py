@@ -78,6 +78,8 @@ async def test_module_cache_remove_entry() -> None:
         loop,
     )
     future.result()
+    # give the cleanup task time
+    await asyncio.sleep(0.2)
     mods_after = thread_manager.attached_modules
     assert len(mods_after) == 1
 

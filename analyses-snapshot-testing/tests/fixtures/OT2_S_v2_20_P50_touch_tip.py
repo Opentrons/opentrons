@@ -1,5 +1,3 @@
-import random
-from typing import Set
 from opentrons import protocol_api
 
 # metadata
@@ -21,7 +19,6 @@ def load_liquid_in_all_wells(labware, liquid) -> None:
 
 
 def run(protocol: protocol_api.ProtocolContext):
-
     # labware
     tiprack2 = protocol.load_labware("opentrons_96_tiprack_20ul", "5")
     wet_sample = protocol.load_labware("nest_12_reservoir_15ml", "2")
