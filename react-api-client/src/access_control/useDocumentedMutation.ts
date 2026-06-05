@@ -83,7 +83,6 @@ function useWrappedMutationFn<TData, TVariables>(
       if (docreport == null) {
         console.error('No documentation report provided')
       }
-      console.log('reason for interaction:', docreport)
       return await mutationFn({ variables, userNotes: docreport ?? '' })
     },
     [actionsToDocument, documentationState, mutationFn]
