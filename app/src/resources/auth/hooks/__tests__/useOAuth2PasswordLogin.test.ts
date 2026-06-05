@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
+import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 
 import { useOAuth2PasswordLogin } from '../useOAuth2PasswordLogin'
 
@@ -79,8 +79,8 @@ describe('useOAuth2PasswordLogin', () => {
           locked: false,
           resetPassword: false,
         },
-      },
-    } as AuthUserResponse)
+      } as AuthUserResponse,
+    } as Awaited<ReturnType<typeof getSelf>>)
   })
 
   it('calls getOAuth2Token with ROPC body including client_id', () => {
@@ -110,8 +110,8 @@ describe('useOAuth2PasswordLogin', () => {
       resetPassword: true,
     }
     mockGetSelf.mockResolvedValue({
-      data: { data: user },
-    } as AuthUserResponse)
+      data: { data: user } as AuthUserResponse,
+    } as Awaited<ReturnType<typeof getSelf>>)
 
     renderHook(() => useOAuth2PasswordLogin({ onSuccess, onError }))
 
