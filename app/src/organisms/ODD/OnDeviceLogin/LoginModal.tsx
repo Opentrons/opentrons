@@ -1,19 +1,15 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { getSelf } from '@opentrons/api-client'
-import { getQueryKey, useHost, useSelfQuery } from '@opentrons/react-api-client'
+import { getQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import {
-  getCurrentUsernameForLocalRobot,
-  getIsLoggedInToLocalRobot,
-  logOut,
-} from '/app/redux/robot-auth'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -53,33 +49,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
 
-  const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
-  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
-  const selfQuery = useSelfQuery({
-    enabled: isLoggedIn,
-  })
-  const resetPasswordRequired = selfQuery.data?.data.resetPassword ?? false
-
   const isChoosingNewPassword = phase === 'chooseNewPassword'
-
-  const shouldSkipToChooseNewPassword =
-    resetPasswordRequired &&
-    isLoggedIn &&
-    currentUsername != null &&
-    currentUsername !== '' &&
-    phase === 'login'
-
-  // Already logged in with a temp password — skip straight to choosing a new one.
-  useEffect(() => {
-    if (!shouldSkipToChooseNewPassword) {
-      return
-    }
-
-    setLoggedInUsername(currentUsername)
-    setPhase('chooseNewPassword')
-    setStep('password')
-    setFormKey(key => key + 1)
-  }, [shouldSkipToChooseNewPassword, currentUsername])
 
   const fetchSelfAfterLogin = useCallback(
     async (accessToken: string) => {
@@ -188,9 +158,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   }
 
   const initialUsername =
-    phase === 'chooseNewPassword'
-      ? (loggedInUsername ?? currentUsername ?? undefined)
-      : undefined
+    phase === 'chooseNewPassword' ? (loggedInUsername ?? undefined) : undefined
 
   return (
     <div className={styles.overlay}>

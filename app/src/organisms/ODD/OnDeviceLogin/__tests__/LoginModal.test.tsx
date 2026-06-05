@@ -3,7 +3,7 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getSelf } from '@opentrons/api-client'
-import { useHost, useSelfQuery } from '@opentrons/react-api-client'
+import { useHost } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -31,12 +31,7 @@ vi.mock('react-i18next', async importOriginal => {
   }
 })
 
-let mockIsLoggedIn = false
-let mockCurrentUsername: string | null = null
-
 vi.mock('/app/redux/robot-auth', () => ({
-  getIsLoggedInToLocalRobot: () => mockIsLoggedIn,
-  getCurrentUsernameForLocalRobot: () => mockCurrentUsername,
   logOut: vi.fn(),
 }))
 
@@ -50,7 +45,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useHost: vi.fn(),
-    useSelfQuery: vi.fn(),
   }
 })
 
@@ -120,10 +114,6 @@ describe('LoginModal', () => {
   const mockStoreLoginState = vi.fn()
 
   beforeEach(() => {
-    mockIsLoggedIn = false
-    mockCurrentUsername = null
-    // useSelfQuery is only enabled when logged in; keep a safe default for logged-out tests.
-
     vi.mocked(useHost).mockReturnValue({ hostname: 'localhost' })
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: vi.fn(),
@@ -131,9 +121,6 @@ describe('LoginModal', () => {
       eatToast: vi.fn(),
     })
     vi.mocked(useStoreLoginState).mockReturnValue(mockStoreLoginState)
-    vi.mocked(useSelfQuery).mockReturnValue({
-      data: { data: { resetPassword: false } },
-    } as ReturnType<typeof useSelfQuery>)
 
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
@@ -214,29 +201,6 @@ describe('LoginModal', () => {
     })
     await new Promise(resolve => setTimeout(resolve, 50))
     expect(modalResolved).toBe(false)
-  })
-
-  it('skips to the new-password flow when already logged in with reset required', async () => {
-    mockIsLoggedIn = true
-    mockCurrentUsername = 'alice'
-    vi.mocked(useSelfQuery).mockReturnValue({
-      data: { data: { resetPassword: true } },
-    } as ReturnType<typeof useSelfQuery>)
-
-    renderWithProviders(
-      <NiceModal.Provider>
-        <div />
-      </NiceModal.Provider>
-    )
-    act(() => {
-      showLoginModal()
-    })
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'on_device_login_new_password' })
-      ).toBeInTheDocument()
-    })
   })
 
   it('completes the new-password flow and resolves the modal', async () => {
