@@ -1,8 +1,12 @@
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 
-import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
-import { useGetOAuth2TokenMutation } from '@opentrons/react-api-client'
+import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
+import {
+  useGetOAuth2TokenMutation,
+  useHost,
+} from '@opentrons/react-api-client'
 
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
 
@@ -20,9 +24,14 @@ interface OAuth2TokenErrorResponse {
 
 export interface UseOAuth2PasswordLoginOptions {
   /**
-   * Called when the login request succeeds.
+   * Called after OAuth login succeeds and `GET /auth/users/self` completes.
    */
-  onSuccess: (username: string, response: OAuth2TokenResponse) => void
+  onSuccess: (
+    username: string,
+    accessToken: string,
+    userMustSetNewPassword: boolean,
+    response: OAuth2TokenResponse
+  ) => void
   /**
    * Called with a user-facing message when the token request fails.
    */
@@ -38,12 +47,17 @@ interface UseOAuth2PasswordLoginResult {
  * Resource-owner password OAuth2 flow against `POST /auth/oauth2/token`
  * on the same base URL as the robot API (`ApiHostProvider` hostname/port).
  * Must run under `ApiHostProvider` so `useGetOAuth2TokenMutation` resolves the host.
+ *
+ * After a successful token response, fetches `GET /auth/users/self` to
+ * determine whether the user must set a new password.
  */
 export function useOAuth2PasswordLogin(
   options: UseOAuth2PasswordLoginOptions
 ): UseOAuth2PasswordLoginResult {
   const { onSuccess, onError } = options
   const { t } = useTranslation('access_control')
+  const host = useHost()
+  const [isFetchingSelf, setIsFetchingSelf] = useState(false)
 
   const getErrorMessage = (error: unknown): string => {
     if (axios.isAxiosError(error)) {
@@ -70,17 +84,44 @@ export function useOAuth2PasswordLogin(
     }
   }
 
+  const fetchSelfAfterLogin = useCallback(
+    async (accessToken: string) => {
+      if (host == null) {
+        throw new Error('Missing API host')
+      }
+      const response = await getSelf({ ...host, token: accessToken })
+      return response.data.data
+    },
+    [host]
+  )
+
   const { getOAuth2Token, isLoading } = useGetOAuth2TokenMutation({
     onSuccess: (responseData, requestVariables) => {
-      if (requestVariables.grant_type === 'password') {
-        onSuccess(requestVariables.username, responseData.data)
-      } else {
+      if (requestVariables.grant_type !== 'password') {
         // Shouldn't happen since this hook only sends request with grant_type==='password'.
         console.warn(
           'Expected grant_type password, got',
           requestVariables.grant_type
         )
+        return
       }
+
+      const response = responseData.data
+      const accessToken = response.access_token as string
+      const username = requestVariables.username
+
+      setIsFetchingSelf(true)
+      void fetchSelfAfterLogin(accessToken)
+        .then(self => {
+          const userMustSetNewPassword = self.resetPassword ?? false
+          onSuccess(username, accessToken, userMustSetNewPassword, response)
+        })
+        .catch(() => {
+          onError(t('login_error_incorrect'))
+        })
+        .finally(() => {
+          setIsFetchingSelf(false)
+        })
     },
     onError: (error: unknown) => {
       onError(getErrorMessage(error))
@@ -96,5 +137,5 @@ export function useOAuth2PasswordLogin(
     })
   }
 
-  return { submitPassword, isAuthLoading: isLoading }
+  return { submitPassword, isAuthLoading: isLoading || isFetchingSelf }
 }

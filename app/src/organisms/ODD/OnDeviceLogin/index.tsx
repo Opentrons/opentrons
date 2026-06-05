@@ -58,12 +58,6 @@ export function OnDeviceLogin({
     },
   })
 
-  useEffect(() => {
-    if (initialUsername != null && initialUsername !== '') {
-      setValue('username', initialUsername)
-    }
-  }, [initialUsername, setValue])
-
   const [showKeyboard, setShowKeyboard] = useState(false)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 

@@ -91,7 +91,7 @@ describe('LoginModal', () => {
         ({
           submitPassword: (username: string, password: string) => {
             submitPassword(username, password)
-            onSuccess(username, TOKEN_RESPONSE)
+            onSuccess(username, 'new-access-token', false, TOKEN_RESPONSE)
           },
           isAuthLoading: false,
         }) as ReturnType<typeof useOAuth2PasswordLogin>

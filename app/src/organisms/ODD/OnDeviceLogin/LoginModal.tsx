@@ -4,7 +4,6 @@ import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { getSelf } from '@opentrons/api-client'
 import { getQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -51,17 +50,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
-  const fetchSelfAfterLogin = useCallback(
-    async (accessToken: string) => {
-      if (host == null) {
-        throw new Error('Missing API host')
-      }
-      const response = await getSelf({ ...host, token: accessToken })
-      return response.data.data
-    },
-    [host]
-  )
-
   const invalidateSelfQuery = useCallback((): void => {
     if (host == null) return
     void queryClient.invalidateQueries(
@@ -79,28 +67,27 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   )
 
   const handleLoginSuccess = useCallback(
-    async (username: string, response: OAuth2TokenResponse): Promise<void> => {
+    (
+      username: string,
+      _accessToken: string,
+      userMustSetNewPassword: boolean,
+      response: OAuth2TokenResponse
+    ): void => {
       setLoginError(null)
       storeLoginState(username, response)
       invalidateSelfQuery()
 
-      try {
-        const self = await fetchSelfAfterLogin(response.access_token as string)
-
-        if (self.resetPassword) {
-          setLoggedInUsername(username)
-          setPhase('chooseNewPassword')
-          setStep('password')
-          setFormKey(key => key + 1)
-          return
-        }
-
-        finishModal(username)
-      } catch {
-        setLoginError(t('on_device_login_error_incorrect') as string)
+      if (userMustSetNewPassword) {
+        setLoggedInUsername(username)
+        setPhase('chooseNewPassword')
+        setStep('password')
+        setFormKey(key => key + 1)
+        return
       }
+
+      finishModal(username)
     },
-    [fetchSelfAfterLogin, finishModal, invalidateSelfQuery, storeLoginState, t]
+    [finishModal, invalidateSelfQuery, storeLoginState]
   )
 
   const dismissModal = useCallback((): void => {
@@ -139,9 +126,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =
     useOAuth2PasswordLogin({
-      onSuccess: (username, response) => {
-        void handleLoginSuccess(username, response)
-      },
+      onSuccess: handleLoginSuccess,
       onError: message => {
         setLoginError(message)
       },

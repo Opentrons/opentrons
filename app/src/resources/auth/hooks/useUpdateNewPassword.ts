@@ -45,7 +45,17 @@ export function useUpdateNewPassword(
     useResetSelfPasswordMutation({}, hostWithToken)
 
   const { submitPassword, isAuthLoading: isOAuthLoading } =
-    useOAuth2PasswordLogin({ onSuccess, onError })
+    useOAuth2PasswordLogin({
+      onSuccess: (
+        username,
+        _accessToken,
+        _userMustSetNewPassword,
+        response
+      ) => {
+        onSuccess(username, response)
+      },
+      onError,
+    })
 
   const updateNewPassword = useCallback(
     (username: string, password: string): void => {

@@ -2,9 +2,6 @@ import NiceModal from '@ebay/nice-modal-react'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getSelf } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
@@ -15,11 +12,7 @@ import {
 
 import { showLoginModal } from '../LoginModal'
 
-import type {
-  AuthUser,
-  AuthUserResponse,
-  OAuth2TokenResponse,
-} from '@opentrons/api-client'
+import type { OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('react-i18next', async importOriginal => {
   const actual = await importOriginal<typeof import('react-i18next')>()
@@ -38,23 +31,6 @@ vi.mock('/app/redux/robot-auth', () => ({
 vi.mock('/app/redux/discovery', () => ({
   getLocalRobot: vi.fn(() => null),
 }))
-
-vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual =
-    await importOriginal<typeof import('@opentrons/react-api-client')>()
-  return {
-    ...actual,
-    useHost: vi.fn(),
-  }
-})
-
-vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = await importOriginal<typeof import('@opentrons/api-client')>()
-  return {
-    ...actual,
-    getSelf: vi.fn(),
-  }
-})
 
 vi.mock('/app/resources/auth', () => ({
   useOAuth2PasswordLogin: vi.fn(),
@@ -76,25 +52,6 @@ const OAUTH_RESPONSE: OAuth2TokenResponse = {
   expires_in: 3600,
 }
 
-const AUTH_USER: AuthUser = {
-  username: 'alice',
-  fullName: 'Alice',
-  accountType: 'user',
-  scopes: [],
-  locked: false,
-  resetPassword: false,
-}
-
-function mockSelfUser(overrides: Partial<AuthUser> = {}): AuthUser {
-  return { ...AUTH_USER, ...overrides }
-}
-
-function mockGetSelfResponse(user: AuthUser): void {
-  vi.mocked(getSelf).mockResolvedValue({
-    data: { data: user } as AuthUserResponse,
-  } as Awaited<ReturnType<typeof getSelf>>)
-}
-
 function openLoginModal(): ReturnType<typeof showLoginModal> {
   renderWithProviders(
     <NiceModal.Provider>
@@ -114,7 +71,6 @@ describe('LoginModal', () => {
   const mockStoreLoginState = vi.fn()
 
   beforeEach(() => {
-    vi.mocked(useHost).mockReturnValue({ hostname: 'localhost' })
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: vi.fn(),
       makeToast: vi.fn(),
@@ -124,7 +80,7 @@ describe('LoginModal', () => {
 
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
-        onSuccess(username, OAUTH_RESPONSE)
+        onSuccess(username, 'access-token', false, OAUTH_RESPONSE)
       },
       isAuthLoading: false,
     }))
@@ -136,7 +92,6 @@ describe('LoginModal', () => {
       isLoading: false,
     }))
 
-    mockGetSelfResponse(mockSelfUser())
   })
 
   afterEach(() => {
@@ -180,7 +135,12 @@ describe('LoginModal', () => {
   })
 
   it('switches to the new-password flow when login requires a password reset', async () => {
-    mockGetSelfResponse(mockSelfUser({ resetPassword: true }))
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+      submitPassword: (username: string, _password: string) => {
+        onSuccess(username, 'access-token', true, OAUTH_RESPONSE)
+      },
+      isAuthLoading: false,
+    }))
 
     const resultPromise = openLoginModal()
 
@@ -204,7 +164,12 @@ describe('LoginModal', () => {
   })
 
   it('completes the new-password flow and resolves the modal', async () => {
-    mockGetSelfResponse(mockSelfUser({ resetPassword: true }))
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+      submitPassword: (username: string, _password: string) => {
+        onSuccess(username, 'access-token', true, OAUTH_RESPONSE)
+      },
+      isAuthLoading: false,
+    }))
 
     const resultPromise = openLoginModal()
 
@@ -218,8 +183,6 @@ describe('LoginModal', () => {
         screen.getByRole('heading', { name: 'on_device_login_new_password' })
       ).toBeInTheDocument()
     })
-
-    mockGetSelfResponse(mockSelfUser({ resetPassword: false }))
 
     fillField('device_settings:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
