@@ -6,7 +6,6 @@ import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import { useLoginFieldError } from './hooks/useLoginFieldError'
 import { LoginFieldController } from './LoginFieldController'
 import styles from './OnDeviceLogin.module.css'
 
@@ -51,7 +50,7 @@ export function OnDeviceLogin({
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | null
   >(null)
-  const { control, watch, setValue, getValues } = useForm<LoginFormValues>({
+  const { control, watch, setValue } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
       password: '',
@@ -73,24 +72,18 @@ export function OnDeviceLogin({
   const confirmPassword = watch('confirmPassword')
 
   const activeFieldName: LoginFieldName =
-    step === 'confirmPassword'
-      ? 'confirmPassword'
-      : step === 'username'
-        ? 'username'
+    step === 'username'
+      ? 'username'
+      : step === 'confirmPassword'
+        ? 'confirmPassword'
         : 'password'
 
   const keyboardFieldValue =
-    activeFieldName === 'username'
+    step === 'username'
       ? username
-      : activeFieldName === 'confirmPassword'
+      : step === 'confirmPassword'
         ? confirmPassword
         : password
-
-  const fieldError = useLoginFieldError({
-    step,
-    loginError,
-    confirmPasswordError,
-  })
 
   const clearFieldErrors = (): void => {
     setConfirmPasswordError(null)
@@ -106,7 +99,6 @@ export function OnDeviceLogin({
   }, [step, showKeyboard, keyboardFieldValue])
 
   const handleNext = (): void => {
-    const { username, password, confirmPassword: confirm } = getValues()
     if (step === 'username') {
       if (username.trim() === '') return
       onStepChange('password')
@@ -122,8 +114,8 @@ export function OnDeviceLogin({
       submitPassword(username, password)
       return
     }
-    if (confirm.trim() === '') return
-    if (confirm !== password) {
+    if (confirmPassword.trim() === '') return
+    if (confirmPassword !== password) {
       setConfirmPasswordError(
         t('on_device_login_password_mismatch', {
           ns: 'device_settings',
@@ -186,11 +178,11 @@ export function OnDeviceLogin({
           <div className={styles.form_inner_container}>
             <LoginFieldController
               control={control}
-              activeFieldName={activeFieldName}
               step={step}
               t={t}
               isPasswordResetRequired={isPasswordResetRequired}
-              fieldError={fieldError}
+              loginError={loginError}
+              confirmPasswordError={confirmPasswordError}
               onClearFieldErrors={clearFieldErrors}
               onFocus={() => {
                 setShowKeyboard(true)

@@ -4,45 +4,95 @@ import { LoginFieldInput } from './LoginFieldInput'
 
 import type { TFunction } from 'i18next'
 import type { Control } from 'react-hook-form'
-import type { LoginFieldName, LoginFormValues, LoginStep } from './index'
+import type { LoginFormValues, LoginStep } from './index'
 
 export interface LoginFieldControllerProps {
   control: Control<LoginFormValues>
-  activeFieldName: LoginFieldName
   step: LoginStep
   t: TFunction
   isPasswordResetRequired: boolean
-  fieldError: string | null
+  loginError: string | null
+  confirmPasswordError: string | null
   onClearFieldErrors: () => void
   onFocus: () => void
 }
 
 export function LoginFieldController({
   control,
-  activeFieldName,
   step,
   t,
   isPasswordResetRequired,
-  fieldError,
+  loginError,
+  confirmPasswordError,
   onClearFieldErrors,
   onFocus,
-}: LoginFieldControllerProps): JSX.Element {
-  return (
-    <Controller
-      key={activeFieldName}
-      control={control}
-      name={activeFieldName}
-      render={({ field }) => (
-        <LoginFieldInput
-          field={field}
-          step={step}
-          t={t}
-          isPasswordResetRequired={isPasswordResetRequired}
-          loginError={fieldError}
-          onClearLoginError={onClearFieldErrors}
-          onFocus={onFocus}
-        />
-      )}
-    />
-  )
+}: LoginFieldControllerProps): JSX.Element | null {
+  if (step === 'username') {
+    return (
+      <Controller
+        key="username"
+        control={control}
+        name="username"
+        render={({ field }) => (
+          <LoginFieldInput
+            field={field}
+            label={t('device_settings:username')}
+            error={null}
+            isPasswordField={false}
+            onClearError={onClearFieldErrors}
+            onFocus={onFocus}
+          />
+        )}
+      />
+    )
+  }
+
+  if (step === 'password') {
+    const passwordError =
+      loginError != null && loginError !== '' ? loginError : null
+
+    return (
+      <Controller
+        key="password"
+        control={control}
+        name="password"
+        render={({ field }) => (
+          <LoginFieldInput
+            field={field}
+            label={
+              isPasswordResetRequired
+                ? t('device_settings:on_device_login_new_password')
+                : t('device_settings:password')
+            }
+            error={passwordError}
+            isPasswordField={true}
+            onClearError={onClearFieldErrors}
+            onFocus={onFocus}
+          />
+        )}
+      />
+    )
+  }
+
+  if (step === 'confirmPassword') {
+    return (
+      <Controller
+        key="confirmPassword"
+        control={control}
+        name="confirmPassword"
+        render={({ field }) => (
+          <LoginFieldInput
+            field={field}
+            label={t('device_settings:on_device_login_confirm_password')}
+            error={confirmPasswordError}
+            isPasswordField={true}
+            onClearError={onClearFieldErrors}
+            onFocus={onFocus}
+          />
+        )}
+      />
+    )
+  }
+
+  return null
 }
