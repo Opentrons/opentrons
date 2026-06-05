@@ -53,6 +53,10 @@ Each protocol version directory contains test protocols used for:
 - **single_eight_partial_tip_setup.py** - 8-channel partial/single tip + 1-channel transfers (384 plate, temp 24-tube block, TC, HS)
 - **96_channel_setup.py** - 96-channel partial/full tip transfers (384 plate, NEST 96 deep well, 1000µL + 200µL tip racks)
 
+See [Partial Tip E2E Coverage](../docs/partial-tip-e2e-coverage.md) for the full test matrix and run instructions.
+- **maor_magnet_sax_predigestion_rqa5529.py** - Customer Maor protocol for reservoir pipette centering (RQA-5529)
+- **post_tagmentation_rqa5354.py** - Customer post-tagmentation protocol for auto tip tracking on full deck (RQA-5354)
+
 ## Usage in Tests
 
 Protocol fixtures are used in:

@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 from typing import List, Literal, Optional, Union
 
-from playwright.sync_api import Locator, Page
+from playwright.sync_api import Locator, Page, expect
 
 from automation.base_page import BasePage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
@@ -516,13 +516,20 @@ class TransferPage(BasePage):
             continue_button.click()
         self.wait_for_visible(modal.get_by_text("Click to select tips in", exact=False))
         for tip in tips:
-            tip_locator = modal.locator(f"[id='{tip}']")
-            if tip_locator.count() > 0:
-                tip_locator.click()
-            else:
-                modal.get_by_text(tip, exact=True).click()
+            # One primary per pickup group (e.g. A4 for 3/8 partial → A4–C4). Tip rack
+            # wells use id="{wellName}".
+            tip_locator = modal.locator(f"#{tip}")
+            if tip_locator.count() == 0:
+                tip_locator = modal.locator(f"[id='{tip}']").first
+            tip_locator.scroll_into_view_if_needed()
+            self.wait_for_visible(tip_locator)
+            tip_locator.click(force=True)
         modal.get_by_role("button", name="Select tips").click()
-        self.wait_for_visible(self.page.get_by_text(re.compile(r"\d+ pickup selected")), timeout=10000)
+        expect(modal.get_by_text("Select tips for manual tip tracking")).to_be_hidden(timeout=10000)
+        self.wait_for_visible(
+            self.page.get_by_text(re.compile(r"\d+ pickups? selected")),
+            timeout=10000,
+        )
 
     def save_transfer_with_tip_settings(
         self,
