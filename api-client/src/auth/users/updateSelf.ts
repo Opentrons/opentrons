@@ -2,13 +2,13 @@ import { PATCH, request } from '../../request'
 
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
-import type { AuthUserResponse, UpdateSelfPasswordRequest } from './types'
+import type { AuthUserResponse, UpdateSelfRequest } from './types'
 
 export function updateSelf(
   config: HostConfig,
-  body: UpdateSelfPasswordRequest
+  body: UpdateSelfRequest
 ): ResponsePromise<AuthUserResponse> {
-  return request<AuthUserResponse, UpdateSelfPasswordRequest>(
+  return request<AuthUserResponse, UpdateSelfRequest>(
     PATCH,
     '/auth/users/self',
     body,

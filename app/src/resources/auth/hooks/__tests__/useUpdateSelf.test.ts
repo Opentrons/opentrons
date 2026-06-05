@@ -1,9 +1,9 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useUpdateNewPassword } from '../useUpdateNewPassword'
+import { useUpdateSelf } from '../useUpdateSelf'
 
-const mockResetSelfPassword = vi.fn()
+const mockPatchSelf = vi.fn()
 const mockSubmitPassword = vi.fn()
 const mockUseHost = vi.fn()
 const mockUseSelector = vi.fn()
@@ -21,8 +21,8 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useHost: () => mockUseHost(),
-    useResetSelfPasswordMutation: () => ({
-      resetSelfPassword: mockResetSelfPassword,
+    useUpdateSelfMutation: () => ({
+      updateSelf: mockPatchSelf,
       isLoading: false,
     }),
   }
@@ -35,18 +35,18 @@ vi.mock('../useOAuth2PasswordLogin', () => ({
   }),
 }))
 
-describe('useUpdateNewPassword', () => {
+describe('useUpdateSelf', () => {
   const onSuccess = vi.fn()
   const onError = vi.fn()
 
   beforeEach(() => {
-    mockResetSelfPassword.mockReset()
+    mockPatchSelf.mockReset()
     mockSubmitPassword.mockReset()
     onSuccess.mockReset()
     onError.mockReset()
     mockUseHost.mockReturnValue({ hostname: 'localhost' })
     mockUseSelector.mockReturnValue('access-token')
-    mockResetSelfPassword.mockResolvedValue({
+    mockPatchSelf.mockResolvedValue({
       data: {
         username: 'alice',
         fullName: 'Alice',
@@ -58,17 +58,15 @@ describe('useUpdateNewPassword', () => {
     })
   })
 
-  it('resets password then signs in with the new password', async () => {
-    const { result } = renderHook(() =>
-      useUpdateNewPassword({ onSuccess, onError })
-    )
+  it('updates self then signs in with the new password', async () => {
+    const { result } = renderHook(() => useUpdateSelf({ onSuccess, onError }))
 
     act(() => {
-      result.current.updateNewPassword('alice', 'new-secret')
+      result.current.updateSelf('alice', 'new-secret')
     })
 
     await waitFor(() => {
-      expect(mockResetSelfPassword).toHaveBeenCalledWith({
+      expect(mockPatchSelf).toHaveBeenCalledWith({
         data: { password: 'new-secret' },
       })
     })
@@ -79,28 +77,24 @@ describe('useUpdateNewPassword', () => {
   it('reports not signed in when host or token is missing', () => {
     mockUseSelector.mockReturnValue(null)
 
-    const { result } = renderHook(() =>
-      useUpdateNewPassword({ onSuccess, onError })
-    )
+    const { result } = renderHook(() => useUpdateSelf({ onSuccess, onError }))
 
     act(() => {
-      result.current.updateNewPassword('alice', 'new-secret')
+      result.current.updateSelf('alice', 'new-secret')
     })
 
     expect(onError).toHaveBeenCalledWith('Not signed in.')
-    expect(mockResetSelfPassword).not.toHaveBeenCalled()
+    expect(mockPatchSelf).not.toHaveBeenCalled()
     expect(mockSubmitPassword).not.toHaveBeenCalled()
   })
 
-  it('reports failure when reset password request fails', async () => {
-    mockResetSelfPassword.mockRejectedValue(new Error('network'))
+  it('reports failure when update self request fails', async () => {
+    mockPatchSelf.mockRejectedValue(new Error('network'))
 
-    const { result } = renderHook(() =>
-      useUpdateNewPassword({ onSuccess, onError })
-    )
+    const { result } = renderHook(() => useUpdateSelf({ onSuccess, onError }))
 
     act(() => {
-      result.current.updateNewPassword('alice', 'new-secret')
+      result.current.updateSelf('alice', 'new-secret')
     })
 
     await waitFor(() => {

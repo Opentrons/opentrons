@@ -12,7 +12,7 @@ import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
-  useUpdateNewPassword,
+  useUpdateSelf,
 } from '/app/resources/auth'
 
 import { OnDeviceLogin } from './index'
@@ -132,11 +132,10 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       },
     })
 
-  const { updateNewPassword, isLoading: isUpdateNewPasswordLoading } =
-    useUpdateNewPassword({
-      onSuccess: handleNewPasswordSuccess,
-      onError: handleNewPasswordFailure,
-    })
+  const { updateSelf, isLoading: isUpdateSelfLoading } = useUpdateSelf({
+    onSuccess: handleNewPasswordSuccess,
+    onError: handleNewPasswordFailure,
+  })
 
   const handleCancel = (): void => {
     dismissModal()
@@ -151,13 +150,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         key={formKey}
         step={step}
         onStepChange={setStep}
-        submitPassword={
-          isChoosingNewPassword ? updateNewPassword : submitPassword
-        }
+        submitPassword={isChoosingNewPassword ? updateSelf : submitPassword}
         isAuthLoading={
-          isChoosingNewPassword
-            ? isUpdateNewPasswordLoading
-            : isLoginAuthLoading
+          isChoosingNewPassword ? isUpdateSelfLoading : isLoginAuthLoading
         }
         isPasswordResetRequired={isChoosingNewPassword}
         initialUsername={initialUsername}

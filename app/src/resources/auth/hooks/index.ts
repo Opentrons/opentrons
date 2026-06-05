@@ -1,2 +1,2 @@
 export * from './useOAuth2PasswordLogin'
-export * from './useUpdateNewPassword'
+export * from './useUpdateSelf'

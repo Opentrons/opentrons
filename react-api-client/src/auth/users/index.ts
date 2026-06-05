@@ -1,2 +1,2 @@
 export * from './useSelfQuery'
-export * from './useResetSelfPasswordMutation'
+export * from './useUpdateSelfMutation'

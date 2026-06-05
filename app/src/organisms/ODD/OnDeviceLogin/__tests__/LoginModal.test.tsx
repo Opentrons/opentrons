@@ -7,7 +7,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
-  useUpdateNewPassword,
+  useUpdateSelf,
 } from '/app/resources/auth'
 
 import { showLoginModal } from '../LoginModal'
@@ -34,7 +34,7 @@ vi.mock('/app/redux/discovery', () => ({
 
 vi.mock('/app/resources/auth', () => ({
   useOAuth2PasswordLogin: vi.fn(),
-  useUpdateNewPassword: vi.fn(),
+  useUpdateSelf: vi.fn(),
 }))
 
 vi.mock('/app/resources/access-control/useStoreLoginState', () => ({
@@ -85,8 +85,8 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    vi.mocked(useUpdateNewPassword).mockImplementation(({ onSuccess }) => ({
-      updateNewPassword: (username: string, _password: string) => {
+    vi.mocked(useUpdateSelf).mockImplementation(({ onSuccess }) => ({
+      updateSelf: (username: string, _password: string) => {
         onSuccess(username, OAUTH_RESPONSE)
       },
       isLoading: false,

@@ -13,7 +13,7 @@ export interface AuthUserResponse {
   data: AuthUser
 }
 
-export interface UpdateSelfPasswordRequest {
+export interface UpdateSelfRequest {
   data: {
     password: string
   }

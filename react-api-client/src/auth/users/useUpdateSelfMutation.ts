@@ -13,18 +13,18 @@ import type {
 import type {
   AuthUserResponse,
   HostConfig,
-  UpdateSelfPasswordRequest,
+  UpdateSelfRequest,
 } from '@opentrons/api-client'
 
 export type UseUpdateSelfMutationResult = UseMutationResult<
   AuthUserResponse,
   AxiosError,
-  UpdateSelfPasswordRequest
+  UpdateSelfRequest
 > & {
   updateSelf: UseMutateAsyncFunction<
     AuthUserResponse,
     AxiosError,
-    UpdateSelfPasswordRequest
+    UpdateSelfRequest
   >
 }
 
@@ -32,7 +32,7 @@ export function useUpdateSelfMutation(
   options: UseMutationOptions<
     AuthUserResponse,
     AxiosError,
-    UpdateSelfPasswordRequest
+    UpdateSelfRequest
   > = {},
   hostOverride?: HostConfig | null
 ): UseUpdateSelfMutationResult {
@@ -42,7 +42,7 @@ export function useUpdateSelfMutation(
 
   const mutation = useMutation(
     getQueryKey(host, 'auth', 'users', 'self'),
-    (body: UpdateSelfPasswordRequest) =>
+    (body: UpdateSelfRequest) =>
       updateSelf(host!, body).then(response => response.data),
     options
   )

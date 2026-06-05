@@ -1,10 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
-import {
-  useHost,
-  useResetSelfPasswordMutation,
-} from '@opentrons/react-api-client'
+import { useHost, useUpdateSelfMutation } from '@opentrons/react-api-client'
 
 import { getLocalRobotAccessToken } from '/app/redux/robot-auth'
 
@@ -12,23 +9,23 @@ import { useOAuth2PasswordLogin } from './useOAuth2PasswordLogin'
 
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
 
-export interface UseUpdateNewPasswordOptions {
+export interface UseUpdateSelfOptions {
   onSuccess: (username: string, response: OAuth2TokenResponse) => void
   onError: (message: string) => void
 }
 
-interface UseUpdateNewPasswordResult {
-  updateNewPassword: (username: string, password: string) => void
+interface UseUpdateSelfResult {
+  updateSelf: (username: string, password: string) => void
   isLoading: boolean
 }
 
 /**
  * After logging in with a temporary password, set a new password via
- * `POST /auth/users/self/resetPassword`, then sign in with the new password.
+ * `PATCH /auth/users/self`, then sign in with the new password.
  */
-export function useUpdateNewPassword(
-  options: UseUpdateNewPasswordOptions
-): UseUpdateNewPasswordResult {
+export function useUpdateSelf(
+  options: UseUpdateSelfOptions
+): UseUpdateSelfResult {
   const { onSuccess, onError } = options
   const host = useHost()
   const accessToken = useSelector(getLocalRobotAccessToken)
@@ -41,8 +38,8 @@ export function useUpdateNewPassword(
     [accessToken, host]
   )
 
-  const { resetSelfPassword, isLoading: isResetLoading } =
-    useResetSelfPasswordMutation({}, hostWithToken)
+  const { updateSelf: patchSelf, isLoading: isPatchSelfLoading } =
+    useUpdateSelfMutation({}, hostWithToken)
 
   const { submitPassword, isAuthLoading: isOAuthLoading } =
     useOAuth2PasswordLogin({
@@ -57,14 +54,14 @@ export function useUpdateNewPassword(
       onError,
     })
 
-  const updateNewPassword = useCallback(
+  const updateSelf = useCallback(
     (username: string, password: string): void => {
       if (hostWithToken == null) {
         onError('Not signed in.')
         return
       }
 
-      void resetSelfPassword({ data: { password } })
+      void patchSelf({ data: { password } })
         .then(() => {
           submitPassword(username, password)
         })
@@ -72,8 +69,11 @@ export function useUpdateNewPassword(
           onError('Failed to update password.')
         })
     },
-    [hostWithToken, onError, resetSelfPassword, submitPassword]
+    [hostWithToken, onError, patchSelf, submitPassword]
   )
 
-  return { updateNewPassword, isLoading: isResetLoading || isOAuthLoading }
+  return {
+    updateSelf,
+    isLoading: isPatchSelfLoading || isOAuthLoading,
+  }
 }
