@@ -15,9 +15,11 @@ import {
 import {
   ApiHostProvider,
   useAccessControlEnabledQuery,
+  useHost,
 } from '@opentrons/react-api-client'
 
 import { AccountIconButton } from '/app/atoms/buttons/AccountIconButton'
+import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
 import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
@@ -26,7 +28,6 @@ import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
 import { useLogOut } from '/app/resources/access-control/useLogOut'
-import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
@@ -76,11 +77,7 @@ function AccountSection(): JSX.Element | null {
     if (accountIconInfo.showIcon) {
       return (
         <div className={styles.right_container}>
-          <AccountIconAndMenu
-            // todo(mm, 2026-05-28): Set initial=accountIconInfo.iconContents
-            // once we have a real login implementation and can get the user's real name.
-            initial="😱"
-          />
+          <AccountIconAndMenu initial={accountIconInfo.iconContents} />
         </div>
       )
     } else {
@@ -138,21 +135,20 @@ function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
 }
 
 function LoginLink(): JSX.Element {
-  const storeLoginState = useStoreLoginState()
-  // todo(mm, 2026-05-28): Replace this placeholder implementation with something
-  // that opens a login form, asks the user for their credentials, and sends the
-  // credentials to the robot.
-  const fakeHandleLogin = useCallback(() => {
-    storeLoginState('fake_username', {
-      access_token: 'fake_access_token',
-      token_type: 'Bearer',
-      expires_in: 180,
-    })
-  }, [storeLoginState])
   const { t } = useTranslation('top_navigation')
+  const host = useHost()
+  const handleClick = useCallback(() => {
+    if (host == null) {
+      console.error(
+        "Couldn't determine the host for a login modal. Is a provider missing?"
+      )
+    } else {
+      showLoginModal({ host })
+    }
+  }, [host])
 
   return (
-    <BasicButton onClick={fakeHandleLogin} underLine>
+    <BasicButton type="button" onClick={handleClick} underLine>
       {t('log_in')}
     </BasicButton>
   )

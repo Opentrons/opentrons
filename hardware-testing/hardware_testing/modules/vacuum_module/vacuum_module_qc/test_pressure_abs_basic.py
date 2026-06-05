@@ -56,7 +56,6 @@ async def test_abs_sensors_for_comms(
 async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
     print("Pressure sensor I2C communication")
-    # We only use abs b for pressure regulation
+    await test_abs_sensors_for_comms(vacuum, "a", True, report, section)
     await test_abs_sensors_for_comms(vacuum, "b", True, report, section)
-    await test_abs_sensors_for_comms(vacuum, "a", False, report, section)
     # TODO: For the functional lets get to pressure and make sure theres variation

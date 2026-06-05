@@ -8,11 +8,12 @@ import { CURSOR_NOT_ALLOWED, CURSOR_POINTER } from '../../styles/cursor'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText/StyledText'
 
-import type { MouseEvent } from 'react'
+import type { ComponentProps, MouseEvent } from 'react'
 import type { IconName } from '../../icons'
 
 interface BasicButtonProps {
   children: string // Content of basic button
+  type?: ComponentProps<'button'>['type']
   onClick: (event: MouseEvent<HTMLButtonElement>) => void // Function to handle button click events
   isDisabled?: boolean // Optional prop to control button aria-disabled
   underLine?: boolean // Optional prop to control underline styling
