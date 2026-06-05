@@ -20,6 +20,12 @@ from server_utils.auth.scopes import Scope, serialize_scopes
 
 
 class TestAlwaysAllowedAuthorizationChecker:
+    async def test_get_require_reason_for_interaction_settings(self) -> None:
+        subject = AlwaysAllowedAuthorizationChecker()
+        settings = await subject.get_require_reason_for_interaction_settings()
+        assert settings.data.requireReasonForInteraction is False
+        assert await subject.is_reason_for_interaction_required() is False
+
     async def test_check(self) -> None:
         subject = AlwaysAllowedAuthorizationChecker()
         assert (
@@ -39,6 +45,46 @@ class TestAuthServerAuthorizationChecker:
     def mock_client(self, decoy: Decoy) -> Client:
         """Return a mock in the shape of a client."""
         return decoy.mock(cls=Client)
+
+    async def test_get_require_reason_for_interaction_settings(
+        self, mock_client: Client, decoy: Decoy
+    ) -> None:
+        subject = AuthServerAuthorizationChecker(mock_client)
+        expected = RequireReasonForInteractionSettingsResponse(
+            data=RequireReasonForInteractionSettingsResponseData(
+                requireReasonForInteraction=True
+            )
+        )
+        decoy.when(
+            await mock_client.get_require_reason_for_interaction_settings()
+        ).then_return(expected)
+        decoy.when(await mock_client.get_auth_settings()).then_return(
+            AuthSettingsResponse(
+                data=AuthSettingsResponseData(accessControlEnabled=True)
+            )
+        )
+        assert await subject.get_require_reason_for_interaction_settings() == expected
+        assert await subject.is_reason_for_interaction_required() is True
+
+    async def test_get_require_reason_disabled_when_access_control_off(
+        self, mock_client: Client, decoy: Decoy
+    ) -> None:
+        subject = AuthServerAuthorizationChecker(mock_client)
+        decoy.when(
+            await mock_client.get_require_reason_for_interaction_settings()
+        ).then_return(
+            RequireReasonForInteractionSettingsResponse(
+                data=RequireReasonForInteractionSettingsResponseData(
+                    requireReasonForInteraction=True
+                )
+            )
+        )
+        decoy.when(await mock_client.get_auth_settings()).then_return(
+            AuthSettingsResponse(
+                data=AuthSettingsResponseData(accessControlEnabled=False)
+            )
+        )
+        assert await subject.is_reason_for_interaction_required() is False
 
     async def test_check_given_no_token(
         self, mock_client: Client, decoy: Decoy
