@@ -135,7 +135,7 @@ These projects have their **own** `Makefile` and use **uv** (not pipenv). They a
 | --- | --- | --- |
 | AI Server | `opentrons-ai-server/` | `make setup` (runs `uv sync`) |
 | E2E Testing | `e2e-testing/` | `make setup` (runs `uv sync`) |
-| Analyses Snapshot Testing | `analyses-snapshot-testing/` | `make setup` (runs bootstrap script) |
+| Analyses Snapshot Testing | `analyses-snapshot-testing/` | `make setup` (runs bootstrap script; Python 3.12) |
 | Static Deploy | `scripts/static-deploy/` | `make setup` (runs `uv sync`) |
 
 Run their setup from within their own directory.

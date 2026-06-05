@@ -122,7 +122,7 @@ mock_pipette.configure_nozzle_layout(
       `
 mock_pipette.configure_nozzle_layout(
     protocol_api.PARTIAL_COLUMN,
-    start="D1", end="H1",
+    start="H1", end="D1",
 )`.trimStart()
     )
   })
