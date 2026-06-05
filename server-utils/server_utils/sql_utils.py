@@ -44,6 +44,35 @@ def enable_foreign_key_constraints(engine: sqlalchemy.engine.Engine) -> None:
         cursor.close()
 
 
+def enable_write_ahead_logging(engine: sqlalchemy.engine.Engine) -> None:
+    """Switch the SQLite database into write-ahead logging (WAL) journal mode.
+
+    WAL improves concurrency by letting readers run alongside a single writer,
+    and survives across processes since the journal mode is persisted in the
+    database file itself.
+
+    This should be called once per SQLAlchemy engine, shortly after creating it,
+    before doing anything substantial with it.
+
+    Params:
+        engine: A SQLAlchemy engine connected to a SQLite database, backed by
+            Python's built-in ``sqlite3`` module (pysqlite).
+    """
+    # The journal mode is persisted in the database header, so this only needs
+    # to take effect once per database file. We still listen on every connect
+    # so that fresh database files (e.g. just created by Alembic) get switched
+    # over to WAL the first time we touch them.
+
+    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[untyped-decorator]
+    def on_connect(
+        dbapi_connection: Any,
+        connection_record: object,
+    ) -> None:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL;")
+        cursor.close()
+
+
 def fix_transactions(engine: sqlalchemy.engine.Engine) -> None:
     """Make SQLite transactions behave sanely.
 
