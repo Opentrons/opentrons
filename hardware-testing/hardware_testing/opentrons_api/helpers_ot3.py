@@ -353,14 +353,13 @@ def _get_serial_for_dut(
 def set_csv_report_meta_data_ot3(
     api: Union[OT3API, SyncHardwareAPI],
     report: csv_report.CSVReport,
+    operator: str,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
 ) -> None:
     """Set CSVReport meta-data given an OT3."""
     # operator should be entered first
-    report.set_operator(
-        "simulating" if api.is_simulator else input("enter OPERATOR name: ")
-    )
+    report.set_operator(operator)
 
     # default DUT to be the robot serial
     # and only scan barcode if we're not simulating

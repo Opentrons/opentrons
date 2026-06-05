@@ -115,7 +115,8 @@ async def _main(is_simulating: bool, volume: float) -> None:
         ],
     )
     dut = helpers_ot3.DeviceUnderTest.OTHER
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator, dut=dut)
 
     mount = OT3Mount.LEFT
 
