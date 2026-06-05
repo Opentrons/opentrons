@@ -1,0 +1,41 @@
+test_name: logMessage endpoint
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: POST /audit/internal/logMessage logs valid message with reason
+    request:
+      method: POST
+      url: '{run_server.base_url}/audit/internal/logMessage'
+      json:
+        data:
+          action: 'test action'
+          accountName: 'testAccountName'
+          legalName: 'testLegalName'
+          message: 'testMessage'
+          reason: 'testReason'
+
+    response:
+      status_code: 201
+      json:
+        data:
+          loggedAt: !anystr
+  - name: POST /audit/internal/logMessage logs valid message without reason
+    request:
+      method: POST
+      url: '{run_server.base_url}/audit/internal/logMessage'
+      json:
+        data:
+          action: 'test action'
+          accountName: 'testAccountName'
+          legalName: 'testLegalName'
+          message: 'testMessage'
+          reason: null
+
+    response:
+      status_code: 201
+      json:
+        data:
+          loggedAt: !anystr

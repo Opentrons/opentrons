@@ -7,7 +7,7 @@ from fastapi import FastAPI
 
 from server_utils import systemd_utils
 
-from audit_server.test.router import router as test_router
+from audit_server.log_ingest.router import router as ingest_router
 
 
 @asynccontextmanager
@@ -25,4 +25,4 @@ app = FastAPI(
     lifespan=_lifespan,
 )
 
-app.include_router(test_router)
+app.include_router(ingest_router)
