@@ -91,7 +91,6 @@ describe('LoginModal', () => {
       },
       isLoading: false,
     }))
-
   })
 
   afterEach(() => {

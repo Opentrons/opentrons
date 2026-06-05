@@ -10,8 +10,10 @@ import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps, FieldPath } from 'react-hook-form'
 import type { LoginFormValues } from './index'
 
-export interface LoginFieldInputProps {
-  field: ControllerRenderProps<LoginFormValues, FieldPath<LoginFormValues>>
+export interface LoginFieldInputProps<
+  TFieldName extends FieldPath<LoginFormValues> = FieldPath<LoginFormValues>,
+> {
+  field: ControllerRenderProps<LoginFormValues, TFieldName>
   label: string
   error: string | null
   isPasswordField: boolean
@@ -19,14 +21,16 @@ export interface LoginFieldInputProps {
   onFocus: () => void
 }
 
-export function LoginFieldInput({
+export function LoginFieldInput<
+  TFieldName extends FieldPath<LoginFormValues> = FieldPath<LoginFormValues>,
+>({
   field,
   label,
   error,
   isPasswordField,
   onClearError,
   onFocus,
-}: LoginFieldInputProps): JSX.Element {
+}: LoginFieldInputProps<TFieldName>): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword

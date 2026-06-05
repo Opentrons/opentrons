@@ -3,10 +3,7 @@ import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 
 import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
-import {
-  useGetOAuth2TokenMutation,
-  useHost,
-} from '@opentrons/react-api-client'
+import { useGetOAuth2TokenMutation, useHost } from '@opentrons/react-api-client'
 
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
 
