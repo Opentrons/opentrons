@@ -16,7 +16,7 @@ The Opentrons Temperature Module GEN2 is a hot and cold plate module. It is ofte
 
 ### Thermal blocks { #thermal-blocks-flex }
 
-The Temperature Module uses interchangeable aluminum thermal blocks to help hold labware at temperature.
+The Temperature Module uses interchangeable aluminum *thermal blocks* to help hold labware at temperature.
 
 At the time of purchase, each Temperature Module includes your choice of one (1) thermal block. You can select a 24-well block, a 96-well block, a deep well block, or a flat-bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
 

@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-04-03T21:12:31.645921Z"
+exclude-newer = "2026-05-12T02:40:13.524112Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -1312,11 +1312,11 @@ wheels = [
 
 [[package]]
 name = "python-multipart"
-version = "0.0.6"
+version = "0.0.28"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2d/23/abcfad10c3348cb6358400f8adbc21b523bbc6c954494fd0974428068672/python_multipart-0.0.6.tar.gz", hash = "sha256:e9925a80bb668529f1b67c7fdb0a5dacdd7cbfc6fb0bff3ea443fe22bdd62132", size = 31024, upload-time = "2023-02-27T16:40:10.091Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/54/a85eb421fbdd5007bc5af39d0f4ed9fa609e0fedbfdc2adcf0b34526870e/python_multipart-0.0.28.tar.gz", hash = "sha256:8550da197eac0f7ab748961fc9509b999fa2662ea25cef857f05249f6893c0f8", size = 45314, upload-time = "2026-05-10T11:05:16.596Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/ff/b1e11d8bffb5e0e1b6d27f402eeedbeb9be6df2cdbc09356a1ae49806dbf/python_multipart-0.0.6-py3-none-any.whl", hash = "sha256:ee698bab5ef148b0a760751c261902cd096e57e10558e11aca17646b74ee1c18", size = 45711, upload-time = "2023-02-27T16:40:14.113Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/a2/43bbc5860b5034e2af4ef99a0e04d726ff329c43e192ef3abaa8d7ecfce5/python_multipart-0.0.28-py3-none-any.whl", hash = "sha256:10faac07eb966c3f48dc415f9dee46c04cb10d58d30a35677db8027c825ed9b6", size = 29438, upload-time = "2026-05-10T11:05:15.052Z" },
 ]
 
 [[package]]
@@ -1399,7 +1399,7 @@ wheels = [
 
 [[package]]
 name = "requests"
-version = "2.27.1"
+version = "2.33.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi", marker = "python_full_version >= '3.11'" },
@@ -1407,9 +1407,9 @@ dependencies = [
     { name = "idna", marker = "python_full_version >= '3.11'" },
     { name = "urllib3", marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/60/f3/26ff3767f099b73e0efa138a9998da67890793bfa475d8278f84a30fec77/requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61", size = 106758, upload-time = "2022-01-05T15:40:51.698Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/a4/98b9c7c6428a668bf7e42ebb7c79d576a1c3c1e3ae2d47e674b468388871/requests-2.33.1.tar.gz", hash = "sha256:18817f8c57c6263968bc123d237e3b8b08ac046f5456bd1e307ee8f4250d3517", size = 134120, upload-time = "2026-03-30T16:09:15.531Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2d/61/08076519c80041bc0ffa1a8af0cbd3bf3e2b62af10435d269a9d0f40564d/requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d", size = 63133, upload-time = "2022-01-05T15:40:49.334Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/8e/7540e8a2036f79a125c1d2ebadf69ed7901608859186c856fa0388ef4197/requests-2.33.1-py3-none-any.whl", hash = "sha256:4e6d1ef462f3626a1f0a0a9c42dd93c63bad33f9f1c1937509b8c5c8718ab56a", size = 64947, upload-time = "2026-03-30T16:09:13.83Z" },
 ]
 
 [[package]]
@@ -1641,7 +1641,6 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
-    { name = "python-multipart" },
     { name = "sqlalchemy" },
     { name = "systemd-python", marker = "sys_platform == 'linux'" },
     { name = "typing-extensions" },
@@ -1658,7 +1657,6 @@ requires-dist = [
     { name = "pydantic", specifier = ">2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2.0.0,<3" },
     { name = "python-dotenv", specifier = "==1.0.1" },
-    { name = "python-multipart", specifier = "==0.0.6" },
     { name = "sqlalchemy", specifier = ">=1.4.51,<3" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -1850,7 +1848,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = "==2.4.0" },
     { name = "pyjwt", specifier = "==2.6.0" },
     { name = "python-dotenv", specifier = "==1.0.1" },
-    { name = "python-multipart", specifier = "==0.0.6" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "server-utils", editable = "../server-utils" },
     { name = "sqlalchemy", specifier = "==1.4.51" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
@@ -1870,11 +1868,11 @@ dev = [
     { name = "pytest-cov", marker = "python_full_version >= '3.11'", specifier = "==4.1.0" },
     { name = "pytest-lazy-fixtures", marker = "python_full_version >= '3.11'", specifier = ">=1.1.4,<2" },
     { name = "pytest-xdist", marker = "python_full_version >= '3.11'", specifier = "~=2.5.0" },
-    { name = "requests", marker = "python_full_version >= '3.11'", specifier = "==2.27.1" },
+    { name = "requests", marker = "python_full_version >= '3.11'", specifier = "==2.33.*" },
     { name = "ruff", marker = "python_full_version >= '3.11'", specifier = "==0.14.10" },
     { name = "sqlalchemy2-stubs", marker = "python_full_version >= '3.11'", specifier = "==0.0.2a38" },
     { name = "tavern", marker = "python_full_version >= '3.11'", specifier = ">=3.0.2" },
-    { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.27.1" },
+    { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.33.*" },
 ]
 robot = [
     { name = "anyio", specifier = "==4.9.0" },
@@ -1884,7 +1882,7 @@ robot = [
     { name = "pydantic-settings", specifier = "==2.4.0" },
     { name = "pyjwt", specifier = "==2.6.0" },
     { name = "python-dotenv", specifier = "==1.0.1" },
-    { name = "python-multipart", specifier = "==0.0.6" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "server-utils", editable = "../server-utils" },
     { name = "sqlalchemy", specifier = "==1.4.51" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
@@ -1970,11 +1968,14 @@ wheels = [
 
 [[package]]
 name = "types-requests"
-version = "2.27.1"
+version = "2.33.0.20260508"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3a/12/f17ed7841bbc299cc4f6b9e2b0c23b93fa006716f9a3b2021dea9094a43f/types-requests-2.27.1.tar.gz", hash = "sha256:59ae7a60ed4b61ece7ff6f0ccff394e4d65a6df9b2970cfeb7a0015cb0c91b7e", size = 14395, upload-time = "2022-01-07T11:32:15.382Z" }
+dependencies = [
+    { name = "urllib3", marker = "python_full_version >= '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/6b/eb226bdd61a982c9a03e02c657fb4ab001733506e6423906ac142331f2e3/types_requests-2.33.0.20260508.tar.gz", hash = "sha256:81b2ae5f0d20967714a6aa5ef9284c05570d7cb06b7de8f2a77b918b63ddd411", size = 23991, upload-time = "2026-05-08T04:50:56.818Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/9d/2119ebfc8c3cc849b61712c2b2fba5ac6e42c7406acb9423d1452400253f/types_requests-2.27.1-py3-none-any.whl", hash = "sha256:d03823054e34cb683ffcc4a05035482224c264096b20e1e14adb99f2b1775f09", size = 22722, upload-time = "2022-01-07T11:32:14.481Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/96/080db0afdf2c5cc5fe512b41354e8d114fe8f65e9510c56ff8dfd40216ce/types_requests-2.33.0.20260508-py3-none-any.whl", hash = "sha256:fa01459cca184229713df03709db46a905325906d27e042cd4fd7ea3d15d3400", size = 20722, upload-time = "2026-05-08T04:50:55.548Z" },
 ]
 
 [[package]]
@@ -2000,11 +2001,11 @@ wheels = [
 
 [[package]]
 name = "urllib3"
-version = "1.26.20"
+version = "2.7.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc59b6ea711b687e2b7ed4bdb373f7eeec370a97d7392f/urllib3-1.26.20.tar.gz", hash = "sha256:40c2dc0c681e47eb8f90e7e27bf6ff7df2e677421fd46756da1161c39ca70d32", size = 307380, upload-time = "2024-08-29T15:43:11.37Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/53/0c/06f8b233b8fd13b9e5ee11424ef85419ba0d8ba0b3138bf360be2ff56953/urllib3-2.7.0.tar.gz", hash = "sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c", size = 433602, upload-time = "2026-05-07T16:13:18.596Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/cf/8435d5a7159e2a9c83a95896ed596f68cf798005fe107cc655b5c5c14704/urllib3-1.26.20-py2.py3-none-any.whl", hash = "sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e", size = 144225, upload-time = "2024-08-29T15:43:08.921Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/3e/5db95bcf282c52709639744ca2a8b149baccf648e39c8cc87553df9eae0c/urllib3-2.7.0-py3-none-any.whl", hash = "sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897", size = 131087, upload-time = "2026-05-07T16:13:17.151Z" },
 ]
 
 [[package]]

@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getCommand } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CommandDetail } from '@opentrons/api-client'
@@ -15,7 +15,7 @@ export function useCommandQuery(
   const host = useHost()
   const defaultEnabled = host !== null && runId != null && commandId != null
   const query = useQuery<CommandDetail, Error>(
-    [host, 'runs', runId, 'commands', commandId],
+    getQueryKey(host, 'runs', runId, 'commands', commandId),
     () =>
       getCommand(host!, runId!, commandId!)
         .then(response => response.data)

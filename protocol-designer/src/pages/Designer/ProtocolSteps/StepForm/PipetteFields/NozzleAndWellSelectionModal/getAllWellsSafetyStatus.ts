@@ -6,7 +6,7 @@ import {
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
-import { getIsSafePipetteMovement } from '@opentrons/step-generation'
+import { getPipetteMovementSafetyStatus } from '@opentrons/step-generation'
 
 import { canPipetteUseLabware } from '../../../../../../utils'
 
@@ -64,8 +64,8 @@ export function getAllWellsSafetyStatus(
     for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
       const firstWell = allWells[0][rowIndex]
       const safe =
-        robotState === null ||
-        getIsSafePipetteMovement({
+        robotState == null ||
+        getPipetteMovementSafetyStatus({
           robotState,
           invariantContext,
           pipetteId,
@@ -74,7 +74,7 @@ export function getAllWellsSafetyStatus(
           primaryNozzle,
           nozzleConfiguration,
           tiprackId,
-        })
+        }).isSafe
 
       // mark all wells in this row
       allWells.forEach(column => {
@@ -90,8 +90,8 @@ export function getAllWellsSafetyStatus(
       const column = allWells[colIndex]
       const firstWell = column[0]
       const safe =
-        robotState === null ||
-        getIsSafePipetteMovement({
+        robotState == null ||
+        getPipetteMovementSafetyStatus({
           robotState,
           invariantContext,
           pipetteId,
@@ -100,7 +100,7 @@ export function getAllWellsSafetyStatus(
           primaryNozzle,
           nozzleConfiguration,
           tiprackId,
-        })
+        }).isSafe
 
       column.forEach(wellName => {
         allWellsWithStatus[wellName] = safe ? 0 : 1
@@ -109,8 +109,8 @@ export function getAllWellsSafetyStatus(
   } else if (nozzleConfiguration === ALL && channels === 96) {
     // ALL 96 Nozzles: only check the first well
     const safe =
-      robotState === null ||
-      getIsSafePipetteMovement({
+      robotState == null ||
+      getPipetteMovementSafetyStatus({
         robotState,
         invariantContext,
         pipetteId,
@@ -119,7 +119,7 @@ export function getAllWellsSafetyStatus(
         primaryNozzle,
         nozzleConfiguration,
         tiprackId,
-      })
+      }).isSafe
 
     allWells.flat().forEach(wellName => {
       allWellsWithStatus[wellName] = safe ? 0 : 1
@@ -128,8 +128,8 @@ export function getAllWellsSafetyStatus(
     // SINGLE nozzle for 8ch and 96ch: check every well individually
     allWells.flat().forEach(wellName => {
       const safe =
-        robotState === null ||
-        getIsSafePipetteMovement({
+        robotState == null ||
+        getPipetteMovementSafetyStatus({
           robotState,
           invariantContext,
           pipetteId,
@@ -138,7 +138,7 @@ export function getAllWellsSafetyStatus(
           primaryNozzle,
           nozzleConfiguration,
           tiprackId,
-        })
+        }).isSafe
 
       allWellsWithStatus[wellName] = safe ? 0 : 1
     })
@@ -150,8 +150,8 @@ export function getAllWellsSafetyStatus(
       for (let i = 0; i < column.length; i++) {
         const wellToTest = column[i]
         const safe =
-          robotState === null ||
-          getIsSafePipetteMovement({
+          robotState == null ||
+          getPipetteMovementSafetyStatus({
             robotState,
             invariantContext,
             pipetteId,
@@ -160,7 +160,7 @@ export function getAllWellsSafetyStatus(
             primaryNozzle,
             nozzleConfiguration,
             tiprackId,
-          })
+          }).isSafe
 
         const canFitBlock = i <= column.length - totalSelectionLength
         const labwareHasOneRow = labwareDef.ordering[0].length === 1
@@ -174,8 +174,8 @@ export function getAllWellsSafetyStatus(
           for (let k = i + totalSelectionLength; k < column.length; k++) {
             const remainingWell = column[k]
             const remainingSafe =
-              robotState === null ||
-              getIsSafePipetteMovement({
+              robotState == null ||
+              getPipetteMovementSafetyStatus({
                 robotState,
                 invariantContext,
                 pipetteId,
@@ -184,7 +184,7 @@ export function getAllWellsSafetyStatus(
                 primaryNozzle,
                 nozzleConfiguration,
                 tiprackId,
-              })
+              }).isSafe
 
             allWellsWithStatus[remainingWell] = remainingSafe ? 0 : 1
           }

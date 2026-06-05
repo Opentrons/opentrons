@@ -1,5 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
+  AddressableArea,
+  CommonArgs,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerStoredLabwareGroup,
@@ -15,6 +17,7 @@ import type {
   ModuleType,
   PipetteMount as Mount,
   NozzleConfigurationStyle,
+  OpentronsAIArgs,
   PipetteName,
   PipetteV2Specs,
   PositionReference,
@@ -401,19 +404,6 @@ export interface InnerDelayArgs {
   seconds: number
 }
 
-interface CommonArgs {
-  /** NOTE: stepNumber probably shouldn't be optional but making it optional
-   * for the sake of not having to make too many changes for PD 8.5.2
-   * this should be refactored to not be optional for PD 8.6.0
-   * making it optional saves a lot of changes in unit tests
-   */
-  stepNumber?: number
-  /** Optional user-readable name for this step */
-  name?: string | null
-  /** Optional user-readable description/notes for this step */
-  description?: string | null
-}
-
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
@@ -708,6 +698,7 @@ interface VacuumProfileStepItem {
   id: string
   durationSeconds: number
   pumpData: VacuumPumpData
+  ventAfter: boolean
 }
 
 interface VacuumProfileCycleItem {
@@ -837,7 +828,21 @@ export interface VacuumPumpPowerArgs
   extends CommonArgs, VacuumPumpAdvancedArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumSetPumpPower'
-  powerPercent: number
+  percentPower: number
+}
+
+export interface VacuumCloseVentSetPumpPressureArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentSetPumpPressure'
+  gaugePressure: number
+}
+
+export interface VacuumCloseVentSetPumpPowerArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
+  percentPower: number
 }
 
 export interface VacuumOpenVentArgs extends CommonArgs {
@@ -862,7 +867,7 @@ export interface VacuumPressureData {
 
 export interface VacuumPowerData {
   mode: typeof VACUUM_MODE_POWER
-  powerPercent: number
+  percentPower: number
 }
 
 type VacuumPumpData = VacuumPressureData | VacuumPowerData
@@ -878,13 +883,24 @@ export interface VacuumProfileStep extends ProfileStepItemBase {
 
 export type VacuumProfileItem = VacuumProfileStepItem | VacuumProfileCycleItem
 
-export type VacuumPumpArgs = VacuumPumpPressureArgs | VacuumPumpPowerArgs
-
+export type VacuumPumpArgs =
+  | VacuumPumpPressureArgs
+  | VacuumPumpPowerArgs
+  | VacuumCloseVentSetPumpPowerArgs
+  | VacuumCloseVentSetPumpPressureArgs
+  | VacuumCloseVentStartProfileArgs
 export interface VacuumStartRunProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumStartRunProfile'
   profile: VacuumRunProfileParams['profile']
-  ventAfter?: boolean
+  ventAfter: boolean
+}
+
+export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentStartProfile'
+  profile: VacuumRunProfileParams['profile']
+  ventAfter: boolean
 }
 
 export type VacuumArgs =
@@ -923,6 +939,7 @@ export type CommandCreatorArgs =
   | CommentArgs
   | FlexStackerArgs
   | VacuumArgs
+  | OpentronsAIArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -1054,7 +1071,9 @@ export type ErrorType =
   | 'PIPETTE_HAS_TIP'
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'PIPETTING_INTO_COLUMN_4'
-  | 'POSSIBLE_PIPETTE_COLLISION'
+  | 'POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID'
+  | 'POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS'
+  | 'POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
@@ -1074,6 +1093,7 @@ export type ErrorType =
 export interface CommandCreatorError {
   message: string
   type: ErrorType
+  translationParams?: Record<string, string>
 }
 
 export type WarningType =
@@ -1150,3 +1170,19 @@ export interface WellContentsByNumber {
 }
 
 export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL
+
+export type UnsafePipetteMovementReason =
+  | {
+      type: 'thermocyclerLidCollision'
+    }
+  | {
+      type: 'outsidePipetteExtents'
+    }
+  | {
+      type: 'adjacentAdressableAreaCollision'
+      addressableAreaCausingCollision: AddressableArea
+    }
+
+export type PipetteMovementSafetyStatus =
+  | { isSafe: true }
+  | { isSafe: false; reason: UnsafePipetteMovementReason }

@@ -29,6 +29,7 @@ from .types import (
     TemperatureStatus,
     ThermocyclerStep,
     UploadFunction,
+    VacuumModuleProfileStep,
     VacuumModuleStatus,
     module_model_from_string,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "build",
     "update_firmware",
     "ThermocyclerStep",
+    "VacuumModuleProfileStep",
     "AbstractModule",
     "TempDeck",
     "MagDeck",

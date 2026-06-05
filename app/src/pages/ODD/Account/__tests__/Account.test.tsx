@@ -4,13 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useLogOut } from '/app/resources/access-control/useLogOut'
 
 import { Account } from '..'
-import { useAccountInfo, useLogOut } from '../hooks'
+import { useAccountInfo } from '../hooks'
 
+vi.mock('/app/resources/access-control/useLogOut')
 vi.mock('../hooks', () => ({
   useAccountInfo: vi.fn(),
-  useLogOut: vi.fn(),
 }))
 
 const mockNavigate = vi.fn()
@@ -47,7 +48,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'george_clooney',
-      legalName: 'George Clooney',
+      fullName: 'George Clooney',
     })
 
     renderAccount()
@@ -64,7 +65,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: false,
       username: null,
-      legalName: null,
+      fullName: null,
     })
 
     renderAccount()
@@ -82,7 +83,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'username',
-      legalName: 'Full Name',
+      fullName: 'Full Name',
     })
 
     renderAccount()
@@ -95,7 +96,7 @@ describe('Account', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'george_clooney',
-      legalName: 'George Clooney',
+      fullName: 'George Clooney',
     })
 
     renderAccount()

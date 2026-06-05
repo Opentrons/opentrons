@@ -65,6 +65,7 @@ describe('BeforeBeginning', () => {
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
       deckConfig: mockDeckConfig,
+      documentationState: { accessControlEnabled: false },
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
@@ -345,7 +346,7 @@ describe('BeforeBeginning', () => {
           { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { maintenancePosition: 'attachPlate', mount: RIGHT },
+            params: { motionModifier: 'lowerZAxesSequentially', mount: RIGHT },
           },
         ],
         false

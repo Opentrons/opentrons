@@ -16,6 +16,9 @@ from opentrons.hardware_control.modules.types import (
     VacuumModulePressureStep,
     VacuumModuleStep,
 )
+from opentrons.hardware_control.modules.types import (
+    VacuumModuleProfileStep as hc_profile_step,
+)
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
@@ -78,13 +81,18 @@ class VacuumModuleProfileCycle(BaseModel):
 
     steps: List[StartRunProfileStepParams]
     repetitions: int
+    ventAfter: bool | SkipJsonSchema[None] = None
 
     def convert_element(self) -> VacuumModuleCycle:
         """Convert a VacuumModuleCycle into a hardware controller type."""
         steps: List[VacuumModuleStep] = []
         for step in self.steps:
             steps.append(step.convert_element())
-        return VacuumModuleCycle(steps=steps, repetitions=self.repetitions)
+        return VacuumModuleCycle(
+            steps=steps,
+            repetitions=self.repetitions,
+            vent_after=self.ventAfter,
+        )
 
 
 StartRunProfileStepParams = Union[
@@ -101,6 +109,9 @@ class StartRunProfileParams(BaseModel):
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
     profile: ProfileType = Field(
         ..., description="List of Vacuum Module profile steps."
+    )
+    ventAfter: bool = Field(
+        False, description="Whether to open the vent after the profile is complete."
     )
     taskId: str | None = Field(None, description="The id of the profile task")
 
@@ -133,16 +144,16 @@ class StartRunProfileImpl(
         """Run a vacuum module profile."""
         vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
-        profile: List[
-            Union[VacuumModulePressureStep, VacuumModulePowerStep, VacuumModuleCycle]
-        ] = []
+        profile: List[hc_profile_step] = []
         for step in params.profile:
             profile.append(step.convert_element())
 
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if vm_hardware is not None:
                 async with task_handler.synchronize_cancel_latest(vm_state.module_id):
-                    await vm_hardware.execute_profile(profile=profile)
+                    await vm_hardware.execute_profile(
+                        profile=profile, vent_after=params.ventAfter
+                    )
 
         task = await self._task_handler.create_task(
             task_function=start_run_profile, id=params.taskId

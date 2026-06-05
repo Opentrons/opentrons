@@ -8,6 +8,9 @@ import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '..'
+import { getQueryKey } from '../api'
+
+import type { DocumentationState } from '../access_control'
 
 interface UseRunActionMutations {
   playRun: () => void
@@ -22,25 +25,34 @@ interface UseRunActionMutations {
   isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: boolean
 }
 
-export function useRunActionMutations(runId: string): UseRunActionMutations {
+export function useRunActionMutations(
+  runId: string,
+  documentationState: DocumentationState
+): UseRunActionMutations {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const onSuccess = (): void => {
-    queryClient.invalidateQueries([host, 'runs', runId]).catch((e: Error) => {
-      console.error(`error invalidating run ${runId} query: ${e.message}`)
-    })
+    queryClient
+      .invalidateQueries(getQueryKey(host, 'runs', runId))
+      .catch((e: Error) => {
+        console.error(`error invalidating run ${runId} query: ${e.message}`)
+      })
   }
 
-  const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation({
-    onSuccess,
-  })
+  const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation(
+    documentationState,
+    {
+      onSuccess,
+    }
+  )
 
   const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation({
     onSuccess,
   })
 
-  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation()
+  const { stopRun, isLoading: isStopRunActionLoading } =
+    useStopRunMutation(documentationState)
 
   const {
     resumeRunFromRecovery,

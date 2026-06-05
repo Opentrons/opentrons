@@ -44,8 +44,9 @@ dev = [
     "pytest-cov==4.1.0",
     "pytest-lazy-fixtures>=1.1.4,<2",
     "pytest-xdist~=2.5.0",
-    "types-requests==2.27.1",
+    "types-requests==2.33.*",
     "tavern>=3.0.2",
+    "requests==2.33.*",
 ]
 
 [tool.ruff.lint]

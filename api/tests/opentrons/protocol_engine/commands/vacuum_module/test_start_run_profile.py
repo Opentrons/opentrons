@@ -134,12 +134,14 @@ async def test_start_run_profile(
                 ),
             ],
             repetitions=vm_cycle.repetitions,
+            vent_after=vm_cycle.ventAfter,
         ),
     ]
 
     data = StartRunProfileParams(
         moduleId="input-vacuum_module-id",
         profile=step_data,
+        ventAfter=True,
         taskId="task-id",
     )
     expected_result = vm_commands.StartRunProfileResult(taskId="task-id")
@@ -178,5 +180,7 @@ async def test_start_run_profile(
     await task.asyncioTask
 
     # should call execute_profile w the correct steps
-    decoy.verify(await vm_hardware.execute_profile(profile=expected_hc_steps))
+    decoy.verify(
+        await vm_hardware.execute_profile(profile=expected_hc_steps, vent_after=True)
+    )
     assert result == SuccessData(public=expected_result)

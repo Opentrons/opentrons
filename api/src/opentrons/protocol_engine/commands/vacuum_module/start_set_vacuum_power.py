@@ -81,6 +81,10 @@ class StartSetVacuumPowerImpl(
             await vm_hardware.set_pump_state(
                 start_pump=True,
                 duty_cycle=params.percentPower,
+                duration_s=params.duration,
+                timeout_s=params.timeout,
+                rate=params.rate,
+                vent_after=params.ventAfter,
             )
 
         return SuccessData(

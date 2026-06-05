@@ -12,6 +12,7 @@ interface MenuHandleClickOutside {
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 
+// todo(mm, 2026-05-28): When should this be used vs. useOnClickOutside()?
 export function useMenuHandleClickOutside(): MenuHandleClickOutside {
   const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
 

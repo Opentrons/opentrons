@@ -537,9 +537,7 @@ def test_start_execute_profile(
     """It should execute a thermocycler profile via the core and return a task."""
     subject._api_version = api_version
     mock_task = decoy.mock(cls=Task)
-    decoy.when(mock_validation.ensure_thermocycler_repetition_count(123)).then_return(
-        321
-    )
+    decoy.when(mock_validation.ensure_profile_repetition_count(123)).then_return(321)
     decoy.when(
         mock_validation.ensure_thermocycler_profile_steps(
             [
@@ -624,9 +622,7 @@ def test_execute_profile(
     subject: ThermocyclerContext,
 ) -> None:
     """It should execute a thermocycler profile via the core."""
-    decoy.when(mock_validation.ensure_thermocycler_repetition_count(123)).then_return(
-        321
-    )
+    decoy.when(mock_validation.ensure_profile_repetition_count(123)).then_return(321)
     decoy.when(
         mock_validation.ensure_thermocycler_profile_steps(
             [

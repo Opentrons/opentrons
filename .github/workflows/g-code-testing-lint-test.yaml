@@ -84,8 +84,3 @@ jobs:
         run: make -C g-code-testing lint
       - name: Test
         run: make -C g-code-testing test
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./g-code-testing/coverage.xml
-          flags: g-code-testing

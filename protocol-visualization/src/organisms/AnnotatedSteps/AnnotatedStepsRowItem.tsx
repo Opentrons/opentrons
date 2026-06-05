@@ -22,6 +22,7 @@ import type { ItemData } from './index'
 interface GroupAnnotatedStepRowProps {
   scrollTargetId: string | null
   listElement: HTMLElement | null
+  listViewportHeight: number
   annotationType: string
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
@@ -167,6 +168,7 @@ export function AnnotatedStepsRowItem(
           <GroupAnnotatedStepRow
             scrollTargetId={data.scrollTargetId}
             listElement={data.listElement}
+            listViewportHeight={data.listViewportHeight}
             analysis={data.analysis}
             annotationType={row.annotationType}
             subCommands={row.group.subCommands}

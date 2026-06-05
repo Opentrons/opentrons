@@ -37,6 +37,7 @@ describe('AnnotatedGroup', () => {
     props = {
       scrollTargetId: 'mockTargetId',
       listElement: null,
+      listViewportHeight: 0,
       annotationType: 'mockAnnotationType',
       subCommands: [],
       analysis: {} as any,

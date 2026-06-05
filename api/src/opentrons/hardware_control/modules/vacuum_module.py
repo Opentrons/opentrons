@@ -38,6 +38,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -274,6 +275,7 @@ class VacuumModule(mod_abc.AbstractModule):
         dfu_info = await update.find_dfu_device(pid=DFU_PID, expected_device_count=3)
         return dfu_info
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 
@@ -442,7 +444,9 @@ class VacuumModule(mod_abc.AbstractModule):
             )
 
     async def _execute_profile(
-        self, profile: List[Union[VacuumModuleCycle, VacuumModuleStep]]
+        self,
+        profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
+        vent_after: bool = False,
     ) -> None:
         self._current_cycle_index = 0
         self._current_step_index = 0
@@ -455,11 +459,26 @@ class VacuumModule(mod_abc.AbstractModule):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
                         await self._execute_cycle_step(step)
+                        await self.wait_for_target()
+                        if (
+                            step["hold_time_minutes"] is not None
+                            or step["hold_time_seconds"] is not None
+                        ):
+                            await self.wait_for_command_duration()
+                if this_cycle["vent_after"] is not None:
+                    await self.set_vent_state(
+                        vent_state=VentState(this_cycle["vent_after"])
+                    )
             else:
                 await self._execute_cycle_step(step_or_cycle)
+                await self.wait_for_command_duration()
+        if vent_after:
+            await self.set_vent_state(VentState.OPENED)
 
     async def execute_profile(
-        self, profile: List[Union[VacuumModuleCycle, VacuumModuleStep]]
+        self,
+        profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
+        vent_after: bool = False,
     ) -> None:
         await self.wait_for_is_running()
         self._total_cycle_count = 0
@@ -480,6 +499,49 @@ class VacuumModule(mod_abc.AbstractModule):
         self.make_cancellable(task)
         await task
 
+    async def _wait_for_command_duration(self) -> None:
+        await self._reader.update_vacuum_state()
+
+        while self.vacuum_state.vacuum_duration > 0:
+            await self._poller.wait_next_poll()
+
+    async def wait_for_command_duration(self) -> None:
+        await self.wait_for_is_running()
+
+        task = self._loop.create_task(self._wait_for_command_duration())
+        self.make_cancellable(task)
+        await task
+
+    async def wait_for_target(self) -> None:
+        await self.wait_for_is_running()
+
+        task = self._loop.create_task(self._wait_for_target())
+        self.make_cancellable(task)
+        await task
+
+    async def _wait_for_target(self) -> None:
+        if self._reader.operation_mode == VacuumModuleOperationMode.POWER:
+            await self._reader.update_pump_state()
+            if not self._reader.pump_state.pump_running:
+                return
+            # should there be a tolerance here?
+            while (
+                self._reader.pump_state.current_pwm
+                != self._reader.pump_state.target_pwm
+            ):
+                await self._poller.wait_next_poll()
+        elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
+            await self._reader.update_vacuum_state()
+            if not self._reader.vacuum_state.vacuum_enabled:
+                return
+            while (
+                self._reader.vacuum_state.current_gauge_pressure
+                != self._reader.vacuum_state.target_gauge_pressure
+            ):
+                await self._poller.wait_next_poll()
+        else:
+            raise ValueError("Vacuum module target invalid.")
+
 
 class VacuumModuleReader(Reader):
     error: Optional[str]
@@ -493,6 +555,7 @@ class VacuumModuleReader(Reader):
             pressure_abs_b=0,
             pressure_atm=0,
             vacuum_enabled=False,
+            vacuum_duration=0,
             vent_state=VentState.CLOSED,
         )
         self.pump_state: PumpState = PumpState(

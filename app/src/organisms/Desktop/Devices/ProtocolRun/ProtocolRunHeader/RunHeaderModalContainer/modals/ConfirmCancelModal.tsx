@@ -52,7 +52,8 @@ export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
   const { onClose, runId, robotName, runStatus } = props
-  const { stopRun } = useStopRunMutation()
+  // TODO(jj): add doc state to desktop app
+  const { stopRun } = useStopRunMutation({ accessControlEnabled: false })
   const isFlex = useIsFlex(robotName)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const [isCanceling, setIsCanceling] = useState(false)

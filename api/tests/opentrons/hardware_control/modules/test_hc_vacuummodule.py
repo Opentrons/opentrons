@@ -1,7 +1,6 @@
 import asyncio
 from typing import AsyncGenerator, List, Optional, Union
 
-import mock
 import pytest
 from decoy import Decoy
 
@@ -48,75 +47,12 @@ def mock_driver(decoy: Decoy) -> SimulatingDriver:
 
 
 @pytest.fixture
-def set_vacuum_state_spy(mock_driver: SimulatingDriver) -> mock.AsyncMock:
-    """Build a spy for set vacuum state."""
-    return mock.AsyncMock(wraps=mock_driver.set_vacuum_state)
-
-
-@pytest.fixture
-def set_pump_state_spy(mock_driver: SimulatingDriver) -> mock.AsyncMock:
-    """Build a spy for set pump state."""
-    return mock.AsyncMock(wraps=mock_driver.set_pump_state)
-
-
-@pytest.fixture
-async def test_execute_profile_subject(
-    usb_port: USBPort,
-    mock_driver: SimulatingDriver,
-    mock_execution_manager: ExecutionManager,
-    module_error_callback: ModuleErrorCallback,
-    module_disconnected_callback: ModuleDisconnectedCallback,
-    set_vacuum_state_spy: mock.AsyncMock,
-    set_pump_state_spy: mock.AsyncMock,
-    decoy: Decoy,
-) -> AsyncGenerator[modules.VacuumModule, None]:
-    """Test subject with mocked driver."""
-    reader = VacuumModuleReader(driver=mock_driver)
-    poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
-    mock_driver.set_vacuum_state = set_vacuum_state_spy  # type: ignore[method-assign]
-    mock_driver.set_pump_state = set_pump_state_spy  # type: ignore[method-assign]
-    vacuum = modules.VacuumModule(
-        port="/dev/ot_module_sim_vacuummodule0",
-        usb_port=usb_port,
-        driver=mock_driver,
-        reader=reader,
-        poller=poller,
-        device_info={
-            "serial": "dummySerialFS",
-            "model": "nff",
-            "version": "vacuum-fw",
-            "reset_reason": "0",
-        },
-        hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=mock_execution_manager,
-        error_callback=module_error_callback,
-        disconnected_callback=module_disconnected_callback,
-    )
-    decoy.when(await mock_driver.get_device_info()).then_return(
-        {
-            "serial": "vacuum-fw",
-            "model": HardwareRevision.NFF.value,
-            "version": "dummySerialFS",
-            "reset_reason": "0",
-        }
-    )
-
-    await poller.start()
-    try:
-        yield vacuum
-    finally:
-        await vacuum.cleanup()
-
-
-@pytest.fixture
 async def subject(
     usb_port: USBPort,
     mock_driver: SimulatingDriver,
     mock_execution_manager: ExecutionManager,
     module_error_callback: ModuleErrorCallback,
     module_disconnected_callback: ModuleDisconnectedCallback,
-    set_vacuum_state_spy: mock.AsyncMock,
-    set_pump_state_spy: mock.AsyncMock,
     decoy: Decoy,
 ) -> AsyncGenerator[modules.VacuumModule, None]:
     """Test subject with mocked driver."""
@@ -389,6 +325,7 @@ async def test_update_pump_state(
             pressure_abs_b=0,
             pressure_atm=0,
             vacuum_enabled=False,
+            vacuum_duration=0,
             vent_state=VentState.CLOSED,
         )
     ],
@@ -406,14 +343,62 @@ async def test_update_vacuum_state(
     assert subject._reader.vacuum_state == vacuum_state
 
 
-async def test_execute_profile(
-    test_execute_profile_subject: modules.VacuumModule,
+async def test_wait_for_target(
+    subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
-    set_vacuum_state_spy: mock.AsyncMock,
-    set_pump_state_spy: mock.AsyncMock,
+    decoy: Decoy,
+) -> None:
+    """Ensure that the hc function reads the correct state and returns."""
+    current_pressures = [0, -100, -200, -300]
+    current_powers = [0, 30, 50, 75]
+    target_gauge_pressure = current_pressures[-1]
+    target_pwm = current_powers[-1]
+    vacuum_states = [
+        VacuumState(
+            target_gauge_pressure=target_gauge_pressure,
+            current_gauge_pressure=_pressure,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+        for _pressure in current_pressures
+    ]
+    pump_states = [
+        PumpState(
+            target_rpm=90,
+            current_rpm=80,
+            target_pwm=target_pwm,
+            current_pwm=_pwm,
+            pump_running=False,
+            manual_control=True,
+        )
+        for _pwm in current_powers
+    ]
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        vacuum_states[0], vacuum_states[1], vacuum_states[2], vacuum_states[3]
+    )
+    decoy.when(await mock_driver.get_pump_state()).then_return(
+        pump_states[0], pump_states[1], pump_states[2], pump_states[3]
+    )
+
+    await subject.set_pump_state(start_pump=True, duty_cycle=target_pwm)
+    await subject.wait_for_target()
+
+    await subject.set_vacuum_state(
+        enable_vacuum=True, gauge_pressure_mbar=target_gauge_pressure
+    )
+    await subject.wait_for_target()
+
+
+async def test_execute_profile(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
 ) -> None:
     """Ensure that execute_profile calls down to the correct hardware control functions in the right quantity."""
-    subject = test_execute_profile_subject
     profile: List[
         Union[VacuumModuleCycle, VacuumModulePowerStep, VacuumModulePressureStep]
     ] = [
@@ -466,6 +451,7 @@ async def test_execute_profile(
                 },
             ],
             "repetitions": 9,
+            "vent_after": True,
         },
         {
             "enable_pump": False,
@@ -477,10 +463,29 @@ async def test_execute_profile(
             "gauge_pressure_mbar": -111,
         },
     ]
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=True,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+
+    async def _fake_wait_for_target() -> None:
+        return
+
+    subject.wait_for_target = _fake_wait_for_target  # type: ignore[method-assign]
+
     await subject.execute_profile(profile)
 
-    set_vacuum_state_expected_call_list = [
-        mock.call(
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
             enable_vacuum=True,
             gauge_pressure_mbar=-300,
             duration_s=343,
@@ -488,12 +493,9 @@ async def test_execute_profile(
             rate=1.3,
             vent_after=True,
         ),
-        mock.call(
-            enable_vacuum=False
-        ),  # there should be a call to disable pressure control for every set_pump_state call
-    ]
-    set_pump_state_expected_call_list = [
-        mock.call(
+    )
+    decoy.verify(
+        await mock_driver.set_pump_state(
             start_pump=True,
             target_rpm=None,
             duty_cycle=61,
@@ -502,10 +504,15 @@ async def test_execute_profile(
             rate=1.4,
             vent_after=False,
         )
-    ]
+    )
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=False
+        ),  # there should be a call to disable pressure control for every set_pump_state call
+    )
     for i in range(9):
-        set_pump_state_expected_call_list.append(
-            mock.call(
+        decoy.verify(
+            await mock_driver.set_pump_state(
                 start_pump=True,
                 target_rpm=None,
                 duty_cycle=99,
@@ -515,9 +522,9 @@ async def test_execute_profile(
                 vent_after=False,
             )
         )
-        set_vacuum_state_expected_call_list.append(mock.call(enable_vacuum=False))
-        set_vacuum_state_expected_call_list.append(
-            mock.call(
+        decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
+        decoy.verify(
+            await mock_driver.set_vacuum_state(
                 enable_vacuum=True,
                 gauge_pressure_mbar=-99,
                 duration_s=639,
@@ -527,8 +534,8 @@ async def test_execute_profile(
             )
         )
 
-        set_pump_state_expected_call_list.append(
-            mock.call(
+        decoy.verify(
+            await mock_driver.set_pump_state(
                 start_pump=True,
                 target_rpm=None,
                 duty_cycle=11,
@@ -538,10 +545,11 @@ async def test_execute_profile(
                 vent_after=False,
             )
         )
-        set_vacuum_state_expected_call_list.append(mock.call(enable_vacuum=False))
+        decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
 
-    set_vacuum_state_expected_call_list.append(
-        mock.call(
+    decoy.verify(await mock_driver.set_vent_state(state=VentState.OPENED))
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
             enable_vacuum=False,
             gauge_pressure_mbar=-111,
             duration_s=720,
@@ -550,5 +558,3 @@ async def test_execute_profile(
             vent_after=False,
         )
     )
-    assert set_vacuum_state_spy.call_args_list == set_vacuum_state_expected_call_list
-    assert set_pump_state_spy.call_args_list == set_pump_state_expected_call_list

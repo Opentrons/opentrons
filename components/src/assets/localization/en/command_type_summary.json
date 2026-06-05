@@ -116,6 +116,7 @@
   "vacuumModule/openVent": "Open vent",
   "vacuumModule/closeVent": "Close vent",
   "vacuumModule/startRunProfile": "Run profile",
+  "vacuumModule/waitForTarget": "Wait for target",
   "verifyTipPresence": "Tip presence",
   "waitForDuration": "Wait",
   "waitForResume": "Wait",

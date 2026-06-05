@@ -11,6 +11,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
@@ -36,7 +37,8 @@ export function ConfirmCancelRunModal({
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
-  const { stopRun } = useStopRunMutation()
+  const documentationState = useGuardedAction()
+  const { stopRun } = useStopRunMutation(documentationState)
   const { dismissCurrentRun, isLoading: isDismissing } =
     useDismissCurrentRunMutation()
   const localRobot = useSelector(getLocalRobot)

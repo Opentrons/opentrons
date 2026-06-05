@@ -17,7 +17,7 @@ export const vacuumStopPump: CommandCreator<
     }
   }
 
-  const dummyPython = `${module.pythonName}.stop_vacuum()`
+  const python = `${module.pythonName}.stop_vacuum_pump()`
   return {
     commands: [
       {
@@ -28,6 +28,6 @@ export const vacuumStopPump: CommandCreator<
         },
       },
     ],
-    python: dummyPython,
+    python,
   }
 }

@@ -124,7 +124,9 @@ def _verify_height(
     Evaluate the height found by capacitive probe against search settings.
     """
     if found_pos > expected_pos + settings.early_sense_tolerance_mm:
-        raise EarlyCapacitiveSenseTrigger(found_pos, expected_pos)
+        raise EarlyCapacitiveSenseTrigger(
+            f"Calibration triggered early at z={found_pos}mm, expected {expected_pos}"
+        )
 
 
 async def _verify_edge_pos(
@@ -166,7 +168,9 @@ async def _verify_edge_pos(
             return
         else:
             last_result = hit_deck
-    raise EdgeNotFoundError(edge_name_str, check_stride)
+    raise EdgeNotFoundError(
+        f"Edge {edge_name_str} could not be verified at {check_stride} mm resolution."
+    )
 
 
 def critical_edge_offset(
@@ -377,7 +381,9 @@ async def find_calibration_structure_height(
         hcapi, mount, z_prep_point, z_pass_settings, probe=probe
     )
     if not hit_deck:
-        raise CalibrationStructureNotFoundError(structure_z, z_limit)
+        raise CalibrationStructureNotFoundError(
+            f"Structure height at z={structure_z}mm beyond lower limit: {z_limit}."
+        )
     LOG.info(f"autocalibration: found structure at {structure_z}")
     return structure_z
 
@@ -455,7 +461,10 @@ async def find_axis_center(
     left_edge_absolute = axis.of_point(start) + left_edge
     right_edge_absolute = axis.of_point(start) + right_edge
     if abs(detected_width - nominal_width) > WIDTH_TOLERANCE_MM:
-        raise InaccurateNonContactSweepError(nominal_width, detected_width)
+        raise InaccurateNonContactSweepError(
+            f"Calibration detected a slot width of {detected_width:.3f}mm, "
+            f"which is too far from the design width of {nominal_width:.3f}mm"
+        )
     return (left_edge_absolute + right_edge_absolute) / 2
 
 

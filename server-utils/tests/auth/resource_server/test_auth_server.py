@@ -9,12 +9,15 @@ import aiohttp.web
 import pytest
 
 from server_utils.auth.resource_server.auth_server import (
+    ALL_AUTH_SETTINGS_ENDPOINT_PATH,
     CLIENT_ID,
     SETTINGS_ENDPOINT_PATH,
     TOKEN_INTROSPECTION_ENDPOINT_PATH,
     AuthSettingsResponse,
     AuthSettingsResponseData,
     LocalHTTPClient,
+    RequireReasonForInteractionSettingsResponse,
+    RequireReasonForInteractionSettingsResponseData,
     TokenIntrospectionResponse,
 )
 
@@ -42,15 +45,23 @@ class AppMock:
     A JSON-serializable object.
     """
 
+    all_auth_settings_response: object
+    """How the server should respond to GET /auth/settings."""
+
     app: Final[aiohttp.web.Application]
 
     def __init__(self) -> None:
         self.settings_response = {}
+        self.all_auth_settings_response = {}
         self.introspect_response = {}
         self.introspect_requests = []
 
         app = aiohttp.web.Application()
         app.router.add_get(f"/{SETTINGS_ENDPOINT_PATH}", self._get_settings)
+        app.router.add_get(
+            f"/{ALL_AUTH_SETTINGS_ENDPOINT_PATH}",
+            self._get_all_auth_settings,
+        )
         app.router.add_post(
             f"/{TOKEN_INTROSPECTION_ENDPOINT_PATH}", self._post_introspect
         )
@@ -60,6 +71,11 @@ class AppMock:
         self, _request: aiohttp.web.Request
     ) -> aiohttp.web.Response:
         return aiohttp.web.json_response(data=self.settings_response)
+
+    async def _get_all_auth_settings(
+        self, _request: aiohttp.web.Request
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(data=self.all_auth_settings_response)
 
     async def _post_introspect(
         self, request: aiohttp.web.Request
@@ -130,6 +146,37 @@ async def test_settings(mock_server: tuple[AppMock, LocalHTTPClient]) -> None:
     settings_result = await client.get_auth_settings()
     assert settings_result == AuthSettingsResponse(
         data=AuthSettingsResponseData(accessControlEnabled=True)
+    )
+
+
+async def test_require_reason_for_interaction_settings(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client can retrieve the require-reason-for-interaction setting."""
+    app_mock, client = mock_server
+
+    app_mock.all_auth_settings_response = {
+        "data": {
+            "requireReasonForInteraction": True,
+            "accessControlEnabled": True,
+            "idleLogout": 180.0,
+        }
+    }
+    result = await client.get_require_reason_for_interaction_settings()
+    assert result == RequireReasonForInteractionSettingsResponse(
+        data=RequireReasonForInteractionSettingsResponseData(
+            requireReasonForInteraction=True
+        )
+    )
+
+    app_mock.all_auth_settings_response = {
+        "data": {"requireReasonForInteraction": False, "idleLogout": 60.0}
+    }
+    result = await client.get_require_reason_for_interaction_settings()
+    assert result == RequireReasonForInteractionSettingsResponse(
+        data=RequireReasonForInteractionSettingsResponseData(
+            requireReasonForInteraction=False
+        )
     )
 
 

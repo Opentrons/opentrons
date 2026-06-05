@@ -2,6 +2,8 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
+import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
+
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 
@@ -42,12 +44,14 @@ export function useRobotControlCommands({
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
   const [isExecuting, setIsExecuting] = useState(false)
 
-  const { chainRunCommands } = useChainMaintenanceCommands()
+  const docState = usePromptForInteractionReason()
+
+  const { chainRunCommands } = useChainMaintenanceCommands(docState)
   const { mutateAsync: deleteMaintenanceRun } =
-    useDeleteMaintenanceRunMutation()
+    useDeleteMaintenanceRunMutation(docState)
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(docState, {
       onSuccess: response => {
         const runId = response.data.id as string
 

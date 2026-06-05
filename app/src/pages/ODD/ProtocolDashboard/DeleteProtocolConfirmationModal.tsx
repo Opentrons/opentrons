@@ -15,7 +15,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  getQueryKey,
+  useHost,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
@@ -66,7 +70,7 @@ export function DeleteProtocolConfirmationModal({
         .then(() => deleteProtocol(host, protocolId))
         .then(() =>
           queryClient
-            .invalidateQueries([host, 'protocols'])
+            .invalidateQueries(getQueryKey(host, 'protocols'))
             .catch((e: Error) => {
               console.error(`error invalidating runs query: ${e.message}`)
             })

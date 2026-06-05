@@ -26,6 +26,7 @@ import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { LoggedOutOverlayMount } from '/app/organisms/ODD/OnDeviceLogin/LoggedOutOverlayMount'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
+import { RobotEncryptionKeyTakeover } from '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeyTakeover'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { Account } from '/app/pages/ODD/Account'
@@ -38,13 +39,13 @@ import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
 import { InitialLoadingScreen } from '/app/pages/ODD/InitialLoadingScreen'
 import { InstrumentDetail } from '/app/pages/ODD/InstrumentDetail'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
-import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
 import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
 import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
+import { RobotNameEditor } from '/app/pages/ODD/RobotNameEditor'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
 import { RunSummary } from '/app/pages/ODD/RunSummary'
@@ -58,15 +59,18 @@ import {
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
+import { showDocumentationRequiredModal } from '../organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
-  useProtocolReceiptToast,
   useScrollRef,
-  useSoftwareUpdatePoll,
-} from './hooks'
+} from './hooks/useModuleAttachedToast'
+import { useProtocolReceiptToast } from './hooks/useProtocolReceiptToast'
+import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
@@ -142,7 +146,7 @@ function getPathComponent(
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':
-      return <NameRobot />
+      return <RobotNameEditor />
     case '/robot-settings/update-robot':
       return <UpdateRobot />
     case '/robot-settings/update-robot-during-onboarding':
@@ -200,6 +204,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   }, [dispatch, isIdle, userSetBrightness])
 
+  useRefreshAccessTokenOnActivity()
+
   const isShellReady = useSelector(getIsShellReady)
 
   const robotSettingsQuery = useRobotSettingsQuery(
@@ -253,21 +259,27 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                       />
                     ) : null}
                     <NiceModal.Provider>
-                      <ToasterOven>
-                        <ProtocolReceiptToasts />
-                        {!showModuleSetupModal ? (
-                          <ModuleAttachedToasts
-                            openFlow={(open: boolean) => {
-                              setShowModuleSetupModal(open)
-                            }}
-                          />
-                        ) : null}
+                      <DocumentationRequiredModalContext.Provider
+                        value={{ showDocumentationRequiredModal }}
+                      >
+                        <RobotEncryptionKeyTakeover>
+                          <ToasterOven>
+                            <ProtocolReceiptToasts />
+                            {!showModuleSetupModal ? (
+                              <ModuleAttachedToasts
+                                openFlow={(open: boolean) => {
+                                  setShowModuleSetupModal(open)
+                                }}
+                              />
+                            ) : null}
 
-                        <SharedScrollRefProvider>
-                          <OnDeviceDisplayAppRoutes />
-                        </SharedScrollRefProvider>
-                        <LoggedOutOverlayMount />
-                      </ToasterOven>
+                            <SharedScrollRefProvider>
+                              <OnDeviceDisplayAppRoutes />
+                            </SharedScrollRefProvider>
+                            <LoggedOutOverlayMount />
+                          </ToasterOven>
+                        </RobotEncryptionKeyTakeover>
+                      </DocumentationRequiredModalContext.Provider>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
                 </>

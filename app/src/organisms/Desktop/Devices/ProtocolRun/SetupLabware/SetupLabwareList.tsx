@@ -10,8 +10,12 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareInfoByLiquidId,
+  getModuleType,
+  getSlotDisplayNameFromAAWithFakes,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
@@ -63,6 +67,12 @@ export function SetupLabwareList(
   const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key, value]) => key !== 'offDeck')
+  const vacuumDockSlotName = getSlotDisplayNameFromAAWithFakes(
+    VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
+  )
+  const hasVacuumModule = (protocolAnalysis?.modules ?? []).some(
+    m => getModuleType(m.model) === VACUUM_MODULE_TYPE
+  )
   const offDeckItems = useMemo(
     () =>
       protocolAnalysis != null
@@ -111,6 +121,9 @@ export function SetupLabwareList(
               onClick={() => {
                 setSelectedStack({ slotName: key, stack: value })
               }}
+              {...(hasVacuumModule && key === vacuumDockSlotName
+                ? { moduleTypeOverride: VACUUM_MODULE_TYPE }
+                : {})}
             />
           )
         })}

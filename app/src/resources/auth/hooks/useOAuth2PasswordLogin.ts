@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 
 import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
@@ -17,26 +18,13 @@ interface OAuth2TokenErrorResponse {
   opentrons_login_attempts_remaining?: number
 }
 
-function getOAuth2PasswordLoginErrorMessage(error: unknown): string {
-  if (axios.isAxiosError(error)) {
-    const data = error.response?.data as OAuth2TokenErrorResponse | undefined
-    const description = data?.error_description
-    if (description != null && description !== '') return description
-    const code = data?.error
-    if (code != null && code !== '') return code
-  }
-  return error instanceof Error ? error.message : 'Login failed'
-}
-
 export interface UseOAuth2PasswordLoginOptions {
   /**
-   * Called when the token endpoint succeeds (e.g. navigate away).
-   * Use `useNavigate` from the caller for desktop vs ODD routing.
+   * Called when the login request succeeds.
    */
   onSuccess: (username: string, response: OAuth2TokenResponse) => void
   /**
    * Called with a user-facing message when the token request fails.
-   * Wire to `makeSnackbar` / toast in the page or organism, not in this hook.
    */
   onError: (message: string) => void
 }
@@ -55,6 +43,32 @@ export function useOAuth2PasswordLogin(
   options: UseOAuth2PasswordLoginOptions
 ): UseOAuth2PasswordLoginResult {
   const { onSuccess, onError } = options
+  const { t } = useTranslation('access_control')
+
+  const getErrorMessage = (error: unknown): string => {
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data as OAuth2TokenErrorResponse | undefined
+      const oauth2ErrorCode = data?.error
+      const attemptsRemaining = data?.opentrons_login_attempts_remaining
+      if (oauth2ErrorCode === 'invalid_grant') {
+        if (typeof attemptsRemaining === 'number') {
+          if (attemptsRemaining === 0) {
+            return t('login_error_locked')
+          } else {
+            return t('login_error_incorrect_with_attempts_remaining', {
+              attemptsRemaining,
+            })
+          }
+        } else {
+          return t('login_error_incorrect')
+        }
+      } else {
+        return t('login_error_unknown_with_message', { message: error.message })
+      }
+    } else {
+      return t('login_error_unknown')
+    }
+  }
 
   const { getOAuth2Token, isLoading } = useGetOAuth2TokenMutation({
     onSuccess: (responseData, requestVariables) => {
@@ -69,7 +83,7 @@ export function useOAuth2PasswordLogin(
       }
     },
     onError: (error: unknown) => {
-      onError(getOAuth2PasswordLoginErrorMessage(error))
+      onError(getErrorMessage(error))
     },
   })
 
