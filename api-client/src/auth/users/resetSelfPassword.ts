@@ -1,4 +1,4 @@
-import { POST, request } from '../../request'
+import { PATCH, request } from '../../request'
 
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
@@ -9,7 +9,7 @@ export function resetSelfPassword(
   body: UpdateSelfPasswordRequest
 ): ResponsePromise<AuthUserResponse> {
   return request<AuthUserResponse, UpdateSelfPasswordRequest>(
-    POST,
+    PATCH,
     '/auth/users/self/resetPassword',
     body,
     config
