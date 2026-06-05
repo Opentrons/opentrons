@@ -32,7 +32,7 @@ endfunction()
 function(target_pipettes_core_96 TARGET REVISION)
     target_pipettes_core_common(${TARGET} ${REVISION})
     target_compile_definitions(${TARGET} PUBLIC PIPETTE_TYPE_DEFINE=NINETY_SIX_CHANNEL)
-    target_compile_definitions(${TARGET} PUBLIC SENSOR_BUFF_SIZE=300)
+    target_compile_definitions(${TARGET} PUBLIC SENSOR_BUFF_SIZE=20)
     target_compile_definitions(${TARGET} PUBLIC USE_TWO_BUFFERS=true)
     target_sources(${TARGET} PUBLIC
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/can_task_high_throughput.cpp)
