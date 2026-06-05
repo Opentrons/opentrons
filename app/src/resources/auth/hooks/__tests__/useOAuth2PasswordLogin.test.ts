@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
+import { OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 
 import { useOAuth2PasswordLogin } from '../useOAuth2PasswordLogin'
 
@@ -13,6 +13,7 @@ import type {
 } from '@opentrons/api-client'
 
 const mockGetOAuth2Token = vi.fn()
+const mockGetSelf = vi.fn()
 const mockUseHost = vi.fn()
 
 let mutationOnSuccess:
@@ -21,6 +22,14 @@ let mutationOnSuccess:
       variables: { grant_type: string; username: string }
     ) => void)
   | undefined
+
+vi.mock('@opentrons/api-client', async importOriginal => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    getSelf: (...args: unknown[]) => mockGetSelf(...args),
+  }
+})
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
@@ -42,14 +51,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 
-vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getSelf: vi.fn(),
-  }
-})
-
 const TOKEN_RESPONSE: OAuth2TokenResponse = {
   access_token: 'access-token',
   token_type: 'Bearer',
@@ -63,11 +64,12 @@ describe('useOAuth2PasswordLogin', () => {
 
   beforeEach(() => {
     mockGetOAuth2Token.mockReset()
+    mockGetSelf.mockReset()
     mutationOnSuccess = undefined
     mockUseHost.mockReturnValue({ hostname: 'localhost' })
     onSuccess.mockReset()
     onError.mockReset()
-    vi.mocked(getSelf).mockResolvedValue({
+    mockGetSelf.mockResolvedValue({
       data: {
         data: {
           username: 'alice',
@@ -77,8 +79,8 @@ describe('useOAuth2PasswordLogin', () => {
           locked: false,
           resetPassword: false,
         },
-      } as AuthUserResponse,
-    } as Awaited<ReturnType<typeof getSelf>>)
+      },
+    } as AuthUserResponse)
   })
 
   it('calls getOAuth2Token with ROPC body including client_id', () => {
@@ -107,9 +109,9 @@ describe('useOAuth2PasswordLogin', () => {
       locked: false,
       resetPassword: true,
     }
-    vi.mocked(getSelf).mockResolvedValue({
-      data: { data: user } as AuthUserResponse,
-    } as Awaited<ReturnType<typeof getSelf>>)
+    mockGetSelf.mockResolvedValue({
+      data: { data: user },
+    } as AuthUserResponse)
 
     renderHook(() => useOAuth2PasswordLogin({ onSuccess, onError }))
 
@@ -121,22 +123,17 @@ describe('useOAuth2PasswordLogin', () => {
     })
 
     await waitFor(() => {
-      expect(getSelf).toHaveBeenCalledWith({
+      expect(mockGetSelf).toHaveBeenCalledWith({
         hostname: 'localhost',
         token: 'access-token',
       })
     })
-    expect(onSuccess).toHaveBeenCalledWith(
-      'alice',
-      'access-token',
-      user,
-      TOKEN_RESPONSE
-    )
+    expect(onSuccess).toHaveBeenCalledWith('alice', user, TOKEN_RESPONSE)
     expect(onError).not.toHaveBeenCalled()
   })
 
   it('reports an error when fetching self fails after OAuth success', async () => {
-    vi.mocked(getSelf).mockRejectedValue(new Error('network'))
+    mockGetSelf.mockRejectedValue(new Error('network'))
 
     renderHook(() => useOAuth2PasswordLogin({ onSuccess, onError }))
 

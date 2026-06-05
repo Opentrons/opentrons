@@ -1,16 +1,20 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { getSelf } from '@opentrons/api-client'
 import { getQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
 import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
-import { useOAuth2PasswordLogin, useUpdateSelf } from '/app/resources/auth'
+import {
+  useOAuth2PasswordLogin,
+  useSetNewPasswordAndSignIn,
+} from '/app/resources/auth'
 
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
@@ -29,138 +33,159 @@ export interface LoginModalResult {
 type LoginModalPhase = 'login' | 'chooseNewPassword'
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
-  const modal = useModal()
-  const dispatch = useDispatch()
-  const { t } = useTranslation('device_settings')
-  const { makeSnackbar } = useToaster()
-  const host = useHost()
-  const queryClient = useQueryClient()
-  const localRobotName = useSelector(
-    (state: State) => getLocalRobot(state)?.name ?? null
-  )
-  const [phase, setPhase] = useState<LoginModalPhase>('login')
-  const [step, setStep] = useState<LoginStep>('username')
-  const [formKey, setFormKey] = useState(0)
-  const [loginError, setLoginError] = useState<string | null>(null)
-  const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
-  const storeLoginState = useStoreLoginState()
-
-  const isChoosingNewPassword = phase === 'chooseNewPassword'
-
-  const invalidateSelfQuery = useCallback((): void => {
-    if (host == null) return
-    void queryClient.invalidateQueries(
-      getQueryKey(host, 'auth', 'users', 'self') as QueryKey
+    const modal = useModal()
+    const dispatch = useDispatch()
+    const { t } = useTranslation('device_settings')
+    const { t: tAccessControl } = useTranslation('access_control')
+    const { makeSnackbar } = useToaster()
+    const host = useHost()
+    const queryClient = useQueryClient()
+    const localRobotName = useSelector(
+      (state: State) => getLocalRobot(state)?.name ?? null
     )
-  }, [host, queryClient])
-
-  const finishModal = useCallback(
-    (username: string): void => {
-      const result: LoginModalResult = { username }
-      modal.resolve(result)
-      modal.remove()
-    },
-    [modal]
-  )
-
-  const handleLoginSuccess = useCallback(
-    (
-      username: string,
-      _accessToken: string,
-      user: AuthUser,
-      response: OAuth2TokenResponse
-    ): void => {
-      setLoginError(null)
-      storeLoginState(username, response)
-      invalidateSelfQuery()
-
-      if (user.resetPassword) {
-        setLoggedInUsername(username)
-        setPhase('chooseNewPassword')
-        setStep('password')
-        setFormKey(key => key + 1)
-        return
-      }
-
-      finishModal(username)
-    },
-    [finishModal, invalidateSelfQuery, storeLoginState]
-  )
-
-  const dismissModal = useCallback((): void => {
-    modal.resolve(null)
-    modal.remove()
-  }, [modal])
-
-  const handleNewPasswordSuccess = useCallback(
-    (username: string, response: OAuth2TokenResponse): void => {
-      setLoginError(null)
-      storeLoginState(username, response)
-      invalidateSelfQuery()
-      finishModal(username)
-    },
-    [finishModal, invalidateSelfQuery, storeLoginState]
-  )
-
-  const handleNewPasswordFailure = useCallback((): void => {
-    if (localRobotName != null) {
-      dispatch(logOut({ robotName: localRobotName }))
-    }
-    invalidateSelfQuery()
-    makeSnackbar(
-      t('on_device_login_error_incorrect') as string,
-      INVALID_CREDENTIALS_TOAST_DURATION_MS
+    const [phase, setPhase] = useState<LoginModalPhase>('login')
+    const [step, setStep] = useState<LoginStep>('username')
+    const [formKey, setFormKey] = useState(0)
+    const [loginError, setLoginError] = useState<string | null>(null)
+    const [loggedInUsername, setLoggedInUsername] = useState<string | null>(
+      null
     )
-    dismissModal()
-  }, [
-    dismissModal,
-    dispatch,
-    invalidateSelfQuery,
-    localRobotName,
-    makeSnackbar,
-    t,
-  ])
+    const storeLoginState = useStoreLoginState()
 
-  const { submitPassword, isAuthLoading: isLoginAuthLoading } =
-    useOAuth2PasswordLogin({
-      onSuccess: handleLoginSuccess,
-      onError: message => {
-        setLoginError(message)
+    useEffect(() => {
+      if (host?.token == null || localRobotName == null) return
+
+      void getSelf(host)
+        .then(response => {
+          if (response.data.data.resetPassword) {
+            dispatch(logOut({ robotName: localRobotName }))
+          }
+        })
+        .catch(() => {
+          // Ignore: the user will sign in through the modal.
+        })
+    }, [dispatch, host, localRobotName])
+
+    const isChoosingNewPassword = phase === 'chooseNewPassword'
+
+    const invalidateSelfQuery = useCallback((): void => {
+      if (host == null) return
+      void queryClient.invalidateQueries(
+        getQueryKey(host, 'auth', 'users', 'self') as QueryKey
+      )
+    }, [host, queryClient])
+
+    const finishModal = useCallback(
+      (username: string): void => {
+        const result: LoginModalResult = { username }
+        modal.resolve(result)
+        modal.remove()
       },
-    })
+      [modal]
+    )
 
-  const { updateSelf, isLoading: isUpdateSelfLoading } = useUpdateSelf({
-    onSuccess: handleNewPasswordSuccess,
-    onError: handleNewPasswordFailure,
-  })
+    const handleLoginSuccess = useCallback(
+      (
+        username: string,
+        user: AuthUser,
+        response: OAuth2TokenResponse
+      ): void => {
+        setLoginError(null)
+        storeLoginState(username, response)
+        invalidateSelfQuery()
 
-  const handleCancel = (): void => {
-    dismissModal()
-  }
-
-  const initialUsername =
-    phase === 'chooseNewPassword' ? (loggedInUsername ?? undefined) : undefined
-
-  return (
-    <div className={styles.overlay}>
-      <OnDeviceLogin
-        key={formKey}
-        step={step}
-        onStepChange={setStep}
-        submitPassword={isChoosingNewPassword ? updateSelf : submitPassword}
-        isAuthLoading={
-          isChoosingNewPassword ? isUpdateSelfLoading : isLoginAuthLoading
+        if (user.resetPassword) {
+          setLoggedInUsername(username)
+          setPhase('chooseNewPassword')
+          setStep('password')
+          setFormKey(key => key + 1)
+          return
         }
-        isPasswordResetRequired={isChoosingNewPassword}
-        initialUsername={initialUsername}
-        loginError={loginError}
-        onClearLoginError={() => {
-          setLoginError(null)
-        }}
-        onCancel={handleCancel}
-      />
-    </div>
-  )
+
+        finishModal(username)
+      },
+      [finishModal, invalidateSelfQuery, storeLoginState]
+    )
+
+    const dismissModal = useCallback((): void => {
+      modal.resolve(null)
+      modal.remove()
+    }, [modal])
+
+    const handleNewPasswordSuccess = useCallback(
+      (username: string, response: OAuth2TokenResponse): void => {
+        setLoginError(null)
+        storeLoginState(username, response)
+        invalidateSelfQuery()
+        finishModal(username)
+      },
+      [finishModal, invalidateSelfQuery, storeLoginState]
+    )
+
+    const handleNewPasswordFailure = useCallback((): void => {
+      if (localRobotName != null) {
+        dispatch(logOut({ robotName: localRobotName }))
+      }
+      invalidateSelfQuery()
+      makeSnackbar(
+        t('on_device_login_error_incorrect') as string,
+        INVALID_CREDENTIALS_TOAST_DURATION_MS
+      )
+      dismissModal()
+    }, [
+      dismissModal,
+      dispatch,
+      invalidateSelfQuery,
+      localRobotName,
+      makeSnackbar,
+      t,
+    ])
+
+    const { submitPassword, isAuthLoading: isLoginAuthLoading } =
+      useOAuth2PasswordLogin({
+        onSuccess: handleLoginSuccess,
+        onError: message => {
+          setLoginError(tAccessControl(message) as string)
+        },
+      })
+
+    const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
+      useSetNewPasswordAndSignIn({
+        onSuccess: handleNewPasswordSuccess,
+        onError: handleNewPasswordFailure,
+      })
+
+    const handleCancel = (): void => {
+      dismissModal()
+    }
+
+    const initialUsername =
+      phase === 'chooseNewPassword'
+        ? (loggedInUsername ?? undefined)
+        : undefined
+
+    return (
+      <div className={styles.overlay}>
+        <OnDeviceLogin
+          key={formKey}
+          step={step}
+          onStepChange={setStep}
+          submitPassword={
+            isChoosingNewPassword ? submitNewPassword : submitPassword
+          }
+          isAuthLoading={
+            isChoosingNewPassword ? isSetNewPasswordLoading : isLoginAuthLoading
+          }
+          isPasswordResetRequired={isChoosingNewPassword}
+          initialUsername={initialUsername}
+          loginError={loginError}
+          onClearLoginError={() => {
+            setLoginError(null)
+          }}
+          onCancel={handleCancel}
+        />
+      </div>
+    )
 })
 
 /**

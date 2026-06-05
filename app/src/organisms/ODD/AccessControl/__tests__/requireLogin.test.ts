@@ -3,14 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getSelf } from '@opentrons/api-client'
 
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
-import { getLocalRobot } from '/app/redux/discovery'
-import { logOut } from '/app/redux/robot-auth'
-import { store } from '/app/redux/store'
 
 import { requireLogin } from '../requireLogin'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/api-client', () => ({
   getSelf: vi.fn(),
@@ -18,24 +14,6 @@ vi.mock('@opentrons/api-client', () => ({
 
 vi.mock('/app/organisms/ODD/OnDeviceLogin/LoginModal', () => ({
   showLoginModal: vi.fn(),
-}))
-
-vi.mock('/app/redux/store', () => ({
-  store: {
-    getState: vi.fn(),
-    dispatch: vi.fn(),
-  },
-}))
-
-vi.mock('/app/redux/discovery', () => ({
-  getLocalRobot: vi.fn(),
-}))
-
-vi.mock('/app/redux/robot-auth', () => ({
-  logOut: vi.fn((payload: { robotName: string }) => ({
-    type: 'logOut',
-    payload,
-  })),
 }))
 
 const HOST_CONFIG: HostConfig = {
@@ -74,18 +52,11 @@ describe('requireLogin', () => {
         },
       },
     } as Awaited<ReturnType<typeof getSelf>>)
-    vi.mocked(store.getState).mockReturnValue({} as State)
-    vi.mocked(getLocalRobot).mockReturnValue({
-      name: 'odd-robot',
-    } as ReturnType<typeof getLocalRobot>)
     vi.mocked(showLoginModal).mockResolvedValue({ username: 'alice' })
 
     const result = await requireLogin('alice', HOST_CONFIG)
 
     expect(result).toEqual({ username: 'alice' })
-    expect(store.dispatch).toHaveBeenCalledWith(
-      logOut({ robotName: 'odd-robot' })
-    )
     expect(showLoginModal).toHaveBeenCalledOnce()
   })
 
@@ -114,6 +85,5 @@ describe('requireLogin', () => {
 
     expect(result).toEqual({ username: 'alice' })
     expect(showLoginModal).not.toHaveBeenCalled()
-    expect(store.dispatch).not.toHaveBeenCalled()
   })
 })

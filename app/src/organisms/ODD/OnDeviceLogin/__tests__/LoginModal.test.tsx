@@ -2,15 +2,27 @@ import NiceModal from '@ebay/nice-modal-react'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getSelf } from '@opentrons/api-client'
+import { useHost } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { getLocalRobot } from '/app/redux/discovery'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
-import { useOAuth2PasswordLogin, useUpdateSelf } from '/app/resources/auth'
+import {
+  useOAuth2PasswordLogin,
+  useSetNewPasswordAndSignIn,
+} from '/app/resources/auth'
 
 import { showLoginModal } from '../LoginModal'
 
 import type * as ReactI18next from 'react-i18next'
-import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+import type {
+  AuthUser,
+  AuthUserResponse,
+  OAuth2TokenResponse,
+} from '@opentrons/api-client'
 
 vi.mock('react-i18next', async importOriginal => {
   const actual = await importOriginal<typeof ReactI18next>()
@@ -32,7 +44,7 @@ vi.mock('/app/redux/discovery', () => ({
 
 vi.mock('/app/resources/auth', () => ({
   useOAuth2PasswordLogin: vi.fn(),
-  useUpdateSelf: vi.fn(),
+  useSetNewPasswordAndSignIn: vi.fn(),
 }))
 
 vi.mock('/app/resources/access-control/useStoreLoginState', () => ({
@@ -42,6 +54,22 @@ vi.mock('/app/resources/access-control/useStoreLoginState', () => ({
 vi.mock('/app/organisms/ToasterOven', () => ({
   useToaster: vi.fn(),
 }))
+
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useHost: vi.fn(),
+  }
+})
+
+vi.mock('@opentrons/api-client', async importOriginal => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    getSelf: vi.fn(),
+  }
+})
 
 const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
@@ -81,6 +109,15 @@ describe('LoginModal', () => {
   const mockStoreLoginState = vi.fn()
 
   beforeEach(() => {
+    vi.mocked(useHost).mockReturnValue({
+      hostname: 'localhost',
+      token: 'access-token',
+    })
+    vi.mocked(getSelf).mockResolvedValue({
+      data: {
+        data: mockAuthUser({ resetPassword: false }),
+      } as AuthUserResponse,
+    } as Awaited<ReturnType<typeof getSelf>>)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: vi.fn(),
       makeToast: vi.fn(),
@@ -90,17 +127,19 @@ describe('LoginModal', () => {
 
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
-        onSuccess(username, 'access-token', mockAuthUser(), OAUTH_RESPONSE)
+        onSuccess(username, mockAuthUser(), OAUTH_RESPONSE)
       },
       isAuthLoading: false,
     }))
 
-    vi.mocked(useUpdateSelf).mockImplementation(({ onSuccess }) => ({
-      updateSelf: (username: string, _password: string) => {
-        onSuccess(username, OAUTH_RESPONSE)
-      },
-      isLoading: false,
-    }))
+    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+      ({ onSuccess }) => ({
+        submitNewPassword: (username: string, _password: string) => {
+          onSuccess(username, OAUTH_RESPONSE)
+        },
+        isLoading: false,
+      })
+    )
   })
 
   afterEach(() => {
@@ -114,6 +153,23 @@ describe('LoginModal', () => {
   const clickPrimary = (name: 'next' | 'confirm'): void => {
     fireEvent.click(screen.getByRole('button', { name }))
   }
+
+  it('clears local login state on open when getSelf reports resetPassword', async () => {
+    vi.mocked(getLocalRobot).mockReturnValue({
+      name: 'odd-robot',
+    } as ReturnType<typeof getLocalRobot>)
+    vi.mocked(getSelf).mockResolvedValue({
+      data: {
+        data: mockAuthUser({ resetPassword: true }),
+      } as AuthUserResponse,
+    } as Awaited<ReturnType<typeof getSelf>>)
+
+    openLoginModal()
+
+    await waitFor(() => {
+      expect(logOut).toHaveBeenCalledWith({ robotName: 'odd-robot' })
+    })
+  })
 
   it('opens on the username step', () => {
     openLoginModal()
@@ -148,7 +204,6 @@ describe('LoginModal', () => {
       submitPassword: (username: string, _password: string) => {
         onSuccess(
           username,
-          'access-token',
           mockAuthUser({ resetPassword: true }),
           OAUTH_RESPONSE
         )
@@ -182,7 +237,6 @@ describe('LoginModal', () => {
       submitPassword: (username: string, _password: string) => {
         onSuccess(
           username,
-          'access-token',
           mockAuthUser({ resetPassword: true }),
           OAUTH_RESPONSE
         )

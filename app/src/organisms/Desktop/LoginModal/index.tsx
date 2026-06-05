@@ -57,13 +57,13 @@ function LoginModalImpl(): JSX.Element {
   }
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
-    onSuccess: (successfulUsername, _accessToken, _user, response) => {
+    onSuccess: (successfulUsername, _user, response) => {
       setLoginError(null)
       storeLoginState(successfulUsername, response)
       modal.remove()
     },
     onError: message => {
-      setLoginError(message)
+      setLoginError(t(`access_control:${message}`) as string)
     },
   })
 

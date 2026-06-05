@@ -1,5 +1,4 @@
-import { useCallback, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 import axios from 'axios'
 
 import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
@@ -25,12 +24,11 @@ export interface UseOAuth2PasswordLoginOptions {
    */
   onSuccess: (
     username: string,
-    accessToken: string,
     user: AuthUser,
     response: OAuth2TokenResponse
   ) => void
   /**
-   * Called with a user-facing message when the token request fails.
+   * Called with an `access_control` i18n key when the token request fails.
    */
   onError: (message: string) => void
 }
@@ -51,11 +49,10 @@ export function useOAuth2PasswordLogin(
   options: UseOAuth2PasswordLoginOptions
 ): UseOAuth2PasswordLoginResult {
   const { onSuccess, onError } = options
-  const { t } = useTranslation('access_control')
   const host = useHost()
   const [isFetchingSelf, setIsFetchingSelf] = useState(false)
 
-  const getErrorMessage = (error: unknown): string => {
+  const getOAuthTokenErrorMessage = (error: unknown): string => {
     if (axios.isAxiosError(error)) {
       const data = error.response?.data as OAuth2TokenErrorResponse | undefined
       const oauth2ErrorCode = data?.error
@@ -63,65 +60,58 @@ export function useOAuth2PasswordLogin(
       if (oauth2ErrorCode === 'invalid_grant') {
         if (typeof attemptsRemaining === 'number') {
           if (attemptsRemaining === 0) {
-            return t('login_error_locked')
+            return 'login_error_locked'
           } else {
-            return t('login_error_incorrect_with_attempts_remaining', {
-              attemptsRemaining,
-            })
+            return 'login_error_incorrect_with_attempts_remaining'
           }
         } else {
-          return t('login_error_incorrect')
+          return 'login_error_incorrect'
         }
       } else {
-        return t('login_error_unknown_with_message', { message: error.message })
+        return 'login_error_unknown_with_message'
       }
     } else {
-      return t('login_error_unknown')
+      return 'login_error_unknown'
     }
   }
 
-  const fetchSelfAfterLogin = useCallback(
-    async (accessToken: string) => {
-      if (host == null) {
-        throw new Error('Missing API host')
-      }
-      const response = await getSelf({ ...host, token: accessToken })
-      return response.data.data
-    },
-    [host]
-  )
+  const { getOAuth2Token, isLoading: isOAuthLoading } =
+    useGetOAuth2TokenMutation({
+      onSuccess: (responseData, requestVariables) => {
+        if (requestVariables.grant_type !== 'password') {
+          // Shouldn't happen since this hook only sends request with grant_type==='password'.
+          console.warn(
+            'Expected grant_type password, got',
+            requestVariables.grant_type
+          )
+          return
+        }
 
-  const { getOAuth2Token, isLoading } = useGetOAuth2TokenMutation({
-    onSuccess: (responseData, requestVariables) => {
-      if (requestVariables.grant_type !== 'password') {
-        // Shouldn't happen since this hook only sends request with grant_type==='password'.
-        console.warn(
-          'Expected grant_type password, got',
-          requestVariables.grant_type
-        )
-        return
-      }
+        const response = responseData.data
+        const accessToken = response.access_token as string
+        const username = requestVariables.username
 
-      const response = responseData.data
-      const accessToken = response.access_token as string
-      const username = requestVariables.username
+        if (host == null) {
+          onError('login_error_incorrect')
+          return
+        }
 
-      setIsFetchingSelf(true)
-      void fetchSelfAfterLogin(accessToken)
-        .then(user => {
-          onSuccess(username, accessToken, user, response)
-        })
-        .catch(() => {
-          onError(t('login_error_incorrect') as string)
-        })
-        .finally(() => {
-          setIsFetchingSelf(false)
-        })
-    },
-    onError: (error: unknown) => {
-      onError(getErrorMessage(error))
-    },
-  })
+        setIsFetchingSelf(true)
+        void getSelf({ ...host, token: accessToken })
+          .then(selfResponse => {
+            onSuccess(username, selfResponse.data.data, response)
+          })
+          .catch(() => {
+            onError('login_error_incorrect')
+          })
+          .finally(() => {
+            setIsFetchingSelf(false)
+          })
+      },
+      onError: (error: unknown) => {
+        onError(getOAuthTokenErrorMessage(error))
+      },
+    })
 
   const submitPassword = (username: string, password: string): void => {
     getOAuth2Token({
@@ -132,5 +122,5 @@ export function useOAuth2PasswordLogin(
     })
   }
 
-  return { submitPassword, isAuthLoading: isLoading || isFetchingSelf }
+  return { submitPassword, isAuthLoading: isOAuthLoading || isFetchingSelf }
 }

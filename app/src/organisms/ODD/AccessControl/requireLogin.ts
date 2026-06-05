@@ -1,9 +1,6 @@
 import { getSelf } from '@opentrons/api-client'
 
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
-import { getLocalRobot } from '/app/redux/discovery'
-import { logOut } from '/app/redux/robot-auth'
-import { store } from '/app/redux/store'
 
 import type { HostConfig } from '@opentrons/api-client'
 
@@ -31,23 +28,9 @@ export async function requireLogin(
     return { username: currentUsername }
   }
 
-  if (currentUsername != null) {
-    clearLocalLoginState()
-  }
-
   const result = await showLoginModal()
   if (result == null) return null
   return { username: result.username }
-}
-
-function clearLocalLoginState(): void {
-  const state = store.getState()
-  const localRobotName = getLocalRobot(state)?.name ?? null
-  if (localRobotName == null) {
-    console.warn("Couldn't determine the local robot.")
-    return
-  }
-  store.dispatch(logOut({ robotName: localRobotName }))
 }
 
 async function isPasswordResetRequired(
