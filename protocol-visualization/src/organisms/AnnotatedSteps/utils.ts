@@ -49,9 +49,7 @@ export function shouldCapExpandedGroupBodyHeight(params: {
     return false
   }
 
-  return (
-    getEstimatedExpandedGroupContentHeightPx(params) > bodyMaxHeightPx
-  )
+  return getEstimatedExpandedGroupContentHeightPx(params) > bodyMaxHeightPx
 }
 
 export const getIsVisibleProtocolStep = (command: RunTimeCommand): boolean => {

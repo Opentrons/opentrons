@@ -72,9 +72,7 @@ export function IndividualCommand({
         ? commandEl.closest<HTMLElement>(`.${styles.annotated_group_expanded}`)
         : null
     const outerListEl =
-      listElement ??
-      commandEl.closest<HTMLElement>('[role="list"]') ??
-      null
+      listElement ?? commandEl.closest<HTMLElement>('[role="list"]') ?? null
 
     let scrollContainer: HTMLElement | null = outerListEl
 

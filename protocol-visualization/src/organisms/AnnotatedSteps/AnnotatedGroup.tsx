@@ -1,5 +1,5 @@
-import clsx from 'clsx'
 import { useLayoutEffect, useState } from 'react'
+import clsx from 'clsx'
 
 import { COLORS, Icon, StepGroup } from '@opentrons/components'
 
