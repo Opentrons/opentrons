@@ -1,5 +1,5 @@
-import clsx from 'clsx'
 import { useLayoutEffect, useState } from 'react'
+import clsx from 'clsx'
 
 import { COLORS, Icon, StepGroup } from '@opentrons/components'
 
@@ -105,11 +105,11 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
               [styles.annotated_group_expanded_natural_height]:
                 !shouldCapExpandedBody,
             })}
-            style={
-              expandedMaxHeightPx != null
-                ? { maxHeight: expandedMaxHeightPx }
-                : undefined
-            }
+            style={{
+              ...(expandedMaxHeightPx != null && {
+                maxHeight: expandedMaxHeightPx,
+              }),
+            }}
           >
             {subCommands.map((subCommand, index) => (
               <IndividualCommand

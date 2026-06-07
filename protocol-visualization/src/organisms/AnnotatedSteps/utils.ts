@@ -1,10 +1,10 @@
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
-/** Reserve space for StepGroup header (title row, optional subtitle, padding). */
+// space for StepGroup header (title row, optional subtitle, padding)
 export const STEP_GROUP_HEADER_RESERVE_PX = 80
 export const MIN_EXPANDED_BODY_PX = 160
 export const LIST_VIEWPORT_BOTTOM_BUFFER_PX = 8
-/** Matches AnnotatedSteps DEFAULT_ROW_HEIGHT_PX. */
+// matches AnnotatedSteps DEFAULT_ROW_HEIGHT_PX.
 export const ESTIMATED_COMMAND_HEIGHT_PX = 64
 export const TRAILING_ERRORS_FOOTER_ESTIMATE_PX = 100
 
@@ -35,7 +35,7 @@ export function getEstimatedExpandedGroupContentHeightPx(params: {
   )
 }
 
-/** Only cap expanded step-group height when content would exceed the list viewport. */
+// only cap expanded stepGroup height when content would exceed the list viewport
 export function shouldCapExpandedGroupBodyHeight(params: {
   subCommandCount: number
   listViewportHeight: number
