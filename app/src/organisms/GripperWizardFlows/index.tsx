@@ -37,7 +37,7 @@ import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { MountGripper } from './MountGripper'
 import { MovePin } from './MovePin'
 import { Success } from './Success'
-import { GRIPPER_FLOW_NAMES } from './types'
+import { GRIPPER_FLOW_ACTIONS, GRIPPER_FLOW_FINISH_ACTIONS } from './types'
 import { UnmountGripper } from './UnmountGripper'
 
 import type { AxiosError } from 'axios'
@@ -65,7 +65,7 @@ export function GripperWizardFlows(
 ): JSX.Element {
   const { flowType, closeFlow, attachedGripper } = props
 
-  const flowName = GRIPPER_FLOW_NAMES[flowType]
+  const flowName = GRIPPER_FLOW_ACTIONS[flowType]
 
   const {
     commandDocState,
@@ -153,7 +153,7 @@ export function GripperWizardFlows(
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
     useDeleteMaintenanceRunMutation(
       deletionDocState,
-      [...actionsToDocument, 'end_gripper_wizard'],
+      [...actionsToDocument, GRIPPER_FLOW_FINISH_ACTIONS[flowType]],
       {
         onSuccess: () => {
           closeFlow()

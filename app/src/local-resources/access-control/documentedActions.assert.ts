@@ -2,7 +2,7 @@ import audit_log from '/app/assets/localization/en/audit_log.json'
 
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type {
-  AttachingModule,
+  AttachingModuleAction,
   PipetteWizardFlowAction,
 } from '@opentrons/react-api-client/src/access_control/types'
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -15,7 +15,7 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 
 type DocumentedActionStrings = Exclude<
   DocumentedAction,
-  RunTimeCommand | AttachingModule | PipetteWizardFlowAction
+  RunTimeCommand | AttachingModuleAction | PipetteWizardFlowAction
 >
 
 // compile time assertion that the audit_log keys match the DocumentedAction enum

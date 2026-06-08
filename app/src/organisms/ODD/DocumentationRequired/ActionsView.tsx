@@ -6,6 +6,7 @@ import {
   getLabwareDefinitionsFromCommands,
   useCommandTextString,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { i18n } from '/app/i18n'
 import { OddModal } from '/app/molecules/OddModal'
@@ -17,7 +18,11 @@ import type { TFunction } from 'i18next'
 import type { CommandTextData, IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { PipetteWizardFlowAction } from '@opentrons/react-api-client/src/access_control/types'
-import type { LabwareDefinition, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition,
+  ModuleModel,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 const ActionsViewImpl = ({
   actionsToDocument,
@@ -76,7 +81,7 @@ const ActionItem = ({
   allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData | null
 }): JSX.Element => {
-  const { t } = useTranslation(['audit_log'])
+  const { t } = useTranslation(['audit_log', 'deck_configuration'])
   if (typeof action === 'string') {
     // AuditLog
     return <div className={styles.action}>{t(action)}</div>
@@ -94,6 +99,21 @@ const ActionItem = ({
   // PipetteWizardFlow
   if ('type' in action && action.type === 'pipette_wizard_flow') {
     return <PipetteFlowText action={action} t={t} />
+  }
+  if ('type' in action && action.type === 'attach_module') {
+    return (
+      <div className={styles.action}>
+        {t('attach_module', {
+          module: t(
+            getModuleDisplayName(action.module.moduleModel as ModuleModel)
+          ),
+        })}
+      </div>
+    )
+  }
+  // AuditLogActionWithParams
+  if ('key' in action && 'params' in action) {
+    return <div className={styles.action}>{t(action.key, action.params)}</div>
   }
   return <div className={styles.action}>{JSON.stringify(action)}</div>
 }

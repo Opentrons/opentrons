@@ -1,4 +1,4 @@
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { getModuleDisplayName, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
 import type {
@@ -15,9 +15,8 @@ export function getCalibrationCommandText({
   switch (command.commandType) {
     case 'calibration/calibratePipette': {
       const { mount } = command.params
-      const pipetteName = commandTextData?.pipettes.find(
-        pip => pip.mount === mount
-      )?.pipetteName
+      const pipette = commandTextData?.pipettes.find(pip => pip.mount === mount)
+      const pipetteName = getPipetteSpecsV2(pipette?.pipetteName)?.displayName
       return t('calibrate_pipette', {
         pipette: pipetteName,
         mount: gantryMountName(mount, t),

@@ -12,7 +12,6 @@
   "drop_tips": "Dropping tips",
   "end_calibration": "Finishing calibration",
   "add_module": "Adding module to deck configuration",
-  "attach_pipette": "Launching attach pipette flow",
   "end_module_setup": "Finishing module setup",
   "end_lpc_flow": "Finishing labware position check",
   "end_gripper_wizard": "Finishing gripper setup",
@@ -25,5 +24,11 @@
   "single_channel_and_8_channel": "single channel or 8 channel",
   "left_mount": "left mount",
   "right_mount": "right mount",
-  "end": "Finishing"
+  "end": "Finishing",
+  "attach_module": "Launching setup flow for {{module}}",
+  "attach_pipette_left": "Launching attach pipette on left mount flow",
+  "attach_pipette_right": "Launching attach pipette on right mount flow",
+  "finish_attach_gripper": "Finishing attach gripper flow",
+  "finish_detach_gripper": "Finishing detach gripper flow",
+  "finish_recalibrate_gripper": "Finishing recalibrate gripper flow"
 }

@@ -29,13 +29,22 @@ export type GripperWizardFlowType =
   | typeof GRIPPER_FLOW_TYPES.DETACH
   | typeof GRIPPER_FLOW_TYPES.RECALIBRATE
 
-export const GRIPPER_FLOW_NAMES: Record<
+export const GRIPPER_FLOW_ACTIONS: Record<
   GripperWizardFlowType,
   DocumentedAction
 > = {
   [GRIPPER_FLOW_TYPES.ATTACH]: 'attach_gripper',
   [GRIPPER_FLOW_TYPES.DETACH]: 'detach_gripper',
   [GRIPPER_FLOW_TYPES.RECALIBRATE]: 'recalibrate_gripper',
+}
+
+export const GRIPPER_FLOW_FINISH_ACTIONS: Record<
+  GripperWizardFlowType,
+  DocumentedAction
+> = {
+  [GRIPPER_FLOW_TYPES.ATTACH]: 'finish_attach_gripper',
+  [GRIPPER_FLOW_TYPES.DETACH]: 'finish_detach_gripper',
+  [GRIPPER_FLOW_TYPES.RECALIBRATE]: 'finish_recalibrate_gripper',
 }
 
 export interface BeforeBeginningStep {

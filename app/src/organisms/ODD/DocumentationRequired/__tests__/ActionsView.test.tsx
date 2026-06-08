@@ -79,6 +79,36 @@ describe('ActionsView', () => {
     screen.getByText('Stopping protocol run')
   })
 
+  it('renders attach module action with translated text', () => {
+    renderWithModal([
+      {
+        type: 'attach_module',
+        module: {
+          moduleModel: 'magneticModuleV2',
+          moduleType: 'magneticModuleType',
+          data: {
+            engaged: false,
+            height: 42,
+            status: 'disengaged',
+          },
+          usbPort: {
+            path: '/dev/ot_module_magdeck0',
+            port: 1,
+            hub: false,
+            portGroup: 'unknown',
+          },
+          id: '123',
+          serialNumber: '123',
+          hardwareRevision: '1.0',
+          firmwareVersion: '1.0',
+          hasAvailableUpdate: true,
+        },
+        step: 'start',
+      },
+    ])
+    screen.getByText('Launching setup flow for Magnetic Module GEN2')
+  })
+
   it('renders pipette wizard flow with pipette category when pipetteInfo is null', () => {
     renderWithModal([
       {

@@ -72,11 +72,13 @@ interface PipetteInformation {
   displayName: string
 }
 
-export type AttachingModule = AttachedModule & {
-  readonly _brand: 'Attaching'
+export interface AttachingModuleAction {
+  module: AttachedModule
+  type: 'attach_module'
+  step: 'start' | 'end'
 }
 
-export type DocumentedAction =
+type AuditLogAction =
   | 'stop_run'
   | 'play_run'
   | 'place_plate_reader_lid'
@@ -90,11 +92,17 @@ export type DocumentedAction =
   | 'drop_tips'
   | 'end_calibration'
   | 'add_module'
-  | 'attach_pipette'
   | 'end_module_setup'
   | 'end_lpc_flow'
-  | 'end_gripper_wizard'
+  | 'finish_attach_gripper'
+  | 'finish_detach_gripper'
+  | 'finish_recalibrate_gripper'
   | 'end_drop_tips'
+  | 'attach_pipette_left'
+  | 'attach_pipette_right'
+
+export type DocumentedAction =
+  | AuditLogAction
   | RunTimeCommand
   | PipetteWizardFlowAction
-  | AttachingModule
+  | AttachingModuleAction

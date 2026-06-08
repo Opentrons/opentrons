@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { getModuleDisplayName, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'
@@ -50,16 +50,19 @@ const render = (command: any) => {
 describe('getCalibrationCommandText', () => {
   beforeEach(() => {
     vi.mocked(getModuleDisplayName).mockReturnValue('Temperature Module')
+    vi.mocked(getPipetteSpecsV2).mockReturnValue({
+      displayName: 'Flex 1-Channel 1000 µL',
+    } as any)
   })
   ;(['left', 'right'] as const).forEach(mount => {
     it(`should render calibrate pipette command text for ${mount} mount`, () => {
       render({
         id: 'cmd-1',
         commandType: 'calibration/calibratePipette',
-        params: { mount },
+        params: { mount, pipette: '' },
       })
 
-      screen.getByText(`Calibrating p1000_single_flex on ${mount} mount`)
+      screen.getByText(`Calibrating Flex 1-Channel 1000 µL on ${mount} mount`)
     })
   })
   ;(['front', 'rear'] as const).forEach(jaw => {
