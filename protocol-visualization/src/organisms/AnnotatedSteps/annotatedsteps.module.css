@@ -40,6 +40,11 @@
   overflow-y: auto;
 }
 
+.annotated_group_expanded_natural_height {
+  max-height: none;
+  overflow-y: visible;
+}
+
 .annotated_group_expanded::-webkit-scrollbar {
   display: none;
 }
