@@ -63,7 +63,7 @@ function LoginModalImpl(): JSX.Element {
       modal.remove()
     },
     onError: message => {
-      setLoginError(t(`access_control:${message}`) as string)
+      setLoginError(message)
     },
   })
 

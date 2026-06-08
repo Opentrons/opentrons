@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 
 import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation, useHost } from '@opentrons/react-api-client'
 
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+import type { TFunction } from 'i18next'
 
 /**
  * Shape of an error response from `POST /auth/oauth2/token`: the standard
@@ -18,6 +20,10 @@ interface OAuth2TokenErrorResponse {
   opentrons_login_attempts_remaining?: number
 }
 
+function getReloginErrorMessage(t: TFunction): string {
+  return t('login_error_incorrect') as string
+}
+
 export interface UseOAuth2PasswordLoginOptions {
   /**
    * Called after OAuth login succeeds and `GET /auth/users/self` completes.
@@ -28,7 +34,7 @@ export interface UseOAuth2PasswordLoginOptions {
     response: OAuth2TokenResponse
   ) => void
   /**
-   * Called with an `access_control` i18n key when the token request fails.
+   * Called with a user-facing message when the token request fails.
    */
   onError: (message: string) => void
 }
@@ -49,10 +55,11 @@ export function useOAuth2PasswordLogin(
   options: UseOAuth2PasswordLoginOptions
 ): UseOAuth2PasswordLoginResult {
   const { onSuccess, onError } = options
+  const { t } = useTranslation('access_control')
   const host = useHost()
   const [isFetchingSelf, setIsFetchingSelf] = useState(false)
 
-  const getOAuthTokenErrorMessage = (error: unknown): string => {
+  const getErrorMessage = (error: unknown): string => {
     if (axios.isAxiosError(error)) {
       const data = error.response?.data as OAuth2TokenErrorResponse | undefined
       const oauth2ErrorCode = data?.error
@@ -60,18 +67,20 @@ export function useOAuth2PasswordLogin(
       if (oauth2ErrorCode === 'invalid_grant') {
         if (typeof attemptsRemaining === 'number') {
           if (attemptsRemaining === 0) {
-            return 'login_error_locked'
+            return t('login_error_locked')
           } else {
-            return 'login_error_incorrect_with_attempts_remaining'
+            return t('login_error_incorrect_with_attempts_remaining', {
+              attemptsRemaining,
+            })
           }
         } else {
-          return 'login_error_incorrect'
+          return t('login_error_incorrect')
         }
       } else {
-        return 'login_error_unknown_with_message'
+        return t('login_error_unknown_with_message', { message: error.message })
       }
     } else {
-      return 'login_error_unknown'
+      return t('login_error_unknown')
     }
   }
 
@@ -92,7 +101,7 @@ export function useOAuth2PasswordLogin(
         const username = requestVariables.username
 
         if (host == null) {
-          onError('login_error_incorrect')
+          onError(getReloginErrorMessage(t))
           return
         }
 
@@ -102,14 +111,14 @@ export function useOAuth2PasswordLogin(
             onSuccess(username, selfResponse.data.data, response)
           })
           .catch(() => {
-            onError('login_error_incorrect')
+            onError(getReloginErrorMessage(t))
           })
           .finally(() => {
             setIsFetchingSelf(false)
           })
       },
       onError: (error: unknown) => {
-        onError(getOAuthTokenErrorMessage(error))
+        onError(getErrorMessage(error))
       },
     })
 

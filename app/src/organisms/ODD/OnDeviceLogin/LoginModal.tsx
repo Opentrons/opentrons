@@ -36,7 +36,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
   const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
-  const { t: tAccessControl } = useTranslation('access_control')
   const { makeSnackbar } = useToaster()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -139,7 +138,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     useOAuth2PasswordLogin({
       onSuccess: handleLoginSuccess,
       onError: message => {
-        setLoginError(tAccessControl(message) as string)
+        setLoginError(message)
       },
     })
 

@@ -32,6 +32,12 @@ vi.mock('@opentrons/api-client', async importOriginal => {
   }
 })
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}))
+
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
