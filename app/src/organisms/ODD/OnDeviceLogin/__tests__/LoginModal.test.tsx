@@ -39,13 +39,9 @@ vi.mock('react-i18next', async importOriginal => {
   }
 })
 
-vi.mock('/app/redux/discovery', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/discovery')>()
-  return {
-    ...actual,
-    getLocalRobot: vi.fn(() => null),
-  }
-})
+vi.mock('/app/redux/discovery', () => ({
+  getLocalRobot: vi.fn(() => null),
+}))
 
 vi.mock('../clearStaleAuthBeforeLogin', () => ({
   clearStaleAuthBeforeLogin: vi.fn().mockResolvedValue(undefined),

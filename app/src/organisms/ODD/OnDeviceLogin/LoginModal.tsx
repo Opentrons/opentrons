@@ -48,7 +48,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   )
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
-  const [formKey, setFormKey] = useState(0)
   const [loginError, setLoginError] = useState<string | null>(null)
   const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
@@ -79,7 +78,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         setLoggedInUsername(username)
         setPhase('chooseNewPassword')
         setStep('password')
-        setFormKey(key => key + 1)
         return
       }
 
@@ -146,7 +144,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   return (
     <div className={styles.overlay}>
       <OnDeviceLogin
-        key={formKey}
+        key={phase}
         step={step}
         onStepChange={setStep}
         submitPassword={
