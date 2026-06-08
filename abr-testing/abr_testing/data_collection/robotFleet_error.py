@@ -167,7 +167,7 @@ def update_camera_status(status: str, robot_ip: str, key_path: str):
         print(f"Command failed with exit code {e.returncode}.")
         if e.stderr:
             print(f"Error details: {e.stderr.strip()}")
-            
+
     except FileNotFoundError:
         print("Error: The 'ssh' command was not found on this system.")
 
@@ -349,9 +349,17 @@ def get_error_runs_from_robot(ip: str) -> Tuple[List[str], List[str]]:
         "awaiting-recovery-paused",
         "awaiting-recovery-blocked-by-open-door",
     }
-    response = requests.get(
-        f"http://{ip}:31950/runs", headers={"opentrons-version": "*"}
-    )
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/runs", headers={"opentrons-version": "*"}, timeout=10
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(
+            f"Could not fetch runs from robot (HTTP unavailable): {e}\n"
+            "No error/recovery runs could be read from the robot."
+        )
+        return (error_run_ids, protocol_ids)
     run_data = response.json()
     run_list = run_data.get("data", [])
     for run in run_list:
@@ -376,42 +384,61 @@ def get_robot_state(
 ) -> Tuple[Any, Any, Any, List[str], List[str], str]:
     """Get robot status in case of non run error."""
     description = dict()
-    # Get instruments attached to robot
+    # Get robot health info. If the HTTP server is down/erroring we still want
+    # to create a ticket from the manually-provided title, just with less info.
+    health_data: Dict[str, Any] = {}
     try:
         response = requests.get(
-            f"http://{ip}:31950/health", headers={"opentrons-version": "*"}
+            f"http://{ip}:31950/health",
+            headers={"opentrons-version": "*"},
+            timeout=10,
         )
+        response.raise_for_status()
+        health_data = response.json()
         print(f"Connected to {ip}")
-    except Exception:
-        print(f"ERROR: Failed to read IP address: {ip}")
-        sys.exit()
-    response = requests.get(
-        f"http://{ip}:31950/health", headers={"opentrons-version": "*"}
-    )
-    health_data = response.json()
-    #print(f"health data {health_data}")
+    except requests.exceptions.RequestException as e:
+        print(
+            f"WARNING: Could not reach robot health endpoint (HTTP unavailable): {e}\n"
+            "Robot name, version, instruments, and modules will be omitted from the ticket."
+        )
     robot = health_data.get("name", "")
     # Create summary name
     description["robot_name"] = robot
-    summary = robot + ": " + reported_string
+    summary = (robot + ": " + reported_string) if robot else reported_string
     affects_version = health_data.get("api_version", "")
     description["affects_version"] = affects_version
-    # Instruments Attached
-    response = requests.get(
-        f"http://{ip}:31950/instruments", headers={"opentrons-version": "*"}
-    )
-
-    instrument_data = response.json()
-    for instrument in instrument_data["data"]:
-        key = instrument.get("mount") or instrument.get("instrumentType") or instrument.get("subsystem", "unknown")
-        description[key] = instrument
-    # Get modules attached to robot
-    response = requests.get(
-        f"http://{ip}:31950/modules", headers={"opentrons-version": "*"}
-    )
-    module_data = response.json()
-    for module in module_data["data"]:
-        description[module["moduleType"]] = module
+    # Instruments Attached (only if HTTP is responsive)
+    if health_data:
+        try:
+            response = requests.get(
+                f"http://{ip}:31950/instruments",
+                headers={"opentrons-version": "*"},
+                timeout=10,
+            )
+            response.raise_for_status()
+            instrument_data = response.json()
+            for instrument in instrument_data.get("data", []):
+                key = (
+                    instrument.get("mount")
+                    or instrument.get("instrumentType")
+                    or instrument.get("subsystem", "unknown")
+                )
+                description[key] = instrument
+        except requests.exceptions.RequestException as e:
+            print(f"WARNING: Could not fetch instruments (HTTP unavailable): {e}")
+        # Get modules attached to robot
+        try:
+            response = requests.get(
+                f"http://{ip}:31950/modules",
+                headers={"opentrons-version": "*"},
+                timeout=10,
+            )
+            response.raise_for_status()
+            module_data = response.json()
+            for module in module_data.get("data", []):
+                description[module["moduleType"]] = module
+        except requests.exceptions.RequestException as e:
+            print(f"WARNING: Could not fetch modules (HTTP unavailable): {e}")
     components = []
     #components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, reported_string, components)
@@ -529,12 +556,19 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
     storage = Path(storage_directory)
     ssh_key = storage / "robot_key"
 
-    response = requests.get(
-        f"http://{robot_ip}:31950/runs",
-        headers={"opentrons-version": "*"},
-        timeout=10,
-    )
-    response.raise_for_status()
+    try:
+        response = requests.get(
+            f"http://{robot_ip}:31950/runs",
+            headers={"opentrons-version": "*"},
+            timeout=10,
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(
+            f"Could not fetch runs from robot (HTTP unavailable): {e}\n"
+            "Skipping latest protocol download."
+        )
+        return ""
 
     run_list = response.json().get("data") or []
     if not run_list:
@@ -638,6 +672,45 @@ def make_json_file(storage_directory: str, whole_description_str: str):
     return str(absolute_filepath)
 
 
+def preflight_connection_check(ip: str, storage_directory: str) -> bool:
+    """Check HTTP and SSH connectivity up front and let the user decide.
+
+    Returns True if the user wants to proceed, False to abort.
+    """
+    print(f"\nChecking connections to {ip} ...")
+    http_ok = read_robot_logs.check_http_available(ip)
+    ssh_ok = read_robot_logs.check_ssh_available(ip, storage_directory)
+
+    print(f"  HTTP (port 31950): {'OK' if http_ok else 'UNAVAILABLE'}")
+    print(f"  SSH  (robot_key):  {'OK' if ssh_ok else 'UNAVAILABLE'}")
+
+    if http_ok and ssh_ok:
+        print("All connections OK.\n")
+        return True
+
+    print("\nSome connections failed. The following data may be missing:")
+    if not http_ok:
+        print(
+            "  - HTTP unavailable: robot name/version, instruments, modules,\n"
+            "    run logs, calibration, and HTTP system logs will be skipped."
+        )
+    if not ssh_ok:
+        print(
+            "  - SSH unavailable: weston log, VERSION.json, protocol files, and\n"
+            "    camera/ODD images will be skipped. Make sure the robot_key is\n"
+            "    authorized on this robot (see Opentrons app SSH setup)."
+        )
+    while True:
+        choice = input("\nContinue anyway? (y/n): ").strip().lower()
+        if choice in ("y", "yes"):
+            print("Continuing with available data...\n")
+            return True
+        if choice in ("n", "no"):
+            print("Aborting.")
+            return False
+        print("Please enter 'y' or 'n'.")
+
+
 if __name__ == "__main__":
     """Create ticket for specified robot."""
     parser = argparse.ArgumentParser(description="Pulls run logs from ABR robots.")
@@ -669,6 +742,8 @@ if __name__ == "__main__":
             print("Invalid input, try again.")
     #TODO: auto grab from fleet
     ip = str(input("Enter Robot IP: "))
+    if not preflight_connection_check(ip, storage_directory):
+        sys.exit()
     run_or_other = str(
         input(
             "Press ENTER to report run error. If not, please format title as:\n"

@@ -125,6 +125,6 @@ def get_odd_console_logs(
 
 
 if __name__ == "__main__":
-    robot_ip = sys.argv[1] if len(sys.argv) > 1 else "10.14.19.159"
+    robot_ip = sys.argv[1] if len(sys.argv) > 1 else "10.14.19.202"
     storage = sys.argv[2] if len(sys.argv) > 2 else "/Users/nicholas.shilandopentrons.com/Documents/ODD crap"
     get_odd_console_logs(robot_ip, storage)

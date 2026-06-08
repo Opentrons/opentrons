@@ -20,6 +20,43 @@ from abr_testing.data_collection import get_run_logs
 import websocket
 
 
+def check_http_available(ip: str, timeout: int = 10) -> bool:
+    """Return True if the robot's HTTP server responds to /health."""
+    try:
+        resp = requests.get(
+            f"http://{ip}:31950/health",
+            headers={"opentrons-version": "*"},
+            timeout=timeout,
+        )
+        resp.raise_for_status()
+        return True
+    except requests.exceptions.RequestException:
+        return False
+
+
+def check_ssh_available(ip: str, storage_directory: str, timeout: int = 15) -> bool:
+    """Return True if we can authenticate to the robot over SSH with robot_key."""
+    key_path = Path(storage_directory) / "robot_key"
+    try:
+        result = subprocess.run(
+            [
+                "ssh",
+                "-i", str(key_path),
+                "-o", "StrictHostKeyChecking=no",
+                "-o", "BatchMode=yes",
+                "-o", "ConnectTimeout=10",
+                f"root@{ip}",
+                "echo ok",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        return result.returncode == 0
+    except (subprocess.SubprocessError, OSError):
+        return False
+
+
 def lpc_data(
     file_results: Dict[str, Any],
     protocol_info: Dict[str, Any],
@@ -852,12 +889,15 @@ def get_calibration_offsets(
     # Robot Information [Name, Software Version]
     try:
         response = requests.get(
-            f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+            f"http://{ip}:31950/health",
+            headers={"opentrons-version": "3"},
+            timeout=10,
         )
+        response.raise_for_status()
         print(f"Connected to {ip}")
         health_data = response.json()
-    except Exception:
-        print(f"ERROR: Failed to read IP address: {ip}")
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to fetch calibration data (HTTP unavailable): {e}")
         return collected_files
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
@@ -870,27 +910,36 @@ def get_calibration_offsets(
     calibration["Pull Timestamp"] = pull_date_timestamp.isoformat()
     calibration["run_id"] = "calibration" + "_" + file_date
     # Calibration [Instruments, modules, deck]
-    response = requests.get(
-        f"http://{ip}:31950/instruments",
-        headers={"opentrons-version": "3"},
-        params={"cursor": 0, "pageLength": 0},
-    )
-    instruments: Dict[str, Any] = response.json()
-    calibration["Instruments"] = instruments.get("data", "")
-    response = requests.get(
-        f"http://{ip}:31950/modules",
-        headers={"opentrons-version": "3"},
-        params={"cursor": 0, "pageLength": 0},
-    )
-    modules: Dict[str, Any] = response.json()
-    calibration["Modules"] = modules.get("data", "")
-    response = requests.get(
-        f"http://{ip}:31950/calibration/status",
-        headers={"opentrons-version": "3"},
-        params={"cursor": 0, "pageLength": 0},
-    )
-    deck: Dict[str, Any] = response.json()
-    calibration["Deck"] = deck.get("deckCalibration", "")
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/instruments",
+            headers={"opentrons-version": "3"},
+            params={"cursor": 0, "pageLength": 0},
+            timeout=10,
+        )
+        response.raise_for_status()
+        instruments: Dict[str, Any] = response.json()
+        calibration["Instruments"] = instruments.get("data", "")
+        response = requests.get(
+            f"http://{ip}:31950/modules",
+            headers={"opentrons-version": "3"},
+            params={"cursor": 0, "pageLength": 0},
+            timeout=10,
+        )
+        response.raise_for_status()
+        modules: Dict[str, Any] = response.json()
+        calibration["Modules"] = modules.get("data", "")
+        response = requests.get(
+            f"http://{ip}:31950/calibration/status",
+            headers={"opentrons-version": "3"},
+            params={"cursor": 0, "pageLength": 0},
+            timeout=10,
+        )
+        response.raise_for_status()
+        deck: Dict[str, Any] = response.json()
+        calibration["Deck"] = deck.get("deckCalibration", "")
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to fetch some calibration data (HTTP unavailable): {e}")
 
 
     save_name = "calibration.json"
@@ -1060,7 +1109,7 @@ def retreive_odd_console(
     robot_ip: str,
     storage_directory: str,
     collected_files: list
-) -> str:
+) -> list:
     """Connect to the ODD via websocket, collect all buffered 
     console messages, sort chronologically, and save to CSV.
     """
@@ -1075,7 +1124,7 @@ def retreive_odd_console(
         ).json()
     except Exception as e:
         print(f"Could not reach port 9223 on {robot_ip}: {e}")
-        return ""
+        return collected_files
 
     target = next(
         (
@@ -1092,7 +1141,8 @@ def retreive_odd_console(
             writer = csv.writer(csv_file)
             writer.writerow(["timestamp", "level", "message"])
             writer.writerow([t.strftime("%Y-%m-%d %H:%M:%S"), "ERROR", msg])
-        return str(output_csv)
+        collected_files.append(str(output_csv))
+        return collected_files
 
     ws_url = target["webSocketDebuggerUrl"].replace("localhost", robot_ip)
     ws = websocket.create_connection(ws_url, timeout=10)
