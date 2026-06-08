@@ -12,13 +12,13 @@ export interface PatchAccessControlEnabledSettingsRequest {
 
 export interface AuthSettingsResponse {
   data: {
-    maxNumberOfLoginAttempts: number
-    passwordResetTime: number
-    passwordComplexityMinimumLength: number
+    maxNumberOfLoginAttempts: number | null
+    passwordResetTime: number | null
+    passwordComplexityMinimumLength: number | null
     passwordComplexitySpecialCharacters: boolean
     idleLogout: number
     requireReasonForInteraction: boolean
-    minLengthOfReasonForInteraction: number
+    minLengthOfReasonForInteraction: number | null
     requireAdminCredsWhenUpdatingRobotSoftware: boolean
     requireAdminCredsWhenSendingProtocolToRobot: boolean
     requireAdminCredsForSignoffProtocol: boolean
