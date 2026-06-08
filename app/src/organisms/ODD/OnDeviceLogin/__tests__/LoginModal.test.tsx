@@ -2,8 +2,7 @@ import NiceModal from '@ebay/nice-modal-react'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getSelf } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import { fetchSelfQuery, useHost } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -60,14 +59,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useHost: vi.fn(),
-  }
-})
-
-vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getSelf: vi.fn(),
+    fetchSelfQuery: vi.fn(),
   }
 })
 
@@ -113,11 +105,9 @@ describe('LoginModal', () => {
       hostname: 'localhost',
       token: 'access-token',
     })
-    vi.mocked(getSelf).mockResolvedValue({
-      data: {
-        data: mockAuthUser({ resetPassword: false }),
-      } as AuthUserResponse,
-    } as Awaited<ReturnType<typeof getSelf>>)
+    vi.mocked(fetchSelfQuery).mockResolvedValue({
+      data: mockAuthUser({ resetPassword: false }),
+    } as AuthUserResponse)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: vi.fn(),
       makeToast: vi.fn(),
@@ -158,11 +148,9 @@ describe('LoginModal', () => {
     vi.mocked(getLocalRobot).mockReturnValue({
       name: 'odd-robot',
     } as ReturnType<typeof getLocalRobot>)
-    vi.mocked(getSelf).mockResolvedValue({
-      data: {
-        data: mockAuthUser({ resetPassword: true }),
-      } as AuthUserResponse,
-    } as Awaited<ReturnType<typeof getSelf>>)
+    vi.mocked(fetchSelfQuery).mockResolvedValue({
+      data: mockAuthUser({ resetPassword: true }),
+    } as AuthUserResponse)
 
     openLoginModal()
 

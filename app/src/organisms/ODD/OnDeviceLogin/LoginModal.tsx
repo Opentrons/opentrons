@@ -4,8 +4,11 @@ import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { getSelf } from '@opentrons/api-client'
-import { getQueryKey, useHost } from '@opentrons/react-api-client'
+import {
+  fetchSelfQuery,
+  getSelfQueryKey,
+  useHost,
+} from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -19,7 +22,6 @@ import {
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
-import type { QueryKey } from 'react-query'
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
@@ -52,24 +54,22 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   useEffect(() => {
     if (host?.token == null || localRobotName == null) return
 
-    void getSelf(host)
-      .then(response => {
-        if (response.data.data.resetPassword) {
+    void fetchSelfQuery(queryClient, host)
+      .then(self => {
+        if (self.data.resetPassword) {
           dispatch(logOut({ robotName: localRobotName }))
         }
       })
       .catch(() => {
         // Ignore: the user will sign in through the modal.
       })
-  }, [dispatch, host, localRobotName])
+  }, [dispatch, host, localRobotName, queryClient])
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
   const invalidateSelfQuery = useCallback((): void => {
     if (host == null) return
-    void queryClient.invalidateQueries(
-      getQueryKey(host, 'auth', 'users', 'self') as QueryKey
-    )
+    void queryClient.invalidateQueries(getSelfQueryKey(host))
   }, [host, queryClient])
 
   const finishModal = useCallback(

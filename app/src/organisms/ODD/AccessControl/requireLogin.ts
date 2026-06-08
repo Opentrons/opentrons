@@ -1,8 +1,9 @@
-import { getSelf } from '@opentrons/api-client'
+import { fetchSelfQuery } from '@opentrons/react-api-client'
 
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 
 import type { HostConfig } from '@opentrons/api-client'
+import type { QueryClient } from 'react-query'
 
 export interface RequireLoginResult {
   username: string
@@ -18,11 +19,13 @@ export interface RequireLoginResult {
  * `null` if the user dismisses.
  */
 export async function requireLogin(
+  queryClient: QueryClient,
   currentUsername: string | null,
   hostConfig: HostConfig | null
 ): Promise<RequireLoginResult | null> {
   const shouldShowLogin =
-    currentUsername == null || (await isPasswordResetRequired(hostConfig))
+    currentUsername == null ||
+    (await isPasswordResetRequired(queryClient, hostConfig))
 
   if (!shouldShowLogin) {
     return { username: currentUsername }
@@ -34,13 +37,14 @@ export async function requireLogin(
 }
 
 async function isPasswordResetRequired(
+  queryClient: QueryClient,
   hostConfig: HostConfig | null
 ): Promise<boolean> {
   if (hostConfig?.token == null) return false
 
   try {
-    const response = await getSelf(hostConfig)
-    return response.data.data.resetPassword
+    const self = await fetchSelfQuery(queryClient, hostConfig)
+    return self.data.resetPassword
   } catch {
     return false
   }
