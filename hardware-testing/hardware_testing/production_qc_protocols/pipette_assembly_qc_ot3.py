@@ -1150,7 +1150,42 @@ def test_diagnostics(
 # ----------- TEST PLUNGER -----------
 def build_plunger_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    return []
+    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
+    lines.append(CSVLine("plunger-blow-out", [CSVResult]))
+    lines.append(CSVLine("plunger-drop-tip", [CSVResult]))
+    return lines
+
+
+def _test_plunger_positions(
+    api: SyncHardwareAPI,
+    report: CSVReport,
+    section: str,
+    ctx: ProtocolContext,
+    cfg: TestConfig,
+) -> None:
+    api.home([Axis.by_mount(cfg.mount), Axis.of_main_tool_actuator(cfg.mount)])
+    _, bottom, blow_out, drop_tip = helpers_ot3.get_plunger_positions_ot3(
+        api, cfg.mount
+    )
+    helpers_ot3.move_plunger_absolute_ot3_sync(api, cfg.mount, blow_out)
+    if api.is_simulator:
+        blow_out_passed = True
+    else:
+        blow_out_passed = helpers_ot3.get_user_answer(api, "is BLOW-OUT correct?")
+        if not blow_out_passed:
+            printval = f"02-01-BLOW-OUT:移液器BLOW-OUT {blow_out_passed}"
+            FINAL_TEST_FAIL_INFOR.append(printval)
+    report(section, "plunger-blow-out", [CSVResult.from_bool(blow_out_passed)])
+    helpers_ot3.move_plunger_absolute_ot3_sync(api, cfg.mount, drop_tip)
+    if api.is_simulator:
+        drop_tip_passed = True
+    else:
+        drop_tip_passed = helpers_ot3.get_user_answer(api, "is DROP-TIP correct?")
+        if not drop_tip_passed:
+            printval = f"02-02-DROP-TIP:移液器DROP-TIP {drop_tip_passed}"
+            FINAL_TEST_FAIL_INFOR.append(printval)
+    report(section, "plunger-drop-tip", [CSVResult.from_bool(drop_tip_passed)])
+    api.home([Axis.of_main_tool_actuator(cfg.mount)])
 
 
 def test_plunger(
@@ -1160,8 +1195,13 @@ def test_plunger(
     ctx: ProtocolContext,
     cfg: TestConfig,
 ) -> None:
-    """Test Liquid."""
-    pass
+    """Test Plunger."""
+    pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
+    current_pos = api.gantry_position(cfg.mount)
+    hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z - 20)
+    api.move_to(cfg.mount, hover_over_slot_3)
+    api.move_rel(cfg.mount, Point(z=-20))
+    _test_plunger_positions(api, report, section, ctx, cfg)
 
 
 # ----------- END TEST PLUNGER -----------
