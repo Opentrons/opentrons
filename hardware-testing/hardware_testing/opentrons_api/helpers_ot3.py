@@ -22,6 +22,8 @@ from typing import (
     Sequence,
     Any,
 )
+
+from opentrons.protocol_api import ProtocolContext
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId

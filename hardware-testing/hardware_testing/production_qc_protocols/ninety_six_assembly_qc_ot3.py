@@ -25,6 +25,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.constants import SensorId
 
+from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
+
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import (
     Axis,
@@ -482,6 +484,43 @@ def build_capacitance_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
+def _read_from_cap_sensor(
+    api: SyncHardwareAPI,
+    sensor_id: SensorId,
+    num_readings: int,
+) -> float:
+    readings: List[float] = []
+    sequential_failures = 0
+    while len(readings) != num_readings:
+        try:
+            r = api.read_instrument_capacitance(OT3Mount.LEFT, sensor_id == SensorId.S0)
+            sequential_failures = 0
+            readings.append(r)
+            if not api.is_simulator:
+                sleep(SECONDS_BETWEEN_READINGS)
+        except Exception:
+            sequential_failures += 1
+            if sequential_failures == 3:
+                raise
+            else:
+                continue
+    return sum(readings) / num_readings
+
+
+def _get_hover_and_probe_pos(
+    api: SyncHardwareAPI, probe: InstrumentProbeType
+) -> Tuple[Point, Point]:
+    # FIXME: remove this once OT3API supports probing with secondary/front channels
+    probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(TEST_SLOT)
+    probe_pos += PROBE_POS_OFFSET
+    hover_pos = probe_pos._replace(z=api.get_instrument_max_height(OT3Mount.LEFT))
+    if probe == InstrumentProbeType.SECONDARY:
+        probe_offset = Point(x=9 * -11, y=9 * 7)
+    else:
+        probe_offset = Point()
+    return hover_pos + probe_offset, probe_pos + probe_offset
+
+
 def test_capacitance(
     api: SyncHardwareAPI,
     report: CSVReport,
@@ -490,7 +529,118 @@ def test_capacitance(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test capacitive sensor."""
-    pass
+    z_ax = Axis.Z_L
+    p_ax = Axis.P_L
+    t_ax = Axis.Q
+
+    default_probe_cfg = api.config.calibration.z_offset.pass_settings
+    api.reset_instrument_offset(OT3Mount.LEFT)
+
+    ctx.pause("REMOVE everything from the deck")
+
+    for probe in PROBE_POSITIONS:
+        # store the thresolds (for reference)
+        for k in THRESHOLDS.keys():
+            report(
+                section, _get_capacitive_test_tag(probe, f"{k}-min"), [THRESHOLDS[k][0]]
+            )
+            report(
+                section, _get_capacitive_test_tag(probe, f"{k}-max"), [THRESHOLDS[k][1]]
+            )
+
+        hover_pos, probe_pos = _get_hover_and_probe_pos(api, probe)
+        sensor_id = sensor_id_for_instrument(probe)
+        api.home([z_ax, p_ax, t_ax])
+        helpers_ot3.move_to_arched_ot3_sync(api, OT3Mount.LEFT, hover_pos)
+
+        # AIR-pF
+        air_pf = _read_from_cap_sensor(api, sensor_id, 10)
+        if not air_pf:
+            # ui.print_error(f"{probe} cap sensor not working, skipping")
+            continue
+        air_passed = THRESHOLDS["air-pf"][0] <= air_pf <= THRESHOLDS["air-pf"][1]
+        report(
+            section,
+            _get_capacitive_test_tag(probe, "air-pf"),
+            [air_pf, CSVResult.from_bool(air_passed)],
+        )
+
+        # ATTACHED-pF
+        ctx.pause(f"ATTACH probe to {probe.name} channel")
+        api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
+        attached_pf = _read_from_cap_sensor(api, sensor_id, 10)
+        if not attached_pf:
+            # ui.print_error(f"{probe} cap sensor not working, skipping")
+            continue
+        attached_passed = (
+            THRESHOLDS["attached-pf"][0] <= attached_pf <= THRESHOLDS["attached-pf"][1]
+        )
+        attached_passed = attached_passed if attached_pf > air_pf else False
+        report(
+            section,
+            _get_capacitive_test_tag(probe, "attached-pf"),
+            [attached_pf, CSVResult.from_bool(attached_passed)],
+        )
+
+        if not air_passed or not attached_passed:
+            continue
+
+        # DECK-mm
+        def _probe(distance: float, speed: float) -> float:
+            if api.is_simulator:
+                return 0.0
+            return api._capacitive_probe(
+                distance=distance,
+                mount_speed=speed,
+                sensor_id=sensor_id,
+                relative_threshold_pf=default_probe_cfg.sensor_threshold_pf,
+            )
+
+        ctx.pause("about to probe the DECK")
+        # move to 5 mm above the deck
+        api.home_z(OT3Mount.LEFT)
+        current_pos = api.gantry_position(OT3Mount.LEFT)
+        api.move_to(OT3Mount.LEFT, probe_pos._replace(z=current_pos.z))
+        api.move_to(OT3Mount.LEFT, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
+        z_ax = Axis.by_mount(OT3Mount.LEFT)
+        # NOTE: currently there's an issue where the 1st time an instrument
+        #       probes, it won't trigger when contacting the deck. However all
+        #       following probes work fine. So, here we do a "fake" probe
+        #       in case this instrument was just turned on
+        _probe(distance=0.5, speed=5)
+        _probe(distance=-0.5, speed=5)
+        _probe(
+            distance=PROBE_MAX_OVERRUN + PROBE_PREP_HEIGHT_MM,
+            speed=default_probe_cfg.speed_mm_per_s,
+        )
+        api.refresh_positions()
+        found_pos = api.gantry_position(OT3Mount.LEFT)
+        deck_mm_relative = found_pos.z - (PROBE_MAX_OVERRUN * -1.0)
+        deck_mm_is_valid = deck_mm_relative >= 0.001
+        report(
+            section,
+            _get_capacitive_test_tag(probe, "deck-mm"),
+            [deck_mm_relative, CSVResult.from_bool(deck_mm_is_valid)],
+        )
+
+        # DECK-pF
+        if deck_mm_is_valid:
+            api.move_to(OT3Mount.LEFT, probe_pos._replace(z=found_pos.z))
+            deck_pf = _read_from_cap_sensor(api, sensor_id, 10)
+            if not deck_pf:
+                # ui.print_error(f"{probe} cap sensor not working, skipping")
+                continue
+            passed = THRESHOLDS["deck-pf"][0] <= deck_pf <= THRESHOLDS["deck-pf"][1]
+            passed = passed if deck_pf > attached_pf else False
+            report(
+                section,
+                _get_capacitive_test_tag(probe, "deck-pf"),
+                [deck_pf, CSVResult.from_bool(passed)],
+            )
+
+        api.home_z(OT3Mount.LEFT)
+        ctx.pause("REMOVE probe")
+        api.remove_tip(OT3Mount.LEFT)
 
 
 # ----------- END TestSection.CAPACITANCE -----------
@@ -579,7 +729,7 @@ def build_pressure_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-def _read_from_sensor(
+def _read_from_pressure_sensor(
     api: SyncHardwareAPI,
     sensor_id: SensorId,
     num_readings: int,
@@ -704,7 +854,9 @@ def test_pressure(  # noqa: C901
         open_pa = 0.0
         if not api.is_simulator:
             try:
-                open_pa = _read_from_sensor(api, sensor_id, NUM_PRESSURE_READINGS)
+                open_pa = _read_from_pressure_sensor(
+                    api, sensor_id, NUM_PRESSURE_READINGS
+                )
             except Exception:
                 ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
                 continue
@@ -745,7 +897,9 @@ def test_pressure(  # noqa: C901
                     helpers_ot3.move_to_arched_ot3_sync(api, OT3Mount.LEFT, fixture_pos)
 
             try:
-                sealed_pa = _read_from_sensor(api, sensor_id, NUM_PRESSURE_READINGS)
+                sealed_pa = _read_from_pressure_sensor(
+                    api, sensor_id, NUM_PRESSURE_READINGS
+                )
             except Exception:
                 ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
                 break
@@ -761,7 +915,9 @@ def test_pressure(  # noqa: C901
         if not api.is_simulator:
             api.aspirate(OT3Mount.LEFT, ASPIRATE_VOLUME)
             try:
-                aspirate_pa = _read_from_sensor(api, sensor_id, NUM_PRESSURE_READINGS)
+                aspirate_pa = _read_from_pressure_sensor(
+                    api, sensor_id, NUM_PRESSURE_READINGS
+                )
             except Exception:
                 ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
                 break
@@ -777,7 +933,9 @@ def test_pressure(  # noqa: C901
         if not api.is_simulator:
             api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME, is_full_dispense=True)
             try:
-                dispense_pa = _read_from_sensor(api, sensor_id, NUM_PRESSURE_READINGS)
+                dispense_pa = _read_from_pressure_sensor(
+                    api, sensor_id, NUM_PRESSURE_READINGS
+                )
             except Exception:
                 ctx.delay(3, msg=f"{probe} pressure sensor not working, skipping")
                 break
@@ -1273,6 +1431,7 @@ def run(ctx: ProtocolContext) -> None:
     # apply monkey patch
     OT3API._partial_pick_up_z_motion = _partial_pick_up_z_motion_patch  # type: ignore[attr-defined]
     OT3API._get_tip_status = _get_tip_status_patch  # type: ignore[attr-defined]
+    OT3API._capactive_probe = _cap_probe_patch  # type: ignore[attr-defined]
     api = ctx._core.get_hardware()
 
     if ctx.is_simulating():
