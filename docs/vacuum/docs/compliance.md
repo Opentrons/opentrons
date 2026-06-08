@@ -10,8 +10,6 @@ The Vacuum Module is designed for use only as specified. Review all safety infor
 
 ## Instrument safety warnings
 
-<font color="red">SAMPLE PLACEHOLDERS ONLY</font>
-
 Various labels on the vacuum module or in this manual warn you about sources of potential injury or harm.
 
 <table>
@@ -19,20 +17,13 @@ Various labels on the vacuum module or in this manual warn you about sources of 
         <th>Symbol</th>
         <th>Description</th>
     </tr>
-    <tr><td><img src="../images/caution.png" alt="Yellow warning or caution triangle"></td>
-        <td><strong>Warning</strong> or <strong>Caution</strong> alerts users about:
-            <ul>
-                <li>Potentially hazardous conditions.</li>
-                <li>Equipment damage.</li>
-                <li>Actions that may result in personal injury or death.</li>
-                <li>Potentially lost or corrupted data.</li>
-                <li>An unrecoverable interruption of the operation being performed.</li>
-            </ul>
-        </td>
+    <tr>
+        <td></td>
+        <td></td>
     </tr>
     <tr>
-        <td><img src="../images/electrical.png" alt="Yellow electrical warning triangle"></td>
-        <td><strong>Electrical shock</strong>: alerts users about instrument components that might pose a risk of electrical shock if the instrument is handled improperly.</td>
+        <td></td>
+        <td></td>
     </tr>
 </table>
 
