@@ -468,7 +468,7 @@ class VacuumModule(mod_abc.AbstractModule):
                             or step["hold_time_seconds"] is not None
                         ):
                             await self.wait_for_command_duration()
-                        else:  # profile will wait for either
+                        else:
                             await self.wait_for_target()
                 if this_cycle["vent_after"] is not None:
                     await self.set_vent_state(
