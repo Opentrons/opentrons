@@ -25,7 +25,7 @@ import {
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
-import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
+import { useSendIdentifyModule } from '../../ModuleWizardFlows/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ComponentProps } from 'react'
@@ -57,7 +57,7 @@ const render = (props: ComponentProps<typeof LocationConflictModal>) => {
 
 describe('LocationConflictModal', () => {
   let props: ComponentProps<typeof LocationConflictModal>
-  let sendIdentifyStacker: (
+  let sendIdentifyModule: (
     module: AttachedModule,
     start: boolean,
     color?: IdentifyColor
@@ -71,7 +71,7 @@ describe('LocationConflictModal', () => {
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
-    sendIdentifyStacker = vi.fn()
+    sendIdentifyModule = vi.fn()
     vi.mocked(useCloseCurrentRun).mockReturnValue({
       closeCurrentRun: vi.fn(),
     } as any)
@@ -82,7 +82,7 @@ describe('LocationConflictModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
-    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
+    vi.mocked(useSendIdentifyModule).mockReturnValue(sendIdentifyModule)
   })
   afterEach(() => {
     vi.resetAllMocks()
