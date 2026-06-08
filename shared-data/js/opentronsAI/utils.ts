@@ -51,6 +51,7 @@ export const NON_PROTOCOL_COMMAND_TYPES = [
   'robot/moveAxesTo',
   'robot/moveTo',
   'robot/openGripperJaw',
+  'savePosition',
   'sealPipetteToTip',
   'setRailLights',
   'setStatusBar',
