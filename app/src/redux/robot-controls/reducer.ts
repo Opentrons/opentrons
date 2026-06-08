@@ -7,7 +7,6 @@ import type { PerRobotControlsState, RobotControlsState } from './types'
 const INITIAL_STATE: RobotControlsState = {}
 
 const INITIAL_CONTROLS_STATE: PerRobotControlsState = {
-  lightsOn: null,
   movementStatus: null,
   movementError: null,
 }
@@ -30,12 +29,6 @@ export const robotControlsReducer: Reducer<RobotControlsState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case Constants.FETCH_LIGHTS_SUCCESS:
-    case Constants.UPDATE_LIGHTS_SUCCESS: {
-      const { robotName, lightsOn } = action.payload
-      return updateRobotState(state, robotName, { lightsOn })
-    }
-
     case Constants.HOME:
     case Constants.MOVE: {
       const { robotName } = action.payload

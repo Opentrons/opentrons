@@ -14,32 +14,6 @@ interface ReducerSpec {
 
 const SPECS: ReducerSpec[] = [
   {
-    name: 'handles robotControls:FETCH_LIGHTS_SUCCESS',
-    action: {
-      type: 'robotControls:FETCH_LIGHTS_SUCCESS',
-      payload: {
-        robotName: 'robotName',
-        lightsOn: true,
-      },
-      meta: {} as any,
-    },
-    state: { robotName: { lightsOn: false } },
-    expected: { robotName: { lightsOn: true } },
-  },
-  {
-    name: 'handles robotControls:UPDATE_LIGHTS_SUCCESS',
-    action: {
-      type: 'robotControls:UPDATE_LIGHTS_SUCCESS',
-      payload: {
-        robotName: 'robotName',
-        lightsOn: false,
-      },
-      meta: {} as any,
-    },
-    state: { robotName: { lightsOn: true } },
-    expected: { robotName: { lightsOn: false } },
-  },
-  {
     name: 'handles robotControls:HOME',
     action: {
       type: 'robotControls:HOME',
