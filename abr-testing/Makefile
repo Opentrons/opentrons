@@ -113,10 +113,13 @@ shortcut_path ?= $(parent_dir)/$(shortcut_base).bat
 desktop-shortcut:
 	@printf '%s\r\n' \
 		'@echo off' \
+		'setlocal' \
 		'rem Resolve the folder this script lives in (sibling of the $(repo_name) folder)' \
 		'set "HERE=%~dp0"' \
-		'set "PYTHONPATH=%HERE%$(repo_name)\abr-testing"' \
-		'python "%HERE%$(repo_name)\abr-testing\abr_testing\data_collection\robotFleet_error.py" "%HERE%Errors"' \
+		'set "ABR=%HERE%$(repo_name)\abr-testing"' \
+		'rem Run inside the project pipenv environment so all deps are available' \
+		'cd /d "%ABR%"' \
+		'py -m pipenv run python "%ABR%\abr_testing\data_collection\robotFleet_error.py" "%HERE%Errors"' \
 		'echo.' \
 		'pause' \
 		> "$(shortcut_path)"
@@ -131,9 +134,11 @@ desktop-shortcut:
 		'' \
 		'# Resolve the folder this script lives in (sibling of the $(repo_name) folder)' \
 		'HERE="$${0:A:h}"' \
+		'ABR="$$HERE/$(repo_name)/abr-testing"' \
 		'' \
-		'# Point PYTHONPATH to the repo, then run the script with self-relative paths' \
-		'PYTHONPATH="$$HERE/$(repo_name)/abr-testing" python3 "$$HERE/$(repo_name)/abr-testing/abr_testing/data_collection/robotFleet_error.py" "$$HERE/Errors"' \
+		'# Run inside the project pipenv environment so all deps are available' \
+		'cd "$$ABR"' \
+		'pipenv run python "$$ABR/abr_testing/data_collection/robotFleet_error.py" "$$HERE/Errors"' \
 		'' \
 		'# Keep the terminal window open so you can see the results' \
 		'echo ""' \
