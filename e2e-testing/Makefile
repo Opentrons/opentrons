@@ -6,7 +6,7 @@ SHELL := bash
 TEST_ENV ?= local
 
 # Parallel pytest workers (override: make test-pd-local XDIST_ARGS="-n 0")
-XDIST_ARGS ?= -n 3 --dist loadscope
+XDIST_ARGS ?= -n 2 --dist loadscope
 
 .PHONY: setup
 setup:

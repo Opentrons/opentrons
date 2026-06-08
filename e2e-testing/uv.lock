@@ -126,7 +126,7 @@ requires-dist = [
     { name = "pytest-html", specifier = ">=4.1.1" },
     { name = "pytest-playwright", specifier = ">=0.6.2" },
     { name = "pytest-timeout", specifier = ">=2.3.1" },
-    { name = "pytest-xdist", specifier = ">=3.8.0" },
+    { name = "pytest-xdist", specifier = ">=3.5.0" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "ruff", specifier = ">=0.14.2" },
 ]

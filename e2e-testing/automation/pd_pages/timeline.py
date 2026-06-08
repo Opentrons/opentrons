@@ -35,9 +35,23 @@ class Timeline(BasePage):
         if min_steps > 1:
             expect(steps.nth(min_steps - 1)).to_be_attached(timeout=timeout)
 
+    def get_timeline_error_text(self) -> str | None:
+        """Return visible timeline error banner text, if any."""
+        banner = self.page.get_by_test_id(self.timeline_error_banner_testid)
+        if banner.count() == 0:
+            return None
+        return " ".join(banner.first.inner_text().split())
+
     def expect_no_timeline_errors(self, timeout: int = 120000) -> None:
         """Assert the protocol has no timeline-level error banners."""
-        expect(self.page.get_by_test_id(self.timeline_error_banner_testid)).to_have_count(0, timeout=timeout)
+        banner = self.page.get_by_test_id(self.timeline_error_banner_testid)
+        try:
+            expect(banner).to_have_count(0, timeout=timeout)
+        except AssertionError as error:
+            error_text = self.get_timeline_error_text()
+            if error_text is not None:
+                raise AssertionError(f"Timeline error banner: {error_text}") from error
+            raise
 
     def expect_no_known_regression_errors(self, timeout: int = 120000) -> None:
         """Assert common PD 9.0 regression error copy is not shown."""

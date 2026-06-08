@@ -50,7 +50,7 @@ End-to-end tests for the Opentrons **Protocol Designer (PD)** and **Labware Libr
 
 ```bash
 make serve-pd                                    # Terminal 1: start PD (required for local)
-make test-pd-local                               # Terminal 2: headless, 3 workers (default)
+make test-pd-local                               # Terminal 2: headless, 2 workers (default)
 make test-pd-local PYTEST_ARGS="-k test_name"    # Parallel + filter one test
 make test-pd-local XDIST_ARGS="-n 0"             # Sequential (debugging)
 make test-pd-local-headed                        # Headed, sequential (-n 0), one test via -k

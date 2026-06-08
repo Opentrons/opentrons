@@ -1,5 +1,6 @@
 import functools
 import re
+from pathlib import Path
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, TimeoutError, expect
@@ -54,6 +55,23 @@ def troubleshoot_and_pause(func):
             raise  # Re-raise the exception after pausing
 
     return wrapper
+
+
+def assert_export_downloads_clean_protocol(
+    page: Page,
+    editor: ProtocolEditorPage,
+    exports_dir: Path,
+    *,
+    filename: str,
+    export_timeout: int = 60000,
+) -> Path:
+    """Export the open protocol and assert the timeline stays error-free."""
+    expect(page.get_by_text("Protocol has timeline errors", exact=False)).to_have_count(0, timeout=5000)
+    destination = exports_dir / filename
+    editor.export_protocol(destination, timeout=export_timeout)
+    assert destination.exists(), f"Export did not create {destination}"
+    assert destination.stat().st_size > 0, f"Export file is empty: {destination}"
+    return destination
 
 
 def import_protocol_and_open_editor(

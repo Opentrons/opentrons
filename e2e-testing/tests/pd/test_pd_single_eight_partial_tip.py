@@ -1,13 +1,21 @@
 """E2E tests for 8-channel partial/single tip pickup and multi-transfer workflows."""
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Optional, Union
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
-from automation.pd_pages import ProtocolEditorPage, Timeline, TransferPage, TransferStepConfig, add_transfer_step
-from utility import import_protocol_and_open_editor
+from automation.pd_pages import (
+    MixStepForm,
+    ProtocolEditorPage,
+    Timeline,
+    TransferPage,
+    TransferStepConfig,
+    add_transfer_step,
+)
+from utility import assert_export_downloads_clean_protocol, import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/9/single_eight_partial_tip_setup.py"
 
@@ -29,6 +37,11 @@ PRIMARY_NOZZLE_BY_COUNT = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
 MANUAL_TIP_COL_BY_COUNT = {2: 2, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8}
 ROW_LABELS = "ABCDEFGH"
 
+# Fixture ships with thermocycler + heater-shaker before wizard-authored steps.
+SETUP_STEP_COUNT = 2
+PARTIAL_8CH_SAMPLE_STEP_INDICES = [2, 8, 14, 21]
+SINGLE_NOZZLE_SAMPLE_STEP_INDICES = [2, 5, 7]
+
 
 @dataclass(frozen=True)
 class Partial8chScenario:
@@ -48,10 +61,19 @@ class Partial8chScenario:
     dest_col: int = 2
 
 
-def _active_wells_96(col: int, partial_count: int) -> List[str]:
-    """Return the bottom *partial_count* wells in a 96-well column."""
-    start = len(ROW_LABELS) - partial_count
-    return [f"{ROW_LABELS[start + i]}{col}" for i in range(partial_count)]
+def _partial_primary_well(col: int, partial_count: int) -> str:
+    """Bottom-aligned primary well for a partial-nozzle group in one column."""
+    return f"{ROW_LABELS[len(ROW_LABELS) - partial_count]}{col}"
+
+
+def _partial_primary_wells_across_columns(
+    start_col: int,
+    partial_count: int,
+    count: int = 3,
+) -> List[str]:
+    """Primary wells in distinct columns (one partial group each)."""
+    row = ROW_LABELS[len(ROW_LABELS) - partial_count]
+    return [f"{row}{start_col + i}" for i in range(count)]
 
 
 def _manual_tips_for_partial(partial_count: int, tip_col: Optional[int] = None) -> List[str]:
@@ -66,15 +88,21 @@ def _wells_for_partial_path(
     source_col: int,
     dest_col: int,
 ) -> tuple[Union[str, List[str]], Union[str, List[str]]]:
-    """Source/dest wells aligned with partial nozzle geometry."""
-    source_wells = _active_wells_96(source_col, partial_count)
-    dest_wells = _active_wells_96(dest_col, partial_count)
+    """Source/dest primary wells aligned with partial nozzle geometry.
+
+    PD stores one primary well per partial group. Distribute needs 1 source
+    primary and multiple dest primaries in *different columns*; consolidate
+    needs the inverse. Selecting F/G/H (or A–C) in the same column collapses
+    to one group and disables distribute/consolidate.
+    """
+    source_primary = _partial_primary_well(source_col, partial_count)
+    dest_primary = _partial_primary_well(dest_col, partial_count)
     if path == "Single transfer":
-        return source_wells[0], dest_wells[0]
+        return source_primary, dest_primary
     if path == "Distribute":
-        return source_wells[0], dest_wells
+        return source_primary, _partial_primary_wells_across_columns(dest_col, partial_count)
     if path == "Consolidate":
-        return source_wells, dest_wells[-1]
+        return _partial_primary_wells_across_columns(source_col, partial_count), dest_primary
     raise ValueError(f"Unsupported path: {path}")
 
 
@@ -111,14 +139,28 @@ def _partial_8ch_config(scenario: Partial8chScenario) -> TransferStepConfig:
 def _partial_8ch_scenarios() -> List[Partial8chScenario]:
     """Cover partial counts 2–7 across transfer/distribute/consolidate and tip settings."""
     # Manual tip tracking is only used with Once (single pickup); Always uses automatic.
+    # Transfer skips 2/8 (inaccessible after prior tip use) and uses A1 for 4/8 manual pickup.
+    transfer_partial_counts = [3, 4, 5, 6, 7]
     transfer_strategies = [
-        ("Always", "Automatic tip tracking (recommended)", "Tip rack", None),
         ("Once", "Manual tip tracking", "Tip rack", "manual"),
-        ("Once", "Automatic tip tracking (recommended)", "Waste Chute", None),
+        ("Once", "Manual tip tracking", "Tip rack", "manual"),
         ("Always", "Automatic tip tracking (recommended)", "Tip rack", None),
         ("Once", "Manual tip tracking", "Tip rack", "manual"),
         ("Once", "Automatic tip tracking (recommended)", "Waste Chute", None),
     ]
+    transfer_overrides: dict[int, dict[str, object]] = {
+        # First transfer runs while thermocycler lid is open — use deck 384, not TC plate.
+        3: {
+            "source_labware": PLATE_384,
+            "dest_labware": PLATE_384,
+        },
+        4: {
+            "manual_tips": ["A1"],
+            "manual_tip_col": 1,
+            "source_col": 1,
+            "dest_col": 2,
+        },
+    }
     distribute_strategies = [
         ("Once", "Manual tip tracking", "Tip rack", "manual"),
         ("Always", "Automatic tip tracking (recommended)", "Tip rack", None),
@@ -139,12 +181,44 @@ def _partial_8ch_scenarios() -> List[Partial8chScenario]:
     def _append_scenarios(
         path: str,
         strategies: list[tuple[str, str, str, Optional[str]]],
+        partial_counts: Optional[List[int]] = None,
+        overrides: Optional[dict[int, dict[str, object]]] = None,
     ) -> None:
         # Run Once (incl. manual) before Always so automatic tip use does not block manual selection.
+        counts = partial_counts or PARTIAL_COUNTS
         ordered = sorted(enumerate(strategies), key=lambda item: 0 if item[1][0] == "Once" else 1)
         for idx, strat in ordered:
-            count = PARTIAL_COUNTS[idx]
+            count = counts[idx]
             change_tip, tracking, drop, tip_mode = strat
+            override = (overrides or {}).get(count, {})
+            manual_tip_col_value = override.get("manual_tip_col", MANUAL_TIP_COL_BY_COUNT[count])
+            source_col_value = override.get("source_col", MANUAL_TIP_COL_BY_COUNT[count])
+            dest_col_value = override.get("dest_col", MANUAL_TIP_COL_BY_COUNT[count] + 1)
+            manual_tip_col = (
+                manual_tip_col_value
+                if isinstance(manual_tip_col_value, int)
+                else MANUAL_TIP_COL_BY_COUNT[count]
+            )
+            source_col = source_col_value if isinstance(source_col_value, int) else MANUAL_TIP_COL_BY_COUNT[count]
+            dest_col = dest_col_value if isinstance(dest_col_value, int) else MANUAL_TIP_COL_BY_COUNT[count] + 1
+            manual_tips: Optional[List[str]] = None
+            if tip_mode == "manual":
+                override_manual_tips = override.get("manual_tips")
+                manual_tips = (
+                    override_manual_tips
+                    if isinstance(override_manual_tips, list)
+                    else _manual_tips_for_partial(count, manual_tip_col)
+                )
+            source_labware = (
+                override["source_labware"]
+                if isinstance(override.get("source_labware"), str)
+                else TC_96
+            )
+            dest_labware = (
+                override["dest_labware"]
+                if isinstance(override.get("dest_labware"), str)
+                else TC_96
+            )
             scenarios.append(
                 Partial8chScenario(
                     label=f"8ch partial {count}/8 {path.lower()}",
@@ -153,16 +227,23 @@ def _partial_8ch_scenarios() -> List[Partial8chScenario]:
                     change_tip=change_tip,
                     tip_tracking=tracking,  # type: ignore[arg-type]
                     drop_location=drop,
-                    manual_tip_col=MANUAL_TIP_COL_BY_COUNT[count],
-                    manual_tips=_manual_tips_for_partial(count) if tip_mode == "manual" else None,
-                    source_col=MANUAL_TIP_COL_BY_COUNT[count],
-                    dest_col=MANUAL_TIP_COL_BY_COUNT[count] + 1,
+                    manual_tip_col=manual_tip_col,
+                    manual_tips=manual_tips,
+                    source_labware=source_labware,
+                    dest_labware=dest_labware,
+                    source_col=source_col,
+                    dest_col=dest_col,
                 )
             )
 
     scenarios: List[Partial8chScenario] = []
+    _append_scenarios(
+        "Single transfer",
+        transfer_strategies,
+        partial_counts=transfer_partial_counts,
+        overrides=transfer_overrides,
+    )
     for path, strategies in (
-        ("Single transfer", transfer_strategies),
         ("Distribute", distribute_strategies),
         ("Consolidate", consolidate_strategies),
     ):
@@ -173,7 +254,7 @@ def _partial_8ch_scenarios() -> List[Partial8chScenario]:
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @pytest.mark.timeout(900)
-def test_pd_8ch_partial_all_counts_paths_and_tip_strategies(page: Page) -> None:
+def test_pd_8ch_partial_all_counts_paths_and_tip_strategies(page: Page, pd_exports_dir: Path) -> None:
     """Exercise 8ch partial 2–7 nozzle pickups across transfer/distribute/consolidate with varied tip settings."""
     import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
     editor = ProtocolEditorPage(page)
@@ -206,6 +287,8 @@ def test_pd_8ch_partial_all_counts_paths_and_tip_strategies(page: Page) -> None:
         ),
     )
 
+    # Never can only follow an adjacent Once/Always on the same pipette with the same
+    # nozzle configuration (here: 4/8 partial). Prior 5/8 Always drops tips via waste chute.
     print("8ch partial 4/8 TC→TC transfer — Once (setup for Never reuse)")
     add_transfer_step(
         editor,
@@ -222,37 +305,77 @@ def test_pd_8ch_partial_all_counts_paths_and_tip_strategies(page: Page) -> None:
         ),
     )
 
-    print("8ch partial 3/8 TC→TC transfer — Never (reuse tip from prior Once step)")
+    print("8ch partial 4/8 TC→TC transfer — Never (reuse 4/8 tip from prior Once step)")
     add_transfer_step(
         editor,
         transfer,
-        TransferStepConfig(
-            pipette=PIPETTE_8CH,
-            tip_rack=TIPRACK_1000,
-            source_labware=TC_96,
-            dest_labware=TC_96,
-            source_wells="F5",
-            dest_wells="F6",
-            path="Single transfer",
-            volume="20",
-            change_tip="Never",
-            nozzle_config="Partial nozzles",
-            partial_count=3,
-            primary_nozzle="F1",
+        _partial_8ch_config(
+            Partial8chScenario(
+                label="8ch partial 4/8 transfer Never reuse",
+                partial_count=4,
+                path="Single transfer",
+                change_tip="Never",
+                source_col=5,
+                dest_col=6,
+            )
         ),
     )
 
     timeline = Timeline(page)
-    timeline.wait_for_timeline_steps(min_steps=len(_partial_8ch_scenarios()) + 5)
+    timeline.wait_for_timeline_steps(min_steps=len(_partial_8ch_scenarios()) + SETUP_STEP_COUNT + 3)
     timeline.expect_no_known_regression_errors()
 
-    expect(page.get_by_role("button", name="Export")).to_be_visible(timeout=10000)
+    timeline.select_transfer_steps_sample(PARTIAL_8CH_SAMPLE_STEP_INDICES, expect_no_errors=True)
+    assert_export_downloads_clean_protocol(
+        page,
+        editor,
+        pd_exports_dir,
+        filename="8ch_partial_all_counts.py",
+    )
+
+
+@pytest.mark.pdE2E
+@pytest.mark.slow
+@pytest.mark.timeout(300)
+def test_pd_8ch_partial_mix_on_96_well(page: Page, pd_exports_dir: Path) -> None:
+    """Exercise 8ch partial-nozzle pickup on a mix step targeting a 96-well plate."""
+    import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
+    editor = ProtocolEditorPage(page)
+    mix_form = MixStepForm(page)
+
+    editor.add_step("Mix")
+    mix_form.select_pipette(PIPETTE_8CH)
+    mix_form.select_tiprack(TIPRACK_1000)
+    mix_form.select_labware(TC_96)
+    mix_form.open_nozzle_and_well_selector()
+    mix_form.select_nozzle_configuration("Partial nozzles", partial_count=4, primary_nozzle="E1")
+    mix_form.expect_mix_well_modal(TC_96)
+    mix_form.select_wells(["D1", "E1"])
+    mix_form.enter_volume("30")
+    mix_form.enter_mix_repetitions("3")
+    mix_form.click_continue()
+    mix_form.click_continue()
+    mix_form.click_continue()
+    mix_form.select_tip_handling_option("Once")
+    mix_form.save_step()
+
+    timeline = Timeline(page)
+    timeline.wait_for_timeline_steps(min_steps=SETUP_STEP_COUNT + 1)
+    timeline.expect_no_known_regression_errors()
+
+    timeline.select_transfer_steps_sample([SETUP_STEP_COUNT], expect_no_errors=True)
+    assert_export_downloads_clean_protocol(
+        page,
+        editor,
+        pd_exports_dir,
+        filename="8ch_partial_mix_96well.py",
+    )
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @pytest.mark.timeout(600)
-def test_pd_8ch_single_nozzle_and_1ch_workflows(page: Page) -> None:
+def test_pd_8ch_single_nozzle_and_1ch_workflows(page: Page, pd_exports_dir: Path) -> None:
     """Exercise 8ch single-nozzle distribute and 1ch distribute/consolidate/transfer with manual tip tracking."""
     import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
     editor = ProtocolEditorPage(page)
@@ -331,6 +454,7 @@ def test_pd_8ch_single_nozzle_and_1ch_workflows(page: Page) -> None:
         ),
     )
 
+    # Never follows adjacent 1ch Once (same single-tip nozzle count).
     print("1ch single transfer TC→temp — manual tip tracking")
     add_transfer_step(
         editor,
@@ -368,7 +492,13 @@ def test_pd_8ch_single_nozzle_and_1ch_workflows(page: Page) -> None:
     )
 
     timeline = Timeline(page)
-    timeline.wait_for_timeline_steps(min_steps=8)
+    timeline.wait_for_timeline_steps(min_steps=SETUP_STEP_COUNT + 6)
     timeline.expect_no_known_regression_errors()
 
-    expect(page.get_by_role("button", name="Export")).to_be_visible(timeout=10000)
+    timeline.select_transfer_steps_sample(SINGLE_NOZZLE_SAMPLE_STEP_INDICES, expect_no_errors=True)
+    assert_export_downloads_clean_protocol(
+        page,
+        editor,
+        pd_exports_dir,
+        filename="8ch_single_nozzle_and_1ch.py",
+    )

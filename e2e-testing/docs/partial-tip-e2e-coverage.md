@@ -1,8 +1,12 @@
 # Partial Tip E2E Coverage
 
-Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, adds transfer steps via `add_transfer_step()`, then asserts a clean timeline and visible Export button.
+Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, adds transfer (or mix) steps, re-opens a sample of timeline steps in the editor, exports the protocol to `test-results/exports/<test-name>/`, and asserts a clean timeline.
 
 **Fixtures:** `single_eight_partial_tip_setup.py` (1ch + 8ch) · `96_channel_setup.py` (96ch)
+
+**Exports:** `test-results/exports/` (per-test subfolder via `pd_exports_dir` fixture)
+
+**Never tip handling:** `Never` must immediately follow an adjacent `Once` or `Always` step on the same pipette with the **same nozzle configuration** (e.g. 4/8 partial cannot reuse a 5/8 tip). Each Never pair in these tests is authored back-to-back with matching `partial_count` / `nozzle_config`.
 
 ---
 
@@ -18,7 +22,13 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
 - Extra steps:
   - 5/8 partial, 384→TC, manual tips, waste chute (H23→H1)
   - 4/8 partial, Once (setup for Never)
-  - 3/8 partial, **Never** (tip reuse)
+  - 4/8 partial, **Never** (reuse same 4/8 tip from prior step)
+- Re-opens sample step indices `[2, 8, 14, 21]`; exports `8ch_partial_all_counts.py`
+
+### `test_pd_8ch_partial_mix_on_96_well` (300s)
+
+- Same fixture; **8ch partial 4/8** mix on TC 96-well (`D1`, `E1`); Once tip handling
+- Re-opens mix step; exports `8ch_partial_mix_96well.py`
 
 ### `test_pd_8ch_single_nozzle_and_1ch_workflows` (600s)
 
@@ -31,6 +41,7 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
   - Consolidate temp 24→TC, Once, waste chute
   - Transfer TC→temp 24, Once, manual tips (A1)
   - Transfer temp 24→TC, **Never** (reuse tip)
+- Re-opens sample step indices `[2, 5, 7]`; exports `8ch_single_nozzle_and_1ch.py`
 
 ---
 
@@ -41,9 +52,10 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
 - Fixture: `96_channel_setup.py`
 - 384-well plate; primary nozzles at **A1, A12, H1, H12**
 - **Single nozzle** (6 steps): transfer + distribute; Always/Once; automatic/manual; tip rack/waste chute
-- **Single row** (6 steps): same tip strategies; includes consolidate + manual + waste chute (H1)
+- **Single row** (7 steps): same tip strategies; includes **distribute**, consolidate + manual + waste chute (H1)
 - **Single column** (6 steps): same tip strategies; includes distribute + manual + waste chute (A12)
 - Extra: single A12 Once → single A12 **Never** (tip reuse)
+- Re-opens sample step indices `[0, 7, 14, 20]`; exports `96ch_partial_tip_strategies.py`
 
 ### `test_pd_96_channel_full_rack_and_manual_tip_selection` (600s)
 
@@ -52,6 +64,7 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
 - Transfer Always → waste chute
 - Distribute, Once, **manual** tips (full row A1–A12)
 - Once setup → **Never** reuse (full rack)
+- Re-opens sample step indices `[0, 2, 4]`; exports `96ch_full_rack_manual_tips.py`
 
 ---
 
@@ -59,7 +72,7 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
 
 Import-only customer protocol regressions (not wizard-authored partial-tip steps):
 
-- `test_pd_import_maor_protocol_no_reservoir_timeline_errors` — RQA-5529, 90+ steps
+- `test_pd_import_maor_protocol_no_reservoir_timeline_errors` — RQA-5529, 96 steps
 - `test_pd_maor_protocol_reservoir_transfer_steps_have_no_errors` — RQA-5529, sample reservoir steps + export
 - `test_pd_import_post_tagmentation_no_timeline_errors` — RQA-5354
 - `test_pd_post_tagmentation_reservoir_wash_steps_have_no_errors` — RQA-5354, named wash steps

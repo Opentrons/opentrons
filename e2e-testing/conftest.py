@@ -42,9 +42,13 @@ def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
                 item.obj = troubleshoot_and_pause(item.obj)
 
 
+PD_EXPORTS_DIR = Path("test-results/exports")
+
+
 def _ensure_test_results_dir() -> None:
     """Ensure the test-results directory exists."""
     os.makedirs("test-results", exist_ok=True)
+    PD_EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _slugify_nodeid(nodeid: str) -> str:
@@ -187,6 +191,7 @@ def browser_context_args() -> dict[str, Any]:
         "viewport": {"width": 1280, "height": 720},
         "record_video_dir": "test-results/videos",
         "record_video_size": {"width": 1280, "height": 720},
+        "accept_downloads": True,
     }
 
 
@@ -352,6 +357,16 @@ def _start_ll_server() -> Generator[str, None, None]:
             server_process.wait(timeout=5)
         if server_process.stdout:
             server_process.stdout.close()
+
+
+@pytest.fixture
+def pd_exports_dir(request: FixtureRequest) -> Path:
+    """Per-test subdirectory under test-results/exports for protocol downloads."""
+    _ensure_test_results_dir()
+    slug = _slugify_nodeid(request.node.nodeid)
+    destination = PD_EXPORTS_DIR / slug
+    destination.mkdir(parents=True, exist_ok=True)
+    return destination
 
 
 @pytest.fixture(scope="session")

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable, Sequence
+from typing import Iterable, Literal, Optional, Sequence
 
 from playwright.sync_api import Locator, Page
 
@@ -84,17 +84,52 @@ class MixStepForm(BasePage):
         print(f"Selecting tiprack option: {option_text}")
         self._select_dropdown_option("Tiprack", option_text)
 
+    NozzleConfig = Literal[
+        "All nozzles (recommended)",
+        "Single nozzle",
+        "Single column of nozzles",
+        "Single row of nozzles",
+        "Partial nozzles",
+    ]
+
     def open_nozzle_and_well_selector(self) -> None:
         """Open the well selector modal."""
 
         self.page.get_by_test_id("nozzle_and_well_modal").click()
 
-    def select_nozzles(self) -> None:
+    def select_primary_nozzle(self, nozzle: str) -> None:
+        """Click a primary nozzle in the nozzle selection modal."""
+        modal = self._modal_area()
+        modal.locator(f'[data-wellname="{nozzle}"]').click()
+
+    def select_partial_nozzle_count(self, count: int) -> None:
+        """Select partial nozzle count from the dropdown (e.g. 4 for 4/8 nozzles)."""
+        modal = self._modal_area()
+        dropdown = modal.get_by_test_id("dropdownMenu")
+        self.wait_for_visible(dropdown)
+        dropdown.click()
+        modal.get_by_role("listbox").get_by_text(f"{count} nozzles", exact=True).click()
+
+    def select_nozzle_configuration(
+        self,
+        config: NozzleConfig,
+        partial_count: Optional[int] = None,
+        primary_nozzle: Optional[str] = None,
+    ) -> None:
+        """Select nozzle configuration in step 1 of the nozzle/well modal."""
         modal = self._modal_area()
         self.wait_for_visible(modal.get_by_text("Select Pipette nozzles to use", exact=False).first)
         self.wait_for_visible(modal.get_by_role("button", name="Continue"))
-        modal.locator('label:has-text("All nozzles (recommended)")').click()
+        modal.locator(f'label:has-text("{config}")').click()
+        if partial_count is not None:
+            self.select_partial_nozzle_count(partial_count)
+        if primary_nozzle is not None:
+            self.select_primary_nozzle(primary_nozzle)
         modal.get_by_role("button", name="Continue").click()
+
+    def select_nozzles(self) -> None:
+        """Select all nozzles and continue to well selection."""
+        self.select_nozzle_configuration("All nozzles (recommended)")
 
     def expect_well_modal(self) -> None:
         modal = self._modal_area()
@@ -103,6 +138,12 @@ class MixStepForm(BasePage):
                 "Select wells to mix liquid in Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt", exact=False
             ).first
         )
+        self.wait_for_visible(modal.get_by_role("button", name="Save"))
+
+    def expect_mix_well_modal(self, labware_name: str) -> None:
+        """Wait for the mix well-selection modal for a given labware display name."""
+        modal = self._modal_area()
+        self.wait_for_visible(modal.get_by_text(labware_name, exact=False).first)
         self.wait_for_visible(modal.get_by_role("button", name="Save"))
 
     def select_wells(self, wells: Iterable[str]) -> None:

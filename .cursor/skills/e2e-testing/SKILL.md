@@ -272,6 +272,77 @@ def test_my_feature(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
     eyes.check_element("Timeline", page.get_by_test_id("TimelineToolbox_scrollContainer"))
 ```
 
+## Protocol Designer — Transfer tip tracking & reuse
+
+When authoring transfer steps in PD E2E tests, tip handling is **not** always automatic. Use `TransferStepConfig.tip_tracking` and `manual_tips` deliberately.
+
+### Reused tips require manual selection
+
+**If a step reuses a tip that was already picked up and returned to the rack, you must use manual tip tracking and pass the exact rack position in `manual_tips`.** Automatic tip tracking does not reliably select reused/used tips — the manual tip wizard opens and only the previously used position(s) may be accessible; other wells show as **Inaccessible**.
+
+Common reuse cases:
+
+- **Back-to-back `Once` steps** with the same nozzle layout on a depleted rack (e.g. Maor post-import: first `Once` returns a single-column tip to the rack; the next `Once` on the same column must use `tip_tracking="Manual tip tracking"` and `manual_tips=["A1"]` or whatever position is still selectable).
+- **Partial-nozzle manual pickup** after prior steps consumed most of the rack — only one primary well may remain (often `A1`). Override default `MANUAL_TIP_COL_BY_COUNT` / `_manual_tips_for_partial()` values when headed runs show a single accessible tip.
+- **`Never` reuse** — different rule: the tip **stays on the pipette** from the immediately prior adjacent `Once`/`Always` step with the **same nozzle configuration**. `save_transfer_with_tip_settings` skips the tip-tracking UI when `change_tip="Never"`. Do **not** open manual selection on the `Never` step itself; configure the **setup** step instead (manual selection or waste-chute drop so the tip remains on-pipette).
+
+### Authoring checklist
+
+1. **Order steps** — Run `Once` (especially manual) before `Always` on the same rack so automatic pickups do not block manual selection.
+2. **`Never` pairs** — Place `Never` immediately after its setup step; match `nozzle_config`, `partial_count`, and `primary_nozzle` exactly (e.g. 4/8 cannot reuse a 5/8 tip).
+3. **Waste chute vs tip rack** — Drop to **Waste Chute** on the setup step when the tip must stay on the pipette for the following `Never` step; drop to **Tip rack** when the next step should pick the same tip back up manually.
+4. **Partial manual wizard** — Click one **top-row primary** per pickup group (e.g. `A4` for 3/8 partial selects A4–C4). Pass that well in `manual_tips`.
+5. **Verify in headed mode** — When a manual wizard stalls, inspect which wells are **Selected** vs **Inaccessible** and align `manual_tips` to an accessible primary.
+
+### Example — reused single-column tip (post-import)
+
+```python
+# First Once: fresh pickup, automatic is fine.
+add_transfer_step(editor, transfer, TransferStepConfig(
+    ...,
+    change_tip="Once",
+    nozzle_config="Single column of nozzles",
+    primary_nozzle="A1",
+))
+
+# Second Once: reuses tip returned to rack — manual selection required.
+add_transfer_step(editor, transfer, TransferStepConfig(
+    ...,
+    change_tip="Once",
+    tip_tracking="Manual tip tracking",
+    manual_tips=["A1"],
+    nozzle_config="Single column of nozzles",
+    primary_nozzle="A1",
+))
+```
+
+### Example — `Never` after manual setup
+
+```python
+# Setup: manual pickup, drop to waste chute so tip stays on pipette.
+add_transfer_step(editor, transfer, TransferStepConfig(
+    ...,
+    change_tip="Once",
+    drop_location="Waste Chute",
+    tip_tracking="Manual tip tracking",
+    manual_tips=["A1"],
+    nozzle_config="Partial nozzles",
+    partial_count=4,
+    primary_nozzle="E1",
+))
+
+# Reuse: no tip-tracking UI; same nozzle layout as setup.
+add_transfer_step(editor, transfer, TransferStepConfig(
+    ...,
+    change_tip="Never",
+    nozzle_config="Partial nozzles",
+    partial_count=4,
+    primary_nozzle="E1",
+))
+```
+
+See also `e2e-testing/docs/partial-tip-e2e-coverage.md` for per-test coverage notes.
+
 ## Common Patterns
 
 ### Adding a New PD Test

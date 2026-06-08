@@ -1,13 +1,15 @@
 """E2E tests for 96-channel partial/single tip pickup and full-rack transfer workflows."""
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Optional, Union
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from automation.pd_pages import ProtocolEditorPage, Timeline, TransferPage, TransferStepConfig, add_transfer_step
-from utility import import_protocol_and_open_editor
+from automation.pd_pages.flex_stacker import FlexStackerPage
+from utility import assert_export_downloads_clean_protocol, import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/9/96_channel_setup.py"
 
@@ -18,6 +20,15 @@ TIPRACK_200 = "Opentrons Flex 96 Filter Tip Rack 200 µL"
 
 ROW_NOZZLE_TIPS: List[str] = [f"A{col}" for col in range(1, 13)]
 COLUMN_NOZZLE_TIPS: List[str] = [f"{row}1" for row in "ABCDEFGH"]
+# 96ch all-nozzles manual tracking uses a single primary (A1) for the full-rack pickup.
+FULL_RACK_MANUAL_TIPS: List[str] = ["A1"]
+FLEX_STACKER_A4 = "A4 Flex Stacker"
+TIPRACK_200_DEPLETED = "D2 Opentrons Flex 96 Filter Tip Rack 200 µL"
+TIPRACK_200_FRESH = "A4 Opentrons Flex 96 Filter Tip Rack 200 µL (1)"
+WASTE_CHUTE_D3 = "D3 Waste Chute in D3"
+
+PARTIAL_96CH_SAMPLE_STEP_INDICES = [0, 7, 14, 20]
+FULL_RACK_SAMPLE_STEP_INDICES = [0, 5, 6]
 
 
 @dataclass(frozen=True)
@@ -125,14 +136,8 @@ def _partial_96ch_config(scenario: Partial96chScenario) -> TransferStepConfig:
 
 def _single_nozzle_scenarios() -> List[Partial96chScenario]:
     """Cover single-quadrant pickups across tip strategies and transfer paths."""
+    # Run Once (incl. manual) before Always so automatic tip use does not block manual selection.
     return [
-        Partial96chScenario(
-            label="96ch single A1 — Always, automatic",
-            nozzle_config="Single nozzle",
-            primary_nozzle="A1",
-            path="Single transfer",
-            change_tip="Always",
-        ),
         Partial96chScenario(
             label="96ch single A12 — Once, return tip",
             nozzle_config="Single nozzle",
@@ -140,14 +145,6 @@ def _single_nozzle_scenarios() -> List[Partial96chScenario]:
             path="Single transfer",
             change_tip="Once",
             drop_location="Tip rack",
-        ),
-        Partial96chScenario(
-            label="96ch single H1 — Once, waste chute",
-            nozzle_config="Single nozzle",
-            primary_nozzle="H1",
-            path="Single transfer",
-            change_tip="Once",
-            drop_location="Waste chute",
         ),
         Partial96chScenario(
             label="96ch single H12 — Once, manual tip tracking",
@@ -158,12 +155,12 @@ def _single_nozzle_scenarios() -> List[Partial96chScenario]:
             tip_tracking="Manual tip tracking",
         ),
         Partial96chScenario(
-            label="96ch single A1 — Always, manual tip tracking",
+            label="96ch single H1 — Once, waste chute",
             nozzle_config="Single nozzle",
-            primary_nozzle="A1",
+            primary_nozzle="H1",
             path="Single transfer",
-            change_tip="Always",
-            tip_tracking="Manual tip tracking",
+            change_tip="Once",
+            drop_location="Waste Chute",
         ),
         Partial96chScenario(
             label="96ch single H1 — distribute, manual tips, waste chute",
@@ -171,7 +168,22 @@ def _single_nozzle_scenarios() -> List[Partial96chScenario]:
             primary_nozzle="H1",
             path="Distribute",
             change_tip="Once",
-            drop_location="Waste chute",
+            drop_location="Waste Chute",
+            tip_tracking="Manual tip tracking",
+        ),
+        Partial96chScenario(
+            label="96ch single A1 — Always, automatic",
+            nozzle_config="Single nozzle",
+            primary_nozzle="A1",
+            path="Single transfer",
+            change_tip="Always",
+        ),
+        Partial96chScenario(
+            label="96ch single A1 — Always, manual tip tracking",
+            nozzle_config="Single nozzle",
+            primary_nozzle="A1",
+            path="Single transfer",
+            change_tip="Always",
             tip_tracking="Manual tip tracking",
         ),
     ]
@@ -181,27 +193,12 @@ def _row_nozzle_scenarios() -> List[Partial96chScenario]:
     """Cover single-row partial pickups across tip strategies and transfer paths."""
     return [
         Partial96chScenario(
-            label="96ch row A1 — Always, automatic",
-            nozzle_config="Single row of nozzles",
-            primary_nozzle="A1",
-            path="Single transfer",
-            change_tip="Always",
-        ),
-        Partial96chScenario(
             label="96ch row H1 — Once, return tip",
             nozzle_config="Single row of nozzles",
             primary_nozzle="H1",
             path="Single transfer",
             change_tip="Once",
             drop_location="Tip rack",
-        ),
-        Partial96chScenario(
-            label="96ch row A1 — Once, automatic, waste chute",
-            nozzle_config="Single row of nozzles",
-            primary_nozzle="A1",
-            path="Single transfer",
-            change_tip="Once",
-            drop_location="Waste chute",
         ),
         Partial96chScenario(
             label="96ch row H1 — Once, manual tip tracking",
@@ -212,12 +209,12 @@ def _row_nozzle_scenarios() -> List[Partial96chScenario]:
             tip_tracking="Manual tip tracking",
         ),
         Partial96chScenario(
-            label="96ch row A1 — Always, manual tip tracking",
+            label="96ch row A1 — Once, automatic, waste chute",
             nozzle_config="Single row of nozzles",
             primary_nozzle="A1",
             path="Single transfer",
-            change_tip="Always",
-            tip_tracking="Manual tip tracking",
+            change_tip="Once",
+            drop_location="Waste Chute",
         ),
         Partial96chScenario(
             label="96ch row H1 — consolidate, manual tips, waste chute",
@@ -225,7 +222,29 @@ def _row_nozzle_scenarios() -> List[Partial96chScenario]:
             primary_nozzle="H1",
             path="Consolidate",
             change_tip="Once",
-            drop_location="Waste chute",
+            drop_location="Waste Chute",
+            tip_tracking="Manual tip tracking",
+        ),
+        Partial96chScenario(
+            label="96ch row A1 — distribute, automatic",
+            nozzle_config="Single row of nozzles",
+            primary_nozzle="A1",
+            path="Distribute",
+            change_tip="Once",
+        ),
+        Partial96chScenario(
+            label="96ch row A1 — Always, automatic",
+            nozzle_config="Single row of nozzles",
+            primary_nozzle="A1",
+            path="Single transfer",
+            change_tip="Always",
+        ),
+        Partial96chScenario(
+            label="96ch row A1 — Always, manual tip tracking",
+            nozzle_config="Single row of nozzles",
+            primary_nozzle="A1",
+            path="Single transfer",
+            change_tip="Always",
             tip_tracking="Manual tip tracking",
         ),
     ]
@@ -235,27 +254,12 @@ def _column_nozzle_scenarios() -> List[Partial96chScenario]:
     """Cover single-column partial pickups across tip strategies and transfer paths."""
     return [
         Partial96chScenario(
-            label="96ch column A1 — Always, automatic",
-            nozzle_config="Single column of nozzles",
-            primary_nozzle="A1",
-            path="Single transfer",
-            change_tip="Always",
-        ),
-        Partial96chScenario(
             label="96ch column A12 — Once, return tip",
             nozzle_config="Single column of nozzles",
             primary_nozzle="A12",
             path="Single transfer",
             change_tip="Once",
             drop_location="Tip rack",
-        ),
-        Partial96chScenario(
-            label="96ch column A1 — Once, automatic, waste chute",
-            nozzle_config="Single column of nozzles",
-            primary_nozzle="A1",
-            path="Single transfer",
-            change_tip="Once",
-            drop_location="Waste chute",
         ),
         Partial96chScenario(
             label="96ch column A12 — Once, manual tip tracking",
@@ -266,6 +270,30 @@ def _column_nozzle_scenarios() -> List[Partial96chScenario]:
             tip_tracking="Manual tip tracking",
         ),
         Partial96chScenario(
+            label="96ch column A12 — distribute, manual tips, waste chute",
+            nozzle_config="Single column of nozzles",
+            primary_nozzle="A12",
+            path="Distribute",
+            change_tip="Once",
+            drop_location="Waste Chute",
+            tip_tracking="Manual tip tracking",
+        ),
+        Partial96chScenario(
+            label="96ch column A1 — Once, automatic, waste chute",
+            nozzle_config="Single column of nozzles",
+            primary_nozzle="A1",
+            path="Single transfer",
+            change_tip="Once",
+            drop_location="Waste Chute",
+        ),
+        Partial96chScenario(
+            label="96ch column A1 — Always, automatic",
+            nozzle_config="Single column of nozzles",
+            primary_nozzle="A1",
+            path="Single transfer",
+            change_tip="Always",
+        ),
+        Partial96chScenario(
             label="96ch column A1 — Always, manual tip tracking",
             nozzle_config="Single column of nozzles",
             primary_nozzle="A1",
@@ -273,16 +301,24 @@ def _column_nozzle_scenarios() -> List[Partial96chScenario]:
             change_tip="Always",
             tip_tracking="Manual tip tracking",
         ),
-        Partial96chScenario(
-            label="96ch column A12 — distribute, manual tips, waste chute",
-            nozzle_config="Single column of nozzles",
-            primary_nozzle="A12",
-            path="Distribute",
-            change_tip="Once",
-            drop_location="Waste chute",
-            tip_tracking="Manual tip tracking",
-        ),
     ]
+
+
+def _replace_depleted_200ul_tiprack(editor: ProtocolEditorPage, stacker: FlexStackerPage) -> None:
+    """Retrieve a fresh 200 µL rack from the A4 stacker and swap it onto the adapter."""
+    print("96ch full-rack — retrieve fresh 200µL tip rack from stacker")
+    editor.add_step("Stacker")
+    stacker.retrieve_stacker(FLEX_STACKER_A4)
+    stacker.save_stacker_step()
+    stacker.wait_for_save_banner_gone()
+
+    print("96ch full-rack — move depleted 200µL tip rack to waste chute")
+    editor.add_step("Move")
+    editor.move_labware(TIPRACK_200_DEPLETED, WASTE_CHUTE_D3)
+
+    print("96ch full-rack — move fresh 200µL tip rack onto adapter")
+    editor.add_step("Move")
+    editor.move_labware(TIPRACK_200_FRESH, "D2")
 
 
 def _all_partial_scenarios() -> List[Partial96chScenario]:
@@ -293,7 +329,7 @@ def _all_partial_scenarios() -> List[Partial96chScenario]:
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @pytest.mark.timeout(900)
-def test_pd_96_channel_partial_tip_strategies(page: Page) -> None:
+def test_pd_96_channel_partial_tip_strategies(page: Page, pd_exports_dir: Path) -> None:
     """Exercise 96ch single/row/column partial pickups with varied tip strategies and paths."""
     import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
     editor = ProtocolEditorPage(page)
@@ -303,6 +339,7 @@ def test_pd_96_channel_partial_tip_strategies(page: Page) -> None:
         print(scenario.label)
         add_transfer_step(editor, transfer, _partial_96ch_config(scenario))
 
+    # Never requires an adjacent Once/Always with the same nozzle layout (single A12).
     print("96ch single A12 — Once (setup for Never reuse)")
     add_transfer_step(
         editor,
@@ -340,17 +377,24 @@ def test_pd_96_channel_partial_tip_strategies(page: Page) -> None:
     timeline.wait_for_timeline_steps(min_steps=len(_all_partial_scenarios()) + 2)
     timeline.expect_no_known_regression_errors()
 
-    expect(page.get_by_role("button", name="Export")).to_be_visible(timeout=10000)
+    timeline.select_transfer_steps_sample(PARTIAL_96CH_SAMPLE_STEP_INDICES, expect_no_errors=True)
+    assert_export_downloads_clean_protocol(
+        page,
+        editor,
+        pd_exports_dir,
+        filename="96ch_partial_tip_strategies.py",
+    )
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @pytest.mark.timeout(600)
-def test_pd_96_channel_full_rack_and_manual_tip_selection(page: Page) -> None:
+def test_pd_96_channel_full_rack_and_manual_tip_selection(page: Page, pd_exports_dir: Path) -> None:
     """Exercise full-rack 96ch transfers with automatic and manual tip tracking."""
     import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
     editor = ProtocolEditorPage(page)
     transfer = TransferPage(page)
+    stacker = FlexStackerPage(page)
 
     print("96ch full-rack transfer — 200µL tip rack, automatic, Once")
     add_transfer_step(
@@ -370,7 +414,8 @@ def test_pd_96_channel_full_rack_and_manual_tip_selection(page: Page) -> None:
         ),
     )
 
-    print("96ch full-rack transfer — 200µL tip rack, Always, waste chute")
+    # After return-tip, automatic pickup grabs used tips — must manually select.
+    print("96ch full-rack transfer — Always, manual tip selection, waste chute")
     add_transfer_step(
         editor,
         transfer,
@@ -383,12 +428,17 @@ def test_pd_96_channel_full_rack_and_manual_tip_selection(page: Page) -> None:
             path="Single transfer",
             volume="50",
             change_tip="Always",
-            drop_location="Waste chute",
+            drop_location="Waste Chute",
+            tip_tracking="Manual tip tracking",
+            manual_tips=FULL_RACK_MANUAL_TIPS,
             nozzle_config="All nozzles (recommended)",
         ),
     )
 
-    print("96ch full-rack distribute — manual tip selection on 96-well plate")
+    _replace_depleted_200ul_tiprack(editor, stacker)
+
+    # Never follows adjacent Once: drop to waste chute (not tip rack) so the tip stays on the pipette.
+    print("96ch full-rack transfer — Once, manual tip selection (setup for Never reuse)")
     add_transfer_step(
         editor,
         transfer,
@@ -397,18 +447,19 @@ def test_pd_96_channel_full_rack_and_manual_tip_selection(page: Page) -> None:
             source_labware=PLATE_96,
             dest_labware=PLATE_96,
             source_wells="A3",
-            dest_wells=["B3", "C3", "D3"],
-            path="Distribute",
-            volume="40",
+            dest_wells="B3",
+            path="Single transfer",
+            volume="50",
             change_tip="Once",
-            drop_location="Tip rack",
+            drop_location="Waste Chute",
             tip_tracking="Manual tip tracking",
-            manual_tips=ROW_NOZZLE_TIPS,
+            manual_tips=FULL_RACK_MANUAL_TIPS,
             nozzle_config="All nozzles (recommended)",
         ),
     )
 
-    print("96ch full-rack transfer — Once setup for Never reuse")
+    # Never requires an adjacent Once/Always with the same nozzle layout (full rack).
+    print("96ch full-rack transfer — Never (reuse manually selected full-rack tip)")
     add_transfer_step(
         editor,
         transfer,
@@ -420,31 +471,19 @@ def test_pd_96_channel_full_rack_and_manual_tip_selection(page: Page) -> None:
             dest_wells="B4",
             path="Single transfer",
             volume="50",
-            change_tip="Once",
-            drop_location="Tip rack",
-            nozzle_config="All nozzles (recommended)",
-        ),
-    )
-
-    print("96ch full-rack transfer — Never (reuse full-rack tip)")
-    add_transfer_step(
-        editor,
-        transfer,
-        TransferStepConfig(
-            tip_rack=TIPRACK_200,
-            source_labware=PLATE_96,
-            dest_labware=PLATE_96,
-            source_wells="A5",
-            dest_wells="B5",
-            path="Single transfer",
-            volume="50",
             change_tip="Never",
             nozzle_config="All nozzles (recommended)",
         ),
     )
 
     timeline = Timeline(page)
-    timeline.wait_for_timeline_steps(min_steps=5)
+    timeline.wait_for_timeline_steps(min_steps=7)
     timeline.expect_no_known_regression_errors()
 
-    expect(page.get_by_role("button", name="Export")).to_be_visible(timeout=10000)
+    timeline.select_transfer_steps_sample(FULL_RACK_SAMPLE_STEP_INDICES, expect_no_errors=True)
+    assert_export_downloads_clean_protocol(
+        page,
+        editor,
+        pd_exports_dir,
+        filename="96ch_full_rack_manual_tips.py",
+    )

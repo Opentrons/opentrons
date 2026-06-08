@@ -1,6 +1,7 @@
 """Protocol editor page object."""
 
 import re
+from pathlib import Path
 from typing import Sequence
 
 from playwright.sync_api import Page, TimeoutError, expect
@@ -313,6 +314,14 @@ class ProtocolEditorPage(BasePage):
         """Confirm the liquid setup and close the modal."""
         self.page.get_by_text("Done").click()
 
+    def export_protocol(self, destination: Path, *, timeout: int = 60000) -> Path:
+        """Click Export and save the downloaded protocol .py file."""
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with self.page.expect_download(timeout=timeout) as download_info:
+            self.click_button("Export")
+        download_info.value.save_as(str(destination))
+        return destination
+
     def add_step(self, step_type: str = "Transfer") -> None:
         """Add a new protocol step.
 
@@ -390,6 +399,8 @@ class ProtocolEditorPage(BasePage):
         else:
             self.page.get_by_role("button", name=new_location).click()
         self.page.get_by_role("button", name="Save").click()
+        if "Waste Chute" in new_location:
+            self.page.get_by_role("button", name="Confirm").click()
         self.page.locator("div").filter(has_text="Move has been saved").nth(3).click()
 
     def drag_and_drop(self, from_index: int, to_num: int) -> None:

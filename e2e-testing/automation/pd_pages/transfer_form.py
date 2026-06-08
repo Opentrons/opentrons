@@ -29,12 +29,49 @@ class TransferPage(BasePage):
 
     def tip_rack_select(self, tiprack: str) -> None:
         """Select tip rack in transfer step step 1, if multiple racks are available."""
+        if self._static_tiprack_field_matches(tiprack):
+            return
+
         dropdown = self.page.get_by_test_id("tipRack_dropdownMenu")
         if dropdown.count() == 0:
             return
+
+        current_value = " ".join(dropdown.inner_text().split())
+        if tiprack in current_value:
+            return
+
         self.wait_for_visible(dropdown)
         dropdown.click()
-        self.page.get_by_role("listbox").get_by_text(tiprack).click()
+
+        listbox = self.page.locator("div[role='listbox']").last
+        self.wait_for_visible(listbox)
+        buttons = listbox.locator("button")
+        for index in range(buttons.count()):
+            button = buttons.nth(index)
+            normalized = " ".join(button.inner_text().split())
+            if tiprack in normalized:
+                button.click()
+                return
+
+        available = buttons.all_inner_texts()
+        raise AssertionError(f"Tip rack option '{tiprack}' not found. Available options: {available}")
+
+    def _static_tiprack_field_matches(self, tiprack: str) -> bool:
+        """Return True when Tiprack is a read-only field already showing the requested rack."""
+        label = self.page.get_by_text("Tiprack", exact=True)
+        if label.count() == 0:
+            label = self.page.get_by_text("Tiprack", exact=False)
+        if label.count() == 0:
+            return False
+
+        list_item = label.first.locator("xpath=../*[@data-testid='ListItem_default']")
+        if list_item.count() == 0:
+            list_item = label.first.locator("xpath=../../*[@data-testid='ListItem_default']")
+        if list_item.count() == 0:
+            return False
+
+        texts = [" ".join(text.split()) for text in list_item.locator("p").all_inner_texts()]
+        return any(tiprack in text for text in texts)
 
     def pipette_select(self, pipette: str) -> None:
         """Select pipette in transfer step step 1."""
@@ -50,9 +87,7 @@ class TransferPage(BasePage):
         args:
             labware: The labware to select like "Opentrons Tough 300 mL 1 Well Reservoir".
         """
-        self.page.get_by_test_id("aspirate_labware_dropdownMenu").click()
-        source_labware = self.page.get_by_text(labware)
-        source_labware.click()
+        self._select_labware_dropdown_option("aspirate_labware_dropdownMenu", labware)
 
     locations = Literal["Source", "Destination"]
 
@@ -119,6 +154,32 @@ class TransferPage(BasePage):
         self.wells_select("Source", source_labware, source_wells, False)
         self.wells_select("Destination", dest_labware, dest_wells, True)
 
+    def _click_well_in_modal(self, modal: Locator, well: str) -> None:
+        """Click a well or tip in a modal via mouse coordinates for SelectionRect."""
+        well_locator = modal.locator(f"#{well}")
+        if well_locator.count() == 0:
+            well_locator = modal.locator(f"[data-wellname='{well}']").first
+        if well_locator.count() == 0:
+            well_locator = modal.locator(f"[id='{well}']").first
+        well_locator.scroll_into_view_if_needed()
+        self.wait_for_visible(well_locator)
+        box = well_locator.bounding_box()
+        if box is not None:
+            self.page.mouse.click(
+                box["x"] + box["width"] / 2,
+                box["y"] + box["height"] / 2,
+            )
+        else:
+            well_locator.click(force=True)
+
+    def _well_selector_labware_label(self, labware: str) -> str:
+        """Well selector headings use labware displayName, not slot or deck nicknames."""
+        normalized = re.sub(r"\s+\(\d+\)$", "", labware)
+        slot_match = re.match(r"^([A-D]\d+)\s+(.+)$", normalized)
+        if slot_match is not None:
+            return slot_match.group(2)
+        return normalized
+
     def wells_select(
         self, location: locations, labwareName: str, wells: Union[str, List[str]], finalStep: bool
     ) -> None:
@@ -129,20 +190,22 @@ class TransferPage(BasePage):
             rect: If True, uses the 'rect' selector logic for SVG grids.
         """
         modal = self._modal_area()
+        labware_label = self._well_selector_labware_label(labwareName)
         if location == "Source":
-            self.wait_for_visible(modal.get_by_text(f"Select wells to aspirate liquid from {labwareName}"))
+            self.wait_for_visible(
+                modal.get_by_text(f"Select wells to aspirate liquid from {labware_label}", exact=False).first
+            )
         elif location == "Destination":
-            self.wait_for_visible(modal.get_by_text(f"Select wells to dispense liquid into in {labwareName}"))
+            self.wait_for_visible(
+                modal.get_by_text(f"Select wells to dispense liquid into in {labware_label}", exact=False).first,
+                timeout=10000,
+            )
 
         # 2. Convert single string to list for uniform processing
         well_list = [wells] if isinstance(wells, str) else wells
 
         for well in well_list:
-            well_locator = modal.locator(f"#{well}")
-            if well_locator.count() == 0:
-                well_locator = modal.locator(f"[data-wellname='{well}']").first
-            self.wait_for_visible(well_locator)
-            well_locator.click(force=True)
+            self._click_well_in_modal(modal, well)
         if finalStep:
             modal.get_by_role("button", name="Save").click()
             self.page.get_by_test_id("nozzle_and_well_modal").wait_for(state="visible", timeout=10000)
@@ -151,10 +214,45 @@ class TransferPage(BasePage):
 
     def destination_labware_select(self, labware: str) -> None:
         """Select destination labware in transfer step."""
-        self.page.get_by_test_id("dispense_labware_dropdownMenu").click()
-        option = self.page.get_by_role("listbox").get_by_text(labware)
-        option.scroll_into_view_if_needed()
-        option.click()
+        self._select_labware_dropdown_option("dispense_labware_dropdownMenu", labware)
+
+    def _labware_option_matches(self, option_text: str, labware: str) -> bool:
+        """Return True when a dropdown row matches the requested labware nickname."""
+        normalized_option = " ".join(option_text.split())
+        normalized_labware = " ".join(labware.split())
+        if normalized_option == normalized_labware:
+            return True
+
+        slot_match = re.match(r"^([A-D]\d+)\s+(.+)$", normalized_labware)
+        if slot_match is not None:
+            return normalized_option == normalized_labware
+
+        option_slot_match = re.match(r"^([A-D]\d+)\s+(.+)$", normalized_option)
+        if option_slot_match is not None:
+            return option_slot_match.group(2) == normalized_labware
+
+        return False
+
+    def _select_labware_dropdown_option(self, dropdown_test_id: str, labware: str) -> None:
+        """Select a labware nickname from a transfer-step labware dropdown."""
+        dropdown = self.page.get_by_test_id(dropdown_test_id)
+        self.wait_for_visible(dropdown)
+        dropdown.click()
+
+        listbox = self.page.locator("div[role='listbox']").last
+        self.wait_for_visible(listbox)
+        buttons = listbox.locator("button")
+        matching_indices = [
+            index
+            for index in range(buttons.count())
+            if self._labware_option_matches(buttons.nth(index).inner_text(), labware)
+        ]
+
+        if not matching_indices:
+            available = buttons.all_inner_texts()
+            raise AssertionError(f"Labware option '{labware}' not found. Available options: {available}")
+
+        buttons.nth(matching_indices[0]).click()
 
     def pipette_path_select(self, pathtype: str) -> None:
         """Select pipette path type in transfer step.
@@ -516,14 +614,11 @@ class TransferPage(BasePage):
             continue_button.click()
         self.wait_for_visible(modal.get_by_text("Click to select tips in", exact=False))
         for tip in tips:
-            # One primary per pickup group (e.g. A4 for 3/8 partial → A4–C4). Tip rack
-            # wells use id="{wellName}".
-            tip_locator = modal.locator(f"#{tip}")
-            if tip_locator.count() == 0:
-                tip_locator = modal.locator(f"[id='{tip}']").first
-            tip_locator.scroll_into_view_if_needed()
-            self.wait_for_visible(tip_locator)
-            tip_locator.click(force=True)
+            # One primary per pickup group (e.g. A4 for 3/8 partial → A4–C4).
+            self._click_well_in_modal(modal, tip)
+            if modal.get_by_text("All tips selected").count() > 0:
+                break
+        expect(modal.get_by_text("All tips selected")).to_be_visible(timeout=10000)
         modal.get_by_role("button", name="Select tips").click()
         expect(modal.get_by_text("Select tips for manual tip tracking")).to_be_hidden(timeout=10000)
         self.wait_for_visible(
