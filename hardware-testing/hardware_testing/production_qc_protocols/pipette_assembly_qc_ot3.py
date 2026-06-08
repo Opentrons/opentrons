@@ -528,25 +528,6 @@ def _move_safe(api: SyncHardwareAPI, mount: OT3Mount, dest: Point) -> None:
 
 # --------------- END Helpers -------------
 
-# ----------- TEST LIQUID -----------
-def build_liquid_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
-    """Build CSV Lines."""
-    return []
-
-
-def test_liquid(
-    api: SyncHardwareAPI,
-    report: CSVReport,
-    section: str,
-    ctx: ProtocolContext,
-    cfg: TestConfig,
-) -> None:
-    """Test Liquid."""
-    pass
-
-
-# ----------- END TEST LIQUID -----------
-
 # ----------- TEST FIXTURE -----------
 def build_fixture_csv_lines(
     pipette_channels: int,
@@ -788,8 +769,8 @@ def _test_for_leak(
     cfg: TestConfig,
     tip_volume: int,
     fixture: Optional[PressureFixtureBase],
-    report: CSVReport,
-    section: str,
+    report: Optional[CSVReport],
+    section: Optional[str],
     droplet_wait_seconds: int = 30,
 ) -> bool:
 
@@ -799,6 +780,8 @@ def _test_for_leak(
         ]
         helpers_ot3.update_pick_up_current(api, cfg.mount, current_val)
     if fixture:
+        assert report
+        assert section
         test_passed = _fixture_check_pressure(
             api,
             cfg,
@@ -842,6 +825,46 @@ def test_fixture(
 
 
 # ----------- END TEST FIXTURE -----------
+
+# ----------- TEST LIQUID -----------
+def build_liquid_csv_lines(cfg: TestConfig) -> List[Union[CSVLine, CSVLineRepeating]]:
+    """Build CSV Lines."""
+    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
+    for i in range(cfg.num_trials):
+        lines.append(CSVLine(f"droplets-{(i+1)*cfg.droplet_wait_seconds}", [CSVResult]))
+    return lines
+
+
+def test_liquid(
+    api: SyncHardwareAPI,
+    report: CSVReport,
+    section: str,
+    ctx: ProtocolContext,
+    cfg: TestConfig,
+) -> None:
+    """Test Liquid."""
+    for i in range(cfg.num_trials):
+        droplet_wait_seconds = cfg.droplet_wait_seconds * (i + 1)
+        test_passed = _test_for_leak(
+            api,
+            cfg,
+            cfg.pipette_volume,
+            None,
+            None,
+            None,
+            cfg.droplet_wait_seconds,
+        )
+        if not test_passed:
+            printsig = f"04-01-liquid:测试吸液保持,吸水后等待 {droplet_wait_seconds} 秒针管漏液"
+            FINAL_TEST_FAIL_INFOR.append(printsig)
+        report(
+            section,
+            f"droplets-{droplet_wait_seconds}",
+            CSVResult.from_bool(test_passed),
+        )
+
+
+# ----------- END TEST LIQUID -----------
 
 # ----------- TEST DIAGNOSTICS -----------
 def build_diagnostics_csv_lines(
@@ -1345,7 +1368,7 @@ def store_config(
     report("PRESSURE-DATA", "PHASE", [f"CH{c+1}" for c in range(pipette_channels)])
 
 
-def build_report(test_name: str, pipette_channels: int) -> CSVReport:
+def build_report(test_name: str, cfg: TestConfig) -> CSVReport:
     """Build report."""
     return CSVReport(
         test_name=test_name,
@@ -1355,14 +1378,16 @@ def build_report(test_name: str, pipette_channels: int) -> CSVReport:
             CSVSection(
                 title="PRESSURE-CONFIGURATIONS", lines=build_pressure_cfg_csv_lines()
             ),
-            CSVSection(title=TestSection.LIQUID.value, lines=build_liquid_csv_lines()),
+            CSVSection(
+                title=TestSection.LIQUID.value, lines=build_liquid_csv_lines(cfg)
+            ),
             CSVSection(
                 title=TestSection.FIXTURE.value,
-                lines=build_fixture_csv_lines(pipette_channels),
+                lines=build_fixture_csv_lines(cfg.pipette_channels),
             ),
             CSVSection(
                 title=TestSection.DIAGNOSTICS.value,
-                lines=build_diagnostics_csv_lines(pipette_channels),
+                lines=build_diagnostics_csv_lines(cfg.pipette_channels),
             ),
             CSVSection(
                 title=TestSection.PLUNGER.value, lines=build_plunger_csv_lines()
@@ -1380,7 +1405,7 @@ def build_report(test_name: str, pipette_channels: int) -> CSVReport:
             ),
             CSVSection(
                 title="PRESSURE-DATA",
-                lines=build_pressure_data_csv_lines(pipette_channels),
+                lines=build_pressure_data_csv_lines(cfg.pipette_channels),
             ),
         ],
     )
@@ -1600,7 +1625,7 @@ def run(ctx: ProtocolContext) -> None:
         config.pipette_channels = current_pipette.channels
         config.pipette_volume = current_pipette.working_volume
 
-        report = build_report(test_name, config.pipette_channels)
+        report = build_report(test_name, config)
         dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
         helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut)  # type: ignore[attr-defined]
 
