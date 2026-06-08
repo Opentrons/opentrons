@@ -172,9 +172,12 @@ When you choose a partial tip pickup nozzle configuration, Protocol Designer inc
   <figcaption>Protocol Designer shows a collision error because the pipette could collide with the tip rack in slot C2.</figcaption>
 </figure> 
 
-Even though the tip rack above is full of pipette tips, the "not enough tips" warning tells you that there aren't enough tips that the pipette can safely access to complete your protocol step. This results in a collision error to prevent the pipette from striking adjacent labware in your final protocol. 
+Even though the tip rack above is full, the "not enough tips" warning indicates that the pipette can't safely access them to complete your protocol step. This results in a collision error to prevent the pipette from striking adjacent labware in your final protocol. 
 
-To fix the collision error in the example above, move the well plate from slot C3 so the labware items are no longer adjacent, or change your tip pickup selections.
+To fix the collision error in the example above, you can either:
+
+- Move the well plate from slot C3 so the labware items are no longer adjacent.
+- Change your tip pickup selections.
 
 Fix all errors before exporting to ensure your protocol runs successfully. You won't be able to run protocols with unresolved errors. 
 
