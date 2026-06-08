@@ -1043,6 +1043,47 @@ async def jog_mount_ot3(
             )
 
 
+def jog_mount_ot3_sync(
+    api: SyncHardwareAPI,
+    mount: OT3Mount,
+    critical_point: Optional[CriticalPoint] = None,
+    display: Optional[bool] = True,
+    speed: Optional[float] = None,
+) -> Dict[Axis, float]:
+    """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    return api.current_position_ot3(mount=mount, critical_point=critical_point)
+    """
+    if api.is_simulator:
+        return await api.current_position_ot3(
+            mount=mount, critical_point=critical_point
+        )
+    axis: str = ""
+    distance: float = 0.0
+    do_home: bool = False
+    print("jogging")
+    while True:
+        try:
+            axis, distance, do_home = await _jog_do_print_then_input_then_move(
+                api,
+                mount,
+                critical_point,
+                axis,
+                distance,
+                do_home,
+                display=display,
+                speed=speed,
+            )
+        except ValueError as e:
+            print(e)
+            continue
+        except OT3JogTermination:
+            print("done jogging")
+            return await api.current_position_ot3(
+                mount=mount, critical_point=critical_point
+            )
+    """
+
+
 async def move_to_arched_ot3(
     api: OT3API,
     mount: OT3Mount,

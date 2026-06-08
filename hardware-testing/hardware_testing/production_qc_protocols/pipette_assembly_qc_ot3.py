@@ -32,6 +32,8 @@ from opentrons.hardware_control.ot3_calibration import (
     CalibrationStructureNotFoundError,
 )
 from opentrons.hardware_control.types import (
+    TipStateType,
+    FailedTipStateCheck,
     InstrumentProbeType,
 )
 from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId, MessageId
@@ -1209,7 +1211,49 @@ def test_plunger(
 # ----------- TEST TIP_SENSOR -----------
 def build_tip_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    return []
+    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
+    lines.append(CSVLine("tip-presence-ejector-height-above-nozzle", [float]))
+    lines.append(CSVLine("tip-presence-pick-up-displacement", [float, CSVResult]))
+    lines.append(CSVLine("tip-presence-pick-up-height-above-nozzle", [float]))
+    lines.append(CSVLine("tip-presence-drop-displacement", [float, CSVResult]))
+    lines.append(CSVLine("tip-presence-drop-height-above-nozzle", [float]))
+    return lines
+
+
+def _jog_for_tip_state(
+    api: SyncHardwareAPI,
+    mount: OT3Mount,
+    current_z: float,
+    max_z: float,
+    step_mm: float,
+    criteria: Tuple[float, float],
+    tip_state: TipStateType,
+) -> bool:
+    def _matches_state(_state: TipStateType) -> bool:
+        try:
+            sleep(0.3)
+            api.verify_tip_presence(mount, _state)
+            return True
+        except FailedTipStateCheck:
+            return False
+
+    times = 0
+    while (step_mm > 0 and current_z < max_z) or (step_mm < 0 and current_z > max_z):
+        api.move_rel(mount, Point(z=step_mm))
+        current_z = round(current_z + step_mm, 2)
+        times += 1
+        if _matches_state(tip_state):
+            graval = times * 0.1
+            passed = min(criteria) <= current_z <= max(criteria)
+            if not passed:
+                printsig = f"06-02-tip-presence:测试光栅距离,针管状态{tip_state.name}移液轴头到触发光栅的距离为{current_z} 结果为{passed} 阈值为{min(criteria)} ~ {max(criteria)}.触发光电开关的走的距离为{graval}"
+                FINAL_TEST_FAIL_INFOR.append(printsig)
+            return passed
+    printsig = (
+        f"06-03-tip-presence:光电传感器故障,在状态{tip_state.name} 位移最大值{current_z} 没触发光电开关"
+    )
+    FINAL_TEST_FAIL_INFOR.append(printsig)
+    return False
 
 
 def test_tip_sensor(
@@ -1219,8 +1263,91 @@ def test_tip_sensor(
     ctx: ProtocolContext,
     cfg: TestConfig,
 ) -> None:
-    """Test Liquid."""
-    pass
+    api.retract(cfg.mount)
+    ctx.pause("Ready to start test-tip-presence?")
+
+    if cfg.pipette_channels == 1:
+        offset_from_a1 = Point(x=9 * 11, y=9 * -7, z=-5)
+    else:
+        offset_from_a1 = Point(x=9 * 11, y=0, z=-5)
+    test_pos = (
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_50 + offset_from_a1  # type: ignore[operator]
+    )
+    helpers_ot3.move_to_arched_ot3_sync(api, cfg.mount, test_pos)
+    ctx.pause("align NOZZLE with tip-rack HOLE:")
+    helpers_ot3.jog_mount_ot3_sync(api, cfg.mount)
+    nozzle_pos = api.gantry_position(cfg.mount)
+    if cfg.pipette_channels == 1:
+        api.move_rel(cfg.mount, Point(z=-6))
+    else:
+        api.move_rel(cfg.mount, Point(z=-2))
+    ctx.pause("align EJECTOR with tip-rack HOLE:")
+    helpers_ot3.jog_mount_ot3_sync(api, cfg.mount)
+    ejector_pos = api.gantry_position(cfg.mount)
+    ejector_rel_pos = round(ejector_pos.z - nozzle_pos.z, 2)
+    pick_up_criteria = {
+        1: (
+            ejector_rel_pos + -1.3,
+            ejector_rel_pos + -2.5,
+        ),
+        8: (
+            ejector_rel_pos + -1.9,
+            ejector_rel_pos + -4.0,
+        ),
+    }[cfg.pipette_channels]
+
+    pick_up_result = _jog_for_tip_state(
+        api,
+        cfg.mount,
+        current_z=ejector_rel_pos,
+        max_z=-10.5,
+        criteria=pick_up_criteria,
+        step_mm=-0.1,
+        tip_state=TipStateType.PRESENT,
+    )
+    pick_up_pos = api.gantry_position(cfg.mount)
+    pick_up_pos_rel = round(pick_up_pos.z - nozzle_pos.z, 2)
+    api.move_to(cfg.mount, nozzle_pos + Point(z=-10.5))  # nominal tip depth
+    drop_criteria = {
+        1: (
+            -10.5 + 1.2,
+            -10.5 + 2.3,
+        ),
+        8: (
+            -10.5 + 1.9,
+            -10.5 + 4.0,
+        ),
+    }[cfg.pipette_channels]
+    drop_result = _jog_for_tip_state(
+        api,
+        cfg.mount,
+        current_z=-10.5,
+        max_z=0.0,
+        criteria=drop_criteria,
+        step_mm=0.1,
+        tip_state=TipStateType.ABSENT,
+    )
+    drop_pos = api.gantry_position(cfg.mount)
+    drop_pos_rel = round(drop_pos.z - nozzle_pos.z, 2)
+
+    pick_up_disp = round(ejector_rel_pos - pick_up_pos_rel, 2)
+    drop_disp = round(10.5 + drop_pos_rel, 2)
+    report(section, "tip-presence-ejector-height-above-nozzle", [ejector_rel_pos])
+    report(
+        section,
+        "tip-presence-pick-up-displacement",
+        [
+            pick_up_disp,
+            CSVResult.from_bool(pick_up_result),
+        ],
+    )
+    report(section, "tip-presence-pick-up-height-above-nozzle", [pick_up_pos_rel])
+    report(
+        section,
+        "tip-presence-drop-displacement",
+        [drop_disp, CSVResult.from_bool(drop_result)],
+    )
+    report(section, "tip-presence-drop-height-above-nozzle", [drop_pos_rel])
 
 
 # ----------- END TEST TIP_SENSOR -----------
