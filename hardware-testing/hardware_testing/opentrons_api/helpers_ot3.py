@@ -682,8 +682,8 @@ def get_plunger_positions_ot3(
     )
 
 
-async def update_pick_up_current(
-    api: OT3API, mount: OT3Mount, current: float = 0.125
+def update_pick_up_current(
+    api: Union[OT3API, SyncHardwareAPI], mount: OT3Mount, current: float = 0.125
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
@@ -1511,3 +1511,17 @@ def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
         unit_number=data.unit_number,
         sku=getattr(data, "sku", None),
     )
+
+
+# TODO Barcode scanner?
+def get_user_answer(api: SyncHardwareAPI, prompt: str) -> bool:
+    """Have the user answer a yes/no question."""
+    return True
+
+
+def get_input_number(
+    ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str, default: Union[int, float]
+) -> Union[int, float]:
+    """Have the user input a value."""
+    ctx.pause(f"Use Scanner: {prompt}")
+    return default

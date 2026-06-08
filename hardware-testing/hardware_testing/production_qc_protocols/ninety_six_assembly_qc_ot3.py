@@ -93,20 +93,6 @@ from hardware_testing.drivers.sealed_pressure_fixture import (  # noqa: E402
 from hardware_testing.opentrons_api import helpers_ot3  # noqa: E402
 
 
-# TODO Barcode scanner?
-def get_user_answer(prompt: str) -> bool:
-    """Have the user answer a yes/no question."""
-    return True
-
-
-def get_input_number(
-    ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str, default: Union[int, float]
-) -> Union[int, float]:
-    """Have the user input a value."""
-    ctx.pause(f"Use Scanner: {prompt}")
-    return default
-
-
 # ----------- Monkey patches -----------
 
 
@@ -159,6 +145,25 @@ async def _get_tip_status_patch(self) -> bool:  # noqa: ANN001
         can_messenger.remove_listener(_listener)
     result = bool(value)
     return result
+
+
+async def _cap_probe_patch(
+    self,  # noqa: ANN001
+    distance: float,
+    speed: float,
+    sensor_id: SensorId,
+    relative_threshold_pf: float,
+) -> float:
+    pos = await capacitive_probe(
+        self._backend._messenger,
+        NodeId.pipette_left,
+        NodeId.head_l,
+        distance=distance,
+        mount_speed=speed,
+        sensor_id=sensor_id,
+        relative_threshold_pf=relative_threshold_pf,
+    )
+    return pos.motor_position
 
 
 # ----------- END Monkey patches -----------
@@ -336,7 +341,7 @@ def build_jaws_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 def _check_if_jaw_is_aligned_with_endstop(api: SyncHardwareAPI) -> bool:
     if not api.is_simulator:
-        pass_no_hit = get_user_answer("are both endstop Lights OFF?")
+        pass_no_hit = helpers_ot3.get_user_answer(api, "are both endstop Lights OFF?")
     else:
         pass_no_hit = True
 
@@ -349,7 +354,7 @@ def jaw_precheck(api: SyncHardwareAPI, ax: Axis, speed: float) -> Tuple[bool, bo
     helpers_ot3.home_tip_motors_sync(api, False)  # Home with no backoff
     # Check LEDs can turn on when homed
     if not api.is_simulator:
-        led_check = get_user_answer("are both endstop Lights ON?")
+        led_check = helpers_ot3.get_user_answer(api, "are both endstop Lights ON?")
     else:
         led_check = True
     if not led_check:
@@ -358,7 +363,7 @@ def jaw_precheck(api: SyncHardwareAPI, ax: Axis, speed: float) -> Tuple[bool, bo
     helpers_ot3.move_tip_motor_relative_ot3_sync(api, RETRACT_MM, speed=speed)
     # Check Jaws are aligned
     if not api.is_simulator:
-        jaws_aligned = get_user_answer("are both endstop Lights OFF?")
+        jaws_aligned = helpers_ot3.get_user_answer(api, "are both endstop Lights OFF?")
     else:
         jaws_aligned = True
 
@@ -626,7 +631,7 @@ def calibrate_to_pressue_fixture(
     if api.is_simulator:
         debug_target = f"{SET_PRESSURE_TARGET}"
     else:
-        target_input = get_input_number(
+        target_input = helpers_ot3.get_input_number(
             ctx,
             api,
             f"Setting target pressure (default: {SET_PRESSURE_TARGET}g): ",
@@ -986,7 +991,7 @@ def aspirate_and_wait(
     api.set_lights(True, True)
 
     if not api.is_simulator:
-        result = get_user_answer("look good")
+        result = helpers_ot3.get_user_answer(api, "look good")
     else:
         result = True
     duration_seconds = monotonic() - start_time

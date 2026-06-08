@@ -19,7 +19,7 @@ async def _main(is_simulating: bool) -> None:
     # move to the tip
     await helpers_ot3.move_to_arched_ot3(api, mount, TIP_POS)
     # overwrite the default current/distance
-    await helpers_ot3.update_pick_up_current(api, mount, current=0.25)
+    helpers_ot3.update_pick_up_current(api, mount, current=0.25)
     await helpers_ot3.update_pick_up_distance(api, mount, distance=0.25)
     # pickup the tip
     await api.pick_up_tip(mount, tip_length=40)
