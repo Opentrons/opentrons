@@ -49,6 +49,7 @@ from opentrons.hardware_control.types import (
     Axis,
     OT3Mount,
 )
+
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 from opentrons.hardware_control.motion_utilities import target_position_from_relative
 
@@ -410,6 +411,16 @@ class LabwareLocations:
     fixture: Optional[Point]
 
 
+IDEAL_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
+    trash=None,
+    tip_rack_1000=None,
+    tip_rack_200=None,
+    tip_rack_50=None,
+    reservoir=None,
+    plate_primary=None,
+    plate_secondary=None,
+    fixture=None,
+)
 CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     trash=None,
     tip_rack_1000=None,
@@ -422,6 +433,10 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
 )
 
 # --------------- Helpers -------------
+
+
+def _bool_to_pass_fail(result: bool) -> str:
+    return "PASS" if result else "FAIL"
 
 
 def get_trash_nominal(cfg: TestConfig) -> Point:
@@ -1353,9 +1368,122 @@ def test_tip_sensor(
 # ----------- END TEST TIP_SENSOR -----------
 
 # ----------- TEST LIQUID_PROBE -----------
-def build_liquid_probe_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
+def build_liquid_probe_csv_lines(
+    cfg: TestConfig,
+) -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    return []
+    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
+    probes = [InstrumentProbeType.PRIMARY]
+    if cfg.pipette_channels > 1:
+        probes.append(InstrumentProbeType.SECONDARY)
+    tip_vols = [50] if cfg.pipette_volume == 50 else [50, 200, 1000]
+    for tip_vol in tip_vols:
+        for probe in probes:
+            for trial in range(3):
+                lines.append(
+                    CSVLine(
+                        f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-trial-{trial}",
+                        [float],
+                    )
+                )
+            lines.append(
+                CSVLine(
+                    f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision",
+                    [float, CSVResult],
+                )
+            )
+            lines.append(
+                CSVLine(
+                    f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy",
+                    [float, CSVResult],
+                )
+            )
+            lines.append(
+                CSVLine(
+                    f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe",
+                    [CSVResult],
+                )
+            )
+
+    return lines
+
+
+def _move_to_plate_liquid(
+    api: SyncHardwareAPI, mount: OT3Mount, probe: InstrumentProbeType
+) -> None:
+    if probe == InstrumentProbeType.PRIMARY:
+        assert IDEAL_LABWARE_LOCATIONS.plate_primary
+        _move_safe(api, mount, IDEAL_LABWARE_LOCATIONS.plate_primary)
+        helpers_ot3.jog_mount_ot3_sync(api, mount)
+        CALIBRATED_LABWARE_LOCATIONS.plate_primary = api.gantry_position(mount)
+    else:
+        assert IDEAL_LABWARE_LOCATIONS.plate_secondary
+        _move_safe(api, mount, IDEAL_LABWARE_LOCATIONS.plate_secondary + Point(y=9 * 7))
+        helpers_ot3.jog_mount_ot3_sync(api, mount)
+        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = api.gantry_position(mount)
+
+
+def _move_to_above_plate_liquid(
+    api: SyncHardwareAPI, mount: OT3Mount, probe: InstrumentProbeType, height_mm: float
+) -> None:
+    if probe == InstrumentProbeType.PRIMARY:
+        assert (
+            CALIBRATED_LABWARE_LOCATIONS.plate_primary
+        ), "you must calibrate the liquid before hovering"
+        point = CALIBRATED_LABWARE_LOCATIONS.plate_primary + Point(z=height_mm)
+    else:
+        assert (
+            CALIBRATED_LABWARE_LOCATIONS.plate_secondary
+        ), "you must calibrate the liquid before hovering"
+        point = CALIBRATED_LABWARE_LOCATIONS.plate_secondary + Point(z=height_mm)
+    _move_safe(
+        api,
+        mount,
+        point,
+    )
+
+
+def _test_liquid_probe(
+    api: SyncHardwareAPI,
+    cfg: TestConfig,
+    tip_volume: int,
+    trials: int,
+    probes: List[InstrumentProbeType],
+) -> Dict[InstrumentProbeType, List[float]]:
+    trial_results: Dict[InstrumentProbeType, List[float]] = {
+        probe: [] for probe in probes
+    }
+    hover_mm = 3
+    max_submerge_mm = -3
+    max_z_distance_machine_coords = hover_mm - max_submerge_mm
+    assert CALIBRATED_LABWARE_LOCATIONS.plate_primary is not None
+    if InstrumentProbeType.SECONDARY in probes:
+        assert CALIBRATED_LABWARE_LOCATIONS.plate_secondary is not None
+    for trial in range(trials):
+        api.home()
+        _pick_up_tip_for_tip_volume(api, cfg, tip_volume)
+        for probe in probes:
+            _move_to_above_plate_liquid(api, cfg.mount, probe, height_mm=hover_mm)
+            start_pos = api.gantry_position(cfg.mount)
+            try:
+                end_z = api.liquid_probe(
+                    cfg.mount,
+                    max_z_distance_machine_coords,
+                    probe=probe,
+                )
+            except Exception as eee:
+                probeval = f"07-03{probe}传感器故障: 读取{probe}传感器值失败"
+                FINAL_TEST_FAIL_INFOR.append(probeval)
+                end_z = 0
+
+            if probe == InstrumentProbeType.PRIMARY:
+                pz = CALIBRATED_LABWARE_LOCATIONS.plate_primary.z
+            else:
+                pz = CALIBRATED_LABWARE_LOCATIONS.plate_secondary.z  # type: ignore[union-attr]
+            error_mm = end_z - pz
+            trial_results[probe].append(error_mm)  # store the mm error from target
+        _drop_tip_in_trash(api, cfg)
+    return trial_results
 
 
 def test_liquid_probe(
@@ -1366,7 +1494,65 @@ def test_liquid_probe(
     cfg: TestConfig,
 ) -> None:
     """Test Liquid probe."""
-    pass
+    tip_vols = [50] if cfg.pipette_volume == 50 else [50, 200, 1000]
+    probes = [InstrumentProbeType.PRIMARY]
+    if cfg.pipette_channels > 1:
+        probes.append(InstrumentProbeType.SECONDARY)
+    test_passed = True
+    for tip_vol in tip_vols:
+        # force the operator to re-calibrate the liquid for each tip-type
+        CALIBRATED_LABWARE_LOCATIONS.plate_primary = None
+        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = None
+
+        if cfg.pipette_channels == 8:
+            current_val = PRESSURE_THRESH_current[cfg.pipette_channels][
+                cfg.pipette_volume
+            ][2]
+            helpers_ot3.update_pick_up_current(api, cfg.mount, current_val)
+        _pick_up_tip_for_tip_volume(api, cfg, tip_vol)
+        for probe in probes:
+            _move_to_plate_liquid(api, cfg.mount, probe=probe)
+        _drop_tip_in_trash(api, cfg)
+        probes_data = _test_liquid_probe(
+            api, cfg, tip_volume=tip_vol, trials=3, probes=probes
+        )
+        for probe in probes:
+            probe_data = probes_data[probe]
+            for trial, found_height in enumerate(probe_data):
+                report(
+                    section,
+                    f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-trial-{trial}",
+                    [round(found_height, 2)],
+                )
+            precision = abs(max(probe_data) - min(probe_data)) * 0.5
+            accuracy = sum(probe_data) / len(probe_data)
+            prec_tag = (
+                f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision"
+            )
+            acc_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy"
+            tip_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe"
+            precision_passed = bool(
+                precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
+            )
+            accuracy_passed = bool(
+                abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
+            )
+            tip_passed = precision_passed and accuracy_passed
+            report(
+                section, prec_tag, [precision, CSVResult.from_bool(precision_passed)]
+            )
+            report(section, acc_tag, [accuracy, CSVResult.from_bool(accuracy_passed)])
+            report(section, prec_tag, [tip_tag, CSVResult.from_bool(tip_passed)])
+
+            if not precision_passed:
+                prec_tag2 = f"03-01-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
+                FINAL_TEST_FAIL_INFOR.append(prec_tag2)
+            if not accuracy_passed:
+                acc_tag2 = f"03-02-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
+                FINAL_TEST_FAIL_INFOR.append(acc_tag2)
+            if not tip_passed:
+                tip_tag2 = f"03-03-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
+                FINAL_TEST_FAIL_INFOR.append(tip_tag2)
 
 
 # ----------- END TEST LIQUID_PROBE -----------
@@ -1565,7 +1751,7 @@ def build_report(test_name: str, cfg: TestConfig) -> CSVReport:
             ),
             CSVSection(
                 title=TestSection.LIQUID_PROBE.value,
-                lines=build_liquid_probe_csv_lines(),
+                lines=build_liquid_probe_csv_lines(cfg),
             ),
             CSVSection(
                 title=TestSection.ENCODER_CLEAN.value, lines=build_encoder_csv_lines()
