@@ -17,6 +17,7 @@ from pathlib import Path
 import zipfile
 from abr_testing.tools import plate_reader
 from abr_testing.data_collection import get_run_logs
+import websocket
 
 
 def lpc_data(
@@ -979,6 +980,8 @@ def get_logs(storage_directory: Path, ip: str) -> str:
         ip, storage_directory, collected_files
     )
 
+    collected_files = retreive_odd_console(ip, storage_directory, collected_files)
+
     version_file_path = retrieve_version_file(robot_ip=ip, storage=storage_directory)
     if version_file_path:
         collected_files.append(str(version_file_path))
@@ -1049,5 +1052,113 @@ def fetch_weston_log(
         print(f"Failed to fetch weston log for {robot_name}: {e}")
     except subprocess.TimeoutExpired:
         print(f"Weston log fetch timed out for {robot_name}")
+
+    return collected_files
+
+    
+def retreive_odd_console(
+    robot_ip: str,
+    storage_directory: str,
+    collected_files: list
+) -> str:
+    """Connect to the ODD via websocket, collect all buffered 
+    console messages, sort chronologically, and save to CSV.
+    """
+    log_buffer = 3.0
+    save_directory = Path(storage_directory)
+    output_csv = (save_directory) / "odd_console.log"
+
+    # Find the opentrons page target, this is specific to each boot of each robot
+    try:
+        targets = requests.get(
+            f"http://{robot_ip}:9223/json/list", timeout=5
+        ).json()
+    except Exception as e:
+        print(f"Could not reach port 9223 on {robot_ip}: {e}")
+        return ""
+
+    target = next(
+        (
+            t for t in targets
+            if t.get("type") == "page"
+            and "opentrons" in (t.get("title") or "").lower()
+        ),
+        None,
+    )
+    if target is None:
+        msg = f"No Opentrons console log target found on {robot_ip}."
+        print(msg)
+        with open(output_csv, "w", newline="") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(["timestamp", "level", "message"])
+            writer.writerow([t.strftime("%Y-%m-%d %H:%M:%S"), "ERROR", msg])
+        return str(output_csv)
+
+    ws_url = target["webSocketDebuggerUrl"].replace("localhost", robot_ip)
+    ws = websocket.create_connection(ws_url, timeout=10)
+    # setting a collection time basically
+    ws.settimeout(log_buffer)
+
+    for i, method in enumerate(
+        ["Runtime.enable", "Log.enable", "Console.enable"], start=1
+    ):
+        ws.send(json.dumps({"id": i, "method": method}))
+
+    # Collect all entries: (robot_timestamp_ms, level, text)
+    entries: List[Tuple[float, str, str]] = []
+    while True:
+        try:
+            msg = json.loads(ws.recv())
+        except websocket.WebSocketTimeoutException:
+            break
+
+        method = msg.get("method", "")
+        robot_ts_ms: float = 0.0
+        level = ""
+        text = ""
+
+        if method == "Runtime.consoleAPICalled":
+            args = msg["params"].get("args", [])
+            text = " ".join(
+                str(a["value"]) if "value" in a else a.get("description", json.dumps(a))
+                for a in args
+            )
+            level = msg["params"].get("type", "log").upper()
+            robot_ts_ms = float(msg["params"].get("timestamp") or 0)
+
+        elif method == "Log.entryAdded":
+            e = msg["params"]["entry"]
+            raw_text = e.get("text", "")
+            text = raw_text if isinstance(raw_text, str) else json.dumps(raw_text)
+            level = e.get("level", "?").upper()
+            robot_ts_ms = float(e.get("timestamp") or 0)
+
+        elif method == "Console.messageAdded":
+            m = msg["params"]["message"]
+            raw_text = m.get("text", "")
+            text = raw_text if isinstance(raw_text, str) else json.dumps(raw_text)
+            level = m.get("level", "log").upper()
+            robot_ts_ms = float(m.get("timestamp") or 0)
+
+        if "[object Object]" in text:
+            text = f"[unparseable object] raw: {json.dumps(msg['params'])}"
+
+        if level and text:
+            entries.append((robot_ts_ms, level, text))
+
+    ws.close()
+
+    # logs come in by log type, so we sort by time
+    entries.sort(key=lambda e: e[0])
+
+    with open(output_csv, "w", newline="") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["timestamp", "level", "message"])
+        for ts_ms, level, text in entries:
+            ts = t.strftime("%b %d %H:%M:%S", t.localtime(ts_ms / 1000)) if ts_ms else "unknown"
+            writer.writerow([ts, level, text])
+
+    print(f"\nSaved {len(entries)} entries to {output_csv}")
+    collected_files.append(str(output_csv))
 
     return collected_files
