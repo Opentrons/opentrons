@@ -24,6 +24,6 @@ The following table lists the chemicals you can use to clean the exterior of the
     - Do not clean the vacuum module with acetone.
     - Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
-## Emptying the air/liquid separator
+## Emptying the air-liquid separator
 
-
+The Control Box houses an external air-liquid separator. This device prevents mist/aerosols, liquids, and other debris from being pulled into the the pump. It relies on gravity and flow redirection to trap fluids in a removable collection canister while allowing dry air to pass through the vacuum pump. This device is an essential piece of safety equipment and should be cleaned whenever moisture accumulates on the sides or in the bottom of the canister.
