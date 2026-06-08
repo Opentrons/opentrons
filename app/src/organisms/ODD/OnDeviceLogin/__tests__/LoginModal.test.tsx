@@ -1,27 +1,33 @@
+import { QueryClient } from 'react-query'
 import NiceModal from '@ebay/nice-modal-react'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fetchSelfQuery, useHost } from '@opentrons/react-api-client'
+import { useHost } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { getLocalRobot } from '/app/redux/discovery'
-import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
 
+import { clearStaleAuthBeforeLogin } from '../clearStaleAuthBeforeLogin'
 import { showLoginModal } from '../LoginModal'
 
 import type * as ReactI18next from 'react-i18next'
 import type {
   AuthUser,
-  AuthUserResponse,
+  HostConfig,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
+
+const QUERY_CLIENT = new QueryClient()
+const HOST_CONFIG: HostConfig = {
+  hostname: 'localhost',
+  token: 'access-token',
+}
 
 vi.mock('react-i18next', async importOriginal => {
   const actual = await importOriginal<typeof ReactI18next>()
@@ -33,12 +39,16 @@ vi.mock('react-i18next', async importOriginal => {
   }
 })
 
-vi.mock('/app/redux/robot-auth', () => ({
-  logOut: vi.fn(),
-}))
+vi.mock('/app/redux/discovery', async importOriginal => {
+  const actual = await importOriginal<typeof import('/app/redux/discovery')>()
+  return {
+    ...actual,
+    getLocalRobot: vi.fn(() => null),
+  }
+})
 
-vi.mock('/app/redux/discovery', () => ({
-  getLocalRobot: vi.fn(() => null),
+vi.mock('../clearStaleAuthBeforeLogin', () => ({
+  clearStaleAuthBeforeLogin: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock('/app/resources/auth', () => ({
@@ -59,7 +69,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...actual,
     useHost: vi.fn(),
-    fetchSelfQuery: vi.fn(),
   }
 })
 
@@ -82,7 +91,9 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
   }
 }
 
-function openLoginModal(): ReturnType<typeof showLoginModal> {
+async function openLoginModal(): Promise<
+  ReturnType<typeof showLoginModal>
+> {
   renderWithProviders(
     <NiceModal.Provider>
       <div />
@@ -91,7 +102,13 @@ function openLoginModal(): ReturnType<typeof showLoginModal> {
 
   let resultPromise!: ReturnType<typeof showLoginModal>
   act(() => {
-    resultPromise = showLoginModal()
+    resultPromise = showLoginModal(QUERY_CLIENT, HOST_CONFIG)
+  })
+
+  await waitFor(() => {
+    expect(
+      screen.getByLabelText('device_settings:username')
+    ).toBeInTheDocument()
   })
 
   return resultPromise
@@ -105,9 +122,6 @@ describe('LoginModal', () => {
       hostname: 'localhost',
       token: 'access-token',
     })
-    vi.mocked(fetchSelfQuery).mockResolvedValue({
-      data: mockAuthUser({ resetPassword: false }),
-    } as AuthUserResponse)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: vi.fn(),
       makeToast: vi.fn(),
@@ -144,23 +158,17 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name }))
   }
 
-  it('clears local login state on open when getSelf reports resetPassword', async () => {
-    vi.mocked(getLocalRobot).mockReturnValue({
-      name: 'odd-robot',
-    } as ReturnType<typeof getLocalRobot>)
-    vi.mocked(fetchSelfQuery).mockResolvedValue({
-      data: mockAuthUser({ resetPassword: true }),
-    } as AuthUserResponse)
+  it('clears stale auth before opening the modal', async () => {
+    await openLoginModal()
 
-    openLoginModal()
-
-    await waitFor(() => {
-      expect(logOut).toHaveBeenCalledWith({ robotName: 'odd-robot' })
-    })
+    expect(clearStaleAuthBeforeLogin).toHaveBeenCalledWith(
+      QUERY_CLIENT,
+      HOST_CONFIG
+    )
   })
 
-  it('opens on the username step', () => {
-    openLoginModal()
+  it('opens on the username step', async () => {
+    await openLoginModal()
 
     expect(
       screen.getByLabelText('device_settings:username')
@@ -168,7 +176,7 @@ describe('LoginModal', () => {
   })
 
   it('resolves with the username after a successful login', async () => {
-    const resultPromise = openLoginModal()
+    const resultPromise = await openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -180,7 +188,7 @@ describe('LoginModal', () => {
   })
 
   it('resolves with null when cancel is clicked', async () => {
-    const resultPromise = openLoginModal()
+    const resultPromise = await openLoginModal()
 
     fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
 
@@ -199,7 +207,7 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    const resultPromise = openLoginModal()
+    const resultPromise = await openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -232,7 +240,7 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    const resultPromise = openLoginModal()
+    const resultPromise = await openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')
@@ -261,7 +269,7 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    openLoginModal()
+    await openLoginModal()
 
     fillField('device_settings:username', 'alice')
     clickPrimary('next')

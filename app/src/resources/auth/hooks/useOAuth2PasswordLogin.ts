@@ -5,8 +5,8 @@ import axios from 'axios'
 import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation, useHost } from '@opentrons/react-api-client'
 
-import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { TFunction } from 'i18next'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 /**
  * Shape of an error response from `POST /auth/oauth2/token`: the standard

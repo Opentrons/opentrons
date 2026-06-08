@@ -2,8 +2,8 @@ import { fetchSelfQuery } from '@opentrons/react-api-client'
 
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { QueryClient } from 'react-query'
+import type { HostConfig } from '@opentrons/api-client'
 
 export interface RequireLoginResult {
   username: string
@@ -31,7 +31,7 @@ export async function requireLogin(
     return { username: currentUsername }
   }
 
-  const result = await showLoginModal()
+  const result = await showLoginModal(queryClient, hostConfig)
   if (result == null) return null
   return { username: result.username }
 }

@@ -1,9 +1,11 @@
+import { QueryClient } from 'react-query'
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useAccessControlEnabledQuery,
+  useHost,
   useSelfQuery,
 } from '@opentrons/react-api-client'
 
@@ -16,8 +18,11 @@ import { showLoginModal, useIsLoginModalOpen } from '../LoginModal'
 import type * as ReactRedux from 'react-redux'
 import type * as RobotAuth from '/app/redux/robot-auth'
 
+const MOCK_HOST = { hostname: 'localhost', token: 'access-token' }
+
 vi.mock('@opentrons/react-api-client', () => ({
   useAccessControlEnabledQuery: vi.fn(),
+  useHost: vi.fn(),
   useSelfQuery: vi.fn(),
 }))
 
@@ -59,6 +64,7 @@ const mockAccessControlEnabled = (enabled: boolean): void => {
 describe('LoggedOutOverlayMount', () => {
   beforeEach(() => {
     mockAccessControlEnabled(true)
+    vi.mocked(useHost).mockReturnValue(MOCK_HOST)
     vi.mocked(getIsLoggedInToLocalRobot).mockReturnValue(false)
     vi.mocked(useSelfQuery).mockReturnValue({
       data: { data: { resetPassword: false } },
@@ -97,7 +103,10 @@ describe('LoggedOutOverlayMount', () => {
 
     fireEvent.click(screen.getByRole('dialog', { name: 'Logged out' }))
 
-    expect(showLoginModal).toHaveBeenCalledOnce()
+    expect(showLoginModal).toHaveBeenCalledWith(
+      expect.any(QueryClient),
+      MOCK_HOST
+    )
   })
 
   it('renders nothing when access control is disabled', () => {

@@ -44,7 +44,6 @@ export function LoginFieldInput<
   const inputField = (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
-      autoFocus={isPasswordField}
       type={inputType}
       label={label}
       error={error}
