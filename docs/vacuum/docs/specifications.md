@@ -220,7 +220,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
   <tbody>
     <tr>
       <td><strong>Manufacturer and model</strong></td>
-        <td>The module is powered by a <a href="https://www.meanwell.com/index.aspx">Mean Well</a> LOP-200 series low-profile, open-frame internal power supply.
+        <td>The module is powered by a <a href="https://www.meanwell.com/index.aspx">Mean Well</a> LOP-200-24 series low-profile, open-frame internal power supply.
         </td>
     </tr>
     <tr>
@@ -238,7 +238,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td>
         <ul>
           <li>24 VDC</li>
-          <li>2.7 A to 25 A</li>
+          <li>Up to 5.9 A</li>
           <li>140 W (maximum, with convection cooling)</li>
         </ul>
       </td>
@@ -257,7 +257,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td>
         <ul>
           <li>Line Regulation: ±0.5%</li>
-          <li>Voltage Tolerance: ±1.0% to ±3.0%</li>
+          <li>Voltage Tolerance: ±2%</li>
         </ul>
       </td>
     </tr>
