@@ -2,7 +2,7 @@
 import asyncio
 from dataclasses import dataclass, fields
 import enum
-from time import sleep, monotonic, time
+from time import sleep, time
 from typing import (
     Dict,
     Callable,
@@ -15,7 +15,7 @@ from typing import (
     Any,
     Optional,
 )
-from opentrons.protocol_api import ParameterContext, ProtocolContext, OFF_DECK
+from opentrons.protocol_api import ParameterContext, ProtocolContext
 from opentrons.types import Point
 
 from opentrons.config import IS_ROBOT
@@ -24,11 +24,9 @@ from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3simulator import (
     _sanitize_attached_instrument,
 )
-from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
     EdgeNotFoundError,
-    EarlyCapacitiveSenseTrigger,
     CalibrationStructureNotFoundError,
 )
 from opentrons.hardware_control.types import (
@@ -51,7 +49,6 @@ from opentrons.hardware_control.types import (
 )
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
-from opentrons.hardware_control.motion_utilities import target_position_from_relative
 
 # ------ TODO remove and move necessary libraries into a standard release library. ----
 import importlib
@@ -107,14 +104,11 @@ from hardware_testing.data.csv_report import (  # noqa: E402
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.drivers.sealed_pressure_fixture import (  # noqa: E402
-    SerialDriver as SealedPressureDriver,
-)
 from hardware_testing.opentrons_api import helpers_ot3  # noqa: E402
 
-from hardware_testing.drivers import asair_sensor
+from hardware_testing.drivers import asair_sensor  # noqa: E402
 
-from hardware_testing.drivers.pressure_fixture import (
+from hardware_testing.drivers.pressure_fixture import (  # noqa: E402
     PressureFixtureBase,
     connect_to_fixture,
 )
@@ -159,7 +153,7 @@ async def _get_tip_status_patch(self) -> bool:  # noqa: ANN001
 
 
 async def _calibrate_pipette_patch(
-    self, mount: OT3Mount, probe: InstrumentProbeType
+    self, mount: OT3Mount, probe: InstrumentProbeType  # noqa: ANN001
 ) -> Point:
     try:
         offset = await calibrate_pipette(self, mount, slot=5, probe=probe)  # type: ignore[arg-type]
@@ -479,8 +473,8 @@ def _pick_up_tip(
     tip_length = helpers_ot3.get_default_tip_length(int(tip_volume))
     try:
         api.pick_up_tip(mount, tip_length=tip_length)
-    except Exception as err:
-        prinval = f"07-02光电传感器故障: 取针管状态不正确"
+    except Exception:
+        prinval = "07-02光电传感器故障: 取针管状态不正确"
         FINAL_TEST_FAIL_INFOR.append(prinval)
     if movez:
         api.move_rel(mount, Point(z=int(tip_length * 0.2)))
@@ -572,7 +566,6 @@ def build_fixture_csv_lines(
                     3, f"pressure-{event.value}-channel-{channel+1}", [str, float]
                 )
             )
-    lines.append(CSVLine(f"pressure", [CSVResult]))
     return lines
 
 
@@ -708,10 +701,6 @@ def _fixture_check_pressure(
     tip_volume: int,
 ) -> bool:
     results = []
-    pip = api.hardware_pipettes[cfg.mount.to_mount()]
-    assert pip
-    pip_vol = int(pip.working_volume)
-    pip_channels = int(pip.channels)
 
     _pick_up_tip_for_fixture(api, cfg, tip_volume=tip_volume)
     # above the fixture
@@ -742,9 +731,9 @@ def _fixture_check_pressure(
     )
     results.append(r)
     # aspirate 50uL
-    api.aspirate(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
+    api.aspirate(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume])
     sleep(2)
-    if pip_vol == 50:
+    if cfg.pipette_volume == 50:
         asp_evt = PressureEvent.ASPIRATE_P50
     else:
         asp_evt = PressureEvent.ASPIRATE_P1000
@@ -759,7 +748,7 @@ def _fixture_check_pressure(
     )
     results.append(r)
     # dispense
-    api.dispense(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol], 0.5)
+    api.dispense(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume], 0.5)
     sleep(2)
     r, _ = _read_pressure_and_check_results(
         api,
@@ -836,7 +825,7 @@ def test_fixture(
         cfg.simulate,
         side=cfg.fixture_side,
     )
-    test_passed = _test_for_leak(
+    _test_for_leak(
         api,
         cfg,
         PRESSURE_FIXTURE_TIP_VOLUME,
@@ -844,7 +833,6 @@ def test_fixture(
         report,
         section,
     )
-    pass
 
 
 # ----------- END TEST FIXTURE -----------
@@ -917,8 +905,8 @@ def build_diagnostics_csv_lines(
         lines.append(
             CSVLine(f"capacitive-probe-slot-{sensor_id.name}-result", [CSVResult])
         )
-    lines.append(CSVLine(f"encoder-home", [float, float, CSVResult]))
-    lines.append(CSVLine(f"encoder-move", [float, float, CSVResult]))
+    lines.append(CSVLine("encoder-home", [float, float, CSVResult]))
+    lines.append(CSVLine("encoder-move", [float, float, CSVResult]))
     return lines
 
 
@@ -1284,6 +1272,7 @@ def test_tip_sensor(
     ctx: ProtocolContext,
     cfg: TestConfig,
 ) -> None:
+    """Test the tip sensor."""
     api.retract(cfg.mount)
     ctx.pause("Ready to start test-tip-presence?")
 
@@ -1470,14 +1459,14 @@ def _test_liquid_probe(
         _pick_up_tip_for_tip_volume(api, cfg, tip_volume)
         for probe in probes:
             _move_to_above_plate_liquid(api, cfg.mount, probe, height_mm=hover_mm)
-            start_pos = api.gantry_position(cfg.mount)
+            api.gantry_position(cfg.mount)
             try:
                 end_z = api.liquid_probe(
                     cfg.mount,
                     max_z_distance_machine_coords,
                     probe=probe,
                 )
-            except Exception as eee:
+            except Exception:
                 probeval = f"07-03{probe}传感器故障: 读取{probe}传感器值失败"
                 FINAL_TEST_FAIL_INFOR.append(probeval)
                 end_z = 0
@@ -1504,7 +1493,6 @@ def test_liquid_probe(
     probes = [InstrumentProbeType.PRIMARY]
     if cfg.pipette_channels > 1:
         probes.append(InstrumentProbeType.SECONDARY)
-    test_passed = True
     for tip_vol in tip_vols:
         # force the operator to re-calibrate the liquid for each tip-type
         CALIBRATED_LABWARE_LOCATIONS.plate_primary = None
@@ -1613,7 +1601,6 @@ def test_encoder(
     max_error_ticks = 0.0
     for cycle in range(cycles):
         helpers_ot3.move_plunger_absolute_ot3_sync(api, cfg.mount, 0)
-        init_pos = api.current_position_ot3(cfg.mount, refresh=True)
         init_encoder_pos = api.encoder_current_position_ot3(cfg.mount, refresh=True)
         prev_encoder_tick = (
             init_encoder_pos[pipette_ax] / MOTOR_MM_PER_REV * ENCODER_TICKS_PER_REV
@@ -1649,7 +1636,7 @@ def test_encoder(
                 if stalled_this_move:
                     stall = True
                     break
-            except StallOrCollisionDetectedError as e:
+            except StallOrCollisionDetectedError:
                 stall = True
                 break
 
