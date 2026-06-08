@@ -65,3 +65,10 @@ You can find the serial number for your Flex:
 - On the certification sticker on the back of Flex, near the on/off switch.
 - On the reverse side of the touchscreen (towards the working area).
 - In the Opentrons App under **Devices** \> your Flex \> **Robot settings** \> **Advanced**.
+
+<figure markdown>
+
+![Regulatory and certification sticker](../images/regulatory-specs-sticker.png){ width="80%" }
+
+<figcaption>Example of a Flex regulatory and certification sticker. Your specific sticker may vary slightly.</figcaption>
+</figure>
