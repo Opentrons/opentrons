@@ -220,6 +220,12 @@ MULTI_CHANNEL_1_OFFSET = Point(y=9 * 7 * 0.5)
 PRESSURE_DATA_CACHE: List[Any] = []
 FINAL_TEST_FAIL_INFOR: List[str] = []
 
+STALL_THRESHOLD = 0.25
+MOTOR_MM_PER_REV = 3
+ENCODER_TICKS_PER_REV = 1000
+# there is 4 pulses per tick
+PULSE_PER_MM = (4 * ENCODER_TICKS_PER_REV) / MOTOR_MM_PER_REV
+
 
 class PressureEvent(enum.Enum):
     """Pressure Event."""
@@ -1560,7 +1566,27 @@ def test_liquid_probe(
 # ----------- TEST ENCODER_CLEAN -----------
 def build_encoder_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    return []
+    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
+    lines.append(
+        CSVLine(
+            "diagnostics-encoder-clean",
+            [float, float, float, float, float, CSVResult],
+        )
+    )
+    return lines
+
+
+def _plunger_alignment(
+    api: SyncHardwareAPI, mount: OT3Mount
+) -> Tuple[float, float, float, float]:
+    pipette_ax = Axis.of_main_tool_actuator(mount)
+    current_pos = api.current_position_ot3(mount, refresh=True)
+    est = current_pos[pipette_ax]
+    encoder_pos = api.encoder_current_position_ot3(mount, refresh=True)
+    enc = encoder_pos[pipette_ax]
+    stalled_mm = est - enc
+    stall_detected = abs(stalled_mm) >= STALL_THRESHOLD
+    return est, enc, stalled_mm, stall_detected
 
 
 def test_encoder(
@@ -1571,7 +1597,77 @@ def test_encoder(
     cfg: TestConfig,
 ) -> None:
     """Test Liquid."""
-    pass
+    cycles = 100
+    api.cache_instruments()
+    api.home()
+    api.home_plunger(cfg.mount)
+    top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, cfg.mount)
+    pipette_ax = Axis.of_main_tool_actuator(cfg.mount)
+    cumulative_error = 0.0
+    abs_error = 0.0
+    completed_moves = 0
+    cycle_count = 0
+    stall = False
+    max_error_mm = 0.0
+    max_error_pulses = 0.0
+    max_error_ticks = 0.0
+    for cycle in range(cycles):
+        helpers_ot3.move_plunger_absolute_ot3_sync(api, cfg.mount, 0)
+        init_pos = api.current_position_ot3(cfg.mount, refresh=True)
+        init_encoder_pos = api.encoder_current_position_ot3(cfg.mount, refresh=True)
+        prev_encoder_tick = (
+            init_encoder_pos[pipette_ax] / MOTOR_MM_PER_REV * ENCODER_TICKS_PER_REV
+        )
+        prev_encoder_pulse = init_encoder_pos[pipette_ax] * PULSE_PER_MM
+        for i in range(int((bottom_pos - top_pos) / MOTOR_MM_PER_REV)):
+            try:
+                helpers_ot3.move_plunger_absolute_ot3_sync(
+                    api, cfg.mount, (i + 1) * MOTOR_MM_PER_REV
+                )
+                (
+                    mot_est,
+                    enc_pos,
+                    diff,
+                    stalled_this_move,
+                ) = _plunger_alignment(api, cfg.mount)
+                next_enc_tick = enc_pos / MOTOR_MM_PER_REV * ENCODER_TICKS_PER_REV
+                next_enc_pulse = enc_pos * PULSE_PER_MM
+                pulse_error = int(abs(next_enc_pulse - prev_encoder_pulse)) - (
+                    ENCODER_TICKS_PER_REV * 4
+                )
+                tick_error = (
+                    int(abs(next_enc_tick - prev_encoder_tick)) - ENCODER_TICKS_PER_REV
+                )
+                prev_encoder_pulse = next_enc_pulse
+                prev_encoder_tick = next_enc_tick
+                cumulative_error += diff
+                abs_error += abs(diff)
+                max_error_mm = max(abs(diff), max_error_mm)
+                max_error_pulses = max(abs(pulse_error), max_error_pulses)
+                max_error_ticks = max(abs(tick_error), max_error_ticks)
+                completed_moves += 1
+                if stalled_this_move:
+                    stall = True
+                    break
+            except StallOrCollisionDetectedError as e:
+                stall = True
+                break
+
+        cycle_count += 1
+        if stall:
+            break
+    report(
+        section,
+        "diagnostics-encoder-clean",
+        [
+            CSVResult.from_bool(not stall),
+            cumulative_error,
+            (abs_error / completed_moves),
+            max_error_mm,
+            max_error_pulses,
+            max_error_ticks,
+        ],
+    )
 
 
 # ----------- END TEST ENCODER_CLEAN -----------
