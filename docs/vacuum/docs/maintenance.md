@@ -7,7 +7,6 @@ title: "Vacuum Module: Maintenance and Cleaning"
 You should not attempt to service or repair the vacuum module. If you have concerns about the module’s performance, contact Opentrons Support at <support@opentrons.com>.
 
 ## Cleaning
-<!-- slightly different from the usual instructions because of potential waste issues -->
 
 Turn off and disconnect the module from mains power before cleaning it.
 
@@ -24,6 +23,46 @@ The following table lists the chemicals you can use to clean the exterior of the
     - Do not clean the vacuum module with acetone.
     - Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
-## Emptying the air-liquid separator
+## Cleaning the air-liquid separator
 
-The Control Box houses an external air-liquid separator. This device prevents mist/aerosols, liquids, and other debris from being pulled into the the pump. It relies on gravity and flow redirection to trap fluids in a removable collection canister while allowing dry air to pass through the vacuum pump. This device is an essential piece of safety equipment and should be cleaned whenever moisture accumulates on the sides or in the bottom of the canister.
+The Control Box houses an air-liquid separator. This device traps mist and liquid droplets in a clear, removable filter bowl while allowing dry air to pass through into the vacuum pump. The air-liquid separator is an essential piece of safety equipment and should be emptied whenever liquid accumulates inside the bowl or reaches the max fill line.
+
+<font color="red">IMAGE PLACEHOLDER</font>
+
+### Detach the bowl
+
+To remove the separator bowl:
+
+<div class="instruction-list" markdown>
+
+1. Turn off the power and disconnect the power cable.
+
+2. Disconnect the vacuum hose from the manifold base or another convenient fitting. This removes any residual vacuum and restores the system to atmospheric pressure.
+
+3. Pull the locking tab down.
+
+4. Twist the bowl slightly to the right or left to disengage the retaining lugs.
+
+5. Pull down gently on the bowl to remove it.
+
+6. Discard any accumulated material and clean the bowl with a soft, dry cloth.
+
+</div>
+
+### Reattach the bowl
+
+To reattach the separator bowl:
+
+<div class="instruction-list" markdown>
+
+1. With the bowl locking tab slightly offset to the left or right, insert it into the housing.
+
+2. Push up firmly on the bowl.
+
+3. Hold the locking tab down and rotate the bowl slightly to engage the retaining lugs and restore the locking tab to its original position.
+
+4. Release the tab when the bowl snaps into place.
+
+5. Reattach the power cable.
+
+</div>
