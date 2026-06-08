@@ -14,7 +14,7 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
-import { useSendIdentifyStacker } from './hooks'
+import { useSendIdentifyModule } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
 import type { SetStateAction } from 'react'
@@ -68,7 +68,7 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-  const sendIdentifyStacker = useSendIdentifyStacker()
+  const sendIdentifyModule = useSendIdentifyModule()
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -142,7 +142,7 @@ export function useModuleSetupWizard(
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (attachedModule != null) sendIdentifyStacker(attachedModule, false)
+    if (attachedModule != null) sendIdentifyModule(attachedModule, false)
     if (maintenanceRunId == null) {
       console.log(
         'closing module setup wizard: no maintenance run, not deleting'
