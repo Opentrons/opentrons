@@ -294,22 +294,22 @@ On the other hand, you must use the tip rack adapter for full rack pickup. If th
 When switching between full and partial pickup, you may want to organize your tip racks into lists, depending on whether they're loaded on adapters or not.
 
 ```python
-tips_1 = protocol.load_labware(
+tip_rack_1 = protocol.load_labware(
     "opentrons_flex_96_tiprack_1000ul", "C1"
 )
-tips_2 = protocol.load_labware(
+tip_rack_2 = protocol.load_labware(
     "opentrons_flex_96_tiprack_1000ul", "D1"
 )
-tips_3 = protocol.load_labware(
+tip_rack_3 = protocol.load_labware(
     "opentrons_flex_96_tiprack_1000ul", "C3",
     adapter="opentrons_flex_96_tiprack_adapter"
 )
-tips_4 = protocol.load_labware(
+tip_rack_4 = protocol.load_labware(
     "opentrons_flex_96_tiprack_1000ul", "D3",
     adapter="opentrons_flex_96_tiprack_adapter"
 )
-partial_tip_racks = [tips_1, tips_2]
-full_tip_racks = [tips_3, tips_4]
+partial_tip_racks = [tip_rack_1, tip_rack_2]
+full_tip_racks = [tip_rack_3, tip_rack_4]
 ```
 
 !!! tip
@@ -387,12 +387,12 @@ pipette.configure_nozzle_layout(
 When using column 12, the pipette overhangs space to the left of wherever it is picking up tips or pipetting. For this reason, it's a good idea to organize tip racks front to back on the deck. If you place them side by side, the rack to the right will be inaccessible. For example, let's load three tip racks in the front left corner of the deck:
 
 ```python
-tips_C1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
-tips_D1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
-tips_D2 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D2")
+tip_rack_C1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
+tip_rack_D1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
+tip_rack_D2 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D2")
 ```
 
-Now the pipette will be able to access the racks in column 1 only. `pick_up_tip(tips_D2["A1"])` will raise an error due to the tip rack immediately to its left, in slot D1. There a couple of ways to avoid this error:
+Now the pipette will be able to access the racks in column 1 only. `pick_up_tip(tip_rack_D2["A1"])` will raise an error due to the tip rack immediately to its left, in slot D1. There a couple of ways to avoid this error:
 
 - Load the tip rack in a different slot, with no tall labware to its left.
 - Use all the tips in slot D1 first, and then use [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] to make space for the pipette before picking up tips from D2.

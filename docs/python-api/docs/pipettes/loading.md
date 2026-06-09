@@ -100,18 +100,18 @@ from opentrons import protocol_api
 requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
-    tiprack1 = protocol.load_labware(
+    tip_rack_1 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
-    tiprack2 = protocol.load_labware(
+    tip_rack_2 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="C1")
     left = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
-        tip_racks=[tiprack1])
+        tip_racks=[tip_rack_1])
     right = protocol.load_instrument(
         instrument_name="flex_8channel_1000",
         mount="right",
-        tip_racks=[tiprack2])
+        tip_racks=[tip_rack_2])
 ```
 
 If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require `load_instrument()`! Whether your gripper requires a protocol is determined by the presence of [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] commands. See [Moving Labware](../moving-labware.md) for more details.
@@ -142,18 +142,18 @@ from opentrons import protocol_api
 metadata = {"apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
-    tiprack1 = protocol.load_labware(
+    tip_rack_1 = protocol.load_labware(
         load_name="opentrons_96_tiprack_1000ul", location=1)
-    tiprack2 = protocol.load_labware(
+    tip_rack_2 = protocol.load_labware(
         load_name="opentrons_96_tiprack_1000ul", location=2)
     left = protocol.load_instrument(
         instrument_name="p1000_single_gen2",
         mount="left",
-        tip_racks=[tiprack1])
+        tip_racks=[tip_rack_1])
     right = protocol.load_instrument(
         instrument_name="p300_multi_gen2",
         mount="right",
-        tip_racks=[tiprack1])
+        tip_racks=[tip_rack_1])
 ```
 
 *New in version 2.0*
@@ -169,35 +169,35 @@ The advantage of using `tip_racks` is twofold. First, associating tip racks with
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
-    tiprack_left = protocol.load_labware(
+    tip_rack_left = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_200ul", location="D1")
-    tiprack_right = protocol.load_labware(
+    tip_rack_right = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_200ul", location="D2")
     left_pipette = protocol.load_instrument(
         instrument_name="flex_8channel_1000", mount="left")
     right_pipette = protocol.load_instrument(
         instrument_name="flex_8channel_1000",
         mount="right",
-        tip_racks=[tiprack_right])
+        tip_racks=[tip_rack_right])
 ```
 
 Let's pick up a tip with the left pipette. We need to specify the location as an argument of `pick_up_tip()`, since we loaded the left pipette without a `tip_racks` argument.
 
 ```python
-left_pipette.pick_up_tip(tiprack_left["A1"])
+left_pipette.pick_up_tip(tip_rack_left["A1"])
 left_pipette.drop_tip()
 ```
 
-But now you have to specify `tiprack_left` every time you call `pick_up_tip`, which means you're doing all your own tip tracking:
+But now you have to specify `tip_rack_left` every time you call `pick_up_tip`, which means you're doing all your own tip tracking:
 
 ```python
-left_pipette.pick_up_tip(tiprack_left["A2"])
+left_pipette.pick_up_tip(tip_rack_left["A2"])
 left_pipette.drop_tip()
-left_pipette.pick_up_tip(tiprack_left["A3"])
+left_pipette.pick_up_tip(tip_rack_left["A3"])
 left_pipette.drop_tip()
 ```
 
-However, because you specified a tip rack location for the right pipette, the robot will automatically pick up from location A1 of its associated tiprack:
+However, because you specified a tip rack location for the right pipette, the robot will automatically pick up from location A1 of its associated tip rack:
 
 ```python
 right_pipette.pick_up_tip()
@@ -288,7 +288,7 @@ To automatically use liquid presence detection, add the optional Boolean argumen
 right = protocol.load_instrument(
     instrument_name="flex_8channel_1000",
     mount="right",
-    tip_racks=[tiprack2],
+    tip_racks=[tip_rack_2],
     liquid_presence_detection=True
 )
 ```

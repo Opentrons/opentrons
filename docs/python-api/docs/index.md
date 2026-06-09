@@ -48,14 +48,14 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
         plate = protocol.load_labware(
             "corning_96_wellplate_360ul_flat", location="D1"
         )
-        tiprack = protocol.load_labware(
+        tip_rack = protocol.load_labware(
             "opentrons_flex_96_tiprack_200ul", location="D2"
         )
         trash = protocol.load_trash_bin(location="A3")
 
         # pipettes
         left_pipette = protocol.load_instrument(
-            "flex_1channel_1000", mount="left", tip_racks=[tiprack]
+            "flex_1channel_1000", mount="left", tip_racks=[tip_rack]
         )
 
         # commands
@@ -100,13 +100,13 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
         plate = protocol.load_labware(
             "corning_96_wellplate_360ul_flat", location="1"
         )
-        tiprack = protocol.load_labware(
+        tip_rack = protocol.load_labware(
             "opentrons_96_tiprack_300ul", location="2"
         )
 
         # pipettes
         left_pipette = protocol.load_instrument(
-            "p300_single", mount="left", tip_racks=[tiprack]
+            "p300_single", mount="left", tip_racks=[tip_rack]
         )
 
         # commands

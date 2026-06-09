@@ -48,18 +48,18 @@ For example, you could convert an OT-2 protocol that uses a P300 Single-Channel 
 ```python
 # Original OT-2 code
 def run(protocol: protocol_api.ProtocolContext):
-    tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+    tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
     left_pipette = protocol.load_instrument(
-        "p300_single_gen2", "left", tip_racks=[tips]
+        "p300_single_gen2", "left", tip_racks=[tip_rack]
     )
 ```
 
 ```python
 # Modified Flex code
 def run(protocol: protocol_api.ProtocolContext):
-    tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
+    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
     left_pipette = protocol.load_instrument(
-        "flex_1channel_1000", "left", tip_racks[tips]
+        "flex_1channel_1000", "left", tip_racks=[tip_rack]
     )
 ```
 
