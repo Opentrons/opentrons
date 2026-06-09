@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -64,7 +64,7 @@ export function OnDeviceLogin({
     kb.setInput(step === 'username' ? username : password)
   }, [step, showKeyboard, username, password])
 
-  const handleNext = (): void => {
+  const handleNext = useCallback((): void => {
     const { username, password } = getValues()
     if (step === 'username') {
       if (username.trim() === '') return
@@ -73,7 +73,7 @@ export function OnDeviceLogin({
     }
     if (password.trim() === '') return
     submitPassword(username, password)
-  }
+  }, [step, getValues, onStepChange, submitPassword])
 
   const primaryDisabled =
     step === 'username'
@@ -83,6 +83,23 @@ export function OnDeviceLogin({
   const activeFieldName = step === 'username' ? 'username' : 'password'
   const passwordLabelHasError =
     step === 'password' && loginError != null && loginError !== ''
+
+  // NOTE: this pattern only works because usernames and passwords are single line inputs
+  // if we need multi-line inputs like in documentation required, this will not work
+  const handleEnterPress = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key !== 'Enter' || primaryDisabled) return
+      handleNext()
+    },
+    [primaryDisabled, handleNext]
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleEnterPress)
+    return () => {
+      window.removeEventListener('keydown', handleEnterPress)
+    }
+  }, [handleEnterPress])
 
   return (
     <>
