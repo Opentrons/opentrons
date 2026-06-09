@@ -4,6 +4,7 @@
   "desktop_login_form_subheading": "Log in to access robot controls.",
   "desktop_login_modal_header": "Compliance Ready Software Login",
   "documentation_required": "Documentation Required",
+  "actions_requiring_documentation": "Actions requiring documentation",
   "forgot_password_heading": "Forgot password?",
   "forgot_password_link": "Forgot password?",
   "forgot_password_subheading": "Log in to an admin account to reset the password for your account.",

@@ -93,19 +93,32 @@ export function useModuleSetupWizard(
   }
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
 
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation('add_module')
 
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands(commandDocState)
+    useChainMaintenanceCommands(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation(commandDocState, {
-      onSuccess: (response: {
-        data: { id: SetStateAction<string | null> }
-      }) => {
-        setMaintenanceRunId(response.data.id)
-      },
-    })
+    useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
+      actionsToDocument,
+      {
+        onSuccess: (response: {
+          data: { id: SetStateAction<string | null> }
+        }) => {
+          setMaintenanceRunId(response.data.id)
+        },
+      }
+    )
 
   useMonitorMaintenanceRunForDeletion({
     maintenanceRunId,
@@ -130,6 +143,7 @@ export function useModuleSetupWizard(
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
     deletionDocState,
+    [...actionsToDocument, 'end_module_setup'],
     {
       onSuccess: () => {
         setMaintenanceRunId(null)
@@ -221,6 +235,11 @@ export function useModuleSetupWizard(
   const buildFlowForSelectedModule = (
     selectedModuleToBuildFlow: AttachedModule
   ): void => {
+    addActionToDocument({
+      module: selectedModuleToBuildFlow,
+      type: 'attach_module',
+      step: 'start',
+    })
     dispatch({
       type: ACTIONS.BUILD_FLOW,
       attachedModule: selectedModuleToBuildFlow,

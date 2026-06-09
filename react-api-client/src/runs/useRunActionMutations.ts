@@ -42,6 +42,7 @@ export function useRunActionMutations(
 
   const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation(
     documentationState,
+    [],
     {
       onSuccess,
     }

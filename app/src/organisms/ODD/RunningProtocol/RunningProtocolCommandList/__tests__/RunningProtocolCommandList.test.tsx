@@ -38,7 +38,7 @@ describe('RunningProtocolCommandList', () => {
     render(props)
     screen.getByText('Running')
     screen.getByText('mockRunningProtocolName')
-    screen.getByText('Load P300 Single-Channel GEN1 in Left Mount')
+    screen.getByText('Load P300 Single-Channel GEN1 on left mount')
     screen.getByLabelText('stop')
     screen.getByLabelText('pause')
   })

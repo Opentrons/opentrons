@@ -5,6 +5,7 @@ import { useGuardedAction } from './useGuardedAction'
 import type {
   DocumentationReport,
   DocumentationState,
+  DocumentedAction,
 } from '@opentrons/react-api-client'
 
 /**
@@ -19,10 +20,11 @@ import type {
  *
  */
 export const usePromptForInteractionReason = (
+  actionsToDocument: DocumentedAction[],
   initialDocstate?: DocumentationState
 ): DocumentationState => {
   const [docReport, setDocReport] = useState<DocumentationReport>()
-  const docStateToUse = initialDocstate?.accessControlEnabled
+  const docStateToUse = initialDocstate?.reasonForInteractionRequired
     ? initialDocstate.docreport
     : docReport
   const docState = useGuardedAction(docStateToUse ?? undefined)
@@ -30,11 +32,11 @@ export const usePromptForInteractionReason = (
 
   useEffect(() => {
     const promptForDocumentation = async (): Promise<void> => {
-      if (docState.accessControlEnabled) {
+      if (docState.reasonForInteractionRequired) {
         if (docState.docreport == null && !promptInFlight.current) {
           promptInFlight.current = true
           await docState
-            .askForDocumentation()
+            .askForDocumentation(actionsToDocument)
             .then(setDocReport)
             .finally(() => {
               promptInFlight.current = false
@@ -43,7 +45,7 @@ export const usePromptForInteractionReason = (
       }
     }
     void promptForDocumentation()
-  }, [docReport, docState])
+  }, [actionsToDocument, docReport, docState])
 
   return docState
 }
