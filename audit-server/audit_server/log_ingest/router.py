@@ -13,7 +13,8 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleBody,
 )
 from server_utils.keys.fastapi import get_key_client
-from server_utils.keys.key_server import Client as KeyClient, SignMessageData
+from server_utils.keys.key_server import Client as KeyClient
+from server_utils.keys.key_server import SignMessageData
 
 from .models import (
     AuditLogMessage,

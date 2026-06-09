@@ -80,15 +80,15 @@ def _assert_loggedat_is_recent_utc_iso(value: object) -> datetime.datetime:
     assert isinstance(value, str)
     parsed = datetime.datetime.fromisoformat(value)
     assert parsed.tzinfo is not None, f"loggedAt {value!r} must include tz info"
-    assert parsed.utcoffset() == datetime.timedelta(
-        0
-    ), f"loggedAt {value!r} must be UTC"
+    assert parsed.utcoffset() == datetime.timedelta(0), (
+        f"loggedAt {value!r} must be UTC"
+    )
     # The route stamps loggedAt at request handling time; allow a generous skew so
     # the test isn't flaky on slow CI.
     now = datetime.datetime.now(datetime.timezone.utc)
-    assert (
-        abs((now - parsed).total_seconds()) < 60
-    ), f"loggedAt {value!r} is too far from now {now.isoformat()}"
+    assert abs((now - parsed).total_seconds()) < 60, (
+        f"loggedAt {value!r} is too far from now {now.isoformat()}"
+    )
     return parsed
 
 
