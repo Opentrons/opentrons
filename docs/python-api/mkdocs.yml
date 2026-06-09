@@ -4,6 +4,7 @@ site_name: python-api
 nav:
   - Python Protocol API: index.md
   - Tutorial: tutorial.md
+  - Protocol Structure: protocol-structure.md
   - Versioning: versioning.md
   - Labware: labware.md
   - Moving Labware: moving-labware.md
