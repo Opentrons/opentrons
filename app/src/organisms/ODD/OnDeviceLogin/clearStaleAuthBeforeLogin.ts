@@ -4,8 +4,8 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { logOut } from '/app/redux/robot-auth'
 import { store } from '/app/redux/store'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { QueryClient } from 'react-query'
+import type { HostConfig } from '@opentrons/api-client'
 
 // TODO: This should be done by the auth server.
 export async function clearStaleAuthBeforeLogin(

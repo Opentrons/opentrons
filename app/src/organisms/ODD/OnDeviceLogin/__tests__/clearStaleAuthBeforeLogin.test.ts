@@ -1,5 +1,5 @@
 import { QueryClient } from 'react-query'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fetchSelfQuery } from '@opentrons/react-api-client'
 

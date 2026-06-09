@@ -87,9 +87,7 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
   }
 }
 
-async function openLoginModal(): Promise<
-  ReturnType<typeof showLoginModal>
-> {
+async function openLoginModal(): Promise<ReturnType<typeof showLoginModal>> {
   renderWithProviders(
     <NiceModal.Provider>
       <div />
