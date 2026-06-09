@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from types import ModuleType
 from typing import Any, Callable, Iterator
 
+import numpy
 import serpent
 from pydantic import BaseModel
 from Pyro5 import api as pyro
@@ -268,19 +269,23 @@ class OpentronsPyroSerializer:
         """Registers the specialty handler for dicts with non builtin keys using NonBuiltinKeyDictWrapper."""
         class_name = register_type_to_serpent(
             NonBuiltinKeyDictWrapper,
-            cls._unhashable_dict_wrapper_dict_to_class,
+            cls._non_builtin_key_dict_wrapper_dict_to_class,
             cls._pydantic_class_to_dict,
         )
         cls._pydantic_class_name_to_model[class_name] = NonBuiltinKeyDictWrapper
 
     @classmethod
-    def _unhashable_dict_wrapper_dict_to_class(  # noqa: C901
+    def _non_builtin_key_dict_wrapper_dict_to_class(  # noqa: C901
         cls, classname: str, d: dict[str, Any]
     ) -> dict[Any, Any]:
         registries: list[dict[str, Any]] = [
             cls._pydantic_class_name_to_model,
             cls._enum_class_name_to_type,
             cls._typed_dict_class_name_to_type,
+            # Sometimes the hardware API sends floats in the form of numpy float 64s. If they happen
+            # to be in a non-builtin dict wrapper, they won't get handled by the normal pyro serialization
+            # so we need to handle it here by adding it to the list of registries.
+            {"numpy.float64": numpy.float64},
         ]
         # Identify the types for the key and values, if available. Check for builtin types first.
         key_type = (
