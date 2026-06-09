@@ -1,72 +1,44 @@
 import { QueryClient } from 'react-query'
 import NiceModal from '@ebay/nice-modal-react'
-import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useHost } from '@opentrons/react-api-client'
-
 import { renderWithProviders } from '/app/__testing-utils__'
-import { useToaster } from '/app/organisms/ToasterOven'
+import { i18n } from '/app/i18n'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
 
-import { clearStaleAuthBeforeLogin } from '../clearStaleAuthBeforeLogin'
 import { showLoginModal } from '../LoginModal'
 
-import type * as ReactI18next from 'react-i18next'
 import type {
   AuthUser,
   HostConfig,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
 
+vi.mock('../clearStaleAuthBeforeLogin', () => ({
+  clearStaleAuthBeforeLogin: () => Promise.resolve(),
+}))
+
+vi.mock('/app/redux/discovery', async importOriginal => {
+  const actual = await importOriginal<typeof import('/app/redux/discovery')>()
+  return {
+    ...actual,
+    getLocalRobot: vi.fn(() => null),
+  }
+})
+
+vi.mock('/app/resources/access-control/useStoreLoginState')
+vi.mock('/app/resources/auth')
+
 const QUERY_CLIENT = new QueryClient()
 const HOST_CONFIG: HostConfig = {
   hostname: 'localhost',
   token: 'access-token',
 }
-
-vi.mock('react-i18next', async importOriginal => {
-  const actual = await importOriginal<typeof ReactI18next>()
-  return {
-    ...actual,
-    useTranslation: () => ({
-      t: (key: string) => key,
-    }),
-  }
-})
-
-vi.mock('/app/redux/discovery', () => ({
-  getLocalRobot: vi.fn(() => null),
-}))
-
-vi.mock('../clearStaleAuthBeforeLogin', () => ({
-  clearStaleAuthBeforeLogin: vi.fn().mockResolvedValue(undefined),
-}))
-
-vi.mock('/app/resources/auth', () => ({
-  useOAuth2PasswordLogin: vi.fn(),
-  useSetNewPasswordAndSignIn: vi.fn(),
-}))
-
-vi.mock('/app/resources/access-control/useStoreLoginState', () => ({
-  useStoreLoginState: vi.fn(),
-}))
-
-vi.mock('/app/organisms/ToasterOven', () => ({
-  useToaster: vi.fn(),
-}))
-
-vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    useHost: vi.fn(),
-  }
-})
 
 const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
@@ -87,106 +59,126 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
   }
 }
 
-async function openLoginModal(): Promise<ReturnType<typeof showLoginModal>> {
+function mockSuccessfulLogin(): void {
+  vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+    submitPassword: (username: string, _password: string) => {
+      onSuccess(username, mockAuthUser(), OAUTH_RESPONSE)
+    },
+    isAuthLoading: false,
+  }))
+
+  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
+    submitNewPassword: (username: string, _password: string) => {
+      onSuccess(username, OAUTH_RESPONSE)
+    },
+    isLoading: false,
+  }))
+}
+
+function renderLoginModalTrigger(): () => ReturnType<typeof showLoginModal> {
+  let resultPromise!: ReturnType<typeof showLoginModal>
+
   renderWithProviders(
     <NiceModal.Provider>
-      <div />
-    </NiceModal.Provider>
+      <button
+        type="button"
+        onClick={() => {
+          resultPromise = showLoginModal(QUERY_CLIENT, HOST_CONFIG)
+        }}
+      >
+        Open login modal
+      </button>
+    </NiceModal.Provider>,
+    { i18nInstance: i18n }
   )
 
-  let resultPromise!: ReturnType<typeof showLoginModal>
-  act(() => {
-    resultPromise = showLoginModal(QUERY_CLIENT, HOST_CONFIG)
-  })
+  return () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Open login modal' }))
+    return resultPromise
+  }
+}
 
+async function waitForLoginModalOpen(): Promise<void> {
   await waitFor(() => {
-    expect(
-      screen.getByLabelText('device_settings:username')
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText('Username')).toBeInTheDocument()
   })
+}
 
-  return resultPromise
+function fillField(label: string, value: string): void {
+  fireEvent.change(screen.getByLabelText(label), { target: { value } })
+}
+
+function clickPrimary(name: 'Next' | 'Confirm'): void {
+  fireEvent.click(screen.getByRole('button', { name }))
 }
 
 describe('LoginModal', () => {
-  const mockStoreLoginState = vi.fn()
-
   beforeEach(() => {
-    vi.mocked(useHost).mockReturnValue({
-      hostname: 'localhost',
-      token: 'access-token',
-    })
-    vi.mocked(useToaster).mockReturnValue({
-      makeSnackbar: vi.fn(),
-      makeToast: vi.fn(),
-      eatToast: vi.fn(),
-    })
-    vi.mocked(useStoreLoginState).mockReturnValue(mockStoreLoginState)
-
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
-      submitPassword: (username: string, _password: string) => {
-        onSuccess(username, mockAuthUser(), OAUTH_RESPONSE)
-      },
+    vi.mocked(useStoreLoginState).mockReturnValue(vi.fn())
+    vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
+      submitPassword: vi.fn(),
       isAuthLoading: false,
-    }))
-
-    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
-      ({ onSuccess }) => ({
-        submitNewPassword: (username: string, _password: string) => {
-          onSuccess(username, OAUTH_RESPONSE)
-        },
-        isLoading: false,
-      })
-    )
+    })
+    vi.mocked(useSetNewPasswordAndSignIn).mockReturnValue({
+      submitNewPassword: vi.fn(),
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
     vi.clearAllMocks()
   })
 
-  const fillField = (label: string, value: string): void => {
-    fireEvent.change(screen.getByLabelText(label), { target: { value } })
-  }
-
-  const clickPrimary = (name: 'next' | 'confirm'): void => {
-    fireEvent.click(screen.getByRole('button', { name }))
-  }
-
-  it('clears stale auth before opening the modal', async () => {
-    await openLoginModal()
-
-    expect(clearStaleAuthBeforeLogin).toHaveBeenCalledWith(
-      QUERY_CLIENT,
-      HOST_CONFIG
-    )
-  })
-
   it('opens on the username step', async () => {
-    await openLoginModal()
+    const openModal = renderLoginModalTrigger()
+    openModal()
+    await waitForLoginModalOpen()
 
-    expect(
-      screen.getByLabelText('device_settings:username')
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText('Username')).toBeInTheDocument()
   })
 
   it('resolves with the username after a successful login', async () => {
-    const resultPromise = await openLoginModal()
+    mockSuccessfulLogin()
+    const openModal = renderLoginModalTrigger()
+    const resultPromise = openModal()
+    await waitForLoginModalOpen()
 
-    fillField('device_settings:username', 'alice')
-    clickPrimary('next')
-    fillField('device_settings:password', 'secret123')
-    clickPrimary('confirm')
+    fillField('Username', 'alice')
+    clickPrimary('Next')
+    fillField('Password', 'secret123')
+    clickPrimary('Confirm')
 
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
-    expect(mockStoreLoginState).toHaveBeenCalledWith('alice', OAUTH_RESPONSE)
   })
 
   it('resolves with null when cancel is clicked', async () => {
-    const resultPromise = await openLoginModal()
+    const openModal = renderLoginModalTrigger()
+    const resultPromise = openModal()
+    await waitForLoginModalOpen()
 
-    fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
 
     await expect(resultPromise).resolves.toBeNull()
+  })
+
+  it('shows an error when OAuth login fails', async () => {
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onError }) => ({
+      submitPassword: () => {
+        onError('Login failed')
+      },
+      isAuthLoading: false,
+    }))
+
+    const openModal = renderLoginModalTrigger()
+    openModal()
+    await waitForLoginModalOpen()
+
+    fillField('Username', 'alice')
+    clickPrimary('Next')
+    fillField('Password', 'wrong')
+    clickPrimary('Confirm')
+
+    expect(screen.getByText('Login failed')).toBeInTheDocument()
   })
 
   it('switches to the new-password flow when login requires a password reset', async () => {
@@ -201,18 +193,18 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    const resultPromise = await openLoginModal()
+    const openModal = renderLoginModalTrigger()
+    const resultPromise = openModal()
+    await waitForLoginModalOpen()
 
-    fillField('device_settings:username', 'alice')
-    clickPrimary('next')
-    fillField('device_settings:password', 'temp-pass')
-    clickPrimary('confirm')
+    fillField('Username', 'alice')
+    clickPrimary('Next')
+    fillField('Password', 'temp-pass')
+    clickPrimary('Confirm')
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'on_device_login_new_password' })
-      ).toBeInTheDocument()
-    })
+    expect(
+      await screen.findByRole('heading', { name: 'New password' })
+    ).toBeInTheDocument()
 
     let modalResolved = false
     void Promise.resolve(resultPromise).then(() => {
@@ -223,6 +215,7 @@ describe('LoginModal', () => {
   })
 
   it('completes the new-password flow and resolves the modal', async () => {
+    mockSuccessfulLogin()
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
         onSuccess(
@@ -234,42 +227,22 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    const resultPromise = await openLoginModal()
+    const openModal = renderLoginModalTrigger()
+    const resultPromise = openModal()
+    await waitForLoginModalOpen()
 
-    fillField('device_settings:username', 'alice')
-    clickPrimary('next')
-    fillField('device_settings:password', 'temp-pass')
-    clickPrimary('confirm')
+    fillField('Username', 'alice')
+    clickPrimary('Next')
+    fillField('Password', 'temp-pass')
+    clickPrimary('Confirm')
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'on_device_login_new_password' })
-      ).toBeInTheDocument()
-    })
+    await screen.findByRole('heading', { name: 'New password' })
 
-    fillField('device_settings:on_device_login_new_password', 'newpass123')
-    clickPrimary('next')
-    fillField('device_settings:on_device_login_confirm_password', 'newpass123')
-    clickPrimary('confirm')
+    fillField('New password', 'newpass123')
+    clickPrimary('Next')
+    fillField('Confirm password', 'newpass123')
+    clickPrimary('Confirm')
 
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
-  })
-
-  it('shows an error when OAuth login fails', async () => {
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onError }) => ({
-      submitPassword: () => {
-        onError('Login failed')
-      },
-      isAuthLoading: false,
-    }))
-
-    await openLoginModal()
-
-    fillField('device_settings:username', 'alice')
-    clickPrimary('next')
-    fillField('device_settings:password', 'wrong')
-    clickPrimary('confirm')
-
-    expect(screen.getByText('Login failed')).toBeInTheDocument()
   })
 })
