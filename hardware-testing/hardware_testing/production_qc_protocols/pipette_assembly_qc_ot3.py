@@ -203,7 +203,6 @@ SAFE_HEIGHT_CALIBRATE = 0
 
 ENCODER_ALIGNMENT_THRESHOLD_HOME_MM = 0.005
 ENCODER_ALIGNMENT_THRESHOLD_MM = 0.1
-CHTYPE_PIPPETE = 50
 COLUMNS = "ABCDEFGH"
 PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
 
@@ -343,7 +342,7 @@ PRESSURE_THRESH_COMPRESS = {
 }
 PRESSURE_THRESH_current = {
     1: {50: {1: 0.2}, 1000: {1: 0.2}},
-    8: {50: {2: 0.2, 8: 0.55}, 1000: {2: 0.2, 8: 0.55}},
+    8: {50: {1: 0.2, 8: 0.55}, 1000: {1: 0.2, 8: 0.55}},
 }
 
 PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
@@ -608,11 +607,6 @@ def build_fixture_csv_lines(
         lines.append(CSVLineRepeating(3, f"pressure-{event.value}", [str, CSVResult]))
         for channel in range(pipette_channels):
             # Min max, average
-            lines.append(
-                CSVLineRepeating(
-                    3, f"pressure-{event.value}-channel-{channel+1}", [str, float]
-                )
-            )
             lines.append(
                 CSVLineRepeating(
                     3, f"pressure-{event.value}-channel-{channel+1}", [str, float]
@@ -962,6 +956,11 @@ def build_diagnostics_csv_lines(
         lines.append(
             CSVLine(f"capacitive-probe-slot-{sensor_id.name}-result", [CSVResult])
         )
+        lines.append(CSVLine(f"pressure-open-air-{sensor_id.name}", [float, CSVResult]))
+        lines.append(CSVLine(f"pressure-sealed-{sensor_id.name}", [float, CSVResult]))
+        lines.append(
+            CSVLine(f"pressure-compressed-{sensor_id.name}", [float, CSVResult])
+        )
     lines.append(CSVLine("encoder-home", [float, float, CSVResult]))
     lines.append(CSVLine("encoder-move", [float, float, CSVResult]))
     return lines
@@ -1002,7 +1001,7 @@ def _test_env_sensors(
     section: str,
     ctx: ProtocolContext,
     cfg: TestConfig,
-) -> bool:
+) -> None:
     env_sensor = asair_sensor.BuildAsairSensor(cfg.simulate)
     reading = env_sensor.get_reading()
     room_c = reading.temperature
@@ -1032,7 +1031,6 @@ def _test_env_sensors(
         "diagnostic-environment",
         [CSVResult.from_bool(env_pass)],
     )
-    return env_pass
 
 
 def _test_encoder(
@@ -1041,7 +1039,7 @@ def _test_encoder(
     section: str,
     ctx: ProtocolContext,
     cfg: TestConfig,
-) -> bool:
+) -> None:
     pip_axis = Axis.of_main_tool_actuator(cfg.mount)
     _, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, cfg.mount)
 
@@ -1069,10 +1067,9 @@ def _test_encoder(
     )
     report(
         section,
-        "diagnostic-environment",
+        "diagnostic-encoder",
         [CSVResult.from_bool(encoder_move_pass and encoder_home_pass)],
     )
-    return encoder_move_pass and encoder_home_pass
 
 
 def _test_cap_sensors(
@@ -1081,7 +1078,7 @@ def _test_cap_sensors(
     section: str,
     ctx: ProtocolContext,
     cfg: TestConfig,
-) -> bool:
+) -> None:
     sensor_to_probe = {
         SensorId.S0: InstrumentProbeType.PRIMARY,
         SensorId.S1: InstrumentProbeType.SECONDARY,
@@ -1192,7 +1189,127 @@ def _test_cap_sensors(
         "diagnostic-capacitance",
         [CSVResult.from_bool(cap_pass)],
     )
-    return cap_pass
+
+
+def _test_diagnostics_pressure(
+    api: SyncHardwareAPI,
+    report: CSVReport,
+    section: str,
+    ctx: ProtocolContext,
+    cfg: TestConfig,
+) -> None:
+    results: List[bool] = []
+    sensor_ids = [SensorId.S0]
+    if cfg.pipette_channels == 8:
+        sensor_ids.append(SensorId.S1)
+    api.add_tip(cfg.mount, 0.1)
+    api.prepare_for_aspirate(cfg.mount)
+    api.remove_tip(cfg.mount)
+
+    def _read_pressure(_sensor_id: SensorId) -> float:
+        return _read_and_average(api, cfg.mount, SensorType.pressure, _sensor_id)
+
+    current_val = PRESSURE_THRESH_current[cfg.pipette_channels][cfg.pipette_volume][1]
+    helpers_ot3.update_pick_up_current(api, cfg.mount, current_val)
+    if cfg.pipette_volume == 50:
+        if cfg.pipette_channels == 1:
+            movez = -155.5
+        else:
+            movez = -154.8
+    else:
+        movez = -117
+
+    open_thresholds = PRESSURE_THRESH_OPEN_AIR[cfg.pipette_channels][cfg.pipette_volume]
+    sealed_thresholds = PRESSURE_THRESH_SEALED[cfg.pipette_channels][cfg.pipette_volume]
+    compressed_thresholds = PRESSURE_THRESH_COMPRESS[cfg.pipette_channels][
+        cfg.pipette_volume
+    ]
+
+    for sensor_id in sensor_ids:
+        pressure = _read_pressure(sensor_id)
+        if not (open_thresholds[0] <= pressure <= open_thresholds[1]):
+            results.append(False)
+            printtxt = f"01-08-open-air-pressure:气压传感器,通道{sensor_id.name}在空气中的气压差值{pressure}超出范围值{PRESSURE_THRESH_OPEN_AIR[cfg.pipette_channels][cfg.pipette_volume]}"
+            FINAL_TEST_FAIL_INFOR.append(printtxt)
+        else:
+            results.append(True)
+        report(
+            section,
+            f"pressure-open-air-{sensor_id.name}",
+            [
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ],
+        )
+
+    # PICK-UP TIP(S)
+    _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, cfg.mount)
+    helpers_ot3.move_plunger_absolute_ot3_sync(api, cfg.mount, bottom)
+    _pick_up_tip_for_tip_volume(api, cfg, tip_volume=50)
+    api.retract(cfg.mount)
+
+    # SEALED PRESSURE
+    current_pos = api.gantry_position(cfg.mount)
+    slot_11_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
+    if cfg.pipette_channels == 1:
+        slot_11_pos._replace(z=current_pos.z)
+    else:
+        slot_11_pos._replace(y=slot_11_pos.y + 29, z=current_pos.z)
+
+    api.move_to(cfg.mount, slot_11_pos)
+    api.move_rel(cfg.mount, Point(z=movez + 10))
+    api.move_rel(cfg.mount, Point(z=-10), speed=5)
+    sleep(2)
+    for sensor_id in sensor_ids:
+        pressure = _read_pressure(sensor_id)
+        if not (sealed_thresholds[0] <= pressure <= sealed_thresholds[1]):
+            results.append(False)
+            printtxt = f"01-09-sealed-pressure:气压传感器,通道{sensor_id.name}堵住针管时的气压差值{pressure}超出范围值{PRESSURE_THRESH_SEALED[cfg.pipette_channels][cfg.pipette_volume]}"
+            FINAL_TEST_FAIL_INFOR.append(printtxt)
+
+        else:
+            results.append(True)
+
+        report(
+            section,
+            f"pressure-sealed-{sensor_id.name}",
+            [
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ],
+        )
+    # COMPRESSED
+    plunger_aspirate_ul = PRESSURE_ASPIRATE_VOL[cfg.pipette_channels][
+        cfg.pipette_volume
+    ]
+    api.aspirate(cfg.mount, plunger_aspirate_ul)
+    sleep(2)
+    for sensor_id in sensor_ids:
+        pressure = _read_pressure(sensor_id)
+        if not (compressed_thresholds[0] <= pressure <= compressed_thresholds[1]):
+            results.append(False)
+            printtxt = f"01-10-compressed-pressure:气压传感器,通道{sensor_id.name}吸液{plunger_aspirate_ul}ul时的气压差{pressure}超出范围值{PRESSURE_THRESH_COMPRESS[cfg.pipette_channels][cfg.pipette_volume]}"
+            FINAL_TEST_FAIL_INFOR.append(printtxt)
+        else:
+            results.append(True)
+        report(
+            section,
+            f"pressure-compressed-{sensor_id.name}",
+            [
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ],
+        )
+    sleep(1)
+    api.dispense(cfg.mount, is_full_dispense=True)
+    api.prepare_for_aspirate(cfg.mount)
+    _drop_tip_in_trash(api, cfg)
+
+    report(
+        section,
+        "diagnostic-pressure",
+        [CSVResult.from_bool(all(results))],
+    )
 
 
 def test_diagnostics(
@@ -1210,6 +1327,7 @@ def test_diagnostics(
     _test_env_sensors(api, report, section, ctx, cfg)
     _test_encoder(api, report, section, ctx, cfg)
     _test_cap_sensors(api, report, section, ctx, cfg)
+    _test_diagnostics_pressure(api, report, section, ctx, cfg)
     api.retract(cfg.mount)
 
 
@@ -1558,7 +1676,7 @@ def test_liquid_probe(
         if cfg.pipette_channels == 8:
             current_val = PRESSURE_THRESH_current[cfg.pipette_channels][
                 cfg.pipette_volume
-            ][2]
+            ][1]
             helpers_ot3.update_pick_up_current(api, cfg.mount, current_val)
         _pick_up_tip_for_tip_volume(api, cfg, tip_vol)
         for probe in probes:
@@ -1761,8 +1879,9 @@ def build_pressure_cfg_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
     for event, config in PRESSURE_FIXTURE_EVENT_CONFIGS.items():
-        for f in fields(config):
-            lines.append(CSVLine(f"{event.value}", [str, float]))
+        lines.append(
+            CSVLineRepeating(len(fields(config)), f"{event.value}", [str, float])
+        )
     return lines
 
 
@@ -1857,12 +1976,15 @@ def store_config(
     )
 
     for event, config in PRESSURE_FIXTURE_EVENT_CONFIGS.items():
+        line_ind = 0
         for f in fields(config):
             report(
                 "PRESSURE-CONFIGURATIONS",
                 f"{event.value}",
                 [f.name, getattr(config, f.name)],
+                line_ind,
             )
+            line_ind += 1
     report("PRESSURE-DATA", "PHASE", [f"CH{c+1}" for c in range(pipette_channels)])
 
 
