@@ -810,6 +810,30 @@ def build_report(test_name: str) -> CSVReport:
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Build the runtime parameters."""
+    parameters.add_str(
+        display_name="Operator",
+        variable_name="operator",
+        default="Unused",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Unused",
+                "Haiyan",
+                "Jiqing",
+                "Yanglin",
+                "Yangyin",
+                "Hejie",
+                "Zhihua",
+                "Huanjun",
+                "Chengkun",
+                "Xiongjian",
+                "Zhougui",
+                "Zhiwei",
+                "TE",
+            ]
+        ],
+        description="Operator for this QC run",
+    )
     for s in TestSection:
         parameters.add_bool(
             display_name=f"Skip {s.value.lower()}",
