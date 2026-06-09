@@ -4,25 +4,17 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import {
   COLORS,
   getLabwareDefinitionsFromCommands,
-  useCommandTextString,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { i18n } from '/app/i18n'
 import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
+import { ActionItem } from './ActionItems/ActionItem'
 import styles from './documentationrequired.module.css'
 
-import type { TFunction } from 'i18next'
-import type { CommandTextData, IconName } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
-import type { PipetteWizardFlowAction } from '@opentrons/react-api-client/src/access_control/types'
-import type {
-  LabwareDefinition,
-  ModuleModel,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const ActionsViewImpl = ({
   actionsToDocument,
@@ -72,108 +64,8 @@ const ActionsViewImpl = ({
   )
 }
 
-const ActionItem = ({
-  action,
-  allRunDefs,
-  commandTextData,
-}: {
-  action: DocumentedAction
-  allRunDefs: LabwareDefinition[]
-  commandTextData: CommandTextData | null
-}): JSX.Element => {
-  const { t } = useTranslation(['audit_log', 'deck_configuration'])
-  if (typeof action === 'string') {
-    // AuditLog
-    return <div className={styles.action}>{t(action)}</div>
-  }
-  // RunTimeCommand
-  if ('commandType' in action && commandTextData != null) {
-    return (
-      <DocumentedCommandText
-        action={action}
-        allRunDefs={allRunDefs}
-        commandTextData={commandTextData}
-      />
-    )
-  }
-  // PipetteWizardFlow
-  if ('type' in action && action.type === 'pipette_wizard_flow') {
-    return <PipetteFlowText action={action} t={t} />
-  }
-  if ('type' in action && action.type === 'attach_module') {
-    return (
-      <div className={styles.action}>
-        {t('attach_module', {
-          module: t(
-            getModuleDisplayName(action.module.moduleModel as ModuleModel)
-          ),
-        })}
-      </div>
-    )
-  }
-  // AuditLogActionWithParams
-  if ('key' in action && 'params' in action) {
-    return <div className={styles.action}>{t(action.key, action.params)}</div>
-  }
-  return <div className={styles.action}>{JSON.stringify(action)}</div>
-}
-
-function DocumentedCommandText({
-  action,
-  allRunDefs,
-  commandTextData,
-}: {
-  action: RunTimeCommand
-  allRunDefs: LabwareDefinition[]
-  commandTextData: CommandTextData
-}): JSX.Element {
-  const commandInfo = useCommandTextString({
-    command: action,
-    allRunDefs,
-    robotType: 'OT-3 Standard',
-    commandTextData,
-  })
-
-  return <div className={styles.action}>{commandInfo.commandText}</div>
-}
-
 function isRunTimeCommand(action: DocumentedAction): action is RunTimeCommand {
   return typeof action === 'object' && 'commandType' in action
-}
-
-function PipetteFlowText({
-  action,
-  t,
-}: {
-  action: PipetteWizardFlowAction
-  t: TFunction
-}): JSX.Element {
-  const { flowType, pipette, mount, pipetteInfo, step } = action
-  const mountName = mount === 'left' ? t('left_mount') : t('right_mount')
-  const flowTypeText =
-    flowType === 'ATTACH'
-      ? t('attach')
-      : flowType === 'DETACH'
-        ? t('detach')
-        : t('calibrate')
-  const pipetteCategoryText =
-    pipette === '96-Channel'
-      ? t('96_channel')
-      : t('single_channel_and_8_channel')
-
-  const pipetteNameText = pipetteInfo?.displayName
-
-  const endText = step === 'end' ? t('end') + ' ' : ''
-
-  const text =
-    endText +
-    t('pipette_wizard_flow', {
-      flowtype: endText ? i18n.format(flowTypeText, 'lowerCase') : flowTypeText,
-      pipette: pipetteNameText || pipetteCategoryText,
-      mount: mountName,
-    })
-
-  return <div className={styles.action}>{text}</div>
 }
 
 export const ActionsView = NiceModal.create(ActionsViewImpl)
