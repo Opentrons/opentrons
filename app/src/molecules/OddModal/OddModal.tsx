@@ -67,6 +67,8 @@ export function OddModal(props: OddModalProps): JSX.Element {
         margin={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
         aria-label={`modal_${modalSize}`}
+        role="dialog"
+        aria-modal="true"
         onClick={(e: MouseEvent) => {
           e.stopPropagation()
         }}
