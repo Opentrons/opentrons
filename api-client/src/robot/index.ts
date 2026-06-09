@@ -2,6 +2,7 @@ export { getDoorStatus } from './getDoorStatus'
 export { getEstopStatus } from './getEstopStatus'
 export { acknowledgeEstopDisengage } from './acknowledgeEstopDisengage'
 export { getLights } from './getLights'
+export { home } from './home'
 export { setLights } from './setLights'
 export { getRobotSettings } from './getRobotSettings'
 export { updateRobotSetting } from './updateRobotSetting'
@@ -11,6 +12,9 @@ export type {
   EstopPhysicalStatus,
   EstopState,
   EstopStatus,
+  HomeData,
+  HomeResponse,
+  HomeTarget,
   Lights,
   RobotSettings,
   RobotSettingsField,

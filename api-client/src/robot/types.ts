@@ -29,6 +29,16 @@ export interface SetLightsData {
   on: boolean
 }
 
+export type HomeTarget = 'robot' | 'pipette'
+
+export type HomeData =
+  | { target: 'robot' }
+  | { target: 'pipette'; mount: 'left' | 'right' }
+
+export interface HomeResponse {
+  message: string
+}
+
 export interface RobotSettingsField {
   id: string
   title: string
