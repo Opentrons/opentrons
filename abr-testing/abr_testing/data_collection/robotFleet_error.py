@@ -18,7 +18,7 @@ from statistics import mean, StatisticsError
 from abr_testing.tools import plate_reader
 import time
 import base64
-import websocket
+import websocket  # type: ignore[import-untyped,import-not-found]
 
 
 def open_folder(path: str) -> None:
@@ -793,7 +793,7 @@ if __name__ == "__main__":
         )
     )
     url = "https://opentrons.atlassian.net"
-    log_zip_path = read_robot_logs.get_logs(storage_directory, ip)
+    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
     # Nick Check
     run_log_file_path = ""

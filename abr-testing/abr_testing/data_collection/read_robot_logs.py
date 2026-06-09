@@ -17,7 +17,7 @@ from pathlib import Path
 import zipfile
 from abr_testing.tools import plate_reader
 from abr_testing.data_collection import get_run_logs
-import websocket
+import websocket  # type: ignore[import-untyped,import-not-found]
 
 
 def check_http_available(ip: str, timeout: int = 10) -> bool:
@@ -955,12 +955,12 @@ def get_calibration_offsets(
 
 def retrieve_version_file(
     robot_ip: str,
-    storage: str,
+    storage: Path,
 ) -> Path | str:
     """Retrieve Version file."""
     version_file_path = "/etc/VERSION.json"
-    save_dir = Path(f"{storage}")
-    key_path = Path(storage) / "robot_key"
+    save_dir = Path(f"{str(storage)}")
+    key_path = storage / "robot_key"
     command = [
         "scp",
         "-i",
@@ -1036,7 +1036,7 @@ def get_logs(storage_directory: Path, ip: str) -> str:
 
     collected_files = retreive_odd_console(ip, storage_directory, collected_files)
 
-    version_file_path = retrieve_version_file(robot_ip=ip, storage=storage_directory)
+    version_file_path = retrieve_version_file(ip, storage_directory)
     if version_file_path:
         collected_files.append(str(version_file_path))
 
@@ -1116,14 +1116,13 @@ def fetch_weston_log(
 
 
 def retreive_odd_console(
-    robot_ip: str, storage_directory: str, collected_files: list
+    robot_ip: str, storage_directory: Path, collected_files: list
 ) -> list:
     """Connect to the ODD via websocket, collect all buffered
     console messages, sort chronologically, and save to CSV.
     """
     log_buffer = 3.0
-    save_directory = Path(storage_directory)
-    output_csv = (save_directory) / "odd_console.log"
+    output_csv = Path(storage_directory) / "odd_console.log"
 
     # Find the opentrons page target, this is specific to each boot of each robot
     try:
@@ -1141,7 +1140,7 @@ def retreive_odd_console(
         None,
     )
     if target is None:
-        msg = f"No Opentrons console log target found on {robot_ip}."
+        msg: Any = f"No Opentrons console log target found on {robot_ip}."
         print(msg)
         with open(output_csv, "w", newline="") as csv_file:
             writer = csv.writer(csv_file)
@@ -1183,11 +1182,11 @@ def retreive_odd_console(
             robot_ts_ms = float(msg["params"].get("timestamp") or 0)
 
         elif method == "Log.entryAdded":
-            e = msg["params"]["entry"]
-            raw_text = e.get("text", "")
+            entry = msg["params"]["entry"]
+            raw_text = entry.get("text", "")
             text = raw_text if isinstance(raw_text, str) else json.dumps(raw_text)
-            level = e.get("level", "?").upper()
-            robot_ts_ms = float(e.get("timestamp") or 0)
+            level = entry.get("level", "?").upper()
+            robot_ts_ms = float(entry.get("timestamp") or 0)
 
         elif method == "Console.messageAdded":
             m = msg["params"]["message"]

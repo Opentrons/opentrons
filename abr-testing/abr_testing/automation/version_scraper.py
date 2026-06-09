@@ -4,7 +4,7 @@ import csv
 import sys
 import requests
 from typing import List, Dict, Any, Optional
-from jira_tool import JiraTicket
+from abr_testing.automation.jira_tool import JiraTicket
 
 
 class JiraBugExporter(JiraTicket):
