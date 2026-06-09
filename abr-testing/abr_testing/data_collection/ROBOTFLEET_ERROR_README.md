@@ -24,9 +24,12 @@ Get your JIRA API token at: https://id.atlassian.com/manage-profile/security
 ## Usage
 
 ```bash
-make robot-fleet-error
-# or explicitly:
-make robot-fleet-error errors_dir="/path/to/opentrons/abr-testing/errors"
+PYTHONPATH="/path/to/opentrons/abr-testing" python robotFleet_error.py <storage_directory>
+```
+
+**Example:**
+```bash
+PYTHONPATH="/Users/you/Desktop/opentrons/abr-testing" python robotFleet_error.py "/Users/you/Desktop/Errors"
 ```
 
 ## Prompts
