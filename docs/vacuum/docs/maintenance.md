@@ -23,7 +23,7 @@ The following table lists the chemicals you can use to clean the exterior of the
     - Do not clean the vacuum module with acetone.
     - Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
-## Cleaning the air-liquid separator
+## Emptying the air-liquid separator
 
 The Control Box houses an air-liquid separator. This device traps suspended mist and liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. The air-liquid separator is an essential piece of safety equipment and should be emptied whenever liquid accumulates inside the bowl or reaches the max fill line.
 
