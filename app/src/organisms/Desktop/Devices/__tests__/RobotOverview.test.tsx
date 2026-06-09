@@ -48,7 +48,6 @@ import type { ComponentProps } from 'react'
 import type { Config } from '/app/redux/config/types'
 import type { State } from '/app/redux/types'
 
-vi.mock('/app/redux/robot-controls')
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery/selectors')
