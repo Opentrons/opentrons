@@ -530,14 +530,14 @@ class VacuumModule(mod_abc.AbstractModule):
             while not self._reader.power_target_reached():
                 await self._poller.wait_next_poll()
             # clear target after it's reached
-            self._reader.set_target_power(None)
+            self._reader.reset_power_target()
         elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
             if not self._reader.vacuum_state.vacuum_enabled:
                 return
             while not self._reader.pressure_target_reached():
                 await self._poller.wait_next_poll()
             # clear target after it's reached
-            self._reader.set_target_pressure(None)
+            self._reader.reset_pressure_target()
         else:
             raise ValueError("Vacuum module target invalid.")
 
@@ -607,6 +607,14 @@ class VacuumModuleReader(Reader):
 
     def set_target_power(self, duty_cycle: Optional[float]) -> None:
         self.target_power = duty_cycle
+
+    def reset_pressure_target(self) -> None:
+        self.set_target_pressure(None)
+        self._pressure_readings = [None for p in self._pressure_readings]
+
+    def reset_power_target(self) -> None:
+        self.set_target_power(None)
+        self._power_readings = [None for p in self._power_readings]
 
     async def read(self) -> None:
         await self.update_vacuum_state()
