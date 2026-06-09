@@ -283,7 +283,7 @@ class OpentronsPyroSerializer:
             cls._enum_class_name_to_type,
             cls._typed_dict_class_name_to_type,
             # Sometimes the hardware API sends floats in the form of numpy float 64s. If they happen
-            # to be in a non-builtin dict wrapper, they won't get handled but the normal pyro serialization
+            # to be in a non-builtin dict wrapper, they won't get handled by the normal pyro serialization
             # so we need to handle it here by adding it to the list of registries.
             {"numpy.float64": numpy.float64},
         ]
