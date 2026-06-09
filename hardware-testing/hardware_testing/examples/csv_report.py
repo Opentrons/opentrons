@@ -41,7 +41,7 @@ if __name__ == "__main__":
     EXAMPLE_REPORT("PIPETTE-LEFT", "pipette-stall", [1.0, 2.0, CSVResult.FAIL])
     for i in range(NUM_REPEATING_DATA):
         d = [i / 100, i / 200, i / 300, i / 400, CSVResult.PASS]
-        EXAMPLE_REPORT("PIPETTE-RAW-DATA", "pipette-pressure-data", i, d)
+        EXAMPLE_REPORT("PIPETTE-RAW-DATA", "pipette-pressure-data", d, i)
     print(EXAMPLE_REPORT)
     report_path = EXAMPLE_REPORT.save_to_disk()
     complete_msg = "complete" if EXAMPLE_REPORT.completed else "incomplete"

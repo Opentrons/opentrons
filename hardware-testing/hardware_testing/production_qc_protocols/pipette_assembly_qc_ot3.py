@@ -586,7 +586,7 @@ def _read_pressure_and_check_results(
         _samples.append(fixture.read_all_pressure_channel())
         next_sample_time = time() + pressure_event_config.sample_delay
         _sample_rounded = [round(p, 2) for p in _samples[-1]]
-        report(section, tag.value, i, _sample_rounded)
+        report(section, tag.value, _sample_rounded, i)
         delay_time = next_sample_time - time()
         if (
             not api.is_simulator
@@ -603,13 +603,13 @@ def _read_pressure_and_check_results(
         _samples_per_channel[c].sort()
         _c_min = min(_samples_per_channel[c][1:])
         _c_max = max(_samples_per_channel[c][1:])
-        report(section, f"pressure-{tag.value}-channel-{c + 1}", 0, ["min", _c_min])
-        report(section, f"pressure-{tag.value}-channel-{c + 1}", 1, ["max", _c_max])
+        report(section, f"pressure-{tag.value}-channel-{c + 1}", ["min", _c_min], 0)
+        report(section, f"pressure-{tag.value}-channel-{c + 1}", ["max", _c_max], 1)
         report(
             section,
             f"pressure-{tag.value}-channel-{c + 1}",
-            2,
             ["average", _average_per_channel[c]],
+            2,
         )
         if _c_max - _c_min > pressure_event_config.stability_threshold:
             printsig = f"05-01-fixture-pressure:测试工装气压,状态{tag.value},ch{c + 1}气压差变动最大值{round(_c_max, 2)}与最小值 {round(_c_min, 2)}差值 {abs(round(_c_max, 2)-round(_c_min, 2))} 超过阈值{pressure_event_config.stability_threshold}"
@@ -618,8 +618,8 @@ def _read_pressure_and_check_results(
     report(
         section,
         f"pressure-{tag.value}",
-        0,
         ["stability", CSVResult.from_bool(test_pass_stability)],
+        0,
     )
     _all_samples = [s[c] for s in _samples for c in range(cfg.pipette_channels)]
     _all_samples.sort()
@@ -637,8 +637,8 @@ def _read_pressure_and_check_results(
     report(
         section,
         f"pressure-{tag.value}",
-        1,
         ["accuracy", CSVResult.from_bool(test_pass_accuracy)],
+        1,
     )
     test_pass_delta = True
     if previous:
@@ -660,8 +660,8 @@ def _read_pressure_and_check_results(
         report(
             section,
             f"pressure-{tag.value}",
-            2,
             ["delta", CSVResult.from_bool(test_pass_delta)],
+            2,
         )
     _passed = test_pass_stability and test_pass_accuracy and test_pass_delta
     return _passed, _samples
@@ -871,7 +871,7 @@ def test_liquid(
         report(
             section,
             f"droplets-{droplet_wait_seconds}",
-            CSVResult.from_bool(test_passed),
+            [CSVResult.from_bool(test_passed)],
         )
 
 
@@ -1733,29 +1733,31 @@ def store_config(
 ) -> None:
     """Store the config."""
     args = ctx.params.get_all()
-    report("TEST-CONFIGURATIONS", "operator_name", args["operator"])
+    report("TEST-CONFIGURATIONS", "operator_name", [args["operator"]])
     for s in TestSection:
         report(
             "TEST-CONFIGURATIONS",
             f"skip_{s.value.lower().replace('-', '_')}",
-            args[f"skip_{s.value.lower().replace('-', '_')}"],
+            [args[f"skip_{s.value.lower().replace('-', '_')}"]],
         )
-    report("TEST-CONFIGURATIONS", "fixture_side", args["fixture_side"])
+    report("TEST-CONFIGURATIONS", "fixture_side", [args["fixture_side"]])
     report(
         "TEST-CONFIGURATIONS",
         "fixture_aspirate_sample_count",
-        args["fixture_aspirate_sample_count"],
+        [args["aspirate_sample_count"]],
     )
-    report("TEST-CONFIGURATIONS", "slot_tip_rack_1000", args["slot_tip_rack_1000"])
-    report("TEST-CONFIGURATIONS", "slot_tip_rack_200", args["slot_tip_rack_200"])
-    report("TEST-CONFIGURATIONS", "slot_tip_rack_50", args["slot_tip_rack_50"])
-    report("TEST-CONFIGURATIONS", "slot_reservoir", args["slot_reservoir"])
-    report("TEST-CONFIGURATIONS", "slot_plate", args["slot_plate"])
-    report("TEST-CONFIGURATIONS", "slot_fixture", args["slot_fixture"])
-    report("TEST-CONFIGURATIONS", "slot_trash", args["slot_trash"])
-    report("TEST-CONFIGURATIONS", "num_trials", args["num_trials"])
-    report("TEST-CONFIGURATIONS", "droplet_wait_seconds", args["droplet_wait_seconds"])
-    report("TEST-CONFIGURATIONS", "simulate", ctx.is_simulating())
+    report("TEST-CONFIGURATIONS", "slot_tip_rack_1000", [args["slot_tip_rack_1000"]])
+    report("TEST-CONFIGURATIONS", "slot_tip_rack_200", [args["slot_tip_rack_200"]])
+    report("TEST-CONFIGURATIONS", "slot_tip_rack_50", [args["slot_tip_rack_50"]])
+    report("TEST-CONFIGURATIONS", "slot_reservoir", [args["slot_reservoir"]])
+    report("TEST-CONFIGURATIONS", "slot_plate", [args["slot_plate"]])
+    report("TEST-CONFIGURATIONS", "slot_fixture", [args["slot_fixture"]])
+    report("TEST-CONFIGURATIONS", "slot_trash", [args["slot_trash"]])
+    report("TEST-CONFIGURATIONS", "num_trials", [args["num_trials"]])
+    report(
+        "TEST-CONFIGURATIONS", "droplet_wait_seconds", [args["droplet_wait_seconds"]]
+    )
+    report("TEST-CONFIGURATIONS", "simulate", [ctx.is_simulating()])
 
     report("TEST-THRESHOLDS", "temperature", TEMP_THRESH)
     report("TEST-THRESHOLDS", "humidity", HUMIDITY_THRESH)
@@ -1767,31 +1769,35 @@ def store_config(
     report(
         "TEST-THRESHOLDS",
         "pressure-microliters-aspirated",
-        PRESSURE_ASPIRATE_VOL[pipette_channels][pipette_volume],
+        [PRESSURE_ASPIRATE_VOL[pipette_channels][pipette_volume]],
     )
     report(
         "TEST-THRESHOLDS",
         "pressure-open-air",
-        PRESSURE_THRESH_OPEN_AIR[pipette_channels],
+        PRESSURE_THRESH_OPEN_AIR[pipette_channels][pipette_volume],
     )
     report(
-        "TEST-THRESHOLDS", "pressure-sealed", PRESSURE_THRESH_SEALED[pipette_channels]
+        "TEST-THRESHOLDS",
+        "pressure-sealed",
+        PRESSURE_THRESH_SEALED[pipette_channels][pipette_volume],
     )
     report(
         "TEST-THRESHOLDS",
         "pressure-compressed",
-        PRESSURE_THRESH_COMPRESS[pipette_channels],
+        PRESSURE_THRESH_COMPRESS[pipette_channels][pipette_volume],
     )
-    report("TEST-THRESHOLDS", "probe-deck", PROBING_DECK_PRECISION_MM)
+    report("TEST-THRESHOLDS", "probe-deck", [PROBING_DECK_PRECISION_MM])
     report(
         "TEST-THRESHOLDS",
         "liquid-probe-precision",
-        LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM,
+        [LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM],
     )
     report(
         "TEST-THRESHOLDS",
         "liquid-probe-accuracy",
-        LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM,
+        [
+            LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM,
+        ],
     )
 
     for event, config in PRESSURE_FIXTURE_EVENT_CONFIGS.items():
