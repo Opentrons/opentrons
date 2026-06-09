@@ -738,7 +738,7 @@ def _aspirate_and_look_for_droplets(
         leak_test_passed = helpers_ot3.get_user_answer(api, "did it pass? no leaking?")
 
     api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
-    api.dispense(mount, pipette_volume)
+    api.dispense(mount, pipette_volume, is_full_dispense=True)
     api.blow_out(mount)
     api.move_rel(mount, Point(z=ASPIRATE_SUBMERGE_MM))
     return leak_test_passed
@@ -944,7 +944,7 @@ def build_diagnostics_csv_lines(
         sensors.append(SensorId.S1)
     for sensor_id in sensors:
         lines.append(CSVLine(f"humidity-{sensor_id.name}", [float, float, CSVResult]))
-        lines.append(CSVLine(f"humidity-{sensor_id.name}", [float, float, CSVResult]))
+        lines.append(CSVLine(f"celsius-{sensor_id.name}", [float, float, CSVResult]))
         lines.append(
             CSVLine(f"capacitive-open-air-{sensor_id.name}", [float, CSVResult])
         )
@@ -1588,7 +1588,7 @@ def test_liquid_probe(
                 section, prec_tag, [precision, CSVResult.from_bool(precision_passed)]
             )
             report(section, acc_tag, [accuracy, CSVResult.from_bool(accuracy_passed)])
-            report(section, prec_tag, [tip_tag, CSVResult.from_bool(tip_passed)])
+            report(section, tip_tag, [CSVResult.from_bool(tip_passed)])
 
             if not precision_passed:
                 prec_tag2 = f"03-01-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
@@ -1610,7 +1610,7 @@ def build_encoder_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     lines.append(
         CSVLine(
             "diagnostics-encoder-clean",
-            [float, float, float, float, float, CSVResult],
+            [CSVResult, float, float, float, float, float],
         )
     )
     return lines
