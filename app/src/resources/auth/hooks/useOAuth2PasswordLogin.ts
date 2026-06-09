@@ -87,15 +87,6 @@ export function useOAuth2PasswordLogin(
   const { getOAuth2Token, isLoading: isOAuthLoading } =
     useGetOAuth2TokenMutation({
       onSuccess: (responseData, requestVariables) => {
-        if (requestVariables.grant_type !== 'password') {
-          // Shouldn't happen since this hook only sends request with grant_type==='password'.
-          console.warn(
-            'Expected grant_type password, got',
-            requestVariables.grant_type
-          )
-          return
-        }
-
         const response = responseData.data
         const accessToken = response.access_token as string
         const username = requestVariables.username
