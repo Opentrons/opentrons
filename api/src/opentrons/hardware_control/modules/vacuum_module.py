@@ -530,14 +530,14 @@ class VacuumModule(mod_abc.AbstractModule):
             while not self._reader.power_target_reached():
                 await self._poller.wait_next_poll()
             # clear target after it's reached
-            self._reader.set_target_power(None)
+            self._reader.reset_power_target()
         elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
             if not self._reader.vacuum_state.vacuum_enabled:
                 return
             while not self._reader.pressure_target_reached():
                 await self._poller.wait_next_poll()
             # clear target after it's reached
-            self._reader.set_target_pressure(None)
+            self._reader.reset_pressure_target()
         else:
             raise ValueError("Vacuum module target invalid.")
 
@@ -547,8 +547,6 @@ class VacuumModuleReader(Reader):
 
     def __init__(self, driver: AbstractVacuumModuleDriver) -> None:
         self.error: Optional[str] = None
-        self.pressure_calls = 0
-        self.power_calls = 0
         self.vacuum_state: VacuumState = VacuumState(
             target_gauge_pressure=0,
             current_gauge_pressure=0,
@@ -610,6 +608,14 @@ class VacuumModuleReader(Reader):
     def set_target_power(self, duty_cycle: Optional[float]) -> None:
         self.target_power = duty_cycle
 
+    def reset_pressure_target(self) -> None:
+        self.set_target_pressure(None)
+        self._pressure_readings = [None for p in self._pressure_readings]
+
+    def reset_power_target(self) -> None:
+        self.set_target_power(None)
+        self._power_readings = [None for p in self._power_readings]
+
     async def read(self) -> None:
         await self.update_vacuum_state()
         await self.update_pump_state()
@@ -664,10 +670,10 @@ class VacuumModuleReader(Reader):
     async def update_pump_state(self) -> None:
         """Get latest pump state from driver and save updated values."""
         self.pump_state = await self._driver.get_pump_state()
+
         if self.target_power is not None:
             self._power_readings.insert(0, self.pump_state.current_pwm)
             self._power_readings.pop()
-        self.power_calls += 1
 
     def set_operation_mode(self, mode_type: VacuumModuleOperationMode) -> None:
         self.operation_mode = mode_type
