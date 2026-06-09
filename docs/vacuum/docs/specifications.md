@@ -24,6 +24,10 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 <figcaption>(1) Tall collar, 72 mm</figcaption>
 </figure>
 
+</div>
+
+<div class="parts-list" markdown>
+
 <figure markdown>
 ![Short spacer, 27 mm](images/spacer-short.png "Short spacer, 27 mm")
 <figcaption>(1) Short spacer, 27 mm</figcaption>
@@ -33,6 +37,10 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 ![Tall spacer, 34 mm](images/spacer-tall.png "Tall spacer, 34 mm")
 <figcaption>(1) Tall spacer, 34 mm</figcaption>
 </figure>
+
+</div>
+
+<div class="parts-list" markdown>
 
 <figure markdown>
 ![Vacuum manifold base](images/mainifold-base-test2.svg "Manifold base")
