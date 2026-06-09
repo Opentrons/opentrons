@@ -800,7 +800,12 @@ def _fixture_check_pressure(
     )
     results.append(r)
     # dispense
-    api.dispense(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume], 0.5, is_full_dispense=True)
+    api.dispense(
+        cfg.mount,
+        PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume],
+        0.5,
+        is_full_dispense=True,
+    )
     sleep(2)
     r, _ = _read_pressure_and_check_results(
         api,
