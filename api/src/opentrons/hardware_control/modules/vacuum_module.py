@@ -547,8 +547,6 @@ class VacuumModuleReader(Reader):
 
     def __init__(self, driver: AbstractVacuumModuleDriver) -> None:
         self.error: Optional[str] = None
-        self.pressure_calls = 0
-        self.power_calls = 0
         self.vacuum_state: VacuumState = VacuumState(
             target_gauge_pressure=0,
             current_gauge_pressure=0,
@@ -664,10 +662,10 @@ class VacuumModuleReader(Reader):
     async def update_pump_state(self) -> None:
         """Get latest pump state from driver and save updated values."""
         self.pump_state = await self._driver.get_pump_state()
+
         if self.target_power is not None:
             self._power_readings.insert(0, self.pump_state.current_pwm)
             self._power_readings.pop()
-        self.power_calls += 1
 
     def set_operation_mode(self, mode_type: VacuumModuleOperationMode) -> None:
         self.operation_mode = mode_type
