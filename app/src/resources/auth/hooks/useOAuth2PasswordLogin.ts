@@ -5,8 +5,11 @@ import axios from 'axios'
 import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation, useHost } from '@opentrons/react-api-client'
 
-import type { TFunction } from 'i18next'
-import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+import type {
+  AuthUser,
+  OAuth2TokenResponse,
+  ROPCRequest,
+} from '@opentrons/api-client'
 
 /**
  * Shape of an error response from `POST /auth/oauth2/token`: the standard
@@ -18,10 +21,6 @@ interface OAuth2TokenErrorResponse {
   error?: string
   error_description?: string
   opentrons_login_attempts_remaining?: number
-}
-
-function getReloginErrorMessage(t: TFunction): string {
-  return t('login_error_incorrect') as string
 }
 
 export interface UseOAuth2PasswordLoginOptions {
@@ -89,10 +88,10 @@ export function useOAuth2PasswordLogin(
       onSuccess: (responseData, requestVariables) => {
         const response = responseData.data
         const accessToken = response.access_token as string
-        const username = requestVariables.username
+        const { username } = requestVariables as ROPCRequest
 
         if (host == null) {
-          onError(getReloginErrorMessage(t))
+          onError(t('login_error_incorrect') as string)
           return
         }
 
@@ -102,7 +101,7 @@ export function useOAuth2PasswordLogin(
             onSuccess(username, selfResponse.data.data, response)
           })
           .catch(() => {
-            onError(getReloginErrorMessage(t))
+            onError(t('login_error_incorrect') as string)
           })
           .finally(() => {
             setIsFetchingSelf(false)

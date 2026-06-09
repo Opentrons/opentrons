@@ -20,10 +20,10 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 
 vi.mock('/app/redux/discovery', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/discovery')>()
+  const actual = await importOriginal<typeof getLocalRobot>()
   return {
     ...actual,
-    getLocalRobot: vi.fn(() => null),
+    getLocalRobot: vi.fn(),
   }
 })
 

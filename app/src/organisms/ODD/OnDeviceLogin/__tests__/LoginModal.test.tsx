@@ -24,7 +24,7 @@ vi.mock('../clearStaleAuthBeforeLogin', () => ({
 }))
 
 vi.mock('/app/redux/discovery', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/discovery')>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     getLocalRobot: vi.fn(() => null),
@@ -75,7 +75,7 @@ function mockSuccessfulLogin(): void {
   }))
 }
 
-function renderLoginModalTrigger(): () => ReturnType<typeof showLoginModal> {
+function setupLoginModalTrigger(): () => ReturnType<typeof showLoginModal> {
   let resultPromise!: ReturnType<typeof showLoginModal>
 
   renderWithProviders(
@@ -130,8 +130,8 @@ describe('LoginModal', () => {
   })
 
   it('opens on the username step', async () => {
-    const openModal = renderLoginModalTrigger()
-    openModal()
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     expect(screen.getByLabelText('Username')).toBeInTheDocument()
@@ -139,8 +139,8 @@ describe('LoginModal', () => {
 
   it('resolves with the username after a successful login', async () => {
     mockSuccessfulLogin()
-    const openModal = renderLoginModalTrigger()
-    const resultPromise = openModal()
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     fillField('Username', 'alice')
@@ -152,8 +152,8 @@ describe('LoginModal', () => {
   })
 
   it('resolves with null when cancel is clicked', async () => {
-    const openModal = renderLoginModalTrigger()
-    const resultPromise = openModal()
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
@@ -169,8 +169,8 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    const openModal = renderLoginModalTrigger()
-    openModal()
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     fillField('Username', 'alice')
@@ -193,8 +193,8 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    const openModal = renderLoginModalTrigger()
-    const resultPromise = openModal()
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     fillField('Username', 'alice')
@@ -227,8 +227,8 @@ describe('LoginModal', () => {
       isAuthLoading: false,
     }))
 
-    const openModal = renderLoginModalTrigger()
-    const resultPromise = openModal()
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
     fillField('Username', 'alice')
