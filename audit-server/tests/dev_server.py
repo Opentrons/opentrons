@@ -5,15 +5,25 @@ import signal
 import subprocess
 import sys
 from types import TracebackType
-from typing import Optional
+from typing import Mapping, Optional
 
 
 class DevServer:
     """An instance of the server, running as a background process."""
 
-    def __init__(self, port: int) -> None:
-        """Initialize a dev server."""
+    def __init__(
+        self,
+        port: int,
+        extra_env: Optional[Mapping[str, str]] = None,
+    ) -> None:
+        """Initialize a dev server.
+
+        ``extra_env`` is layered on top of the parent process's environment
+        when spawning the subprocess, so tests can inject configuration like
+        ``OT_AUDIT_SERVER_key_server_url`` without polluting ``os.environ``.
+        """
         self.port: int = port
+        self._extra_env: Mapping[str, str] = extra_env or {}
 
     def __enter__(self) -> DevServer:
         return self
@@ -29,6 +39,7 @@ class DevServer:
     def start(self) -> None:
         """Run the audit server in a background process."""
         env = {k: v for k, v in os.environ.items()}
+        env.update(self._extra_env)
         # In order to collect coverage we run using `coverage`.
         # `-a` is to append to existing `.coverage` file.
         # `--source` is the source code folder to collect coverage stats on.

@@ -341,7 +341,7 @@ dev-backend:
 dev-backend-flex:
 	$(python) scripts/run_concurrently.py \
 		$(MAKE) -C auth-server dev ';' \
-		$(MAKE) -C audit-server dev ';' \
+		$(MAKE) -C audit-server dev OT_AUDIT_SERVER_key_server_url=http://localhost:33960 ';' \
 		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
 		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
 		$(MAKE) -C key-server dev-mitmproxy ';' \

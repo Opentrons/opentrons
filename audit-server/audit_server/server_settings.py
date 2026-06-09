@@ -45,3 +45,21 @@ class AuditServerSettings(BaseSettings):
         description="Path to Alembic config file.",
         validation_alias="ALEMBIC_CONFIG",  # read ALEMBIC_CONFIG from env (no OT_ prefix)
     )
+    key_server_uds: str | None = Field(
+        default=None,
+        description=(
+            "The path to the Unix domain socket where key-server is listening."
+            " This is mutually exclusive with key_server_url."
+            " If both are unset, audit log messages cannot be signed and any"
+            " request that requires the key-server client will fail."
+        ),
+    )
+    key_server_url: str | None = Field(
+        default=None,
+        description=(
+            "The base URL (e.g. `http://localhost:33960`) where key-server is listening."
+            " This is mutually exclusive with key_server_uds."
+            " If both are unset, audit log messages cannot be signed and any"
+            " request that requires the key-server client will fail."
+        ),
+    )

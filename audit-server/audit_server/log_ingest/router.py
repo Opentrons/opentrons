@@ -2,6 +2,7 @@
 
 import datetime
 from logging import getLogger
+from typing import Annotated
 
 import fastapi
 
@@ -10,6 +11,8 @@ from server_utils.fastapi_utils.models.json_api import (
     RequestModel,
     SimpleBody,
 )
+from server_utils.keys.fastapi import get_key_client
+from server_utils.keys.key_server import Client as KeyClient
 
 from .models import SubmitAuditLogMessageData, SubmitAuditLogSuccessData
 
@@ -30,6 +33,7 @@ router = fastapi.APIRouter()
 )
 async def post_log_message(
     request_body: RequestModel[SubmitAuditLogMessageData],
+    key_client: Annotated[KeyClient, fastapi.Depends(get_key_client)],
 ) -> PydanticResponse[SimpleBody[SubmitAuditLogSuccessData]]:
     """Log an audit message."""
     LOG.info(
