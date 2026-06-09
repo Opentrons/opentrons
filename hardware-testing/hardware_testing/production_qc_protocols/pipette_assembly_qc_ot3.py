@@ -538,7 +538,7 @@ def pressure_fixture_a1_location(side: str) -> Point:
 def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
     CALIBRATED_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
     IDEAL_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
-    if not (ctx.params.skip_fixture and ctx.params.skip_liquid and ctx.params.skip_liquid_probe):  # type: ignore[attr-defined]
+    if not (ctx.params.skip_fixture and ctx.params.skip_liquid and ctx.params.skip_liquid_probe and ctx.params.skip_tip_sensor):  # type: ignore[attr-defined]
         tiprack_50 = ctx.load_labware(
             "opentrons_flex_96_tiprack_50uL", cfg.slot_tip_rack_50
         )
@@ -1414,6 +1414,8 @@ def _jog_for_tip_state(
     tip_state: TipStateType,
 ) -> bool:
     def _matches_state(_state: TipStateType) -> bool:
+        if api.is_simulator:
+            return True
         try:
             sleep(0.3)
             api.verify_tip_presence(mount, _state)
@@ -1438,6 +1440,98 @@ def _jog_for_tip_state(
     )
     FINAL_TEST_FAIL_INFOR.append(printsig)
     return False
+
+
+def test_tip_sensor_new(
+    api: SyncHardwareAPI,
+    report: CSVReport,
+    section: str,
+    ctx: ProtocolContext,
+    cfg: TestConfig,
+) -> None:
+    """Fully automated tip sensor check."""
+    api.retract(cfg.mount)
+    if cfg.pipette_channels == 1:
+        offset_from_a1 = Point(x=9 * 11, y=9 * -7, z=0)
+    else:
+        offset_from_a1 = Point(x=9 * 11, y=0, z=0)
+    test_pos = (
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_50 + offset_from_a1  # type: ignore[operator]
+    )
+    helpers_ot3.move_to_arched_ot3_sync(api, cfg.mount, test_pos)
+    nozzle_pos = api.gantry_position(cfg.mount)
+    nominal_single_ejector_relative = -7
+    nominal_multi_ejector_relative = -5.1
+    ejector_rel_pos = (
+        nominal_single_ejector_relative
+        if cfg.pipette_channels == 1
+        else nominal_multi_ejector_relative
+    )
+    pick_up_criteria = {
+        1: (
+            ejector_rel_pos + -1.3,
+            ejector_rel_pos + -2.5,
+        ),
+        8: (
+            ejector_rel_pos + -1.9,
+            ejector_rel_pos + -4.0,
+        ),
+    }[cfg.pipette_channels]
+    if cfg.pipette_channels == 1:
+        api.move_rel(cfg.mount, Point(z=nominal_single_ejector_relative))
+    else:
+        api.move_rel(cfg.mount, Point(z=nominal_multi_ejector_relative))
+    pick_up_result = _jog_for_tip_state(
+        api,
+        cfg.mount,
+        current_z=ejector_rel_pos,
+        max_z=-10.5,
+        criteria=pick_up_criteria,
+        step_mm=-0.1,
+        tip_state=TipStateType.PRESENT,
+    )
+    pick_up_pos = api.gantry_position(cfg.mount)
+    pick_up_pos_rel = round(pick_up_pos.z - nozzle_pos.z, 2)
+    api.move_to(cfg.mount, nozzle_pos + Point(z=-10.5))  # nominal tip depth
+    drop_criteria = {
+        1: (
+            -10.5 + 1.2,
+            -10.5 + 2.3,
+        ),
+        8: (
+            -10.5 + 1.9,
+            -10.5 + 4.0,
+        ),
+    }[cfg.pipette_channels]
+    drop_result = _jog_for_tip_state(
+        api,
+        cfg.mount,
+        current_z=-10.5,
+        max_z=0.0,
+        criteria=drop_criteria,
+        step_mm=0.1,
+        tip_state=TipStateType.ABSENT,
+    )
+    drop_pos = api.gantry_position(cfg.mount)
+    drop_pos_rel = round(drop_pos.z - nozzle_pos.z, 2)
+    pick_up_disp = round(ejector_rel_pos - pick_up_pos_rel, 2)
+    drop_disp = round(10.5 + drop_pos_rel, 2)
+    report(section, "tip-presence-ejector-height-above-nozzle", [ejector_rel_pos])
+    report(
+        section,
+        "tip-presence-pick-up-displacement",
+        [
+            pick_up_disp,
+            CSVResult.from_bool(pick_up_result),
+        ],
+    )
+    report(section, "tip-presence-pick-up-height-above-nozzle", [pick_up_pos_rel])
+    report(
+        section,
+        "tip-presence-drop-displacement",
+        [drop_disp, CSVResult.from_bool(drop_result)],
+    )
+    report(section, "tip-presence-drop-height-above-nozzle", [drop_pos_rel])
 
 
 def test_tip_sensor(
@@ -2058,7 +2152,8 @@ TESTS = [
     ),
     (
         TestSection.TIP_SENSOR,
-        test_tip_sensor,
+        # test_tip_sensor,
+        test_tip_sensor_new,
     ),
 ]
 
@@ -2202,6 +2297,7 @@ def run(ctx: ProtocolContext) -> None:
     """Entry point into testing protocol."""
     # apply monkey patch
     OT3API._get_tip_status = _get_tip_status_patch  # type: ignore[attr-defined]
+    OT3API._calibrate_pipette = _calibrate_pipette_patch  # type: ignore[attr-defined]
 
     api = ctx._core.get_hardware()
 
