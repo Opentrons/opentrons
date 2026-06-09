@@ -84,6 +84,8 @@ export function OnDeviceLogin({
   const passwordLabelHasError =
     step === 'password' && loginError != null && loginError !== ''
 
+  // NOTE: this pattern only works because usernames and passwords are single line inputs
+  // if we need multi-line inputs like in documentation required, this will not work
   const handleEnterPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.key !== 'Enter' || primaryDisabled) return
