@@ -27,9 +27,9 @@ from opentrons.protocol_engine.resources.file_provider import (
 )
 from opentrons.util.pyro.pyro_client_async_adapter import (
     AsyncClientPyroObject,
-    AsyncPyroFunctionWrapper,
+    ClientPyroFunctionWrapper,
 )
-from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
@@ -46,6 +46,8 @@ from robot_server.service.pyro_utils import (
     pyro_resource,
     resource_utilities,
 )
+
+TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
@@ -115,7 +117,7 @@ async def _host_pyro_nameserver_and_ot3api(
 
     def _ot3api_pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", hw_api, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -129,7 +131,7 @@ async def _host_pyro_nameserver_and_ot3api(
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0
@@ -183,7 +185,13 @@ async def test_run_hardware_event_callback(
         robot_server_resource.create_run_hardware_event_callback()
     )
 
-    assert isinstance(result, AsyncPyroFunctionWrapper)
+    assert isinstance(result, ClientPyroFunctionWrapper)
+
+    default_run_door_watcher_result = ot3api.register_callback(
+        robot_server_resource.get_default_run_orchestrator_door_watcher_callback()
+    )
+
+    assert isinstance(default_run_door_watcher_result, ClientPyroFunctionWrapper)
 
 
 async def test_maintenance_run_hardware_event_callback(
@@ -218,7 +226,13 @@ async def test_maintenance_run_hardware_event_callback(
         robot_server_resource.create_maintenance_run_hardware_event_callback()
     )
 
-    assert isinstance(result, AsyncPyroFunctionWrapper)
+    assert isinstance(result, ClientPyroFunctionWrapper)
+
+    door_watcher_result = ot3api.register_callback(
+        robot_server_resource.get_maintenance_run_door_watcher_callback()
+    )
+
+    assert isinstance(door_watcher_result, ClientPyroFunctionWrapper)
 
 
 async def test_camera_provider(
@@ -241,10 +255,9 @@ async def test_camera_provider(
     )
 
     # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
-    camera_proxy_async = robot_server_resource.get_camera_provider()
+    camera_provider = robot_server_resource.get_camera_provider()
 
-    cam_provider = cast(CameraProvider, camera_proxy_async)
-    settings = await cam_provider.get_camera_settings()
+    settings = await camera_provider.get_camera_settings()
 
     # Empty Camera settings defaults all to True, assert the proxy gave us that
     assert settings.cameraEnabled
@@ -272,9 +285,8 @@ async def test_file_provider(
     )
 
     # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
-    file_proxy_async = robot_server_resource.get_file_provider()
+    file_provider = robot_server_resource.get_file_provider()
 
-    file_provider = cast(FileProvider, file_proxy_async)
     results = await file_provider.write_file(
         data=bytes([1, 2, 3]),
         mime_type=MimeType("text/csv"),
@@ -341,4 +353,4 @@ async def test_notify_publisher(
 
     result = robot_server_resource.get_notify_publishers()
 
-    assert isinstance(result, AsyncPyroFunctionWrapper)
+    assert isinstance(result, ClientPyroFunctionWrapper)

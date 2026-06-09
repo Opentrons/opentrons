@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { updateDeckConfiguration } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -42,11 +42,11 @@ export function useUpdateDeckConfigurationMutation(
     AxiosError<ErrorResponse>,
     DeckConfiguration
   >(
-    [host, 'deck_configuration'],
+    getQueryKey(host, 'deck_configuration'),
     (deckConfig: DeckConfiguration) =>
       updateDeckConfiguration(host!, deckConfig).then(response => {
         queryClient
-          .invalidateQueries([host, 'deck_configuration'])
+          .invalidateQueries(getQueryKey(host, 'deck_configuration'))
           .catch((e: Error) => {
             throw e
           })

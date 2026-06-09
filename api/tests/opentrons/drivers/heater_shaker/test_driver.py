@@ -29,7 +29,7 @@ async def test_open_lock(
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode(
         gcode="M242"
     )
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
 
 
 async def test_close_lock(
@@ -41,7 +41,7 @@ async def test_close_lock(
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode(
         gcode="M243"
     )
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
 
 
 async def test_get_lock_status(
@@ -56,7 +56,7 @@ async def test_get_lock_status(
         gcode="M241"
     )
 
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
     assert response == HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
 
 
@@ -71,7 +71,7 @@ async def test_set_temperature(
         .add_gcode(gcode="M104")
         .add_float(prefix="S", value=65.02, precision=2)
     )
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
 
 
 async def test_get_temperature(
@@ -82,7 +82,7 @@ async def test_get_temperature(
     connection.send_command.return_value = "M105 T:91.25 C:54.02 ok\n"
     response = await subject.get_temperature()
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode("M105")
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
     assert response == Temperature(current=54.02, target=91.25)
 
 
@@ -97,7 +97,7 @@ async def test_set_rpm(
         .add_gcode(gcode="M3")
         .add_int(prefix="S", value=2500)
     )
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
 
 
 async def test_get_rpm(
@@ -107,7 +107,7 @@ async def test_get_rpm(
     connection.send_command.return_value = "M123 T:2200 C:2100 ok\n"
     response = await subject.get_rpm()
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode("M123")
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
     assert response == RPM(current=2100, target=2200)
 
 
@@ -116,7 +116,7 @@ async def test_home(subject: driver.HeaterShakerDriver, connection: AsyncMock) -
     connection.send_command.return_value = "G28 ok\n"
     await subject.home()
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode("G28")
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
 
 
 async def test_deactivate_heater(
@@ -126,7 +126,7 @@ async def test_deactivate_heater(
     connection.send_command.return_value = "M106 ok\n"
     await subject.deactivate_heater()
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode("M106")
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_command.assert_called_once_with(command=expected, retries=4)
 
 
 async def test_get_device_info(
@@ -144,8 +144,8 @@ async def test_get_device_info(
     reset_reason = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode(
         gcode="M114"
     )
-    connection.send_command.assert_any_call(command=device_info, retries=0)
-    connection.send_command.assert_called_with(command=reset_reason, retries=0)
+    connection.send_command.assert_any_call(command=device_info, retries=4)
+    connection.send_command.assert_called_with(command=reset_reason, retries=4)
 
 
 async def test_enter_bootloader(

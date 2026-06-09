@@ -3,13 +3,10 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
+import type { DocumentationReport } from '@opentrons/react-api-client'
+
 export interface DocumentationRequiredModalArgs {
   username: string
-}
-
-export interface DocumentationRequiredModalResult {
-  note: string
-  confirmedAt: string
 }
 
 const DocumentationRequiredModalImpl = NiceModal.create(
@@ -17,16 +14,13 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {
-      const result: DocumentationRequiredModalResult = {
-        note,
-        confirmedAt: new Date().toISOString(),
-      }
+      const result: DocumentationReport = note as DocumentationReport
       modal.resolve(result)
       modal.remove()
     }
 
     const handleBack = (): void => {
-      modal.resolve(null)
+      modal.resolve('' as DocumentationReport)
       modal.remove()
     }
 
@@ -44,5 +38,5 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 
 export const showDocumentationRequiredModal = (
   username: string
-): Promise<DocumentationRequiredModalResult | null> =>
+): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, { username })

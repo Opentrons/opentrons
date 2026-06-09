@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { createCapturePreviewImage } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
@@ -39,7 +39,7 @@ export function useCapturePreviewImage(): UseAddCapturePreviewImageMutationResul
     createCapturePreviewImage(host!, settings, { responseType: 'blob' })
       .then(response => {
         queryClient
-          .invalidateQueries([host, 'camera', 'capturePreviewImage'])
+          .invalidateQueries(getQueryKey(host, 'camera', 'capturePreviewImage'))
           .catch((e: Error) => {
             console.error(`error invalidating camera query: ${e.message}`)
           })

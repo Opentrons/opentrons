@@ -6,6 +6,30 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
+## Opentrons App Changes in 9.1.0
+
+Welcome to the v9.1.0 release of the Opentrons App! This release is designed specifically for use with Opentrons Flex and includes other new features, improvements, and bug fixes.
+
+**OT-2 robots will no longer appear in the Opentrons App.** v9.1.0 will prompt you to get the separate Opentrons OT-2 App, or you can download it directly from <https://opentrons.com/app>.
+
+### New Features
+
+- Use the updated Opentrons App to control and work with your Flex, including running protocols. Download the OT-2 App to control the OT-2 liquid handling robot.
+- View step groups added to your protocols in [visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
+
+### Improvements
+
+- View tip racks marked as empty on the deck map during run setup.
+
+### Bug Fixes
+
+- View individual labware loaded off-deck to check liquid volumes and locations.
+- Protocol run setup correctly displays the number of labware loaded in a Flex Stacker.
+- Slot spotlights in protocol visualization correctly display the number of tips returned to an empty tip rack.
+- Slot spotlights for deck slots containing a Flex Stacker no longer crash.
+
+---
+
 ## Opentrons App Changes in 9.0.0
 
 Welcome to the v9.0.0 release of the Opentrons App! This release includes protocol visualization and other feature improvements and bug fixes.

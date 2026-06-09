@@ -325,6 +325,7 @@ async def test_update_pump_state(
             pressure_abs_b=0,
             pressure_atm=0,
             vacuum_enabled=False,
+            vacuum_duration=0,
             vent_state=VentState.CLOSED,
         )
     ],
@@ -340,6 +341,56 @@ async def test_update_vacuum_state(
 
     await subject._reader.update_vacuum_state()
     assert subject._reader.vacuum_state == vacuum_state
+
+
+async def test_wait_for_target(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Ensure that the hc function reads the correct state and returns."""
+    current_pressures = [0, -100, -200, -300]
+    current_powers = [0, 30, 50, 75]
+    target_gauge_pressure = current_pressures[-1]
+    target_pwm = current_powers[-1]
+    vacuum_states = [
+        VacuumState(
+            target_gauge_pressure=target_gauge_pressure,
+            current_gauge_pressure=_pressure,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+        for _pressure in current_pressures
+    ]
+    pump_states = [
+        PumpState(
+            target_rpm=90,
+            current_rpm=80,
+            target_pwm=target_pwm,
+            current_pwm=_pwm,
+            pump_running=False,
+            manual_control=True,
+        )
+        for _pwm in current_powers
+    ]
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        vacuum_states[0], vacuum_states[1], vacuum_states[2], vacuum_states[3]
+    )
+    decoy.when(await mock_driver.get_pump_state()).then_return(
+        pump_states[0], pump_states[1], pump_states[2], pump_states[3]
+    )
+
+    await subject.set_pump_state(start_pump=True, duty_cycle=target_pwm)
+    await subject.wait_for_target()
+
+    await subject.set_vacuum_state(
+        enable_vacuum=True, gauge_pressure_mbar=target_gauge_pressure
+    )
+    await subject.wait_for_target()
 
 
 async def test_execute_profile(
@@ -412,6 +463,25 @@ async def test_execute_profile(
             "gauge_pressure_mbar": -111,
         },
     ]
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=True,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+
+    async def _fake_wait_for_target() -> None:
+        return
+
+    subject.wait_for_target = _fake_wait_for_target  # type: ignore[method-assign]
+
     await subject.execute_profile(profile)
 
     decoy.verify(

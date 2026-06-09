@@ -28,6 +28,7 @@ import {
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
+  getIsSlotAVacuumDock,
 } from '@opentrons/step-generation'
 
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
@@ -42,7 +43,10 @@ import {
   SelectLabwareModal,
 } from '../../../components/organisms'
 import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
-import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
+import {
+  DECK_SETUP_TOOLS_WIDTH_REM,
+  VACUUM_DOCK_DISPLAY_LOCATION,
+} from '../../../constants'
 import {
   createContainer,
   deleteContainer,
@@ -107,6 +111,8 @@ export function DeckSetupToolbox(
     return null
   }
   const isHopperSlot = getIsSlotAHopper(slot)
+  const isVacuumDockSlot = getIsSlotAVacuumDock(slot)
+  const realSlot = slot
   const offDeckLabware = deckSetup.labware[slot]
   const isVacuumModule =
     selectedModuleModel != null &&
@@ -142,6 +148,15 @@ export function DeckSetupToolbox(
   const isVacuumModuleFull =
     hasVacuumModuleCreated &&
     getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware)
+
+  // Check if vacuum dock is full by checking both stack and adapter for collar
+  // The dock and main module areas are independently managed
+  // Note: The collar might be in createdAdapterForSlot instead of createdStackForSlot
+  const isVacuumDockFull =
+    isVacuumDockSlot &&
+    (getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware) ||
+      (createdAdapterForSlot != null &&
+        getIsVacuumModuleFull([createdAdapterForSlot.id], deckSetup.labware)))
 
   const slotFull =
     ((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
@@ -248,7 +263,7 @@ export function DeckSetupToolbox(
     } else {
       dispatch(
         createContainer({
-          slot,
+          slot: realSlot,
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
             ...(selectedTopLabware.labwareDefURI != null
@@ -299,9 +314,16 @@ export function DeckSetupToolbox(
       handleClear()
     }
   }
-  const displaySlot = getIsSlotAHopper(slot)
-    ? t('shared:stacker', { slot: getColumnFromWellName(slot) })
-    : slot
+
+  let displaySlot = slot
+  if (getIsSlotAHopper(slot)) {
+    displaySlot = t('shared:stacker', { slot: getColumnFromWellName(slot) })
+  } else if (getIsSlotAVacuumDock(slot)) {
+    displaySlot = VACUUM_DOCK_DISPLAY_LOCATION
+  }
+
+  const isMultiStack = createdStackForSlot.length > 1
+  const shouldShowTopBottomOfSlotLabels = slotFull || isMultiStack
 
   return (
     <>
@@ -368,13 +390,16 @@ export function DeckSetupToolbox(
               <EmptySelectorButton
                 textAlignment="left"
                 text={
-                  hasNoLabware || hasVacuumModuleCreated
+                  hasNoLabware || hasVacuumModuleCreated || isVacuumDockSlot
                     ? t('add_labware')
                     : t('replace_labware')
                 }
                 iconName="plus"
                 onClick={() => {
-                  if (hasVacuumModuleCreated && isVacuumModuleFull) {
+                  if (
+                    (hasVacuumModuleCreated && isVacuumModuleFull) ||
+                    isVacuumDockFull
+                  ) {
                     makeSnackbar(t('labware_limit_reached') as string)
                   } else {
                     setShowSelectLabwareModal(true)
@@ -396,7 +421,7 @@ export function DeckSetupToolbox(
             />
           ) : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-              {slotFull ? (
+              {shouldShowTopBottomOfSlotLabels ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}
@@ -432,7 +457,7 @@ export function DeckSetupToolbox(
                   location={slot}
                 />
               ) : null}
-              {slotFull ? (
+              {shouldShowTopBottomOfSlotLabels ? (
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   color={COLORS.grey60}

@@ -18,6 +18,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     TemperatureStatus,
     ThermocyclerStep,
+    VacuumModuleStep,
 )
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
@@ -552,6 +553,14 @@ class AbstractVacuumModuleCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
+    def get_max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+
+    @abstractmethod
+    def get_min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+
+    @abstractmethod
     def start_set_vacuum_pressure(
         self,
         gauge_pressure_mbar: float,
@@ -578,3 +587,25 @@ class AbstractVacuumModuleCore(
         self,
     ) -> None:
         """Stop the vacuum pump."""
+
+    @abstractmethod
+    def start_execute_profile(
+        self, steps: List[VacuumModuleStep], repetitions: int, vent_after: bool = False
+    ) -> AbstractTaskCore:
+        """Start a vacuum module profile."""
+
+    @abstractmethod
+    def open_vent(
+        self,
+    ) -> None:
+        """Open the vent."""
+
+    @abstractmethod
+    def close_vent(
+        self,
+    ) -> None:
+        """Close the vent."""
+
+    @abstractmethod
+    def wait_for_target(self) -> None:
+        """Wait for either vacuum pressure or pwm."""

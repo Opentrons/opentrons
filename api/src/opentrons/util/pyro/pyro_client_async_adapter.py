@@ -1,29 +1,47 @@
 """Class wrapper that ingests a PyroSynchronousObject and maps 'synchronized' async functions to awaitable methods."""
 
 import asyncio
+import logging
 from typing import Any, Iterator, ParamSpec, TypeVar
 
 import Pyro5.api
 
 from opentrons.util.pyro.pyro_serialization import NonBuiltinKeyDictWrapper
 
+log = logging.getLogger(__name__)
+
 T = TypeVar("T")
 P = ParamSpec("P")
 
 
-class AsyncPyroFunctionWrapper:
+class ClientPyroFunctionWrapper:
     """Wrapper class to make Proxy response objects callable."""
 
     def __init__(
         self,
         proxy: Pyro5.api.Proxy,
     ) -> None:
-        self.proxy = proxy
+        self._proxy = proxy
+        self.validated_call = wrap_parameter_validation(self._proxy, "call")
 
-    def __call__(self: Any, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
         """Overload client-side call references with proxy-safe callable reference."""
-        with _get_thread_proxy(self.proxy) as threadsafe_proxy:
-            return threadsafe_proxy.call(*args, **kwargs)
+        return self.validated_call(self, *args, **kwargs)
+
+
+class AsyncClientPyroFunctionWrapper:
+    """Wrapper class to make Async Proxy response objects callable and awaitable."""
+
+    def __init__(
+        self,
+        proxy: Pyro5.api.Proxy,
+    ) -> None:
+        self._proxy = proxy
+        self.validated_call = wrap_parameter_validation(self._proxy, "call")
+
+    async def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Any:  # type: ignore
+        """Overload client-side async call references with proxy-safe synchronized callable reference."""
+        return self.validated_call(self, *args, **kwargs)
 
 
 class _ACPO:
@@ -162,7 +180,8 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str) -> Any:
         def _validations(arg: Any) -> Any:
             # NOTE: Extend this as further validations are needed
             arg = _validate_keys_builtins(arg)
-            arg = _validate_outbound_callback(arg)
+            arg = _validate_outbound_proxy(arg)
+            arg = _validate_outbound_nested_proxy(arg)
             return arg
 
         validated_args = tuple()  # type: ignore
@@ -209,13 +228,46 @@ def _validate_keys_builtins(arg: Any) -> Any:
     return arg
 
 
-def _validate_outbound_callback(arg: Any) -> Any:
-    """Handle an argument which is a remote callback in an AsyncPyroFunctionWrapper.
+def _validate_outbound_proxy(arg: Any) -> Any:
+    """Handle an argument which is a wrapped proxy such as a callback Function Wrapper or Async Client Pyro Object.
 
     For roundtrip functions, which may be sent across multiple processes, we only want to perserve the inner Proxy.
     """
-    if isinstance(arg, AsyncPyroFunctionWrapper):
-        arg = arg.proxy
+    if hasattr(arg, "_proxy"):
+        arg = arg._proxy
+
+    return arg
+
+
+def _validate_outbound_nested_proxy(arg: Any) -> Any:  # noqa: C901
+    """Handle an argument which may contain a nested wrapped proxy, such as a callback Function Wrapper or Async Client Pyro Object.
+
+    For roundtrip functions, which may be sent across multiple processes, we only want to perserve the inner Proxy while maintaining the shape of argument.
+    """
+    if type(arg) is tuple:
+        validated_tuple: tuple[Any, ...] = ()
+        for inner in arg:
+            if hasattr(inner, "_proxy"):
+                validated_tuple = (*validated_tuple, inner._proxy)
+            else:
+                validated_tuple = (*validated_tuple, inner)
+        return validated_tuple
+    elif isinstance(arg, dict):
+        validated_dict: dict[Any, Any] = {}
+        for inner_key, inner_val in arg.items():
+            if hasattr(inner_val, "_proxy"):
+                validated_dict[inner_key] = inner_val._proxy
+            else:
+                validated_dict[inner_key] = inner_val
+        return validated_dict
+    elif isinstance(arg, list):
+        validated_list = []
+        for inner in arg:
+            if hasattr(inner, "_proxy"):
+                validated_list.append(inner._proxy)
+            else:
+                validated_list.append(inner)
+        return validated_list
 
     return arg
 
@@ -223,7 +275,7 @@ def _validate_outbound_callback(arg: Any) -> Any:
 ### Result Validations
 
 
-def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) -> Any:
+def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) -> Any:  # noqa: C901
     """Validate incoming result format before returning from a remote call.
 
     This is not to be confused with serialization. The validation process can be used to reformat
@@ -243,17 +295,37 @@ def wrap_result_validation(proxy: Pyro5.api.Proxy, func_name: str, result: Any) 
             return None
         try:
             if result.is_callable:
-                validated_result = AsyncPyroFunctionWrapper(result)
-
+                # Determine if proxy is a callback
+                validated_result = ClientPyroFunctionWrapper(result)
         except AttributeError:
             try:
-                iter(result)
-                validated_result = []
-                for r in result:
-                    assert isinstance(r, Pyro5.api.Proxy)
-                    validated_result.append(AsyncClientPyroObject(r))
+                if result.is_awaitable:
+                    # Determine if proxy is an async callback
+                    validated_result = AsyncClientPyroFunctionWrapper(result)
             except AttributeError:
-                assert isinstance(result, Pyro5.api.Proxy)
-                validated_result = AsyncClientPyroObject(result)
+                # Handle dictionaries of Proxies
+                if isinstance(result, dict):
+                    new_dict = {}
+                    for key, value in result.items():
+                        # Dictionary values are optional for Pyro dictionaries, so handle None case while assigning
+                        new_dict[key] = (
+                            AsyncClientPyroObject(value)
+                            if isinstance(value, Pyro5.api.Proxy)
+                            else None
+                        )
+                    validated_result = new_dict
+
+                else:
+                    try:
+                        # Attempt to handle a list of Proxies
+                        iter(result)
+                        validated_result = []
+                        for r in result:
+                            assert isinstance(r, Pyro5.api.Proxy)
+                            validated_result.append(AsyncClientPyroObject(r))
+                    except AttributeError:
+                        # Handle a single Proxy instance
+                        assert isinstance(result, Pyro5.api.Proxy)
+                        validated_result = AsyncClientPyroObject(result)
 
     return validated_result

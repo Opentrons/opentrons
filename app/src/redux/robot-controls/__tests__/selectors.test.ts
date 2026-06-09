@@ -14,28 +14,6 @@ interface SelectorSpec {
 
 const SPECS: SelectorSpec[] = [
   {
-    name: 'getLightsOn returns null by default',
-    selector: Selectors.getLightsOn,
-    state: { robotControls: {} } as any,
-    args: ['robotName'],
-    expected: null,
-  },
-  {
-    name: 'getLightsOn returns value if present',
-    selector: Selectors.getLightsOn,
-    state: {
-      robotControls: {
-        robotName: {
-          lightsOn: false,
-          movementStatus: null,
-          movementError: null,
-        },
-      },
-    } as any,
-    args: ['robotName'],
-    expected: false,
-  },
-  {
     name: 'getMovementStatus returns null by default',
     selector: Selectors.getMovementStatus,
     state: {

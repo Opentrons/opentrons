@@ -4,11 +4,10 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   Banner,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InfoScreen,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SIZE_3,
   SPACING,
   StyledText,
@@ -130,6 +129,7 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       gap={SPACING.spacing16}
+      paddingBottom={SPACING.spacing12}
     >
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('instruments_and_modules')}
@@ -276,23 +276,7 @@ export function InstrumentsAndModules({
             </Flex>
           </Flex>
         ) : (
-          <Flex
-            alignItems={ALIGN_CENTER}
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing12}
-            justifyContent={JUSTIFY_CENTER}
-            minHeight={SIZE_3}
-            padding={SPACING.spacing12}
-          >
-            {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
-            <LegacyStyledText
-              forwardedAs="p"
-              color={COLORS.grey40}
-              id="InstrumentsAndModules_offline"
-            >
-              {t('offline_instruments_and_modules')}
-            </LegacyStyledText>
-          </Flex>
+          <InfoScreen content={t('offline_instruments_and_modules')} />
         )}
       </Flex>
     </Flex>

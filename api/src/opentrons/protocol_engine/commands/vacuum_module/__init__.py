@@ -15,11 +15,16 @@ from .open_vent import (
     OpenVentResult,
 )
 from .start_run_profile import (
+    ProfileType,
     StartRunProfile,
     StartRunProfileCommandType,
     StartRunProfileCreate,
     StartRunProfileParams,
     StartRunProfileResult,
+    StartRunProfileStepParams,
+    VacuumModuleProfileCycle,
+    VacuumModuleProfilePowerStep,
+    VacuumModuleProfilePressureStep,
 )
 from .start_set_vacuum_power import (
     StartSetVacuumPower,
@@ -41,6 +46,13 @@ from .stop_vacuum import (
     StopVacuumCreate,
     StopVacuumParams,
     StopVacuumResult,
+)
+from .wait_for_target import (
+    WaitForTarget,
+    WaitForTargetCommandType,
+    WaitForTargetCreate,
+    WaitForTargetParams,
+    WaitForTargetResult,
 )
 
 __all__ = [
@@ -80,4 +92,15 @@ __all__ = [
     "StartRunProfileCreate",
     "StartRunProfileParams",
     "StartRunProfileResult",
+    "VacuumModuleProfileCycle",
+    "VacuumModuleProfilePowerStep",
+    "VacuumModuleProfilePressureStep",
+    "ProfileType",
+    "StartRunProfileStepParams",
+    # wait for target command models
+    "WaitForTarget",
+    "WaitForTargetCommandType",
+    "WaitForTargetCreate",
+    "WaitForTargetParams",
+    "WaitForTargetResult",
 ]

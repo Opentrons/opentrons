@@ -107,6 +107,17 @@ def test_request_with_id() -> None:
         "data": {"type": "item", "attributes": {}, "id": "abc123"},
     }
     my_request_obj = MyRequest.model_validate(obj_to_validate)
-    assert my_request_obj.model_dump() == {
-        "data": {"type": "item", "attributes": {}, "id": "abc123"},
+    assert my_request_obj.model_dump() == obj_to_validate
+
+
+def test_legacy_user_notes_field_is_ignored() -> None:
+    """Top-level ``userNotes`` in JSON bodies is no longer read; use the header instead."""
+    ItemRequest = RequestModel[ItemModel]
+    payload = {
+        "data": {"name": "apple", "quantity": 10, "price": 1.20},
+        "userNotes": "audit note",
     }
+
+    obj = ItemRequest.model_validate(payload)
+
+    assert obj.model_dump() == {"data": payload["data"]}

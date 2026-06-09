@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -13,7 +14,7 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
-import { useSendIdentifyStacker } from './hooks'
+import { useSendIdentifyModule } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
 import type { SetStateAction } from 'react'
@@ -67,7 +68,7 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-  const sendIdentifyStacker = useSendIdentifyStacker()
+  const sendIdentifyModule = useSendIdentifyModule()
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -92,11 +93,13 @@ export function useModuleSetupWizard(
   }
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
 
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands()
+    useChainMaintenanceCommands(commandDocState)
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(commandDocState, {
       onSuccess: (response: {
         data: { id: SetStateAction<string | null> }
       }) => {
@@ -125,18 +128,21 @@ export function useModuleSetupWizard(
     if (onComplete != null) onComplete()
   }
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      setMaintenanceRunId(null)
-    },
-    onError: () => {
-      setMaintenanceRunId(null)
-    },
-  })
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    {
+      onSuccess: () => {
+        setMaintenanceRunId(null)
+      },
+      onError: () => {
+        setMaintenanceRunId(null)
+      },
+    }
+  )
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (attachedModule != null) sendIdentifyStacker(attachedModule, false)
+    if (attachedModule != null) sendIdentifyModule(attachedModule, false)
     if (maintenanceRunId == null) {
       console.log(
         'closing module setup wizard: no maintenance run, not deleting'

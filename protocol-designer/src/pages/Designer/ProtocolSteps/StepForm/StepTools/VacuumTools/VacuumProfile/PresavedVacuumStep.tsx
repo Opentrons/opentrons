@@ -17,6 +17,8 @@ import {
 import {
   VACUUM_MAX_PRESSURE_MBAR,
   VACUUM_MIN_PRESSURE_MBAR,
+} from '@opentrons/shared-data'
+import {
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
 } from '@opentrons/step-generation'
@@ -77,10 +79,10 @@ export function PresavedVacuumStep(
             }
           : {
               mode: VACUUM_MODE_POWER,
-              powerPercent:
-                'powerPercent' in patch && patch.powerPercent !== undefined
-                  ? patch.powerPercent
-                  : stepData.pumpData.powerPercent,
+              percentPower:
+                'percentPower' in patch && patch.percentPower !== undefined
+                  ? patch.percentPower
+                  : stepData.pumpData.percentPower,
             }
       onStepChange(stepData.id, { pumpData: nextPumpData })
     } else {
@@ -156,10 +158,10 @@ export function PresavedVacuumStep(
                   />
                 ) : (
                   <Slider
-                    value={pumpData.powerPercent}
+                    value={pumpData.percentPower}
                     label={t('vacuum.controls.profile.pump_power')}
                     adjustValue={value => {
-                      updateField('pumpData', { powerPercent: value })
+                      updateField('pumpData', { percentPower: value })
                     }}
                     backgroundColor={COLORS.grey35}
                     type="small"

@@ -1,10 +1,13 @@
 import { MemoryRouter } from 'react-router-dom'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { describe, it } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 import { Navbar } from '../Navbar'
 
-import type { RouteProps } from '..//types'
+import type { RouteProps } from '../types'
 
 const ROUTE_PROPS: RouteProps[] = [
   { name: 'foo', navLinkTo: '/foo', path: '/foo', Component: () => null },
@@ -14,23 +17,31 @@ const ROUTE_PROPS: RouteProps[] = [
 
 describe('Navbar', () => {
   it('should render a NavbarLink for every nav location', () => {
-    render(
+    renderWithProviders(
       <MemoryRouter>
         <Navbar routes={ROUTE_PROPS} />
-      </MemoryRouter>
+      </MemoryRouter>,
+      { i18nInstance: i18n }
     )
     screen.getByRole('link', { name: 'foo' })
     screen.getByRole('link', { name: 'bar' })
     screen.getByRole('link', { name: 'baz' })
   })
+
   it('should render logo, settings, and help', () => {
-    render(
+    renderWithProviders(
       <MemoryRouter>
         <Navbar routes={ROUTE_PROPS} />
-      </MemoryRouter>
+      </MemoryRouter>,
+      { i18nInstance: i18n }
     )
+
     screen.getByRole('img', { name: 'opentrons logo' })
-    screen.getByTestId('Navbar_settingsLink')
-    screen.getByTestId('Navbar_helpLink')
+
+    screen.getByRole('button', { name: 'App Settings' })
+    screen.getByRole('link', { name: 'Help' })
+
+    screen.getByLabelText('Settings icon')
+    screen.getByLabelText('Help icon')
   })
 })

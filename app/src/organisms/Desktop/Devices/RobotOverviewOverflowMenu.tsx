@@ -249,8 +249,7 @@ export const RobotOverviewOverflowMenu = (
                 robot.name
               )}`}
             >
-              {/* TODO(jh, 05-18-26): Update after Design finalizes implementation */}
-              {t('robot_controls:shutdown_label')}
+              {t('robot_controls:turn_off_label')}
             </MenuItem>
           ) : null}
           <Divider marginY="0" />

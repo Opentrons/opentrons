@@ -14,7 +14,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import { useSendIdentifyStacker } from '../../ModuleWizardFlows/hooks'
+import { useSendIdentifyModule } from '../../ModuleWizardFlows/hooks'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { Mock } from 'vitest'
@@ -60,7 +60,7 @@ const render = (props: ComponentProps<typeof AddFixtureModal>) => {
 
 describe('Touchscreen AddFixtureModal', () => {
   let props: ComponentProps<typeof AddFixtureModal>
-  let sendIdentifyStacker: (
+  let sendIdentifyModule: (
     module: AttachedModule,
     start: boolean,
     color?: IdentifyColor
@@ -71,7 +71,7 @@ describe('Touchscreen AddFixtureModal', () => {
     t = vi.fn(key => key)
     vi.mocked(useTranslation).mockReturnValue({ t } as any)
 
-    sendIdentifyStacker = vi.fn()
+    sendIdentifyModule = vi.fn()
     props = {
       cutoutId: 'cutoutD3',
       addressableAreaId: 'D3',
@@ -87,7 +87,7 @@ describe('Touchscreen AddFixtureModal', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
     } as unknown as UseQueryResult<Modules>)
-    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
+    vi.mocked(useSendIdentifyModule).mockReturnValue(sendIdentifyModule)
   })
 
   it('should render text and buttons', () => {

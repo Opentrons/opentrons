@@ -1,0 +1,312 @@
+# Build and deploy the Opentrons app without running unit tests.
+# Use this workflow (workflow_dispatch) when you need a build on demand.
+
+name: 'App build and deploy'
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+env:
+  CI: 'true'
+  _APP_DEPLOY_BUCKET_ROBOTSTACK: builds.opentrons.com
+  _APP_DEPLOY_FOLDER_ROBOTSTACK: app
+  _APP_DEPLOY_BUCKET_OT3: ot3-development.builds.opentrons.com
+  _APP_DEPLOY_FOLDER_OT3: app
+
+jobs:
+  determine-build-type:
+    runs-on: 'ubuntu-latest'
+    name: 'Determine build variant and type'
+    outputs:
+      variants: ${{ steps.determine-build-type.outputs.variants }}
+      type: ${{ steps.determine-build-type.outputs.type }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: ./.github/actions/app/determine-build-type
+        id: determine-build-type
+        with:
+          edge-build-policy: always
+          skip-pull-requests: 'false'
+
+  build-app:
+    needs: [determine-build-type]
+    if: needs.determine-build-type.outputs.variants != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
+        target: ['desktop', 'odd']
+        exclude:
+          - os: 'windows-2022'
+            target: 'odd'
+          - os: 'macos-latest'
+            target: 'odd'
+
+    runs-on: ${{ matrix.os }}
+    name: 'Build ${{matrix.variant}} ${{matrix.target}} app on ${{matrix.os}}'
+    steps:
+      - name: 'Get project name for variant'
+        id: project
+        shell: bash
+        run: |
+          if [ "${{matrix.variant}}" = "release" ] ; then
+             echo "Configuring project, bucket, and folder for robot-stack"
+             echo "project=robot-stack" >> $GITHUB_OUTPUT
+             echo "bucket=${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}" >> $GITHUB_OUTPUT
+             echo "folder=${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}" >> $GITHUB_OUTPUT
+          else
+             echo "Configuring project, bucket, and folder for ot3"
+             echo "project=ot3" >> $GITHUB_OUTPUT
+             echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
+             echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
+          fi
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/js/setup
+      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
+        with:
+          python-version: '3.12'
+      - name: check make version
+        run: make --version
+      - name: 'Configure Windows code signing environment'
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: bash
+        run: |
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64_V2 }}" | base64 --decode > /d/Certificate_pkcs12.p12
+          echo "${{ secrets.WINDOWS_CSC_B64_V2 }}" | base64 --decode > /d/opentrons_labworks_inc.crt
+          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
+          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
+          echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
+
+      - name: 'Setup Windows code signing helpers'
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: cmd
+        env:
+          SM_HOST: ${{ secrets.SM_HOST_V2 }}
+          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
+          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
+          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
+        run: |
+          REM Download DigiCert Keylocker Tools installer (quiet curl: -s silent, -S show errors, -f fail on HTTP errors, -L follow redirects)
+          curl -sSfL ^
+            --retry 5 --retry-all-errors ^
+            --connect-timeout 30 --max-time 120 ^
+            -X GET ^
+            -H "x-api-key:%SM_API_KEY%" ^
+            -o Keylockertools-windows-x64.msi ^
+            --write-out "Download complete: %%{filename_effective} (%%{size_download} bytes) in %%{time_total}s @ %%{speed_download} bytes/s\n" ^
+            "https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download"
+          msiexec /i Keylockertools-windows-x64.msi /quiet /qn
+          smksp_registrar.exe list
+          smctl.exe keypair ls
+          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
+          smksp_cert_sync.exe
+          smctl.exe healthcheck --all
+
+      - name: 'bundle ${{matrix.variant}} frontend'
+        env:
+          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
+          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
+          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          OT_SENTRY_DSN: ${{ matrix.target == 'desktop' && secrets.OT_DESKTOP_SENTRY_DSN || secrets.OT_ODD_SENTRY_DSN }}
+        run: |
+          make -C app dist
+
+      - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
+        if: matrix.target == 'desktop'
+        timeout-minutes: 60
+        env:
+          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
+          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          WINDOWS_SIGN: ${{ format('{0}', contains(needs.determine-build-type.outputs.type, 'release')) }}
+          SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH_V3}}
+          SM_KEYPAIR_ALIAS: ${{secrets.SM_KEYPAIR_ALIAS_V3}}
+          SM_HOST: ${{ secrets.SM_HOST_V2 }}
+          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
+          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
+          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
+          WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
+          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
+          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
+          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD_V2 }}
+          APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID_V2 }}
+          HOST_PYTHON: python
+          OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
+          OT_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
+          OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
+          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          OT_SENTRY_DSN: ${{ secrets.OT_DESKTOP_SENTRY_DSN }}
+        run: |
+          make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
+
+      - name: 'upload github artifact'
+        if: matrix.target == 'desktop'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: 'opentrons-${{matrix.variant}}-${{ matrix.os }}'
+          path: app-shell/dist/publish
+
+      - if: matrix.target == 'odd'
+        name: 'build ${{matrix.variant}} ODD app'
+        timeout-minutes: 60
+        env:
+          OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
+          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          OT_SENTRY_DSN: ${{ secrets.OT_ODD_SENTRY_DSN }}
+        run: |
+          make -C app-shell-odd dist-ot3
+
+  deploy-release-app:
+    name: 'Deploy built app artifacts to S3'
+    runs-on: 'ubuntu-22.04'
+    needs: ['build-app', 'determine-build-type']
+    if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: 'download run app builds'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: ./artifacts
+      - name: 'separate release and internal-release artifacts'
+        run: |
+          for variant in release internal-release ; do
+              mkdir to_upload_${variant}
+              variant_pattern="./artifacts/opentrons-${variant}-*"
+              ls ${variant_pattern}/ 2>/dev/null 1>/dev/null || continue
+              echo "Moving ${variant} builds ${variant_pattern}/* to to_upload_${variant}"
+              cp ${variant_pattern}/* ./to_upload_${variant}/
+              echo "Moved $(ls ./to_upload_${variant})"
+          done
+      - name: 'configure s3 deploy creds (GitHub OIDC)'
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ vars.OT_APP_OT3_DEPLOY_ROLE }}
+          aws-region: us-east-2
+      - name: 'deploy release builds to s3'
+        run: |
+          aws s3 sync --acl=public-read to_upload_release/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
+      - name: 'deploy internal-release release builds to s3'
+        run: |
+          aws s3 sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+
+      - name: 'upload windows artifacts to GH release'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
+        if: needs.determine-build-type.outputs.type == 'release'
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./artifacts/*/*.exe
+          artifactContentType: application/vnd.microsoft.portable-executable
+      - name: 'upload macos artifacts to GH release'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
+        if: needs.determine-build-type.outputs.type == 'release'
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./artifacts/*/*.dmg
+          artifactContentType: application/octet-stream
+      - name: 'upload linux artifacts to GH release'
+        uses: 'ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e' # v1.12.0
+        if: needs.determine-build-type.outputs.type == 'release'
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./artifacts/*/*.AppImage
+          artifactContentType: application/octet-stream
+      - name: 'detect build data for notification'
+        id: names
+        shell: bash
+        run: |
+          for variant in release internal-release ; do
+              dir=./to_upload_${variant}
+              echo "Checking for ${variant} builds in ${dir}"
+              ls ${dir}/Opentrons* || continue
+              _windows_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.exe))
+              _mac_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.dmg))
+              _linux_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.AppImage))
+              echo "windows-${variant}=$_windows_build">>$GITHUB_OUTPUT
+              echo "mac-${variant}=$_mac_build">>$GITHUB_OUTPUT
+              echo "linux-${variant}=$_linux_build">>$GITHUB_OUTPUT
+          done
+      - name: 'slack notify internal-release'
+        uses: slackapi/slack-github-action@d09f6a279ff492756a31df59952ee6dce8c9b772 # v1.14.0
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+        continue-on-error: true
+        with:
+          payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}"}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
+      - name: 'slack notify release'
+        uses: slackapi/slack-github-action@d09f6a279ff492756a31df59952ee6dce8c9b772 # v1.14.0
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
+        continue-on-error: true
+        with:
+          payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}"}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}
+
+      - name: 'backup upload folders before checkout'
+        run: |
+          mkdir -p ${{ runner.temp }}/upload_backup
+          mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
+      - name: 'pull repo for scripts'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: 'restore upload folders after checkout'
+        run: |
+          mv ${{ runner.temp }}/upload_backup/to_upload_* ./ 2>/dev/null || true
+      - uses: ./.github/actions/js/setup
+      - name: 'print upload folders contents'
+        run: |
+          echo "Test Outputs"
+          echo "Contents of to_upload_internal-release: $(ls -l ./to_upload_internal-release)"
+          echo "Contents of to_upload_release: $(ls -l ./to_upload_release)"
+      - name: 'update internal-releases releases.json'
+        if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+        run: |
+          aws s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
+          node ./scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
+          aws s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
+
+      - name: 'update release releases.json'
+        if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
+        run: |
+          aws s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
+          node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
+          aws s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
+
+      - name: 'invalidate CloudFront cache (builds.opentrons.com)'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') && vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID != ''
+        run: |
+          set -euo pipefail
+          INVALIDATION_ID="$(
+            aws cloudfront create-invalidation \
+              --distribution-id '${{ vars.OT_APP_BUILDS_CLOUDFRONT_DISTRIBUTION_ID }}' \
+              --paths '/app/*' \
+              --output text \
+              --query 'Invalidation.Id'
+          )"
+          echo "Started CloudFront invalidation: ${INVALIDATION_ID}"

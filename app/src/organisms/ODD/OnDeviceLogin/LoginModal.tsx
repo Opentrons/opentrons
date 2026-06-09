@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
-import { useStoreLoginState } from './hooks'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
@@ -16,7 +15,6 @@ export interface LoginModalResult {
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
-  const { t } = useTranslation('device_settings')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
@@ -29,8 +27,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       modal.resolve(result)
       modal.remove()
     },
-    onError: () => {
-      setLoginError(t('on_device_login_error_incorrect') as string)
+    onError: message => {
+      setLoginError(message)
     },
   })
 

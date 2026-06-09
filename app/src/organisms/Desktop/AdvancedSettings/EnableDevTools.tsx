@@ -12,7 +12,11 @@ import {
 } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { getDevtoolsEnabled, toggleDevtools } from '/app/redux/config'
+import {
+  clearDevInternalFlags,
+  getDevtoolsEnabled,
+  toggleDevtools,
+} from '/app/redux/config'
 
 import type { Dispatch } from '/app/redux/types'
 
@@ -20,7 +24,12 @@ export function EnableDevTools(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const dispatch = useDispatch<Dispatch>()
-  const toggleDevTools = (): unknown => dispatch(toggleDevtools())
+  const toggleDevTools = (): void => {
+    if (devToolsOn) {
+      dispatch(clearDevInternalFlags())
+    }
+    dispatch(toggleDevtools())
+  }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
