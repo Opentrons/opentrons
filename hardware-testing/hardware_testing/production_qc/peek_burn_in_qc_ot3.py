@@ -686,6 +686,19 @@ def _dry_run_reports(cycles: int, trials: int) -> None:
     print(f"Dry-run OK: {results_path}")
     print(f"Dry-run OK: {recorder_path}")
 
+def _upload_data_to_google_drive(
+    path: Path,
+) -> None:
+    """Upload data to Google Drive."""
+    condition = True
+    upload_count = 0
+    while condition:
+        res = upload_data_to_google_drive(path, include_source_zip=True)
+        if res:
+            condition = False
+        upload_count += 1
+        if upload_count > 2:
+            break
 
 async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_stall: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -769,15 +782,15 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                 if stall_reason:
                     cycle_plunger_stall_reasons.append(stall_reason)
                     cycle_plunger_passed = False
+                    # Stop burn-in immediately when stall occurs during cycle plunger
+                    ui.print_error("STALL detected in cycle plunger, stopping burn-in test")
+                    break
                 data = [failed_cycles, CSVResult.from_bool(failed_cycles == 0)]
                 results_report(
                     _get_cycling_section_tag(),
                     _get_cycling_test_tag(cycle),
                     data,
                 )
-                # Only stop all burn-in cycles when test_plunger fails at >= 0.55A.
-                # Low-current failures and cycle stalls are recorded in SUMMARY but
-                # do not skip remaining cycles.
             # Only run final test_plunger if burn-in was not stopped early
             if not stop_burn_in:
                 _max_failed, fail_reason, had_failure, stop_burn_in = await _test_plunger(
@@ -806,14 +819,11 @@ async def _main(is_simulating: bool, cycles: int, trials: int, continue_after_st
                 test_plunger_fail_reasons=test_plunger_fail_reasons,
                 cycle_plunger_stall_reasons=cycle_plunger_stall_reasons,
             )
-            upload_data_to_google_drive(
-                results_path,
-                True,
-            )
-            upload_data_to_google_drive(
-                recorder_path,
-                True,
-            )
+            ### Upload data to Google Drive
+            _upload_data_to_google_drive(results_path)
+            time.sleep(60)
+            _upload_data_to_google_drive(recorder_path)
+
             if api.is_simulator:
                 break
 
