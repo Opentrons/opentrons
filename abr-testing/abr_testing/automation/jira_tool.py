@@ -6,7 +6,7 @@ import json
 import webbrowser
 from pathlib import Path
 import argparse
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 import os
 
 
@@ -112,7 +112,7 @@ class JiraTicket:
         affects_versions: str,
         labels: list,
         parent: str,
-    ) -> Tuple[str, str]:
+    ) -> Tuple[Optional[str], Optional[str]]:
         """Create ticket."""
         # Check if software version is a field on JIRA, if not replaces with existing version
         data = {

@@ -36,7 +36,9 @@ class JiraBugExporter(JiraTicket):
         fields: str = "*all",
     ) -> List[Dict[str, Any]]:
         """Get all child issues under a parent key with optional type filter.
-        Handles pagination automatically."""
+
+        Handles pagination automatically.
+        """
         jql = f"parent = {parent_key}"
         if issue_type:
             jql += f" AND issuetype = {issue_type}"

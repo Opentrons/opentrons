@@ -253,7 +253,9 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
     return ""
 
 
-def read_each_log(folder_path: str, issue_url: str) -> None:
+def read_each_log(
+    folder_path: str, issue_url: str, ticket: jira_tool.JiraTicket, issue_key: str
+) -> None:
     """Read log and comment error portion on JIRA ticket."""
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
@@ -341,7 +343,7 @@ def get_parent_key(
     ]
     if not matches:
         print(f"No issue named '{parent_name}' in {project_key}")
-        return
+        return ""
     return matches[0]["key"]
 
 
@@ -419,7 +421,7 @@ def get_robot_state(
     ip: str, reported_string: str, project_key: str
 ) -> Tuple[Any, Any, Any, List[str], List[str], str]:
     """Get robot status in case of non run error."""
-    description = dict()
+    description: Dict[str, Any] = dict()
     # Get robot health info. If the HTTP server is down/erroring we still want
     # to create a ticket from the manually-provided title, just with less info.
     health_data: Dict[str, Any] = {}
@@ -475,7 +477,7 @@ def get_robot_state(
                 description[module["moduleType"]] = module
         except requests.exceptions.RequestException as e:
             print(f"WARNING: Could not fetch modules (HTTP unavailable): {e}")
-    components = []
+    components: List[str] = []
     # components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, reported_string, components)
     # if "alpha" in affects_version:
@@ -516,7 +518,7 @@ def get_run_error_info_from_robot(
     project_key: str,
 ) -> Tuple[str, str, str, List[str], List[str], str, str]:
     """Get error information from robot to fill out ticket."""
-    description = dict()
+    description: Dict[str, Any] = dict()
     # get run information
     results = get_run_logs.get_run_data(one_run, ip)
     # Get version file
@@ -535,7 +537,7 @@ def get_run_error_info_from_robot(
     robot = results.get("robot_name", "")
     failure_level = "Level " + str(error_level) + " Failure"
 
-    components = []
+    components: List[str] = []
     # components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, str(error_type), components)
     affects_version = results["API_Version"]
@@ -567,7 +569,7 @@ def get_run_error_info_from_robot(
     description["error"] = " ".join([error_code, error_type, error_instrument])
     protocol_step = list(results["commands"])[-1]
     errored_labware_id = protocol_step["params"].get("labwareId", "")
-    errored_labware_dict = {}
+    errored_labware_dict: Dict[str, Any] = {}
     description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")
     description["left_mount"] = results.get("left", "No attachment")
@@ -871,6 +873,8 @@ if __name__ == "__main__":
         labels,
         parent,
     )
+    issue_key = issue_key or ""
+    raw_issue_url = raw_issue_url or ""
     image_files = ""
     if len(run_or_other) < 1:
         image_files = retrieve_protocol_images(one_run, ip, storage_directory)
@@ -918,7 +922,7 @@ if __name__ == "__main__":
         file_to_attach = os.path.join(error_folder_path, file)
         ticket.post_attachment_to_ticket(issue_key, file_to_attach)
     # ADD ERROR COMMENTS TO TICKET
-    read_each_log(error_folder_path, raw_issue_url)
+    read_each_log(error_folder_path, raw_issue_url, ticket, issue_key)
 
     # Cleanup error folder
     cleanup_report_folders(storage_directory)

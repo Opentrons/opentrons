@@ -886,8 +886,12 @@ def write_to_sheets(
 
 
 def get_calibration_offsets(
-    ip: str, storage_directory: Path, collected_files: list
-) -> list:
+    ip: str,
+    storage_directory: Path,
+    collected_files: Optional[List[str]] = None,
+) -> Tuple[str, Dict[str, Any]]:
+    if collected_files is None:
+        collected_files = []
     """Connect to robot via ip and get calibration data."""
     calibration = dict()
     # Robot Information [Name, Software Version]
@@ -902,7 +906,7 @@ def get_calibration_offsets(
         health_data = response.json()
     except requests.exceptions.RequestException as e:
         print(f"Failed to fetch calibration data (HTTP unavailable): {e}")
-        return collected_files
+        return "", {}
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
     pull_date_timestamp = datetime.now()
@@ -949,8 +953,7 @@ def get_calibration_offsets(
     saved_file_path = os.path.join(storage_directory, save_name)
     with open(saved_file_path, mode="w") as f:
         json.dump(calibration, f, indent=2)
-    collected_files.append(str(saved_file_path))
-    return collected_files
+    return str(saved_file_path), calibration
 
 
 def retrieve_version_file(
@@ -1032,7 +1035,11 @@ def get_logs(storage_directory: Path, ip: str) -> str:
     )
 
     # Get Calibration and version Data
-    collected_files = get_calibration_offsets(ip, storage_directory, collected_files)
+    calibration_file, _ = get_calibration_offsets(
+        ip, storage_directory, collected_files
+    )
+    if calibration_file:
+        collected_files.append(calibration_file)
 
     collected_files = retreive_odd_console(ip, storage_directory, collected_files)
 
@@ -1066,7 +1073,7 @@ def get_logs(storage_directory: Path, ip: str) -> str:
 
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file_path in collected_files:
-            arcname: str = os.path.basename(file_path)  # ✅ always str
+            arcname: str = os.path.basename(file_path)
             zipf.write(file_path, arcname=arcname)
 
     for file_path in collected_files:
