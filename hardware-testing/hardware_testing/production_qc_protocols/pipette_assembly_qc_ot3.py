@@ -638,7 +638,7 @@ def _read_pressure_and_check_results(
         _samples.append(fixture.read_all_pressure_channel())
         next_sample_time = time() + pressure_event_config.sample_delay
         _sample_rounded = [round(p, 2) for p in _samples[-1]]
-        report(section, tag.value, _sample_rounded, i)
+        report("PRESSURE-DATA", f"{tag.value}", _sample_rounded, i)
         delay_time = next_sample_time - time()
         if (
             not api.is_simulator
@@ -800,7 +800,7 @@ def _fixture_check_pressure(
     )
     results.append(r)
     # dispense
-    api.dispense(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume], 0.5)
+    api.dispense(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume], 0.5, is_full_dispense=True)
     sleep(2)
     r, _ = _read_pressure_and_check_results(
         api,
@@ -1769,14 +1769,13 @@ def build_pressure_data_csv_lines(
     lines.append(CSVLine("PHASE", [str for _ in range(pipette_channels)]))
     for event, config in PRESSURE_FIXTURE_EVENT_CONFIGS.items():
         # Skip the second aspirate so we don't double up
-        if event != PressureEvent.ASPIRATE_P1000:
-            lines.append(
-                CSVLineRepeating(
-                    config.sample_count,
-                    event.value,
-                    [float for _ in range(pipette_channels)],
-                )
+        lines.append(
+            CSVLineRepeating(
+                config.sample_count,
+                event.value,
+                [float for _ in range(pipette_channels)],
             )
+        )
     return lines
 
 
