@@ -16,6 +16,7 @@ export const DocumentationRequiredModalTestProvider: FunctionComponent<{
   <DocumentationRequiredModalContext.Provider
     value={{
       showDocumentationRequiredModal: mockShowDocumentationRequiredModal,
+      setIsLoading: vi.fn(),
     }}
   >
     {children}

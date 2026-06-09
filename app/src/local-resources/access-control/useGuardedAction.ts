@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo } from 'react'
+import { useCallback, useContext, useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -43,14 +43,18 @@ export function useGuardedAction(
   const minLengthOfReasonForInteraction =
     authSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
 
+  const reasonForInteractionLoading = useMemo(
+    () => authSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
+    [accessControlEnabledQuery?.isLoading, authSettingsQuery?.isLoading]
+  )
+
   const reasonForInteractionRequired = useMemo(
     () => accessControlEnabled && requireReasonForInteraction,
     [accessControlEnabled, requireReasonForInteraction]
   )
 
-  const { showDocumentationRequiredModal: requireDocumentation } = useContext(
-    DocumentationRequiredModalContext
-  )
+  const { showDocumentationRequiredModal: requireDocumentation, setIsLoading } =
+    useContext(DocumentationRequiredModalContext)
 
   const showDocumentationModal = useCallback(
     async (actionsToDocument: DocumentedAction[]) => {
@@ -63,9 +67,13 @@ export function useGuardedAction(
     [currentUsername, requireDocumentation]
   )
 
+  useEffect(() => {
+    setIsLoading(reasonForInteractionLoading)
+  }, [reasonForInteractionLoading, setIsLoading])
+
   const docState: DocumentationState = useMemo(() => {
     if (!reasonForInteractionRequired) {
-      return { reasonForInteractionRequired: false }
+      return { reasonForInteractionRequired: false, isLoading: false }
     }
 
     if (

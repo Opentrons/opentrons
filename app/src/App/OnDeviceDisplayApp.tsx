@@ -59,8 +59,9 @@ import {
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
-import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { DocumentationRequiredContextProvider } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
+import { InProgressModal } from '../molecules/InProgressModal'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
@@ -258,10 +259,11 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                         robotName={localRobot.name}
                       />
                     ) : null}
-                    <DocumentationRequiredModalContext.Provider
-                      value={{
-                        showDocumentationRequiredModal: requireDocumentation,
-                      }}
+                    <DocumentationRequiredContextProvider
+                      showDocumentationRequiredModal={requireDocumentation}
+                      loadingModal={
+                        <InProgressModal description="Loading..." />
+                      }
                     >
                       <NiceModal.Provider>
                         <RobotEncryptionKeyTakeover>
@@ -282,7 +284,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                           </ToasterOven>
                         </RobotEncryptionKeyTakeover>
                       </NiceModal.Provider>
-                    </DocumentationRequiredModalContext.Provider>
+                    </DocumentationRequiredContextProvider>
                   </MaintenanceRunTakeover>
                 </>
               )}
