@@ -3,9 +3,11 @@ title: "Vacuum Module: Collars and Spacers"
 description: "General use and specifications for Vacuum Module collars and spacers."
 ---
 
+The Vacuum Module uses combinations of interchangeable collars and spacers to control labware stacking and spacing in automated, sold-phase (SPE) extraction protocols. This hardware holds filtration labware, ensures a vacuum seal, and helps route liquid correctly, whether is being saved as an eluate or discarded as waste.
+
 ## Collars
 
-Collars sit directly on the manifold base to support filter plates during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the manifold base seals the collar to the unit. All collars are fully compatible with the Flex Gripper for automated deck operations.
+Collars sit directly on the manifold base to support filter plates during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the manifold base it to the collar. All collars are fully compatible with the Flex Gripper for automated protocol operations.
 
 The Vacuum Module ships with two collar sizes:
 
@@ -20,7 +22,7 @@ The Vacuum Module ships with two collar sizes:
 
 ## Spacers
 
-Spacers fit inside the manifold base to support internal labware that collects material drawn through the filter plate. Their primary mechanical purpose is to minimize the gap between the source filter plate and the destination collection plate. Reducing this gap ensures liquid drops fall cleanly and directly into the receiving wells, preventing high-velocity vacuum streams from pulling fluid droplets sideways or causing cross-contamination.
+Spacers fit inside the manifold base to support internal labware that collects material drawn through the filter plate. Their primary mechanical purpose is to minimize the gap between the source filter plate and the destination collection plate. Reducing this gap ensures liquid drops fall cleanly and directly into the recieving wells, preventing high-velocity vacuum streams from pulling fluid droplets sideways or causing cross-contamination.
 
 The Vacuum Module ships with two spacer sizes to match varying labware profiles:
 
@@ -42,8 +44,8 @@ This configuration is used when a protocol requires capturing the filtered liqui
 * **Internal Hardware:** An internal spacer is placed inside the manifold base to elevate and position the collection labware directly beneath the filter plate.
 * **Fluid Routing:** Liquid flows vertically through the filter plate and drips straight into the corresponding collection wells.
 
-<font color="red">IMAGE PLACEHOLDER</font>  
-*Standard stack order: Vacuum Manifold Base > Spacer > Collection Plate > Collar > Filter Plate*
+
+Standard stack order: manifold base > spacer > collection plate > collar > filter plate
 
 ### Direct Filter to Waste
 
