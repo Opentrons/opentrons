@@ -4,7 +4,6 @@ import enum
 from pathlib import Path
 from time import time
 from typing import Any, List, Union, Optional, overload
-from collections.abc import Iterable
 from hardware_testing import data as data_io
 
 
@@ -124,7 +123,7 @@ class CSVLine:
         else:
             return None
 
-    def store(self, *data: Any, print_results: bool = True) -> None:
+    def store(self, data: List[Any], print_results: bool = True) -> None:
         """Line store data."""
         if len(data) != len(self._data_types):
             raise ValueError(
@@ -346,17 +345,15 @@ class CSVReport:
         self._dont_write_to_disk = dont_write_to_disk
 
     @overload
-    def __call__(self, section: str, tag: str, line_data: Iterable[Any]) -> None:
+    def __call__(self, section: str, tag: str, line_data: List[Any]) -> None:
         ...
 
     @overload
-    def __call__(
-        self, section: str, tag: str, line_data: Iterable[Any], ind: int
-    ) -> None:
+    def __call__(self, section: str, tag: str, line_data: List[Any], ind: int) -> None:
         ...
 
     def __call__(
-        self, section: str, tag: str, line_data: Iterable[Any], ind: int = -1
+        self, section: str, tag: str, line_data: List[Any], ind: int = -1
     ) -> None:
         """CSV Report call."""
         if ind == -1:
@@ -392,11 +389,11 @@ class CSVReport:
             line = results_section[f"RESULT_{s.title}"]
             assert isinstance(line, CSVLine)
             if s.result_passed:
-                line.store(CSVResult.PASS, print_results=False)
+                line.store([CSVResult.PASS], print_results=False)
             elif s.result_passed is False:
-                line.store(CSVResult.FAIL, print_results=False)
+                line.store([CSVResult.FAIL], print_results=False)
             else:
-                line.store(None, print_results=False)
+                line.store([None], print_results=False)
 
     def __str__(self) -> str:
         """CSV Report string."""

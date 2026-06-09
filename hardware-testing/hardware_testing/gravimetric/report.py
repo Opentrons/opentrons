@@ -240,7 +240,7 @@ def create_csv_test_report(
     # NOTE: just immediately clear all the "isolate" flags on the volume section
     #       so that final CSV is guaranteed to not be filled with a bunch of "None"
     for line in report["VOLUMES"].lines:
-        line.store(None, "")
+        line.store([None, ""])
     return report
 
 
