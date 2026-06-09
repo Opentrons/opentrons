@@ -21,7 +21,6 @@ import base64
 import websocket
 
 
-
 def open_folder(path: str) -> None:
     """Open file folder on mac or windows."""
     system = platform.system()
@@ -33,7 +32,6 @@ def open_folder(path: str) -> None:
         raise OSError("Unsupported operating system")
 
 
-
 def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
     """Save all capture images for a run."""
     save_dir = Path(f"{storage}")
@@ -42,8 +40,10 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
     zip_path = save_dir / f"{run_id}_images"
     command = [
         "scp",
-        "-i", str(key_path),
-        "-o", "StrictHostKeyChecking=no",
+        "-i",
+        str(key_path),
+        "-o",
+        "StrictHostKeyChecking=no",
         "-r",
         f"root@{robot_ip}:/data/images/{run_id}/",
         save_dir,
@@ -56,7 +56,15 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
         ws_url = targets[0]["webSocketDebuggerUrl"].replace("localhost", robot_ip)
         # Connect and send Page.captureScreenshot
         ws = websocket.create_connection(ws_url, timeout=10)
-        ws.send(json.dumps({"id": 1, "method": "Page.captureScreenshot", "params": {"format": "png"}}))
+        ws.send(
+            json.dumps(
+                {
+                    "id": 1,
+                    "method": "Page.captureScreenshot",
+                    "params": {"format": "png"},
+                }
+            )
+        )
         result = json.loads(ws.recv())
         ws.close()
         image_data = base64.b64decode(result["result"]["data"])
@@ -78,17 +86,22 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
         print(f"Error during file transfer: {e}")
     return ""
 
+
 def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     """Capture a live camera image and ODD screenshot, return path to zip."""
     save_dir = Path(storage)
     key_path = save_dir / "robot_key"
     # grabbing the camera image
     ssh_command = [
-        "ssh", "-i", str(key_path), "-o", "StrictHostKeyChecking=no",
+        "ssh",
+        "-i",
+        str(key_path),
+        "-o",
+        "StrictHostKeyChecking=no",
         f"root@{robot_ip}",
     ]
     captured = []
-    update_camera_status("ON", robot_ip, key_path)
+    update_camera_status("ON", robot_ip, str(key_path))
     time.sleep(3)
     # grab one frame from camera live stream
     camera_path = save_dir / "robot_pic.jpg"
@@ -96,13 +109,15 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     try:
         subprocess.run(
             ["ffmpeg", "-i", stream_url, "-frames:v", "1", str(camera_path), "-y"],
-            check=True, capture_output=True, timeout=30,
+            check=True,
+            capture_output=True,
+            timeout=30,
         )
         captured.append(camera_path)
         print(f"Camera image saved: {camera_path}")
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
         print(f"Failed to capture camera image for {robot_name}: {e}")
-    update_camera_status("OFF", robot_ip, key_path)
+    update_camera_status("OFF", robot_ip, str(key_path))
     # ODD screenshot via Chrome DevTools Protocol (port 9222 on robot)
     odd_path = save_dir / "odd_pic.png"
     try:
@@ -111,7 +126,15 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
         ws_url = targets[0]["webSocketDebuggerUrl"].replace("localhost", robot_ip)
         # Connect and send Page.captureScreenshot
         ws = websocket.create_connection(ws_url, timeout=10)
-        ws.send(json.dumps({"id": 1, "method": "Page.captureScreenshot", "params": {"format": "png"}}))
+        ws.send(
+            json.dumps(
+                {
+                    "id": 1,
+                    "method": "Page.captureScreenshot",
+                    "params": {"format": "png"},
+                }
+            )
+        )
         result = json.loads(ws.recv())
         ws.close()
         image_data = base64.b64decode(result["result"]["data"])
@@ -140,29 +163,28 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
 
     return zip_base + ".zip"
 
+
 import subprocess
 
+
 def update_camera_status(status: str, robot_ip: str, key_path: str):
-    username = "root"                         # Opentrons default
+    username = "root"  # Opentrons default
     status_upper = str(status).upper()
     # sed command
     remote_command = f"sed -i 's/^STATUS=.*/STATUS={status_upper}/' /data/opentrons-live-stream.env && systemctl restart opentrons-live-stream"
     # ssh command
     ssh_command = [
         "ssh",
-        "-i", key_path,
-        "-o", "StrictHostKeyChecking=no",
+        "-i",
+        key_path,
+        "-o",
+        "StrictHostKeyChecking=no",
         f"{username}@{robot_ip}",
-        remote_command
+        remote_command,
     ]
     try:
         # Run the command and capture output
-        result = subprocess.run(
-            ssh_command, 
-            capture_output=True, 
-            text=True, 
-            check=True
-        )
+        result = subprocess.run(ssh_command, capture_output=True, text=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Command failed with exit code {e.returncode}.")
         if e.stderr:
@@ -176,8 +198,10 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
     """Find and copy protocol file on robot with error handling."""
     list_folder_command = [
         "ssh",
-        "-i", str(Path(storage) / "robot_key"),
-        "-o", "StrictHostKeyChecking=no",
+        "-i",
+        str(Path(storage) / "robot_key"),
+        "-o",
+        "StrictHostKeyChecking=no",
         f"root@{robot_ip}",
         "ls /var/lib/opentrons-robot-server",
     ]
@@ -205,14 +229,18 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
     key_path = save_dir / "robot_key"
 
     for folder_num in folders:
-        protocol_dir = f"/var/lib/opentrons-robot-server/{folder_num}/protocols/{protocol_id}"
+        protocol_dir = (
+            f"/var/lib/opentrons-robot-server/{folder_num}/protocols/{protocol_id}"
+        )
         command = [
             "scp",
-            "-i", str(key_path),
-            "-o", "StrictHostKeyChecking=no",
+            "-i",
+            str(key_path),
+            "-o",
+            "StrictHostKeyChecking=no",
             "-r",
             f"root@{robot_ip}:{protocol_dir}",
-            save_dir,
+            str(save_dir),
         ]
         try:
             subprocess.run(command, check=True)
@@ -295,23 +323,30 @@ def match_error_to_component(
     return components
 
 
-def get_parent_key(url: str, api_token: str, email: str, project_key: str, parent_name: str) -> str:
+def get_parent_key(
+    url: str, api_token: str, email: str, project_key: str, parent_name: str
+) -> str:
     """Find a project key from a name"""
-    jql = f'project = {project_key} AND summary ~ "{parent_name}"' #we can make this hit everything not just the project
+    jql = f'project = {project_key} AND summary ~ "{parent_name}"'  # we can make this hit everything not just the project
     response = requests.post(
         f"{url}/rest/api/3/search/jql",
         json={"jql": jql, "fields": ["summary"], "maxResults": 50},
         auth=(email, api_token),
     )
     response.raise_for_status()
-    matches = [i for i in response.json()["issues"] if i["fields"]["summary"].strip().lower() == parent_name.strip().lower()]
+    matches = [
+        i
+        for i in response.json()["issues"]
+        if i["fields"]["summary"].strip().lower() == parent_name.strip().lower()
+    ]
     if not matches:
         print(f"No issue named '{parent_name}' in {project_key}")
         return
     return matches[0]["key"]
 
+
 def cleanup_report_folders(storage_directory: str, keep_count: int = 3) -> None:
-    """Cleans up report folder, keeping only the _ (default 3) 
+    """Cleans up report folder, keeping only the _ (default 3)
     newest reports to conserve storage space"""
     storage_path = Path(storage_directory)
     folders = [f for f in storage_path.iterdir() if f.is_dir()]
@@ -328,6 +363,7 @@ def cleanup_report_folders(storage_directory: str, keep_count: int = 3) -> None:
                 print(f"Deleted folder: {folder.name}")
             except Exception as e:
                 print(f"Failed to delete {folder.name}: {e}")
+
 
 def get_user_id(user_file_path: str, assignee_name: str) -> str:
     """Get assignee account id."""
@@ -440,17 +476,17 @@ def get_robot_state(
         except requests.exceptions.RequestException as e:
             print(f"WARNING: Could not fetch modules (HTTP unavailable): {e}")
     components = []
-    #components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
+    # components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, reported_string, components)
-    #if "alpha" in affects_version:
+    # if "alpha" in affects_version:
     components.append("flex internal release")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
-    #print(f"components: {str(components)}")
+    # print(f"components: {str(components)}")
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    if project_key == "RQA": #217 is ABR
+    if project_key == "RQA":  # 217 is ABR
         parent_name = affects_version + " Bugs"
         parent = get_parent_key(url, api_token, email, project_key, parent_name)
     else:
@@ -473,7 +509,11 @@ def get_robot_state(
 
 
 def get_run_error_info_from_robot(
-    ip: str, one_run: str, storage_directory: Path, protocol_found: bool, project_key: str
+    ip: str,
+    one_run: str,
+    storage_directory: Path,
+    protocol_found: bool,
+    project_key: str,
 ) -> Tuple[str, str, str, List[str], List[str], str, str]:
     """Get error information from robot to fill out ticket."""
     description = dict()
@@ -496,10 +536,10 @@ def get_run_error_info_from_robot(
     failure_level = "Level " + str(error_level) + " Failure"
 
     components = []
-    #components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
+    # components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, str(error_type), components)
     affects_version = results["API_Version"]
-    #if "alpha" in affects_version:
+    # if "alpha" in affects_version:
     components.append("flex internal release")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
@@ -507,7 +547,7 @@ def get_run_error_info_from_robot(
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    if project_key == "RQA": #217 is ABR
+    if project_key == "RQA":  # 217 is ABR
         parent_name = affects_version + " Bugs"
         parent = get_parent_key(url, api_token, email, project_key, parent_name)
     else:
@@ -540,7 +580,7 @@ def get_run_error_info_from_robot(
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in whole_description.items())
         + "}"
     )
-   
+
     return (
         summary,
         parent,
@@ -550,6 +590,7 @@ def get_run_error_info_from_robot(
         whole_description_str,
         saved_file_path,
     )
+
 
 def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
     """Fetch latest run and SCP protocol into storage_directory (needs robot_key there)."""
@@ -663,6 +704,7 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
     shutil.rmtree(protocol_folder, ignore_errors=True)
     return ""
 
+
 def make_json_file(storage_directory: str, whole_description_str: str):
     save_dir = Path(storage_directory)
     file_path = save_dir / "health.json"
@@ -740,7 +782,7 @@ if __name__ == "__main__":
             break
         else:
             print("Invalid input, try again.")
-    #TODO: auto grab from fleet
+    # TODO: auto grab from fleet
     ip = str(input("Enter Robot IP: "))
     if not preflight_connection_check(ip, storage_directory):
         sys.exit()
@@ -753,17 +795,17 @@ if __name__ == "__main__":
     url = "https://opentrons.atlassian.net"
     log_zip_path = read_robot_logs.get_logs(storage_directory, ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    #Nick Check
+    # Nick Check
     run_log_file_path = ""
     protocol_found = False
-    #Nick Check
+    # Nick Check
     try:
         error_runs, protocol_ids = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
-    #Nick Check
-    #Nick Check
+    # Nick Check
+    # Nick Check
     protocol_file_path = ""
     one_run = ""
     if len(run_or_other) < 1 and error_runs and protocol_ids:
@@ -798,10 +840,7 @@ if __name__ == "__main__":
         if len(run_or_other) < 1:
             print("No failed/recovery runs matched filters.")
             run_or_other = str(
-                input(
-                    "Please format title as:\n"
-                    "feature, brief summary\n> "
-                )
+                input("Please format title as:\n" "feature, brief summary\n> ")
             ).strip()
         protocol_file_path = save_latest_protocol(ip, storage_directory)
         (
@@ -818,7 +857,7 @@ if __name__ == "__main__":
     print(f"Making ticket for {summary}.")
     all_issues = ticket.issues_on_board(project_key)
     # CREATE TICKET
-    #TODO: for pyro, add pyro filter as HIGH priority
+    # TODO: for pyro, add pyro filter as HIGH priority
     description = "Error recreation steps: (PLEASE FILL)"
     issue_key, raw_issue_url = ticket.create_ticket(
         summary,
@@ -838,7 +877,9 @@ if __name__ == "__main__":
     else:
         try:
             health = requests.get(
-                f"http://{ip}:31950/health", headers={"opentrons-version": "*"}, timeout=10
+                f"http://{ip}:31950/health",
+                headers={"opentrons-version": "*"},
+                timeout=10,
             )
             robot_name = health.json().get("name", ip)
         except Exception:
@@ -852,8 +893,8 @@ if __name__ == "__main__":
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
     error_files = [
-        run_log_file_path, # run-error path only
-        protocol_file_path, # run-error path only
+        run_log_file_path,  # run-error path only
+        protocol_file_path,  # run-error path only
         log_zip_path,
         image_files,
         status_path,

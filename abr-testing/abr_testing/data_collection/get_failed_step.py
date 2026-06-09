@@ -38,33 +38,46 @@ def get_failed_step(robot_ip: str) -> None:
 
     if recovering_link:
         cmd_id = recovering_link["meta"]["commandId"]
-        cmd = requests.get(
-            f"http://{robot_ip}:31950/runs/{run_id}/commands/{cmd_id}",
-            headers=HEADERS,
-            timeout=10,
-        ).json().get("data", {})
+        cmd = (
+            requests.get(
+                f"http://{robot_ip}:31950/runs/{run_id}/commands/{cmd_id}",
+                headers=HEADERS,
+                timeout=10,
+            )
+            .json()
+            .get("data", {})
+        )
         _print_command(cmd, source="currentlyRecoveringFrom")
         return
 
     # 2. Fallback: scan commands list for any with status "failed" or an error set.
     #    commandErrors only returns error metadata (no commandType/params), so we
     #    need the full command objects to know which step was running.
-    total = requests.get(
-        f"http://{robot_ip}:31950/runs/{run_id}/commands",
-        headers=HEADERS,
-        params={"pageLength": 0},
-        timeout=10,
-    ).json().get("meta", {}).get("totalLength", 0)
+    total = (
+        requests.get(
+            f"http://{robot_ip}:31950/runs/{run_id}/commands",
+            headers=HEADERS,
+            params={"pageLength": 0},
+            timeout=10,
+        )
+        .json()
+        .get("meta", {})
+        .get("totalLength", 0)
+    )
 
     page_size = 100
     failed_cmd = None
     for cursor in range(0, total, page_size):
-        page = requests.get(
-            f"http://{robot_ip}:31950/runs/{run_id}/commands",
-            headers=HEADERS,
-            params={"cursor": cursor, "pageLength": page_size},
-            timeout=10,
-        ).json().get("data", [])
+        page = (
+            requests.get(
+                f"http://{robot_ip}:31950/runs/{run_id}/commands",
+                headers=HEADERS,
+                params={"cursor": cursor, "pageLength": page_size},
+                timeout=10,
+            )
+            .json()
+            .get("data", [])
+        )
         for cmd in page:
             if cmd.get("status") == "failed" or cmd.get("error"):
                 failed_cmd = cmd  # keep last one found
@@ -83,7 +96,9 @@ def _print_command(cmd: dict, source: str) -> None:
     print(f"  commandType : {cmd.get('commandType')}")
     print(f"  status      : {cmd.get('status')}")
     print(f"  detail      : {detail[:300]}")
-    print(f"  line        : {line_match.group(1) if line_match else 'N/A (hardware error)'}")
+    print(
+        f"  line        : {line_match.group(1) if line_match else 'N/A (hardware error)'}"
+    )
     params = cmd.get("params", {})
     if params:
         print(

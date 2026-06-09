@@ -172,7 +172,11 @@ class JiraTicket:
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
         file = {
-            "file": (os.path.basename(attachment_path), open(attachment_path, "rb"), "application-type")
+            "file": (
+                os.path.basename(attachment_path),
+                open(attachment_path, "rb"),
+                "application-type",
+            )
         }
         JSON_headers = {"Accept": "application/json", "X-Atlassian-Token": "no-check"}
         attachment_url = f"{self.url}/rest/api/3/issue/{issue_id}/attachments"
@@ -264,7 +268,9 @@ class JiraTicket:
         response = requests.get(component_url, headers=self.headers, auth=self.auth)
         components_list = response.json()
         if not isinstance(components_list, list):
-            print(f"Failed to get components for project '{project_id}': {components_list}")
+            print(
+                f"Failed to get components for project '{project_id}': {components_list}"
+            )
             return []
         return components_list
 

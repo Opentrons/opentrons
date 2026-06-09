@@ -10,14 +10,22 @@ from jira_tool import JiraTicket
 class JiraBugExporter(JiraTicket):
     """Extends JiraTicket with initiative bug export capabilities."""
 
-    def search_jql(self, jql: str, fields: str = "*all",
-                   max_results: int = 100, start_at: int = 0,) -> Dict[str, Any]:
+    def search_jql(
+        self,
+        jql: str,
+        fields: str = "*all",
+        max_results: int = 100,
+        start_at: int = 0,
+    ) -> Dict[str, Any]:
         """Generic JQL search with customizable query, fields, and pagination."""
         url = f"{self.url}/rest/api/3/search/jql"
-        query = {"jql": jql, "maxResults": str(max_results), 
-                 "startAt": str(start_at), "fields": fields,}
-        response = requests.get(url, headers=self.headers, 
-                    auth=self.auth, params=query)
+        query = {
+            "jql": jql,
+            "maxResults": str(max_results),
+            "startAt": str(start_at),
+            "fields": fields,
+        }
+        response = requests.get(url, headers=self.headers, auth=self.auth, params=query)
         response.raise_for_status()
         return response.json()
 
@@ -48,15 +56,11 @@ class JiraBugExporter(JiraTicket):
             start += 100
         return all_issues
 
-    def get_issue_details(
-        self, issue_key: str, fields: str = "*all"
-    ) -> Dict[str, Any]:
+    def get_issue_details(self, issue_key: str, fields: str = "*all") -> Dict[str, Any]:
         """Get full details for a single issue by key."""
         url = f"{self.url}/rest/api/3/issue/{issue_key}"
         query = {"fields": fields}
-        response = requests.get(
-            url, headers=self.headers, auth=self.auth, params=query
-        )
+        response = requests.get(url, headers=self.headers, auth=self.auth, params=query)
         response.raise_for_status()
         return response.json()
 
@@ -166,13 +170,24 @@ class JiraBugExporter(JiraTicket):
             writer.writerow(
                 [
                     # Tier 1
-                    "Key", "Summary", "Description", "Issue Type",
-                    "Components", "Fix Version",
+                    "Key",
+                    "Summary",
+                    "Description",
+                    "Issue Type",
+                    "Components",
+                    "Fix Version",
                     # Tier 2
-                    "Parent Epic Key", "Parent Epic Summary",
-                    "Linked Issues", "Comments", "Labels", "Attachments",
+                    "Parent Epic Key",
+                    "Parent Epic Summary",
+                    "Linked Issues",
+                    "Comments",
+                    "Labels",
+                    "Attachments",
                     # Context
-                    "Status", "Priority", "Assignee", "Created",
+                    "Status",
+                    "Priority",
+                    "Assignee",
+                    "Created",
                 ]
             )
             for bug in bugs:
@@ -185,12 +200,8 @@ class JiraBugExporter(JiraTicket):
                         fields["summary"],
                         self.extract_description(fields),
                         fields.get("issuetype", {}).get("name", ""),
-                        ", ".join(
-                            c["name"] for c in (fields.get("components") or [])
-                        ),
-                        ", ".join(
-                            v["name"] for v in (fields.get("fixVersions") or [])
-                        ),
+                        ", ".join(c["name"] for c in (fields.get("components") or [])),
+                        ", ".join(v["name"] for v in (fields.get("fixVersions") or [])),
                         # Tier 2
                         parent_key,
                         epic_summaries.get(parent_key, ""),
@@ -201,9 +212,7 @@ class JiraBugExporter(JiraTicket):
                         # Context
                         fields["status"]["name"],
                         fields["priority"]["name"],
-                        (fields.get("assignee") or {}).get(
-                            "displayName", "Unassigned"
-                        ),
+                        (fields.get("assignee") or {}).get("displayName", "Unassigned"),
                         fields["created"][:10],
                     ]
                 )

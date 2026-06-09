@@ -41,10 +41,14 @@ def check_ssh_available(ip: str, storage_directory: str, timeout: int = 15) -> b
         result = subprocess.run(
             [
                 "ssh",
-                "-i", str(key_path),
-                "-o", "StrictHostKeyChecking=no",
-                "-o", "BatchMode=yes",
-                "-o", "ConnectTimeout=10",
+                "-i",
+                str(key_path),
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-o",
+                "BatchMode=yes",
+                "-o",
+                "ConnectTimeout=10",
                 f"root@{ip}",
                 "echo ok",
             ],
@@ -941,13 +945,13 @@ def get_calibration_offsets(
     except requests.exceptions.RequestException as e:
         print(f"Failed to fetch some calibration data (HTTP unavailable): {e}")
 
-
     save_name = "calibration.json"
     saved_file_path = os.path.join(storage_directory, save_name)
     with open(saved_file_path, mode="w") as f:
         json.dump(calibration, f, indent=2)
     collected_files.append(str(saved_file_path))
     return collected_files
+
 
 def retrieve_version_file(
     robot_ip: str,
@@ -956,11 +960,13 @@ def retrieve_version_file(
     """Retrieve Version file."""
     version_file_path = "/etc/VERSION.json"
     save_dir = Path(f"{storage}")
-    key_path = Path(storage)/"robot_key"
+    key_path = Path(storage) / "robot_key"
     command = [
         "scp",
-        "-i", str(key_path),
-        "-o", "StrictHostKeyChecking=no",
+        "-i",
+        str(key_path),
+        "-o",
+        "StrictHostKeyChecking=no",
         "-r",
         f"root@{robot_ip}:{version_file_path}",
         save_dir,
@@ -971,6 +977,7 @@ def retrieve_version_file(
     except subprocess.CalledProcessError as e:
         print(f"Error during file transfer: {e}")
         return ""
+
 
 def get_logs(storage_directory: Path, ip: str) -> str:
     """Get Robot logs and return a zip file path containing them."""
@@ -1010,10 +1017,10 @@ def get_logs(storage_directory: Path, ip: str) -> str:
             log_data: str = response.text
             log_name: str = log_type_name
             file_path: str = os.path.join(storage_directory, log_name)
-            
+
             with open(file_path, mode="w", encoding="utf-8") as f:
                 f.write(log_data)
-                
+
             collected_files.append(file_path)
         except Exception as e:
             print(f"Failed to fetch {log_type['log type']}: {e}")
@@ -1025,9 +1032,7 @@ def get_logs(storage_directory: Path, ip: str) -> str:
     )
 
     # Get Calibration and version Data
-    collected_files = get_calibration_offsets(
-        ip, storage_directory, collected_files
-    )
+    collected_files = get_calibration_offsets(ip, storage_directory, collected_files)
 
     collected_files = retreive_odd_console(ip, storage_directory, collected_files)
 
@@ -1053,12 +1058,12 @@ def get_logs(storage_directory: Path, ip: str) -> str:
         print(f"Failed to fetch run log: {e}")
 
     timestamp = datetime.now().strftime("%Y-%m-%d")
-    
+
     # Create a ZIP archive with all collected files
     zip_filename: str = os.path.join(
         storage_directory, f"{robot_name}_{timestamp}_{sw_version}_logs.zip"
     )
-    
+
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file_path in collected_files:
             arcname: str = os.path.basename(file_path)  # ✅ always str
@@ -1084,11 +1089,16 @@ def fetch_weston_log(
         result = subprocess.run(
             [
                 "ssh",
-                "-i", str(key_path),
-                "-o", "StrictHostKeyChecking=no",
-                "-o", "BatchMode=yes",
+                "-i",
+                str(key_path),
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-o",
+                "BatchMode=yes",
                 f"root@{ip}",
-                "journalctl", "_COMM=weston", "--no-pager",
+                "journalctl",
+                "_COMM=weston",
+                "--no-pager",
             ],
             check=True,
             capture_output=True,
@@ -1104,13 +1114,11 @@ def fetch_weston_log(
 
     return collected_files
 
-    
+
 def retreive_odd_console(
-    robot_ip: str,
-    storage_directory: str,
-    collected_files: list
+    robot_ip: str, storage_directory: str, collected_files: list
 ) -> list:
-    """Connect to the ODD via websocket, collect all buffered 
+    """Connect to the ODD via websocket, collect all buffered
     console messages, sort chronologically, and save to CSV.
     """
     log_buffer = 3.0
@@ -1119,18 +1127,16 @@ def retreive_odd_console(
 
     # Find the opentrons page target, this is specific to each boot of each robot
     try:
-        targets = requests.get(
-            f"http://{robot_ip}:9223/json/list", timeout=5
-        ).json()
+        targets = requests.get(f"http://{robot_ip}:9223/json/list", timeout=5).json()
     except Exception as e:
         print(f"Could not reach port 9223 on {robot_ip}: {e}")
         return collected_files
 
     target = next(
         (
-            t for t in targets
-            if t.get("type") == "page"
-            and "opentrons" in (t.get("title") or "").lower()
+            t
+            for t in targets
+            if t.get("type") == "page" and "opentrons" in (t.get("title") or "").lower()
         ),
         None,
     )
@@ -1205,7 +1211,11 @@ def retreive_odd_console(
         writer = csv.writer(csv_file)
         writer.writerow(["timestamp", "level", "message"])
         for ts_ms, level, text in entries:
-            ts = t.strftime("%b %d %H:%M:%S", t.localtime(ts_ms / 1000)) if ts_ms else "unknown"
+            ts = (
+                t.strftime("%b %d %H:%M:%S", t.localtime(ts_ms / 1000))
+                if ts_ms
+                else "unknown"
+            )
             writer.writerow([ts, level, text])
 
     print(f"\nSaved {len(entries)} entries to {output_csv}")
