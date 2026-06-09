@@ -358,6 +358,9 @@ TRASH_OFFSETS = [
     Point(x=(64 * 0.75)),
 ]
 
+LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=100)
+LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - LOCATION_A1_LEFT.x)
+
 _available_tips: Dict[int, List[str]] = {}
 _available_tips_fixture: Dict[int, List[str]] = {}
 
@@ -522,6 +525,55 @@ def _pick_up_tip_for_tip_volume(
         tip_location,
         tip_volume=tip_volume,
     )
+
+
+def pressure_fixture_a1_location(side: str) -> Point:
+    """Get the A1 position of the pressure fixture within a slot."""
+    assert side in ["left", "right"], "pressure fixture side must be left or right"
+    if side == "left":
+        return LOCATION_A1_LEFT
+    else:
+        return LOCATION_A1_RIGHT
+
+
+def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
+    CALIBRATED_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
+    IDEAL_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
+    if not (ctx.params.skip_fixture and ctx.params.skip_liquid and ctx.params.skip_liquid_probe):  # type: ignore[attr-defined]
+        tiprack_50 = ctx.load_labware(
+            "opentrons_flex_96_tiprack_50uL", cfg.slot_tip_rack_50
+        )
+        tiprack_200 = ctx.load_labware(
+            "opentrons_flex_96_tiprack_200uL", cfg.slot_tip_rack_200
+        )
+        tiprack_1000 = ctx.load_labware(
+            "opentrons_flex_96_tiprack_1000uL", cfg.slot_tip_rack_1000
+        )
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_50 = tiprack_50["A1"].top().point
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_200 = tiprack_200["A1"].top().point
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_1000 = tiprack_1000["A1"].top().point
+        IDEAL_LABWARE_LOCATIONS.tip_rack_50 = tiprack_50["A1"].top().point
+        IDEAL_LABWARE_LOCATIONS.tip_rack_200 = tiprack_200["A1"].top().point
+        IDEAL_LABWARE_LOCATIONS.tip_rack_1000 = tiprack_1000["A1"].top().point
+    if not (ctx.params.skip_fixture and ctx.params.skip_liquid):  # type: ignore[attr-defined]
+        reservoir = ctx.load_labware("nest_1_reservoir_195ml", cfg.slot_reservoir)
+        CALIBRATED_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point
+        IDEAL_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point
+    if not ctx.params.skip_liquid_probe:  # type: ignore[attr-defined]
+        plate = ctx.load_labware("corning_96_wellplate_360ul_flat", cfg.slot_plate)
+        CALIBRATED_LABWARE_LOCATIONS.plate_primary = plate["H6"].top(5).point
+        IDEAL_LABWARE_LOCATIONS.plate_primary = plate["H6"].top(5).point
+        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = plate["H6"].top(5).point
+        IDEAL_LABWARE_LOCATIONS.plate_secondary = plate["H6"].top(5).point
+    if not ctx.params.skip_fixture:  # type: ignore[attr-defined]
+        # TODO: make a fixture labware definition
+        fixture_slot_pos = helpers_ot3.get_slot_bottom_left_position_ot3(
+            cfg.slot_fixture
+        )
+        fixture_loc = fixture_slot_pos + pressure_fixture_a1_location(cfg.fixture_side)
+        fixture_loc = fixture_loc + Point(z=-8)
+        CALIBRATED_LABWARE_LOCATIONS.fixture = fixture_loc
+        IDEAL_LABWARE_LOCATIONS.fixture = fixture_loc
 
 
 def _drop_tip_in_trash(api: SyncHardwareAPI, cfg: TestConfig) -> None:
@@ -2010,6 +2062,16 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
+def _reset_available_tips() -> None:
+    for tip_size in [50, 200, 1000]:
+        _available_tips[tip_size] = [
+            f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"
+        ]
+        _available_tips_fixture[tip_size] = [
+            f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"
+        ]
+
+
 def run(ctx: ProtocolContext) -> None:
     """Entry point into testing protocol."""
     # apply monkey patch
@@ -2058,7 +2120,8 @@ def run(ctx: ProtocolContext) -> None:
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     current_pos = api.gantry_position(OT3Mount.RIGHT)
     api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
-
+    _reset_available_tips()
+    _load_labware_locations(config, ctx)
     pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
     assert pips, "no pipettes attached"
     for mount, pipette in pips.items():
