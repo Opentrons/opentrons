@@ -5,12 +5,15 @@ import type { EmptyResponse, HostConfig } from '../types'
 
 export function deleteMaintenanceRun(
   config: HostConfig,
-  maintenanceRunId: string
+  maintenanceRunId: string,
+  userNotes?: string
 ): ResponsePromise<EmptyResponse> {
   return request<EmptyResponse>(
     DELETE,
     `/maintenance_runs/${maintenanceRunId}`,
     null,
-    config
+    config,
+    undefined,
+    userNotes
   )
 }

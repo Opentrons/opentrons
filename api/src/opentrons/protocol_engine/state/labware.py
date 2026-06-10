@@ -1329,10 +1329,14 @@ class LabwareView:
             )
         elif isinstance(below_labware.location, ModuleLocation):
             below_definition = self.get_definition(labware_id=below_labware.id)
-            if not labware_validation.validate_definition_is_adapter(
-                below_definition
-            ) and not labware_validation.validate_definition_is_lid(
-                top_labware_definition
+            if (
+                not labware_validation.validate_definition_is_adapter(below_definition)
+                and not labware_validation.validate_definition_is_lid(
+                    top_labware_definition
+                )
+                and not labware_validation.validate_definition_is_filter_plate(
+                    top_labware_definition
+                )
             ):
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"

@@ -104,9 +104,13 @@ export function useCommandTextString(
     case 'sealPipetteToTip':
     case 'unsealPipetteFromTip':
     case 'pressureDispense':
+    case 'verifyTipPresence':
       return {
         kind: 'generic',
-        commandText: utils.getPipettingCommandText(fullParams),
+        commandText: utils.getPipettingCommandText({
+          ...fullParams,
+          command,
+        }),
       }
 
     case 'loadLabware':
@@ -364,6 +368,18 @@ export function useCommandTextString(
         }),
       }
     }
+
+    case 'calibration/calibratePipette':
+    case 'calibration/calibrateGripper':
+    case 'calibration/calibrateModule':
+    case 'calibration/moveToMaintenancePosition':
+      return {
+        kind: 'generic',
+        commandText: utils.getCalibrationCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
 
     case undefined:
     case null:

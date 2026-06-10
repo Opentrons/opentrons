@@ -7,6 +7,8 @@ from decoy import Decoy
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
+    POWER_COMPARISON_WINDOW_SIZE,
+    PRESSURE_COMPARISON_WINDOW_SIZE,
     HardwareRevision,
     LEDColor,
     LEDPattern,
@@ -44,6 +46,74 @@ def usb_port() -> USBPort:
 def mock_driver(decoy: Decoy) -> SimulatingDriver:
     """Mocked simulating driver."""
     return decoy.mock(cls=SimulatingDriver)
+
+
+@pytest.fixture
+async def test_wait_for_target_subject(
+    usb_port: USBPort,
+    mock_driver: SimulatingDriver,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    decoy: Decoy,
+) -> AsyncGenerator[modules.VacuumModule, None]:
+    """Test subject with mocked vm state updates."""
+    reader = VacuumModuleReader(driver=mock_driver)
+    poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
+    vacuum = modules.VacuumModule(
+        port="/dev/ot_module_sim_vacuummodule0",
+        usb_port=usb_port,
+        driver=mock_driver,
+        reader=reader,
+        poller=poller,
+        device_info={
+            "serial": "dummySerialFS",
+            "model": "nff",
+            "version": "vacuum-fw",
+            "reset_reason": "0",
+        },
+        hw_control_loop=asyncio.get_running_loop(),
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
+    )
+    decoy.when(await mock_driver.get_device_info()).then_return(
+        {
+            "serial": "vacuum-fw",
+            "model": HardwareRevision.NFF.value,
+            "version": "dummySerialFS",
+            "reset_reason": "0",
+        }
+    )
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=True,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+    decoy.when(await mock_driver.get_pump_state()).then_return(
+        PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=True,
+            manual_control=True,
+        )
+    )
+
+    await poller.start()
+    try:
+        yield vacuum
+    finally:
+        await vacuum.cleanup()
 
 
 @pytest.fixture
@@ -343,16 +413,28 @@ async def test_update_vacuum_state(
     assert subject._reader.vacuum_state == vacuum_state
 
 
+@pytest.mark.parametrize(
+    ("pressure_readings", "power_readings"),
+    [
+        (
+            [0, 0, -100, -200, -199, -201, -250, -300, -299, -300, -275, -300],
+            [0, 0, 30, 50, 30, 35, 40, 65, 66, 67, 68, 75],
+        )
+    ],
+)
 async def test_wait_for_target(
-    subject: modules.VacuumModule,
+    test_wait_for_target_subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
     decoy: Decoy,
+    pressure_readings: List[float],
+    power_readings: List[int],
 ) -> None:
     """Ensure that the hc function reads the correct state and returns."""
-    current_pressures = [0, -100, -200, -300]
-    current_powers = [0, 30, 50, 75]
-    target_gauge_pressure = current_pressures[-1]
-    target_pwm = current_powers[-1]
+    subject = test_wait_for_target_subject
+
+    target_pwm = power_readings[-1]
+    target_gauge_pressure = pressure_readings[-1]
+
     vacuum_states = [
         VacuumState(
             target_gauge_pressure=target_gauge_pressure,
@@ -360,11 +442,11 @@ async def test_wait_for_target(
             pressure_abs_a=0,
             pressure_abs_b=0,
             pressure_atm=0,
-            vacuum_enabled=False,
+            vacuum_enabled=True,
             vacuum_duration=0,
             vent_state=VentState.CLOSED,
         )
-        for _pressure in current_pressures
+        for _pressure in pressure_readings
     ]
     pump_states = [
         PumpState(
@@ -372,25 +454,58 @@ async def test_wait_for_target(
             current_rpm=80,
             target_pwm=target_pwm,
             current_pwm=_pwm,
-            pump_running=False,
+            pump_running=True,
             manual_control=True,
         )
-        for _pwm in current_powers
+        for _pwm in power_readings
     ]
-    decoy.when(await mock_driver.get_vacuum_state()).then_return(
-        vacuum_states[0], vacuum_states[1], vacuum_states[2], vacuum_states[3]
-    )
-    decoy.when(await mock_driver.get_pump_state()).then_return(
-        pump_states[0], pump_states[1], pump_states[2], pump_states[3]
-    )
 
+    pressure_read_calls = 0
+
+    async def _pressure_reading_side_effect() -> VacuumState:
+        nonlocal pressure_read_calls
+        pressure_read_calls += 1
+        if pressure_read_calls < len(pressure_readings):
+            return vacuum_states[pressure_read_calls - 1]
+        else:
+            return vacuum_states[-1]
+
+    power_read_calls = 0
+
+    async def _power_reading_side_effect() -> PumpState:
+        nonlocal power_read_calls
+        power_read_calls += 1
+        if power_read_calls < len(power_readings):
+            return pump_states[power_read_calls - 1]
+        else:
+            return pump_states[-1]
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_do(
+        _pressure_reading_side_effect
+    )
+    decoy.when(await mock_driver.get_pump_state()).then_do(_power_reading_side_effect)
+
+    power_read_calls = 0
     await subject.set_pump_state(start_pump=True, duty_cycle=target_pwm)
     await subject.wait_for_target()
+    power_reads_while_waiting = power_read_calls
 
+    pressure_read_calls = 0
     await subject.set_vacuum_state(
         enable_vacuum=True, gauge_pressure_mbar=target_gauge_pressure
     )
     await subject.wait_for_target()
+    pressure_reads_while_waiting = pressure_read_calls
+
+    assert len(pressure_readings) == len(power_readings)
+
+    expected_pressure_reads = (
+        len(pressure_readings) + PRESSURE_COMPARISON_WINDOW_SIZE - 1
+    )
+    expected_power_reads = len(power_readings) + POWER_COMPARISON_WINDOW_SIZE - 1
+
+    assert pressure_reads_while_waiting == expected_pressure_reads
+    assert power_reads_while_waiting == expected_power_reads
 
 
 async def test_execute_profile(

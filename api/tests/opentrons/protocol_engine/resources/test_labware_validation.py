@@ -120,3 +120,33 @@ def test_validate_gripper_compatible(
 ) -> None:
     """It should validate if definition is defined as an adapter."""
     assert subject.validate_gripper_compatible(definition) == expected_result
+
+
+@pytest.mark.parametrize(
+    ("definition", "expected_result"),
+    [
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(quirks=None)  # type: ignore[call-arg]
+            ),
+            False,
+        ),
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(quirks=["foo"])  # type: ignore[call-arg]
+            ),
+            False,
+        ),
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(quirks=["filterPlate"])  # type: ignore[call-arg]
+            ),
+            True,
+        ),
+    ],
+)
+def test_validate_definition_is_filter_plate(
+    definition: LabwareDefinition, expected_result: bool
+) -> None:
+    """It should validate if definition is defined as a labware with a `filterPlate` quirk."""
+    assert subject.validate_definition_is_filter_plate(definition) == expected_result

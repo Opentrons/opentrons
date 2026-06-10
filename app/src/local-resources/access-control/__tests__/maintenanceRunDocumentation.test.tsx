@@ -9,6 +9,7 @@ import {
 } from '@opentrons/api-client'
 import {
   useAccessControlEnabledQuery,
+  useAuthSettingsQuery,
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
@@ -41,6 +42,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
+    useAuthSettingsQuery: vi.fn(),
     useAccessControlEnabledQuery: vi.fn(),
     useHost: vi.fn(),
   }
@@ -99,12 +101,31 @@ const useFakeMaintenanceRun = (): {
   moveCommand: ReturnType<typeof useCreateMaintenanceCommandMutation>
   deleteRun: ReturnType<typeof useDeleteMaintenanceRunMutation>
 } => {
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation('lpc_flow')
 
-  const createRun = useCreateMaintenanceRunMutation(commandDocState)
-  const homeCommand = useCreateMaintenanceCommandMutation(commandDocState)
-  const moveCommand = useCreateMaintenanceCommandMutation(commandDocState)
-  const deleteRun = useDeleteMaintenanceRunMutation(deletionDocState)
+  const createRun = useCreateMaintenanceRunMutation(
+    commandDocState,
+    actionsToDocument
+  )
+  const homeCommand = useCreateMaintenanceCommandMutation(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+  const moveCommand = useCreateMaintenanceCommandMutation(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+  const deleteRun = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    actionsToDocument
+  )
 
   return {
     commandDocState,
@@ -121,8 +142,20 @@ describe('maintenance run documentation flow', () => {
 
   beforeEach(() => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          requireReasonForInteraction: true,
+          minLengthOfReasonForInteraction: 10,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
+      data: {
+        data: {
+          accessControlEnabled: true,
+        },
+      },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(mockShowDocumentationRequiredModal).mockResolvedValue(
       MOCK_DOCREPORT
@@ -158,20 +191,22 @@ describe('maintenance run documentation flow', () => {
     })
     await waitFor(() => {
       expect(
-        result.current.commandDocState.accessControlEnabled &&
+        result.current.commandDocState.reasonForInteractionRequired &&
           result.current.commandDocState.docreport
       ).toEqual(MOCK_DOCREPORT)
     })
 
     // The deletion gate is in place but has NOT prompted yet — it is set up
     // to prompt only when the deletion mutation actually runs.
-    expect(result.current.deletionDocState.accessControlEnabled).toBe(true)
+    expect(result.current.deletionDocState.reasonForInteractionRequired).toBe(
+      true
+    )
     expect(
-      result.current.deletionDocState.accessControlEnabled &&
+      result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport
     ).toBeNull()
     expect(
-      result.current.deletionDocState.accessControlEnabled &&
+      result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport == null &&
         result.current.deletionDocState.askForDocumentation
     ).toBeDefined()
@@ -201,7 +236,7 @@ describe('maintenance run documentation flow', () => {
     // commandDocState's report rather than asking the user again.
     expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     expect(
-      result.current.commandDocState.accessControlEnabled &&
+      result.current.commandDocState.reasonForInteractionRequired &&
         result.current.commandDocState.docreport
     ).toEqual(MOCK_DOCREPORT)
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Type
@@ -12,8 +12,9 @@ from ..types import ModuleModel
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
+    from ..execution import EquipmentHandler
+    from ..state.module_substates import FlexStackerSubState, VacuumModuleSubState
     from ..state.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
 
 IdentifyModuleCommandType = Literal["identifyModule"]
 
@@ -46,20 +47,23 @@ class IdentifyModuleImpl(
         self, params: IdentifyModuleParams
     ) -> SuccessData[IdentifyModuleResult]:
         """Execute the IdentifyModule command."""
+        module_substate: Union[FlexStackerSubState, VacuumModuleSubState]
         # ONLY flex stacker has support for identify module command...for now
         if params.model == ModuleModel.FLEX_STACKER_MODULE_V1:
             module_substate = self._state_view.modules.get_flex_stacker_substate(
                 module_id=params.moduleId
             )
-            module_hw = self._equipment.get_module_hardware_api(
-                module_substate.module_id
+        elif params.model == ModuleModel.VACUUM_MODULE_V1:
+            module_substate = self._state_view.modules.get_vacuum_module_substate(
+                module_id=params.moduleId
             )
-            if module_hw is not None:
-                await module_hw.identify(params.start, params.color)
         else:
             raise NotImplementedError(
                 f"IdentifyModule is not supported for {params.model}"
             )
+        module_hw = self._equipment.get_module_hardware_api(module_substate.module_id)
+        if module_hw is not None:
+            await module_hw.identify(params.start, params.color)
 
         return SuccessData(public=IdentifyModuleResult())
 

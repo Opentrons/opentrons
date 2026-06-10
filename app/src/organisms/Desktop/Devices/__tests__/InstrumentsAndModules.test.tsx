@@ -21,7 +21,6 @@ import { getShowPipetteCalibrationWarning } from '/app/transformations/instrumen
 
 import { GripperCard } from '../GripperCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
-import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 
@@ -38,7 +37,6 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../GripperCard')
 vi.mock('/app/organisms/ModuleCard')
-vi.mock('../PipetteCard')
 vi.mock('../PipetteCard/FlexPipetteCard')
 vi.mock('../PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
@@ -102,19 +100,6 @@ describe('InstrumentsAndModules', () => {
     render(props)
     expect(vi.mocked(ModuleCard)).toHaveBeenCalled()
   })
-  it('renders pipette cards when a ot2 robot is viewable', () => {
-    vi.mocked(useModulesQuery).mockReturnValue({
-      data: { data: [mockMagneticModule] },
-    } as any)
-    vi.mocked(usePipettesQuery).mockReturnValue({
-      data: {
-        left: null,
-        right: null,
-      },
-    } as any)
-    render(props)
-    expect(vi.mocked(PipetteCard)).toHaveBeenCalledTimes(2)
-  })
   it('renders gripper and flex pipette cards when a robot is Flex', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
 
@@ -155,25 +140,9 @@ describe('InstrumentsAndModules', () => {
     render(props)
     expect(vi.mocked(PipetteRecalibrationWarning)).toHaveBeenCalled()
   })
-  it('fetches pipette and modules on short poll for ot2', () => {
-    render(props)
-    expect(usePipettesQuery).toHaveBeenCalledWith(
-      {},
-      { refetchInterval: 5000, enabled: true }
-    )
-    expect(useModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
-    expect(useInstrumentsQuery).toHaveBeenCalledWith({
-      refetchInterval: 5000,
-      enabled: false,
-    })
-  })
   it('fetches instruments and modules on short poll for flex', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
-    expect(usePipettesQuery).toHaveBeenCalledWith(
-      {},
-      { refetchInterval: 5000, enabled: false }
-    )
     expect(useModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
     expect(useInstrumentsQuery).toHaveBeenCalledWith({
       refetchInterval: 5000,

@@ -979,7 +979,7 @@
       {
         "id": "vacuumModuleV1A3",
         "areaType": "vacuumModule",
-        "offsetFromCutoutFixture": [161.0, 0.0, 31.0],
+        "offsetFromCutoutFixture": [0, 0, 19.0],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -992,7 +992,7 @@
       {
         "id": "vacuumModuleV1DockA4",
         "areaType": "lidDock",
-        "offsetFromCutoutFixture": [162.0, 0.0, 26.0],
+        "offsetFromCutoutFixture": [164.0, 0.0, 20.0],
         "boundingBox": {
           "xDimension": 128.5,
           "yDimension": 86.5,

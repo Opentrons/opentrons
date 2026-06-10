@@ -18,6 +18,7 @@ on:
       - 'pnpm-lock.yaml'
       - '.github/workflows/app-test-build-deploy.yaml'
       - '.github/workflows/app-build-deploy.yaml'
+      - '.github/actions/app/determine-build-type/**'
       - '.github/workflows/utils.js'
       - 'vitest.config.*'
     branches:
@@ -119,7 +120,7 @@ jobs:
       - name: check make version
         run: make --version
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="${{matrix.shell}}/src"
+        run: make test-js-${{matrix.shell}}
 
   determine-build-type:
     runs-on: 'ubuntu-latest'
@@ -128,96 +129,16 @@ jobs:
       actions: read
       contents: read
     outputs:
-      variants: ${{steps.determine-build-type.outputs.variants}}
-      type: ${{steps.determine-build-type.outputs.type}}
+      variants: ${{ steps.determine-build-type.outputs.variants }}
+      type: ${{ steps.determine-build-type.outputs.type }}
     steps:
-      - id: determine-build-type
-        run: |
-          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
-            echo "No builds for pull requests"
-            echo 'variants=[]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/ot3')) }}" = "true" ] ; then
-            echo "internal-release release builds for ot3 tags"
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=release' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/v')) }}" = "true" ] ; then
-            echo "release release builds for v tags"
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=release' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/internal-release')) }}" = "true" ] ; then
-            echo "internal-release develop builds for internal-release branches"
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/release') || startsWith(github.ref, 'refs/heads/chore_release')) }}" = "true" ] ; then
-            echo "Release develop builds for release branches"
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
-            # Edge pushes: at most one full develop build (robot-stack + ot3) per UTC day.
-            # First push that day runs build+deploy; later pushes still run unit tests only.
-            # For manual builds without tests, use the "App build and deploy" workflow.
-            TODAY="$(date -u +%Y-%m-%d)"
-            RUN_ID="${{ github.run_id }}"
-            API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/app-test-build-deploy.yaml/runs?branch=edge&event=push&per_page=50"
-            if ! RESP="$(curl -fsS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "${API_URL}")"; then
-              echo "⚠️ Could not list workflow runs; allowing develop build (fail open)"
-              EARLIER=0
-            else
-              EARLIER="$(echo "${RESP}" | jq --arg today "${TODAY}" --argjson rid "${RUN_ID}" '[.workflow_runs[] | select(.created_at | startswith($today)) | select(.id < $rid)] | length')"
-            fi
-            if ! [[ "${EARLIER}" =~ ^[0-9]+$ ]]; then
-              echo "⚠️ Unexpected API response; allowing develop build (fail open)"
-              EARLIER=0
-            fi
-            if [ "${EARLIER}" -gt 0 ]; then
-              echo "edge push: another workflow run for this workflow on edge already started earlier today (UTC); skipping develop build"
-              echo 'variants=[]' >> $GITHUB_OUTPUT
-              echo 'type=develop' >> $GITHUB_OUTPUT
-            else
-              echo "edge push: develop build (first push today in UTC, or no earlier run detected)"
-              echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-              echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build-internal')) }}" = "true" ] ; then
-
-            echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "internal-release as-release builds for app-build-internal + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "internal-release develop builds for app-build-internal suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build')) }}" = "true" ] ; then
-            echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "release as-release builds for app-build + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "release develop builds for app-build suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          elif [ "${{ format('{0}', contains(github.ref, 'app-build-both')) }}" = "true" ] ; then
-
-            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
-               echo "Both as-release builds for app-build-both + as-release suffixes"
-               echo 'type=as-release' >> $GITHUB_OUTPUT
-            else
-               echo "Both develop builds for app-build-both + as-release suffixes"
-               echo 'type=develop' >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
-            echo 'variants=[]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          fi
-
-      - name: set summary
-        run: |
-          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: ./.github/actions/app/determine-build-type
+        id: determine-build-type
+        with:
+          edge-build-policy: once-per-day
+          skip-pull-requests: 'true'
+          workflow-file: app-test-build-deploy.yaml
 
   build-app:
     needs: [determine-build-type]

@@ -49,7 +49,10 @@ import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { CommandData, HostConfig } from '@opentrons/api-client'
-import type { DocumentationState } from '@opentrons/react-api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   LoadedPipette,
@@ -184,15 +187,46 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
-  const { commandDocState, deletionDocState } =
-    useMaintenanceRunDocumentation(initialDocstate)
+  const maintenanceRunAction: DocumentedAction = useMemo(() => {
+    return {
+      type: 'pipette_wizard_flow',
+      mount,
+      flowType,
+      pipette: selectedPipette,
+      pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'start',
+    }
+  }, [mount, flowType, selectedPipette, attachedPipettes])
+
+  const deleteRunAction: DocumentedAction = useMemo(() => {
+    return {
+      type: 'pipette_wizard_flow',
+      mount,
+      flowType,
+      pipette: selectedPipette,
+      pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'end',
+    }
+  }, [mount, flowType, selectedPipette, attachedPipettes])
+
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation(maintenanceRunAction, initialDocstate)
 
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands(commandDocState)
+    useChainMaintenanceCommands(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
       commandDocState,
+      actionsToDocument,
       {
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)
@@ -250,14 +284,18 @@ export const PipetteWizardFlows = (
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation(deletionDocState, {
-      onSuccess: () => {
-        closeFlow()
-      },
-      onError: () => {
-        closeFlow()
-      },
-    })
+    useDeleteMaintenanceRunMutation(
+      deletionDocState,
+      [...actionsToDocument, deleteRunAction],
+      {
+        onSuccess: () => {
+          closeFlow()
+        },
+        onError: () => {
+          closeFlow()
+        },
+      }
+    )
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()

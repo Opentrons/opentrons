@@ -50,6 +50,14 @@ def validate_definition_is_system(definition: LabwareDefinition) -> bool:
     return LabwareRole.system in definition.allowedRoles
 
 
+def validate_definition_is_filter_plate(definition: LabwareDefinition) -> bool:
+    """Validate that the definitions is a filter plate."""
+    return (
+        definition.parameters.quirks is not None
+        and "filterPlate" in definition.parameters.quirks
+    )
+
+
 def validate_legacy_labware_can_be_stacked(
     child_labware_definition: LabwareDefinition2, parent_labware_load_name: str
 ) -> bool:
