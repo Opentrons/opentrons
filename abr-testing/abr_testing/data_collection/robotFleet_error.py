@@ -1,6 +1,7 @@
 """Create ticket for robot with error."""
 
 from typing import List, Tuple, Any, Dict
+from dataclasses import dataclass, field
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -771,6 +772,104 @@ def preflight_connection_check(ip: str, storage_directory: str) -> bool:
         print("Please enter 'y' or 'n'.")
 
 
+def init_ticketing() -> Tuple[str, str, str, str]:
+    """Gets initial robot info."""
+    while True:
+        board = str(input("Enter ABR or RQA: ")).upper()
+        if board == "ABR":
+            board_id = str(217)
+            project_key = "RABR"
+            break
+        elif board == "RQA":
+            board_id = str(826)
+            project_key = "RQA"
+            break
+        else:
+            print("Invalid input, try again.")
+
+    ip = str(input("Enter Robot IP: "))
+    if not preflight_connection_check(ip, storage_directory):
+        sys.exit()
+    run_or_other = str(
+        input(
+            "Press ENTER to report run error. If not, please format title as:\n"
+            "feature, brief summary\n> "
+        )
+    )
+    return board_id, project_key, ip, run_or_other
+
+
+@dataclass
+class TicketData:
+    """Ticket data."""
+
+    summary: str = ""
+    parent: str = ""
+    affects_version: str = ""
+    components: List[str] = field(default_factory=list)
+    labels: List[str] = field(default_factory=list)
+    whole_description_str: str = ""
+    run_log_file_path: str = ""
+    protocol_file_path: str = ""
+    one_run: str = ""
+
+
+def organize_ticket_data(
+    run_or_other: str,
+    ip: str,
+    storage_directory: Path,
+    project_key: str,
+    error_runs: List,
+    protocol_ids: List,
+) -> TicketData:
+    """Collects and organizes all ticket data."""
+    ticketData = TicketData()
+    if len(run_or_other) < 1 and error_runs and protocol_ids:
+        protocol_folder = retrieve_protocol_file(
+            protocol_ids[-1], ip, str(storage_directory)
+        )
+        protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
+        protocol_found = False
+        try:
+            ticketData.protocol_file_path = next(
+                os.path.join(protocol_folder_path, f)
+                for f in os.listdir(protocol_folder_path)
+                if f.endswith(".py")
+            )
+            protocol_found = True
+        except (FileNotFoundError, StopIteration):
+            print(f"No .py file found or folder not found: {protocol_folder_path}")
+        ticketData.one_run = error_runs[-1]
+        (
+            ticketData.summary,
+            ticketData.parent,
+            ticketData.affects_version,
+            ticketData.components,
+            ticketData.labels,
+            ticketData.whole_description_str,
+            ticketData.run_log_file_path,
+        ) = get_run_error_info_from_robot(
+            ip, ticketData.one_run, storage_directory, protocol_found, project_key
+        )
+    else:
+        if len(run_or_other) < 1:
+            print("No failed/recovery runs matched filters.")
+            run_or_other = str(
+                input("Please format title as:\nfeature, brief summary\n> ")
+            ).strip()
+        ticketData.protocol_file_path = save_latest_protocol(ip, str(storage_directory))
+        (
+            ticketData.summary,
+            ticketData.parent,
+            ticketData.affects_version,
+            ticketData.components,
+            ticketData.labels,
+            ticketData.whole_description_str,
+        ) = get_robot_state(ip, run_or_other, project_key)
+
+    return ticketData
+
+
 if __name__ == "__main__":
     """Create ticket for specified robot."""
     parser = argparse.ArgumentParser(description="Pulls run logs from ABR robots.")
@@ -788,112 +887,44 @@ if __name__ == "__main__":
         jiraCreds = json.load(f)
     email = jiraCreds["Jira API"]["email"]
     api_token = jiraCreds["Jira API"]["key"]
-    while True:
-        board = str(input("Enter ABR or RQA: ")).upper()
-        if board == "ABR":
-            board_id = str(217)
-            project_key = "RABR"
-            break
-        elif board == "RQA":
-            board_id = str(826)
-            project_key = "RQA"
-            break
-        else:
-            print("Invalid input, try again.")
-    # TODO: auto grab from fleet
-    ip = str(input("Enter Robot IP: "))
-    if not preflight_connection_check(ip, storage_directory):
-        sys.exit()
-    run_or_other = str(
-        input(
-            "Press ENTER to report run error. If not, please format title as:\n"
-            "feature, brief summary\n> "
-        )
-    )
+    # Simplify the main section
+    board_id, project_key, ip, run_or_other = init_ticketing()
     url = "https://opentrons.atlassian.net"
     log_zip_path = read_robot_logs.get_logs(Path(storage_directory), ip)
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    # Nick Check
-    run_log_file_path = ""
-    protocol_found = False
-    # Nick Check
     try:
         error_runs, protocol_ids = get_error_runs_from_robot(ip)
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
-    # Nick Check
-    # Nick Check
-    protocol_file_path = ""
-    one_run = ""
-    if len(run_or_other) < 1 and error_runs and protocol_ids:
-        protocol_folder = retrieve_protocol_file(
-            protocol_ids[-1], ip, storage_directory
-        )
-        protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
-        try:
-            protocol_file_path = next(
-                os.path.join(protocol_folder_path, f)
-                for f in os.listdir(protocol_folder_path)
-                if f.endswith(".py")
-            )
-        except (FileNotFoundError, StopIteration):
-            print(f"No .py file found or folder not found: {protocol_folder_path}")
-
-        if protocol_file_path:
-            protocol_found = True
-        one_run = error_runs[-1]
-        (
-            summary,
-            parent,
-            affects_version,
-            components,
-            labels,
-            whole_description_str,
-            run_log_file_path,
-        ) = get_run_error_info_from_robot(
-            ip, one_run, storage_directory, protocol_found, project_key
-        )
-    else:
-        if len(run_or_other) < 1:
-            print("No failed/recovery runs matched filters.")
-            run_or_other = str(
-                input("Please format title as:\nfeature, brief summary\n> ")
-            ).strip()
-        protocol_file_path = save_latest_protocol(ip, storage_directory)
-        (
-            summary,
-            parent,
-            affects_version,
-            components,
-            labels,
-            whole_description_str,
-        ) = get_robot_state(ip, run_or_other, project_key)
+    data = organize_ticket_data(
+        run_or_other, ip, storage_directory, project_key, error_runs, protocol_ids
+    )
 
     # make description replacement file
-    status_path = make_json_file(storage_directory, whole_description_str)
-    print(f"Making ticket for {summary}.")
+    status_path = make_json_file(storage_directory, data.whole_description_str)
+    print(f"Making ticket for {data.summary}.")
     all_issues = ticket.issues_on_board(project_key)
     # CREATE TICKET
     # TODO: for pyro, add pyro filter as HIGH priority
     description = "Error recreation steps: (PLEASE FILL)"
     issue_key, raw_issue_url = ticket.create_ticket(
-        summary,
+        data.summary,
         description,
         project_key,
         "-1",
         "Bug",
         "Medium",
-        components,
-        affects_version,
-        labels,
-        parent,
+        data.components,
+        data.affects_version,
+        data.labels,
+        data.parent,
     )
     issue_key = issue_key or ""
     raw_issue_url = raw_issue_url or ""
     image_files = ""
     if len(run_or_other) < 1:
-        image_files = retrieve_protocol_images(one_run, ip, storage_directory)
+        image_files = retrieve_protocol_images(data.one_run, ip, storage_directory)
     else:
         try:
             health = requests.get(
@@ -907,14 +938,14 @@ if __name__ == "__main__":
         image_files = retrieve_live_image(ip, storage_directory, robot_name)
 
     # Link Tickets - TODO: FIX THIS TO WORK
-    to_link = ticket.match_issues(all_issues, summary)
+    to_link = ticket.match_issues(all_issues, data.summary)
     ticket.link_issues(to_link, issue_key)
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
     error_files = [
-        run_log_file_path,  # run-error path only
-        protocol_file_path,  # run-error path only
+        data.run_log_file_path,  # run-error path only
+        data.protocol_file_path,  # run-error path only
         log_zip_path,
         image_files,
         status_path,
