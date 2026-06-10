@@ -30,7 +30,6 @@ export interface DiscoveryState {
 }
 
 export interface BaseRobot extends Omit<DiscoveryClientRobot, 'addresses'> {
-  displayName: string // todo(mm, 2026-04-27): What is the difference between this and DiscoveryClientRobot.name?
   local: boolean | null
   seen: boolean
   robotModel: RobotModel

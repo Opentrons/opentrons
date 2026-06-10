@@ -42,8 +42,6 @@ type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
-const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
-
 const isLocal = (ip: string): boolean => {
   return (
     RE_HOSTNAME_IPV6_LL.test(ip) ||
@@ -109,7 +107,6 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
         const serverHealthStatus = addr?.serverHealthStatus ?? null
         const baseRobot = {
           ...robotState,
-          displayName: makeDisplayName(robotName),
           local: ip !== null ? isLocal(ip) : null,
           seen: addr?.seen === true,
           robotModel: makeRobotModel(
