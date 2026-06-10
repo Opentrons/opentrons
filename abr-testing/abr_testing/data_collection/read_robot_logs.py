@@ -1038,12 +1038,11 @@ def get_basic_logs(ip: str, storage_directory: Path) -> Tuple[List[str], str, st
 def get_logs(storage_directory: Path, ip: str) -> str:
     """Get Robot logs and return a zip file path containing them."""
     collected_files, robot_name, sw_version = get_basic_logs(ip, storage_directory)
-
+    # Collect all nonstandard logs
     collected_files = fetch_weston_log(
         ip, storage_directory, collected_files, robot_name
     )
 
-    # Get Calibration and version Data
     calibration_file, _ = get_calibration_offsets(
         ip, storage_directory, collected_files
     )
