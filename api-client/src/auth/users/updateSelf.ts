@@ -12,9 +12,6 @@ export function updateSelf(
     PATCH,
     '/auth/users/self',
     body,
-    {
-      ...config,
-      secure: true,
-    }
+    config
   )
 }
