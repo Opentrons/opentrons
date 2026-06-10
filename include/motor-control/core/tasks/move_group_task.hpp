@@ -13,7 +13,7 @@
 namespace move_group_task {
 
 constexpr std::size_t max_groups = 3;
-constexpr std::size_t max_moves_per_group = 12;
+constexpr std::size_t max_moves_per_group = 6;
 #ifdef USE_SENSOR_MOVE
 using MoveGroupType = move_group::MoveGroupManager<
     max_groups, max_moves_per_group, can::messages::AddLinearMoveRequest,
@@ -143,7 +143,7 @@ class MoveGroupMessageHandler {
  * The task type.
  */
 template <template <class> class QueueImpl>
-requires MessageQueue<QueueImpl<TaskMessage>, TaskMessage>
+    requires MessageQueue<QueueImpl<TaskMessage>, TaskMessage>
 class MoveGroupTask {
   public:
     using Messages = TaskMessage;
@@ -185,7 +185,7 @@ class MoveGroupTask {
  */
 template <typename Client>
 concept TaskClient = requires(Client client, const TaskMessage& m) {
-    {client.send_move_group_queue(m)};
+    { client.send_move_group_queue(m) };
 };
 
 }  // namespace move_group_task
