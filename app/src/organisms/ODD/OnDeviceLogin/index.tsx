@@ -123,9 +123,11 @@ export function OnDeviceLogin({
     step,
     username,
     password,
+    confirmPassword,
     isPasswordResetRequired,
     onStepChange,
     submitPassword,
+    t,
   ])
 
   const primaryDisabled =
@@ -153,13 +155,6 @@ export function OnDeviceLogin({
     },
     [primaryDisabled, handleNext]
   )
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleEnterPress)
-    return () => {
-      window.removeEventListener('keydown', handleEnterPress)
-    }
-  }, [handleEnterPress])
 
   useEffect(() => {
     window.addEventListener('keydown', handleEnterPress)
