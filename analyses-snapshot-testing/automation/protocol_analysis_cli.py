@@ -358,16 +358,11 @@ class ProtocolAnalysisCLI:
         Returns:
             Protocol object.
         """
-        # Determine robot type based on filename or content
-        robot_type = "Flex"  # Default
-        if "ot2" in file_path.name.lower():
-            robot_type = "OT2"
-
         return Protocol(
             file_stem=file_path.stem,
             folder=file_path.parent,
             file_extension=file_path.suffix[1:],  # Remove the dot
-            robot=robot_type,
+            robot="Flex",
         )
 
     async def analyze_single_protocol(self, protocol_file: Path) -> AnalysisResult:

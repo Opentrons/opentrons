@@ -1,9 +1,14 @@
 import { useLayoutEffect, useState } from 'react'
+import clsx from 'clsx'
 
 import { COLORS, Icon, StepGroup } from '@opentrons/components'
 
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
+import {
+  getExpandedGroupBodyMaxHeightPx,
+  shouldCapExpandedGroupBodyHeight,
+} from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
@@ -12,11 +17,6 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { LeafNode } from '../../types'
-
-/** Reserve space for StepGroup header (title row, optional subtitle, padding). */
-const STEP_GROUP_HEADER_RESERVE_PX = 80
-const MIN_EXPANDED_BODY_PX = 160
-const LIST_VIEWPORT_BOTTOM_BUFFER_PX = 8
 
 interface AnnotatedGroupProps {
   scrollTargetId: string | null
@@ -70,15 +70,14 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     command => command.isHighlighted
   )
 
-  const expandedMaxHeightPx =
-    listViewportHeight > 0
-      ? Math.max(
-          MIN_EXPANDED_BODY_PX,
-          listViewportHeight -
-            STEP_GROUP_HEADER_RESERVE_PX -
-            LIST_VIEWPORT_BOTTOM_BUFFER_PX
-        )
-      : null
+  const shouldCapExpandedBody = shouldCapExpandedGroupBodyHeight({
+    subCommandCount: subCommands.length,
+    listViewportHeight,
+    hasTrailingErrors,
+  })
+  const expandedMaxHeightPx = shouldCapExpandedBody
+    ? getExpandedGroupBodyMaxHeightPx(listViewportHeight)
+    : null
 
   return (
     <div className={styles.annotated_group_container}>
@@ -102,12 +101,15 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
       >
         {isExpanded ? (
           <div
-            className={styles.annotated_group_expanded}
-            style={
-              expandedMaxHeightPx != null
-                ? { maxHeight: expandedMaxHeightPx }
-                : {}
-            }
+            className={clsx(styles.annotated_group_expanded, {
+              [styles.annotated_group_expanded_natural_height]:
+                !shouldCapExpandedBody,
+            })}
+            style={{
+              ...(expandedMaxHeightPx != null && {
+                maxHeight: expandedMaxHeightPx,
+              }),
+            }}
           >
             {subCommands.map((subCommand, index) => (
               <IndividualCommand
