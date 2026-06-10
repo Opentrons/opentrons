@@ -810,6 +810,30 @@ def build_report(test_name: str) -> CSVReport:
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Build the runtime parameters."""
+    parameters.add_str(
+        display_name="Operator",
+        variable_name="operator",
+        default="Unused",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Unused",
+                "Haiyan",
+                "Jiqing",
+                "Yanglin",
+                "Yangyin",
+                "Hejie",
+                "Zhihua",
+                "Huanjun",
+                "Chengkun",
+                "Xiongjian",
+                "Zhougui",
+                "Zhiwei",
+                "TE",
+            ]
+        ],
+        description="Operator for this QC run",
+    )
     for s in TestSection:
         parameters.add_bool(
             display_name=f"Skip {s.value.lower()}",
@@ -851,7 +875,7 @@ def run(ctx: ProtocolContext) -> None:
 
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.GRIPPER
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut)  # type: ignore[attr-defined]
     args = ctx.params.get_all()
     t_sections = {s: f for s, f in TESTS if not args[f"skip_{s.value.lower()}"]}
     if args["increment"]:

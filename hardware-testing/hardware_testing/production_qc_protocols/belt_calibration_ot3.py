@@ -164,7 +164,7 @@ def _generate_report(
 ) -> None:
     report = _create_csv_report()
     helpers_ot3.set_csv_report_meta_data_ot3(
-        ctx._core.get_hardware(), report
+        ctx._core.get_hardware(), report, operator=ctx.params.operator  # type: ignore[attr-defined]
     )  # STORE ATTITUDE
     if attitude:
         report("ATTITUDE", "attitude-x", attitude[0])
@@ -237,6 +237,30 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="skip_test",
         default=False,
         description="When this is true the robot will not test calibration",
+    )
+    parameters.add_str(
+        display_name="Operator",
+        variable_name="operator",
+        default="Unused",
+        choices=[
+            {"display_name": name, "value": name}
+            for name in [
+                "Unused",
+                "Haiyan",
+                "Jiqing",
+                "Yanglin",
+                "Yangyin",
+                "Hejie",
+                "Zhihua",
+                "Huanjun",
+                "Chengkun",
+                "Xiongjian",
+                "Zhougui",
+                "Zhiwei",
+                "TE",
+            ]
+        ],
+        description="Operator for this QC run",
     )
 
 

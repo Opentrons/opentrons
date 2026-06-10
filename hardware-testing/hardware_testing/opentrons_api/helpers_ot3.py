@@ -22,6 +22,8 @@ from typing import (
     Sequence,
     Any,
 )
+
+from opentrons.protocol_api import ProtocolContext
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -353,14 +355,13 @@ def _get_serial_for_dut(
 def set_csv_report_meta_data_ot3(
     api: Union[OT3API, SyncHardwareAPI],
     report: csv_report.CSVReport,
+    operator: str,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
 ) -> None:
     """Set CSVReport meta-data given an OT3."""
     # operator should be entered first
-    report.set_operator(
-        "simulating" if api.is_simulator else input("enter OPERATOR name: ")
-    )
+    report.set_operator(operator)
 
     # default DUT to be the robot serial
     # and only scan barcode if we're not simulating
@@ -683,8 +684,8 @@ def get_plunger_positions_ot3(
     )
 
 
-async def update_pick_up_current(
-    api: OT3API, mount: OT3Mount, current: float = 0.125
+def update_pick_up_current(
+    api: Union[OT3API, SyncHardwareAPI], mount: OT3Mount, current: float = 0.125
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
@@ -1040,6 +1041,48 @@ async def jog_mount_ot3(
             return await api.current_position_ot3(
                 mount=mount, critical_point=critical_point
             )
+
+
+def jog_mount_ot3_sync(
+    api: SyncHardwareAPI,
+    mount: OT3Mount,
+    critical_point: Optional[CriticalPoint] = None,
+    display: Optional[bool] = True,
+    speed: Optional[float] = None,
+) -> Dict[Axis, float]:
+    """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    assert False
+    return api.current_position_ot3(mount=mount, critical_point=critical_point)
+    """
+    if api.is_simulator:
+        return await api.current_position_ot3(
+            mount=mount, critical_point=critical_point
+        )
+    axis: str = ""
+    distance: float = 0.0
+    do_home: bool = False
+    print("jogging")
+    while True:
+        try:
+            axis, distance, do_home = await _jog_do_print_then_input_then_move(
+                api,
+                mount,
+                critical_point,
+                axis,
+                distance,
+                do_home,
+                display=display,
+                speed=speed,
+            )
+        except ValueError as e:
+            print(e)
+            continue
+        except OT3JogTermination:
+            print("done jogging")
+            return await api.current_position_ot3(
+                mount=mount, critical_point=critical_point
+            )
+    """
 
 
 async def move_to_arched_ot3(
@@ -1512,3 +1555,17 @@ def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
         unit_number=data.unit_number,
         sku=getattr(data, "sku", None),
     )
+
+
+# TODO Barcode scanner?
+def get_user_answer(api: SyncHardwareAPI, prompt: str) -> bool:
+    """Have the user answer a yes/no question."""
+    return True
+
+
+def get_input_number(
+    ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str, default: Union[int, float]
+) -> Union[int, float]:
+    """Have the user input a value."""
+    ctx.pause(f"Use Scanner: {prompt}")
+    return default
