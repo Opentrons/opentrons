@@ -1537,6 +1537,7 @@ def test_tip_sensor_new(
     report(section, "tip-presence-drop-height-above-nozzle", [drop_pos_rel])
 
 
+# TODO: RYAN Delete this function after verification.
 def test_tip_sensor(
     api: SyncHardwareAPI,
     report: CSVReport,
@@ -1851,6 +1852,7 @@ def test_liquid_probe_new(
                 FINAL_TEST_FAIL_INFOR.append(tip_tag2)
 
 
+# TODO: RYAN Delete this function after verification.
 def test_liquid_probe(
     api: SyncHardwareAPI,
     report: CSVReport,
