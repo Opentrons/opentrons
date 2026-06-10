@@ -7,6 +7,7 @@ import {
 import {
   COLUMN_4_SLOTS,
   getIsSafePickupWithinTiprack,
+  getPipetteCenteringFullOffset,
   getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
@@ -101,6 +102,7 @@ export const getHoveredOffsetFromWell = (args: {
   wellName: string | null
   pipetteSpec: PipetteV2Specs
   primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzleConfiguration: NozzleConfigurationStyle
 }): { x: number; y: number } => {
   const {
     selectedLabwareId,
@@ -108,6 +110,7 @@ export const getHoveredOffsetFromWell = (args: {
     wellName,
     pipetteSpec,
     primaryNozzle,
+    nozzleConfiguration,
   } = args
   const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteSpec
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
@@ -126,13 +129,17 @@ export const getHoveredOffsetFromWell = (args: {
     }
   }
   const well = labware.def.wells[wellName]
-  const wellIsRectangular = well.shape === 'rectangular'
 
-  const labwareHasOneRowAndIsRectangular =
-    labware.def.ordering[0].length === 1 && wellIsRectangular
-  const wellHeight = labwareHasOneRowAndIsRectangular ? well.yDimension : well.y
-  const wellX = well.x + xOffset
-  const wellY = wellHeight + yOffset
+  const centeringOffset = getPipetteCenteringFullOffset({
+    wellTargetName: wellName,
+    primaryNozzle,
+    nozzleConfiguration,
+    specs: pipetteSpec,
+    labwareDef: labware.def,
+  })
+
+  const wellX = well.x + centeringOffset.x + xOffset
+  const wellY = well.y + centeringOffset.y + yOffset
   const isSingleChannelPipette = pipetteSpec.channels === 1
 
   return {

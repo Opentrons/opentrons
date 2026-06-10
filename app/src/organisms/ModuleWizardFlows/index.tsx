@@ -20,7 +20,7 @@ import { CheckStackerInstall } from './CheckStackerInstall'
 import { CloseDoor } from './CloseStackerDoor'
 import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
-import { useSendIdentifyStacker } from './hooks'
+import { useSendIdentifyModule } from './hooks'
 import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
@@ -67,7 +67,7 @@ export function ModuleWizardFlows(
     deckConfig,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
-  const sendIdentifyStacker = useSendIdentifyStacker()
+  const sendIdentifyModule = useSendIdentifyModule()
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
   )
@@ -118,7 +118,7 @@ export function ModuleWizardFlows(
         isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={() => {
           if (selectedModule != null) {
-            sendIdentifyStacker(selectedModule, false)
+            sendIdentifyModule(selectedModule, false)
           }
           handleCleanUpAndClose()
         }}

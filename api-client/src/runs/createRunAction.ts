@@ -11,12 +11,15 @@ export interface CreateRunActionData {
 export function createRunAction(
   config: HostConfig,
   runId: string,
-  data: CreateRunActionData
+  data: CreateRunActionData,
+  userNotes?: string
 ): ResponsePromise<RunAction> {
   return request<RunAction, { data: CreateRunActionData }>(
     POST,
     `/runs/${runId}/actions`,
     { data },
-    config
+    config,
+    undefined,
+    userNotes
   )
 }

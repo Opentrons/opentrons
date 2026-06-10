@@ -12,7 +12,8 @@ import type {
 } from 'react-query'
 import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { DocumentationState } from '../access_control'
+import type { DocumentationState, DocumentedAction } from '../access_control'
+import type { DocumentedMutationParameters } from '../access_control/types'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
   maintenanceRunId: string
@@ -40,7 +41,9 @@ export type UseCreateMaintenanceCommandMutationOptions = UseMutationOptions<
 >
 
 export function useCreateMaintenanceCommandMutation(
-  documentationState: DocumentationState
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void
 ): UseCreateMaintenanceCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
@@ -51,11 +54,21 @@ export function useCreateMaintenanceCommandMutation(
     CreateMaintenanceCommandMutateParams
   >(
     documentationState,
-    ({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
-      createMaintenanceCommand(host!, maintenanceRunId, command, {
-        waitUntilComplete,
-        timeout,
-      })
+    actionsToDocument,
+    ({
+      variables: { maintenanceRunId, command, waitUntilComplete, timeout },
+      userNotes,
+    }: DocumentedMutationParameters<CreateMaintenanceCommandMutateParams>) =>
+      createMaintenanceCommand(
+        host!,
+        maintenanceRunId,
+        command,
+        {
+          waitUntilComplete,
+          timeout,
+        },
+        userNotes
+      )
         .then(response => {
           queryClient
             .invalidateQueries(getQueryKey(host, 'maintenance_runs'))
@@ -64,6 +77,8 @@ export function useCreateMaintenanceCommandMutation(
                 `error invalidating maintenance runs query: ${e.message}`
               )
             })
+
+          addActionToDocument(response.data.data)
           return response.data
         })
         .catch((e: any) => {

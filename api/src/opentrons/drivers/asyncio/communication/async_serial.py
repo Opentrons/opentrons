@@ -54,6 +54,8 @@ class AsyncSerial:
             executor=executor,
             loop=loop,
             reset_buffer_before_write=reset_buffer_before_write,
+            baud_rate=baud_rate,
+            timeout=timeout,
         )
 
     def __init__(
@@ -62,6 +64,8 @@ class AsyncSerial:
         executor: ThreadPoolExecutor,
         loop: asyncio.AbstractEventLoop,
         reset_buffer_before_write: bool,
+        baud_rate: int,
+        timeout: Optional[float],
     ) -> None:
         """
         Constructor
@@ -75,6 +79,8 @@ class AsyncSerial:
         self._executor = executor
         self._loop = loop
         self._reset_buffer_before_write = reset_buffer_before_write
+        self._baud_rate = baud_rate
+        self._timeout = timeout
 
     async def read_until(self, match: bytes) -> bytes:
         """
@@ -162,6 +168,11 @@ class AsyncSerial:
     def reset_output_buffer(self) -> None:
         """Reset the output buffer"""
         self._serial.reset_output_buffer()
+
+    def get_timeout(self, timeout_property: TimeoutProperties) -> float:
+        """Get the underlying timeout."""
+        # we always build with a timeout so the "or" is just for typing.
+        return getattr(self._serial, timeout_property) or 5.0
 
     async def set_timeout(
         self, timeout_property: TimeoutProperties, timeout: Optional[float]

@@ -24,6 +24,8 @@ interface OddModalProps extends StyleProps {
   modalSize?: ModalSize
   /** see OddModalHeader component for more details */
   header?: OddModalHeaderBaseProps
+  /** optional zIndex for the modal */
+  modalZIndex?: number
 }
 /**
  * For ODD use only.
@@ -34,6 +36,7 @@ export function OddModal(props: OddModalProps): JSX.Element {
     onOutsideClick,
     children,
     header,
+    modalZIndex,
     ...styleProps
   } = props
 
@@ -56,6 +59,7 @@ export function OddModal(props: OddModalProps): JSX.Element {
       }}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
+      zIndex={modalZIndex}
     >
       <Flex
         backgroundColor={COLORS.white}
@@ -67,6 +71,8 @@ export function OddModal(props: OddModalProps): JSX.Element {
         margin={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
         aria-label={`modal_${modalSize}`}
+        role="dialog"
+        aria-modal="true"
         onClick={(e: MouseEvent) => {
           e.stopPropagation()
         }}

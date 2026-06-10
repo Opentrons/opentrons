@@ -188,7 +188,7 @@ api/.venv/bin/python -m opentrons.cli analyze \
 
 ## Snapshot Testing Integration
 
-For protocols to be tracked for regression, use `analyses-snapshot-testing/`:
+For Flex protocols to be tracked for regression, use `analyses-snapshot-testing/` (Flex-only in this repository):
 
 ```bash
 cd analyses-snapshot-testing/

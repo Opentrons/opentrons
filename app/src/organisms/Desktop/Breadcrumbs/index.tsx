@@ -1,40 +1,156 @@
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import clsx from 'clsx'
 
-import { Icon } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import {
+  BasicButton,
+  Icon,
+  MenuItem,
+  MenuList,
+  StyledText,
+  useOnClickOutside,
+} from '@opentrons/components'
+import {
+  ApiHostProvider,
+  useAccessControlEnabledQuery,
+  useHost,
+} from '@opentrons/react-api-client'
 
+import { AccountIconButton } from '/app/atoms/buttons/AccountIconButton'
+import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
 import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
+import { useLogOut } from '/app/resources/access-control/useLogOut'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import styles from './breadcrumbs.module.css'
 
+import type { ComponentProps } from 'react'
 import type { DesktopRouteParams } from '/app/App/types'
 import type { State } from '/app/redux/types'
 
-interface CrumbNameProps {
+interface CrumbAndSeparatorProps {
   crumbName: string
   isLastCrumb: boolean
 }
 
-function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
+function CrumbAndSeparator({
+  crumbName,
+  isLastCrumb,
+}: CrumbAndSeparatorProps): JSX.Element {
   return (
-    <div className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}>
-      <div className={clsx(styles.crumb_name, styles.text_style)}>
+    <div
+      className={clsx(
+        styles.crumb_and_separator,
+        isLastCrumb ? styles.crumb_inactive : styles.crumb_active
+      )}
+    >
+      <StyledText className={styles.text_style} desktopStyle="captionRegular">
         {crumbName}
-      </div>
+      </StyledText>
       {!isLastCrumb ? (
-        <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
+        <Icon
+          className={styles.separator}
+          name="caret-right"
+          width="0.25rem"
+          height="0.3125rem"
+        />
       ) : null}
     </div>
+  )
+}
+
+function AccountSection(): JSX.Element | null {
+  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const accessControlEnabled =
+    accessControlEnabledQuery?.data?.data.accessControlEnabled ?? false
+  const accountIconInfo = useAccountIconInitial()
+  if (accessControlEnabled) {
+    if (accountIconInfo.showIcon) {
+      return (
+        <div className={styles.right_container}>
+          <AccountIconAndMenu initial={accountIconInfo.iconContents} />
+        </div>
+      )
+    } else {
+      return (
+        <div className={styles.right_container}>
+          <LoginLink />
+        </div>
+      )
+    }
+  } else {
+    return null
+  }
+}
+
+interface AccountIconAndMenuProps {
+  initial: ComponentProps<typeof AccountIconButton>['initial']
+}
+
+function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
+  const { initial } = props
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const onClickOutside = useCallback(() => {
+    setIsMenuOpen(false)
+  }, [])
+  const menuContainerRef = useOnClickOutside<HTMLDivElement>({ onClickOutside })
+
+  const logOut = useLogOut()
+  const { t } = useTranslation('top_navigation')
+
+  return (
+    <div
+      ref={menuContainerRef}
+      className={styles.account_popover_menu_container}
+    >
+      <AccountIconButton
+        initial={initial}
+        onClick={() => {
+          setIsMenuOpen(current => !current)
+        }}
+      />
+      {isMenuOpen ? (
+        // todo(mm, 2026-05-28): This MenuList is rendering too far away from the button.
+        // MenuList hard-codes an offset that's wrong here (and perhaps wrong everywhere),
+        // and doesn't give us a way to override it.
+        //
+        // todo(mm, 2026-05-28): The account_settings menu item should link to the user's
+        // account settings, when that's implemented.
+        <MenuList>
+          <MenuItem>{t('account_settings')}</MenuItem>
+          <MenuItem onClick={logOut}>{t('log_out')}</MenuItem>
+        </MenuList>
+      ) : null}
+    </div>
+  )
+}
+
+function LoginLink(): JSX.Element {
+  const { t } = useTranslation('top_navigation')
+  const host = useHost()
+  const handleClick = useCallback(() => {
+    if (host == null) {
+      console.error(
+        "Couldn't determine the host for a login modal. Is a provider missing?"
+      )
+    } else {
+      showLoginModal({ host })
+    }
+  }, [host])
+
+  return (
+    <BasicButton type="button" onClick={handleClick} underLine>
+      {t('log_in')}
+    </BasicButton>
   )
 }
 
@@ -125,25 +241,28 @@ function BreadcrumbsComponent(): JSX.Element | null {
 
   return pathCrumbs.length > 1 ? (
     <div className={styles.root_container}>
-      {pathCrumbs.map((crumb, i) => {
-        const isLastCrumb = i === pathCrumbs.length - 1
+      <div className={styles.left_container}>
+        {pathCrumbs.map((crumb, i) => {
+          const isLastCrumb = i === pathCrumbs.length - 1
 
-        return (
-          <div className={styles.crumb_container} key={crumb.linkPath}>
-            <Link
-              className={
-                isLastCrumb ? styles.crumb_link_inactive : styles.crumb_link
-              }
-              to={crumb.linkPath}
-            >
-              <CrumbName
-                crumbName={crumb.crumbName}
-                isLastCrumb={isLastCrumb}
-              />
-            </Link>
-          </div>
-        )
-      })}
+          return (
+            <div className={styles.crumb_container} key={crumb.linkPath}>
+              <Link
+                className={
+                  isLastCrumb ? styles.crumb_link_inactive : styles.crumb_link
+                }
+                to={crumb.linkPath}
+              >
+                <CrumbAndSeparator
+                  crumbName={crumb.crumbName}
+                  isLastCrumb={isLastCrumb}
+                />
+              </Link>
+            </div>
+          )
+        })}
+      </div>
+      <AccountSection />
     </div>
   ) : null
 }

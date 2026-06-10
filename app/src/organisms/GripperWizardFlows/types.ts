@@ -1,7 +1,11 @@
-import type { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { GRIPPER_FLOW_TYPES } from './constants'
+
+import type {
+  DocumentedAction,
+  useCreateCommandMutation,
+} from '@opentrons/react-api-client'
 import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
 import type {
-  GRIPPER_FLOW_TYPES,
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
@@ -24,6 +28,24 @@ export type GripperWizardFlowType =
   | typeof GRIPPER_FLOW_TYPES.ATTACH
   | typeof GRIPPER_FLOW_TYPES.DETACH
   | typeof GRIPPER_FLOW_TYPES.RECALIBRATE
+
+export const GRIPPER_FLOW_ACTIONS: Record<
+  GripperWizardFlowType,
+  DocumentedAction
+> = {
+  [GRIPPER_FLOW_TYPES.ATTACH]: 'attach_gripper',
+  [GRIPPER_FLOW_TYPES.DETACH]: 'detach_gripper',
+  [GRIPPER_FLOW_TYPES.RECALIBRATE]: 'recalibrate_gripper',
+}
+
+export const GRIPPER_FLOW_FINISH_ACTIONS: Record<
+  GripperWizardFlowType,
+  DocumentedAction
+> = {
+  [GRIPPER_FLOW_TYPES.ATTACH]: 'finish_attach_gripper',
+  [GRIPPER_FLOW_TYPES.DETACH]: 'finish_detach_gripper',
+  [GRIPPER_FLOW_TYPES.RECALIBRATE]: 'finish_recalibrate_gripper',
+}
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING

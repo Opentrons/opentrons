@@ -39,7 +39,8 @@ export function request<ResData, ReqData = null>(
   url: string,
   data: ReqData,
   hostConfig: HostConfig,
-  axiosConfig?: BrandedAxiosConfig
+  axiosConfig?: BrandedAxiosConfig,
+  userNotes?: string
 ): ResponsePromise<ResData> {
   const {
     hostname,
@@ -50,7 +51,14 @@ export function request<ResData, ReqData = null>(
   } = hostConfig
 
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
-  const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
+  const userNotesHeader =
+    userNotes != null ? { 'Opentrons-User-Notes': userNotes } : {}
+  const headers = {
+    ...DEFAULT_HEADERS,
+    ...tokenHeader,
+    ...userNotesHeader,
+    ...axiosConfig?.headers,
+  }
 
   const protocol = (secure ?? false) ? 'https' : 'http'
   const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
@@ -58,11 +66,11 @@ export function request<ResData, ReqData = null>(
   const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
 
   return requestor<ResData>({
-    headers,
     method,
     baseURL,
     url,
     data,
     ...axiosConfig,
+    headers,
   })
 }

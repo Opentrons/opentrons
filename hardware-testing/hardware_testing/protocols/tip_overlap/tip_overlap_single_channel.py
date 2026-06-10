@@ -75,7 +75,7 @@ def run(ctx: ProtocolContext) -> None:
     ctx.load_trash_bin("A3")
     tiprack1 = ctx.load_labware(f"opentrons_flex_96_{ctx.params.tip_type}", "C2")  # type: ignore [attr-defined]
     pipette = ctx.load_instrument(
-        f"flex_8channel_{ctx.params.pipette_volume}", "left", tip_racks=[tiprack1]  # type: ignore [attr-defined]
+        f"flex_1channel_{ctx.params.pipette_volume}", "left", tip_racks=[tiprack1]  # type: ignore [attr-defined]
     )
     test_labware = ctx.load_labware("dial_indicator", "C3")
 

@@ -1,3 +1,4 @@
+import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -9,9 +10,14 @@ import { DocumentationRequired } from '../DocumentationRequired'
 import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof DocumentationRequired>) =>
-  renderWithProviders(<DocumentationRequired {...props} />, {
-    i18nInstance: i18n,
-  })
+  renderWithProviders(
+    <NiceModal.Provider>
+      <DocumentationRequired {...props} />
+    </NiceModal.Provider>,
+    {
+      i18nInstance: i18n,
+    }
+  )
 
 const editNote = (value: string): void => {
   fireEvent.change(screen.getByRole('textbox'), { target: { value } })
@@ -23,6 +29,7 @@ describe('DocumentationRequired', () => {
   beforeEach(() => {
     props = {
       username: 'alice',
+      actionsToDocument: [],
       onConfirm: vi.fn(),
       onBack: vi.fn(),
     }
@@ -77,5 +84,11 @@ describe('DocumentationRequired', () => {
       screen.getByRole('button', { name: 'Back to previous page' })
     )
     expect(props.onBack).toHaveBeenCalledOnce()
+  })
+
+  it('shows the actions view when the view actions button is clicked', () => {
+    render(props)
+    fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
+    screen.getByText('Actions requiring documentation')
   })
 })

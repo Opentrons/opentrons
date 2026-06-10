@@ -11,6 +11,7 @@ API_DIR := api
 APP_DIR := app
 APP_SHELL_DIR := app-shell
 APP_SHELL_ODD_DIR := app-shell-odd
+AUDIT_SERVER_DIR := audit-server
 AUTH_SERVER_DIR := auth-server
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
@@ -30,7 +31,7 @@ SYSTEM_SERVER_DIR := system-server
 UPDATE_SERVER_DIR := update-server
 USB_BRIDGE_DIR := usb-bridge
 
-PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(KEY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(AUDIT_SERVER_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(KEY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR) $(SYSTEM_SERVER_DIR) $(UPDATE_SERVER_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -38,10 +39,9 @@ PYTHON_DIRS := $(API_DIR) $(AUTH_SERVER_DIR) $(DOCS_DIR) $(G_CODE_TESTING_DIR) $
 # documentation
 BUILD_NUMBER ?=
 
-# watch, coverage, update snapshot, and warning suppresion variables for tests and linting
+# watch, coverage, and warning suppresion variables for tests and linting
 watch ?= false
 cover ?= true
-updateSnapshot ?= false
 quiet ?= false
 
 FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
@@ -193,6 +193,7 @@ push-ot3:
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
 	$(MAKE) -C $(AUTH_SERVER_DIR) push-ot3
+	$(MAKE) -C $(AUDIT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(KEY_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
@@ -230,7 +231,12 @@ $(SHARED_DATA_DIR)-py-test:
 	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-js
-test-js: test-js-internal
+test-js:
+	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-js-%
+test-js-%:
+	pnpm vitest run --dir $* $(tests) $(test_opts) $(cov_opts)
 
 # lints and typechecks
 .PHONY: lint
@@ -320,19 +326,6 @@ circular-dependencies-js: $(JS_CIRCULAR_DEPENDENCIES_TARGETS)
 %-circular-dependencies-js:
 	pnpm madge $(and $(CI),--no-spinner --no-color) --circular $*
 
-.PHONY: test-js-internal
-test-js-internal:
-	pnpm vitest run $(tests) $(test_opts) $(cov_opts)
-
-
-.PHONY: test-js-%
-test-js-%:
-	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" test_opts="$(test_opts)" cov_opts="$(cov_opts)"
-
-.PHONY: validate-codecov-yml
-validate-codecov-yml:
-	curl --data-binary @.codecov.yml https://codecov.io/validate
-
 # Convenience commands for running all of our servers in dev mode, together,
 # behind a reverse proxy listening on port 31950.
 #
@@ -348,6 +341,7 @@ dev-backend:
 dev-backend-flex:
 	$(python) scripts/run_concurrently.py \
 		$(MAKE) -C auth-server dev ';' \
+		$(MAKE) -C audit-server dev ';' \
 		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
 		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
 		$(MAKE) -C key-server dev-mitmproxy ';' \

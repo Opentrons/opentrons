@@ -51,6 +51,28 @@ ssh $(call id-file-arg,$(2)) $(3)  root@$(1) \
 "systemctl restart $(4)"
 endef
 
+# stop-service: ssh to a robot and stop one of its systemd units
+#
+# argument 1 is the host to push to
+# argument 2 is the identity file to use, if any
+# argument 3 is any further ssh options, quoted
+# argument 4 is the service name
+define stop-service
+ssh $(call id-file-arg,$(2)) $(3)  root@$(1) \
+"systemctl stop $(4)"
+endef
+
+# start-service: ssh to a robot and start one of its systemd units
+#
+# argument 1 is the host to push to
+# argument 2 is the identity file to use, if any
+# argument 3 is any further ssh options, quoted
+# argument 4 is the service name
+define start-service
+ssh $(call id-file-arg,$(2)) $(3)  root@$(1) \
+"systemctl start $(4)"
+endef
+
 # push-systemd-unit: move a systemd unit file to the robot
 #
 # argument 1 is the host to push to

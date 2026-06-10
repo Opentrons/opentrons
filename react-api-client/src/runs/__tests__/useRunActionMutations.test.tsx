@@ -74,7 +74,10 @@ describe('useRunActionMutations hook', () => {
     } as unknown as UseResumeRunFromRecoveryAssumingFalsePositiveMutationResult)
 
     const { result } = renderHook(
-      () => useRunActionMutations(RUN_ID_1, { accessControlEnabled: false }),
+      () =>
+        useRunActionMutations(RUN_ID_1, {
+          reasonForInteractionRequired: false,
+        }),
       {
         wrapper,
       }

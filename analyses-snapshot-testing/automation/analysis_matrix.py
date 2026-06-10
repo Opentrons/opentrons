@@ -52,9 +52,9 @@ def determine_expect_no_errors(filename: str) -> bool:
         filename: The name of the file.
 
     Returns:
-        True if filename starts with 'Flex_S', 'OT2_S', or 'pl_', else False.
+        True if filename starts with 'Flex_S', else False.
     """
-    return filename.startswith("Flex_S") or filename.startswith("OT2_S")
+    return filename.startswith("Flex_S")
 
 
 @dataclass
@@ -65,7 +65,7 @@ class ProtocolInfo:
     Attributes:
         filepath: Path to the protocol file.
         filename: Name of the file.
-        expect_no_errors: True if the filename starts with 'Flex_S', 'OT2_S', or 'pl_'.
+        expect_no_errors: True if the filename starts with 'Flex_S'.
         api_level: The API level extracted either from requirements or metadata.
         pd_version: The designer application version from a JSON file (if applicable).
         robot: The robot type extracted either from the file's requirements, metadata, or JSON.
@@ -167,7 +167,7 @@ def extract_py_fields(filepath: Path) -> Tuple[Optional[Any], Optional[str]]:  #
           robot = requirements["robotType"]
       - Otherwise, if a 'metadata' variable is found, extract:
           api_level = metadata["apiLevel"]
-          robot is set to "OT-2"
+          robot is set to "Flex"
 
     Args:
         filepath: Path to the .py file.
@@ -207,11 +207,11 @@ def extract_py_fields(filepath: Path) -> Tuple[Optional[Any], Optional[str]]:  #
                         try:
                             meta_dict: Dict[Any, Any] = ast.literal_eval(node.value)
                             api_level = meta_dict.get("apiLevel")
-                            # When requirements are missing, default robot to "OT-2"
-                            return api_level, "OT-2"
+                            # When requirements are missing, default robot to Flex
+                            return api_level, "Flex"
                         except Exception as e:
                             console.print(f"[red]Error evaluating metadata in {filepath}: {e}[/red]")
-                            return None, "OT-2"
+                            return None, "Flex"
     return None, None
 
 

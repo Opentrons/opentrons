@@ -34,6 +34,7 @@ import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
   SINGLE_SLOT_FIXTURES,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { useModuleUSBPort } from '/app/local-resources/modules'
@@ -87,6 +88,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   const { parseModuleUSBPort } = useModuleUSBPort()
 
   const isFlexStacker = attachedModule.moduleType === FLEX_STACKER_MODULE_TYPE
+  const isVacuumModule = attachedModule.moduleType === VACUUM_MODULE_TYPE
 
   const handleOnClick = (): void => {
     if (maintenanceRunId == null) {
@@ -282,7 +284,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             })}
             {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
           </StyledText>
-          {isFlexStacker ? (
+          {isFlexStacker || isVacuumModule ? (
             <InlineNotification
               type="neutral"
               message={t('look_for_pulsing_lights')}

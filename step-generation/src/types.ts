@@ -1,6 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
   AddressableArea,
+  CommonArgs,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerStoredLabwareGroup,
@@ -16,6 +17,7 @@ import type {
   ModuleType,
   PipetteMount as Mount,
   NozzleConfigurationStyle,
+  OpentronsAIArgs,
   PipetteName,
   PipetteV2Specs,
   PositionReference,
@@ -400,19 +402,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-}
-
-interface CommonArgs {
-  /** NOTE: stepNumber probably shouldn't be optional but making it optional
-   * for the sake of not having to make too many changes for PD 8.5.2
-   * this should be refactored to not be optional for PD 8.6.0
-   * making it optional saves a lot of changes in unit tests
-   */
-  stepNumber?: number
-  /** Optional user-readable name for this step */
-  name?: string | null
-  /** Optional user-readable description/notes for this step */
-  description?: string | null
 }
 
 // ===== Processed form types. Used as args to call command creator fns =====
@@ -950,6 +939,7 @@ export type CommandCreatorArgs =
   | CommentArgs
   | FlexStackerArgs
   | VacuumArgs
+  | OpentronsAIArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }

@@ -57,7 +57,7 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-protocol-designer tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-protocol-designer tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
 # analyze bundle
 .PHONY: bundle-analyzer

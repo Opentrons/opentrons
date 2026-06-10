@@ -177,7 +177,7 @@ export type ProtocolFile<DesignerApplicationData = {}> =
       | CommandV16Mixin
       | CommandV17Mixin
     ) &
-    CommandAnnotationV1Mixin
+    (CommandAnnotationV1Mixin | CommandAnnotationV2Mixin)
 
 export type ProtocolStructure = ProtocolBase<{}> &
   RobotStructure &
