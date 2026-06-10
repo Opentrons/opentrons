@@ -108,10 +108,12 @@ constexpr types::address data_address_begin = lookup_table_tail_end;
 
 // create ot_library variables
 // First 3 pages of the eeprom are reserved for the lookup table
-constexpr types::address ot_library_begin = types::page_length * 3;
+constexpr types::address ot_library_begin = types::page_length * 7;
 constexpr types::address ot_library_end =
     static_cast<types::address>(hardware_iface::EEpromMemorySize::ST_16_KBYTE) -
     types::page_length;
+
+constexpr types::address ot_library_table = types::page_length * 4;
 
 /*
  *Wrapper class for ot_library_end and ot_library_begin

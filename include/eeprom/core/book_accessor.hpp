@@ -115,7 +115,7 @@ class BookAccessor
             if (key == 0) {
                 // double check if this is writig to the data_table
                 message::WriteEepromMessage write;
-                write.memory_address = addresses::data_address_begin;
+                write.memory_address = addresses::ot_library_table;
                 write.length = 2 * conf.addr_bytes;
                 // data pointers are offsets from the start of the data
                 // section of the eeprom, so we subtract ot_library_begin
@@ -267,10 +267,10 @@ class BookAccessor
             }
 
             auto table_location = calculate_table_entry_start(key);
-            if (table_location > tail_accessor.get_data_tail()) {
-                LOG("Error, attemping to read uninitalized value");
-                return;
-            }
+            // if (table_location > tail_accessor.get_data_tail()) {
+            //     LOG("Error, attemping to read uninitalized value");
+            //     return;
+            // }
 
             if (!(action_cmd_m.action == TableAction::READ_BEFORE_WRITE)) {
                 action_cmd_m = table_entry_action{.key = key,
@@ -605,7 +605,7 @@ class BookAccessor
     auto calculate_table_entry_start(uint16_t key) -> types::address {
         types::address addr = 0;
         if (config_updated) {
-            addr = addresses::data_address_begin + (key * 2 * conf.addr_bytes);
+            addr = addresses::ot_library_table + (key * 2 * conf.addr_bytes);
         }
         return addr;
     }
@@ -647,12 +647,8 @@ class BookAccessor
                     // if we're migrating we want to write the new table
                     // entry to the same place as the old one, if we're not
                     // we want to write it to the tail
-                    if (migrating) {
-                        write.memory_address =
-                            m.memory_address + (2 * conf.addr_bytes);
-                    } else {
-                        write.memory_address = tail_accessor.get_data_tail();
-                    }
+                    write.memory_address =
+                        m.memory_address + (2 * conf.addr_bytes);
 
                     write.length = 2 * conf.addr_bytes;
                     auto* write_iter = write.data.begin();
