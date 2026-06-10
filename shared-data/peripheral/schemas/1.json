@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {},
+  "description": "Peripheral specification",
+  "type": "object",
+  "required": ["peripheralType", "model", "displayName", "quirks"],
+  "additionalProperties": false,
+  "properties": {
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/peripheral/schemas/1 is a reference to this schema."
+    },
+    "peripheralType": {
+      "enum": ["barcodeScannerPeripheralType"],
+      "type": "string"
+    },
+    "model": {
+      "type": "string",
+      "pattern": "^(barcodeScannerPeripheral)V[0-9]+$"
+    },
+    "displayName": { "type": "string" },
+    "quirks": {
+      "type": "array",
+      "description": "List of quirks for a given peripheral",
+      "items": {
+        "type": "string"
+      }
+    },
+    "compatibleWith": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A compatible peripheral model (e.g. barcodeScannerPeripheralV1)"
+      }
+    }
+  }
+}

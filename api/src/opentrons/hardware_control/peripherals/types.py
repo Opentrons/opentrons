@@ -11,7 +11,7 @@ PeripheralModel = Union[BarcodeScannerModel]
 
 
 class PeripheralType(StrEnum):
-    BARCODE_SCANNER = "barcodeScannerPeripheralType"
+    BARCODE_SCANNER = "barcodeScannerType"
 
     @classmethod
     def from_model(cls, model: PeripheralModel) -> "PeripheralType":

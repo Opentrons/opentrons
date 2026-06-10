@@ -26,6 +26,8 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
     OnLabwareLocation,
+    PeripheralDefinition,
+    PeripheralModel,
     PreconditionTypes,
     StackerStoredLabwareGroup,
     TipGeometry,
@@ -411,6 +413,25 @@ class VacuumModuleStateUpdate:
 
 
 @dataclasses.dataclass
+class BarcodeScannerPeripheralStateUpdate:
+    """An update to the Barcode Scanner Peripheral state."""
+
+    peripheral_id: str
+
+    @classmethod
+    def create_or_override(
+        cls,
+        maybe_inst: BarcodeScannerPeripheralStateUpdate | NoChangeType,
+        peripheral_id: str,
+    ) -> BarcodeScannerPeripheralStateUpdate:
+        """Build or default a state update."""
+        if maybe_inst == NO_CHANGE:
+            return BarcodeScannerPeripheralStateUpdate(peripheral_id=peripheral_id)
+        else:
+            return maybe_inst
+
+
+@dataclasses.dataclass
 class LiquidClassLoadedUpdate:
     """The state update from loading a liquid class."""
 
@@ -459,6 +480,16 @@ class LoadModuleUpdate:
 
 
 @dataclasses.dataclass
+class LoadPeripheralUpdate:
+    """An update that loads a module."""
+
+    peripheral_id: str
+    definition: PeripheralDefinition
+    requested_model: PeripheralModel
+    serial_number: typing.Optional[str]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
@@ -467,6 +498,8 @@ class StateUpdate:
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
 
     loaded_module: LoadModuleUpdate | NoChangeType = NO_CHANGE
+
+    loaded_peripheral: LoadPeripheralUpdate | NoChangeType = NO_CHANGE
 
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 

@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     Liquid,
     LoadedLabware,
     LoadedModule,
+    LoadedPeripheral,
     LoadedPipette,
     StateSummary,
     commands,
@@ -73,6 +74,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[LabwareOffset.model_construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.model_construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.model_construct(id="some-module-id")],  # type: ignore[call-arg]
+        peripherals=[LoadedPeripheral.model_construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[
             Liquid.model_construct(
                 id="some-liquid-id", displayName="liquid", description="desc"
