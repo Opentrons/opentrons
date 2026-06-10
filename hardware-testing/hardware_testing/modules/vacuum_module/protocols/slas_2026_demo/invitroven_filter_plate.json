@@ -1019,22 +1019,7 @@
     "default": {
         "x": 0,
         "y": 0,
-        "z": 0
-    },
-    "millipore_vacuum_manifold_collar_tall": {
-      "x": 0,
-      "y": 0,
-      "z": 22.38
-    },
-    "opentrons_vacuum_manifold_collar_tall": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "opentrons_vacuum_manifold_collar_short": {
-      "x": 0,
-      "y": 0,
-      "z": 0
+        "z": 2
     }
   },
   "gripHeightFromLabwareBottom": 11

@@ -446,7 +446,7 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
         child_labware_overlap_with_parent_deck_item = (
             _get_child_labware_overlap_with_parent_labware(
                 child_labware=child_labware,
-                parent_labware_name=parent_deck_item.parameters.loadName,
+                parent_labware=parent_deck_item,
             )
         )
 
@@ -986,29 +986,47 @@ def _screw_anchored_feature_to_child_origin(
 
 
 def _get_child_labware_overlap_with_parent_labware(
-    child_labware: LabwareDefinition, parent_labware_name: str
+    child_labware: LabwareDefinition, parent_labware: LabwareDefinition
 ) -> Point:
-    """Get the child labware's overlap with the parent labware's load name."""
-    if isinstance(child_labware, LabwareDefinition3) and not hasattr(
-        child_labware, "legacyStackingOffsetWithLabware"
+    """Get the child labware's overlap with the parent labware."""
+    if (
+        isinstance(child_labware, LabwareDefinition3)
+        and not hasattr(child_labware, "legacyStackingOffsetWithLabware")
+        and isinstance(parent_labware, LabwareDefinition3)
+        and not hasattr(parent_labware, "legacyStackingOffsetWithLabware")
     ):
         raise NotImplementedError(
             f"Labware {child_labware.metadata.displayName} contains no legacyStackingOffsetWithLabware. "
             f"Either add this property explictly on the definition or update your protocol's API Level."
         )
 
+    # Try to get the offset directly from the childs stackingOffsetWithLabware mapping
+    parent_labware_name = parent_labware.parameters.loadName
     overlap = (
         child_labware.stackingOffsetWithLabware.get(parent_labware_name)
         if isinstance(child_labware, LabwareDefinition2)
         else child_labware.legacyStackingOffsetWithLabware.get(parent_labware_name)
     )
 
+    # The parent labware does not exist in the child mapping, use the childs `default` value
     if overlap is None:
         overlap = (
             child_labware.stackingOffsetWithLabware.get("default")
             if isinstance(child_labware, LabwareDefinition2)
             else child_labware.legacyStackingOffsetWithLabware.get("default")
         )
+
+    # The child mapping does not have a default, use the `default` from the parent
+    # IF the parent has the `providesStackingDefault` quirk.
+    if overlap is None:
+        if isinstance(parent_labware, LabwareDefinition2):
+            if (
+                parent_labware.parameters.quirks is not None
+                and "providesStackingDefault" in parent_labware.parameters.quirks
+            ):
+                overlap = parent_labware.stackingOffsetWithLabware.get("default")
+        else:
+            overlap = parent_labware.legacyStackingOffsetWithLabware.get("default")
 
     if overlap is None:
         if isinstance(child_labware, LabwareDefinition3):

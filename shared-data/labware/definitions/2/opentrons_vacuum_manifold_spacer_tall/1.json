@@ -1,0 +1,52 @@
+{
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "wells": {},
+  "groups": [
+    {
+      "wells": [],
+      "metadata": {}
+    }
+  ],
+  "version": 1,
+  "metadata": {
+    "tags": [],
+    "displayName": "Opentrons Vacuum Manifold Spacer Tall",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL"
+  },
+  "ordering": [],
+  "namespace": "opentrons",
+  "dimensions": {
+    "xDimension": 128.0,
+    "yDimension": 86.0,
+    "zDimension": 39.5
+  },
+  "parameters": {
+    "format": "96Standard",
+    "quirks": ["providesStackingDefault"],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "isMovableAdapter": true,
+    "loadName": "opentrons_vacuum_manifold_spacer_tall"
+  },
+  "stackLimit": 2,
+  "allowedRoles": ["adapter"],
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "stackingOffsetWithLabware": {
+    "default": {
+      "x": 0,
+      "y": 0,
+      "z": 5.5
+    }
+  },
+  "gripForce": 17,
+  "gripHeightFromLabwareBottom": 30.0
+}
