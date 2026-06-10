@@ -37,7 +37,7 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     const { result } = renderHook(
       () =>
         useDeleteMaintenanceRunMutation(
-          { reasonForInteractionRequired: false },
+          { reasonForInteractionRequired: false, isLoading: false },
           []
         ),
       {
@@ -61,7 +61,7 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     const { result } = renderHook(
       () =>
         useDeleteMaintenanceRunMutation(
-          { reasonForInteractionRequired: false },
+          { reasonForInteractionRequired: false, isLoading: false },
           []
         ),
       {

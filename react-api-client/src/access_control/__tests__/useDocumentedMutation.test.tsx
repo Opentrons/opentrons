@@ -31,7 +31,7 @@ describe('useDocumentedMutation', () => {
     const { result } = renderHook(
       () =>
         useDocumentedMutation<number, AxiosError, number>(
-          { reasonForInteractionRequired: false },
+          { reasonForInteractionRequired: false, isLoading: false },
           ['play_run'],
           testMutationKey,
           ({ variables: n }) => mutationFn(n),
@@ -59,6 +59,7 @@ describe('useDocumentedMutation', () => {
           {
             reasonForInteractionRequired: true,
             docreport: MOCK_REPORT,
+            isLoading: false,
           },
           ['play_run'],
           testMutationKey,
@@ -89,6 +90,7 @@ describe('useDocumentedMutation', () => {
             reasonForInteractionRequired: true,
             docreport: null,
             askForDocumentation,
+            isLoading: false,
           },
           ['play_run'],
           testMutationKey,
@@ -118,6 +120,7 @@ describe('useDocumentedMutation', () => {
             reasonForInteractionRequired: true,
             docreport: null,
             askForDocumentation,
+            isLoading: false,
           },
           ['play_run'],
           testMutationKey,

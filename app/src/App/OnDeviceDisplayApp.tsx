@@ -247,24 +247,23 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
-                  <MaintenanceRunTakeover>
-                    <EstopTakeover />
-                    <FirmwareUpdateTakeover />
-                    {showModuleSetupModal && localRobot?.name != null ? (
-                      <ModuleWizardFlows
-                        showSetupLauncher={true}
-                        closeFlow={() => {
-                          setShowModuleSetupModal(false)
-                        }}
-                        robotName={localRobot.name}
-                      />
-                    ) : null}
-                    <DocumentationRequiredContextProvider
-                      showDocumentationRequiredModal={requireDocumentation}
-                      loadingModal={
-                        <InProgressModal description="Loading..." />
-                      }
-                    >
+                  <DocumentationRequiredContextProvider
+                    showDocumentationRequiredModal={requireDocumentation}
+                    loadingModal={<InProgressModal description="Loading..." />}
+                  >
+                    <MaintenanceRunTakeover>
+                      <EstopTakeover />
+                      <FirmwareUpdateTakeover />
+                      {showModuleSetupModal && localRobot?.name != null ? (
+                        <ModuleWizardFlows
+                          showSetupLauncher={true}
+                          closeFlow={() => {
+                            setShowModuleSetupModal(false)
+                          }}
+                          robotName={localRobot.name}
+                        />
+                      ) : null}
+
                       <NiceModal.Provider>
                         <RobotEncryptionKeyTakeover>
                           <ToasterOven>
@@ -284,8 +283,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                           </ToasterOven>
                         </RobotEncryptionKeyTakeover>
                       </NiceModal.Provider>
-                    </DocumentationRequiredContextProvider>
-                  </MaintenanceRunTakeover>
+                    </MaintenanceRunTakeover>
+                  </DocumentationRequiredContextProvider>
                 </>
               )}
             </Box>

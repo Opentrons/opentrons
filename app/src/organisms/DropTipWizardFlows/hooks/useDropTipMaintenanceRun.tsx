@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
@@ -126,28 +127,39 @@ function useCreateDropTipMaintenanceRun({
       }
     )
 
-  useEffect(
-    () => {
-      if (
-        issuedCommandsType === 'setup' &&
-        mount != null &&
-        instrumentModelName != null
-      ) {
-        createTargetedMaintenanceRun({}).catch((e: Error) => {
-          setErrorDetails({
-            message: `Error creating maintenance run: ${e.message}`,
-          })
+  const hasSentCreateMaintenanceRun = useRef(false)
+
+  useEffect(() => {
+    if (
+      issuedCommandsType === 'setup' &&
+      mount != null &&
+      instrumentModelName != null &&
+      isDocumentationProvided(commandDocState) &&
+      !hasSentCreateMaintenanceRun.current
+    ) {
+      hasSentCreateMaintenanceRun.current = true
+      createTargetedMaintenanceRun({}).catch((e: Error) => {
+        hasSentCreateMaintenanceRun.current = false
+        setErrorDetails({
+          message: `Error creating maintenance run: ${e.message}`,
         })
-      } else {
-        console.warn(
-          'Could not create maintenance run due to missing pipette data.'
-        )
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [mount, instrumentModelName]
-  )
+      })
+    } else if (
+      issuedCommandsType === 'setup' &&
+      (mount == null || instrumentModelName == null)
+    ) {
+      console.warn(
+        'Could not create maintenance run due to missing pipette data.'
+      )
+    }
+  }, [
+    commandDocState,
+    createTargetedMaintenanceRun,
+    instrumentModelName,
+    issuedCommandsType,
+    mount,
+    setErrorDetails,
+  ])
 }
 
 interface UseMonitorMaintenanceRunForDeletionParams {

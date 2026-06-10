@@ -29,6 +29,7 @@ export const useMaintenanceRunDocumentation = (
   deletionDocState: DocumentationState
   actionsToDocument: DocumentedAction[]
   addActionToDocument: (action: DocumentedAction) => void
+  isLoading: boolean
 } => {
   const [actionsToDocument, setActionsToDocument] = useState<
     DocumentedAction[]
@@ -44,6 +45,7 @@ export const useMaintenanceRunDocumentation = (
   }, [])
 
   return {
+    isLoading: commandDocState.isLoading || deletionDocState.isLoading,
     commandDocState,
     deletionDocState,
     actionsToDocument,

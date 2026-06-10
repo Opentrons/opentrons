@@ -13,6 +13,9 @@ export function isDocumentationReportValid(
 }
 
 export function isDocumentationProvided(state: DocumentationState): boolean {
+  if (state.isLoading) {
+    return false
+  }
   if (!state.reasonForInteractionRequired) {
     return true
   }

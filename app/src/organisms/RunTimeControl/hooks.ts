@@ -40,7 +40,10 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
-  } = useRunActionMutations(runId!, { reasonForInteractionRequired: false })
+  } = useRunActionMutations(runId!, {
+    reasonForInteractionRequired: false,
+    isLoading: false,
+  })
 
   const {
     cloneRun,

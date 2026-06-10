@@ -60,7 +60,10 @@ const checkDocumentationReport = async (
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[]
 ): Promise<DocumentationReport | null> => {
-  if (!documentationState.reasonForInteractionRequired) {
+  if (
+    documentationState.isLoading ||
+    !documentationState.reasonForInteractionRequired
+  ) {
     return null
   }
   if (documentationState.docreport != null) {
@@ -82,6 +85,9 @@ function useWrappedMutationFn<TData, TVariables>(
       )
       if (docreport == null) {
         console.error('No documentation report provided')
+      }
+      if (documentationState.isLoading) {
+        throw new Error('Access control queries are still loading')
       }
       return await mutationFn({ variables, userNotes: docreport ?? '' })
     },

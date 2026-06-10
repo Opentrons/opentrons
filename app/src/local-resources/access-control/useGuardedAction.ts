@@ -72,6 +72,9 @@ export function useGuardedAction(
   }, [reasonForInteractionLoading, setIsLoading])
 
   const docState: DocumentationState = useMemo(() => {
+    if (reasonForInteractionLoading) {
+      return { isLoading: true }
+    }
     if (!reasonForInteractionRequired) {
       return { reasonForInteractionRequired: false, isLoading: false }
     }
@@ -80,17 +83,19 @@ export function useGuardedAction(
       docreport != null &&
       isDocumentationReportValid(docreport, minLengthOfReasonForInteraction)
     ) {
-      return { reasonForInteractionRequired: true, docreport }
+      return { reasonForInteractionRequired: true, docreport, isLoading: false }
     }
 
     return {
       reasonForInteractionRequired: true,
       docreport: null,
       askForDocumentation: showDocumentationModal,
+      isLoading: false,
     }
   }, [
     docreport,
     minLengthOfReasonForInteraction,
+    reasonForInteractionLoading,
     reasonForInteractionRequired,
     showDocumentationModal,
   ])

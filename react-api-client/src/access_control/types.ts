@@ -18,14 +18,20 @@ export type DocumentationReport = string & {
  * @param askForDocumentation - a function that opens the documentation modal and returns the documentation report
  */
 export type DocumentationState =
-  | { reasonForInteractionRequired: false }
-  | { reasonForInteractionRequired: true; docreport: DocumentationReport }
+  | { isLoading: true }
+  | { reasonForInteractionRequired: false; isLoading: false }
+  | {
+      reasonForInteractionRequired: true
+      docreport: DocumentationReport
+      isLoading: false
+    }
   | {
       reasonForInteractionRequired: true
       docreport: null
       askForDocumentation: (
         actionsToDocument: DocumentedAction[]
       ) => Promise<DocumentationReport>
+      isLoading: false
     }
 
 export interface DocumentedMutationParameters<TVariables = void> {
