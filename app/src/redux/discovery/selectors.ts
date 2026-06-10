@@ -165,7 +165,7 @@ export const getConnectableRobots: GetConnectableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === CONNECTABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -175,7 +175,7 @@ export const getReachableRobots: GetReachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === REACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -185,7 +185,7 @@ export const getUnreachableRobots: GetUnreachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === UNREACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -197,7 +197,7 @@ export const getAllRobots: GetAllRobots = createSelector(
   (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
     orderBy(
       concat<DiscoveredRobot>(cr, rr, ur),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -208,7 +208,7 @@ export const getViewableRobots: GetViewableRobots = createSelector(
   (cr: ViewableRobot[], rr: ViewableRobot[]) =>
     orderBy(
       concat<ViewableRobot>(cr, rr),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
