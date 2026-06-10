@@ -35,8 +35,7 @@ import { OPENTRONS_USB } from '/app/redux/discovery'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
-import { DocumentationRequiredContextProvider } from '../local-resources/access-control/DocumentationRequiredModalContext'
-import { InProgressModal } from '../molecules/InProgressModal'
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
@@ -129,9 +128,11 @@ export const DesktopApp = (): JSX.Element => {
                 setIsEmergencyStopModalDismissed,
               }}
             >
-              <DocumentationRequiredContextProvider
-                showDocumentationRequiredModal={showDocumentationRequiredModal}
-                loadingModal={<InProgressModal description="Loading..." />}
+              <DocumentationRequiredModalContext.Provider
+                value={{
+                  showDocumentationRequiredModal:
+                    showDocumentationRequiredModal,
+                }}
               >
                 <Box width="100%" height="100vh">
                   <Alerts>
@@ -175,7 +176,7 @@ export const DesktopApp = (): JSX.Element => {
                     <RobotControlTakeover />
                   </Alerts>
                 </Box>
-              </DocumentationRequiredContextProvider>
+              </DocumentationRequiredModalContext.Provider>
             </EmergencyStopContext.Provider>
           </ToasterOven>
         </ErrorBoundary>

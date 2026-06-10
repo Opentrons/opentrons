@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo } from 'react'
+import { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
@@ -53,8 +53,9 @@ export function useGuardedAction(
     [accessControlEnabled, requireReasonForInteraction]
   )
 
-  const { showDocumentationRequiredModal: requireDocumentation, setIsLoading } =
-    useContext(DocumentationRequiredModalContext)
+  const { showDocumentationRequiredModal: requireDocumentation } = useContext(
+    DocumentationRequiredModalContext
+  )
 
   const showDocumentationModal = useCallback(
     async (actionsToDocument: DocumentedAction[]) => {
@@ -66,10 +67,6 @@ export function useGuardedAction(
     },
     [currentUsername, requireDocumentation]
   )
-
-  useEffect(() => {
-    setIsLoading(reasonForInteractionLoading)
-  }, [reasonForInteractionLoading, setIsLoading])
 
   const docState: DocumentationState = useMemo(() => {
     if (reasonForInteractionLoading) {

@@ -59,9 +59,8 @@ import {
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
-import { DocumentationRequiredContextProvider } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
-import { InProgressModal } from '../molecules/InProgressModal'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
@@ -247,9 +246,10 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
-                  <DocumentationRequiredContextProvider
-                    showDocumentationRequiredModal={requireDocumentation}
-                    loadingModal={<InProgressModal description="Loading..." />}
+                  <DocumentationRequiredModalContext.Provider
+                    value={{
+                      showDocumentationRequiredModal: requireDocumentation,
+                    }}
                   >
                     <MaintenanceRunTakeover>
                       <EstopTakeover />
@@ -284,7 +284,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                         </RobotEncryptionKeyTakeover>
                       </NiceModal.Provider>
                     </MaintenanceRunTakeover>
-                  </DocumentationRequiredContextProvider>
+                  </DocumentationRequiredModalContext.Provider>
                 </>
               )}
             </Box>
