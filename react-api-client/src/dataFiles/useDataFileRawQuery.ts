@@ -4,9 +4,11 @@ import { getDataFileRaw } from '@opentrons/api-client'
 
 import { getQueryKey, useHost } from '../api'
 
-import type { AxiosRequestConfig } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { DownloadedDataFileResponse } from '@opentrons/api-client'
+import type {
+  DownloadedDataFileResponse,
+  RequestConfig,
+} from '@opentrons/api-client'
 
 // TODO(jh, 10-28-25): Split this into two hooks, perhaps in /app, that
 //  parses the return data via responseType based on known metadata about the
@@ -15,7 +17,7 @@ import type { DownloadedDataFileResponse } from '@opentrons/api-client'
 export function useDataFileRawQuery(
   fileId: string,
   options?: UseQueryOptions<DownloadedDataFileResponse>,
-  responseType?: AxiosRequestConfig['responseType']
+  responseType?: RequestConfig<unknown>['responseType']
 ): UseQueryResult<DownloadedDataFileResponse> {
   const host = useHost()
   const allOptions: UseQueryOptions<DownloadedDataFileResponse> = {

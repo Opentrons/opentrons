@@ -1,10 +1,10 @@
-import { createAxiosConfig, POST, request } from '../request'
+import { POST, request } from '../request'
 
 import type {
   CameraImageSettings,
   DownloadedPreviewImageFileResponse,
 } from '../camera'
-import type { ResponsePromise } from '../request'
+import type { RequestConfig, ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 
 export function createCapturePreviewImage(
@@ -14,11 +14,8 @@ export function createCapturePreviewImage(
   return request<
     DownloadedPreviewImageFileResponse,
     { data: CameraImageSettings }
-  >(
-    POST,
-    `/camera/capturePreviewImage`,
-    { data },
-    config,
-    createAxiosConfig({ responseType: 'blob' })
-  )
+  >(POST, `/camera/capturePreviewImage`, config, {
+    body: { data },
+    responseType: 'blob',
+  })
 }

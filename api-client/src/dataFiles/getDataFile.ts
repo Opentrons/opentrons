@@ -8,10 +8,5 @@ export function getDataFile(
   config: HostConfig,
   fileId: string
 ): ResponsePromise<DataFileDataResponse> {
-  return request<DataFileDataResponse>(
-    GET,
-    `/dataFiles/${fileId}`,
-    null,
-    config
-  )
+  return request<DataFileDataResponse>(GET, `/dataFiles/${fileId}`, config)
 }

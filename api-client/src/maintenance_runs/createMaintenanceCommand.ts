@@ -1,4 +1,4 @@
-import { createAxiosConfig, POST, request } from '../request'
+import { POST, request } from '../request'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../request'
@@ -15,9 +15,7 @@ export function createMaintenanceCommand(
   return request<CommandData, { data: CreateCommand }>(
     POST,
     `/maintenance_runs/${maintenanceRunId}/commands`,
-    { data },
     config,
-    params && createAxiosConfig({ params }),
-    userNotes
+    { queryParams: { ...params }, body: { data }, userNotes }
   )
 }
