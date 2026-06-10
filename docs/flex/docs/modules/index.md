@@ -15,7 +15,7 @@ This chapter summarizes the functions and physical specifications of modules tha
 
 ## Supported modules
 
-Opentrons Flex is compatible with with the following Opentrons modules:
+Opentrons Flex is compatible with the following Opentrons modules:
 
 - The [**Absorbance Plate Reader**](absorbance-plate-reader.md) is a fully automated spectrophotometer that uses light absorbance to determine sample concentrations. This module is optimized for a variety of applications, including protein quantification, sample normalization, cell viability assays, and monitoring bacterial growth.
 
