@@ -560,9 +560,12 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
         IDEAL_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point
     if not ctx.params.skip_liquid_probe:  # type: ignore[attr-defined]
         plate = ctx.load_labware("corning_96_wellplate_360ul_flat", cfg.slot_plate)
-        CALIBRATED_LABWARE_LOCATIONS.plate_primary = plate["H6"].top(5).point
+        CALIBRATED_LABWARE_LOCATIONS.plate_primary = plate["H6"].top().point
         IDEAL_LABWARE_LOCATIONS.plate_primary = plate["H6"].top(5).point
-        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = plate["H6"].top(5).point
+        # plate_secondary is for the front probe so offset the pipette
+        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = plate["H6"].top().point + Point(
+            y=9 * -7
+        )
         IDEAL_LABWARE_LOCATIONS.plate_secondary = plate["H6"].top(5).point
     if not ctx.params.skip_fixture:  # type: ignore[attr-defined]
         # TODO: make a fixture labware definition
@@ -1750,6 +1753,104 @@ def _test_liquid_probe(
     return trial_results
 
 
+def test_liquid_probe_new(
+    api: SyncHardwareAPI,
+    report: CSVReport,
+    section: str,
+    ctx: ProtocolContext,
+    cfg: TestConfig,
+) -> None:
+    """No jog required liquid probe."""
+    tip_vols = [50] if cfg.pipette_volume == 50 else [50, 200, 1000]
+    above_well_height = 2
+    max_submerge_mm = 3
+    max_z_distance_machine_coords = above_well_height + max_submerge_mm
+    probes = [InstrumentProbeType.PRIMARY]
+    if cfg.pipette_channels > 1:
+        probes.append(InstrumentProbeType.SECONDARY)
+    if cfg.pipette_channels == 8:
+        current_val = PRESSURE_THRESH_current[cfg.pipette_channels][cfg.pipette_volume][
+            1
+        ]
+        helpers_ot3.update_pick_up_current(api, cfg.mount, current_val)
+    for tip_vol in tip_vols:
+        results: Dict[InstrumentProbeType, List[Tuple[float, bool]]] = {}
+        for probe in probes:
+            results[probe] = []
+            good_height = 0.0
+            for trial in range(3):
+                _pick_up_tip_for_tip_volume(api, cfg, tip_vol)
+                _move_to_above_plate_liquid(
+                    api, cfg.mount, probe, height_mm=above_well_height
+                )
+                top_z = api.gantry_position(cfg.mount).z - above_well_height
+                good_probe = False
+                try:
+                    end_z = api.liquid_probe(
+                        cfg.mount,
+                        max_z_distance_machine_coords,
+                        probe=probe,
+                    )
+                    good_probe = True
+                except Exception:
+                    probeval = f"07-03{probe}传感器故障: 读取{probe}传感器值失败"
+                    FINAL_TEST_FAIL_INFOR.append(probeval)
+                    end_z = 0
+
+                if end_z >= top_z:
+                    # failed early
+                    good_probe = False
+                elif end_z <= top_z - max_submerge_mm:
+                    # went too low
+                    good_probe = False
+                results[probe].append((end_z, good_probe))
+                report(
+                    section,
+                    f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-trial-{trial}",
+                    [round(end_z, 2)],
+                )
+                if trial == 0:
+                    # bad named method here since it's going to the liquid
+                    _move_to_above_plate_liquid(api, cfg.mount, probe, end_z - top_z)
+                    helpers_ot3.get_user_answer(
+                        api, "Is the tip just touching the liquid?"
+                    )
+                    good_height = end_z
+                _drop_tip_in_trash(api, cfg)
+            heights = [h for h, _ in results[probe]]
+            passing = [p for _, p in results[probe]]
+            corrected_results = [h - good_height for h in heights]
+            precision = abs(max(corrected_results) - min(corrected_results)) * 0.5
+            accuracy = sum(corrected_results) / len(corrected_results)
+            prec_tag = (
+                f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-precision"
+            )
+            acc_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-accuracy"
+            tip_tag = f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe"
+            precision_passed = bool(
+                precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
+            )
+            accuracy_passed = bool(
+                abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
+            )
+            tip_passed = precision_passed and accuracy_passed and all(passing)
+            report(
+                section, prec_tag, [precision, CSVResult.from_bool(precision_passed)]
+            )
+            report(section, acc_tag, [accuracy, CSVResult.from_bool(accuracy_passed)])
+            report(section, tip_tag, [CSVResult.from_bool(tip_passed)])
+
+            if not precision_passed:
+                prec_tag2 = f"03-01-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水精度{precision}结果{_bool_to_pass_fail(precision_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM} mm)"
+                FINAL_TEST_FAIL_INFOR.append(prec_tag2)
+            if not accuracy_passed:
+                acc_tag2 = f"03-02-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水准确度{accuracy}结果{_bool_to_pass_fail(accuracy_passed)} 阈值为(<{LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM} mm)"
+                FINAL_TEST_FAIL_INFOR.append(acc_tag2)
+            if not tip_passed:
+                tip_tag2 = f"03-03-liquid-probe:测试液体探测,{tip_vol}ul针管{probe.name.lower()}自动点水测试结果{tip_passed}"
+                FINAL_TEST_FAIL_INFOR.append(tip_tag2)
+
+
 def test_liquid_probe(
     api: SyncHardwareAPI,
     report: CSVReport,
@@ -2140,7 +2241,8 @@ TESTS = [
     ),
     (
         TestSection.LIQUID_PROBE,
-        test_liquid_probe,
+        test_liquid_probe_new,
+        # test_liquid_probe,
     ),
     (
         TestSection.LIQUID,
