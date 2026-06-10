@@ -51,6 +51,28 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
         ],
     )
+    parameters.add_int(
+        display_name="Target Pressure (MBar)",
+        variable_name="target_pressure",
+        description="The target gauge pressure in mbar.",
+        default=-200,
+        minimum=-800,
+        maximum=0,
+    )
+    parameters.add_int(
+        display_name="Vacuum Hold Seconds",
+        variable_name="hold_time",
+        description="The vacuum hold time in seconds.",
+        default=30,
+        minimum=1,
+        maximum=60 * 60 * 12,  # 12 hrs
+    )
+    parameters.add_bool(
+        display_name="Run Ramp Profile",
+        variable_name="run_ramp_profile",
+        description="Ramps the vacuum starting at -200 - -800.",
+        default=True,
+    )
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -92,8 +114,11 @@ def run(ctx: ProtocolContext) -> None:
     ctx.home()
 
     # ------------------ Pipetting positional checks ----------------
+    target_pressure = ctx.params.target_pressure  # type: ignore[attr-defined]
+    hold_time = ctx.params.hold_time  # type: ignore[attr-defined]
+    run_profile = ctx.params.run_ramp_profile  # type: ignore[attr-defined]
     for cycle in range(ctx.params.cycles):  # type: ignore[attr-defined]
-        ctx.comment(f"Cycle #{cycle}")
+        ctx.comment(f"Cycle #{cycle} at {target_pressure} mbar")
 
         # You can move the collar with the plate ontop from the dock to the module
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
@@ -105,14 +130,16 @@ def run(ctx: ProtocolContext) -> None:
         pip.return_tip()
         tiprack_1000.reset()
 
-        # Close the vent and vacuum at -400 mbar for 30s, then open the vent
+        # Close the vent and vacuum at -200 mbar for 30s, then open the vent
         # Note: The `start_set_vacuum_pressure` command is a concurrent module action
         # So you have to use another mechanism like ProtocolContext.delay or
         # ProtocolContext.create_timer + ProtocolContext.wait_for_tasks if you
         # want to WAIT for the vacuum step to finish before continuing.
         vm_mod.close_vent()
-        vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
-        ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
+        vm_mod.start_set_vacuum_pressure(target_pressure, hold_time, vent_after=True)
+        ctx.delay(
+            hold_time, msg=f"Start Vacuum {target_pressure} mbar for {hold_time}s"
+        )
 
         # Move the collar with filter plate to the dock
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
@@ -128,10 +155,12 @@ def run(ctx: ProtocolContext) -> None:
         pip.return_tip()
         tiprack_200.reset()
 
-        # Close the vent and vacuum at -400 mbar for 30s, and keep the vent closed
+        # Close the vent and vacuum at -200 mbar for 30s, and keep the vent closed
         vm_mod.close_vent()
-        vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=False)
-        ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
+        vm_mod.start_set_vacuum_pressure(target_pressure, hold_time, vent_after=False)
+        ctx.delay(
+            hold_time, msg=f"Start Vacuum {target_pressure} mbar for {hold_time}s"
+        )
         # Manually open the vent
         vm_mod.open_vent()
 
@@ -148,38 +177,39 @@ def run(ctx: ProtocolContext) -> None:
         # ⚠️ Stopping the vacuum module, note this automatically opens the vent
         vm_mod.stop_vacuum_pump()
 
-        # ------------- Running profiles -------------
-        vm_mod.close_vent()
-        task1 = vm_mod.start_execute_profile(
-            steps=[
-                {
-                    "enable_pump": True,
-                    "gauge_pressure_mbar": -200,
-                    "hold_time_seconds": 10,
-                    "vent_after": False,
-                },
-                {
-                    "enable_pump": True,
-                    "gauge_pressure_mbar": -300,
-                    "hold_time_seconds": 20,
-                    "vent_after": False,
-                },
-                {
-                    "enable_pump": True,
-                    "gauge_pressure_mbar": -500,
-                    "hold_time_seconds": 40,
-                    "vent_after": False,
-                },
-                {
-                    "enable_pump": True,
-                    "gauge_pressure_mbar": -800,
-                    "hold_time_seconds": 120,
-                    "vent_after": True,
-                },
-            ],
-            repetitions=1,
-        )
-        ctx.wait_for_tasks([task1])
+        if run_profile:
+            # ------------- Running profiles -------------
+            vm_mod.close_vent()
+            task1 = vm_mod.start_execute_profile(
+                steps=[
+                    {
+                        "enable_pump": True,
+                        "gauge_pressure_mbar": -200,
+                        "hold_time_seconds": 10,
+                        "vent_after": False,
+                    },
+                    {
+                        "enable_pump": True,
+                        "gauge_pressure_mbar": -300,
+                        "hold_time_seconds": 20,
+                        "vent_after": False,
+                    },
+                    {
+                        "enable_pump": True,
+                        "gauge_pressure_mbar": -500,
+                        "hold_time_seconds": 40,
+                        "vent_after": False,
+                    },
+                    {
+                        "enable_pump": True,
+                        "gauge_pressure_mbar": -800,
+                        "hold_time_seconds": 120,
+                        "vent_after": True,
+                    },
+                ],
+                repetitions=1,
+            )
+            ctx.wait_for_tasks([task1])
 
-        # Turn off the pump after the profile is done
-        vm_mod.stop_vacuum_pump()
+            # Turn off the pump after the profile is done
+            vm_mod.stop_vacuum_pump()
