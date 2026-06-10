@@ -77,6 +77,9 @@ export function useLPCFlows({
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
+
+  // if launchLPC is called while other queries are still loading, we will return a constructed promise and store any provided callbacks in this ref
+  // once unblocked, the useEffect will launch LPC and resolve the constructed promise with the results
   const pendingLaunchRef = useRef<PendingLaunch | null>(null)
 
   const {
