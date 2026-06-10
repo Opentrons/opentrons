@@ -1382,7 +1382,7 @@ class LabwareView:
                 )
             ):
                 raise errors.LabwareCannotBeStackedError(
-                    f"HERE Labware {top_labware_definition.parameters.loadName} cannot be loaded to stack of more than {self.get_labware_stacking_maximum(top_labware_definition)} labware."
+                    f"Labware {top_labware_definition.parameters.loadName} cannot be loaded to stack of more than {self.get_labware_stacking_maximum(top_labware_definition)} labware."
                 )
 
             further_below_definition = self.get_definition(
