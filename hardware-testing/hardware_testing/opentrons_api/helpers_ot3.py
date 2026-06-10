@@ -1051,6 +1051,7 @@ def jog_mount_ot3_sync(
     speed: Optional[float] = None,
 ) -> Dict[Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    assert False
     return api.current_position_ot3(mount=mount, critical_point=critical_point)
     """
     if api.is_simulator:
