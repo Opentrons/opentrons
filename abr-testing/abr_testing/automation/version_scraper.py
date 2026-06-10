@@ -1,7 +1,6 @@
 """Export bugs from a Jira Initiative using JiraTicket class."""
 
 import csv
-import sys
 import requests
 from typing import List, Dict, Any, Optional
 from abr_testing.automation.jira_tool import JiraTicket
@@ -131,9 +130,7 @@ class JiraBugExporter(JiraTicket):
         )
 
     def export_initiative_bugs(self, initiative_key: str) -> str:
-        """Main export: finds all epics under an initiative,
-        then all bugs under those epics, and writes to CSV."""
-
+        """Find all epics under an initiative, then all bugs under those epics, and write to CSV."""
         bug_fields = (
             "key,summary,description,status,priority,assignee,"
             "components,fixVersions,labels,issuetype,parent,"

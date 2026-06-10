@@ -1,5 +1,6 @@
 """Create ticket for robot with error."""
-from typing import List, Tuple, Any, Dict, Optional
+
+from typing import List, Tuple, Any, Dict
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 import requests
 import argparse
@@ -8,14 +9,10 @@ import shutil
 import os
 import subprocess
 import platform
-from datetime import datetime
 import sys
 import json
 import re
 from pathlib import Path
-import pandas as pd
-from statistics import mean, StatisticsError
-from abr_testing.tools import plate_reader
 import time
 import base64
 import websocket  # type: ignore[import-untyped,import-not-found]
@@ -92,14 +89,6 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     save_dir = Path(storage)
     key_path = save_dir / "robot_key"
     # grabbing the camera image
-    ssh_command = [
-        "ssh",
-        "-i",
-        str(key_path),
-        "-o",
-        "StrictHostKeyChecking=no",
-        f"root@{robot_ip}",
-    ]
     captured = []
     update_camera_status("ON", robot_ip, str(key_path))
     time.sleep(3)
@@ -164,15 +153,16 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     return zip_base + ".zip"
 
 
-import subprocess
-
-
-def update_camera_status(status: str, robot_ip: str, key_path: str):
+def update_camera_status(status: str, robot_ip: str, key_path: str) -> None:
+    """Set the live-stream camera status on the robot via SSH and restart the stream service."""
     username = "root"  # Opentrons default
     status_upper = str(status).upper()
     # sed command
-    remote_command = f"sed -i 's/^STATUS=.*/STATUS={status_upper}/' /data/opentrons-live-stream.env && systemctl restart opentrons-live-stream"
-    # ssh command
+    remote_command = (
+        f"sed -i 's/^STATUS=.*/STATUS={status_upper}/'"
+        " /data/opentrons-live-stream.env"
+        " && systemctl restart opentrons-live-stream"
+    )  # ssh command
     ssh_command = [
         "ssh",
         "-i",
@@ -184,7 +174,7 @@ def update_camera_status(status: str, robot_ip: str, key_path: str):
     ]
     try:
         # Run the command and capture output
-        result = subprocess.run(ssh_command, capture_output=True, text=True, check=True)
+        subprocess.run(ssh_command, capture_output=True, text=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Command failed with exit code {e.returncode}.")
         if e.stderr:
@@ -328,8 +318,8 @@ def match_error_to_component(
 def get_parent_key(
     url: str, api_token: str, email: str, project_key: str, parent_name: str
 ) -> str:
-    """Find a project key from a name"""
-    jql = f'project = {project_key} AND summary ~ "{parent_name}"'  # we can make this hit everything not just the project
+    """Find a project key from a name."""
+    jql = f'project = {project_key} AND summary ~ "{parent_name}"'
     response = requests.post(
         f"{url}/rest/api/3/search/jql",
         json={"jql": jql, "fields": ["summary"], "maxResults": 50},
@@ -348,8 +338,7 @@ def get_parent_key(
 
 
 def cleanup_report_folders(storage_directory: str, keep_count: int = 3) -> None:
-    """Cleans up report folder, keeping only the _ (default 3)
-    newest reports to conserve storage space"""
+    """Cleans up report folder."""
     storage_path = Path(storage_directory)
     folders = [f for f in storage_path.iterdir() if f.is_dir()]
     folders.sort(key=lambda f: f.stat().st_mtime)
@@ -543,6 +532,9 @@ def get_run_error_info_from_robot(
     affects_version = results["API_Version"]
     # if "alpha" in affects_version:
     components.append("flex internal release")
+    if project_key == "RABR":
+        components.append(failure_level)
+        components.append("Flex-RABR")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
     print(f"components: {str(components)}")
@@ -565,11 +557,10 @@ def get_run_error_info_from_robot(
 
     # If Protocol was successfully retrieved from the robot
     description["protocol_found_on_robot"] = protocol_found
-    # Build ticket description: error summary, last protocol step, mount/gripper attachments, and module info
+    """Build ticket description:
+    error summary, last protocol step, mount/gripper attachments, and module info"""
     description["error"] = " ".join([error_code, error_type, error_instrument])
     protocol_step = list(results["commands"])[-1]
-    errored_labware_id = protocol_step["params"].get("labwareId", "")
-    errored_labware_dict: Dict[str, Any] = {}
     description["protocol_step"] = protocol_step
     description["right_mount"] = results.get("right", "No attachment")
     description["left_mount"] = results.get("left", "No attachment")
@@ -594,11 +585,8 @@ def get_run_error_info_from_robot(
     )
 
 
-def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
-    """Fetch latest run and SCP protocol into storage_directory (needs robot_key there)."""
-    storage = Path(storage_directory)
-    ssh_key = storage / "robot_key"
-
+def _fetch_latest_protocol_id(robot_ip: str) -> str:
+    """Return the protocolId from the most recent run, or '' on failure."""
     try:
         response = requests.get(
             f"http://{robot_ip}:31950/runs",
@@ -618,11 +606,11 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
         print("No runs found on robot.")
         return ""
 
-    latest_run = run_list[-1]
-    protocol_id = latest_run.get("protocolId")
-    if not protocol_id:
-        return ""
+    return run_list[-1].get("protocolId") or ""
 
+
+def _list_version_dirs(robot_ip: str, ssh_key: Path) -> List[int]:
+    """Return robot-server version directories sorted newest-first, or [] on failure."""
     try:
         result = subprocess.run(
             [
@@ -638,19 +626,25 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
             capture_output=True,
             text=True,
         )
-        version_dirs = []
-        for line in result.stdout.splitlines():
-            try:
-                num = float(line)
-                version_dirs.append(int(num) if num.is_integer() else int(num))
-            except ValueError:
-                pass
-        version_dirs.sort(reverse=True)
-    except (subprocess.CalledProcessError, ValueError) as e:
+    except subprocess.CalledProcessError as e:
         print(f"Could not find robot-server data folder: {e}")
-        return ""
+        return []
 
-    remote = None
+    version_dirs: List[int] = []
+    for line in result.stdout.splitlines():
+        try:
+            num = float(line)
+            version_dirs.append(int(num))
+        except ValueError:
+            pass
+    version_dirs.sort(reverse=True)
+    return version_dirs
+
+
+def _find_remote_protocol_path(
+    robot_ip: str, ssh_key: Path, version_dirs: List[int], protocol_id: str
+) -> str:
+    """Return the first remote path that contains protocol_id, or ''."""
     for folder_num in version_dirs:
         candidate = (
             f"/var/lib/opentrons-robot-server/{folder_num}/protocols/{protocol_id}"
@@ -668,12 +662,14 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
             capture_output=True,
         )
         if check.returncode == 0:
-            remote = candidate
-            break
+            return candidate
+    return ""
 
-    if not remote:
-        return ""
 
+def _scp_and_extract_protocol(
+    robot_ip: str, ssh_key: Path, remote: str, storage: Path, protocol_id: str
+) -> str:
+    """SCP remote protocol folder to storage and return the local protocol file path."""
     try:
         subprocess.run(
             [
@@ -693,7 +689,6 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
         return ""
 
     protocol_folder = storage / protocol_id
-
     for ext in (".py", ".json"):
         for name in os.listdir(protocol_folder):
             if name.endswith(ext):
@@ -701,13 +696,34 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
                 shutil.move(str(protocol_folder / name), str(dest))
                 shutil.rmtree(protocol_folder, ignore_errors=True)
                 print(f"protocol_file: {dest}")
-                return dest
+                return str(dest)
 
     shutil.rmtree(protocol_folder, ignore_errors=True)
     return ""
 
 
-def make_json_file(storage_directory: str, whole_description_str: str):
+def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
+    """Fetch latest run and SCP protocol into storage_directory (needs robot_key there)."""
+    storage = Path(storage_directory)
+    ssh_key = storage / "robot_key"
+
+    protocol_id = _fetch_latest_protocol_id(robot_ip)
+    if not protocol_id:
+        return ""
+
+    version_dirs = _list_version_dirs(robot_ip, ssh_key)
+    if not version_dirs:
+        return ""
+
+    remote = _find_remote_protocol_path(robot_ip, ssh_key, version_dirs, protocol_id)
+    if not remote:
+        return ""
+
+    return _scp_and_extract_protocol(robot_ip, ssh_key, remote, storage, protocol_id)
+
+
+def make_json_file(storage_directory: str, whole_description_str: str) -> str:
+    """Makes old Jira description into a json file."""
     save_dir = Path(storage_directory)
     file_path = save_dir / "health.json"
     with open(file_path, "w") as json_file:
@@ -842,7 +858,7 @@ if __name__ == "__main__":
         if len(run_or_other) < 1:
             print("No failed/recovery runs matched filters.")
             run_or_other = str(
-                input("Please format title as:\n" "feature, brief summary\n> ")
+                input("Please format title as:\nfeature, brief summary\n> ")
             ).strip()
         protocol_file_path = save_latest_protocol(ip, storage_directory)
         (

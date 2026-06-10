@@ -890,6 +890,7 @@ def get_calibration_offsets(
     storage_directory: Path,
     collected_files: Optional[List[str]] = None,
 ) -> Tuple[str, Dict[str, Any]]:
+    """Connect to robot via IP and get calibration data."""
     if collected_files is None:
         collected_files = []
     """Connect to robot via ip and get calibration data."""
@@ -982,8 +983,11 @@ def retrieve_version_file(
         return ""
 
 
-def get_logs(storage_directory: Path, ip: str) -> str:
-    """Get Robot logs and return a zip file path containing them."""
+def get_basic_logs(ip: str, storage_directory: Path) -> Tuple[List[str], str, str]:
+    """Fetch system HTTP logs and robot health info.
+
+    Returns collected file paths, name, and version.
+    """
     log_types: List[Dict[str, Any]] = [
         {"log type": "api.log", "records": 10000},
         {"log type": "server.log", "records": 10000},
@@ -1028,8 +1032,13 @@ def get_logs(storage_directory: Path, ip: str) -> str:
         except Exception as e:
             print(f"Failed to fetch {log_type['log type']}: {e}")
             continue
+    return collected_files, robot_name, sw_version
 
-    # Get weston.log using your existing SCP helper function
+
+def get_logs(storage_directory: Path, ip: str) -> str:
+    """Get Robot logs and return a zip file path containing them."""
+    collected_files, robot_name, sw_version = get_basic_logs(ip, storage_directory)
+
     collected_files = fetch_weston_log(
         ip, storage_directory, collected_files, robot_name
     )
@@ -1125,9 +1134,7 @@ def fetch_weston_log(
 def retreive_odd_console(
     robot_ip: str, storage_directory: Path, collected_files: list
 ) -> list:
-    """Connect to the ODD via websocket, collect all buffered
-    console messages, sort chronologically, and save to CSV.
-    """
+    """Connect to the ODD collect and save console logs."""
     log_buffer = 3.0
     output_csv = Path(storage_directory) / "odd_console.log"
 
