@@ -129,10 +129,7 @@ export const DesktopApp = (): JSX.Element => {
               }}
             >
               <DocumentationRequiredModalContext.Provider
-                value={{
-                  showDocumentationRequiredModal:
-                    showDocumentationRequiredModal,
-                }}
+                value={{ showDocumentationRequiredModal }}
               >
                 <Box width="100%" height="100vh">
                   <Alerts>
