@@ -17,6 +17,12 @@ class SubmitAuditLogMessageData(_StrictBaseModel):
     reason: str | None
 
 
+class AuditLogMessage(SubmitAuditLogMessageData):
+    """An audit log message together with the time the audit server received it."""
+
+    loggedAt: datetime.datetime
+
+
 class SubmitAuditLogSuccessData(_StrictBaseModel):
     """The response to a successful audit log submission."""
 
