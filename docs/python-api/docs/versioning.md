@@ -118,8 +118,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 - Adds additional tools to customize pipette blowouts: 
     - an absolute `flow_rate`.
     - a blowout position for a liquid class transfer.
-- Simplifies [customizing liquid class](liquid-classes/customize.md) tip positions, including aspirate, dispense, and blowout positions.
-- Use the load name `opentrons_flex_96_tiprack_20ul` to use Flex 20 μL pipette tips in your protocols. The tips are fully compatible with [liquid class](liquid-classes/using-liquid-classes.md) commands and with Flex 1- and 8-Channel (1–50 μL range) and 96-Channel (1–200 μL range) pipettes.
+- Simplifies [customizing liquid class](liquid-classes/customizing.md) tip positions, including aspirate, dispense, and blowout positions.
+- Use the load name `opentrons_flex_96_tiprack_20ul` to use Flex 20 μL pipette tips in your protocols. The tips are fully compatible with [liquid class](liquid-classes/using.md) commands and with Flex 1- and 8-Channel (1–50 μL range) and 96-Channel (1–200 μL range) pipettes.
 - Control how quickly the Thermocycler Module's block heats or cools with the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature] and [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] methods' optional `ramp_rate` parameter.
 - Use the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method's optional `alternate_drop_location` argument to vary the tip drop location in a waste container, preventing tips from piling up in a single location.
 - In protocols using API version 2.28, the API raises an error when calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] in large spaces, like reservoirs and large well plates.

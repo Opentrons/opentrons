@@ -6,6 +6,6 @@ Accounting for properties of liquids in your protocols can increase pipetting ac
 
 Pages in this section of the documentation cover:
 
-- The [properties](liquid-classes.md) of Opentrons-verified liquid classes.
-- API commands that let you [use](using-liquid-classes.md) and [customize](customize.md) liquid classes in your Flex protocols.
+- The [properties](properties.md) of Opentrons-verified liquid classes.
+- API commands that let you [use](using.md) and [customize](customizing.md) liquid classes in your Flex protocols.
 - Full [definitions](definitions.md) for Opentrons-verified liquid classes.

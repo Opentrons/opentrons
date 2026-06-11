@@ -73,7 +73,7 @@ If this poses a contamination risk, you can work around it in a few ways:
 
 - Use `transfer()` or `transfer_with_liquid_class()` with `new_tip="always"` instead.
 - Set [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance] high enough that the tip doesn't contact liquid in the destination well.
-- [Customize your liquid class](../liquid-classes/customize.md) to change dispense heights or add touch tip behavior.
+- [Customize your liquid class](../liquid-classes/customizing.md) to change dispense heights or add touch tip behavior.
 - Use [building block commands](../building-block-commands/liquids.md) instead of complex commands.
 
 ## Mix before

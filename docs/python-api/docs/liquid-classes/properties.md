@@ -26,21 +26,21 @@ Each Opentrons-verified liquid class is defined by a set of these properties:
     <tbody>
         <tr>
             <td>
-                <img src="../lc_icons/submerge_position.png">
+                <img src="../img/lc_icons/submerge_position.png">
                 <p><strong>Submerge position</strong></p>
             </td>
             <td>The pipette begins at this position above the liquid.</td>
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/submerge_speed.png">
+                <img src="../img/lc_icons/retract_speed.png">
                 <p><strong>Submerge speed</strong></p>
             </td>
             <td>The pipette submerges into the liquid at this speed.</td>
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/delay_after_submerge.png">
+                <img src="../img/lc_icons/delay_after_submerge.png">
                 <p><strong>Delay after submerging</strong></p>
             </td>
             <td>
@@ -54,21 +54,21 @@ Each Opentrons-verified liquid class is defined by a set of these properties:
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/mix.png">
+                <img src="../img/lc_icons/mix.png">
                 <p><strong>Mix liquid</strong></p>
             </td>
             <td>The pipette mixes liquid inside the well before an aspirate or after a dispense.</td>
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/prewet_tip.png">
+                <img src="../img/lc_icons/prewet_tip.png">
                 <p><strong>Pre-wet tip</strong></p>
             </td>
             <td>The pipette pre-wets the attached tip before aspirating liquid.</td>
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/flow_rate_aspirate.png">
+                <img src="../img/lc_icons/flow_rate_aspirate.png">
                 <p><strong>Aspirate flow rate</strong></p>
             </td>
             <td>
@@ -80,7 +80,7 @@ Each Opentrons-verified liquid class is defined by a set of these properties:
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/flow_rate_dispense.png">
+                <img src="../img/lc_icons/flow_rate_dispense.png">
                 <p><strong>Dispense flow rate</strong></p>
             </td>
             <td>
@@ -92,21 +92,21 @@ Each Opentrons-verified liquid class is defined by a set of these properties:
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/retract_position.png">
+                <img src="../img/lc_icons/retract_position.png">
                 <p><strong>Retract position</strong></p>
             </td>
             <td>The pipette retracts from the liquid and moves to this position.</td>
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/retract_speed.png">
+                <img src="../img/lc_icons/retract_speed.png">
                 <p><strong>Retract speed</strong></p>
             </td>
             <td>The pipette retracts from the liquid at the specified speed.</td>
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/push_out.png">
+                <img src="../img/lc_icons/push_out.png">
                 <p><strong>Push out</strong></p>
             </td>
             <td>
@@ -118,14 +118,14 @@ Each Opentrons-verified liquid class is defined by a set of these properties:
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/touch_tip.png">
+                <img src="../img/lc_icons/touch_tip.png">
                 <p><strong>Touch tip</strong></p>
             </td>
             <td>The pipette touches the attached tip to the sides of a well to remove droplets.</td>
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/air_gap.png">
+                <img src="../img/lc_icons/air_gap.png">
                 <p><strong>Air gap</strong></p>
             </td>
             <td>
@@ -137,7 +137,7 @@ Each Opentrons-verified liquid class is defined by a set of these properties:
         </tr>
         <tr>
             <td>
-                <img src="../lc_icons/blow_out.png">
+                <img src="../img/lc_icons/blow_out.png">
                 <p><strong>Blow out</strong></p>
             </td>
             <td>The pipette dispenses a larger amount of air to ensure all liquid leaves the tip.</td>
@@ -147,4 +147,4 @@ Each Opentrons-verified liquid class is defined by a set of these properties:
 
 A [liquid class definition](definitions.md) specifies values for each property. When your Flex protocol includes a liquid class, these property values automatically define transfer behavior. For example, if you use the [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] command to transfer a viscous liquid, the pipette submerges into the liquid and aspirates more slowly to prevent air bubbles from forming.
 
-Read more about [using liquid classes](using-liquid-classes.md) in the next section.
+Read more about [using liquid classes](using.md) in the next section.

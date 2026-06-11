@@ -28,9 +28,9 @@ nav:
       - Volume Modes: pipettes/volume-modes.md
   - Liquid Classes: 
       - Liquid Classes: liquid-classes/index.md
-      - Liquid Class Properties: liquid-classes/liquid-classes.md
-      - Using Liquid Classes: liquid-classes/using-liquid-classes.md
-      - Customizing Liquid Classes: liquid-classes/customize.md
+      - Liquid Class Properties: liquid-classes/properties.md
+      - Using Liquid Classes: liquid-classes/using.md
+      - Customizing Liquid Classes: liquid-classes/customizing.md
       - Liquid Class Definitions: liquid-classes/definitions.md
   - Building Block Commands:
       - Building Block Commands: building-block-commands/index.md
