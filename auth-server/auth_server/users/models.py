@@ -40,6 +40,12 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
     AccountType.AUDITOR: {Scope.USERS_READ_OTHERS},
 }
 
+# Scopes granted while resetPassword is true, before the user chooses a new password.
+RESET_PASSWORD_SCOPES: set[Scope] = {
+    Scope.USERS_READ_SELF,
+    Scope.USERS_WRITE_SELF_PASSWORD,
+}
+
 
 class UserCreate(BaseModel):
     """Request body for creating a user."""

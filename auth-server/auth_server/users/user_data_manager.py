@@ -14,6 +14,7 @@ from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
     ACCOUNT_TYPE_TO_SCOPES,
+    RESET_PASSWORD_SCOPES,
     AccountType,
     ResetPasswordResponse,
     UserResponse,
@@ -90,7 +91,7 @@ def get_scope_set_of_user(user: User) -> set[Scope]:
     own account, so they can change their password but nothing else until they do.
     """
     if user.reset_password:
-        return {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
+        return set(RESET_PASSWORD_SCOPES)
     return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])
 
 
