@@ -5,6 +5,7 @@ import string
 from typing import Literal
 
 from pwdlib import PasswordHash
+
 from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.orm_models import User

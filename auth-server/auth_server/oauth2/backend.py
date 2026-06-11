@@ -437,4 +437,3 @@ def _get_scope_set_of_user(user: ORMUser) -> set[Scope]:
     if user.reset_password:
         return {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
     return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])
-

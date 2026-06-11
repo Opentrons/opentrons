@@ -3,11 +3,12 @@ import string
 import pytest
 from decoy import Decoy, matchers
 
+from server_utils.auth.scopes import Scope
+
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType, UserResponse
-from server_utils.auth.scopes import Scope
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
