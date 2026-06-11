@@ -42,7 +42,7 @@ BUILD_NUMBER ?=
 # watch, coverage, and warning suppresion variables for tests and linting
 watch ?= false
 cover ?= true
-quiet ?= false
+quiet ?= true
 
 FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
 
