@@ -34,6 +34,10 @@ describe('BeforeBeginning', () => {
       setErrorMessage: vi.fn(),
       errorMessage: null,
       createdMaintenanceRunId: null,
+      documentationState: {
+        reasonForInteractionRequired: false,
+        isLoading: false,
+      },
     }
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })

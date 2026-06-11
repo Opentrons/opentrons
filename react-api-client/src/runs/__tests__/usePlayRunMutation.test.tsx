@@ -37,7 +37,11 @@ describe('usePlayRunMutation hook', () => {
     vi.mocked(createRunAction).mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      () => usePlayRunMutation({ reasonForInteractionRequired: false }),
+      () =>
+        usePlayRunMutation({
+          reasonForInteractionRequired: false,
+          isLoading: false,
+        }),
       { wrapper }
     )
 
@@ -55,7 +59,11 @@ describe('usePlayRunMutation hook', () => {
     } as Response<RunAction>)
 
     const { result } = renderHook(
-      () => usePlayRunMutation({ reasonForInteractionRequired: false }),
+      () =>
+        usePlayRunMutation({
+          reasonForInteractionRequired: false,
+          isLoading: false,
+        }),
       {
         wrapper,
       }

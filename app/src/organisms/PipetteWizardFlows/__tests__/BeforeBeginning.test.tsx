@@ -65,7 +65,10 @@ describe('BeforeBeginning', () => {
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
       deckConfig: mockDeckConfig,
-      documentationState: { reasonForInteractionRequired: false },
+      documentationState: {
+        reasonForInteractionRequired: false,
+        isLoading: false,
+      },
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)

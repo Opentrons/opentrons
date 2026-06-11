@@ -90,7 +90,9 @@ describe('usePromptForInteractionReason', () => {
       }
     )
 
-    expect(result.current.reasonForInteractionRequired).toBe(false)
+    expect(
+      !result.current.isLoading && result.current.reasonForInteractionRequired
+    ).toBe(false)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
 
@@ -116,7 +118,9 @@ describe('usePromptForInteractionReason', () => {
         wrapper,
       }
     )
-    expect(result.current.reasonForInteractionRequired).toBe(false)
+    expect(
+      !result.current.isLoading && result.current.reasonForInteractionRequired
+    ).toBe(false)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
   it('prompts for documentation when access control is enabled', async () => {
@@ -132,9 +136,13 @@ describe('usePromptForInteractionReason', () => {
     })
 
     await waitFor(() => {
-      expect(result.current.reasonForInteractionRequired).toBe(true)
       expect(
-        result.current.reasonForInteractionRequired && result.current.docreport
+        !result.current.isLoading && result.current.reasonForInteractionRequired
+      ).toBe(true)
+      expect(
+        !result.current.isLoading &&
+          result.current.reasonForInteractionRequired &&
+          result.current.docreport
       ).toEqual(mockDocreport)
     })
   })

@@ -77,6 +77,7 @@ describe('useRunActionMutations hook', () => {
       () =>
         useRunActionMutations(RUN_ID_1, {
           reasonForInteractionRequired: false,
+          isLoading: false,
         }),
       {
         wrapper,

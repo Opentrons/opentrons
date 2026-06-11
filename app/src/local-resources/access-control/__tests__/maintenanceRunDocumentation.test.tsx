@@ -191,24 +191,30 @@ describe('maintenance run documentation flow', () => {
     })
     await waitFor(() => {
       expect(
-        result.current.commandDocState.reasonForInteractionRequired &&
+        !result.current.commandDocState.isLoading &&
+          result.current.commandDocState.reasonForInteractionRequired &&
           result.current.commandDocState.docreport
       ).toEqual(MOCK_DOCREPORT)
     })
 
+    const { deletionDocState } = result.current
+
     // The deletion gate is in place but has NOT prompted yet — it is set up
     // to prompt only when the deletion mutation actually runs.
-    expect(result.current.deletionDocState.reasonForInteractionRequired).toBe(
-      true
-    )
     expect(
-      result.current.deletionDocState.reasonForInteractionRequired &&
-        result.current.deletionDocState.docreport
+      !deletionDocState.isLoading &&
+        deletionDocState.reasonForInteractionRequired
+    ).toBe(true)
+    expect(
+      !deletionDocState.isLoading &&
+        deletionDocState.reasonForInteractionRequired &&
+        deletionDocState.docreport
     ).toBeNull()
     expect(
-      result.current.deletionDocState.reasonForInteractionRequired &&
-        result.current.deletionDocState.docreport == null &&
-        result.current.deletionDocState.askForDocumentation
+      !deletionDocState.isLoading &&
+        deletionDocState.reasonForInteractionRequired &&
+        deletionDocState.docreport == null &&
+        deletionDocState.askForDocumentation
     ).toBeDefined()
 
     // 2) Every step of the maintenance run executes against the same
@@ -236,7 +242,8 @@ describe('maintenance run documentation flow', () => {
     // commandDocState's report rather than asking the user again.
     expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     expect(
-      result.current.commandDocState.reasonForInteractionRequired &&
+      !result.current.commandDocState.isLoading &&
+        result.current.commandDocState.reasonForInteractionRequired &&
         result.current.commandDocState.docreport
     ).toEqual(MOCK_DOCREPORT)
 
