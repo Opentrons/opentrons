@@ -89,8 +89,8 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     """Capture a live camera image and ODD screenshot, return path to zip."""
     save_dir = Path(storage)
     key_path = save_dir / "robot_key"
-    # grabbing the camera image
     captured = []
+    # turn the live stream on if it is not already
     update_camera_status("ON", robot_ip, str(key_path))
     time.sleep(3)
     # grab one frame from camera live stream
@@ -108,7 +108,7 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
         print(f"Failed to capture camera image for {robot_name}: {e}")
     update_camera_status("OFF", robot_ip, str(key_path))
-    # ODD screenshot via Chrome DevTools Protocol (port 9222 on robot)
+    # ODD screenshot via port 9223
     odd_path = save_dir / "odd_pic.png"
     try:
         # Get the CDP websocket URL
@@ -137,7 +137,6 @@ def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
     if not captured:
         return ""
 
-    # Zip both images together into a temp subfolder then archive it
     zip_base = str(save_dir / f"{robot_name}_live_images")
     tmp_dir = save_dir / f"{robot_name}_live_images_tmp"
     tmp_dir.mkdir(exist_ok=True)
@@ -468,13 +467,11 @@ def get_robot_state(
         except requests.exceptions.RequestException as e:
             print(f"WARNING: Could not fetch modules (HTTP unavailable): {e}")
     components: List[str] = []
-    # components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, reported_string, components)
     # if "alpha" in affects_version:
     components.append("flex internal release")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
-    # print(f"components: {str(components)}")
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
@@ -484,7 +481,6 @@ def get_robot_state(
     else:
         parent_name = robot
         parent = get_parent_key(url, api_token, email, project_key, parent_name)
-    print(f"parent: {parent}")
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -538,7 +534,6 @@ def get_run_error_info_from_robot(
         components.append("Flex-RABR")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
-    print(f"components: {str(components)}")
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
@@ -548,7 +543,6 @@ def get_run_error_info_from_robot(
     else:
         parent_name = robot
         parent = get_parent_key(url, api_token, email, project_key, parent_name)
-    print(f"parent: {parent}")
 
     summary = robot + "_" + str(one_run) + "_" + str(error_code) + "_" + error_type
     # Description of error

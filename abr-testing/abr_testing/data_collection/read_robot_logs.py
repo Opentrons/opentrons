@@ -35,7 +35,7 @@ def check_http_available(ip: str, timeout: int = 10) -> bool:
 
 
 def check_ssh_available(ip: str, storage_directory: str, timeout: int = 15) -> bool:
-    """Return True if we can authenticate to the robot over SSH with robot_key."""
+    """Return True if SSH authenticates."""
     key_path = Path(storage_directory) / "robot_key"
     try:
         result = subprocess.run(
@@ -893,13 +893,12 @@ def get_calibration_offsets(
     """Connect to robot via IP and get calibration data."""
     if collected_files is None:
         collected_files = []
-    """Connect to robot via ip and get calibration data."""
     calibration = dict()
     # Robot Information [Name, Software Version]
     try:
         response = requests.get(
             f"http://{ip}:31950/health",
-            headers={"opentrons-version": "3"},
+            headers={"opentrons-version": "*"},
             timeout=10,
         )
         response.raise_for_status()
@@ -922,7 +921,7 @@ def get_calibration_offsets(
     try:
         response = requests.get(
             f"http://{ip}:31950/instruments",
-            headers={"opentrons-version": "3"},
+            headers={"opentrons-version": "*"},
             params={"cursor": 0, "pageLength": 0},
             timeout=10,
         )
@@ -931,7 +930,7 @@ def get_calibration_offsets(
         calibration["Instruments"] = instruments.get("data", "")
         response = requests.get(
             f"http://{ip}:31950/modules",
-            headers={"opentrons-version": "3"},
+            headers={"opentrons-version": "*"},
             params={"cursor": 0, "pageLength": 0},
             timeout=10,
         )
@@ -940,7 +939,7 @@ def get_calibration_offsets(
         calibration["Modules"] = modules.get("data", "")
         response = requests.get(
             f"http://{ip}:31950/calibration/status",
-            headers={"opentrons-version": "3"},
+            headers={"opentrons-version": "*"},
             params={"cursor": 0, "pageLength": 0},
             timeout=10,
         )
