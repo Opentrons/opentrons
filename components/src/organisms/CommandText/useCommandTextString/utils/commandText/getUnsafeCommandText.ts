@@ -29,15 +29,8 @@ export function getUnsafeCommandText({
         flow_rate: flowRate,
       })
     }
-    case 'unsafe/dropTipInPlace': {
-      const pipetteName = getPipetteDisplayName(
-        command.params.pipetteId,
-        commandTextData
-      )
-      return t('drop_tip_in_place', {
-        pipette: pipetteName,
-      })
-    }
+    case 'unsafe/dropTipInPlace':
+      return t('drop_tip_in_place')
     case 'unsafe/updatePositionEstimators': {
       const axesText = getAxesText(command.params.axes, t)
       return t('update_position_estimators', { axes: axesText })

@@ -50,7 +50,7 @@
   "dispense_push_out": "Dispensing {{volume}} µL into well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec and pushing out {{push_out_volume}} µL",
   "dispense_while_tracking": "Dispensing {{volume}} µL at {{flow_rate}} µL/sec between {{track_from_location}} and {{track_to_location}} of well {{well_name}} of {{labware}} in {{labware_location}}",
   "drop_tip": "Dropping tip in {{well_name}} of {{labware}}",
-  "drop_tip_in_place": "Dropping tip on {{pipette}} in place",
+  "drop_tip_in_place": "Dropping tip in place",
   "dropping_tip_in_trash": "Dropping tip in {{trash}}",
   "empty_stacker": "Empty Stacker",
   "engage_axes": "Engaging {{axes}} axes",
