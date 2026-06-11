@@ -27,9 +27,10 @@ The following table lists the chemicals you can use to clean the exterior of the
 
 The Control Box houses an air-liquid separator. It traps liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. You should regularly clean condensate from the bowl or whenever any accumulated liquid reaches the max fill line.
 
+
 <figure markdown>
-![Air-liquid separator showing detachment tab in a magnified section](./images/separator-remove.png){ width="50%" }
-<figcaption>Air-liquid separator and locking tab details</figcaption>
+![Air-liquid separator showing detachment tab and twist directions in a magnified section](./images/separator-magnified2.png){ width="50%" }
+<figcaption>Separator filter bowl. Pull tab down and twist bowl to remove.</figcaption>
 </figure>
 
 ### Detach the bowl
@@ -62,10 +63,12 @@ To reattach the separator bowl:
 
 2. Push up firmly on the bowl.
 
-3. Hold the locking tab down and rotate the bowl slightly to engage the retaining lugs and restore the locking tab to its original position.
+3. Pull the locking tab down.
 
-4. Release the tab when the bowl snaps into place.
+4. Twist the bowl to engage the retaining lugs and restore the locking tab to its original position.
 
-5. Reattach the power cable.
+5. Release the locking tab when the bowl snaps into place.
+
+6. Reattach the power cable and turn the power back on.
 
 </div>
