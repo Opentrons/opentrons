@@ -247,6 +247,16 @@ export const getPipettingCommandText = ({
         mount,
       })
     }
+    case 'getTipPresence': {
+      const pipetteId = command.params.pipetteId
+      const pipette = commandTextData?.pipettes.find(
+        pipette => pipette.id === pipetteId
+      )
+      const pipetteName = getPipetteSpecsV2(pipette?.pipetteName)?.displayName
+      return t('get_tip_presence', {
+        pipette: pipetteName,
+      })
+    }
     default: {
       console.warn(
         'PipettingCommandText encountered a command with an unrecognized commandType: ',
