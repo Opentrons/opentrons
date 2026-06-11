@@ -8,13 +8,13 @@ import type { DownloadedDataFileResponse } from './types'
 export function getDataFileRaw(
   config: HostConfig,
   fileId: string,
-  axiosConfig?: AxiosRequestConfig
+  responseType?: AxiosRequestConfig['responseType']
 ): ResponsePromise<DownloadedDataFileResponse> {
   return request<DownloadedDataFileResponse>(
     GET,
     `/dataFiles/${fileId}/download`,
     null,
     config,
-    axiosConfig && createAxiosConfig(axiosConfig)
+    createAxiosConfig({ responseType })
   )
 }
