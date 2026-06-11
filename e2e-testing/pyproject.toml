@@ -22,6 +22,9 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "rich>=13.0.0",
     "ruff>=0.14.2",
+    "cryptography>=44.0.0",
+    "pyyaml>=6.0.2",
+    "types-PyYAML>=6.0.12",
 ]
 
 [tool.hatch.build.targets.wheel]

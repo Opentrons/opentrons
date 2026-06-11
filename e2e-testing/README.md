@@ -153,7 +153,36 @@ uv run python scripts/check_auth.py localhost
 ROBOT_IP=localhost uv run python scripts/check_auth.py
 
 # Same checks, no stdout on success (exit 0 / 1)
-uv run python scripts/check_auth_quiet.py localhost
+uv run python scripts/check_auth_quiet.py 192.168.0.20
+
+# Read-only auth-server inspection on a Flex robot over HTTPS:
+make inspect-robot-auth ROBOT_IP=192.168.1.42
+# With credentials for protected reads:
+make inspect-robot-auth ROBOT_IP=192.168.1.42 INSPECT_AUTH_ARGS="--username admin --password secret --user operator1"
+
+# Verify robot encryption key and install HTTPS CA trust (interactive):
+make verify-robot-encryption ROBOT_IP=192.168.1.42
+uv run python scripts/verify_robot_encryption.py 192.168.1.42
+
+# Create demo accounts at each account type (admin, user, auditor, service):
+make provision-demo-users ROBOT_IP=192.168.1.42
+make provision-demo-users ROBOT_IP=192.168.1.42 PROVISION_DEMO_ARGS="--replace"
+uv run python scripts/provision_demo_users.py 192.168.1.42
+
+# Stop active runs, clear leftover state, and optionally reboot:
+make cleanup-robot-runs ROBOT_IP=192.168.1.42 CLEANUP_ROBOT_ARGS="--restart"
+uv run python scripts/cleanup_robot_runs.py 192.168.1.42 --restart
+
+# Wipe auth-server data on the robot over SSH (same as Jupyter terminal reset):
+make reset-robot-auth-server ROBOT_IP=192.168.1.42 RESET_AUTH_ARGS="--yes"
+uv run python scripts/reset_robot_auth_server.py 192.168.1.42 --yes
+
+# Open a root SSH shell on the robot (requires ~/.ssh/robot_key):
+make ssh-flex ROBOT_IP=192.168.1.42
+
+# Render and serve the demo-user access-control test matrix (same data the tests use):
+make demo-access-matrix
+# Writes test-results/demo-access-matrix.html (gitignored) and serves it (default port 8765; picks next free port if busy).
 ```
 
 Use **`AuthClient`** in code:
@@ -161,12 +190,17 @@ Use **`AuthClient`** in code:
 ```python
 from automation.clients.auth import AuthClient
 
-async with AuthClient(base_url="http://localhost:33950") as client:
-    ok = await client.is_alive()
+async with AuthClient("192.168.0.20") as client:
     settings = await client.get_settings()
 ```
 
-For pytest, use **`automation.auth_helpers`** (admin login, provision users) and fixtures in **`tests/auth/conftest.py`** (`auth_client`, `builtin_admin_session`, `provisioned_test_user`). The session fixture starts the server with **`make -C ../auth-server dev-no-reload`** unless one is already up or **`SKIP_AUTH_SERVER_START=true`**. See **`compose/README.md`**.
+Robot CA files live in **`robot-certs/`** (gitignored). After `make verify-robot-encryption`,
+see **`robot-certs/registry.yaml`** for the mapping of `robot_serial`, `ip`, and `ca_cert`.
+Copy **`robot-certs/registry.example.yaml`** as a template.
+
+For pytest, set **`ROBOT_IP`**, **`AUTH_USERNAME`**, and **`AUTH_PASSWORD`**, then use
+**`automation.auth_helpers`** and fixtures in **`tests/auth/conftest.py`**
+(`auth_client`, `admin_session`, `provisioned_test_user`).
 
 ### Key Fixtures (conftest.py)
 

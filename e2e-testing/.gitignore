@@ -35,3 +35,8 @@ Thumbs.db
 
 .env*
 !.env.example
+
+# Robot HTTPS CA material (PEM files + registry.yaml); see robot-certs/registry.example.yaml
+robot-certs/*
+!robot-certs/.gitkeep
+!robot-certs/registry.example.yaml

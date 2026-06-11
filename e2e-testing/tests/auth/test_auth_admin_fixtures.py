@@ -8,7 +8,7 @@ import httpx
 import pytest
 
 from automation.auth_helpers import (
-    BuiltinAdminSession,
+    AdminSession,
     ProvisionedTestUser,
     create_test_user_under_admin,
 )
@@ -18,12 +18,12 @@ from automation.clients.auth import AuthClient
 @pytest.mark.auth_api
 async def test_admin_session_and_provisioned_user_round_trip(
     auth_client: AuthClient,
-    builtin_admin_session: BuiltinAdminSession,
+    admin_session: AdminSession,
     provisioned_test_user: ProvisionedTestUser,
 ) -> None:
     """Admin can create a user; that user can log in; GET user matches create response."""
 
-    fetched = await auth_client.get_user(builtin_admin_session.token, provisioned_test_user.user_name)
+    fetched = await auth_client.get_user(admin_session.token, provisioned_test_user.user_name)
     assert fetched.user_name == provisioned_test_user.user_name
     assert fetched.full_name == provisioned_test_user.full_name
     assert fetched.account_type == "user"
@@ -39,11 +39,11 @@ async def test_admin_session_and_provisioned_user_round_trip(
 @pytest.mark.auth_api
 async def test_patch_second_user_username_to_first_users_name_returns_400(
     auth_client: AuthClient,
-    builtin_admin_session: BuiltinAdminSession,
+    admin_session: AdminSession,
 ) -> None:
     """Renaming user B to user A's username is rejected with the same body as duplicate POST."""
 
-    admin = builtin_admin_session
+    admin = admin_session
     suffix = uuid.uuid4().hex[:12]
     first = f"e2e_name_clash_{suffix}_a"
     second = f"e2e_name_clash_{suffix}_b"
@@ -83,20 +83,15 @@ async def test_patch_second_user_username_to_first_users_name_returns_400(
 @pytest.mark.auth_api
 async def test_patch_access_control_enabled_once_then_rejects_second_patch(
     auth_client: AuthClient,
-    builtin_admin_session: BuiltinAdminSession,
+    admin_session: AdminSession,
 ) -> None:
     """Admin enables access control; GET reflects it; a second PATCH returns 422.
 
-    On a **fresh** auth-server DB, access control starts **off** (see
-    ``SettingsStore.get_access_control_settings``: no row means ``False``).
-    If this test sees AC already on, you are almost certainly hitting a **reused**
-    process on ``E2E_AUTH_SERVER_PORT`` (for example ``make -C auth-server dev``)
-    whose persistence still has AC enabled from an earlier run. Use a free port
-    and a spawned child (default runner behavior when nothing is listening), or
-    ``pytest.skip`` below, or restart that server with a clean persistence dir.
+    On a fresh robot, access control starts **off**. This test mutates robot-wide
+    auth settings; it is ordered last via ``pytest_collection_modifyitems``.
     """
 
-    admin = builtin_admin_session
+    admin = admin_session
     before = await auth_client.get_access_control_settings()
     if before.access_control_enabled:
         pytest.skip(

@@ -1,0 +1,16 @@
+# Example robot CA registry for e2e-testing.
+# Copy to robot-certs/registry.yaml and adjust for your Flex (robot-certs/ is gitignored).
+#
+#   cp robot-certs/registry.example.yaml robot-certs/registry.yaml
+#
+# Or run: make verify-robot-encryption ROBOT_IP=<ip>
+# which writes registry.yaml automatically after verifying the encryption key.
+
+robots:
+  - robot_serial: FLEX12345678
+    ip: 192.168.0.20
+    ca_cert: 87f392a4d8d77efe1e3dfb33395b4bba371a428d1194f07c0fe171753d46a12d.pem
+    http_port: 31950
+    https_port: 32313
+    robot_name: opentrons-flex
+    updated_at: "2026-06-03T12:00:00+00:00"

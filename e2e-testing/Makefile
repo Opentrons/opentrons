@@ -102,6 +102,61 @@ test-api-integration:
 .PHONY: test-auth
 test-auth: test-api-integration
 
+DEMO_ACCESS_MATRIX_HTML ?= test-results/demo-access-matrix.html
+DEMO_ACCESS_MATRIX_PORT ?= 8765
+
+.PHONY: demo-access-matrix
+demo-access-matrix:
+	uv run python scripts/print_demo_access_matrix.py --output $(DEMO_ACCESS_MATRIX_HTML) --serve --port $(DEMO_ACCESS_MATRIX_PORT)
+
+.PHONY: provision-demo-users
+provision-demo-users:
+	@if [ -z "$(ROBOT_IP)" ]; then \
+		echo "Usage: make provision-demo-users ROBOT_IP=<robot-ip-or-hostname> [PROVISION_DEMO_ARGS='--replace']"; \
+		exit 1; \
+	fi
+	uv run python scripts/provision_demo_users.py $(ROBOT_IP) $(PROVISION_DEMO_ARGS)
+
+.PHONY: cleanup-robot-runs
+cleanup-robot-runs:
+	@if [ -z "$(ROBOT_IP)" ]; then \
+		echo "Usage: make cleanup-robot-runs ROBOT_IP=<robot-ip-or-hostname> [CLEANUP_ROBOT_ARGS='--keep-idle-runs']"; \
+		exit 1; \
+	fi
+	uv run python scripts/cleanup_robot_runs.py $(ROBOT_IP) $(CLEANUP_ROBOT_ARGS)
+
+.PHONY: inspect-robot-auth
+inspect-robot-auth:
+	@if [ -z "$(ROBOT_IP)" ]; then \
+		echo "Usage: make inspect-robot-auth ROBOT_IP=<robot-ip-or-hostname> [INSPECT_AUTH_ARGS='--username u --password p']"; \
+		exit 1; \
+	fi
+	uv run python scripts/inspect_robot_auth.py $(ROBOT_IP) $(INSPECT_AUTH_ARGS)
+
+.PHONY: ssh-flex
+ssh-flex:
+	@if [ -z "$(ROBOT_IP)" ]; then \
+		echo "Usage: make ssh-flex ROBOT_IP=<robot-ip-or-hostname> [SSH_FLEX_ARGS='-- ls /data']"; \
+		exit 1; \
+	fi
+	uv run python scripts/ssh_flex.py $(ROBOT_IP) $(SSH_FLEX_ARGS)
+
+.PHONY: reset-robot-auth-server
+reset-robot-auth-server:
+	@if [ -z "$(ROBOT_IP)" ]; then \
+		echo "Usage: make reset-robot-auth-server ROBOT_IP=<robot-ip-or-hostname> [RESET_AUTH_ARGS='--yes']"; \
+		exit 1; \
+	fi
+	uv run python scripts/reset_robot_auth_server.py $(ROBOT_IP) $(RESET_AUTH_ARGS)
+
+.PHONY: verify-robot-encryption
+verify-robot-encryption:
+	@if [ -z "$(ROBOT_IP)" ]; then \
+		echo "Usage: make verify-robot-encryption ROBOT_IP=<robot-ip-or-hostname> [VERIFY_ENCRYPTION_ARGS='--skip-https-test']"; \
+		exit 1; \
+	fi
+	uv run python scripts/verify_robot_encryption.py $(ROBOT_IP) $(VERIFY_ENCRYPTION_ARGS)
+
 .PHONY: test-ll-local
 test-ll-local:
 	TEST_ENV=local uv run pytest -m llE2E $(PYTEST_ARGS)

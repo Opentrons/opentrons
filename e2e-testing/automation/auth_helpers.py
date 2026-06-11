@@ -1,4 +1,4 @@
-"""Business-level helpers for auth-server component tests.
+"""Business-level helpers for Flex robot auth-server tests.
 
 These functions compose multiple :class:`automation.clients.auth.AuthClient`
 calls (login, create user, fetch profile). Keep the httpx client itself thin;
@@ -7,37 +7,20 @@ put multi-step flows here so tests stay readable.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 
-from automation.clients.auth import (
-    ADMIN_PASSWORD,
-    ADMIN_USERNAME,
-    AuthClient,
-)
+from automation.clients.auth import AuthClient
 from automation.clients.auth_models import AccountType, TokenResponse, UserResponse
 
 
 @dataclass(frozen=True, slots=True)
-class BuiltinAdminSession:
-    """OAuth session for the auth-server's seeded administrator account.
-
-    The server ships ``test_admin`` / ``test_admin_password`` for integration
-    testing (same credentials as ``AuthClient.ADMIN_*``). That account has full
-    scopes, including ``users.read``, ``users.write``, and
-    ``auth_settings.write``, so it can create disposable users and change
-    settings during a test run.
-    """
+class AdminSession:
+    """OAuth session for a robot administrator account."""
 
     username: str
     password: str
     token: TokenResponse
-
-
-async def obtain_builtin_admin_session(client: AuthClient) -> BuiltinAdminSession:
-    """Log in as ``test_admin`` and return a :class:`BuiltinAdminSession`."""
-
-    token = await client.get_token(ADMIN_USERNAME, ADMIN_PASSWORD)
-    return BuiltinAdminSession(username=ADMIN_USERNAME, password=ADMIN_PASSWORD, token=token)
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,9 +38,26 @@ class ProvisionedTestUser:
     profile: UserResponse
 
 
+def resolve_admin_credentials() -> tuple[str, str]:
+    """Return ``(AUTH_USERNAME, AUTH_PASSWORD)`` from the environment."""
+    username = os.environ.get("AUTH_USERNAME", "").strip()
+    password = os.environ.get("AUTH_PASSWORD", "").strip()
+    if not username or not password:
+        raise ValueError("Set AUTH_USERNAME and AUTH_PASSWORD for robot auth tests")
+    return username, password
+
+
+async def obtain_admin_session(client: AuthClient) -> AdminSession:
+    """Log in with ``AUTH_USERNAME`` / ``AUTH_PASSWORD`` and return a session."""
+
+    username, password = resolve_admin_credentials()
+    token = await client.get_token(username, password)
+    return AdminSession(username=username, password=password, token=token)
+
+
 async def create_test_user_under_admin(
     client: AuthClient,
-    admin: BuiltinAdminSession,
+    admin: AdminSession,
     *,
     user_name: str,
     password: str,

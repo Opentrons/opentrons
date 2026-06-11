@@ -37,6 +37,7 @@ from automation.clients.auth_models import (
     UserResourceResponse,
     UserResponse,
 )
+from automation.robot_certs.host import resolve_robot_host
 
 _SETTINGS_RESPONSE_ENVELOPE = TypeAdapter(SettingsResponseEnvelope)
 _SETTINGS_PATCH_REQUEST = TypeAdapter(SettingsPatchRequestEnvelope)
@@ -53,38 +54,39 @@ _UNSET = _UnsetType()
 # Hardcoded client_id expected by the auth-server (see auth_server/oauth2/backend.py).
 DEFAULT_CLIENT_ID = "opentrons_app"
 
-# Well-known test users baked into the auth-server for testing.
-ADMIN_USERNAME = "test_admin"
-ADMIN_PASSWORD = "test_admin_password"
-USER_USERNAME = "test_user"
-USER_PASSWORD = "test_user_password"
-
 
 class AuthClient:
-    """E2E test client for the auth-server.
+    """E2E test client for the auth-server on a Flex robot over HTTPS.
 
     Wraps ``httpx.AsyncClient`` with a fixed ``base_url``. Each public method maps to
     one HTTP request (method + path + body). Paths are relative to ``base_url``, so
-    a call like ``get("/auth/settings")`` becomes ``GET http://<host>:33950/auth/settings``.
+    a call like ``get("/auth/settings")`` becomes ``GET https://<robot-ip>:32313/auth/settings``.
 
     Successful JSON responses are parsed into models from ``automation.clients.auth_models``.
 
     Usage::
 
-        async with AuthClient(base_url="http://localhost:33950") as client:
-            token = await client.get_token("test_admin", "test_admin_password")
-            assert token.access_token
+        async with AuthClient("192.168.0.20") as client:
+            settings = await client.get_settings()
+            token = await client.get_token("admin", "password")
     """
 
     def __init__(
         self,
-        base_url: str,
+        robot_ip: str,
+        *,
         client_id: str = DEFAULT_CLIENT_ID,
         timeout: float = 30.0,
     ) -> None:
-        self.base_url = base_url.rstrip("/")
         self.client_id = client_id
-        self._client = httpx.AsyncClient(base_url=self.base_url, timeout=timeout)
+        self.robot_host = resolve_robot_host(robot_ip)
+        self.base_url = self.robot_host.base_url.rstrip("/")
+        self._client = httpx.AsyncClient(
+            base_url=self.base_url,
+            timeout=timeout,
+            verify=self.robot_host.httpx_verify(),
+            headers=self.robot_host.default_headers,
+        )
 
     # -- Context-manager support ---------------------------------------------------
 
@@ -96,6 +98,10 @@ class AuthClient:
 
     async def close(self) -> None:
         await self._client.aclose()
+
+    @staticmethod
+    def _user_by_username_path(username: str) -> str:
+        return f"/auth/users/byUsername/{username}"
 
     # -- OAuth 2 Password Grant ----------------------------------------------------
 
@@ -199,7 +205,7 @@ class AuthClient:
 
     async def patch_access_control_enabled_response(
         self,
-        token: TokenResponse,
+        token: TokenResponse | None,
     ) -> httpx.Response:
         """PATCH ``/auth/settings/accessControlEnabled`` without ``raise_for_status``.
 
@@ -209,15 +215,16 @@ class AuthClient:
         body: AccessControlPatchRequestEnvelope = {
             "data": {"accessControlEnabled": True},
         }
+        headers = AuthClient.auth_header(token) if token else {}
         return await self._client.patch(
             "/auth/settings/accessControlEnabled",
             json=body,
-            headers=AuthClient.auth_header(token),
+            headers=headers,
         )
 
     async def patch_access_control_enabled(
         self,
-        token: TokenResponse,
+        token: TokenResponse | None,
     ) -> AccessControlResponseData:
         """PATCH /auth/settings/accessControlEnabled to enable access control.
 
@@ -283,16 +290,16 @@ class AuthClient:
 
     async def create_user(
         self,
-        token: TokenResponse,
+        token: TokenResponse | None,
         *,
         user_name: str,
         password: str,
         full_name: str,
         account_type: AccountType = "user",
     ) -> UserResponse:
-        """POST /auth/users. Create a user (requires USERS_WRITE scope)."""
+        """POST /auth/users. Create a user (requires USERS_WRITE when access control is on)."""
         create_data: UserCreateData = {
-            "userName": user_name,
+            "username": user_name,
             "password": password,
             "fullName": full_name,
             "accountType": account_type,
@@ -304,20 +311,30 @@ class AuthClient:
 
     async def post_users_request(
         self,
-        token: TokenResponse,
+        token: TokenResponse | None,
         body: UserCreateRequestEnvelope | dict[str, Any],
     ) -> httpx.Response:
         """POST /auth/users with a full JSON body (for success and error cases)."""
+        headers = AuthClient.auth_header(token) if token else {}
         return await self._client.post(
             "/auth/users",
             json=body,
-            headers=AuthClient.auth_header(token),
+            headers=headers,
         )
 
     async def get_user(self, token: TokenResponse, user_name: str) -> UserResponse:
-        """GET /auth/users/{user_name} (requires USERS_READ scope)."""
+        """GET /auth/users/byUsername/{user_name} (requires USERS_READ_OTHERS scope)."""
         response = await self._client.get(
-            f"/auth/users/{user_name}",
+            self._user_by_username_path(user_name),
+            headers=AuthClient.auth_header(token),
+        )
+        response.raise_for_status()
+        return UserResourceResponse.model_validate(response.json()).data
+
+    async def get_self(self, token: TokenResponse) -> UserResponse:
+        """GET /auth/users/self (requires USERS_READ_SELF scope)."""
+        response = await self._client.get(
+            "/auth/users/self",
             headers=AuthClient.auth_header(token),
         )
         response.raise_for_status()
@@ -335,7 +352,7 @@ class AuthClient:
         locked: UserPatchLocked | _UnsetType = _UNSET,
         reset_password: bool | _UnsetType = _UNSET,
     ) -> httpx.Response:
-        """PATCH /auth/users/{user_name} without calling ``raise_for_status``.
+        """PATCH /auth/users/byUsername/{user_name} without calling ``raise_for_status``.
 
         Use this when the test expects a non-2xx response and needs to inspect
         ``status_code``, ``.json()``, or ``.text`` (same keyword semantics as
@@ -343,7 +360,7 @@ class AuthClient:
         """
         raw: dict[str, Any] = {}
         if user_name_new is not _UNSET:
-            raw["userName"] = user_name_new
+            raw["username"] = user_name_new
         if password is not _UNSET:
             raw["password"] = password
         if full_name is not _UNSET:
@@ -356,7 +373,7 @@ class AuthClient:
             raw["resetPassword"] = reset_password
         body = _USER_PATCH_REQUEST.validate_python({"data": raw})
         return await self._client.patch(
-            f"/auth/users/{user_name}",
+            self._user_by_username_path(user_name),
             json=body,
             headers=AuthClient.auth_header(token),
         )
@@ -373,7 +390,7 @@ class AuthClient:
         locked: UserPatchLocked | _UnsetType = _UNSET,
         reset_password: bool | _UnsetType = _UNSET,
     ) -> UserResponse:
-        """PATCH /auth/users/{user_name} (requires USERS_WRITE scope).
+        """PATCH /auth/users/byUsername/{user_name} (requires USERS_WRITE scope).
 
         Keyword arguments default to "not sent". Pass ``None`` only when you
         intend JSON null for a nullable field; omit the argument to leave the
@@ -401,18 +418,19 @@ class AuthClient:
         user_name: str,
         body: dict[str, Any],
     ) -> httpx.Response:
-        """PATCH /auth/users/{user_name} with a raw request body."""
+        """PATCH /auth/users/byUsername/{user_name} with a raw request body."""
         return await self._client.patch(
-            f"/auth/users/{user_name}",
+            self._user_by_username_path(user_name),
             json=body,
             headers=AuthClient.auth_header(token),
         )
 
-    async def delete_user(self, token: TokenResponse, user_name: str) -> None:
-        """DELETE /auth/users/{user_name} (requires USERS_WRITE scope). Returns 200 with empty body."""
+    async def delete_user(self, token: TokenResponse | None, user_name: str) -> None:
+        """DELETE /auth/users/byUsername/{user_name} (requires USERS_WRITE when access control is on)."""
+        headers = AuthClient.auth_header(token) if token else {}
         response = await self._client.delete(
-            f"/auth/users/{user_name}",
-            headers=AuthClient.auth_header(token),
+            self._user_by_username_path(user_name),
+            headers=headers,
         )
         response.raise_for_status()
 

@@ -19,7 +19,7 @@ class UserCreateData(TypedDict):
     All fields are required in JSON. Matches ``auth_server.users.models.UserCreate``.
     """
 
-    userName: str
+    username: str
     password: str
     fullName: str
     accountType: AccountType
@@ -32,13 +32,13 @@ class UserCreateRequestEnvelope(TypedDict):
 
 
 class UserPatchData(TypedDict, total=False):
-    """Inner ``data`` for PATCH **requests** to ``/auth/users/{userName}``.
+    """Inner ``data`` for PATCH **requests** to ``/auth/users/byUsername/{username}``.
 
     Only include keys being updated. JSON null is represented as ``None``; omit
     keys you do not want to change. Matches ``auth_server.users.models.UpdateUser``.
     """
 
-    userName: str | None
+    username: str | None
     password: str | None
     fullName: str | None
     accountType: AccountType | None
@@ -47,7 +47,7 @@ class UserPatchData(TypedDict, total=False):
 
 
 class UserPatchRequestEnvelope(TypedDict):
-    """Top-level **request** JSON for PATCH ``/auth/users/{userName}``."""
+    """Top-level **request** JSON for PATCH ``/auth/users/byUsername/{username}``."""
 
     data: UserPatchData
 
@@ -57,7 +57,7 @@ class UserResponse(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    user_name: str = Field(alias="userName")
+    user_name: str = Field(alias="username")
     full_name: str = Field(alias="fullName")
     account_type: AccountType = Field(alias="accountType")
     scopes: list[str] = Field(default_factory=list)
