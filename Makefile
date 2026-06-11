@@ -42,7 +42,7 @@ BUILD_NUMBER ?=
 # watch, coverage, and warning suppresion variables for tests and linting
 watch ?= false
 cover ?= true
-quiet ?= false
+quiet ?= true
 
 FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
 
@@ -260,7 +260,7 @@ lint-js: lint-js-eslint lint-js-prettier
 lint-js-eslint:
 # todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
 # when the file supports it (upgrade eslint and/or move away from legacy config format)
-	pnpm exec eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
@@ -271,7 +271,7 @@ lint-js-prettier:
 lint-json:
 # todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
 # when the file supports it (upgrade eslint and/or move away from legacy config format)
-	pnpm exec eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
