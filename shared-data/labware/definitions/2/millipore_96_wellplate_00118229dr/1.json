@@ -1,5 +1,4 @@
 {
-  "$otSharedSchema": "#/labware/schemas/2",
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",

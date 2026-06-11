@@ -316,7 +316,6 @@ export function SelectLabwareModal(
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
       const isLid = labwareDef.allowedRoles?.includes('lid')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
-      const isWellPlate = labwareDef.metadata.displayCategory === 'wellPlate'
       const isVacuumCollar = getIsVacuumCollar(labwareDef)
 
       // for vacuum dock, show collars when empty, filter plates when collar present
