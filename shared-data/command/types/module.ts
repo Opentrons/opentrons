@@ -3,7 +3,7 @@ import type {
   CommonCommandRunTimeInfo,
   RunCommandFlexStackerError,
 } from '.'
-import type { LabwareDefinition } from '../../js'
+import type { LabwareDefinition, ModuleModel } from '../../js'
 import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
@@ -685,7 +685,7 @@ export type IdentifyColor = 'white' | 'red' | 'green' | 'blue' | 'yellow' | null
 export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'identifyModule'
   params: {
-    model: string
+    model: ModuleModel
     moduleId: string
     start: boolean
     color?: IdentifyColor

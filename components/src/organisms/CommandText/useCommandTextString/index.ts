@@ -242,6 +242,15 @@ export function useCommandTextString(
         }),
       }
 
+    case 'retractAxis':
+      return {
+        kind: 'generic',
+        commandText: utils.getRetractAxisCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
     case 'configureForVolume':
       return {
         kind: 'generic',
@@ -376,6 +385,23 @@ export function useCommandTextString(
       return {
         kind: 'generic',
         commandText: utils.getCalibrationCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+    case 'setStatusBar':
+      return {
+        kind: 'generic',
+        commandText: utils.getSetStatusBarCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
+    case 'identifyModule':
+      return {
+        kind: 'generic',
+        commandText: utils.getIdentifyModuleCommandText({
           ...fullParams,
           command,
         }),
