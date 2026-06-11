@@ -102,9 +102,8 @@ Flex deck layout: D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3 (Trash bin)
   - Not allowed: A1, A2, A3, B1, B2, B3, C1, C2, C3, D1, D2, or D3
   - Notes:
     - Modules or fixtures that are loaded beneath the deck (trash bin, temperature module, heater-shaker module, and absorbance plate reader module) cannot be added to column 3 while a Flex Stacker is in the same row.
-    - The magnetic block can be added to column 3 in the same row as a Flex Stacker.
-    - The waste chute can be added to slot D3 next to a Flex Stacker in slot D4.
-    - Any labware can be added to column 3 in the same row as a Flex Stacker
+    - Modules or fixtures that are loaded above the deck (waste chute, magnetic block) can be added to column 3. This means the magnetic block can be added to column 3 in the same row as a Flex Stacker, and the waste chute can be added to slot D3 even if it is next to a Flex Stacker in slot D4.
+    - Any labware can be added to column 3 in the same row as a Flex Stacker.
 
 ### Fixtures
 

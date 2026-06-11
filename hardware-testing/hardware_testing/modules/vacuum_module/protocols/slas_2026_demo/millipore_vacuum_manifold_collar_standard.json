@@ -35,7 +35,7 @@
   ],
   "parameters": {
     "format": "96Standard",
-    "quirks": ["vacuumModuleDock"],
+    "quirks": ["vacuumModuleDock", "providesStackingDefault"],
     "isTiprack": false,
     "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,

@@ -1,0 +1,47 @@
+"""Audit-server application settings, loaded from environment variables."""
+
+import typing
+from functools import lru_cache
+from pathlib import Path
+
+import typing_extensions
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from server_utils.settings_utils import get_dot_env_path
+
+_ENV_PREFIX = "OT_AUDIT_SERVER_"
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> "AuditServerSettings":
+    """Return the cached singleton settings instance."""
+    return AuditServerSettings(_env_file=get_dot_env_path(_ENV_PREFIX))
+
+
+class AuditServerSettings(BaseSettings):
+    """Audit server settings.
+
+    To override any of these create an environment variable with prefix
+    ``OT_AUDIT_SERVER_``, e.g. ``OT_AUDIT_SERVER_persistence_directory``.
+    """
+
+    model_config = SettingsConfigDict(env_prefix=_ENV_PREFIX)
+    persistence_directory: typing.Union[
+        typing_extensions.Literal["automatically_make_temporary"],
+        Path,
+    ] = Field(
+        default="automatically_make_temporary",
+        description=(
+            "A directory for the server to store things persistently across boots."
+            " If this directory doesn't already exist, the server will create it."
+            " If this is the string `automatically_make_temporary`,"
+            " the server will use a fresh temporary directory"
+            " (effectively not persisting anything)."
+        ),
+    )
+    alembic_config: Path = Field(
+        default_factory=lambda: Path(__file__).resolve().parent / "alembic.ini",
+        description="Path to Alembic config file.",
+        validation_alias="ALEMBIC_CONFIG",  # read ALEMBIC_CONFIG from env (no OT_ prefix)
+    )

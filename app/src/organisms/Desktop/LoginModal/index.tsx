@@ -57,7 +57,7 @@ function LoginModalImpl(): JSX.Element {
   }
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
-    onSuccess: (successfulUsername, response) => {
+    onSuccess: (successfulUsername, _user, response) => {
       setLoginError(null)
       storeLoginState(successfulUsername, response)
       modal.remove()

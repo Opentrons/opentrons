@@ -20,6 +20,8 @@ const EXPECTED_VALID_QUIRKS = [
   'offsetPipetteFor96GridSubwells',
   'offsetPipetteFor12GridSubwells',
   'vacuumModuleDock',
+  'providesStackingDefault',
+  'filterPlate',
 ]
 
 describe('check quirks for all labware defs', () => {

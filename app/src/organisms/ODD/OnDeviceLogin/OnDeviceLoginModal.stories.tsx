@@ -74,3 +74,23 @@ export const WithLoginError: Story = {
     onClearLoginError: action('onClearLoginError'),
   },
 }
+
+/** Choose a new password after signing in with a temporary password. */
+export const PasswordResetRequired: Story = {
+  args: {
+    ...Default.args,
+    step: 'password',
+    isPasswordResetRequired: true,
+    initialUsername: 'alice',
+  },
+}
+
+/** Confirm-password step in the reset-password flow. */
+export const PasswordResetConfirmPassword: Story = {
+  args: {
+    ...Default.args,
+    step: 'confirmPassword',
+    isPasswordResetRequired: true,
+    initialUsername: 'alice',
+  },
+}
