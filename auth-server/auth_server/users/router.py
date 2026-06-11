@@ -250,7 +250,9 @@ async def update_self(
     request_body: RequestModel[UpdateSelf],
     authorization_details: Annotated[
         RequireScopesResult,
-        fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF_PASSWORD)),
+        fastapi.Depends(
+            require_scopes(Scope.USERS_WRITE_SELF_PASSWORD, Scope.USERS_WRITE_SELF)
+        ),
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)

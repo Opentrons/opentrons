@@ -15,9 +15,8 @@ from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_sc
 from auth_server.persistence.orm_models import User as ORMUser
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import password_hash
+from auth_server.users.user_data_manager import get_scope_set_of_user, password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -131,7 +130,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
         requested_scopes = set(scopes)
         return requested_scopes.issubset(
-            s.api_name for s in _get_scope_set_of_user(user)
+            s.api_name for s in get_scope_set_of_user(user)
         )
 
     @override
@@ -142,7 +141,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         """Scopes that we'll authorize a client for, if it doesn't ask for any explicitly."""
         assert isinstance(request.user, ORMUser)
         user: ORMUser = request.user
-        return sorted(s.api_name for s in _get_scope_set_of_user(user))
+        return sorted(s.api_name for s in get_scope_set_of_user(user))
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -426,14 +425,3 @@ def _is_list_of_type[ElementT](
 
 def _now() -> datetime:
     return datetime.now(tz=UTC)
-
-
-def _get_scope_set_of_user(user: ORMUser) -> set[Scope]:
-    """Return the scopes that a user is authorized for.
-
-    A user who must reset their password is restricted to reading and writing their
-    own account, so they can change their password but nothing else until they do.
-    """
-    if user.reset_password:
-        return {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
-    return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])

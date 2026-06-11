@@ -83,6 +83,17 @@ def _validate_fields(
         raise InvalidInputError("Password must be at least 8 characters long")
 
 
+def get_scope_set_of_user(user: User) -> set[Scope]:
+    """Return the scopes that a user is authorized for.
+
+    A user who must reset their password is restricted to reading and writing their
+    own account, so they can change their password but nothing else until they do.
+    """
+    if user.reset_password:
+        return {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
+    return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])
+
+
 class UserDataManager:
     """Manages user data operations."""
 
@@ -97,11 +108,7 @@ class UserDataManager:
         )
 
         account_type = AccountType(user.account_type)
-        if user.reset_password:
-            scope_set = {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
-        else:
-            scope_set = ACCOUNT_TYPE_TO_SCOPES[account_type]
-        scopes = sorted(scope.api_name for scope in scope_set)
+        scopes = sorted(scope.api_name for scope in get_scope_set_of_user(user))
 
         return UserResponse(
             username=user.username,
