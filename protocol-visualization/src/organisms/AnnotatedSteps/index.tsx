@@ -344,10 +344,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
     const frameId = requestAnimationFrame(() => {
       const listElement = listRef?.element
-      if (
-        listElement != null &&
-        !isElementVerticallyScrollable(listElement)
-      ) {
+      if (listElement != null && !isElementVerticallyScrollable(listElement)) {
         return
       }
 

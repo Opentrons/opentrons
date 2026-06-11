@@ -348,10 +348,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     // scroll when content fits avoids Windows scrollbar show/hide jitter.
     const frameId = requestAnimationFrame(() => {
       const listElement = listRef?.element
-      if (
-        listElement != null &&
-        !isElementVerticallyScrollable(listElement)
-      ) {
+      if (listElement != null && !isElementVerticallyScrollable(listElement)) {
         return
       }
 
