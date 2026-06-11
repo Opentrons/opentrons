@@ -25,9 +25,12 @@ The following table lists the chemicals you can use to clean the exterior of the
 
 ## Emptying the air-liquid separator
 
-The Control Box houses an air-liquid separator. This device traps suspended mist and liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. The air-liquid separator is an essential piece of safety equipment and should be emptied whenever liquid accumulates inside the bowl or reaches the max fill line.
+The Control Box houses an air-liquid separator. It traps liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. You should regularly clean condensate from the bowl or whenever any accumulated liquid reaches the max fill line.
 
-<font color="red">IMAGE PLACEHOLDER</font>
+<figure markdown>
+![Air-liquid separator showing detachment tab in a magnified section](./images/separator-remove.png){ width="50%" }
+<figcaption>Air-liquid separator and locking tab details</figcaption>
+</figure>
 
 ### Detach the bowl
 

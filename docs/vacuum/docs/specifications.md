@@ -29,12 +29,12 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Short spacer, 27 mm](images/spacer-short.png "Short spacer, 27 mm")
+![Short spacer, 27 mm](images/spacer-short3.svg "Short spacer, 27 mm")
 <figcaption>(1) Short spacer, 27 mm</figcaption>
 </figure>
 
 <figure markdown>
-![Tall spacer, 34 mm](images/spacer-tall.png "Tall spacer, 34 mm")
+![Tall spacer, 34 mm](images/spacer-tall3.svg "Tall spacer, 34 mm")
 <figcaption>(1) Tall spacer, 34 mm</figcaption>
 </figure>
 
