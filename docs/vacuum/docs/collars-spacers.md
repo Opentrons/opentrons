@@ -30,8 +30,8 @@ The Vacuum Module ships with two spacer sizes to match varying labware profiles:
 * **Tall Spacer:** 34 mm
 
 <figure class="side-by-side" markdown>
-![Short spacer](./images/spacer-short.png)
-![Tall spacer](./images/spacer-tall.png)
+![Short spacer](./images/spacer-short3.svg)
+![Tall spacer](./images/spacer-tall3.svg)
 <figcaption>Short spacer (27 mm) and tall spacer (34 mm)</figcaption>
 </figure>
 
