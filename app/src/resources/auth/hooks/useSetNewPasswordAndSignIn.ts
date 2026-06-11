@@ -11,7 +11,7 @@ import type { OAuth2TokenResponse } from '@opentrons/api-client'
 
 export interface UseSetNewPasswordAndSignInOptions {
   onSuccess: (username: string, response: OAuth2TokenResponse) => void
-  onError: (message: string) => void
+  onError: () => void
 }
 
 interface UseSetNewPasswordAndSignInResult {
@@ -36,7 +36,8 @@ export function useSetNewPasswordAndSignIn(
   const submitNewPassword = useCallback(
     (username: string, password: string): void => {
       if (host?.token == null) {
-        onError('Not signed in.')
+        console.error('useSetNewPasswordAndSignIn: missing host token')
+        onError()
         return
       }
 
@@ -45,8 +46,12 @@ export function useSetNewPasswordAndSignIn(
         try {
           try {
             await updateSelf(host, { data: { password } })
-          } catch {
-            onError('Failed to update password.')
+          } catch (error) {
+            console.error(
+              'useSetNewPasswordAndSignIn: failed to update password',
+              error
+            )
+            onError()
             return
           }
 
@@ -57,8 +62,9 @@ export function useSetNewPasswordAndSignIn(
             client_id: OAUTH2_CLIENT_ID,
           })
           onSuccess(username, tokenResponse.data)
-        } catch {
-          onError('Failed to sign in.')
+        } catch (error) {
+          console.error('useSetNewPasswordAndSignIn: failed to sign in', error)
+          onError()
         } finally {
           setIsLoading(false)
         }
