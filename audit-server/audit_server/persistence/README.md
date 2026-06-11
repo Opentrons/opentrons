@@ -31,22 +31,7 @@ On first boot, this creates the database from scratch. On subsequent boots, only
 
 ## Developer Workflow
 
-### Adding the first schema (skeleton state)
-
-The ORM in `orm_models.py` currently only declares the shared `Base` class with no concrete tables. To bootstrap:
-
-1. Define your tables in `orm_models.py`.
-2. Autogenerate the initial migration:
-
-   ```
-   OT_AUDIT_SERVER_persistence_directory=/tmp/audit-server-alembic \
-     uv run alembic revision --autogenerate -m "create initial schema"
-   ```
-
-3. Review the generated file in `alembic/versions/` and adjust as needed.
-4. Update `LATEST_VERSION_DIRECTORY` in `file_and_directory_names.py` to encode the new head revision (e.g. `"1_<revision_hash>"`).
-
-### Adding a subsequent schema change
+### Adding a schema change
 
 1. Modify the ORM model in `orm_models.py`.
 2. Autogenerate the migration:
