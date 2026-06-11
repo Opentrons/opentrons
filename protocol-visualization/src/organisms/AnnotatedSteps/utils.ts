@@ -35,6 +35,11 @@ export function getEstimatedExpandedGroupContentHeightPx(params: {
   )
 }
 
+// true when the element has overflow content (with 1px tolerance for subpixel rounding)
+export function isElementVerticallyScrollable(element: HTMLElement): boolean {
+  return element.scrollHeight > element.clientHeight + 1
+}
+
 // only cap expanded stepGroup height when content would exceed the list viewport
 export function shouldCapExpandedGroupBodyHeight(params: {
   subCommandCount: number
