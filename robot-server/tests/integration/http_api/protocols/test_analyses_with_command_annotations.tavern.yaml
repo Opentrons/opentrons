@@ -159,3 +159,22 @@ stages:
             liquids: []
             liquidClasses: []
             labwareOffsets: []
+
+  - name: Delete the protocol
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
+  - name: Get protocol with id to verify it is deleted
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 404
+      json:
+        errors:
+          - id: ProtocolNotFound
+            title: Protocol Not Found
