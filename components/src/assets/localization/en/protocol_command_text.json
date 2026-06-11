@@ -62,6 +62,7 @@
   "fixed_trash": "Fixed Trash",
   "front": "front",
   "get_next_tip": "Calculating position of the next available tip",
+  "get_tip_presence": "Sensing if calibration tip is attached to {{pipette}}",
   "green": "green",
   "home_gantry": "Homing all gantry, pipette, and plunger axes",
   "identify_module": "{{start}} identifying {{model}} in slot {{slot}} {{color}}",
