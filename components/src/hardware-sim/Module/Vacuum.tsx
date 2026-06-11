@@ -2,9 +2,9 @@ export function Vacuum(): JSX.Element {
   return (
     <svg
       x="-18.75"
-      y="-8"
+      y="-9"
       width="331"
-      height="102"
+      height="103"
       viewBox="0 0 247 80"
       preserveAspectRatio="none"
       fill="none"

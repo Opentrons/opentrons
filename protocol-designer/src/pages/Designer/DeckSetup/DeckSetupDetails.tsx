@@ -385,19 +385,15 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           labwareRightBelowTopMostLabware?.def.parameters.quirks?.includes(
             'vacuumModuleDock'
           ) ?? false
-        // for vacuum module: collar may be below a non-lid top labware (e.g. filter plate)
-        // which rightBelowTopId doesn't cover since it's lid-only
-        const collarBelowTop =
-          moduleOnDeck.type === VACUUM_MODULE_TYPE &&
-          !isLabwareOnModuleVacuumCollar &&
-          labwareOnModule != null
-            ? allLabwareValues.find(
-                lw =>
-                  lw.stack.includes(moduleOnDeck.id) &&
-                  !lw.stack.includes(VACUUM_DOCK_LOCATION) &&
-                  (lw.def.parameters.quirks?.includes('vacuumModuleDock') ??
-                    false)
-              ) ?? null
+        const vacuumMainModuleStack =
+          moduleOnDeck.type === VACUUM_MODULE_TYPE
+            ? allLabwareValues
+                .filter(
+                  lw =>
+                    lw.stack.includes(moduleOnDeck.id) &&
+                    !lw.stack.includes(VACUUM_DOCK_LOCATION)
+                )
+                .sort((a, b) => a.stack.length - b.stack.length)
             : null
         const labwareInHopper =
           'labwareInHopper' in moduleOnDeck.moduleState
@@ -443,28 +439,33 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
-                  {labwareRightBelowTopMostLabware != null ? (
-                    <LabwareOnDeck
-                      x={0}
-                      y={0}
-                      labwareOnDeck={labwareRightBelowTopMostLabware}
-                      centerInSlot={isLabwareBelowTopVacuumCollar}
-                    />
-                  ) : null}
-                  {collarBelowTop != null ? (
-                    <LabwareOnDeck
-                      x={0}
-                      y={0}
-                      labwareOnDeck={collarBelowTop}
-                      centerInSlot
-                    />
-                  ) : null}
-                  <LabwareOnDeck
-                    x={0}
-                    y={0}
-                    labwareOnDeck={labwareOnModule}
-                    centerInSlot={isLabwareOnModuleVacuumCollar}
-                  />
+                  {vacuumMainModuleStack != null
+                    ? vacuumMainModuleStack.map(lw => (
+                        <LabwareOnDeck
+                          key={lw.id}
+                          x={0}
+                          y={0}
+                          labwareOnDeck={lw}
+                          centerInSlot
+                        />
+                      ))
+                    : <>
+                        {labwareRightBelowTopMostLabware != null ? (
+                          <LabwareOnDeck
+                            x={0}
+                            y={0}
+                            labwareOnDeck={labwareRightBelowTopMostLabware}
+                            centerInSlot={isLabwareBelowTopVacuumCollar}
+                          />
+                        ) : null}
+                        <LabwareOnDeck
+                          x={0}
+                          y={0}
+                          labwareOnDeck={labwareOnModule}
+                          centerInSlot={isLabwareOnModuleVacuumCollar}
+                        />
+                      </>
+                  }
                   <HighlightLabware
                     labwareOnDeck={labwareOnModule}
                     position={[0, 0, 0]}
