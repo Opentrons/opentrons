@@ -22,46 +22,6 @@ export interface PositionsResponse {
 
 // action types
 
-// fetch lights
-
-export interface FetchLightsAction {
-  type: 'robotControls:FETCH_LIGHTS'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface FetchLightsSuccessAction {
-  type: 'robotControls:FETCH_LIGHTS_SUCCESS'
-  payload: { robotName: string; lightsOn: boolean }
-  meta: RobotApiRequestMeta
-}
-
-export interface FetchLightsFailureAction {
-  type: 'robotControls:FETCH_LIGHTS_FAILURE'
-  payload: { robotName: string; error: { message: string } }
-  meta: RobotApiRequestMeta
-}
-
-// update lights
-
-export interface UpdateLightsAction {
-  type: 'robotControls:UPDATE_LIGHTS'
-  payload: { robotName: string; lightsOn: boolean }
-  meta: RobotApiRequestMeta
-}
-
-export interface UpdateLightsSuccessAction {
-  type: 'robotControls:UPDATE_LIGHTS_SUCCESS'
-  payload: { robotName: string; lightsOn: boolean }
-  meta: RobotApiRequestMeta
-}
-
-export interface UpdateLightsFailureAction {
-  type: 'robotControls:UPDATE_LIGHTS_FAILURE'
-  payload: { robotName: string; error: { message: string } }
-  meta: RobotApiRequestMeta
-}
-
 // home
 
 export interface HomeAction {
@@ -119,12 +79,6 @@ export interface ClearMovementStatusAction {
 // action union
 
 export type RobotControlsAction =
-  | FetchLightsAction
-  | FetchLightsSuccessAction
-  | FetchLightsFailureAction
-  | UpdateLightsAction
-  | UpdateLightsSuccessAction
-  | UpdateLightsFailureAction
   | HomeAction
   | HomeSuccessAction
   | HomeFailureAction
@@ -136,7 +90,6 @@ export type RobotControlsAction =
 // state types
 
 export type PerRobotControlsState = Readonly<{
-  lightsOn: boolean | null
   movementStatus: MovementStatus | null
   movementError: string | null
 }>

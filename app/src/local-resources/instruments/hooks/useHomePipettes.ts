@@ -24,6 +24,8 @@ export function useHomePipettes(
     ...props,
     commands: [HOME_EXCEPT_PLUNGERS],
     continuePastCommandFailure: true,
+    runStartedAction: 'home_pipettes',
+    runEndedAction: 'end_home_pipettes',
   })
 
   return {

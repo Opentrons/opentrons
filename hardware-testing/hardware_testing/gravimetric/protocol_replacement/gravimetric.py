@@ -2,10 +2,7 @@
 
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, asdict
-import os
-import sys
 from time import time
-import importlib
 import copy
 import json
 import traceback
@@ -19,7 +16,6 @@ from opentrons.protocol_api import (
     LiquidClass,
     OFF_DECK,
 )
-from opentrons import version
 from opentrons.protocol_api._liquid_properties import TransferProperties
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
@@ -29,12 +25,19 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
     pipette_movement_conflict,
 )
-from opentrons.config import infer_config_base_dir, IS_ROBOT
+from opentrons.config import IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
+
+# ------ TODO remove and move necessary libraries into a standard release library. ----
+import importlib
+import os
+from opentrons.config import infer_config_base_dir
+from opentrons import version
+import sys
 
 metadata = {"protocolName": "Gravimetric QC V3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.30"}
@@ -77,6 +80,10 @@ if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
     else:
         _download_and_extract(release, base_dir)
     sys.path.append(base_dir)
+
+
+# ----- END: TODO ------
+
 
 from hardware_testing.scripts.data_center_client import (  # noqa: E402
     upload_data_to_google_drive,

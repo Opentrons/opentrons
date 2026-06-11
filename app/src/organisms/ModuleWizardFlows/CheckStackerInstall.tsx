@@ -7,7 +7,7 @@ import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { SmallButton } from '/app/atoms/buttons'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyStacker } from './hooks'
+import { useSendIdentifyModule } from './hooks'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
@@ -49,17 +49,17 @@ export function CheckStackerInstall(
     } else {
       if (attachedStacker != null) {
         // Transition back to standard identify for stacker
-        sendIdentifyStacker(attachedStacker, true, 'blue')
+        sendIdentifyModule(attachedStacker, true, 'blue')
       }
       proceed()
     }
   }
 
-  const sendIdentifyStacker = useSendIdentifyStacker()
+  const sendIdentifyModule = useSendIdentifyModule()
   const handleTryAgain = (): void => {
     if (attachedStacker != null) {
       // Set the stacker to red
-      sendIdentifyStacker(attachedStacker, true, 'red')
+      sendIdentifyModule(attachedStacker, true, 'red')
     }
     setStackerNotInstalled(false)
   }

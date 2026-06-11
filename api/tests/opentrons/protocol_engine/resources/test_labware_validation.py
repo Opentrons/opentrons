@@ -62,33 +62,130 @@ def test_validate_definition_is_adapter(
 
 
 @pytest.mark.parametrize(
-    ("definition", "expected_result"),
+    ("child", "parent", "expected_result"),
     [
+        # parent loadName is in childs `stackingOffsetWithLabware`
         (
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"labware123": Vector3D(x=4, y=5, z=6)}
+                stackingOffsetWithLabware={"parent": Vector3D(x=4, y=5, z=6)},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="child", quirks=["foo"]
+                ),
+            ),
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="parent", quirks=["foo"]
+                ),
             ),
             True,
         ),
+        # child has a `default` key in its `stackingOffsetWithLabware`
         (
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"labwareXYZ": Vector3D(x=4, y=5, z=6)}
+                stackingOffsetWithLabware={"default": Vector3D(x=4, y=5, z=6)},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="child", quirks=["foo"]
+                ),
+            ),
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="parent", quirks=["foo"]
+                ),
+            ),
+            True,
+        ),
+        # parent has a `providesStackingDefault` quirk, and a `default` key in
+        # its `stackingOffsetWithLabware`
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="child", quirks=["foo"]
+                ),
+            ),
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={"default": Vector3D(x=4, y=5, z=6)},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="parent", quirks=["providesStackingDefault"]
+                ),
+            ),
+            True,
+        ),
+        # parent has `default` key in its `stackingOffsetWithLabware` but no
+        # `providesStackingDefault` quirk
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={},
+                parameters=Parameters2.model_construct(
+                    loadName="child",
+                    quirks=["foo"],  # type: ignore[call-arg]
+                ),
+            ),
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={"default": Vector3D(x=4, y=5, z=6)},
+                parameters=Parameters2.model_construct(loadName="parent", quirks=[]),  # type: ignore[call-arg]
             ),
             False,
         ),
+        # parent has `providesStackingDefault` quirk but no `default` key in
+        # its `stackingOffsetWithLabware`.
         (
-            LabwareDefinition2.model_construct(stackingOffsetWithLabware={}),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="child", quirks=["foo"]
+                ),
+            ),
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="parent", quirks=["providesStackingDefault"]
+                ),
+            ),
+            False,
+        ),
+        # parent is NOT in childs stackingOffsetWithLabware map and has no `default`
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={"labwareXYZ": Vector3D(x=4, y=5, z=6)},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="child", quirks=["foo"]
+                ),
+            ),
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={},
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="parent", quirks=["foo"]
+                ),
+            ),
+            False,
+        ),
+        # Both child and parent have empty stackingOffsetWithLabware values.
+        (
+            LabwareDefinition2.model_construct(
+                stackingOffsetWithLabware={},  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="child", quirks=["foo"]
+                ),
+            ),
+            LabwareDefinition2.model_construct(
+                stackingOffsetWithLabware={},  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    loadName="parent", quirks=["foo"]
+                ),
+            ),
             False,
         ),
     ],
 )
 def test_validate_labware_can_be_stacked(
-    definition: LabwareDefinition2, expected_result: bool
+    child: LabwareDefinition2, parent: LabwareDefinition2, expected_result: bool
 ) -> None:
     """It should validate if definition allows it to stack on given labware."""
     assert (
-        subject.validate_legacy_labware_can_be_stacked(definition, "labware123")
-        == expected_result
+        subject.validate_legacy_labware_can_be_stacked(child, parent) == expected_result
     )
 
 

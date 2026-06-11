@@ -46,6 +46,8 @@ export function LegacyModal(props: LegacyModalProps): JSX.Element {
         className={cx(styles.modal, props.className, {
           [styles.alert_modal]: alertOverlay,
         })}
+        role="dialog"
+        aria-modal="true"
       >
         <Overlay onClick={onCloseClick} alertOverlay={alertOverlay} />
         <div

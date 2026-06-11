@@ -272,9 +272,17 @@ export const LegacyLabwarePositionCheckComponent = (
 
   const [isExiting, setIsExiting] = useState(false)
   const { createMaintenanceCommand: createSilentCommand } =
-    useCreateMaintenanceCommandMutation({ accessControlEnabled: false }) // No ACM on the OT-2
+    useCreateMaintenanceCommandMutation(
+      { reasonForInteractionRequired: false },
+      [],
+      () => {}
+    ) // No ACM on the OT-2
   const { chainRunCommands, isCommandMutationLoading: isCommandChainLoading } =
-    useChainMaintenanceCommands({ accessControlEnabled: false }) // No ACM on the OT-2
+    useChainMaintenanceCommands(
+      { reasonForInteractionRequired: false },
+      [],
+      () => {}
+    ) // No ACM on the OT-2
 
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const handleCleanUpAndClose = (): void => {

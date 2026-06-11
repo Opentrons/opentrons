@@ -36,7 +36,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { accessControlEnabled: false }
+        { reasonForInteractionRequired: false }
       )
     )
 
@@ -52,7 +52,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { accessControlEnabled: false }
+        { reasonForInteractionRequired: false }
       )
     )
 
@@ -76,7 +76,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { accessControlEnabled: false }
+        { reasonForInteractionRequired: false }
       )
     )
 
@@ -94,7 +94,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { accessControlEnabled: false }
+        { reasonForInteractionRequired: false }
       )
     )
 

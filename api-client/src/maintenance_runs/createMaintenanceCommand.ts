@@ -9,13 +9,15 @@ export function createMaintenanceCommand(
   config: HostConfig,
   maintenanceRunId: string,
   data: CreateCommand,
-  params?: CreateCommandParams
+  params?: CreateCommandParams,
+  userNotes?: string
 ): ResponsePromise<CommandData> {
   return request<CommandData, { data: CreateCommand }>(
     POST,
     `/maintenance_runs/${maintenanceRunId}/commands`,
     { data },
     config,
-    params && createAxiosConfig({ params })
+    params && createAxiosConfig({ params }),
+    userNotes
   )
 }

@@ -45,7 +45,7 @@ describe('useRunControls hook', () => {
     const mockResumeRunFromRecoveryAssumingFalsePositive = vi.fn()
 
     when(useRunActionMutations)
-      .calledWith(mockPausedRun.id, { accessControlEnabled: false })
+      .calledWith(mockPausedRun.id, { reasonForInteractionRequired: false })
       .thenReturn({
         playRun: mockPlayRun,
         pauseRun: mockPauseRun,

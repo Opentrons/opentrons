@@ -2,12 +2,13 @@ import { useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 
 import type { MaintenanceRun, Mount } from '@opentrons/api-client'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export interface PipetteDetails {
@@ -32,6 +33,8 @@ export interface UseRobotControlCommandsProps {
   continuePastCommandFailure: boolean
   /* An onSettled callback executed after the deletion of the maintenance run. */
   onSettled?: () => void
+  runStartedAction: DocumentedAction
+  runEndedAction: DocumentedAction
 }
 // Issue commands to the robot, creating an on-the-fly maintenance run for the duration of the issued commands, loading
 // the relevant pipette if necessary. Commands are then executed, and regardless of the success status of those commands,
@@ -41,55 +44,75 @@ export function useRobotControlCommands({
   commands,
   continuePastCommandFailure,
   onSettled,
+  runStartedAction,
+  runEndedAction,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
   const [isExecuting, setIsExecuting] = useState(false)
 
-  const docState = usePromptForInteractionReason()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation(runStartedAction)
 
-  const { chainRunCommands } = useChainMaintenanceCommands(docState)
-  const { mutateAsync: deleteMaintenanceRun } =
-    useDeleteMaintenanceRunMutation(docState)
+  const { chainRunCommands } = useChainMaintenanceCommands(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+  const { mutateAsync: deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
+    deletionDocState,
+    [...actionsToDocument, runEndedAction]
+  )
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation(docState, {
-      onSuccess: response => {
-        const runId = response.data.id as string
+    useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
+      [runStartedAction],
+      {
+        onSuccess: response => {
+          const runId = response.data.id as string
 
-        const loadPipetteIfSupplied = (): Promise<void> => {
-          if (pipetteInfo !== null) {
-            const loadPipetteCommand = buildLoadPipetteCommand(pipetteInfo)
-            return chainRunCommands(runId, [loadPipetteCommand], false)
-              .then(() => Promise.resolve())
-              .catch((error: Error) => {
-                console.error(error.message)
-              })
+          const loadPipetteIfSupplied = (): Promise<void> => {
+            if (pipetteInfo !== null) {
+              const loadPipetteCommand = buildLoadPipetteCommand(pipetteInfo)
+              return chainRunCommands(runId, [loadPipetteCommand], false)
+                .then(() => Promise.resolve())
+                .catch((error: Error) => {
+                  console.error(error.message)
+                })
+            }
+            return Promise.resolve()
           }
-          return Promise.resolve()
-        }
 
-        // Execute the command(s)
-        loadPipetteIfSupplied()
-          .then(() =>
-            chainRunCommands(runId, commands, continuePastCommandFailure)
-          )
-          .catch((error: Error) => {
-            console.error(error.message)
-          })
-          .finally(() =>
-            deleteMaintenanceRun(runId).catch((error: Error) => {
-              console.error('Failed to delete maintenance run:', error.message)
+          // Execute the command(s)
+          loadPipetteIfSupplied()
+            .then(() =>
+              chainRunCommands(runId, commands, continuePastCommandFailure)
+            )
+            .catch((error: Error) => {
+              console.error(error.message)
             })
-          )
-          .finally(() => {
-            onSettled?.()
-            setIsExecuting(false)
-          })
-      },
-      onError: (error: Error) => {
-        console.error(error.message)
-        setIsExecuting(false)
-      },
-    })
+            .finally(() =>
+              deleteMaintenanceRun(runId).catch((error: Error) => {
+                console.error(
+                  'Failed to delete maintenance run:',
+                  error.message
+                )
+              })
+            )
+            .finally(() => {
+              onSettled?.()
+              setIsExecuting(false)
+            })
+        },
+        onError: (error: Error) => {
+          console.error(error.message)
+          setIsExecuting(false)
+        },
+      }
+    )
 
   const executeCommands = (): Promise<MaintenanceRun> => {
     setIsExecuting(true)

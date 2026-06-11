@@ -84,6 +84,11 @@ class Scope(enum.Enum):
         "Read the details of the currently authenticated user.",
     )
 
+    USERS_WRITE_SELF = (
+        "users.write.self",
+        "Update the currently authenticated user's own account (e.g. change password).",
+    )
+
     USERS_WRITE = (
         "users.write",
         "Create, update, and delete users.",

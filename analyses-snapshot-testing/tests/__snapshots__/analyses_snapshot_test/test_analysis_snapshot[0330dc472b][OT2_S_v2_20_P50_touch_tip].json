@@ -1,3 +1,0 @@
-{
-  "error": "Exception: This protocol is designed for an OT-2 robot. To utilize this protocol, please download the most recent version of the Opentrons-OT2 app from https://github.com/Opentrons/opentrons-ot2/releases"
-}

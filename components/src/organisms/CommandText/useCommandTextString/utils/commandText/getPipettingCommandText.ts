@@ -1,4 +1,4 @@
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { getAddressableAreaDisplayName } from '../getAddressableAreaDisplayName'
 import { getFinalMoveToAddressableAreaCmd } from '../getFinalAddressableAreaCmd'
@@ -9,8 +9,12 @@ import { getLabwareName } from '../getLabwareName'
 import { getLoadedLabware } from '../getLoadedLabware'
 import { getWellRange } from '../getWellRange'
 
-import type { PipetteName, RunTimeCommand } from '@opentrons/shared-data'
-import type { GetCommandText } from '../..'
+import type {
+  PipetteName,
+  PipettingRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { HandlesCommands } from '../..'
 
 export const getPipettingCommandText = ({
   command,
@@ -18,7 +22,7 @@ export const getPipettingCommandText = ({
   commandTextData,
   robotType,
   t,
-}: GetCommandText): string => {
+}: HandlesCommands<PipettingRunTimeCommand>): string => {
   const labwareId =
     command != null && 'labwareId' in command.params
       ? (command.params.labwareId as string)
@@ -223,6 +227,25 @@ export const getPipettingCommandText = ({
     }
     case 'pressureDispense': {
       return t('pressurizing_to_dispense', { volume, flow_rate: flowRate })
+    }
+    case 'verifyTipPresence': {
+      const pipetteId = command.params.pipetteId
+      const pipette = commandTextData?.pipettes.find(
+        pipette => pipette.id === pipetteId
+      )
+      const mount =
+        pipette?.mount === 'left' ? t('left_mount') : t('right_mount')
+      const presence = !!command.params.expectedState
+        ? t(command.params.expectedState)
+        : ''
+
+      const pipetteName = getPipetteSpecsV2(pipette?.pipetteName)?.displayName
+
+      return t('verifying_tip_presence', {
+        presence,
+        pipette: pipetteName,
+        mount,
+      })
     }
     default: {
       console.warn(

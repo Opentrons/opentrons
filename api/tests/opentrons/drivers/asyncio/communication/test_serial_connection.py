@@ -1,4 +1,5 @@
 from typing import AsyncGenerator, Type, Union
+from unittest.mock import patch
 
 import mock
 import pytest
@@ -142,9 +143,11 @@ async def test_send_command_with_zero_retries(
     # the retries from the subject.send_data(data, retries=0) method call.
     async_subject._number_of_retries = 1
 
-    with pytest.raises(NoResponse):
-        # We want this to overwrite the internal `_number_of_retries`
-        await async_subject.send_data(data="send data", retries=0)
+    with patch("os.path.exists") as mock_exists:
+        mock_exists.return_value = True
+        with pytest.raises(NoResponse):
+            # We want this to overwrite the internal `_number_of_retries`
+            await async_subject.send_data(data="send data", retries=0)
 
     mock_serial_port.timeout_override.assert_called_once_with("timeout", None)
     mock_serial_port.write.assert_called_once_with(data=b"send data")
@@ -231,7 +234,9 @@ def test_get_error_codes_lowercase(
 
 async def test_on_retry(mock_serial_port: AsyncMock, subject: SerialKind) -> None:
     """It should try to re-open connection."""
-    await subject.on_retry()
+    with patch("os.path.exists") as mock_exists:
+        mock_exists.return_value = True
+        await subject.on_retry()
 
     mock_serial_port.close.assert_called_once()
     mock_serial_port.open.assert_called_once()

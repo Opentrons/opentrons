@@ -69,6 +69,8 @@ const FLEX_TC_LID_FRONT_RIGHT_PT = {
   z: FLEX_TC_LID_COLLISION_ZONE.front_right.z,
 }
 
+const FULL_96_PIPETTE_NOZZLE_OFFSET_X_MM = 49.5 // designates half of full width of pipette nozzle plane for 96-ch pipettes
+
 interface SlotInfo {
   addressableArea: AddressableArea | null
   position: CoordinateTuple | null
@@ -845,9 +847,14 @@ const getIsMovementWithinDeckExtents = (args: {
 
 // gets arbitrary span between two pipette nozzles, assuming constant grid spacing
 const getNozzleGapFromPipetteSpecs = (specs: PipetteV2Specs): number => {
-  const [nozzleX1, nozzleX2] = [0, 1].map(
-    index => Object.values(specs.nozzleMap)[index][0]
-  )
+  const { channels, nozzleMap } = specs
+  if (channels === 1) {
+    return 0
+  }
+
+  // for 96- and 8-channel pipettes, the gap between nozzles A1 and B1
+  // is consistent for all nozzles
+  const [nozzleX1, nozzleX2] = ['A1', 'B1'].map(key => nozzleMap[key][1])
   const nozzleGap = Math.abs(nozzleX1 - nozzleX2)
   return nozzleGap
 }
@@ -860,7 +867,9 @@ interface PipetteCenteringArgs {
   labwareDef: LabwareDefinition
 }
 
-const getPipetteCenteringFullOffset = (args: PipetteCenteringArgs): Point => {
+export const getPipetteCenteringFullOffset = (
+  args: PipetteCenteringArgs
+): Point => {
   const centeringXOffset = getPipetteCenteringXOffset(args)
   const centeringYOffset = getPipetteCenteringYOffset(args)
   return {
@@ -872,12 +881,16 @@ const getPipetteCenteringFullOffset = (args: PipetteCenteringArgs): Point => {
 const getPipetteCenteringXOffset = (args: PipetteCenteringArgs): number => {
   const { primaryNozzle, nozzleConfiguration, specs, labwareDef } = args
   const { channels } = specs
+  if (channels !== 96) {
+    return 0
+  }
   const { ordering } = labwareDef
   const shouldCenterInX = ordering.length === 1 // labware is comprised of 1 column (row-format, as an 8-ch reservoir)
   if (!shouldCenterInX) {
     return 0
   }
   let numNozzleColumns: number
+  const directionForXOffset = getTipColumnName(primaryNozzle) === '12' ? 1 : -1
   if (
     (nozzleConfiguration === ALL && channels === 96) ||
     nozzleConfiguration === ROW
@@ -886,9 +899,8 @@ const getPipetteCenteringXOffset = (args: PipetteCenteringArgs): number => {
   } else if (nozzleConfiguration === QUADRANT) {
     numNozzleColumns = 6
   } else {
-    numNozzleColumns = 1
+    return directionForXOffset * FULL_96_PIPETTE_NOZZLE_OFFSET_X_MM
   }
-  const directionForXOffset = getTipColumnName(primaryNozzle) === '12' ? 1 : -1
   const nozzleGap = getNozzleGapFromPipetteSpecs(specs)
   return shouldCenterInX
     ? (((numNozzleColumns - 1) * nozzleGap) / 2) * directionForXOffset
@@ -904,30 +916,36 @@ const getPipetteCenteringYOffset = (args: PipetteCenteringArgs): number => {
     labwareDef,
   } = args
   const { channels } = specs
+  if (channels === 1) {
+    return 0
+  }
+  const nozzleGap = getNozzleGapFromPipetteSpecs(specs)
   const { ordering } = labwareDef
   const wellTargetColumnIndex = ordering.findIndex(column =>
     column.includes(wellTargetName)
   )
   const wellTargetColumn = ordering[wellTargetColumnIndex]
-  const shouldCenterInY = wellTargetColumn.length === 1
-  if (!shouldCenterInY) {
+  if (wellTargetColumn.length !== 1) {
     return 0
   }
-  let numNozzleRows: number
-  if (
-    nozzleConfiguration === COLUMN ||
-    (nozzleConfiguration === ALL && channels === 96) ||
-    channels === 8
-  ) {
-    numNozzleRows = 8
-  } else if (nozzleConfiguration === PARTIAL_COLUMN) {
-    numNozzleRows = PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-  } else if (nozzleConfiguration === QUADRANT) {
-    numNozzleRows = 4
-  } else {
-    numNozzleRows = 1
+  if (nozzleConfiguration === PARTIAL_COLUMN) {
+    // determine number of nozzle gaps between nozzle A and primary
+    const spanFromAToPrimary =
+      8 - PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+
+    // shift forward such that nozzle A targets the well center
+    const offsetToNozzleA = -1 * spanFromAToPrimary * nozzleGap
+
+    // since there are 7 "gaps" between front and back nozzles
+    const offsetFromNozzleAToBack = (7 * nozzleGap) / 2
+
+    // "push" pipette back to center the pipette
+    return offsetToNozzleA + offsetFromNozzleAToBack
   }
-  const nozzleGap = getNozzleGapFromPipetteSpecs(specs)
+
+  // all other 96- and 8-channel nozzle configs
   const directionForYOffset = getTipRowName(primaryNozzle) === 'H' ? -1 : 1
-  return (((numNozzleRows - 1) * nozzleGap) / 2) * directionForYOffset
+
+  // 7 here again since there are 7 "gaps" between front and back nozzles
+  return ((7 * nozzleGap) / 2) * directionForYOffset
 }

@@ -37,7 +37,7 @@ HS_COMMAND_TERMINATOR = "\n"
 HS_ACK = "OK" + HS_COMMAND_TERMINATOR
 HS_ERROR_KEYWORD = "err"
 HS_ASYNC_ERROR_ACK = "async"
-DEFAULT_COMMAND_RETRIES = 0
+DEFAULT_COMMAND_RETRIES = 4
 
 
 class HeaterShakerDriver(AbstractHeaterShakerDriver):
@@ -59,9 +59,11 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
             baud_rate=HS_BAUDRATE,
             timeout=DEFAULT_HS_TIMEOUT,
             ack=HS_ACK,
+            retry_wait_time_seconds=1,
             loop=loop,
             error_keyword=HS_ERROR_KEYWORD,
             async_error_ack=HS_ASYNC_ERROR_ACK,
+            number_of_retries=DEFAULT_COMMAND_RETRIES,
         )
         return cls(connection=connection)
 
@@ -213,3 +215,7 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
             ),
             acks=2,
         )
+
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underling connection."""
+        await self._connection.update_port(new_port)

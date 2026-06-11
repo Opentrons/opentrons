@@ -10,9 +10,13 @@ description: Conventions for the analyses snapshot testing framework in analyses
 The `analyses-snapshot-testing` directory validates that protocol analysis output remains consistent across code changes by comparing JSON results against committed snapshots.
 
 - **Regression testing**: Detect unintended changes in protocol analysis behavior
-- **Protocol validation**: Ensure protocols analyze correctly for Flex
+- **Protocol validation**: Ensure Flex protocols analyze correctly
 - **CI/CD**: Automated testing in GitHub Actions with matrix-based parallel execution
 - **Snapshot management**: Track expected output and flag deviations
+
+This repository is **Flex-only**. All protocols must target Flex (or OT-3) robots.
+
+A standalone OT-2 compatibility test (`tests/test_ot2_compatibility.py`) runs via `make ot2-compatibility-test`. It uses a fixture protocol in `tests/fixtures/` and is **not** part of chunk generation, `protocols.py`, or syrupy snapshots. CI runs it in `analyses-snapshot-test.yaml` (not the lint workflow).
 
 ## Architecture
 
@@ -22,7 +26,7 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 2. **Analysis Engine** (`automation/analyze.py`) — runs protocol analysis in subprocess, 120-second timeout, JSON output
 3. **Snapshot Storage** (`tests/__snapshots__/`) — committed JSON snapshots managed by `syrupy` with custom JSON extension
 4. **Test Suite** (`tests/`) — `analyses_snapshot_test.py` (main), `audit_snapshot_test.py` (audit), `custom_json_snapshot_extension.py` (serialization)
-5. **Audit** (`automation/audit_snapshots.py`) — validates snapshots: `Flex_S` protocols must have zero errors; non-Flex (i.e., OT2) protocols are expected to have errors
+5. **Audit** (`automation/audit_snapshots.py`) — validates snapshots: `Flex_S` protocols must have zero errors; `Flex_X` and other failure-case protocols are expected to have errors
 6. **Protocol Registry** (`automation/data/`) — `protocols.py` (auto-generated), `protocols_with_overrides.py` (manual), `protocol_registry.py` (combined)
 7. **CI/CD** (`citools/`, `.github/workflows/`) — matrix-based parallel execution via Docker
 
@@ -32,7 +36,7 @@ The `analyses-snapshot-testing` directory validates that protocol analysis outpu
 {Robot}_{Status}_{Version}_{Source}_{Pipettes}_{Modules}_{Overrides}\_{Description}
 ```
 
-- **Robot**: `Flex` (one legacy `OT2` protocol is kept to verify it properly fails with an OT-2 compatibility error)
+- **Robot**: `Flex`
 - **Status**: `S` (Success) or `X` (Failure expected)
 - **Version**: API version (e.g., `v2_19`) or `PD` (Protocol Designer)
 - **Source** (optional): `PL_` (Protocol Library) or `MPL_` (Manual Protocol Library)
@@ -96,14 +100,14 @@ uv run python -m pytest -k analyses_snapshot_test -vv --tb=short    # Verbose de
 
 ## Environment Setup
 
-**Prerequisites**: Python 3.10+, **uv**, Node.js/pnpm (for prettier)
+**Prerequisites**: Python 3.12, **uv**, Node.js/pnpm (for prettier)
 
 ```bash
 cd analyses-snapshot-testing
 make setup    # Creates uv venv and installs dependencies
 ```
 
-The setup script (`bootstrap_uv_env.py`) installs `api` and `shared-data` as editable packages so analysis uses local code.
+The setup script (`bootstrap_uv_env.py`) installs `api` and `shared-data` as editable packages so analysis uses local code. It creates a Python 3.12 venv by default (`UV_PY=3.12`).
 
 ## Common Commands
 
@@ -116,6 +120,8 @@ make teardown                 # Remove virtual environment
 make snapshot-test            # Run all snapshot tests
 make snapshot-test-update     # Update all snapshots
 make snapshot-audit-test      # Validate snapshot audit metadata
+make ot2-compatibility-test # Standalone OT-2 rejection test (not in snapshot battery)
+make snapshot-validation    # snapshot-audit-test + ot2-compatibility-test
 
 # Protocol Management
 make prep                     # Regenerate protocol registry
@@ -145,4 +151,4 @@ PR label `gen-analyses-snapshot-pr` auto-opens a PR with updated snapshots on fa
 - **Snapshot mismatch**: Review diff, update if intentional (`make snapshot-test-update PROTOCOL_NAMES=...`), fix code if not
 - **Protocol not found**: Check registry, run `make prep`, verify file exists and follows naming convention
 - **Analysis timeout** (120s): Simplify protocol or increase timeout in `automation/analyze.py`
-- **Environment issues**: Run `make setup`, ensure `uv` is installed
+- **Environment issues**: Run `make setup`, ensure `uv` is installed and Python 3.12 is available

@@ -26,7 +26,7 @@ export const configureNozzleLayout: CommandCreator<
     pythonArgs = [
       `protocol_api.${style}`,
       ...(primaryNozzle != null
-        ? [`start=${formatPyStr(primaryNozzle)}, end=${formatPyStr(H1_NOZZLE)}`]
+        ? [`start=${formatPyStr(H1_NOZZLE)}, end=${formatPyStr(primaryNozzle)}`]
         : []),
     ]
   } else {

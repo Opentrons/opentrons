@@ -262,8 +262,9 @@ async def test_async_error_response(
     )
     await simulating_module_driver_patched._poller.wait_next_poll()
     decoy.when(await mock_driver.get_temperature()).then_raise(exc)
-    with pytest.raises(Exception):
-        await simulating_module_driver_patched._poller.wait_next_poll()
+    for i in range(5):
+        with pytest.raises(Exception):
+            await simulating_module_driver_patched._poller.wait_next_poll()
     decoy.verify(
         module_error_callback(
             exc, "heaterShakerModuleV1", "/dev/ot_module_sim_heatershaker0", None
@@ -313,8 +314,9 @@ async def test_reader_raises_error_from_get_error(
         "/dev/ot_module_sim_heatershaker0", "ERR:666:you know what it is", "M411"
     )
     decoy.when(await mock_driver.get_error_state()).then_raise(error_state_response)  # type: ignore[func-returns-value]
-    with pytest.raises(ErrorResponse):
-        await simulating_module_driver_patched._poller.wait_next_poll()
+    for i in range(5):
+        with pytest.raises(ErrorResponse):
+            await simulating_module_driver_patched._poller.wait_next_poll()
     decoy.verify(
         module_error_callback(
             error_state_response,

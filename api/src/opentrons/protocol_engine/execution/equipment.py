@@ -1,5 +1,6 @@
 """Equipment command side-effect logic."""
 
+import logging
 from dataclasses import dataclass
 from typing import List, Optional, overload
 
@@ -52,6 +53,8 @@ from opentrons.protocol_engine.state.module_substates import (
     VacuumModuleId,
 )
 from opentrons.types import MountType
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -774,9 +777,17 @@ class EquipmentHandler:
 
         attached_modules = self._hardware_api.attached_modules
         serial_number = self._state_store.modules.get_serial_number(module_id)
+        duplicates = []
         for mod in attached_modules:
             if mod.device_info["serial"] == serial_number:
-                return mod
+                duplicates.append(mod)
+
+        if len(duplicates):
+            if len(duplicates) > 1:
+                log.warn(f"found {len(duplicates)} modules with {serial_number}")
+            # Return the last one, because that should be the recently disconnected one
+            # the recently disconnected one will be the one that doesn't get deleted
+            return duplicates[-1]
 
         raise ModuleNotAttachedError(
             f'No module attached with serial number "{serial_number}"'

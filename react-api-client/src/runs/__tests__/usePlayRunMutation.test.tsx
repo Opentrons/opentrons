@@ -37,7 +37,7 @@ describe('usePlayRunMutation hook', () => {
     vi.mocked(createRunAction).mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      () => usePlayRunMutation({ accessControlEnabled: false }),
+      () => usePlayRunMutation({ reasonForInteractionRequired: false }),
       { wrapper }
     )
 
@@ -55,7 +55,7 @@ describe('usePlayRunMutation hook', () => {
     } as Response<RunAction>)
 
     const { result } = renderHook(
-      () => usePlayRunMutation({ accessControlEnabled: false }),
+      () => usePlayRunMutation({ reasonForInteractionRequired: false }),
       {
         wrapper,
       }
