@@ -1,27 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import axios from 'axios'
 
 import { getSelf, OAUTH2_CLIENT_ID } from '@opentrons/api-client'
 import { useGetOAuth2TokenMutation, useHost } from '@opentrons/react-api-client'
+
+import { getOAuth2LoginErrorMessage } from './getOAuth2LoginErrorMessage'
 
 import type {
   AuthUser,
   OAuth2TokenResponse,
   ROPCRequest,
 } from '@opentrons/api-client'
-
-/**
- * Shape of an error response from `POST /auth/oauth2/token`: the standard
- * RFC 6749 § 5.2 fields plus the opentrons-specific
- * `opentrons_login_attempts_remaining` field returned when the lockout limit
- * is configured.
- */
-interface OAuth2TokenErrorResponse {
-  error?: string
-  error_description?: string
-  opentrons_login_attempts_remaining?: number
-}
 
 export interface UseOAuth2PasswordLoginOptions {
   /**
@@ -58,31 +47,6 @@ export function useOAuth2PasswordLogin(
   const host = useHost()
   const [isFetchingSelf, setIsFetchingSelf] = useState(false)
 
-  const getErrorMessage = (error: unknown): string => {
-    if (axios.isAxiosError(error)) {
-      const data = error.response?.data as OAuth2TokenErrorResponse | undefined
-      const oauth2ErrorCode = data?.error
-      const attemptsRemaining = data?.opentrons_login_attempts_remaining
-      if (oauth2ErrorCode === 'invalid_grant') {
-        if (typeof attemptsRemaining === 'number') {
-          if (attemptsRemaining === 0) {
-            return t('login_error_locked')
-          } else {
-            return t('login_error_incorrect_with_attempts_remaining', {
-              attemptsRemaining,
-            })
-          }
-        } else {
-          return t('login_error_incorrect')
-        }
-      } else {
-        return t('login_error_unknown_with_message', { message: error.message })
-      }
-    } else {
-      return t('login_error_unknown')
-    }
-  }
-
   const { getOAuth2Token, isLoading: isOAuthLoading } =
     useGetOAuth2TokenMutation({
       onSuccess: (responseData, requestVariables) => {
@@ -108,7 +72,7 @@ export function useOAuth2PasswordLogin(
           })
       },
       onError: (error: unknown) => {
-        onError(getErrorMessage(error))
+        onError(getOAuth2LoginErrorMessage(error, t))
       },
     })
 

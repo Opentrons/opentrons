@@ -1,14 +1,9 @@
 import { useCallback, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
 
-import { useToaster } from '/app/organisms/ToasterOven'
-import { getLocalRobot } from '/app/redux/discovery'
-import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -25,10 +20,7 @@ import type {
   HostConfig,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
-
-const INVALID_CREDENTIALS_TOAST_DURATION_MS = 3000
 
 export interface LoginModalResult {
   username: string
@@ -38,14 +30,8 @@ type LoginModalPhase = 'login' | 'chooseNewPassword'
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
-  const dispatch = useDispatch()
-  const { t } = useTranslation('device_settings')
-  const { makeSnackbar } = useToaster()
   const host = useHost()
   const queryClient = useQueryClient()
-  const localRobotName = useSelector(
-    (state: State) => getLocalRobot(state)?.name ?? null
-  )
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
@@ -101,25 +87,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     [finishModal, invalidateSelfQuery, storeLoginState]
   )
 
-  const handleNewPasswordFailure = useCallback((): void => {
-    if (localRobotName != null) {
-      dispatch(logOut({ robotName: localRobotName }))
-    }
-    invalidateSelfQuery()
-    makeSnackbar(
-      t('on_device_login_error_incorrect') as string,
-      INVALID_CREDENTIALS_TOAST_DURATION_MS
-    )
-    dismissModal()
-  }, [
-    dismissModal,
-    dispatch,
-    invalidateSelfQuery,
-    localRobotName,
-    makeSnackbar,
-    t,
-  ])
-
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =
     useOAuth2PasswordLogin({
       onSuccess: handleLoginSuccess,
@@ -131,7 +98,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
       onSuccess: handleNewPasswordSuccess,
-      onError: handleNewPasswordFailure,
+      onError: message => {
+        setLoginError(message)
+      },
     })
 
   const handleCancel = (): void => {

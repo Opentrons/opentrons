@@ -16,6 +16,12 @@ vi.mock('@opentrons/api-client', async importOriginal => {
   }
 })
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}))
+
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
@@ -95,7 +101,7 @@ describe('useSetNewPasswordAndSignIn', () => {
       result.current.submitNewPassword('alice', 'new-secret')
     })
 
-    expect(onError).toHaveBeenCalled()
+    expect(onError).toHaveBeenCalledWith('login_error_incorrect')
     expect(mockUpdateSelf).not.toHaveBeenCalled()
     expect(mockGetOAuth2Token).not.toHaveBeenCalled()
   })
@@ -112,8 +118,27 @@ describe('useSetNewPasswordAndSignIn', () => {
     })
 
     await waitFor(() => {
-      expect(onError).toHaveBeenCalled()
+      expect(onError).toHaveBeenCalledWith(
+        'set_new_password_error_update_failed'
+      )
     })
     expect(mockGetOAuth2Token).not.toHaveBeenCalled()
+  })
+
+  it('reports failure when sign in request fails', async () => {
+    mockGetOAuth2Token.mockRejectedValue(new Error('network'))
+
+    const { result } = renderHook(() =>
+      useSetNewPasswordAndSignIn({ onSuccess, onError })
+    )
+
+    act(() => {
+      result.current.submitNewPassword('alice', 'new-secret')
+    })
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith('login_error_unknown')
+    })
+    expect(onSuccess).not.toHaveBeenCalled()
   })
 })

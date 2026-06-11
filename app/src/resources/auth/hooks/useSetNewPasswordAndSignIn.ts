@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   getOAuth2Token,
@@ -7,11 +8,13 @@ import {
 } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
+import { getOAuth2LoginErrorMessage } from './getOAuth2LoginErrorMessage'
+
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
 
 export interface UseSetNewPasswordAndSignInOptions {
   onSuccess: (username: string, response: OAuth2TokenResponse) => void
-  onError: () => void
+  onError: (message: string) => void
 }
 
 interface UseSetNewPasswordAndSignInResult {
@@ -30,6 +33,7 @@ export function useSetNewPasswordAndSignIn(
   options: UseSetNewPasswordAndSignInOptions
 ): UseSetNewPasswordAndSignInResult {
   const { onSuccess, onError } = options
+  const { t } = useTranslation('access_control')
   const host = useHost()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -37,7 +41,7 @@ export function useSetNewPasswordAndSignIn(
     (username: string, password: string): void => {
       if (host?.token == null) {
         console.error('useSetNewPasswordAndSignIn: missing host token')
-        onError()
+        onError(t('login_error_incorrect') as string)
         return
       }
 
@@ -51,7 +55,7 @@ export function useSetNewPasswordAndSignIn(
               'useSetNewPasswordAndSignIn: failed to update password',
               error
             )
-            onError()
+            onError(t('set_new_password_error_update_failed') as string)
             return
           }
 
@@ -64,13 +68,13 @@ export function useSetNewPasswordAndSignIn(
           onSuccess(username, tokenResponse.data)
         } catch (error) {
           console.error('useSetNewPasswordAndSignIn: failed to sign in', error)
-          onError()
+          onError(getOAuth2LoginErrorMessage(error, t))
         } finally {
           setIsLoading(false)
         }
       })()
     },
-    [host, onError, onSuccess]
+    [host, onError, onSuccess, t]
   )
 
   return {
