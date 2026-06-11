@@ -58,6 +58,19 @@ export interface RequestConfig<
    * What kind of response body to expect and how Axios should parse it.
    */
   responseType?: AxiosRequestConfig['responseType']
+
+  /**
+   * If true, this request will always use HTTPS, never HTTP.
+   * (Unless it's to localhost, in which case it may still use HTTP.)
+   *
+   * This must be set to true whenever a request carries secrets. For example, if
+   * the request is to change a user's password, this needs to be true to avoid
+   * exposing the new password over the network.
+   *
+   * This should otherwise be set to false because HTTPS requires some onerous manual
+   * setup, and so not every robot will support it.
+   */
+  requiresSecureTransport?: boolean
 }
 
 export function request<
@@ -91,8 +104,15 @@ export function request<
     ...extraHeaders,
   }
 
-  const protocol = (secure ?? false) ? 'https' : 'http'
-  const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
+  const requiresSecureTransport =
+    'Authorization' in headers ||
+    (requestConfig?.requiresSecureTransport ?? false)
+
+  const protocol =
+    (secure ?? false) || (requiresSecureTransport && !isLocalhost(hostConfig))
+      ? 'https'
+      : 'http'
+  const defaultPort = protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
   const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
 
@@ -105,4 +125,12 @@ export function request<
     headers,
     responseType: requestConfig?.responseType,
   })
+}
+
+function isLocalhost(hostConfig: HostConfig): boolean {
+  return (
+    hostConfig.hostname === 'localhost' ||
+    hostConfig.hostname === '127.0.0.1' ||
+    hostConfig.hostname === '::1'
+  )
 }
