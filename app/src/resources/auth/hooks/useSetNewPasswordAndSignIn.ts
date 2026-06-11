@@ -10,6 +10,7 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { getOAuth2LoginErrorMessage } from './getOAuth2LoginErrorMessage'
 
+import type { TFunction } from 'i18next'
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
 
 export interface UseSetNewPasswordAndSignInOptions {
@@ -33,7 +34,7 @@ export function useSetNewPasswordAndSignIn(
   options: UseSetNewPasswordAndSignInOptions
 ): UseSetNewPasswordAndSignInResult {
   const { onSuccess, onError } = options
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('access_control') as { t: TFunction }
   const host = useHost()
   const [isLoading, setIsLoading] = useState(false)
 

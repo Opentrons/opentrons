@@ -6,6 +6,7 @@ import { useGetOAuth2TokenMutation, useHost } from '@opentrons/react-api-client'
 
 import { getOAuth2LoginErrorMessage } from './getOAuth2LoginErrorMessage'
 
+import type { TFunction } from 'i18next'
 import type {
   AuthUser,
   OAuth2TokenResponse,
@@ -43,7 +44,7 @@ export function useOAuth2PasswordLogin(
   options: UseOAuth2PasswordLoginOptions
 ): UseOAuth2PasswordLoginResult {
   const { onSuccess, onError } = options
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('access_control') as { t: TFunction }
   const host = useHost()
   const [isFetchingSelf, setIsFetchingSelf] = useState(false)
 
