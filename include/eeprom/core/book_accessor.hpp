@@ -128,7 +128,7 @@ class BookAccessor
                     (types::page_length * types::pages_per_book) -
                     addresses::ot_library_begin;
 
-                // drop second byte (first byte is pre-aligned to 4 pages);
+                // drop second byte (see confluence page for details)
                 new_ptr &= 0xFF00;
 
                 auto* data_iter = write.data.begin();
