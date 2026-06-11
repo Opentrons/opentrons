@@ -14,7 +14,7 @@ export function updateSelf(
     config,
     {
       body,
-      requiresSecureTransport: true // Might be sending a new password.
+      requiresSecureTransport: true, // Might be sending a new password.
     }
   )
 }
