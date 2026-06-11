@@ -64,7 +64,8 @@ function setWindow(
   key: string,
   window: BrowserWindow
 ): void {
-  const windowsForType = secondaryWindows.get(type) ?? new Map()
+  const windowsForType =
+    secondaryWindows.get(type) ?? new Map<string, BrowserWindow>()
   windowsForType.set(key, window)
   secondaryWindows.set(type, windowsForType)
 }
