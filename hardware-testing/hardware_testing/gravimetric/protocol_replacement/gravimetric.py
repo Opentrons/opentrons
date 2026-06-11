@@ -2,10 +2,7 @@
 
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, asdict
-import os
-import sys
 from time import time
-import importlib
 import copy
 import json
 import traceback
@@ -19,7 +16,6 @@ from opentrons.protocol_api import (
     LiquidClass,
     OFF_DECK,
 )
-from opentrons import version
 from opentrons.protocol_api._liquid_properties import TransferProperties
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
@@ -29,17 +25,19 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
     pipette_movement_conflict,
 )
-from opentrons.config import infer_config_base_dir, IS_ROBOT
+from opentrons.config import IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V3"}
-requirements = {"robotType": "Flex", "apiLevel": "2.29"}
-
-SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
+# ------ TODO remove and move necessary libraries into a standard release library. ----
+import importlib
+import os
+from opentrons.config import infer_config_base_dir
+from opentrons import version
+import sys
 
 
 def _download_and_extract(version_str: str, base_dir: str) -> None:
@@ -78,6 +76,10 @@ if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
         _download_and_extract(release, base_dir)
     sys.path.append(base_dir)
 
+
+# ----- END: TODO ------
+
+
 from hardware_testing.scripts.data_center_client import (  # noqa: E402
     upload_data_to_google_drive,
 )
@@ -115,6 +117,12 @@ from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: 
 from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
     clear_pipette_ul_per_mm,
 )  # noqa: E402
+
+
+metadata = {"protocolName": "Gravimetric QC V3"}
+requirements = {"robotType": "Flex", "apiLevel": "2.29"}
+
+SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -468,6 +476,7 @@ class FixtureSettings(CSVSettings):
             trials=csv_settings.trials,
             name=csv_settings.name,
             run_id=run_id,
+            blank_trials=csv_settings.blank_trials,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
         )
@@ -1191,6 +1200,7 @@ def aspirate_with_liquid_class(
                 air_gap=0,
             )
         ],
+        max_pipette_and_tip_volume=tip,
         volume_for_pipette_mode_configuration=None,
     )
     fixture_settings.recorder.clear_sample_tag()

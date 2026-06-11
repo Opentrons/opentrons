@@ -9,7 +9,8 @@ from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 

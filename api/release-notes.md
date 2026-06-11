@@ -8,25 +8,23 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons Robot Software Changes in 9.1.0
 
-Welcome to the v9.1.0 release of the Opentrons robot software!
+Welcome to the v9.1.0 release of the Opentrons Flex robot software! This release enables step grouping to better visualize and organize Python protocols, along with other new features, improvements, and bug fixes.
 
 ### New Features
 
-- TODO
+- Use new methods to create step groups within your Python protocols. These groups are visible in your protocol file, or in [protocol visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
+- Use the `set_empty()` method to label a tip rack as empty, and return used tips to an empty rack throughout your protocol.
 
 ### Feature Improvements
 
-- TODO
+Most Flex pipettes no longer descend during attachment, detachment, or probe attachment to prevent collision risk. The 96-channel pipette still descends.
 
 ### Bug Fixes
 
-- TODO
-
-### Known Issues
-
-- TODO
+Distributing with a liquid class now correctly calculates maximum aspirate volume for Flex 50 µL pipettes using 20 µL tips.
 
 ---
+
 ## Opentrons Robot Software Changes in 9.0.0
 
 Welcome to the v9.0.0 release of the Opentrons robot software! This release includes several new and improved features.

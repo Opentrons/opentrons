@@ -6,8 +6,10 @@ from typing import Callable, Dict, Optional
 
 from typing_extensions import Final
 
+from opentrons.config import IS_ROBOT
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.temp_deck import (
+    DEFAULT_COMMAND_RETRIES,
     AbstractTempDeckDriver,
     SimulatingDriver,
     TempDeckDriver,
@@ -128,11 +130,15 @@ class TempDeck(mod_abc.AbstractModule):
         self._poller = poller
         self._reader.set_error_callback(self.error_callback)
 
-    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
-    async def cleanup(self) -> None:
+    async def soft_cleanup(self) -> None:
         """Stop the poller task."""
         await self._poller.stop()
         await self._driver.disconnect()
+
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self.soft_cleanup()
 
     @classmethod
     def name(cls) -> str:
@@ -190,9 +196,7 @@ class TempDeck(mod_abc.AbstractModule):
                 while self.temperature > awaiting_temperature:
                     await self._poller.wait_next_poll()
 
-        t = self._loop.create_task(_await_temperature())
-        self.make_cancellable(t)
-        await t
+        await self.run_task_fault_tolerant(_await_temperature, DEFAULT_COMMAND_RETRIES)
 
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling and turn off the fan"""
@@ -296,6 +300,26 @@ class TempDeck(mod_abc.AbstractModule):
         else:
             return "temperatureModuleV2"
 
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        if not IS_ROBOT:
+            return
+        try:
+            if not await self._driver.is_connected():
+                self._driver = await TempDeckDriver.create(
+                    port=self.port, loop=self.loop
+                )
+                self._reader._driver = self._driver
+            # restart the poller
+            await self._poller.stop()
+            await self._poller.start()
+        except BaseException as e:
+            log.error(f"Got {e} when trying to reconnect.")
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        self._port = port
+        self._usb_port = usb_port
+
 
 class TempDeckReader(Reader):
     """Reads data from an attached Temperature Module."""
@@ -306,10 +330,13 @@ class TempDeckReader(Reader):
         self.temperature = Temperature(current=25, target=None)
         self._driver = driver
         self._error_callback: Optional[Callable[[Exception], None]] = None
+        self._debounce_count = DEFAULT_COMMAND_RETRIES
 
     async def read(self) -> None:
         """Read the module's current and target temperatures."""
         self.temperature = await self._driver.get_temperature()
+        # reset on success
+        self._debounce_count = DEFAULT_COMMAND_RETRIES
 
     def set_error_callback(
         self, error_callback: Callable[[Exception], None]
@@ -321,5 +348,11 @@ class TempDeckReader(Reader):
         self._error_callback = None
 
     def on_error(self, exception: Exception) -> None:
+        self._debounce_count -= 1
         if self._error_callback:
-            self._error_callback(exception)
+            if self._debounce_count == 0:
+                log.error(
+                    f"Reader encountered error {exception} but has {self._debounce_count} tries left"
+                )
+            else:
+                self._error_callback(exception)

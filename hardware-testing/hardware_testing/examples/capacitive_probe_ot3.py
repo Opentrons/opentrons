@@ -5,7 +5,8 @@ import asyncio
 from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 # distance added to the pipette shaft
@@ -24,8 +25,8 @@ STABLE_CAP_PF = 0.1
 # The Z is different from the XY probing location
 # because the pipette cannot reach the bottom of the
 # cutout, so we cannot probe the Z inside the cutout
-ASSUMED_Z_LOCATION = types.Point(x=300, y=300, z=150)  # keep is SAFE
-ASSUMED_XY_LOCATION = types.Point(x=285, y=285, z=ASSUMED_Z_LOCATION.z)
+ASSUMED_Z_LOCATION = Point(x=300, y=300, z=150)  # keep is SAFE
+ASSUMED_XY_LOCATION = Point(x=285, y=285, z=ASSUMED_Z_LOCATION.z)
 
 # configure how the probing motion behaves
 # capacitive_probe will always automatically do the following:
@@ -53,10 +54,8 @@ PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
 )
 
 
-async def _probe_sequence(
-    api: OT3API, mount: types.OT3Mount, stable: bool
-) -> types.Point:
-    z_ax = types.Axis.by_mount(mount)
+async def _probe_sequence(api: OT3API, mount: OT3Mount, stable: bool) -> Point:
+    z_ax = Axis.by_mount(mount)
 
     print("Align the XY axes above Z probe location...")
     home_pos_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
@@ -87,7 +86,7 @@ async def _probe_sequence(
         )
     found_x_left, _ = await api.capacitive_probe(
         mount,
-        types.Axis.X,
+        Axis.X,
         ASSUMED_XY_LOCATION.x - half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -97,7 +96,7 @@ async def _probe_sequence(
         )
     found_x_right, _ = await api.capacitive_probe(
         mount,
-        types.Axis.X,
+        Axis.X,
         ASSUMED_XY_LOCATION.x + half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -108,7 +107,7 @@ async def _probe_sequence(
         )
     found_y_front, _ = await api.capacitive_probe(
         mount,
-        types.Axis.Y,
+        Axis.Y,
         ASSUMED_XY_LOCATION.y - half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -118,7 +117,7 @@ async def _probe_sequence(
         )
     found_y_back, _ = await api.capacitive_probe(
         mount,
-        types.Axis.Y,
+        Axis.Y,
         ASSUMED_XY_LOCATION.y + half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -127,7 +126,7 @@ async def _probe_sequence(
     # calculate the center XYZ position of the cutout
     center_x = (found_x_right + found_x_left) / 2
     center_y = (found_y_back + found_y_front) / 2
-    cutout_center = types.Point(x=center_x, y=center_y, z=found_z)
+    cutout_center = Point(x=center_x, y=center_y, z=found_z)
     print(f"Found cutout center = {cutout_center}")
     return cutout_center
 
@@ -136,7 +135,7 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, pipette_left="p1000_single_v3.3"
     )
-    mount = types.OT3Mount.LEFT
+    mount = OT3Mount.LEFT
     if not api.hardware_pipettes[mount.to_mount()]:
         raise RuntimeError("No pipette attached")
 
@@ -149,11 +148,11 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
         await _probe_sequence(api, mount, stable)
 
     # move up, "remove" the probe, then disengage the XY motors when done
-    z_ax = types.Axis.by_mount(mount)
+    z_ax = Axis.by_mount(mount)
     top_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
     await api.move_to(mount, ASSUMED_XY_LOCATION._replace(z=top_z))
     api.remove_tip(mount)
-    await api.disengage_axes([types.Axis.X, types.Axis.Y])
+    await api.disengage_axes([Axis.X, Axis.Y])
 
 
 if __name__ == "__main__":

@@ -96,6 +96,8 @@ async def test_module_caching() -> None:
             ModuleAtPort(port="/dev/ot_module_sim_tempdeck111", name="tempdeck")
         ]
     )
+    # give the remove module call time
+    await asyncio.sleep(0.2)
     only_magdeck = api.attached_modules.copy()
 
     assert only_magdeck[0] is with_magdeck[1]

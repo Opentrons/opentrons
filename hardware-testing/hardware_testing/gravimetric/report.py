@@ -84,6 +84,7 @@ def create_csv_test_report(
     trials: int,
     name: str,
     run_id: str,
+    blank_trials: int,
     runtime_parameters: Optional[List[List[str]]] = None,
     dont_write_to_disk: bool = False,
 ) -> CSVReport:
@@ -98,7 +99,7 @@ def create_csv_test_report(
             0,  # channel (hardcoded to 1)
             trial,
         )
-        for trial in range(config.NUM_BLANK_TRIALS)
+        for trial in range(blank_trials)
     ]
     for vol in volumes:
         meas_vols += [
@@ -206,7 +207,7 @@ def create_csv_test_report(
                     for volume, channel, trial in meas_vols
                     for measurement in MeasurementType
                     for i in meas_info
-                    if volume is not None or trial < config.NUM_BLANK_TRIALS
+                    if volume is not None or trial < blank_trials
                 ],
             ),
             CSVSection(
@@ -239,7 +240,7 @@ def create_csv_test_report(
     # NOTE: just immediately clear all the "isolate" flags on the volume section
     #       so that final CSV is guaranteed to not be filled with a bunch of "None"
     for line in report["VOLUMES"].lines:
-        line.store(None, "")
+        line.store([None, ""])
     return report
 
 

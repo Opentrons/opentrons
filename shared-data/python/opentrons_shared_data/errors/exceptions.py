@@ -909,6 +909,29 @@ class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
         )
 
 
+class BarcodeScanFailureError(RoboticsInteractionError):
+    """An error occurred when the Barcode scanner unable to detect barcode."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a BarcodeScanFailureError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = "Barcode scanner unable to detect barcode."
+        super().__init__(
+            ErrorCodes.BARCODE_SCANNER_FAILURE,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
     """An error indicating that a firmware update is required."""
 

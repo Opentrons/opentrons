@@ -23,7 +23,8 @@ from hardware_testing.data.csv_report import (
 )
 
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperProbe
+from opentrons.hardware_control.types import OT3Mount, Axis, GripperProbe
+from opentrons.types import Point
 
 
 TEST_SLOT = 5

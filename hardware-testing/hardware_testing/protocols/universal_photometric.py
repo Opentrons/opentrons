@@ -321,6 +321,7 @@ def aspirate_with_liquid_class(
     transfer_properties: TransferProperties,
     transfer_type: tx_comps_executor.TransferType,
     source: Well,
+    tip_size: int,
 ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
     contents = pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
@@ -337,6 +338,7 @@ def aspirate_with_liquid_class(
                 air_gap=0,
             )
         ],
+        max_pipette_and_tip_volume=tip_size,
         volume_for_pipette_mode_configuration=None,
     )
     return contents
@@ -509,6 +511,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # NOQA: C901
             liquid_class.get_for(pip, tips),
             transfer_type,
             dye_source["A1"],
+            ctx.params.tip_type,  # type: ignore [attr-defined]
         )
         # Dispense conditioning volume, if any, while submerged
         if ctx.params.conditioning_volume:  # type: ignore [attr-defined]

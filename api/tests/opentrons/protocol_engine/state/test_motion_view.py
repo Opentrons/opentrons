@@ -107,7 +107,7 @@ def _fake_static_pipette_config(channels: int) -> StaticPipetteConfig:
         shaft_ul_per_mm=5.0,
         available_sensors=AvailableSensorDefinition(sensors=[]),
         volume_mode=VolumeModes.default,
-        available_volume_modes_min_vol={},
+        available_volume_modes_min_and_max_vol={},
     )
 
 

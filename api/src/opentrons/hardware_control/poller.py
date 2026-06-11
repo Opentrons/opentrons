@@ -111,6 +111,7 @@ class Poller:
             async with self._use_read_lock():
                 await self._reader.read()
         except asyncio.CancelledError:
+            log.exception("poller canceled.")
             raise
         except AbsorbanceReaderDisconnectedError as e:
             self._error_callback(e)

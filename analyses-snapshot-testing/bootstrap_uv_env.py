@@ -7,7 +7,7 @@ It will:
   3) Install ../api and ../shared-data themselves editable into the same venv.
 
 Environment variables:
-  - UV_PY (default: 3.10)
+  - UV_PY (default: 3.12)
   - API_DIR (default: ../api)
   - SHARED_DATA_DIR (default: ../shared-data)
 """
@@ -128,7 +128,7 @@ def ensure_uv_venv_and_sync(python: str) -> None:
     """Ensure uv venv exists with the given Python version, then run `uv sync`.
 
     Args:
-        python: Python version string, e.g., "3.10".
+        python: Python version string, e.g., "3.12".
     """
     venv_path = Path(".venv")
     if not venv_path.exists():
@@ -212,7 +212,7 @@ def main() -> int:
     ensure_cwd_has_pyproject()
     ensure_uv_available()
 
-    uv_py = os.environ.get("UV_PY", "3.10")
+    uv_py = os.environ.get("UV_PY", "3.12")
     api_dir = Path(os.environ.get("API_DIR", "../api"))
     sd_dir = Path(os.environ.get("SHARED_DATA_DIR", "../shared-data"))
 

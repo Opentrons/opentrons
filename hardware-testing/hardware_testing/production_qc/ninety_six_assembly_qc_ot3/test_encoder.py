@@ -1,8 +1,7 @@
 """Test Encoder cleanliness."""
-from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from typing import List, Union, Literal, Tuple
-from hardware_testing.opentrons_api.types import OT3Mount
+from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.hardware_control.ot3api import OT3API
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
@@ -31,7 +30,7 @@ async def _plunger_alignment(
     api: OT3API, mount: OT3Mount
 ) -> Tuple[float, float, float]:
     print("Checking alignment...\n")
-    pipette_ax = types.Axis.of_main_tool_actuator(mount)
+    pipette_ax = Axis.of_main_tool_actuator(mount)
     current_pos = await api.current_position_ot3(mount, refresh=True)
     est = current_pos[pipette_ax]
     encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
@@ -52,13 +51,13 @@ async def run(
 ) -> None:
     """Run."""
     cycles = 100
-    mount = types.OT3Mount.LEFT
+    mount = OT3Mount.LEFT
     await api.cache_instruments()
     await api.home()
     await api.home_plunger(mount)
 
     top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
-    pipette_ax = types.Axis.of_main_tool_actuator(mount)
+    pipette_ax = Axis.of_main_tool_actuator(mount)
 
     print("Move to bottom position\n")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
