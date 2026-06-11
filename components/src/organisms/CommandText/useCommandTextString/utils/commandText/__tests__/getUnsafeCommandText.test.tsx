@@ -84,7 +84,7 @@ describe('getUnsafeCommandText', () => {
       params: { pipetteId: 'pipette-1' },
     })
 
-    screen.getByText('Dropping tip on Flex 1-Channel 1000 µL in place')
+    screen.getByText('Dropping tip in place')
   })
 
   it('should render updatePositionEstimators command text', () => {
