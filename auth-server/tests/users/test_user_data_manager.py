@@ -6,7 +6,12 @@ from decoy import Decoy, matchers
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType, UserResponse
+from auth_server.users.models import (
+    ACCOUNT_TYPE_TO_SCOPES,
+    RESET_PASSWORD_SCOPES,
+    AccountType,
+    UserResponse,
+)
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
@@ -396,6 +401,7 @@ def test_reset_user_password(
 
     assert result.username == "reset_me"
     assert result.resetPassword is True
+    assert result.scopes == sorted(scope.api_name for scope in RESET_PASSWORD_SCOPES)
     assert len(result.temporaryPassword) == 8
     assert all(
         c in string.ascii_letters + string.digits for c in result.temporaryPassword

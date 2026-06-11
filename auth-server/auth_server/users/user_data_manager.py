@@ -6,12 +6,15 @@ from typing import Literal
 
 from pwdlib import PasswordHash
 
+from server_utils.auth.scopes import Scope
+
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
     ACCOUNT_TYPE_TO_SCOPES,
+    RESET_PASSWORD_SCOPES,
     AccountType,
     ResetPasswordResponse,
     UserResponse,
@@ -81,6 +84,17 @@ def _validate_fields(
         raise InvalidInputError("Password must be at least 8 characters long")
 
 
+def get_scope_set_of_user(user: User) -> set[Scope]:
+    """Return the scopes that a user is authorized for.
+
+    A user who must reset their password is restricted to reading and writing their
+    own account, so they can change their password but nothing else until they do.
+    """
+    if user.reset_password:
+        return set(RESET_PASSWORD_SCOPES)
+    return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])
+
+
 class UserDataManager:
     """Manages user data operations."""
 
@@ -95,14 +109,13 @@ class UserDataManager:
         )
 
         account_type = AccountType(user.account_type)
+        scopes = sorted(scope.api_name for scope in get_scope_set_of_user(user))
 
         return UserResponse(
             username=user.username,
             fullName=user.full_name,
             accountType=account_type,
-            scopes=sorted(
-                scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]
-            ),
+            scopes=scopes,
             locked=is_currently_locked,
             resetPassword=user.reset_password,
         )

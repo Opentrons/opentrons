@@ -31,12 +31,19 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
         # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
         Scope.USERS_READ_SELF,
         Scope.USERS_WRITE_SELF,
+        Scope.USERS_WRITE_SELF_PASSWORD,
         Scope.PROTOCOLS_WRITE,
     },
     # Auditors should have read-only access to everything. Our read-only endpoints are
     # mostly accessible without authentication, but there are some exceptions. This
     # just needs to have the scopes to cover those exceptions.
     AccountType.AUDITOR: {Scope.USERS_READ_OTHERS},
+}
+
+# Scopes granted while resetPassword is true, before the user chooses a new password.
+RESET_PASSWORD_SCOPES: set[Scope] = {
+    Scope.USERS_READ_SELF,
+    Scope.USERS_WRITE_SELF_PASSWORD,
 }
 
 
