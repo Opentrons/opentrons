@@ -58,7 +58,11 @@ import { createContainerAboveModule } from '../../../step-forms/actions/thunks'
 import { getSavedStepForms } from '../../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getSlotInformation } from '../utils'
-import { getIsLabwareOnSlotInUse, getIsVacuumModuleFull } from './utils'
+import {
+  getIsLabwareOnSlotInUse,
+  getIsVacuumDockFull,
+  getIsVacuumModuleFull,
+} from './utils'
 
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
@@ -149,11 +153,13 @@ export function DeckSetupToolbox(
     hasVacuumModuleCreated &&
     getIsVacuumModuleFull(createdStackForSlot, deckSetup.labware)
 
-  // Dock is full when it has both a collar (as adapter) and a well plate (in stack)
   const isVacuumDockFull =
     isVacuumDockSlot &&
-    createdAdapterForSlot != null &&
-    createdStackForSlot.length > 0
+    getIsVacuumDockFull(
+      createdAdapterForSlot?.id ?? null,
+      createdStackForSlot,
+      deckSetup.labware
+    )
 
   const slotFull =
     ((createdAdapterForSlot != null && createdStackForSlot.length > 0) ||

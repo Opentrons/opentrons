@@ -140,10 +140,12 @@ export const RECOMMENDED_LABWARE_BY_MODULE: {
   ],
   // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
   [VACUUM_MODULE_TYPE]: [
-    'opentrons_vacuum_module_spacer_thingamajig',
     'opentrons_vacuum_manifold_collar_tall',
     'opentrons_vacuum_manifold_collar_short',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'nest_96_wellplate_2ml_deep',
+    'opentrons_vacuum_manifold_spacer_tall',
+    'opentrons_vacuum_manifold_spacer_short',
   ],
   // TODO (nd: 2026/05/20): audit this once recommended labware is finalized
   [VACUUM_MODULE_TYPE_WITH_LABWARE]: [

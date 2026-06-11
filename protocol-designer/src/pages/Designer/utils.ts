@@ -21,6 +21,7 @@ import {
   getFullStackFromLabwares,
   getIsSlotAHopper,
   getIsSlotAVacuumDock,
+  getIsVacuumSpacer,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
@@ -39,7 +40,6 @@ import {
   getFullStackFromLabwaresOnDeck,
   getStagingAreaAddressableAreas,
 } from '../../utils'
-import { getIsVacuumCollar } from './DeckSetup/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -403,7 +403,7 @@ export const useLabwareDropdownOptions = (
         deckSlot === 'fixedTrash'
 
       const isAdapter = def.allowedRoles?.includes('adapter') ?? false
-      const isVacuumCollar = getIsVacuumCollar(def)
+      const isMovableAdapter = def.parameters.isMovableAdapter === true
       const { nickName, latestSlot } = getLabwareInfo(
         nicknamesById,
         activeDeckSetup,
@@ -421,13 +421,13 @@ export const useLabwareDropdownOptions = (
       const shouldExclude =
         isInaccessible ||
         (type === 'labware' && isOnStacker) ||
-        (isAdapter && !isVacuumCollar) ||
+        (isAdapter && !isMovableAdapter) ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
         (type === 'moveLabware' &&
           !isTopOfStack &&
-          !isVacuumCollar &&
+          !isMovableAdapter &&
           !isLabwareLidCombo) ||
         (type === 'labware' && !isTopOfStack)
       if (shouldExclude) {
@@ -485,8 +485,28 @@ export const getUnoccupiedStackOptions = (args: {
       const allowedRoles = labwareOnDeckDef.allowedRoles ?? []
       const isLidRole = allowedRoles.includes('lid')
 
+      const isFilterPlate =
+        def.parameters.quirks?.includes('filterPlate') ?? false
+      const isLabwareOnSlotFilterPlate =
+        labwareOnDeckDef.parameters.quirks?.includes('filterPlate') ?? false
+      const destProvidesStackingDefault =
+        labwareOnDeckDef.parameters.quirks?.includes('providesStackingDefault') ??
+        false
+      const destIsVacuumSpacer = getIsVacuumSpacer(labwareOnDeckDef)
+      const movingLabwareIsCollar =
+        def.parameters.quirks?.includes('vacuumModuleDock') ?? false
+
       const isCompatible =
+        // filter plates can go on any non-lid, non-tiprack, non-filter-plate labware
+        (isFilterPlate &&
+          !isLidRole &&
+          !isLabwareOnSlotTiprack &&
+          !isLabwareOnSlotFilterPlate) ||
         labwareCompatibleParentLabware?.includes(labwareOnDeckLoadName) ||
+        // vacuum spacer: same rules as the main module area — only collars and filter plates
+        (destIsVacuumSpacer && movingLabwareIsCollar) ||
+        // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
+        (destProvidesStackingDefault && !destIsVacuumSpacer) ||
         // allow universal lid can go anywhere except for tubeRacks, aluminum blocks, and tipracks and other lids
         // since it doesn't have a labwareCompatibleLabware array, we need to special-case it, huhu
         (isUniversalLid &&

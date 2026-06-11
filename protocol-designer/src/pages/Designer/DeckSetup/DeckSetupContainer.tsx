@@ -27,11 +27,11 @@ import {
   OT2_ROBOT_TYPE,
   STAGING_AREA_CUTOUTS,
   TRASH_BIN_ADAPTER_FIXTURE,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getIsSlotAVacuumDock } from '@opentrons/step-generation'
 
-import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import {
   DECK_SETUP_TOOLS_WIDTH_REM,
   HOPPER_ZOOM_OFFSET_POSTITION,
@@ -110,8 +110,6 @@ export function DeckSetupContainer(
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const terminalItemId = useSelector(getSelectedTerminalItemId)
-  const { makeSnackbar } = useKitchen()
-
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -179,22 +177,6 @@ export function DeckSetupContainer(
   }
 
   const addEquipment = (location: string): void => {
-    // Check if vacuum dock is full before opening toolbox
-    const isVacuumDockSlot = getIsSlotAVacuumDock(location)
-    if (isVacuumDockSlot) {
-      const { createdStackForSlot, createdAdapterForSlot } = getSlotInformation({
-        deckSetup: activeDeckSetup,
-        slot: location,
-        deckDef,
-      })
-      const isDockFull =
-        createdAdapterForSlot != null && createdStackForSlot.length > 0
-      if (isDockFull) {
-        makeSnackbar('Labware limit reached for this slot')
-        return
-      }
-    }
-
     const slotForPositioning = _getSlotForPositioning(location)
     const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
       deckSetup: activeDeckSetup,
@@ -445,7 +427,14 @@ export function DeckSetupContainer(
                   />
                   <SlotLabels
                     robotType={robotType}
-                    show4thColumn={stagingAreaFixturesAndStacker.length > 0}
+                    show4thColumn={
+                      stagingAreaFixturesAndStacker.length > 0 ||
+                      Object.values(activeDeckSetup.modules).some(
+                        ({ type }) =>
+                          type === FLEX_STACKER_MODULE_TYPE ||
+                          type === VACUUM_MODULE_TYPE
+                      )
+                    }
                   />
                 </>
               )}

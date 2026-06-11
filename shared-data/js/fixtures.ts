@@ -7,6 +7,7 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   THERMOCYCLER_MODULE_CUTOUTS,
+  VACUUM_MODULE_CUTOUT,
   VACUUM_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
@@ -1048,6 +1049,22 @@ export const replaceCutoutFixtureWithComboFixture = (
     if (
       THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) &&
       MODULE_FIXTURES_BY_MODEL.thermocyclerModuleV2?.includes(
+        aaCutoutItem.cutoutFixtureId as CutoutFixtureId
+      )
+    ) {
+      return {
+        cutoutFixtureId: getReplacementFixtureForFakeFixture(
+          aaCutoutItem.cutoutFixtureId
+        ) as CutoutFixtureId,
+        cutoutId: aaCutoutItem.cutoutId,
+        opentronsModuleSerialNumber: aaCutoutItem.opentronsModuleSerialNumber,
+      }
+    }
+
+    // Handle vacuum module fixtures
+    if (
+      cutoutId === VACUUM_MODULE_CUTOUT &&
+      MODULE_FIXTURES_BY_MODEL[VACUUM_MODULE_V1]?.includes(
         aaCutoutItem.cutoutFixtureId as CutoutFixtureId
       )
     ) {

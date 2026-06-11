@@ -17,7 +17,7 @@ import {
   VACUUM_MODULE_TYPE,
   VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import { getIsVacuumSpacer, getSlotInLocationStack } from '@opentrons/step-generation'
 
 import {
   getIsAdapter,
@@ -74,6 +74,8 @@ export function getIsVacuumCollar(labwareDef: LabwareDefinition2): boolean {
     loadName === 'opentrons_vacuum_manifold_collar_short'
   )
 }
+
+export { getIsVacuumSpacer } from '@opentrons/step-generation'
 
 export function getCutoutIdForAddressableArea(
   addressableArea: AddressableAreaName,
@@ -186,14 +188,15 @@ export const getLabwareIsRecommended = (
   // For vacuum module, show different labware based on whether module has labware
   if (moduleType === VACUUM_MODULE_TYPE) {
     if (moduleHasLabware) {
-      // Show collars and wellplates when module already has labware
+      // Show collars, wellplates, and filter plates when module already has labware
       return (
         def.parameters.loadName ===
           'opentrons_vacuum_manifold_collar_tall' ||
         def.parameters.loadName ===
           'opentrons_vacuum_manifold_collar_short' ||
         def.parameters.loadName ===
-          'opentrons_96_wellplate_200ul_pcr_full_skirt'
+          'opentrons_96_wellplate_200ul_pcr_full_skirt' ||
+        (def.parameters.quirks ?? []).includes('filterPlate')
       )
     } else {
       // Show spacer and wellplate for empty module
@@ -219,26 +222,67 @@ export const getLabwareCompatibleWithAdapter = (
     return []
   }
 
+  // vacuum spacers expose the same recommended well plates as the bare module
+  const adapterDef = Object.values(defs).find(
+    d => d.parameters.loadName === adapterLoadName
+  )
+  if (adapterDef != null && getIsVacuumSpacer(adapterDef)) {
+    const vacuumRecommended = RECOMMENDED_LABWARE_BY_MODULE[VACUUM_MODULE_TYPE]
+    return Object.entries(defs)
+      .filter(
+        ([, def]) =>
+          vacuumRecommended.includes(def.parameters.loadName) &&
+          !getIsVacuumSpacer(def) &&
+          !getIsVacuumCollar(def)
+      )
+      .map(([uri]) => uri)
+  }
+
   return Object.entries(defs)
     .filter(
-      ([, { stackingOffsetWithLabware }]) =>
-        stackingOffsetWithLabware?.[adapterLoadName] != null
+      ([, def]) =>
+        def.stackingOffsetWithLabware?.[adapterLoadName] != null ||
+        (def.parameters.quirks ?? []).includes('filterPlate')
     )
     .map(([labwareDefUri]) => labwareDefUri)
+}
+
+const _stackTopIsNonAdapter = (
+  labwareStack: string[],
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+): boolean => {
+  const topDef =
+    labwareStack.length > 0
+      ? deckSetupLabware[labwareStack[0]]?.def
+      : null
+  return topDef != null && !topDef.allowedRoles?.includes('adapter')
 }
 
 export const getIsVacuumModuleFull = (
   labwareStack: string[],
   deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
 ): boolean => {
-  // Vacuum module is considered "full" if it contains any collar adapter
-  return labwareStack.some(labwareId => {
-    const loadName = deckSetupLabware[labwareId]?.def.parameters.loadName
-    return (
-      loadName === 'opentrons_vacuum_manifold_collar_tall' ||
-      loadName === 'opentrons_vacuum_manifold_collar_short'
-    )
+  // Full only when a non-adapter (filter plate/wellplate) sits on top of a collar.
+  // A base plate alone (no collar) or a collar alone does not make the module full.
+  const hasCollar = labwareStack.some(labwareId => {
+    const def = deckSetupLabware[labwareId]?.def
+    return def != null && getIsVacuumCollar(def)
   })
+  return _stackTopIsNonAdapter(labwareStack, deckSetupLabware) && hasCollar
+}
+
+export const getIsVacuumDockFull = (
+  adapterLabwareId: string | null,
+  labwareStack: string[],
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+): boolean => {
+  // Full only when a non-adapter sits on top of a collar in the dock.
+  // A collar alone does not make the dock full.
+  const adapterIsCollar =
+    adapterLabwareId != null &&
+    deckSetupLabware[adapterLabwareId]?.def != null &&
+    getIsVacuumCollar(deckSetupLabware[adapterLabwareId].def)
+  return adapterIsCollar && _stackTopIsNonAdapter(labwareStack, deckSetupLabware)
 }
 
 const getStackerDefinitionsFromLoadName = (

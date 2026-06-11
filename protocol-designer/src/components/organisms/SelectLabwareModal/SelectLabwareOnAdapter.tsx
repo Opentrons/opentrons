@@ -17,6 +17,7 @@ import {
 } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import {
+  getIsVacuumSpacer,
   getLabwareCompatibleWithAdapter,
   getStackerDefinitions,
 } from '../../../pages/Designer/DeckSetup/utils'
@@ -180,8 +181,10 @@ export function SelectLabwareOnAdapter(
                 defs[nestedDefUri] ?? customLabwareDefs[nestedDefUri]
 
               // don't show lid option for vacuum module adapters
+              const adapterDef =
+                defs[parentLabwareURI] ?? customLabwareDefs[parentLabwareURI]
               const isVacuumModuleAdapter =
-                loadName === 'opentrons_vacuum_module_spacer_thingamajig'
+                adapterDef != null && getIsVacuumSpacer(adapterDef)
 
               const stackingLabwareDefUris = getStackerDefinitions(
                 {
