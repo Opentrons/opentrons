@@ -4,7 +4,7 @@ import type {
   CameraImageSettings,
   DownloadedPreviewImageFileResponse,
 } from '../camera'
-import type { RequestConfig, ResponsePromise } from '../request'
+import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 
 export function addCapturePreviewImageToRun(
