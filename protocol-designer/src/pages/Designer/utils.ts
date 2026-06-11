@@ -490,8 +490,9 @@ export const getUnoccupiedStackOptions = (args: {
       const isLabwareOnSlotFilterPlate =
         labwareOnDeckDef.parameters.quirks?.includes('filterPlate') ?? false
       const destProvidesStackingDefault =
-        labwareOnDeckDef.parameters.quirks?.includes('providesStackingDefault') ??
-        false
+        labwareOnDeckDef.parameters.quirks?.includes(
+          'providesStackingDefault'
+        ) ?? false
       const destIsVacuumSpacer = getIsVacuumSpacer(labwareOnDeckDef)
       const movingLabwareIsCollar =
         def.parameters.quirks?.includes('vacuumModuleDock') ?? false

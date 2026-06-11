@@ -17,7 +17,10 @@ import {
   VACUUM_MODULE_TYPE,
   VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getIsVacuumSpacer, getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getIsVacuumSpacer,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import {
   getIsAdapter,
@@ -190,10 +193,8 @@ export const getLabwareIsRecommended = (
     if (moduleHasLabware) {
       // Show collars, wellplates, and filter plates when module already has labware
       return (
-        def.parameters.loadName ===
-          'opentrons_vacuum_manifold_collar_tall' ||
-        def.parameters.loadName ===
-          'opentrons_vacuum_manifold_collar_short' ||
+        def.parameters.loadName === 'opentrons_vacuum_manifold_collar_tall' ||
+        def.parameters.loadName === 'opentrons_vacuum_manifold_collar_short' ||
         def.parameters.loadName ===
           'opentrons_96_wellplate_200ul_pcr_full_skirt' ||
         (def.parameters.quirks ?? []).includes('filterPlate')
@@ -252,9 +253,7 @@ const _stackTopIsNonAdapter = (
   deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
 ): boolean => {
   const topDef =
-    labwareStack.length > 0
-      ? deckSetupLabware[labwareStack[0]]?.def
-      : null
+    labwareStack.length > 0 ? deckSetupLabware[labwareStack[0]]?.def : null
   return topDef != null && !topDef.allowedRoles?.includes('adapter')
 }
 
@@ -282,7 +281,9 @@ export const getIsVacuumDockFull = (
     adapterLabwareId != null &&
     deckSetupLabware[adapterLabwareId]?.def != null &&
     getIsVacuumCollar(deckSetupLabware[adapterLabwareId].def)
-  return adapterIsCollar && _stackTopIsNonAdapter(labwareStack, deckSetupLabware)
+  return (
+    adapterIsCollar && _stackTopIsNonAdapter(labwareStack, deckSetupLabware)
+  )
 }
 
 const getStackerDefinitionsFromLoadName = (

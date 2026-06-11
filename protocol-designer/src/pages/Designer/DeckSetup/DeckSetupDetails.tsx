@@ -439,33 +439,34 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
-                  {vacuumMainModuleStack != null
-                    ? vacuumMainModuleStack.map(lw => (
-                        <LabwareOnDeck
-                          key={lw.id}
-                          x={0}
-                          y={0}
-                          labwareOnDeck={lw}
-                          centerInSlot
-                        />
-                      ))
-                    : <>
-                        {labwareRightBelowTopMostLabware != null ? (
-                          <LabwareOnDeck
-                            x={0}
-                            y={0}
-                            labwareOnDeck={labwareRightBelowTopMostLabware}
-                            centerInSlot={isLabwareBelowTopVacuumCollar}
-                          />
-                        ) : null}
+                  {vacuumMainModuleStack != null ? (
+                    vacuumMainModuleStack.map(lw => (
+                      <LabwareOnDeck
+                        key={lw.id}
+                        x={0}
+                        y={0}
+                        labwareOnDeck={lw}
+                        centerInSlot
+                      />
+                    ))
+                  ) : (
+                    <>
+                      {labwareRightBelowTopMostLabware != null ? (
                         <LabwareOnDeck
                           x={0}
                           y={0}
-                          labwareOnDeck={labwareOnModule}
-                          centerInSlot={isLabwareOnModuleVacuumCollar}
+                          labwareOnDeck={labwareRightBelowTopMostLabware}
+                          centerInSlot={isLabwareBelowTopVacuumCollar}
                         />
-                      </>
-                  }
+                      ) : null}
+                      <LabwareOnDeck
+                        x={0}
+                        y={0}
+                        labwareOnDeck={labwareOnModule}
+                        centerInSlot={isLabwareOnModuleVacuumCollar}
+                      />
+                    </>
+                  )}
                   <HighlightLabware
                     labwareOnDeck={labwareOnModule}
                     position={[0, 0, 0]}

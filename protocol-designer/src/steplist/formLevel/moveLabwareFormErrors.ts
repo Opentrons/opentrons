@@ -2,10 +2,9 @@ import {
   getLabwareDefIsStandard,
   locationIsOffDeck,
 } from '@opentrons/shared-data'
+import { getIsVacuumSpacer } from '@opentrons/step-generation'
 
 import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
-
-import { getIsVacuumSpacer } from '@opentrons/step-generation'
 
 import type { LabwareLocation } from '@opentrons/shared-data'
 import type {
