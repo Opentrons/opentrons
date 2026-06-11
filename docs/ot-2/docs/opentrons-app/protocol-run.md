@@ -7,7 +7,7 @@ After creating and uploading a protocol, it's time to run it on your OT-2. Follo
 
 <div class="instruction-list" markdown>
 
-1. Launch the Opentrons App.
+1. Launch the Opentrons OT-2 App.
 2. From the Protocols tab, find the protocol you want to run.
 3. Click the three-dot (⋮) menu for that protocol and click **Start setup**.
 
