@@ -25,12 +25,6 @@ def user_scopes_str() -> str:
 
 
 @pytest.fixture
-def reset_password_scopes_str() -> str:
-    """The restricted OAuth 2 scopes a user gets while they must reset their password."""
-    return serialize_scopes({Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD})
-
-
-@pytest.fixture
 def reset_password_scopes_list() -> list[str]:
     """Scopes returned on a user record while they must reset their password."""
     return sorted(
