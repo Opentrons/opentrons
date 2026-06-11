@@ -4,7 +4,7 @@ from typing import Generator
 import pytest
 import requests
 
-from server_utils.auth.scopes import Scope, serialize_scopes
+from server_utils.auth.scopes import serialize_scopes
 from tests.dev_server import DevServer
 
 from auth_server.users.models import (
