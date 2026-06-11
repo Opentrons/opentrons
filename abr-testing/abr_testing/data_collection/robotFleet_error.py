@@ -475,12 +475,8 @@ def get_robot_state(
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    if project_key == "RQA":  # 217 is ABR
-        parent_name = affects_version + " Bugs"
-        parent = get_parent_key(url, api_token, email, project_key, parent_name)
-    else:
-        parent_name = robot
-        parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    parent_name = affects_version + " Bugs"
+    parent = get_parent_key(url, api_token, email, project_key, parent_name)
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
