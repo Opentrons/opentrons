@@ -114,7 +114,7 @@ describe('getUnsafeCommandText', () => {
       params: {},
     })
 
-    screen.getByText('Homing gripper axis to ungrip labware')
+    screen.getByText('Homing gripper axis to release labware')
   })
 
   it('should render placeLabware command text', () => {
@@ -127,7 +127,9 @@ describe('getUnsafeCommandText', () => {
       },
     })
 
-    screen.getByText('Finishing placing 96 Well Plate in Slot D4 using gripper')
+    screen.getByText(
+      'After interruption, placing 96 Well Plate in Slot D4 using gripper'
+    )
   })
 
   it('should render manualRetrieve command text', () => {

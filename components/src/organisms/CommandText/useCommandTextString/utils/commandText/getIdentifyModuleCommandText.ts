@@ -17,7 +17,7 @@ export function getIdentifyModuleCommandText({
     moduleId
   )
   const colorText = color ? t(color) : ''
-  const startText = start ? t('start') : t('stop')
+  const startText = start ? t('starting') : t('stopping')
   return t('identify_module', {
     model: modelName,
     slot,
