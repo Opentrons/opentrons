@@ -249,7 +249,8 @@ async def get_self(  # noqa: D103
 async def update_self(
     request_body: RequestModel[UpdateSelf],
     authorization_details: Annotated[
-        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF))
+        RequireScopesResult,
+        fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF_PASSWORD)),
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)

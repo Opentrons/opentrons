@@ -5,6 +5,7 @@ import string
 from typing import Literal
 
 from pwdlib import PasswordHash
+from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
@@ -95,14 +96,17 @@ class UserDataManager:
         )
 
         account_type = AccountType(user.account_type)
+        if user.reset_password:
+            scope_set = {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
+        else:
+            scope_set = ACCOUNT_TYPE_TO_SCOPES[account_type]
+        scopes = sorted(scope.api_name for scope in scope_set)
 
         return UserResponse(
             username=user.username,
             fullName=user.full_name,
             accountType=account_type,
-            scopes=sorted(
-                scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]
-            ),
+            scopes=scopes,
             locked=is_currently_locked,
             resetPassword=user.reset_password,
         )

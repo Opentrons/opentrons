@@ -31,6 +31,7 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
         # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
         Scope.USERS_READ_SELF,
         Scope.USERS_WRITE_SELF,
+        Scope.USERS_WRITE_SELF_PASSWORD,
         Scope.PROTOCOLS_WRITE,
     },
     # Auditors should have read-only access to everything. Our read-only endpoints are

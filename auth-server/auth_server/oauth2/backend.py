@@ -429,5 +429,12 @@ def _now() -> datetime:
 
 
 def _get_scope_set_of_user(user: ORMUser) -> set[Scope]:
-    """Return the scopes that a user is authorized for."""
+    """Return the scopes that a user is authorized for.
+
+    A user who must reset their password is restricted to reading and writing their
+    own account, so they can change their password but nothing else until they do.
+    """
+    if user.reset_password:
+        return {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
     return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])
+

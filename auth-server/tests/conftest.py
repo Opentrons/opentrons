@@ -4,7 +4,7 @@ from typing import Generator
 import pytest
 import requests
 
-from server_utils.auth.scopes import serialize_scopes
+from server_utils.auth.scopes import Scope, serialize_scopes
 from tests.dev_server import DevServer
 
 from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
@@ -22,6 +22,21 @@ def admin_scopes_str() -> str:
 def user_scopes_str() -> str:
     """All the OAuth 2 scopes that a regular user should have, as a space-separated string."""
     return serialize_scopes(set(ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]))
+
+
+@pytest.fixture
+def reset_password_scopes_str() -> str:
+    """The restricted OAuth 2 scopes a user gets while they must reset their password."""
+    return serialize_scopes({Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD})
+
+
+@pytest.fixture
+def reset_password_scopes_list() -> list[str]:
+    """Scopes returned on a user record while they must reset their password."""
+    return sorted(
+        scope.api_name
+        for scope in {Scope.USERS_READ_SELF, Scope.USERS_WRITE_SELF_PASSWORD}
+    )
 
 
 @pytest.fixture
