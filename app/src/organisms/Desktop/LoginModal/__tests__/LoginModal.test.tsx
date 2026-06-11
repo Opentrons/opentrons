@@ -9,7 +9,11 @@ import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { showLoginModal } from '..'
 
-import type { HostConfig, OAuth2TokenResponse } from '@opentrons/api-client'
+import type {
+  AuthUser,
+  HostConfig,
+  OAuth2TokenResponse,
+} from '@opentrons/api-client'
 
 vi.mock('/app/resources/access-control/useStoreLoginState')
 vi.mock('/app/resources/auth')
@@ -21,6 +25,15 @@ const TOKEN_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
   expires_in: 180,
   refresh_token: 'new-refresh-token',
+}
+
+const AUTH_USER: AuthUser = {
+  username: 'alice',
+  fullName: 'Alice',
+  accountType: 'user',
+  scopes: [],
+  locked: false,
+  resetPassword: false,
 }
 
 const renderAndOpenLoginModal = (): void => {
@@ -91,7 +104,7 @@ describe('LoginModal', () => {
         ({
           submitPassword: (username: string, password: string) => {
             submitPassword(username, password)
-            onSuccess(username, TOKEN_RESPONSE)
+            onSuccess(username, AUTH_USER, TOKEN_RESPONSE)
           },
           isAuthLoading: false,
         }) as ReturnType<typeof useOAuth2PasswordLogin>

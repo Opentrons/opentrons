@@ -12,3 +12,9 @@ export interface AuthUser {
 export interface AuthUserResponse {
   data: AuthUser
 }
+
+export interface UpdateSelfRequest {
+  data: {
+    password: string
+  }
+}

@@ -20,6 +20,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from auth_server.users.dependencies import get_user_by_username, get_user_data_manager
 from auth_server.users.models import (
     ResetPasswordResponse,
+    UpdateSelf,
     UpdateUser,
     UserCreate,
     UserResponse,
@@ -232,34 +233,45 @@ async def get_self(  # noqa: D103
 
 
 @PydanticResponse.wrap_route(
-    router.post,
-    path="/auth/users/self/resetPassword",
-    summary="Reset the currently logged-in user's password",
+    router.patch,
+    path="/auth/users/self",
+    summary="Update the currently logged-in user",
     description=(
-        "Reset the currently logged-in user's password to a newly generated temporary "
-        "password. The user must change their password upon next login."
+        "Update the currently authenticated user, for example to set a new password "
+        "when resetPassword is true."
     ),
     responses={
-        fastapi.status.HTTP_200_OK: {"model": SimpleBody[ResetPasswordResponse]},
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
+        fastapi.status.HTTP_400_BAD_REQUEST: {},
         fastapi.status.HTTP_401_UNAUTHORIZED: {},
     },
 )
-async def reset_self_password(
+async def update_self(
+    request_body: RequestModel[UpdateSelf],
     authorization_details: Annotated[
-        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_WRITE))
+        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF))
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
-) -> PydanticResponse[SimpleBody[ResetPasswordResponse]]:
-    """Reset the current user's password to a random temporary password."""
+) -> PydanticResponse[SimpleBody[UserResponse]]:
+    """Set the current user's password and clear the resetPassword flag."""
     if isinstance(authorization_details, AuthorizationNotRequiredResult):
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="This endpoint needs an access token to determine the current user.",
         )
 
-    result = user_data_manager.reset_user_password(authorization_details.username)
+    try:
+        result = user_data_manager.update_user(
+            authorization_details.username,
+            new_password=request_body.data.password.get_secret_value(),
+        )
+    except InvalidInputError as e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
