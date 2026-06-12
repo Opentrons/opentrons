@@ -288,7 +288,7 @@ def run_belt_calibration(
     current_pos = api.gantry_position(mount)
     api.move_to(mount, attach_pos._replace(z=current_pos.z))
     api.move_rel(mount, Point(x=0, y=0, z=-20))
-    found = False
+    found = api.hardware_pipettes[mount.to_mount()] is not None
     while not found:
         ctx.pause("Attach Pipette: Press Resume when Ready")
         found = api.hardware_pipettes[mount.to_mount()] is not None

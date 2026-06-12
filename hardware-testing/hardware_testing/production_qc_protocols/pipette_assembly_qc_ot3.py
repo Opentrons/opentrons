@@ -832,6 +832,7 @@ def test_fixture(
     cfg: TestConfig,
 ) -> None:
     """Test Liquid."""
+    ctx.comment("Test Fixture.")
     fixture = connect_to_fixture(
         cfg.simulate,
         side=cfg.fixture_side,
@@ -866,6 +867,7 @@ def test_liquid(
     cfg: TestConfig,
 ) -> None:
     """Test Liquid."""
+    ctx.comment("Test Liquid.")
     for i in range(cfg.num_trials):
         droplet_wait_seconds = cfg.droplet_wait_seconds * (i + 1)
         test_passed = _test_for_leak(
@@ -964,6 +966,7 @@ def _test_env_sensors(
     ctx: ProtocolContext,
     cfg: TestConfig,
 ) -> None:
+    ctx.comment("Test diagnostics environment.")
     env_sensor = asair_sensor.BuildAsairSensor(cfg.simulate)
     reading = env_sensor.get_reading()
     room_c = reading.temperature
@@ -1002,6 +1005,7 @@ def _test_encoder(
     ctx: ProtocolContext,
     cfg: TestConfig,
 ) -> None:
+    ctx.comment("Test diagnostics encoder.")
     pip_axis = Axis.of_main_tool_actuator(cfg.mount)
     _, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, cfg.mount)
 
@@ -1041,6 +1045,7 @@ def _test_cap_sensors(
     ctx: ProtocolContext,
     cfg: TestConfig,
 ) -> None:
+    ctx.comment("Test diagnostics capacitance.")
     sensor_to_probe = {
         SensorId.S0: InstrumentProbeType.PRIMARY,
         SensorId.S1: InstrumentProbeType.SECONDARY,
@@ -1160,6 +1165,7 @@ def _test_diagnostics_pressure(
     ctx: ProtocolContext,
     cfg: TestConfig,
 ) -> None:
+    ctx.comment("Test diagnostics pressure.")
     results: List[bool] = []
     sensor_ids = [SensorId.S0]
     if cfg.pipette_channels == 8:
@@ -1282,6 +1288,7 @@ def test_diagnostics(
     cfg: TestConfig,
 ) -> None:
     """Test Liquid."""
+    ctx.comment("Test diagnostics.")
     pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
     current_pos = api.gantry_position(cfg.mount)
     hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z - 20)
@@ -1344,6 +1351,7 @@ def test_plunger(
     cfg: TestConfig,
 ) -> None:
     """Test Plunger."""
+    ctx.comment("Test plunger.")
     pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
     current_pos = api.gantry_position(cfg.mount)
     hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z - 20)
@@ -1412,6 +1420,7 @@ def test_tip_sensor_new(
     cfg: TestConfig,
 ) -> None:
     """Fully automated tip sensor check."""
+    ctx.comment("Test tip sensor.")
     api.retract(cfg.mount)
     if cfg.pipette_channels == 1:
         offset_from_a1 = Point(x=9 * 11, y=9 * -7, z=0)
@@ -1505,6 +1514,7 @@ def test_tip_sensor(
     cfg: TestConfig,
 ) -> None:
     """Test the tip sensor."""
+    ctx.comment("Test tip sensor.")
     api.retract(cfg.mount)
     ctx.pause("Ready to start test-tip-presence?")
 
@@ -1721,6 +1731,7 @@ def test_liquid_probe_new(
     cfg: TestConfig,
 ) -> None:
     """No jog required liquid probe."""
+    ctx.comment("Test liquid probe.")
     tip_vols = [50] if cfg.pipette_volume == 50 else [50, 200, 1000]
     above_well_height = 2
     max_submerge_mm = 3
@@ -1820,6 +1831,7 @@ def test_liquid_probe(
     cfg: TestConfig,
 ) -> None:
     """Test Liquid probe."""
+    ctx.comment("Test liquid probe.")
     tip_vols = [50] if cfg.pipette_volume == 50 else [50, 200, 1000]
     probes = [InstrumentProbeType.PRIMARY]
     if cfg.pipette_channels > 1:
@@ -1916,6 +1928,7 @@ def test_encoder(
     cfg: TestConfig,
 ) -> None:
     """Test Liquid."""
+    ctx.comment("Test Encoder.")
     cycles = 100
     api.cache_instruments()
     api.home()

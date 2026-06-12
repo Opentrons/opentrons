@@ -186,6 +186,7 @@ def test_mount(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper mount."""
+    ctx.comment("Test Mount")
     z_ax = Axis.Z_G
     g_ax = Axis.G
     mount = OT3Mount.GRIPPER
@@ -316,7 +317,7 @@ def test_probe(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the grippers probes."""
-    """Run."""
+    ctx.comment("Test Probe")
     z_ax = Axis.Z_G
     g_ax = Axis.G
     mount = OT3Mount.GRIPPER
@@ -428,6 +429,7 @@ def test_width(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper width."""
+    ctx.comment("Test Width")
     z_ax = Axis.Z_G
     g_ax = Axis.G
     mount = OT3Mount.GRIPPER
@@ -596,8 +598,9 @@ def test_force(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper force."""
-    gauge = _setup(api, ctx)
+    ctx.comment("Test Force")
 
+    gauge = _setup(api, ctx)
     # LOOP THROUGH FORCES
     for expected_force, allowed_percent_error in zip(
         GRIP_FORCES_NEWTON_FORCE, FAILURE_THRESHOLD_PERCENTAGES
@@ -623,6 +626,7 @@ def test_force_increment(
     api: SyncHardwareAPI, report: CSVReport, section: str, ctx: ProtocolContext
 ) -> None:
     """Test the gripper force increment."""
+    ctx.comment("Test Force Increment")
     gauge = _setup(api, ctx)
 
     # LOOP THROUGH DUTY-CYCLES

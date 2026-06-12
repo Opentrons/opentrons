@@ -202,7 +202,7 @@ def test_plunger(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test plunger."""
-    """Run."""
+    ctx.comment("Test Plunger.")
     ax = Axis.P_L
     mount = OT3Mount.LEFT
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
@@ -342,6 +342,7 @@ def test_jaws(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test jaws."""
+    ctx.comment("Test Jaws.")
     ax = Axis.Q
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
     default_current = settings.run_current
@@ -490,7 +491,8 @@ def test_capacitance(
     ctx: ProtocolContext,
     pipette: Literal[200, 1000],
 ) -> None:
-    """Test capacitive sensor."""
+    """Test capacitance sensor."""
+    ctx.comment("Test capacitance sensor")
     z_ax = Axis.Z_L
     p_ax = Axis.P_L
     t_ax = Axis.Q
@@ -792,6 +794,7 @@ def test_pressure(  # noqa: C901
     pipette: Literal[200, 1000],
 ) -> None:
     """Test pressure sensor."""
+    ctx.comment("Test Pressure")
     api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = api.gantry_position(OT3Mount.LEFT)
@@ -956,6 +959,7 @@ def test_environmental_sensor(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test environmental sensor."""
+    ctx.comment("Test Environmental Sensor")
     api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = api.gantry_position(OT3Mount.LEFT)
@@ -1010,6 +1014,7 @@ def test_tip_sensor(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test tip sensor."""
+    ctx.comment("Test Tip Sensor")
     ax = Axis.Q
     api.home_z(OT3Mount.LEFT)
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
@@ -1140,6 +1145,7 @@ def test_droplets(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test Droplets."""
+    ctx.comment("Test Droplets")
     # GATHER NOMINAL POSITIONS
     reservoir = ctx.load_labware("nest_1_reservoir_195ml", RESERVOIR_SLOT)
     adapter = ctx.load_adapter("opentrons_flex_96_tiprack_adapter", TIP_RACK_96_SLOT)
@@ -1216,6 +1222,7 @@ def test_encoder(
     pipette: Literal[200, 1000],
 ) -> None:
     """Test Encoder."""
+    ctx.comment("Test Encoder")
     cycles = 100
     mount = OT3Mount.LEFT
     api.cache_instruments()
