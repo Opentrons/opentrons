@@ -208,9 +208,7 @@ describe('LoginModal', () => {
 
     expect(storeLoginState).toHaveBeenCalledWith('alice', TOKEN_RESPONSE)
     screen.getByText('Your password has expired')
-    screen.getByText(
-      'Create a new password to use'
-    )
+    screen.getByText('Create a new password to use')
     screen.getByLabelText('New password')
     screen.getByLabelText('Confirm password')
     screen.getByRole('button', { name: 'Confirm' })
