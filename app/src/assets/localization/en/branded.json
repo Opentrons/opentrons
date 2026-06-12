@@ -84,7 +84,7 @@
   "secure_labware_explanation_magnetic_module": "<block>Opentrons recommends ensuring your labware locks to the Magnetic Module by adjusting the black plate bracket on top of the module.</block> <block>There are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the module's thumb screw (the silver knob on the front).</block>",
   "secure_labware_explanation_thermocycler": "Opentrons recommends securing your labware to the Thermocycler Module by closing its latch. Doing so ensures level and accurate plate placement for optimal results.",
   "send_a_protocol_to_store": "Send a protocol from the Opentrons App to get started.",
-  "setup_instructions_description": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box or scan the QR code to visit the modules section of the Opentrons Help Center.",
+  "setup_instructions_description": "Follow the step-by-step setup instructions in the module’s manual. Scan the QR code or click the link below to view it on the Opentrons documentation website.",
   "share_app_analytics": "Share App Analytics with Opentrons",
   "share_app_analytics_description": "Help Opentrons improve its products and services by automatically sending anonymous diagnostics and usage data.",
   "share_display_usage_description": "Data on how you interact with the touchscreen on Flex.",
