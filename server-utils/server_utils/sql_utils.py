@@ -1,8 +1,9 @@
 """Utilities for working with SQLite databases through SQLAlchemy."""
 
+import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeAlias
 
 import sqlalchemy
 
@@ -163,4 +164,40 @@ class UTCDateTime(sqlalchemy.types.TypeDecorator[datetime]):
         if value is not None:
             assert value.tzinfo is None
             return value.replace(tzinfo=timezone.utc)
+        return None
+
+
+JsonPythonValue: TypeAlias = (
+    str
+    | int
+    | float
+    | bool
+    | None
+    | list["JsonPythonValue"]
+    | dict[str, "JsonPythonValue"]
+)
+"""The output of `json.dumps()` / the input of `json.loads()`."""
+
+
+class JsonValue(sqlalchemy.TypeDecorator[object]):
+    """Transparently serializes Python values to/from JSON strings in the DB.
+
+    Requires the use of the sqlalchemy ORM layer; set a column type to this
+    to automatically write any serializable value to it:
+
+    column_name: Mapped[JsonPythonValue] = mapped_column(JsonValue, ...)
+    """
+
+    impl = sqlalchemy.String
+    cache_ok = True
+
+    def process_bind_param(self, value: object | None, dialect: Any) -> str | None:
+        """Python → DB: json.dumps before writing."""
+        return json.dumps(value)
+
+    def process_result_value(self, value: str | None, dialect: Any) -> object | None:
+        """DB → Python: json.loads after reading."""
+        if value is not None:
+            result: object = json.loads(value)
+            return result
         return None
