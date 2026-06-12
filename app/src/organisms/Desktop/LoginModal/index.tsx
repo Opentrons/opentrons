@@ -329,7 +329,9 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
       <div className={styles.fields_container}>
         <InputField
           name="newPassword"
-          title={t('access_control:desktop_password_expired_new_password_field')}
+          title={t(
+            'access_control:desktop_password_expired_new_password_field'
+          )}
           type="password"
           value={newPassword}
           error={newPasswordError ?? undefined}
@@ -339,7 +341,9 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
         />
         <InputField
           name="confirmPassword"
-          title={t('access_control:desktop_password_expired_confirm_password_field')}
+          title={t(
+            'access_control:desktop_password_expired_confirm_password_field'
+          )}
           type="password"
           value={confirmPassword}
           error={confirmPasswordError ?? undefined}
