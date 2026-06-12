@@ -60,6 +60,7 @@ ignore = ["E203", "E501", "E741", "ANN401", "D100", "D104", "D107", "D402", "D41
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D"]
 "audit_server/_version.py" = ["I"]
+"audit_server/alembic/versions/*.py" = ["D"]
 
 [tool.ruff.lint.isort]
 known-local-folder = ["audit_server"]

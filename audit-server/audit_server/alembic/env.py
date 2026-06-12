@@ -39,6 +39,8 @@ db_url = config.get_main_option("sqlalchemy.url")
 if db_url is None or db_url == "driver://user:pass@localhost/dbname":
     if isinstance(settings.persistence_directory, Path):
         db_path = settings.persistence_directory / LATEST_VERSION_DIRECTORY / DB_FILE
+        if not db_path.parent.is_dir():
+            db_path.parent.mkdir(parents=True)
     else:
         raise RuntimeError(
             "Set OT_AUDIT_SERVER_persistence_directory to a real path for Alembic migrations."

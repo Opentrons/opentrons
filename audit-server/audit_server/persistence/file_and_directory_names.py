@@ -12,6 +12,6 @@ from typing import Final
 # By convention, when an Alembic migration is introduced for this version,
 # rename this to include the head revision (e.g. ``"1_<revision_hash>"``)
 # so it's obvious which schema state lives inside.
-LATEST_VERSION_DIRECTORY: Final = "1"
+LATEST_VERSION_DIRECTORY: Final = "1_d35b498590ff"
 
 DB_FILE: Final = "audit_server.db"
