@@ -25,6 +25,8 @@ from audit_server.server_configuration import (
     AuditServerConfiguration,
     get_configuration,
 )
+from audit_server.settings.router import router as settings_router
+from audit_server.settings.store import SettingsStore, install_settings_store
 
 _log = logging.getLogger(__name__)
 
@@ -51,6 +53,8 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with AsyncExitStack() as exit_stack:
         engine = exit_stack.enter_context(sql_engine_ctx(db_path))
         set_sql_engine(app.state, engine)
+
+        install_settings_store(app.state, SettingsStore(sql_engine=engine))
 
         if (
             configuration.key_server_uds is not None
@@ -84,3 +88,4 @@ app = FastAPI(
 )
 
 app.include_router(ingest_router)
+app.include_router(settings_router)
