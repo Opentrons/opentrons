@@ -60,7 +60,7 @@ export function getOAuth2Token(
   return request<OAuth2TokenResponse, URLSearchParams>(
     POST,
     '/auth/oauth2/token',
-    encodedBody,
-    config
+    config,
+    { body: encodedBody }
   )
 }

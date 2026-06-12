@@ -21,5 +21,7 @@ export function createRun(
   config: HostConfig,
   data: CreateRunData = {}
 ): ResponsePromise<Run> {
-  return request<Run, { data: CreateRunData }>(POST, '/runs', { data }, config)
+  return request<Run, { data: CreateRunData }>(POST, '/runs', config, {
+    body: { data },
+  })
 }

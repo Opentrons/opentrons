@@ -11,7 +11,7 @@ export function updateSelf(
   return request<AuthUserResponse, UpdateSelfRequest>(
     PATCH,
     '/auth/users/self',
-    body,
-    config
+    config,
+    { body }
   )
 }

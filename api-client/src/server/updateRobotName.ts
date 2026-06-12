@@ -11,7 +11,7 @@ export function updateRobotName(
   return request<UpdatedRobotName, { name: string }>(
     POST,
     '/server/name',
-    { name: newName },
-    config
+    config,
+    { body: { name: newName } }
   )
 }

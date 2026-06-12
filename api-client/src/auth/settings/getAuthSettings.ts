@@ -7,5 +7,5 @@ import type { AuthSettingsResponse } from './types'
 export function getAuthSettings(
   config: HostConfig
 ): ResponsePromise<AuthSettingsResponse> {
-  return request<AuthSettingsResponse>(GET, '/auth/settings', null, config)
+  return request<AuthSettingsResponse>(GET, '/auth/settings', config)
 }

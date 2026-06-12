@@ -11,7 +11,6 @@ export function getMaintenanceRun(
   return request<MaintenanceRun>(
     GET,
     `/maintenace_runs/${maintenanceRunId}`,
-    null,
     config
   )
 }

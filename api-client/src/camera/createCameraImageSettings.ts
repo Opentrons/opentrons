@@ -14,7 +14,7 @@ export function createCameraImageSettings(
   return request<CameraImageSettingsResponse, { data: CameraImageSettings }>(
     POST,
     `/camera/cameraSettings`,
-    { data },
-    config
+    config,
+    { body: { data } }
   )
 }

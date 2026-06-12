@@ -15,7 +15,6 @@ export function getCurrentAllSubsystemUpdates(
   return request<CurrentSubsystemUpdates>(
     GET,
     '/subsystems/updates/current',
-    null,
     config
   )
 }
