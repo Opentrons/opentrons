@@ -41,15 +41,15 @@ To remove the separator bowl:
 
 1. Turn off the power and disconnect the power cable.
 
-2. Disconnect the vacuum hose from the manifold base or another convenient fitting. This removes any residual vacuum and restores the system to atmospheric pressure.
+2. Disconnect the vacuum hose from the manifold base or another convenient fitting to remove any residual vacuum and restore the system to atmospheric pressure.
 
-3. Pull the locking tab down.
+3. Pull down on the separator bowl locking tab.
 
 4. Twist the bowl slightly to the right or left to disengage the retaining lugs.
 
 5. Pull down gently on the bowl to remove it.
 
-6. Discard any accumulated material and clean the bowl with a soft, dry cloth.
+6. Safely dispose of any accumulated material and clean the bowl with a soft, dry cloth.
 
 </div>
 
@@ -61,13 +61,11 @@ To reattach the separator bowl:
 
 1. With the bowl locking tab slightly offset to the left or right, insert it into the housing.
 
-2. Push up firmly on the bowl.
+2. Push up firmly on the bowl while pulling down on the locking tab.
 
-3. Pull the locking tab down.
+3. Twist the bowl to engage the retaining lugs and restore the locking tab to its original position.
 
-4. Twist the bowl to engage the retaining lugs and restore the locking tab to its original position.
-
-5. Release the locking tab when the bowl snaps into place.
+4. Release the locking tab when the bowl snaps into place.
 
 6. Reattach the power cable and turn the power back on.
 

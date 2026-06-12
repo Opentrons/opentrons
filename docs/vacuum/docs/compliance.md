@@ -18,7 +18,7 @@ Various labels on the vacuum module or in this manual warn you about sources of 
         <th>Description</th>
     </tr>
     <tr>
-        <td></td>
+        <td><font color="red"><strong>TBD</strong></font></td>
         <td></td>
     </tr>
     <tr>
@@ -35,15 +35,14 @@ The vacuum module has been tested and found to be in compliance with all applica
 
 | Rule ID | Title |
 |----|----|
-| | |
+| <span style="color: red;">**TBD**</span> | |
 | | |
 
 ### Electromagnetic compatibility
 
-
 | Rule ID | Title |
 |----|----|
-| | |
+| <span style="color: red;">**TBD**</span> | |
 | | |
 
 ### Hazardous substances
