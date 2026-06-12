@@ -35,7 +35,7 @@ jobs:
       CI: true
     steps:
       - name: Checkout target branch
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 1
@@ -55,47 +55,19 @@ jobs:
           LOCIZE_PROJECT_ID: ${{ secrets.LOCIZE_PROJECT_ID }}
         run: uv run scripts/locize_sync.py ${{ inputs.locize_action }}
 
-      - name: Open pull request
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BRANCH: automation/locize-${{ inputs.locize_action }}-${{ github.run_id }}
-          BASE: ${{ inputs.target_branch }}
-        run: |
-          set -euo pipefail
-
-          paths=(
-            app/src/assets/localization/en
-            app/src/assets/localization/zh
-            components/src/assets/localization/en
-            components/src/assets/localization/zh
-          )
-
-          if git diff --quiet HEAD -- "${paths[@]}" && \
-             [ -z "$(git ls-files --others --exclude-standard -- "${paths[@]}")" ]; then
-            echo "No localization changes to commit."
-            exit 0
-          fi
-
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-          git status
-          git checkout -b "$BRANCH"
-          git add "${paths[@]}"
-          git status
-          if git diff --staged --quiet; then
-            echo "No staged localization changes."
-            exit 0
-          fi
-
-          git commit -m "chore(locize): ${{ inputs.locize_action }} via workflow"
-          git push origin "$BRANCH"
-
-          pr_body="Automated Locize \`${{ inputs.locize_action }}\` run triggered via workflow dispatch.
-          - branch: \`$BASE\`
-          - actor: \`${{ github.actor }}\`"
-
-          gh pr create \
-            --base "$BASE" \
-            --head "$BRANCH" \
-            --title "chore(locize): ${{ inputs.locize_action }}" \
-            --body "$pr_body"
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: automation/locize-${{ inputs.locize_action }}-${{ github.run_id }}
+          base: ${{ inputs.target_branch }}
+          commit-message: "chore(locize): ${{ inputs.locize_action }} via workflow"
+          title: "chore(locize): ${{ inputs.locize_action }}"
+          body: |
+            Automated Locize `${{ inputs.locize_action }}` run triggered via workflow dispatch.
+            - branch: `${{ inputs.target_branch }}`
+            - actor: `${{ github.actor }}`
+          add-paths: |
+            app/src/assets/localization/en/
+            app/src/assets/localization/zh/
+            components/src/assets/localization/en/
+            components/src/assets/localization/zh/
