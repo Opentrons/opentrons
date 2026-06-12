@@ -18,7 +18,6 @@ from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings, get_settings
 from api.utils.api_docs_metadata import get_default_api_level
-from api.utils.api_docs_struct_curated import legacy_rst_path_to_md_path
 
 MessageType = Literal["create", "update"]
 
@@ -72,7 +71,7 @@ class AnthropicPredict:
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
         self.path_docs_pd: Path = ROOT_PATH / "api" / "storage" / "docs" / "pd"
-        self.path_api_docs: Path = API_DOCS_STRUCT_PATH if API_DOCS_STRUCT_PATH.exists() else API_DOCS_ROOT / "api_docs_struct_v2.25.md"
+        self.path_api_docs: Path = API_DOCS_STRUCT_PATH
         self._api_docs_content_root: Path = API_DOCS_CONTENT_ROOT
         self.system_prompt_pd = self.get_system_prompt_pd()
 
@@ -199,24 +198,12 @@ class AnthropicPredict:
         return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
 
     def _api_doc_resolve_path(self, filename: str) -> Optional[Path]:
-        """
-        Resolve a structure path to a synced markdown file under api/storage/api_docs/docs/v2.
-        Supports current relative markdown paths and legacy docs/v2/*.rst references.
-        """
+        """Resolve a structure path to a synced markdown file under api/storage/api_docs/docs/v2."""
         normalized = filename.strip().strip(",")
-        if not normalized:
+        if not normalized or not normalized.endswith(".md"):
             return None
 
-        if normalized.endswith(".md"):
-            return self._api_docs_content_root / normalized
-
-        if normalized.startswith("docs/v2/"):
-            mapped = legacy_rst_path_to_md_path(normalized)
-            if mapped is not None:
-                return self._api_docs_content_root / mapped
-            return None
-
-        return None
+        return self._api_docs_content_root / normalized
 
     def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
         """

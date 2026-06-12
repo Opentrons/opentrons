@@ -2,7 +2,7 @@
 
 The Anthropic protocol-generation flow uses a helper model to pick relevant Python API docs before reading file contents. That routing depends on rich `<about>` descriptions in a structure file, not on raw markdown frontmatter alone.
 
-This document explains how synced mkdocs markdown, legacy RST-era curation, and new pages fit together.
+This document explains how synced mkdocs markdown and curated descriptions fit together.
 
 ## Runtime flow
 
@@ -25,16 +25,15 @@ Prompt text for the helper model lives in `api/domain/config_anthropic.py` (`PRO
 
 ## Files and responsibilities
 
-| File                                              | Committed?      | Role                                                                             |
-| ------------------------------------------------- | --------------- | -------------------------------------------------------------------------------- |
-| `api/storage/api_docs/docs/v2/`                   | No (gitignored) | Synced Python API markdown from pinned `DOCS_TAG`                                |
-| `api/storage/api_docs/.docs-tag`                  | No              | Records which mkdocs tag was synced                                              |
-| `api/storage/api_docs/.api-level`                 | No              | Default `apiLevel` from synced `mkdocs.yml`                                      |
-| `api/storage/api_docs/api_docs_struct.md`         | Yes             | **Generated** structure fed to the helper model at runtime                       |
-| `api/storage/api_docs/api_docs_struct_about.json` | Yes             | **Source of truth** for curated `<about>` text keyed by markdown path            |
-| `api/storage/api_docs/api_docs_struct_v2.25.md`   | Yes             | **Legacy archive** of RST-path curation (historical reference + bootstrap input) |
+| File                                            | Committed?      | Role                                                                  |
+| ----------------------------------------------- | --------------- | --------------------------------------------------------------------- |
+| `api/storage/api_docs/docs/v2/`                 | No (gitignored) | Synced Python API markdown from pinned `DOCS_TAG`                     |
+| `api/storage/api_docs/.docs-tag`                | No              | Records which mkdocs tag was synced                                   |
+| `api/storage/api_docs/.api-level`               | No              | Default `apiLevel` from synced `mkdocs.yml`                           |
+| `api/storage/api_docs/api_docs_struct.md`       | Yes             | **Generated** structure fed to the helper model at runtime            |
+| `api/storage/api_docs/api_docs_struct_about.md` | Yes             | **Source of truth** for curated `<about>` text keyed by markdown path |
 
-Do **not** hand-edit `api_docs_struct.md`. It is regenerated on every `make sync-api-docs`. Edit curation in `api_docs_struct_about.json` or the override dicts in `api/utils/api_docs_struct_curated.py`.
+Do **not** hand-edit `api_docs_struct.md`. It is regenerated on every `make sync-api-docs`. Edit curation in `api_docs_struct_about.md`.
 
 ## Sync pipeline
 
@@ -45,107 +44,24 @@ Do **not** hand-edit `api_docs_struct.md`. It is regenerated on every `make sync
 3. Read `extra.apiLevel` from `docs/python-api/mkdocs.yml`.
 4. Regenerate `api_docs_struct.md`:
    - List every `*.md` under the synced tree.
-   - For each file, look up `<about>` in `api_docs_struct_about.json`.
-   - If no curated entry exists, fall back to frontmatter `description` or the first body paragraph (auto-summary).
+   - For each file, look up `<about>` in `api_docs_struct_about.md`.
+   - Fail if any synced doc is missing a curated entry.
 
 Implementation: `api/utils/sync_api_docs.py` (`generate_api_docs_struct`) and `api/utils/api_docs_struct_curated.py` (`load_curated_about`).
 
-## Legacy curation migration
+## Curated about file format
 
-Before mkdocs sync, curation lived in `api_docs_struct_v2.25.md` with paths like `docs/v2/new_modules.rst`. The new docs use markdown paths like `modules/index.md`.
-
-### Step 1: Parse legacy struct
-
-`parse_legacy_struct_entries()` reads `api_docs_struct_v2.25.md` and extracts each:
+Edit `api/storage/api_docs/api_docs_struct_about.md` directly. Each entry uses markdown paths (not legacy RST paths):
 
 ```markdown
-### N. docs/v2/some_file.rst
+### modules/index.md
 
 <about>
-...curated LLM description...
+This file is the main index page for the Hardware Modules section...
 </about>
 ```
 
-### Step 2: Map legacy RST path to markdown path
-
-Mapping is implemented in `legacy_rst_path_to_md_path()` in `api/utils/api_docs_struct_curated.py`. Three cases:
-
-**A. Explicit renames** (`LEGACY_RST_TO_MD`)
-
-Used when mkdocs reorganized or renamed files. Examples:
-
-| Legacy RST path                              | Synced markdown path                      |
-| -------------------------------------------- | ----------------------------------------- |
-| `docs/v2/new_modules.rst`                    | `modules/index.md`                        |
-| `docs/v2/new_atomic_commands.rst`            | `building-block-commands/index.md`        |
-| `docs/v2/new_protocol_api.rst`               | `reference/protocols.md`                  |
-| `docs/v2/basic_commands/pipette_tips.rst`    | `building-block-commands/pipette-tips.md` |
-| `docs/v2/advanced_control/motor_control.rst` | `advanced-control/robot-motors.md`        |
-| `docs/v2/modules/stacker.rst`                | `modules/flex-stacker.md`                 |
-| `docs/v2/parameters/use_case_dry_run.rst`    | `runtime-parameters/use-case-dry-run.md`  |
-
-The full map is in `LEGACY_RST_TO_MD` in `api/utils/api_docs_struct_curated.py`. The same map is used at runtime when resolving legacy RST paths returned by older prompts or tests (`AnthropicPredict._api_doc_resolve_path`).
-
-**B. Mechanical conversion** (default for unlisted RST paths)
-
-For paths under `docs/v2/` not in the explicit map:
-
-- Strip the `docs/v2/` prefix.
-- Replace `_` with `-` in the filename stem.
-- Change `.rst` to `.md`.
-- Example: `docs/v2/deck_slots.rst` → `deck-slots.md`
-- Example: `docs/v2/modules/heater_shaker.rst` → `modules/heater-shaker.md`
-
-**C. Special skips and merges**
-
-| Legacy path pattern              | Result                                                                                                        |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `docs/v2/conf.py`                | Skipped (not documentation)                                                                                   |
-| `docs/v2/example_protocols/*.py` | Mapped to `examples.md` (legacy struct had separate entries; curation uses the `new_examples.rst` about text) |
-| Duplicate targets                | First legacy entry wins                                                                                       |
-
-### Step 3: Apply post-migration overrides
-
-After legacy migration, two override dicts in `api_docs_struct_curated.py` patch gaps:
-
-- **`REFERENCE_ABOUT_OVERRIDES`**: The old monolithic `new_protocol_api.rst` entry became many `reference/*.md` pages. Each reference page gets its own curated `<about>`.
-- **`NEW_DOCS_ABOUT_OVERRIDES`**: Pages that did not exist in v2.25 (for example `modules/concurrent.md`, `liquid-class-tables/*.md`).
-
-### Step 4: Write committed JSON
-
-```shell
-cd opentrons-ai-server
-uv run --python 3.12 python -m api.utils.api_docs_struct_curated
-```
-
-Writes `api_docs_struct_about.json`. Commit this file when curation changes.
-
-## Setting curation for new or changed docs
-
-When mkdocs adds or renames pages after a tag bump:
-
-### 1. Doc existed in legacy struct under a new path
-
-Add or update an entry in `LEGACY_RST_TO_MD`, then regenerate JSON:
-
-```shell
-uv run --python 3.12 python -m api.utils.api_docs_struct_curated
-make sync-api-docs
-```
-
-### 2. Brand-new page (no legacy RST equivalent)
-
-Preferred: edit `api_docs_struct_about.json` directly:
-
-```json
-{
-  "some/new-page.md": "Curated description for the helper model: topics covered, robot types, related concepts."
-}
-```
-
-Or add to `NEW_DOCS_ABOUT_OVERRIDES` in `api_docs_struct_curated.py` and regenerate JSON.
-
-Guidelines for `<about>` text (match legacy v2.25 style):
+Guidelines for `<about>` text:
 
 - State whether the file is documentation vs an example protocol.
 - Mention OT-2, Flex, or both when relevant.
@@ -153,20 +69,27 @@ Guidelines for `<about>` text (match legacy v2.25 style):
 - Note API version constraints when important.
 - Write for routing: help the helper model pick this file for the right user questions.
 
-### 3. No curated entry yet
+## Setting curation for new or changed docs
 
-`make sync-api-docs` still works. The struct file uses auto-summary from frontmatter or the first paragraph. Auto-summary is weaker for routing; add curation before relying on new pages in production.
+When mkdocs adds or renames pages after a tag bump, add or update the matching entry in `api_docs_struct_about.md`, then run:
+
+```shell
+cd opentrons-ai-server
+make sync-api-docs
+make check-api-docs-curation
+```
+
+Commit `api_docs_struct_about.md` when `<about>` text changes.
 
 ## How you get alerted
 
 There is no silent success when curation drifts. Three layers catch gaps:
 
-### 1. Warnings during sync (local feedback)
+### 1. Failure during sync (local feedback)
 
-Every `make sync-api-docs` (including `make setup`) compares synced markdown paths to `api_docs_struct_about.json`. If anything is missing or stale, sync **still completes** but prints a warning to stderr listing:
+Every `make sync-api-docs` requires a curated entry for every synced markdown file. Sync fails immediately if anything is missing.
 
-- **Missing curation:** synced `.md` files with no JSON entry (common after bumping `DOCS_TAG` when mkdocs added pages)
-- **Orphan curation:** JSON entries with no matching synced file (common after renames/removals)
+If coverage gaps remain after a partial edit, sync also prints a warning listing orphan curated entries.
 
 ### 2. Hard check before merge (`make check-api-docs-curation`)
 
@@ -176,7 +99,7 @@ Exits non-zero on any gap:
 make check-api-docs-curation
 ```
 
-This runs in CI after `make setup` and is part of `make prep`. Fix gaps by editing `api_docs_struct_about.json` (or override dicts in `api_docs_struct_curated.py`), then re-run sync.
+This runs in CI after `make setup` and is part of `make prep`.
 
 Implementation: `python -m api.utils.api_docs_struct_curated --check`
 
@@ -189,10 +112,8 @@ Implementation: `python -m api.utils.api_docs_struct_curated --check`
 When mkdocs publishes a new tag and you update `DOCS_TAG` in the Makefile:
 
 1. `make setup` syncs the new doc tree.
-2. Sync warns about any new `.md` files lacking curation.
-3. CI fails on `make check-api-docs-curation` until you add `<about>` entries and commit `api_docs_struct_about.json`.
-
-Renames may also require new `LEGACY_RST_TO_MD` entries if the helper model or tests still reference old RST paths.
+2. Sync fails until you add `<about>` entries for any new pages.
+3. CI fails on `make check-api-docs-curation` until you commit updated `api_docs_struct_about.md`.
 
 ## Verification checklist
 
@@ -205,7 +126,7 @@ make sync-api-docs
 Confirm:
 
 1. Every synced `*.md` appears in `api_docs_struct.md` with a non-empty `<about>`.
-2. Key pages (for example `modules/index.md`, `building-block-commands/liquids.md`) still have long curated descriptions, not one-line frontmatter.
+2. Key pages (for example `modules/index.md`, `building-block-commands/liquids.md`) still have long curated descriptions.
 3. `grep -c '<about>' api/storage/api_docs/api_docs_struct.md` matches the number of markdown files synced.
 
 Run unit tests and the coverage check:
@@ -220,7 +141,7 @@ make check-api-docs-curation
 | Module                                 | Purpose                                                   |
 | -------------------------------------- | --------------------------------------------------------- |
 | `api/utils/sync_api_docs.py`           | Sync docs from git tag; generate `api_docs_struct.md`     |
-| `api/utils/api_docs_struct_curated.py` | Legacy mapping, overrides, JSON load/save                 |
+| `api/utils/api_docs_struct_curated.py` | Load curated about text; coverage checks                  |
 | `api/utils/api_docs_metadata.py`       | Read default `apiLevel` from sync manifests               |
 | `api/domain/anthropic_predict.py`      | `get_relevant_api_docs`, path resolution, content loading |
 | `api/domain/config_anthropic.py`       | `PROMPT_FIND_RELEVANT_DOCS`                               |

@@ -72,13 +72,12 @@ make list-api-docs-tags                         # list available mkdocs tags
 | ------------------------------------------------- | --------------------------------------------------------------- |
 | `api/storage/api_docs/docs/v2/`                   | Synced markdown (gitignored)                                    |
 | `api/storage/api_docs/api_docs_struct.md`         | Generated index fed to the doc-finder LLM (do not edit by hand) |
-| `api/storage/api_docs/api_docs_struct_about.json` | Committed curated `<about>` descriptions keyed by markdown path |
-| `api/storage/api_docs/api_docs_struct_v2.25.md`   | Legacy RST-era curation archive (bootstrap input)               |
+| `api/storage/api_docs/api_docs_struct_about.md`   | Committed curated `<about>` descriptions keyed by markdown path |
 | `api/storage/api_docs/.api-level`                 | Default `apiLevel` from synced `mkdocs.yml` (gitignored)        |
 
-**Curation workflow:** Legacy descriptions from `api_docs_struct_v2.25.md` are mapped to new markdown paths (explicit renames + mechanical RST→MD rules), merged with overrides for new `reference/*` and mkdocs-only pages, and stored in `api_docs_struct_about.json`. `make sync-api-docs` regenerates `api_docs_struct.md` using that JSON.
+**Curation workflow:** Edit `api_docs_struct_about.md` with one `<about>` block per synced markdown path. `make sync-api-docs` regenerates `api_docs_struct.md` from that file.
 
-See **[docs/API_DOCS_CURATION.md](docs/API_DOCS_CURATION.md)** for the full mapping rules and how to add curation for new pages.
+See **[docs/API_DOCS_CURATION.md](docs/API_DOCS_CURATION.md)** for the file format and how to add curation for new pages.
 
 `make setup`, `make local-run`, `make build`, and deploy targets run the sync step automatically.
 

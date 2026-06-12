@@ -7,11 +7,13 @@ import pytest
 from api.domain.anthropic_predict import AnthropicPredict
 from api.utils.api_docs_metadata import get_default_api_level
 from api.utils.api_docs_struct_curated import (
+    CURATED_ABOUT_PATH,
     DOCS_V2_DIR,
-    LEGACY_RST_TO_MD,
     CurationCoverageError,
     assert_curation_coverage,
     audit_curation_coverage,
+    load_curated_about,
+    parse_curated_about_file,
 )
 from api.utils.sync_api_docs import (
     DocSummary,
@@ -73,7 +75,7 @@ def test_generate_api_docs_struct_writes_paths(tmp_path: Path) -> None:
     (docs_root / "index.md").write_text("# Index\n\nWelcome to the API.\n", encoding="utf-8")
     output_path = tmp_path / "api_docs_struct.md"
 
-    generate_api_docs_struct(docs_root, output_path, "mkdocs-2026-06-02", "2.28")
+    generate_api_docs_struct(docs_root, output_path, "mkdocs-2026-06-02", "2.28", curated_about={"index.md": "Welcome to the API."})
 
     content = output_path.read_text(encoding="utf-8")
     assert "Documentation tag: mkdocs-2026-06-02" in content
@@ -166,24 +168,51 @@ def test_assert_curation_coverage_raises_on_gaps(tmp_path: Path) -> None:
 
 @pytest.mark.unit
 def test_synced_api_docs_have_full_curation_coverage() -> None:
+    """Every synced markdown doc must have a curated entry in api_docs_struct_about.md."""
     if not DOCS_V2_DIR.is_dir():
         pytest.skip("Synced API docs not present; run make sync-api-docs first.")
 
-    report = assert_curation_coverage(DOCS_V2_DIR)
+    assert CURATED_ABOUT_PATH.is_file(), f"Missing curated about file: {CURATED_ABOUT_PATH}"
+
+    curated = load_curated_about()
+    assert curated, f"No curated entries parsed from {CURATED_ABOUT_PATH.name}"
+    assert all(about.strip() for about in curated.values()), "Curated <about> entries must not be empty"
+
+    report = assert_curation_coverage(DOCS_V2_DIR, curated)
 
     assert report.synced_paths
     assert report.synced_paths == report.curated_paths
 
 
 @pytest.mark.unit
-def test_api_doc_resolve_path_supports_markdown_and_legacy_rst() -> None:
+def test_parse_curated_about_file() -> None:
+    content = """### modules/index.md
+
+<about>
+Curated LLM description for hardware modules index.
+</about>
+
+### tutorial.md
+
+<about>
+Tutorial overview.
+</about>
+"""
+    curated = parse_curated_about_file(content)
+
+    assert curated == {
+        "modules/index.md": "Curated LLM description for hardware modules index.",
+        "tutorial.md": "Tutorial overview.",
+    }
+
+
+@pytest.mark.unit
+def test_api_doc_resolve_path_supports_markdown_paths() -> None:
     with patch("api.domain.anthropic_predict.get_default_api_level", return_value="2.28"):
         predict = AnthropicPredict(settings=MagicMock())
 
     markdown_path = predict._api_doc_resolve_path("modules/index.md")
-    legacy_path = predict._api_doc_resolve_path("docs/v2/new_modules.rst")
 
     assert markdown_path is not None
     assert markdown_path.name == "index.md"
-    assert legacy_path == markdown_path
-    assert "docs/v2/new_modules.rst" in LEGACY_RST_TO_MD
+    assert predict._api_doc_resolve_path("docs/v2/new_modules.rst") is None

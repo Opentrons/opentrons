@@ -274,10 +274,13 @@ def generate_api_docs_struct(
 ) -> None:
     """Generate the LLM documentation structure file from synced markdown docs.
 
-    Curated <about> text comes from api_docs_struct_about.json (see docs/API_DOCS_CURATION.md).
+    Curated <about> text comes from api_docs_struct_about.md (see docs/API_DOCS_CURATION.md).
     """
     markdown_files = sorted(path for path in docs_root.rglob("*.md") if path.is_file())
     curated = curated_about if curated_about is not None else load_curated_about()
+    if not curated:
+        msg = "No curated about entries found. Add api/storage/api_docs/api_docs_struct_about.md."
+        raise RuntimeError(msg)
     generated_at = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %Z")
 
     lines = [
@@ -308,7 +311,10 @@ def generate_api_docs_struct(
 
     for index, path in enumerate(markdown_files, start=1):
         summary = summarize_markdown_file(path, docs_root)
-        about = curated.get(summary.relative_path, summary.about)
+        about = curated.get(summary.relative_path)
+        if about is None:
+            msg = f"Missing curated <about> entry for {summary.relative_path!r} in api_docs_struct_about.md."
+            raise RuntimeError(msg)
         lines.extend(
             [
                 f"### {index}. {summary.relative_path}",
@@ -330,7 +336,7 @@ def generate_api_docs_struct(
         print(
             "warning: API docs curation coverage gaps detected:\n"
             f"{format_curation_coverage_issues(coverage)}\n"
-            "Run make check-api-docs-curation after adding entries to api_docs_struct_about.json.",
+            "Run make check-api-docs-curation after adding entries to api_docs_struct_about.md.",
             file=sys.stderr,
         )
 
