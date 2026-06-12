@@ -12,11 +12,15 @@ import {
   getPipetteEntities,
 } from '/protocol-designer/step-forms/selectors'
 import { getAllWellContentsForActiveItem } from '/protocol-designer/top-selectors/well-contents'
-import { getEntireWellSelection } from '../../../PipetteFields/NozzleAndWellSelectionModal/utils'
 
 import { selectors as labwareIngredSelectors } from '../../../../../../../labware-ingred/selectors'
+import { getEntireWellSelection } from '../../../PipetteFields/NozzleAndWellSelectionModal/utils'
 import { getShouldUpdateForLiquidClass } from '../../../utils'
 
+import type {
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { FormData } from '/protocol-designer/form-types'
 
 export interface LiquidClassOption {
@@ -47,24 +51,26 @@ export function useAssignLiquidClass(
   )[formData[labwareField]]
   const pipetteEntities = useSelector(getPipetteEntities)
   const pipetteChannels = pipetteEntities[formData.pipette]?.spec.channels ?? 1
-  const nozzlesConfigured = formData.nozzles
-  const primaryNozzle = formData.primaryNozzle
+  const nozzlesConfigured = formData.nozzles as NozzleConfigurationStyle
+  const primaryNozzle =
+    formData.primaryNozzle as PrimaryNozzleConfigurationStyle
   const labwareDef = labwareEntities[formData[labwareField]]?.def
-  const allWellsAdjustedForPipette = labwareDef != null
-    ? [
-        ...new Set(
-          (formData[wellsField] as string[]).flatMap(well =>
-            getEntireWellSelection(
-              well,
-              labwareDef.ordering,
-              nozzlesConfigured,
-              primaryNozzle,
-              pipetteChannels
+  const allWellsAdjustedForPipette =
+    labwareDef != null
+      ? [
+          ...new Set(
+            (formData[wellsField] as string[]).flatMap(well =>
+              getEntireWellSelection(
+                well,
+                labwareDef.ordering,
+                nozzlesConfigured,
+                primaryNozzle,
+                pipetteChannels
+              )
             )
-          )
-        ),
-      ]
-    : (formData[wellsField] as string[])
+          ),
+        ]
+      : (formData[wellsField] as string[])
 
   const liquidClassesInSourceWellsSet = allWellsAdjustedForPipette.reduce<
     Set<string>
