@@ -59,7 +59,7 @@ Click **Edit protocol** to add labware, liquids, and additional hardware to your
 
 You can fully customize the Flex deck in Protocol Designer by adding compatible modules, staging areas, the waste chute, and custom labware. Click any open slot to add or edit hardware or labware. Click, drag, and drop to move labware and tips racks on the deck. 
 
-Click **Liquids** in the upper right to add liquids in your protocol. You can also define your liquids as Opentrons-verified [liquid class](../../../python-api/liquid-classes/liquid-classes.md) to apply optimized pipetting settings. Then, click on any labware and choose **Edit labware** to assign liquid locations and volumes on the protocol starting deck. 
+Click **Liquids** in the upper right to add liquids in your protocol. You can also define your liquids as Opentrons-verified [liquid class](../../python-api/liquid-classes/index.md) to apply optimized pipetting settings. Then, click on any labware and choose **Edit labware** to assign liquid locations and volumes on the protocol starting deck. 
 
 The protocol timeline on the left side of the screen shows the steps the Flex will perform. Click **Add step** to add transfer, move, mix, pause, or module-specific steps in your protocol.
 

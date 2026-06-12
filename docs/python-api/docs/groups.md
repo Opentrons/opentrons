@@ -54,10 +54,10 @@ step_group_1.end_group()
 ```
 *New in version 2.29*
 
-Step groups can organize a protocol with hundreds of commands into a handful of easily readable groups. This makes a long Python protocol easier to understand, whether in your preferred code editor or in [protocol visualization](../../flex/docs/opentrons-app/protocol-viz.md).
+Step groups can organize a protocol with hundreds of commands into a handful of easily readable groups. This makes a long Python protocol easier to understand, whether in your preferred code editor or in [protocol visualization](../flex/opentrons-app/protocol-viz.md).
 
 <figure class="screenshot" markdown>
-![Image showing the protocol visualization screen for a protocol with step groups.](../img/step-groups-in-viz.png)
+![Image showing the protocol visualization screen for a protocol with step groups.](img/step-groups-in-viz.png)
 <figcaption>Step groups, names, and descriptions are shown in protocol visualization in the Opentrons App.</figcaption>
 </figure>
 
