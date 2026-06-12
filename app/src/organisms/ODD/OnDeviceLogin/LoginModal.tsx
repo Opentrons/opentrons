@@ -10,7 +10,6 @@ import {
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
 
-import { clearStaleAuthBeforeLogin } from './clearStaleAuthBeforeLogin'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
@@ -138,12 +137,10 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
  * Open the login modal and await the result.
  */
 export function showLoginModal(
-  queryClient: QueryClient,
-  hostConfig: HostConfig | null
+  _queryClient: QueryClient,
+  _hostConfig: HostConfig | null
 ): Promise<LoginModalResult | null> {
-  return clearStaleAuthBeforeLogin(queryClient, hostConfig).then(
-    () => NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
-  )
+  return NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
 }
 
 /**

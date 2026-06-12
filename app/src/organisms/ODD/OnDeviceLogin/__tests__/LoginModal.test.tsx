@@ -19,10 +19,6 @@ import type {
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
 
-vi.mock('../clearStaleAuthBeforeLogin', () => ({
-  clearStaleAuthBeforeLogin: () => Promise.resolve(),
-}))
-
 vi.mock('/app/redux/discovery', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
