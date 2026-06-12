@@ -13,7 +13,6 @@ from alembic import op
 
 import server_utils.sql_utils
 
-
 # revision identifiers, used by Alembic.
 revision: str = "b21fa90308b1"
 down_revision: Union[str, Sequence[str], None] = "d35b498590ff"
