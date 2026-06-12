@@ -25,50 +25,22 @@ export const PATCH = 'PATCH'
 export const DELETE = 'DELETE'
 export const PUT = 'PUT'
 
-export interface RequestConfig<
-  RequestBodyT extends AxiosRequestConfig['data'],
-> {
-  /**
-   * The request body.
-   */
-  body?: RequestBodyT
-
-  /**
-   * Query parameters, e.g. {foo: "bar"} for ?foo=bar.
-   */
-  queryParams?: Record<string, string | number | boolean>
-
-  /**
-   * Request-specific headers.
-   *
-   * Common headers like Authorization, Opentrons-Version,
-   * and Opentrons-User-Notes don't need to be set here;
-   * they'll be added automatically.
-   */
-  headers?: Record<string, string>
-
-  /**
-   * The user-entered reason for this interaction with the robot.
-   * Generally required by the server for any mutation when
-   * Compliance Ready Software is enabled.
-   */
-  userNotes?: string
-
-  /**
-   * What kind of response body to expect and how Axios should parse it.
-   */
-  responseType?: AxiosRequestConfig['responseType']
+export type BrandedAxiosConfig = AxiosRequestConfig & {
+  readonly __axiosConfigBrand: unique symbol
+}
+export function createAxiosConfig(
+  config: AxiosRequestConfig
+): BrandedAxiosConfig {
+  return config as BrandedAxiosConfig
 }
 
-export function request<
-  ResponseBodyT,
-  RequestBodyT extends AxiosRequestConfig['data'] = never,
->(
+export function request<ResData, ReqData = null>(
   method: Method,
   url: string,
+  data: ReqData,
   hostConfig: HostConfig,
-  requestConfig?: RequestConfig<RequestBodyT>
-): ResponsePromise<ResponseBodyT> {
+  axiosConfig?: BrandedAxiosConfig
+): ResponsePromise<ResData> {
   const {
     hostname,
     port,
@@ -77,32 +49,20 @@ export function request<
     secure,
   } = hostConfig
 
-  const params = requestConfig?.queryParams ?? {}
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
-  const userNotesHeader =
-    requestConfig?.userNotes != null
-      ? { 'Opentrons-User-Notes': requestConfig.userNotes }
-      : {}
-  const extraHeaders = requestConfig?.headers ?? {}
-  const headers = {
-    ...DEFAULT_HEADERS,
-    ...tokenHeader,
-    ...userNotesHeader,
-    ...extraHeaders,
-  }
+  const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
 
   const protocol = (secure ?? false) ? 'https' : 'http'
   const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
   const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
 
-  return requestor<ResponseBodyT>({
+  return requestor<ResData>({
+    headers,
     method,
     baseURL,
     url,
-    params,
-    data: requestConfig?.body,
-    headers,
-    responseType: requestConfig?.responseType,
+    data,
+    ...axiosConfig,
   })
 }
