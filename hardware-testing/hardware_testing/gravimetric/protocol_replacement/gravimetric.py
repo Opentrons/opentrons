@@ -32,6 +32,22 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
+from hardware_testing.data import create_run_id, get_git_description
+from hardware_testing.data.ui import (  # noqa: F401
+    set_output_file,
+    print_info,
+    print_title,
+    print_header,
+    print_warning,
+    print_error,
+)
+
+from hardware_testing.drivers import asair_sensor as AsairDriver
+from hardware_testing.drivers import ImpactProtectionV2
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    clear_pipette_ul_per_mm,
+)
+
 # ------ TODO remove and move necessary libraries into a standard release library. ----
 import importlib
 import os
@@ -83,15 +99,6 @@ if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
 from hardware_testing.scripts.data_center_client import (  # noqa: E402
     upload_data_to_google_drive,
 )
-from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
-from hardware_testing.data.ui import (  # noqa: F401, E402
-    set_output_file,
-    print_info,
-    print_title,
-    print_header,
-    print_warning,
-    print_error,
-)
 from hardware_testing.gravimetric.measurement import (  # noqa: E402
     create_measurement_tag,
     record_measurement_data,
@@ -110,13 +117,8 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.drivers import ImpactProtectionV2  # noqa: E402
 
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
-from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
-    clear_pipette_ul_per_mm,
-)  # noqa: E402
 
 
 metadata = {"protocolName": "Gravimetric QC V3"}
