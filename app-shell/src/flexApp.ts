@@ -4,7 +4,7 @@ import { createLogger } from './log'
 
 const PROTOCOL_NAME = 'com-opentrons-flex-app'
 
-export const FLEX_APP_DOWNLOAD_PAGE = 'https://opentrons.com/ot-app'
+export const FLEX_APP_DOWNLOAD_PAGE = 'https://opentrons.com/app'
 
 const log = createLogger('flex-app')
 

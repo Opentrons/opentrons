@@ -206,8 +206,8 @@ export const supportLinkProps: SupportLinks = {
   },
   app: {
     name: 'Install the App',
-    url: 'http://opentrons.com/ot-app',
-    gtm: { action: 'click', category: 'l-header', label: 'ot-app' },
+    url: 'http://opentrons.com/app',
+    gtm: { action: 'click', category: 'l-header', label: 'app' },
   },
   warranty: {
     name: 'Warranty & Returns',
