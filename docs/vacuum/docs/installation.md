@@ -17,7 +17,7 @@ Follow these instructions to install the Vacuum Module.
 2. Remove the waste bin (if installed) and any modules, labware, or deck adapters and/or plates from slots A3—A4.
 
     <figure markdown>
-    ![Deck map with sots A3 and A4 highlighted](./images/deck-map.png)
+    ![Deck map with sots A3 and A4 highlighted](images/deck-map.png)
     <figcaption>Vacuum Module deck location</figcaption>
     </figure>
 
@@ -26,14 +26,14 @@ Follow these instructions to install the Vacuum Module.
 4. Seat the manifold base plate in slot A3. You can put a collar in slot A4, which is its "home" or default location.
 
     <figure markdown>
-    ![Deck adapter showing locations for manifold base and collar](./images/image-placeholder.png)
+    ![Deck adapter showing locations for manifold base and collar](images/image-placeholder.png)
     <figcaption>IMAGE TBD</figcaption>
     </figure>
 
 5. Secure one end of the 6 mm (&frac14;") vacuum tube to the manifold base plate, and route the remaining tubing through the opening in the deck plate adapter, under the deck, and to the waste collection area. You can knock out the small side plates on Flex to continue routing the hose.
 
     <figure markdown>
-    ![Placeholder for image, FPO](./images/image-placeholder.png)
+    ![Placeholder for image, FPO](images/image-placeholder.png)
     <figcaption>IMAGE TBD</figcaption>
     </figure>
 

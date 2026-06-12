@@ -29,7 +29,7 @@ The Control Box houses an air-liquid separator. It traps liquid droplets in a cl
 
 
 <figure markdown>
-![Air-liquid separator showing detachment tab and twist directions in a magnified section](./images/separator-magnified2.png){ width="50%" }
+![Air-liquid separator showing detachment tab and twist directions in a magnified section](images/separator-magnified2.png){ width="50%" }
 <figcaption>Separator filter bowl. Pull tab down and twist bowl to remove.</figcaption>
 </figure>
 

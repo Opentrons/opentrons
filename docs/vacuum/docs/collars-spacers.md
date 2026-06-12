@@ -15,8 +15,8 @@ The Vacuum Module ships with two collar sizes:
 * **Tall Collar (72 mm):** Accommodates deep-well filter plates (typically up to 2 mL).
 
 <figure class="side-by-side" markdown>
-![Short collar](./images/collar-short.png)
-![Tall collar](./images/collar-tall.png)
+![Short collar](images/collar-short.png)
+![Tall collar](images/collar-tall.png)
 <figcaption>Short collar (42 mm) and tall collar (72 mm)</figcaption>
 </figure>
 
@@ -32,8 +32,8 @@ The Vacuum Module ships with two spacer sizes to match varying labware profiles:
 * **Tall Spacer:** 34 mm
 
 <figure class="side-by-side" markdown>
-![Short spacer](./images/spacer-short3.svg)
-![Tall spacer](./images/spacer-tall3.svg)
+![Short spacer](images/spacer-short3.svg)
+![Tall spacer](images/spacer-tall3.svg)
 <figcaption>Short spacer (27 mm) and tall spacer (34 mm)</figcaption>
 </figure>
 
@@ -49,7 +49,7 @@ This configuration is used when a protocol requires capturing the filtered liqui
 <font color="red"><strong>EXPLODED DIAGRAM PLACEHOLDER</strong></font>
 
 <figure markdown>
-![placeholder for diagram](./images/image-placeholder.png)
+![placeholder for diagram](images/image-placeholder.png)
 <figcaption>Stack (top to bottom): source well plate, collar and grid, collection plate, spacer, manifold base</figcaption>
 </figure>
 
@@ -63,6 +63,6 @@ This configuration is used when the liquid being pulled through the filter plate
 <font color="red"><strong>EXPLODED DIAGRAM PLACEHOLDER</strong></font>
 
 <figure markdown>
-![placeholder for diagram](./images/image-placeholder.png)
+![placeholder for diagram](images/image-placeholder.png)
 <figcaption>Stack (top to bottom): source well plate, collar and grid, manifold base</figcaption>
 </figure>
