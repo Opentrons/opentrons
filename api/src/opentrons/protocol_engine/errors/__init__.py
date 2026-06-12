@@ -79,6 +79,9 @@ from .exceptions import (
     OffsetLocationInvalidError,
     OperationLocationNotInWellError,
     PauseNotAllowedError,
+    PeripheralNotAttachedError,
+    PeripheralNotConnectedError,
+    PeripheralNotLoadedError,
     PickUpTipTipNotAttachedError,
     PipetteMovementRestrictedByHeaterShakerError,
     PipetteNotAttachedError,
@@ -100,6 +103,7 @@ from .exceptions import (
     VolumeModeDoesNotExistError,
     WellDoesNotExistError,
     WrongModuleTypeError,
+    WrongPeripheralTypeError,
 )
 
 __all__ = [
@@ -152,6 +156,10 @@ __all__ = [
     "WrongModuleTypeError",
     "ThermocyclerNotOpenError",
     "RobotDoorOpenError",
+    "PeripheralNotConnectedError",
+    "PeripheralNotLoadedError",
+    "PeripheralNotAttachedError",
+    "WrongPeripheralTypeError",
     "PipetteMovementRestrictedByHeaterShakerError",
     "HeaterShakerLabwareLatchNotOpenError",
     "HeaterShakerLabwareLatchStatusUnknown",

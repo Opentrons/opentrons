@@ -401,7 +401,8 @@ async def _main(arguments: argparse.Namespace) -> None:
 
     report = _build_csv_report()
     dut = helpers_ot3.DeviceUnderTest.OTHER
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator, dut=dut)
 
     # NOTE: We submit an automatic "PASS" result for these parameter lists.
     # They do not test any logic but only add the list of parameters used to the CSV
