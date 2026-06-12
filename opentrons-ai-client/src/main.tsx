@@ -9,7 +9,6 @@ import { App } from './App'
 import { i18n } from './i18n'
 import {
   AUTH0_DOMAIN,
-  LOCAL_AUTH0_AUDIENCE,
   LOCAL_AUTH0_CLIENT_ID,
   LOCAL_AUTH0_DOMAIN,
   PROD_AUTH0_CLIENT_ID,
@@ -49,11 +48,6 @@ if (rootElement != null) {
         domain={domain}
         authorizationParams={{
           redirect_uri: window.location.origin,
-          // Local dev only: Auth0 requires explicit consent for sandbox-ai-api.
-          // _NODE_ENV_ is 'development' for `make dev` only; staging/production builds skip this.
-          ...(_NODE_ENV_ === 'development'
-            ? { prompt: 'consent', audience: LOCAL_AUTH0_AUDIENCE }
-            : {}),
         }}
       >
         <I18nextProvider i18n={i18n}>

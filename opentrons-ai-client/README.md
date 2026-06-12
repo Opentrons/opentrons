@@ -27,11 +27,20 @@ make -C opentrons-ai-client dev
 
 ## Auth0
 
-[Auth0 requires consent](https://auth0.com/docs/get-started/applications/confidential-and-public-applications/user-consent-and-third-party-applications#skip-consent-for-first-party-applications) for the local API audience (`sandbox-ai-api`).
+[Auth0 requires consent](https://auth0.com/docs/get-started/applications/confidential-and-public-applications/user-consent-and-third-party-applications#skip-consent-for-first-party-applications) in the local application.
 
-Local dev (`make dev`, `_NODE_ENV_ === 'development'`) sets `prompt: 'consent'` and `audience: sandbox-ai-api` in `src/main.tsx` so the consent screen appears at login. Staging and production builds use different `_NODE_ENV_` values and do not include those params.
+### Allow consent in the local application
 
-After you approve consent once for your user on localhost, Auth0 remembers it; you may still see the consent screen on later logins because `prompt: 'consent'` is set, but silent token refresh should work for API calls.
+Alter the `authorizationParams` in `src/main.tsx`, provide consent, then remove the change. Once you provide consent in the local application, you will not be prompted for consent again.
+
+```ts
+// src/main.tsx
+authorizationParams={{
+  redirect_uri: window.location.origin,
+  prompt: 'consent',
+  audience: 'sandbox-ai-api',
+}}
+```
 
 ## Stack and structure
 
