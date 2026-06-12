@@ -22,7 +22,7 @@ SRC_PATH = app-shell
 noop := cd .
 
 # build and publish options
-dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-OT2-*","dist/**/Opentrons-Internal-OT2-*")
+dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons OT-2-*","dist/**/Opentrons Internal OT-2-*")
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 

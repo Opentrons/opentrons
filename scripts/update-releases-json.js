@@ -29,8 +29,8 @@ async function readOrDefaultReleases(releasesPath) {
   }
 }
 
-// Robot-stack installers use Opentrons-OT2-*; internal builds use Opentrons-Internal-OT2-*.
-const OT2_INSTALLER_RE = /Opentrons(?:-Internal)?-OT2.*\.(exe|dmg|AppImage)$/i
+// Robot-stack installers use Opentrons OT-2-*; internal builds use Opentrons Internal OT-2-*.
+const OT2_INSTALLER_RE = /Opentrons(?: Internal)? OT-2.*\.(exe|dmg|AppImage)$/i
 
 const FILES_IN_RELEASE_JSON = [
   OT2_INSTALLER_RE,
@@ -59,8 +59,8 @@ function channelUpdateManifestUrls(urlBase) {
 }
 
 function installerManifestKeys(artifactName) {
-  const isInternal = /Opentrons-Internal-OT2/i.test(artifactName)
-  const prefix = isInternal ? 'Opentrons-Internal-OT2' : 'Opentrons-OT2'
+  const isInternal = /Opentrons Internal OT-2/i.test(artifactName)
+  const prefix = isInternal ? 'Opentrons Internal OT-2' : 'Opentrons OT-2'
   return {
     exe: `${prefix}.exe`,
     dmg: `${prefix}.dmg`,
@@ -70,14 +70,14 @@ function installerManifestKeys(artifactName) {
 
 function artifactNameToObj(artifactName, urlBase) {
   const k = installerManifestKeys(artifactName)
-  if (artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.exe$/i) !== -1) {
+  if (artifactName.search(/Opentrons(?: Internal)? OT-2.*\.exe$/i) !== -1) {
     return { [k.exe]: urlBase + artifactName }
   } else if (
-    artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.dmg$/i) !== -1
+    artifactName.search(/Opentrons(?: Internal)? OT-2.*\.dmg$/i) !== -1
   ) {
     return { [k.dmg]: urlBase + artifactName }
   } else if (
-    artifactName.search(/Opentrons(?:-Internal)?-OT2.*\.AppImage$/i) !== -1
+    artifactName.search(/Opentrons(?: Internal)? OT-2.*\.AppImage$/i) !== -1
   ) {
     return { [k.appimage]: urlBase + artifactName }
   } else if (artifactName.search(/(latest|alpha|beta).*yml$/) !== -1) {

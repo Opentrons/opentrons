@@ -7,6 +7,8 @@ const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const WINDOWS_SIGN = process.env.WINDOWS_SIGN === 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
+const productName =
+  project === 'robot-stack' ? 'Opentrons OT-2' : 'Opentrons Internal OT-2'
 const MAC_ASSET_CATALOG_PATH = path.join(__dirname, 'build/Assets.car')
 const HAS_MAC_ASSET_CATALOG = fs.existsSync(MAC_ASSET_CATALOG_PATH)
 
@@ -22,6 +24,7 @@ const publishConfig =
     : null
 
 module.exports = async () => ({
+  productName,
   appId:
     project === 'robot-stack'
       ? 'com.opentrons.appot2'
@@ -57,8 +60,7 @@ module.exports = async () => ({
     version: await (
       await import('../scripts/git-version.mjs')
     ).versionForProject(project),
-    productName:
-      project === 'robot-stack' ? 'Opentrons-OT2' : 'Opentrons-Internal-OT2',
+    productName,
   },
   /* eslint-disable no-template-curly-in-string */
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
@@ -69,9 +71,10 @@ module.exports = async () => ({
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
-    extendInfo: HAS_MAC_ASSET_CATALOG
-      ? { CFBundleIconName: 'AppIcon' }
-      : undefined,
+    extendInfo: {
+      CFBundleDisplayName: productName,
+      ...(HAS_MAC_ASSET_CATALOG ? { CFBundleIconName: 'AppIcon' } : {}),
+    },
     forceCodeSigning: !DEV_MODE,
     gatekeeperAssess: true,
     // note: notarize.teamId is passed by implicitly sending through the APPLE_TEAM_ID env var
