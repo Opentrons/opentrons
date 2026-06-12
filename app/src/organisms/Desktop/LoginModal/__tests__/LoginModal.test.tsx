@@ -5,7 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
-import { useOAuth2PasswordLogin } from '/app/resources/auth'
+import {
+  useOAuth2PasswordLogin,
+  useSetNewPasswordAndSignIn,
+} from '/app/resources/auth'
 
 import { showLoginModal } from '..'
 
@@ -59,6 +62,10 @@ describe('LoginModal', () => {
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,
+    })
+    vi.mocked(useSetNewPasswordAndSignIn).mockReturnValue({
+      submitNewPassword: vi.fn(),
+      isLoading: false,
     })
   })
 
@@ -148,5 +155,129 @@ describe('LoginModal', () => {
 
     screen.getByText('Test error message')
     screen.getByText('Compliance Ready Software Login')
+  })
+
+  it('shows password expired view when login requires a new password', () => {
+    const storeLoginState = vi.fn()
+    vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
+      ({ onSuccess }) =>
+        ({
+          submitPassword: (username: string, password: string) => {
+            onSuccess(
+              username,
+              { ...AUTH_USER, resetPassword: true },
+              TOKEN_RESPONSE
+            )
+          },
+          isAuthLoading: false,
+        }) as ReturnType<typeof useOAuth2PasswordLogin>
+    )
+
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'temp-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    expect(storeLoginState).toHaveBeenCalledWith('alice', TOKEN_RESPONSE)
+    screen.getByText('Password expired')
+    screen.getByText(
+      'Your password has expired. Choose a new password to continue.'
+    )
+    screen.getByLabelText('New password')
+    screen.getByLabelText('Confirm password')
+    screen.getByRole('button', { name: 'Confirm' })
+  })
+
+  it('submits a new password and closes on success', () => {
+    const storeLoginState = vi.fn()
+    const submitNewPassword = vi.fn()
+    vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
+      ({ onSuccess }) =>
+        ({
+          submitPassword: (username: string) => {
+            onSuccess(
+              username,
+              { ...AUTH_USER, resetPassword: true },
+              TOKEN_RESPONSE
+            )
+          },
+          isAuthLoading: false,
+        }) as ReturnType<typeof useOAuth2PasswordLogin>
+    )
+    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+      ({ onSuccess }) =>
+        ({
+          submitNewPassword: (username: string, password: string) => {
+            submitNewPassword(username, password)
+            onSuccess(username, TOKEN_RESPONSE)
+          },
+          isLoading: false,
+        }) as ReturnType<typeof useSetNewPasswordAndSignIn>
+    )
+
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'temp-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    fireEvent.change(screen.getByLabelText('New password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Confirm password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    expect(submitNewPassword).toHaveBeenCalledWith('alice', 'new-password')
+    expect(storeLoginState).toHaveBeenLastCalledWith('alice', TOKEN_RESPONSE)
+    expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
+  })
+
+  it('shows a mismatch error when confirm password does not match', () => {
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
+      ({ onSuccess }) =>
+        ({
+          submitPassword: (username: string) => {
+            onSuccess(
+              username,
+              { ...AUTH_USER, resetPassword: true },
+              TOKEN_RESPONSE
+            )
+          },
+          isAuthLoading: false,
+        }) as ReturnType<typeof useOAuth2PasswordLogin>
+    )
+
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'temp-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    fireEvent.change(screen.getByLabelText('New password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Confirm password'), {
+      target: { value: 'different-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    screen.getByText('Passwords do not match.')
   })
 })
