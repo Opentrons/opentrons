@@ -24,7 +24,8 @@ async def _main(cfg: TestConfig) -> None:
     # CSV REPORT
     report = build_report(test_name.replace("_", "-"))
     dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator, dut=dut)
 
     # HOME and ATTACH
     mount = OT3Mount.LEFT

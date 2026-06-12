@@ -315,7 +315,12 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
 
             report = _build_csv_report(trials=trials)
 
-            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+            operator = (
+                "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+            )
+            helpers_ot3.set_csv_report_meta_data_ot3(
+                api, report, operator=operator, dut=dut
+            )
 
             await _test_plunger(
                 api,

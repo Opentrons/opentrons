@@ -22,6 +22,8 @@ from typing import (
     Sequence,
     Any,
 )
+
+from opentrons.protocol_api import ProtocolContext
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -156,10 +158,15 @@ def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[s
         case "p200":
             size = "P2H"
             version = 30
-    channels = "S" if items[1] == "single" else "M"
+    if items[1] == "single":
+        channels = "S"
+    elif items[1] == "multi":
+        channels = "M"
+    else:
+        channels = "H"
     date = datetime.now().strftime("%y%m%d")
     unique_number = 1 if mount == OT3Mount.LEFT else 2
-    return f"{size}{channels}{version}{date}A0{unique_number}"
+    return f"{size}{channels}V{version}{date}A0{unique_number}"
 
 
 def _create_attached_instruments_dict(
@@ -348,14 +355,13 @@ def _get_serial_for_dut(
 def set_csv_report_meta_data_ot3(
     api: Union[OT3API, SyncHardwareAPI],
     report: csv_report.CSVReport,
+    operator: str,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
 ) -> None:
     """Set CSVReport meta-data given an OT3."""
     # operator should be entered first
-    report.set_operator(
-        "simulating" if api.is_simulator else input("enter OPERATOR name: ")
-    )
+    report.set_operator(operator)
 
     # default DUT to be the robot serial
     # and only scan barcode if we're not simulating
@@ -656,7 +662,9 @@ async def home_ot3(api: OT3API, axes: Optional[List[Axis]] = None) -> None:
         )
 
 
-def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> PipetteOT3:
+def _get_pipette_from_mount(
+    api: Union[OT3API, SyncHardwareAPI], mount: OT3Mount
+) -> PipetteOT3:
     pipette = api.hardware_pipettes[mount.to_mount()]
     if pipette is None:
         raise RuntimeError(f"No pipette currently attaced to mount {mount}")
@@ -664,7 +672,7 @@ def _get_pipette_from_mount(api: OT3API, mount: OT3Mount) -> PipetteOT3:
 
 
 def get_plunger_positions_ot3(
-    api: OT3API, mount: OT3Mount
+    api: Union[OT3API, SyncHardwareAPI], mount: OT3Mount
 ) -> Tuple[float, float, float, float]:
     """Update plunger current."""
     pipette = _get_pipette_from_mount(api, mount)
@@ -676,8 +684,8 @@ def get_plunger_positions_ot3(
     )
 
 
-async def update_pick_up_current(
-    api: OT3API, mount: OT3Mount, current: float = 0.125
+def update_pick_up_current(
+    api: Union[OT3API, SyncHardwareAPI], mount: OT3Mount, current: float = 0.125
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
@@ -730,9 +738,61 @@ async def move_plunger_absolute_ot3(
             await _move_coro
 
 
+async def _move_plunger_absolute_ot3_patch(
+    self,  # noqa: ANN001
+    mount: OT3Mount,
+    position: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+    expect_stalls: bool = False,
+) -> None:
+    """Move OT3 plunger position to an absolute position."""
+    if not self.hardware_pipettes[mount.to_mount()]:
+        raise RuntimeError(f"No pipette found on mount: {mount}")
+    plunger_axis = Axis.of_main_tool_actuator(mount)
+    _move_coro = self._move(
+        target_position={plunger_axis: position},  # type: ignore[arg-type]
+        speed=speed,
+        expect_stalls=expect_stalls,
+    )
+    if motor_current is None:
+        await _move_coro
+    else:
+        async with self._backend.motor_current(
+            run_currents={Axis.of_main_tool_actuator(mount): motor_current}
+        ):
+            await _move_coro
+
+
+def move_plunger_absolute_ot3_sync(
+    api: SyncHardwareAPI,
+    mount: OT3Mount,
+    position: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+    expect_stalls: bool = False,
+) -> None:
+    """Move OT3 plunger position to an absolute position."""
+    OT3API._move_plunger_absolute_ot3 = _move_plunger_absolute_ot3_patch  # type: ignore[attr-defined]
+
+    api._move_plunger_absolute_ot3(mount, position, motor_current, speed, expect_stalls)
+
+
 async def home_tip_motors(api: OT3API, back_off: bool = True) -> None:
     """Homes the tip motors with backoff option broken out."""
     await api._backend.home_tip_motors(distance=50, velocity=5, back_off=back_off)
+
+
+async def _home_tip_motors_patch(self, back_off: bool = True) -> None:  # noqa: ANN001
+    """Homes the tip motors with backoff option broken out."""
+    await self._backend.home_tip_motors(distance=50, velocity=5, back_off=back_off)
+
+
+def home_tip_motors_sync(api: SyncHardwareAPI, back_off: bool = True) -> None:
+    """Homes the tip motors with backoff option broken out."""
+    if not api.is_simulator:
+        OT3API._home_tip_motors = _home_tip_motors_patch  # type: ignore[attr-defined]
+        api._backend._home_tip_motors(back_off)
 
 
 async def move_tip_motor_relative_ot3(
@@ -757,6 +817,43 @@ async def move_tip_motor_relative_ot3(
     else:
         async with api._backend.motor_current(run_currents={Axis.Q: motor_current}):
             await _move_coro
+
+
+async def _move_tip_motor_relative_ot3_patch(
+    self,  # noqa: ANN001
+    distance: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+) -> None:
+    """Move 96ch tip-motor (Q) to an absolute position."""
+    if not self.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
+        raise RuntimeError("No pipette found on LEFT mount")
+
+    current_gear_pos = self._backend.gear_motor_position or 0.0
+    target_pos = current_gear_pos + distance
+
+    # if speed is not None and distance < 0:
+    #     speed *= -1
+
+    _move_coro = self._backend.tip_action(
+        current_gear_pos, [(target_pos, speed or 400)]
+    )
+    if motor_current is None:
+        await _move_coro
+    else:
+        async with self._backend.motor_current(run_currents={Axis.Q: motor_current}):
+            await _move_coro
+
+
+def move_tip_motor_relative_ot3_sync(
+    api: SyncHardwareAPI,
+    distance: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+) -> None:
+    """Move 96ch tip-motor (Q) to an absolute position."""
+    OT3API._move_tip_motor_relative_ot3 = _move_tip_motor_relative_ot3_patch  # type: ignore[attr-defined]
+    api._move_tip_motor_relative_ot3(distance, motor_current, speed)
 
 
 async def move_plunger_relative_ot3(
@@ -944,6 +1041,48 @@ async def jog_mount_ot3(
             return await api.current_position_ot3(
                 mount=mount, critical_point=critical_point
             )
+
+
+def jog_mount_ot3_sync(
+    api: SyncHardwareAPI,
+    mount: OT3Mount,
+    critical_point: Optional[CriticalPoint] = None,
+    display: Optional[bool] = True,
+    speed: Optional[float] = None,
+) -> Dict[Axis, float]:
+    """Jog an OT3 mount's gantry XYZ and pipettes axes."""
+    assert False
+    return api.current_position_ot3(mount=mount, critical_point=critical_point)
+    """
+    if api.is_simulator:
+        return await api.current_position_ot3(
+            mount=mount, critical_point=critical_point
+        )
+    axis: str = ""
+    distance: float = 0.0
+    do_home: bool = False
+    print("jogging")
+    while True:
+        try:
+            axis, distance, do_home = await _jog_do_print_then_input_then_move(
+                api,
+                mount,
+                critical_point,
+                axis,
+                distance,
+                do_home,
+                display=display,
+                speed=speed,
+            )
+        except ValueError as e:
+            print(e)
+            continue
+        except OT3JogTermination:
+            print("done jogging")
+            return await api.current_position_ot3(
+                mount=mount, critical_point=critical_point
+            )
+    """
 
 
 async def move_to_arched_ot3(
@@ -1416,3 +1555,17 @@ def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
         unit_number=data.unit_number,
         sku=getattr(data, "sku", None),
     )
+
+
+# TODO Barcode scanner?
+def get_user_answer(api: SyncHardwareAPI, prompt: str) -> bool:
+    """Have the user answer a yes/no question."""
+    return True
+
+
+def get_input_number(
+    ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str, default: Union[int, float]
+) -> Union[int, float]:
+    """Have the user input a value."""
+    ctx.pause(f"Use Scanner: {prompt}")
+    return default
