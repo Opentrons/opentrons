@@ -43,7 +43,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {
                 "display_name": "Millipore: Short",
-                "value": "millipore_vacuum_manifold_collar_tall",
+                "value": "millipore_vacuum_manifold_collar_short",
             },
             {
                 "display_name": "Millipore: Tall",
