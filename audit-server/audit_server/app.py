@@ -21,22 +21,27 @@ from audit_server.persistence.persistence_directory import (
     prepare_active_subdirectory,
     prepare_root,
 )
-from audit_server.server_settings import AuditServerSettings, get_settings
+from audit_server.server_configuration import (
+    AuditServerConfiguration,
+    get_configuration,
+)
 
 _log = logging.getLogger(__name__)
 
 
-def _get_persistence_directory_root(settings: AuditServerSettings) -> Optional[Path]:
+def _get_persistence_directory_root(
+    configuration: AuditServerConfiguration,
+) -> Optional[Path]:
     """Return the root persistence directory, or ``None`` for auto-temp."""
-    if settings.persistence_directory == "automatically_make_temporary":
+    if configuration.persistence_directory == "automatically_make_temporary":
         return None
-    return settings.persistence_directory
+    return configuration.persistence_directory
 
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    settings = get_settings()
-    persistence_directory_root = _get_persistence_directory_root(settings)
+    configuration = get_configuration()
+    persistence_directory_root = _get_persistence_directory_root(configuration)
     prepared_root = await prepare_root(persistence_directory_root)
     set_persistence_directory(app.state, prepared_root)
 
@@ -47,11 +52,14 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         engine = exit_stack.enter_context(sql_engine_ctx(db_path))
         set_sql_engine(app.state, engine)
 
-        if settings.key_server_uds is not None or settings.key_server_url is not None:
+        if (
+            configuration.key_server_uds is not None
+            or configuration.key_server_url is not None
+        ):
             key_client = await exit_stack.enter_async_context(
                 build_key_client(
-                    key_server_uds=settings.key_server_uds,
-                    key_server_url=settings.key_server_url,
+                    key_server_uds=configuration.key_server_uds,
+                    key_server_url=configuration.key_server_url,
                 )
             )
             install_key_client(app.state, key_client)
