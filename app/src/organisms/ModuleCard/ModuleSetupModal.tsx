@@ -112,7 +112,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             width="50%"
           >
             <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
-              {t('module_instructions_manual')}
+              {t('branded:setup_instructions_description')}
             </LegacyStyledText>
             <Link
               external
