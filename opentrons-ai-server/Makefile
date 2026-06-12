@@ -1,8 +1,26 @@
 # opentrons ai server makefile
 
+include ../scripts/python-uv.mk
+
+# Pin the Python API docs release synced into LLM context. Bump when publishing new mkdocs tags.
+DOCS_TAG ?= mkdocs-2026-06-02
+
+.PHONY: check-api-docs-curation
+check-api-docs-curation:
+	$(python) -m api.utils.api_docs_struct_curated --check
+
+.PHONY: sync-api-docs
+sync-api-docs:
+	$(python) -m api.utils.sync_api_docs --tag $(DOCS_TAG)
+
+.PHONY: list-api-docs-tags
+list-api-docs-tags:
+	git -C .. tag -l 'mkdocs-*'
+
 .PHONY: setup
 setup:
-	uv sync --frozen --extra dev
+	$(UV) sync --frozen --extra dev --python $(UV_PYTHON)
+	$(MAKE) sync-api-docs
 
 .PHONY: teardown
 teardown:
@@ -10,21 +28,21 @@ teardown:
 
 .PHONY: ruff
 ruff:
-	uv run ruff format .
-	uv run ruff check . --fix --unsafe-fixes
+	$(ruff) format .
+	$(ruff) check . --fix --unsafe-fixes
 
 .PHONY: ruff-check
 ruff-check:
-	uv run ruff format . --check
-	uv run ruff check .
+	$(ruff) format . --check
+	$(ruff) check .
 
 .PHONY: mypy
 mypy:
-	uv run mypy deploy.py api tests
+	$(UV) run --python $(UV_PYTHON) mypy deploy.py api tests
 
 .PHONY: format-readme
 format-readme:
-	pnpm exec prettier --ignore-path .eslintignore --write opentrons-ai-server/**/*.md opentrons-ai-server/**/*.json
+	cd .. && pnpm exec prettier --ignore-path .eslintignore --write opentrons-ai-server/**/*.md opentrons-ai-server/**/*.json
 
 .PHONY: lint
 lint: ruff-check mypy
@@ -37,16 +55,16 @@ format:
 	$(MAKE) format-readme
 
 .PHONY: prep
-prep: format lint unit-test
-	@echo prep is a combination of format, lint, and unit-test
+prep: format lint unit-test check-api-docs-curation
+	@echo prep is a combination of format, lint, unit-test, and check-api-docs-curation
 
 .PHONY: gen-env
 gen-env:
-	uv run python -m api.settings
+	$(python) -m api.settings
 
 .PHONY: unit-test
 unit-test:
-	uv run pytest tests -m unit
+	$(pytest) tests -m unit
 
 .PHONY: gen-requirements
 gen-requirements:
@@ -57,43 +75,43 @@ ENV ?= local
 TAG ?=
 
 .PHONY: deploy
-deploy: gen-requirements
+deploy: gen-requirements sync-api-docs
 	@echo "Deploying to environment: $(ENV)"
-	uv run python deploy.py --env $(ENV) $(if $(TAG),--tag $(TAG),)
+	$(python) deploy.py --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
 .PHONY: build-only
-build-only: gen-requirements
+build-only: gen-requirements sync-api-docs
 	@echo "Building Docker image only for environment: $(ENV)"
-	uv run python deploy.py --build-only --env $(ENV) $(if $(TAG),--tag $(TAG),)
+	$(python) deploy.py --build-only --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
 .PHONY: dry-deploy
-dry-deploy: gen-requirements
+dry-deploy: gen-requirements sync-api-docs
 	@echo "Dry run deploying to environment: $(ENV)"
 	@echo "Data is retrieved from AWS but no changes are made"
-	uv run python deploy.py --dry --env $(ENV) $(if $(TAG),--tag $(TAG),)
+	$(python) deploy.py --dry --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
 .PHONY: prompted-deploy
-prompted-deploy: gen-requirements
-	uv run python deploy.py
+prompted-deploy: gen-requirements sync-api-docs
+	$(python) deploy.py
 
 .PHONY: print-client-settings-vars
 print-client-settings-vars:
-	uv run python -m tests.helpers.settings
+	$(python) -m tests.helpers.settings
 
 .PHONY: live-client
 live-client:
 	@echo "Uses the test helpers to interact with the API"
-	uv run python -m tests.helpers.client
+	$(python) -m tests.helpers.client
 
 .PHONY: live-hf
 live-hf:
 	@echo "Sends a simple protocol for simulation to the"
 	@echo "Hugging Face Simulate tool to verify connectivity and auth"
-	uv run python -m tests.helpers.huggingface_client
+	$(python) -m tests.helpers.huggingface_client
 
 .PHONY: live-test
 live-test:
-	uv run pytest tests -m live --env $(ENV)
+	$(pytest) tests -m live --env $(ENV)
 
 IMAGE_NAME=ai-server-local
 CONTAINER_NAME=ai-server-container
@@ -102,8 +120,8 @@ ENV_FILE=.env
 CACHEBUST := $(shell date +%s)
 
 .PHONY: build
-build: gen-requirements
-	# Use repo root as context so Dockerfile COPY paths like 'api/docs/v2' resolve
+build: gen-requirements sync-api-docs
+	# Use repo root as context; synced API docs live under api/storage/api_docs/docs/v2
 	cd .. && docker build --build-arg CACHEBUST=$(CACHEBUST) -t $(IMAGE_NAME) -f opentrons-ai-server/Dockerfile .
 
 .PHONY: run
@@ -120,8 +138,8 @@ clean: gen-requirements
 rebuild: clean build run
 
 .PHONY: local-run
-local-run:
-	uv run python -m api.handler.local_run --env $(ENV)
+local-run: sync-api-docs
+	$(python) -m api.handler.local_run --env $(ENV)
 
 .PHONY: run-shell
 run-shell:
@@ -134,4 +152,4 @@ shell:
 .PHONY: test-googlesheet
 test-googlesheet:
 	@echo "Loading environment variables from .env and running test-googlesheet"
-	uv run python -m api.integration.google_sheets
+	$(python) -m api.integration.google_sheets

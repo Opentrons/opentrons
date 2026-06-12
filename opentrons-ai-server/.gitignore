@@ -12,6 +12,9 @@ tests/helpers/*_cached_token.txt
 tests/helpers/test.env
 tests/helpers/*.env
 evaluation/
+api/storage/api_docs/docs/
+api/storage/api_docs/.docs-tag
+api/storage/api_docs/.api-level
 api/storage/api_docs/scripts/
 ai-server/
 .venv/
