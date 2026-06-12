@@ -78,10 +78,10 @@ jobs:
 
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-
+          git status
           git checkout -b "$BRANCH"
           git add "${paths[@]}"
-
+          git status
           if git diff --staged --quiet; then
             echo "No staged localization changes."
             exit 0
