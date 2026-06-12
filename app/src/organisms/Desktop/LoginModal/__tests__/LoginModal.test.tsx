@@ -207,9 +207,9 @@ describe('LoginModal', () => {
     logInWithTempPassword()
 
     expect(storeLoginState).toHaveBeenCalledWith('alice', TOKEN_RESPONSE)
-    screen.getByText('Password expired')
+    screen.getByText('Your password has expired')
     screen.getByText(
-      'Your password has expired. Choose a new password to continue.'
+      'Create a new password to use'
     )
     screen.getByLabelText('New password')
     screen.getByLabelText('Confirm password')
@@ -249,6 +249,23 @@ describe('LoginModal', () => {
       target: { value: 'different-password' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    screen.getByText('Passwords do not match.')
+  })
+
+  it('shows a mismatch error when confirm password loses focus', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.change(screen.getByLabelText('New password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Confirm password'), {
+      target: { value: 'different-password' },
+    })
+    fireEvent.blur(screen.getByLabelText('Confirm password'))
 
     screen.getByText('Passwords do not match.')
   })

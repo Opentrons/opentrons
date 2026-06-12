@@ -111,7 +111,7 @@ function LoginModalImpl(): JSX.Element {
     submitPassword(username, password)
   }
 
-  const handleSetNewPassword = (): void => {
+  const handleSetNewPassword = (submit = true): void => {
     if (newPassword !== confirmPassword) {
       setConfirmPasswordError(
         t('access_control:desktop_password_expired_mismatch') as string
@@ -119,9 +119,17 @@ function LoginModalImpl(): JSX.Element {
       return
     }
     setConfirmPasswordError(null)
-    if (loggedInUsername != null) {
-      submitNewPassword(loggedInUsername, newPassword)
+    if (!submit || loggedInUsername == null) {
+      return
     }
+    submitNewPassword(loggedInUsername, newPassword)
+  }
+
+  const handleConfirmPasswordBlur = (): void => {
+    if (newPassword.trim() === '' || confirmPassword.trim() === '') {
+      return
+    }
+    handleSetNewPassword(false)
   }
 
   const handleUsernameChange = (value: string): void => {
@@ -207,6 +215,7 @@ function LoginModalImpl(): JSX.Element {
             confirmPasswordError={confirmPasswordError}
             onNewPasswordChange={handleNewPasswordChange}
             onConfirmPasswordChange={handleConfirmPasswordChange}
+            onConfirmPasswordBlur={handleConfirmPasswordBlur}
           />
         )}
       </div>
@@ -302,6 +311,7 @@ interface PasswordExpiredViewProps {
   confirmPasswordError: string | null
   onNewPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
+  onConfirmPasswordBlur: () => void
 }
 
 function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
@@ -312,6 +322,7 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
     confirmPasswordError,
     onNewPasswordChange,
     onConfirmPasswordChange,
+    onConfirmPasswordBlur,
   } = props
   const { t } = useTranslation()
 
@@ -349,6 +360,9 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
           error={confirmPasswordError ?? undefined}
           onChange={event => {
             onConfirmPasswordChange(event.target.value)
+          }}
+          onBlur={() => {
+            onConfirmPasswordBlur()
           }}
         />
       </div>
