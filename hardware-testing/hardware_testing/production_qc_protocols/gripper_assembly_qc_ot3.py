@@ -11,6 +11,7 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_MAX_SPEEDS,
     DEFAULT_RUN_CURRENT,
 )
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper,
     calibrate_gripper_jaw,
@@ -818,6 +819,7 @@ def run(ctx: ProtocolContext) -> None:
             )
             for m in OT3Mount
         }
+        api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
         api.reset()
 
     # Apply monkey patches

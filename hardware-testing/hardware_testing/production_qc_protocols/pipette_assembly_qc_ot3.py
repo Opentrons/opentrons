@@ -28,6 +28,7 @@ from opentrons.hardware_control.ot3_calibration import (
     EdgeNotFoundError,
     CalibrationStructureNotFoundError,
 )
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
@@ -2373,6 +2374,7 @@ def run(ctx: ProtocolContext) -> None:
             )
             for m in OT3Mount
         }
+        api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
         api.reset()
 
     args = ctx.params.get_all()

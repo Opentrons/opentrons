@@ -26,6 +26,7 @@ from opentrons_shared_data.errors.exceptions import (
     EdgeNotFoundError,
     MisalignedGantryError,
 )
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 
 
 from hardware_testing.data.csv_report import (
@@ -356,6 +357,9 @@ def run(ctx: ProtocolContext) -> None:
                 results.append(dist_after)
             passing = max(results) <= MAX_ERROR_DISTANCE_MM
     else:
+        ctx._core.get_hardware().create_simulating_peripheral(
+            BarcodeScannerModel.BARCODE_SCANNER_V1
+        )
         nom_front_left = helpers_ot3.get_slot_calibration_square_position_ot3(
             SLOT_FRONT_LEFT
         )

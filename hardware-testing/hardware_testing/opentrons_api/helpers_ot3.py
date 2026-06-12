@@ -391,18 +391,17 @@ def set_csv_report_meta_data_ot3(
     robot_serial = get_robot_serial_ot3(api)
     dut_str = _get_serial_for_dut(api, dut)
     print(f"device under test: {dut_str}")
-    if isinstance(api, SynchronousAdapter):
-        # if we're running with one of protocol engine's adapters we're running in a protocol and
-        # need to use the ctx to grab the barcode scanner instead of users typing input.
-        assert ctx
-    if not api.is_simulator and dut != DeviceUnderTest.OTHER:
+    if dut != DeviceUnderTest.OTHER:
         # always confirm barcode for robot/pipette/gripper
-        if ctx:
-            barcode = get_device_barcode(ctx, api, dut)  # type: ignore[arg-type]
-        else:
+        if isinstance(api, SynchronousAdapter):
+            # if we're running with one of protocol engine's adapters we're running in a protocol and
+            # need to use the ctx to grab the barcode scanner instead of users typing input.
+            assert ctx
+            barcode = get_device_barcode(ctx, api, dut)
+        elif not api.is_simulator:
             barcode = input("SCAN device barcode: ").strip()
-    else:
-        barcode = dut_str
+        else:
+            barcode = dut_str
     print(f"barcode: {barcode}")
 
     # default the CSV tag to be the DUT

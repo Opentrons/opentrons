@@ -7,6 +7,7 @@ from typing import Dict, Callable, cast, List, Union, Tuple, Literal
 from opentrons.protocol_api import ParameterContext, ProtocolContext, OFF_DECK
 from opentrons.types import Point
 
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3simulator import (
@@ -1415,6 +1416,7 @@ def run(ctx: ProtocolContext) -> None:
             )
             for m in OT3Mount
         }
+        api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
         api.reset()
 
     test_name = "ninety-six-assembly-qc-ot3"
