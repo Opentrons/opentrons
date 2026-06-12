@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
@@ -55,13 +55,25 @@ export function useRobotControlCommands({
   const [isExecuting, setIsExecuting] = useState(false)
   const pendingExecutionRef = useRef<PendingExecution | null>(null)
 
+  const handleDocumentationCancel = useCallback((): void => {
+    if (pendingExecutionRef.current != null) {
+      const { reject } = pendingExecutionRef.current
+      pendingExecutionRef.current = null
+      reject(new Error('Documentation cancelled'))
+    }
+    setIsExecuting(false)
+  }, [])
+
   const {
     commandDocState,
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
     isLoading: isDocumentationLoading,
-  } = useMaintenanceRunDocumentation(runStartedAction)
+  } = useMaintenanceRunDocumentation(
+    runStartedAction,
+    handleDocumentationCancel
+  )
 
   const { chainRunCommands } = useChainMaintenanceCommands(
     commandDocState,

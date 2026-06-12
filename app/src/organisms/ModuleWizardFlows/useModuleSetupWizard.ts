@@ -98,7 +98,7 @@ export function useModuleSetupWizard(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation('add_module')
+  } = useMaintenanceRunDocumentation('add_module', closeFlow)
 
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands(

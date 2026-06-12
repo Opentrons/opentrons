@@ -214,7 +214,11 @@ export const PipetteWizardFlows = (
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation(maintenanceRunAction, initialDocstate)
+  } = useMaintenanceRunDocumentation(
+    maintenanceRunAction,
+    closeFlow,
+    initialDocstate
+  )
 
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands(

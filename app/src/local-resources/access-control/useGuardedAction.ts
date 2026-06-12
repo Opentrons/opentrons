@@ -58,10 +58,11 @@ export function useGuardedAction(
   )
 
   const showDocumentationModal = useCallback(
-    async (actionsToDocument: DocumentedAction[]) => {
+    async (actionsToDocument: DocumentedAction[], onCancel?: () => void) => {
       const docResult = await requireDocumentation(
         currentUsername ?? '',
-        actionsToDocument
+        actionsToDocument,
+        onCancel
       )
       return docResult
     },

@@ -23,6 +23,7 @@ import type {
  */
 export const useMaintenanceRunDocumentation = (
   maintenanceRunName: DocumentedAction,
+  onCancel?: () => void,
   initialDocstate?: DocumentationState
 ): {
   commandDocState: DocumentationState
@@ -36,6 +37,7 @@ export const useMaintenanceRunDocumentation = (
   >([maintenanceRunName])
   const commandDocState = usePromptForInteractionReason(
     [maintenanceRunName],
+    onCancel,
     initialDocstate
   )
   const deletionDocState = useGuardedAction()

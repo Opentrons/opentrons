@@ -29,7 +29,8 @@ export type DocumentationState =
       reasonForInteractionRequired: true
       docreport: null
       askForDocumentation: (
-        actionsToDocument: DocumentedAction[]
+        actionsToDocument: DocumentedAction[],
+        onCancel?: () => void
       ) => Promise<DocumentationReport>
       isLoading: false
     }

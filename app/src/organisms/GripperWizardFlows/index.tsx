@@ -73,7 +73,7 @@ export function GripperWizardFlows(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation(flowName)
+  } = useMaintenanceRunDocumentation(flowName, closeFlow)
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
