@@ -68,12 +68,12 @@ make sync-api-docs DOCS_TAG=mkdocs-2026-06-02   # sync a specific tag
 make list-api-docs-tags                         # list available mkdocs tags
 ```
 
-| Path                                              | Role                                                            |
-| ------------------------------------------------- | --------------------------------------------------------------- |
-| `api/storage/api_docs/docs/v2/`                   | Synced markdown (gitignored)                                    |
-| `api/storage/api_docs/api_docs_struct.md`         | Generated index fed to the doc-finder LLM (do not edit by hand) |
-| `api/storage/api_docs/api_docs_struct_about.md`   | Committed curated `<about>` descriptions keyed by markdown path |
-| `api/storage/api_docs/.api-level`                 | Default `apiLevel` from synced `mkdocs.yml` (gitignored)        |
+| Path                                            | Role                                                            |
+| ----------------------------------------------- | --------------------------------------------------------------- |
+| `api/storage/api_docs/docs/v2/`                 | Synced markdown (gitignored)                                    |
+| `api/storage/api_docs/api_docs_struct.md`       | Generated index fed to the doc-finder LLM (do not edit by hand) |
+| `api/storage/api_docs/api_docs_struct_about.md` | Committed curated `<about>` descriptions keyed by markdown path |
+| `api/storage/api_docs/.api-level`               | Default `apiLevel` from synced `mkdocs.yml` (gitignored)        |
 
 **Curation workflow:** Edit `api_docs_struct_about.md` with one `<about>` block per synced markdown path. `make sync-api-docs` regenerates `api_docs_struct.md` from that file.
 
