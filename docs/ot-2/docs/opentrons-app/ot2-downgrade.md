@@ -3,7 +3,7 @@ title: "Opentrons OT-2: Downgrading Robot Software"
 description: "Roll back OT-2 robot and app software from v9.0 or 26.06+ to earlier versions."
 ---
 
-Start here for information and instructions about how to downgrade your Opentrons OT-2 robot and Opentrons App software.
+Start here for information and instructions about how to downgrade your Opentrons OT-2 robot and Opentrons OT-2 App software.
 
 !!! note
     Downgrading robot software should only be done at direction of Opentrons Support for troubleshooting or software compliance purposes.
@@ -79,7 +79,7 @@ The table below shows the default directory paths where the app saves your proto
 
 ### Install robot software
 
-1.  From the **Devices** tab in the Opentrons App, select the robot you want to work with.
+1.  From the **Devices** tab in the Opentrons OT-2 App, select the robot you want to work with.
 
 2. Click the three-dot menu (⋮) and then click **Robot Settings**.
 
@@ -99,7 +99,7 @@ The table below shows the default directory paths where the app saves your proto
 
 ## App version requirements
 
-To run protocols on a downgraded OT-2, the Opentrons App version must match the robot's software version. While you can interact with an OT-2 using mismatched software, protocol execution requires identical app and robot software versions.
+To run protocols on a downgraded OT-2, the app version must match the robot's software version. While you can interact with an OT-2 using mismatched software, protocol execution requires identical app and robot software versions.
 
 ### App download and installation
 
@@ -124,15 +124,15 @@ To install an earlier version of the Opentrons App:
 
 3. Navigate to the saved file location and double-click the file to install it.
 
-### Managing multiple App versions
+### Managing multiple app versions
 
-Installing multiple Opentrons App versions may cause system conflicts, particularly on Windows.
+Installing multiple app versions may cause system conflicts, particularly on Windows.
 
 - **macOS and Linux:** These systems use software encapsulation. You can typically run different versions by renaming the installed application.
 - **Windows:** The software integrates deeply with the operating system. Trying to install and run multiple app versions may cause conflicts with shared Windows files.
 
 To avoid version conflicts:
 
-- Uninstall your current Opentrons App before installing a downgraded version.
-- Consult your IT team or Opentrons Support if you need to run multiple versions of the Opentrons App.
+- Uninstall your current Opentrons OT-2 App before installing a downgraded version.
+- Consult your IT team or Opentrons Support if you need to run multiple versions of the app.
 - Do not attempt to downgrade robot or app software unless directed by Opentrons Support.
