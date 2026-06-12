@@ -48,6 +48,7 @@ nav:
       - "Use Case: Dry Run": runtime-parameters/use-case-dry-run.md
       - "Use Case: Cherrypicking": runtime-parameters/use-case-cherrypicking.md
       - Parameter Style Guide: runtime-parameters/style.md
+  - Step Grouping: groups.md
   - Advanced Control:
       - Advanced Control: advanced-control/index.md
       - Jupyter Notebook: advanced-control/jupyter.md
