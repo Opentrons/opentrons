@@ -250,7 +250,8 @@ async def run(is_simulating: bool, skip_calibration: bool, skip_test: bool) -> N
 
     # CREATE REPORT
     report = _create_csv_report()
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator)
 
     # RUN TEST
     before: Optional[_TestBeltCalibrationData] = None

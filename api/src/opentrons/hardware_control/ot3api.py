@@ -678,6 +678,7 @@ class OT3API(
     async def create_simulating_peripheral(
         self,
         model: peripherals.types.PeripheralModel,
+        sim_serial: Optional[str] = None,
     ) -> peripherals.AbstractPeripheral:
         """Create a simulating peripheral hardware interface."""
         assert self.is_simulator, (
@@ -690,6 +691,7 @@ class OT3API(
             ),
             type=peripherals.PeripheralType.from_model(model),
             sim_model=model.value,
+            sim_serial=sim_serial,
         )
         assert isinstance(peripheral, peripherals.AbstractPeripheral)
         return peripheral
