@@ -377,4 +377,5 @@ def run(ctx: ProtocolContext) -> None:
         details = sim_cal_data.build_details()
         passing = True
     _generate_report(before, details, attitude, after, ctx)
-    ctx.pause(f"Belt calibration pass: {passing}")
+    if not passing:
+        raise RuntimeError("Belt calibration did not pass.")

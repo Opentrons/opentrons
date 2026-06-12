@@ -850,3 +850,5 @@ def run(ctx: ProtocolContext) -> None:
 
     # SAVE REPORT
     report.save_to_disk()
+    if not report.all_succeded():
+        raise RuntimeError("Error during QC run.")
