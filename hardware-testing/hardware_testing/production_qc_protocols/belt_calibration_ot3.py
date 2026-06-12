@@ -115,7 +115,7 @@ def _generate_report(
 ) -> None:
     report = _create_csv_report()
     helpers_ot3.set_csv_report_meta_data_ot3(
-        ctx._core.get_hardware(), report, operator=ctx.params.operator  # type: ignore[attr-defined]
+        ctx._core.get_hardware(), report, operator=ctx.params.operator, ctx=ctx  # type: ignore[attr-defined]
     )  # STORE ATTITUDE
     if attitude:
         report("ATTITUDE", "attitude-x", attitude[0])

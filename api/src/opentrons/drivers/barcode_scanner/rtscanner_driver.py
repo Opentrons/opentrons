@@ -132,7 +132,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
 
     async def set_scan_timeout(self, timeout_ms: int) -> None:
         """Tell the scanner how long to keep decoding before failing."""
-        assert timeout_ms <= 3000
+        assert timeout_ms <= 3600000
         self._timeout_ms = timeout_ms
         await self.set_menu_option(decode_timeout + int_conv(timeout_ms))
         await self._conn.set_timeout("timeout", timeout_ms / 1000.0)

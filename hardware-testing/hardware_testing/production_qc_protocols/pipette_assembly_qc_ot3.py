@@ -670,7 +670,7 @@ def _read_pressure_and_check_results(
 
 
 def _aspirate_and_look_for_droplets(
-    api: SyncHardwareAPI, mount: OT3Mount, wait_time: int
+    ctx: ProtocolContext, api: SyncHardwareAPI, mount: OT3Mount, wait_time: int
 ) -> bool:
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
@@ -685,7 +685,9 @@ def _aspirate_and_look_for_droplets(
     if api.is_simulator:
         leak_test_passed = True
     else:
-        leak_test_passed = helpers_ot3.get_user_answer(api, "did it pass? no leaking?")
+        leak_test_passed = helpers_ot3.get_user_answer(
+            ctx, api, "did it pass? no leaking?"
+        )
 
     api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
     api.dispense(mount, pipette_volume, is_full_dispense=True)
@@ -784,6 +786,7 @@ def _fixture_check_pressure(
 
 
 def _test_for_leak(
+    ctx: ProtocolContext,
     api: SyncHardwareAPI,
     cfg: TestConfig,
     tip_volume: int,
@@ -814,7 +817,7 @@ def _test_for_leak(
         assert CALIBRATED_LABWARE_LOCATIONS.reservoir
         _move_safe(api, cfg.mount, CALIBRATED_LABWARE_LOCATIONS.reservoir)
         test_passed = _aspirate_and_look_for_droplets(
-            api, cfg.mount, droplet_wait_seconds
+            ctx, api, cfg.mount, droplet_wait_seconds
         )
         _drop_tip_in_trash(api, cfg)
     return test_passed
@@ -833,6 +836,7 @@ def test_fixture(
         side=cfg.fixture_side,
     )
     _test_for_leak(
+        ctx,
         api,
         cfg,
         PRESSURE_FIXTURE_TIP_VOLUME,
@@ -864,6 +868,7 @@ def test_liquid(
     for i in range(cfg.num_trials):
         droplet_wait_seconds = cfg.droplet_wait_seconds * (i + 1)
         test_passed = _test_for_leak(
+            ctx,
             api,
             cfg,
             cfg.pipette_volume,
@@ -1313,7 +1318,7 @@ def _test_plunger_positions(
     if api.is_simulator:
         blow_out_passed = True
     else:
-        blow_out_passed = helpers_ot3.get_user_answer(api, "is BLOW-OUT correct?")
+        blow_out_passed = helpers_ot3.get_user_answer(ctx, api, "is BLOW-OUT correct?")
         if not blow_out_passed:
             printval = f"02-01-BLOW-OUT:移液器BLOW-OUT {blow_out_passed}"
             FINAL_TEST_FAIL_INFOR.append(printval)
@@ -1322,7 +1327,7 @@ def _test_plunger_positions(
     if api.is_simulator:
         drop_tip_passed = True
     else:
-        drop_tip_passed = helpers_ot3.get_user_answer(api, "is DROP-TIP correct?")
+        drop_tip_passed = helpers_ot3.get_user_answer(ctx, api, "is DROP-TIP correct?")
         if not drop_tip_passed:
             printval = f"02-02-DROP-TIP:移液器DROP-TIP {drop_tip_passed}"
             FINAL_TEST_FAIL_INFOR.append(printval)
@@ -1767,7 +1772,7 @@ def test_liquid_probe_new(
                     # bad named method here since it's going to the liquid
                     _move_to_above_plate_liquid(api, cfg.mount, probe, end_z - top_z)
                     helpers_ot3.get_user_answer(
-                        api, "Is the tip just touching the liquid?"
+                        ctx, api, "Is the tip just touching the liquid?"
                     )
                     good_height = end_z
                 _drop_tip_in_trash(api, cfg)
@@ -2411,7 +2416,7 @@ def run(ctx: ProtocolContext) -> None:
 
         report = build_report(test_name, config)
         dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
-        helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut)  # type: ignore[attr-defined]
+        helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut, ctx=ctx)  # type: ignore[attr-defined]
 
         store_config(report, ctx, config.pipette_channels, config.pipette_volume)
 
