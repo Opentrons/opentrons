@@ -58,11 +58,7 @@ function mockLoginSuccess(
 function mockLoginRequiringPasswordReset(): void {
   vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
     submitPassword: (username: string, _password: string) => {
-      onSuccess(
-        username,
-        mockAuthUser({ resetPassword: true }),
-        TOKEN_RESPONSE
-      )
+      onSuccess(username, mockAuthUser({ resetPassword: true }), TOKEN_RESPONSE)
     },
     isAuthLoading: false,
   }))
@@ -117,14 +113,21 @@ function logInWithTempPassword(): void {
 }
 
 describe('LoginModal', () => {
+  let storeLoginState: ReturnType<typeof vi.fn>
+  let submitPassword: ReturnType<typeof vi.fn>
+  let submitNewPassword: ReturnType<typeof vi.fn>
+
   beforeEach(() => {
-    vi.mocked(useStoreLoginState).mockReturnValue(vi.fn())
+    storeLoginState = vi.fn()
+    submitPassword = vi.fn()
+    submitNewPassword = vi.fn()
+    vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
-      submitPassword: vi.fn(),
+      submitPassword,
       isAuthLoading: false,
     })
     vi.mocked(useSetNewPasswordAndSignIn).mockReturnValue({
-      submitNewPassword: vi.fn(),
+      submitNewPassword,
       isLoading: false,
     })
   })
@@ -163,9 +166,6 @@ describe('LoginModal', () => {
   })
 
   it('submits credentials, stores login state, and closes on success', () => {
-    const storeLoginState = vi.fn()
-    const submitPassword = vi.fn()
-    vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
     mockLoginSuccess(submitPassword)
 
     renderAndOpenLoginModal()
@@ -201,8 +201,6 @@ describe('LoginModal', () => {
   })
 
   it('shows password expired view when login requires a new password', () => {
-    const storeLoginState = vi.fn()
-    vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
     mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
@@ -219,9 +217,6 @@ describe('LoginModal', () => {
   })
 
   it('submits a new password and closes on success', () => {
-    const storeLoginState = vi.fn()
-    const submitNewPassword = vi.fn()
-    vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
     mockLoginRequiringPasswordReset()
     mockSetNewPasswordSuccess(submitNewPassword)
 
