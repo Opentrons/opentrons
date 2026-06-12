@@ -16,7 +16,10 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
-import { useOAuth2PasswordLogin } from '/app/resources/auth'
+import {
+  useOAuth2PasswordLogin,
+  useSetNewPasswordAndSignIn,
+} from '/app/resources/auth'
 
 import styles from './loginmodal.module.css'
 
@@ -44,9 +47,17 @@ const LoginModal = NiceModal.create((props: LoginModalProps) => {
 function LoginModalImpl(): JSX.Element {
   const modal = useModal()
   const { t } = useTranslation()
-  const [view, setView] = useState<'login' | 'forgotPassword'>('login')
+  const [view, setView] = useState<
+    'login' | 'forgotPassword' | 'passwordExpired'
+  >('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [confirmPasswordError, setConfirmPasswordError] = useState<
+    string | null
+  >(null)
+  const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
   const [loginError, setLoginError] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
 
@@ -57,9 +68,18 @@ function LoginModalImpl(): JSX.Element {
   }
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
-    onSuccess: (successfulUsername, _user, response) => {
+    onSuccess: (successfulUsername, user, response) => {
       setLoginError(null)
       storeLoginState(successfulUsername, response)
+
+      if (user.resetPassword) {
+        setLoggedInUsername(successfulUsername)
+        setPassword('')
+        setConfirmPasswordError(null)
+        setView('passwordExpired')
+        return
+      }
+
       modal.remove()
     },
     onError: message => {
@@ -67,11 +87,41 @@ function LoginModalImpl(): JSX.Element {
     },
   })
 
+  const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
+    useSetNewPasswordAndSignIn({
+      onSuccess: (successfulUsername, response) => {
+        setLoginError(null)
+        storeLoginState(successfulUsername, response)
+        modal.remove()
+      },
+      onError: message => {
+        setLoginError(message)
+      },
+    })
+
   const isLoginDisabled = username === '' || password === '' || isAuthLoading
+  const isPasswordExpiredDisabled =
+    newPassword === '' ||
+    confirmPassword === '' ||
+    isSetNewPasswordLoading ||
+    loggedInUsername == null
 
   const handleSubmit: ComponentProps<'form'>['onSubmit'] = event => {
     event.preventDefault()
     submitPassword(username, password)
+  }
+
+  const handleSetNewPassword = (): void => {
+    if (newPassword !== confirmPassword) {
+      setConfirmPasswordError(
+        t('access_control:desktop_password_expired_mismatch') as string
+      )
+      return
+    }
+    setConfirmPasswordError(null)
+    if (loggedInUsername != null) {
+      submitNewPassword(loggedInUsername, newPassword)
+    }
   }
 
   const handleUsernameChange = (value: string): void => {
@@ -82,6 +132,18 @@ function LoginModalImpl(): JSX.Element {
   const handlePasswordChange = (value: string): void => {
     setLoginError(null)
     setPassword(value)
+  }
+
+  const handleNewPasswordChange = (value: string): void => {
+    setLoginError(null)
+    setConfirmPasswordError(null)
+    setNewPassword(value)
+  }
+
+  const handleConfirmPasswordChange = (value: string): void => {
+    setLoginError(null)
+    setConfirmPasswordError(null)
+    setConfirmPassword(value)
   }
 
   const footer = (
@@ -96,7 +158,7 @@ function LoginModalImpl(): JSX.Element {
         >
           {t('access_control:log_in_link')}
         </PrimaryButton>
-      ) : (
+      ) : view === 'forgotPassword' ? (
         <SecondaryButton
           onClick={() => {
             setView('login')
@@ -104,6 +166,13 @@ function LoginModalImpl(): JSX.Element {
         >
           {t('shared:back')}
         </SecondaryButton>
+      ) : (
+        <PrimaryButton
+          onClick={handleSetNewPassword}
+          disabled={isPasswordExpiredDisabled}
+        >
+          {t('shared:confirm')}
+        </PrimaryButton>
       )}
     </div>
   )
@@ -128,8 +197,17 @@ function LoginModalImpl(): JSX.Element {
               setView('forgotPassword')
             }}
           />
-        ) : (
+        ) : view === 'forgotPassword' ? (
           <ForgotPasswordView />
+        ) : (
+          <PasswordExpiredView
+            newPassword={newPassword}
+            confirmPassword={confirmPassword}
+            newPasswordError={loginError}
+            confirmPasswordError={confirmPasswordError}
+            onNewPasswordChange={handleNewPasswordChange}
+            onConfirmPasswordChange={handleConfirmPasswordChange}
+          />
         )}
       </div>
     </Modal>,
@@ -214,5 +292,62 @@ function ForgotPasswordView(): JSX.Element {
         {t('access_control:forgot_password_subheading')}
       </StyledText>
     </div>
+  )
+}
+
+interface PasswordExpiredViewProps {
+  newPassword: string
+  confirmPassword: string
+  newPasswordError: string | null
+  confirmPasswordError: string | null
+  onNewPasswordChange: (value: string) => void
+  onConfirmPasswordChange: (value: string) => void
+}
+
+function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
+  const {
+    newPassword,
+    confirmPassword,
+    newPasswordError,
+    confirmPasswordError,
+    onNewPasswordChange,
+    onConfirmPasswordChange,
+  } = props
+  const { t } = useTranslation()
+
+  return (
+    <>
+      <div className={styles.text_container}>
+        <StyledText desktopStyle="headingSmallBold">
+          {t('access_control:desktop_password_expired_heading')}
+        </StyledText>
+        <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
+          {t('access_control:desktop_password_expired_subheading')}
+        </StyledText>
+      </div>
+
+      <div className={styles.fields_container}>
+        <InputField
+          name="newPassword"
+          title={t('access_control:desktop_password_expired_new_password_field')}
+          type="password"
+          value={newPassword}
+          error={newPasswordError ?? undefined}
+          onChange={event => {
+            onNewPasswordChange(event.target.value)
+          }}
+        />
+        <InputField
+          name="confirmPassword"
+          title={t('access_control:desktop_password_expired_confirm_password_field')}
+          type="password"
+          value={confirmPassword}
+          error={confirmPasswordError ?? undefined}
+          onChange={event => {
+            onConfirmPasswordChange(event.target.value)
+          }}
+        />
+      </div>
+    </>
   )
 }
