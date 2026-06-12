@@ -27,6 +27,7 @@ This release is designed specifically for use with Opentrons Flex, and includes 
 - Protocol Designer allows manual tip tracking with:
   - A partial column pickup (for 5 or more pipette tips).
   - Tip pickups with Flex 20 µL pipette tips.
+- Protocols that include partial column (2-7 pipette tips) liquid handling steps aspirate from and dispense into the correct source and destination wells.
 - Protocol Designer no longer includes unnecessary collision warnings when transferring liquid with every nozzle of a Flex 96-channel pipette.
 - Move Opentrons Tough Universal Lids onto any compatible labware on the deck.
 
