@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react'
 import { useQueryClient } from 'react-query'
+import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
 
+import { getLocalRobot } from '/app/redux/discovery'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -20,6 +22,7 @@ import type {
   HostConfig,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
 export interface LoginModalResult {
@@ -37,6 +40,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [loginError, setLoginError] = useState<string | null>(null)
   const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
+  const localRobotName = useSelector(
+    (state: State) => getLocalRobot(state)?.name ?? null
+  )
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
@@ -57,7 +63,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleLoginSuccess = useCallback(
     (username: string, user: AuthUser, response: OAuth2TokenResponse): void => {
       setLoginError(null)
-      storeLoginState(username, response)
+      storeLoginState(localRobotName, username, response)
       invalidateSelfQuery()
 
       if (user.resetPassword) {
@@ -69,7 +75,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
       finishModal(username)
     },
-    [finishModal, invalidateSelfQuery, storeLoginState]
+    [finishModal, invalidateSelfQuery, storeLoginState, localRobotName]
   )
 
   const dismissModal = useCallback((): void => {
@@ -80,11 +86,11 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleNewPasswordSuccess = useCallback(
     (username: string, response: OAuth2TokenResponse): void => {
       setLoginError(null)
-      storeLoginState(username, response)
+      storeLoginState(localRobotName, username, response)
       invalidateSelfQuery()
       finishModal(username)
     },
-    [finishModal, invalidateSelfQuery, storeLoginState]
+    [finishModal, invalidateSelfQuery, storeLoginState, localRobotName]
   )
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =

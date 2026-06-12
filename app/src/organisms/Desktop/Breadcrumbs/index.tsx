@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import clsx from 'clsx'
 
@@ -15,7 +15,6 @@ import {
 import {
   ApiHostProvider,
   useAccessControlEnabledQuery,
-  useHost,
 } from '@opentrons/react-api-client'
 
 import { AccountIconButton } from '/app/atoms/buttons/AccountIconButton'
@@ -24,10 +23,9 @@ import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { logOut, useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
-import { useLogOut } from '/app/resources/access-control/useLogOut'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
@@ -68,7 +66,13 @@ function CrumbAndSeparator({
   )
 }
 
-function AccountSection(): JSX.Element | null {
+interface AccountSectionProps {
+  robotName: string
+}
+
+function AccountSection({
+  robotName,
+}: AccountSectionProps): JSX.Element | null {
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data.accessControlEnabled ?? false
@@ -77,13 +81,16 @@ function AccountSection(): JSX.Element | null {
     if (accountIconInfo.showIcon) {
       return (
         <div className={styles.right_container}>
-          <AccountIconAndMenu initial={accountIconInfo.iconContents} />
+          <AccountIconAndMenu
+            initial={accountIconInfo.iconContents}
+            robotName={robotName}
+          />
         </div>
       )
     } else {
       return (
         <div className={styles.right_container}>
-          <LoginLink />
+          <LoginLink robotName={robotName} />
         </div>
       )
     }
@@ -94,17 +101,18 @@ function AccountSection(): JSX.Element | null {
 
 interface AccountIconAndMenuProps {
   initial: ComponentProps<typeof AccountIconButton>['initial']
+  robotName: string
 }
 
 function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
-  const { initial } = props
+  const { initial, robotName } = props
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const onClickOutside = useCallback(() => {
     setIsMenuOpen(false)
   }, [])
   const menuContainerRef = useOnClickOutside<HTMLDivElement>({ onClickOutside })
 
-  const logOut = useLogOut()
+  const dispatch = useDispatch()
   const { t } = useTranslation('top_navigation')
 
   return (
@@ -127,25 +135,32 @@ function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
         // account settings, when that's implemented.
         <MenuList>
           <MenuItem>{t('account_settings')}</MenuItem>
-          <MenuItem onClick={logOut}>{t('log_out')}</MenuItem>
+          <MenuItem
+            onClick={() => {
+              dispatch(logOut({ robotName }))
+            }}
+          >
+            {t('log_out')}
+          </MenuItem>
         </MenuList>
       ) : null}
     </div>
   )
 }
 
-function LoginLink(): JSX.Element {
+interface LoginLinkProps {
+  robotName: string
+}
+
+function LoginLink({ robotName }: LoginLinkProps): JSX.Element {
   const { t } = useTranslation('top_navigation')
-  const host = useHost()
   const handleClick = useCallback(() => {
-    if (host == null) {
-      console.error(
-        "Couldn't determine the host for a login modal. Is a provider missing?"
-      )
+    if (robotName == null) {
+      console.error("Couldn't determine the robot to log in to.")
     } else {
-      showLoginModal({ host })
+      showLoginModal({ robotName })
     }
-  }, [host])
+  }, [robotName])
 
   return (
     <BasicButton type="button" onClick={handleClick} underLine>
@@ -262,7 +277,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
           )
         })}
       </div>
-      <AccountSection />
+      <AccountSection robotName={robotName} />
     </div>
   ) : null
 }
