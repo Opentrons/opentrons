@@ -14,15 +14,11 @@ classifiers = [
     "Private :: Do Not Upload"  # Prevent uploading to PyPI.
 ]
 dependencies = [
-    "opentrons[flex-hardware]",
+    "opentrons==0.0.0",
     "opentrons-shared-data==0.0.0",
     "opentrons-hardware[FLEX]==0.0.0",
     "hardware-testing",
-    "abr-testing",
     "pyserial==3.5",
-    "types-pytz",
-    "paramiko",
-    "types-paramiko",
     "anyio==4.9.0",
 ]
 dynamic = ["version"]
@@ -52,6 +48,17 @@ local_scheme = 'no-local-version'
 [tool.hatch.build.targets.wheel]
 packages = ["hardware_testing"]
 exclude = [
+    "abr_tools",
+    "examples",
+    "gravimetric",
+    "labware",
+    "legacy_tests",
+    "modules",
+    "production_qc",
+    "production_qc_protocols",
+    "protocols",
+    "scripts",
+    "tools",
     "tests",
     "tests.*",
 ]
@@ -75,6 +82,7 @@ abr-testing = {path = "./../abr-testing", editable = true}
 
 [dependency-groups]
 dev = [
+    "abr-testing",
     "atomicwrites==1.4.1",
     "colorama==0.4.4",
     "pytest<9,>=8",
@@ -92,4 +100,7 @@ dev = [
     "build~=1.2.0",
     "matplotlib==3.10.0",
     "setuptools<82",
+    "paramiko",
+    "types-paramiko",
+    "types-pytz",
 ]
