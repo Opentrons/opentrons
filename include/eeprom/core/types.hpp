@@ -21,9 +21,7 @@ constexpr data_length book_header_length = 8;
 
 constexpr data_length page_length = 64;
 
-// NOTE: Changed during testing to be 64 instead of 8 to try and write more in
-// one go
-using EepromData = std::array<uint8_t, page_length>;
+using EepromData = std::array<uint8_t, page_length / 2>;
 
 constexpr uint8_t pages_per_book = 4;
 

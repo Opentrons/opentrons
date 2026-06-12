@@ -9,6 +9,8 @@ namespace i2c {
 namespace messages {
 
 using std::size_t;
+// The maximum buffer size for an i2c transaction is 34 bytes, which is the size
+// of EEPromData (in eeprom::types) + 2 bytes for the register address.
 static constexpr std::size_t MAX_BUFFER_SIZE = 34;
 using MaxMessageBuffer = std::array<uint8_t, MAX_BUFFER_SIZE>;
 

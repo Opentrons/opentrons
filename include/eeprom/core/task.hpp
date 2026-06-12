@@ -129,6 +129,7 @@ class EEPromMessageHandler {
         auto buffer = i2c::messages::MaxMessageBuffer{};
         auto *iter = buffer.begin();
 
+        uint8_t offset = 2;
         // Older boards use 1 byte addresses, if we're on an older board we
         // need to drop the higher byte of the memory address when sending the
         // the message over i2c
@@ -137,15 +138,16 @@ class EEPromMessageHandler {
                 hardware_iface::EEPromAddressType::EEPROM_ADDR_8_BIT)) {
             m.memory_address = m.memory_address
                                << hardware_iface::ADDR_BITS_DIFFERENCE;
+            offset = 1;
         }
         iter = bit_utils::int_to_bytes(
             // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             m.memory_address, iter, (iter + hw_iface.get_eeprom_addr_bytes()));
         // Remainder is data
-        iter = std::copy_n(
-            m.data.cbegin(),
-            std::min(buffer.size() - 1, static_cast<std::size_t>(m.length)),
-            iter);
+        iter = std::copy_n(m.data.cbegin(),
+                           std::min(buffer.size() - offset,
+                                    static_cast<std::size_t>(m.length)),
+                           iter);
         // A write transaction.
         auto transaction = i2c::messages::Transaction{
             .message_index = m.message_index,
