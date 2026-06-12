@@ -37,21 +37,29 @@ Follow these instructions to install the Vacuum Module.
     <figcaption>IMAGE TBD</figcaption>
     </figure>
 
+</div>
+
+<div class="instruction-list" markdown>
+
 ## Part 2: External components setup
 
-6. Position the carboy cradle and the 2-liter glass carboy on the lab bench at or below the level of the control box.
+6. Position the carboy cradle and the 2-liter glass carboy on the lab bench at or below the level of the Control Box.
 
 7. Tighten the cap onto the carboy by hand until it is securely sealed. Do not over-tighten the cap, this is not a trial of strength.
 
 8. Connect the free end of the 6 mm (&frac14;") vacuum tube coming from the manifold base to the carboy inlet port. Measure and cut the tubing to length if necessary.
 
-8. Connect the 9.5 mm (&frac38;") vacuum hose from the carboy outlet port to the inlet port on the control box. Measure and cut the hose to length if necessary.
+9. Connect the 9.5 mm (&frac38;") vacuum hose from the carboy outlet port to the inlet port on the Control Box. Measure and cut the hose to length if necessary.
+
+</div>
+
+<div class="instruction-list" markdown>
 
 ## Part 3: Data and power connections
 
-10. Connect the USB cable to the data port on the control box and to an available USB port on the Flex.
+10. Connect the USB cable to the data port on the Control Box and to an available USB port on the Flex.
 
-11. Connect the IEC power cable to the control box power inlet and plug it into a mains power outlet.
+11. Connect the IEC power cable to the Control Box power inlet and plug it into a mains power outlet.
 
 12. Turn on the power to the Flex. After the Flex reboots, then power on the Vacuum Module. Verify that the LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font>.
 
