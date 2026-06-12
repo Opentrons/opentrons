@@ -134,10 +134,10 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
     </tr>
     <tr>
       <td><strong>Weight</strong></td>
-      <td>kg</td>
+      <td><font color="red"><strong>TBD</strong></font> kg</td>
     </tr>
       <td><strong>Maximum pump rate</strong></td>
-      <td>L/min</td>
+      <td><font color="red"><strong>TBD</strong></font> L/min</td>
     </tr>
     <tr>
       <td><strong>Vacuum range (absolute)</strong></td>
@@ -169,13 +169,7 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
     </tr>
     <tr>
       <td><strong>Material composition</strong></td>
-      <td>
-        <ul>
-          <li>Hoses: Perfluoroalkoxy (PFA)</li>
-          <li>Fittings: Polypropylene (PP)</li>
-          <li>Gaskets: Ethylene Propylene Diene Monomer (EPDM)</li>
-        </ul>
-      </td>
+      <td>Perfluoroalkoxy (PFA)</td>
     </tr>
   </tbody>
 </table>
@@ -206,9 +200,9 @@ The Vacuum Module ships with glass carboy for waste collection and a safety crad
       <td>
         <ul>
           <li>Type: GL80 (blue)</li>
-          <li>Insert: Stainless steel, ported/threaded for hose connectors</li>
-          <li>Seal: integral lip seal (PP)</li>
-          <li>Backflow preventer: float ball and valve (PP)
+          <li>Insert: Stainless steel, ported and threaded for hose connectors</li>
+          <li>Seal: integral lip seal (polypropylene)</li>
+          <li>Backflow preventer: float ball and valve (polypropylene)</li>
       </td>
     </tr>
   </tbody>
@@ -296,7 +290,7 @@ Opentrons has validated the performance of the Vacuum Module in the conditions r
 
 ## LED Status Lights
 
-Status lights on the vacuum pump unit provide at-a-glance information about its operations. The colors and illumination patterns listed below indicate the different operating states.
+Status lights on the control box provide at-a-glance information about its operations. The colors and illumination patterns listed below indicate the different operating states.
 
 <table>
     <thead>

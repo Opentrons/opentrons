@@ -7,7 +7,7 @@ The Vacuum Module uses combinations of interchangeable collars and spacers to co
 
 ## Collars
 
-Collars sit directly on the manifold base to support filter plates during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the manifold base it to the collar. All collars are fully compatible with the Flex Gripper for automated protocol operations.
+Collars sit directly on the manifold base to support filter plates during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the manifold base seals it to the collar. All collars are fully compatible with the Flex Gripper for automated protocol operations.
 
 The Vacuum Module ships with two collar sizes:
 
@@ -22,7 +22,9 @@ The Vacuum Module ships with two collar sizes:
 
 ## Spacers
 
-Spacers fit inside the manifold base to support internal labware that collects material drawn through the filter plate. Their primary mechanical purpose is to minimize the gap between the source filter plate and the destination collection plate. Reducing this gap ensures liquid drops fall cleanly and directly into the recieving wells, preventing high-velocity vacuum streams from pulling fluid droplets sideways or causing cross-contamination.
+Spacers sit inside the manifold base to elevate and support the internal collection labware.
+
+The primary purpose of a spacer is to minimize the vertical clearance between the source filter plate and the destination collection plate. A small plate gap helps ensure fluid droplets drop cleanly and directly into the receiving wells, preventing high-velocity vacuum streams from diverting droplets sideways and causing cross-contamination.
 
 The Vacuum Module ships with two spacer sizes to match varying labware profiles:
 
@@ -41,18 +43,26 @@ The Vacuum Module ships with two spacer sizes to match varying labware profiles:
 
 This configuration is used when a protocol requires capturing the filtered liquid (the eluate or a target filtrate) into a collection plate placed inside the manifold base.
 
-* **Internal Hardware:** An internal spacer is placed inside the manifold base to elevate and position the collection labware directly beneath the filter plate.
+* **Internal Hardware:** An internal spacer is placed inside the manifold base to raise and position the collection labware directly beneath the filter plate.
 * **Fluid Routing:** Liquid flows vertically through the filter plate and drips straight into the corresponding collection wells.
 
+<font color="red"><strong>EXPLODED DIAGRAM PLACEHOLDER</strong></font>
 
-Standard stack order: manifold base > spacer > collection plate > collar > filter plate
+<figure markdown>
+![placeholder for diagram](./images/image-placeholder.png)
+<figcaption>Stack (top to bottom): source well plate, collar and grid, collection plate, spacer, manifold base</figcaption>
+</figure>
 
 ### Direct Filter to Waste
 
-This configuration is used when the liquid being pulled through the filter plate is unwanted waste and can be immediately discarded.
+This configuration is used when the liquid being pulled through the filter plate is unwanted waste and can be discarded to the carboy.
 
 * **Internal Hardware:** No internal spacer or collection plate is used. The inside of the manifold base remains completely empty.
 * **Fluid Routing:** Vacuum pressure draws liquid straight through the filter plate into the manifold base, routing it through the connected vacuum hose and out to the off-deck 2-liter carboy.
 
-<font color="red">IMAGE PLACEHOLDER</font>  
-*Standard stack order: Vacuum Manifold Base > Collar > Filter Plate*
+<font color="red"><strong>EXPLODED DIAGRAM PLACEHOLDER</strong></font>
+
+<figure markdown>
+![placeholder for diagram](./images/image-placeholder.png)
+<figcaption>Stack (top to bottom): source well plate, collar and grid, manifold base</figcaption>
+</figure>
