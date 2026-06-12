@@ -7,7 +7,6 @@ from typing import Dict, Callable, cast, List, Union, Tuple, Literal
 from opentrons.protocol_api import ParameterContext, ProtocolContext, OFF_DECK
 from opentrons.types import Point
 
-from opentrons.config import IS_ROBOT
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3simulator import (
@@ -35,64 +34,18 @@ from opentrons.hardware_control.types import (
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 from opentrons.hardware_control.motion_utilities import target_position_from_relative
 
-# ------ TODO remove and move necessary libraries into a standard release library. ----
-import importlib
-import os
-from opentrons.config import infer_config_base_dir
-from opentrons import version
-import sys
 
-
-def _download_and_extract(version_str: str, base_dir: str) -> None:
-    from urllib.request import urlretrieve
-    from zipfile import ZipFile
-
-    zipfile = f"https://github.com/Opentrons/opentrons/archive/refs/tags/v{release}.zip"
-    where_to_place = os.path.join(base_dir, "hardware_testing")
-    urlretrieve(zipfile, os.path.join(base_dir, "source.zip"))
-    zf = ZipFile(os.path.join(base_dir, "source.zip"), "r")
-    files = [f for f in zf.namelist() if "hardware_testing" in f and "tests" not in f]
-    files = [f for f in files if "py" in f]
-    start_path = f"opentrons-{version_str}/hardware-testing/hardware_testing/"
-    for f in files:
-        dest_name = f.replace(start_path, "")
-        dest_file = os.path.join(where_to_place, dest_name)
-        dat = zf.read(f)
-        os.makedirs(os.path.dirname(dest_file), exist_ok=True)
-        out = open(dest_file, "wb")
-        out.write(dat)
-        out.close()
-    with open(os.path.join(where_to_place, "VERSION.txt"), "w") as ver_file:
-        ver_file.write(version_str)
-
-
-if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
-    # we're simulating or there is not a vaild hardware-testing yet
-    base_dir = str(infer_config_base_dir())
-    release = f"{version.replace('a', '-alpha.').replace('b', '-beta.')}"
-    version_file_path = os.path.join(base_dir, "hardware_testing", "VERSION.txt")
-    if os.path.exists(version_file_path):
-        with open(version_file_path, "r") as version_file:
-            if version_file.readline() != release:
-                _download_and_extract(release, base_dir)
-    else:
-        _download_and_extract(release, base_dir)
-    sys.path.append(base_dir)
-
-
-# ----- END: TODO ------
-
-from hardware_testing.data.csv_report import (  # noqa: E402
+from hardware_testing.data.csv_report import (
     CSVReport,
     CSVSection,
     CSVResult,
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.drivers.sealed_pressure_fixture import (  # noqa: E402
+from hardware_testing.drivers.sealed_pressure_fixture import (
     SerialDriver as SealedPressureDriver,
 )
-from hardware_testing.opentrons_api import helpers_ot3  # noqa: E402
+from hardware_testing.opentrons_api import helpers_ot3
 
 
 # ----------- Monkey patches -----------

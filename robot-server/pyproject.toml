@@ -23,6 +23,7 @@ dependencies = [
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
     "opentrons-hardware[FLEX]==0.0.0",
+    "hardware-testing==0.0.0",
     "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
@@ -37,6 +38,7 @@ dev = {requires-python = ">=3.11"}
 robot = [
     "opentrons==0.0.0",
     "opentrons-hardware[FLEX]==0.0.0",
+    "hardware-testing==0.0.0",
     "opentrons-shared-data==0.0.0",
     "server-utils==0.0.0",
     "anyio==4.9.0",
@@ -124,6 +126,7 @@ opentrons = { path = "../api", editable = true }
 opentrons-shared-data = { path = "../shared-data", editable = true }
 server-utils = { path = "../server-utils", editable = true }
 opentrons-hardware = { path = "../hardware", editable = true }
+hardware-testing = { path = "../hardware-testing", editable = true }
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/robot-server"
@@ -138,7 +141,7 @@ build-backend = "hatchling.build"
 
 # --- hatch-dependency-coversion: exact co-versioning of specific deps ---
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of = ["opentrons-shared-data", "opentrons", "server-utils"]
+override-versions-of = ["opentrons-shared-data", "opentrons", "server-utils", "hardware-testing"]
 
 # --- hatch-vcs-tunable: VCS-derived version with env-tunable settings ---
 [tool.hatch.build.hooks.vcs-tunable]
