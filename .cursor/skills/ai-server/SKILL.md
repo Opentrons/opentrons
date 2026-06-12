@@ -61,7 +61,7 @@ opentrons-ai-server/
 │ ├── constants/ # Shared constants
 │ ├── data/ # Static data files
 │ ├── storage/ # Stored API docs, indexes
-│ ├── utils/ # Markdown conversion, index creation
+│ ├── utils/ # API docs sync, curation, metadata helpers
 │ └── settings.py # Pydantic Settings — all env vars and secrets
 ├── tests/
 │ ├── conftest.py # Pytest fixtures and --env option
@@ -145,10 +145,37 @@ The container does **not** use uv internally:
 
 1. `make build` calls `make gen-requirements` → `uv export --no-hashes --no-dev -o requirements.txt`
 2. Dockerfile installs with plain `pip`
-3. Copies `api/` source and Opentrons API docs
+3. Copies `api/` source and Opentrons API docs synced under `api/storage/api_docs/docs/v2`
 4. Entrypoint: `uvicorn api.handler.fast:app` (3 workers, port 8000)
 
-Docker build context is the **repo root** (not `opentrons-ai-server/`) so the Dockerfile can copy `api/docs/v2` from the sibling `api/` package.
+Docker build context is the **repo root** (not `opentrons-ai-server/`). Run `make sync-api-docs` before building so Python API docs from the pinned `DOCS_TAG` Makefile variable are present under `api/storage/api_docs/docs/v2`.
+
+## Python API docs curation
+
+The helper model that selects relevant docs reads `api/storage/api_docs/api_docs_struct.md`. Rich `<about>` routing text is **not** taken from synced markdown alone; it comes from committed curation.
+
+| File                         | Edit?  | Purpose                                             |
+| ---------------------------- | ------ | --------------------------------------------------- |
+| `api_docs_struct_about.json` | Yes    | Source of truth for curated `<about>` text          |
+| `api_docs_struct_v2.25.md`   | Rarely | Legacy RST-path archive; bootstrap for regeneration |
+| `api_docs_struct.md`         | **No** | Generated on `make sync-api-docs`                   |
+| `docs/v2/` (synced markdown) | **No** | Gitignored; fetched from `DOCS_TAG`                 |
+
+**Legacy → markdown mapping** (single module: `api/utils/api_docs_struct_curated.py`):
+
+1. `LEGACY_RST_TO_MD` for explicit renames (e.g. `docs/v2/new_modules.rst` → `modules/index.md`)
+2. Mechanical rule for other `docs/v2/*.rst`: underscores → hyphens, `.rst` → `.md`
+3. `REFERENCE_ABOUT_OVERRIDES` and `NEW_DOCS_ABOUT_OVERRIDES` for pages without legacy entries
+
+Runtime path resolution in `anthropic_predict.py` imports the same mapping. Do not duplicate the map.
+
+```bash
+uv run --python 3.12 python -m api.utils.api_docs_struct_curated  # rebuild JSON from legacy + overrides
+make sync-api-docs                                                 # regenerate api_docs_struct.md (warns on gaps)
+make check-api-docs-curation                                       # fail if JSON and synced docs diverge
+```
+
+Full details: `opentrons-ai-server/docs/API_DOCS_CURATION.md`
 
 ## Testing
 
