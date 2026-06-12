@@ -7,6 +7,7 @@ from typing import Dict, Callable, cast, List, Union, Tuple, Literal
 from opentrons.protocol_api import ParameterContext, ProtocolContext, OFF_DECK
 from opentrons.types import Point
 
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3simulator import (
@@ -294,22 +295,28 @@ def build_jaws_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-def _check_if_jaw_is_aligned_with_endstop(api: SyncHardwareAPI) -> bool:
+def _check_if_jaw_is_aligned_with_endstop(
+    ctx: ProtocolContext, api: SyncHardwareAPI
+) -> bool:
     if not api.is_simulator:
-        pass_no_hit = helpers_ot3.get_user_answer(api, "are both endstop Lights OFF?")
+        pass_no_hit = helpers_ot3.get_user_answer(
+            ctx, api, "are both endstop Lights OFF?"
+        )
     else:
         pass_no_hit = True
 
     return pass_no_hit
 
 
-def jaw_precheck(api: SyncHardwareAPI, ax: Axis, speed: float) -> Tuple[bool, bool]:
+def jaw_precheck(
+    ctx: ProtocolContext, api: SyncHardwareAPI, ax: Axis, speed: float
+) -> Tuple[bool, bool]:
     """Check the LEDs work and jaws are aligned."""
     # HOME
     helpers_ot3.home_tip_motors_sync(api, False)  # Home with no backoff
     # Check LEDs can turn on when homed
     if not api.is_simulator:
-        led_check = helpers_ot3.get_user_answer(api, "are both endstop Lights ON?")
+        led_check = helpers_ot3.get_user_answer(ctx, api, "are both endstop Lights ON?")
     else:
         led_check = True
     if not led_check:
@@ -318,7 +325,9 @@ def jaw_precheck(api: SyncHardwareAPI, ax: Axis, speed: float) -> Tuple[bool, bo
     helpers_ot3.move_tip_motor_relative_ot3_sync(api, RETRACT_MM, speed=speed)
     # Check Jaws are aligned
     if not api.is_simulator:
-        jaws_aligned = helpers_ot3.get_user_answer(api, "are both endstop Lights OFF?")
+        jaws_aligned = helpers_ot3.get_user_answer(
+            ctx, api, "are both endstop Lights OFF?"
+        )
     else:
         jaws_aligned = True
 
@@ -340,7 +349,7 @@ def test_jaws(
 
     async def _save_result(tag: str, led_check: bool, jaws_aligned: bool) -> bool:
         if led_check and jaws_aligned:
-            no_hit = _check_if_jaw_is_aligned_with_endstop(api)
+            no_hit = _check_if_jaw_is_aligned_with_endstop(ctx, api)
         else:
             no_hit = False
         result = CSVResult.from_bool(led_check and jaws_aligned and no_hit)
@@ -358,7 +367,7 @@ def test_jaws(
         speeds = CURRENTS_SPEEDS_JAWS[current]
         for speed in sorted(speeds, reverse=False):
 
-            led_check, jaws_aligned = jaw_precheck(api, ax, speed)
+            led_check, jaws_aligned = jaw_precheck(ctx, api, ax, speed)
 
             if led_check and jaws_aligned:
                 helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3_sync(
@@ -1085,7 +1094,11 @@ def get_trash_nominal() -> Point:
 
 
 def aspirate_and_wait(
-    api: SyncHardwareAPI, reservoir: Point, volume: int, seconds: int = 30
+    ctx: ProtocolContext,
+    api: SyncHardwareAPI,
+    reservoir: Point,
+    volume: int,
+    seconds: int = 30,
 ) -> Tuple[bool, float]:
     """Aspirate and wait."""
     helpers_ot3.move_to_arched_ot3_sync(api, OT3Mount.LEFT, reservoir)
@@ -1102,7 +1115,7 @@ def aspirate_and_wait(
     api.set_lights(True, True)
 
     if not api.is_simulator:
-        result = helpers_ot3.get_user_answer(api, "look good")
+        result = helpers_ot3.get_user_answer(ctx, api, "look good")
     else:
         result = True
     duration_seconds = monotonic() - start_time
@@ -1152,6 +1165,7 @@ def test_droplets(
         api.home_z(OT3Mount.LEFT)
 
         result, duration = aspirate_and_wait(
+            ctx,
             api,
             reservoir["A1"].top().move(OFFSET_FOR_1_WELL_LABWARE).point,
             test_volume,
@@ -1402,12 +1416,13 @@ def run(ctx: ProtocolContext) -> None:
             )
             for m in OT3Mount
         }
+        api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
         api.reset()
 
     test_name = "ninety-six-assembly-qc-ot3"
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut)  # type: ignore[attr-defined]
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut, ctx=ctx)  # type: ignore[attr-defined]
     args = ctx.params.get_all()
     t_sections = {
         s: f for s, f in TESTS if not args[f"skip_{s.value.lower().replace('-', '_')}"]

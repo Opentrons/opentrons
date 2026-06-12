@@ -11,6 +11,7 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_MAX_SPEEDS,
     DEFAULT_RUN_CURRENT,
 )
+from opentrons.hardware_control.peripherals import BarcodeScannerModel
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper,
     calibrate_gripper_jaw,
@@ -818,6 +819,7 @@ def run(ctx: ProtocolContext) -> None:
             )
             for m in OT3Mount
         }
+        api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
         api.reset()
 
     # Apply monkey patches
@@ -827,7 +829,7 @@ def run(ctx: ProtocolContext) -> None:
 
     report = build_report(test_name)
     dut = helpers_ot3.DeviceUnderTest.GRIPPER
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut)  # type: ignore[attr-defined]
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut, ctx=ctx)  # type: ignore[attr-defined]
     args = ctx.params.get_all()
     t_sections = {s: f for s, f in TESTS if not args[f"skip_{s.value.lower()}"]}
     if args["increment"]:
