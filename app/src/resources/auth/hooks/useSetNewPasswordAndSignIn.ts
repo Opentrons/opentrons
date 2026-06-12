@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   getOAuth2Token,
@@ -8,10 +9,14 @@ import {
 } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
+import { getLocalRobot } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+
 import { getOAuth2LoginErrorMessage } from './getOAuth2LoginErrorMessage'
 
 import type { TFunction } from 'i18next'
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 
 export interface UseSetNewPasswordAndSignInOptions {
   onSuccess: (username: string, response: OAuth2TokenResponse) => void
@@ -21,6 +26,15 @@ export interface UseSetNewPasswordAndSignInOptions {
 interface UseSetNewPasswordAndSignInResult {
   submitNewPassword: (username: string, password: string) => void
   isLoading: boolean
+}
+
+// TODO(TZ,6/12/2026): Do we have something like this already?
+/** Robot name to use when reading auth state during the set-new-password flow. */
+export function getAuthRobotNameForHost(
+  hostRobotName: string | null | undefined,
+  localRobotName: string | null
+): string | null {
+  return hostRobotName ?? localRobotName
 }
 
 /**
@@ -36,21 +50,29 @@ export function useSetNewPasswordAndSignIn(
   const { onSuccess, onError } = options
   const { t } = useTranslation('access_control') as { t: TFunction }
   const host = useHost()
+  const localRobotName = useSelector(
+    (state: State) => getLocalRobot(state)?.name ?? null
+  )
+  const robotName = getAuthRobotNameForHost(host?.robotName, localRobotName)
+  const accessTokenFromRedux = useAccessTokenForRobot(robotName)
   const [isLoading, setIsLoading] = useState(false)
 
   const submitNewPassword = useCallback(
     (username: string, password: string): void => {
-      if (host?.token == null) {
+      const accessToken = host?.token ?? accessTokenFromRedux ?? null
+      if (host == null || accessToken == null) {
         console.error('useSetNewPasswordAndSignIn: missing host token')
         onError(t('login_error_incorrect') as string)
         return
       }
 
+      const hostWithToken = { ...host, token: accessToken }
+
       setIsLoading(true)
       void (async () => {
         try {
           try {
-            await updateSelf(host, { data: { password } })
+            await updateSelf(hostWithToken, { data: { password } })
           } catch (error) {
             console.error(
               'useSetNewPasswordAndSignIn: failed to update password',
@@ -60,7 +82,7 @@ export function useSetNewPasswordAndSignIn(
             return
           }
 
-          const tokenResponse = await getOAuth2Token(host, {
+          const tokenResponse = await getOAuth2Token(hostWithToken, {
             grant_type: 'password',
             username,
             password,
@@ -75,7 +97,7 @@ export function useSetNewPasswordAndSignIn(
         }
       })()
     },
-    [host, onError, onSuccess, t]
+    [accessTokenFromRedux, host, onError, onSuccess, t]
   )
 
   return {
