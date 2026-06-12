@@ -39,6 +39,56 @@ const AUTH_USER: AuthUser = {
   resetPassword: false,
 }
 
+function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
+  return { ...AUTH_USER, ...overrides }
+}
+
+function mockLoginSuccess(
+  onSubmit?: (username: string, password: string) => void
+): void {
+  vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+    submitPassword: (username: string, password: string) => {
+      onSubmit?.(username, password)
+      onSuccess(username, mockAuthUser(), TOKEN_RESPONSE)
+    },
+    isAuthLoading: false,
+  }))
+}
+
+function mockLoginRequiringPasswordReset(): void {
+  vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+    submitPassword: (username: string, _password: string) => {
+      onSuccess(
+        username,
+        mockAuthUser({ resetPassword: true }),
+        TOKEN_RESPONSE
+      )
+    },
+    isAuthLoading: false,
+  }))
+}
+
+function mockLoginFailure(message: string): void {
+  vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onError }) => ({
+    submitPassword: () => {
+      onError(message)
+    },
+    isAuthLoading: false,
+  }))
+}
+
+function mockSetNewPasswordSuccess(
+  onSubmit?: (username: string, password: string) => void
+): void {
+  vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
+    submitNewPassword: (username: string, password: string) => {
+      onSubmit?.(username, password)
+      onSuccess(username, TOKEN_RESPONSE)
+    },
+    isLoading: false,
+  }))
+}
+
 const renderAndOpenLoginModal = (): void => {
   renderWithProviders(
     <NiceModal.Provider>
@@ -54,6 +104,16 @@ const renderAndOpenLoginModal = (): void => {
     { i18nInstance: i18n }
   )
   fireEvent.click(screen.getByRole('button', { name: 'Open login modal' }))
+}
+
+function logInWithTempPassword(): void {
+  fireEvent.change(screen.getByLabelText('Username'), {
+    target: { value: 'alice' },
+  })
+  fireEvent.change(screen.getByLabelText('Password'), {
+    target: { value: 'temp-password' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 }
 
 describe('LoginModal', () => {
@@ -106,16 +166,7 @@ describe('LoginModal', () => {
     const storeLoginState = vi.fn()
     const submitPassword = vi.fn()
     vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
-      ({ onSuccess }) =>
-        ({
-          submitPassword: (username: string, password: string) => {
-            submitPassword(username, password)
-            onSuccess(username, AUTH_USER, TOKEN_RESPONSE)
-          },
-          isAuthLoading: false,
-        }) as ReturnType<typeof useOAuth2PasswordLogin>
-    )
+    mockLoginSuccess(submitPassword)
 
     renderAndOpenLoginModal()
 
@@ -133,15 +184,7 @@ describe('LoginModal', () => {
   })
 
   it('shows an error when authentication fails', () => {
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
-      ({ onError }) =>
-        ({
-          submitPassword: () => {
-            onError('Test error message')
-          },
-          isAuthLoading: false,
-        }) as ReturnType<typeof useOAuth2PasswordLogin>
-    )
+    mockLoginFailure('Test error message')
 
     renderAndOpenLoginModal()
 
@@ -160,29 +203,10 @@ describe('LoginModal', () => {
   it('shows password expired view when login requires a new password', () => {
     const storeLoginState = vi.fn()
     vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
-      ({ onSuccess }) =>
-        ({
-          submitPassword: (username: string, password: string) => {
-            onSuccess(
-              username,
-              { ...AUTH_USER, resetPassword: true },
-              TOKEN_RESPONSE
-            )
-          },
-          isAuthLoading: false,
-        }) as ReturnType<typeof useOAuth2PasswordLogin>
-    )
+    mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-
-    fireEvent.change(screen.getByLabelText('Username'), {
-      target: { value: 'alice' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'temp-password' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    logInWithTempPassword()
 
     expect(storeLoginState).toHaveBeenCalledWith('alice', TOKEN_RESPONSE)
     screen.getByText('Password expired')
@@ -198,39 +222,11 @@ describe('LoginModal', () => {
     const storeLoginState = vi.fn()
     const submitNewPassword = vi.fn()
     vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
-      ({ onSuccess }) =>
-        ({
-          submitPassword: (username: string) => {
-            onSuccess(
-              username,
-              { ...AUTH_USER, resetPassword: true },
-              TOKEN_RESPONSE
-            )
-          },
-          isAuthLoading: false,
-        }) as ReturnType<typeof useOAuth2PasswordLogin>
-    )
-    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
-      ({ onSuccess }) =>
-        ({
-          submitNewPassword: (username: string, password: string) => {
-            submitNewPassword(username, password)
-            onSuccess(username, TOKEN_RESPONSE)
-          },
-          isLoading: false,
-        }) as ReturnType<typeof useSetNewPasswordAndSignIn>
-    )
+    mockLoginRequiringPasswordReset()
+    mockSetNewPasswordSuccess(submitNewPassword)
 
     renderAndOpenLoginModal()
-
-    fireEvent.change(screen.getByLabelText('Username'), {
-      target: { value: 'alice' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'temp-password' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    logInWithTempPassword()
 
     fireEvent.change(screen.getByLabelText('New password'), {
       target: { value: 'new-password' },
@@ -246,29 +242,10 @@ describe('LoginModal', () => {
   })
 
   it('shows a mismatch error when confirm password does not match', () => {
-    vi.mocked(useOAuth2PasswordLogin).mockImplementation(
-      ({ onSuccess }) =>
-        ({
-          submitPassword: (username: string) => {
-            onSuccess(
-              username,
-              { ...AUTH_USER, resetPassword: true },
-              TOKEN_RESPONSE
-            )
-          },
-          isAuthLoading: false,
-        }) as ReturnType<typeof useOAuth2PasswordLogin>
-    )
+    mockLoginRequiringPasswordReset()
 
     renderAndOpenLoginModal()
-
-    fireEvent.change(screen.getByLabelText('Username'), {
-      target: { value: 'alice' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'temp-password' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    logInWithTempPassword()
 
     fireEvent.change(screen.getByLabelText('New password'), {
       target: { value: 'new-password' },
