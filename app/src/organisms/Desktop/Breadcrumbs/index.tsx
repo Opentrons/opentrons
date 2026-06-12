@@ -76,7 +76,7 @@ function AccountSection({
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data.accessControlEnabled ?? false
-  const accountIconInfo = useAccountIconInitial()
+  const accountIconInfo = useAccountIconInitial(robotName)
   if (accessControlEnabled) {
     if (accountIconInfo.showIcon) {
       return (
