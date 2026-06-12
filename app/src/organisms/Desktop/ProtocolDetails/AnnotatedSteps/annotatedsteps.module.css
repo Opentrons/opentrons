@@ -133,9 +133,6 @@
 .annotated_steps_list {
   width: 100%;
   height: 100%;
-
-  /* prevent layout shift when Windows shows a classic scrollbar. */
-  scrollbar-gutter: stable;
 }
 
 .annotated_steps_row {

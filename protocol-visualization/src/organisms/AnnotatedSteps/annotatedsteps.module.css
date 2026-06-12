@@ -133,7 +133,6 @@
 .annotated_steps_list {
   width: 100%;
   height: 100%;
-  scrollbar-gutter: stable;
 }
 
 .annotated_steps_row {
