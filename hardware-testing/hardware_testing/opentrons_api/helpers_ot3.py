@@ -22,7 +22,8 @@ from typing import (
     Sequence,
     Any,
 )
-
+import json
+from opentrons.config import IS_ROBOT
 from opentrons.protocol_api import ProtocolContext
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -111,6 +112,21 @@ CALIBRATION_SQUARE_EVT = CalibrationSquare(
     top_left_offset=CALIBRATION_SQUARE_OFFSET_EVT, width=20, height=20, depth=3
 )
 CALIBRATION_PROBE_EVT = CalibrationProbe(length=44.5, diameter=4.0)
+
+
+def get_system_langauge() -> str:
+    """Return the language setting of the robot."""
+    if IS_ROBOT:
+        try:
+            with open("/data/ODD/config.json", "r") as f:
+                app_config = json.load(f)
+            return app_config["language"]["appLanguage"]
+        except Exception:
+            pass
+    return "en-US"
+
+
+LOCALIZE = get_system_langauge() == "zh-CN"
 
 
 def stop_server_ot3() -> None:
@@ -365,11 +381,15 @@ def get_device_barcode(
     """Have the user scan a devices barcode."""
     OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
     for i in range(3):
-        ctx.pause(f"Point scanner at {dut.value} barcode")
+        ctx.pause(
+            f"将扫描仪对准 {dut.value} 条形码"
+            if LOCALIZE
+            else f"Point scanner at {dut.value} barcode"
+        )
         result = api._scan_barcode()
         if result:
             return result
-        ctx.pause("Failed to scan, try again.")
+        ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
 
     raise RuntimeError("Error scanning barcode.")
 
@@ -1589,11 +1609,15 @@ def get_user_answer(ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str) -> 
     """Have the user answer a yes/no question."""
     OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
     for i in range(3):
-        ctx.pause(f"Point Scanner at Yes or No: {prompt}")
+        ctx.pause(
+            f"将扫描仪对准“是”或“否”： {prompt}"
+            if LOCALIZE
+            else f"Point Scanner at Yes or No: {prompt}"
+        )
         result = api._scan_barcode()
         if result:
             return "yes" in result.lower()
-        ctx.pause("Failed to scan, try again.")
+        ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
 
     raise RuntimeError("Error scanning barcode.")
 
@@ -1619,14 +1643,20 @@ def get_input_number(
             return False
 
     for i in range(3):
-        ctx.pause(f"Point Scanner at Yes or No: {prompt}")
+        ctx.pause(
+            f"将扫描仪对准数字：{prompt}" if LOCALIZE else f"Point Scanner at number: {prompt}"
+        )
         result = api._scan_barcode()
         if result:
             if _is_int(result):
                 return int(result)
             elif _is_float(result):
                 return float(result)
-            ctx.pause(f"{result} is not a number, try again.")
+            ctx.pause(
+                f"{result} 不是数字，请重试"
+                if LOCALIZE
+                else f"{result} is not a number, try again."
+            )
         else:
-            ctx.pause("Failed to scan, try again.")
+            ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
     return default
