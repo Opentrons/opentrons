@@ -99,7 +99,7 @@ class SettingsStore:
                 select(LoggingEnabled).filter(LoggingEnabled.id == 1)
             ).scalar_one_or_none()
             if row is None:
-                session.add(LoggingEnabled(id=1, enabled=loggingEnabled))
+                session.add(LoggingEnabled(enabled=loggingEnabled))
             else:
                 row.enabled = loggingEnabled
             session.commit()
