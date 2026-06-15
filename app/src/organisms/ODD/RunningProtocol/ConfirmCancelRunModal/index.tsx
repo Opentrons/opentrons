@@ -68,7 +68,6 @@ export function ConfirmCancelRunModal({
     }
   }, [isActiveRun, dismissCurrentRun, runId, protocolId, navigate])
 
-  // TODO(jj): add error handling for docreport error
   const handleCancelRun = (): void => {
     setIsCanceling(true)
     stopRun(runId, {
