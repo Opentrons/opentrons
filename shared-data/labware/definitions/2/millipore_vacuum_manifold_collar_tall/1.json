@@ -63,11 +63,11 @@
     "vacuumModuleV1": {
       "x": 0,
       "y": 0,
-      "z": 2.0
+      "z": -8.0
     }
   },
   "gripForce": 17,
-  "gripHeightFromLabwareBottom": 74,
+  "gripHeightFromLabwareBottom": 66,
   "containedSpace": {
     "shape": "rectangular",
     "origin": { "x": 0, "y": 0, "z": 0 },
