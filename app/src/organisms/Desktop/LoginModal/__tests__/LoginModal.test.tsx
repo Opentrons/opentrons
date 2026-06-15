@@ -212,7 +212,11 @@ describe('LoginModal', () => {
     renderAndOpenLoginModal()
     logInWithTempPassword()
 
-    expect(storeLoginState).toHaveBeenCalledWith('alice', TOKEN_RESPONSE)
+    expect(storeLoginState).toHaveBeenCalledWith(
+      ROBOT_NAME,
+      'alice',
+      TOKEN_RESPONSE
+    )
     screen.getByText('Your password has expired')
     screen.getByText('Create a new password to use')
     screen.getByLabelText('New password')
@@ -236,7 +240,11 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
 
     expect(submitNewPassword).toHaveBeenCalledWith('alice', 'new-password')
-    expect(storeLoginState).toHaveBeenLastCalledWith('alice', TOKEN_RESPONSE)
+    expect(storeLoginState).toHaveBeenLastCalledWith(
+      ROBOT_NAME,
+      'alice',
+      TOKEN_RESPONSE
+    )
     expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
   })
 
