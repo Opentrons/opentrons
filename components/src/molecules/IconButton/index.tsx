@@ -78,7 +78,7 @@ interface IconButtonProps extends ComponentPropsWithoutRef<'button'> {
    * Whether the button is disabled.
    * ToDo: (kk: 2026-06-12) for this case, there is no specific style now
    */
-  'aria-disabled'?: boolean
+  focusableDisabled?: boolean
 }
 
 /**
@@ -95,7 +95,7 @@ export function NewIconButton({
   iconName,
   size = 'md',
   'aria-label': ariaLabel,
-  'aria-disabled': ariaDisabled,
+  focusableDisabled,
   onClick,
   ...restProps
 }: IconButtonProps): JSX.Element {
@@ -116,7 +116,7 @@ export function NewIconButton({
   }
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
-    if (ariaDisabled === true) {
+    if (focusableDisabled) {
       event.preventDefault()
       return
     }
@@ -129,7 +129,7 @@ export function NewIconButton({
       className={buttonClassName}
       style={buttonStyle}
       aria-label={ariaLabel}
-      aria-disabled={ariaDisabled}
+      aria-disabled={focusableDisabled === true ? 'true' : undefined}
       onClick={handleClick}
       {...restProps}
     >
