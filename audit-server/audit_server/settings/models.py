@@ -34,12 +34,10 @@ class LoggingEnabledResponseData(pydantic.BaseModel):
     loggingEnabled: Annotated[
         bool,
         pydantic.Field(
-            description=dedent(
-                """\
+            description=dedent("""\
                 When enabled, the audit server records audit log messages it
                 receives. When disabled (the default), audit logging is off.
-                """
-            )
+                """)
         ),
     ]
 
@@ -48,11 +46,10 @@ class PatchLoggingEnabledRequestData(_StrictBaseModel):
     """A request to change the logging-enabled setting."""
 
     loggingEnabled: Annotated[
-        bool | None,
+        bool,
         pydantic.Field(
             description=(
                 "Set to `true` to enable audit logging, or `false` to disable it."
-                " If omitted, the setting is left unchanged."
             )
         ),
-    ] = None
+    ]

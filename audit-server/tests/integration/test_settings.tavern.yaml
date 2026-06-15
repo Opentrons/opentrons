@@ -38,18 +38,6 @@ stages:
         data:
           loggingEnabled: true
 
-  - name: PATCH /audit/internal/loggingEnabled with empty body leaves it unchanged
-    request:
-      method: PATCH
-      url: '{run_server.base_url}/audit/internal/loggingEnabled'
-      json:
-        data: {}
-    response:
-      status_code: 200
-      json:
-        data:
-          loggingEnabled: true
-
   - name: PATCH /audit/internal/loggingEnabled disables logging
     request:
       method: PATCH
@@ -64,7 +52,6 @@ stages:
           loggingEnabled: false
 
 ---
-
 test_name: generic settings endpoints
 
 marks:

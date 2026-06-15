@@ -61,14 +61,6 @@ def test_patch_logging_enabled_can_disable(client: TestClient) -> None:
     assert response.json()["data"] == {"loggingEnabled": False}
 
 
-def test_patch_logging_enabled_omitted_leaves_unchanged(client: TestClient) -> None:
-    """An empty PATCH body leaves loggingEnabled unchanged."""
-    client.patch(_LOGGING_ENABLED_PATH, json={"data": {"loggingEnabled": True}})
-    response = client.patch(_LOGGING_ENABLED_PATH, json={"data": {}})
-    assert response.status_code == 200
-    assert response.json()["data"] == {"loggingEnabled": True}
-
-
 def test_get_settings_returns_defaults(client: TestClient) -> None:
     """GET generic settings returns the (currently empty) defaults."""
     response = client.get(_SETTINGS_PATH)

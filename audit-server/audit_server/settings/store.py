@@ -112,8 +112,6 @@ class SettingsStore:
         Unlike auth-server's access-control flag, this is freely toggleable in
         both directions. An omitted ``loggingEnabled`` leaves the setting as-is.
         """
-        if patch.loggingEnabled is None:
-            return self.get_logging_enabled_settings()
         self.update_logging_enabled_table(patch.loggingEnabled)
         return self.get_logging_enabled_settings()
 

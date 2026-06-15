@@ -56,25 +56,16 @@ def test_patch_logging_enabled_is_toggleable_both_ways(
     settings_store: SettingsStore,
 ) -> None:
     """Unlike auth-server access control, loggingEnabled can be turned back off."""
-    settings_store.patch_logging_enabled(
+    returned_set = settings_store.patch_logging_enabled(
         PatchLoggingEnabledRequestData(loggingEnabled=True)
     )
+    assert returned_set.loggingEnabled is True
+    assert settings_store.get_logging_enabled_settings().loggingEnabled is True
     returned = settings_store.patch_logging_enabled(
         PatchLoggingEnabledRequestData(loggingEnabled=False)
     )
     assert returned.loggingEnabled is False
     assert settings_store.get_logging_enabled_settings().loggingEnabled is False
-
-
-def test_patch_logging_enabled_with_none_leaves_unchanged(
-    settings_store: SettingsStore,
-) -> None:
-    """Omitting loggingEnabled in the patch leaves the current value alone."""
-    settings_store.patch_logging_enabled(
-        PatchLoggingEnabledRequestData(loggingEnabled=True)
-    )
-    returned = settings_store.patch_logging_enabled(PatchLoggingEnabledRequestData())
-    assert returned.loggingEnabled is True
 
 
 def test_get_settings_returns_defaults_when_empty(
