@@ -83,8 +83,8 @@ function useWrappedMutationFn<TData, TVariables>(
         documentationState,
         actionsToDocument
       )
-      if (docreport == null) {
-        console.error('No documentation report provided')
+      if (docreport == null || docreport.length === 0) {
+        throw new Error('No documentation report provided')
       }
       if (documentationState.isLoading) {
         throw new Error('Access control queries are still loading')
