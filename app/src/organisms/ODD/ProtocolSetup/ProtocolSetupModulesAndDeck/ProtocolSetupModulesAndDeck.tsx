@@ -20,7 +20,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { FloatingActionButton } from '/app/atoms/buttons'
+import { TouchFloatingActionButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
@@ -196,7 +196,7 @@ export function ProtocolSetupModulesAndDeck({
           </>
         )}
       </Flex>
-      <FloatingActionButton
+      <TouchFloatingActionButton
         buttonText={showMapView ? t('list_view') : t('map_view')}
         onClick={() => {
           setShowMapView(mapView => !mapView)

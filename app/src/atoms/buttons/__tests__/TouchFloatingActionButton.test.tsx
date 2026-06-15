@@ -9,18 +9,18 @@ import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { FloatingActionButton } from '..'
+import { TouchFloatingActionButton } from '..'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof FloatingActionButton>) => {
-  return renderWithProviders(<FloatingActionButton {...props} />, {
+const render = (props: ComponentProps<typeof TouchFloatingActionButton>) => {
+  return renderWithProviders(<TouchFloatingActionButton {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('FloatingActionButton', () => {
-  let props: ComponentProps<typeof FloatingActionButton>
+describe('TouchFloatingActionButton', () => {
+  let props: ComponentProps<typeof TouchFloatingActionButton>
 
   beforeEach(() => {
     props = {

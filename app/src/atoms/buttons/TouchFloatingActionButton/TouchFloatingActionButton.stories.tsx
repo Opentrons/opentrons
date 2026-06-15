@@ -1,12 +1,12 @@
 import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
 
-import { FloatingActionButton } from './'
+import { TouchFloatingActionButton } from '.'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
 
 export default {
-  title: 'ODD/Atoms/Buttons/FloatingActionButton',
+  title: 'ODD/Atoms/Buttons/TouchFloatingActionButton',
   argTypes: {
     iconName: {
       control: {
@@ -20,13 +20,12 @@ export default {
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-const FloatingActionButtonTemplate: Story<
-  React.ComponentProps<typeof FloatingActionButton>
-> = args => <FloatingActionButton {...args} />
-export const FloatingActionButtonComponent = FloatingActionButtonTemplate.bind(
-  {}
-)
-FloatingActionButtonComponent.args = {
+const TouchFloatingActionButtonTemplate: Story<
+  React.ComponentProps<typeof TouchFloatingActionButton>
+> = args => <TouchFloatingActionButton {...args} />
+export const TouchFloatingActionButtonComponent =
+  TouchFloatingActionButtonTemplate.bind({})
+TouchFloatingActionButtonComponent.args = {
   buttonText: 'Button text',
   disabled: false,
 }

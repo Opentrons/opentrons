@@ -17,14 +17,14 @@ import {
 import type { ComponentProps } from 'react'
 import type { IconName } from '@opentrons/components'
 
-interface FloatingActionButtonProps extends ComponentProps<typeof Btn> {
+interface TouchFloatingActionButtonProps extends ComponentProps<typeof Btn> {
   buttonText: string
   disabled?: boolean
   iconName?: IconName
 }
 
-export function FloatingActionButton(
-  props: FloatingActionButtonProps
+export function TouchFloatingActionButton(
+  props: TouchFloatingActionButtonProps
 ): JSX.Element {
   const { buttonText, disabled = false, iconName, ...buttonProps } = props
 
