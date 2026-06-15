@@ -4,13 +4,18 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Sequence
 
-DEFAULT_JIRA_URL = "https://opentrons.atlassian.net"
-DEFAULT_CLEANUP_KEEP_COUNT = 3
-DEFAULT_ENV_FILE_NAME = "robot_fleet_error.env"
+from abr_testing.automation.jira_constants import DEFAULT_JIRA_URL
+from abr_testing.data_collection.robot_fleet_error_constants import (
+    DEFAULT_CLEANUP_KEEP_COUNT,
+    DEFAULT_ENV_FILE_NAME,
+    DEFAULT_ROBOT_SSH_KEY_NAME,
+    EnvVar,
+)
 
 
 @dataclass(frozen=True)
@@ -52,7 +57,7 @@ def _parse_env_file(env_file_path: Path) -> dict[str, str]:
     """Parse a simple KEY=VALUE env file into a dictionary.
 
     Lines beginning with ``#`` and blank lines are ignored. Values may be quoted.
-  """
+    """
     values: dict[str, str] = {}
     if not env_file_path.is_file():
         return values
@@ -87,21 +92,41 @@ def _require_value(values: Mapping[str, str], key: str) -> str:
     return value
 
 
+def _optional_value(
+    values: Mapping[str, str], key: str, default: str
+) -> str:
+    """Return an env value or a code default when the key is unset."""
+    value = values.get(key, "").strip()
+    return value if value else default
+
+
 def _optional_path(values: Mapping[str, str], key: str) -> Path | None:
     """Return a path value when the key is set."""
     value = values.get(key, "").strip()
     return Path(value).expanduser() if value else None
 
 
+def _parse_robot_ips(raw_value: str) -> tuple[str, ...]:
+    """Parse a whitespace- or comma-separated robot IP list."""
+    robot_ips = tuple(
+        ip.strip()
+        for ip in re.split(r"[\s,]+", raw_value.strip())
+        if ip.strip()
+    )
+    if not robot_ips:
+        raise ValueError(f"{EnvVar.ROBOT_IPS} requires at least one IP address.")
+    return robot_ips
+
+
 def _build_local_machine_config(values: Mapping[str, str]) -> LocalMachineConfig:
     """Build local machine configuration from merged env values."""
     storage_directory = Path(
-        _require_value(values, "ABR_STORAGE_DIRECTORY")
+        _require_value(values, EnvVar.STORAGE_DIRECTORY)
     ).expanduser()
-    ssh_key_path = _optional_path(values, "ABR_ROBOT_SSH_KEY_PATH")
+    ssh_key_path = _optional_path(values, EnvVar.ROBOT_SSH_KEY_PATH)
 
     if ssh_key_path is None:
-        ssh_key_path = storage_directory / "robot_key"
+        ssh_key_path = storage_directory / DEFAULT_ROBOT_SSH_KEY_NAME
 
     return LocalMachineConfig(
         storage_directory=storage_directory,
@@ -111,30 +136,39 @@ def _build_local_machine_config(values: Mapping[str, str]) -> LocalMachineConfig
 
 def _build_jira_config(values: Mapping[str, str]) -> JiraConfig:
     """Build Jira configuration from merged env values."""
-    url = values.get("ABR_JIRA_URL", DEFAULT_JIRA_URL).strip() or DEFAULT_JIRA_URL
-    project_key = _require_value(values, "ABR_JIRA_PROJECT_KEY")
-    email = _require_value(values, "ABR_JIRA_EMAIL")
-    api_token = _require_value(values, "ABR_JIRA_API_TOKEN")
     return JiraConfig(
-        url=url,
-        project_key=project_key,
-        email=email,
-        api_token=api_token,
+        url=_optional_value(values, EnvVar.JIRA_URL, DEFAULT_JIRA_URL),
+        project_key=_require_value(values, EnvVar.JIRA_PROJECT_KEY),
+        email=_require_value(values, EnvVar.JIRA_EMAIL),
+        api_token=_require_value(values, EnvVar.JIRA_API_TOKEN),
     )
 
 
 def _build_artifact_config(values: Mapping[str, str]) -> ArtifactConfig:
     """Build artifact retention configuration from merged env values."""
     raw_keep_count = values.get(
-        "ABR_CLEANUP_KEEP_COUNT", str(DEFAULT_CLEANUP_KEEP_COUNT)
+        EnvVar.CLEANUP_KEEP_COUNT, str(DEFAULT_CLEANUP_KEEP_COUNT)
     ).strip()
     try:
         cleanup_keep_count = int(raw_keep_count)
     except ValueError as exc:
         raise ValueError(
-            f"ABR_CLEANUP_KEEP_COUNT must be an integer, got: {raw_keep_count!r}"
+            f"{EnvVar.CLEANUP_KEEP_COUNT} must be an integer, got: {raw_keep_count!r}"
         ) from exc
     return ArtifactConfig(cleanup_keep_count=cleanup_keep_count)
+
+
+def _resolve_robot_ips(
+    values: Mapping[str, str],
+    cli_robot_ips: Sequence[str] | None,
+) -> tuple[str, ...]:
+    """Resolve robot IPs from CLI args or the env file."""
+    if cli_robot_ips:
+        robot_ips = tuple(str(ip).strip() for ip in cli_robot_ips)
+        if not robot_ips or any(not ip for ip in robot_ips):
+            raise ValueError("--robot-ips requires at least one non-empty IP address.")
+        return robot_ips
+    return _parse_robot_ips(_require_value(values, EnvVar.ROBOT_IPS))
 
 
 def validate_local_machine_config(local_machine: LocalMachineConfig) -> None:
@@ -155,8 +189,9 @@ def load_robot_fleet_config(
 ) -> RobotFleetRuntimeConfig:
     """Load configuration from an env file, environment variables, and CLI args.
 
-    Machine-local values come from ``ABR_*`` variables (typically in a local env
-    file). Runtime invocation data, especially robot IPs, comes from CLI args.
+    Secrets, machine-local paths, and per-run targets come from ``ABR_*``
+    variables in the local env file. ``--robot-ips`` overrides ``ABR_ROBOT_IPS``
+    when provided. The only secret is ``ABR_JIRA_API_TOKEN``.
     """
     parser = argparse.ArgumentParser(
         description="Create Jira tickets for robots with errors."
@@ -164,16 +199,19 @@ def load_robot_fleet_config(
     parser.add_argument(
         "--robot-ips",
         nargs="+",
-        required=True,
+        default=None,
         metavar="ROBOT_IP",
-        help="One or more robot IP addresses to process.",
+        help=(
+            "Robot IP addresses to process. Overrides "
+            f"{EnvVar.ROBOT_IPS} from the env file when set."
+        ),
     )
     parser.add_argument(
         "--env-file",
         type=Path,
         default=None,
         help=(
-            "Path to a local env file with ABR_* machine configuration. "
+            "Path to a local env file with ABR_* configuration. "
             f"Defaults to ./{DEFAULT_ENV_FILE_NAME} in the current working directory."
         ),
     )
@@ -188,10 +226,7 @@ def load_robot_fleet_config(
     local_machine = _build_local_machine_config(values)
     jira = _build_jira_config(values)
     artifacts = _build_artifact_config(values)
-
-    robot_ips = tuple(str(ip).strip() for ip in args.robot_ips)
-    if not robot_ips or any(not ip for ip in robot_ips):
-        raise ValueError("--robot-ips requires at least one non-empty IP address.")
+    robot_ips = _resolve_robot_ips(values=values, cli_robot_ips=args.robot_ips)
 
     return RobotFleetRuntimeConfig(
         robot_ips=robot_ips,

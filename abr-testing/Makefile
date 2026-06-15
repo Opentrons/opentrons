@@ -96,13 +96,12 @@ simulate:
 
 # Create a double-clickable shortcut that runs robot_fleet_error against an
 # Errors folder. Requires robot_fleet_error.env beside the Errors folder with
-# ABR_* machine configuration and ROBOT_IPS in the generated script.
+# ABR_* configuration including ABR_ROBOT_IPS in robot_fleet_error.env.
 opentrons_dir := $(abspath $(CURDIR)/..)
 parent_dir := $(abspath $(CURDIR)/../..)
 repo_name := $(notdir $(opentrons_dir))
 errors_dir ?= $(parent_dir)/Errors
 shortcut_base ?= robot_fleet_error
-robot_ips ?= 10.0.0.1
 
 .PHONY: desktop-shortcut
 ifeq ($(OS),Windows_NT)
@@ -116,7 +115,7 @@ desktop-shortcut:
 		'set "ABR=%HERE%$(repo_name)\abr-testing"' \
 		'rem Run inside the project pipenv environment so all deps are available' \
 		'cd /d "%ABR%"' \
-		'py -m pipenv run python -m abr_testing.data_collection.robot_fleet_error --env-file "%HERE%robot_fleet_error.env" --robot-ips $(robot_ips)' \
+		'py -m pipenv run python -m abr_testing.data_collection.robot_fleet_error --env-file "%HERE%robot_fleet_error.env"' \
 		'echo.' \
 		'pause' \
 		> "$(shortcut_path)"
@@ -135,7 +134,7 @@ desktop-shortcut:
 		'' \
 		'# Run inside the project pipenv environment so all deps are available' \
 		'cd "$$ABR"' \
-		'pipenv run python -m abr_testing.data_collection.robot_fleet_error --env-file "$$HERE/robot_fleet_error.env" --robot-ips $(robot_ips)' \
+		'pipenv run python -m abr_testing.data_collection.robot_fleet_error --env-file "$$HERE/robot_fleet_error.env"' \
 		'' \
 		'# Keep the terminal window open so you can see the results' \
 		'echo ""' \

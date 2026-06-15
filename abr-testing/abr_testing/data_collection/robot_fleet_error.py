@@ -9,6 +9,25 @@ from abr_testing.data_collection.robot_fleet_error_config import (
     validate_local_machine_config,
     load_robot_fleet_config,
 )
+from abr_testing.data_collection.robot_fleet_error_constants import (
+    COMPONENT_FLEX_INTERNAL_RELEASE,
+    COMPONENT_FLEX_RABR,
+    COMPONENT_FLEX_STACKER,
+    DEFAULT_TICKET_ASSIGNEE_ID,
+    LABEL_VERSION_8_2_0,
+    OPENTRONS_VERSION_HEADER,
+    PARENT_NAME_VERSION_BUGS_SUFFIX,
+    PROJECT_KEY_RABR,
+    PROJECT_KEY_RQA,
+    ROBOT_HTTP_PORT,
+    ROBOT_ODD_DEBUG_PORT,
+    ROBOT_SSH_USER,
+    TICKET_ASSIGNEE_ID,
+    TICKET_DESCRIPTION_TEMPLATE,
+    TICKET_ISSUE_TYPE,
+    TICKET_PRIORITY,
+    VERSION_LABEL_8_2_SUBSTRING,
+)
 import requests
 from abr_testing.automation import jira_tool
 import shutil
@@ -60,7 +79,9 @@ def retrieve_protocol_images(
     odd_path = new_save_dir / "odd_pic.png"
     try:
         # Get the CDP websocket URL
-        targets = requests.get(f"http://{robot_ip}:9223/json", timeout=5).json()
+        targets = requests.get(
+            f"http://{robot_ip}:{ROBOT_ODD_DEBUG_PORT}/json", timeout=5
+        ).json()
         ws_url = targets[0]["webSocketDebuggerUrl"].replace("localhost", robot_ip)
         # Connect and send Page.captureScreenshot
         ws = websocket.create_connection(ws_url, timeout=10)
@@ -110,7 +131,7 @@ def retrieve_live_image(
     time.sleep(3)
     # grab one frame from camera live stream
     camera_path = save_dir / "robot_pic.jpg"
-    stream_url = f"http://{robot_ip}:31950/hls/stream.m3u8"
+    stream_url = f"http://{robot_ip}:{ROBOT_HTTP_PORT}/hls/stream.m3u8"
     try:
         subprocess.run(
             ["ffmpeg", "-i", stream_url, "-frames:v", "1", str(camera_path), "-y"],
@@ -127,7 +148,9 @@ def retrieve_live_image(
     odd_path = save_dir / "odd_pic.png"
     try:
         # Get the CDP websocket URL
-        targets = requests.get(f"http://{robot_ip}:9223/json", timeout=5).json()
+        targets = requests.get(
+            f"http://{robot_ip}:{ROBOT_ODD_DEBUG_PORT}/json", timeout=5
+        ).json()
         ws_url = targets[0]["webSocketDebuggerUrl"].replace("localhost", robot_ip)
         # Connect and send Page.captureScreenshot
         ws = websocket.create_connection(ws_url, timeout=10)
@@ -170,7 +193,7 @@ def retrieve_live_image(
 
 def update_camera_status(status: str, robot_ip: str, key_path: str) -> None:
     """Set the live-stream camera status on the robot via SSH and restart the stream service."""
-    username = "root"  # Opentrons default
+    username = ROBOT_SSH_USER
     status_upper = str(status).upper()
     # sed command
     remote_command = (
@@ -385,7 +408,7 @@ def cleanup_report_folders(storage_directory: str, keep_count: int = 3) -> None:
 def get_user_id(user_file_path: str, assignee_name: str) -> str:
     """Get assignee account id."""
     users = json.load(open(user_file_path))
-    assignee_id = "-1"  # Code to leave issue unassigned.
+    assignee_id = TICKET_ASSIGNEE_ID
     for item in users:
         user = users[item]
         if user["displayName"] == assignee_name:
@@ -404,7 +427,9 @@ def get_error_runs_from_robot(ip: str) -> Tuple[List[str], List[str]]:
     }
     try:
         response = requests.get(
-            f"http://{ip}:31950/runs", headers={"opentrons-version": "*"}, timeout=10
+            f"http://{ip}:{ROBOT_HTTP_PORT}/runs",
+            headers={"opentrons-version": OPENTRONS_VERSION_HEADER},
+            timeout=10,
         )
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
@@ -445,8 +470,8 @@ def get_robot_state(
     health_data: Dict[str, Any] = {}
     try:
         response = requests.get(
-            f"http://{ip}:31950/health",
-            headers={"opentrons-version": "*"},
+            f"http://{ip}:{ROBOT_HTTP_PORT}/health",
+            headers={"opentrons-version": OPENTRONS_VERSION_HEADER},
             timeout=10,
         )
         response.raise_for_status()
@@ -467,8 +492,8 @@ def get_robot_state(
     if health_data:
         try:
             response = requests.get(
-                f"http://{ip}:31950/instruments",
-                headers={"opentrons-version": "*"},
+                f"http://{ip}:{ROBOT_HTTP_PORT}/instruments",
+                headers={"opentrons-version": OPENTRONS_VERSION_HEADER},
                 timeout=10,
             )
             response.raise_for_status()
@@ -485,8 +510,8 @@ def get_robot_state(
         # Get modules attached to robot
         try:
             response = requests.get(
-                f"http://{ip}:31950/modules",
-                headers={"opentrons-version": "*"},
+                f"http://{ip}:{ROBOT_HTTP_PORT}/modules",
+                headers={"opentrons-version": OPENTRONS_VERSION_HEADER},
                 timeout=10,
             )
             response.raise_for_status()
@@ -503,13 +528,13 @@ def get_robot_state(
         components=components,
     )
     # if "alpha" in affects_version:
-    components.append("flex internal release")
+    components.append(COMPONENT_FLEX_INTERNAL_RELEASE)
     if "flexStacker" in str(description):
-        components.append("Flex Stacker")
+        components.append(COMPONENT_FLEX_STACKER)
     labels = [robot]
-    if "8.2" in affects_version:
-        labels.append("8_2_0")
-    parent_name = affects_version + " Bugs"
+    if VERSION_LABEL_8_2_SUBSTRING in affects_version:
+        labels.append(LABEL_VERSION_8_2_0)
+    parent_name = affects_version + PARENT_NAME_VERSION_BUGS_SUFFIX
     parent = get_parent_key(
         jira_url=jira_client.url,
         api_token=jira_client.api_token,
@@ -570,17 +595,17 @@ def get_run_error_info_from_robot(
     )
     affects_version = results["API_Version"]
     # if "alpha" in affects_version:
-    components.append("flex internal release")
-    if project_key == "RABR":
+    components.append(COMPONENT_FLEX_INTERNAL_RELEASE)
+    if project_key == PROJECT_KEY_RABR:
         components.append(failure_level)
-        components.append("Flex-RABR")
+        components.append(COMPONENT_FLEX_RABR)
     if "flexStacker" in str(description):
-        components.append("Flex Stacker")
+        components.append(COMPONENT_FLEX_STACKER)
     labels = [robot]
-    if "8.2" in affects_version:
-        labels.append("8_2_0")
-    if project_key == "RQA":  # 217 is ABR
-        parent_name = affects_version + " Bugs"
+    if VERSION_LABEL_8_2_SUBSTRING in affects_version:
+        labels.append(LABEL_VERSION_8_2_0)
+    if project_key == PROJECT_KEY_RQA:
+        parent_name = affects_version + PARENT_NAME_VERSION_BUGS_SUFFIX
         parent = get_parent_key(
             jira_url=jira_client.url,
             api_token=jira_client.api_token,
@@ -638,8 +663,8 @@ def _fetch_latest_protocol_id(robot_ip: str) -> str:
     """Return the protocolId from the most recent run, or '' on failure."""
     try:
         response = requests.get(
-            f"http://{robot_ip}:31950/runs",
-            headers={"opentrons-version": "*"},
+            f"http://{robot_ip}:{ROBOT_HTTP_PORT}/runs",
+            headers={"opentrons-version": OPENTRONS_VERSION_HEADER},
             timeout=10,
         )
         response.raise_for_status()
@@ -823,7 +848,7 @@ def preflight_connection_check(
     http_ok = read_robot_logs.check_http_available(ip)
     ssh_ok = _check_ssh_with_key(ip=ip, ssh_key_path=ssh_key_path)
 
-    print(f"  HTTP (port 31950): {'OK' if http_ok else 'UNAVAILABLE'}")
+    print(f"  HTTP (port {ROBOT_HTTP_PORT}): {'OK' if http_ok else 'UNAVAILABLE'}")
     print(f"  SSH  (robot_key):  {'OK' if ssh_ok else 'UNAVAILABLE'}")
 
     if http_ok and ssh_ok:
@@ -973,8 +998,8 @@ def get_name_from_ip(ip: str) -> str:
     """Get robot name from IP address."""
     try:
         health = requests.get(
-            f"http://{ip}:31950/health",
-            headers={"opentrons-version": "*"},
+            f"http://{ip}:{ROBOT_HTTP_PORT}/health",
+            headers={"opentrons-version": OPENTRONS_VERSION_HEADER},
             timeout=10,
         )
         robot_name = health.json().get("name", ip)
@@ -1010,8 +1035,8 @@ def build_jira_client(config: RobotFleetRuntimeConfig) -> jira_tool.JiraTicket:
     jira_client = jira_tool.JiraTicket(
         api_token=config.jira.api_token,
         email=config.jira.email,
+        url=config.jira.url,
     )
-    jira_client.url = config.jira.url
     return jira_client
 
 
@@ -1061,11 +1086,11 @@ def process_robot(
     all_issues = jira_client.issues_on_board(project_key=inputs.project_key)
     issue_key, _ = jira_client.create_ticket(
         summary=ticket_data.summary,
-        description="Error recreation steps: (PLEASE FILL)",
+        description=TICKET_DESCRIPTION_TEMPLATE,
         project_key=inputs.project_key,
-        assignee_id="-1",
-        issue_type="Bug",
-        priority="Medium",
+        assignee_id=TICKET_ASSIGNEE_ID,
+        issue_type=TICKET_ISSUE_TYPE,
+        priority=TICKET_PRIORITY,
         components=ticket_data.components,
         affects_versions=ticket_data.affects_version,
         labels=ticket_data.labels,

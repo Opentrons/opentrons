@@ -8,20 +8,28 @@ from pathlib import Path
 import argparse
 from typing import List, Dict, Any, Tuple
 import os
+from typing import List, Dict, Any, Tuple
+
+from abr_testing.automation import jira_constants as jc
 
 
 class JiraTicket:
     """Connects to JIRA ticket site."""
 
-    def __init__(self, api_token: str, email: str) -> None:
+    def __init__(
+        self,
+        api_token: str,
+        email: str,
+        url: str = jc.DEFAULT_JIRA_URL,
+    ) -> None:
         """Connect to jira."""
-        self.url = "https://opentrons.atlassian.net"
+        self.url = url
         self.api_token = api_token
         self.email = email
         self.auth = HTTPBasicAuth(email, api_token)
         self.headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
+            "Accept": jc.HTTP_ACCEPT_JSON,
+            "Content-Type": jc.HTTP_CONTENT_TYPE_JSON,
         }
 
     def issues_on_board(self, project_key: str) -> List[List[Any]]:
@@ -64,12 +72,12 @@ class JiraTicket:
                 {
                     "inwardIssue": {"key": ticket_key},
                     "outwardIssue": {"id": issue},
-                    "type": {"name": "Relates"},
+                    "type": {"name": jc.ISSUE_LINK_RELATES},
                 }
             )
             try:
                 response = requests.post(
-                    f"{self.url}/rest/api/3/issueLink",
+                    f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/issueLink",
                     headers=self.headers,
                     auth=self.auth,
                     data=link_data,
@@ -96,7 +104,7 @@ class JiraTicket:
 
     def get_labels(self) -> List[str]:
         """Get list of available labels."""
-        url = f"{self.url}/rest/api/3/label"
+        url = f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/label"
         response = requests.request("GET", url, headers=self.headers, auth=self.auth)
         return response.json()
 
@@ -150,7 +158,7 @@ class JiraTicket:
             data["fields"]["parent"] = {"key": parent}
         try:
             response = requests.post(
-                f"{self.url}/rest/api/3/issue",
+                f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/issue",
                 headers=self.headers,
                 auth=self.auth,
                 json=data,
@@ -180,8 +188,13 @@ class JiraTicket:
                 "application-type",
             )
         }
-        JSON_headers = {"Accept": "application/json", "X-Atlassian-Token": "no-check"}
-        attachment_url = f"{self.url}/rest/api/3/issue/{issue_id}/attachments"
+        JSON_headers = {
+            "Accept": jc.HTTP_ACCEPT_JSON,
+            "X-Atlassian-Token": jc.HTTP_ATLASSIAN_ATTACHMENT_TOKEN,
+        }
+        attachment_url = (
+            f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/issue/{issue_id}/attachments"
+        )
         try:
             response = requests.request(
                 "POST",
@@ -197,11 +210,11 @@ class JiraTicket:
 
     def get_project_issues(self, project_key: str) -> Dict[str, Any]:
         """Get all issues for a project."""
-        url = f"{self.url}/rest/api/3/search/jql"
+        url = f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/search/jql"
         query = {
-            "jql": 'project = "Robotics ABR"',
-            "maxResults": "273",
-            "reconcileIssues": "2154",
+            "jql": jc.RABR_PROJECT_JQL,
+            "maxResults": jc.RABR_PROJECT_MAX_RESULTS,
+            "reconcileIssues": jc.RABR_PROJECT_RECONCILE_ISSUES,
             "fields": "assignee, summary, id",
         }
         response = requests.request(
@@ -216,8 +229,8 @@ class JiraTicket:
 
     def get_project_versions(self, project_key: str) -> List[str]:
         """Get all project software versions."""
-        url = f"{self.url}/rest/api/3/project/{project_key}/versions"
-        headers = {"Accept": "application/json"}
+        url = f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/project/{project_key}/versions"
+        headers = {"Accept": jc.HTTP_ACCEPT_JSON}
         version_list = []
         response = requests.request("GET", url, headers=headers, auth=self.auth)
         versions = response.json()
@@ -247,7 +260,7 @@ class JiraTicket:
 
     def save_users_to_file(self, users: Dict[str, Any], storage_directory: Path) -> str:
         """Save users to a JSON file."""
-        file_path = os.path.join(storage_directory, "RABR_Users.json")
+        file_path = os.path.join(storage_directory, jc.JIRA_USERS_FILENAME)
         with open(file_path, mode="w") as file:
             json.dump(users, file, indent=4)
         return file_path
@@ -266,7 +279,9 @@ class JiraTicket:
 
     def get_project_components(self, project_id: str) -> List[Dict[str, str]]:
         """Get list of components on JIRA board."""
-        component_url = f"{self.url}/rest/api/3/project/{project_id}/components"
+        component_url = (
+            f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/project/{project_id}/components"
+        )
         response = requests.get(component_url, headers=self.headers, auth=self.auth)
         components_list = response.json()
         if not isinstance(components_list, list):
@@ -278,7 +293,7 @@ class JiraTicket:
 
     def comment(self, content_list: List[Dict[str, Any]], issue_key: str) -> None:
         """Leave comment on JIRA Ticket."""
-        comment_url = f"{self.url}/rest/api/3/issue/{issue_key}/comment"
+        comment_url = f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/issue/{issue_key}/comment"
         payload = json.dumps(
             {
                 "body": {
@@ -306,8 +321,8 @@ class JiraTicket:
         """Gets and confirms jira ticket number."""
         while True:
             issue_key = input("Ticket Key: ")
-            url = f"{self.url}/rest/api/3/issue/{issue_key}"
-            headers = {"Accept": "application/json"}
+            url = f"{self.url}/rest/api/{jc.JIRA_API_VERSION}/issue/{issue_key}"
+            headers = {"Accept": jc.HTTP_ACCEPT_JSON}
             response = requests.request("GET", url, headers=headers, auth=self.auth)
             if str(response) == "<Response [200]>":
                 break
