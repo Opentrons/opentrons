@@ -86,7 +86,13 @@ export function useDropTipCommands({
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
     deletionDocState,
-    [...actionsToDocument, 'end_drop_tips']
+    [...actionsToDocument, 'end_drop_tips'],
+    {
+      onError: () => {
+        setHasSeenClose(false)
+        toggleIsExiting()
+      },
+    }
   )
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
@@ -111,7 +117,7 @@ export function useDropTipCommands({
               })
               .finally(() => {
                 deleteMaintenanceRun(activeMaintenanceRunId, {
-                  onSettled: () => {
+                  onSuccess: () => {
                     closeFlow()
                   },
                 })

@@ -298,6 +298,7 @@ export const PipetteWizardFlows = (
     )
 
   const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(
