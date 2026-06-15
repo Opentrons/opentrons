@@ -1,0 +1,89 @@
+test_name: loggingEnabled settings endpoints
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET /audit/internal/loggingEnabled defaults to false
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/internal/loggingEnabled'
+    response:
+      status_code: 200
+      json:
+        data:
+          loggingEnabled: false
+
+  - name: PATCH /audit/internal/loggingEnabled enables logging
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/audit/internal/loggingEnabled'
+      json:
+        data:
+          loggingEnabled: true
+    response:
+      status_code: 200
+      json:
+        data:
+          loggingEnabled: true
+
+  - name: GET /audit/internal/loggingEnabled reflects the persisted value
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/internal/loggingEnabled'
+    response:
+      status_code: 200
+      json:
+        data:
+          loggingEnabled: true
+
+  - name: PATCH /audit/internal/loggingEnabled disables logging
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/audit/internal/loggingEnabled'
+      json:
+        data:
+          loggingEnabled: false
+    response:
+      status_code: 200
+      json:
+        data:
+          loggingEnabled: false
+
+---
+test_name: generic settings endpoints
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET /audit/external/settings returns defaults
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/external/settings'
+    response:
+      status_code: 200
+      json:
+        data: {}
+
+  - name: PATCH /audit/external/settings returns the settings
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/audit/external/settings'
+      json:
+        data: {}
+    response:
+      status_code: 200
+      json:
+        data: {}
+
+  - name: DELETE /audit/external/settings resets the settings
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/audit/external/settings'
+    response:
+      status_code: 200
+      json:
+        data: {}

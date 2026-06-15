@@ -1,4 +1,4 @@
-"""Audit-server application settings, loaded from environment variables."""
+"""Audit-server application configuration, loaded from environment variables."""
 
 import typing
 from functools import lru_cache
@@ -14,13 +14,13 @@ _ENV_PREFIX = "OT_AUDIT_SERVER_"
 
 
 @lru_cache(maxsize=1)
-def get_settings() -> "AuditServerSettings":
-    """Return the cached singleton settings instance."""
-    return AuditServerSettings(_env_file=get_dot_env_path(_ENV_PREFIX))
+def get_configuration() -> "AuditServerConfiguration":
+    """Return the cached singleton configuration instance."""
+    return AuditServerConfiguration(_env_file=get_dot_env_path(_ENV_PREFIX))
 
 
-class AuditServerSettings(BaseSettings):
-    """Audit server settings.
+class AuditServerConfiguration(BaseSettings):
+    """Audit server configuration.
 
     To override any of these create an environment variable with prefix
     ``OT_AUDIT_SERVER_``, e.g. ``OT_AUDIT_SERVER_persistence_directory``.

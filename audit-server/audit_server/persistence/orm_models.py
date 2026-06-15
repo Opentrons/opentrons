@@ -13,7 +13,7 @@ from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from server_utils.sql_utils import UTCDateTime
+from server_utils.sql_utils import JsonPythonValue, JsonValue, UTCDateTime
 
 
 class Base(DeclarativeBase):
@@ -88,3 +88,31 @@ class RobotLog(Base):
     file_hash: Mapped[str]
     file_sig: Mapped[str]
     file_sig_version: Mapped[str]
+
+
+class Setting(Base):
+    """ORM model for a single generic setting, stored as a JSON-encoded value.
+
+    This is the generic key/value settings table. Settings that don't warrant
+    their own dedicated table live here. There are currently no such settings,
+    but the table exists so new ones can be added without a schema change.
+    """
+
+    __tablename__ = "setting"
+
+    key: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[JsonPythonValue] = mapped_column(JsonValue, nullable=False)
+
+
+class LoggingEnabled(Base):
+    """ORM model for the logging-enabled setting.
+
+    This setting lives in its own table (rather than the generic ``setting``
+    table) because it's a special case that we want to read and write through a
+    dedicated, internal-only API.
+    """
+
+    __tablename__ = "logging_enabled"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    enabled: Mapped[bool]
