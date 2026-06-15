@@ -61,6 +61,6 @@ export function getOAuth2Token(
     POST,
     '/auth/oauth2/token',
     config,
-    { body: encodedBody }
+    { body: encodedBody, requiresSecureTransport: true }
   )
 }
