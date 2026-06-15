@@ -1,15 +1,24 @@
 """Olink Target 48/96 Protocol."""
 from opentrons.protocol_api import (
-    ALL,
-    COLUMN,
-    SINGLE,
-    ParameterContext,
     ProtocolContext,
-    Well,
     Labware,
+    ParameterContext,
+    Well,
+    SINGLE
 )
-from typing import List, Any
-from abr_testing.protocols.helpers import run_helpers, background_helpers
+from typing import Tuple, Optional, Union
+from opentrons.protocol_api import COLUMN, ALL
+from opentrons.protocol_api.module_contexts import (
+    HeaterShakerContext,
+    MagneticBlockContext,
+    ThermocyclerContext,
+    TemperatureModuleContext,
+    MagneticModuleContext,
+    AbsorbanceReaderContext,
+)
+
+
+from typing import List, Dict
 
 metadata = {
     "protocolName": "Olink Target 96/ 48 v3",
@@ -18,7 +27,7 @@ metadata = {
 
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
-open_location: Any = "A4"
+open_location: any = "A4"
 
 
 def add_parameters(p: ParameterContext) -> None:
@@ -80,21 +89,24 @@ def add_parameters(p: ParameterContext) -> None:
         default=False,
         description="ON - protocol will use the waste chute.",
     )
-    run_helpers.create_error_capture_duration_duration(p)
+    p.add_int(
+        variable_name="error_capture_duration",
+        display_name="Error Capture Duration",
+        description="Length of video clip to capture on error (in seconds).",
+        default=30,
+        minimum=5,
+        maximum=6000,
+        unit="seconds",
+    )
 
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
-    if not protocol.is_simulating():
-        background_helpers.launch_background_tasks()
-
+ 
     global open_location
     protocol.capture_image(filename="start_of_run")
 
     # Import Parameters
-    if not protocol.is_simulating():
-        slack_bot = run_helpers.set_up_slack()
-        slack_bot.send_run_started_message(metadata["protocolName"])
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
     ep_to_sample_plate = protocol.params.ep_to_sample_plate  # type: ignore[attr-defined]
@@ -108,7 +120,6 @@ def run(protocol: ProtocolContext) -> None:
         open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
-    run_helpers.comment_protocol_version(protocol, "03")
 
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
@@ -283,7 +294,7 @@ def run(protocol: ProtocolContext) -> None:
         pip.touch_tip(well)
 
     def transfer_mm(
-        src: Well, destination: List[Any], volume: float, multi_disp: bool = False
+        src: Well, destination: List[any], volume: float, multi_disp: bool = False
     ) -> None:
         """Transfer Mastermix to Sample Plate."""
         global open_location
@@ -491,51 +502,42 @@ def run(protocol: ProtocolContext) -> None:
             protocol.move_labware(col_tips.pop(0), open_location, use_gripper=True)
             protocol.move_labware(col_tips[0], loc, use_gripper=True)
 
-    try:
-        if mmx_to_sample_plate:
-            protocol.comment(
-                "\n*****\nTransferring Mastermix to Each Well of Sample Plate\n*****\n"
-            )
-            transfer_mm(
-                mastermix, mm_dest, mm_vol, multi_disp=False if ninety_six else False
-            )
-        if ep_to_sample_plate:
-            protocol.comment(
-                "\n*****\nTransferring Extension Product to Each Well of Sample Plate\n*****\n"
-            )
-            transfer_ep(extension_source, sample_dest, pcr_product_vol)
-        if primer_to_chip:
-            protocol.comment("\n*****\nTransferring Primers to IFP Chip\n*****\n")
-            transfer_ifp(
-                primer_source, ifp_primer_dests, ifc_vol, col_tips=col_tips, prim=True
-            )
-        if sample_to_chip:
-            protocol.comment("\n*****\nTransferring Sample to IFP Chip\n*****\n")
-            transfer_ifp(sample_source, ifp_samp_dests, ifc_vol, col_tips=col_tips)
 
-        protocol.move_labware(col_tips[-1], "C4", use_gripper=True)
-        protocol.move_labware(col_tips[-2], "A1", use_gripper=True)
-        pip.configure_nozzle_layout(
-            style=SINGLE,
-            start="A1",
-            tip_racks=col_tips,
-        )  # Resetting to all tips for liquid tracking
-        liquid_heights = {}
-        pip.pick_up_tip()
-        for ifp_plate_well in ifp_plate.wells():
-            if ifp_plate_well.current_liquid_height() > 1:
-                pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
-            height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
-            liquid_heights[ifp_plate_well.well_name] = height
-        protocol.comment(str(liquid_heights))
-        protocol.capture_image(filename="end_of_run")
-        if not protocol.is_simulating():
-            run_helpers.send_slack_message_with_image(
-                slack_bot, metadata["protocolName"]
-            )
-    except Exception as e:
-        if not protocol.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
-                slack_bot, metadata["protocolName"], str(e), length
-            )
-        raise (e)
+    if mmx_to_sample_plate:
+        protocol.comment(
+            "\n*****\nTransferring Mastermix to Each Well of Sample Plate\n*****\n"
+        )
+        transfer_mm(
+            mastermix, mm_dest, mm_vol, multi_disp=False if ninety_six else False
+        )
+    if ep_to_sample_plate:
+        protocol.comment(
+            "\n*****\nTransferring Extension Product to Each Well of Sample Plate\n*****\n"
+        )
+        transfer_ep(extension_source, sample_dest, pcr_product_vol)
+    if primer_to_chip:
+        protocol.comment("\n*****\nTransferring Primers to IFP Chip\n*****\n")
+        transfer_ifp(
+            primer_source, ifp_primer_dests, ifc_vol, col_tips=col_tips, prim=True
+        )
+    if sample_to_chip:
+        protocol.comment("\n*****\nTransferring Sample to IFP Chip\n*****\n")
+        transfer_ifp(sample_source, ifp_samp_dests, ifc_vol, col_tips=col_tips)
+
+    protocol.move_labware(col_tips[-1], "C4", use_gripper=True)
+    protocol.move_labware(col_tips[-2], "A1", use_gripper=True)
+    pip.configure_nozzle_layout(
+        style=SINGLE,
+        start="A1",
+        tip_racks=col_tips,
+    )  # Resetting to all tips for liquid tracking
+    liquid_heights = {}
+    pip.pick_up_tip()
+    for ifp_plate_well in ifp_plate.wells():
+        if ifp_plate_well.current_liquid_height() > 1:
+            pip.measure_liquid_height(ifp_plate[ifp_plate_well.well_name])
+        height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
+        liquid_heights[ifp_plate_well.well_name] = height
+    protocol.comment(str(liquid_heights))
+    protocol.capture_image(filename="end_of_run")
+    
