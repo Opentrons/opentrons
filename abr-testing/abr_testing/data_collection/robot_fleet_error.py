@@ -1,10 +1,15 @@
-"""Create ticket for robot with error."""
+"""Create Jira tickets for robots with errors."""
 
 from typing import List, Tuple, Any, Dict
 from dataclasses import dataclass, field
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
+from abr_testing.data_collection.robot_fleet_error_config import (
+    LocalMachineConfig,
+    RobotFleetRuntimeConfig,
+    validate_local_machine_config,
+    load_robot_fleet_config,
+)
 import requests
-import argparse
 from abr_testing.automation import jira_tool
 import shutil
 import os
@@ -30,11 +35,16 @@ def open_folder(path: str) -> None:
         raise OSError("Unsupported operating system")
 
 
-def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
+def retrieve_protocol_images(
+    run_id: str,
+    robot_ip: str,
+    storage: str,
+    ssh_key_path: Path | None = None,
+) -> str:
     """Save all capture images for a run."""
     save_dir = Path(f"{storage}")
     new_save_dir = save_dir / run_id
-    key_path = save_dir / "robot_key"
+    key_path = ssh_key_path or (save_dir / "robot_key")
     zip_path = save_dir / f"{run_id}_images"
     command = [
         "scp",
@@ -85,10 +95,15 @@ def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
     return ""
 
 
-def retrieve_live_image(robot_ip: str, storage: str, robot_name: str) -> str:
+def retrieve_live_image(
+    robot_ip: str,
+    storage: str,
+    robot_name: str,
+    ssh_key_path: Path | None = None,
+) -> str:
     """Capture a live camera image and ODD screenshot, return path to zip."""
     save_dir = Path(storage)
-    key_path = save_dir / "robot_key"
+    key_path = ssh_key_path or (save_dir / "robot_key")
     captured = []
     # turn the live stream on if it is not already
     update_camera_status("ON", robot_ip, str(key_path))
@@ -184,12 +199,19 @@ def update_camera_status(status: str, robot_ip: str, key_path: str) -> None:
         print("Error: The 'ssh' command was not found on this system.")
 
 
-def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Path | str:
+def retrieve_protocol_file(
+    protocol_id: str,
+    robot_ip: str,
+    storage: str,
+    ssh_key_path: Path | None = None,
+) -> Path | str:
     """Find and copy protocol file on robot with error handling."""
+    save_dir = Path(storage)
+    key_path = ssh_key_path or (save_dir / "robot_key")
     list_folder_command = [
         "ssh",
         "-i",
-        str(Path(storage) / "robot_key"),
+        str(key_path),
         "-o",
         "StrictHostKeyChecking=no",
         f"root@{robot_ip}",
@@ -214,9 +236,6 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
     if not folders:
         print("No folders found.")
         return ""
-
-    save_dir = Path(storage)
-    key_path = save_dir / "robot_key"
 
     for folder_num in folders:
         protocol_dir = (
@@ -302,10 +321,13 @@ def read_each_log(
 
 
 def match_error_to_component(
-    project_id: str, error_message: str, components: List[str]
+    jira_client: jira_tool.JiraTicket,
+    project_id: str,
+    error_message: str,
+    components: List[str],
 ) -> List[str]:
     """Match error to component based on error message."""
-    project_components = ticket.get_project_components(project_id)
+    project_components = jira_client.get_project_components(project_id)
     component_names = [proj_comp["name"] for proj_comp in project_components]
     for component in component_names:
         pattern = re.compile(component, re.IGNORECASE)
@@ -316,13 +338,16 @@ def match_error_to_component(
 
 
 def get_parent_key(
-    api_token: str, email: str, project_key: str, parent_name: str
+    jira_url: str,
+    api_token: str,
+    email: str,
+    project_key: str,
+    parent_name: str,
 ) -> str:
     """Find a project key from a name."""
-    url = "https://opentrons.atlassian.net"
     jql = f'project = {project_key} AND summary ~ "{parent_name}"'
     response = requests.post(
-        f"{url}/rest/api/3/search/jql",
+        f"{jira_url}/rest/api/3/search/jql",
         json={"jql": jql, "fields": ["summary"], "maxResults": 50},
         auth=(email, api_token),
     )
@@ -408,7 +433,10 @@ def get_error_runs_from_robot(ip: str) -> Tuple[List[str], List[str]]:
 
 
 def get_robot_state(
-    ip: str, reported_string: str, project_key: str
+    ip: str,
+    reported_string: str,
+    project_key: str,
+    jira_client: jira_tool.JiraTicket,
 ) -> Tuple[Any, Any, Any, List[str], List[str], str]:
     """Get robot status in case of non run error."""
     description: Dict[str, Any] = dict()
@@ -468,7 +496,12 @@ def get_robot_state(
         except requests.exceptions.RequestException as e:
             print(f"WARNING: Could not fetch modules (HTTP unavailable): {e}")
     components: List[str] = []
-    components = match_error_to_component(project_key, reported_string, components)
+    components = match_error_to_component(
+        jira_client=jira_client,
+        project_id=project_key,
+        error_message=reported_string,
+        components=components,
+    )
     # if "alpha" in affects_version:
     components.append("flex internal release")
     if "flexStacker" in str(description):
@@ -478,10 +511,11 @@ def get_robot_state(
         labels.append("8_2_0")
     parent_name = affects_version + " Bugs"
     parent = get_parent_key(
-        jira_credentials.api_token,
-        jira_credentials.email,
-        project_key,
-        parent_name,
+        jira_url=jira_client.url,
+        api_token=jira_client.api_token,
+        email=jira_client.email,
+        project_key=project_key,
+        parent_name=parent_name,
     )
     whole_description_str = (
         "{"
@@ -504,6 +538,7 @@ def get_run_error_info_from_robot(
     storage_directory: Path,
     protocol_found: bool,
     project_key: str,
+    jira_client: jira_tool.JiraTicket,
 ) -> Tuple[str, str, str, List[str], List[str], str, str]:
     """Get error information from robot to fill out ticket."""
     description: Dict[str, Any] = dict()
@@ -527,7 +562,12 @@ def get_run_error_info_from_robot(
 
     components: List[str] = []
     # components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
-    components = match_error_to_component(project_key, str(error_type), components)
+    components = match_error_to_component(
+        jira_client=jira_client,
+        project_id=project_key,
+        error_message=str(error_type),
+        components=components,
+    )
     affects_version = results["API_Version"]
     # if "alpha" in affects_version:
     components.append("flex internal release")
@@ -542,18 +582,20 @@ def get_run_error_info_from_robot(
     if project_key == "RQA":  # 217 is ABR
         parent_name = affects_version + " Bugs"
         parent = get_parent_key(
-            jira_credentials.api_token,
-            jira_credentials.email,
-            project_key,
-            parent_name,
+            jira_url=jira_client.url,
+            api_token=jira_client.api_token,
+            email=jira_client.email,
+            project_key=project_key,
+            parent_name=parent_name,
         )
     else:
         parent_name = robot
         parent = get_parent_key(
-            jira_credentials.api_token,
-            jira_credentials.email,
-            project_key,
-            parent_name,
+            jira_url=jira_client.url,
+            api_token=jira_client.api_token,
+            email=jira_client.email,
+            project_key=project_key,
+            parent_name=parent_name,
         )
 
     summary = robot + "_" + str(one_run) + "_" + str(error_code) + "_" + error_type
@@ -709,10 +751,14 @@ def _scp_and_extract_protocol(
     return ""
 
 
-def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
-    """Fetch latest run and SCP protocol into storage_directory (needs robot_key there)."""
+def save_latest_protocol(
+    robot_ip: str,
+    storage_directory: str,
+    ssh_key_path: Path | None = None,
+) -> str:
+    """Fetch latest run and SCP protocol into storage_directory."""
     storage = Path(storage_directory)
-    ssh_key = storage / "robot_key"
+    ssh_key = ssh_key_path or (storage / "robot_key")
 
     protocol_id = _fetch_latest_protocol_id(robot_ip)
     if not protocol_id:
@@ -739,14 +785,43 @@ def make_json_file(storage_directory: str, whole_description_str: str) -> str:
     return str(absolute_filepath)
 
 
-def preflight_connection_check(ip: str, storage_directory: str) -> bool:
+def _check_ssh_with_key(ip: str, ssh_key_path: Path, timeout: int = 15) -> bool:
+    """Return True when SSH authenticates with the given key."""
+    try:
+        result = subprocess.run(
+            [
+                "ssh",
+                "-i",
+                str(ssh_key_path),
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-o",
+                "BatchMode=yes",
+                "-o",
+                "ConnectTimeout=10",
+                f"root@{ip}",
+                "echo ok",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        return result.returncode == 0
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return False
+
+
+def preflight_connection_check(
+    ip: str,
+    ssh_key_path: Path,
+) -> bool:
     """Check HTTP and SSH connectivity up front and let the user decide.
 
-    Returns True if the user wants to proceed, False to abort.
+    Returns True if the user wants to proceed, False to skip this robot.
     """
     print(f"\nChecking connections to {ip} ...")
     http_ok = read_robot_logs.check_http_available(ip)
-    ssh_ok = read_robot_logs.check_ssh_available(ip, storage_directory)
+    ssh_ok = _check_ssh_with_key(ip=ip, ssh_key_path=ssh_key_path)
 
     print(f"  HTTP (port 31950): {'OK' if http_ok else 'UNAVAILABLE'}")
     print(f"  SSH  (robot_key):  {'OK' if ssh_ok else 'UNAVAILABLE'}")
@@ -779,40 +854,29 @@ def preflight_connection_check(ip: str, storage_directory: str) -> bool:
 
 
 @dataclass
-class ticketInputs:
-    """Make a class for all manual inputs during ticket creation."""
+class TicketInputs:
+    """Manual ticket inputs collected at runtime."""
 
     project_key: str
     ip: str
     run_or_other: str
 
 
-def init_ticketing() -> ticketInputs:
-    """Collects robot and ticket info from the user."""
-    while True:
-        board = str(input("Enter ABR or RQA: ")).upper()
-        if board == "ABR":
-            # board_id = str(217)
-            project_key = "RABR"
-            break
-        elif board == "RQA":
-            # board_id = str(826)
-            project_key = "RQA"
-            break
-        else:
-            print("Invalid input, try again.")
-
-    ip = str(input("Enter Robot IP: "))
-    if not preflight_connection_check(ip, storage_directory):
-        sys.exit()
-    run_or_other = str(
+def prompt_ticket_title() -> str:
+    """Prompt for a manual ticket title or empty input for run-error mode."""
+    return str(
         input(
             "Press ENTER to report run error. If not, please format title as:\n"
             "feature, brief summary\n> "
         )
     )
 
-    return ticketInputs(project_key, ip, run_or_other)
+
+def prompt_manual_ticket_title() -> str:
+    """Prompt when no failed runs were found for run-error mode."""
+    return str(
+        input("Please format title as:\nfeature, brief summary\n> ")
+    ).strip()
 
 
 @dataclass
@@ -831,67 +895,78 @@ class TicketData:
 
 
 def organize_ticket_data(
-    inputs: ticketInputs,
-    storage_directory: Path,
+    inputs: TicketInputs,
+    local_machine: LocalMachineConfig,
     error_runs: List,
     protocol_ids: List,
+    jira_client: jira_tool.JiraTicket,
 ) -> TicketData:
-    """Collects and organizes all ticket data.
+    """Collect and organize ticket fields from robot data or a manual title."""
+    ticket_data = TicketData()
+    storage_directory = local_machine.storage_directory
+    ssh_key_path = local_machine.robot_ssh_key_path
 
-    Collects robot, protocol, and error information, and
-    formats it for the Jira API to use in ticket creation.
-    """
-    ticketData = TicketData()
     if len(inputs.run_or_other) < 1 and error_runs and protocol_ids:
         protocol_folder = retrieve_protocol_file(
-            protocol_ids[-1], inputs.ip, str(storage_directory)
+            protocol_id=protocol_ids[-1],
+            robot_ip=inputs.ip,
+            storage=str(storage_directory),
+            ssh_key_path=ssh_key_path,
         )
         protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
         protocol_found = False
         try:
-            ticketData.protocol_file_path = next(
-                os.path.join(protocol_folder_path, f)
-                for f in os.listdir(protocol_folder_path)
-                if f.endswith(".py")
+            ticket_data.protocol_file_path = next(
+                os.path.join(protocol_folder_path, file_name)
+                for file_name in os.listdir(protocol_folder_path)
+                if file_name.endswith(".py")
             )
             protocol_found = True
         except (FileNotFoundError, StopIteration):
             print(f"No .py file found or folder not found: {protocol_folder_path}")
-        ticketData.one_run = error_runs[-1]
+        ticket_data.one_run = error_runs[-1]
         (
-            ticketData.summary,
-            ticketData.parent,
-            ticketData.affects_version,
-            ticketData.components,
-            ticketData.labels,
-            ticketData.whole_description_str,
-            ticketData.run_log_file_path,
+            ticket_data.summary,
+            ticket_data.parent,
+            ticket_data.affects_version,
+            ticket_data.components,
+            ticket_data.labels,
+            ticket_data.whole_description_str,
+            ticket_data.run_log_file_path,
         ) = get_run_error_info_from_robot(
-            inputs.ip,
-            ticketData.one_run,
-            storage_directory,
-            protocol_found,
-            inputs.project_key,
+            ip=inputs.ip,
+            one_run=ticket_data.one_run,
+            storage_directory=storage_directory,
+            protocol_found=protocol_found,
+            project_key=inputs.project_key,
+            jira_client=jira_client,
         )
     else:
-        if len(inputs.run_or_other) < 1:
+        run_or_other = inputs.run_or_other
+        if len(run_or_other) < 1:
             print("No failed/recovery runs matched filters.")
-            inputs.run_or_other = str(
-                input("Please format title as:\nfeature, brief summary\n> ")
-            ).strip()
-        ticketData.protocol_file_path = save_latest_protocol(
-            inputs.ip, str(storage_directory)
+            run_or_other = prompt_manual_ticket_title()
+            inputs.run_or_other = run_or_other
+        ticket_data.protocol_file_path = save_latest_protocol(
+            robot_ip=inputs.ip,
+            storage_directory=str(storage_directory),
+            ssh_key_path=ssh_key_path,
         )
         (
-            ticketData.summary,
-            ticketData.parent,
-            ticketData.affects_version,
-            ticketData.components,
-            ticketData.labels,
-            ticketData.whole_description_str,
-        ) = get_robot_state(inputs.ip, inputs.run_or_other, inputs.project_key)
+            ticket_data.summary,
+            ticket_data.parent,
+            ticket_data.affects_version,
+            ticket_data.components,
+            ticket_data.labels,
+            ticket_data.whole_description_str,
+        ) = get_robot_state(
+            ip=inputs.ip,
+            reported_string=run_or_other,
+            project_key=inputs.project_key,
+            jira_client=jira_client,
+        )
 
-    return ticketData
+    return ticket_data
 
 
 def get_name_from_ip(ip: str) -> str:
@@ -930,78 +1005,147 @@ def make_error_folder(
     return error_folder_path
 
 
-if __name__ == "__main__":
-    """Create ticket for specified robot."""
-    parser = argparse.ArgumentParser(description="Pulls run logs from ABR robots.")
-    parser.add_argument(
-        "storage_directory",
-        metavar="STORAGE_DIRECTORY",
-        type=str,
-        nargs=1,
-        help="Path to long term storage directory for run logs.",
+def build_jira_client(config: RobotFleetRuntimeConfig) -> jira_tool.JiraTicket:
+    """Build a Jira client from resolved configuration."""
+    credentials = jira_tool.get_credentials_from_path(config.jira.credentials_path)
+    jira_client = jira_tool.JiraTicket(
+        api_token=credentials.api_token,
+        email=credentials.email,
     )
-    args = parser.parse_args()
-    storage_directory = args.storage_directory[0]
-    jira_credentials = jira_tool.get_credentials(storage_directory)
-    # Simplify the main section
-    inputs = init_ticketing()
-    ticket = jira_tool.JiraTicket(jira_credentials.api_token, jira_credentials.email)
-    error_runs, protocol_ids = get_error_runs_from_robot(inputs.ip)
-    data = organize_ticket_data(
-        inputs,
-        storage_directory,
-        error_runs,
-        protocol_ids,
+    jira_client.url = config.jira.url
+    return jira_client
+
+
+def attach_artifacts_to_ticket(
+    ticket: jira_tool.JiraTicket,
+    issue_key: str,
+    error_folder_path: str,
+) -> None:
+    """Upload local artifacts and add log keyword comments to the Jira ticket."""
+    for file_name in os.listdir(error_folder_path):
+        file_to_attach = os.path.join(error_folder_path, file_name)
+        ticket.post_attachment_to_ticket(issue_key=issue_key, attachment_path=file_to_attach)
+    read_each_log(folder_path=error_folder_path, ticket=ticket, issue_key=issue_key)
+
+
+def process_robot(
+    robot_ip: str,
+    jira_client: jira_tool.JiraTicket,
+    config: RobotFleetRuntimeConfig,
+) -> None:
+    """Create one Jira ticket for a robot and attach collected error artifacts."""
+    local_machine = config.local_machine
+    storage_directory = local_machine.storage_directory
+
+    if not preflight_connection_check(
+        ip=robot_ip,
+        ssh_key_path=local_machine.robot_ssh_key_path,
+    ):
+        print(f"Skipping robot {robot_ip}.")
+        return
+
+    inputs = TicketInputs(
+        project_key=config.jira.project_key,
+        ip=robot_ip,
+        run_or_other=prompt_ticket_title(),
+    )
+    error_runs, protocol_ids = get_error_runs_from_robot(ip=robot_ip)
+    ticket_data = organize_ticket_data(
+        inputs=inputs,
+        local_machine=local_machine,
+        error_runs=error_runs,
+        protocol_ids=protocol_ids,
+        jira_client=jira_client,
     )
 
-    print(f"Making ticket for {data.summary}.")
-    all_issues = ticket.issues_on_board(inputs.project_key)
-    # CREATE TICKET
-    issue_key, raw_issue_url = ticket.create_ticket(
-        summary=data.summary,
+    print(f"Making ticket for {ticket_data.summary}.")
+    all_issues = jira_client.issues_on_board(project_key=inputs.project_key)
+    issue_key, _ = jira_client.create_ticket(
+        summary=ticket_data.summary,
         description="Error recreation steps: (PLEASE FILL)",
         project_key=inputs.project_key,
         assignee_id="-1",
         issue_type="Bug",
         priority="Medium",
-        components=data.components,
-        affects_versions=data.affects_version,
-        labels=data.labels,
-        parent=data.parent,
+        components=ticket_data.components,
+        affects_versions=ticket_data.affects_version,
+        labels=ticket_data.labels,
+        parent=ticket_data.parent,
     )
+    if not issue_key:
+        print("Ticket creation failed; skipping attachments for this robot.")
+        return
 
-    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), inputs.ip)
-    # make description replacement file
-    status_path = make_json_file(storage_directory, data.whole_description_str)
+    log_zip_path = read_robot_logs.get_logs(
+        storage_directory=Path(storage_directory),
+        ip=robot_ip,
+    )
+    status_path = make_json_file(
+        storage_directory=str(storage_directory),
+        whole_description_str=ticket_data.whole_description_str,
+    )
     if len(inputs.run_or_other) < 1:
         image_files = retrieve_protocol_images(
-            data.one_run, inputs.ip, storage_directory
+            run_id=ticket_data.one_run,
+            robot_ip=robot_ip,
+            storage=str(storage_directory),
+            ssh_key_path=local_machine.robot_ssh_key_path,
         )
     else:
-        robot_name = get_name_from_ip(inputs.ip)
-        image_files = retrieve_live_image(inputs.ip, storage_directory, robot_name)
+        robot_name = get_name_from_ip(ip=robot_ip)
+        image_files = retrieve_live_image(
+            robot_ip=robot_ip,
+            storage=str(storage_directory),
+            robot_name=robot_name,
+            ssh_key_path=local_machine.robot_ssh_key_path,
+        )
 
-    to_link = ticket.match_issues(all_issues, data.summary)
-    ticket.link_issues(to_link, issue_key)
-    # OPEN TICKET
-    issue_url = ticket.open_issue(issue_key)
-    # MOVE FILES TO ERROR FOLDER.
+    to_link = jira_client.match_issues(
+        issue_ids=all_issues,
+        ticket_summary=ticket_data.summary,
+    )
+    jira_client.link_issues(to_link=to_link, ticket_key=issue_key)
+    jira_client.open_issue(issue_key=issue_key)
+
     error_files = [
-        data.run_log_file_path,  # run-error path only
-        data.protocol_file_path,  # run-error path only
+        ticket_data.run_log_file_path,
+        ticket_data.protocol_file_path,
         log_zip_path,
         image_files,
         status_path,
     ]
-    error_folder_path = make_error_folder(storage_directory, issue_key, error_files)
+    error_folder_path = make_error_folder(
+        storage_directory=storage_directory,
+        issue_key=issue_key,
+        error_files=error_files,
+    )
+    attach_artifacts_to_ticket(
+        ticket=jira_client,
+        issue_key=issue_key,
+        error_folder_path=error_folder_path,
+    )
+    cleanup_report_folders(
+        storage_directory=str(storage_directory),
+        keep_count=config.artifacts.cleanup_keep_count,
+    )
 
-    # POST ALL FILES TO TICKET
-    list_of_files = os.listdir(error_folder_path)
-    for file in list_of_files:
-        file_to_attach = os.path.join(error_folder_path, file)
-        ticket.post_attachment_to_ticket(issue_key, file_to_attach)
-    # ADD ERROR COMMENTS TO TICKET
-    read_each_log(error_folder_path, ticket, issue_key)
 
-    # Cleanup error folder
-    cleanup_report_folders(storage_directory)
+def main(config: RobotFleetRuntimeConfig) -> None:
+    """Create Jira tickets for the configured robot fleet."""
+    jira_client = build_jira_client(config=config)
+    validate_local_machine_config(config.local_machine)
+
+    for robot_ip in config.robot_ips:
+        process_robot(
+            robot_ip=robot_ip,
+            jira_client=jira_client,
+            config=config,
+        )
+
+
+if __name__ == "__main__":
+    try:
+        main(load_robot_fleet_config())
+    except (ValueError, FileNotFoundError) as exc:
+        print(f"Configuration error: {exc}")
+        sys.exit(1)

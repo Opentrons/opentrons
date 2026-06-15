@@ -94,18 +94,15 @@ EXTENSION := .py
 simulate:
 	$(python) $(SIMULATION_TOOL)
 
-# Create a double-clickable shortcut that runs robotFleet_error.py against an
-# Errors folder. The OS is auto-detected ($(OS) is "Windows_NT" on Windows, set
-# by GNU Make): a .bat is written on Windows and a .command on macOS/Unix, with
-# zero user input either way. The generated scripts are self-locating, resolving
-# their own folder at runtime, which must sit next to the opentrons repo (so the
-# repo and the Errors folder are siblings of the shortcut). Generation relies on
-# a POSIX shell (Git Bash on Windows), matching the rest of the monorepo.
+# Create a double-clickable shortcut that runs robot_fleet_error against an
+# Errors folder. Requires robot_fleet_error.env beside the Errors folder with
+# ABR_* machine configuration and ROBOT_IPS in the generated script.
 opentrons_dir := $(abspath $(CURDIR)/..)
 parent_dir := $(abspath $(CURDIR)/../..)
 repo_name := $(notdir $(opentrons_dir))
 errors_dir ?= $(parent_dir)/Errors
-shortcut_base ?= robotFleet_error
+shortcut_base ?= robot_fleet_error
+robot_ips ?= 10.0.0.1
 
 .PHONY: desktop-shortcut
 ifeq ($(OS),Windows_NT)
@@ -119,7 +116,7 @@ desktop-shortcut:
 		'set "ABR=%HERE%$(repo_name)\abr-testing"' \
 		'rem Run inside the project pipenv environment so all deps are available' \
 		'cd /d "%ABR%"' \
-		'py -m pipenv run python "%ABR%\abr_testing\data_collection\robot_fleet_error.py" "%HERE%Errors"' \
+		'py -m pipenv run python -m abr_testing.data_collection.robot_fleet_error --env-file "%HERE%robot_fleet_error.env" --robot-ips $(robot_ips)' \
 		'echo.' \
 		'pause' \
 		> "$(shortcut_path)"
@@ -138,7 +135,7 @@ desktop-shortcut:
 		'' \
 		'# Run inside the project pipenv environment so all deps are available' \
 		'cd "$$ABR"' \
-		'pipenv run python "$$ABR/abr_testing/data_collection/robotFleet_error.py" "$$HERE/Errors"' \
+		'pipenv run python -m abr_testing.data_collection.robot_fleet_error --env-file "$$HERE/robot_fleet_error.env" --robot-ips $(robot_ips)' \
 		'' \
 		'# Keep the terminal window open so you can see the results' \
 		'echo ""' \
