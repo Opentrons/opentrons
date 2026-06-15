@@ -15,7 +15,7 @@ from audit_server.persistence import orm_models
 
 @contextmanager
 def sql_engine_ctx(
-    db_path: Path,
+    db_path: Path, echo: bool = False
 ) -> Generator[sqlalchemy.engine.Engine, None, None]:
     """Context-managed engine that disposes itself on exit.
 
@@ -25,7 +25,7 @@ def sql_engine_ctx(
     * use sane, transactional DDL semantics, and
     * use write-ahead logging (WAL) for the database journal.
     """
-    engine = sqlalchemy.create_engine(sql_utils.get_connection_url(db_path))
+    engine = sqlalchemy.create_engine(sql_utils.get_connection_url(db_path), echo=echo)
     try:
         sql_utils.enable_foreign_key_constraints(engine)
         sql_utils.fix_transactions(engine)
