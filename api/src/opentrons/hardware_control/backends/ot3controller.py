@@ -1479,6 +1479,10 @@ class OT3Controller(FlexBackend):
         """
         await self._subsystem_manager.refresh()
 
+    def set_subsystem_event_callback(self, event_callback: Callable[[], None]) -> None:
+        """Set the event callback to be used for network connection notifications on the subsystem manager."""
+        self._subsystem_manager._network_info.set_event_callback(event_callback)
+
     def axis_is_present(self, axis: Axis) -> bool:
         try:
             return axis_to_node(axis) in self._motor_nodes()

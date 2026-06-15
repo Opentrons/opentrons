@@ -39,6 +39,7 @@ from robot_server.errors.robot_errors import (
 )
 from robot_server.file_provider.fastapi_dependencies import get_file_provider
 from robot_server.hardware import (
+    HardwareStateStore,
     get_deck_type,
     get_hardware,
     get_robot_type,
@@ -83,6 +84,7 @@ async def get_run_store(
 async def start_light_control_task(
     app_state: AppState,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """Should be called once to start the light control task during server initialization.
 
@@ -94,7 +96,9 @@ async def start_light_control_task(
 
     if light_controller is None:
         light_controller = LightController(
-            api=hardware_api, run_orchestrator_store=None
+            api=hardware_api,
+            run_orchestrator_store=None,
+            hardware_state_store=hardware_state_store,
         )
         get_task_runner(app_state=app_state).run(
             run_light_task, driver=light_controller
@@ -107,6 +111,7 @@ async def start_light_control_task(
 async def mark_light_control_startup_finished(
     app_state: AppState,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """Should be called once the hardware initialization finishes.
 

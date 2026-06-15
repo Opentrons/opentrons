@@ -10,8 +10,10 @@ from typing import (
     Annotated,
     Awaitable,
     Callable,
+    Dict,
     Iterable,
     Iterator,
+    List,
     Optional,
     Tuple,
     cast,
@@ -36,8 +38,21 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
-from opentrons.hardware_control.types import StatusBarState
+from opentrons.hardware_control.types import (
+    DoorState,
+    DoorStateNotification,
+    EstopState,
+    EstopStateNotification,
+    HardwareEvent,
+    HardwareEventHandler,
+    ModuleConnectedNotification,
+    ModuleDisconnectedNotification,
+    StatusBarState,
+    SubsystemConnectionNotification,
+    SubSystemState,
+)
 from opentrons.protocol_engine import DeckType
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
@@ -85,6 +100,9 @@ _hw_api_accessor = AppStateAccessor[ThreadManagedHardware]("hardware_api")
 _hw_subprocess_accessor = AppStateAccessor[HardwareControlAPI](
     "hardware_api_subprocess"
 )
+_hw_state_store_accessor = AppStateAccessor["HardwareStateStore"](
+    "hardware_state_store"
+)
 _init_task_accessor = AppStateAccessor["asyncio.Task[None]"]("hardware_init_task")
 _postinit_task_accessor = AppStateAccessor["asyncio.Task[None]"](
     "hardware_postinit_task"
@@ -93,6 +111,87 @@ _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
     "firmware_update_manager"
 )
 _estop_handler_accessor = AppStateAccessor[EstopHandler]("estop_handler")
+
+
+class HardwareStateStore:
+    """State Store to provide updated hardware resource data."""
+
+    def __init__(
+        self,
+        hardware_resource: ThreadManagedHardware | HardwareControlAPI,
+    ) -> None:
+        """State store for frequently queried Hardware API resources.
+
+        To keep this class small, this should be limited to resources which are can cause a high volume of requests
+        to the Hardware API, particularly things that are polled often. This is especially true when operating in
+        subprocess mode.
+        """
+        if ff.hardware_subprocess_enabled():
+            self._hardware_resource = hardware_resource
+            # In subprocess mode a proxy-safe callback is registered after initialization
+        else:
+            assert isinstance(hardware_resource, ThreadManager)
+            self._hardware_resource = hardware_resource.wrapped()
+            self._hardware_resource.register_callback(
+                self.update_hardware_status_callback
+            )
+
+        # Initialize hardware state values
+        self._attached_modules: List[AbstractModule] = (
+            self._hardware_resource.attached_modules
+        )
+        self._attached_subsystems: Dict[SubSystem, SubSystemState] = (
+            self._hardware_resource.attached_subsystems
+        )
+        self._estop_state: EstopState = self._hardware_resource.get_estop_state()
+        self._door_state: DoorState = self._hardware_resource.door_state
+
+    def update_hardware_status_callback(self, event: HardwareEvent) -> None:
+        """Callback to update the Hardware State Store when changes occur on the hardware resource."""
+        if isinstance(event, ModuleConnectedNotification) or isinstance(
+            event, ModuleDisconnectedNotification
+        ):
+            self._attached_modules = self._hardware_resource.attached_modules
+        if isinstance(event, SubsystemConnectionNotification):
+            self._attached_subsystems = self._hardware_resource.attached_subsystems
+        if isinstance(event, EstopStateNotification):
+            self._estop_state = self._hardware_resource.get_estop_state()
+        if isinstance(event, DoorStateNotification):
+            self._door_state = self._hardware_resource.door_state
+
+    def register_proxy_hardware_status_callback(
+        self, proxy_callback: HardwareEventHandler
+    ) -> None:
+        """Register a proxy of the hardware status callback to a remote Hardware API."""
+        self._hardware_resource.register_callback(proxy_callback)
+
+    @property
+    def attached_modules(self) -> List[AbstractModule]:
+        """Return a list of all currently-attached modules."""
+        return self._attached_modules
+
+    @property
+    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        """Return a list of all currently-attached modules."""
+        return self._attached_subsystems
+
+    @property
+    def door_state(self) -> DoorState:
+        """The current state of the machine's door."""
+        return self._door_state
+
+    def get_estop_state(self) -> EstopState:
+        """Get the current Estop state."""
+        return self._estop_state
+
+
+def get_hardware_state_store(app_state: AppState) -> HardwareStateStore:
+    """Get the Hardware State Store as a route dependency."""
+    hardware_state_store = _hw_state_store_accessor.get_from(app_state)
+    if hardware_state_store is not None:
+        return hardware_state_store
+    else:
+        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 class _ExcPassthrough(BaseException):
@@ -623,13 +722,19 @@ async def _initialize_hardware_api(
             )
             _hw_api_accessor.set_on(app_state, hardware)
 
+        # Initialize the hardware state store
+        hardware_state_store = HardwareStateStore(hardware_resource=hardware)
+        _hw_state_store_accessor.set_on(app_state, hardware_state_store)
+
         for callback in callbacks:
             if callback[1]:
                 if ff.hardware_subprocess_enabled():
-                    await callback[0](app_state, hardware)
+                    await callback[0](app_state, hardware, hardware_state_store)
                 else:
                     assert isinstance(hardware, ThreadManager)
-                    await callback[0](app_state, hardware.wrapped())
+                    await callback[0](
+                        app_state, hardware.wrapped(), hardware_state_store
+                    )
 
         # This ties systemd notification to hardware initialization. We might want to move
         # systemd notification so it also waits for DB migration+initialization.

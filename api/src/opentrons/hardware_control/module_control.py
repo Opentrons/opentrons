@@ -21,6 +21,7 @@ from .types import (
     AsynchronousModuleErrorNotification,
     BoardRevision,
     HardwareEvent,
+    ModuleConnectedNotification,
     ModuleDisconnectedNotification,
     OT3Mount,
     StatusBarUpdateEvent,
@@ -398,6 +399,21 @@ class AttachedModulesControl:
                         f"Module {device.name} discovered and attached"
                         f" at port {device.port}, new_instance: {new_instance}"
                     )
+                    try:
+                        self._api.loop.call_soon(
+                            self._event_callback,
+                            ModuleConnectedNotification(
+                                module_serial=device.serial,
+                                module_model=modules.module_model_from_string(
+                                    device.model
+                                ),
+                                port=device.port,
+                            ),
+                        )
+                    except Exception:
+                        log.exception(
+                            f"Module connection callback for module {device.model} {device.serial} at {device.port} failed"
+                        )
             except Exception as e:
                 log.exception(
                     f"Failed to build device {device.name} at port {device.port}: {e}"

@@ -26,6 +26,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
 )
 
+from robot_server.hardware import HardwareStateStore
 from robot_server.service.pyro_utils.serpent_type_registry import (
     register_robot_server_types,
 )
@@ -72,6 +73,7 @@ class RobotServerPyroResource:
         self._camera_provider: Optional[CameraProvider] = None
         self._file_provider: Optional[FileProvider] = None
         self._notify_publishers: Optional[Callable[[], None]] = None
+        self._hardware_state_store: Optional[HardwareStateStore] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
     def set_run_orchestrator_store(
@@ -113,6 +115,10 @@ class RobotServerPyroResource:
         # they need refreshing. Will this cause problems with multi-run situations, like maintenance runs on top of existing runs?
         # Do we need an entirely seperate notification publisher for maintenance runs?
         self._notify_publishers = notify_publishers
+
+    def set_hardware_state_store(self, hardware_store: HardwareStateStore) -> None:
+        """Set the HardwareStateStore of the RobotServerPyroResource, not serialized for remote processes."""
+        self._hardware_state_store = hardware_store
 
     ### Interface methods for remote access ###
 
@@ -237,6 +243,29 @@ class RobotServerPyroResource:
         """
 
         return self._notify_publishers
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def create_hardware_state_update_callback(self) -> HardwareEventHandler:
+        """Create a callback for hardware events to report to the HardwareStateStore.
+
+        The returned callback is meant to run in the hardware API's thread.
+        """
+        hardware_store = self._hardware_state_store
+        if hardware_store is not None:
+
+            def run_hardware_event_update_from_hardware_thread(
+                event: HardwareEvent,
+            ) -> None:
+                asyncio.run_coroutine_threadsafe(
+                    hardware_store.update_hardware_status_callback(event),
+                    self._loop,
+                )
+
+            return run_hardware_event_update_from_hardware_thread
+        else:
+            raise RuntimeError(
+                "Cannot provider a hardware updates callback from the RobotServerPyroResource without a HardwareStateStore."
+            )
 
 
 ### Utility methods for initializing and registering state within the RobotServerPyroResource

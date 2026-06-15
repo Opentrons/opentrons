@@ -10,6 +10,9 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from opentrons import __version__
+from opentrons.config import (
+    feature_flags as ff,
+)
 from server_utils.auth.resource_server.fastapi import (
     build_authorization_checker,
     install_authorization_checker,
@@ -20,6 +23,7 @@ from .errors.exception_handlers import exception_handlers
 from .hardware import (
     FrontButtonLightBlinker,
     clean_up_hardware,
+    get_hardware_state_store,
     start_initializing_hardware,
 )
 from .persistence.fastapi_dependencies import (
@@ -39,8 +43,12 @@ from .service.notifications import (
     set_up_notification_client,
 )
 from .service.pyro_utils.pyro_resource import start_initializing_pyro_resource
+from .service.pyro_utils.resource_utilities import (
+    register_hardware_state_store_to_pyro_resource,
+)
 from .service.task_runner import set_up_task_runner
 from .settings import RobotServerSettings, get_settings
+from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
@@ -110,6 +118,18 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Always make an empty Robot Server Pyro Resource, and populate if appropriate
         start_initializing_pyro_resource(app_state=app.state)
+
+        # Register the hardware state callback for pyro
+        # Must happen after completing both the hardware API initialization and the pyro resource setup
+        if ff.hardware_subprocess_enabled:
+            hardware_store = get_hardware_state_store(app.state)
+            register_hardware_state_store_to_pyro_resource(
+                hardware_store=hardware_store
+            )
+            pyro_resource_proxy = get_pyro_resource()
+            hardware_store.register_proxy_hardware_status_callback(
+                pyro_resource_proxy.create_hardware_state_update_callback()
+            )
 
         # Start the run process pyro provider so a process is ready when a run starts
         await exit_stack.enter_async_context(

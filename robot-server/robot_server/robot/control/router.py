@@ -19,7 +19,13 @@ from .estop_handler import EstopHandler
 from .models import DoorState, DoorStatusModel, EstopStatusModel
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.errors.robot_errors import NotSupportedOnOT2
-from robot_server.hardware import get_estop_handler, get_hardware, get_robot_type
+from robot_server.hardware import (
+    HardwareStateStore,
+    get_estop_handler,
+    get_hardware,
+    get_hardware_state_store,
+    get_robot_type,
+)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
@@ -91,12 +97,13 @@ def get_door_switch_required(
 )
 async def get_door_status(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    hardware_store: Annotated[HardwareStateStore, Depends(get_hardware_state_store)],
     door_required: Annotated[bool, Depends(get_door_switch_required)],
 ) -> PydanticResponse[SimpleBody[DoorStatusModel]]:
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(
             data=DoorStatusModel.model_construct(
-                status=DoorState.from_hw_physical_status(hardware.door_state),
+                status=DoorState.from_hw_physical_status(hardware_store.door_state),
                 doorRequiredClosedForProtocol=door_required,
                 moduleSerial=hardware.module_door_serial,
             )

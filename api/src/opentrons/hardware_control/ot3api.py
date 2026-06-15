@@ -112,6 +112,7 @@ from .types import (
     HepaFanState,
     HepaUVState,
     InstrumentProbeType,
+    ModuleConnectedNotification,
     ModuleDisconnectedNotification,
     MotionChecks,
     OT3AxisKind,
@@ -123,6 +124,7 @@ from .types import (
     StatusBarUpdateListener,
     StatusBarUpdateUnsubscriber,
     SubSystem,
+    SubsystemConnectionNotification,
     SubSystemState,
     TipScrapeType,
     TipStateType,
@@ -381,6 +383,7 @@ class OT3API(
             (
                 AsynchronousModuleErrorNotification,
                 ModuleDisconnectedNotification,
+                ModuleConnectedNotification,
             ),
         ):
             return
@@ -392,6 +395,15 @@ class OT3API(
                 cb(event)
             except Exception:
                 mod_log.exception("Errored during module asynchronous callback")
+
+    def _send_subsystem_notification(self) -> None:
+        subsystem_event = SubsystemConnectionNotification()
+        mod_log.info(f"Forwarding subsystem event.")
+        for cb in self._callbacks:
+            try:
+                cb(subsystem_event)
+            except Exception:
+                mod_log.exception("Errored during subsystem asynchronous callback")
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
@@ -446,6 +458,8 @@ class OT3API(
             config=checked_config,
             feature_flags=feature_flags,
         )
+
+        backend.set_subsystem_event_callback(api_instance._send_subsystem_notification)
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
