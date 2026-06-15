@@ -1,6 +1,8 @@
 import { useCallback } from 'react'
 import { useMutation } from 'react-query'
 
+import { DocumentedMutationError } from './types'
+
 import type {
   MutationFunction,
   MutationKey,
@@ -83,11 +85,11 @@ function useWrappedMutationFn<TData, TVariables>(
         documentationState,
         actionsToDocument
       )
-      if (!isDocumentationProvided(documentationState, docreport)) {
-        throw new Error('No documentation report provided')
-      }
       if (documentationState.isLoading) {
-        throw new Error('Access control queries are still loading')
+        throw new DocumentedMutationError('access_control_loading')
+      }
+      if (!isDocumentationProvided(documentationState, docreport)) {
+        throw new DocumentedMutationError('no_documentation_report')
       }
       return await mutationFn({ variables, userNotes: docreport ?? '' })
     },

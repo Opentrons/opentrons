@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useDismissCurrentRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
@@ -73,9 +74,14 @@ export function ConfirmCancelRunModal({
     stopRun(runId, {
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      },
-      onSettled: () => {
         dismissAndNavigate()
+      },
+      onError: (error: unknown) => {
+        if (isDocumentedMutationError(error)) {
+          setIsCanceling(false)
+        } else {
+          dismissAndNavigate()
+        }
       },
     })
   }
