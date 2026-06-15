@@ -95,7 +95,7 @@ export function NewIconButton({
   iconName,
   size = 'md',
   'aria-label': ariaLabel,
-  focusableDisabled,
+  focusableDisabled = false,
   onClick,
   ...restProps
 }: IconButtonProps): JSX.Element {
@@ -129,7 +129,7 @@ export function NewIconButton({
       className={buttonClassName}
       style={buttonStyle}
       aria-label={ariaLabel}
-      aria-disabled={focusableDisabled === true ? 'true' : undefined}
+      aria-disabled={focusableDisabled ? 'true' : undefined}
       onClick={handleClick}
       {...restProps}
     >
