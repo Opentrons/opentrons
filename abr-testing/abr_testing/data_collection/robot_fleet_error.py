@@ -316,9 +316,10 @@ def match_error_to_component(
 
 
 def get_parent_key(
-    url: str, api_token: str, email: str, project_key: str, parent_name: str
+    api_token: str, email: str, project_key: str, parent_name: str
 ) -> str:
     """Find a project key from a name."""
+    url = "https://opentrons.atlassian.net"
     jql = f'project = {project_key} AND summary ~ "{parent_name}"'
     response = requests.post(
         f"{url}/rest/api/3/search/jql",
@@ -477,7 +478,6 @@ def get_robot_state(
         labels.append("8_2_0")
     parent_name = affects_version + " Bugs"
     parent = get_parent_key(
-        url,
         jira_credentials.api_token,
         jira_credentials.email,
         project_key,
@@ -542,7 +542,6 @@ def get_run_error_info_from_robot(
     if project_key == "RQA":  # 217 is ABR
         parent_name = affects_version + " Bugs"
         parent = get_parent_key(
-            url,
             jira_credentials.api_token,
             jira_credentials.email,
             project_key,
@@ -551,7 +550,6 @@ def get_run_error_info_from_robot(
     else:
         parent_name = robot
         parent = get_parent_key(
-            url,
             jira_credentials.api_token,
             jira_credentials.email,
             project_key,
@@ -780,16 +778,25 @@ def preflight_connection_check(ip: str, storage_directory: str) -> bool:
         print("Please enter 'y' or 'n'.")
 
 
-def init_ticketing() -> Tuple[str, str, str, str]:
+@dataclass
+class ticketInputs:
+    """Make a class for all manual inputs during ticket creation."""
+
+    project_key: str
+    ip: str
+    run_or_other: str
+
+
+def init_ticketing() -> ticketInputs:
     """Gets initial robot info."""
     while True:
         board = str(input("Enter ABR or RQA: ")).upper()
         if board == "ABR":
-            board_id = str(217)
+            # board_id = str(217)
             project_key = "RABR"
             break
         elif board == "RQA":
-            board_id = str(826)
+            # board_id = str(826)
             project_key = "RQA"
             break
         else:
@@ -804,7 +811,8 @@ def init_ticketing() -> Tuple[str, str, str, str]:
             "feature, brief summary\n> "
         )
     )
-    return board_id, project_key, ip, run_or_other
+
+    return ticketInputs(project_key, ip, run_or_other)
 
 
 @dataclass
@@ -823,18 +831,20 @@ class TicketData:
 
 
 def organize_ticket_data(
-    run_or_other: str,
-    ip: str,
+    inputs: ticketInputs,
     storage_directory: Path,
-    project_key: str,
     error_runs: List,
     protocol_ids: List,
 ) -> TicketData:
-    """Collects and organizes all ticket data."""
+    """Collects and organizes all ticket data.
+
+    Collects robot, protocol, and error information, and
+    formats it for the Jira API to use in ticket creation.
+    """
     ticketData = TicketData()
-    if len(run_or_other) < 1 and error_runs and protocol_ids:
+    if len(inputs.run_or_other) < 1 and error_runs and protocol_ids:
         protocol_folder = retrieve_protocol_file(
-            protocol_ids[-1], ip, str(storage_directory)
+            protocol_ids[-1], inputs.ip, str(storage_directory)
         )
         protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
         protocol_found = False
@@ -857,15 +867,21 @@ def organize_ticket_data(
             ticketData.whole_description_str,
             ticketData.run_log_file_path,
         ) = get_run_error_info_from_robot(
-            ip, ticketData.one_run, storage_directory, protocol_found, project_key
+            inputs.ip,
+            ticketData.one_run,
+            storage_directory,
+            protocol_found,
+            inputs.project_key,
         )
     else:
-        if len(run_or_other) < 1:
+        if len(inputs.run_or_other) < 1:
             print("No failed/recovery runs matched filters.")
-            run_or_other = str(
+            inputs.run_or_other = str(
                 input("Please format title as:\nfeature, brief summary\n> ")
             ).strip()
-        ticketData.protocol_file_path = save_latest_protocol(ip, str(storage_directory))
+        ticketData.protocol_file_path = save_latest_protocol(
+            inputs.ip, str(storage_directory)
+        )
         (
             ticketData.summary,
             ticketData.parent,
@@ -873,7 +889,7 @@ def organize_ticket_data(
             ticketData.components,
             ticketData.labels,
             ticketData.whole_description_str,
-        ) = get_robot_state(ip, run_or_other, project_key)
+        ) = get_robot_state(inputs.ip, inputs.run_or_other, inputs.project_key)
 
     return ticketData
 
@@ -928,26 +944,23 @@ if __name__ == "__main__":
     storage_directory = args.storage_directory[0]
     jira_credentials = jira_tool.get_credentials(storage_directory)
     # Simplify the main section
-    board_id, project_key, ip, run_or_other = init_ticketing()
-    url = "https://opentrons.atlassian.net"
-    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), ip)
-    ticket = jira_tool.JiraTicket(
-        url, jira_credentials.api_token, jira_credentials.email
-    )
-    error_runs, protocol_ids = get_error_runs_from_robot(ip)
+    inputs = init_ticketing()
+    ticket = jira_tool.JiraTicket(jira_credentials.api_token, jira_credentials.email)
+    error_runs, protocol_ids = get_error_runs_from_robot(inputs.ip)
     data = organize_ticket_data(
-        run_or_other, ip, storage_directory, project_key, error_runs, protocol_ids
+        inputs,
+        storage_directory,
+        error_runs,
+        protocol_ids,
     )
 
-    # make description replacement file
-    status_path = make_json_file(storage_directory, data.whole_description_str)
     print(f"Making ticket for {data.summary}.")
-    all_issues = ticket.issues_on_board(project_key)
+    all_issues = ticket.issues_on_board(inputs.project_key)
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
         summary=data.summary,
         description="Error recreation steps: (PLEASE FILL)",
-        project_key=project_key,
+        project_key=inputs.project_key,
         assignee_id="-1",
         issue_type="Bug",
         priority="Medium",
@@ -956,18 +969,23 @@ if __name__ == "__main__":
         labels=data.labels,
         parent=data.parent,
     )
-    if len(run_or_other) < 1:
-        image_files = retrieve_protocol_images(data.one_run, ip, storage_directory)
+
+    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), inputs.ip)
+    # make description replacement file
+    status_path = make_json_file(storage_directory, data.whole_description_str)
+    if len(inputs.run_or_other) < 1:
+        image_files = retrieve_protocol_images(
+            data.one_run, inputs.ip, storage_directory
+        )
     else:
-        robot_name = get_name_from_ip(ip)
-        image_files = retrieve_live_image(ip, storage_directory, robot_name)
+        robot_name = get_name_from_ip(inputs.ip)
+        image_files = retrieve_live_image(inputs.ip, storage_directory, robot_name)
 
     to_link = ticket.match_issues(all_issues, data.summary)
     ticket.link_issues(to_link, issue_key)
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
-    # TODO: make this a function
     error_files = [
         data.run_log_file_path,  # run-error path only
         data.protocol_file_path,  # run-error path only

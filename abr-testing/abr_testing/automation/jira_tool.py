@@ -32,9 +32,9 @@ def get_credentials(storage_directory: str) -> JiraCredentials:
 class JiraTicket:
     """Connects to JIRA ticket site."""
 
-    def __init__(self, url: str, api_token: str, email: str) -> None:
+    def __init__(self, api_token: str, email: str) -> None:
         """Connect to jira."""
-        self.url = url
+        self.url = "https://opentrons.atlassian.net"
         self.api_token = api_token
         self.email = email
         self.auth = HTTPBasicAuth(email, api_token)
@@ -369,10 +369,9 @@ if __name__ == "__main__":
         help="JIRA Board ID. RABR is 217",
     )
     args = parser.parse_args()
-    url = "https://opentrons.atlassian.net"
 
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
-    ticket = JiraTicket(url, api_token, email)
+    ticket = JiraTicket(api_token, email)

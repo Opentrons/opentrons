@@ -273,7 +273,7 @@ def compare_lpc_to_historical_data(
 
 
 def read_each_log(
-    folder_path: str, issue_url: str, ticket: jira_tool.JiraTicket, issue_key: str
+    folder_path: str, ticket: jira_tool.JiraTicket, issue_key: str
 ) -> None:
     """Read log and comment error portion on JIRA ticket."""
     for file_name in os.listdir(folder_path):
@@ -640,12 +640,11 @@ if __name__ == "__main__":
             "Press ENTER to report run error. If not a run error, type short summary of error: "
         )
     )
-    url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
     log_zip_path = read_robot_logs.get_logs(storage_directory, ip)
-    ticket = jira_tool.JiraTicket(url, api_token, email)
+    ticket = jira_tool.JiraTicket(api_token, email)
     project_key = "RABR"
     users_file_path = ticket.get_jira_users(storage_directory, project_key)
     assignee_id = get_user_id(users_file_path, assignee)
@@ -753,7 +752,7 @@ if __name__ == "__main__":
         file_to_attach = os.path.join(error_folder_path, file)
         ticket.post_attachment_to_ticket(issue_key, file_to_attach)
     # ADD ERROR COMMENTS TO TICKET
-    read_each_log(error_folder_path, raw_issue_url, ticket, issue_key)
+    read_each_log(error_folder_path, ticket, issue_key)
     # WRITE ERRORED RUN TO GOOGLE SHEET
     if len(run_or_other) < 1:
         # CONNECT TO GOOGLE DRIVE
