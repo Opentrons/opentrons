@@ -84,7 +84,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (successfulUsername, user, response) => {
       setLoginError(null)
-      storeLoginState(successfulUsername, response)
+      storeLoginState(robotName, successfulUsername, response)
 
       if (user.resetPassword) {
         setLoggedInUsername(successfulUsername)
@@ -106,7 +106,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     useSetNewPasswordAndSignIn({
       onSuccess: (successfulUsername, response) => {
         setLoginError(null)
-        storeLoginState(successfulUsername, response)
+        storeLoginState(robotName, successfulUsername, response)
         modal.remove()
       },
       onError: message => {
