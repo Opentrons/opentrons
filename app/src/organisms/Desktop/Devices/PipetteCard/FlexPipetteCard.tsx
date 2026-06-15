@@ -205,9 +205,9 @@ export function FlexPipetteCard({
           label={
             attachedPipetteIs96Channel
               ? t('both_mounts')
-              : t('mount', {
-                  side: mount === LEFT ? t('left') : t('right'),
-                })
+              : mount === LEFT
+                ? t('left_mount')
+                : t('right_mount')
           }
           menuOverlayItems={menuOverlayItems as MenuOverlayItemProps[]}
           isEstopNotDisengaged={isEstopNotDisengaged}

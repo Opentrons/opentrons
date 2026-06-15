@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import clsx from 'clsx'
 
 import { COLORS, CommandText } from '@opentrons/components'
@@ -26,6 +26,28 @@ interface IndividualCommandProps {
   commandNumber: number
   setSelectedCommand?: Dispatch<SetStateAction<string | null>> // remove redux dependency
 }
+
+function scrollContainerToShowTarget(
+  container: HTMLElement,
+  target: HTMLElement
+): boolean {
+  const containerRect = container.getBoundingClientRect()
+  const targetRect = target.getBoundingClientRect()
+  const isBelow = targetRect.bottom >= containerRect.bottom - 8
+  const isAbove = targetRect.top <= containerRect.top + 1
+
+  if (!isBelow && !isAbove) {
+    return false
+  }
+
+  const nextTop = container.scrollTop + (targetRect.top - containerRect.top)
+  container.scrollTo({
+    behavior: 'auto',
+    top: Math.max(0, nextTop),
+  })
+  return true
+}
+
 export function IndividualCommand({
   command,
   analysis,
@@ -40,50 +62,36 @@ export function IndividualCommand({
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isHighlighted || commandRef.current == null) return
     if (command.id !== scrollTargetId) return
 
-    requestAnimationFrame(() => {
-      const commandEl = commandRef.current
-      if (commandEl == null) return
+    const commandEl = commandRef.current
+    const groupExpandedEl =
+      fromGroup === true
+        ? commandEl.closest<HTMLElement>(`.${styles.annotated_group_expanded}`)
+        : null
+    const outerListEl =
+      listElement ?? commandEl.closest<HTMLElement>('[role="list"]') ?? null
 
-      const groupExpandedEl =
-        fromGroup === true
-          ? commandEl.closest<HTMLElement>(
-              `.${styles.annotated_group_expanded}`
-            )
-          : null
+    let scrollContainer: HTMLElement | null = outerListEl
 
-      const container: HTMLElement | null =
-        groupExpandedEl instanceof HTMLElement
-          ? groupExpandedEl
-          : (listElement ??
-            commandEl.closest<HTMLElement>('[role="list"]') ??
-            null)
+    if (groupExpandedEl instanceof HTMLElement) {
+      const hasInnerScroll =
+        groupExpandedEl.scrollHeight > groupExpandedEl.clientHeight + 1
+      scrollContainer = hasInnerScroll ? groupExpandedEl : outerListEl
+    }
 
-      if (container == null) {
-        commandEl.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'nearest',
-        })
-        return
-      }
-
-      const containerRect = container.getBoundingClientRect()
-      const commandRect = commandEl.getBoundingClientRect()
-      const isBelow = commandRect.bottom >= containerRect.bottom - 8
-      const isAbove = commandRect.top <= containerRect.top + 1
-      if (!isBelow && !isAbove) return
-
-      const nextTop =
-        container.scrollTop + (commandRect.top - containerRect.top)
-      container.scrollTo({
-        behavior: 'smooth',
-        top: Math.max(0, nextTop),
+    if (scrollContainer == null) {
+      commandEl.scrollIntoView({
+        behavior: 'auto',
+        block: 'nearest',
+        inline: 'nearest',
       })
-    })
+      return
+    }
+
+    scrollContainerToShowTarget(scrollContainer, commandEl)
   }, [isHighlighted, scrollTargetId, command.id, listElement, fromGroup])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
