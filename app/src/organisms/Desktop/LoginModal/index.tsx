@@ -126,25 +126,28 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     submitPassword(username, password)
   }
 
-  const handleSetNewPassword = (submit = true): void => {
+  const validateConfirmPasswordMatch = (): boolean => {
     if (newPassword !== confirmPassword) {
       setConfirmPasswordError(
         t('access_control:desktop_password_expired_mismatch') as string
       )
-      return
+      return false
     }
     setConfirmPasswordError(null)
-    if (!submit || loggedInUsername == null) {
+    return true
+  }
+
+  const handleConfirmNewPasswordSubmit = (): void => {
+    if (loggedInUsername == null || !validateConfirmPasswordMatch()) {
       return
     }
     submitNewPassword(loggedInUsername, newPassword)
   }
 
   const handleConfirmPasswordBlur = (): void => {
-    if (newPassword.trim() === '' || confirmPassword.trim() === '') {
-      return
+    if (newPassword.trim() !== '' && confirmPassword.trim() !== '') {
+      validateConfirmPasswordMatch()
     }
-    handleSetNewPassword(false)
   }
 
   const handleUsernameChange = (value: string): void => {
@@ -191,7 +194,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
         </SecondaryButton>
       ) : (
         <PrimaryButton
-          onClick={handleSetNewPassword}
+          onClick={handleConfirmNewPasswordSubmit}
           disabled={isPasswordExpiredDisabled}
         >
           {t('shared:confirm')}
