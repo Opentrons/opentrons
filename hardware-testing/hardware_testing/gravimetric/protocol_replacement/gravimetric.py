@@ -1092,7 +1092,9 @@ def retract_and_wait(
                 return_val.grams_average += volume * 0.001
         return return_val
 
-    m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
+    m_tag = create_measurement_tag(
+        mode.value, None if blank else volume, channel, trial
+    )
     fixture_settings.pipette._retract()
     if fixture_settings.recorder and not blank and fixture_settings.ctx.is_simulating():
         if mode == MeasurementType.ASPIRATE:
