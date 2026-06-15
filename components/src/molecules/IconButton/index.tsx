@@ -77,6 +77,7 @@ interface IconButtonProps extends ComponentPropsWithoutRef<'button'> {
   /**
    * Whether the button is disabled.
    * ToDo: (kk: 2026-06-12) for this case, there is no specific style now
+   * in the future, we will need to add a style for this
    */
   focusableDisabled?: boolean
 }
