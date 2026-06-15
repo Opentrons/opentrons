@@ -404,15 +404,13 @@ class AttachedModulesControl:
                             self._event_callback,
                             ModuleConnectedNotification(
                                 module_serial=device.serial,
-                                module_model=modules.module_model_from_string(
-                                    device.model
-                                ),
+                                module_model=device.name,
                                 port=device.port,
                             ),
                         )
                     except Exception:
                         log.exception(
-                            f"Module connection callback for module {device.model} {device.serial} at {device.port} failed"
+                            f"Module connection callback for module {device.name} {device.serial} at {device.port} failed"
                         )
             except Exception as e:
                 log.exception(

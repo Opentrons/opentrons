@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 from logging import getLogger
 from typing import (
+    Callable,
     Dict,
     List,
     Mapping,
@@ -35,6 +36,7 @@ from ..types import (
     CurrentPipetteLocation,
     CurrentWell,
     DeckPoint,
+    EngineEventNotification,
     FlowRates,
     LabwareWellId,
     LoadedPipette,
@@ -143,7 +145,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     _state: PipetteState
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        updates_callback: Optional[Callable[[EngineEventNotification], None]] = None,
+    ) -> None:
         """Initialize a PipetteStore and its state."""
         self._state = PipetteState(
             pipettes_by_id={},
@@ -160,6 +165,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             has_clean_tips_by_id={},
             tip_source_by_id={},
         )
+        self._updates_callback = updates_callback
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -191,6 +197,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.attached_tip_by_id[pipette_id] = None
             self._state.ready_to_aspirate_by_id[pipette_id] = False
             self._state.tip_source_by_id[pipette_id] = None
+            if self._updates_callback:
+                self._updates_callback(EngineEventNotification.TIP_ATTACHED)
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
@@ -243,6 +251,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                         default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                     )
+
+            if self._updates_callback:
+                self._updates_callback(EngineEventNotification.TIP_ATTACHED)
 
     def _update_current_location(self, state_update: update_types.StateUpdate) -> None:
         location_update = state_update.pipette_location
@@ -329,6 +340,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.nozzle_configuration_by_id[
                 state_update.pipette_config.pipette_id
             ] = config.nozzle_map
+            if self._updates_callback:
+                self._updates_callback(EngineEventNotification.NOZZLE_CONFIG)
 
     def _update_pipette_nozzle_map(
         self, state_update: update_types.StateUpdate
@@ -337,6 +350,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.nozzle_configuration_by_id[
                 state_update.pipette_nozzle_map.pipette_id
             ] = state_update.pipette_nozzle_map.nozzle_map
+            if self._updates_callback:
+                self._updates_callback(EngineEventNotification.NOZZLE_CONFIG)
 
     def _update_ready_for_aspirate(
         self, state_update: update_types.StateUpdate

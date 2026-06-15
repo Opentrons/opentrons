@@ -47,6 +47,7 @@ from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CSVRuntimeParamPaths,
     DeckConfigurationType,
+    EngineEventNotification,
     EngineStatus,
     PostRunHardwareState,
     PrimitiveRunTimeParamValuesType,
@@ -195,6 +196,13 @@ class RunOrchestratorStore:
         if not feature_flags.hardware_subprocess_enabled():
             hardware_api.register_callback(_get_hardware_listener(self))
 
+        # Locally stored engine state, updated via notifications
+        self._nozzle_maps: Optional[Mapping[str, NozzleMapInterface]] = None
+        self._tip_attached: Optional[Dict[str, bool]] = None
+        self._current_command: Optional[CommandPointer] = None
+        self._most_recent_finalized_command: Optional[CommandPointer] = None
+        self._flex_stacker_substate: Optional[Mapping[str, FlexStackerSubState]] = None
+
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
         """Get the "current" RunOrchestrator or DirectedRunProcess."""
@@ -320,6 +328,8 @@ class RunOrchestratorStore:
 
         if self._run_coordinator is not None:
             raise RunConflictError("Another run is currently active.")
+
+        # CASEY NOTE: non-proxy version could be passed in here
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -335,6 +345,7 @@ class RunOrchestratorStore:
             file_provider=file_provider,
             camera_provider=camera_provider,
             notify_publishers=notify_publishers,
+            updates_callback=self.update_engine_status_callback,
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
@@ -364,6 +375,9 @@ class RunOrchestratorStore:
 
         summary = orchestrator.get_state_summary()
         self._run_coordinator = orchestrator
+
+        self._initialize_stored_engine_state()
+
         return summary
 
     async def clear(self) -> RunResult:
@@ -431,6 +445,7 @@ class RunOrchestratorStore:
 
         summary = run_process.get_state_summary()
         self._run_coordinator = run_process
+        self._initialize_stored_engine_state()
         return summary
 
     async def clear_pyro(self) -> RunResult:
@@ -495,11 +510,13 @@ class RunOrchestratorStore:
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get the current nozzle map keyed by pipette id."""
-        return self.run_coordinator.get_nozzle_maps()
+        assert self._nozzle_maps
+        return self._nozzle_maps
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        return self.run_coordinator.get_tip_attached()
+        assert self._tip_attached
+        return self._tip_attached
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
@@ -511,7 +528,8 @@ class RunOrchestratorStore:
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the current running command, if any."""
-        return self.run_coordinator.get_current_command()
+        assert self._current_command
+        return self._current_command
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
@@ -684,3 +702,34 @@ class RunOrchestratorStore:
             # This is a background task kicked off by a hardware event,
             # so there's no one to propagate this exception to.
             _log.exception("Exception handling E-stop event.")
+
+    def update_engine_status_callback(self, event: EngineEventNotification) -> None:
+        """Handle protocol engine status updates for the run orchestrator store."""
+        if isinstance(event, EngineEventNotification.NOZZLE_CONFIG):
+            self._nozzle_maps = self.run_coordinator.get_nozzle_maps()
+
+        if isinstance(event, EngineEventNotification.TIP_ATTACHED):
+            self._tip_attached = self.run_coordinator.get_tip_attached()
+
+        if isinstance(event, EngineEventNotification.CURRENT_COMMAND):
+            self._current_command = self.run_coordinator.get_current_command()
+
+        if isinstance(event, EngineEventNotification.FINALIZED_COMMAND):
+            self._most_recent_finalized_command = (
+                self.run_coordinator.get_most_recently_finalized_command()
+            )
+
+        if isinstance(event, EngineEventNotification.FLEX_STACKER_SUBSTATE):
+            self._flex_stacker_substate = (
+                self.run_coordinator.get_flex_stacker_substate()
+            )
+
+    def _initialize_stored_engine_state(self) -> None:
+        """Initialize the orchestrator store local engine state."""
+        self._nozzle_maps = self.run_coordinator.get_nozzle_maps()
+        self._tip_attached = self.run_coordinator.get_tip_attached()
+        self._current_command = self.run_coordinator.get_current_command()
+        self._most_recent_finalized_command = (
+            self.run_coordinator.get_most_recently_finalized_command()
+        )
+        self._flex_stacker_substate = self.run_coordinator.get_flex_stacker_substate()

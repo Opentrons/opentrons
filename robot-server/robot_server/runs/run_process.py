@@ -211,6 +211,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             error_recovery_rules, error_recovery_is_enabled
         )
 
+        # CASEY NOTE: proxy callback for the updates callback can be provided here (look at get engine updates callback)
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -226,6 +227,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             file_provider=self._robot_server_resource.get_file_provider(),
             camera_provider=self._robot_server_resource.get_camera_provider(),
             notify_publishers=self._robot_server_resource.get_notify_publishers(),
+            updates_callback=self._robot_server_resource.get_engine_updates_callback(),
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
         )
 

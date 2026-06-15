@@ -12,7 +12,7 @@ from opentrons_shared_data.robot.types import RobotDefinition
 
 from ..actions import Action, ActionHandler
 from ..resources import DeckFixedLabware
-from ..types import DeckConfigurationType
+from ..types import DeckConfigurationType, EngineEventNotification
 from ._abstract_store import HandlesActions, HasState
 from .addressable_areas import (
     AddressableAreaState,
@@ -216,6 +216,7 @@ class StateStore(StateView, ActionHandler):
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
         notify_publishers: Optional[Callable[[], None]] = None,
+        updates_callback: Optional[Callable[[EngineEventNotification], None]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -232,13 +233,14 @@ class StateStore(StateView, ActionHandler):
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
             robot_definition: Static information about the robot type being used.
             notify_publishers: Notifies robot server publishers of internal state change.
+            updates_callback: Notifies the robot server of specific Protocol Engine events.
         """
         self._command_store = CommandStore(
             config=config,
             is_door_open=is_door_open,
             error_recovery_policy=error_recovery_policy,
         )
-        self._pipette_store = PipetteStore()
+        self._pipette_store = PipetteStore(updates_callback=updates_callback)
         if deck_configuration is None:
             deck_configuration = []
         self._addressable_area_store = AddressableAreaStore(
@@ -255,6 +257,7 @@ class StateStore(StateView, ActionHandler):
             config=config,
             deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
+            updates_callback=updates_callback,
         )
         self._liquid_store = LiquidStore()
         self._liquid_class_store = LiquidClassStore()

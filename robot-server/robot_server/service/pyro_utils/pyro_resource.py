@@ -15,7 +15,10 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.types import DeckConfigurationType
+from opentrons.protocol_engine.types import (
+    DeckConfigurationType,
+    EngineEventNotification,
+)
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
@@ -142,7 +145,7 @@ class RobotServerPyroResource:
             return run_handler_in_engine_thread_from_hardware_thread
         else:
             raise RuntimeError(
-                "Cannot provider a hardware listener from the RobotServerPyroResource without a RunOrchestratorStore."
+                "Cannot provide a hardware listener from the RobotServerPyroResource without a RunOrchestratorStore."
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -166,7 +169,7 @@ class RobotServerPyroResource:
 
         else:
             raise RuntimeError(
-                "Cannot provider a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+                "Cannot provide a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -179,7 +182,7 @@ class RobotServerPyroResource:
             )
         else:
             raise RuntimeError(
-                "Cannot provider a maintenance run door watcher from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+                "Cannot provide a maintenance run door watcher from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -192,7 +195,7 @@ class RobotServerPyroResource:
             return orchestrator_store.default_run_orchestrator_door_watcher_callback_route_for_proxy
         else:
             raise RuntimeError(
-                "Cannot provider a default run orchestrator door watcher from the RobotServerPyroResource without a RunOrchestratorStore."
+                "Cannot provide a default run orchestrator door watcher from the RobotServerPyroResource without a RunOrchestratorStore."
             )
 
     async def get_deck_configuration(self) -> DeckConfigurationType:
@@ -264,7 +267,30 @@ class RobotServerPyroResource:
             return run_hardware_event_update_from_hardware_thread
         else:
             raise RuntimeError(
-                "Cannot provider a hardware updates callback from the RobotServerPyroResource without a HardwareStateStore."
+                "Cannot provide a hardware updates callback from the RobotServerPyroResource without a HardwareStateStore."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_engine_updates_callback(self) -> Callable[[], None] | None:
+        """Create a callback for protocol engine events during a Run.
+
+        The returned callback is meant to alert the robot server process to engine state updates.
+        """
+        orchestrator_store = self._run_orchestrator_store
+        if orchestrator_store is not None:
+
+            def run_engine_event_update_from_engine_thread(
+                event: EngineEventNotification,
+            ) -> None:
+                asyncio.run_coroutine_threadsafe(
+                    orchestrator_store.update_engine_status_callback(event),
+                    self._loop,
+                )
+
+            return run_engine_event_update_from_engine_thread
+        else:
+            raise RuntimeError(
+                "Cannot provide a protocol engine listener from the RobotServerPyroResource without a RunOrchestratorStore."
             )
 
 

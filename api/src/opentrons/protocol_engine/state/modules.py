@@ -6,6 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import (
     Any,
+    Callable,
     Dict,
     List,
     NamedTuple,
@@ -41,6 +42,7 @@ from ..types import (
     AddressableAreaLocation,
     DeckSlotLocation,
     DeckType,
+    EngineEventNotification,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     LoadedModule,
@@ -222,6 +224,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         config: Config,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
+        updates_callback: Optional[Callable[[EngineEventNotification], None]] = None,
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
@@ -235,6 +238,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             deck_fixed_labware=deck_fixed_labware,
         )
         self._robot_type = config.robot_type
+        self._updates_callback = updates_callback
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -666,6 +670,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         self._state.substate_by_module_id[module_id] = (
             prev_substate.new_from_state_change(state_update)
         )
+        if self._updates_callback:
+            self._updates_callback(EngineEventNotification.FLEX_STACKER_SUBSTATE)
 
     def _handle_vacuum_module_commands(
         self, state_update: VacuumModuleStateUpdate

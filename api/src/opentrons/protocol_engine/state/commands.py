@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import assert_never
@@ -38,7 +38,7 @@ from ..errors import (
     SetupCommandNotAllowedError,
     UnexpectedProtocolError,
 )
-from ..types import EngineStatus
+from ..types import EngineEventNotification, EngineStatus
 from ..types.command_annotations import CommandAnnotation
 from ._abstract_store import HandlesActions, HasState
 from .command_history import (
@@ -277,6 +277,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         config: Config,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
+        updates_callback: Optional[Callable[[EngineEventNotification], None]] = None,
     ) -> None:
         """Initialize a CommandStore and its state."""
         self._config = config
@@ -299,6 +300,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             has_entered_error_recovery=False,
             command_annotations={},
         )
+        self._updates_callback = updates_callback
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
@@ -371,10 +373,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
         )
 
         self._state.command_history.set_command_running(running_command)
+        if self._updates_callback:
+            # CASEY NOTE: do all of these need to go inside a call soon?
+            self._updates_callback(EngineEventNotification.CURRENT_COMMAND)
 
     def _handle_succeed_command_action(self, action: SucceedCommandAction) -> None:
         succeeded_command = action.command
         self._state.command_history.set_command_succeeded(succeeded_command)
+        if self._updates_callback:
+            self._updates_callback(EngineEventNotification.FINALIZED_COMMAND)
 
     def _handle_fail_command_action(  # noqa: C901
         self, action: FailCommandAction
@@ -612,6 +619,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self._state.command_history.set_command_failed(failed_command)
         if error_recovery_type is not None:
             self._state.command_error_recovery_types[command_id] = error_recovery_type
+        if self._updates_callback:
+            self._updates_callback(EngineEventNotification.FINALIZED_COMMAND)
 
     def _handle_create_user_command_annotation(
         self, action: CreateUserCommandAnnotation

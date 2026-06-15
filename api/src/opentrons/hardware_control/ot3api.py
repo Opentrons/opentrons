@@ -398,7 +398,7 @@ class OT3API(
 
     def _send_subsystem_notification(self) -> None:
         subsystem_event = SubsystemConnectionNotification()
-        mod_log.info(f"Forwarding subsystem event.")
+        mod_log.info("Forwarding subsystem event.")
         for cb in self._callbacks:
             try:
                 cb(subsystem_event)
