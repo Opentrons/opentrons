@@ -65,7 +65,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     'login' | 'forgotPassword' | 'passwordExpired'
   >('login')
   const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [logInPassword, setLogInPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [confirmPasswordError, setConfirmPasswordError] = useState<
@@ -88,7 +88,6 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
       if (user.resetPassword) {
         setLoggedInUsername(successfulUsername)
-        setPassword('')
         setConfirmPasswordError(null)
         setView('passwordExpired')
         return
@@ -114,7 +113,8 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       },
     })
 
-  const isLoginDisabled = username === '' || password === '' || isAuthLoading
+  const isLoginDisabled =
+    username === '' || logInPassword === '' || isAuthLoading
   const isPasswordExpiredDisabled =
     newPassword === '' ||
     confirmPassword === '' ||
@@ -123,7 +123,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const handleSubmit: ComponentProps<'form'>['onSubmit'] = event => {
     event.preventDefault()
-    submitPassword(username, password)
+    submitPassword(username, logInPassword)
   }
 
   const validateConfirmPasswordMatch = (): boolean => {
@@ -155,9 +155,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     setUsername(value)
   }
 
-  const handlePasswordChange = (value: string): void => {
+  const handleLogInPasswordChange = (value: string): void => {
     setLoginError(null)
-    setPassword(value)
+    setLogInPassword(value)
   }
 
   const handleNewPasswordChange = (value: string): void => {
@@ -215,10 +215,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
             formId={loginFormId}
             onSubmit={handleSubmit}
             username={username}
-            password={password}
+            logInPassword={logInPassword}
             loginError={loginError}
             onUsernameChange={handleUsernameChange}
-            onPasswordChange={handlePasswordChange}
+            onLogInPasswordChange={handleLogInPasswordChange}
             onForgotPasswordClick={() => {
               setView('forgotPassword')
             }}
@@ -246,10 +246,10 @@ interface LoginViewProps {
   formId: string
   onSubmit: ComponentProps<'form'>['onSubmit']
   username: string
-  password: string
+  logInPassword: string
   loginError: string | null
   onUsernameChange: (value: string) => void
-  onPasswordChange: (value: string) => void
+  onLogInPasswordChange: (value: string) => void
   onForgotPasswordClick: () => void
 }
 
@@ -258,10 +258,10 @@ function LoginView(props: LoginViewProps): JSX.Element {
     formId,
     onSubmit,
     username,
-    password,
+    logInPassword,
     loginError,
     onUsernameChange,
-    onPasswordChange,
+    onLogInPasswordChange,
     onForgotPasswordClick,
   } = props
   const { t } = useTranslation()
@@ -291,10 +291,10 @@ function LoginView(props: LoginViewProps): JSX.Element {
           name="password"
           title={t('access_control:login_form_password_field')}
           type="password"
-          value={password}
+          value={logInPassword}
           error={loginError ?? undefined}
           onChange={event => {
-            onPasswordChange(event.target.value)
+            onLogInPasswordChange(event.target.value)
           }}
         />
         <div>
