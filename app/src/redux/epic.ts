@@ -9,7 +9,6 @@ import { modulesEpic } from './modules/epic'
 import { networkingEpic } from './networking/epic'
 import { pipettesEpic } from './pipettes/epic'
 import { robotAdminEpic } from './robot-admin/epic'
-import { robotControlsEpic } from './robot-controls/epic'
 import { robotSettingsEpic } from './robot-settings/epic'
 import { robotUpdateEpic } from './robot-update/epic'
 import { sessionsEpic } from './sessions/epic'
@@ -22,7 +21,6 @@ export const rootEpic = combineEpics<Epic>(
   analyticsEpic,
   discoveryEpic,
   robotAdminEpic,
-  robotControlsEpic,
   robotSettingsEpic,
   robotUpdateEpic,
   pipettesEpic,
