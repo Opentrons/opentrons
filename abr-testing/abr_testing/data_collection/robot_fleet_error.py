@@ -13,7 +13,6 @@ from abr_testing.data_collection.robot_fleet_error_constants import (
     COMPONENT_FLEX_INTERNAL_RELEASE,
     COMPONENT_FLEX_RABR,
     COMPONENT_FLEX_STACKER,
-    DEFAULT_TICKET_ASSIGNEE_ID,
     LABEL_VERSION_8_2_0,
     OPENTRONS_VERSION_HEADER,
     PARENT_NAME_VERSION_BUGS_SUFFIX,
@@ -193,22 +192,19 @@ def retrieve_live_image(
 
 def update_camera_status(status: str, robot_ip: str, key_path: str) -> None:
     """Set the live-stream camera status on the robot via SSH and restart the stream service."""
-    username = ROBOT_SSH_USER
     status_upper = str(status).upper()
-    # sed command
-    remote_command = (
-        f"sed -i 's/^STATUS=.*/STATUS={status_upper}/'"
-        " /data/opentrons-live-stream.env"
-        " && systemctl restart opentrons-live-stream"
-    )  # ssh command
     ssh_command = [
         "ssh",
         "-i",
         key_path,
         "-o",
         "StrictHostKeyChecking=no",
-        f"{username}@{robot_ip}",
-        remote_command,
+        f"{ROBOT_SSH_USER}@{robot_ip}",
+        (
+            f"sed -i 's/^STATUS=.*/STATUS={status_upper}/'"
+            " /data/opentrons-live-stream.env"
+            " && systemctl restart opentrons-live-stream"
+        ),
     ]
     try:
         # Run the command and capture output
@@ -388,8 +384,7 @@ def get_parent_key(
 
 def cleanup_report_folders(storage_directory: str, keep_count: int = 3) -> None:
     """Cleans up report folder."""
-    storage_path = Path(storage_directory)
-    folders = [f for f in storage_path.iterdir() if f.is_dir()]
+    folders = [f for f in Path(storage_directory).iterdir() if f.is_dir()]
     folders.sort(key=lambda f: f.stat().st_mtime)
     # get folders, then sort by modification time
 
@@ -928,15 +923,13 @@ def organize_ticket_data(
 ) -> TicketData:
     """Collect and organize ticket fields from robot data or a manual title."""
     ticket_data = TicketData()
-    storage_directory = local_machine.storage_directory
-    ssh_key_path = local_machine.robot_ssh_key_path
 
     if len(inputs.run_or_other) < 1 and error_runs and protocol_ids:
         protocol_folder = retrieve_protocol_file(
             protocol_id=protocol_ids[-1],
             robot_ip=inputs.ip,
-            storage=str(storage_directory),
-            ssh_key_path=ssh_key_path,
+            storage=str(local_machine.storage_directory),
+            ssh_key_path=local_machine.robot_ssh_key_path,
         )
         protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
         protocol_found = False
@@ -961,21 +954,19 @@ def organize_ticket_data(
         ) = get_run_error_info_from_robot(
             ip=inputs.ip,
             one_run=ticket_data.one_run,
-            storage_directory=storage_directory,
+            storage_directory=local_machine.storage_directory,
             protocol_found=protocol_found,
             project_key=inputs.project_key,
             jira_client=jira_client,
         )
     else:
-        run_or_other = inputs.run_or_other
-        if len(run_or_other) < 1:
+        if len(inputs.run_or_other) < 1:
             print("No failed/recovery runs matched filters.")
-            run_or_other = prompt_manual_ticket_title()
-            inputs.run_or_other = run_or_other
+            inputs.run_or_other = prompt_manual_ticket_title()
         ticket_data.protocol_file_path = save_latest_protocol(
             robot_ip=inputs.ip,
-            storage_directory=str(storage_directory),
-            ssh_key_path=ssh_key_path,
+            storage_directory=str(local_machine.storage_directory),
+            ssh_key_path=local_machine.robot_ssh_key_path,
         )
         (
             ticket_data.summary,
@@ -986,7 +977,7 @@ def organize_ticket_data(
             ticket_data.whole_description_str,
         ) = get_robot_state(
             ip=inputs.ip,
-            reported_string=run_or_other,
+            reported_string=inputs.run_or_other,
             project_key=inputs.project_key,
             jira_client=jira_client,
         )
@@ -1032,12 +1023,11 @@ def make_error_folder(
 
 def build_jira_client(config: RobotFleetRuntimeConfig) -> jira_tool.JiraTicket:
     """Build a Jira client from resolved configuration."""
-    jira_client = jira_tool.JiraTicket(
+    return jira_tool.JiraTicket(
         api_token=config.jira.api_token,
         email=config.jira.email,
         url=config.jira.url,
     )
-    return jira_client
 
 
 def attach_artifacts_to_ticket(
@@ -1058,12 +1048,9 @@ def process_robot(
     config: RobotFleetRuntimeConfig,
 ) -> None:
     """Create one Jira ticket for a robot and attach collected error artifacts."""
-    local_machine = config.local_machine
-    storage_directory = local_machine.storage_directory
-
     if not preflight_connection_check(
         ip=robot_ip,
-        ssh_key_path=local_machine.robot_ssh_key_path,
+        ssh_key_path=config.local_machine.robot_ssh_key_path,
     ):
         print(f"Skipping robot {robot_ip}.")
         return
@@ -1076,7 +1063,7 @@ def process_robot(
     error_runs, protocol_ids = get_error_runs_from_robot(ip=robot_ip)
     ticket_data = organize_ticket_data(
         inputs=inputs,
-        local_machine=local_machine,
+        local_machine=config.local_machine,
         error_runs=error_runs,
         protocol_ids=protocol_ids,
         jira_client=jira_client,
@@ -1101,27 +1088,27 @@ def process_robot(
         return
 
     log_zip_path = read_robot_logs.get_logs(
-        storage_directory=Path(storage_directory),
+        storage_directory=config.local_machine.storage_directory,
         ip=robot_ip,
     )
     status_path = make_json_file(
-        storage_directory=str(storage_directory),
+        storage_directory=str(config.local_machine.storage_directory),
         whole_description_str=ticket_data.whole_description_str,
     )
     if len(inputs.run_or_other) < 1:
         image_files = retrieve_protocol_images(
             run_id=ticket_data.one_run,
             robot_ip=robot_ip,
-            storage=str(storage_directory),
-            ssh_key_path=local_machine.robot_ssh_key_path,
+            storage=str(config.local_machine.storage_directory),
+            ssh_key_path=config.local_machine.robot_ssh_key_path,
         )
     else:
         robot_name = get_name_from_ip(ip=robot_ip)
         image_files = retrieve_live_image(
             robot_ip=robot_ip,
-            storage=str(storage_directory),
+            storage=str(config.local_machine.storage_directory),
             robot_name=robot_name,
-            ssh_key_path=local_machine.robot_ssh_key_path,
+            ssh_key_path=config.local_machine.robot_ssh_key_path,
         )
 
     to_link = jira_client.match_issues(
@@ -1139,7 +1126,7 @@ def process_robot(
         status_path,
     ]
     error_folder_path = make_error_folder(
-        storage_directory=storage_directory,
+        storage_directory=config.local_machine.storage_directory,
         issue_key=issue_key,
         error_files=error_files,
     )
@@ -1149,7 +1136,7 @@ def process_robot(
         error_folder_path=error_folder_path,
     )
     cleanup_report_folders(
-        storage_directory=str(storage_directory),
+        storage_directory=str(config.local_machine.storage_directory),
         keep_count=config.artifacts.cleanup_keep_count,
     )
 

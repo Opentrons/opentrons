@@ -223,14 +223,12 @@ def load_robot_fleet_config(
         env_file = default_env if default_env.is_file() else None
 
     values = _merged_env_values(env_file)
-    local_machine = _build_local_machine_config(values)
-    jira = _build_jira_config(values)
-    artifacts = _build_artifact_config(values)
-    robot_ips = _resolve_robot_ips(values=values, cli_robot_ips=args.robot_ips)
 
     return RobotFleetRuntimeConfig(
-        robot_ips=robot_ips,
-        local_machine=local_machine,
-        jira=jira,
-        artifacts=artifacts,
+        robot_ips=_resolve_robot_ips(
+            values=values, cli_robot_ips=args.robot_ips
+        ),
+        local_machine=_build_local_machine_config(values),
+        jira=_build_jira_config(values),
+        artifacts=_build_artifact_config(values),
     )
