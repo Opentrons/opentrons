@@ -980,7 +980,9 @@ if __name__ == "__main__":
         robot_name = get_name_from_ip(inputs.ip)
         image_files = retrieve_live_image(inputs.ip, storage_directory, robot_name)
 
-    to_link = ticket.match_issues(ticket.issues_on_board(inputs.project_key), data.summary)
+    to_link = ticket.match_issues(
+        ticket.issues_on_board(inputs.project_key), data.summary
+    )
     ticket.link_issues(to_link, issue_key)
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
