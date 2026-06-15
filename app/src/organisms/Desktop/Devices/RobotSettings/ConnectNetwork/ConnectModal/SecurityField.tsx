@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { SelectField } from '@opentrons/components'
@@ -24,11 +25,6 @@ export interface SecurityFieldProps {
   fieldState: ControllerFieldState
   className?: string
 }
-
-const ALL_SECURITY_OPTIONS = [
-  { options: [{ value: SECURITY_NONE, label: 'shared:none' }] },
-  { options: [{ value: SECURITY_WPA_PSK, label: 'wpa2_personal' }] },
-]
 
 const makeEapOptionsGroup = (
   eapOptions: EapOption[]
@@ -58,8 +54,18 @@ export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
     fieldState
   )
 
+  const noneText = t('shared:none')
+  const wpa2PersonalText = t('wpa2_personal')
+  const allSecurityOptions = useMemo(
+    () => [
+      { options: [{ value: SECURITY_NONE, label: noneText }] },
+      { options: [{ value: SECURITY_WPA_PSK, label: wpa2PersonalText }] },
+    ],
+    [noneText, wpa2PersonalText]
+  )
+
   const options = [
-    ...(showAllOptions ? ALL_SECURITY_OPTIONS : []),
+    ...(showAllOptions ? allSecurityOptions : []),
     makeEapOptionsGroup(eapOptions),
   ]
 
