@@ -19,7 +19,9 @@ const baseCommandData = {
 
 function TestWrapper({ command }: { command: any }): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'branded'])
-  return <div>{getVacuumModuleCommandText({ command, ...baseCommandData, t })}</div>
+  return (
+    <div>{getVacuumModuleCommandText({ command, ...baseCommandData, t })}</div>
+  )
 }
 
 const render = (command: any) =>
@@ -89,5 +91,4 @@ describe('getVacuumModuleCommandText', () => {
     })
     screen.getByText('Closing Vacuum Module vent')
   })
-
 })

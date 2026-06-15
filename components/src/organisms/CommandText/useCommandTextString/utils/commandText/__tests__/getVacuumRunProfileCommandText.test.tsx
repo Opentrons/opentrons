@@ -6,7 +6,10 @@ import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { getVacuumRunProfileCommandText } from '../getVacuumRunProfileCommandText'
 
-import type { VacuumProfileCycleText, VacuumProfileStepText } from '../getVacuumRunProfileCommandText'
+import type {
+  VacuumProfileCycleText,
+  VacuumProfileStepText,
+} from '../getVacuumRunProfileCommandText'
 
 const baseCommandData = {
   allRunDefs: [],
