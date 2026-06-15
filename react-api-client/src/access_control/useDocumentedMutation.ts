@@ -83,7 +83,7 @@ function useWrappedMutationFn<TData, TVariables>(
         documentationState,
         actionsToDocument
       )
-      if (docreport == null || docreport.length === 0) {
+      if (!isDocumentationProvided(documentationState, docreport)) {
         throw new Error('No documentation report provided')
       }
       if (documentationState.isLoading) {
@@ -94,4 +94,17 @@ function useWrappedMutationFn<TData, TVariables>(
     [actionsToDocument, documentationState, mutationFn]
   )
   return wrappedMutationFn
+}
+
+const isDocumentationProvided = (
+  state: DocumentationState,
+  docreport: DocumentationReport | null
+): boolean => {
+  if (state.isLoading) {
+    return false
+  }
+  if (!state.reasonForInteractionRequired) {
+    return true
+  }
+  return docreport != null && docreport.length > 0
 }

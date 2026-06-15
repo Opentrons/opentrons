@@ -19,7 +19,7 @@ interface UsePlacePlateReaderLidResult {
 
 type UsePlacePlateReaderLidProps = Pick<
   UseRobotControlCommandsProps,
-  'onSettled'
+  'onSuccess'
 >
 
 export function usePlacePlateReaderLid(

@@ -67,15 +67,15 @@ export function ConfirmCancelRunModal({
     }
   }, [isActiveRun, dismissCurrentRun, runId, protocolId, navigate])
 
+  // TODO(jj): add error handling for docreport error
   const handleCancelRun = (): void => {
     setIsCanceling(true)
     stopRun(runId, {
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-        dismissAndNavigate()
       },
-      onError: () => {
-        setIsCanceling(false)
+      onSettled: () => {
+        dismissAndNavigate()
       },
     })
   }
