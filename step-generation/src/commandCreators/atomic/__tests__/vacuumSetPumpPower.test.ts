@@ -106,11 +106,12 @@ mock_vacuum_module.start_set_vacuum_power(
         },
       ],
       python: `
-mock_vacuum_module_task_1 = mock_vacuum_module.start_set_vacuum_power(
+mock_vacuum_module.start_set_vacuum_power(
     percent_power=40,
-    duration=120,
+    duration_s=120,
     vent_after=False
-)`.trim(),
+)
+mock_vacuum_module_task_1 = protocol.create_timer(seconds=120)`.trim(),
     })
   })
 
