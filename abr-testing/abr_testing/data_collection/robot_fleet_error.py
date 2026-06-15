@@ -788,7 +788,7 @@ class ticketInputs:
 
 
 def init_ticketing() -> ticketInputs:
-    """Gets initial robot info."""
+    """Collects robot and ticket info from the user."""
     while True:
         board = str(input("Enter ABR or RQA: ")).upper()
         if board == "ABR":
