@@ -244,7 +244,7 @@ def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Pat
 
 
 def read_each_log(
-    folder_path: str, issue_url: str, ticket: jira_tool.JiraTicket, issue_key: str
+    folder_path: str, ticket: jira_tool.JiraTicket, issue_key: str
 ) -> None:
     """Read log and comment error portion on JIRA ticket."""
     for file_name in os.listdir(folder_path):
@@ -476,7 +476,13 @@ def get_robot_state(
     if "8.2" in affects_version:
         labels.append("8_2_0")
     parent_name = affects_version + " Bugs"
-    parent = get_parent_key(url, api_token, email, project_key, parent_name)
+    parent = get_parent_key(
+        url,
+        jira_credentials.api_token,
+        jira_credentials.email,
+        project_key,
+        parent_name,
+    )
     whole_description_str = (
         "{"
         + "\n".join("{!r}: {!r},".format(k, v) for k, v in description.items())
@@ -535,10 +541,22 @@ def get_run_error_info_from_robot(
         labels.append("8_2_0")
     if project_key == "RQA":  # 217 is ABR
         parent_name = affects_version + " Bugs"
-        parent = get_parent_key(url, api_token, email, project_key, parent_name)
+        parent = get_parent_key(
+            url,
+            jira_credentials.api_token,
+            jira_credentials.email,
+            project_key,
+            parent_name,
+        )
     else:
         parent_name = robot
-        parent = get_parent_key(url, api_token, email, project_key, parent_name)
+        parent = get_parent_key(
+            url,
+            jira_credentials.api_token,
+            jira_credentials.email,
+            project_key,
+            parent_name,
+        )
 
     summary = robot + "_" + str(one_run) + "_" + str(error_code) + "_" + error_type
     # Description of error
@@ -860,86 +878,26 @@ def organize_ticket_data(
     return ticketData
 
 
-if __name__ == "__main__":
-    """Create ticket for specified robot."""
-    parser = argparse.ArgumentParser(description="Pulls run logs from ABR robots.")
-    parser.add_argument(
-        "storage_directory",
-        metavar="STORAGE_DIRECTORY",
-        type=str,
-        nargs=1,
-        help="Path to long term storage directory for run logs.",
-    )
-    args = parser.parse_args()
-    storage_directory = args.storage_directory[0]
-    credentials_path = os.path.join(storage_directory, "jiraCredentials.json")
-    with open(credentials_path) as f:
-        jiraCreds = json.load(f)
-    email = jiraCreds["Jira API"]["email"]
-    api_token = jiraCreds["Jira API"]["key"]
-    # Simplify the main section
-    board_id, project_key, ip, run_or_other = init_ticketing()
-    url = "https://opentrons.atlassian.net"
-    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), ip)
-    ticket = jira_tool.JiraTicket(url, api_token, email)
+def get_name_from_ip(ip: str) -> str:
+    """Get robot name from IP address."""
     try:
-        error_runs, protocol_ids = get_error_runs_from_robot(ip)
-    except requests.exceptions.InvalidURL:
-        print("Invalid IP address.")
-        sys.exit()
-    data = organize_ticket_data(
-        run_or_other, ip, storage_directory, project_key, error_runs, protocol_ids
-    )
+        health = requests.get(
+            f"http://{ip}:31950/health",
+            headers={"opentrons-version": "*"},
+            timeout=10,
+        )
+        robot_name = health.json().get("name", ip)
+    except Exception:
+        robot_name = ip
+    return robot_name
 
-    # make description replacement file
-    status_path = make_json_file(storage_directory, data.whole_description_str)
-    print(f"Making ticket for {data.summary}.")
-    all_issues = ticket.issues_on_board(project_key)
-    # CREATE TICKET
-    # TODO: for pyro, add pyro filter as HIGH priority
-    description = "Error recreation steps: (PLEASE FILL)"
-    issue_key, raw_issue_url = ticket.create_ticket(
-        data.summary,
-        description,
-        project_key,
-        "-1",
-        "Bug",
-        "Medium",
-        data.components,
-        data.affects_version,
-        data.labels,
-        data.parent,
-    )
-    issue_key = issue_key or ""
-    raw_issue_url = raw_issue_url or ""
-    image_files = ""
-    if len(run_or_other) < 1:
-        image_files = retrieve_protocol_images(data.one_run, ip, storage_directory)
-    else:
-        try:
-            health = requests.get(
-                f"http://{ip}:31950/health",
-                headers={"opentrons-version": "*"},
-                timeout=10,
-            )
-            robot_name = health.json().get("name", ip)
-        except Exception:
-            robot_name = ip
-        image_files = retrieve_live_image(ip, storage_directory, robot_name)
 
-    # Link Tickets - TODO: FIX THIS TO WORK
-    to_link = ticket.match_issues(all_issues, data.summary)
-    ticket.link_issues(to_link, issue_key)
-    # OPEN TICKET
-    issue_url = ticket.open_issue(issue_key)
-    # MOVE FILES TO ERROR FOLDER.
-    error_files = [
-        data.run_log_file_path,  # run-error path only
-        data.protocol_file_path,  # run-error path only
-        log_zip_path,
-        image_files,
-        status_path,
-    ]
+def make_error_folder(
+    storage_directory: Path,
+    issue_key: str,
+    error_files: list,
+) -> str:
+    """Creates and populates the folder attached to each ticket."""
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:
@@ -953,13 +911,79 @@ if __name__ == "__main__":
         except (shutil.Error, FileNotFoundError) as e:
             print(f"Could not move {source_file}: {e}")
             continue
+    return error_folder_path
+
+
+if __name__ == "__main__":
+    """Create ticket for specified robot."""
+    parser = argparse.ArgumentParser(description="Pulls run logs from ABR robots.")
+    parser.add_argument(
+        "storage_directory",
+        metavar="STORAGE_DIRECTORY",
+        type=str,
+        nargs=1,
+        help="Path to long term storage directory for run logs.",
+    )
+    args = parser.parse_args()
+    storage_directory = args.storage_directory[0]
+    jira_credentials = jira_tool.get_credentials(storage_directory)
+    # Simplify the main section
+    board_id, project_key, ip, run_or_other = init_ticketing()
+    url = "https://opentrons.atlassian.net"
+    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), ip)
+    ticket = jira_tool.JiraTicket(
+        url, jira_credentials.api_token, jira_credentials.email
+    )
+    error_runs, protocol_ids = get_error_runs_from_robot(ip)
+    data = organize_ticket_data(
+        run_or_other, ip, storage_directory, project_key, error_runs, protocol_ids
+    )
+
+    # make description replacement file
+    status_path = make_json_file(storage_directory, data.whole_description_str)
+    print(f"Making ticket for {data.summary}.")
+    all_issues = ticket.issues_on_board(project_key)
+    # CREATE TICKET
+    issue_key, raw_issue_url = ticket.create_ticket(
+        summary=data.summary,
+        description="Error recreation steps: (PLEASE FILL)",
+        project_key=project_key,
+        assignee_id="-1",
+        issue_type="Bug",
+        priority="Medium",
+        components=data.components,
+        affects_versions=data.affects_version,
+        labels=data.labels,
+        parent=data.parent,
+    )
+    if len(run_or_other) < 1:
+        image_files = retrieve_protocol_images(data.one_run, ip, storage_directory)
+    else:
+        robot_name = get_name_from_ip(ip)
+        image_files = retrieve_live_image(ip, storage_directory, robot_name)
+
+    to_link = ticket.match_issues(all_issues, data.summary)
+    ticket.link_issues(to_link, issue_key)
+    # OPEN TICKET
+    issue_url = ticket.open_issue(issue_key)
+    # MOVE FILES TO ERROR FOLDER.
+    # TODO: make this a function
+    error_files = [
+        data.run_log_file_path,  # run-error path only
+        data.protocol_file_path,  # run-error path only
+        log_zip_path,
+        image_files,
+        status_path,
+    ]
+    error_folder_path = make_error_folder(storage_directory, issue_key, error_files)
+
     # POST ALL FILES TO TICKET
     list_of_files = os.listdir(error_folder_path)
     for file in list_of_files:
         file_to_attach = os.path.join(error_folder_path, file)
         ticket.post_attachment_to_ticket(issue_key, file_to_attach)
     # ADD ERROR COMMENTS TO TICKET
-    read_each_log(error_folder_path, raw_issue_url, ticket, issue_key)
+    read_each_log(error_folder_path, ticket, issue_key)
 
     # Cleanup error folder
     cleanup_report_folders(storage_directory)

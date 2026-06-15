@@ -119,7 +119,7 @@ desktop-shortcut:
 		'set "ABR=%HERE%$(repo_name)\abr-testing"' \
 		'rem Run inside the project pipenv environment so all deps are available' \
 		'cd /d "%ABR%"' \
-		'py -m pipenv run python "%ABR%\abr_testing\data_collection\robotFleet_error.py" "%HERE%Errors"' \
+		'py -m pipenv run python "%ABR%\abr_testing\data_collection\robot_fleet_error.py" "%HERE%Errors"' \
 		'echo.' \
 		'pause' \
 		> "$(shortcut_path)"

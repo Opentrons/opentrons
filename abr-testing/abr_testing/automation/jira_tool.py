@@ -6,8 +6,27 @@ import json
 import webbrowser
 from pathlib import Path
 import argparse
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Tuple
 import os
+from dataclasses import dataclass
+
+
+@dataclass
+class JiraCredentials:
+    """A class containing Jira token and associated email."""
+
+    email: str
+    api_token: str
+
+
+def get_credentials(storage_directory: str) -> JiraCredentials:
+    """A function to populate the JiraCredentials class."""
+    credentials_path = os.path.join(storage_directory, "jiraCredentials.json")
+    with open(credentials_path) as f:
+        jiraCreds = json.load(f)
+    email = jiraCreds["Jira API"]["email"]
+    api_token = jiraCreds["Jira API"]["key"]
+    return JiraCredentials(email, api_token)
 
 
 class JiraTicket:
@@ -112,7 +131,7 @@ class JiraTicket:
         affects_versions: str,
         labels: list,
         parent: str,
-    ) -> Tuple[Optional[str], Optional[str]]:
+    ) -> Tuple[str, str]:
         """Create ticket."""
         # Check if software version is a field on JIRA, if not replaces with existing version
         data = {
@@ -144,8 +163,8 @@ class JiraTicket:
             print(f"Software version {affects_versions} added.")
         else:
             print("Software version of robot not in jira releases.")
-        issue_key = None
-        issue_url = None
+        issue_key = ""
+        issue_url = ""
         if parent:
             data["fields"]["parent"] = {"key": parent}
         try:
@@ -162,6 +181,8 @@ class JiraTicket:
             print(f"issue key: {issue_key}")
             print(f"issue url: {issue_url}")
             if issue_key is None:
+                issue_key = ""
+                issue_url = ""
                 print("Error: Could not create issue. No key returned.")
         except requests.exceptions.HTTPError:
             print(f"HTTP error occurred. Response content: {response_str}")
