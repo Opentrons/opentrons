@@ -1,15 +1,28 @@
 import asyncio
 import threading
 import time
+from pathlib import Path
 from typing import Callable, Generator
 
 import aiohttp.web
 import pytest
 import requests
+from sqlalchemy.engine import Engine as SQLEngine
 
 from tests.dev_server import DevServer
 
+from audit_server.persistence.database import create_schema, sql_engine_ctx
+
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
+
+
+@pytest.fixture
+def db_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
+    """A SQLAlchemy engine backed by a fresh SQLite DB with the schema created."""
+    db_path = tmp_path / "test_audit.db"
+    with sql_engine_ctx(db_path, echo=False) as engine:
+        create_schema(engine)
+        yield engine
 
 
 @pytest.fixture
