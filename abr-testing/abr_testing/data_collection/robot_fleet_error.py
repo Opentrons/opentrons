@@ -841,7 +841,7 @@ def organize_ticket_data(
     Collects robot, protocol, and error information, and
     formats it for the Jira API to use in ticket creation.
     """
-    ticketData = TicketData()
+    ticket_data = TicketData()
     if len(inputs.run_or_other) < 1 and error_runs and protocol_ids:
         protocol_folder = retrieve_protocol_file(
             protocol_ids[-1], inputs.ip, str(storage_directory)
@@ -849,7 +849,7 @@ def organize_ticket_data(
         protocol_folder_path = os.path.join(protocol_folder, protocol_ids[-1])
         protocol_found = False
         try:
-            ticketData.protocol_file_path = next(
+            ticket_data.protocol_file_path = next(
                 os.path.join(protocol_folder_path, f)
                 for f in os.listdir(protocol_folder_path)
                 if f.endswith(".py")
@@ -857,18 +857,18 @@ def organize_ticket_data(
             protocol_found = True
         except (FileNotFoundError, StopIteration):
             print(f"No .py file found or folder not found: {protocol_folder_path}")
-        ticketData.one_run = error_runs[-1]
+        ticket_data.one_run = error_runs[-1]
         (
-            ticketData.summary,
-            ticketData.parent,
-            ticketData.affects_version,
-            ticketData.components,
-            ticketData.labels,
-            ticketData.whole_description_str,
-            ticketData.run_log_file_path,
+            ticket_data.summary,
+            ticket_data.parent,
+            ticket_data.affects_version,
+            ticket_data.components,
+            ticket_data.labels,
+            ticket_data.whole_description_str,
+            ticket_data.run_log_file_path,
         ) = get_run_error_info_from_robot(
             inputs.ip,
-            ticketData.one_run,
+            ticket_data.one_run,
             storage_directory,
             protocol_found,
             inputs.project_key,
@@ -879,19 +879,19 @@ def organize_ticket_data(
             inputs.run_or_other = str(
                 input("Please format title as:\nfeature, brief summary\n> ")
             ).strip()
-        ticketData.protocol_file_path = save_latest_protocol(
+        ticket_data.protocol_file_path = save_latest_protocol(
             inputs.ip, str(storage_directory)
         )
         (
-            ticketData.summary,
-            ticketData.parent,
-            ticketData.affects_version,
-            ticketData.components,
-            ticketData.labels,
-            ticketData.whole_description_str,
+            ticket_data.summary,
+            ticket_data.parent,
+            ticket_data.affects_version,
+            ticket_data.components,
+            ticket_data.labels,
+            ticket_data.whole_description_str,
         ) = get_robot_state(inputs.ip, inputs.run_or_other, inputs.project_key)
 
-    return ticketData
+    return ticket_data
 
 
 def get_name_from_ip(ip: str) -> str:
@@ -955,7 +955,6 @@ if __name__ == "__main__":
     )
 
     print(f"Making ticket for {data.summary}.")
-    all_issues = ticket.issues_on_board(inputs.project_key)
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
         summary=data.summary,
@@ -981,7 +980,7 @@ if __name__ == "__main__":
         robot_name = get_name_from_ip(inputs.ip)
         image_files = retrieve_live_image(inputs.ip, storage_directory, robot_name)
 
-    to_link = ticket.match_issues(all_issues, data.summary)
+    to_link = ticket.match_issues(ticket.issues_on_board(inputs.project_key), data.summary)
     ticket.link_issues(to_link, issue_key)
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
