@@ -15,6 +15,10 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useRobot } from '/app/redux-resources/robots'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -24,10 +28,9 @@ import {
 import styles from './loginmodal.module.css'
 
 import type { ComponentProps } from 'react'
-import type { HostConfig } from '@opentrons/api-client'
 
 interface LoginModalProps {
-  host: HostConfig /** Which robot to log in to. */
+  robotName: string /** Which robot to log in to. */
 }
 
 /** Open the desktop login modal in the appropriate React portal. */
@@ -36,15 +39,26 @@ export const showLoginModal = (props: LoginModalProps): void => {
 }
 
 const LoginModal = NiceModal.create((props: LoginModalProps) => {
-  const { host } = props
+  const { robotName } = props
+  const robot = useRobot(robotName)
+  const token = useAccessTokenForRobot(robotName)
   return (
-    <ApiHostProvider {...host}>
-      <LoginModalImpl />
+    <ApiHostProvider
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
+      token={token}
+    >
+      <LoginModalImpl robotName={robotName} />
     </ApiHostProvider>
   )
 })
 
-function LoginModalImpl(): JSX.Element {
+interface LoginModalImplProps {
+  robotName: string
+}
+
+function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
+  const { robotName } = props
   const modal = useModal()
   const { t } = useTranslation()
   const [view, setView] = useState<
@@ -80,6 +94,7 @@ function LoginModalImpl(): JSX.Element {
         return
       }
 
+      storeLoginState(robotName, successfulUsername, response)
       modal.remove()
     },
     onError: message => {

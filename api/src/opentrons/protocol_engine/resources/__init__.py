@@ -13,6 +13,7 @@ from .labware_data_provider import LabwareDataProvider
 from .model_utils import ModelUtils
 from .module_data_provider import ModuleDataProvider
 from .ot3_validation import ensure_ot3_hardware
+from .peripheral_data_provider import PeripheralDataProvider
 
 __all__ = [
     "ModelUtils",
@@ -21,6 +22,7 @@ __all__ = [
     "DeckFixedLabware",
     "ConcurrencyProvider",
     "ModuleDataProvider",
+    "PeripheralDataProvider",
     "FileProvider",
     "CameraProvider",
     "ensure_ot3_hardware",

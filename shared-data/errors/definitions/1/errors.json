@@ -226,6 +226,10 @@
       "detail": "Flex Stacker Shuttle Occupied",
       "category": "roboticsInteractionError"
     },
+    "3024": {
+      "detail": "Barcode scanner failed to find barcode.",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

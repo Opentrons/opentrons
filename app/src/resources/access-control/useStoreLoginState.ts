@@ -1,27 +1,26 @@
 import { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
-import { getLocalRobot } from '/app/redux/discovery'
 import { logIn } from '/app/redux/robot-auth'
 
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 /** Returns a function that updates client-side state to reflect a successful login. */
 export function useStoreLoginState(): (
+  robotName: string | null,
   username: string,
   successfulLoginResponse: OAuth2TokenResponse
 ) => void {
   const dispatch = useDispatch()
 
-  const localRobotName = useSelector(
-    (state: State) => getLocalRobot(state)?.name ?? null
-  )
-
   const storeLoginState = useCallback(
-    (username: string, successfulLoginResponse: OAuth2TokenResponse): void => {
-      if (localRobotName == null) {
-        console.warn("Couldn't identify the local robot.")
+    (
+      robotName: string | null,
+      username: string,
+      successfulLoginResponse: OAuth2TokenResponse
+    ): void => {
+      if (robotName == null) {
+        console.warn("Couldn't identify the robot to log in to.")
         return
       }
       if (successfulLoginResponse.token_type !== 'Bearer') {
@@ -35,7 +34,7 @@ export function useStoreLoginState(): (
       dispatch(
         logIn({
           username,
-          robotName: localRobotName,
+          robotName,
           accessToken: successfulLoginResponse.access_token,
           refreshToken: successfulLoginResponse.refresh_token ?? null,
           expiresAt:
@@ -45,7 +44,7 @@ export function useStoreLoginState(): (
         })
       )
     },
-    [dispatch, localRobotName]
+    [dispatch]
   )
 
   return storeLoginState

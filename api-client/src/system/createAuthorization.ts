@@ -8,8 +8,9 @@ export function createAuthorization(
   config: HostConfig,
   registrationToken: RegistrationToken
 ): ResponsePromise<AuthorizationToken> {
-  return request<AuthorizationToken>(POST, '/system/authorize', {
-    ...config,
-    ...registrationToken,
+  return request<AuthorizationToken>(POST, '/system/authorize', config, {
+    headers: {
+      authenticationBearer: registrationToken.token,
+    },
   })
 }

@@ -29,6 +29,7 @@ from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
 from .liquids import LiquidState, LiquidStore, LiquidView
 from .modules import ModuleState, ModuleStore, ModuleView
 from .motion import MotionView
+from .peripherals import PeripheralState, PeripheralStore, PeripheralView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .preconditions import (
     CommandPreconditionState,
@@ -56,6 +57,7 @@ class State:
     labware: LabwareState
     pipettes: PipetteState
     modules: ModuleState
+    peripherals: PeripheralState
     liquids: LiquidState
     liquid_classes: LiquidClassState
     tips: TipState
@@ -75,6 +77,7 @@ class StateView(HasState[State]):
     _labware: LabwareView
     _pipettes: PipetteView
     _modules: ModuleView
+    _peripherals: PeripheralView
     _liquid: LiquidView
     _liquid_classes: LiquidClassView
     _tips: TipView
@@ -111,6 +114,11 @@ class StateView(HasState[State]):
     def modules(self) -> ModuleView:
         """Get state view selectors for hardware module state."""
         return self._modules
+
+    @property
+    def peripherals(self) -> PeripheralView:
+        """Get state view selectors for hardware module state."""
+        return self._peripherals
 
     @property
     def liquid(self) -> LiquidView:
@@ -178,6 +186,7 @@ class StateView(HasState[State]):
             labware=self._labware.get_all(),
             labwareOffsets=self._labware.get_labware_offsets(),
             modules=self._modules.get_all(),
+            peripherals=self._peripherals.get_all(),
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
             liquids=self._liquid.get_all(),
@@ -256,6 +265,9 @@ class StateStore(StateView, ActionHandler):
             deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
         )
+        self._peripheral_store = PeripheralStore(
+            config=config,
+        )
         self._liquid_store = LiquidStore()
         self._liquid_class_store = LiquidClassStore()
         self._tip_store = TipStore()
@@ -271,6 +283,7 @@ class StateStore(StateView, ActionHandler):
             self._addressable_area_store,
             self._labware_store,
             self._module_store,
+            self._peripheral_store,
             self._liquid_store,
             self._liquid_class_store,
             self._tip_store,
@@ -397,6 +410,7 @@ class StateStore(StateView, ActionHandler):
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
             modules=self._module_store.state,
+            peripherals=self._peripheral_store.state,
             liquids=self._liquid_store.state,
             liquid_classes=self._liquid_class_store.state,
             tips=self._tip_store.state,
@@ -418,6 +432,7 @@ class StateStore(StateView, ActionHandler):
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
         self._modules = ModuleView(state=state.modules)
+        self._peripherals = PeripheralView(state=state.peripherals)
         self._liquid = LiquidView(state.liquids)
         self._liquid_classes = LiquidClassView(state.liquid_classes)
         self._tips = TipView(state.tips)
@@ -454,6 +469,7 @@ class StateStore(StateView, ActionHandler):
         self._labware._state = next_state.labware
         self._pipettes._state = next_state.pipettes
         self._modules._state = next_state.modules
+        self._peripherals._state = next_state.peripherals
         self._liquid._state = next_state.liquids
         self._liquid_classes._state = next_state.liquid_classes
         self._tips._state = next_state.tips

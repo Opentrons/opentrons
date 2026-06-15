@@ -12,6 +12,9 @@ export function updateSelf(
     PATCH,
     '/auth/users/self',
     config,
-    { body }
+    {
+      body,
+      requiresSecureTransport: true, // Might be sending a new password.
+    }
   )
 }
