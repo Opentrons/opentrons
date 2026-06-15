@@ -71,7 +71,7 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 </figure>
 
 <figure markdown>
-![Deck plate adapter](images/deck-adapter-3.png" Deck plate adapter")
+![Deck plate adapter](images/deck-adapter.png" Deck plate adapter")
 <figcaption>(1) Deck adapter</figcaption>
 </figure>
 
