@@ -18,7 +18,6 @@ class LocalMachineConfig:
     """Machine-local paths that rarely change between runs."""
 
     storage_directory: Path
-    jira_credentials_path: Path
     robot_ssh_key_path: Path
 
 
@@ -28,7 +27,8 @@ class JiraConfig:
 
     url: str
     project_key: str
-    credentials_path: Path
+    email: str
+    api_token: str
 
 
 @dataclass(frozen=True)
@@ -98,31 +98,28 @@ def _build_local_machine_config(values: Mapping[str, str]) -> LocalMachineConfig
     storage_directory = Path(
         _require_value(values, "ABR_STORAGE_DIRECTORY")
     ).expanduser()
-    credentials_path = _optional_path(values, "ABR_JIRA_CREDENTIALS_PATH")
     ssh_key_path = _optional_path(values, "ABR_ROBOT_SSH_KEY_PATH")
 
-    if credentials_path is None:
-        credentials_path = storage_directory / "jiraCredentials.json"
     if ssh_key_path is None:
         ssh_key_path = storage_directory / "robot_key"
 
     return LocalMachineConfig(
         storage_directory=storage_directory,
-        jira_credentials_path=credentials_path,
         robot_ssh_key_path=ssh_key_path,
     )
 
 
-def _build_jira_config(
-    values: Mapping[str, str], local_machine: LocalMachineConfig
-) -> JiraConfig:
+def _build_jira_config(values: Mapping[str, str]) -> JiraConfig:
     """Build Jira configuration from merged env values."""
     url = values.get("ABR_JIRA_URL", DEFAULT_JIRA_URL).strip() or DEFAULT_JIRA_URL
     project_key = _require_value(values, "ABR_JIRA_PROJECT_KEY")
+    email = _require_value(values, "ABR_JIRA_EMAIL")
+    api_token = _require_value(values, "ABR_JIRA_API_TOKEN")
     return JiraConfig(
         url=url,
         project_key=project_key,
-        credentials_path=local_machine.jira_credentials_path,
+        email=email,
+        api_token=api_token,
     )
 
 
@@ -147,10 +144,6 @@ def validate_local_machine_config(local_machine: LocalMachineConfig) -> None:
     """
     local_machine.storage_directory.mkdir(parents=True, exist_ok=True)
 
-    if not local_machine.jira_credentials_path.is_file():
-        raise FileNotFoundError(
-            f"Jira credentials file not found: {local_machine.jira_credentials_path}"
-        )
     if not local_machine.robot_ssh_key_path.is_file():
         raise FileNotFoundError(
             f"Robot SSH key not found: {local_machine.robot_ssh_key_path}"
@@ -193,7 +186,7 @@ def load_robot_fleet_config(
 
     values = _merged_env_values(env_file)
     local_machine = _build_local_machine_config(values)
-    jira = _build_jira_config(values, local_machine)
+    jira = _build_jira_config(values)
     artifacts = _build_artifact_config(values)
 
     robot_ips = tuple(str(ip).strip() for ip in args.robot_ips)

@@ -10,14 +10,15 @@ The `robot_fleet_error` script creates Jira tickets for robots with errors.
 
 ### Configuration
 
-Machine-local settings live in a local env file (or exported `ABR_*` environment variables). Copy `abr_testing/data_collection/robot_fleet_error.env.example` to `robot_fleet_error.env` in your working directory and fill in paths for your machine.
+Machine-local settings live in a single local env file (or exported `ABR_*` environment variables). Copy `abr_testing/data_collection/robot_fleet_error.env.example` to `robot_fleet_error.env` in your working directory and fill in values for your machine.
 
 | Variable | Purpose |
 | --- | --- |
 | `ABR_STORAGE_DIRECTORY` | Local folder for ticket artifacts and scratch files |
-| `ABR_JIRA_URL` | Jira site URL (optional, defaults to Opentrons Atlassian) |
-| `ABR_JIRA_CREDENTIALS_PATH` | Path to `jiraCredentials.json` (optional if file is in storage directory) |
 | `ABR_ROBOT_SSH_KEY_PATH` | Path to the robot SSH private key (optional if `robot_key` is in storage directory) |
+| `ABR_JIRA_URL` | Jira site URL (optional, defaults to Opentrons Atlassian) |
+| `ABR_JIRA_EMAIL` | Email for your Atlassian account |
+| `ABR_JIRA_API_TOKEN` | Atlassian API token (from Atlassian account security settings) |
 | `ABR_JIRA_PROJECT_KEY` | Jira project key, for example `RQA` or `RABR` |
 | `ABR_CLEANUP_KEEP_COUNT` | Number of local report folders to retain after cleanup |
 

@@ -1007,10 +1007,9 @@ def make_error_folder(
 
 def build_jira_client(config: RobotFleetRuntimeConfig) -> jira_tool.JiraTicket:
     """Build a Jira client from resolved configuration."""
-    credentials = jira_tool.get_credentials_from_path(config.jira.credentials_path)
     jira_client = jira_tool.JiraTicket(
-        api_token=credentials.api_token,
-        email=credentials.email,
+        api_token=config.jira.api_token,
+        email=config.jira.email,
     )
     jira_client.url = config.jira.url
     return jira_client
