@@ -36,7 +36,7 @@ export function LoginFieldController({
         render={({ field }) => (
           <LoginFieldInput
             field={field}
-            label={t('device_settings:username')}
+            label={t('access_control:username')}
             error={null}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
@@ -61,8 +61,8 @@ export function LoginFieldController({
             field={field}
             label={
               isPasswordResetRequired
-                ? t('device_settings:on_device_login_new_password')
-                : t('device_settings:password')
+                ? t('access_control:on_device_login_new_password')
+                : t('access_control:login_form_password_field')
             }
             error={passwordError}
             isPasswordField={true}
@@ -83,7 +83,7 @@ export function LoginFieldController({
         render={({ field }) => (
           <LoginFieldInput
             field={field}
-            label={t('device_settings:on_device_login_confirm_password')}
+            label={t('access_control:on_device_login_confirm_password')}
             error={confirmPasswordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
