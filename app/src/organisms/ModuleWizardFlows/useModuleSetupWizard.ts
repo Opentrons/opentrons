@@ -98,7 +98,7 @@ export function useModuleSetupWizard(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation('add_module')
+  } = useMaintenanceRunDocumentation('add_module', closeFlow)
 
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands(
@@ -147,9 +147,10 @@ export function useModuleSetupWizard(
     {
       onSuccess: () => {
         setMaintenanceRunId(null)
+        handleClose()
       },
       onError: () => {
-        setMaintenanceRunId(null)
+        setIsExiting(false)
       },
     }
   )
@@ -176,7 +177,6 @@ export function useModuleSetupWizard(
             'closing module setup wizard: homed, clearing maintenance run'
           )
           deleteMaintenanceRun(maintenanceRunId)
-          handleClose()
         })
         .catch(error => {
           console.error(error.message)

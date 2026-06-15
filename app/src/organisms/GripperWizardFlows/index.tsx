@@ -73,7 +73,7 @@ export function GripperWizardFlows(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation(flowName)
+  } = useMaintenanceRunDocumentation(flowName, closeFlow)
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
@@ -147,8 +147,9 @@ export function GripperWizardFlows(
     }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
@@ -160,7 +161,7 @@ export function GripperWizardFlows(
           closeFlow()
         },
         onError: () => {
-          closeFlow()
+          setIsExiting(false)
         },
       }
     )

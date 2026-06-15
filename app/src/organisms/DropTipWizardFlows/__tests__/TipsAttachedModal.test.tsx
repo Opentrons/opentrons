@@ -54,7 +54,7 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
             host: MOCK_HOST,
             aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
-            onSettled: vi.fn(),
+            onSuccess: vi.fn(),
           })
         }
         data-testid="testButton"

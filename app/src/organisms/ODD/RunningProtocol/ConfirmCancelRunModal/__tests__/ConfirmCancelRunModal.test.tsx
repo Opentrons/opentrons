@@ -150,7 +150,7 @@ describe('ConfirmCancelRunModal', () => {
 
   it('when tapping cancel run with error, should remain in canceling state', () => {
     mockStopRun.mockImplementation((_id: string, options: any) => {
-      options.onSettled()
+      options.onError()
     })
 
     render(props)
@@ -168,7 +168,6 @@ describe('ConfirmCancelRunModal', () => {
 
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onSuccess()
-      options.onSettled()
     })
 
     render(props)
@@ -191,7 +190,6 @@ describe('ConfirmCancelRunModal', () => {
 
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onSuccess()
-      options.onSettled()
     })
 
     render(props)
@@ -206,7 +204,6 @@ describe('ConfirmCancelRunModal', () => {
   it('when run is active, stop run does not dismiss or navigate', () => {
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onSuccess()
-      options.onSettled()
     })
 
     render(props)
@@ -225,7 +222,7 @@ describe('ConfirmCancelRunModal', () => {
     }
 
     mockStopRun.mockImplementation((_id: string, options: any) => {
-      options.onSettled()
+      options.onError()
     })
 
     render(props)

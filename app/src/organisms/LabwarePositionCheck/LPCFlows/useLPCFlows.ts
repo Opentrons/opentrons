@@ -82,13 +82,22 @@ export function useLPCFlows({
   // once unblocked, the useEffect will launch LPC and resolve the constructed promise with the results
   const pendingLaunchRef = useRef<PendingLaunch | null>(null)
 
+  const handleDocumentationCancel = useCallback((): void => {
+    if (pendingLaunchRef.current != null) {
+      const { reject } = pendingLaunchRef.current
+      pendingLaunchRef.current = null
+      reject(new Error('Documentation cancelled'))
+    }
+    setIsLaunching(false)
+  }, [])
+
   const {
     commandDocState,
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
     isLoading: isDocumentationLoading,
-  } = useMaintenanceRunDocumentation('lpc_flow')
+  } = useMaintenanceRunDocumentation('lpc_flow', handleDocumentationCancel)
 
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data

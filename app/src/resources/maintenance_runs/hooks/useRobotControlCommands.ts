@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
@@ -36,8 +36,8 @@ export interface UseRobotControlCommandsProps {
   pipetteInfo: PipetteDetails | null
   commands: CreateCommand[]
   continuePastCommandFailure: boolean
-  /* An onSettled callback executed after the deletion of the maintenance run. */
-  onSettled?: () => void
+  /* An onSuccess callback executed after the deletion of the maintenance run. */
+  onSuccess?: () => void
   runStartedAction: DocumentedAction
   runEndedAction: DocumentedAction
 }
@@ -48,12 +48,21 @@ export function useRobotControlCommands({
   pipetteInfo,
   commands,
   continuePastCommandFailure,
-  onSettled,
+  onSuccess,
   runStartedAction,
   runEndedAction,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
   const [isExecuting, setIsExecuting] = useState(false)
   const pendingExecutionRef = useRef<PendingExecution | null>(null)
+
+  const handleDocumentationCancel = useCallback((): void => {
+    if (pendingExecutionRef.current != null) {
+      const { reject } = pendingExecutionRef.current
+      pendingExecutionRef.current = null
+      reject(new Error('Documentation cancelled'))
+    }
+    setIsExecuting(false)
+  }, [])
 
   const {
     commandDocState,
@@ -61,7 +70,10 @@ export function useRobotControlCommands({
     actionsToDocument,
     addActionToDocument,
     isLoading: isDocumentationLoading,
-  } = useMaintenanceRunDocumentation(runStartedAction)
+  } = useMaintenanceRunDocumentation(
+    runStartedAction,
+    handleDocumentationCancel
+  )
 
   const { chainRunCommands } = useChainMaintenanceCommands(
     commandDocState,
@@ -102,17 +114,13 @@ export function useRobotControlCommands({
               console.error(error.message)
             })
             .finally(() =>
-              deleteMaintenanceRun(runId).catch((error: Error) => {
-                console.error(
-                  'Failed to delete maintenance run:',
-                  error.message
-                )
+              deleteMaintenanceRun(runId, {
+                onSuccess: () => {
+                  onSuccess?.()
+                  setIsExecuting(false)
+                },
               })
             )
-            .finally(() => {
-              onSettled?.()
-              setIsExecuting(false)
-            })
         },
         onError: (error: Error) => {
           console.error(error.message)

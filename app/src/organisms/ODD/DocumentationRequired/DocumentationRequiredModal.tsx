@@ -12,9 +12,11 @@ const DocumentationRequiredModalImpl = NiceModal.create(
   ({
     username,
     actionsToDocument,
+    onCancel,
   }: {
     username: string
     actionsToDocument: DocumentedAction[]
+    onCancel?: () => void
   }): JSX.Element => {
     const modal = useModal()
 
@@ -25,6 +27,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     }
 
     const handleBack = (): void => {
+      onCancel?.()
       modal.resolve('' as DocumentationReport)
       modal.remove()
     }
@@ -44,9 +47,11 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 
 export const showDocumentationRequiredModal = (
   username: string,
-  actionsToDocument: DocumentedAction[]
+  actionsToDocument: DocumentedAction[],
+  onCancel?: () => void
 ): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, {
     username,
     actionsToDocument,
+    onCancel,
   })
