@@ -1,7 +1,6 @@
 """IDT xGEn 1000ul 96x with Flex Stacker."""
 
 from opentrons.protocol_api import ProtocolContext, ParameterContext
-from abr_testing.protocols.helpers import run_helpers, background_helpers
 from typing import List
 from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
@@ -24,10 +23,46 @@ requirements = {
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Runtime parameters."""
-    run_helpers.create_deactivate_modules_parameter(parameters)
-    run_helpers.create_dry_run_parameter(parameters)
-    run_helpers.create_dot_bottom_parameter(parameters)
-    run_helpers.create_error_capture_duration_duration(parameters)
+    parameters.add_bool(
+        variable_name="deactivate_modules",
+        display_name="Deactivate Modules",
+        description="deactivate all modules at end of run",
+        default=True,
+    )
+    parameters.add_bool(
+        variable_name="dry_run",
+        display_name="Dry Run",
+        description="If Dry Run is True, skip incubation.",
+        default=False,
+    )
+    parameters.add_float(
+        variable_name="dot_bottom",
+        display_name=".bottom",
+        description="Lowest value pipette will go to.",
+        default=0.5,
+        choices=[
+            {"display_name": "0.0", "value": 0.0},
+            {"display_name": "0.1", "value": 0.1},
+            {"display_name": "0.2", "value": 0.2},
+            {"display_name": "0.3", "value": 0.3},
+            {"display_name": "0.4", "value": 0.4},
+            {"display_name": "0.5", "value": 0.5},
+            {"display_name": "0.6", "value": 0.6},
+            {"display_name": "0.7", "value": 0.7},
+            {"display_name": "0.8", "value": 0.8},
+            {"display_name": "0.9", "value": 0.9},
+            {"display_name": "1.0", "value": 1.0},
+        ],
+    )
+    parameters.add_int(
+        variable_name="error_capture_duration",
+        display_name="Error Capture Duration",
+        description="Length of video clip to capture on error (in seconds).",
+        default=30,
+        minimum=5,
+        maximum=6000,
+        unit="seconds",
+    )
     parameters.add_str(
         display_name="Frag Mode",
         variable_name="FRAG_MODE",
@@ -58,9 +93,6 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    if not protocol.is_simulating():
-        background_helpers.launch_background_tasks()
-
     protocol.capture_image(filename="start_of_run")
 
     # ======================== DOWNLOADED PARAMETERS ========================
@@ -73,11 +105,7 @@ def run(protocol: ProtocolContext) -> None:
     PCRCYCLES = protocol.params.PCRCYCLES  # type: ignore[attr-defined]
     DEACTIVATE_TEMP = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
-    run_helpers.comment_protocol_version(protocol, "02")
-
-    if not protocol.is_simulating():
-        slack_bot = run_helpers.set_up_slack()
-        slack_bot.send_run_started_message(metadata["protocolName"])
+    protocol.comment("Protocol Version: 02")
 
     #  ADVANCED PARAMETERS ======================================
     # -------PROTOCOL STEP-------
@@ -133,7 +161,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # ========== FIRST ROW ===========
     thermocycler: ThermocyclerContext = protocol.load_module(
-        run_helpers.tc_str
+        "thermocycler module gen2"
     )  # type: ignore[assignment]
     sample_plate_1 = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Sample Plate 1"
@@ -160,7 +188,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     # ========== THIRD ROW ===========
     temp_block: TemperatureModuleContext = protocol.load_module(
-        run_helpers.temp_str, "C1"
+        "temperature module gen2", "C1"
     )  # type: ignore[assignment]
     reagent_plate_1 = temp_block.load_labware(
         "greiner_384_wellplate_240ul", "Reagent Plate 1"
@@ -170,7 +198,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "C3", 4)
     mag_block: MagneticBlockContext = protocol.load_module(
-        run_helpers.mag_str, "D2"
+        "magneticBlockV1", "D2"
     )  # type: ignore[assignment]
     CleanupPlate_1 = mag_block.load_labware(
         "nest_96_wellplate_2ml_deep", "Cleanup Plate 1"
@@ -376,1115 +404,1105 @@ def run(protocol: ProtocolContext) -> None:
                 liquid=Placeholder_Sample, volume=0
             )
     # ========================================= PROTOCOL START
-    try:
-        thermocycler.open_lid()
+
+    thermocycler.open_lid()
+    if DRYRUN is False:
+        protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
+        tc_block_task = thermocycler.start_set_block_temperature(4)
+        tc_lid_task = thermocycler.start_set_lid_temperature(100)
+        temp_task = temp_block.start_set_temperature(4)
+        protocol.wait_for_tasks([tc_block_task, tc_lid_task, temp_task])
+    if STEP_EZ_FRERAT:
+        protocol.comment("==============================================")
+        protocol.comment("--> Enzymatic Prep")
+        protocol.comment("==============================================")
+
+        protocol.comment("--> Adding Enzymatic Prep")
+        FRERATVol = 10.5
+        FRERATMixRep = 25 if DRYRUN is False else 1
+        FRERATMixVol = 25
+        FRERATBuffPremix = 2 if DRYRUN is False else 1
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_1["A1"])
+        p1000.mix(
+            FRERATBuffPremix,
+            FRERATMixVol + 1,
+            FRERAT.bottom(z=dot_bottom),
+        )
+        p1000.aspirate(
+            FRERATVol + 1,
+            location=FRERAT.meniscus(z=-1, target="start"),
+            end_location=FRERAT.meniscus(z=-1, target="end"),
+        )
+        p1000.dispense(1, FRERAT.bottom(z=dot_bottom))
+        p1000.dispense(
+            FRERATVol,
+            location=sample_plate_1.wells_by_name()["A1"].meniscus(
+                z=-1, target="start"
+            ),
+            end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
+                z=-1, target="end"
+            ),
+        )
+        p1000.mix(FRERATMixRep, FRERATMixVol)
+        p1000.move_to(sample_plate_1["A1"].top(z=-3))
+        protocol.delay(seconds=3)
+        p1000.blow_out(sample_plate_1["A1"].top(z=-3))
+        p1000.return_tip()
+        # ===============================================
+
+        #####################################################################
+        protocol.comment("MOVING: Plate Lid #1 = lids[1] --> sample_plate_1")
+        protocol.move_lid(
+            source_location=lids, new_location=sample_plate_1, use_gripper=True
+        )
+        if ONDECK_THERMO:
+            thermocycler.close_lid()
+            if DRYRUN is False:
+                profile_FRERAT: List[ThermocyclerStep] = [
+                    {"temperature": 32, "hold_time_minutes": FRAGTIME},
+                    {"temperature": 65, "hold_time_minutes": 30},
+                ]
+                thermocycler.execute_profile(
+                    steps=profile_FRERAT, repetitions=1, block_max_volume=50
+                )
+                thermocycler.set_block_temperature(4)
+            thermocycler.open_lid()
+        else:
+            if DRYRUN is False:
+                protocol.pause(
+                    "Pause to run Fragmentation & End Repair on an off deck Thermocycler ~45min"
+                )
+            else:
+                protocol.comment(
+                    "Pause to run Fragmentation & End Repair on an off deck Thermocycler ~45min"
+                )
+        protocol.comment("MOVING: Plate Lid #1 = sample_plate_1 --> lids[1]")
+        protocol.move_lid(
+            source_location=sample_plate_1, new_location=lids, use_gripper=True
+        )
+
+        # protocol.move_labware(labware=lids[0], new_location=lids[1], use_gripper=True)
+        ###############################################################################
+    if STEP_MC_ERAT:
+        protocol.comment("==============================================")
+        protocol.comment("--> End Prep")
+        protocol.comment("==============================================")
+
+        protocol.comment("--> Adding End Prep")
+        ERATVol = 10
+        ERATMixRep = 10 if DRYRUN is False else 1
+        ERATMixVol = 40
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_1["A1"])
+        p1000.aspirate(ERATVol, ERAT.bottom(z=0.5))
+        p1000.dispense(
+            ERATVol,
+            location=sample_plate_1.wells_by_name()["A1"].meniscus(
+                z=-1, target="start"
+            ),
+            end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
+                z=-1, target="end"
+            ),
+        )
+        p1000.mix(ERATMixRep, ERATMixVol, rate=0.5)
+        p1000.move_to(sample_plate_1["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(sample_plate_1["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # ===============================================
+
+        protocol.comment("MOVING: Plate Lid #1 = lids[1] --> sample_plate_1")
+        protocol.move_lid(
+            source_location=lids, new_location=sample_plate_1, use_gripper=True
+        )
+
+        # protocol.move_labware(
+        #     labware=lids[-1],
+        #     new_location=sample_plate_1,
+        #     use_gripper=True,
+        # )
+        if ONDECK_THERMO:
+            thermocycler.close_lid()
+            if DRYRUN is False:
+                profile_ERAT: List[ThermocyclerStep] = [
+                    {"temperature": 20, "hold_time_minutes": 30},
+                    {"temperature": 65, "hold_time_minutes": 30},
+                ]
+                thermocycler.execute_profile(
+                    steps=profile_ERAT, repetitions=1, block_max_volume=50
+                )
+                thermocycler.set_block_temperature(4)
+            thermocycler.open_lid()
+        else:
+            if DRYRUN is False:
+                protocol.pause(
+                    "Pausing to run End Repair on an off deck Thermocycler ~60min"
+                )
+            else:
+                protocol.comment(
+                    "Pausing to run End Repair on an off deck Thermocycler ~60min"
+                )
+        protocol.comment("MOVING: Plate Lid #1 = sample_plate_1 --> TRASH")
+        protocol.move_lid(
+            source_location=sample_plate_1, new_location=TRASH, use_gripper=True
+        )
+
+        ##################################################################
+    if STEP_LIG:
+        protocol.comment("==============================================")
+        protocol.comment("--> Adapter Ligation")
+        protocol.comment("==============================================")
+
+        protocol.comment("--> Adding Stubby Adapter")
+        AdapterVol = 5
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_2["A1"])
+        p1000.aspirate(
+            AdapterVol + 1,
+            location=Adapter.meniscus(z=-1, target="start"),
+            end_location=Adapter.meniscus(z=-1, target="end"),
+        )
+        p1000.dispense(
+            AdapterVol,
+            location=sample_plate_1.wells_by_name()["A1"].meniscus(
+                z=-1, target="start"
+            ),
+            end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
+                z=-1, target="end"
+            ),
+        )
+        p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
+        p1000.move_to(sample_plate_1["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        protocol.comment("--> Adding Lig")
+        LIGVol = 25
+        LIGMixRep = 20 if DRYRUN is False else 1
+        LIGMixVol = 40
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.aspirate(
+            LIGVol,
+            location=LIG.meniscus(z=-1, target="start"),
+            end_location=LIG.meniscus(z=-1, target="end"),
+        )
+        p1000.default_speed = 100
+        p1000.move_to(LIG.top(z=3))
+        protocol.delay(seconds=1)
+        p1000.default_speed = 400
+        p1000.dispense(
+            LIGVol,
+            location=sample_plate_1["A1"].meniscus(z=-1, target="start"),
+            end_location=sample_plate_1["A1"].meniscus(z=-1, target="end"),
+        )
+        p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
+        p1000.mix(LIGMixRep, LIGMixVol, rate=0.5)
+        p1000.default_speed = 100
+        p1000.move_to(sample_plate_1["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(sample_plate_1["A1"].top(z=-3))
+        p1000.default_speed = 400
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # ===============================================
+
+        #####################################################################
+        protocol.comment("MOVING: Plate Lid #2 = lids[1] --> sample_plate_1")
+        protocol.move_lid(
+            source_location=lids, new_location=sample_plate_1, use_gripper=True
+        )
+
+        if ONDECK_THERMO:
+            thermocycler.close_lid()
+            if DRYRUN is False:
+                profile_LIG: List[ThermocyclerStep] = [
+                    {"temperature": 20, "hold_time_minutes": 20}
+                ]
+                thermocycler.execute_profile(
+                    steps=profile_LIG, repetitions=1, block_max_volume=50
+                )
+                thermocycler.set_block_temperature(4)
+            thermocycler.open_lid()
+        else:
+            if DRYRUN is False:
+                protocol.pause(
+                    "Pausing to run Ligation on an off deck Thermocycler ~20min"
+                )
+            else:
+                protocol.comment(
+                    "Pausing to run Ligation on an off deck Thermocycler ~20min"
+                )
+        protocol.comment("MOVING: Plate Lid #2 = sample_plate_1 --> TRASH")
+        protocol.move_lid(
+            source_location=sample_plate_1, new_location=TRASH, use_gripper=True
+        )
+        ########################################################################
+    if STEP_CLEANUP_1:
+
+        # ============================================================
+        # GRIPPER MOVE tiprack_50_1 FROM: tiprack_A2_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_50_1,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_50_2 FROM: tiprack_A3_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_50_2,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_200_1 FROM: D1 --> tiprack_A3_adapter
+        tiprack_200_1 = stacker_200_ul_tips.retrieve()
+        protocol.move_lid(tiprack_200_1, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_200_1, tiprack_A3_adapter, use_gripper=True)
+        # GRIPPER MOVE CleanupPlate_1 FROM: MAG PLATE --> D1
+        protocol.move_labware(
+            labware=CleanupPlate_1,
+            new_location="D1",
+            use_gripper=True,
+        )
+        # ================================================================
+
+        protocol.comment("==============================================")
+        protocol.comment("--> Cleanup 1")
+        protocol.comment("==============================================")
+
+        protocol.comment("--> ADDING CleanupBead (0.8x)")
+        CleanupBeadVol = 72.0
+        CleanupBeadPremix = 5 if DRYRUN is False else 1
+        CleanupBeadMix = 10 if TIP_MIX else 1
+
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.1
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_200_1["A1"])
+        p1000.move_to(CleanupBead.bottom(z=7))
+        p1000.mix(CleanupBeadPremix, 40, rate=0.5)
+        p1000.aspirate(CleanupBeadVol, CleanupBead.bottom(z=7))
+        p1000.default_speed = 100
+        p1000.move_to(CleanupBead.bottom(z=7))
+        p1000.default_speed = 400
+        p1000.dispense(CleanupBeadVol, CleanupPlate_1["A1"].bottom(z=7))
+        protocol.delay(seconds=1)
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
+
+        TransferSup = 80.0
+        p1000.move_to(sample_plate_1["A1"].bottom(z=0.5))
+        p1000.aspirate(TransferSup / 2)
+        protocol.delay(seconds=1)
+        p1000.aspirate(TransferSup / 2)
+        p1000.dispense(TransferSup, CleanupPlate_1["A1"].bottom(z=+1), rate=0.5)
+
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.75
+        p1000.mix(CleanupBeadMix, 150, rate=0.5)
+        p1000.move_to(CleanupPlate_1["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(CleanupPlate_1["A1"].top(z=-3))
+        p1000.move_to(CleanupPlate_1["A1"].top(z=5))
+        p1000.move_to(CleanupPlate_1["A1"].top(z=0))
+        p1000.move_to(CleanupPlate_1["A1"].top(z=5))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # ===============================================
+
+        # ==============================================================
+        # GRIPPER MOVE CleanupPlate_1 FROM: HEATER SHAKER --> MAG BLOCK
+        protocol.move_labware(
+            labware=CleanupPlate_1,
+            new_location=mag_block,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_200_1 FROM: tiprack_A3_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_200_1,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_200_X FROM: A4 --> tiprack_A3_adapter
+        tiprack_200_X = stacker_200_ul_tips.retrieve()
+        protocol.move_lid(tiprack_200_X, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_200_X, tiprack_A3_adapter, use_gripper=True)
+
+        # TOWER DISPENSES NEW PLATE
+        tiprack_200_2 = stacker_200_ul_tips.retrieve()
+        protocol.move_lid(tiprack_200_2, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_200_2, tiprack_A2_adapter, use_gripper=True)
+        protocol.comment("Unloading tiprack 200 ul")
+        # ==============================================================
+
         if DRYRUN is False:
-            protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-            tc_block_task = thermocycler.start_set_block_temperature(4)
-            tc_lid_task = thermocycler.start_set_lid_temperature(100)
-            temp_task = temp_block.start_set_temperature(4)
-            protocol.wait_for_tasks([tc_block_task, tc_lid_task, temp_task])
-        if STEP_EZ_FRERAT:
-            protocol.comment("==============================================")
-            protocol.comment("--> Enzymatic Prep")
-            protocol.comment("==============================================")
+            protocol.delay(minutes=2)
 
-            protocol.comment("--> Adding Enzymatic Prep")
-            FRERATVol = 10.5
-            FRERATMixRep = 25 if DRYRUN is False else 1
-            FRERATMixVol = 25
-            FRERATBuffPremix = 2 if DRYRUN is False else 1
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_1["A1"])
-            p1000.mix(
-                FRERATBuffPremix,
-                FRERATMixVol + 1,
-                FRERAT.bottom(z=dot_bottom),
-            )
-            p1000.aspirate(
-                FRERATVol + 1,
-                location=FRERAT.meniscus(z=-1, target="start"),
-                end_location=FRERAT.meniscus(z=-1, target="end"),
-            )
-            p1000.dispense(1, FRERAT.bottom(z=dot_bottom))
-            p1000.dispense(
-                FRERATVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
-            )
-            p1000.mix(FRERATMixRep, FRERATMixVol)
-            p1000.move_to(sample_plate_1["A1"].top(z=-3))
-            protocol.delay(seconds=3)
-            p1000.blow_out(sample_plate_1["A1"].top(z=-3))
-            p1000.return_tip()
-            # ===============================================
+        protocol.comment("--> Removing Supernatant")
+        RemoveSup = 200
+        CleanupBeadMix = 10 if TIP_MIX else 1
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # =============================
+        p1000.pick_up_tip(tiprack_200_2["A1"])
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
+        p1000.mix(CleanupBeadMix, 100, rate=0.5)
+        p1000.move_to(CleanupPlate_1["A1"].top(z=-3))
+        if DRYRUN is False:
+            protocol.delay(minutes=3)
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
+        p1000.aspirate(RemoveSup - 100, rate=1)
+        protocol.delay(seconds=5)
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100, rate=0.5)
+        p1000.default_speed = 200
+        p1000.move_to(CleanupPlate_1["A1"].top(z=2))
+        p1000.dispense(200, Liquid_trash["A1"].top(z=0), rate=0.5)
+        protocol.delay(seconds=5)
+        p1000.blow_out()
+        p1000.default_speed = 400
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # =============================
 
-            #####################################################################
-            protocol.comment("MOVING: Plate Lid #1 = lids[1] --> sample_plate_1")
-            protocol.move_lid(
-                source_location=lids, new_location=sample_plate_1, use_gripper=True
-            )
-            if ONDECK_THERMO:
-                thermocycler.close_lid()
-                if DRYRUN is False:
-                    profile_FRERAT: List[ThermocyclerStep] = [
-                        {"temperature": 32, "hold_time_minutes": FRAGTIME},
-                        {"temperature": 65, "hold_time_minutes": 30},
-                    ]
-                    thermocycler.execute_profile(
-                        steps=profile_FRERAT, repetitions=1, block_max_volume=50
-                    )
-                    thermocycler.set_block_temperature(4)
-                thermocycler.open_lid()
+        protocol.comment("--> ETOH Wash 1")
+        ETOHMaxVol = 150
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # ===============================================
+        p1000.pick_up_tip(tiprack_200_X["A1"])
+        p1000.aspirate(
+            ETOHMaxVol + 10,
+            location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
+            end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
+        )
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
+        p1000.move_to(CleanupPlate_1["A1"].top(z=2))
+        p1000.dispense(ETOHMaxVol)
+        protocol.delay(seconds=2)
+        p1000.aspirate(10, CleanupPlate_1["A1"].top(z=2))
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.move_to(Liquid_trash["A1"].top(z=0))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.return_tip()
+        # ===============================================
+
+        if DRYRUN is False:
+            protocol.delay(minutes=0.5)
+
+        # ==============================================================
+        # GRIPPER MOVE tiprack_200_2 FROM: tiprack_A2_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_200_2,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # TOWER DISPENSES NEW PLATE
+        protocol.comment("MOVING: tiprack_200_3 = A4 --> tiprack_A2_adapter")
+        tiprack_200_3 = stacker_200_ul_tips.retrieve()
+        protocol.move_lid(tiprack_200_3, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_200_3, tiprack_A2_adapter, use_gripper=True)
+        # ================================================================
+        protocol.comment("--> Remove ETOH Wash")
+        RemoveSup = 200
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # =============================
+        p1000.pick_up_tip(tiprack_200_3["A1"])
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
+        p1000.aspirate(RemoveSup - 100, rate=1)
+        protocol.delay(minutes=0.1)
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100, rate=0.5)
+        p1000.default_speed = 200
+        p1000.move_to(CleanupPlate_1["A1"].top(z=2))
+        p1000.dispense(200, Liquid_trash["A1"].top(z=0))
+        protocol.delay(minutes=0.1)
+        p1000.blow_out()
+        p1000.default_speed = 400
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # =============================
+
+        protocol.comment("--> ETOH Wash 2")
+        ETOHMaxVol = 150
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # ===============================================
+        p1000.pick_up_tip(tiprack_200_X["A1"])
+        p1000.aspirate(
+            ETOHMaxVol + 10,
+            location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
+            end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
+        )
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
+        p1000.move_to(CleanupPlate_1["A1"].top(z=2))
+        p1000.dispense(ETOHMaxVol)
+        protocol.delay(seconds=2)
+        p1000.aspirate(10, CleanupPlate_1["A1"].top(z=2))
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.move_to(Liquid_trash["A1"].top(z=0))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.return_tip()
+        # ===============================================
+
+        if DRYRUN is False:
+            protocol.delay(minutes=0.5)
+
+        # =================================================================
+        # GRIPPER MOVE tiprack_200_3 FROM: tiprack_A2_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_200_3,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # TOWER DISPENSES NEW PLATE
+        tiprack_200_4 = stacker_200_ul_tips.retrieve()
+        protocol.move_lid(tiprack_200_4, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_200_4, tiprack_A2_adapter, use_gripper=True)
+        protocol.comment("MOVING: tiprack_200_4 = A4 --> tiprack_A2_adapter")
+        # =======================================================================
+        protocol.comment("--> Remove ETOH Wash")
+        RemoveSup = 200
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # =============================
+        p1000.pick_up_tip(tiprack_200_4["A1"])
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
+        p1000.aspirate(RemoveSup - 100, rate=1)
+        protocol.delay(minutes=0.1)
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100, rate=0.5)
+        p1000.default_speed = 200
+        p1000.move_to(CleanupPlate_1["A1"].top(z=2))
+        p1000.dispense(200, Liquid_trash["A1"].top(z=0))
+        protocol.delay(minutes=0.1)
+        p1000.blow_out()
+        p1000.default_speed = 400
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+
+        if DRYRUN is False:
+            protocol.delay(minutes=1)
+
+        protocol.comment("--> Removing Residual Wash")
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100)
+        p1000.dispense(100, Liquid_trash["A1"])
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        protocol.delay(minutes=0.1)
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # ===============================================
+
+        if DRYRUN is False:
+            protocol.delay(minutes=0.5)
+
+        # =====================================================================
+        # GRIPPER MOVE CleanupPlate_1 FROM: MAG BLOCK --> D1
+        protocol.move_labware(
+            labware=CleanupPlate_1,
+            new_location="D1",
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_200_4 FROM: tiprack_A2_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_200_4,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+
+        # TOWER DISPENSES NEW PLATE
+        tiprack_50_3 = stacker_50_ul_tips.retrieve()
+        protocol.move_lid(tiprack_50_3, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_50_3, tiprack_A2_adapter, use_gripper=True)
+        protocol.comment("MOVING: tiprack_50_3 = B4 --> tiprack_A2_adapter")
+        # GRIPPER MOVE CleanupPlate_1 FROM: MAG BLOCK --> D1
+        protocol.move_labware(
+            labware=CleanupPlate_1,
+            new_location=mag_block,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE CleanupPlate_1 FROM: MAG BLOCK --> D1
+        protocol.move_labware(
+            labware=CleanupPlate_1,
+            new_location="D1",
+            use_gripper=True,
+        )
+        # =====================================================================
+
+        protocol.comment("--> Adding RSB")
+        RSBVol = 22
+        RSBMix = 10 if TIP_MIX else 1
+        RSBMixVol = 17.5
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_3["A1"])
+        p1000.aspirate(
+            RSBVol,
+            location=RSB.meniscus(z=-1, target="start"),
+            end_location=RSB.meniscus(z=-1, target="end"),
+        )
+        p1000.move_to(CleanupPlate_1.wells_by_name()["A1"].bottom(z=dot_bottom))
+        p1000.dispense(
+            RSBVol,
+            location=CleanupPlate_1.wells_by_name()["A1"].bottom(z=dot_bottom),
+        )
+        p1000.mix(RSBMix, RSBMixVol, rate=0.5)
+        p1000.blow_out(CleanupPlate_1.wells_by_name()["A1"].top(z=-3))
+        p1000.return_tip()
+        # ===============================================
+
+        # ======================================================================
+        # GRIPPER MOVE CleanupPlate_1 FROM: D1 --> MAG BLOCK
+        protocol.move_labware(
+            labware=CleanupPlate_1,
+            new_location=mag_block,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE sample_plate_1 FROM: THERMOCYCLER --> TRASH
+        protocol.move_labware(
+            labware=sample_plate_1,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE sample_plate_2 FROM: C3 --> THERMOCYCLER
+        protocol.move_labware(
+            labware=sample_plate_2,
+            new_location=thermocycler,
+            use_gripper=True,
+        )
+
+        # GRIPPER MOVE tiprack_50_3 FROM: tiprack_A2_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_50_3,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # TOWER DISPENSES NEW PLATE
+        protocol.comment("MOVING: tiprack_50_4 = B4 --> tiprack_A2_adapter")
+
+        tiprack_50_4 = stacker_50_ul_tips.retrieve()
+        protocol.move_lid(tiprack_50_4, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_50_4, tiprack_A2_adapter, use_gripper=True)
+        # ========================================================================
+
+        if DRYRUN is False:
+            protocol.delay(minutes=3)
+
+    if STEP_PCR:
+        protocol.comment("==============================================")
+        protocol.comment("--> Amplification")
+        protocol.comment("==============================================")
+
+        protocol.comment("--> Transferring Supernatant")
+        TransferSup = 20
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.2
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.2
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_4["A1"])
+        p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(TransferSup / 2)
+        protocol.delay(seconds=1)
+        p1000.aspirate(TransferSup / 2)
+        p1000.dispense(TransferSup, sample_plate_2["A1"].bottom(z=1))
+        protocol.comment("--> Adding PCR")
+        PCRVol = 25
+        PCRMixRep = 2
+        PCRMixVol = 40
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.2
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.2
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.prepare_to_aspirate()
+        p1000.aspirate(
+            PCRVol,
+            location=PCR.meniscus(z=-1, target="start"),
+            end_location=PCR.meniscus(z=-1, target="end"),
+        )
+        p1000.dispense(
+            PCRVol,
+            location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
+            end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
+        )
+        p1000.mix(PCRMixRep, PCRMixVol)
+        p1000.move_to(sample_plate_2["A1"].top(z=-3))
+        protocol.delay(seconds=3)
+        protocol.comment("--> Adding Barcodes")
+        BarcodeVol = 5
+        BarcodeMixRep = 10 if DRYRUN is False else 1
+        BarcodeMixVol = 40
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.prepare_to_aspirate()
+        p1000.aspirate(
+            BarcodeVol,
+            location=Barcodes.meniscus(z=-1, target="start"),
+            end_location=Barcodes.meniscus(z=-1, target="end"),
+        )
+        p1000.dispense(
+            BarcodeVol,
+            location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
+            end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
+        )
+        p1000.mix(BarcodeMixRep, BarcodeMixVol)
+        p1000.move_to(sample_plate_2["A1"].top(z=-3))
+        protocol.delay(seconds=3)
+        p1000.blow_out(sample_plate_2["A1"].top(z=-3))
+        p1000.return_tip()
+        # ===============================================
+
+        #####################################################################
+        protocol.comment("MOVING: Plate Lid #3= lids[2] --> sample_plate_1")
+        protocol.move_lid(
+            source_location=lids, new_location=sample_plate_2, use_gripper=True
+        )
+
+        if ONDECK_THERMO:
+            thermocycler.close_lid()
+            if DRYRUN is False:
+                profile_PCR_1: List[ThermocyclerStep] = [
+                    {"temperature": 98, "hold_time_seconds": 45}
+                ]
+                thermocycler.execute_profile(
+                    steps=profile_PCR_1, repetitions=1, block_max_volume=50
+                )
+                profile_PCR_2: List[ThermocyclerStep] = [
+                    {"temperature": 98, "hold_time_seconds": 15},
+                    {"temperature": 60, "hold_time_seconds": 30},
+                    {"temperature": 72, "hold_time_seconds": 30},
+                ]
+                thermocycler.execute_profile(
+                    steps=profile_PCR_2, repetitions=PCRCYCLES, block_max_volume=50
+                )
+                profile_PCR_3: List[ThermocyclerStep] = [
+                    {"temperature": 72, "hold_time_minutes": 1}
+                ]
+                thermocycler.execute_profile(
+                    steps=profile_PCR_3, repetitions=1, block_max_volume=50
+                )
+                thermocycler.set_block_temperature(4)
+            thermocycler.open_lid()
+        else:
+            if DRYRUN is False:
+                protocol.pause(
+                    "Pausing to run PCR on an off deck Thermocycler ~20min"
+                )
             else:
-                if DRYRUN is False:
-                    protocol.pause(
-                        "Pause to run Fragmentation & End Repair on an off deck Thermocycler ~45min"
-                    )
-                else:
-                    protocol.comment(
-                        "Pause to run Fragmentation & End Repair on an off deck Thermocycler ~45min"
-                    )
-            protocol.comment("MOVING: Plate Lid #1 = sample_plate_1 --> lids[1]")
-            protocol.move_lid(
-                source_location=sample_plate_1, new_location=lids, use_gripper=True
-            )
+                protocol.comment(
+                    "Pausing to run PCR on an off deck Thermocycler ~20min"
+                )
+        protocol.comment("MOVING: Plate Lid #3 = sample_plate_1 --> TRASH")
+        protocol.move_lid(
+            source_location=sample_plate_2, new_location=TRASH, use_gripper=True
+        )
 
-            # protocol.move_labware(labware=lids[0], new_location=lids[1], use_gripper=True)
-            ###############################################################################
-        if STEP_MC_ERAT:
-            protocol.comment("==============================================")
-            protocol.comment("--> End Prep")
-            protocol.comment("==============================================")
+    if STEP_CLEANUP_2:
+        protocol.comment("==============================================")
+        protocol.comment("--> Cleanup 2")
+        protocol.comment("==============================================")
 
-            protocol.comment("--> Adding End Prep")
-            ERATVol = 10
-            ERATMixRep = 10 if DRYRUN is False else 1
-            ERATMixVol = 40
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_1["A1"])
-            p1000.aspirate(ERATVol, ERAT.bottom(z=0.5))
-            p1000.dispense(
-                ERATVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
-            )
-            p1000.mix(ERATMixRep, ERATMixVol, rate=0.5)
-            p1000.move_to(sample_plate_1["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(sample_plate_1["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # ===============================================
+        # ===================================================================
+        # GRIPPER MOVE CleanupPlate_1 FROM: HEATER SHAKER --> TRASH
+        protocol.move_labware(
+            labware=CleanupPlate_1,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_50_4 FROM: tiprack_A2_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_50_4,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE CleanupPlate_2 FROM: D4 --> D1
+        protocol.move_labware(
+            labware=CleanupPlate_2,
+            new_location="D1",
+            use_gripper=True,
+        )
+        # TOWER DISPENSES NEW PLATE
+        tiprack_50_5 = stacker_50_ul_tips.retrieve()
+        protocol.move_lid(tiprack_50_5, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_50_5, tiprack_A2_adapter, use_gripper=True)
+        protocol.comment("MOVING: tiprack_50_5 = B4 --> tiprack_A2_adapter")
+        # ======================================================================
 
-            protocol.comment("MOVING: Plate Lid #1 = lids[1] --> sample_plate_1")
-            protocol.move_lid(
-                source_location=lids, new_location=sample_plate_1, use_gripper=True
-            )
+        protocol.comment("--> Transferring Samples")
+        CleanupBeadVol = 32.5
+        TransferSup = 50.0
+        CleanupBeadPremix = 3 if DRYRUN is False else 1
+        CleanupBeadMix = 10 if TIP_MIX else 1
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.1
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.1
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_5["A1"])
+        p1000.move_to(sample_plate_2["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(TransferSup / 2)
+        protocol.delay(seconds=0.2)
+        p1000.aspirate(TransferSup / 2)
+        p1000.dispense(TransferSup, CleanupPlate_2["A1"].bottom(z=0.5))
+        protocol.comment("--> ADDING CleanupBead (0.8x)")
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.1
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.1
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        p1000.move_to(CleanupBead.bottom(z=1))
+        p1000.mix(CleanupBeadPremix, 30, rate=0.5)
+        p1000.prepare_to_aspirate()
+        p1000.aspirate(
+            CleanupBeadVol,
+            location=CleanupBead.meniscus(z=-1, target="start"),
+            end_location=CleanupBead.meniscus(z=-1, target="end"),
+        )
+        p1000.move_to(CleanupBead.top(z=-3))
+        p1000.dispense(CleanupBeadVol, CleanupPlate_2["A1"].bottom(z=0.5))
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=2.5))
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.75
+        p1000.mix(CleanupBeadMix, 40, rate=0.5)
+        p1000.move_to(CleanupPlate_2["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(CleanupPlate_2["A1"].top(z=-3))
+        p1000.move_to(CleanupPlate_2["A1"].top(z=5))
+        p1000.move_to(CleanupPlate_2["A1"].top(z=0))
+        p1000.move_to(CleanupPlate_2["A1"].top(z=5))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # ===============================================
 
-            # protocol.move_labware(
-            #     labware=lids[-1],
-            #     new_location=sample_plate_1,
-            #     use_gripper=True,
-            # )
-            if ONDECK_THERMO:
-                thermocycler.close_lid()
-                if DRYRUN is False:
-                    profile_ERAT: List[ThermocyclerStep] = [
-                        {"temperature": 20, "hold_time_minutes": 30},
-                        {"temperature": 65, "hold_time_minutes": 30},
-                    ]
-                    thermocycler.execute_profile(
-                        steps=profile_ERAT, repetitions=1, block_max_volume=50
-                    )
-                    thermocycler.set_block_temperature(4)
-                thermocycler.open_lid()
-            else:
-                if DRYRUN is False:
-                    protocol.pause(
-                        "Pausing to run End Repair on an off deck Thermocycler ~60min"
-                    )
-                else:
-                    protocol.comment(
-                        "Pausing to run End Repair on an off deck Thermocycler ~60min"
-                    )
-            protocol.comment("MOVING: Plate Lid #1 = sample_plate_1 --> TRASH")
-            protocol.move_lid(
-                source_location=sample_plate_1, new_location=TRASH, use_gripper=True
-            )
+        # ==================================================================
+        # GRIPPER MOVE CleanupPlate_2 FROM: D1 --> MAG BLOCK
+        protocol.move_labware(
+            labware=CleanupPlate_2,
+            new_location=mag_block,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_50_5 FROM: tiprack_A2_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_50_5,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # TOWER DISPENSES NEW PLATE
+        tiprack_200_5 = stacker_200_ul_tips.retrieve()
+        protocol.move_lid(tiprack_200_5, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_200_5, tiprack_A2_adapter, use_gripper=True)
+        protocol.comment("MOVING: tiprack_200_5 = A4 --> tiprack_A2_adapter")
+        # ====================================================================
 
-            ##################################################################
-        if STEP_LIG:
-            protocol.comment("==============================================")
-            protocol.comment("--> Adapter Ligation")
-            protocol.comment("==============================================")
+        if DRYRUN is False:
+            protocol.delay(minutes=4)
 
-            protocol.comment("--> Adding Stubby Adapter")
-            AdapterVol = 5
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_2["A1"])
-            p1000.aspirate(
-                AdapterVol + 1,
-                location=Adapter.meniscus(z=-1, target="start"),
-                end_location=Adapter.meniscus(z=-1, target="end"),
-            )
-            p1000.dispense(
-                AdapterVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
-            )
-            p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
-            p1000.move_to(sample_plate_1["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            protocol.comment("--> Adding Lig")
-            LIGVol = 25
-            LIGMixRep = 20 if DRYRUN is False else 1
-            LIGMixVol = 40
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.25
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.aspirate(
-                LIGVol,
-                location=LIG.meniscus(z=-1, target="start"),
-                end_location=LIG.meniscus(z=-1, target="end"),
-            )
-            p1000.default_speed = 100
-            p1000.move_to(LIG.top(z=3))
-            protocol.delay(seconds=1)
-            p1000.default_speed = 400
-            p1000.dispense(
-                LIGVol,
-                location=sample_plate_1["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_1["A1"].meniscus(z=-1, target="end"),
-            )
-            p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
-            p1000.mix(LIGMixRep, LIGMixVol, rate=0.5)
-            p1000.default_speed = 100
-            p1000.move_to(sample_plate_1["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(sample_plate_1["A1"].top(z=-3))
-            p1000.default_speed = 400
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # ===============================================
+        protocol.comment("--> Removing Supernatant")
+        RemoveSup = 200
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # =============================
+        p1000.pick_up_tip(tiprack_200_5["A1"])
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=2))
+        p1000.aspirate(RemoveSup - 100)
+        protocol.delay(seconds=5)
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100, rate=0.5)
+        p1000.default_speed = 200
+        p1000.move_to(CleanupPlate_2["A1"].top(z=2))
+        p1000.dispense(200, Liquid_trash["A1"].top(z=0), rate=0.5)
+        protocol.delay(seconds=5)
+        p1000.blow_out()
+        p1000.default_speed = 400
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # =============================
 
-            #####################################################################
-            protocol.comment("MOVING: Plate Lid #2 = lids[1] --> sample_plate_1")
-            protocol.move_lid(
-                source_location=lids, new_location=sample_plate_1, use_gripper=True
-            )
+        protocol.comment("--> ETOH Wash 1")
+        ETOHMaxVol = 150
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # ===============================================
+        p1000.pick_up_tip(tiprack_200_X["A1"])
+        p1000.aspirate(ETOHMaxVol + 10, ETOH_Reservoir["A1"].bottom(z=dot_bottom))
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
+        p1000.move_to(CleanupPlate_2["A1"].top(z=2))
+        p1000.dispense(ETOHMaxVol)
+        protocol.delay(seconds=2)
+        p1000.aspirate(10, CleanupPlate_2["A1"].top(z=2))
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.move_to(Liquid_trash["A1"].top(z=0))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.return_tip()
+        # ===============================================
 
-            if ONDECK_THERMO:
-                thermocycler.close_lid()
-                if DRYRUN is False:
-                    profile_LIG: List[ThermocyclerStep] = [
-                        {"temperature": 20, "hold_time_minutes": 20}
-                    ]
-                    thermocycler.execute_profile(
-                        steps=profile_LIG, repetitions=1, block_max_volume=50
-                    )
-                    thermocycler.set_block_temperature(4)
-                thermocycler.open_lid()
-            else:
-                if DRYRUN is False:
-                    protocol.pause(
-                        "Pausing to run Ligation on an off deck Thermocycler ~20min"
-                    )
-                else:
-                    protocol.comment(
-                        "Pausing to run Ligation on an off deck Thermocycler ~20min"
-                    )
-            protocol.comment("MOVING: Plate Lid #2 = sample_plate_1 --> TRASH")
-            protocol.move_lid(
-                source_location=sample_plate_1, new_location=TRASH, use_gripper=True
-            )
-            ########################################################################
-        if STEP_CLEANUP_1:
+        if DRYRUN is False:
+            protocol.delay(minutes=0.5)
 
-            # ============================================================
-            # GRIPPER MOVE tiprack_50_1 FROM: tiprack_A2_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_50_1,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE tiprack_50_2 FROM: tiprack_A3_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_50_2,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE tiprack_200_1 FROM: D1 --> tiprack_A3_adapter
-            tiprack_200_1 = stacker_200_ul_tips.retrieve()
-            protocol.move_lid(tiprack_200_1, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_200_1, tiprack_A3_adapter, use_gripper=True)
-            # GRIPPER MOVE CleanupPlate_1 FROM: MAG PLATE --> D1
-            protocol.move_labware(
-                labware=CleanupPlate_1,
-                new_location="D1",
-                use_gripper=True,
-            )
-            # ================================================================
+        protocol.comment("--> Remove ETOH Wash")
+        RemoveSup = 200
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # =============================
+        p1000.pick_up_tip(tiprack_200_5["A1"])
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=1))
+        p1000.aspirate(RemoveSup - 100, rate=1)
+        protocol.delay(minutes=0.1)
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100, rate=0.5)
+        p1000.default_speed = 200
+        p1000.move_to(CleanupPlate_2["A1"].top(z=2))
+        p1000.dispense(200, Liquid_trash["A1"].top(z=0))
+        protocol.delay(minutes=0.1)
+        p1000.blow_out()
+        p1000.default_speed = 400
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # ===============================================
 
-            protocol.comment("==============================================")
-            protocol.comment("--> Cleanup 1")
-            protocol.comment("==============================================")
+        protocol.comment("--> ETOH Wash 2")
+        ETOHMaxVol = 150
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # ===============================================
+        p1000.pick_up_tip(tiprack_200_X["A1"])
+        p1000.aspirate(ETOHMaxVol + 10, ETOH_Reservoir["A1"].bottom(z=dot_bottom))
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
+        p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
+        p1000.move_to(CleanupPlate_2["A1"].top(z=2))
+        p1000.dispense(ETOHMaxVol)
+        protocol.delay(seconds=2)
+        p1000.aspirate(10, CleanupPlate_2["A1"].top(z=2))
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.move_to(Liquid_trash["A1"].top(z=0))
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        p1000.return_tip()
+        # ===============================================
 
-            protocol.comment("--> ADDING CleanupBead (0.8x)")
-            CleanupBeadVol = 72.0
-            CleanupBeadPremix = 5 if DRYRUN is False else 1
-            CleanupBeadMix = 10 if TIP_MIX else 1
+        if DRYRUN is False:
+            protocol.delay(minutes=0.5)
 
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.1
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_200_1["A1"])
-            p1000.move_to(CleanupBead.bottom(z=7))
-            p1000.mix(CleanupBeadPremix, 40, rate=0.5)
-            p1000.aspirate(CleanupBeadVol, CleanupBead.bottom(z=7))
-            p1000.default_speed = 100
-            p1000.move_to(CleanupBead.bottom(z=7))
-            p1000.default_speed = 400
-            p1000.dispense(CleanupBeadVol, CleanupPlate_1["A1"].bottom(z=7))
-            protocol.delay(seconds=1)
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
+        protocol.comment("--> Remove ETOH Wash")
+        RemoveSup = 200
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        # ===============================================
+        p1000.pick_up_tip(tiprack_200_X["A1"])
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=1))
+        p1000.aspirate(RemoveSup - 100, rate=1)
+        protocol.delay(minutes=0.1)
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100, rate=0.5)
+        p1000.default_speed = 200
+        p1000.move_to(CleanupPlate_2["A1"].top(z=2))
+        p1000.dispense(200, Liquid_trash["A1"].top(z=0))
+        protocol.delay(minutes=0.1)
+        p1000.blow_out()
+        p1000.default_speed = 400
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
 
-            TransferSup = 80.0
-            p1000.move_to(sample_plate_1["A1"].bottom(z=0.5))
-            p1000.aspirate(TransferSup / 2)
-            protocol.delay(seconds=1)
-            p1000.aspirate(TransferSup / 2)
-            p1000.dispense(TransferSup, CleanupPlate_1["A1"].bottom(z=+1), rate=0.5)
+        if DRYRUN is False:
+            protocol.delay(minutes=1)
 
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.75
-            p1000.mix(CleanupBeadMix, 150, rate=0.5)
-            p1000.move_to(CleanupPlate_1["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(CleanupPlate_1["A1"].top(z=-3))
-            p1000.move_to(CleanupPlate_1["A1"].top(z=5))
-            p1000.move_to(CleanupPlate_1["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_1["A1"].top(z=5))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # ===============================================
+        protocol.comment("--> Removing Residual Wash")
+        p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
+        p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(100)
+        p1000.dispense(100, Liquid_trash["A1"])
+        p1000.move_to(Liquid_trash["A1"].top(z=5))
+        protocol.delay(minutes=0.1)
+        p1000.move_to(Liquid_trash["A1"].top(z=-3))
+        protocol.delay(seconds=1)
+        p1000.blow_out(Liquid_trash["A1"].top(z=-3))
+        p1000.touch_tip(speed=100)
+        p1000.return_tip()
+        # ===============================================
 
-            # ==============================================================
-            # GRIPPER MOVE CleanupPlate_1 FROM: HEATER SHAKER --> MAG BLOCK
-            protocol.move_labware(
-                labware=CleanupPlate_1,
-                new_location=mag_block,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE tiprack_200_1 FROM: tiprack_A3_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_200_1,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE tiprack_200_X FROM: A4 --> tiprack_A3_adapter
-            tiprack_200_X = stacker_200_ul_tips.retrieve()
-            protocol.move_lid(tiprack_200_X, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_200_X, tiprack_A3_adapter, use_gripper=True)
+        if DRYRUN is False:
+            protocol.delay(minutes=0.5)
 
-            # TOWER DISPENSES NEW PLATE
-            tiprack_200_2 = stacker_200_ul_tips.retrieve()
-            protocol.move_lid(tiprack_200_2, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_200_2, tiprack_A2_adapter, use_gripper=True)
-            protocol.comment("Unloading tiprack 200 ul")
-            # ==============================================================
+        # ===============================================================
+        # GRIPPER MOVE CleanupPlate_2 FROM: MAG BLOCK --> D1
+        protocol.move_labware(
+            labware=CleanupPlate_2,
+            new_location="D1",
+            use_gripper=True,
+        )
+        # GRIPPER MOVE tiprack_200_6 FROM tiprack_A3_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_200_5,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE  FROM tiprack_A3_adapter --> TRASH
+        protocol.move_labware(
+            labware=tiprack_200_X,
+            new_location=TRASH,
+            use_gripper=True,
+        )
+        # TOWER DISPENSES NEW PLATE
+        tiprack_50_6 = stacker_50_ul_tips.retrieve()
+        protocol.move_lid(tiprack_50_6, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_50_6, tiprack_A2_adapter, use_gripper=True)
+        protocol.comment("MOVING: tiprack_50_6 = B4 --> tiprack_A2_adapter")
+        # TOWER DISPENSES NEW PLATE
+        tiprack_50_7 = stacker_50_ul_tips.retrieve()
+        protocol.move_lid(tiprack_50_7, TRASH, use_gripper=True)
+        protocol.move_labware(tiprack_50_7, tiprack_A3_adapter, use_gripper=True)
+        protocol.comment("MOVING: tiprack_50_7 = B4 --> tiprack_A3_adapter")
+        # ================================================================
 
-            if DRYRUN is False:
-                protocol.delay(minutes=2)
+        protocol.comment("--> Adding RSB")
+        RSBVol = 22
+        RSBMix = 10 if TIP_MIX else 1
+        RSBMixVol = 17.5
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_6["A1"].top(z=2))
+        p1000.aspirate(
+            RSBVol,
+            location=RSB.meniscus(z=-1, target="start"),
+            end_location=RSB.meniscus(z=-1, target="end"),
+        )
+        p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=dot_bottom))
+        p1000.dispense(
+            RSBVol,
+            CleanupPlate_2.wells_by_name()["A1"].bottom(z=0.1),
+        )
+        p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=dot_bottom))
+        p1000.mix(RSBMix, RSBMixVol, rate=0.5)
+        p1000.blow_out(CleanupPlate_2.wells_by_name()["A1"].top(z=-3))
+        p1000.return_tip()
+        # ===============================================
 
-            protocol.comment("--> Removing Supernatant")
-            RemoveSup = 200
-            CleanupBeadMix = 10 if TIP_MIX else 1
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # =============================
-            p1000.pick_up_tip(tiprack_200_2["A1"])
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
-            p1000.mix(CleanupBeadMix, 100, rate=0.5)
-            p1000.move_to(CleanupPlate_1["A1"].top(z=-3))
-            if DRYRUN is False:
-                protocol.delay(minutes=3)
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
-            p1000.aspirate(RemoveSup - 100, rate=1)
-            protocol.delay(seconds=5)
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100, rate=0.5)
-            p1000.default_speed = 200
-            p1000.move_to(CleanupPlate_1["A1"].top(z=2))
-            p1000.dispense(200, Liquid_trash["A1"].top(z=0), rate=0.5)
-            protocol.delay(seconds=5)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # =============================
-
-            protocol.comment("--> ETOH Wash 1")
-            ETOHMaxVol = 150
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # ===============================================
-            p1000.pick_up_tip(tiprack_200_X["A1"])
-            p1000.aspirate(
-                ETOHMaxVol + 10,
-                location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
-                end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
-            )
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
-            p1000.move_to(CleanupPlate_1["A1"].top(z=2))
-            p1000.dispense(ETOHMaxVol)
-            protocol.delay(seconds=2)
-            p1000.aspirate(10, CleanupPlate_1["A1"].top(z=2))
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.move_to(Liquid_trash["A1"].top(z=0))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.return_tip()
-            # ===============================================
-
-            if DRYRUN is False:
-                protocol.delay(minutes=0.5)
-
-            # ==============================================================
-            # GRIPPER MOVE tiprack_200_2 FROM: tiprack_A2_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_200_2,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # TOWER DISPENSES NEW PLATE
-            protocol.comment("MOVING: tiprack_200_3 = A4 --> tiprack_A2_adapter")
-            tiprack_200_3 = stacker_200_ul_tips.retrieve()
-            protocol.move_lid(tiprack_200_3, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_200_3, tiprack_A2_adapter, use_gripper=True)
-            # ================================================================
-            protocol.comment("--> Remove ETOH Wash")
-            RemoveSup = 200
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # =============================
-            p1000.pick_up_tip(tiprack_200_3["A1"])
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
-            p1000.aspirate(RemoveSup - 100, rate=1)
-            protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100, rate=0.5)
-            p1000.default_speed = 200
-            p1000.move_to(CleanupPlate_1["A1"].top(z=2))
-            p1000.dispense(200, Liquid_trash["A1"].top(z=0))
-            protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # =============================
-
-            protocol.comment("--> ETOH Wash 2")
-            ETOHMaxVol = 150
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # ===============================================
-            p1000.pick_up_tip(tiprack_200_X["A1"])
-            p1000.aspirate(
-                ETOHMaxVol + 10,
-                location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
-                end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
-            )
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
-            p1000.move_to(CleanupPlate_1["A1"].top(z=2))
-            p1000.dispense(ETOHMaxVol)
-            protocol.delay(seconds=2)
-            p1000.aspirate(10, CleanupPlate_1["A1"].top(z=2))
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.move_to(Liquid_trash["A1"].top(z=0))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.return_tip()
-            # ===============================================
-
-            if DRYRUN is False:
-                protocol.delay(minutes=0.5)
-
-            # =================================================================
-            # GRIPPER MOVE tiprack_200_3 FROM: tiprack_A2_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_200_3,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # TOWER DISPENSES NEW PLATE
-            tiprack_200_4 = stacker_200_ul_tips.retrieve()
-            protocol.move_lid(tiprack_200_4, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_200_4, tiprack_A2_adapter, use_gripper=True)
-            protocol.comment("MOVING: tiprack_200_4 = A4 --> tiprack_A2_adapter")
-            # =======================================================================
-            protocol.comment("--> Remove ETOH Wash")
-            RemoveSup = 200
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # =============================
-            p1000.pick_up_tip(tiprack_200_4["A1"])
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=1))
-            p1000.aspirate(RemoveSup - 100, rate=1)
-            protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100, rate=0.5)
-            p1000.default_speed = 200
-            p1000.move_to(CleanupPlate_1["A1"].top(z=2))
-            p1000.dispense(200, Liquid_trash["A1"].top(z=0))
-            protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-
-            if DRYRUN is False:
-                protocol.delay(minutes=1)
-
-            protocol.comment("--> Removing Residual Wash")
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100)
-            p1000.dispense(100, Liquid_trash["A1"])
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            protocol.delay(minutes=0.1)
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # ===============================================
-
-            if DRYRUN is False:
-                protocol.delay(minutes=0.5)
-
-            # =====================================================================
-            # GRIPPER MOVE CleanupPlate_1 FROM: MAG BLOCK --> D1
-            protocol.move_labware(
-                labware=CleanupPlate_1,
-                new_location="D1",
-                use_gripper=True,
-            )
-            # GRIPPER MOVE tiprack_200_4 FROM: tiprack_A2_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_200_4,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-
-            # TOWER DISPENSES NEW PLATE
-            tiprack_50_3 = stacker_50_ul_tips.retrieve()
-            protocol.move_lid(tiprack_50_3, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_50_3, tiprack_A2_adapter, use_gripper=True)
-            protocol.comment("MOVING: tiprack_50_3 = B4 --> tiprack_A2_adapter")
-            # GRIPPER MOVE CleanupPlate_1 FROM: MAG BLOCK --> D1
-            protocol.move_labware(
-                labware=CleanupPlate_1,
-                new_location=mag_block,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE CleanupPlate_1 FROM: MAG BLOCK --> D1
-            protocol.move_labware(
-                labware=CleanupPlate_1,
-                new_location="D1",
-                use_gripper=True,
-            )
-            # =====================================================================
-
-            protocol.comment("--> Adding RSB")
-            RSBVol = 22
-            RSBMix = 10 if TIP_MIX else 1
-            RSBMixVol = 17.5
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_3["A1"])
-            p1000.aspirate(
-                RSBVol,
-                location=RSB.meniscus(z=-1, target="start"),
-                end_location=RSB.meniscus(z=-1, target="end"),
-            )
-            p1000.move_to(CleanupPlate_1.wells_by_name()["A1"].bottom(z=dot_bottom))
-            p1000.dispense(
-                RSBVol,
-                location=CleanupPlate_1.wells_by_name()["A1"].bottom(z=dot_bottom),
-            )
-            p1000.mix(RSBMix, RSBMixVol, rate=0.5)
-            p1000.blow_out(CleanupPlate_1.wells_by_name()["A1"].top(z=-3))
-            p1000.return_tip()
-            # ===============================================
-
-            # ======================================================================
-            # GRIPPER MOVE CleanupPlate_1 FROM: D1 --> MAG BLOCK
-            protocol.move_labware(
-                labware=CleanupPlate_1,
-                new_location=mag_block,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE sample_plate_1 FROM: THERMOCYCLER --> TRASH
-            protocol.move_labware(
-                labware=sample_plate_1,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE sample_plate_2 FROM: C3 --> THERMOCYCLER
+        # ===============================================================
+        # GRIPPER MOVE CleanupPlate_2 FROM: D1 --> MAG BLOCK
+        protocol.move_labware(
+            labware=CleanupPlate_2,
+            new_location=mag_block,
+            use_gripper=True,
+        )
+        # GRIPPER MOVE sample_plate_2 FROM THERMOCYCLER --> TRASH
+        if ONDECK_THERMO:
             protocol.move_labware(
                 labware=sample_plate_2,
-                new_location=thermocycler,
-                use_gripper=True,
-            )
-
-            # GRIPPER MOVE tiprack_50_3 FROM: tiprack_A2_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_50_3,
                 new_location=TRASH,
                 use_gripper=True,
             )
-            # TOWER DISPENSES NEW PLATE
-            protocol.comment("MOVING: tiprack_50_4 = B4 --> tiprack_A2_adapter")
-
-            tiprack_50_4 = stacker_50_ul_tips.retrieve()
-            protocol.move_lid(tiprack_50_4, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_50_4, tiprack_A2_adapter, use_gripper=True)
-            # ========================================================================
-
-            if DRYRUN is False:
-                protocol.delay(minutes=3)
-
-        if STEP_PCR:
-            protocol.comment("==============================================")
-            protocol.comment("--> Amplification")
-            protocol.comment("==============================================")
-
-            protocol.comment("--> Transferring Supernatant")
-            TransferSup = 20
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.2
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.2
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_4["A1"])
-            p1000.move_to(CleanupPlate_1["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(TransferSup / 2)
-            protocol.delay(seconds=1)
-            p1000.aspirate(TransferSup / 2)
-            p1000.dispense(TransferSup, sample_plate_2["A1"].bottom(z=1))
-            protocol.comment("--> Adding PCR")
-            PCRVol = 25
-            PCRMixRep = 2
-            PCRMixVol = 40
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.2
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.2
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.prepare_to_aspirate()
-            p1000.aspirate(
-                PCRVol,
-                location=PCR.meniscus(z=-1, target="start"),
-                end_location=PCR.meniscus(z=-1, target="end"),
-            )
-            p1000.dispense(
-                PCRVol,
-                location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
-            )
-            p1000.mix(PCRMixRep, PCRMixVol)
-            p1000.move_to(sample_plate_2["A1"].top(z=-3))
-            protocol.delay(seconds=3)
-            protocol.comment("--> Adding Barcodes")
-            BarcodeVol = 5
-            BarcodeMixRep = 10 if DRYRUN is False else 1
-            BarcodeMixVol = 40
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.prepare_to_aspirate()
-            p1000.aspirate(
-                BarcodeVol,
-                location=Barcodes.meniscus(z=-1, target="start"),
-                end_location=Barcodes.meniscus(z=-1, target="end"),
-            )
-            p1000.dispense(
-                BarcodeVol,
-                location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
-            )
-            p1000.mix(BarcodeMixRep, BarcodeMixVol)
-            p1000.move_to(sample_plate_2["A1"].top(z=-3))
-            protocol.delay(seconds=3)
-            p1000.blow_out(sample_plate_2["A1"].top(z=-3))
-            p1000.return_tip()
-            # ===============================================
-
-            #####################################################################
-            protocol.comment("MOVING: Plate Lid #3= lids[2] --> sample_plate_1")
-            protocol.move_lid(
-                source_location=lids, new_location=sample_plate_2, use_gripper=True
-            )
-
-            if ONDECK_THERMO:
-                thermocycler.close_lid()
-                if DRYRUN is False:
-                    profile_PCR_1: List[ThermocyclerStep] = [
-                        {"temperature": 98, "hold_time_seconds": 45}
-                    ]
-                    thermocycler.execute_profile(
-                        steps=profile_PCR_1, repetitions=1, block_max_volume=50
-                    )
-                    profile_PCR_2: List[ThermocyclerStep] = [
-                        {"temperature": 98, "hold_time_seconds": 15},
-                        {"temperature": 60, "hold_time_seconds": 30},
-                        {"temperature": 72, "hold_time_seconds": 30},
-                    ]
-                    thermocycler.execute_profile(
-                        steps=profile_PCR_2, repetitions=PCRCYCLES, block_max_volume=50
-                    )
-                    profile_PCR_3: List[ThermocyclerStep] = [
-                        {"temperature": 72, "hold_time_minutes": 1}
-                    ]
-                    thermocycler.execute_profile(
-                        steps=profile_PCR_3, repetitions=1, block_max_volume=50
-                    )
-                    thermocycler.set_block_temperature(4)
-                thermocycler.open_lid()
-            else:
-                if DRYRUN is False:
-                    protocol.pause(
-                        "Pausing to run PCR on an off deck Thermocycler ~20min"
-                    )
-                else:
-                    protocol.comment(
-                        "Pausing to run PCR on an off deck Thermocycler ~20min"
-                    )
-            protocol.comment("MOVING: Plate Lid #3 = sample_plate_1 --> TRASH")
-            protocol.move_lid(
-                source_location=sample_plate_2, new_location=TRASH, use_gripper=True
-            )
-
-        if STEP_CLEANUP_2:
-            protocol.comment("==============================================")
-            protocol.comment("--> Cleanup 2")
-            protocol.comment("==============================================")
-
-            # ===================================================================
-            # GRIPPER MOVE CleanupPlate_1 FROM: HEATER SHAKER --> TRASH
+        else:
             protocol.move_labware(
-                labware=CleanupPlate_1,
+                labware=sample_plate_2,
                 new_location=TRASH,
                 use_gripper=True,
             )
-            # GRIPPER MOVE tiprack_50_4 FROM: tiprack_A2_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_50_4,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE CleanupPlate_2 FROM: D4 --> D1
-            protocol.move_labware(
-                labware=CleanupPlate_2,
-                new_location="D1",
-                use_gripper=True,
-            )
-            # TOWER DISPENSES NEW PLATE
-            tiprack_50_5 = stacker_50_ul_tips.retrieve()
-            protocol.move_lid(tiprack_50_5, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_50_5, tiprack_A2_adapter, use_gripper=True)
-            protocol.comment("MOVING: tiprack_50_5 = B4 --> tiprack_A2_adapter")
-            # ======================================================================
 
-            protocol.comment("--> Transferring Samples")
-            CleanupBeadVol = 32.5
-            TransferSup = 50.0
-            CleanupBeadPremix = 3 if DRYRUN is False else 1
-            CleanupBeadMix = 10 if TIP_MIX else 1
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.1
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.1
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_5["A1"])
-            p1000.move_to(sample_plate_2["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(TransferSup / 2)
-            protocol.delay(seconds=0.2)
-            p1000.aspirate(TransferSup / 2)
-            p1000.dispense(TransferSup, CleanupPlate_2["A1"].bottom(z=0.5))
-            protocol.comment("--> ADDING CleanupBead (0.8x)")
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.1
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.1
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            p1000.move_to(CleanupBead.bottom(z=1))
-            p1000.mix(CleanupBeadPremix, 30, rate=0.5)
-            p1000.prepare_to_aspirate()
-            p1000.aspirate(
-                CleanupBeadVol,
-                location=CleanupBead.meniscus(z=-1, target="start"),
-                end_location=CleanupBead.meniscus(z=-1, target="end"),
-            )
-            p1000.move_to(CleanupBead.top(z=-3))
-            p1000.dispense(CleanupBeadVol, CleanupPlate_2["A1"].bottom(z=0.5))
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=2.5))
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.75
-            p1000.mix(CleanupBeadMix, 40, rate=0.5)
-            p1000.move_to(CleanupPlate_2["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(CleanupPlate_2["A1"].top(z=-3))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=0))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=5))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # ===============================================
+        if DRYRUN is False:
+            protocol.delay(minutes=3)
 
-            # ==================================================================
-            # GRIPPER MOVE CleanupPlate_2 FROM: D1 --> MAG BLOCK
-            protocol.move_labware(
-                labware=CleanupPlate_2,
-                new_location=mag_block,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE tiprack_50_5 FROM: tiprack_A2_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_50_5,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # TOWER DISPENSES NEW PLATE
-            tiprack_200_5 = stacker_200_ul_tips.retrieve()
-            protocol.move_lid(tiprack_200_5, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_200_5, tiprack_A2_adapter, use_gripper=True)
-            protocol.comment("MOVING: tiprack_200_5 = A4 --> tiprack_A2_adapter")
-            # ====================================================================
+        protocol.comment("--> Transferring Supernatant")
+        TransferSup = 20
+        # P1000 Head with p50 Tip Speed
+        p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.2
+        p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.2
+        p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
+        # ===============================================
+        p1000.pick_up_tip(tiprack_50_7["A1"])
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
+        p1000.aspirate(TransferSup / 2)
+        protocol.delay(seconds=1)
+        p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.1))
+        # p1000.aspirate(TransferSup / 2)
+        # p1000.dispense(TransferSup, sample_plate_3["A1"].bottom(z=1))
+        p1000.return_tip()
+        # ===============================================
 
-            if DRYRUN is False:
-                protocol.delay(minutes=4)
+    # ========================================== PROTOCOL END
+    if DEACTIVATE_TEMP:
+        if ONDECK_THERMO:
+            thermocycler.deactivate_block()
+        if ONDECK_THERMO:
+            thermocycler.deactivate_lid()
+        if ONDECK_TEMP:
+            temp_block.deactivate()
+    # ========================================== PROTOCOL END
 
-            protocol.comment("--> Removing Supernatant")
-            RemoveSup = 200
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # =============================
-            p1000.pick_up_tip(tiprack_200_5["A1"])
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=2))
-            p1000.aspirate(RemoveSup - 100)
-            protocol.delay(seconds=5)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100, rate=0.5)
-            p1000.default_speed = 200
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.dispense(200, Liquid_trash["A1"].top(z=0), rate=0.5)
-            protocol.delay(seconds=5)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # =============================
-
-            protocol.comment("--> ETOH Wash 1")
-            ETOHMaxVol = 150
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # ===============================================
-            p1000.pick_up_tip(tiprack_200_X["A1"])
-            p1000.aspirate(ETOHMaxVol + 10, ETOH_Reservoir["A1"].bottom(z=dot_bottom))
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.dispense(ETOHMaxVol)
-            protocol.delay(seconds=2)
-            p1000.aspirate(10, CleanupPlate_2["A1"].top(z=2))
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.move_to(Liquid_trash["A1"].top(z=0))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.return_tip()
-            # ===============================================
-
-            if DRYRUN is False:
-                protocol.delay(minutes=0.5)
-
-            protocol.comment("--> Remove ETOH Wash")
-            RemoveSup = 200
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # =============================
-            p1000.pick_up_tip(tiprack_200_5["A1"])
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=1))
-            p1000.aspirate(RemoveSup - 100, rate=1)
-            protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100, rate=0.5)
-            p1000.default_speed = 200
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.dispense(200, Liquid_trash["A1"].top(z=0))
-            protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # ===============================================
-
-            protocol.comment("--> ETOH Wash 2")
-            ETOHMaxVol = 150
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # ===============================================
-            p1000.pick_up_tip(tiprack_200_X["A1"])
-            p1000.aspirate(ETOHMaxVol + 10, ETOH_Reservoir["A1"].bottom(z=dot_bottom))
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
-            p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.dispense(ETOHMaxVol)
-            protocol.delay(seconds=2)
-            p1000.aspirate(10, CleanupPlate_2["A1"].top(z=2))
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.move_to(Liquid_trash["A1"].top(z=0))
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            p1000.return_tip()
-            # ===============================================
-
-            if DRYRUN is False:
-                protocol.delay(minutes=0.5)
-
-            protocol.comment("--> Remove ETOH Wash")
-            RemoveSup = 200
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            # ===============================================
-            p1000.pick_up_tip(tiprack_200_X["A1"])
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=1))
-            p1000.aspirate(RemoveSup - 100, rate=1)
-            protocol.delay(minutes=0.1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100, rate=0.5)
-            p1000.default_speed = 200
-            p1000.move_to(CleanupPlate_2["A1"].top(z=2))
-            p1000.dispense(200, Liquid_trash["A1"].top(z=0))
-            protocol.delay(minutes=0.1)
-            p1000.blow_out()
-            p1000.default_speed = 400
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-
-            if DRYRUN is False:
-                protocol.delay(minutes=1)
-
-            protocol.comment("--> Removing Residual Wash")
-            p1000.flow_rate.aspirate = p96x_200_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_200_flow_rate_dispense_default
-            p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(100)
-            p1000.dispense(100, Liquid_trash["A1"])
-            p1000.move_to(Liquid_trash["A1"].top(z=5))
-            protocol.delay(minutes=0.1)
-            p1000.move_to(Liquid_trash["A1"].top(z=-3))
-            protocol.delay(seconds=1)
-            p1000.blow_out(Liquid_trash["A1"].top(z=-3))
-            p1000.touch_tip(speed=100)
-            p1000.return_tip()
-            # ===============================================
-
-            if DRYRUN is False:
-                protocol.delay(minutes=0.5)
-
-            # ===============================================================
-            # GRIPPER MOVE CleanupPlate_2 FROM: MAG BLOCK --> D1
-            protocol.move_labware(
-                labware=CleanupPlate_2,
-                new_location="D1",
-                use_gripper=True,
-            )
-            # GRIPPER MOVE tiprack_200_6 FROM tiprack_A3_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_200_5,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE  FROM tiprack_A3_adapter --> TRASH
-            protocol.move_labware(
-                labware=tiprack_200_X,
-                new_location=TRASH,
-                use_gripper=True,
-            )
-            # TOWER DISPENSES NEW PLATE
-            tiprack_50_6 = stacker_50_ul_tips.retrieve()
-            protocol.move_lid(tiprack_50_6, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_50_6, tiprack_A2_adapter, use_gripper=True)
-            protocol.comment("MOVING: tiprack_50_6 = B4 --> tiprack_A2_adapter")
-            # TOWER DISPENSES NEW PLATE
-            tiprack_50_7 = stacker_50_ul_tips.retrieve()
-            protocol.move_lid(tiprack_50_7, TRASH, use_gripper=True)
-            protocol.move_labware(tiprack_50_7, tiprack_A3_adapter, use_gripper=True)
-            protocol.comment("MOVING: tiprack_50_7 = B4 --> tiprack_A3_adapter")
-            # ================================================================
-
-            protocol.comment("--> Adding RSB")
-            RSBVol = 22
-            RSBMix = 10 if TIP_MIX else 1
-            RSBMixVol = 17.5
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_6["A1"].top(z=2))
-            p1000.aspirate(
-                RSBVol,
-                location=RSB.meniscus(z=-1, target="start"),
-                end_location=RSB.meniscus(z=-1, target="end"),
-            )
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=dot_bottom))
-            p1000.dispense(
-                RSBVol,
-                CleanupPlate_2.wells_by_name()["A1"].bottom(z=0.1),
-            )
-            p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=dot_bottom))
-            p1000.mix(RSBMix, RSBMixVol, rate=0.5)
-            p1000.blow_out(CleanupPlate_2.wells_by_name()["A1"].top(z=-3))
-            p1000.return_tip()
-            # ===============================================
-
-            # ===============================================================
-            # GRIPPER MOVE CleanupPlate_2 FROM: D1 --> MAG BLOCK
-            protocol.move_labware(
-                labware=CleanupPlate_2,
-                new_location=mag_block,
-                use_gripper=True,
-            )
-            # GRIPPER MOVE sample_plate_2 FROM THERMOCYCLER --> TRASH
-            if ONDECK_THERMO:
-                protocol.move_labware(
-                    labware=sample_plate_2,
-                    new_location=TRASH,
-                    use_gripper=True,
-                )
-            else:
-                protocol.move_labware(
-                    labware=sample_plate_2,
-                    new_location=TRASH,
-                    use_gripper=True,
-                )
-
-            if DRYRUN is False:
-                protocol.delay(minutes=3)
-
-            protocol.comment("--> Transferring Supernatant")
-            TransferSup = 20
-            # P1000 Head with p50 Tip Speed
-            p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.2
-            p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.2
-            p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
-            # ===============================================
-            p1000.pick_up_tip(tiprack_50_7["A1"])
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=dot_bottom))
-            p1000.aspirate(TransferSup / 2)
-            protocol.delay(seconds=1)
-            p1000.move_to(CleanupPlate_2["A1"].bottom(z=0.1))
-            # p1000.aspirate(TransferSup / 2)
-            # p1000.dispense(TransferSup, sample_plate_3["A1"].bottom(z=1))
-            p1000.return_tip()
-            # ===============================================
-
-        # ========================================== PROTOCOL END
-        if DEACTIVATE_TEMP:
-            if ONDECK_THERMO:
-                thermocycler.deactivate_block()
-            if ONDECK_THERMO:
-                thermocycler.deactivate_lid()
-            if ONDECK_TEMP:
-                temp_block.deactivate()
-        # ========================================== PROTOCOL END
-
-        protocol.comment("==============================================")
-        protocol.comment("--> Report")
-        protocol.comment("==============================================")
-        protocol.capture_image(filename="end_of_run")
-        if not protocol.is_simulating():
-            run_helpers.send_slack_message_with_image(
-                slack_bot, metadata["protocolName"]
-            )
-    except Exception as e:
-        if not protocol.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
-                slack_bot, metadata["protocolName"], str(e), length
-            )
-        raise (e)
+    protocol.comment("==============================================")
+    protocol.comment("--> Report")
+    protocol.comment("==============================================")
+    protocol.capture_image(filename="end_of_run")
