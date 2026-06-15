@@ -2,11 +2,7 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
-import {
-  BUTTON_TYPE_SUBMIT,
-  Flex,
-  FONT_SIZE_BODY_1,
-} from '@opentrons/components'
+import { BUTTON_TYPE_SUBMIT, FONT_SIZE_BODY_1 } from '@opentrons/components'
 
 import { ScrollableAlertModal } from '/app/molecules/modals'
 import { SECURITY_WPA_EAP, SECURITY_WPA_PSK } from '/app/redux/networking'
