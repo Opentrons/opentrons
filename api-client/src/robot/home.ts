@@ -8,5 +8,7 @@ export function home(
   config: HostConfig,
   data: HomeData
 ): ResponsePromise<HomeResponse> {
-  return request<HomeResponse, HomeData>(POST, '/robot/home', data, config)
+  return request<HomeResponse, HomeData>(POST, '/robot/home', config, {
+    body: data,
+  })
 }
