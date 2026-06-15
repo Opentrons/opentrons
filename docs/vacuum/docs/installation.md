@@ -18,46 +18,48 @@ Follow these instructions to install the Vacuum Module.
 
     <figure markdown>
     ![Deck map with sots A3 and A4 highlighted](images/deck-map.png)
-    <figcaption>Vacuum Module deck location</figcaption>
+    <figcaption>Vacuum Module deck map location.</figcaption>
     </figure>
 
 3. Install the Vacuum Module deck adapter in slots A3–A4 only. Fasten it to the deck with the original deck screws or use the screws provided with the module.
 
-4. Seat the manifold base plate in slot A3. You can put a collar in slot A4, which is its "home" or default location.
+4. Set the manifold base plate on the deck adapter in slot A-3.
+
+5. Attach the 6 mm (&frac14;") vacuum hose and coupling insert to the exhaust manifold on the base plate. Fittings lock into place with an audible click.
+
+<!-- Images won't center or render without left justify?!? -->
+<figure class="screenshot side-by-side" markdown>
+![Manifold fitting disconnected](images/fitting-disconnected.svg)
+![Manifold fitting connected](images/fitting-connected.svg)
+</figure>
+
+6. Run the hose from the manifold through the notch on the side of the deck plate adapter and into the space below the deck. The area below the deck keeps cables, tubes, hoses, and other module connections from cluttering the work area.
 
     <figure markdown>
-    ![Deck adapter showing locations for manifold base and collar](images/image-placeholder.png)
-    <figcaption>IMAGE TBD</figcaption>
+    ![Deck plate with magnified image of vacuum hose notch](images/deck-plate-notch.png){ width="80%" }
+    <figcaption>Adapter notch provides below-deck access for the vacuum hose.</figcaption>
     </figure>
 
-5. Secure one end of the 6 mm (&frac14;") vacuum tube to the manifold base plate, and route the remaining tubing through the opening in the deck plate adapter, under the deck, and to the waste collection area. You can knock out the small side plates on Flex to continue routing the hose.
+7.  Remove one of the lower cosmetic side panels on the robot and bring the remaining hose section through this opening. From here, you can connect the hose to the carboy.
 
-    <figure markdown>
-    ![Placeholder for image, FPO](images/image-placeholder.png)
-    <figcaption>IMAGE TBD</figcaption>
+    <figure class="screenshot" markdown>
+    ![Flex with a single lower cosmetic panel removed. Shows vacuum hose exiting robot.](images/side-panel.png)
+    <figcaption>Vacuum hose exiting Flex from a lower side panel.</figcaption>
     </figure>
-
-</div>
-
-<div class="instruction-list" markdown>
 
 ## Part 2: External components setup
 
 6. Position the carboy cradle and the 2-liter glass carboy on the lab bench at or below the level of the Control Box.
 
-7. Tighten the cap onto the carboy by hand until it is securely sealed. Do not over-tighten the cap, this is not a trial of strength.
+7. Place the cap on the carboy and hand tighten it. Do not over-tighten the cap, this is not a trial of strength.
 
-8. Connect the free end of the 6 mm (&frac14;") vacuum tube coming from the manifold base to the carboy inlet port. Measure and cut the tubing to length if necessary.
+8. Attach the free end of the 6 mm (&frac14;") vacuum tube coupling insert into the connector on the cap. Measure and cut the tubing to length if necessary.
 
-9. Connect the 9.5 mm (&frac38;") vacuum hose from the carboy outlet port to the inlet port on the Control Box. Measure and cut the hose to length if necessary.
-
-</div>
-
-<div class="instruction-list" markdown>
+9. Attach the 9.5 mm (&frac38;") vacuum hose and coupling inserts into the connector on the cap and on the Control Box. Measure and cut the hose to length if necessary.
 
 ## Part 3: Data and power connections
 
-10. Connect the USB cable to the data port on the Control Box and to an available USB port on the Flex.
+10. Connect the USB cable to the port on the Control Box and to an available USB port on the Flex.
 
 11. Connect the IEC power cable to the Control Box power inlet and plug it into a mains power outlet.
 
