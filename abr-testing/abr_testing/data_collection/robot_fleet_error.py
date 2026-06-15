@@ -31,7 +31,7 @@ def open_folder(path: str) -> None:
 
 
 def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
-    """Save all capture images for a run."""
+    """Save all automatically captured run images."""
     save_dir = Path(f"{storage}")
     new_save_dir = save_dir / run_id
     key_path = save_dir / "robot_key"
@@ -339,7 +339,7 @@ def get_parent_key(
 
 
 def cleanup_report_folders(storage_directory: str, keep_count: int = 3) -> None:
-    """Cleans up report folder."""
+    """Cleans up report folder to prevent excessive storage use."""
     storage_path = Path(storage_directory)
     folders = [f for f in storage_path.iterdir() if f.is_dir()]
     folders.sort(key=lambda f: f.stat().st_mtime)
@@ -369,7 +369,7 @@ def get_user_id(user_file_path: str, assignee_name: str) -> str:
 
 
 def get_error_runs_from_robot(ip: str) -> Tuple[List[str], List[str]]:
-    """Get runs that have errors from robot. Now including error recovery!"""
+    """Collects all recent run ID's from the robot, separates errored run IDs."""
     error_run_ids: List[str] = []
     protocol_ids: List[str] = []
     recovery_statuses = {
@@ -730,7 +730,7 @@ def save_latest_protocol(robot_ip: str, storage_directory: str) -> str:
 
 
 def make_json_file(storage_directory: str, whole_description_str: str) -> str:
-    """Makes old Jira description into a json file."""
+    """Makes old Jira description into an attached json file."""
     save_dir = Path(storage_directory)
     file_path = save_dir / "health.json"
     with open(file_path, "w") as json_file:

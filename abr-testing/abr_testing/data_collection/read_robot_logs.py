@@ -1035,7 +1035,7 @@ def get_basic_logs(ip: str, storage_directory: Path) -> Tuple[List[str], str, st
 
 
 def get_logs(storage_directory: Path, ip: str) -> str:
-    """Get Robot logs and return a zip file path containing them."""
+    """Collect Robot logs, organize in a zip file, then return the zip path."""
     collected_files, robot_name, sw_version = get_basic_logs(ip, storage_directory)
     # Collect all nonstandard logs
     collected_files = fetch_weston_log(
@@ -1132,7 +1132,7 @@ def fetch_weston_log(
 def retreive_odd_console(
     robot_ip: str, storage_directory: Path, collected_files: list
 ) -> list:
-    """Connect to the ODD collect and save console logs."""
+    """Connect to the ODD through port 9223, collect and save console logs."""
     log_buffer = 3.0
     output_csv = Path(storage_directory) / "odd_console.log"
 

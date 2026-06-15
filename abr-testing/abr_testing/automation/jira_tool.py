@@ -20,7 +20,7 @@ class JiraCredentials:
 
 
 def get_credentials(storage_directory: str) -> JiraCredentials:
-    """A function to populate the JiraCredentials class."""
+    """Opens and parses local Jira credentials file."""
     credentials_path = os.path.join(storage_directory, "jiraCredentials.json")
     with open(credentials_path) as f:
         jiraCreds = json.load(f)
@@ -44,7 +44,7 @@ class JiraTicket:
         }
 
     def issues_on_board(self, project_key: str) -> List[List[Any]]:
-        """Print Issues on board."""
+        """Return all Issues on specified Jira board."""
         all_issues = self.get_project_issues(project_key)
         issues_dict = all_issues["issues"]
         issue_ids = []
