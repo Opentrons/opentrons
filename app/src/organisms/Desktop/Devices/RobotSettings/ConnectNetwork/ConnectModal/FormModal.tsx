@@ -26,7 +26,7 @@ const StyledCopy = styled.p`
   margin: 0 1rem 1rem;
 `
 
-const StyledFlex = styled(Flex)`
+const StyledFieldContainer = styled.div`
   font-size: ${FONT_SIZE_BODY_1};
   display: table;
   width: 80%;
@@ -91,7 +91,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
       ]}
     >
       <StyledCopy>{bodyText}</StyledCopy>
-      <StyledFlex id={id}>
+      <StyledFieldContainer id={id}>
         {fields.map(fieldProps => {
           const { name } = fieldProps
           const fieldId = `${id}__${name}`
@@ -154,7 +154,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
             />
           )
         })}
-      </StyledFlex>
+      </StyledFieldContainer>
     </ScrollableAlertModal>
   )
 }
