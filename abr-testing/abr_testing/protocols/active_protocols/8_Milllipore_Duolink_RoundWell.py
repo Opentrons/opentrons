@@ -12,7 +12,6 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
 )
 from typing import List, Union
-from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 metadata = {
     "protocolName": "Duolink PLA for Microscopy - Combined Day 1 & Day 2",
@@ -82,7 +81,15 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Keep reagents cold?",
         default=True,
     )
-    run_helpers.create_error_capture_duration_duration(parameters)
+    parameters.add_int(
+        variable_name="error_capture_duration",
+        display_name="Error Capture Duration",
+        description="Length of video clip to capture on error (in seconds).",
+        default=30,
+        minimum=5,
+        maximum=6000,
+        unit="seconds",
+    )
 
 
 # ----------------------------
@@ -209,174 +216,164 @@ def discard(
 # ----------------------------
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
-    if not ctx.is_simulating():
-        background_helpers.launch_background_tasks()
-
     num_sample = ctx.params.num_sample  # type: ignore[attr-defined]
     length = ctx.params.error_capture_duration  # type: ignore[attr-defined]
     heat_on_deck = ctx.params.heat_on_deck  # type: ignore[attr-defined]
     use_lid = ctx.params.use_lid  # type: ignore[attr-defined]
     use_temp = ctx.params.use_temp  # type: ignore[attr-defined]
-    if not ctx.is_simulating():
-        run_helpers.comment_protocol_version(ctx, "01")
-        slack_bot = run_helpers.set_up_slack()
-        slack_bot.send_run_started_message(metadata["protocolName"])
-    try:
-        ctx.capture_image(filename="start_of_run")
-        num_col_full = num_sample // 8
-        num_well_last_col = num_sample % 8
-        num_col_total = num_col_full + (1 if num_well_last_col > 0 else 0)
+    
+    ctx.comment("Protocol Version: 01")
+    ctx.capture_image(filename="start_of_run")
+    
+    num_col_full = num_sample // 8
+    num_well_last_col = num_sample % 8
+    num_col_total = num_col_full + (1 if num_well_last_col > 0 else 0)
 
-        # ----------------------------
-        # Load labware
-        # ----------------------------
-        working_plate = ctx.load_labware(
-            "milliplex_r_96_well_microtiter_plate", "C2", "ASSAY PLATE"
-        )
-        waste_res = ctx.load_labware("nest_1_reservoir_290ml", "D2", "LIQUID WASTE")
-        waste = waste_res.wells()[0]
-        ctx.load_trash_bin("A3")
-        ctx.load_lid_stack("opentrons_tough_universal_lid", "C4", 1)
+    # ----------------------------
+    # Load labware
+    # ----------------------------
+    working_plate = ctx.load_labware(
+        "milliplex_r_96_well_microtiter_plate", "C2", "ASSAY PLATE"
+    )
+    waste_res = ctx.load_labware("nest_1_reservoir_290ml", "D2", "LIQUID WASTE")
+    waste = waste_res.wells()[0]
+    ctx.load_trash_bin("A3")
+    ctx.load_lid_stack("opentrons_tough_universal_lid", "C4", 1)
 
-        if use_temp:
-            temp_mod: TemperatureModuleContext = ctx.load_module(
-                "temperature module gen2", "C1"
-            )  # type: ignore[assignment]
-            temp_adapter = temp_mod.load_adapter(
-                "opentrons_96_deep_well_temp_mod_adapter"
-            )
-            reagent_plate = temp_adapter.load_labware(
-                "nest_96_wellplate_2ml_deep", "Reagent Plate"
-            )
-        else:
-            reagent_plate = ctx.load_labware(
-                "nest_96_wellplate_2ml_deep", "C1", "REAGENTS"
-            )
-
-        hs: HeaterShakerContext = ctx.load_module(
-            "heaterShakerModuleV1", "D1"
+    if use_temp:
+        temp_mod: TemperatureModuleContext = ctx.load_module(
+            "temperature module gen2", "C1"
         )  # type: ignore[assignment]
-        hs_adapter = hs.load_adapter("opentrons_universal_flat_adapter_type_b")
+        temp_adapter = temp_mod.load_adapter(
+            "opentrons_96_deep_well_temp_mod_adapter"
+        )
+        reagent_plate = temp_adapter.load_labware(
+            "nest_96_wellplate_2ml_deep", "Reagent Plate"
+        )
+    else:
+        reagent_plate = ctx.load_labware(
+            "nest_96_wellplate_2ml_deep", "C1", "REAGENTS"
+        )
 
-        # ---- LOAD TIPRACKS INTO VARIABLES (important) ----
-        tips_1k = [
-            ctx.load_labware("opentrons_flex_96_tiprack_1000ul", slot, "1000uL TIPS")
-            for slot in ["B3", "B2"]
-        ]  # << CHANGED: store refs
-        tips_200 = [
-            ctx.load_labware("opentrons_flex_96_tiprack_200ul", slot, "200uL TIPS")
-            for slot in ["B1", "A2", "A1"]
-        ]  # << CHANGED: store refs
+    hs: HeaterShakerContext = ctx.load_module(
+        "heaterShakerModuleV1", "D1"
+    )  # type: ignore[assignment]
+    hs_adapter = hs.load_adapter("opentrons_universal_flat_adapter_type_b")
 
-        p1k_8 = ctx.load_instrument("flex_8channel_1000", "left")
-        p1k_1 = ctx.load_instrument("flex_1channel_1000", "right")
-        for p in [p1k_8, p1k_1]:
-            p.flow_rate.aspirate = DEFAULT_RATE
-            p.flow_rate.dispense = DEFAULT_RATE
+    # ---- LOAD TIPRACKS INTO VARIABLES (important) ----
+    tips_1k = [
+        ctx.load_labware("opentrons_flex_96_tiprack_1000ul", slot, "1000uL TIPS")
+        for slot in ["B3", "B2"]
+    ]  # << CHANGED: store refs
+    tips_200 = [
+        ctx.load_labware("opentrons_flex_96_tiprack_200ul", slot, "200uL TIPS")
+        for slot in ["B1", "A2", "A1"]
+    ]  # << CHANGED: store refs
 
-        # ---- ASSIGN TIPRACKS TO PIPETTES ----
+    p1k_8 = ctx.load_instrument("flex_8channel_1000", "left")
+    p1k_1 = ctx.load_instrument("flex_1channel_1000", "right")
+    for p in [p1k_8, p1k_1]:
+        p.flow_rate.aspirate = DEFAULT_RATE
+        p.flow_rate.dispense = DEFAULT_RATE
+
+    # ---- ASSIGN TIPRACKS TO PIPETTES ----
+    p1k_8.tip_racks = tips_1k
+    p1k_1.tip_racks = tips_1k
+
+    # ----------------------------
+    # Define wells
+    # ----------------------------
+    rxn_total = working_plate.rows()[0][:num_col_total]
+    rxn_full = working_plate.rows()[0][:num_col_full]
+    rxn_remainder = (
+        working_plate.wells()[
+            num_col_full * 8 : num_col_full * 8 + num_well_last_col
+        ]
+        if num_well_last_col > 0
+        else []
+    )
+    # ----------------------------
+    # Define liquids
+    # ----------------------------
+    vol_ab = 40 * num_col_full + 40
+    vol_ab_plus_one = 40 * (num_col_full + 1) + 40
+    def_ab = ctx.define_liquid(
+        name="ANTIBODY SOLUTION", description="", display_color="#98FB98"
+    )  # green
+    if num_well_last_col > 0:
+        [
+            reagent_plate.rows()[row][0].load_liquid(
+                liquid=def_ab, volume=vol_ab_plus_one
+            )
+            for row in range(num_well_last_col)
+        ]
+    [
+        reagent_plate.rows()[row][0].load_liquid(liquid=def_ab, volume=vol_ab)
+        for row in range(num_well_last_col, 8)
+    ]
+
+    vol_re = 40 * num_col_total + 40
+    def_block = ctx.define_liquid(
+        name="BLOCKING SOLUTION", description="", display_color="#FFC300"
+    )  # yellow
+    [
+        reagent_plate.rows()[row][1].load_liquid(liquid=def_block, volume=vol_re)
+        for row in range(8)
+    ]
+    # Day 1: Blocking and Primary Ab
+    # ----------------------------
+    block = reagent_plate.rows()[0][1]
+    ab = reagent_plate.rows()[0][0]
+
+    # transfer blocking (uses 1000uL tips we already assigned)
+    transfer(p1k_8, block, rxn_full, VOL_BLOCK)
+    if num_well_last_col:
+        # pairwise remainder: p1k_1 is assigned 1k tipracks too
+        transfer(p1k_1, [block] * len(rxn_remainder), rxn_remainder, VOL_BLOCK)
+
+    if use_lid:
+        cover_plate(ctx, "C4", working_plate)
+    if heat_on_deck:
+        heat_plate(hs, ctx, working_plate, hs_adapter, MIN_BLOCK)
+    if use_lid:
+        remove_lid(ctx, "C4", working_plate)
+
+    # BEFORE discarding, switch the 8-channel pipette to 200 uL tipracks
+    p1k_8.tip_racks = tips_200  # << CHANGED: switch to 200 uL tips for discard
+    discard(ctx, p1k_8, rxn_total, VOL_BLOCK, waste)
+
+    # restore 1000 uL tipracks for transfers
+    p1k_8.tip_racks = tips_1k  # << CHANGED
+    p1k_1.tip_racks = tips_1k  # ensure 1ch still set
+
+    transfer(p1k_8, ab, rxn_full, VOL_AB)
+    if num_well_last_col:
+        transfer(p1k_1, [ab] * len(rxn_remainder), rxn_remainder, VOL_AB)
+
+    # ----------------------------
+    # Day 2: PLA Probe, Ligation, Amplification, DAPI, AF
+    # ----------------------------
+    reagents_day2 = reagent_plate.rows()[0][:5]
+    vols_day2 = [VOL_PROBE, VOL_LIGATION, VOL_AMP, VOL_DAPI, VOL_AF]
+    mins_day2 = [MIN_PROBE, MIN_LIGATION, MIN_AMP, MIN_DAPI, 0]
+
+    for reagent, vol, min_incub in zip(reagents_day2, vols_day2, mins_day2):
+        # transfer reagent -> use 1k tipracks
         p1k_8.tip_racks = tips_1k
         p1k_1.tip_racks = tips_1k
-
-        # ----------------------------
-        # Define wells
-        # ----------------------------
-        rxn_total = working_plate.rows()[0][:num_col_total]
-        rxn_full = working_plate.rows()[0][:num_col_full]
-        rxn_remainder = (
-            working_plate.wells()[
-                num_col_full * 8 : num_col_full * 8 + num_well_last_col
-            ]
-            if num_well_last_col > 0
-            else []
-        )
-        # ----------------------------
-        # Define liquids
-        # ----------------------------
-        vol_ab = 40 * num_col_full + 40
-        vol_ab_plus_one = 40 * (num_col_full + 1) + 40
-        def_ab = ctx.define_liquid(
-            name="ANTIBODY SOLUTION", description="", display_color="#98FB98"
-        )  # green
-        if num_well_last_col > 0:
-            [
-                reagent_plate.rows()[row][0].load_liquid(
-                    liquid=def_ab, volume=vol_ab_plus_one
-                )
-                for row in range(num_well_last_col)
-            ]
-        [
-            reagent_plate.rows()[row][0].load_liquid(liquid=def_ab, volume=vol_ab)
-            for row in range(num_well_last_col, 8)
-        ]
-
-        vol_re = 40 * num_col_total + 40
-        def_block = ctx.define_liquid(
-            name="BLOCKING SOLUTION", description="", display_color="#FFC300"
-        )  # yellow
-        [
-            reagent_plate.rows()[row][1].load_liquid(liquid=def_block, volume=vol_re)
-            for row in range(8)
-        ]
-        # Day 1: Blocking and Primary Ab
-        # ----------------------------
-        block = reagent_plate.rows()[0][1]
-        ab = reagent_plate.rows()[0][0]
-
-        # transfer blocking (uses 1000uL tips we already assigned)
-        transfer(p1k_8, block, rxn_full, VOL_BLOCK)
+        transfer(p1k_8, reagent, rxn_full, vol)
         if num_well_last_col:
-            # pairwise remainder: p1k_1 is assigned 1k tipracks too
-            transfer(p1k_1, [block] * len(rxn_remainder), rxn_remainder, VOL_BLOCK)
+            transfer(p1k_1, [reagent] * len(rxn_remainder), rxn_remainder, vol)
 
         if use_lid:
             cover_plate(ctx, "C4", working_plate)
         if heat_on_deck:
-            heat_plate(hs, ctx, working_plate, hs_adapter, MIN_BLOCK)
+            heat_plate(hs, ctx, working_plate, hs_adapter, min_incub)
         if use_lid:
             remove_lid(ctx, "C4", working_plate)
 
-        # BEFORE discarding, switch the 8-channel pipette to 200 uL tipracks
-        p1k_8.tip_racks = tips_200  # << CHANGED: switch to 200 uL tips for discard
-        discard(ctx, p1k_8, rxn_total, VOL_BLOCK, waste)
-
-        # restore 1000 uL tipracks for transfers
-        p1k_8.tip_racks = tips_1k  # << CHANGED
-        p1k_1.tip_racks = tips_1k  # ensure 1ch still set
-
-        transfer(p1k_8, ab, rxn_full, VOL_AB)
-        if num_well_last_col:
-            transfer(p1k_1, [ab] * len(rxn_remainder), rxn_remainder, VOL_AB)
-
-        # ----------------------------
-        # Day 2: PLA Probe, Ligation, Amplification, DAPI, AF
-        # ----------------------------
-        reagents_day2 = reagent_plate.rows()[0][:5]
-        vols_day2 = [VOL_PROBE, VOL_LIGATION, VOL_AMP, VOL_DAPI, VOL_AF]
-        mins_day2 = [MIN_PROBE, MIN_LIGATION, MIN_AMP, MIN_DAPI, 0]
-
-        for reagent, vol, min_incub in zip(reagents_day2, vols_day2, mins_day2):
-            # transfer reagent -> use 1k tipracks
-            p1k_8.tip_racks = tips_1k
-            p1k_1.tip_racks = tips_1k
-            transfer(p1k_8, reagent, rxn_full, vol)
-            if num_well_last_col:
-                transfer(p1k_1, [reagent] * len(rxn_remainder), rxn_remainder, vol)
-
-            if use_lid:
-                cover_plate(ctx, "C4", working_plate)
-            if heat_on_deck:
-                heat_plate(hs, ctx, working_plate, hs_adapter, min_incub)
-            if use_lid:
-                remove_lid(ctx, "C4", working_plate)
-
-            # discard uses 200uL tips
-            p1k_8.tip_racks = tips_200
-            discard(ctx, p1k_8, rxn_total, vol, waste)
-            ctx.capture_image(filename="end_of_run")
-    except Exception as e:
-        if not ctx.is_simulating():
-            run_helpers.send_slack_error_message_with_attachments(
-                slack_bot, metadata["protocolName"], str(e), length
-            )
-        raise (e)
+        # discard uses 200uL tips
+        p1k_8.tip_racks = tips_200
+        discard(ctx, p1k_8, rxn_total, vol, waste)
+        
+    ctx.capture_image(filename="end_of_run")
