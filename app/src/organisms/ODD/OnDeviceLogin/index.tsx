@@ -46,7 +46,7 @@ export function OnDeviceLogin({
   loginError = null,
   onClearLoginError,
 }: OnDeviceLoginProps): JSX.Element {
-  const { t } = useTranslation(['shared', 'device_settings'])
+  const { t } = useTranslation(['shared', 'access_control'])
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | null
   >(null)
@@ -112,7 +112,7 @@ export function OnDeviceLogin({
     if (confirmPassword !== password) {
       setConfirmPasswordError(
         t('on_device_login_password_mismatch', {
-          ns: 'device_settings',
+          ns: 'access_control',
         }) as string
       )
       return
@@ -138,8 +138,8 @@ export function OnDeviceLogin({
         : confirmPassword.trim() === '' || isAuthLoading
 
   const header = isPasswordResetRequired
-    ? t('on_device_login_new_password', { ns: 'device_settings' })
-    : t('on_device_login', { ns: 'device_settings' })
+    ? t('on_device_login_new_password', { ns: 'access_control' })
+    : t('on_device_login', { ns: 'access_control' })
 
   const primaryButtonLabel =
     step === 'username' || (step === 'password' && isPasswordResetRequired)
