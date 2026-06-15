@@ -99,6 +99,8 @@ def create_protocol_context(
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync
     elif hasattr(hardware_api, "_proxy"):
+        # If this is an Async Client Pyro version of the hardware API, we reconstruct it to
+        # force all the calls to be synchronous, allowing it to be easily used in the SynchronousAdapter
         with Proxy(hardware_api._proxy._pyroUri) as new_proxy:  # type: ignore[no-untyped-call]
             sync_acpo = AsyncClientPyroObject(new_proxy, force_synchronous=True)
             sync_hardware = SynchronousAdapter(sync_acpo)  # type: ignore[arg-type]

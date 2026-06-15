@@ -58,6 +58,10 @@ def AsyncClientPyroObject(
     by the PyroSynchronousObject constructor will be wrapped to be awaitable again. Standard method calls and
     property attributes will be forwarded as usual.
 
+    If `force_synchronous` is set to `True`, we instead keep the async methods `synchronized`. This is useful if
+    the proxy is being used in a situation where async calls need to be made synchronous to begin with. This way
+    we do not need to ping pong back and forth between async and non-async wrapping.
+
     Proxy wrapping Example:
     -------
     An example of this would be with a remote call to an `OT3API` instance which has been wrapped and hosted.
