@@ -36,8 +36,8 @@ export interface UseRobotControlCommandsProps {
   pipetteInfo: PipetteDetails | null
   commands: CreateCommand[]
   continuePastCommandFailure: boolean
-  /* An onSettled callback executed after the deletion of the maintenance run. */
-  onSettled?: () => void
+  /* An onSuccess callback executed after the deletion of the maintenance run. */
+  onSuccess?: () => void
   runStartedAction: DocumentedAction
   runEndedAction: DocumentedAction
 }
@@ -48,7 +48,7 @@ export function useRobotControlCommands({
   pipetteInfo,
   commands,
   continuePastCommandFailure,
-  onSettled,
+  onSuccess,
   runStartedAction,
   runEndedAction,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
@@ -114,17 +114,13 @@ export function useRobotControlCommands({
               console.error(error.message)
             })
             .finally(() =>
-              deleteMaintenanceRun(runId).catch((error: Error) => {
-                console.error(
-                  'Failed to delete maintenance run:',
-                  error.message
-                )
+              deleteMaintenanceRun(runId, {
+                onSuccess: () => {
+                  onSuccess?.()
+                  setIsExecuting(false)
+                },
               })
             )
-            .finally(() => {
-              onSettled?.()
-              setIsExecuting(false)
-            })
         },
         onError: (error: Error) => {
           console.error(error.message)

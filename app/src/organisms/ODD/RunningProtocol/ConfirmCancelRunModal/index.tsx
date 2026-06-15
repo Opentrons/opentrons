@@ -72,9 +72,10 @@ export function ConfirmCancelRunModal({
     stopRun(runId, {
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-      },
-      onSettled: () => {
         dismissAndNavigate()
+      },
+      onError: () => {
+        setIsCanceling(false)
       },
     })
   }
