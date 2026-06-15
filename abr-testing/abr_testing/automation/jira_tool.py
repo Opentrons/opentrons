@@ -8,30 +8,6 @@ from pathlib import Path
 import argparse
 from typing import List, Dict, Any, Tuple
 import os
-from dataclasses import dataclass
-
-
-@dataclass
-class JiraCredentials:
-    """A class containing Jira token and associated email."""
-
-    email: str
-    api_token: str
-
-
-def get_credentials_from_path(credentials_path: Path) -> JiraCredentials:
-    """Load Jira API credentials from a JSON credentials file."""
-    with open(credentials_path) as credentials_file:
-        jira_creds = json.load(credentials_file)
-    email = jira_creds["Jira API"]["email"]
-    api_token = jira_creds["Jira API"]["key"]
-    return JiraCredentials(email, api_token)
-
-
-def get_credentials(storage_directory: str) -> JiraCredentials:
-    """Load Jira credentials from the default file inside a storage directory."""
-    credentials_path = Path(storage_directory) / "jiraCredentials.json"
-    return get_credentials_from_path(credentials_path)
 
 
 class JiraTicket:
