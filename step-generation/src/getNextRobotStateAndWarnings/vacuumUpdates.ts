@@ -134,7 +134,7 @@ export const forVacuumStartRunProfile = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, profile, taskId, ventAfter = true } = params
+  const { moduleId, steps, taskId, ventAfter = true } = params
   const { robotState } = robotStateAndWarnings
   const moduleState = vacuumModuleStateGetter(robotState, moduleId)
   // taskId should not be null, but this is to satisfy type checks
@@ -143,7 +143,7 @@ export const forVacuumStartRunProfile = (
   }
   moduleState.currentPumpActivity = {
     type: 'profile',
-    profileElements: profile,
+    profileElements: steps,
     taskId,
     ventAfter,
   }
