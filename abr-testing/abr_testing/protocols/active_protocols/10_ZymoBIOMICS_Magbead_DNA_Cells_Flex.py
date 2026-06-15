@@ -58,14 +58,16 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     """Protocol Set Up."""
 
     protocol.capture_image(filename="start_of_run")
-    
+
     # Standardized run variables to replace former custom parameters
     heater_shaker_speed = 2000
     mount = "left"
     deactivate_modules_bool = True
     meniscus_z = -0.5
     dry_run = False
-    TIP_TRASH = False  # True = Used tips go in Trash, False = Used tips go back into rack
+    TIP_TRASH = (
+        False  # True = Used tips go in Trash, False = Used tips go back into rack
+    )
 
     res_type = "opentrons_tough_12_reservoir_22ml"
     global m1000_tips
@@ -112,9 +114,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     protocol.load_trash_bin("A3")
 
     # Native Module & Labware Loading
-    h_s: HeaterShakerContext = protocol.load_module(
-        "heaterShakerModuleV1", "D1"
-    )
+    h_s: HeaterShakerContext = protocol.load_module("heaterShakerModuleV1", "D1")
     h_s_adapter = h_s.load_adapter("opentrons_96_deep_well_adapter")
     sample_plate = h_s_adapter.load_labware(deepwell_type, "Samples")
     h_s.close_labware_latch()
@@ -126,11 +126,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     elutionplate = temp_adapter.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Elution Plate"
     )
-    
-    magblock: MagneticBlockContext = protocol.load_module(
-        "magneticBlockV1", "C1"
-    )
-    
+
+    magblock: MagneticBlockContext = protocol.load_module("magneticBlockV1", "C1")
+
     waste_reservoir = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "B3", "Liquid Waste"
     )
@@ -281,11 +279,14 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                 tipcheck(m1000)
             mixing(samples_m[i], m1000, tvol, reps=lysis_rep_2)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
-            
+
         # Native set H-S speed and shake
         h_s.close_labware_latch()
         h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=lysis_incubation, msg=f"Shake at {heater_shaker_speed} rpm for {lysis_incubation} minutes.")
+        protocol.delay(
+            minutes=lysis_incubation,
+            msg=f"Shake at {heater_shaker_speed} rpm for {lysis_incubation} minutes.",
+        )
         h_s.deactivate_shaker()
 
     def bind(vol1: float, vol2: float) -> None:
@@ -327,7 +328,10 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         # Native set H-S speed and shake
         h_s.close_labware_latch()
         h_s.set_and_wait_for_shake_speed(int(heater_shaker_speed * 0.9))
-        protocol.delay(minutes=bind_time_1, msg=f"Shake at {int(heater_shaker_speed * 0.9)} rpm for {bind_time_1} minutes.")
+        protocol.delay(
+            minutes=bind_time_1,
+            msg=f"Shake at {int(heater_shaker_speed * 0.9)} rpm for {bind_time_1} minutes.",
+        )
         h_s.deactivate_shaker()
 
         # Native transfer from H-S plate to Magdeck plate
@@ -375,11 +379,14 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                 samples_m[i], m1000, vol_per_trans, reps=3 if not dry_run else 1
             )
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
-            
+
         # Native set H-S speed and shake
         h_s.close_labware_latch()
         h_s.set_and_wait_for_shake_speed(heater_shaker_speed)
-        protocol.delay(minutes=bind_time_2, msg=f"Shake at {heater_shaker_speed} rpm for {bind_time_2} minutes.")
+        protocol.delay(
+            minutes=bind_time_2,
+            msg=f"Shake at {heater_shaker_speed} rpm for {bind_time_2} minutes.",
+        )
         h_s.deactivate_shaker()
 
         # Native transfer from H-S plate to Magdeck plate
@@ -431,11 +438,14 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                     protocol.comment(f"new wash source {whichwash}")
                     wash_volume_tracker = 0.0
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
-        
+
         # Native set H-S speed and shake
         h_s.close_labware_latch()
         h_s.set_and_wait_for_shake_speed(int(heater_shaker_speed * 0.9))
-        protocol.delay(minutes=wash_time, msg=f"Shake at {int(heater_shaker_speed * 0.9)} rpm for {wash_time} minutes.")
+        protocol.delay(
+            minutes=wash_time,
+            msg=f"Shake at {int(heater_shaker_speed * 0.9)} rpm for {wash_time} minutes.",
+        )
         h_s.deactivate_shaker()
 
         # Native transfer to Magdeck
@@ -467,11 +477,14 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
             m1000.dispense(m1000.current_volume, m.top(-3))
             total_elution_vol += vol * 8
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
-        
+
         # Native set H-S speed and shake
         h_s.close_labware_latch()
         h_s.set_and_wait_for_shake_speed(int(heater_shaker_speed * 0.9))
-        protocol.delay(minutes=wash_time, msg=f"Shake at {int(heater_shaker_speed * 0.9)} rpm for {wash_time} minutes.")
+        protocol.delay(
+            minutes=wash_time,
+            msg=f"Shake at {int(heater_shaker_speed * 0.9)} rpm for {wash_time} minutes.",
+        )
         h_s.deactivate_shaker()
 
         # Native transfer back to magnet
@@ -510,7 +523,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     samples_m = sample_plate.rows()[0][:num_cols]
     elution_samples_m = elutionplate.rows()[0][:num_cols]
     samps = sample_plate.wells()[: (8 * num_cols)]
-    
+
     liquid_vols_and_wells: Dict[str, List[Dict[str, Well | List[Well] | float]]] = {
         "Lysis and PK": [{"well": lysis_, "volume": 12320.0}],
         "Beads and Binding": [{"well": binding_buffer, "volume": 11875.0}],
@@ -519,11 +532,19 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         "Samples": [{"well": samps, "volume": 0.0}],
         "Reagents": [{"well": all_washes, "volume": 9800.0}],
     }
-    
+
     elutionplate.load_empty(elutionplate.wells())
 
-    # Native implementation for mapping and loading custom liquids to the deck 
-    liquid_colors = ["#008000", "#A52A2A", "#00FFFF", "#0000FF", "#800080", "#ADD8E6", "#FF0000"]
+    # Native implementation for mapping and loading custom liquids to the deck
+    liquid_colors = [
+        "#008000",
+        "#A52A2A",
+        "#00FFFF",
+        "#0000FF",
+        "#800080",
+        "#ADD8E6",
+        "#FF0000",
+    ]
     color_index = 0
     for liquid_name, wells_info in liquid_vols_and_wells.items():
         liquid = protocol.define_liquid(
@@ -564,5 +585,5 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         h_s.deactivate_heater()
         h_s.deactivate_shaker()
         temp.deactivate()
-        
+
     protocol.capture_image(filename="end_of_run")
