@@ -22,18 +22,6 @@ if TYPE_CHECKING:
     )
 
 
-# TODO (spp, 2023-06-22: should probably move this to definition)
-"""
-The span of pipettes in X-direction based on number of channels.
-This is needed in order to determine safe tip drop location within a labware.
-"""
-PIPETTE_X_SPAN: Dict[ChannelCount, float] = {
-    1: 75,  # includes a margin
-    8: 75,  # includes a margin
-    96: 161,
-}
-
-
 def model_config() -> PipetteModelSpecs:
     """Load the per-pipette-model config file from within the wheel"""
     return copy.deepcopy(_model_config())
