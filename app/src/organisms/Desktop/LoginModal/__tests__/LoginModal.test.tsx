@@ -9,16 +9,18 @@ import { useOAuth2PasswordLogin } from '/app/resources/auth'
 
 import { showLoginModal } from '..'
 
-import type {
-  AuthUser,
-  HostConfig,
-  OAuth2TokenResponse,
-} from '@opentrons/api-client'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('/app/resources/access-control/useStoreLoginState')
 vi.mock('/app/resources/auth')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn(() => null),
+}))
+vi.mock('/app/redux/robot-auth', () => ({
+  useAccessTokenForRobot: vi.fn(() => null),
+}))
 
-const MOCK_HOST: HostConfig = { hostname: 'otie.local' }
+const ROBOT_NAME = 'otie'
 
 const TOKEN_RESPONSE: OAuth2TokenResponse = {
   access_token: 'new-access-token',
@@ -42,7 +44,7 @@ const renderAndOpenLoginModal = (): void => {
       <button
         type="button"
         onClick={() => {
-          showLoginModal({ host: MOCK_HOST })
+          showLoginModal({ robotName: ROBOT_NAME })
         }}
       >
         Open login modal
@@ -121,7 +123,11 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'secret-password')
-    expect(storeLoginState).toHaveBeenCalledWith('alice', TOKEN_RESPONSE)
+    expect(storeLoginState).toHaveBeenCalledWith(
+      ROBOT_NAME,
+      'alice',
+      TOKEN_RESPONSE
+    )
     expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
   })
 

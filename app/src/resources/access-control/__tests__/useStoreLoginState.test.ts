@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -11,7 +11,6 @@ vi.mock('react-redux', async importOriginal => {
   return {
     ...(actual as Record<string, unknown>),
     useDispatch: vi.fn(),
-    useSelector: vi.fn(),
   }
 })
 
@@ -22,18 +21,16 @@ describe('useStoreLoginState', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(now)
+    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
   })
 
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('dispatches a login action with values from the response, and a computed expiresAt', () => {
-    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
-    vi.mocked(useSelector).mockReturnValue('local-robot')
-
+  it('dispatches a login action for the given robot, with a computed expiresAt', () => {
     const { result } = renderHook(() => useStoreLoginState())
-    result.current('test-user', {
+    result.current('remote-robot', 'test-user', {
       token_type: 'Bearer',
       access_token: 'access-token',
       refresh_token: 'refresh-token',
@@ -43,7 +40,7 @@ describe('useStoreLoginState', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       logIn({
         username: 'test-user',
-        robotName: 'local-robot',
+        robotName: 'remote-robot',
         accessToken: 'access-token',
         refreshToken: 'refresh-token',
         expiresAt: now + 3600 * 1000,
@@ -53,12 +50,9 @@ describe('useStoreLoginState', () => {
     vi.useRealTimers()
   })
 
-  it("does not dispatch when local robot can't be identified", () => {
-    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
-    vi.mocked(useSelector).mockReturnValue(null)
-
+  it('does not dispatch when the robot name is null', () => {
     const { result } = renderHook(() => useStoreLoginState())
-    result.current('test-user', {
+    result.current(null, 'test-user', {
       token_type: 'Bearer',
       access_token: 'access-token',
     })
@@ -67,11 +61,8 @@ describe('useStoreLoginState', () => {
   })
 
   it('does not dispatch when token type is not Bearer', () => {
-    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
-    vi.mocked(useSelector).mockReturnValue('local-robot')
-
     const { result } = renderHook(() => useStoreLoginState())
-    result.current('test-user', {
+    result.current('remote-robot', 'test-user', {
       token_type: 'Basic',
       access_token: 'access-token',
     })
