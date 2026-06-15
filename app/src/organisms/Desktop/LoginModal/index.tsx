@@ -145,7 +145,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   }
 
   const handleConfirmPasswordBlur = (): void => {
-    if (newPassword.trim() !== '' && confirmPassword.trim() !== '') {
+    if (newPassword !== '' && confirmPassword !== '') {
       validateConfirmPasswordMatch()
     }
   }

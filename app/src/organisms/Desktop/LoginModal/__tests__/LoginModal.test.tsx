@@ -281,4 +281,21 @@ describe('LoginModal', () => {
 
     screen.getByText('Passwords do not match.')
   })
+
+  it('shows a mismatch error on blur when confirm password is whitespace-only', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.change(screen.getByLabelText('New password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Confirm password'), {
+      target: { value: '   ' },
+    })
+    fireEvent.blur(screen.getByLabelText('Confirm password'))
+
+    screen.getByText('Passwords do not match.')
+  })
 })
