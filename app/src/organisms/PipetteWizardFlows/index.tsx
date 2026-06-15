@@ -275,12 +275,10 @@ export const PipetteWizardFlows = (
     }
   }
   const handleClose = (): void => {
-    if (onComplete != null) {
-      onComplete()
-    }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
     } else {
+      onComplete?.()
       closeFlow()
     }
   }
@@ -290,7 +288,10 @@ export const PipetteWizardFlows = (
       deletionDocState,
       [...actionsToDocument, deleteRunAction],
       {
-        onSuccess: closeFlow,
+        onSuccess: () => {
+          onComplete?.()
+          closeFlow()
+        },
         onError: () => {
           setIsExiting(false)
         },
