@@ -370,10 +370,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
 
   // check compatibility of stack to move to
   if (parentSlotForSlotCompatibility != null) {
-    const largestStackInSlot = getLargestStackInSlot(
-      prevRobotState.labware,
-      parentSlotForSlotCompatibility
-    )
+    const largestStackInSlot = getLargestStackInSlot({
+      slot: parentSlotForSlotCompatibility,
+      labwareState: prevRobotState.labware,
+      modulesState: prevRobotState.modules,
+    })
 
     const slot = getSlotInLocationStack(largestStackInSlot)
     const { isCompatible, isAboveStackLimit } = getIsLabwareCompatibleWithStack(
