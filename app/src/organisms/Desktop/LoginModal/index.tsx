@@ -115,7 +115,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const isLoginDisabled =
     username === '' || logInPassword === '' || isAuthLoading
-  const isPasswordExpiredDisabled =
+  const isSetNewPasswordDisabled =
     newPassword === '' ||
     confirmPassword === '' ||
     isSetNewPasswordLoading ||
@@ -144,7 +144,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     submitNewPassword(loggedInUsername, newPassword)
   }
 
-  const handleConfirmPasswordBlur = (): void => {
+  const handleSetNewPasswordFieldBlur = (): void => {
     if (newPassword !== '' && confirmPassword !== '') {
       validateConfirmPasswordMatch()
     }
@@ -195,7 +195,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       ) : (
         <PrimaryButton
           onClick={handleConfirmNewPasswordSubmit}
-          disabled={isPasswordExpiredDisabled}
+          disabled={isSetNewPasswordDisabled}
         >
           {t('shared:confirm')}
         </PrimaryButton>
@@ -233,7 +233,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
             confirmPasswordError={confirmPasswordError}
             onNewPasswordChange={handleNewPasswordChange}
             onConfirmPasswordChange={handleConfirmPasswordChange}
-            onConfirmPasswordBlur={handleConfirmPasswordBlur}
+            onPasswordFieldBlur={handleSetNewPasswordFieldBlur}
           />
         )}
       </div>
@@ -329,7 +329,7 @@ interface PasswordExpiredViewProps {
   confirmPasswordError: string | null
   onNewPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
-  onConfirmPasswordBlur: () => void
+  onPasswordFieldBlur: () => void
 }
 
 function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
@@ -340,7 +340,7 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
     confirmPasswordError,
     onNewPasswordChange,
     onConfirmPasswordChange,
-    onConfirmPasswordBlur,
+    onPasswordFieldBlur,
   } = props
   const { t } = useTranslation()
 
@@ -367,6 +367,9 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
           onChange={event => {
             onNewPasswordChange(event.target.value)
           }}
+          onBlur={() => {
+            onPasswordFieldBlur()
+          }}
         />
         <InputField
           name="confirmPassword"
@@ -380,7 +383,7 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
             onConfirmPasswordChange(event.target.value)
           }}
           onBlur={() => {
-            onConfirmPasswordBlur()
+            onPasswordFieldBlur()
           }}
         />
       </div>
