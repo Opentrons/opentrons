@@ -33,6 +33,7 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
+  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -103,14 +104,7 @@ export function ProtocolSetupLabware({
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
-    .filter(([key]) => key !== 'offDeck')
-    .flatMap(([location, stacks]) =>
-      stacks
-        .filter(stack => stack.some(item => 'labwareId' in item))
-        .map(stack => ({ location, stack }))
-    )
-    .sort((a, b) => a.location.localeCompare(b.location))
+  const sortedStartingDeckEntries = getSortedStartingDeckEntries(startingDeck)
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null

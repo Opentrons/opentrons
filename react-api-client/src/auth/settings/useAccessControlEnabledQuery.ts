@@ -23,7 +23,15 @@ export function useAccessControlEnabledQuery(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery<AccessControlEnabledSettingsResponse, AxiosError>(
     getQueryKey(host, 'auth', 'settings', 'accessControlEnabled'),
-    () => getAccessControlEnabled(host!).then(response => response.data),
+    () =>
+      getAccessControlEnabled(host!)
+        .then(() => ({ data: { accessControlEnabled: true } }))
+        .catch((error: AxiosError) => {
+          if (error.response?.status === 404) {
+            return { data: { accessControlEnabled: false } }
+          }
+          throw error
+        }),
     { enabled: host !== null, ...options }
   )
 

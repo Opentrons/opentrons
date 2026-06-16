@@ -12,6 +12,7 @@ import {
   getLabwareInfoByLiquidId,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
+  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
   VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
   VACUUM_MODULE_TYPE,
@@ -62,14 +63,8 @@ export function SetupLabwareList(
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     protocolAnalysis?.commands ?? []
   )
-  const sortedStartingDeckEntries = Object.entries(startingDeck)
-    .filter(([key]) => key !== 'offDeck')
-    .flatMap(([location, stacks]) =>
-      stacks
-        .filter(stack => stack.some(item => 'labwareId' in item))
-        .map(stack => ({ location, stack }))
-    )
-    .sort((a, b) => a.location.localeCompare(b.location))
+
+  const sortedStartingDeckEntries = getSortedStartingDeckEntries(startingDeck)
   const vacuumDockSlotName = getSlotDisplayNameFromAAWithFakes(
     VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
   )
@@ -116,7 +111,7 @@ export function SetupLabwareList(
             key={`${location}_${index}`}
             attachedModuleInfo={attachedModuleInfo}
             extraAttentionModules={extraAttentionModules}
-            isFlex={isFlex}
+            isFlex
             slotName={location}
             stackedItems={stack}
             labwareByLiquidId={labwareByLiquidId}
