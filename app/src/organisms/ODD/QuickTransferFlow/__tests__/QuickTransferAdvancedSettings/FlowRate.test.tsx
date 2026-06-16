@@ -9,10 +9,10 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 
+import type { Mock } from 'vitest'
 import type { ChangeEvent, ComponentProps } from 'react'
 import type { TrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import type { QuickTransferSummaryState } from '../../types'
-import type { Mock } from 'vitest'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
