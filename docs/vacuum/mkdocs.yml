@@ -4,7 +4,7 @@ nav:
   - Opentrons Vacuum Module GEN1 Instruction Manual: index.md
   - Safety and Compliance: compliance.md
   - Product Specifications: specifications.md
-  - Collars and Spacers: collars-spacers.md
+  - Vacuum Base, Collars, and Spacers: base-collars-spacers.md
   - Installing the Vacuum Module: installation.md
   - Maintenance and Cleaning: maintenance.md
   - Vacuum Module G-Codes:
