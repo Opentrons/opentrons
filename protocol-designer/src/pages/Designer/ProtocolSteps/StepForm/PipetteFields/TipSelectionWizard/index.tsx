@@ -115,6 +115,7 @@ export function TipSelectionWizard(
     nozzles,
     labwareEntities,
     validTiprackIds,
+    labwareRobotState: activeDeckSetup.labware,
   })
 
   const isSelectedTiprackValid =
@@ -126,6 +127,7 @@ export function TipSelectionWizard(
       nozzles,
       labwareEntities,
       validTiprackIds,
+      labwareRobotState: activeDeckSetup.labware,
     })
   const isAnySelectedWellTooManyPickups = selectedTips.some(group => {
     const primaryWell = group[0]

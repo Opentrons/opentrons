@@ -13,11 +13,13 @@ import {
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_V1_FIXTURE,
   getDeckDefFromRobotType,
+  getIsLid,
   getIsTiprack,
   getLabwareDefURI,
   getMaxPoolCount,
   getMmFromBottom,
   getWellNamePerMultiTip,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   linearInterpolate,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -54,7 +56,7 @@ import {
   ZERO_OFFSET,
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
-import { reduceCommandCreators, uuid } from './index'
+import { OFF_DECK, reduceCommandCreators, uuid } from './index'
 
 import type {
   ActiveNozzleNumber,
@@ -1605,4 +1607,27 @@ export const getIsSpaceInHopper = (
   const labwareStored = stackerState?.labwareInHopper
   const numberOfLabwareStored = labwareStored?.length ?? 0
   return maximumAllowedLabware > numberOfLabwareStored
+}
+
+export const getLabwareHasLid = (args: {
+  labwareId: string
+  labwareRobotState: RobotState['labware']
+  labwareEntities: LabwareEntities
+}): boolean => {
+  const { labwareId, labwareRobotState, labwareEntities } = args
+  return Object.entries(labwareRobotState).some(
+    ([id, { stackedOnNode }]) =>
+      typeof stackedOnNode === 'object' &&
+      'labwareId' in stackedOnNode &&
+      stackedOnNode.labwareId === labwareId &&
+      getIsLid(labwareEntities[id].def)
+  )
+}
+
+export const getIsInPipettableLocation = (location: string): boolean => {
+  return ![
+    OFF_DECK,
+    GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+    ...COLUMN_4_SLOTS,
+  ].some(badLocation => location === badLocation)
 }
