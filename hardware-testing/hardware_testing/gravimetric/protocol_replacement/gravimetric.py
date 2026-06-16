@@ -48,6 +48,10 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     clear_pipette_ul_per_mm,
 )
 
+from hardware_testing.drivers.data_center_client import (
+    upload_data_to_google_drive,
+)
+
 # ------ TODO remove and move necessary libraries into a standard release library. ----
 import importlib
 import os
@@ -96,9 +100,6 @@ if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
 # ----- END: TODO ------
 
 
-from hardware_testing.scripts.data_center_client import (  # noqa: E402
-    upload_data_to_google_drive,
-)
 from hardware_testing.gravimetric.measurement import (  # noqa: E402
     create_measurement_tag,
     record_measurement_data,
