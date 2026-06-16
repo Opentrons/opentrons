@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { SelectField } from '@opentrons/components'
@@ -54,15 +53,10 @@ export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
     fieldState
   )
 
-  const noneText = t('shared:none')
-  const wpa2PersonalText = t('wpa2_personal')
-  const allSecurityOptions = useMemo(
-    () => [
-      { options: [{ value: SECURITY_NONE, label: noneText }] },
-      { options: [{ value: SECURITY_WPA_PSK, label: wpa2PersonalText }] },
-    ],
-    [noneText, wpa2PersonalText]
-  )
+  const allSecurityOptions = [
+    { options: [{ value: SECURITY_NONE, label: t('shared:none') }] },
+    { options: [{ value: SECURITY_WPA_PSK, label: t('wpa2_personal') }] },
+  ]
 
   const options = [
     ...(showAllOptions ? allSecurityOptions : []),
