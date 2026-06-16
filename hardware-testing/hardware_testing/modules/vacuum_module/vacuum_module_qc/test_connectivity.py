@@ -18,7 +18,6 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return [
         CSVLine("usb-get-device-info", [str, str, str, CSVResult]),
         CSVLine("eeprom-set-serial-number", [str, str, CSVResult]),
-        CSVLine("led-blinking", [bool, CSVResult]),
     ]
 
 
