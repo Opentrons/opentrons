@@ -2,7 +2,7 @@
 title: "Vacuum Module: Product Specifications"
 ---
 
-![Labeled parts placeholder](images/vacuum-module-labels.png)
+![Vacuum Module illustration showing main parts with brief labels](images/vacuum-module-labels.png)
 
 ## Vacuum Module parts
 
@@ -51,7 +51,7 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 
 ### Unnamed box 2
 
-Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and data cables.
+Unnamed box 2 includes the Control Box (vacuum pump), a deck adapter (and screws), a region-specific power cable, and a USB A-B data cable.
 
 <div class="parts-list" markdown>
 
@@ -59,6 +59,15 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 ![Control Box, vacuum pump and electronics](images/pump-unit.png "Control Box includes pump and electronics")
 <figcaption>(1) Control Box</figcaption>
 </figure>
+
+<figure markdown>
+![Deck plate adapter](images/deck-adapter.png" Deck plate adapter")
+<figcaption>(1) Deck adapter</figcaption>
+</figure>
+
+</div>
+
+<div class="parts-list" markdown>
 
 <figure markdown>
 ![USB A-to-B cable](images/usb-ab-cable.png "USB A-to-B cable")
@@ -70,10 +79,9 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 <figcaption>(1) IEC power cable</figcaption>
 </figure>
 
-<figure markdown>
-![Deck plate adapter](images/deck-adapter.png" Deck plate adapter")
-<figcaption>(1) Deck adapter</figcaption>
-</figure>
+</div>
+
+<div class="parts-list" markdown>
 
 <figure markdown>
 ![Spare deck plate screws, M4 x 10](images/deck-screws.png "Spare deck plate screws"){ width="50%" }
@@ -84,18 +92,18 @@ Unnamed box 2 includes the vacuum pump, deck adapter hardware, and power and dat
 
 ### Unnamed box 3
 
-Unnamed box 3 includes items that connect the manifold to the waste collection carboy.
+Unnamed box 3 includes the waste collection jar and cap, a stabilization cradle, along with the hoses and couplings that connect the deck pieces and jar to the vacuum pump in the Control Box.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Glass carboy and cap, for waste collection](images/carboy.png "Glass carboy and cap, for waste collection"){ width="70%" }
-<figcaption>(1) Carboy and cap, 2 liter</figcaption>
+![Glass 2 liter waste jar and cap](images/waste-jar.png "2 liter glass waste jar and cap"){ width="70%" }
+<figcaption>(1) Waste jar and cap, 2 liter</figcaption>
 </figure>
 
 <figure markdown>
-![Carboy cradle](images/carboy-cradle.png "Carboy cradle")
-<figcaption>(1) Carboy cradle</figcaption>
+![Carboy cradle](images/waste-jar-cradle.png "Waste jar cradle")
+<figcaption>(1) Waste jar cradle</figcaption>
 </figure>
 
 </div>
