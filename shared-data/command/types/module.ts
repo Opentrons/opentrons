@@ -44,6 +44,12 @@ export type ModuleRunTimeCommand =
   | FlexStackerSetStoredLabwareRunTimeCommand
   | FlexStackerStoreRunTimeCommand
   | IdentifyModuleRunTimeCommand
+  | VacuumModuleSetTargetPressureRunTimeCommand
+  | VacuumModuleSetTargetPowerRunTimeCommand
+  | VacuumModuleStopPumpRunTimeCommand
+  | VacuumModuleOpenVentRunTimeCommand
+  | VacuumModuleCloseVentRunTimeCommand
+  | VacuumModuleStartRunProfileRunTimeCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
@@ -746,4 +752,29 @@ export interface VacuumModuleCloseVentCreateCommand extends CommonCommandCreateI
 export interface VacuumModuleStartRunProfileCreateCommand extends CommonCommandCreateInfo {
   commandType: 'vacuumModule/startRunProfile'
   params: VacuumRunProfileParams
+}
+
+export interface VacuumModuleSetTargetPressureRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleSetTargetPressureCreateCommand {
+  result?: any
+}
+export interface VacuumModuleSetTargetPowerRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleSetTargetPowerCreateCommand {
+  result?: any
+}
+export interface VacuumModuleStopPumpRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleStopPumpCreateCommand {
+  result?: any
+}
+export interface VacuumModuleOpenVentRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleOpenVentCreateCommand {
+  result?: any
+}
+export interface VacuumModuleCloseVentRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleCloseVentCreateCommand {
+  result?: any
+}
+export interface VacuumModuleStartRunProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleStartRunProfileCreateCommand {
+  result?: any
 }
