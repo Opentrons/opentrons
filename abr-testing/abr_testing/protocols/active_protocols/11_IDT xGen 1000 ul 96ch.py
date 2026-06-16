@@ -11,7 +11,7 @@ from opentrons.protocol_api.module_contexts import (
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 metadata = {
-    "protocolName": "IDT xGen 96x v9 ",
+    "protocolName": "IDT xGen 96x v9 ABR FOLDER OFF",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }
