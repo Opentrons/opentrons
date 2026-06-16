@@ -510,12 +510,12 @@ class RunOrchestratorStore:
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get the current nozzle map keyed by pipette id."""
-        assert self._nozzle_maps
+        assert self._nozzle_maps is not None
         return self._nozzle_maps
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        assert self._tip_attached
+        assert self._tip_attached is not None
         return self._tip_attached
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
@@ -524,16 +524,16 @@ class RunOrchestratorStore:
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get the current (if any) Flex Stacker Substates keyed by modile id."""
-        return self.run_coordinator.get_flex_stacker_substate()
+        assert self._flex_stacker_substate is not None
+        return self._flex_stacker_substate
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the current running command, if any."""
-        assert self._current_command
         return self._current_command
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
-        return self.run_coordinator.get_most_recently_finalized_command()
+        return self._most_recent_finalized_command
 
     def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
@@ -705,21 +705,21 @@ class RunOrchestratorStore:
 
     def update_engine_status_callback(self, event: EngineEventNotification) -> None:
         """Handle protocol engine status updates for the run orchestrator store."""
-        if isinstance(event, EngineEventNotification.NOZZLE_CONFIG):
+        _log.info(f"Handling engine status event: {event}")
+        if event is EngineEventNotification.NOZZLE_CONFIG:
             self._nozzle_maps = self.run_coordinator.get_nozzle_maps()
 
-        if isinstance(event, EngineEventNotification.TIP_ATTACHED):
+        if event is EngineEventNotification.TIP_ATTACHED:
             self._tip_attached = self.run_coordinator.get_tip_attached()
 
-        if isinstance(event, EngineEventNotification.CURRENT_COMMAND):
+        if event is EngineEventNotification.CURRENT_COMMAND:
             self._current_command = self.run_coordinator.get_current_command()
 
-        if isinstance(event, EngineEventNotification.FINALIZED_COMMAND):
+        if event is EngineEventNotification.FINALIZED_COMMAND:
             self._most_recent_finalized_command = (
                 self.run_coordinator.get_most_recently_finalized_command()
             )
-
-        if isinstance(event, EngineEventNotification.FLEX_STACKER_SUBSTATE):
+        if event is EngineEventNotification.FLEX_STACKER_SUBSTATE:
             self._flex_stacker_substate = (
                 self.run_coordinator.get_flex_stacker_substate()
             )

@@ -53,6 +53,9 @@ from opentrons.hardware_control.types import (
     SubsystemConnectionNotification,
     SubSystemState,
 )
+from opentrons.hardware_control.types import (
+    SubSystem as HwSubSystem,
+)
 from opentrons.protocol_engine import DeckType
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
@@ -87,7 +90,8 @@ if TYPE_CHECKING:
 
 
 PostInitCallback = Tuple[
-    Callable[[AppState, HardwareControlAPI], Awaitable[None]], bool
+    Callable[[AppState, HardwareControlAPI, "HardwareStateStore"], Awaitable[None]],
+    bool,
 ]
 """Function to be called when hardware init completes.
     - First item is the callback
@@ -129,10 +133,11 @@ class HardwareStateStore:
         if ff.hardware_subprocess_enabled():
             self._hardware_resource = hardware_resource
             # In subprocess mode a proxy-safe callback is registered after initialization
+            self._unregister_hw_callback = None
         else:
             assert isinstance(hardware_resource, ThreadManager)
             self._hardware_resource = hardware_resource.wrapped()
-            self._hardware_resource.register_callback(
+            self._unregister_hw_callback = self._hardware_resource.register_callback(
                 self.update_hardware_status_callback
             )
 
@@ -140,7 +145,7 @@ class HardwareStateStore:
         self._attached_modules: List[AbstractModule] = (
             self._hardware_resource.attached_modules
         )
-        self._attached_subsystems: Dict[SubSystem, SubSystemState] = (
+        self._attached_subsystems: Dict[HwSubSystem, SubSystemState] = (
             self._hardware_resource.attached_subsystems
         )
         self._estop_state: EstopState = self._hardware_resource.get_estop_state()
@@ -148,6 +153,7 @@ class HardwareStateStore:
 
     def update_hardware_status_callback(self, event: HardwareEvent) -> None:
         """Callback to update the Hardware State Store when changes occur on the hardware resource."""
+        log.info(f"Handling hardware status event: {event}")
         if isinstance(event, ModuleConnectedNotification) or isinstance(
             event, ModuleDisconnectedNotification
         ):
@@ -163,7 +169,18 @@ class HardwareStateStore:
         self, proxy_callback: HardwareEventHandler
     ) -> None:
         """Register a proxy of the hardware status callback to a remote Hardware API."""
-        self._hardware_resource.register_callback(proxy_callback)
+        if self._unregister_hw_callback is None:
+            self._unregister_hw_callback = self._hardware_resource.register_callback(
+                proxy_callback
+            )
+        else:
+            raise ValueError(
+                "Hardware State Store unregister callback should not be set ahead of proxy registration."
+            )
+
+    def unregister_hardware_callback(self) -> None:
+        assert self._unregister_hw_callback is not None
+        self._unregister_hw_callback()
 
     @property
     def attached_modules(self) -> List[AbstractModule]:
@@ -171,7 +188,7 @@ class HardwareStateStore:
         return self._attached_modules
 
     @property
-    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
+    def attached_subsystems(self) -> Dict[HwSubSystem, SubSystemState]:
         """Return a list of all currently-attached modules."""
         return self._attached_subsystems
 
@@ -185,7 +202,9 @@ class HardwareStateStore:
         return self._estop_state
 
 
-def get_hardware_state_store(app_state: AppState) -> HardwareStateStore:
+def get_hardware_state_store(
+    app_state: Annotated[AppState, Depends(get_app_state)],
+) -> HardwareStateStore:
     """Get the Hardware State Store as a route dependency."""
     hardware_state_store = _hw_state_store_accessor.get_from(app_state)
     if hardware_state_store is not None:
@@ -519,6 +538,7 @@ async def _postinit_ot2_tasks(
     hardware: ThreadManagedHardware,
     app_state: AppState,
     callbacks: Iterable[PostInitCallback],
+    hardware_store: HardwareStateStore,
 ) -> None:
     """Tasks to run on an initialized OT-2 before it is ready to use."""
     try:
@@ -526,7 +546,8 @@ async def _postinit_ot2_tasks(
     finally:
         for callback in callbacks:
             if not callback[1]:
-                await callback[0](app_state, hardware.wrapped())
+                # NOTE: Hardware State Store is not used on OT-2, no-ops on pass
+                await callback[0](app_state, hardware.wrapped(), hardware_store)
 
 
 async def _home_on_boot(hardware: HardwareControlAPI) -> None:
@@ -574,6 +595,7 @@ async def _postinit_ot3_tasks(
     hardware_resource: ThreadManagedHardware | HardwareControlAPI,
     app_state: AppState,
     callbacks: Iterable[PostInitCallback],
+    hardware_store: HardwareStateStore,
 ) -> None:
     """Tasks to run on an initialized OT-3 before it is ready to use."""
     update_manager = await get_firmware_update_manager(
@@ -593,10 +615,12 @@ async def _postinit_ot3_tasks(
             if not callback[1]:
                 if ff.hardware_subprocess_enabled():
                     # In subprocess mode, hardware resource is a direct HardwareControlAPI
-                    await callback[0](app_state, hardware_resource)
+                    await callback[0](app_state, hardware_resource, hardware_store)
                 else:
                     assert isinstance(hardware_resource, ThreadManager)
-                    await callback[0](app_state, hardware_resource.wrapped())
+                    await callback[0](
+                        app_state, hardware_resource.wrapped(), hardware_store
+                    )
 
     except Exception:
         log.exception("Hardware initialization failure")
@@ -746,12 +770,20 @@ async def _initialize_hardware_api(
 
         if should_use_ot3():
             postinit_task = asyncio.create_task(
-                _wrap_postinit(_postinit_ot3_tasks(hardware, app_state, callbacks))
+                _wrap_postinit(
+                    _postinit_ot3_tasks(
+                        hardware, app_state, callbacks, hardware_state_store
+                    )
+                )
             )
         else:
             assert isinstance(hardware, ThreadManager)
             postinit_task = asyncio.create_task(
-                _wrap_postinit(_postinit_ot2_tasks(hardware, app_state, callbacks))
+                _wrap_postinit(
+                    _postinit_ot2_tasks(
+                        hardware, app_state, callbacks, hardware_state_store
+                    )
+                )
             )
 
         postinit_task.add_done_callback(_postinit_done_handler)

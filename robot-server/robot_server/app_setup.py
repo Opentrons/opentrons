@@ -80,9 +80,16 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 (start_light_control_task, True),
                 (mark_light_control_startup_finished, False),
                 # OT-2 light control:
-                (lambda _app_state, hw_api: blinker.start_blinking(hw_api), True),
                 (
-                    lambda _app_state, _hw_api: blinker.mark_hardware_init_complete(),
+                    lambda _app_state, hw_api, _hw_store: blinker.start_blinking(
+                        hw_api
+                    ),
+                    True,
+                ),
+                (
+                    lambda _app_state,
+                    _hw_api,
+                    _hw_store: blinker.mark_hardware_init_complete(),
                     False,
                 ),
             ],
@@ -121,10 +128,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Register the hardware state callback for pyro
         # Must happen after completing both the hardware API initialization and the pyro resource setup
-        if ff.hardware_subprocess_enabled:
+        if ff.hardware_subprocess_enabled():
             hardware_store = get_hardware_state_store(app.state)
             register_hardware_state_store_to_pyro_resource(
-                hardware_store=hardware_store
+                app_state=app.state, hardware_store=hardware_store
             )
             pyro_resource_proxy = get_pyro_resource()
             hardware_store.register_proxy_hardware_status_callback(

@@ -259,8 +259,11 @@ class RobotServerPyroResource:
             def run_hardware_event_update_from_hardware_thread(
                 event: HardwareEvent,
             ) -> None:
+                async def _async_call(event: HardwareEvent) -> None:
+                    hardware_store.update_hardware_status_callback(event)
+
                 asyncio.run_coroutine_threadsafe(
-                    hardware_store.update_hardware_status_callback(event),
+                    _async_call(event),
                     self._loop,
                 )
 
@@ -271,7 +274,7 @@ class RobotServerPyroResource:
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
-    def get_engine_updates_callback(self) -> Callable[[], None] | None:
+    def get_engine_updates_callback(self) -> Callable[[EngineEventNotification], None]:
         """Create a callback for protocol engine events during a Run.
 
         The returned callback is meant to alert the robot server process to engine state updates.
@@ -282,8 +285,11 @@ class RobotServerPyroResource:
             def run_engine_event_update_from_engine_thread(
                 event: EngineEventNotification,
             ) -> None:
+                async def _async_call(event: EngineEventNotification) -> None:
+                    orchestrator_store.update_engine_status_callback(event)
+
                 asyncio.run_coroutine_threadsafe(
-                    orchestrator_store.update_engine_status_callback(event),
+                    _async_call(event),
                     self._loop,
                 )
 

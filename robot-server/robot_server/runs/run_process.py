@@ -47,7 +47,10 @@ from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
 )
-from opentrons.protocol_engine.types.execution import PostRunHardwareState
+from opentrons.protocol_engine.types.execution import (
+    EngineEventNotification,
+    PostRunHardwareState,
+)
 from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
@@ -96,6 +99,7 @@ def register_process_types() -> None:
             EngineStatus,
             ParseMode,
             PostRunHardwareState,
+            EngineEventNotification,
         ]:
             OpentronsPyroSerializer.register_enum(enum_type)
         for hardware_module_model in get_args(HardwareModuleModel):
