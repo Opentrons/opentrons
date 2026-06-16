@@ -27,7 +27,65 @@ import {
 
 import styles from './loginmodal.module.css'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+
+interface LoginFormState {
+  username: string
+  logInPassword: string
+  error: string | null
+}
+
+interface SetNewPasswordFormState {
+  username: string
+  newPassword: string
+  confirmPassword: string
+  confirmPasswordError: string | null
+  error: string | null
+}
+
+type LoginModalScreen =
+  | { kind: 'login'; formData: LoginFormState }
+  | { kind: 'forgotPassword'; formData: LoginFormState }
+  | { kind: 'setNewPassword'; formData: SetNewPasswordFormState }
+
+const INITIAL_LOGIN_FORM: LoginFormState = {
+  username: '',
+  logInPassword: '',
+  error: null,
+}
+
+function setNewPasswordStateForm(username: string): SetNewPasswordFormState {
+  return {
+    username,
+    newPassword: '',
+    confirmPassword: '',
+    confirmPasswordError: null,
+    error: null,
+  }
+}
+
+function updateLoginFormData(
+  setScreen: Dispatch<SetStateAction<LoginModalScreen>>,
+  updates: Partial<LoginFormState>
+): void {
+  setScreen(prev => {
+    if (prev.kind !== 'login') return prev
+    return { kind: 'login', formData: { ...prev.formData, ...updates } }
+  })
+}
+
+function updateSetNewPasswordFormData(
+  setScreen: Dispatch<SetStateAction<LoginModalScreen>>,
+  updates: Partial<SetNewPasswordFormState>
+): void {
+  setScreen(prev => {
+    if (prev.kind !== 'setNewPassword') return prev
+    return {
+      kind: 'setNewPassword',
+      formData: { ...prev.formData, ...updates },
+    }
+  })
+}
 
 interface LoginModalProps {
   robotName: string /** Which robot to log in to. */
@@ -61,18 +119,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { robotName } = props
   const modal = useModal()
   const { t } = useTranslation()
-  const [view, setView] = useState<
-    'login' | 'forgotPassword' | 'passwordExpired'
-  >('login')
-  const [username, setUsername] = useState('')
-  const [logInPassword, setLogInPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [confirmPasswordError, setConfirmPasswordError] = useState<
-    string | null
-  >(null)
-  const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
-  const [loginError, setLoginError] = useState<string | null>(null)
+  const [screen, setScreen] = useState<LoginModalScreen>({
+    kind: 'login',
+    formData: INITIAL_LOGIN_FORM,
+  })
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
@@ -83,13 +133,13 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (successfulUsername, user, response) => {
-      setLoginError(null)
       storeLoginState(robotName, successfulUsername, response)
 
       if (user.resetPassword) {
-        setLoggedInUsername(successfulUsername)
-        setConfirmPasswordError(null)
-        setView('passwordExpired')
+        setScreen({
+          kind: 'setNewPassword',
+          formData: setNewPasswordStateForm(successfulUsername),
+        })
         return
       }
 
@@ -97,143 +147,145 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       modal.remove()
     },
     onError: message => {
-      setLoginError(message)
+      updateLoginFormData(setScreen, { error: message })
     },
   })
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
       onSuccess: (successfulUsername, response) => {
-        setLoginError(null)
         storeLoginState(robotName, successfulUsername, response)
         modal.remove()
       },
       onError: message => {
-        setLoginError(message)
+        updateSetNewPasswordFormData(setScreen, { error: message })
       },
     })
 
-  const isLoginDisabled =
-    username === '' || logInPassword === '' || isAuthLoading
-  const isSetNewPasswordDisabled =
-    newPassword === '' ||
-    confirmPassword === '' ||
-    isSetNewPasswordLoading ||
-    loggedInUsername == null
-
-  const handleSubmit: ComponentProps<'form'>['onSubmit'] = event => {
+  const handleLoginSubmit: ComponentProps<'form'>['onSubmit'] = event => {
     event.preventDefault()
+    if (screen.kind !== 'login') return
+    const { username, logInPassword } = screen.formData
     submitPassword(username, logInPassword)
   }
 
-  const validateConfirmPasswordMatch = (): boolean => {
-    if (newPassword !== confirmPassword) {
-      setConfirmPasswordError(
-        t('access_control:desktop_password_expired_mismatch') as string
-      )
+  const validateConfirmPasswordMatch = (
+    formData: SetNewPasswordFormState
+  ): boolean => {
+    if (formData.newPassword !== formData.confirmPassword) {
+      updateSetNewPasswordFormData(setScreen, {
+        confirmPasswordError: t(
+          'access_control:desktop_password_expired_mismatch'
+        ) as string,
+      })
       return false
     }
-    setConfirmPasswordError(null)
+    updateSetNewPasswordFormData(setScreen, { confirmPasswordError: null })
     return true
   }
 
-  const handleConfirmNewPasswordSubmit = (): void => {
-    if (loggedInUsername == null || !validateConfirmPasswordMatch()) {
-      return
+  const footer = (() => {
+    switch (screen.kind) {
+      case 'login': {
+        const { username, logInPassword } = screen.formData
+        const isLoginDisabled =
+          username === '' || logInPassword === '' || isAuthLoading
+        return (
+          <PrimaryButton
+            type="submit"
+            form={loginFormId}
+            // todo(mm, 2026-06-02): Instead of outright disabling the submit button
+            // when any fields are missing, we should show errors on those fields.
+            disabled={isLoginDisabled}
+          >
+            {t('access_control:log_in_link')}
+          </PrimaryButton>
+        )
+      }
+      case 'forgotPassword':
+        return (
+          <SecondaryButton
+            onClick={() => {
+              setScreen({ kind: 'login', formData: screen.formData })
+            }}
+          >
+            {t('shared:back')}
+          </SecondaryButton>
+        )
+      case 'setNewPassword': {
+        const { newPassword, confirmPassword } = screen.formData
+        const isSetNewPasswordDisabled =
+          newPassword === '' ||
+          confirmPassword === '' ||
+          isSetNewPasswordLoading
+        return (
+          <PrimaryButton
+            onClick={() => {
+              if (!validateConfirmPasswordMatch(screen.formData)) return
+              submitNewPassword(
+                screen.formData.username,
+                screen.formData.newPassword
+              )
+            }}
+            disabled={isSetNewPasswordDisabled}
+          >
+            {t('shared:confirm')}
+          </PrimaryButton>
+        )
+      }
     }
-    submitNewPassword(loggedInUsername, newPassword)
-  }
-
-  const handleSetNewPasswordFieldBlur = (): void => {
-    if (newPassword !== '' && confirmPassword !== '') {
-      validateConfirmPasswordMatch()
-    }
-  }
-
-  const handleUsernameChange = (value: string): void => {
-    setLoginError(null)
-    setUsername(value)
-  }
-
-  const handleLogInPasswordChange = (value: string): void => {
-    setLoginError(null)
-    setLogInPassword(value)
-  }
-
-  const handleNewPasswordChange = (value: string): void => {
-    setLoginError(null)
-    setConfirmPasswordError(null)
-    setNewPassword(value)
-  }
-
-  const handleConfirmPasswordChange = (value: string): void => {
-    setLoginError(null)
-    setConfirmPasswordError(null)
-    setConfirmPassword(value)
-  }
-
-  const footer = (
-    <div className={styles.modal_footer_container}>
-      {view === 'login' ? (
-        <PrimaryButton
-          type="submit"
-          form={loginFormId}
-          // todo(mm, 2026-06-02): Instead of outright disabling the submit button
-          // when any fields are missing, we should show errors on those fields.
-          disabled={isLoginDisabled}
-        >
-          {t('access_control:log_in_link')}
-        </PrimaryButton>
-      ) : view === 'forgotPassword' ? (
-        <SecondaryButton
-          onClick={() => {
-            setView('login')
-          }}
-        >
-          {t('shared:back')}
-        </SecondaryButton>
-      ) : (
-        <PrimaryButton
-          onClick={handleConfirmNewPasswordSubmit}
-          disabled={isSetNewPasswordDisabled}
-        >
-          {t('shared:confirm')}
-        </PrimaryButton>
-      )}
-    </div>
-  )
+  })()
 
   return createPortal(
     <Modal
       title={t('access_control:desktop_login_modal_header')}
       onClose={handleClose}
-      footer={footer}
+      footer={<div className={styles.modal_footer_container}>{footer}</div>}
     >
       <div className={styles.content_container}>
-        {view === 'login' ? (
+        {screen.kind === 'login' ? (
           <LoginView
             formId={loginFormId}
-            onSubmit={handleSubmit}
-            username={username}
-            logInPassword={logInPassword}
-            loginError={loginError}
-            onUsernameChange={handleUsernameChange}
-            onLogInPasswordChange={handleLogInPasswordChange}
+            formData={screen.formData}
+            onSubmit={handleLoginSubmit}
+            onUsernameChange={value => {
+              updateLoginFormData(setScreen, { username: value, error: null })
+            }}
+            onLogInPasswordChange={value => {
+              updateLoginFormData(setScreen, {
+                logInPassword: value,
+                error: null,
+              })
+            }}
             onForgotPasswordClick={() => {
-              setView('forgotPassword')
+              setScreen({ kind: 'forgotPassword', formData: screen.formData })
             }}
           />
-        ) : view === 'forgotPassword' ? (
+        ) : screen.kind === 'forgotPassword' ? (
           <ForgotPasswordView />
         ) : (
-          <PasswordExpiredView
-            newPassword={newPassword}
-            confirmPassword={confirmPassword}
-            newPasswordError={loginError}
-            confirmPasswordError={confirmPasswordError}
-            onNewPasswordChange={handleNewPasswordChange}
-            onConfirmPasswordChange={handleConfirmPasswordChange}
-            onPasswordFieldBlur={handleSetNewPasswordFieldBlur}
+          <SetNewPasswordView
+            formData={screen.formData}
+            onNewPasswordChange={value => {
+              updateSetNewPasswordFormData(setScreen, {
+                newPassword: value,
+                error: null,
+                confirmPasswordError: null,
+              })
+            }}
+            onConfirmPasswordChange={value => {
+              updateSetNewPasswordFormData(setScreen, {
+                confirmPassword: value,
+                error: null,
+                confirmPasswordError: null,
+              })
+            }}
+            onPasswordFieldBlur={() => {
+              const { newPassword, confirmPassword } = screen.formData
+              if (newPassword !== '' && confirmPassword !== '') {
+                validateConfirmPasswordMatch(screen.formData)
+              }
+            }}
           />
         )}
       </div>
@@ -244,10 +296,8 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
 interface LoginViewProps {
   formId: string
+  formData: LoginFormState
   onSubmit: ComponentProps<'form'>['onSubmit']
-  username: string
-  logInPassword: string
-  loginError: string | null
   onUsernameChange: (value: string) => void
   onLogInPasswordChange: (value: string) => void
   onForgotPasswordClick: () => void
@@ -256,10 +306,8 @@ interface LoginViewProps {
 function LoginView(props: LoginViewProps): JSX.Element {
   const {
     formId,
+    formData,
     onSubmit,
-    username,
-    logInPassword,
-    loginError,
     onUsernameChange,
     onLogInPasswordChange,
     onForgotPasswordClick,
@@ -282,7 +330,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
           name="username"
           title={t('access_control:login_form_username_field')}
           type="text"
-          value={username}
+          value={formData.username}
           onChange={event => {
             onUsernameChange(event.target.value)
           }}
@@ -291,8 +339,8 @@ function LoginView(props: LoginViewProps): JSX.Element {
           name="password"
           title={t('access_control:login_form_password_field')}
           type="password"
-          value={logInPassword}
-          error={loginError ?? undefined}
+          value={formData.logInPassword}
+          error={formData.error ?? undefined}
           onChange={event => {
             onLogInPasswordChange(event.target.value)
           }}
@@ -322,22 +370,16 @@ function ForgotPasswordView(): JSX.Element {
   )
 }
 
-interface PasswordExpiredViewProps {
-  newPassword: string
-  confirmPassword: string
-  newPasswordError: string | null
-  confirmPasswordError: string | null
+interface SetNewPasswordViewProps {
+  formData: SetNewPasswordFormState
   onNewPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
   onPasswordFieldBlur: () => void
 }
 
-function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
+function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
   const {
-    newPassword,
-    confirmPassword,
-    newPasswordError,
-    confirmPasswordError,
+    formData,
     onNewPasswordChange,
     onConfirmPasswordChange,
     onPasswordFieldBlur,
@@ -362,8 +404,8 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
             'access_control:desktop_password_expired_new_password_field'
           )}
           type="password"
-          value={newPassword}
-          error={newPasswordError ?? undefined}
+          value={formData.newPassword}
+          error={formData.error ?? undefined}
           onChange={event => {
             onNewPasswordChange(event.target.value)
           }}
@@ -377,8 +419,8 @@ function PasswordExpiredView(props: PasswordExpiredViewProps): JSX.Element {
             'access_control:desktop_password_expired_confirm_password_field'
           )}
           type="password"
-          value={confirmPassword}
-          error={confirmPasswordError ?? undefined}
+          value={formData.confirmPassword}
+          error={formData.confirmPasswordError ?? undefined}
           onChange={event => {
             onConfirmPasswordChange(event.target.value)
           }}
