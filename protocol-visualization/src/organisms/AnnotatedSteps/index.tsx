@@ -197,7 +197,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   ])
 
   useEffect(() => {
-    if (currentCommandId == null) {
+    if (currentCommandId == null || !isGlobalPlaying) {
       return
     }
     if (filteredGroupedCommands != null && filteredGroupedCommands.length > 0) {
