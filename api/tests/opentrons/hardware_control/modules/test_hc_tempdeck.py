@@ -1,7 +1,7 @@
 import asyncio
 from typing import AsyncGenerator
 
-from decoy import Decoy
+from decoy import Decoy, matchers
 import pytest
 
 from opentrons.hardware_control.modules.types import (
@@ -109,6 +109,31 @@ async def test_error_callback(
     exc = Exception("oh no!")
     decoy.when(await mock_get_temp()).then_raise(exc)
     monkeypatch.setattr(subject._driver, "get_temperature", mock_get_temp)
+    # TODO(sf,rh): this is EXEC-2757. wait_next_poll() doesn't handle disconnects
+    # well and will raise before any HC-module-level error handling happens, aka
+    # reconnect logic (driver-level error handling is fine, though)
+    with pytest.raises(Exception, match="oh no!"):
+        await subject._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            matchers.Anything(),
+            "temperatureModuleV1",
+            "/dev/ot_module_sim_tempdeck0",
+            "dummySerialTD",
+        ),
+        times=0,
+    )
+    with pytest.raises(Exception, match="oh no!"):
+        await subject._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            matchers.Anything(),
+            "temperatureModuleV1",
+            "/dev/ot_module_sim_tempdeck0",
+            "dummySerialTD",
+        ),
+        times=0,
+    )
     with pytest.raises(Exception, match="oh no!"):
         await subject._poller.wait_next_poll()
     decoy.verify(
