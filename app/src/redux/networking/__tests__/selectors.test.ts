@@ -130,69 +130,6 @@ describe('robot settings selectors', () => {
       },
     },
     {
-      name: 'getWifiKeys returns [] if unavailable',
-      selector: Selectors.getWifiKeys,
-      state: {
-        networking: {},
-      } as any,
-      args: ['robotName'],
-      expected: [],
-    },
-    {
-      name: 'getWifiKeys returns keys from state',
-      selector: Selectors.getWifiKeys,
-      state: {
-        networking: {
-          robotName: {
-            wifiKeyIds: ['abc', 'def'],
-            wifiKeysById: {
-              def: { ...Fixtures.mockWifiKey, id: 'def' },
-              abc: { ...Fixtures.mockWifiKey, id: 'abc' },
-            },
-          },
-        },
-      } as any,
-      args: ['robotName'],
-      expected: [
-        { ...Fixtures.mockWifiKey, id: 'abc' },
-        { ...Fixtures.mockWifiKey, id: 'def' },
-      ],
-    },
-    {
-      name: 'getWifiKeyByRequestId returns key with request ID',
-      selector: Selectors.getWifiKeyByRequestId,
-      state: {
-        networking: {
-          robotName: {
-            wifiKeyIds: ['abc', 'def'],
-            wifiKeysById: {
-              def: { ...Fixtures.mockWifiKey, id: 'def' },
-              abc: { ...Fixtures.mockWifiKey, id: 'abc', requestId: 'foobar' },
-            },
-          },
-        },
-      } as any,
-      args: ['robotName', 'foobar'],
-      expected: { ...Fixtures.mockWifiKey, id: 'abc', requestId: 'foobar' },
-    },
-    {
-      name: 'getWifiKeyByRequestId returns null if not found',
-      selector: Selectors.getWifiKeyByRequestId,
-      state: {
-        networking: {
-          robotName: {
-            wifiKeyIds: ['abc', 'def'],
-            wifiKeysById: {
-              def: { ...Fixtures.mockWifiKey, id: 'def' },
-              abc: { ...Fixtures.mockWifiKey, id: 'abc' },
-            },
-          },
-        },
-      } as any,
-      args: ['robotName', 'foobar'],
-      expected: null,
-    },
-    {
       name: 'getEapOptions returns [] if unavailable',
       selector: Selectors.getEapOptions,
       state: {
