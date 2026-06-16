@@ -23,7 +23,7 @@ Follow these instructions to install the Vacuum Module.
 
 3. Install the Vacuum Module deck adapter in slots A3–A4 only. Fasten the adapter to the deck with the original screws or use the screws provided with the module.
 
-4. Set the manifold base plate on the deck adapter in slot A-3.
+4. Set the vacuum base on the deck adapter in slot A-3.
 
 5. Attach the 6 mm (&frac14;") vacuum hose to the quick connect fitting on the base plate. The quick connect fittings lock into place with an audible click.
 
@@ -48,11 +48,12 @@ Follow these instructions to install the Vacuum Module.
     </figure>
 
 ## Part 2: Carboy and vacuum hose connections
+
 8. Place the Control Box on or below your workbench.
 
-9. Put the carboy in the support cradle and place it on the workbench at or below the same level as the Control Box.
+9. Put the waste jar in the support cradle and place it on the workbench at or below the same level as the Control Box.
 
-10. Place the cap on the carboy and hand tighten it. Do not over-tighten the cap, this is not a trial of strength.
+10. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
 
 11. Attach the free end of the 6 mm (&frac14;") vacuum tube into the quick connect fitting on the cap. You can cut the tubing to length as needed.
 
@@ -60,11 +61,11 @@ Follow these instructions to install the Vacuum Module.
 
 ## Part 3: Data and power connections
 
-13. Connect the USB cable to the USB-B port on the Control Box and to an available USB port on the Flex.
+13. Connect the USB cable to the USB port on the Control Box and to an available USB port on the side of your Flex.
 
-14. Connect the power cable to the Control Box power inlet and plug it into a mains power outlet.
+14. Connect the power cable to the Control Box power inlet and plug it into a power outlet.
 
-15. Turn on the power to the Flex. After the Flex reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font> when the module is ready for use.
+15. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font> when the module is ready for use.
 
 </div>
 
