@@ -115,12 +115,19 @@ function logInWithTempPassword(): void {
 }
 
 describe('LoginModal', () => {
-  let storeLoginState: ReturnType<typeof vi.fn>
+  let storeLoginState: ReturnType<typeof useStoreLoginState>
   let submitPassword: ReturnType<typeof vi.fn>
   let submitNewPassword: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    storeLoginState = vi.fn()
+    storeLoginState =
+      vi.fn<
+        (
+          robotName: string | null,
+          username: string,
+          successfulLoginResponse: OAuth2TokenResponse
+        ) => void
+      >()
     submitPassword = vi.fn()
     submitNewPassword = vi.fn()
     vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
