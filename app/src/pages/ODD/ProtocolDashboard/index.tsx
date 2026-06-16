@@ -315,6 +315,7 @@ export function ProtocolDashboard(): JSX.Element {
             buttonText={t('quick_transfer')}
             iconName="plus"
             onClick={handleCreateNewQuickTransfer}
+            aria-label={t('create_quick_transfer')}
           />
         </Box>
       </Flex>

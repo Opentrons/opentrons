@@ -50,6 +50,7 @@ export function ProtocolSetupOffsets(
             buttonText={t('labware_position_check')}
             iconName="reticle"
             onClick={onLPCLaunchClick}
+            aria-label={t('proceed_labware_position_check')}
           />
         </div>
       )}

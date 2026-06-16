@@ -201,6 +201,9 @@ export function ProtocolSetupModulesAndDeck({
         onClick={() => {
           setShowMapView(mapView => !mapView)
         }}
+        aria-label={
+          showMapView ? t('display_list_view') : t('display_map_view')
+        }
       />
     </>
   )
