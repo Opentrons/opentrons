@@ -8,7 +8,7 @@ You should not attempt to service or repair the vacuum module. If you have conce
 
 ## Cleaning
 
-Turn off and disconnect the module from mains power before cleaning it.
+Turn off and unplug the module from the wall outlet before cleaning it.
 
 The following table lists the chemicals you can use to clean the exterior of the vacuum pump and waste collection jug. Diluted alcohol and distilled water are our recommended cleaning products. You can also refer to the table below for other compatible options. For cleaning or decontaminating vacuum tubes or the waste collection jug, refer to your lab's procedures for handling biohazardous and other chemically hazardous waste.
 
@@ -25,7 +25,7 @@ The following table lists the chemicals you can use to clean the exterior of the
 
 ## Emptying the air-liquid separator
 
-The Control Box houses an air-liquid separator. It traps liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. You should regularly clean condensate from the bowl or whenever any accumulated liquid reaches the max fill line.
+The Control Box houses an air-liquid separator. This device is recessed in a niche on the side of the Control Box. It traps liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. You should regularly clean condensate from the bowl or whenever any accumulated liquid reaches the max fill line.
 
 
 <figure markdown>

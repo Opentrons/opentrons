@@ -43,8 +43,8 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum manifold base](images/mainifold-base-test2.svg "Manifold base")
-<figcaption>(1) Vacuum manifold base</figcaption>
+![Vacuum manifold base](images/vacuum-base.svg "Manifold base")
+<figcaption>(1) Vacuum base</figcaption>
 </figure>
 
 </div>
