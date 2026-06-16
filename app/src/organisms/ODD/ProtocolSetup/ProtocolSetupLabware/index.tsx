@@ -38,7 +38,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -229,11 +229,14 @@ export function ProtocolSetupLabware({
               </>
             )}
           </Flex>
-          <FloatingActionButton
+          <TouchFloatingActionButton
             buttonText={showMapView ? t('list_view') : t('map_view')}
             onClick={() => {
               setShowMapView(mapView => !mapView)
             }}
+            aria-label={
+              showMapView ? t('display_list_view') : t('display_map_view')
+            }
           />
         </>
       )}
