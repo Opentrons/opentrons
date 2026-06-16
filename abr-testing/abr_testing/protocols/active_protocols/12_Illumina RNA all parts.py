@@ -13,7 +13,7 @@ from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List
 
 metadata = {
-    "protocolName": "Illumina RNA Enrichment 96x Part 1-3 19MAY",
+    "protocolName": "Illumina RNA Enrichment 96x Part 1-3 19MAY NOABRFOLDER",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }

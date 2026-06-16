@@ -14,7 +14,7 @@ from opentrons.protocol_api.module_contexts import (
 from typing import List
 
 metadata = {
-    "protocolName": "Flex Stacker Stamping Protocol",
+    "protocolName": "Flex Stacker Stamping Protocol NOABRFOLDER",
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com",
 }
 

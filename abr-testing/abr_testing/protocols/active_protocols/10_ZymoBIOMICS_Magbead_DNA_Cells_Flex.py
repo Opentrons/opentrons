@@ -13,7 +13,7 @@ from opentrons.protocol_api.module_contexts import (
 
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "protocolName": "Flex ZymoBIOMICS Magbead DNA Extraction: Cells",
+    "protocolName": "Flex ZymoBIOMICS Magbead DNA Extraction: Cells: NOABRFOLDER",
 }
 
 requirements = {"robotType": "Flex", "apiLevel": "2.28"}

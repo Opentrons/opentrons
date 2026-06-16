@@ -21,7 +21,7 @@ from opentrons.protocol_api.module_contexts import (
 from typing import List, Dict
 
 metadata = {
-    "protocolName": "MiSeq Library Preparation Protocol",
+    "protocolName": "MiSeq Library Preparation Protocol NOABRFOLDER",
     "author": "Anurag Kanase <anurag.kanase@opentrons.com>",
     "description": "Two-step PCR protocol for Illumina MiSeq library prep.",
 }

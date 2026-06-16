@@ -22,7 +22,7 @@ from typing import List, Union, Dict, Tuple
 
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "protocolName": "Omega HDQ DNA Extraction: Bacteria- Tissue Protocol",
+    "protocolName": "Omega HDQ DNA Extraction: Bacteria- Tissue Protocol NOABRFOLDER",
 }
 
 requirements = {

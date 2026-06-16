@@ -18,7 +18,7 @@ import numpy as np
 
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "protocolName": "Thermo MagMax RNA Extraction: Cells Multi-Channel + Plate Reader",
+    "protocolName": "Thermo MagMax RNA Extraction: Cells Multi-Channel + Plate Reader NOABRFOLDER",
 }
 
 requirements = {

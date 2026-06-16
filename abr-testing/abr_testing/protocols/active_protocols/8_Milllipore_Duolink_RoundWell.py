@@ -14,7 +14,7 @@ from opentrons.protocol_api.module_contexts import (
 from typing import List, Union
 
 metadata = {
-    "protocolName": "Duolink PLA for Microscopy - Combined Day 1 & Day 2",
+    "protocolName": "Duolink PLA for Microscopy - Combined Day 1 & Day 2 NOABRFOLDER",
     "author": "Opentrons Science Team",
 }
 

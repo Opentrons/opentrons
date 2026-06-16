@@ -21,7 +21,7 @@ from opentrons.protocol_api.module_contexts import (
 from typing import List, Dict
 
 metadata = {
-    "protocolName": "Olink Target 96/ 48 v3",
+    "protocolName": "Olink Target 96/ 48 v3: NOABRFOLDER",
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
