@@ -474,9 +474,6 @@ def run(protocol: ProtocolContext) -> None:
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
 
-    if not protocol.is_simulating():
-        slack_bot = set_up_slack()
-        slack_bot.send_run_started_message(metadata["protocolName"])
 
     dry_run = False
     TIP_TRASH = False
