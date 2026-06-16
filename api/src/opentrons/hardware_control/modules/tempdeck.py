@@ -342,7 +342,7 @@ class TempDeckReader(Reader):
     def on_error(self, exception: Exception) -> None:
         self._debounce_count -= 1
         if self._error_callback:
-            if self._debounce_count == 0:
+            if self._debounce_count != 0:
                 log.error(
                     f"Reader encountered error {exception} but has {self._debounce_count} tries left"
                 )
