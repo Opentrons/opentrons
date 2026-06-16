@@ -1,5 +1,7 @@
 {
   "access_control_note": "Note for robot audit log by {{user}}",
+  "action_list": "Action list",
+  "cancel_action": "Cancel action",
   "desktop_login_form_heading": "Log in",
   "desktop_login_form_subheading": "Log in to access robot controls.",
   "desktop_login_modal_header": "Compliance Ready Software Login",

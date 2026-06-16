@@ -1,0 +1,54 @@
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
+
+import { DocumentationRequired } from './DocumentationRequired'
+
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
+
+const DocumentationRequiredModalImpl = NiceModal.create(
+  ({
+    username,
+    actionsToDocument,
+    onCancel,
+  }: {
+    username: string
+    actionsToDocument: DocumentedAction[]
+    onCancel?: () => void
+  }): JSX.Element => {
+    const modal = useModal()
+
+    const handleConfirm = (note: string): void => {
+      const result: DocumentationReport = note as DocumentationReport
+      modal.resolve(result)
+      modal.remove()
+    }
+
+    const handleBack = (): void => {
+      onCancel?.()
+      modal.resolve('' as DocumentationReport)
+      modal.remove()
+    }
+
+    return (
+      <DocumentationRequired
+        username={username}
+        actionsToDocument={actionsToDocument}
+        onConfirm={handleConfirm}
+        onClose={handleBack}
+      />
+    )
+  }
+)
+
+export const showDocumentationRequiredModal = (
+  username: string,
+  actionsToDocument: DocumentedAction[],
+  onCancel?: () => void
+): Promise<DocumentationReport> =>
+  NiceModal.show(DocumentationRequiredModalImpl, {
+    username,
+    actionsToDocument,
+    onCancel,
+  })
