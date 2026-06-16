@@ -15,7 +15,7 @@ from typing import (
     Any,
     Optional,
 )
-from opentrons.protocol_api import ParameterContext, ProtocolContext
+from opentrons.protocol_api import ParameterContext, ProtocolContext, Labware
 from opentrons.types import Point
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -66,6 +66,10 @@ from hardware_testing.drivers.pressure_fixture import (
     PressureFixtureBase,
     connect_to_fixture,
 )
+#from hardware_testing.drivers.data_center_client import (
+#    upload_data_to_google_drive,
+#)
+
 
 # ----------- Monkey patches -----------
 
@@ -138,7 +142,7 @@ DEFAULT_SLOT_TIP_RACK_50 = 1
 
 DEFAULT_SLOT_FIXTURE = 3
 DEFAULT_SLOT_RESERVOIR = 8
-DEFAULT_SLOT_PLATE = 2
+DEFAULT_SLOT_LIQUID_PROBE = 2
 DEFAULT_SLOT_TRASH = 12
 
 PROBING_DECK_PRECISION_MM = 1.0
@@ -367,6 +371,16 @@ class LabwareLocations:
     fixture: Optional[Point]
 
 
+LABWARE: Dict[str, Optional[Labware]] = {
+    "tip_rack_1000": None,
+    "tip_rack_200": None,
+    "tip_rack_50": None,
+    "reservoir": None,
+    "plate": None,
+    "plate_secondary": None,
+    "fixture": None,
+}
+
 IDEAL_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     trash=None,
     tip_rack_1000=None,
@@ -387,6 +401,7 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     plate_secondary=None,
     fixture=None,
 )
+
 
 # --------------- Helpers -------------
 
@@ -480,15 +495,6 @@ def _pick_up_tip_for_tip_volume(
     )
 
 
-def pressure_fixture_a1_location(side: str) -> Point:
-    """Get the A1 position of the pressure fixture within a slot."""
-    assert side in ["left", "right"], "pressure fixture side must be left or right"
-    if side == "left":
-        return LOCATION_A1_LEFT
-    else:
-        return LOCATION_A1_RIGHT
-
-
 def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
     CALIBRATED_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
     IDEAL_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
@@ -502,6 +508,9 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
         tiprack_1000 = ctx.load_labware(
             "opentrons_flex_96_tiprack_1000uL", cfg.slot_tip_rack_1000
         )
+        LABWARE["tip_rack_50"] = tiprack_50
+        LABWARE["tip_rack_200"] = tiprack_200
+        LABWARE["tip_rack_1000"] = tiprack_1000
         CALIBRATED_LABWARE_LOCATIONS.tip_rack_50 = tiprack_50["A1"].top().point
         CALIBRATED_LABWARE_LOCATIONS.tip_rack_200 = tiprack_200["A1"].top().point
         CALIBRATED_LABWARE_LOCATIONS.tip_rack_1000 = tiprack_1000["A1"].top().point
@@ -510,27 +519,53 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
         IDEAL_LABWARE_LOCATIONS.tip_rack_1000 = tiprack_1000["A1"].top().point
     if not (ctx.params.skip_fixture and ctx.params.skip_liquid):  # type: ignore[attr-defined]
         reservoir = ctx.load_labware("nest_1_reservoir_195ml", cfg.slot_reservoir)
+        LABWARE["reservoir"] = reservoir
         CALIBRATED_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point
         IDEAL_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point
     if not ctx.params.skip_liquid_probe:  # type: ignore[attr-defined]
-        plate = ctx.load_labware("corning_96_wellplate_360ul_flat", cfg.slot_plate)
-        CALIBRATED_LABWARE_LOCATIONS.plate_primary = plate["H6"].top().point
-        IDEAL_LABWARE_LOCATIONS.plate_primary = plate["H6"].top(5).point
+        # Liquid probe fixture is a vial with an led at the bottom to help the user see the liquid better
+        plate = ctx.load_labware("liquid_probe_fixture", cfg.slot_plate)
+        LABWARE["plate"] = plate
+        CALIBRATED_LABWARE_LOCATIONS.plate_primary = plate["A1"].top().point
+        IDEAL_LABWARE_LOCATIONS.plate_primary = plate["A1"].top(5).point
         # plate_secondary is for the front probe so offset the pipette
-        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = plate["H6"].top().point + Point(
+        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = plate["A1"].top().point + Point(
             y=9 * -7
         )
-        IDEAL_LABWARE_LOCATIONS.plate_secondary = plate["H6"].top(5).point
+        IDEAL_LABWARE_LOCATIONS.plate_secondary = plate["A1"].top(5).point
     if not ctx.params.skip_fixture:  # type: ignore[attr-defined]
-        # TODO: make a fixture labware definition
-        fixture_slot_pos = helpers_ot3.get_slot_bottom_left_position_ot3(
-            cfg.slot_fixture
+        # Fixture is an aluminum tip rack glued trash slot frame so tubes can go out the bottom
+        # to an external pressure sensor. it's ends up a little shorter than the tip rack but good enough
+        # for LPC
+        fixture_lw = ctx.load_labware(
+            "opentrons_flex_96_tiprack_1000uL", cfg.slot_fixture
         )
-        fixture_loc = fixture_slot_pos + pressure_fixture_a1_location(cfg.fixture_side)
-        fixture_loc = fixture_loc + Point(z=-8)
+        LABWARE["fixture"] = fixture_lw
+
+        fixture_loc = fixture_lw["A1"].top().point
         CALIBRATED_LABWARE_LOCATIONS.fixture = fixture_loc
         IDEAL_LABWARE_LOCATIONS.fixture = fixture_loc
 
+    if cfg.simulate:
+        pip = ctx.load_instrument("flex_8channel_50", "left")
+        if LABWARE["tip_rack_200"]:
+            pip.pick_up_tip(LABWARE["tip_rack_200"]["A1"])
+            pip.return_tip()
+        if LABWARE["tip_rack_1000"]:
+            pip.pick_up_tip(LABWARE["tip_rack_1000"]["A1"])
+            pip.return_tip()
+        if LABWARE["tip_rack_50"]:
+            pip.pick_up_tip(LABWARE["tip_rack_50"]["A1"])
+            if LABWARE["plate"]:
+                pip.aspirate(50, LABWARE["plate"]["A1"])
+                pip.dispense(50, LABWARE["plate"]["A1"])
+            if LABWARE["reservoir"]:
+                pip.aspirate(50, LABWARE["reservoir"]["A1"])
+                pip.dispense(50, LABWARE["reservoir"]["A1"])
+            pip.return_tip()
+        if LABWARE["fixture"]:
+            pip.pick_up_tip(LABWARE["fixture"]["A1"])
+            pip.return_tip()
 
 def _drop_tip_in_trash(api: SyncHardwareAPI, cfg: TestConfig) -> None:
     ideal = CALIBRATED_LABWARE_LOCATIONS.trash
@@ -697,6 +732,19 @@ def _aspirate_and_look_for_droplets(
     return leak_test_passed
 
 
+def _pick_up_tip_for_fixture_new(
+    api: SyncHardwareAPI, cfg: TestConfig, well: str
+) -> None:
+    assert LABWARE["fixture"]
+    tip_pos = LABWARE["fixture"][well].top().point
+    _move_safe(api, cfg.mount, tip_pos)
+    # Just always assume a 1000 tip since they're the longest and we don't want to fail to retract
+    tip_length = helpers_ot3.get_default_tip_length(1000)
+    api.pick_up_tip(cfg.mount, tip_length=tip_length)
+    # move up high enough that we can do a drop tip after
+    api.move_rel(cfg.mount, Point(z=15))
+
+
 def _fixture_check_pressure(
     api: SyncHardwareAPI,
     cfg: TestConfig,
@@ -707,7 +755,7 @@ def _fixture_check_pressure(
 ) -> bool:
     results = []
 
-    _pick_up_tip_for_fixture(api, cfg, tip_volume=tip_volume)
+    _pick_up_tip_for_fixture_new(api, cfg, "A1")
     # above the fixture
     r, _ = _read_pressure_and_check_results(
         api,
@@ -720,69 +768,69 @@ def _fixture_check_pressure(
     results.append(r)
     # insert into the fixture
     # : unknown amount of pressure here (depends on where Z was calibrated)
-    fixture_depth = 80
-    api.move_rel(cfg.mount, Point(z=fixture_depth))
+    api.retract(cfg.mount)
     _drop_tip_in_trash(api, cfg)
-    api.move_rel(cfg.mount, Point(z=fixture_depth))
-    _pick_up_tip_for_fixture(api, cfg, tip_volume=tip_volume)
-    sleep(10)
-    r, inserted_pressure_data = _read_pressure_and_check_results(
-        api,
-        cfg,
-        fixture,
-        PressureEvent.INSERT,
-        section,
-        report,
-    )
-    results.append(r)
-    # aspirate 50uL
-    api.aspirate(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume])
-    sleep(2)
-    if cfg.pipette_volume == 50:
-        asp_evt = PressureEvent.ASPIRATE_P50
-    else:
-        asp_evt = PressureEvent.ASPIRATE_P1000
-    r, _ = _read_pressure_and_check_results(
-        api,
-        cfg,
-        fixture,
-        asp_evt,
-        section,
-        report,
-        previous=inserted_pressure_data,
-    )
-    results.append(r)
-    # dispense
-    api.dispense(
-        cfg.mount,
-        PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume],
-        0.5,
-        is_full_dispense=True,
-    )
-    sleep(2)
-    r, _ = _read_pressure_and_check_results(
-        api,
-        cfg,
-        fixture,
-        PressureEvent.DISPENSE,
-        section,
-        report,
-    )
-    results.append(r)
-    api.drop_tip(cfg.mount, home_after=False)
-    tip_length2 = helpers_ot3.get_default_tip_length(int(tip_volume))
-    api.move_rel(cfg.mount, Point(z=int(tip_length2 * 0.1)))
-    sleep(2)
-    r, _ = _read_pressure_and_check_results(
-        api,
-        cfg,
-        fixture,
-        PressureEvent.POST,
-        section,
-        report,
-    )
-    results.append(r)
-    api.move_rel(cfg.mount, Point(z=fixture_depth))
+    api.retract(cfg.mount)
+    try:
+        _pick_up_tip_for_fixture_new(api, cfg, "A2")
+        sleep(10)
+        r, inserted_pressure_data = _read_pressure_and_check_results(
+            api,
+            cfg,
+            fixture,
+            PressureEvent.INSERT,
+            section,
+            report,
+        )
+        results.append(r)
+        # aspirate 50uL
+        api.aspirate(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume])
+        sleep(2)
+        if cfg.pipette_volume == 50:
+            asp_evt = PressureEvent.ASPIRATE_P50
+        else:
+            asp_evt = PressureEvent.ASPIRATE_P1000
+        r, _ = _read_pressure_and_check_results(
+            api,
+            cfg,
+            fixture,
+            asp_evt,
+            section,
+            report,
+            previous=inserted_pressure_data,
+        )
+        results.append(r)
+        # dispense
+        api.dispense(
+            cfg.mount,
+            PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume],
+            0.5,
+            is_full_dispense=True,
+        )
+        sleep(2)
+        r, _ = _read_pressure_and_check_results(
+            api,
+            cfg,
+            fixture,
+            PressureEvent.DISPENSE,
+            section,
+            report,
+        )
+        results.append(r)
+        api.drop_tip(cfg.mount, home_after=False)
+        api.retract(cfg.mount)
+        sleep(2)
+        r, _ = _read_pressure_and_check_results(
+            api,
+            cfg,
+            fixture,
+            PressureEvent.POST,
+            section,
+            report,
+        )
+        results.append(r)
+    except Exception as e:
+        api.drop_tip(cfg.mount)
     return False not in results
 
 
@@ -997,7 +1045,6 @@ def _test_env_sensors(
         [CSVResult.from_bool(env_pass)],
     )
 
-
 def _test_encoder(
     api: SyncHardwareAPI,
     report: CSVReport,
@@ -1007,7 +1054,7 @@ def _test_encoder(
 ) -> None:
     ctx.comment("Test diagnostics encoder.")
     pip_axis = Axis.of_main_tool_actuator(cfg.mount)
-    _, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, cfg.mount)
+    _, bottom, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, cfg.mount)
 
     def _get_plunger_pos_and_encoder() -> Tuple[float, float]:
         _pos = api.current_position_ot3(cfg.mount)
@@ -1036,6 +1083,7 @@ def _test_encoder(
         "diagnostic-encoder",
         [CSVResult.from_bool(encoder_move_pass and encoder_home_pass)],
     )
+    helpers_ot3.move_plunger_absolute_ot3_sync(api, cfg.mount, bottom)
 
 
 def _test_cap_sensors(
@@ -1074,6 +1122,7 @@ def _test_cap_sensors(
         if cfg.pipette_channels == 8:
             nozzle_str = "REAR " if sensor_id == SensorId.S0 else "FRONT "
         ctx.pause(f"ATTACH the {nozzle_str}probe")
+        ctx.comment(f"Calibrating {nozzle_str}")
         probe_cap = _read_and_average(api, cfg.mount, SensorType.capacitive, sensor_id)
         probe_pass = (
             CAP_THRESH_PROBE[cfg.pipette_channels][0]
@@ -1092,11 +1141,12 @@ def _test_cap_sensors(
         for trial in range(2):
             if trial > 0:
                 ctx.pause("`REINSTALL` the probe")
+                ctx.comment(f"Calibrating {nozzle_str}")
             if api.is_simulator:
                 offset = Point(0, 0, 0)
             else:
                 api._calibrate_pipette(cfg.mount, sensor_to_probe[sensor_id])
-                pip = api.hardware_pipettes[cfg.mount]
+                pip = api.hardware_pipettes[cfg.mount.to_mount()]
                 assert pip
                 offset = pip.pipette_offset.offset
             report_offset = [round(offset.x, 2), round(offset.y, 2), round(offset.z, 2)]
@@ -1150,6 +1200,7 @@ def _test_cap_sensors(
 
         api.retract(cfg.mount)
         ctx.pause("REMOVE the probe")
+        ctx.comment(f"Done calibrating {nozzle_str}")
         api.remove_tip(cfg.mount)
     report(
         section,
@@ -1220,11 +1271,10 @@ def _test_diagnostics_pressure(
     current_pos = api.gantry_position(cfg.mount)
     slot_11_pos = helpers_ot3.get_slot_calibration_square_position_ot3(11)
     if cfg.pipette_channels == 1:
-        slot_11_pos._replace(z=current_pos.z)
+        slot_11_pos = slot_11_pos._replace(z=current_pos.z)
     else:
-        slot_11_pos._replace(y=slot_11_pos.y + 29, z=current_pos.z)
-
-    api.move_to(cfg.mount, slot_11_pos)
+        slot_11_pos = slot_11_pos._replace(y=slot_11_pos.y + 29, z=current_pos.z)
+    _move_safe(api, cfg.mount, slot_11_pos)
     api.move_rel(cfg.mount, Point(z=movez + 10))
     api.move_rel(cfg.mount, Point(z=-10), speed=5)
     sleep(2)
@@ -1341,6 +1391,7 @@ def _test_plunger_positions(
             FINAL_TEST_FAIL_INFOR.append(printval)
     report(section, "plunger-drop-tip", [CSVResult.from_bool(drop_tip_passed)])
     api.home([Axis.of_main_tool_actuator(cfg.mount)])
+    ctx.comment("finished testing plunger positions.")
 
 
 def test_plunger(
@@ -1944,6 +1995,7 @@ def test_encoder(
     max_error_pulses = 0.0
     max_error_ticks = 0.0
     for cycle in range(cycles):
+        ctx.comment(f"Running {cycle} of {cycles}")
         helpers_ot3.move_plunger_absolute_ot3_sync(api, cfg.mount, 0)
         init_encoder_pos = api.encoder_current_position_ot3(cfg.mount, refresh=True)
         prev_encoder_tick = (
@@ -2334,12 +2386,12 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="The deck slot the reservoir is in",
     )
     parameters.add_int(
-        display_name="Wellplate slot",
+        display_name="Liquid Probe slot",
         variable_name="slot_plate",
         minimum=1,
         maximum=12,
-        default=DEFAULT_SLOT_PLATE,
-        description="The deck slot 96 wellplate is in",
+        default=DEFAULT_SLOT_LIQUID_PROBE,
+        description="The deck slot liquid probe fixture is in",
     )
     parameters.add_int(
         display_name="Pressure Fixture slot",
@@ -2359,14 +2411,25 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-def _reset_available_tips() -> None:
+def _fixture_tips_for_channels(pipette_channels: int) -> List[str]:
+    """Build fixture tip order.
+
+    Single-channel fixture testing uses A1 for the open-air pressure check,
+    then A2 for the fixture pressure check, followed by the rest of row A.
+    """
+    if pipette_channels == 1:
+        a_row = [f"A{col}" for col in range(1, 13)]
+        remaining_rows = [f"{row}{col}" for col in range(1, 13) for row in "BCDEFGH"]
+        return a_row + remaining_rows
+    return [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"]
+
+
+def _reset_available_tip(pipette_channels: int) -> None:
     for tip_size in [50, 200, 1000]:
         _available_tips[tip_size] = [
             f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"
         ]
-        _available_tips_fixture[tip_size] = [
-            f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"
-        ]
+        _available_tips_fixture[tip_size] = _fixture_tips_for_channels(pipette_channels)
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -2388,7 +2451,7 @@ def run(ctx: ProtocolContext) -> None:
             for m in OT3Mount
         }
         api.create_simulating_peripheral(BarcodeScannerModel.BARCODE_SCANNER_V1)
-        api.reset()
+    api.reset()
 
     args = ctx.params.get_all()
     t_sections = {
@@ -2419,7 +2482,6 @@ def run(ctx: ProtocolContext) -> None:
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     current_pos = api.gantry_position(OT3Mount.RIGHT)
     api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
-    _reset_available_tips()
     _load_labware_locations(config, ctx)
     pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
     assert pips, "no pipettes attached"
@@ -2429,6 +2491,7 @@ def run(ctx: ProtocolContext) -> None:
         config.pipette_channels = current_pipette.channels
         config.pipette_volume = current_pipette.working_volume
 
+        _reset_available_tip(config.pipette_channels)
         report = build_report(test_name, config)
         dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
         helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=ctx.params.operator, dut=dut, ctx=ctx)  # type: ignore[attr-defined]
@@ -2439,6 +2502,9 @@ def run(ctx: ProtocolContext) -> None:
             test_run(api, report, section.value, ctx, config)
 
         # SAVE REPORT
-        report.save_to_disk()
+        report_path = report.save_to_disk()
+        #if ctx.params.operator != "Unused":  # type: ignore[attr-defined]
+            # Don't upload during testing
+        #    upload_data_to_google_drive(report_path)
         if not report.all_succeded():
             raise RuntimeError("Error during QC run.")
