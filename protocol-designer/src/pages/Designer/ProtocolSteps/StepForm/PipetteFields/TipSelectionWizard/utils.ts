@@ -215,7 +215,6 @@ export function getIsTiprackSelectable(args: {
       nozzles,
       channels
     )
-  const slot = getSlotInLocationStack(stack)
   const hasLid = getLabwareHasLid({
     labwareId: id,
     labwareEntities,
