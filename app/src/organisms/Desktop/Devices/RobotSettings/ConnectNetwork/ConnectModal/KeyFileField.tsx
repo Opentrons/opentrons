@@ -12,7 +12,7 @@ import type {
   ControllerRenderProps,
   FieldValues,
 } from 'react-hook-form'
-import type { WifiKey } from '../types'
+import type { WifiKey } from '@opentrons/api-client'
 
 export interface KeyFileFieldProps {
   id: string
