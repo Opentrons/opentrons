@@ -22,7 +22,7 @@ from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 
 metadata = {
-    "protocolName": "Illumina DNA Enrichment v4 with TC Auto Sealing Lid",
+    "protocolName": "ABR OFF Illumina DNA Enrichment v4 with TC Auto Sealing Lid",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }
