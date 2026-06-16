@@ -5,7 +5,6 @@ import {
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
 import {
-  COLUMN_4_SLOTS,
   getIsInPipettableLocation,
   getIsSafePickupWithinTiprack,
   getLabwareHasLid,
