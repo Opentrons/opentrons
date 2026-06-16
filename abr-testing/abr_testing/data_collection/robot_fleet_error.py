@@ -546,7 +546,6 @@ def get_run_error_info_from_robot(
         "RQA",
         parent_name,
     )
-    
 
     summary = robot + "_" + str(one_run) + "_" + str(error_code) + "_" + error_type
     # Description of error
