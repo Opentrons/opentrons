@@ -94,6 +94,7 @@
   "connection_description_wifi": "Find a network in your lab or enter your own.",
   "connection_to_robot_lost": "Connection to robot lost",
   "contrast": "Contrast",
+  "compliance_ready": "Compliance Ready",
   "deck_calibration_description": "Calibrating the deck is required for new robots or after you relocate your robot. Recalibrating the deck will require you to also recalibrate pipette offsets.",
   "deck_calibration_missing": "Deck calibration missing",
   "deck_calibration_missing_no_pipette": "Deck calibration missing. Attach a pipette to perform deck calibration.",

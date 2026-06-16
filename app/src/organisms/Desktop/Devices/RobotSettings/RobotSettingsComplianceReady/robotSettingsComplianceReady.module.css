@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--spacing-16);
+}
+
+.divider {
+  grid-column: 1 / -1;
+}
+
+.field_value {
+  justify-self: end;
+}
+
+.masked_password_input {
+  justify-self: end;
+  width: auto;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: var(--grey-60);
+  font: inherit;
+  text-align: right;
+  pointer-events: none;
+}

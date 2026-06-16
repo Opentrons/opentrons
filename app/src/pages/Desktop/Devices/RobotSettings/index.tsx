@@ -21,6 +21,7 @@ import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
+import { RobotSettingsComplianceReady } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsComplianceReady'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
@@ -103,6 +104,12 @@ export function RobotSettingsComponent({
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
+    'compliance-ready': (
+      <RobotSettingsComplianceReady
+        robotName={robotName}
+        isRobotBusy={isRobotBusy}
+      />
+    ),
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
   }
 
@@ -173,6 +180,11 @@ export function RobotSettingsComponent({
           <RoundTab
             to={`/devices/${robotName}/robot-settings/advanced`}
             tabName={t('advanced')}
+            disabled={false}
+          />
+          <RoundTab
+            to={`/devices/${robotName}/robot-settings/compliance-ready`}
+            tabName={t('compliance-ready')}
             disabled={false}
           />
           {devToolsOn ? (

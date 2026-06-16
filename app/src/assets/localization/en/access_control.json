@@ -29,5 +29,10 @@
   "on_device_login_new_password": "New password",
   "on_device_login_password_mismatch": "Passwords do not match.",
   "username": "Username",
-  "view_actions": "View actions"
+  "view_actions": "View actions",
+  "desktop_personal_account_settings": "Personal account settings",
+  "desktop_edit": "Edit",
+  "desktop_username": "Username",
+  "desktop_password": "Password",
+  "desktop_legal_name": "Legal name"
 }
