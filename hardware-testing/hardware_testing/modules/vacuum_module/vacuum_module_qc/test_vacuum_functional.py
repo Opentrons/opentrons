@@ -130,6 +130,14 @@ async def test_vacuum_regulation(
     final_pressure = vacuum.vacuum_state.current_gauge_pressure
     pressures.append(final_pressure)
 
+    # Determine pass/fail
+    expected = target_pressure > -50 or target_pressure < -800
+    passed = (
+        expected
+        or (reached_time is not None)
+        and (abs(final_pressure - target_pressure) <= PRESSURE_TOLERANCE * 1.5)
+    )
+
     # Use last stable window for metrics
     reached_time = reached_time or -1.0
     settling_time = settling_time or -1.0
@@ -139,14 +147,6 @@ async def test_vacuum_regulation(
     std_dev = stdev(stable_pressures) if len(stable_pressures) > 1 else 0.0
     min_p = min(stable_pressures)
     max_p = max(stable_pressures)
-
-    # Determine pass/fail
-    expected = target_pressure > -50 or target_pressure < -800
-    passed = (
-        expected
-        or (reached_time is not None)
-        and (abs(final_pressure - target_pressure) <= PRESSURE_TOLERANCE * 1.5)
-    )
 
     # Print summary
     print(
