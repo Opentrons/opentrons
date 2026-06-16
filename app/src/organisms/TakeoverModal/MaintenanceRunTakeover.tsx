@@ -48,7 +48,12 @@ export function MaintenanceRunTakeoverModal(
 
   const { deleteMaintenanceRun, reset } = useDeleteMaintenanceRunMutation(
     docState,
-    ['end_calibration']
+    ['end_calibration'],
+    {
+      onError: () => {
+        setIsLoading(false)
+      },
+    }
   )
 
   const handleCloseAndTerminate = (): void => {

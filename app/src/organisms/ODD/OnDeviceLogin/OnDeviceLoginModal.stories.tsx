@@ -68,8 +68,8 @@ export const WithLoginError: Story = {
   args: {
     ...Default.args,
     step: 'password',
-    loginError: i18n.t('on_device_login_error_incorrect', {
-      ns: 'device_settings',
+    loginError: i18n.t('login_error_incorrect', {
+      ns: 'access_control',
     }),
     onClearLoginError: action('onClearLoginError'),
   },

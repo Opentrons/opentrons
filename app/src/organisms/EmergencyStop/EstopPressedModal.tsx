@@ -87,7 +87,7 @@ function TouchscreenModal({
 
   const { handlePlaceReaderLid, isValidPlateReaderMove } =
     usePlacePlateReaderLid({
-      onSettled: closeModal,
+      onSuccess: closeModal,
     })
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
@@ -165,7 +165,7 @@ function DesktopModal({
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
   const { handlePlaceReaderLid, isValidPlateReaderMove } =
     usePlacePlateReaderLid({
-      onSettled: closeModal,
+      onSuccess: closeModal,
     })
 
   const modalProps: ModalProps = {

@@ -10,6 +10,35 @@ export type DocumentationReport = string & {
   readonly _brand: 'DocumentationReport'
 }
 
+export type DocumentedMutationErrorType =
+  | 'no_documentation_report'
+  | 'access_control_loading'
+
+const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
+  DocumentedMutationErrorType,
+  string
+> = {
+  no_documentation_report: 'No documentation report provided',
+  access_control_loading: 'Access control queries are still loading',
+}
+
+export class DocumentedMutationError extends Error {
+  declare readonly name: 'DocumentedMutationError'
+  declare readonly type: DocumentedMutationErrorType
+
+  constructor(type: DocumentedMutationErrorType) {
+    super(DOCUMENTED_MUTATION_ERROR_MESSAGES[type])
+    this.name = 'DocumentedMutationError'
+    this.type = type
+  }
+}
+
+export function isDocumentedMutationError(
+  error: unknown
+): error is DocumentedMutationError {
+  return error instanceof DocumentedMutationError
+}
+
 /**
  * Documentation state to be passed to the useDocumentedMutation hook.
  *
@@ -29,7 +58,8 @@ export type DocumentationState =
       reasonForInteractionRequired: true
       docreport: null
       askForDocumentation: (
-        actionsToDocument: DocumentedAction[]
+        actionsToDocument: DocumentedAction[],
+        onCancel?: () => void
       ) => Promise<DocumentationReport>
       isLoading: false
     }

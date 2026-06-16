@@ -48,13 +48,19 @@ class _ACPO:
     pass
 
 
-def AsyncClientPyroObject(pyro_synchronous_object: Pyro5.api.Proxy) -> _ACPO:
+def AsyncClientPyroObject(
+    pyro_synchronous_object: Pyro5.api.Proxy, force_synchronous: bool = False
+) -> _ACPO:
     """A Wrapper Class constructor to take a PyroSynchronousObject Proxy and make calls awaitable.
 
     The purpose of this class re-constructor is to create an object with all the attributes of a Proxy object
     that was created from a PyroSynchronousObject. The attributes which were originally async but were 'synchronized'
     by the PyroSynchronousObject constructor will be wrapped to be awaitable again. Standard method calls and
     property attributes will be forwarded as usual.
+
+    If `force_synchronous` is set to `True`, we instead keep the async methods `synchronized`. This is useful if
+    the proxy is being used in a situation where async calls need to be made synchronous to begin with. This way
+    we do not need to ping pong back and forth between async and non-async wrapping.
 
     Proxy wrapping Example:
     -------
@@ -71,13 +77,14 @@ def AsyncClientPyroObject(pyro_synchronous_object: Pyro5.api.Proxy) -> _ACPO:
     AsyncCls = type(
         f"AsyncClientPyroObject_{pyro_synchronous_object.__class__.__name__}_{id(pyro_synchronous_object)}",
         (_ACPO,),
-        dict(_build_classdict(pyro_synchronous_object)),
+        dict(_build_classdict(pyro_synchronous_object, force_synchronous)),
     )
     return AsyncCls()  # type: ignore
 
 
 def _build_classdict(
     pso: Pyro5.api.Proxy,
+    force_synchronous: bool,
 ) -> Iterator[tuple[str, Any]]:
     # ensures metadata is available
     pso._pyroBind()  # type: ignore
@@ -85,14 +92,14 @@ def _build_classdict(
     async_method_names = [method["__name__"] for method in async_methods.values()]
     # Attach PSO exposed methods to the AsyncClientPyroObject
     for method in pso._pyroMethods:
-        if method in async_method_names:
+        if method in async_method_names and not force_synchronous:
             # For methods that are awaitable wrap them as an async reference that forwards the call to the PSO Proxy.
             method_metadata: dict[str, Any] = async_methods[method]
             async_method = wrap_as_async(method_metadata)
-            yield (method, async_method)
+            yield method, async_method
         else:
             # For standard method calls forward the direct call to the method on the PSO Proxy.
-            yield (method, wrap_parameter_validation(pso, method))
+            yield method, wrap_parameter_validation(pso, method)
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
         # For property attributes we use to attach a wrapped `getattr` call for that attribute.
@@ -101,7 +108,7 @@ def _build_classdict(
             attr,
             property(wrap_property(pso, attr)),
         )
-    yield ("_proxy", pso)
+    yield "_proxy", pso
 
 
 ### Helpers ###

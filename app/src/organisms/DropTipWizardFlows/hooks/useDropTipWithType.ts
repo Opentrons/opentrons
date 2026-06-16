@@ -34,7 +34,7 @@ export interface UseDropTipWithTypeResult {
 export function useDropTipWithType(
   params: UseDTWithTypeParams
 ): UseDropTipWithTypeResult {
-  const { issuedCommandsType, fixitCommandTypeUtils } = params
+  const { issuedCommandsType, fixitCommandTypeUtils, closeFlow } = params
 
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
   const { errorDetails, setErrorDetails } = useErrorDetails()
@@ -43,7 +43,7 @@ export function useDropTipWithType(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation('drop_tips')
+  } = useMaintenanceRunDocumentation('drop_tips', closeFlow)
   const activeMaintenanceRunId = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
