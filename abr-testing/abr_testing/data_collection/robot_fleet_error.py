@@ -480,7 +480,7 @@ def get_robot_state(
     parent = get_parent_key(
         jira_credentials.api_token,
         jira_credentials.email,
-        project_key,
+        "RQA",
         parent_name,
     )
     whole_description_str = (
@@ -539,22 +539,14 @@ def get_run_error_info_from_robot(
     labels = [robot]
     if "8.2" in affects_version:
         labels.append("8_2_0")
-    if project_key == "RQA":  # 217 is ABR
-        parent_name = affects_version + " Bugs"
-        parent = get_parent_key(
-            jira_credentials.api_token,
-            jira_credentials.email,
-            project_key,
-            parent_name,
-        )
-    else:
-        parent_name = robot
-        parent = get_parent_key(
-            jira_credentials.api_token,
-            jira_credentials.email,
-            project_key,
-            parent_name,
-        )
+    parent_name = affects_version + " Bugs"
+    parent = get_parent_key(
+        jira_credentials.api_token,
+        jira_credentials.email,
+        "RQA",
+        parent_name,
+    )
+    
 
     summary = robot + "_" + str(one_run) + "_" + str(error_code) + "_" + error_type
     # Description of error
