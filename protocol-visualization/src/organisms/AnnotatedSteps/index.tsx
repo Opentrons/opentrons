@@ -219,7 +219,12 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     if (scrollTargetId !== currentCommandId) {
       setScrollTargetId(currentCommandId)
     }
-  }, [filteredGroupedCommands, currentCommandId, scrollTargetId])
+  }, [
+    filteredGroupedCommands,
+    currentCommandId,
+    scrollTargetId,
+    isGlobalPlaying,
+  ])
 
   const { rows, rowIndexByCommandId } = useMemo(() => {
     const nextRows: AnnotatedStepsRow[] = []
