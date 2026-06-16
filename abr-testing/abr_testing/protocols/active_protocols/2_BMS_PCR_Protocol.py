@@ -12,7 +12,7 @@ from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 
 metadata = {
-    "protocolName": "PCR Protocol with TC Auto Sealing Lid",
+    "protocolName": "PCR Protocol with TC Auto Sealing Lid ABR OFF",
     "author": "Rami Farawi <ndiehl@opentrons.com",
 }
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
