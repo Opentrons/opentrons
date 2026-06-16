@@ -31,7 +31,7 @@ const meta: Meta<typeof ListItemComponent> = {
       },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 }
 
 export default meta

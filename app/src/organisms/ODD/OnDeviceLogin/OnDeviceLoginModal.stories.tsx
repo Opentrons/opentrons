@@ -31,7 +31,7 @@ const store: Store<any> = legacy_createStore(
 const meta: Meta<typeof OnDeviceLogin> = {
   title: 'ODD/Organisms/OnDeviceLogin',
   component: OnDeviceLogin,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Provider store={store}>

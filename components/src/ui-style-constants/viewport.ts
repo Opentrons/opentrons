@@ -11,8 +11,7 @@ const customViewports = {
 }
 
 export const touchScreenViewport = {
-  viewport: {
-    viewports: customViewports,
-    defaultViewport: 'onDeviceDisplay',
+  globals: {
+    viewport: { value: 'onDeviceDisplay' },
   },
 }

@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof MenuItemComponent> = {
   title: 'Helix/Atoms/MenuItem',
   component: MenuItemComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     // Disable all StyleProps
     ...Object.fromEntries(
