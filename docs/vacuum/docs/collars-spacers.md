@@ -22,9 +22,9 @@ The Vacuum Module ships with two collar sizes:
 
 ## Spacers
 
-Spacers sit inside the manifold base to elevate and support the internal collection labware.
+Spacers sit inside the manifold base and hold the internal collection labware at the correct height for filtration.
 
-The primary purpose of a spacer is to minimize the vertical clearance between the source filter plate and the destination collection plate. A small plate gap helps ensure fluid droplets drop cleanly and directly into the receiving wells, preventing high-velocity vacuum streams from diverting droplets sideways and causing cross-contamination.
+The primary purpose of a spacer is to minimize the vertical clearance between the source filter plate and the destination collection plate. A small plate gap helps ensure fluid droplets drop cleanly and directly into the receiving wells, preventing cross-contamination.
 
 The Vacuum Module ships with two spacer sizes to match varying labware profiles:
 
