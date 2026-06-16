@@ -19,8 +19,8 @@
 }
 
 .floating_button_style:focus-visible {
-  box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
   border: none;
+  box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
   outline: 0.25rem solid var(--blue-50);
 }
 
