@@ -17,7 +17,7 @@ export default {
     },
     onClick: { action: 'clicked' },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  parameters: { ...VIEWPORT.touchScreenViewport },
 } as Meta
 
 const TouchFloatingActionButtonTemplate: Story<

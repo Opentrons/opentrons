@@ -7,7 +7,6 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-12) var(--spacing-24);
-  border: 0.25rem solid transparent;
   border-radius: var(--border-radius-40);
   background-color: var(--purple-50-touchscreen);
   box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
@@ -20,11 +19,9 @@
 }
 
 .floating_button_style:focus-visible {
-  border-width: 0.25rem;
-  border-style: solid;
-  border-color: var(--blue-50);
   box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
-  outline: none;
+  border: none;
+  outline: 0.25rem solid var(--blue-50);
 }
 
 .floating_button_style:disabled {
