@@ -8,7 +8,8 @@ import type {
 export interface DocumentationRequiredModalContextType {
   showDocumentationRequiredModal: (
     username: string,
-    actionsToDocument: DocumentedAction[]
+    actionsToDocument: DocumentedAction[],
+    onCancel?: () => void
   ) => Promise<DocumentationReport>
 }
 
@@ -19,7 +20,8 @@ export const DocumentationRequiredModalContext =
   createContext<DocumentationRequiredModalContextType>({
     showDocumentationRequiredModal: (
       username: string,
-      actionsToDocument: DocumentedAction[]
+      actionsToDocument: DocumentedAction[],
+      onCancel?: () => void
     ) => {
       return Promise.resolve('' as DocumentationReport)
     },

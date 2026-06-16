@@ -9,7 +9,9 @@ import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 
 import { FlowRateEntry } from '../../QuickTransferAdvancedSettings/FlowRate'
 
+import type { Mock } from 'vitest'
 import type { ChangeEvent, ComponentProps } from 'react'
+import type { TrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
@@ -44,7 +46,7 @@ const changeTouchInputValue = (value: string): void => {
     } as ChangeEvent<HTMLInputElement>)
   })
 }
-let mockTrackEventWithRobotSerial: ReturnType<typeof vi.fn>
+let mockTrackEventWithRobotSerial: Mock<TrackEventWithRobotSerial>
 
 describe('FlowRate', () => {
   let props: ComponentProps<typeof FlowRateEntry>
@@ -93,9 +95,7 @@ describe('FlowRate', () => {
       } as QuickTransferSummaryState,
       dispatch: vi.fn(),
     }
-    mockTrackEventWithRobotSerial = vi.fn(
-      () => new Promise(resolve => resolve({}))
-    )
+    mockTrackEventWithRobotSerial = vi.fn<TrackEventWithRobotSerial>()
     vi.mocked(useTrackEventWithRobotSerial).mockReturnValue({
       trackEventWithRobotSerial: mockTrackEventWithRobotSerial,
     })

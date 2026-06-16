@@ -16,11 +16,13 @@ import type {
  */
 export async function requireDocumentation(
   username: string,
-  actionsToDocument: DocumentedAction[]
+  actionsToDocument: DocumentedAction[],
+  onCancel?: () => void
 ): Promise<DocumentationReport> {
   const modalResult = await showDocumentationRequiredModal(
     username,
-    actionsToDocument
+    actionsToDocument,
+    onCancel
   )
 
   return modalResult

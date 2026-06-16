@@ -21,6 +21,7 @@ import type {
  */
 export const usePromptForInteractionReason = (
   actionsToDocument: DocumentedAction[],
+  onCancel?: () => void,
   initialDocstate?: DocumentationState
 ): DocumentationState => {
   const [docReport, setDocReport] = useState<DocumentationReport>()
@@ -37,7 +38,7 @@ export const usePromptForInteractionReason = (
         if (docState.docreport == null && !promptInFlight.current) {
           promptInFlight.current = true
           await docState
-            .askForDocumentation(actionsToDocument)
+            .askForDocumentation(actionsToDocument, onCancel)
             .then(setDocReport)
             .finally(() => {
               promptInFlight.current = false
@@ -48,7 +49,7 @@ export const usePromptForInteractionReason = (
     if (!docState.isLoading) {
       void promptForDocumentation()
     }
-  }, [actionsToDocument, docReport, docState])
+  }, [actionsToDocument, docReport, docState, onCancel])
 
   return docState
 }

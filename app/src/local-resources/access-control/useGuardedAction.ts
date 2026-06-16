@@ -28,6 +28,7 @@ import type {
  *
  *  This documentation state is designed to be passed along to the useDocumentedMutation hook.
  *
+ * @param docreport - optional pre-provided documentation report
  */
 export function useGuardedAction(
   docreport?: DocumentationReport
@@ -58,14 +59,18 @@ export function useGuardedAction(
   )
 
   const showDocumentationModal = useCallback(
-    async (actionsToDocument: DocumentedAction[]) => {
+    async (
+      actionsToDocument: DocumentedAction[],
+      handleCancel?: () => void
+    ) => {
       const docResult = await requireDocumentation(
         currentUsername ?? '',
-        actionsToDocument
+        actionsToDocument,
+        handleCancel
       )
       return docResult
     },
-    [currentUsername, requireDocumentation]
+    [requireDocumentation, currentUsername]
   )
 
   const docState: DocumentationState = useMemo(() => {

@@ -24,6 +24,10 @@
   "set_new_password_error_update_failed": "Failed to update password. Try again.",
   "login_form_password_field": "Password",
   "login_form_username_field": "Username",
+  "on_device_login": "Login",
+  "on_device_login_confirm_password": "Confirm password",
+  "on_device_login_new_password": "New password",
+  "on_device_login_password_mismatch": "Passwords do not match.",
   "username": "Username",
   "view_actions": "View actions"
 }
