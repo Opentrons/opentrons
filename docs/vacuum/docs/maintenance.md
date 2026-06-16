@@ -19,14 +19,15 @@ The following table lists the chemicals you can use to clean the exterior of the
 | Distilled water | You can use distilled water to clean or rinse your vacuum module. |
 
 !!! Warning
-    - Do not put the vacuum module in an autoclave.
-    - Do not clean the vacuum module with acetone.
-    - Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
+    Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
 ## Emptying the air-liquid separator
 
-The Control Box houses an air-liquid separator. This device is recessed in a niche on the side of the Control Box. It traps liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. You should regularly clean condensate from the bowl or whenever any accumulated liquid reaches the max fill line.
+The Control Box includes an air-liquid separator. This device is located in a recessed in a niche on the side of the Control Box. It traps liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. You can remove the bowl to clean condensate from it, or whenever any accumulated liquid reaches the max fill line.
 
+<figure markdown>
+![test image](images/bi-directional-arrow-test2.png){ width="80%" }
+</figure>
 
 <figure markdown>
 ![Air-liquid separator showing detachment tab and twist directions in a magnified section](images/separator-magnified2.png){ width="50%" }
