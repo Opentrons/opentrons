@@ -4,6 +4,7 @@ import {
   formatPyValue,
   getModuleHasLiveTask,
   indentPyLines,
+  PROTOCOL_CONTEXT_NAME,
   uuid,
 } from '../../utils'
 import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
@@ -46,14 +47,19 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
       }
     : null
 
-  const taskPython = taskId == null ? '' : `${taskId} = `
-
   const gaugePressureArg = `gauge_pressure_mbar=${formatPyValue(gaugePressure)}`
   const holdArgsPython = isTimedHold
     ? getVacuumPumpHoldArgsPython(duration, ventAfter)
     : []
   const allArgsPython = [gaugePressureArg, ...holdArgsPython]
-  const python = `${taskPython}${module.pythonName}.start_set_vacuum_pressure(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
+  const basePython = `${module.pythonName}.start_set_vacuum_pressure(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
+  const taskCreatorPython = isTimedHold
+    ? `${taskId} = ${PROTOCOL_CONTEXT_NAME}.create_timer(seconds=${formatPyValue(duration)})`
+    : null
+  const python = [
+    basePython,
+    ...(taskCreatorPython != null ? [taskCreatorPython] : []),
+  ].join('\n')
 
   return {
     commands: [

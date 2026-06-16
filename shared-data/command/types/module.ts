@@ -403,7 +403,7 @@ export interface VacuumProfileCycle {
 export type VacuumProfile = Array<VacuumProfileCycle | AtomicVacuumProfileStep>
 export interface VacuumRunProfileParams {
   moduleId: string
-  profile: VacuumProfile
+  steps: VacuumProfile
   taskId?: string
   ventAfter?: boolean
 }

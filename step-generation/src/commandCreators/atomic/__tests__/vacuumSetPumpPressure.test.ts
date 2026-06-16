@@ -119,11 +119,13 @@ mock_vacuum_module.start_set_vacuum_pressure(
         },
       ],
       python: `
-mock_vacuum_module_task_3 = mock_vacuum_module.start_set_vacuum_pressure(
+mock_vacuum_module.start_set_vacuum_pressure(
     gauge_pressure_mbar=100,
-    duration=45,
+    duration_s=45,
     vent_after=True
-)`.trim(),
+)
+mock_vacuum_module_task_3 = protocol.create_timer(seconds=45)
+`.trim(),
     })
   })
 
