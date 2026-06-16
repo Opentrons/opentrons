@@ -11,7 +11,7 @@ from opentrons.protocol_api import (
 from typing import List, Dict, Union
 
 metadata = {
-    "protocolName": "Simple Normalize Long with LPD and Single Tip NOABRFOLDER",
+    "protocolName": "Simple Normalize Long with LPD and Single Tip NO ABR",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
 }
