@@ -47,7 +47,7 @@ Basic Flow (No Tip Rack Lid Recycling):
 1. Configure stacker with `set_stored_labware()`
 2. Retrieve labware with `stacker.retrieve()`
 3. Move to workspace with `protocol.move_labware()`
-4. Remove tip rack lid to waste with `protocol.move_lid(tip_rack, waste_chute, use_gripper=True)`
+4. Remove tip rack lid to waste chute or trash bin with `protocol.move_lid(tip_rack, waste_chute, use_gripper=True)` or `protocol.move_lid(tip_rack, trash_bin, use_gripper=True)`
 5. Use labware normally
 6. Dispose used labware to waste chute
 
@@ -81,19 +81,19 @@ Advanced Flow (With Lid Recycling):
 
 - [ ] Stackers only in A4, B4, C4, D4
 - [ ] Labware is allowed in adjacent slots (A3, B3, C3, D3)
-- [ ] Trash bin in column 1 or 3 only (but must use column 1 when four stackers are present)
+- [ ] Trash bin only in column 3 or column 1. If four stackers are installed, the trash bin will be blocked from column 3, so column 1 must be used.
 - [ ] Waste chute loaded for tip rack disposal
 - [ ] Tip rack lid removal after tip rack retrieval OR tip rack lid transfer to temporary storage on lidless tip rack
 - [ ] All moves use `use_gripper=True`
 - [ ] Proper waste disposal hierarchy followed
 - [ ] **Supply stackers configured correctly:**
-  - [] With 'lid' parameter if storing fresh tip racks
-- [] **Collection stackers configured correctly:**
-  - [] Without 'lid' parameter if storing lidless tip racks
-  - [] With 'lid' parameter if storing re-lidded tip racks
-- [] **Lid recycling workflow (if applicable):**
-- [] Temporary lid storage location identified on lidless tip rack
-- [] Lid retrieval steps included before storing used/empty tip racks
+  - [ ] With 'lid' parameter if storing fresh tip racks
+- [ ] **Collection stackers configured correctly:**
+  - [ ] Without 'lid' parameter if storing lidless tip racks
+  - [ ] With 'lid' parameter if storing re-lidded tip racks
+- [ ] **Lid recycling workflow (if applicable):**
+- [ ] Temporary lid storage location identified on lidless tip rack
+- [ ] Lid retrieval steps included before storing used/empty tip racks
 
 ## **Common Stacker Errors and Solutions**
 
