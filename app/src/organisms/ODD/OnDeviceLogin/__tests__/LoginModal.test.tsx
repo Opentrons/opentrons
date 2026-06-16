@@ -1,4 +1,3 @@
-import { QueryClient } from 'react-query'
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,15 +12,7 @@ import {
 
 import { showLoginModal } from '../LoginModal'
 
-import type {
-  AuthUser,
-  HostConfig,
-  OAuth2TokenResponse,
-} from '@opentrons/api-client'
-
-vi.mock('../clearStaleAuthBeforeLogin', () => ({
-  clearStaleAuthBeforeLogin: () => Promise.resolve(),
-}))
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('/app/redux/discovery', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
@@ -33,12 +24,6 @@ vi.mock('/app/redux/discovery', async importOriginal => {
 
 vi.mock('/app/resources/access-control/useStoreLoginState')
 vi.mock('/app/resources/auth')
-
-const QUERY_CLIENT = new QueryClient()
-const HOST_CONFIG: HostConfig = {
-  hostname: 'localhost',
-  token: 'access-token',
-}
 
 const OAUTH_RESPONSE: OAuth2TokenResponse = {
   token_type: 'Bearer',
@@ -83,7 +68,7 @@ function setupLoginModalTrigger(): () => ReturnType<typeof showLoginModal> {
       <button
         type="button"
         onClick={() => {
-          resultPromise = showLoginModal(QUERY_CLIENT, HOST_CONFIG)
+          resultPromise = showLoginModal()
         }}
       >
         Open login modal
