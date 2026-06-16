@@ -116,8 +116,12 @@ function logInWithTempPassword(): void {
 
 describe('LoginModal', () => {
   let storeLoginState: ReturnType<typeof useStoreLoginState>
-  let submitPassword: ReturnType<typeof vi.fn>
-  let submitNewPassword: ReturnType<typeof vi.fn>
+  let submitPassword: ReturnType<
+    typeof useOAuth2PasswordLogin
+  >['submitPassword']
+  let submitNewPassword: ReturnType<
+    typeof useSetNewPasswordAndSignIn
+  >['submitNewPassword']
 
   beforeEach(() => {
     storeLoginState =
@@ -128,8 +132,8 @@ describe('LoginModal', () => {
           successfulLoginResponse: OAuth2TokenResponse
         ) => void
       >()
-    submitPassword = vi.fn()
-    submitNewPassword = vi.fn()
+    submitPassword = vi.fn<(username: string, password: string) => void>()
+    submitNewPassword = vi.fn<(username: string, password: string) => void>()
     vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword,
