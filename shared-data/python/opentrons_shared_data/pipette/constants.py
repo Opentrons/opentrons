@@ -1,9 +1,8 @@
 # This file contains constants defined for pipettes and liquid handling
 
-from typing import TYPE_CHECKING, Dict
+from typing import Dict
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.types import ChannelCount
+from opentrons_shared_data.pipette.types import ChannelCount
 
 PIPETTE_X_SPAN: Dict[ChannelCount, float] = {
     1: 75,  # includes a margin
