@@ -8,7 +8,7 @@ from opentrons.protocol_api import (
 
 
 metadata = {
-    "protocolName": "Vacuum Module DVT QC Protocol V0.1",
+    "protocolName": "Vacuum Module DVT QC Protocol V0.2",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
@@ -133,13 +133,13 @@ def run(ctx: ProtocolContext) -> None:
         # Close the vent and vacuum at -200 mbar for 30s, then open the vent
         # Note: The `start_set_vacuum_pressure` command is a concurrent module action
         # So you have to use another mechanism like ProtocolContext.delay or
-        # ProtocolContext.create_timer + ProtocolContext.wait_for_tasks if you
-        # want to WAIT for the vacuum step to finish before continuing.
+        # ProtocolContext.wait_for_tasks if you want to WAIT for the vacuum
+        # duration step to finish before continuing the protocol.
         vm_mod.close_vent()
-        vm_mod.start_set_vacuum_pressure(target_pressure, hold_time, vent_after=True)
-        ctx.delay(
-            hold_time, msg=f"Start Vacuum {target_pressure} mbar for {hold_time}s"
+        task1 = vm_mod.start_set_vacuum_pressure(
+            target_pressure, hold_time, vent_after=True
         )
+        ctx.wait_for_tasks([task1])
 
         # Move the collar with filter plate to the dock
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
@@ -155,12 +155,10 @@ def run(ctx: ProtocolContext) -> None:
         pip.return_tip()
         tiprack_200.reset()
 
-        # Close the vent and vacuum at -200 mbar for 30s, and keep the vent closed
+        # Close the vent run pump at 80% for 30s, and keep the vent closed
         vm_mod.close_vent()
-        vm_mod.start_set_vacuum_pressure(target_pressure, hold_time, vent_after=False)
-        ctx.delay(
-            hold_time, msg=f"Start Vacuum {target_pressure} mbar for {hold_time}s"
-        )
+        task2 = vm_mod.start_set_vacuum_power(80, hold_time, vent_after=False)
+        ctx.wait_for_tasks([task2])
         # Manually open the vent
         vm_mod.open_vent()
 
@@ -180,7 +178,7 @@ def run(ctx: ProtocolContext) -> None:
         if run_profile:
             # ------------- Running profiles -------------
             vm_mod.close_vent()
-            task1 = vm_mod.start_execute_profile(
+            task3 = vm_mod.start_execute_profile(
                 steps=[
                     {
                         "enable_pump": True,
@@ -209,7 +207,7 @@ def run(ctx: ProtocolContext) -> None:
                 ],
                 repetitions=1,
             )
-            ctx.wait_for_tasks([task1])
+            ctx.wait_for_tasks([task3])
 
             # Turn off the pump after the profile is done
             vm_mod.stop_vacuum_pump()
