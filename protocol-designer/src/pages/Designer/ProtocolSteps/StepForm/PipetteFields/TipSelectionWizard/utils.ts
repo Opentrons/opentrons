@@ -52,6 +52,8 @@ const BASE_OFFSET_Y = 15
 // additional offset to account for irregular OT-2 8-channel pipette geometry (right "hump")
 const OFFSET_OT2_8_CHANNEL = 10
 
+type LabwareRobotState = RobotState['labware']
+
 export const getViewboxFromSelectedLabware = (
   selectedLabwareId: string,
   robotState: TimelineFrame | null,
@@ -194,7 +196,7 @@ export function getIsTiprackSelectable(args: {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
-  labwareRobotState: RobotState['labware']
+  labwareRobotState: LabwareRobotState
 }): boolean {
   // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
   const {
@@ -238,7 +240,7 @@ interface GetIsTiprackSelectableAndValidArgs {
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
   validTiprackIds: string[]
-  labwareRobotState: RobotState['labware']
+  labwareRobotState: LabwareRobotState
 }
 
 export const getIsTiprackSelectableAndValid = (
@@ -271,7 +273,7 @@ export const getAreAnyMatchingTipracksSelectable = (args: {
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
   validTiprackIds: string[]
-  labwareRobotState: RobotState['labware']
+  labwareRobotState: LabwareRobotState
 }): boolean => {
   const {
     allLabware,
@@ -282,12 +284,12 @@ export const getAreAnyMatchingTipracksSelectable = (args: {
     validTiprackIds,
     labwareRobotState,
   } = args
-  return allLabware.some(lw => {
-    if (!validTiprackIds.includes(lw.id)) {
+  return allLabware.some(labware => {
+    if (!validTiprackIds.includes(labware.id)) {
       return false
     }
     return getIsTiprackSelectable({
-      labware: lw,
+      labware,
       pipetteSpecs,
       formTiprackUri,
       nozzles,
