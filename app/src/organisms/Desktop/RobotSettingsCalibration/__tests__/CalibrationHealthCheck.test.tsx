@@ -10,7 +10,18 @@ import {
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useAttachedPipettes } from '/app/resources/instruments'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+} from '/app/redux/calibration/pipette-offset/__fixtures__'
+import {
+  mockTipLengthCalibration1,
+  mockTipLengthCalibration2,
+} from '/app/redux/calibration/tip-length/__fixtures__'
+import {
+  useAttachedPipetteCalibrations,
+  useAttachedPipettes,
+} from '/app/resources/instruments'
 import { mockAttachedPipette } from '/app/resources/instruments/__fixtures__'
 import { useRunStatuses } from '/app/resources/runs'
 
@@ -18,6 +29,7 @@ import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 
 import type { ComponentProps } from 'react'
 import type { AttachedPipettesByMount } from '@opentrons/api-client'
+import type { PipetteCalibrationsByMount } from '/app/resources/instruments/types'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
@@ -29,6 +41,17 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
+
+const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
+  left: {
+    offset: mockPipetteOffsetCalibration1,
+    tipLength: mockTipLengthCalibration1,
+  },
+  right: {
+    offset: mockPipetteOffsetCalibration2,
+    tipLength: mockTipLengthCalibration2,
+  },
+}
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -63,6 +86,9 @@ describe('CalibrationHealthCheck', () => {
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
+    vi.mocked(useAttachedPipetteCalibrations).mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
   })
 
