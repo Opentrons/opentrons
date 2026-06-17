@@ -13,7 +13,5 @@ export function ComplianceReadySoftwareSettings({
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('access_control')
 
-  return (
-    <Accordion title={t('desktop_compliance_ready_software_settings')} />
-  )
+  return <Accordion title={t('desktop_compliance_ready_software_settings')} />
 }

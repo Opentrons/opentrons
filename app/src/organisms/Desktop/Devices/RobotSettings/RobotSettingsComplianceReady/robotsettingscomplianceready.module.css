@@ -1,3 +1,10 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+  width: 100%;
+}
+
 .section {
   display: flex;
   width: 100%;
@@ -5,5 +12,10 @@
   flex-direction: column;
   padding: var(--spacing-16);
   border-radius: var(--border-radius-8);
-  gap: var(--spacing-24);
+  background-color: var(--white);
+}
+
+.section_accordion {
+  padding: 0;
+  overflow: hidden;
 }

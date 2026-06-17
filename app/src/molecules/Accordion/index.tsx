@@ -26,10 +26,7 @@ export function Accordion({ title, children }: AccordionProps): JSX.Element {
         aria-expanded={isExpanded}
         aria-controls={contentId}
       >
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          className={styles.title}
-        >
+        <StyledText desktopStyle="bodyDefaultSemiBold" className={styles.title}>
           {title}
         </StyledText>
         <Icon

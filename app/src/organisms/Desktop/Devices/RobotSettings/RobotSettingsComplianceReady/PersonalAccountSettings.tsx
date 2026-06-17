@@ -50,12 +50,12 @@ export function PersonalAccountSettings({
           {t('desktop_personal_account_settings')}
         </StyledText>
         <StyledText desktopStyle="bodyDefaultRegLink">
-        <a
-          href={`/devices/${robotName}/robot-settings/compliance-ready`}
-          className={styles.edit_link}
-        >
-          {t('desktop_edit')}
-        </a>
+          <a
+            href={`/devices/${robotName}/robot-settings/compliance-ready`}
+            className={styles.edit_link}
+          >
+            {t('desktop_edit')}
+          </a>
         </StyledText>
       </div>
       <div className={styles.content}>

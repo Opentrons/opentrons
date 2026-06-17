@@ -135,6 +135,7 @@ export function RobotSettingsComponent({
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
     <Navigate to={`/devices/${robotName}/robot-settings/calibration`} />
   )
+  const isComplianceReadyTab = robotSettingsTab === 'compliance-ready'
 
   return (
     <>
@@ -197,18 +198,22 @@ export function RobotSettingsComponent({
         </Flex>
       </Box>
       <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_AROUND}
-          backgroundColor={COLORS.white}
-          borderRadius={BORDERS.borderRadius8}
-          marginBottom={SPACING.spacing16}
-          paddingX={SPACING.spacing16}
-          paddingY={SPACING.spacing16}
-        >
-          {robotSettingsContent}
-        </Flex>
+        {isComplianceReadyTab ? (
+          <Box marginBottom={SPACING.spacing16}>{robotSettingsContent}</Box>
+        ) : (
+          <Flex
+            width="100%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_SPACE_AROUND}
+            backgroundColor={COLORS.white}
+            borderRadius={BORDERS.borderRadius8}
+            marginBottom={SPACING.spacing16}
+            paddingX={SPACING.spacing16}
+            paddingY={SPACING.spacing16}
+          >
+            {robotSettingsContent}
+          </Flex>
+        )}
       </Box>
     </>
   )

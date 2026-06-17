@@ -15,7 +15,17 @@ const meta: Meta<typeof AccordionComponent> = {
   },
   decorators: [
     Story => (
-      <div style={{ maxWidth: '42.375rem', width: '100%' }}>
+      <div
+        style={{
+          maxWidth: '42.375rem',
+          width: '100%',
+          padding: '1.5rem 1rem',
+          backgroundColor: 'var(--grey-20)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+        }}
+      >
         <Story />
       </div>
     ),
