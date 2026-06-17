@@ -27,8 +27,6 @@ export interface ProtocolAnalyticsData {
 export interface RobotAnalyticsData {
   robotApiServerVersion: string
   robotSmoothieVersion: string
-  robotLeftPipette: string
-  robotRightPipette: string
   robotSerialNumber: string
 
   // feature flags

@@ -7,7 +7,6 @@ import {
   getRobotFirmwareVersion,
   getRobotSerialNumber,
 } from '/app/redux/discovery'
-import { getAttachedPipettes } from '/app/redux/pipettes'
 import { fetchSettings, getRobotSettings } from '/app/redux/robot-settings'
 
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
@@ -25,9 +24,6 @@ export function useRobotAnalyticsData(
   robotName: string
 ): RobotAnalyticsData | null {
   const robot = useRobot(robotName)
-  const pipettes = useSelector((state: State) =>
-    getAttachedPipettes(state, robotName)
-  )
   const settings = useSelector((state: State) =>
     getRobotSettings(state, robotName)
   )
@@ -49,13 +45,11 @@ export function useRobotAnalyticsData(
         {
           robotApiServerVersion: getRobotApiVersion(robot) ?? '',
           robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
-          robotLeftPipette: pipettes.left?.model ?? '',
-          robotRightPipette: pipettes.right?.model ?? '',
           robotSerialNumber: serialNumber ?? '',
         }
       )
     }
 
     return null
-  }, [pipettes, robot, settings, serialNumber])
+  }, [robot, settings, serialNumber])
 }
