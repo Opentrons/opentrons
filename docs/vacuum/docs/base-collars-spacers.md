@@ -10,7 +10,7 @@ Module deck components consist of a vacuum base, interchangeable collars, and in
 The vacuum base sits directly on the deck plate adapter. It serves as the foundation of the module's hardware stack, supporting all internal spacers, collars, and protocol labware.
 
 <figure markdown>
-  ![Vacuum base](images/vacuum-base.svg){ width="70%" }
+  ![Vacuum base](images/base_iso_right3.svg){ width="90%" }
   <figcaption>Vacuum base with quick-connect manifold.</figcaption>
 </figure>
 
@@ -56,20 +56,18 @@ This configuration is used when a protocol requires capturing liquid (the eluate
 * **Fluid Routing:** Minimizing the gap between the plates ensures that liquid flows vertically through the filter plate and drips straight into the corresponding collection wells.
 
 <figure markdown>
-  ![placeholder for diagram](images/stack-filter-to-plate.svg){ width="60%" }
+  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="60%" }
   <figcaption>Elution and filtrate collection stack</figcaption>
 </figure>
 
-### Filter to waste collection
+### Filter to waste disposal
 
 This configuration is used when a protocol does not require capturing liquid from a filter plate. Instead, the fluid drawn through the filter plate is unwanted waste and can be discarded directly.
 
 * **Internal Hardware:** Neither an internal spacer nor a collection plate is required inside the vacuum base. The interior of the base remains completely empty, capped by a short or tall collar and the fluid source well plate.
 * **Fluid Routing:** Vacuum pressure draws liquid straight through the filter plate into the vacuum base. From there, the material flows out via the connected vacuum hose to the off-deck waste collection jar.
 
-<font color="red"><strong>EXPLODED DIAGRAM PLACEHOLDER</strong></font>
-
 <figure markdown>
-  ![placeholder for diagram](images/image-placeholder.png)
-  <figcaption>Stack (top to bottom): source well plate, collar and grid, vacuum base</figcaption>
+  ![Waste disposal stack showing labeled parts](images/stack-filter-to-waste.svg){ width="80%" }
+  <figcaption>Waste disposal stack</figcaption>
 </figure>
