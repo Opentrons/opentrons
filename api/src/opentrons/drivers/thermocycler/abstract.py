@@ -102,3 +102,7 @@ class AbstractThermocyclerDriver(ABC):
     async def get_error_state(self) -> None:
         """Raise if the thermocycler is in an error state."""
         ...
+
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        pass
