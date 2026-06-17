@@ -1,15 +1,46 @@
 import asyncio
 import threading
 import time
+from pathlib import Path
 from typing import Callable, Generator
 
 import aiohttp.web
 import pytest
 import requests
+from sqlalchemy.engine import Engine as SQLEngine
 
 from tests.dev_server import DevServer
 
+from audit_server.persistence.database import create_schema, sql_engine_ctx
+
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
+
+
+@pytest.fixture
+def db_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
+    """A SQLAlchemy engine backed by a fresh SQLite DB with the schema created."""
+    db_path = tmp_path / "test_audit.db"
+    with sql_engine_ctx(db_path) as engine:
+        create_schema(engine)
+        yield engine
+
+
+@pytest.fixture(autouse=True)
+def configure_test_logs(caplog: pytest.LogCaptureFixture) -> None:
+    """Configure which logs pytest captures and displays.
+
+    Because of the autouse=True, this automatically applies to each test.
+
+    By default, pytest displays log messages of level WARNING and above.
+    If you need to adjust this in the course of a debugging adventure,
+    you should normally do it by passing something like --log-level=DEBUG
+    to pytest on the command line.
+    """
+    # Fix up SQLAlchemy's logging so that it uses the same log level as everything else.
+    # By default, SQLAlchemy's logging is slightly unusual: it hides messages below
+    # WARNING, even if you pass --log-level=DEBUG to pytest on the command line.
+    # See: https://docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
+    caplog.set_level("NOTSET", logger="sqlalchemy")
 
 
 @pytest.fixture

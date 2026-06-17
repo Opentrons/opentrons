@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Generator
-
 import pytest
 from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session
 
-from audit_server.persistence.database import create_schema, sql_engine_ctx
 from audit_server.persistence.orm_models import Setting
 from audit_server.settings.models import (
     PatchLoggingEnabledRequestData,
@@ -18,15 +14,6 @@ from audit_server.settings.models import (
     SettingsResponseData,
 )
 from audit_server.settings.store import SettingsStore
-
-
-@pytest.fixture
-def db_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
-    """A SQLAlchemy engine backed by a fresh SQLite DB with the schema created."""
-    db_path = tmp_path / "test_audit.db"
-    with sql_engine_ctx(db_path) as engine:
-        create_schema(engine)
-        yield engine
 
 
 @pytest.fixture
