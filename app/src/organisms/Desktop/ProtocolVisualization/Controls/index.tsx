@@ -14,6 +14,11 @@ import {
 import styles from './controls.module.css'
 import { PerStepOverflowMenu } from './PerStepOverflowMenu'
 
+// import {
+//   getNextGroupFirstCommandId,
+//   getPreviousGroupFirstCommandId,
+// } from './utils'
+
 import type { Dispatch, SetStateAction } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
