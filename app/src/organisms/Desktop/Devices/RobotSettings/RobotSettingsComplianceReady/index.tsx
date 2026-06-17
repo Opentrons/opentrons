@@ -1,19 +1,35 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { COLORS, Divider, StyledText } from '@opentrons/components'
+import { Divider, StyledText } from '@opentrons/components'
 import { useSelfQuery } from '@opentrons/react-api-client'
 
 import { getAuthStateForRobot } from '/app/redux/robot-auth'
 
 import styles from './robotsettingscomplianceready.module.css'
 
-import type { JSX } from 'react'
+import type { JSX, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 export interface RobotSettingsComplianceReadyProps {
   robotName: string
   isRobotBusy: boolean
+}
+
+interface FieldRowProps {
+  label: string
+  children: ReactNode
+}
+
+function FieldRow({ label, children }: FieldRowProps): JSX.Element {
+  return (
+    <div className={styles.field_row}>
+      <div className={styles.field_label}>
+        <StyledText desktopStyle="bodyDefaultSemiBold">{label}</StyledText>
+      </div>
+      <div className={styles.field_value}>{children}</div>
+    </div>
+  )
 }
 
 export function RobotSettingsComplianceReady({
@@ -31,49 +47,47 @@ export function RobotSettingsComplianceReady({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <StyledText desktopStyle="bodyLargeSemiBold">
+        <StyledText desktopStyle="bodyDefaultRegular">
           {t('desktop_personal_account_settings')}
         </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegLink">
+        <a
+          href={`/devices/${robotName}/robot-settings/compliance-ready`}
+          className={styles.edit_link}
+        >
           {t('desktop_edit')}
-        </StyledText>
+        </a>
       </div>
       <div className={styles.content}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('desktop_username')}
-        </StyledText>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
-          className={styles.field_value}
-        >
-          {username}
-        </StyledText>
-        <Divider className={styles.divider} />
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('desktop_legal_name')}
-        </StyledText>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
-          className={styles.field_value}
-        >
-          {fullName}
-        </StyledText>
-        <Divider className={styles.divider} />
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('desktop_password')}
-        </StyledText>
-        {isProfileLoaded ? (
-          <input
-            type="password"
-            readOnly
-            value="password"
-            className={styles.masked_password_input}
-            tabIndex={-1}
-            aria-hidden
-          />
-        ) : null}
+        <FieldRow label={t('desktop_username')}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            className={styles.field_value_text}
+          >
+            {username}
+          </StyledText>
+        </FieldRow>
+        <Divider />
+        <FieldRow label={t('desktop_legal_name')}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            className={styles.field_value_text}
+          >
+            {fullName}
+          </StyledText>
+        </FieldRow>
+        <Divider />
+        <FieldRow label={t('desktop_password')}>
+          {isProfileLoaded ? (
+            <input
+              type="password"
+              readOnly
+              value="password"
+              className={styles.masked_password_input}
+              tabIndex={-1}
+              aria-hidden
+            />
+          ) : null}
+        </FieldRow>
       </div>
     </div>
   )

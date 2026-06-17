@@ -2,37 +2,55 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-16);
+  width: 100%;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+}
+
+.edit_link {
+  color: inherit;
+  text-decoration: underline;
 }
 
 .content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.field_row {
+  display: flex;
   align-items: center;
   gap: var(--spacing-16);
 }
 
-.divider {
-  grid-column: 1 / -1;
+.field_label {
+  flex-shrink: 0;
+  width: 120px;
+  min-height: 20px;
+  line-height: var(--line-height-20);
 }
 
 .field_value {
-  justify-self: end;
+  flex: 1;
+  min-height: 20px;
+  line-height: var(--line-height-20);
+}
+
+.field_value_text {
+  color: var(--grey-60);
 }
 
 .masked_password_input {
-  justify-self: end;
-  width: auto;
   border: none;
   padding: 0;
   background: transparent;
   color: var(--grey-60);
   font: inherit;
-  text-align: right;
   pointer-events: none;
 }
