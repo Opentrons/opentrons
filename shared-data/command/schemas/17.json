@@ -8219,54 +8219,6 @@
       "title": "WaitForResumeParams",
       "type": "object"
     },
-    "WaitForTargetCreate": {
-      "description": "A request to stop the vacuum pump.",
-      "properties": {
-        "commandAnnotationIds": {
-          "description": "A list of command annotation IDs (if any) that apply to this command.",
-          "items": {
-            "type": "string"
-          },
-          "title": "Commandannotationids",
-          "type": "array"
-        },
-        "commandType": {
-          "const": "vacuumModule/waitForTarget",
-          "default": "vacuumModule/waitForTarget",
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/WaitForTargetParams"
-        }
-      },
-      "required": ["params"],
-      "title": "WaitForTargetCreate",
-      "type": "object"
-    },
-    "WaitForTargetParams": {
-      "description": "Input parameters to wait for pressure.",
-      "properties": {
-        "moduleId": {
-          "description": "Unique ID of the vacuum module.",
-          "title": "Moduleid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "WaitForTargetParams",
-      "type": "object"
-    },
     "WaitForTasksCreate": {
       "description": "WaitForTasks command request model.",
       "properties": {
@@ -8894,7 +8846,6 @@
       "vacuumModule/startSetVacuumPower": "#/$defs/StartSetVacuumPowerCreate",
       "vacuumModule/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
       "vacuumModule/stopVacuum": "#/$defs/StopVacuumCreate",
-      "vacuumModule/waitForTarget": "#/$defs/WaitForTargetCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
       "waitForResume": "#/$defs/WaitForResumeCreate",
@@ -9181,9 +9132,6 @@
     },
     {
       "$ref": "#/$defs/StartRunProfileCreate"
-    },
-    {
-      "$ref": "#/$defs/WaitForTargetCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"

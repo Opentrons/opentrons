@@ -283,18 +283,3 @@ def test_close_vent(
             command_annotations=[],
         )
     )
-
-
-def test_wait_for_target(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: VacuumModuleCore
-) -> None:
-    """Verify that the protocol engine command gets called correctly.."""
-    subject.wait_for_target()
-    decoy.verify(
-        mock_engine_client.execute_command(
-            cmd.vacuum_module.WaitForTargetParams(
-                moduleId="1234",
-            ),
-            command_annotations=[],
-        )
-    )

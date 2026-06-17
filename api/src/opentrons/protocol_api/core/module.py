@@ -605,7 +605,3 @@ class AbstractVacuumModuleCore(
         self,
     ) -> None:
         """Close the vent."""
-
-    @abstractmethod
-    def wait_for_target(self) -> None:
-        """Wait for either vacuum pressure or pwm."""

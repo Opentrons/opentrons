@@ -1307,10 +1307,3 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
             cmd.vacuum_module.CloseVentParams(moduleId=self.module_id),
             command_annotations=self._protocol_core.annotation_ids,
         )
-
-    def wait_for_target(self) -> None:
-        """Wait until the module's pressure or pwm is reached."""
-        self._engine_client.execute_command(
-            cmd.vacuum_module.WaitForTargetParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
-        )

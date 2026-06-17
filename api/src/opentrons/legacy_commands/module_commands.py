@@ -412,13 +412,3 @@ def vacuum_module_close_vent(
         "name": command_types.VACUUM_MODULE_CLOSE_VENT,
         "payload": {"text": text},
     }
-
-
-def vacuum_module_wait_for_target(
-    self: Any,
-) -> command_types.VacuumModuleWaitForTargetCommand:
-    text = f"{self} waiting for target"
-    return {
-        "name": command_types.VACUUM_MODULE_WAIT_FOR_TARGET,
-        "payload": {"text": text},
-    }

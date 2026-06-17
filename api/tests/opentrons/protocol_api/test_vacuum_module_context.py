@@ -394,17 +394,3 @@ def test_vacuum_module_start_execute_profile(
             steps=expected_core_steps, repetitions=repetitions, vent_after=False
         )
     )
-
-
-@pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
-)
-def test_vacuum_wait_for_target(
-    decoy: Decoy,
-    subject: VacuumModuleContext,
-    mock_core: VacuumModuleCore,
-) -> None:
-    """Make sure the the protocol engine function gets called correctly."""
-    subject.wait_for_target()
-
-    decoy.verify(mock_core.wait_for_target())
