@@ -945,6 +945,21 @@ if __name__ == "__main__":
         protocol_ids,
     )
 
+    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), inputs.ip)
+    # make description replacement file
+    status_path = make_json_file(storage_directory, data.whole_description_str)
+    if len(inputs.run_or_other) < 1:
+        image_files = retrieve_protocol_images(
+            data.one_run, inputs.ip, storage_directory
+        )
+    else:
+        robot_name = get_name_from_ip(inputs.ip)
+        image_files = retrieve_live_image(inputs.ip, storage_directory, robot_name)
+
+    to_link = ticket.match_issues(
+        ticket.issues_on_board(inputs.project_key), data.summary
+    )
+
     print(f"Making ticket for {data.summary}.")
     # CREATE TICKET
     issue_key, raw_issue_url = ticket.create_ticket(
@@ -960,20 +975,6 @@ if __name__ == "__main__":
         parent=data.parent,
     )
 
-    log_zip_path = read_robot_logs.get_logs(Path(storage_directory), inputs.ip)
-    # make description replacement file
-    status_path = make_json_file(storage_directory, data.whole_description_str)
-    if len(inputs.run_or_other) < 1:
-        image_files = retrieve_protocol_images(
-            data.one_run, inputs.ip, storage_directory
-        )
-    else:
-        robot_name = get_name_from_ip(inputs.ip)
-        image_files = retrieve_live_image(inputs.ip, storage_directory, robot_name)
-
-    to_link = ticket.match_issues(
-        ticket.issues_on_board(inputs.project_key), data.summary
-    )
     ticket.link_issues(to_link, issue_key)
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)

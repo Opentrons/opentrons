@@ -1042,6 +1042,10 @@ def get_logs(storage_directory: Path, ip: str) -> str:
         ip, storage_directory, collected_files, robot_name
     )
 
+    collected_files = fetch_kernel_log(
+        ip, storage_directory, collected_files, robot_name
+    )
+
     calibration_file, _ = get_calibration_offsets(
         ip, storage_directory, collected_files
     )
@@ -1112,6 +1116,43 @@ def fetch_weston_log(
                 f"root@{ip}",
                 "journalctl",
                 "_COMM=weston",
+                "--no-pager",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        destination_path.write_text(result.stdout)
+        collected_files.append(str(destination_path))
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to fetch weston log for {robot_name}: {e}")
+    except subprocess.TimeoutExpired:
+        print(f"Weston log fetch timed out for {robot_name}")
+
+    return collected_files
+
+
+def fetch_kernel_log(
+    ip: str, storage_directory: Path, collected_files: list, robot_name: str
+) -> list[str]:
+    """Get kernel log via SSH journalctl, saved with robot name."""
+    destination_path = Path(storage_directory) / "kernel.log"
+    key_path = Path(storage_directory) / "robot_key"
+
+    try:
+        result = subprocess.run(
+            [
+                "ssh",
+                "-i",
+                str(key_path),
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-o",
+                "BatchMode=yes",
+                f"root@{ip}",
+                "journalctl",
+                "-k",
                 "--no-pager",
             ],
             check=True,
