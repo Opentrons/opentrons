@@ -23,6 +23,11 @@ export function ComplianceReadySoftwareSettings({
   const [autoLogoutMinutes, setAutoLogoutMinutes] = useState('')
   const [requirePasswordChange, setRequirePasswordChange] = useState(false)
   const [passwordChangeDays, setPasswordChangeDays] = useState('')
+  const [requirePasswordComplexity, setRequirePasswordComplexity] =
+    useState(false)
+  const [requireSpecialCharacters, setRequireSpecialCharacters] =
+    useState(false)
+  const [minimumPasswordLength, setMinimumPasswordLength] = useState('')
 
   const requirePasswordChangeSetting = (
     <div className={styles.toggle_setting}>
@@ -56,6 +61,57 @@ export function ComplianceReadySoftwareSettings({
     </div>
   )
 
+  const requirePasswordComplexitySetting = (
+    <div className={styles.toggle_setting}>
+      <div className={styles.toggle_row}>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          className={styles.toggle_label}
+        >
+          {t('desktop_require_password_complexity_requirements')}
+        </StyledText>
+        <div className={styles.toggle_button}>
+          <ToggleButton
+            label={t('desktop_require_password_complexity_requirements')}
+            toggledOn={requirePasswordComplexity}
+            onClick={() => {
+              setRequirePasswordComplexity(current => !current)
+            }}
+          />
+        </div>
+      </div>
+      {requirePasswordComplexity ? (
+        <>
+          <div className={styles.toggle_row}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              className={styles.toggle_label}
+            >
+              {t('desktop_require_special_characters')}
+            </StyledText>
+            <div className={styles.toggle_button}>
+              <ToggleButton
+                label={t('desktop_require_special_characters')}
+                toggledOn={requireSpecialCharacters}
+                onClick={() => {
+                  setRequireSpecialCharacters(current => !current)
+                }}
+              />
+            </div>
+          </div>
+          <InputSetting
+            label={t('desktop_minimum_password_length')}
+            value={minimumPasswordLength}
+            units={t('desktop_characters')}
+            onChange={event => {
+              setMinimumPasswordLength(event.target.value)
+            }}
+          />
+        </>
+      ) : null}
+    </div>
+  )
+
   const children = (
     <div className={styles.content}>
       <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -74,6 +130,8 @@ export function ComplianceReadySoftwareSettings({
         />
         <Divider />
         {requirePasswordChangeSetting}
+        <Divider />
+        {requirePasswordComplexitySetting}
         <Divider />
         <InputSetting
           label={t('desktop_auto_logout_inactivity_length')}

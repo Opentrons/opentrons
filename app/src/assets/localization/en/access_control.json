@@ -45,5 +45,9 @@
   "desktop_minutes": "mins",
   "desktop_require_password_change_after_time": "Require password to be changed after a certain amount of time",
   "desktop_length_of_time": "Edit length of time",
-  "desktop_days": "days"
+  "desktop_days": "days",
+  "desktop_require_password_complexity_requirements": "Require password complexity requirements",
+  "desktop_require_special_characters": "Require special characters",
+  "desktop_minimum_password_length": "Minimum password length",
+  "desktop_characters": "chars"
 }
