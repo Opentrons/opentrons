@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof ODDMediaContainerContent> = {
   title: 'App/Molecules/ODDMediaContainer',
   component: ODDMediaContainerContent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     state: {
       control: {

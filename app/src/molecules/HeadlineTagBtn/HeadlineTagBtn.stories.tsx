@@ -26,7 +26,7 @@ export default {
       if: { arg: 'hasTag', eq: true },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface HeadlineTagBtnStoryProps {

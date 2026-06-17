@@ -22,7 +22,7 @@ export default {
       description: 'Sample text to display in the example child component.',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface DeckInfoLabelTextTagStoryProps {

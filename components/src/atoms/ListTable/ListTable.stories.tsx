@@ -25,7 +25,7 @@ export default {
         'Prefer this component over SubListTable, since it contains the semantic HTML table tags. Include tr tags in the children when applicable. If a table is nested in ListTable, use SubListTable for the nested table.',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface ListTableStoryProps extends ComponentProps<

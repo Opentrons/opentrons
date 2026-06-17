@@ -37,7 +37,7 @@ const meta: Meta<typeof RadioButtonComponent> = {
     },
   },
 
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   args: {
     onChange: action('on-change'),
   },

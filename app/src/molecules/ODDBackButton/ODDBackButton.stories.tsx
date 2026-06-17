@@ -10,7 +10,7 @@ export default {
   argTypes: {
     onClick: { action: 'clicked' },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 const ODDBackButtonTemplate: Story<
