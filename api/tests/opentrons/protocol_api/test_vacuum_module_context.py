@@ -6,6 +6,10 @@ import pytest
 from decoy import Decoy
 
 from . import versions_at_or_above
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 from opentrons.hardware_control.modules.types import VacuumModuleModel
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import Labware, VacuumModuleContext
@@ -384,8 +388,12 @@ def test_vacuum_module_start_execute_profile(
         ),
     ]
     repetitions = 2
-    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(0)
-    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(-800)
+    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(
+        MAX_GAUGE_PRESSURE_MBAR
+    )
+    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(
+        MIN_GAUGE_PRESSURE_MBAR
+    )
 
     subject.start_execute_profile(steps=profile_steps, repetitions=repetitions)
 
