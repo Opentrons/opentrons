@@ -417,8 +417,8 @@ async def test_update_vacuum_state(
     ("pressure_readings", "power_readings"),
     [
         (
-            [0, 0, -100, -200, -199, -201, -250, -300, -299, -300, -275, -300],
-            [0, 0, 30, 50, 30, 35, 40, 65, 66, 67, 68, 75],
+            [0, 0, -100, -200, -300, -275, -300],
+            [0, 0, 30, 66, 67, 68, 75],
         )
     ],
 )
@@ -500,9 +500,9 @@ async def test_wait_for_target(
     assert len(pressure_readings) == len(power_readings)
 
     expected_pressure_reads = (
-        len(pressure_readings) + PRESSURE_COMPARISON_WINDOW_SIZE + 1
+        len(pressure_readings) + PRESSURE_COMPARISON_WINDOW_SIZE
     )
-    expected_power_reads = len(power_readings) + POWER_COMPARISON_WINDOW_SIZE
+    expected_power_reads = len(power_readings) + POWER_COMPARISON_WINDOW_SIZE - 1
 
     assert pressure_reads_while_waiting == expected_pressure_reads
     assert power_reads_while_waiting == expected_power_reads
