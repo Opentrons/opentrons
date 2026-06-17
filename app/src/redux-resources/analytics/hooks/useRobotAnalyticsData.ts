@@ -39,25 +39,22 @@ export function useRobotAnalyticsData(
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
 
-  // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-  return useMemo(
-    () => {
-      if (robot != null) {
-        return settings.reduce<RobotAnalyticsData>(
-          (result, setting) => ({
-            ...result,
-            [`${FF_PREFIX}${setting.id}`]: !!(setting?.value ?? false),
-          }),
-          // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-          {
-            robotApiServerVersion: getRobotApiVersion(robot) ?? '',
-            robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
-            robotLeftPipette: pipettes.left?.model ?? '',
-            robotRightPipette: pipettes.right?.model ?? '',
-            robotSerialNumber: serialNumber ?? '',
-          }
-        )
-      }
+  return useMemo(() => {
+    if (robot != null) {
+      return settings.reduce<RobotAnalyticsData>(
+        (result, setting) => ({
+          ...result,
+          [`${FF_PREFIX}${setting.id}`]: !!(setting?.value ?? false),
+        }),
+        {
+          robotApiServerVersion: getRobotApiVersion(robot) ?? '',
+          robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
+          robotLeftPipette: pipettes.left?.model ?? '',
+          robotRightPipette: pipettes.right?.model ?? '',
+          robotSerialNumber: serialNumber ?? '',
+        }
+      )
+    }
 
       return null
     },
