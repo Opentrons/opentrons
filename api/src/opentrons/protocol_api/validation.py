@@ -600,7 +600,7 @@ def _ensure_vacuum_module_step(
                 "gauge_pressure_mbar"
             )
             assert gauge_pressure_mbar is not None
-            if gauge_pressure_mbar < max_pressure or gauge_pressure_mbar > min_pressure:
+            if gauge_pressure_mbar < min_pressure or gauge_pressure_mbar > max_pressure:
                 raise ValueError(
                     f"Gauge pressure {gauge_pressure_mbar} invalid must be between {max_pressure} and {min_pressure} mbar."
                 )

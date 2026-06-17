@@ -27,7 +27,7 @@ async def test_start_set_vacuum_presure(
     state_view: StateView,
     equipment: EquipmentHandler,
     movement: MovementHandler,
-    task_handler: TaskHandler,
+    real_task_handler: TaskHandler,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
 ) -> None:
@@ -36,7 +36,7 @@ async def test_start_set_vacuum_presure(
         state_view=state_view,
         equipment=equipment,
         movement=movement,
-        task_handler=task_handler,
+        task_handler=real_task_handler,
     )
 
     gauge_pressure = -444.0
@@ -69,18 +69,6 @@ async def test_start_set_vacuum_presure(
     decoy.when(equipment.get_module_hardware_api(expected_module_id)).then_return(
         vm_hardware
     )
-    result = await subject.execute(data)
-
-    decoy.verify(
-        await vm_hardware.set_vacuum_state(
-            True,
-            gauge_pressure,
-            duration_s,
-            rate=pressure_rate,
-            timeout_s=timeout_s,
-            vent_after=True,
-        )
-    )
 
     task: Task | None = None
 
@@ -92,6 +80,21 @@ async def test_start_set_vacuum_presure(
     decoy.when(
         action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))  # type: ignore[func-returns-value]
     ).then_do(_capture_task)
+
+    result = await subject.execute(data)
+    assert task is not None
+    await task.asyncioTask
+
+    decoy.verify(
+        await vm_hardware.set_vacuum_state(
+            True,
+            gauge_pressure,
+            duration_s,
+            rate=pressure_rate,
+            timeout_s=timeout_s,
+            vent_after=True,
+        )
+    )
 
     assert result == SuccessData(
         public=expected_result,

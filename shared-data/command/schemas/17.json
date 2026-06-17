@@ -6765,6 +6765,19 @@
           "title": "Rate",
           "type": "number"
         },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
+        },
         "timeout": {
           "default": null,
           "description": "Specify timeframe in seconds that target power must be reached in before a timeout error occurs.",
@@ -6841,6 +6854,19 @@
           "description": "Target rate of pressure change in mbar/sec",
           "title": "Rate",
           "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
         },
         "timeout": {
           "default": null,
