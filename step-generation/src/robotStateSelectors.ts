@@ -232,7 +232,7 @@ export function getNextTiprack(
         getIsInPipettableLocation(slotInLocationStack)
 
       const hasLid = getLabwareHasLid({
-        labwareId: labwareId,
+        labwareId,
         labwareRobotState: robotState.labware,
         labwareEntities: invariantContext.labwareEntities,
       })
