@@ -36,5 +36,6 @@
   "desktop_password": "Password",
   "desktop_legal_name": "Legal name",
   "desktop_user_management": "User management",
-  "desktop_account_type": "Account type"
+  "desktop_account_type": "Account type",
+  "desktop_compliance_ready_software_settings": "Compliance Ready Software settings"
 }

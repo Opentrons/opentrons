@@ -184,7 +184,7 @@ export function RobotSettingsComponent({
           />
           <RoundTab
             to={`/devices/${robotName}/robot-settings/compliance-ready`}
-            tabName={t('compliance-ready')}
+            tabName={t('compliance_ready')}
             disabled={false}
           />
           {devToolsOn ? (

@@ -1,6 +1,8 @@
+import { ComplianceReadySoftwareSettings } from './ComplianceReadySoftwareSettings'
 import { PersonalAccountSettings } from './PersonalAccountSettings'
-import styles from './robotsettingscomplianceready.module.css'
 import { UserManagement } from './UserManagement'
+
+import styles from './robotsettingscomplianceready.module.css'
 
 import type { JSX } from 'react'
 
@@ -15,10 +17,13 @@ export function RobotSettingsComplianceReady({
   return (
     <>
       <div className={styles.section}>
-          <PersonalAccountSettings robotName={robotName} />
+        <PersonalAccountSettings robotName={robotName} />
       </div>
       <div className={styles.section}>
-          <UserManagement robotName={robotName} />
+        <UserManagement robotName={robotName} />
+      </div>
+      <div className={styles.section}>
+        <ComplianceReadySoftwareSettings robotName={robotName} />
       </div>
     </>
   )
