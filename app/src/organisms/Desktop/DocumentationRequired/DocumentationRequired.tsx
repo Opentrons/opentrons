@@ -56,6 +56,7 @@ export function DocumentationRequired({
       closeOnOutsideClick={false}
       zIndexOverlay={1000}
       width="47rem"
+      height="30rem"
       overflowY="hidden"
       footer={footer}
       marginLeft="0"

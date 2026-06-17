@@ -1,7 +1,7 @@
 .container {
   display: flex;
   width: 100%;
-  height: 15.5rem;
+  height: 19rem;
   flex-direction: row;
   align-items: stretch;
   gap: var(--spacing-40);
@@ -71,6 +71,7 @@
   height: auto;
   min-height: 0;
   flex: 1;
+  gap: var(--spacing-4);
 }
 
 .action_list div {
