@@ -61,8 +61,10 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedDataTransferProperties,
 )
 from opentrons_shared_data.liquid_classes.types import TipPositionDict
+from opentrons_shared_data.pipette.constants import VOLUME_ROUNDING_ERROR_TOLERANCE
 
 from . import validation
+from .validation import IsNegativeValueError
 
 
 class LiquidHandlingPropertyByVolume:
@@ -87,7 +89,17 @@ class LiquidHandlingPropertyByVolume:
 
     def get_for_volume(self, volume: float) -> float:
         """Get a value by volume for this property. Volumes not defined will be interpolated between set volumes."""
-        validated_volume = validation.ensure_positive_float(volume)
+        try:
+            validated_volume = validation.ensure_positive_float(volume)
+        except IsNegativeValueError as e:
+            # Due to rounding errors when handling volumes, we can sometimes get negative volumes close to zero.
+            # In such cases, we set the volume to zero.
+            if -VOLUME_ROUNDING_ERROR_TOLERANCE < volume < 0:
+                validated_volume = 0
+            else:
+                raise KeyError(
+                    f"Got invalid volume key {volume} for volume-dependent property. {e}"
+                ) from e
         if len(self._properties_by_volume) == 0:
             raise ValueError(
                 "No properties found for any volumes. Cannot interpolate for the given volume."
