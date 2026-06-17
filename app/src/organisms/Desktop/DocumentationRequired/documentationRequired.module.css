@@ -1,3 +1,31 @@
+.action_list_container {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.action_list {
+  height: auto;
+  min-height: 0;
+  flex: 1;
+  gap: var(--spacing-4);
+}
+
+.action_list div {
+  background-color: var(--grey-20);
+}
+
+.button_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
+  gap: var(--spacing-8);
+}
+
 .container {
   display: flex;
   width: 100%;
@@ -23,7 +51,6 @@
 }
 
 /* Stretch TextAreaField internals to fill the column (label + textarea). */
-/* TODO(jj): this sucks */
 .text_area_field_fill > div {
   display: flex;
   min-height: 0;
@@ -56,32 +83,4 @@
 .text_area_field_fill textarea {
   min-height: 0;
   flex: 1;
-}
-
-.action_list_container {
-  display: flex;
-  min-width: 0;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--spacing-8);
-}
-
-.action_list {
-  height: auto;
-  min-height: 0;
-  flex: 1;
-  gap: var(--spacing-4);
-}
-
-.action_list div {
-  background-color: var(--grey-20);
-}
-
-.button_container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
-  gap: var(--spacing-8);
 }
