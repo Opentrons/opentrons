@@ -1,0 +1,11 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.field_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
