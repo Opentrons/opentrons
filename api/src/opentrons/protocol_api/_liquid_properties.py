@@ -97,9 +97,7 @@ class LiquidHandlingPropertyByVolume:
             if -VOLUME_ROUNDING_ERROR_TOLERANCE < volume < 0:
                 validated_volume = 0
             else:
-                raise KeyError(
-                    f"Got invalid volume key {volume} for volume-dependent property. {e}"
-                ) from e
+                raise e
         if len(self._properties_by_volume) == 0:
             raise ValueError(
                 "No properties found for any volumes. Cannot interpolate for the given volume."
