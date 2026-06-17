@@ -24,7 +24,7 @@ function FieldRow({ label, children }: FieldRowProps): JSX.Element {
   return (
     <div className={styles.field_row}>
       <div className={styles.field_label}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">{label}</StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
       </div>
       <div className={styles.field_value}>{children}</div>
     </div>
@@ -46,15 +46,17 @@ export function PersonalAccountSettings({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <StyledText desktopStyle="bodyDefaultRegular">
+        <StyledText desktopStyle="bodyLargeSemiBold">
           {t('desktop_personal_account_settings')}
         </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegLink">
         <a
           href={`/devices/${robotName}/robot-settings/compliance-ready`}
           className={styles.edit_link}
         >
           {t('desktop_edit')}
         </a>
+        </StyledText>
       </div>
       <div className={styles.content}>
         <FieldRow label={t('desktop_username')}>

@@ -1,15 +1,15 @@
 .container {
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: var(--spacing-16);
-  width: 100%;
 }
 
 .header {
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
 }
 
 .edit_link {
@@ -30,15 +30,15 @@
 }
 
 .field_label {
-  flex-shrink: 0;
   width: 120px;
   min-height: 20px;
+  flex-shrink: 0;
   line-height: var(--line-height-20);
 }
 
 .field_value {
-  flex: 1;
   min-height: 20px;
+  flex: 1;
   line-height: var(--line-height-20);
 }
 
@@ -47,8 +47,8 @@
 }
 
 .masked_password_input {
-  border: none;
   padding: 0;
+  border: none;
   background: transparent;
   color: var(--grey-60);
   font: inherit;
