@@ -471,6 +471,8 @@ def get_robot_state(
     components = match_error_to_component(project_key, reported_string, components)
     # if "alpha" in affects_version:
     components.append("flex internal release")
+    if project_key == "RABR":
+        components.append("Flex-RABR")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
     labels = [robot]
@@ -532,7 +534,6 @@ def get_run_error_info_from_robot(
     # if "alpha" in affects_version:
     components.append("flex internal release")
     if project_key == "RABR":
-        components.append(failure_level)
         components.append("Flex-RABR")
     if "flexStacker" in str(description):
         components.append("Flex Stacker")
