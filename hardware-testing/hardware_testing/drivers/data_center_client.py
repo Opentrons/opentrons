@@ -1,3 +1,4 @@
+"""System to automatically upload testing result csvs to gdrive."""
 import argparse
 import json
 import os
@@ -5,8 +6,10 @@ import shutil
 import socket
 import sys
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Optional, Dict, Any, List, Union
 import requests
 
 DEFAULT_SERVER_HOST = "192.168.6.55"
@@ -23,7 +26,8 @@ DEFAULT_TIMEOUT = 120
 DEFAULT_PULL_METHOD = "scp"
 
 
-def get_local_ip():
+def get_local_ip() -> str:
+    """Get the robots ip."""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
@@ -34,7 +38,8 @@ def get_local_ip():
         return "127.0.0.1"
 
 
-def get_gateway():
+def get_gateway() -> Optional[str]:
+    """Get network gateway."""
     local_ip = get_local_ip()
     parts = local_ip.split(".")
     if len(parts) != 4:
@@ -42,7 +47,7 @@ def get_gateway():
     return f"{parts[0]}.{parts[1]}.{parts[2]}.1"
 
 
-def _check_ip(ip, port=8090):
+def _check_ip(ip: str, port: int = 8090) -> Optional[str]:
     try:
         url = f"http://{ip}:{port}{API_ENDPOINT_HEALTH}"
         response = requests.get(url, timeout=DEFAULT_TIMEOUT)
@@ -53,7 +58,8 @@ def _check_ip(ip, port=8090):
     return None
 
 
-def scan_network_for_server():
+def scan_network_for_server() -> Optional[str]:
+    """Find the local server."""
     gateway = get_gateway()
     if not gateway:
         print("Failed to get gateway, cannot scan network")
@@ -67,7 +73,8 @@ def scan_network_for_server():
     scanned_count = 0
     total_ips = 256
 
-    def scan_ip(ip_suffix):
+    def scan_ip(ip_suffix: int) -> Optional[str]:
+        """Scan for the server."""
         nonlocal found_url, scanned_count
         ip = f"{base_ip}.{ip_suffix}"
         url = _check_ip(ip)
@@ -90,7 +97,8 @@ def scan_network_for_server():
     return found_url
 
 
-def get_base_url():
+def get_base_url() -> str:
+    """Get the base url, if we don't have it already find it."""
     global BASE_URL
 
     if BASE_URL:
@@ -120,7 +128,8 @@ def get_base_url():
     return BASE_URL
 
 
-def delete_folder(folder_path):
+def delete_folder(folder_path: str) -> None:
+    """Delete a folder."""
     try:
         if folder_path and os.path.exists(folder_path):
             shutil.rmtree(folder_path)
@@ -129,7 +138,8 @@ def delete_folder(folder_path):
         print(f"Failed to delete files: {exc}")
 
 
-def check_health():
+def check_health() -> Dict[str, Any]:
+    """Get server health."""
     base_url = get_base_url()
     try:
         url = f"{base_url}{API_ENDPOINT_HEALTH}"
@@ -141,7 +151,12 @@ def check_health():
         return {"status": False, "error": str(exc)}
 
 
-def pull_folder(csv_file_path, folder_name, pull_method=DEFAULT_PULL_METHOD):
+def pull_folder(
+    csv_file_path: Union[Path, str],
+    folder_name: str,
+    pull_method: str = DEFAULT_PULL_METHOD,
+) -> Dict[str, Any]:
+    """Pull a folder."""
     base_url = get_base_url()
     try:
         url = f"{base_url}{API_ENDPOINT_PULL}"
@@ -164,7 +179,8 @@ def pull_folder(csv_file_path, folder_name, pull_method=DEFAULT_PULL_METHOD):
         return {"error": str(exc)}
 
 
-def collect_source_files(csv_file_path):
+def collect_source_files(csv_file_path: Union[Path, str]) -> List[str]:
+    """Glob for files."""
     source_dir = os.path.dirname(os.path.abspath(csv_file_path))
     csv_name = os.path.basename(csv_file_path)
     source_files = []
@@ -176,7 +192,8 @@ def collect_source_files(csv_file_path):
     return source_files
 
 
-def upload_data(csv_file_path, zip_file_path):
+def upload_data(csv_file_path: Union[Path, str], zip_file_path: str) -> Dict[str, Any]:
+    """Upload data."""
     base_url = get_base_url()
     try:
         url = f"{base_url}{API_ENDPOINT_UPLOAD}"
@@ -196,10 +213,11 @@ def upload_data(csv_file_path, zip_file_path):
 
 
 def upload_manual_data(
-    csv_file_path,
-    include_source_zip=False,
-    all_files=False,
-):
+    csv_file_path: Union[Path, str],
+    include_source_zip: bool = False,
+    all_files: bool = False,
+) -> Dict[str, Any]:
+    """Upload data manually."""
     base_url = get_base_url()
     opened_files = []
     try:
@@ -245,13 +263,14 @@ def upload_manual_data(
 
 
 def upload_data_to_google_drive(
-    csv_file_path,
-    remove_remote_folder=False,
-    pull_method=DEFAULT_PULL_METHOD,
-    include_source_zip=False,
-    all_files=False,
-    **kwargs,
-):
+    csv_file_path: Union[Path, str],
+    remove_remote_folder: bool = False,
+    pull_method: str = DEFAULT_PULL_METHOD,
+    include_source_zip: bool = False,
+    all_files: bool = False,
+    **kwargs: Any,
+) -> bool:
+    """Upload a file to google drive."""
     if "delete_folder" in kwargs:
         remove_remote_folder = kwargs.pop("delete_folder")
     if kwargs:
@@ -324,7 +343,8 @@ def upload_data_to_google_drive(
     return result
 
 
-def parse_args(argv=None):
+def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
+    """Generate args for running manually."""
     parser = argparse.ArgumentParser(description="Data Center manual upload client")
     parser.add_argument(
         "--csv",
@@ -376,7 +396,10 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def configure_client(base_url=None, timeout=DEFAULT_TIMEOUT):
+def configure_client(
+    base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT
+) -> None:
+    """Configure the base url and timeout global."""
     global BASE_URL, DEFAULT_TIMEOUT
 
     DEFAULT_TIMEOUT = timeout
@@ -384,11 +407,13 @@ def configure_client(base_url=None, timeout=DEFAULT_TIMEOUT):
         BASE_URL = base_url.rstrip("/")
 
 
-def print_response(response):
+def print_response(response: Dict[str, Any]) -> None:
+    """Print server response."""
     print(json.dumps(response, ensure_ascii=False, indent=2))
 
 
-def main(argv=None):
+def main(argv: Optional[List[str]] = None) -> int:
+    """Manually start an upload."""
     args = parse_args(argv)
     configure_client(base_url=args.base_url, timeout=args.timeout)
 
