@@ -530,9 +530,11 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
         IDEAL_LABWARE_LOCATIONS.plate_primary = plate["A1"].top(5).point
         # plate_secondary is for the front probe so offset the pipette
         CALIBRATED_LABWARE_LOCATIONS.plate_secondary = plate["A1"].top().point + Point(
-            y=9 * -7
+            y=9 * 7
         )
-        IDEAL_LABWARE_LOCATIONS.plate_secondary = plate["A1"].top(5).point
+        IDEAL_LABWARE_LOCATIONS.plate_secondary = plate["A1"].top(5).point + Point(
+            y=9 * 7
+        )
     if not ctx.params.skip_fixture:  # type: ignore[attr-defined]
         # Fixture is an aluminum tip rack glued trash slot frame so tubes can go out the bottom
         # to an external pressure sensor. it's ends up a little shorter than the tip rack but good enough
@@ -1785,7 +1787,7 @@ def test_liquid_probe_new(
     ctx.comment("Test liquid probe.")
     tip_vols = [50] if cfg.pipette_volume == 50 else [50, 200, 1000]
     above_well_height = 2
-    max_submerge_mm = 3
+    max_submerge_mm = 10
     max_z_distance_machine_coords = above_well_height + max_submerge_mm
     probes = [InstrumentProbeType.PRIMARY]
     if cfg.pipette_channels > 1:
@@ -1818,6 +1820,7 @@ def test_liquid_probe_new(
                     probeval = f"07-03{probe}传感器故障: 读取{probe}传感器值失败"
                     FINAL_TEST_FAIL_INFOR.append(probeval)
                     end_z = 0
+                    raise
 
                 if end_z >= top_z:
                     # failed early
@@ -1831,7 +1834,7 @@ def test_liquid_probe_new(
                     f"liquid-probe-{tip_vol}-tip-{probe.name.lower()}-probe-trial-{trial}",
                     [round(end_z, 2)],
                 )
-                if trial == 0:
+                if trial == 0 and good_probe:
                     # bad named method here since it's going to the liquid
                     _move_to_above_plate_liquid(api, cfg.mount, probe, end_z - top_z)
                     helpers_ot3.get_user_answer(
