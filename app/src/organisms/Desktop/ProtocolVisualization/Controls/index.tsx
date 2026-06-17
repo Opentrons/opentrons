@@ -46,6 +46,7 @@ export function Controls(props: ControlsProps): JSX.Element {
     handlePlayPause,
     isPlaying,
     commands,
+    // groupedCommands,
     milliSecondsPerFrame,
     setMilliSecondsPerFrame,
   } = props
