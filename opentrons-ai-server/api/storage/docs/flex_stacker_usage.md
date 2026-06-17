@@ -81,7 +81,7 @@ Advanced Flow (With Lid Recycling):
 
 - [ ] Stackers only in A4, B4, C4, D4
 - [ ] Labware is allowed in adjacent slots (A3, B3, C3, D3)
-- [ ] Trash bin only in column 3 or column 1. If four stackers are installed, the trash bin will be blocked from column 3, so column 1 must be used.
+- [ ] Trash bin only in column 3 (A3, B3, C3, D3) or column 1 (A1, B1, C1, D1). A Stacker installed in column 4 blocks a trash bin in the same row in column 3 (for example: if a Stacker is in slot A4 a trash bin cannot be present in A3, but could be present in B3, C3, or D3).
 - [ ] Waste chute loaded for tip rack disposal
 - [ ] Tip rack lid removal after tip rack retrieval OR tip rack lid transfer to temporary storage on lidless tip rack
 - [ ] All moves use `use_gripper=True`
