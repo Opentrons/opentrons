@@ -34,10 +34,10 @@ import { getCustomTipRackDefinitions } from '/app/redux/custom-labware'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
 
 import type { MultiValue, SingleValue } from 'react-select'
+import type { Mount } from '@opentrons/api-client'
 import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { TipLengthCalibration } from '/app/redux/calibration/api-types'
-import type { Mount } from '/app/redux/pipettes/types'
 import type { CalibrationLabware } from '/app/redux/sessions/types'
 import type { State } from '/app/redux/types'
 

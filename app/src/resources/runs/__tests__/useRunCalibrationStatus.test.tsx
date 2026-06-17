@@ -16,7 +16,7 @@ import {
 } from '..'
 
 import type { FunctionComponent, ReactNode } from 'react'
-import type { PipetteInfo } from '/app/redux/pipettes'
+import type { PipetteInfo } from '/app/resources/runs/types'
 
 vi.mock('../useRunPipetteInfoByMount')
 vi.mock('../useNotifyRunQuery')

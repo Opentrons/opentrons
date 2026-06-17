@@ -21,12 +21,13 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import * as PipetteConstants from '/app/redux/pipettes/constants'
+import { INEXACT_MATCH, MATCH } from '/app/resources/runs/constants'
 
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
-import type { Mount, PipetteInfo } from '/app/redux/pipettes'
+import type { Mount } from '@opentrons/api-client'
+import type { PipetteInfo } from '/app/resources/runs/types'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
@@ -60,10 +61,10 @@ export function SetupPipetteCalibrationItem({
   const pipetteCalDate = pipetteInfo.pipetteCalDate
 
   const attached =
-    pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH ||
-    pipetteInfo.requestedPipetteMatch === PipetteConstants.MATCH
+    pipetteInfo.requestedPipetteMatch === INEXACT_MATCH ||
+    pipetteInfo.requestedPipetteMatch === MATCH
 
-  if (pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH) {
+  if (pipetteInfo.requestedPipetteMatch === INEXACT_MATCH) {
     pipetteMismatchInfo = (
       <Flex alignItems={ALIGN_CENTER}>
         <Banner type="warning" padding={SPACING.spacing4}>

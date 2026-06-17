@@ -10,14 +10,14 @@ import {
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
 import { useAttachedPipettes } from '/app/resources/instruments'
+import { mockAttachedPipette } from '/app/resources/instruments/__fixtures__'
 import { useRunStatuses } from '/app/resources/runs'
 
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 
 import type { ComponentProps } from 'react'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')

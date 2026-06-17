@@ -19,7 +19,6 @@ import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../hooks')
