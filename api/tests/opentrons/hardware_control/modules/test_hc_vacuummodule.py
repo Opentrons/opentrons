@@ -499,9 +499,7 @@ async def test_wait_for_target(
 
     assert len(pressure_readings) == len(power_readings)
 
-    expected_pressure_reads = (
-        len(pressure_readings) + PRESSURE_COMPARISON_WINDOW_SIZE
-    )
+    expected_pressure_reads = len(pressure_readings) + PRESSURE_COMPARISON_WINDOW_SIZE
     expected_power_reads = len(power_readings) + POWER_COMPARISON_WINDOW_SIZE - 1
 
     assert pressure_reads_while_waiting == expected_pressure_reads
