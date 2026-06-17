@@ -340,6 +340,10 @@ class _BaseThermocyclerDriver(AbstractThermocyclerDriver, Generic[_ConnectionKin
         """For the gen1, do nothing."""
         pass
 
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        await self._connection.update_port(new_port)
+
 
 ThermocyclerDriver = _BaseThermocyclerDriver[SerialConnection]
 
