@@ -40,7 +40,7 @@ Follow these instructions to install the Vacuum Module.
     <figcaption>Adapter notch provides below-deck access for the vacuum hose.</figcaption>
     </figure>
 
-7.  Remove a lower cosmetic side panel on the robot and bring the remaining hose section through this opening. From here, you can connect the hose to the carboy.
+7.  Remove a lower cosmetic side panel on the robot and bring the remaining hose section through this opening. From here, you can connect the hose to the waste collection jar.
 
     <figure class="screenshot" markdown>
     ![Flex with a single lower cosmetic panel removed. Shows vacuum hose exiting robot.](images/side-panel.png)
