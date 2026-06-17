@@ -21,7 +21,6 @@ import type { AttachedPipettesByMount } from '@opentrons/api-client'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
-vi.mock('/app/redux/pipettes')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/instruments')
 vi.mock('/app/redux-resources/robots')

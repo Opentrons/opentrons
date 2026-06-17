@@ -28,7 +28,6 @@ import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/calibration')
-vi.mock('/app/redux/pipettes')
 vi.mock('/app/redux/robot-api')
 
 const store: Store<State> = legacy_createStore(state => state, {})
