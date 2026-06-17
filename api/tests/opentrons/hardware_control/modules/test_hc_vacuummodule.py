@@ -7,8 +7,6 @@ from decoy import Decoy
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
-    POWER_COMPARISON_WINDOW_SIZE,
-    PRESSURE_COMPARISON_WINDOW_SIZE,
     HardwareRevision,
     LEDColor,
     LEDPattern,
@@ -25,6 +23,8 @@ from opentrons.hardware_control.modules.types import (
     VacuumModulePressureStep,
 )
 from opentrons.hardware_control.modules.vacuum_module import (
+    POWER_COMPARISON_WINDOW_SIZE,
+    PRESSURE_COMPARISON_WINDOW_SIZE,
     SIMULATING_POLL_PERIOD,
     VacuumModuleReader,
 )

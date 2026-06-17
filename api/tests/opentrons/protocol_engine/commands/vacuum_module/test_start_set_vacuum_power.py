@@ -9,6 +9,7 @@ from opentrons.protocol_engine.commands.vacuum_module.start_set_vacuum_power imp
     StartSetVacuumPowerImpl,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+from opentrons.protocol_engine.execution.task_handler import TaskHandler
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.module_substates import (
     VacuumModuleId,
@@ -22,19 +23,23 @@ async def test_start_set_vacuum_power(
     state_view: StateView,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    task_handler: TaskHandler,
 ) -> None:
     """It should call down to the hardware controller's start_set_vacuum_pressure function."""
     subject = StartSetVacuumPowerImpl(
-        state_view=state_view, equipment=equipment, movement=movement
+        state_view=state_view,
+        equipment=equipment,
+        movement=movement,
+        task_handler=task_handler,
     )
 
     duty_cycle = 77
 
     data = vm_commands.StartSetVacuumPowerParams(
-        moduleId="input-vacuum-id", percentPower=duty_cycle
+        moduleId="input-vacuum-id", percentPower=duty_cycle, taskId="taskId"
     )
     expected_module_id = VacuumModuleId("vacuum-id")
-    expected_result = vm_commands.StartSetVacuumPowerResult()
+    expected_result = vm_commands.StartSetVacuumPowerResult(taskId="taskId")
 
     vm_module_substate = decoy.mock(cls=VacuumModuleSubState)
     vm_hardware = decoy.mock(cls=VacuumModule)

@@ -323,6 +323,7 @@ def run(ctx: ProtocolContext) -> None:
                 },
             ],
             repetitions=1,
+            vent_after=False
         )
         ctx.wait_for_tasks([task1])
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import math
 from typing import Any, Awaitable, Callable, List, Mapping, Optional, Union
 
 from typing_extensions import cast
@@ -13,8 +14,6 @@ from opentrons.drivers.vacuum_module.driver import (
 )
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
-    POWER_COMPARISON_WINDOW_SIZE,
-    PRESSURE_COMPARISON_WINDOW_SIZE,
     LEDColor,
     LEDPattern,
     PumpState,
@@ -51,6 +50,14 @@ POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
 DFU_PID = "df11"
+
+
+# Comparison window
+TARGET_REACHED_POLL_PERIOD = 0.5
+PRESSURE_COMPARISON_WINDOW_SIZE = 5
+POWER_COMPARISON_WINDOW_SIZE = 5
+PRESSURE_TOL = 5.0
+POWER_TOL = 1.0
 
 
 class VacuumModule(mod_abc.AbstractModule):
@@ -525,17 +532,19 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def _wait_for_target(self) -> None:
         if self._reader.operation_mode == VacuumModuleOperationMode.POWER:
-            if not self._reader.pump_state.pump_running:
-                return
             while not self._reader.power_target_reached():
-                await self._poller.wait_next_poll()
+                await asyncio.sleep(TARGET_REACHED_POLL_PERIOD)
+                await self._reader.update_pump_state()
+                if not self._reader.pump_state.pump_running:
+                    return
             # clear target after it's reached
             self._reader.reset_power_target()
         elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
-            if not self._reader.vacuum_state.vacuum_enabled:
-                return
             while not self._reader.pressure_target_reached():
-                await self._poller.wait_next_poll()
+                await asyncio.sleep(TARGET_REACHED_POLL_PERIOD)
+                await self._reader.update_vacuum_state()
+                if not self._reader.vacuum_state.vacuum_enabled:
+                    return
             # clear target after it's reached
             self._reader.reset_pressure_target()
         else:
@@ -630,15 +639,29 @@ class VacuumModuleReader(Reader):
 
         self._set_error(None)
 
-    def power_target_reached(self) -> bool:
-        if not all([p is not None for p in self._power_readings]):
+    def power_target_reached(self, tol: float = POWER_TOL) -> bool:
+        if self.target_power is None or any([p is None for p in self._power_readings]):
             return False
-        return all([p == self.target_power for p in self._power_readings])
+        return all(
+            [
+                math.isclose(p, self.target_power, abs_tol=tol)
+                for p in self._power_readings
+                if p is not None
+            ]
+        )
 
-    def pressure_target_reached(self) -> bool:
-        if not all([p is not None for p in self._pressure_readings]):
+    def pressure_target_reached(self, tol: float = PRESSURE_TOL) -> bool:
+        if self.target_pressure is None or any(
+            [p is None for p in self._pressure_readings]
+        ):
             return False
-        return all([p == self.target_pressure for p in self._pressure_readings])
+        return all(
+            [
+                math.isclose(p, self.target_pressure, abs_tol=tol)
+                for p in self._pressure_readings
+                if p is not None
+            ]
+        )
 
     def set_refresh_state(self) -> None:
         """Tell the reader to refresh all states, even ones that arent polled."""
