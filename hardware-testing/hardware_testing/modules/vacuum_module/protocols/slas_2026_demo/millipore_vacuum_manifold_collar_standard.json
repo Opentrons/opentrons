@@ -69,6 +69,7 @@
   "gripForce": 17,
   "gripHeightFromLabwareBottom": 45,
   "containedSpace": {
+    "shape": "rectangular",
     "origin": { "x": 0, "y": 0, "z": 0 },
     "dimensions": {
       "xDimension": 134,
