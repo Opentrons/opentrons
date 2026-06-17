@@ -55,11 +55,9 @@ This configuration is used when a protocol requires capturing liquid (the eluate
 * **Internal Hardware:** Placing a short or tall spacer inside the vacuum base properly positions the collection labware directly beneath the source filter plate.
 * **Fluid Routing:** Minimizing the gap between the plates ensures that liquid flows vertically through the filter plate and drips straight into the corresponding collection wells.
 
-<font color="red"><strong>EXPLODED DIAGRAM PLACEHOLDER</strong></font>
-
 <figure markdown>
-  ![placeholder for diagram](images/image-placeholder.png)
-  <figcaption>Stack (top to bottom): source well plate, collar and grid, collection plate, spacer, vacuum base</figcaption>
+  ![placeholder for diagram](images/stack-filter-to-plate.svg){ width="60%" }
+  <figcaption>Elution and filtrate collection stack</figcaption>
 </figure>
 
 ### Filter to waste collection
