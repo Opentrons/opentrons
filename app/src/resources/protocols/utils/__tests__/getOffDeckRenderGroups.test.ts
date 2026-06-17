@@ -41,8 +41,10 @@ describe('getOffDeckRenderGroups', () => {
     const offDeckGroups = getOffDeckRenderGroups(
       {
         offDeck: [
-          makeOffDeckItem('b36d9b14', 'Reservoir 1'),
-          makeOffDeckItem('1f0fd9b8', 'Reservoir 2'),
+          [
+            makeOffDeckItem('b36d9b14', 'Reservoir 1'),
+            makeOffDeckItem('1f0fd9b8', 'Reservoir 2'),
+          ],
         ],
       },
       protocolAnalysis,
@@ -71,8 +73,10 @@ describe('getOffDeckRenderGroups', () => {
     const offDeckGroups = getOffDeckRenderGroups(
       {
         offDeck: [
-          makeOffDeckItem('labwareA', 'Reservoir'),
-          makeOffDeckItem('labwareB', 'Reservoir'),
+          [
+            makeOffDeckItem('labwareA', 'Reservoir'),
+            makeOffDeckItem('labwareB', 'Reservoir'),
+          ],
         ],
       },
       protocolAnalysis,
@@ -95,8 +99,10 @@ describe('getOffDeckRenderGroups', () => {
     const offDeckGroups = getOffDeckRenderGroups(
       {
         offDeck: [
-          makeOffDeckItem('labwareA', 'Reservoir'),
-          makeOffDeckItem('labwareB', 'Reservoir'),
+          [
+            makeOffDeckItem('labwareA', 'Reservoir'),
+            makeOffDeckItem('labwareB', 'Reservoir'),
+          ],
         ],
       },
       protocolAnalysis,
