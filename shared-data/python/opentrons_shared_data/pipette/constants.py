@@ -1,7 +1,9 @@
 # This file contains constants defined for pipettes and liquid handling
 
-from typing import Dict
-from opentrons_shared_data.pipette.types import ChannelCount
+from typing import TYPE_CHECKING, Dict
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.pipette.types import ChannelCount
 
 PIPETTE_X_SPAN: Dict[ChannelCount, float] = {
     1: 75,  # includes a margin
@@ -27,5 +29,3 @@ VOLUME_ROUNDING_ERROR_TOLERANCE = 1e-9
 # * It's the default relative tolerance for math.isclose(), where it apparently works
 #   well in general.
 """
-
-

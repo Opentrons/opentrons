@@ -7,13 +7,12 @@ from __future__ import annotations
 import copy
 import json
 from functools import lru_cache
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Optional
 
 from .. import load_shared_data
 
 if TYPE_CHECKING:
     from .types import (
-        ChannelCount,
         PipetteFusedSpec,
         PipetteModel,
         PipetteModelSpecs,
