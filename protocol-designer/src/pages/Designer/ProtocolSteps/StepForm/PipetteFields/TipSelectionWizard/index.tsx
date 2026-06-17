@@ -83,6 +83,7 @@ export function TipSelectionWizard(
       ? robotState?.tipState.tipracks[selectedTiprackId]
       : null
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const { labware: activeDeckSetupLabware } = activeDeckSetup
   const { pipetteEntities, labwareEntities } = useSelector(getInvariantContext)
   const { spec: pipetteSpecs } = pipetteEntities[pipetteId]
   const robotType = useSelector(getRobotType)
@@ -109,23 +110,25 @@ export function TipSelectionWizard(
   }
 
   const areAnyMatchingTipracksSelectable = getAreAnyMatchingTipracksSelectable({
-    allLabware: Object.values(activeDeckSetup.labware),
+    allLabware: Object.values(activeDeckSetupLabware),
     formTiprackUri,
     pipetteSpecs,
     nozzles,
     labwareEntities,
     validTiprackIds,
+    labwareRobotState: activeDeckSetupLabware,
   })
 
   const isSelectedTiprackValid =
     selectedTiprackId != null &&
     getIsTiprackSelectableAndValid({
-      labware: activeDeckSetup.labware[selectedTiprackId],
+      labware: activeDeckSetupLabware[selectedTiprackId],
       formTiprackUri,
       pipetteSpecs,
       nozzles,
       labwareEntities,
       validTiprackIds,
+      labwareRobotState: activeDeckSetupLabware,
     })
   const isAnySelectedWellTooManyPickups = selectedTips.some(group => {
     const primaryWell = group[0]
