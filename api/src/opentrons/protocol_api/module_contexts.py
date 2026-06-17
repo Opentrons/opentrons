@@ -1861,19 +1861,19 @@ class VacuumModuleContext(ModuleContext):
     _core: VacuumModuleCore
 
     @property
-    @requires_version(2, 28)
+    @requires_version(2, 30)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
     @property
-    @requires_version(2, 28)
+    @requires_version(2, 30)
     def manifold_dock(self) -> ModuleFixtureLocation:
         base_slot = self._core.get_deck_slot().id
         area_name = f"{self.model}Dock{base_slot[0]}4"
         return ModuleFixtureLocation(addressable_area_name=area_name)
 
-    @requires_version(2, 28)
+    @requires_version(2, 30)
     def load_adapter_to_dock(
         self,
         name: str,
@@ -1905,7 +1905,7 @@ class VacuumModuleContext(ModuleContext):
 
         return adapter
 
-    @requires_version(2, 28)
+    @requires_version(2, 30)
     def move_to_dock(
         self,
         labware: Labware,
@@ -1932,7 +1932,7 @@ class VacuumModuleContext(ModuleContext):
             drop_offset=_drop_offset,
         )
 
-    @requires_version(2, 28)
+    @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_start_set_vacuum_pressure)
     def start_set_vacuum_pressure(
         self,
@@ -1950,7 +1950,7 @@ class VacuumModuleContext(ModuleContext):
             vent_after=vent_after,
         )
 
-    @requires_version(2, 28)
+    @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_start_set_vacuum_power)
     def start_set_vacuum_power(
         self,
@@ -1968,7 +1968,7 @@ class VacuumModuleContext(ModuleContext):
             vent_after=vent_after,
         )
 
-    @requires_version(2, 28)
+    @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_stop_vacuum)
     def stop_vacuum_pump(self) -> None:
         self._core.stop_vacuum()
