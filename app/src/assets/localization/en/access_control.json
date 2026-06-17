@@ -42,5 +42,8 @@
   "desktop_maximum_login_attempts_before_account_deactivation": "Maximum login attempts before account deactivation",
   "desktop_logins": "logins",
   "desktop_auto_logout_inactivity_length": "Length of time for auto-logout due to inactivity",
-  "desktop_minutes": "minutes"
+  "desktop_minutes": "mins",
+  "desktop_require_password_change_after_time": "Require password to be changed after a certain amount of time",
+  "desktop_length_of_time": "Edit length of time",
+  "desktop_days": "days"
 }
