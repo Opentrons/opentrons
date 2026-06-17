@@ -141,7 +141,11 @@ class RTScanner(AbstractBarcodeScannerDriver):
         """Search for a barcode and return if found else None."""
         await self._conn.write(bytes(scan_trigger))
         await self._conn.read_until(bytes(ack))  # eat the ack response
-        barcode: bytes = await self._conn.read_until(bytes(self._scan_terminator))
+        try:
+            barcode: bytes = await self._conn.read_until(bytes(self._scan_terminator))
+        except BaseException as e:
+            log.exception("failed to scan")
+            barcode = b''
         log.debug(f"Scanned {barcode.decode('ascii')}")
         if len(barcode) == 0:
             if self._do_err_beep:
