@@ -189,6 +189,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       initialModuleState.lidOpen !== true
     ) {
       errors.push(errorCreators.absorbanceReaderLidClosed())
+    } else if (
+      initialModuleState.type === VACUUM_MODULE_TYPE &&
+      initialModuleState.currentPumpActivity.type !== 'pumpDeactivated'
+    ) {
+      errors.push(errorCreators.vacuumUnderPressure())
     }
   }
   const destModuleId =
@@ -237,6 +242,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       if (destModuleState.lidOpen !== true) {
         errors.push(errorCreators.absorbanceReaderLidClosed())
       }
+    } else if (
+      destModuleState.type === VACUUM_MODULE_TYPE &&
+      destModuleState.currentPumpActivity.type !== 'pumpDeactivated'
+    ) {
+      errors.push(errorCreators.vacuumUnderPressure())
     }
   }
   const isLabwareIdATiprackLid =

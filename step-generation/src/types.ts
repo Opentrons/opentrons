@@ -1089,6 +1089,7 @@ export type ErrorType =
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
   | 'TOO_MANY_TIPS'
+  | 'VACUUM_UNDER_PRESSURE'
 
 export interface CommandCreatorError {
   message: string
