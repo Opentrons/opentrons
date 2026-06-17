@@ -36,7 +36,10 @@ export function useGuardedAction(
   const authSettingsQuery = useAuthSettingsQuery()
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
 
+  // TODO(jj): this hook is ODD only, so will not work on desktop
+  // replace this with getting the username from whatever robot you're accessing
   const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
+
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
   const requireReasonForInteraction =
