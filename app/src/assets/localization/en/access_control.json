@@ -34,5 +34,7 @@
   "desktop_edit": "Edit",
   "desktop_username": "Username",
   "desktop_password": "Password",
-  "desktop_legal_name": "Legal name"
+  "desktop_legal_name": "Legal name",
+  "desktop_user_management": "User management",
+  "desktop_account_type": "Account type"
 }
