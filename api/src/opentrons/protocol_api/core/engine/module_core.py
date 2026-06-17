@@ -27,6 +27,10 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.types import (
@@ -65,9 +69,6 @@ if TYPE_CHECKING:
 # Valid wavelength range for absorbance reader
 ABS_WAVELENGTH_MIN = 350
 ABS_WAVELENGTH_MAX = 1000
-# Gauge pressure range for vacuum module
-MAX_GAUGE_PRESSURE_MBAR = 0
-MIN_GAUGE_PRESSURE_MBAR = -800
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):

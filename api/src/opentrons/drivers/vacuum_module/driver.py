@@ -34,7 +34,9 @@ MAX_REPS = 10
 MAX_PUMP_RPM = 3500
 MAX_PUMP_DUTY = 100
 MAX_RAMP_RATE = -10.0  # mbar/s
-MAX_PRESSURE_MBAR = -1013.25
+MIN_GAUGE_PRESSURE_MBAR = 0
+MAX_GAUGE_PRESSURE_MBAR = -800
+THEORETICAL_MAX_GAUGE_PRESSURE_MBAR = -1013.25
 MAX_VAC_DURATION_S = 60 * 60 * 24  # 24hrs
 
 
@@ -289,7 +291,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if gauge_pressure_mbar is not None:
             command.add_float(
                 "P",
-                min(max(gauge_pressure_mbar, MAX_PRESSURE_MBAR), 0),
+                min(max(gauge_pressure_mbar, THEORETICAL_MAX_GAUGE_PRESSURE_MBAR), 0),
                 GCODE_ROUNDING_PRECISION,
             )
         if duration_s is not None:

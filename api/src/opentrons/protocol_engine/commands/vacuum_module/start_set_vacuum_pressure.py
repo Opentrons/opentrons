@@ -11,6 +11,10 @@ from typing_extensions import Literal, Type
 from ...errors.error_occurrence import ErrorOccurrence
 from ...state import update_types
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import (
@@ -78,9 +82,12 @@ class StartSetVacuumPressureImpl(
         """Start the vacuum pump."""
         state_update = update_types.StateUpdate()
         vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
-        if params.gaugePressure < -800 or params.gaugePressure > 0:
+        if (
+            params.gaugePressure < MAX_GAUGE_PRESSURE_MBAR
+            or params.gaugePressure > MIN_GAUGE_PRESSURE_MBAR
+        ):
             raise ValueError(
-                f"pressure {params.gaugePressure} invalid must be between -800 and 0 mbar."
+                f"Gauge pressure {params.gaugePressure} invalid must be between {MAX_GAUGE_PRESSURE_MBAR} and {MIN_GAUGE_PRESSURE_MBAR} mbar."
             )
 
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
