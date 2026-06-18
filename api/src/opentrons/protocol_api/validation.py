@@ -110,6 +110,10 @@ class InvalidFixtureLocationError(ValueError):
     """An error raised when attempting to load a fixture in an invalid cutout."""
 
 
+class IsNegativeValueError(ValueError):
+    """An error raised when a negative number is encountered when expecting only positive ones."""
+
+
 def is_pipette_96_channel(pipette: Optional[PipetteNameType]) -> bool:
     """Return if this pipette type is a 96 channel."""
     if pipette is not None:
@@ -763,14 +767,14 @@ def validate_location(
 def ensure_boolean(value: bool) -> bool:
     """Ensure value is a boolean."""
     if not isinstance(value, bool):
-        raise ValueError("Value must be a boolean.")
+        raise ValueError(f"Value must be a boolean but it is {value}.")
     return value
 
 
 def ensure_float(value: Union[int, float]) -> float:
     """Ensure value is a float (or an integer) and return it as a float."""
     if not isinstance(value, (int, float)):
-        raise ValueError("Value must be a floating point number.")
+        raise ValueError(f"Value must be a floating point number but it is {value}.")
     return float(value)
 
 
@@ -780,7 +784,7 @@ def ensure_positive_float(value: Union[int, float]) -> float:
     if isnan(float_value) or isinf(float_value):
         raise ValueError("Value must be a defined, non-infinite number.")
     if float_value < 0:
-        raise ValueError("Value must be a positive float.")
+        raise IsNegativeValueError(f"Value must be a positive float but it is {value}.")
     return float_value
 
 
@@ -790,25 +794,31 @@ def ensure_greater_than_zero_float(value: Union[int, float]) -> float:
     if isnan(float_value) or isinf(float_value):
         raise ValueError("Value must be a defined, non-infinite number.")
     if float_value <= 0:
-        raise ValueError("Value must be a positive float greater than 0.")
+        raise ValueError(
+            f"Value must be a positive float greater than 0, but it is {value}."
+        )
     return float_value
 
 
 def ensure_positive_int(value: int) -> int:
     """Ensure value is a positive integer."""
     if not isinstance(value, int):
-        raise ValueError("Value must be an integer.")
+        raise ValueError(f"Value must be an integer but it is {value}.")
     if value < 0:
-        raise ValueError("Value must be a positive integer.")
+        raise ValueError(f"Value must be a positive integer but it is {value}.")
     return value
 
 
 def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
     """Ensure value is a valid sequence of 3 floats and return a tuple of 3 floats."""
     if len(value) != 3:
-        raise ValueError("Coordinates must be a sequence of exactly three numbers")
+        raise ValueError(
+            f"Coordinates must be a sequence of exactly three numbers but received: {value}"
+        )
     if not all(isinstance(v, (float, int)) for v in value):
-        raise ValueError("All values in coordinates must be floats.")
+        raise ValueError(
+            f"All values in coordinates must be floats but they are: {value}."
+        )
     return float(value[0]), float(value[1]), float(value[2])
 
 
