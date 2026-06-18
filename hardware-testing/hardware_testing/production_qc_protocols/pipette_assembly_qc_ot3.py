@@ -500,7 +500,6 @@ def _pick_up_tip_for_tip_volume(
 
 def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
     CALIBRATED_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
-    IDEAL_LABWARE_LOCATIONS.trash = get_trash_nominal(cfg)
     if not (ctx.params.skip_fixture and ctx.params.skip_liquid and ctx.params.skip_liquid_probe and ctx.params.skip_tip_sensor):  # type: ignore[attr-defined]
         tiprack_50 = ctx.load_labware(
             "opentrons_flex_96_tiprack_50uL", cfg.slot_tip_rack_50
@@ -517,32 +516,24 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
         CALIBRATED_LABWARE_LOCATIONS.tip_rack_50 = tiprack_50["A1"].top().point
         CALIBRATED_LABWARE_LOCATIONS.tip_rack_200 = tiprack_200["A1"].top().point
         CALIBRATED_LABWARE_LOCATIONS.tip_rack_1000 = tiprack_1000["A1"].top().point
-        IDEAL_LABWARE_LOCATIONS.tip_rack_50 = tiprack_50["A1"].top().point
-        IDEAL_LABWARE_LOCATIONS.tip_rack_200 = tiprack_200["A1"].top().point
-        IDEAL_LABWARE_LOCATIONS.tip_rack_1000 = tiprack_1000["A1"].top().point
     if not (ctx.params.skip_fixture and ctx.params.skip_liquid):  # type: ignore[attr-defined]
         reservoir = ctx.load_labware("nest_1_reservoir_195ml", cfg.slot_reservoir)
         LABWARE["reservoir"] = reservoir
-        CALIBRATED_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point
-        IDEAL_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point
+        # 2 mm above the bottom but shift over so that we're not directly on the center ridge
+        CALIBRATED_LABWARE_LOCATIONS.reservoir = reservoir["A1"].bottom(
+            2
+        ).point + Point(x=4.5)
         if cfg.pipette_channels == 8:
-            CALIBRATED_LABWARE_LOCATIONS.reservoir = reservoir[
-                "A1"
-            ].top().point + Point(y=9 * 3.5)
-            IDEAL_LABWARE_LOCATIONS.reservoir = reservoir["A1"].top().point + Point(
-                y=9 * 3.5
+            CALIBRATED_LABWARE_LOCATIONS.reservoir = (
+                CALIBRATED_LABWARE_LOCATIONS.reservoir + Point(y=9 * 3.5)
             )
     if not ctx.params.skip_liquid_probe:  # type: ignore[attr-defined]
         # Liquid probe fixture is a vial with an led at the bottom to help the user see the liquid better
         plate = ctx.load_labware("liquid_probe_fixture", cfg.slot_plate)
         LABWARE["plate"] = plate
         CALIBRATED_LABWARE_LOCATIONS.plate_primary = plate["A1"].top().point
-        IDEAL_LABWARE_LOCATIONS.plate_primary = plate["A1"].top(5).point
         # plate_secondary is for the front probe so offset the pipette
         CALIBRATED_LABWARE_LOCATIONS.plate_secondary = plate["A1"].top().point + Point(
-            y=9 * 7
-        )
-        IDEAL_LABWARE_LOCATIONS.plate_secondary = plate["A1"].top(5).point + Point(
             y=9 * 7
         )
     if not ctx.params.skip_fixture:  # type: ignore[attr-defined]
@@ -556,7 +547,6 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
 
         fixture_loc = fixture_lw["A1"].top().point
         CALIBRATED_LABWARE_LOCATIONS.fixture = fixture_loc
-        IDEAL_LABWARE_LOCATIONS.fixture = fixture_loc
 
     if cfg.simulate:
         pip = ctx.load_instrument("flex_8channel_50", "left")
@@ -737,7 +727,7 @@ def _aspirate_and_look_for_droplets(
         leak_test_passed = helpers_ot3.get_user_answer(
             ctx, api, "did it pass? no leaking?"
         )
-
+    ctx.comment("dispensing")
     api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
     api.dispense(mount, pipette_volume, is_full_dispense=True)
     api.blow_out(mount)
@@ -1415,6 +1405,7 @@ def _test_plunger_positions(
         blow_out_passed = True
     else:
         blow_out_passed = helpers_ot3.get_user_answer(ctx, api, "is BLOW-OUT correct?")
+        ctx.comment(f"Blowout passed {blow_out_passed}")
         if not blow_out_passed:
             printval = f"02-01-BLOW-OUT:移液器BLOW-OUT {blow_out_passed}"
             FINAL_TEST_FAIL_INFOR.append(printval)
@@ -1638,21 +1629,6 @@ def build_liquid_probe_csv_lines(
             )
 
     return lines
-
-
-def _move_to_plate_liquid(
-    api: SyncHardwareAPI, mount: OT3Mount, probe: InstrumentProbeType
-) -> None:
-    if probe == InstrumentProbeType.PRIMARY:
-        assert IDEAL_LABWARE_LOCATIONS.plate_primary
-        _move_safe(api, mount, IDEAL_LABWARE_LOCATIONS.plate_primary)
-        helpers_ot3.jog_mount_ot3_sync(api, mount)
-        CALIBRATED_LABWARE_LOCATIONS.plate_primary = api.gantry_position(mount)
-    else:
-        assert IDEAL_LABWARE_LOCATIONS.plate_secondary
-        _move_safe(api, mount, IDEAL_LABWARE_LOCATIONS.plate_secondary + Point(y=9 * 7))
-        helpers_ot3.jog_mount_ot3_sync(api, mount)
-        CALIBRATED_LABWARE_LOCATIONS.plate_secondary = api.gantry_position(mount)
 
 
 def _move_to_above_plate_liquid(
