@@ -151,6 +151,24 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
       },
     ],
   },
+  {
+    titleKey: 'desktop_audit_log_requirements',
+    fields: [
+      {
+        type: 'toggle',
+        id: 'requireReasonForInteraction',
+        labelKey: 'desktop_require_documentation_for_robot_actions',
+        children: [
+          {
+            type: 'input',
+            id: 'minLengthOfReasonForInteraction',
+            labelKey: 'desktop_minimum_length_for_documentation_for_robot_actions',
+            unitsKey: 'desktop_characters',
+          },
+        ],
+      },
+    ],
+  },
 ]
 
 interface ComplianceReadySettingFieldProps {
