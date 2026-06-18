@@ -4,7 +4,7 @@ import asyncio
 import logging
 from dataclasses import dataclass
 from itertools import chain
-from typing import Any, Callable, Dict, Iterable, Optional, Set, Tuple, Union, cast
+from typing import Any, Dict, Iterable, Optional, Set, Tuple, Union, cast
 
 from .types import PCBARevision
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
@@ -172,11 +172,6 @@ class NetworkInfo:
             USBTarget(target) for target in devices if target in USBTarget
         }
 
-    def set_event_callback(self, event_callback: Callable[[], None]) -> None:
-        """Set the event callback to be used for network connection notifications by subsystems."""
-        self._can_network_info.set_event_callback(event_callback)
-        self._usb_network_info.set_event_callback(event_callback)
-
 
 class UsbNetworkInfo:
     """This class is responsible for keeping track of usb devices."""
@@ -189,8 +184,6 @@ class UsbNetworkInfo:
         """
         self._usb_messenger = usb_messenger
         self._device_info_cache: Dict[USBTarget, DeviceInfoCache] = dict()
-        self._old_device_info_cache: Dict[NodeId, DeviceInfoCache] = dict()
-        self._event_callback: Optional[Callable[[], None]] = None
 
     @property
     def device_info(self) -> Dict[USBTarget, DeviceInfoCache]:
@@ -262,18 +255,6 @@ class UsbNetworkInfo:
         finally:
             self._usb_messenger.remove_listener(listener)
             self._update_only(devices, targets)
-            if (
-                self._device_info_cache != self._old_device_info_cache
-                and self._event_callback
-            ):
-                # Device info has changed, send an update notification
-                try:
-                    self._event_callback()
-                except Exception:
-                    log.exception(
-                        f"Subsystem connection callback for devices {self._device_info_cache} failed"
-                    )
-            self._old_device_info_cache = self._device_info_cache
         return targets
 
     async def probe(
@@ -328,18 +309,6 @@ class UsbNetworkInfo:
         finally:
             self._usb_messenger.remove_listener(listener)
             self._device_info_cache = targets
-            if (
-                self._device_info_cache != self._old_device_info_cache
-                and self._event_callback
-            ):
-                # Device info has changed, send an update notification
-                try:
-                    self._event_callback()
-                except Exception:
-                    log.exception(
-                        f"Subsystem connection callback for devices {self._device_info_cache} failed"
-                    )
-            self._old_device_info_cache = self._device_info_cache
         return targets
 
     def mark_absent(self, devices: Set[USBTarget]) -> Dict[USBTarget, DeviceInfoCache]:
@@ -347,10 +316,6 @@ class UsbNetworkInfo:
         for device in devices:
             self._device_info_cache.pop(device, None)
         return self._device_info_cache
-
-    def set_event_callback(self, event_callback: Callable[[], None]) -> None:
-        """Set the event callback to be used for USB network connection notifications."""
-        self._event_callback = event_callback
 
 
 class CanNetworkInfo:
@@ -364,8 +329,6 @@ class CanNetworkInfo:
         """
         self._can_messenger = can_messenger
         self._device_info_cache: Dict[NodeId, DeviceInfoCache] = dict()
-        self._old_device_info_cache: Dict[NodeId, DeviceInfoCache] = dict()
-        self._event_callback: Optional[Callable[[], None]] = None
 
     @property
     def device_info(self) -> Dict[NodeId, DeviceInfoCache]:
@@ -432,18 +395,6 @@ class CanNetworkInfo:
             self._can_messenger.remove_listener(listener)
             self._device_info_cache = nodes
             self._can_messenger.update_known_nodes(self.nodes)
-            if (
-                self._device_info_cache != self._old_device_info_cache
-                and self._event_callback
-            ):
-                # Device info has changed, send an update notification
-                try:
-                    self._event_callback()
-                except Exception:
-                    log.exception(
-                        f"Subsystem connection callback for devices {self._device_info_cache} failed"
-                    )
-            self._old_device_info_cache = self._device_info_cache
         return nodes
 
     async def probe_specific(
@@ -499,18 +450,6 @@ class CanNetworkInfo:
                 else:
                     self._device_info_cache.pop(target, None)
             self._can_messenger.update_known_nodes(self.nodes)
-            if (
-                self._device_info_cache != self._old_device_info_cache
-                and self._event_callback
-            ):
-                # Device info has changed, send an update notification
-                try:
-                    self._event_callback()
-                except Exception:
-                    log.exception(
-                        f"Subsystem connection callback for devices {self._device_info_cache} failed"
-                    )
-            self._old_device_info_cache = self._device_info_cache
         return nodes
 
     def mark_absent(self, devices: Set[NodeId]) -> Dict[NodeId, DeviceInfoCache]:
@@ -518,10 +457,6 @@ class CanNetworkInfo:
         for device in devices:
             self._device_info_cache.pop(device.application_for(), None)
         return self._device_info_cache
-
-    def set_event_callback(self, event_callback: Callable[[], None]) -> None:
-        """Set the event callback to be used for CAN network connection notifications."""
-        self._event_callback = event_callback
 
 
 def _parse_usb_device_info_response(

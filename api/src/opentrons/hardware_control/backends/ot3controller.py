@@ -1481,7 +1481,7 @@ class OT3Controller(FlexBackend):
 
     def set_subsystem_event_callback(self, event_callback: Callable[[], None]) -> None:
         """Set the event callback to be used for network connection notifications on the subsystem manager."""
-        self._subsystem_manager._network_info.set_event_callback(event_callback)
+        self._subsystem_manager.set_event_callback(event_callback)
 
     def axis_is_present(self, axis: Axis) -> bool:
         try:

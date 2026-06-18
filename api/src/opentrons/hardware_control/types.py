@@ -380,7 +380,7 @@ class HardwareEventType(enum.Enum):
     ASYNCHRONOUS_MODULE_ERROR = enum.auto()
     MODULE_DISCONNECTED = enum.auto()
     MODULE_CONNECTED = enum.auto()
-    SUBSYSTEM_CONNECTION = enum.auto
+    SUBSYSTEM_CONNECTION = enum.auto()
 
 
 @dataclass
