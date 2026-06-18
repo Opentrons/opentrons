@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 72px;
+  min-height: 4.5rem;
   padding: var(--spacing-24) var(--spacing-16);
   border: none;
   background: transparent;
