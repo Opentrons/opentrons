@@ -9,6 +9,8 @@
   "loading_data": "正在加载数据...",
   "modules": "模块",
   "no_data": "无数据",
+  "ot2_protocol_detected": "检测到 OT-2 协议",
+  "ot2_protocol_detected_description": "OT-2 现已拥有专属app。请在该app中运行 OT-2 实验方案。",
   "peripherals": "外设",
   "protocol_analysis_failure": "协议分析失败。",
   "protocol_analysis_outdated": "协议分析已过期。",
