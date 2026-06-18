@@ -1,7 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
+
+import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -13,6 +15,31 @@ import {
 } from '../ComplianceReadySoftwareSettings'
 
 import type { AuthSettingsResponse } from '@opentrons/api-client'
+
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual =
+    await importOriginal<typeof import('@opentrons/react-api-client')>()
+
+  return {
+    ...actual,
+    useAuthSettingsQuery: vi.fn(),
+  }
+})
+
+const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
+  data: {
+    maxNumberOfLoginAttempts: 5,
+    passwordResetTime: null,
+    passwordComplexityMinimumLength: null,
+    passwordComplexitySpecialCharacters: false,
+    idleLogout: 180,
+    requireReasonForInteraction: true,
+    minLengthOfReasonForInteraction: null,
+    requireAdminCredsWhenUpdatingRobotSoftware: true,
+    requireAdminCredsWhenSendingProtocolToRobot: true,
+    requireAdminCredsForSignoffProtocol: false,
+  },
+}
 
 const AUTH_SETTING_KEYS = Object.keys({
   maxNumberOfLoginAttempts: null,
@@ -53,6 +80,13 @@ const expandAccordion = (): void => {
 }
 
 describe('ComplianceReadySoftwareSettings', () => {
+  beforeEach(() => {
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: MOCK_AUTH_SETTINGS,
+      isLoading: false,
+    } as ReturnType<typeof useAuthSettingsQuery>)
+  })
+
   it('should only use auth setting ids or explicit UI-only ids', () => {
     const allowedIds = new Set<string>([
       ...AUTH_SETTING_KEYS,
@@ -103,6 +137,25 @@ describe('ComplianceReadySoftwareSettings', () => {
     screen.getByText('Edit length of time')
   })
 
+  it('should populate fields from auth settings', () => {
+    render()
+    expandAccordion()
+
+    expect(
+      screen.getByLabelText(
+        'Maximum login attempts before account deactivation'
+      )
+    ).toHaveValue(5)
+    expect(
+      screen.getByLabelText('Length of time for auto-logout due to inactivity')
+    ).toHaveValue(3)
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require admin credentials to update robots',
+      })
+    ).toHaveAttribute('aria-checked', 'true')
+  })
+
   it('should update toggle state', () => {
     render()
     expandAccordion()
@@ -111,9 +164,9 @@ describe('ComplianceReadySoftwareSettings', () => {
       name: 'Require admin credentials to update robots',
     })
 
-    expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'false')
-    fireEvent.click(updateRobotsToggle)
     expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'true')
+    fireEvent.click(updateRobotsToggle)
+    expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'false')
   })
 
   it('should update input values', () => {
