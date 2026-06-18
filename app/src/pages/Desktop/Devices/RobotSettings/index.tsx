@@ -15,7 +15,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ApiHostProvider, useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+import {
+  ApiHostProvider,
+  useAccessControlEnabledQuery,
+} from '@opentrons/react-api-client'
 
 import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
@@ -115,8 +118,10 @@ export function RobotSettingsComponent({
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const token = useAccessTokenForRobot(robotName)
   const isAcmDevice =
     accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
+  const showComplianceReadyTab = isAcmDevice && token != null
 
   if (
     (robot == null ||
@@ -131,8 +136,12 @@ export function RobotSettingsComponent({
   const cannotViewFeatureFlags =
     robotSettingsTab === 'feature-flags' && !devToolsOn
   const cannotViewComplianceReady =
-    robotSettingsTab === 'compliance-ready' && !isAcmDevice
-  if (cannotViewCalibration || cannotViewFeatureFlags || cannotViewComplianceReady) {
+    robotSettingsTab === 'compliance-ready' && !showComplianceReadyTab
+  if (
+    cannotViewCalibration ||
+    cannotViewFeatureFlags ||
+    cannotViewComplianceReady
+  ) {
     return <Navigate to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
@@ -188,7 +197,7 @@ export function RobotSettingsComponent({
             tabName={t('advanced')}
             disabled={false}
           />
-          {isAcmDevice ? (
+          {showComplianceReadyTab ? (
             <RoundTab
               to={`/devices/${robotName}/robot-settings/compliance-ready`}
               tabName={t('compliance_ready')}
