@@ -145,7 +145,7 @@ export function getReleaseFiles(
 
 // downloads the entire release set to a temporary directory, and once they're
 // all successfully downloaded, renames the directory to `directory`
-export async function downloadReleaseFiles(
+export function downloadReleaseFiles(
   urls: ReleaseSetUrls,
   directory: string,
   // `onProgress` will be called with download progress as the files are read
@@ -207,7 +207,9 @@ export async function downloadReleaseFiles(
         rm(dlPath(directory, urls.system), { force: true }),
         urls.releaseNotes
           ? rm(dlPath(directory, urls.releaseNotes), { force: true })
-          : new Promise<void>(resolve => resolve()),
+          : new Promise<void>(resolve => {
+              resolve()
+            }),
       ]).then(() => {
         log.error(`throwing error ${error}`)
         throw error
