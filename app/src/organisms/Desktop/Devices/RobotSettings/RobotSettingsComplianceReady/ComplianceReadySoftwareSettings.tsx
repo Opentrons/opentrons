@@ -10,37 +10,34 @@ import { InputSetting } from '/app/molecules/InputSetting'
 import styles from './compliancereadysoftwaresettings.module.css'
 
 import type { JSX } from 'react'
+import type { AuthSettingsResponse } from '@opentrons/api-client'
 
 export interface ComplianceReadySoftwareSettingsProps {
   robotName: string
 }
 
-type FieldId =
-  | 'loginAttempts'
-  | 'autoLogoutMinutes'
-  | 'requirePasswordChange'
-  | 'passwordChangeDays'
-  | 'requirePasswordComplexity'
-  | 'requireSpecialCharacters'
-  | 'minimumPasswordLength'
-  | 'requireAdminCredentialsToUpdateRobots'
-  | 'requireAdminCredentialsToSendProtocols'
-  | 'requireAdminCredentialsToSignRunRecords'
+type AuthSettingFieldId = keyof AuthSettingsResponse['data']
+
+type UiSettingFieldId =
+  | 'passwordResetEnabled'
+  | 'passwordComplexityEnabled'
   | 'requireProtocolLogsSignedAndSaved'
   | 'automaticallyDeleteProtocolRunLogs'
 
-type FieldValues = Record<FieldId, string | boolean>
+type SettingFieldId = AuthSettingFieldId | UiSettingFieldId
+
+type FieldValues = Record<SettingFieldId, string | boolean>
 
 type InputFieldConfig = {
   type: 'input'
-  id: FieldId
+  id: AuthSettingFieldId
   labelKey: string
   unitsKey?: string
 }
 
 type ToggleFieldConfig = {
   type: 'toggle'
-  id: FieldId
+  id: SettingFieldId
   labelKey: string
   children?: Array<InputFieldConfig | ToggleFieldConfig>
 }
@@ -53,16 +50,18 @@ type ComplianceReadySettingsSection = {
 }
 
 const INITIAL_FIELD_VALUES: FieldValues = {
-  loginAttempts: '',
-  autoLogoutMinutes: '',
-  requirePasswordChange: false,
-  passwordChangeDays: '',
-  requirePasswordComplexity: false,
-  requireSpecialCharacters: false,
-  minimumPasswordLength: '',
-  requireAdminCredentialsToUpdateRobots: false,
-  requireAdminCredentialsToSendProtocols: false,
-  requireAdminCredentialsToSignRunRecords: false,
+  maxNumberOfLoginAttempts: '',
+  idleLogout: '',
+  passwordResetEnabled: false,
+  passwordResetTime: '',
+  passwordComplexityEnabled: false,
+  passwordComplexitySpecialCharacters: false,
+  passwordComplexityMinimumLength: '',
+  requireAdminCredsWhenUpdatingRobotSoftware: false,
+  requireAdminCredsWhenSendingProtocolToRobot: false,
+  requireAdminCredsForSignoffProtocol: false,
+  requireReasonForInteraction: false,
+  minLengthOfReasonForInteraction: '',
   requireProtocolLogsSignedAndSaved: false,
   automaticallyDeleteProtocolRunLogs: false,
 }
@@ -73,19 +72,18 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
     fields: [
       {
         type: 'input',
-        id: 'loginAttempts',
-        labelKey:
-          'desktop_maximum_login_attempts_before_account_deactivation',
+        id: 'maxNumberOfLoginAttempts',
+        labelKey: 'desktop_maximum_login_attempts_before_account_deactivation',
         unitsKey: 'desktop_logins',
       },
       {
         type: 'toggle',
-        id: 'requirePasswordChange',
+        id: 'passwordResetEnabled',
         labelKey: 'desktop_require_password_change_after_time',
         children: [
           {
             type: 'input',
-            id: 'passwordChangeDays',
+            id: 'passwordResetTime',
             labelKey: 'desktop_length_of_time',
             unitsKey: 'desktop_days',
           },
@@ -93,17 +91,17 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
       },
       {
         type: 'toggle',
-        id: 'requirePasswordComplexity',
+        id: 'passwordComplexityEnabled',
         labelKey: 'desktop_require_password_complexity_requirements',
         children: [
           {
             type: 'toggle',
-            id: 'requireSpecialCharacters',
+            id: 'passwordComplexitySpecialCharacters',
             labelKey: 'desktop_require_special_characters',
           },
           {
             type: 'input',
-            id: 'minimumPasswordLength',
+            id: 'passwordComplexityMinimumLength',
             labelKey: 'desktop_minimum_password_length',
             unitsKey: 'desktop_characters',
           },
@@ -111,7 +109,7 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
       },
       {
         type: 'input',
-        id: 'autoLogoutMinutes',
+        id: 'idleLogout',
         labelKey: 'desktop_auto_logout_inactivity_length',
         unitsKey: 'desktop_minutes',
       },
@@ -122,17 +120,17 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
     fields: [
       {
         type: 'toggle',
-        id: 'requireAdminCredentialsToUpdateRobots',
+        id: 'requireAdminCredsWhenUpdatingRobotSoftware',
         labelKey: 'desktop_require_admin_credentials_to_update_robots',
       },
       {
         type: 'toggle',
-        id: 'requireAdminCredentialsToSendProtocols',
+        id: 'requireAdminCredsWhenSendingProtocolToRobot',
         labelKey: 'desktop_require_admin_credentials_to_send_protocols',
       },
       {
         type: 'toggle',
-        id: 'requireAdminCredentialsToSignRunRecords',
+        id: 'requireAdminCredsForSignoffProtocol',
         labelKey:
           'desktop_require_admin_credentials_to_sign_protocol_run_records',
       },
@@ -158,8 +156,8 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
 interface ComplianceReadySettingFieldProps {
   field: ComplianceReadyFieldConfig
   values: FieldValues
-  onInputChange: (id: FieldId, value: string) => void
-  onToggleChange: (id: FieldId) => void
+  onInputChange: (id: AuthSettingFieldId, value: string) => void
+  onToggleChange: (id: SettingFieldId) => void
 }
 
 function ComplianceReadySettingField({
@@ -232,8 +230,8 @@ interface ComplianceReadySettingsSectionProps {
   section: ComplianceReadySettingsSection
   isLastSection: boolean
   values: FieldValues
-  onInputChange: (id: FieldId, value: string) => void
-  onToggleChange: (id: FieldId) => void
+  onInputChange: (id: AuthSettingFieldId, value: string) => void
+  onToggleChange: (id: SettingFieldId) => void
 }
 
 function ComplianceReadySettingsSection({
@@ -276,14 +274,14 @@ export function ComplianceReadySoftwareSettings({
   const [fieldValues, setFieldValues] =
     useState<FieldValues>(INITIAL_FIELD_VALUES)
 
-  const handleInputChange = (id: FieldId, value: string): void => {
+  const handleInputChange = (id: AuthSettingFieldId, value: string): void => {
     setFieldValues(current => ({
       ...current,
       [id]: value,
     }))
   }
 
-  const handleToggleChange = (id: FieldId): void => {
+  const handleToggleChange = (id: SettingFieldId): void => {
     setFieldValues(current => ({
       ...current,
       [id]: !current[id],
