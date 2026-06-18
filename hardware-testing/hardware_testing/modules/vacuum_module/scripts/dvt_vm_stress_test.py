@@ -28,7 +28,7 @@ ASPIRATE_OFFSET_MM = 5
 # -20 is acroprep
 DISPENSE_OFFSET_MM = 8
 
-OUTPUT_DIR = "/data/vacuum_manifold_life_test_evt_v1.1/"
+OUTPUT_DIR = "/data/vacuum_manifold_life_test_dvt/"
 
 Ard_idVendor = 9025
 Ard_idProduct = 32858
@@ -365,15 +365,19 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Load Vacuum Module
     vm_mod = cast(VacuumModuleContext, ctx.load_module("vacuumModuleV1", "A3"))
 
-    tips = ctx.load_labware(
+    tip_rack = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
         "B2",
         adapter="opentrons_flex_96_tiprack_adapter",
     )
-    pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tips])
+    tip_rack.set_offset({"x": 0, "y": 0, "z":0})
+    pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tip_rack])
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
     filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
     source = ctx.load_labware("nest_1_reservoir_290ml", "B3")
+
+    filter_plate.set_offset({"x": 0, "y": 0, "z":0})
+    source.set_offset({"x": 0, "y": 0, "z":0})
     # base = ctx.load_labware("millipore_vacuum_manifold_base", "C3")
     # manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
     # filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
