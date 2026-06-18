@@ -1,7 +1,13 @@
-.content {
+.section {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-16);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-40);
 }
 
 .field_list {
