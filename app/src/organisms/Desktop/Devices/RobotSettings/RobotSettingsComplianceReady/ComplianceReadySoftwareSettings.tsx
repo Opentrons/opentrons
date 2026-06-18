@@ -52,6 +52,7 @@ type ComplianceReadySettingsSection = {
   fields: ComplianceReadyFieldConfig[]
 }
 
+// TODO(tz, 2026-06-18): Remove default values and use defult values from API
 const INITIAL_FIELD_VALUES: FieldValues = {
   maxNumberOfLoginAttempts: '',
   idleLogout: '',

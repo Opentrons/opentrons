@@ -3,6 +3,8 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
@@ -26,6 +28,15 @@ vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/robot-update')
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual =
+    await importOriginal<typeof import('@opentrons/react-api-client')>()
+
+  return {
+    ...actual,
+    useAccessControlEnabledQuery: vi.fn(),
+  }
+})
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -52,6 +63,9 @@ describe('RobotSettings', () => {
     when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn(mockConnectableRobot)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: false } },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(RobotSettingsCalibration).mockReturnValue(
       <div>Mock RobotSettingsCalibration</div>
     )
@@ -168,5 +182,27 @@ describe('RobotSettings', () => {
     expect(screen.queryByText('Mock RobotSettingsAdvanced')).toBeFalsy()
     fireEvent.click(AdvancedTab)
     screen.getByText('Mock RobotSettingsAdvanced')
+  })
+
+  it('does not render the compliance ready tab for non-ACM devices', () => {
+    render('/devices/otie/robot-settings/calibration')
+
+    expect(screen.queryByText('Compliance Ready')).not.toBeInTheDocument()
+  })
+
+  it('renders the compliance ready tab for ACM devices', () => {
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: true } },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
+
+    render('/devices/otie/robot-settings/calibration')
+
+    screen.getByText('Compliance Ready')
+  })
+
+  it('redirects to networking tab if compliance ready tab is hidden', () => {
+    render('/devices/otie/robot-settings/compliance-ready')
+
+    screen.getByText('Mock RobotSettingsNetworking')
   })
 })
