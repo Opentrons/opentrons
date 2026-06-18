@@ -425,6 +425,8 @@ class NozzleConfigurationManager:
             )
         elif cp_override == CriticalPoint.XY_CENTER:
             current_nozzle = self._current_nozzle_configuration.xy_center_offset
+        elif cp_override == CriticalPoint.X_CENTER:
+            current_nozzle = self._current_nozzle_configuration.x_center_offset
         elif cp_override == CriticalPoint.Y_CENTER:
             current_nozzle = self._current_nozzle_configuration.y_center_offset
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
