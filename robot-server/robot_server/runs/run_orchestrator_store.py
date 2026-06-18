@@ -276,7 +276,9 @@ class RunOrchestratorStore:
             self._most_recent_finalized_command = (
                 self._default_run_orchestrator.get_most_recently_finalized_command()
             )
-            self._flex_stacker_substate = self._default_run_orchestrator.get_flex_stacker_substate()
+            self._flex_stacker_substate = (
+                self._default_run_orchestrator.get_flex_stacker_substate()
+            )
             return self._default_run_orchestrator
         return default_orchestrator
 
@@ -717,7 +719,6 @@ class RunOrchestratorStore:
 
     def update_engine_status_callback(self, event: EngineEventNotification) -> None:
         """Handle protocol engine status updates for the run orchestrator store."""
-        _log.info(f"Handling engine status event: {event}")
         if event is EngineEventNotification.NOZZLE_CONFIG:
             self._nozzle_maps = self.run_coordinator.get_nozzle_maps()
 
@@ -736,26 +737,30 @@ class RunOrchestratorStore:
                 self.run_coordinator.get_flex_stacker_substate()
             )
 
-    def update_default_run_engine_status_callback(self, event: EngineEventNotification) -> None:
+    def update_default_run_engine_status_callback(
+        self, event: EngineEventNotification
+    ) -> None:
         """Handle protocol engine status updates for the default run orchestrator store."""
-        _log.info(f"Handling engine status event: {event}")
-        if event is EngineEventNotification.NOZZLE_CONFIG:
-            self._nozzle_maps = self._default_run_orchestrator.get_nozzle_maps()
+        if self._default_run_orchestrator:
+            if event is EngineEventNotification.NOZZLE_CONFIG:
+                self._nozzle_maps = self._default_run_orchestrator.get_nozzle_maps()
 
-        if event is EngineEventNotification.TIP_ATTACHED:
-            self._tip_attached = self._default_run_orchestrator.get_tip_attached()
+            if event is EngineEventNotification.TIP_ATTACHED:
+                self._tip_attached = self._default_run_orchestrator.get_tip_attached()
 
-        if event is EngineEventNotification.CURRENT_COMMAND:
-            self._current_command = self._default_run_orchestrator.get_current_command()
+            if event is EngineEventNotification.CURRENT_COMMAND:
+                self._current_command = (
+                    self._default_run_orchestrator.get_current_command()
+                )
 
-        if event is EngineEventNotification.FINALIZED_COMMAND:
-            self._most_recent_finalized_command = (
-                self._default_run_orchestrator.get_most_recently_finalized_command()
-            )
-        if event is EngineEventNotification.FLEX_STACKER_SUBSTATE:
-            self._flex_stacker_substate = (
-                self._default_run_orchestrator.get_flex_stacker_substate()
-            )
+            if event is EngineEventNotification.FINALIZED_COMMAND:
+                self._most_recent_finalized_command = (
+                    self._default_run_orchestrator.get_most_recently_finalized_command()
+                )
+            if event is EngineEventNotification.FLEX_STACKER_SUBSTATE:
+                self._flex_stacker_substate = (
+                    self._default_run_orchestrator.get_flex_stacker_substate()
+                )
 
     def _initialize_stored_engine_state(self) -> None:
         """Initialize the orchestrator store local engine state."""
@@ -774,4 +779,3 @@ class RunOrchestratorStore:
         self._current_command = None
         self._most_recent_finalized_command = None
         self._flex_stacker_substate = None
-

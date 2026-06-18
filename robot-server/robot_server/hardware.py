@@ -155,7 +155,6 @@ class HardwareStateStore:
 
     def update_hardware_status_callback(self, event: HardwareEvent) -> None:
         """Callback to update the Hardware State Store when changes occur on the hardware resource."""
-        log.info(f"Handling hardware status event: {event}")
         if isinstance(event, ModuleConnectedNotification) or isinstance(
             event, ModuleDisconnectedNotification
         ):
