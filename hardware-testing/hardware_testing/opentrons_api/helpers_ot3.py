@@ -422,13 +422,13 @@ def set_csv_report_meta_data_ot3(
         elif not api.is_simulator:
             barcode = input("SCAN device barcode: ").strip()
     print(f"barcode: {barcode}")
-
     # default the CSV tag to be the DUT
     report.set_tag(tag if tag else dut_str)
     report.set_device_id(dut_str, barcode)
     report.set_robot_id(robot_serial)
     report.set_firmware(api.fw_version)
-    report.set_version(get_git_description())
+    if not (ctx and ctx.is_simulating()):
+        report.set_version(get_git_description())
 
 
 def set_gantry_per_axis_setting_ot3(
