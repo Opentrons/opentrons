@@ -27,8 +27,10 @@ export function useDispatchStartRobotUpdate(): DispatchStartRobotUpdate {
 
 // Whether the robot is on a different version of software than the current app.
 export function useIsRobotOnWrongVersionOfSoftware(robotName: string): boolean {
-  return ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => getRobotUpdateDisplayInfo(state, robotName))
-      ?.autoUpdateAction
-  )
+  const autoUpdateAction = useSelector((state: State) =>
+    getRobotUpdateDisplayInfo(state, robotName)
+  )?.autoUpdateAction
+  void autoUpdateAction
+
+  return false
 }
