@@ -152,7 +152,6 @@ PROBING_DECK_PRECISION_MM = 1.0
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
-ASPIRATE_SUBMERGE_MM: Final = 3
 TRAILING_AIR_GAP_DROPLETS_UL: Final = 0.5
 
 # FIXME: reduce this spec after dial indicator is implemented
@@ -522,8 +521,9 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
         # 2 mm above the bottom but shift over so that we're not directly on the center ridge
         CALIBRATED_LABWARE_LOCATIONS.reservoir = reservoir["A1"].bottom(
             2
-        ).point + Point(x=4.5)
+        ).point +  Point(x=4.5, z= 2)
         if cfg.pipette_channels == 8:
+            # Center 8 channel in reservoir
             CALIBRATED_LABWARE_LOCATIONS.reservoir = (
                 CALIBRATED_LABWARE_LOCATIONS.reservoir + Point(y=9 * 3.5)
             )
@@ -712,10 +712,10 @@ def _read_pressure_and_check_results(
 def _aspirate_and_look_for_droplets(
     ctx: ProtocolContext, api: SyncHardwareAPI, mount: OT3Mount, wait_time: int
 ) -> bool:
+    ctx.comment("Aspirating.")
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pipette_volume = pip.working_volume
-    api.move_rel(mount, Point(z=-ASPIRATE_SUBMERGE_MM))
     api.aspirate(mount, pipette_volume - TRAILING_AIR_GAP_DROPLETS_UL)
     api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
     api.aspirate(mount, TRAILING_AIR_GAP_DROPLETS_UL)
@@ -731,7 +731,6 @@ def _aspirate_and_look_for_droplets(
     api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
     api.dispense(mount, pipette_volume, is_full_dispense=True)
     api.blow_out(mount)
-    api.move_rel(mount, Point(z=ASPIRATE_SUBMERGE_MM))
     return leak_test_passed
 
 
