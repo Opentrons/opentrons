@@ -19,6 +19,7 @@ from opentrons.protocol_api import ParameterContext, ProtocolContext, Labware
 from opentrons.types import Point
 
 
+from opentrons.config import IS_ROBOT
 from datetime import datetime
 from urllib.request import Request, urlopen
 from json import loads as json_loads
@@ -2351,7 +2352,7 @@ def _reset_available_tip(pipette_channels: int) -> None:
 def run(ctx: ProtocolContext) -> None:
     """Entry point into testing protocol."""
     # apply monkey patch
-    if ctx.is_simulating and IS_ROBOT:
+    if ctx.is_simulating() and IS_ROBOT:
         ctx.comment("on robot analysis, skipping.")
         return
     OT3API._get_tip_status = _get_tip_status_patch  # type: ignore[attr-defined]
