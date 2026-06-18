@@ -862,6 +862,19 @@ class HeaterShakerLabwareLatchStatusUnknown(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class VacuumModuleUnderVacuumError(ProtocolEngineError):
+    """Raised when trying to move to a labware that's in a Vacuum Module thats under vacuum."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleUnderVacuumError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """Raised when a Magnetic Module engage height is out of bounds."""
 

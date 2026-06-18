@@ -100,6 +100,7 @@ from .exceptions import (
     TouchTipIncompatibleArgumentsError,
     UnexpectedProtocolError,
     UnsupportedLabwareForActionError,
+    VacuumModuleUnderVacuumError,
     VolumeModeDoesNotExistError,
     WellDoesNotExistError,
     WrongModuleTypeError,
@@ -213,4 +214,5 @@ __all__ = [
     "CameraCaptureError",
     "CameraDisabledError",
     "CameraSettingsInvalidError",
+    "VacuumModuleUnderVacuumError",
 ]
