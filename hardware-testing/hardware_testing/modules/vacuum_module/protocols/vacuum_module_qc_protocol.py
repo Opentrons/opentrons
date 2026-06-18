@@ -87,20 +87,20 @@ def run(ctx: ProtocolContext) -> None:
         "D1",
         adapter="opentrons_flex_96_tiprack_adapter",
     )
-    tiprack_200.set_offset(x=0.00, y=0.00, z=0.00) 
+    tiprack_200.set_offset(x=0.00, y=0.00, z=0.00)
 
     # Load Labware
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
     white_filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
-    #white_filter_plate.set_offset(x=0.00, y=0.00, z=0.00) 
+    # white_filter_plate.set_offset(x=0.00, y=0.00, z=0.00)
     black_flat_plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "B2")
-    black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00) 
+    black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00)
     deep_well_plate = ctx.load_labware("nest_96_wellplate_2ml_deep", "B1")
-    deep_well_plate.set_offset(x=0.00, y=0.00, z=0.00) 
+    deep_well_plate.set_offset(x=0.00, y=0.00, z=0.00)
     reservoir_1 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C2")
-    reservoir_1.set_offset(x=0.00, y=0.00, z=0.00) 
+    reservoir_1.set_offset(x=0.00, y=0.00, z=0.00)
     reservoir_2 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C3")
-    reservoir_2 .set_offset(x=0.00, y=0.00, z=0.00)
+    reservoir_2.set_offset(x=0.00, y=0.00, z=0.00)
 
     # Load Instruments + Trash
     pip = ctx.load_instrument(
@@ -144,7 +144,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
         # Move the black flat plate onto the vacuum module
         ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
-        black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00) 
+        black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00)
 
         # Move collar with filter plate to the vacuum module base
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)

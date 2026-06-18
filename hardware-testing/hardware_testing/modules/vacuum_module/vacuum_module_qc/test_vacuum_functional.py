@@ -128,7 +128,6 @@ async def test_vacuum_regulation(
     # Final reading
     await vacuum._reader.update_vacuum_state()
     final_pressure = vacuum.vacuum_state.current_gauge_pressure
-    pressures.append(final_pressure)
 
     # Determine pass/fail
     expected = target_pressure > -50 or target_pressure < -800
