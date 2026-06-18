@@ -123,6 +123,7 @@ Flex deck layout: D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3 (Trash bin)
 - Waste chute
   - Recommended/Allowed: D3 (The waste chute fixture diverts waste to an off-deck receptacle and is designed to be placed exclusively in slot D3).
   - Not allowed: Any other location
+  - Note: The waste chute fixture occupies slot D3 exclusively. No other labware can be loaded in slot D3 when the waste chute is present.
 
 ### Labware
 
