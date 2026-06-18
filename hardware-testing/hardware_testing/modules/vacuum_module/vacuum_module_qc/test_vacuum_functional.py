@@ -186,4 +186,4 @@ async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     finally:
         # Clean shutdown
         await vacuum.set_vacuum_state(False)
-        await vacuum.set_vent_state(VentState.CLOSED)
+        await vacuum.set_vent_state(VentState.OPENED)
