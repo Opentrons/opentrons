@@ -4,7 +4,6 @@ import { mapTo } from 'rxjs/operators'
 import { startDiscovery } from '../../discovery'
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-import { getRobotRestartPath } from '../../robot-settings'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
@@ -21,11 +20,7 @@ const mapActionToRequest: ActionToRequestMapper<RestartRobotAction> = (
   action,
   state
 ) => {
-  const path =
-    getRobotRestartPath(state, action.payload.robotName) ??
-    Constants.RESTART_PATH
-
-  return { method: POST, path }
+  return { method: POST, path: Constants.RESTART_PATH }
 }
 
 const mapResponseToAction: ResponseToActionMapper<RestartRobotAction> = (
