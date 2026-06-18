@@ -1,5 +1,3 @@
-import { useDispatch } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   Box,
@@ -9,13 +7,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { updateSetting } from '/app/redux/robot-settings'
 
 import type { MouseEventHandler } from 'react'
-import type { RobotSettingsField } from '/app/redux/robot-settings/types'
-import type { Dispatch } from '/app/redux/types'
+import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface SettingToggleProps extends RobotSettingsField {
   robotName: string
@@ -35,12 +32,12 @@ export function SettingToggle({
   robotName,
   invert = false,
 }: SettingToggleProps): JSX.Element | null {
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
 
   if (id == null) return null
 
   const handleClick: MouseEventHandler<Element> = () => {
-    dispatch(updateSetting(robotName, id, !value))
+    updateRobotSetting({ id, value: !value })
   }
 
   return (

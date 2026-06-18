@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
-
-import { updateSetting } from '/app/redux/robot-settings'
-
-import type { Dispatch } from '/app/redux/types'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
 export function useLEDLights(robotName: string): {
@@ -14,7 +12,7 @@ export function useLEDLights(robotName: string): {
 } {
   const [lightsEnabledCache, setLightsEnabledCache] = useState<boolean>(true)
 
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
 
   const robotSettingsQuery = useRobotSettingsQuery()
   const settings = robotSettingsQuery.data?.settings ?? []
@@ -26,7 +24,7 @@ export function useLEDLights(robotName: string): {
   }, [isStatusBarEnabled])
 
   const toggleLights = (): void => {
-    dispatch(updateSetting(robotName, 'disableStatusBar', lightsEnabledCache))
+    updateRobotSetting({ id: 'disableStatusBar', value: lightsEnabledCache })
     setLightsEnabledCache(!lightsEnabledCache)
   }
 

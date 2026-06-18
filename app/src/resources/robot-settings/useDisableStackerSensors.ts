@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
-
-import { updateSetting } from '/app/redux/robot-settings'
-
-import type { Dispatch } from '/app/redux/types'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
 export function useDisableStackerSensors(robotName: string): {
@@ -15,7 +13,7 @@ export function useDisableStackerSensors(robotName: string): {
   const [sensorDisabledCache, setSensorsDisabledCache] =
     useState<boolean>(false)
 
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
 
   const robotSettingsQuery = useRobotSettingsQuery()
   const settings = robotSettingsQuery.data?.settings ?? []
@@ -30,13 +28,10 @@ export function useDisableStackerSensors(robotName: string): {
 
   const toggleSensors = (): void => {
     setSensorsDisabledCache(!sensorDisabledCache)
-    dispatch(
-      updateSetting(
-        robotName,
-        'disableFlexStackerLabwareDetection',
-        !sensorDisabledCache
-      )
-    )
+    updateRobotSetting({
+      id: 'disableFlexStackerLabwareDetection',
+      value: !sensorDisabledCache,
+    })
   }
 
   return { sensorsDisabled: sensorDisabledCache, toggleSensors }

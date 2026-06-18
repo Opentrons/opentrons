@@ -7,8 +7,10 @@ import {
   InlineNotification,
   LegacyStyledText,
 } from '@opentrons/components'
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
-
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
@@ -25,7 +27,6 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { updateSetting } from '/app/redux/robot-settings'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
@@ -52,6 +53,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     'branded',
   ])
   const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
@@ -239,9 +241,10 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="gantry-homing"
           rightElement={<OnOffToggle isOn={!isHomeGantryOn} />}
           onClick={() =>
-            dispatch(
-              updateSetting(robotName, HOME_GANTRY_SETTING_ID, !isHomeGantryOn)
-            )
+            updateRobotSetting({
+              id: HOME_GANTRY_SETTING_ID,
+              value: !isHomeGantryOn,
+            })
           }
         />
         <RobotSettingButton

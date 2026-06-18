@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+import { useRobotSettingsQuery, useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
@@ -28,6 +28,9 @@ const render = () => {
 
 describe('RobotSettings Advanced tab', () => {
   beforeEach(() => {
+    vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
+      updateRobotSetting: vi.fn(),
+    } as ReturnType<typeof useUpdateRobotSettingMutation>)
     vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: {
         settings: [

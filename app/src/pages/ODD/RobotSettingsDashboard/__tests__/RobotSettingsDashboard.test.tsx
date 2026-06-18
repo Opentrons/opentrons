@@ -2,7 +2,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -53,7 +56,6 @@ vi.mock('/app/resources/networking', async () => {
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
-vi.mock('/app/redux/robot-settings')
 vi.mock('/app/resources/robot-settings')
 vi.mock('/app/resources/errorRecovery')
 vi.mock('/app/organisms/ODD/Navigation')
@@ -75,6 +77,7 @@ vi.mock(
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
 const mockToggleStackerSensors = vi.fn()
+const mockUpdateRobotSetting = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -93,6 +96,9 @@ const MOCK_DEFAULT_LANGUAGE = 'en-US'
 describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
+      updateRobotSetting: mockUpdateRobotSetting,
+    } as ReturnType<typeof useUpdateRobotSettingMutation>)
     vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: {
         settings: [

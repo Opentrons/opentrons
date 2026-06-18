@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -11,7 +11,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
@@ -19,7 +22,6 @@ import { Divider } from '/app/atoms/structure'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getFeatureFlags } from '/app/redux/config'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
-import { updateSetting } from '/app/redux/robot-settings'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRun } from '/app/resources/runs'
 
@@ -51,7 +53,6 @@ import { handleUpdateBuildroot } from './UpdateBuildroot'
 import type { MouseEventHandler } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
-import type { Dispatch } from '/app/redux/types'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -111,8 +112,6 @@ export function RobotSettingsAdvanced({
     setShowDeviceResetModal(true)
     setIsRobotReachable(isReachable ?? false)
   }
-
-  const dispatch = useDispatch<Dispatch>()
 
   return (
     <>
@@ -286,14 +285,14 @@ export function FeatureFlagToggle({
   robotName,
   isRobotBusy,
 }: FeatureFlagToggleProps): JSX.Element | null {
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
   const { value, id, title, description } = settingField
 
   if (id == null) return null
 
   const handleClick: MouseEventHandler<Element> = () => {
     if (!isRobotBusy) {
-      dispatch(updateSetting(robotName, id, !value))
+      updateRobotSetting({ id, value: !value })
     }
   }
 

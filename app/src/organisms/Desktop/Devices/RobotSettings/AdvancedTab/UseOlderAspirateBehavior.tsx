@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -10,13 +9,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { updateSetting } from '/app/redux/robot-settings'
 
 import type { MouseEventHandler } from 'react'
-import type { RobotSettingsField } from '/app/redux/robot-settings/types'
-import type { Dispatch } from '/app/redux/types'
+import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface UseOlderAspirateBehaviorProps {
   settings: RobotSettingsField | undefined
@@ -30,13 +28,13 @@ export function UseOlderAspirateBehavior({
   isRobotBusy,
 }: UseOlderAspirateBehaviorProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'useOldAspirationFunctions'
 
   const handleClick: MouseEventHandler<Element> = () => {
     if (!isRobotBusy) {
-      dispatch(updateSetting(robotName, id, !value))
+      updateRobotSetting({ id, value: !value })
     }
   }
 
