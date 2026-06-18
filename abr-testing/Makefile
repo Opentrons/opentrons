@@ -93,3 +93,59 @@ SIMULATION_TOOL := abr_testing/protocol_simulation/abr_sim_check.py
 EXTENSION := .py
 simulate:
 	$(python) $(SIMULATION_TOOL)
+
+# Create a double-clickable shortcut that runs robotFleet_error.py against an
+# Errors folder. The OS is auto-detected ($(OS) is "Windows_NT" on Windows, set
+# by GNU Make): a .bat is written on Windows and a .command on macOS/Unix, with
+# zero user input either way. The generated scripts are self-locating, resolving
+# their own folder at runtime, which must sit next to the opentrons repo (so the
+# repo and the Errors folder are siblings of the shortcut). Generation relies on
+# a POSIX shell (Git Bash on Windows), matching the rest of the monorepo.
+opentrons_dir := $(abspath $(CURDIR)/..)
+parent_dir := $(abspath $(CURDIR)/../..)
+repo_name := $(notdir $(opentrons_dir))
+errors_dir ?= $(parent_dir)/Errors
+shortcut_base ?= robotFleet_error
+
+.PHONY: desktop-shortcut
+ifeq ($(OS),Windows_NT)
+shortcut_path ?= $(parent_dir)/$(shortcut_base).bat
+desktop-shortcut:
+	@printf '%s\r\n' \
+		'@echo off' \
+		'setlocal' \
+		'rem Resolve the folder this script lives in (sibling of the $(repo_name) folder)' \
+		'set "HERE=%~dp0"' \
+		'set "ABR=%HERE%$(repo_name)\abr-testing"' \
+		'rem Run inside the project pipenv environment so all deps are available' \
+		'cd /d "%ABR%"' \
+		'py -m pipenv run python "%ABR%\abr_testing\data_collection\robot_fleet_error.py" "%HERE%Errors"' \
+		'echo.' \
+		'pause' \
+		> "$(shortcut_path)"
+	@mkdir -p "$(errors_dir)"
+	@echo "Created shortcut: $(shortcut_path)"
+	@echo "Errors folder: $(errors_dir)"
+else
+shortcut_path ?= $(parent_dir)/$(shortcut_base).command
+desktop-shortcut:
+	@printf '%s\n' \
+		'#!/bin/zsh' \
+		'' \
+		'# Resolve the folder this script lives in (sibling of the $(repo_name) folder)' \
+		'HERE="$${0:A:h}"' \
+		'ABR="$$HERE/$(repo_name)/abr-testing"' \
+		'' \
+		'# Run inside the project pipenv environment so all deps are available' \
+		'cd "$$ABR"' \
+		'pipenv run python "$$ABR/abr_testing/data_collection/robotFleet_error.py" "$$HERE/Errors"' \
+		'' \
+		'# Keep the terminal window open so you can see the results' \
+		'echo ""' \
+		'read -k 1 "?Press any key to close..."' \
+		> "$(shortcut_path)"
+	@chmod +x "$(shortcut_path)"
+	@mkdir -p "$(errors_dir)"
+	@echo "Created shortcut: $(shortcut_path)"
+	@echo "Errors folder: $(errors_dir)"
+endif
