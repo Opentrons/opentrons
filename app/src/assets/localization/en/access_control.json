@@ -55,7 +55,7 @@
   "desktop_require_admin_credentials_to_send_protocols": "Require admin credentials to send protocols to this robot",
   "desktop_require_admin_credentials_to_sign_protocol_run_records": "Require admin credentials to sign protocol run records",
   "desktop_protocol_logs": "Protocol logs",
-  "desktop_require_protocol_logs_signed_and_saved": "Require protocol logs to be signed and saved in Opentrons app",
+  "desktop_require_protocol_logs_signed_and_saved": "Require protocol logs to be signed and saved in the desktop app",
   "desktop_automatically_delete_protocol_run_logs": "Automatically delete protocol run logs on the robot when there are 20 protocol run records",
   "desktop_audit_log_requirements": "Audit log requirements",
   "desktop_require_documentation_for_robot_actions": "Require documentation for robot actions",
