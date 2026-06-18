@@ -1,0 +1,282 @@
+{"kind":"deck","id":"pr/crcpjh","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"material","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout2.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout3.xml","name":"TITLE_AND_BODY","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout4.xml","name":"TITLE_AND_TWO_COLUMNS","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout5.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout6.xml","name":"ONE_COLUMN_TEXT","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout7.xml","name":"MAIN_POINT","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout8.xml","name":"SECTION_TITLE_AND_DESCRIPTION","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout9.xml","name":"CAPTION_ONLY","placeholders":[{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout10.xml","name":"BIG_NUMBER","placeholders":[{"name":"title","type":"title","textPreview":"xx%"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout11.xml","name":"BLANK","type":"blank","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout12.xml","name":"CUSTOM_3","placeholders":[{"name":"picture","type":"picture"},{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout13.xml","name":"CUSTOM_3_1","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster2.xml","name":"","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout14.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout15.xml","name":"OBJECT","type":"obj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout16.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout17.xml","name":"TWO_OBJECTS","type":"twoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout18.xml","name":"TWO_OBJECTS_WITH_TEXT","type":"twoTxTwoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout19.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout20.xml","name":"BLANK","type":"blank","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout21.xml","name":"图片与标题","placeholders":[{"name":"picture","type":"picture"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout22.xml","name":"VERTICAL_TITLE_AND_VERTICAL_TEXT","type":"vertTitleAndTx","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout23.xml","name":"内容","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout24.xml","name":"末尾幻灯片","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout25.xml","name":"Title Only","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"slide","id":"sl/2x4nap4r","slide":1,"title":"P2HHV32 96CH LV Mold Seal Aging Test Report","textShapes":2}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":1,"name":"Google Shape;167;p28","placeholder":"title","text":"P2HHV32 96CH LV Mold Seal Aging Test Report","textPreview":"P2HHV32 96CH LV Mold Seal Aging Test Report","textChars":43,"textLines":1,"bbox":[334,179.31,609.07,124.16]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":1,"name":"Google Shape;168;p28","placeholder":"subtitle","text":"2026.06.15\nSZ ENG","textPreview":"2026.06.15 | SZ ENG","textChars":17,"textLines":2,"bbox":[737.39,393.51,320.66,51.91]}
+{"kind":"image","id":"im/5wjudg7a","slide":1,"name":"Google Shape;169;p28","bbox":[0,0,334,540]}
+{"kind":"notes","id":"nt/2x4nap4r","slide":1,"text":""}
+{"kind":"slide","id":"sl/pg3ex0nu","slide":2,"title":"Executive Summary: All 5 Mold Seal Pipettes Completed; PASS Recommended","textShapes":15}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":2,"name":"Google Shape;216;p33","text":"Executive Summary: All 5 Mold Seal Pipettes Completed; PASS Recommended","textPreview":"Executive Summary: All 5 Mold Seal Pipettes Completed; PASS Recommended","textChars":71,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"shape","id":"sh/e1w7mp0b","slide":2,"bbox":[52,128,150,58]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":2,"text":"Total units","textPreview":"Total units","textChars":11,"textLines":1,"bbox":[64,136,126,14]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":2,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[64,155,126,24]}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":2,"bbox":[222,128,150,58]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":2,"text":"Finish","textPreview":"Finish","textChars":6,"textLines":1,"bbox":[234,136,126,14]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":2,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[234,155,126,24]}
+{"kind":"shape","id":"sh/zqtcj6to","slide":2,"bbox":[392,128,150,58]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":2,"text":"Stop / Fail","textPreview":"Stop / Fail","textChars":11,"textLines":1,"bbox":[404,136,126,14]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":2,"text":"0","textPreview":"0","textChars":1,"textLines":1,"bbox":[404,155,126,24]}
+{"kind":"shape","id":"sh/obm58z25","slide":2,"bbox":[562,128,150,58]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":2,"text":"Max CV","textPreview":"Max CV","textChars":6,"textLines":1,"bbox":[574,136,126,14]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":2,"text":"0.86%","textPreview":"0.86%","textChars":5,"textLines":1,"bbox":[574,155,126,24]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":2,"bbox":[52,214,520,210]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":2,"text":"Overall conclusion","textPreview":"Overall conclusion","textChars":18,"textLines":1,"bbox":[78,238,190,20]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":2,"bbox":[82,281,8,8]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":2,"text":"All 5 units are marked Finish in the RD Lifetime detail sheet and reached 392% / 1,020,000 cycles.","textPreview":"All 5 units are marked Finish in the RD Lifetime detail sheet and reached 392% / 1,020,000 cycles.","textChars":98,"textLines":1,"bbox":[102,276,420,34]}
+{"kind":"shape","id":"sh/0je9cvix","slide":2,"bbox":[82,328,8,8]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":2,"text":"All available 5 uL CV results are below the 4% QC and 5% customer limits; the maximum CV is 0.86% at 100% for 0627A05.","textPreview":"All available 5 uL CV results are below the 4% QC and 5% customer limits; the maximum CV is 0.86% at 100% for 0627A05.","textChars":118,"textLines":1,"bbox":[102,323,420,34]}
+{"kind":"shape","id":"sh/idonyd0z","slide":2,"bbox":[82,375,8,8]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":2,"text":"The maximum worst-channel CV is 3.04% at 100% for 0627A05, below the 5.6% QC and 7% customer limits.","textPreview":"The maximum worst-channel CV is 3.04% at 100% for 0627A05, below the 5.6% QC and 7% customer limits.","textChars":100,"textLines":1,"bbox":[102,370,420,34]}
+{"kind":"shape","id":"sh/0fepkzup","slide":2,"bbox":[602,214,280,210]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":2,"text":"Archive notes","textPreview":"Archive notes","textChars":13,"textLines":1,"bbox":[628,238,110,20]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":2,"text":"1. The aging summary still shows 200% running; sync it to Finish / 392%.\n2. 392% plate4/plate5 are #DIV/0!; retest or document the analysis scope.\n3. Keep the 100% C8 LOW %D note for 0627A05.\n4. 0627A05, 0627A01, and 0702A04 have 315% notes indicating only 3 plates were tested under the new validation.","textPreview":"1. The aging summary still shows 200% running; sync it to Finish / 392%. | 2. 392% plate4/plate5 are #DIV/0!; retest or document the anal...","textChars":303,"textLines":4,"bbox":[628,276,225,128]}
+{"kind":"image","id":"im/sfil0rqd","slide":2,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/pg3ex0nu","slide":2,"text":""}
+{"kind":"slide","id":"sl/s72x4nap","slide":3,"title":"Status Check: Detail Sheet Shows Finish; Summary Sheet Still Needs Sync","textShapes":5}
+{"kind":"textbox","id":"sh/loj2t83i","slide":3,"name":"Google Shape;216;p33","text":"Status Check: Detail Sheet Shows Finish; Summary Sheet Still Needs Sync","textPreview":"Status Check: Detail Sheet Shows Finish; Summary Sheet Still Needs Sync","textChars":71,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"shape","id":"sh/at47y1kr","slide":3,"bbox":[52,360,400,78]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":3,"text":"Sync gap","textPreview":"Sync gap","textChars":8,"textLines":1,"bbox":[74,381,120,18]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":3,"text":"All 5 units are Finish in the RD detail sheet, while the aging summary still shows 200% (520000) and 200%-238% running.","textPreview":"All 5 units are Finish in the RD detail sheet, while the aging summary still shows 200% (520000) and 200%-238% running.","textChars":119,"textLines":1,"bbox":[74,405,335,34]}
+{"kind":"shape","id":"sh/032lszqt","slide":3,"bbox":[490,360,390,78]}
+{"kind":"textbox","id":"sh/tovahoza","slide":3,"text":"Judgment basis","textPreview":"Judgment basis","textChars":14,"textLines":1,"bbox":[512,381,150,18]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":3,"text":"This report uses the RD Lifetime detail sheet, optical CV sheet top metrics, and staged PASS records as the judgment basis.","textPreview":"This report uses the RD Lifetime detail sheet, optical CV sheet top metrics, and staged PASS records as the judgment basis.","textChars":123,"textLines":1,"bbox":[512,405,320,34]}
+{"kind":"table","id":"tb/qxs72x4n","slide":3,"name":"","rows":6,"cols":5,"preview":"SN | Aging summary | RD detail | Highest point | Report judgment","bbox":[52,126,845,205]}
+{"kind":"image","id":"im/xs72x4na","slide":3,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/s72x4nap","slide":3,"text":""}
+{"kind":"slide","id":"sl/val87ed8","slide":4,"title":"5 uL Optical CV: Maximum 0.86%, Well Below the 4% QC Limit","textShapes":8}
+{"kind":"textbox","id":"sh/zidonyd0","slide":4,"name":"Google Shape;216;p33","text":"5 uL Optical CV: Maximum 0.86%, Well Below the 4% QC Limit","textPreview":"5 uL Optical CV: Maximum 0.86%, Well Below the 4% QC Limit","textChars":58,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":4,"bbox":[52,126,620,302]}
+{"kind":"shape","id":"sh/8z25kb6x","slide":4,"bbox":[710,142,150,58]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":4,"text":"Highest CV","textPreview":"Highest CV","textChars":10,"textLines":1,"bbox":[722,150,126,14]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":4,"text":"0.86%","textPreview":"0.86%","textChars":5,"textLines":1,"bbox":[722,169,126,24]}
+{"kind":"textbox","id":"sh/je9cvixc","slide":4,"text":"0627A05 / 100%","textPreview":"0627A05 / 100%","textChars":14,"textLines":1,"bbox":[730,206,115,16]}
+{"kind":"shape","id":"sh/87ed8bat","slide":4,"bbox":[710,240,150,58]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":4,"text":"QC limit","textPreview":"QC limit","textChars":8,"textLines":1,"bbox":[722,248,126,14]}
+{"kind":"textbox","id":"sh/q1orytsv","slide":4,"text":"4.0%","textPreview":"4.0%","textChars":4,"textLines":1,"bbox":[722,267,126,24]}
+{"kind":"shape","id":"sh/fmlkjm1c","slide":4,"bbox":[710,342,150,74]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":4,"text":"Observation","textPreview":"Observation","textChars":11,"textLines":1,"bbox":[728,360,105,16]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":4,"text":"Every unit's maximum CV is below 1%, leaving strong specification margin.","textPreview":"Every unit's maximum CV is below 1%, leaving strong specification margin.","textChars":73,"textLines":1,"bbox":[728,383,115,34]}
+{"kind":"chart","id":"ch/0nuxc3yl","slide":4,"name":"","chartType":"bar","bbox":[80,154,555,230]}
+{"kind":"image","id":"im/z61032ls","slide":4,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/val87ed8","slide":4,"text":""}
+{"kind":"slide","id":"sl/mlkjm1cf","slide":5,"title":"Worst-Channel CV: Maximum 3.04%, Below the 5.6% QC Limit","textShapes":6}
+{"kind":"textbox","id":"sh/t83itgfm","slide":5,"name":"Google Shape;216;p33","text":"Worst-Channel CV: Maximum 3.04%, Below the 5.6% QC Limit","textPreview":"Worst-Channel CV: Maximum 3.04%, Below the 5.6% QC Limit","textChars":56,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"shape","id":"sh/bat47y1k","slide":5,"bbox":[52,126,610,302]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":5,"bbox":[700,150,175,105]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":5,"text":"Highest value","textPreview":"Highest value","textChars":13,"textLines":1,"bbox":[722,170,100,16]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":5,"text":"3.04%","textPreview":"3.04%","textChars":5,"textLines":1,"bbox":[722,198,120,34]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":5,"text":"0627A05 / 100%, with a C8 LOW %D note.","textPreview":"0627A05 / 100%, with a C8 LOW %D note.","textChars":38,"textLines":1,"bbox":[722,235,130,30]}
+{"kind":"shape","id":"sh/ulwval87","slide":5,"bbox":[700,290,175,105]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":5,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[722,313,95,16]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":5,"text":"All units' worst-channel CV values are below the 5.6% QC and 7% customer limits.","textPreview":"All units' worst-channel CV values are below the 5.6% QC and 7% customer limits.","textChars":80,"textLines":1,"bbox":[722,340,130,42]}
+{"kind":"chart","id":"ch/ytsvu9kn","slide":5,"name":"","chartType":"bar","bbox":[80,154,545,230]}
+{"kind":"image","id":"im/lszqtcj6","slide":5,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/mlkjm1cf","slide":5,"text":""}
+{"kind":"slide","id":"sl/58z25kb6","slide":6,"title":"Data Quality and Recommendations: PASS with Archive Notes","textShapes":12}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":6,"name":"Google Shape;225;p34","text":"Data Quality and Recommendations: PASS with Archive Notes","textPreview":"Data Quality and Recommendations: PASS with Archive Notes","textChars":57,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":6,"bbox":[52,135,250,160]}
+{"kind":"shape","id":"sh/w3m94fu1","slide":6,"bbox":[70,156,28,28]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[70,161,28,18]}
+{"kind":"textbox","id":"sh/bulwval8","slide":6,"text":"PASS judgment","textPreview":"PASS judgment","textChars":13,"textLines":1,"bbox":[110,158,170,20]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":6,"text":"All 5 detail records are Finish, reached 392% / 1,020,000 cycles, and current CV / worst-channel CV values meet the limits.","textPreview":"All 5 detail records are Finish, reached 392% / 1,020,000 cycles, and current CV / worst-channel CV values meet the limits.","textChars":123,"textLines":1,"bbox":[76,202,205,82]}
+{"kind":"shape","id":"sh/p0bi9s36","slide":6,"bbox":[340,135,250,160]}
+{"kind":"shape","id":"sh/0fepkzup","slide":6,"bbox":[358,156,28,28]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[358,161,28,18]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":6,"text":"Sync summary","textPreview":"Sync summary","textChars":12,"textLines":1,"bbox":[398,158,170,20]}
+{"kind":"textbox","id":"sh/tovahoza","slide":6,"text":"The aging summary still shows 200% running. Update it to Finish / 392% / 1,020k to avoid status mismatch.","textPreview":"The aging summary still shows 200% running. Update it to Finish / 392% / 1,020k to avoid status mismatch.","textChars":105,"textLines":1,"bbox":[364,202,205,82]}
+{"kind":"shape","id":"sh/032lszqt","slide":6,"bbox":[628,135,250,160]}
+{"kind":"shape","id":"sh/b6xkf6dc","slide":6,"bbox":[646,156,28,28]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[646,161,28,18]}
+{"kind":"textbox","id":"sh/2p8nqxs7","slide":6,"text":"Optical data scope","textPreview":"Optical data scope","textChars":18,"textLines":1,"bbox":[686,158,170,20]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":6,"text":"392% plate4/plate5 are #DIV/0!; some 315% records note only 3 plates under the new validation. Retest or document the scope.","textPreview":"392% plate4/plate5 are #DIV/0!; some 315% records note only 3 plates under the new validation. Retest or document the scope.","textChars":124,"textLines":1,"bbox":[652,202,205,82]}
+{"kind":"shape","id":"sh/gvy90je9","slide":6,"bbox":[52,340,826,86]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":6,"text":"Final recommendation","textPreview":"Final recommendation","textChars":20,"textLines":1,"bbox":[78,365,165,22]}
+{"kind":"textbox","id":"sh/2hwfyxob","slide":6,"text":"Based on Finish status, completion to 392%, no STOP/FAIL records, and current CV metrics below QC/customer limits, the aging test is recommended as PASS for all 5 Mold Seal pipettes. Before formal archive, sync the aging summary and document the plate4/plate5 #DIV/0! and 3-plate validation scope.","textPreview":"Based on Finish status, completion to 392%, no STOP/FAIL records, and current CV metrics below QC/customer limits, the aging test is reco...","textChars":297,"textLines":1,"bbox":[248,354,590,58]}
+{"kind":"image","id":"im/bat47y1k","slide":6,"name":"Google Shape;221;p34","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/58z25kb6","slide":6,"text":""}
+{"kind":"slide","id":"sl/0z61032l","slide":7,"title":"0407A02 Unit Summary: PASS","textShapes":18}
+{"kind":"textbox","id":"sh/0fepkzup","slide":7,"name":"Google Shape;216;p33","text":"0407A02 Unit Summary: PASS","textPreview":"0407A02 Unit Summary: PASS","textChars":26,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":7,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/byhgn29g","slide":7,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":7,"text":"Highest point","textPreview":"Highest point","textChars":13,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":7,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/lwval87e","slide":7,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":7,"text":"Max CV (100% / 315%)","textPreview":"Max CV (100% / 315%)","textChars":20,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":7,"text":"0.54%","textPreview":"0.54%","textChars":5,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":7,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":7,"text":"Max worst ch. (315%)","textPreview":"Max worst ch. (315%)","textChars":20,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":7,"text":"3.00%","textPreview":"3.00%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":7,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/at47y1kr","slide":7,"text":"Judgment","textPreview":"Judgment","textChars":8,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":7,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/d8v6psfi","slide":7,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/z25kb6xk","slide":7,"text":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textPreview":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textChars":84,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/ovahoza1","slide":7,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/dg7adsji","slide":7,"text":"Unit summary","textPreview":"Unit summary","textChars":12,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/6tovahoz","slide":7,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/vahoza1g","slide":7,"text":"Trend","textPreview":"Trend","textChars":5,"textLines":1,"bbox":[590,274,90,14]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":7,"text":"CV remained between 0.35% and 0.54% across all stages, well below the 4% QC limit; worst-channel CV peaked at 3.00% at 315%, still below the 5.6% QC limit.","textPreview":"CV remained between 0.35% and 0.54% across all stages, well below the 4% QC limit; worst-channel CV peaked at 3.00% at 315%, still below ...","textChars":155,"textLines":1,"bbox":[590,291,260,34]}
+{"kind":"shape","id":"sh/dsji5sne","slide":7,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":7,"text":"Data note","textPreview":"Data note","textChars":9,"textLines":1,"bbox":[590,322,90,14]}
+{"kind":"textbox","id":"sh/kb6xkf6d","slide":7,"text":"392% plate4/plate5 are #DIV/0!.","textPreview":"392% plate4/plate5 are #DIV/0!.","textChars":31,"textLines":1,"bbox":[590,339,260,34]}
+{"kind":"shape","id":"sh/rqd4vmtw","slide":7,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":7,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[590,370,90,14]}
+{"kind":"textbox","id":"sh/9knih4by","slide":7,"text":"The detailed sheet shows Finish at 392% / 1,020,000 cycles. Current CV results meet the specification; recommend PASS for archive.","textPreview":"The detailed sheet shows Finish at 392% / 1,020,000 cycles. Current CV results meet the specification; recommend PASS for archive.","textChars":130,"textLines":1,"bbox":[590,387,260,34]}
+{"kind":"chart","id":"ch/y1kre1w7","slide":7,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/9s36hcrm","slide":7,"name":"","rows":3,"cols":6,"preview":"Stage | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/0je9cvix","slide":7,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/0z61032l","slide":7,"text":""}
+{"kind":"slide","id":"sl/fu18jqh0","slide":8,"title":"0627A05 Unit Summary: PASS","textShapes":18}
+{"kind":"textbox","id":"sh/bq1oryts","slide":8,"name":"Google Shape;216;p33","text":"0627A05 Unit Summary: PASS","textPreview":"0627A05 Unit Summary: PASS","textChars":26,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":8,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/47y1kre1","slide":8,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":8,"text":"Highest point","textPreview":"Highest point","textChars":13,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":8,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/yxobm58z","slide":8,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":8,"text":"Max CV (100%)","textPreview":"Max CV (100%)","textChars":13,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":8,"text":"0.86%","textPreview":"0.86%","textChars":5,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/9cvixcze","slide":8,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":8,"text":"Max worst ch. (100%)","textPreview":"Max worst ch. (100%)","textChars":20,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":8,"text":"3.04%","textPreview":"3.04%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/gfmlkjm1","slide":8,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":8,"text":"Judgment","textPreview":"Judgment","textChars":8,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":8,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":8,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":8,"text":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textPreview":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textChars":84,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/z61032ls","slide":8,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":8,"text":"Unit summary","textPreview":"Unit summary","textChars":12,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/hcrmhk3q","slide":8,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":8,"text":"Trend","textPreview":"Trend","textChars":5,"textLines":1,"bbox":[590,274,90,14]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":8,"text":"CV and worst-channel CV peaked at 100%, but 0.86% CV and 3.04% worst-channel CV remain below the limits.","textPreview":"CV and worst-channel CV peaked at 100%, but 0.86% CV and 3.04% worst-channel CV remain below the limits.","textChars":104,"textLines":1,"bbox":[590,291,260,34]}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":8,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":8,"text":"Data note","textPreview":"Data note","textChars":9,"textLines":1,"bbox":[590,322,90,14]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":8,"text":"100% has a C8 LOW %D in plate1 note; 315% notes the new validation with only 3 plates tested; 315%/392% plate4/plate5 are #DIV/0!.","textPreview":"100% has a C8 LOW %D in plate1 note; 315% notes the new validation with only 3 plates tested; 315%/392% plate4/plate5 are #DIV/0!.","textChars":130,"textLines":1,"bbox":[590,339,260,34]}
+{"kind":"shape","id":"sh/kf6dcbul","slide":8,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/d0z61032","slide":8,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[590,370,90,14]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":8,"text":"The detailed sheet shows Finish and current CV results meet the specification. Recommend PASS, retaining the C8 D% and 3-plate scope notes.","textPreview":"The detailed sheet shows Finish and current CV results meet the specification. Recommend PASS, retaining the C8 D% and 3-plate scope notes.","textChars":139,"textLines":1,"bbox":[590,387,260,34]}
+{"kind":"chart","id":"ch/lszqtcj6","slide":8,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/6psfil0r","slide":8,"name":"","rows":3,"cols":6,"preview":"Stage | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/byhgn29g","slide":8,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/fu18jqh0","slide":8,"text":""}
+{"kind":"slide","id":"sl/qh0fepkz","slide":9,"title":"0701A05 Unit Summary: PASS","textShapes":18}
+{"kind":"textbox","id":"sh/t83itgfm","slide":9,"name":"Google Shape;216;p33","text":"0701A05 Unit Summary: PASS","textPreview":"0701A05 Unit Summary: PASS","textChars":26,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":9,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":9,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":9,"text":"Highest point","textPreview":"Highest point","textChars":13,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":9,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/c3ylc7u5","slide":9,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":9,"text":"Max CV (100%)","textPreview":"Max CV (100%)","textChars":13,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/ulwval87","slide":9,"text":"0.69%","textPreview":"0.69%","textChars":5,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/j6tovaho","slide":9,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":9,"text":"Max worst ch. (100%)","textPreview":"Max worst ch. (100%)","textChars":20,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":9,"text":"2.57%","textPreview":"2.57%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":9,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":9,"text":"Judgment","textPreview":"Judgment","textChars":8,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":9,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/0z61032l","slide":9,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":9,"text":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textPreview":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textChars":84,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/p8nqxs72","slide":9,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":9,"text":"Unit summary","textPreview":"Unit summary","textChars":12,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/72x4nap4","slide":9,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":9,"text":"Trend","textPreview":"Trend","textChars":5,"textLines":1,"bbox":[590,274,90,14]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":9,"text":"A temporary increase was observed at 100%; values then returned lower and stayed stable from 200% to 392%. Maximum CV was 0.69%.","textPreview":"A temporary increase was observed at 100%; values then returned lower and stayed stable from 200% to 392%. Maximum CV was 0.69%.","textChars":128,"textLines":1,"bbox":[590,291,260,34]}
+{"kind":"shape","id":"sh/wjudg7ad","slide":9,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":9,"text":"Data note","textPreview":"Data note","textChars":9,"textLines":1,"bbox":[590,322,90,14]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":9,"text":"392% plate4/plate5 are #DIV/0!.","textPreview":"392% plate4/plate5 are #DIV/0!.","textChars":31,"textLines":1,"bbox":[590,339,260,34]}
+{"kind":"shape","id":"sh/6psfil0r","slide":9,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/val87ed8","slide":9,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[590,370,90,14]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":9,"text":"The detailed sheet shows Finish. Current CV and worst-channel CV results are within specification; recommend PASS.","textPreview":"The detailed sheet shows Finish. Current CV and worst-channel CV results are within specification; recommend PASS.","textChars":114,"textLines":1,"bbox":[590,387,260,34]}
+{"kind":"chart","id":"ch/fu18jqh0","slide":9,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/kb6xkf6d","slide":9,"name":"","rows":3,"cols":6,"preview":"Stage | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/9s36hcrm","slide":9,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/qh0fepkz","slide":9,"text":""}
+{"kind":"slide","id":"sl/29gr2p8n","slide":10,"title":"0627A01 Unit Summary: PASS","textShapes":18}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":10,"name":"Google Shape;216;p33","text":"0627A01 Unit Summary: PASS","textPreview":"0627A01 Unit Summary: PASS","textChars":26,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":10,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":10,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":10,"text":"Highest point","textPreview":"Highest point","textChars":13,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":10,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/1w7mp0bi","slide":10,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":10,"text":"Max CV (100%)","textPreview":"Max CV (100%)","textChars":13,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":10,"text":"0.72%","textPreview":"0.72%","textChars":5,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":10,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":10,"text":"Max worst ch. (100%)","textPreview":"Max worst ch. (100%)","textChars":20,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":10,"text":"1.15%","textPreview":"1.15%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/j6tovaho","slide":10,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/ulwval87","slide":10,"text":"Judgment","textPreview":"Judgment","textChars":8,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":10,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/t83itgfm","slide":10,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":10,"text":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textPreview":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textChars":84,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/4byhgn29","slide":10,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":10,"text":"Unit summary","textPreview":"Unit summary","textChars":12,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/m58z25kb","slide":10,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/bq1oryts","slide":10,"text":"Trend","textPreview":"Trend","textChars":5,"textLines":1,"bbox":[590,274,90,14]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":10,"text":"CV peaked at 0.72% at 100%, then decreased to 0.35%-0.50%; maximum worst-channel CV was 1.15%, leaving strong margin.","textPreview":"CV peaked at 0.72% at 100%, then decreased to 0.35%-0.50%; maximum worst-channel CV was 1.15%, leaving strong margin.","textChars":117,"textLines":1,"bbox":[590,291,260,34]}
+{"kind":"shape","id":"sh/tsvu9kni","slide":10,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":10,"text":"Data note","textPreview":"Data note","textChars":9,"textLines":1,"bbox":[590,322,90,14]}
+{"kind":"textbox","id":"sh/wval87ed","slide":10,"text":"315% notes the new validation with only 3 plates tested; 315%/392% plate4/plate5 are #DIV/0!.","textPreview":"315% notes the new validation with only 3 plates tested; 315%/392% plate4/plate5 are #DIV/0!.","textChars":93,"textLines":1,"bbox":[590,339,260,34]}
+{"kind":"shape","id":"sh/7adsji5s","slide":10,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":10,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[590,370,90,14]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":10,"text":"The detailed sheet shows Finish. Current CV data are stable and meet the specification; recommend PASS.","textPreview":"The detailed sheet shows Finish. Current CV data are stable and meet the specification; recommend PASS.","textChars":103,"textLines":1,"bbox":[590,387,260,34]}
+{"kind":"chart","id":"ch/il0rqd4v","slide":10,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/h4byhgn2","slide":10,"name":"","rows":3,"cols":6,"preview":"Stage | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/obm58z25","slide":10,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/29gr2p8n","slide":10,"text":""}
+{"kind":"slide","id":"sl/re1w7mp0","slide":11,"title":"0702A04 Unit Summary: PASS","textShapes":18}
+{"kind":"textbox","id":"sh/32lszqtc","slide":11,"name":"Google Shape;216;p33","text":"0702A04 Unit Summary: PASS","textPreview":"0702A04 Unit Summary: PASS","textChars":26,"textLines":1,"bbox":[50,62,735,57.45]}
+{"kind":"textbox","id":"sh/lwval87e","slide":11,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":11,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/sji5snel","slide":11,"text":"Highest point","textPreview":"Highest point","textChars":13,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":11,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/adsji5sn","slide":11,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":11,"text":"Max CV (100%)","textPreview":"Max CV (100%)","textChars":13,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":11,"text":"0.64%","textPreview":"0.64%","textChars":5,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":11,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":11,"text":"Max worst ch. (315%)","textPreview":"Max worst ch. (315%)","textChars":20,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":11,"text":"1.92%","textPreview":"1.92%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":11,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":11,"text":"Judgment","textPreview":"Judgment","textChars":8,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":11,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/ylc7u54z","slide":11,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":11,"text":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textPreview":"Spec reference: 5 uL CV QC 4% / customer 5%; worst-channel CV QC 5.6% / customer 7%.","textChars":84,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/nih4byhg","slide":11,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":11,"text":"Unit summary","textPreview":"Unit summary","textChars":12,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":11,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":11,"text":"Trend","textPreview":"Trend","textChars":5,"textLines":1,"bbox":[590,274,90,14]}
+{"kind":"textbox","id":"sh/rmhk3q5o","slide":11,"text":"CV peaked at 0.64% and then decreased to 0.37%; worst-channel CV was 1.92% at 315%, still well below the 5.6% QC limit.","textPreview":"CV peaked at 0.64% and then decreased to 0.37%; worst-channel CV was 1.92% at 315%, still well below the 5.6% QC limit.","textChars":119,"textLines":1,"bbox":[590,291,260,34]}
+{"kind":"shape","id":"sh/y1kre1w7","slide":11,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/y90je9cv","slide":11,"text":"Data note","textPreview":"Data note","textChars":9,"textLines":1,"bbox":[590,322,90,14]}
+{"kind":"textbox","id":"sh/nuxc3ylc","slide":11,"text":"75% is skipped/#REF; 315% notes the new validation with only 3 plates tested; 315%/392% plate4/plate5 are #DIV/0!.","textPreview":"75% is skipped/#REF; 315% notes the new validation with only 3 plates tested; 315%/392% plate4/plate5 are #DIV/0!.","textChars":114,"textLines":1,"bbox":[590,339,260,34]}
+{"kind":"shape","id":"sh/gbq1oryt","slide":11,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":11,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[590,370,90,14]}
+{"kind":"textbox","id":"sh/yhgn29gr","slide":11,"text":"The detailed sheet shows Finish and current CV metrics meet the specification; recommend PASS.","textPreview":"The detailed sheet shows Finish and current CV metrics meet the specification; recommend PASS.","textChars":94,"textLines":1,"bbox":[590,387,260,34]}
+{"kind":"chart","id":"ch/dsji5sne","slide":11,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/e1w7mp0b","slide":11,"name":"","rows":3,"cols":6,"preview":"Stage | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/zqtcj6to","slide":11,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/re1w7mp0","slide":11,"text":""}

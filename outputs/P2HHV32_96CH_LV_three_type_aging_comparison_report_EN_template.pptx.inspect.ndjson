@@ -1,0 +1,247 @@
+{"kind":"deck","id":"pr/g4lhs5","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"material","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout2.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout3.xml","name":"TITLE_AND_BODY","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout4.xml","name":"TITLE_AND_TWO_COLUMNS","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout5.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout6.xml","name":"ONE_COLUMN_TEXT","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout7.xml","name":"MAIN_POINT","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout8.xml","name":"SECTION_TITLE_AND_DESCRIPTION","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout9.xml","name":"CAPTION_ONLY","placeholders":[{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout10.xml","name":"BIG_NUMBER","placeholders":[{"name":"title","type":"title","textPreview":"xx%"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout11.xml","name":"BLANK","type":"blank","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout12.xml","name":"CUSTOM_3","placeholders":[{"name":"picture","type":"picture"},{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout13.xml","name":"CUSTOM_3_1","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster2.xml","name":"","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout14.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout15.xml","name":"OBJECT","type":"obj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout16.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout17.xml","name":"TWO_OBJECTS","type":"twoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout18.xml","name":"TWO_OBJECTS_WITH_TEXT","type":"twoTxTwoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout19.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout20.xml","name":"BLANK","type":"blank","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout21.xml","name":"图片与标题","placeholders":[{"name":"picture","type":"picture"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout22.xml","name":"VERTICAL_TITLE_AND_VERTICAL_TEXT","type":"vertTitleAndTx","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout23.xml","name":"内容","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout24.xml","name":"末尾幻灯片","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout25.xml","name":"Title Only","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"slide","id":"sl/2x4nap4r","slide":1,"title":"P2HHV32 96CH LV Three-Type Aging Test Comparison Report","textShapes":2}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":1,"name":"Google Shape;167;p28","placeholder":"title","text":"P2HHV32 96CH LV Three-Type Aging Test Comparison Report","textPreview":"P2HHV32 96CH LV Three-Type Aging Test Comparison Report","textChars":55,"textLines":1,"bbox":[334,179.31,609.07,124.16]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":1,"name":"Google Shape;168;p28","placeholder":"subtitle","text":"2026.06.15\nSZ ENG","textPreview":"2026.06.15 | SZ ENG","textChars":17,"textLines":2,"bbox":[737.39,393.51,320.66,51.91]}
+{"kind":"image","id":"im/5wjudg7a","slide":1,"name":"Google Shape;169;p28","bbox":[0,0,334,540]}
+{"kind":"notes","id":"nt/2x4nap4r","slide":1,"text":""}
+{"kind":"slide","id":"sl/pg3ex0nu","slide":2,"title":"Executive Summary: Main Difference Is Concentrated in Rod Seal","textShapes":15}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":2,"name":"Google Shape;216;p33","text":"Executive Summary: Main Difference Is Concentrated in Rod Seal","textPreview":"Executive Summary: Main Difference Is Concentrated in Rod Seal","textChars":62,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"shape","id":"sh/e1w7mp0b","slide":2,"bbox":[52,128,150,58]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":2,"text":"Compared types","textPreview":"Compared types","textChars":14,"textLines":1,"bbox":[64,136,126,14]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":2,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[64,155,126,24]}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":2,"bbox":[222,128,150,58]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":2,"text":"Total units","textPreview":"Total units","textChars":11,"textLines":1,"bbox":[234,136,126,14]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":2,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[234,155,126,24]}
+{"kind":"shape","id":"sh/zqtcj6to","slide":2,"bbox":[392,128,150,58]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":2,"text":"Reached 392%","textPreview":"Reached 392%","textChars":12,"textLines":1,"bbox":[404,136,126,14]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":2,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[404,155,126,24]}
+{"kind":"shape","id":"sh/obm58z25","slide":2,"bbox":[562,128,150,58]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":2,"text":"STOP / Risk","textPreview":"STOP / Risk","textChars":11,"textLines":1,"bbox":[574,136,126,14]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":2,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[574,155,126,24]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":2,"bbox":[52,214,520,210]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":2,"text":"Key conclusion","textPreview":"Key conclusion","textChars":14,"textLines":1,"bbox":[78,238,150,20]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":2,"bbox":[82,281,8,8]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":2,"text":"Mold Oring Rework and Mold Seal both show 100% Finish / PASS, and both have max CV below 1%, leaving strong margin.","textPreview":"Mold Oring Rework and Mold Seal both show 100% Finish / PASS, and both have max CV below 1%, leaving strong margin.","textChars":115,"textLines":1,"bbox":[102,276,420,34]}
+{"kind":"shape","id":"sh/0je9cvix","slide":2,"bbox":[82,331,8,8]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":2,"text":"Rod Seal has only 2/5 clear PASS units, plus 2 STOP/FAIL and 1 QC risk unit; it is the only type not recommended for direct release.","textPreview":"Rod Seal has only 2/5 clear PASS units, plus 2 STOP/FAIL and 1 QC risk unit; it is the only type not recommended for direct release.","textChars":132,"textLines":1,"bbox":[102,326,420,34]}
+{"kind":"shape","id":"sh/idonyd0z","slide":2,"bbox":[82,381,8,8]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":2,"text":"Rod Seal issues are not driven by broad worst-channel CV exceedance, but by low aspiration, leakage/leak-rate notes, and 392% CV risk.","textPreview":"Rod Seal issues are not driven by broad worst-channel CV exceedance, but by low aspiration, leakage/leak-rate notes, and 392% CV risk.","textChars":134,"textLines":1,"bbox":[102,376,420,34]}
+{"kind":"shape","id":"sh/0fepkzup","slide":2,"bbox":[602,214,280,210]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":2,"text":"Direction","textPreview":"Direction","textChars":9,"textLines":1,"bbox":[628,238,92,20]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":2,"text":"1. Archive Mold Oring Rework and Mold Seal as PASS.\n2. Hold Rod Seal until failure RCA, structural/assembly review, and retest are complete.\n3. Sync the aging summary before formal archive.\n4. Align the retest or written explanation for 392% plate4/plate5 #DIV/0!.","textPreview":"1. Archive Mold Oring Rework and Mold Seal as PASS. | 2. Hold Rod Seal until failure RCA, structural/assembly review, and retest are comp...","textChars":264,"textLines":4,"bbox":[628,276,220,122]}
+{"kind":"image","id":"im/sfil0rqd","slide":2,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/pg3ex0nu","slide":2,"text":""}
+{"kind":"slide","id":"sl/s72x4nap","slide":3,"title":"Three-Type Status Snapshot: Rod Seal Has STOP/FAIL and QC Risk","textShapes":7}
+{"kind":"textbox","id":"sh/loj2t83i","slide":3,"name":"Google Shape;216;p33","text":"Three-Type Status Snapshot: Rod Seal Has STOP/FAIL and QC Risk","textPreview":"Three-Type Status Snapshot: Rod Seal Has STOP/FAIL and QC Risk","textChars":62,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"shape","id":"sh/at47y1kr","slide":3,"bbox":[52,336,240,112]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":3,"text":"Mold Oring","textPreview":"Mold Oring","textChars":10,"textLines":1,"bbox":[70,356,130,18]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":3,"text":"4/4 reached 392% / 1.02M\nFinal PASS: 4/4; Fail/Stop: 0/4\nJudgment: PASS","textPreview":"4/4 reached 392% / 1.02M | Final PASS: 4/4; Fail/Stop: 0/4 | Judgment: PASS","textChars":71,"textLines":3,"bbox":[70,382,195,54]}
+{"kind":"shape","id":"sh/032lszqt","slide":3,"bbox":[345,336,240,112]}
+{"kind":"textbox","id":"sh/tovahoza","slide":3,"text":"Rod Seal","textPreview":"Rod Seal","textChars":8,"textLines":1,"bbox":[363,356,130,18]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":3,"text":"3/5 reached 392%; 2/5 stopped around 175%\nFinal PASS: 2/5; Fail/Stop: 2/5\nJudgment: HOLD / RCA","textPreview":"3/5 reached 392%; 2/5 stopped around 175% | Final PASS: 2/5; Fail/Stop: 2/5 | Judgment: HOLD / RCA","textChars":94,"textLines":3,"bbox":[363,382,195,54]}
+{"kind":"shape","id":"sh/bulwval8","slide":3,"bbox":[638,336,240,112]}
+{"kind":"textbox","id":"sh/0fepkzup","slide":3,"text":"Mold Seal","textPreview":"Mold Seal","textChars":9,"textLines":1,"bbox":[656,356,130,18]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":3,"text":"5/5 reached 392% / 1.02M\nFinal PASS: 5/5; Fail/Stop: 0/5\nJudgment: PASS","textPreview":"5/5 reached 392% / 1.02M | Final PASS: 5/5; Fail/Stop: 0/5 | Judgment: PASS","textChars":71,"textLines":3,"bbox":[656,382,195,54]}
+{"kind":"table","id":"tb/qxs72x4n","slide":3,"name":"","rows":4,"cols":9,"preview":"Type | Units | Finish | PASS | Risk | Fail/Stop | Max CV | Max worst ch. | Overall judgment","bbox":[42,126,870,175]}
+{"kind":"image","id":"im/xs72x4na","slide":3,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/s72x4nap","slide":3,"text":""}
+{"kind":"slide","id":"sl/val87ed8","slide":4,"title":"Completion and Final PASS Rate: Rod Seal Lags Clearly","textShapes":8}
+{"kind":"textbox","id":"sh/zidonyd0","slide":4,"name":"Google Shape;216;p33","text":"Completion and Final PASS Rate: Rod Seal Lags Clearly","textPreview":"Completion and Final PASS Rate: Rod Seal Lags Clearly","textChars":53,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":4,"bbox":[52,126,620,302]}
+{"kind":"shape","id":"sh/8z25kb6x","slide":4,"bbox":[710,142,150,58]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":4,"text":"Best PASS rate","textPreview":"Best PASS rate","textChars":14,"textLines":1,"bbox":[722,150,126,14]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":4,"text":"100%","textPreview":"100%","textChars":4,"textLines":1,"bbox":[722,169,126,24]}
+{"kind":"textbox","id":"sh/je9cvixc","slide":4,"text":"Mold Oring / Mold Seal","textPreview":"Mold Oring / Mold Seal","textChars":22,"textLines":1,"bbox":[724,206,124,20]}
+{"kind":"shape","id":"sh/87ed8bat","slide":4,"bbox":[710,240,150,58]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":4,"text":"Rod Seal PASS","textPreview":"Rod Seal PASS","textChars":13,"textLines":1,"bbox":[722,248,126,14]}
+{"kind":"textbox","id":"sh/q1orytsv","slide":4,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[722,267,126,24]}
+{"kind":"shape","id":"sh/fmlkjm1c","slide":4,"bbox":[710,342,150,74]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":4,"text":"Risk","textPreview":"Risk","textChars":4,"textLines":1,"bbox":[728,360,90,16]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":4,"text":"Rod Seal has 2 STOP/FAIL units and 1 QC risk unit.","textPreview":"Rod Seal has 2 STOP/FAIL units and 1 QC risk unit.","textChars":50,"textLines":1,"bbox":[728,384,110,30]}
+{"kind":"chart","id":"ch/0nuxc3yl","slide":4,"name":"","chartType":"bar","bbox":[82,154,550,230]}
+{"kind":"image","id":"im/z61032ls","slide":4,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/val87ed8","slide":4,"text":""}
+{"kind":"slide","id":"sl/mlkjm1cf","slide":5,"title":"Maximum Optical CV: Rod Seal Exceeds QC Limit at 175%","textShapes":6}
+{"kind":"textbox","id":"sh/t83itgfm","slide":5,"name":"Google Shape;216;p33","text":"Maximum Optical CV: Rod Seal Exceeds QC Limit at 175%","textPreview":"Maximum Optical CV: Rod Seal Exceeds QC Limit at 175%","textChars":53,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"shape","id":"sh/bat47y1k","slide":5,"bbox":[52,126,610,302]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":5,"bbox":[700,150,175,105]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":5,"text":"Highest value","textPreview":"Highest value","textChars":13,"textLines":1,"bbox":[722,170,110,16]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":5,"text":"6.83%","textPreview":"6.83%","textChars":5,"textLines":1,"bbox":[722,198,120,34]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":5,"text":"Rod Seal / 0627A02 / 175%, with D3/G9 low aspiration.","textPreview":"Rod Seal / 0627A02 / 175%, with D3/G9 low aspiration.","textChars":53,"textLines":1,"bbox":[722,235,128,32]}
+{"kind":"shape","id":"sh/ulwval87","slide":5,"bbox":[700,290,175,105]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":5,"text":"Passing types","textPreview":"Passing types","textChars":13,"textLines":1,"bbox":[722,313,100,16]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":5,"text":"Mold Oring and Mold Seal both have max CV below 1%.","textPreview":"Mold Oring and Mold Seal both have max CV below 1%.","textChars":51,"textLines":1,"bbox":[722,340,128,42]}
+{"kind":"chart","id":"ch/ytsvu9kn","slide":5,"name":"","chartType":"bar","bbox":[82,154,540,230]}
+{"kind":"image","id":"im/lszqtcj6","slide":5,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/mlkjm1cf","slide":5,"text":""}
+{"kind":"slide","id":"sl/58z25kb6","slide":6,"title":"Maximum Worst-Channel CV: All Three Types Below the 5.6% QC Limit","textShapes":8}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":6,"name":"Google Shape;225;p34","text":"Maximum Worst-Channel CV: All Three Types Below the 5.6% QC Limit","textPreview":"Maximum Worst-Channel CV: All Three Types Below the 5.6% QC Limit","textChars":65,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":6,"bbox":[52,126,610,302]}
+{"kind":"shape","id":"sh/loj2t83i","slide":6,"bbox":[710,142,150,58]}
+{"kind":"textbox","id":"sh/bulwval8","slide":6,"text":"Highest value","textPreview":"Highest value","textChars":13,"textLines":1,"bbox":[722,150,126,14]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":6,"text":"3.45%","textPreview":"3.45%","textChars":5,"textLines":1,"bbox":[722,169,126,24]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":6,"text":"Rod Seal / 0409A02 / 200%","textPreview":"Rod Seal / 0409A02 / 200%","textChars":25,"textLines":1,"bbox":[724,206,124,20]}
+{"kind":"shape","id":"sh/0fepkzup","slide":6,"bbox":[710,240,150,58]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":6,"text":"QC limit","textPreview":"QC limit","textChars":8,"textLines":1,"bbox":[722,248,126,14]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":6,"text":"5.6%","textPreview":"5.6%","textChars":4,"textLines":1,"bbox":[722,267,126,24]}
+{"kind":"shape","id":"sh/tovahoza","slide":6,"bbox":[710,342,150,74]}
+{"kind":"textbox","id":"sh/032lszqt","slide":6,"text":"Interpretation","textPreview":"Interpretation","textChars":14,"textLines":1,"bbox":[728,360,100,16]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":6,"text":"Rod Seal failures lean mechanical/aspiration/leak related, not broad worst-channel CV exceedance.","textPreview":"Rod Seal failures lean mechanical/aspiration/leak related, not broad worst-channel CV exceedance.","textChars":97,"textLines":1,"bbox":[728,382,112,36]}
+{"kind":"chart","id":"ch/s72x4nap","slide":6,"name":"","chartType":"bar","bbox":[82,154,540,230]}
+{"kind":"image","id":"im/bat47y1k","slide":6,"name":"Google Shape;221;p34","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/58z25kb6","slide":6,"text":""}
+{"kind":"slide","id":"sl/0z61032l","slide":7,"title":"Mold Oring Rework: Overall PASS","textShapes":13}
+{"kind":"textbox","id":"sh/0fepkzup","slide":7,"name":"Google Shape;216;p33","text":"Mold Oring Rework: Overall PASS","textPreview":"Mold Oring Rework: Overall PASS","textChars":31,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":7,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/byhgn29g","slide":7,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":7,"text":"Sample count","textPreview":"Sample count","textChars":12,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":7,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/lwval87e","slide":7,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":7,"text":"Finish / PASS","textPreview":"Finish / PASS","textChars":13,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":7,"text":"4/4 / 4/4","textPreview":"4/4 / 4/4","textChars":9,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":7,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":7,"text":"Max CV","textPreview":"Max CV","textChars":6,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":7,"text":"0.825%","textPreview":"0.825%","textChars":6,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":7,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/at47y1kr","slide":7,"text":"Max worst ch.","textPreview":"Max worst ch.","textChars":13,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":7,"text":"2.88%","textPreview":"2.88%","textChars":5,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/d8v6psfi","slide":7,"bbox":[52,215,370,205]}
+{"kind":"textbox","id":"sh/6hcrmhk3","slide":7,"text":"Type conclusion","textPreview":"Type conclusion","textChars":15,"textLines":1,"bbox":[78,238,150,20]}
+{"kind":"shape","id":"sh/z25kb6xk","slide":7,"bbox":[80,283,8,8]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":7,"text":"All 4 units are Finish and completed 392%; all available CV and worst-channel CV results are below limits, giving the best margin among the three types.","textPreview":"All 4 units are Finish and completed 392%; all available CV and worst-channel CV results are below limits, giving the best margin among t...","textChars":152,"textLines":1,"bbox":[100,278,290,34]}
+{"kind":"shape","id":"sh/dg7adsji","slide":7,"bbox":[80,351,8,8]}
+{"kind":"textbox","id":"sh/6tovahoz","slide":7,"text":"The summary sheet still shows 238% running; 392% plate4/plate5 are #DIV/0!; 0411A03 has an initial 0% high %D note, but later CV remains within spec.","textPreview":"The summary sheet still shows 238% running; 392% plate4/plate5 are #DIV/0!; 0411A03 has an initial 0% high %D note, but later CV remains ...","textChars":149,"textLines":1,"bbox":[100,346,290,34]}
+{"kind":"shape","id":"sh/vahoza1g","slide":7,"bbox":[446,215,434,205]}
+{"kind":"table","id":"tb/hgn29gr2","slide":7,"name":"","rows":5,"cols":6,"preview":"SN | Status | Judgment | Max CV | Max worst | Note","bbox":[464,240,398,148]}
+{"kind":"image","id":"im/0je9cvix","slide":7,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/0z61032l","slide":7,"text":""}
+{"kind":"slide","id":"sl/fu18jqh0","slide":8,"title":"Rod Seal: HOLD and RCA Required","textShapes":13}
+{"kind":"textbox","id":"sh/bq1oryts","slide":8,"name":"Google Shape;216;p33","text":"Rod Seal: HOLD and RCA Required","textPreview":"Rod Seal: HOLD and RCA Required","textChars":31,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":8,"text":"HOLD / RCA","textPreview":"HOLD / RCA","textChars":10,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/47y1kre1","slide":8,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":8,"text":"Sample count","textPreview":"Sample count","textChars":12,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":8,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/yxobm58z","slide":8,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":8,"text":"Finish / PASS","textPreview":"Finish / PASS","textChars":13,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":8,"text":"3/5 / 2/5","textPreview":"3/5 / 2/5","textChars":9,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/9cvixcze","slide":8,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":8,"text":"Max CV","textPreview":"Max CV","textChars":6,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":8,"text":"6.83%","textPreview":"6.83%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/gfmlkjm1","slide":8,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":8,"text":"Max worst ch.","textPreview":"Max worst ch.","textChars":13,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":8,"text":"3.45%","textPreview":"3.45%","textChars":5,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":8,"bbox":[52,215,370,205]}
+{"kind":"textbox","id":"sh/h0fepkzu","slide":8,"text":"Type conclusion","textPreview":"Type conclusion","textChars":15,"textLines":1,"bbox":[78,238,150,20]}
+{"kind":"shape","id":"sh/sfil0rqd","slide":8,"bbox":[80,283,8,8]}
+{"kind":"textbox","id":"sh/z61032ls","slide":8,"text":"This is the only type with STOP/FAIL and QC risk records; issues concentrate in low aspiration, leakage/leak-rate notes, and 392% CV QC risk.","textPreview":"This is the only type with STOP/FAIL and QC risk records; issues concentrate in low aspiration, leakage/leak-rate notes, and 392% CV QC r...","textChars":141,"textLines":1,"bbox":[100,278,290,34]}
+{"kind":"shape","id":"sh/al87ed8b","slide":8,"bbox":[80,351,8,8]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":8,"text":"0627A02 has 6.83% CV at 175% with D3/G9 low aspiration; 0627A03 failed between 150%-175%; 0701A01 is Finish but has 4.16% CV at 392%, judged QC risk.","textPreview":"0627A02 has 6.83% CV at 175% with D3/G9 low aspiration; 0627A03 failed between 150%-175%; 0701A01 is Finish but has 4.16% CV at 392%, jud...","textChars":149,"textLines":1,"bbox":[100,346,290,34]}
+{"kind":"shape","id":"sh/orytsvu9","slide":8,"bbox":[446,215,434,205]}
+{"kind":"table","id":"tb/m1cfa9w3","slide":8,"name":"","rows":6,"cols":6,"preview":"SN | Status | Judgment | Max CV | Max worst | Note","bbox":[464,240,398,166]}
+{"kind":"image","id":"im/byhgn29g","slide":8,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/fu18jqh0","slide":8,"text":""}
+{"kind":"slide","id":"sl/qh0fepkz","slide":9,"title":"Mold Seal: Overall PASS","textShapes":13}
+{"kind":"textbox","id":"sh/t83itgfm","slide":9,"name":"Google Shape;216;p33","text":"Mold Seal: Overall PASS","textPreview":"Mold Seal: Overall PASS","textChars":23,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":9,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":9,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":9,"text":"Sample count","textPreview":"Sample count","textChars":12,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":9,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/c3ylc7u5","slide":9,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":9,"text":"Finish / PASS","textPreview":"Finish / PASS","textChars":13,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/ulwval87","slide":9,"text":"5/5 / 5/5","textPreview":"5/5 / 5/5","textChars":9,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/j6tovaho","slide":9,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":9,"text":"Max CV","textPreview":"Max CV","textChars":6,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":9,"text":"0.86%","textPreview":"0.86%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":9,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":9,"text":"Max worst ch.","textPreview":"Max worst ch.","textChars":13,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":9,"text":"3.04%","textPreview":"3.04%","textChars":5,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/0z61032l","slide":9,"bbox":[52,215,370,205]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":9,"text":"Type conclusion","textPreview":"Type conclusion","textChars":15,"textLines":1,"bbox":[78,238,150,20]}
+{"kind":"shape","id":"sh/itgfmlkj","slide":9,"bbox":[80,283,8,8]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":9,"text":"All 5 units are Finish and completed 392%; max CV is 0.86% and max worst-channel CV is 3.04%, both within specification.","textPreview":"All 5 units are Finish and completed 392%; max CV is 0.86% and max worst-channel CV is 3.04%, both within specification.","textChars":120,"textLines":1,"bbox":[100,278,290,34]}
+{"kind":"shape","id":"sh/0nuxc3yl","slide":9,"bbox":[80,351,8,8]}
+{"kind":"textbox","id":"sh/72x4nap4","slide":9,"text":"The summary sheet still shows 200% running; 392% plate4/plate5 are #DIV/0!; some 315% records used only 3 plates under the new validation.","textPreview":"The summary sheet still shows 200% running; 392% plate4/plate5 are #DIV/0!; some 315% records used only 3 plates under the new validation.","textChars":138,"textLines":1,"bbox":[100,346,290,34]}
+{"kind":"shape","id":"sh/ih4byhgn","slide":9,"bbox":[446,215,434,205]}
+{"kind":"table","id":"tb/8v6psfil","slide":9,"name":"","rows":6,"cols":6,"preview":"SN | Status | Judgment | Max CV | Max worst | Note","bbox":[464,240,398,166]}
+{"kind":"image","id":"im/9s36hcrm","slide":9,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/qh0fepkz","slide":9,"text":""}
+{"kind":"slide","id":"sl/29gr2p8n","slide":10,"title":"Failure Mode and Data Quality Comparison","textShapes":21}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":10,"name":"Google Shape;216;p33","text":"Failure Mode and Data Quality Comparison","textPreview":"Failure Mode and Data Quality Comparison","textChars":40,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"shape","id":"sh/itgfmlkj","slide":10,"bbox":[52,135,250,205]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":10,"bbox":[70,156,28,28]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[70,161,28,18]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":10,"text":"Mold Oring Rework","textPreview":"Mold Oring Rework","textChars":17,"textLines":1,"bbox":[110,158,168,20]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":10,"text":"Failure / risk","textPreview":"Failure / risk","textChars":14,"textLines":1,"bbox":[76,204,95,14]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":10,"text":"No STOP/FAIL; only 0411A03 has an early 0% high %D note, and later CV stays within spec.","textPreview":"No STOP/FAIL; only 0411A03 has an early 0% high %D note, and later CV stays within spec.","textChars":88,"textLines":1,"bbox":[76,222,205,54]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":10,"text":"Data quality","textPreview":"Data quality","textChars":12,"textLines":1,"bbox":[76,286,95,14]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":10,"text":"Summary sheet lags at 238%; 392% plate4/plate5 are #DIV/0!.","textPreview":"Summary sheet lags at 238%; 392% plate4/plate5 are #DIV/0!.","textChars":59,"textLines":1,"bbox":[76,304,205,54]}
+{"kind":"shape","id":"sh/18jqh0fe","slide":10,"bbox":[340,135,250,205]}
+{"kind":"shape","id":"sh/8nqxs72x","slide":10,"bbox":[358,156,28,28]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[358,161,28,18]}
+{"kind":"textbox","id":"sh/ulwval87","slide":10,"text":"Rod Seal","textPreview":"Rod Seal","textChars":8,"textLines":1,"bbox":[398,158,168,20]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":10,"text":"Failure / risk","textPreview":"Failure / risk","textChars":14,"textLines":1,"bbox":[364,204,95,14]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":10,"text":"2 STOP/FAIL units: low/no aspiration and high leak-rate notes; 1 Finish unit has 392% CV 4.16% QC risk.","textPreview":"2 STOP/FAIL units: low/no aspiration and high leak-rate notes; 1 Finish unit has 392% CV 4.16% QC risk.","textChars":103,"textLines":1,"bbox":[364,222,205,54]}
+{"kind":"textbox","id":"sh/mhk3q5o7","slide":10,"text":"Data quality","textPreview":"Data quality","textChars":12,"textLines":1,"bbox":[364,286,95,14]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":10,"text":"Some Finish units still show 200% running in the summary; 392% plate4/plate5 are #DIV/0!.","textPreview":"Some Finish units still show 200% running in the summary; 392% plate4/plate5 are #DIV/0!.","textChars":89,"textLines":1,"bbox":[364,304,205,54]}
+{"kind":"shape","id":"sh/4byhgn29","slide":10,"bbox":[628,135,250,205]}
+{"kind":"shape","id":"sh/twra5gbq","slide":10,"bbox":[646,156,28,28]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[646,161,28,18]}
+{"kind":"textbox","id":"sh/bq1oryts","slide":10,"text":"Mold Seal","textPreview":"Mold Seal","textChars":9,"textLines":1,"bbox":[686,158,168,20]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":10,"text":"Failure / risk","textPreview":"Failure / risk","textChars":14,"textLines":1,"bbox":[652,204,95,14]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":10,"text":"No STOP/FAIL; 0627A05 has a C8 LOW %D note, but CV / worst-channel CV remain within spec.","textPreview":"No STOP/FAIL; 0627A05 has a C8 LOW %D note, but CV / worst-channel CV remain within spec.","textChars":89,"textLines":1,"bbox":[652,222,205,54]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":10,"text":"Data quality","textPreview":"Data quality","textChars":12,"textLines":1,"bbox":[652,286,95,14]}
+{"kind":"textbox","id":"sh/wval87ed","slide":10,"text":"Summary sheet lags at 200%; 392% plate4/plate5 are #DIV/0!; some 315% records use only 3 plates.","textPreview":"Summary sheet lags at 200%; 392% plate4/plate5 are #DIV/0!; some 315% records use only 3 plates.","textChars":96,"textLines":1,"bbox":[652,304,205,54]}
+{"kind":"shape","id":"sh/7adsji5s","slide":10,"bbox":[52,375,826,62]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":10,"text":"Common action","textPreview":"Common action","textChars":13,"textLines":1,"bbox":[78,394,140,18]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":10,"text":"All three types have aging-summary vs. RD-detail sync gaps and 392% plate4/plate5 #DIV/0! archive-scope questions. Align retest or written explanation before final archive.","textPreview":"All three types have aging-summary vs. RD-detail sync gaps and 392% plate4/plate5 #DIV/0! archive-scope questions. Align retest or writte...","textChars":172,"textLines":1,"bbox":[225,390,600,30]}
+{"kind":"image","id":"im/obm58z25","slide":10,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/29gr2p8n","slide":10,"text":""}
+{"kind":"slide","id":"sl/re1w7mp0","slide":11,"title":"Final Recommendation: Two Types Pass; Rod Seal Requires RCA Before Release","textShapes":12}
+{"kind":"textbox","id":"sh/32lszqtc","slide":11,"name":"Google Shape;216;p33","text":"Final Recommendation: Two Types Pass; Rod Seal Requires RCA Before Release","textPreview":"Final Recommendation: Two Types Pass; Rod Seal Requires RCA Before Release","textChars":74,"textLines":1,"bbox":[50,62,800,57.45]}
+{"kind":"shape","id":"sh/lwval87e","slide":11,"bbox":[70,130,780,76]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":11,"bbox":[96,152,30,30]}
+{"kind":"textbox","id":"sh/sji5snel","slide":11,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[96,157,30,18]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":11,"text":"Recommend PASS","textPreview":"Recommend PASS","textChars":14,"textLines":1,"bbox":[148,148,135,22]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":11,"text":"Mold Oring Rework: 4/4 Finish, 4/4 PASS, max CV 0.825%, max worst-channel CV 2.88%; best optical margin among the three types.","textPreview":"Mold Oring Rework: 4/4 Finish, 4/4 PASS, max CV 0.825%, max worst-channel CV 2.88%; best optical margin among the three types.","textChars":126,"textLines":1,"bbox":[295,147,500,42]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":11,"bbox":[70,228,780,76]}
+{"kind":"shape","id":"sh/s72x4nap","slide":11,"bbox":[96,250,30,30]}
+{"kind":"textbox","id":"sh/lszqtcj6","slide":11,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[96,255,30,18]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":11,"text":"Recommend PASS","textPreview":"Recommend PASS","textChars":14,"textLines":1,"bbox":[148,246,135,22]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":11,"text":"Mold Seal: 5/5 Finish, 5/5 PASS, max CV 0.86%, max worst-channel CV 3.04%; archive in the PASS direction.","textPreview":"Mold Seal: 5/5 Finish, 5/5 PASS, max CV 0.86%, max worst-channel CV 3.04%; archive in the PASS direction.","textChars":105,"textLines":1,"bbox":[295,245,500,42]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":11,"bbox":[70,326,780,76]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":11,"bbox":[96,348,30,30]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":11,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[96,353,30,18]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":11,"text":"Hold release","textPreview":"Hold release","textChars":12,"textLines":1,"bbox":[148,344,135,22]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":11,"text":"Rod Seal: 2/5 STOP/FAIL and 1/5 QC risk. Complete failed-unit teardown, aspiration/leak RCA, structure/assembly review, and retest before final judgment.","textPreview":"Rod Seal: 2/5 STOP/FAIL and 1/5 QC risk. Complete failed-unit teardown, aspiration/leak RCA, structure/assembly review, and retest before...","textChars":153,"textLines":1,"bbox":[295,343,500,42]}
+{"kind":"shape","id":"sh/gr2p8nqx","slide":11,"bbox":[70,430,780,50]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":11,"text":"Unified archive actions","textPreview":"Unified archive actions","textChars":23,"textLines":1,"bbox":[96,445,165,18]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":11,"text":"Sync the aging summary; align retest or written explanation for 392% plate4/plate5 #DIV/0!; retain all LOW %D, low aspiration, leak-rate, and 3-plate validation notes.","textPreview":"Sync the aging summary; align retest or written explanation for 392% plate4/plate5 #DIV/0!; retain all LOW %D, low aspiration, leak-rate,...","textChars":167,"textLines":1,"bbox":[270,440,535,30]}
+{"kind":"image","id":"im/zqtcj6to","slide":11,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/re1w7mp0","slide":11,"text":""}

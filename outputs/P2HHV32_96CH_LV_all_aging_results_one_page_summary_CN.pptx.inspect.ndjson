@@ -1,0 +1,79 @@
+{"kind":"deck","id":"pr/47jrl5","name":"Deck"}
+{"kind":"layout","layoutId":"830c0138-b69f-4f04-b97f-f81e1f0dc08f","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"ccd8414c-603a-4fc6-976a-8c08e264263b","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/2vy0c4","slide":1,"title":"P2HHV32 / P2HHV31 96CH LV 老化测试结果一页总览","textShapes":59}
+{"kind":"shape","id":"sh/oza1gvy9","slide":1,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":1,"text":"P2HHV32 / P2HHV31 96CH LV 老化测试结果一页总览","textPreview":"P2HHV32 / P2HHV31 96CH LV 老化测试结果一页总览","textChars":36,"textLines":1,"bbox":[56,38,860,40]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":1,"text":"数据口径：截至 2026-06-16；P2HHV3220250410A04 已剔除","textPreview":"数据口径：截至 2026-06-16；P2HHV3220250410A04 已剔除","textChars":41,"textLines":1,"bbox":[58,82,720,22]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":1,"text":"opentrons\n合创生物","textPreview":"opentrons | 合创生物","textChars":14,"textLines":2,"bbox":[1100,38,120,52]}
+{"kind":"shape","id":"sh/obm58z25","slide":1,"bbox":[56,124,160,72]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":1,"text":"纳入统计","textPreview":"纳入统计","textChars":4,"textLines":1,"bbox":[70,135,132,18]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":1,"text":"18 台","textPreview":"18 台","textChars":4,"textLines":1,"bbox":[70,158,132,30]}
+{"kind":"shape","id":"sh/h0fepkzu","slide":1,"bbox":[236,124,190,72]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":1,"text":"完成 392%/417%","textPreview":"完成 392%/417%","textChars":12,"textLines":1,"bbox":[250,135,162,18]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":1,"text":"16 台","textPreview":"16 台","textChars":4,"textLines":1,"bbox":[250,158,162,30]}
+{"kind":"shape","id":"sh/je9cvixc","slide":1,"bbox":[446,124,220,72]}
+{"kind":"textbox","id":"sh/8z25kb6x","slide":1,"text":"PASS / 通过率","textPreview":"PASS / 通过率","textChars":10,"textLines":1,"bbox":[460,135,192,18]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":1,"text":"13 台 / 72%","textPreview":"13 台 / 72%","textChars":10,"textLines":1,"bbox":[460,158,192,30]}
+{"kind":"shape","id":"sh/q1orytsv","slide":1,"bbox":[686,124,190,72]}
+{"kind":"textbox","id":"sh/fmlkjm1c","slide":1,"text":"Risk + STOP/FAIL","textPreview":"Risk + STOP/FAIL","textChars":16,"textLines":1,"bbox":[700,135,162,18]}
+{"kind":"textbox","id":"sh/87ed8bat","slide":1,"text":"5 台","textPreview":"5 台","textChars":3,"textLines":1,"bbox":[700,158,162,30]}
+{"kind":"shape","id":"sh/xs72x4na","slide":1,"bbox":[896,124,210,72]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":1,"text":"RCA / 风险关闭","textPreview":"RCA / 风险关闭","textChars":10,"textLines":1,"bbox":[910,135,182,18]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":1,"text":"5 项","textPreview":"5 项","textChars":3,"textLines":1,"bbox":[910,158,182,30]}
+{"kind":"shape","id":"sh/7y1kre1w","slide":1,"bbox":[56,238,300,290]}
+{"kind":"textbox","id":"sh/ed8v6psf","slide":1,"text":"我们做了什么","textPreview":"我们做了什么","textChars":6,"textLines":1,"bbox":[84,268,160,26]}
+{"kind":"shape","id":"sh/p4r65wju","slide":1,"bbox":[90,322,8,8]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":1,"text":"对 96CH LV 移液器进行老化验证，覆盖 Mold Oring、Mold Seal、OTP-O ring / Rod Seal 等结构。","textPreview":"对 96CH LV 移液器进行老化验证，覆盖 Mold Oring、Mold Seal、OTP-O ring / Rod Seal 等结构。","textChars":70,"textLines":1,"bbox":[108,316,212,36]}
+{"kind":"shape","id":"sh/7qpg3ex0","slide":1,"bbox":[90,400,8,8]}
+{"kind":"textbox","id":"sh/i5sneloj","slide":1,"text":"统一评估光学 CV、最差通道 CV、LOW %D、吸液/不吸液、泄漏率等风险信号。","textPreview":"统一评估光学 CV、最差通道 CV、LOW %D、吸液/不吸液、泄漏率等风险信号。","textChars":41,"textLines":1,"bbox":[108,394,212,36]}
+{"kind":"shape","id":"sh/pwb2hwfy","slide":1,"bbox":[90,478,8,8]}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":1,"text":"规格口径：CV QC 4% / 客户 5%；最差通道 CV QC 5.6% / 客户 7%。","textPreview":"规格口径：CV QC 4% / 客户 5%；最差通道 CV QC 5.6% / 客户 7%。","textChars":46,"textLines":1,"bbox":[108,472,212,36]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":1,"bbox":[402,238,360,156]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":1,"text":"P2HHV32 Mold Oring Rework","textPreview":"P2HHV32 Mold Oring Rework","textChars":25,"textLines":1,"bbox":[420,254,232,20]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[640,252,112,20]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":1,"text":"跑测数量","textPreview":"跑测数量","textChars":4,"textLines":1,"bbox":[420,289,72,15]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":1,"text":"4 台","textPreview":"4 台","textChars":3,"textLines":1,"bbox":[420,308,72,28]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[514,289,64,15]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":1,"text":"4/4","textPreview":"4/4","textChars":3,"textLines":1,"bbox":[514,308,72,28]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[596,289,72,15]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":1,"text":"100%","textPreview":"100%","textChars":4,"textLines":1,"bbox":[596,308,92,28]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":1,"text":"风险/失败\n0/0","textPreview":"风险/失败 | 0/0","textChars":9,"textLines":2,"bbox":[688,289,64,36]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":1,"text":"4/4 完成 392% / 1.02M；最大 CV 0.825%，光学裕量最好。","textPreview":"4/4 完成 392% / 1.02M；最大 CV 0.825%，光学裕量最好。","textChars":40,"textLines":1,"bbox":[420,350,324,34]}
+{"kind":"shape","id":"sh/1cfa9w3m","slide":1,"bbox":[802,238,360,156]}
+{"kind":"textbox","id":"sh/d4vmtwra","slide":1,"text":"P2HHV32 Mold Seal","textPreview":"P2HHV32 Mold Seal","textChars":17,"textLines":1,"bbox":[820,254,232,20]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[1040,252,112,20]}
+{"kind":"textbox","id":"sh/vy90je9c","slide":1,"text":"跑测数量","textPreview":"跑测数量","textChars":4,"textLines":1,"bbox":[820,289,72,15]}
+{"kind":"textbox","id":"sh/6dcbulwv","slide":1,"text":"5 台","textPreview":"5 台","textChars":3,"textLines":1,"bbox":[820,308,72,28]}
+{"kind":"textbox","id":"sh/dsji5sne","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[914,289,64,15]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":1,"text":"5/5","textPreview":"5/5","textChars":3,"textLines":1,"bbox":[914,308,72,28]}
+{"kind":"textbox","id":"sh/vmtwra5g","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[996,289,72,15]}
+{"kind":"textbox","id":"sh/61032lsz","slide":1,"text":"100%","textPreview":"100%","textChars":4,"textLines":1,"bbox":[996,308,92,28]}
+{"kind":"textbox","id":"sh/dg7adsji","slide":1,"text":"风险/失败\n0/0","textPreview":"风险/失败 | 0/0","textChars":9,"textLines":2,"bbox":[1088,289,64,36]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":1,"text":"5/5 完成 392% / 1.02M；整体满足 CV 与最差通道规格。","textPreview":"5/5 完成 392% / 1.02M；整体满足 CV 与最差通道规格。","textChars":36,"textLines":1,"bbox":[820,350,324,34]}
+{"kind":"shape","id":"sh/yxobm58z","slide":1,"bbox":[402,414,360,156]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":1,"text":"P2HHV31 Mold Oring","textPreview":"P2HHV31 Mold Oring","textChars":18,"textLines":1,"bbox":[420,430,232,20]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":1,"text":"PASS with risk closure","textPreview":"PASS with risk closure","textChars":22,"textLines":1,"bbox":[640,428,112,20]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":1,"text":"跑测数量","textPreview":"跑测数量","textChars":4,"textLines":1,"bbox":[420,465,72,15]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":1,"text":"4 台","textPreview":"4 台","textChars":3,"textLines":1,"bbox":[420,484,72,28]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[514,465,64,15]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":1,"text":"2/4","textPreview":"2/4","textChars":3,"textLines":1,"bbox":[514,484,72,28]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[596,465,72,15]}
+{"kind":"textbox","id":"sh/yd0z6103","slide":1,"text":"50%","textPreview":"50%","textChars":3,"textLines":1,"bbox":[596,484,92,28]}
+{"kind":"textbox","id":"sh/rytsvu9k","slide":1,"text":"风险/失败\n2/0","textPreview":"风险/失败 | 2/0","textChars":9,"textLines":2,"bbox":[688,465,64,36]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":1,"text":"2 台 PASS，2 台需关闭风险：0407A01 D2 漏液；0702A03 H3 low %D。","textPreview":"2 台 PASS，2 台需关闭风险：0407A01 D2 漏液；0702A03 H3 low %D。","textChars":50,"textLines":1,"bbox":[420,526,324,34]}
+{"kind":"shape","id":"sh/ap4r65wj","slide":1,"bbox":[802,414,360,156]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":1,"text":"P2HHV32 OTP-O ring / Rod Seal","textPreview":"P2HHV32 OTP-O ring / Rod Seal","textChars":29,"textLines":1,"bbox":[820,430,232,20]}
+{"kind":"textbox","id":"sh/svu9knih","slide":1,"text":"HOLD / RCA","textPreview":"HOLD / RCA","textChars":10,"textLines":1,"bbox":[1040,428,112,20]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":1,"text":"跑测数量","textPreview":"跑测数量","textChars":4,"textLines":1,"bbox":[820,465,72,15]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":1,"text":"5 台","textPreview":"5 台","textChars":3,"textLines":1,"bbox":[820,484,72,28]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[914,465,64,15]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":1,"text":"2/5","textPreview":"2/5","textChars":3,"textLines":1,"bbox":[914,484,72,28]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[996,465,72,15]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":1,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[996,484,92,28]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":1,"text":"风险/失败\n1/2","textPreview":"风险/失败 | 1/2","textChars":9,"textLines":2,"bbox":[1088,465,64,36]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":1,"text":"2 STOP/FAIL + 1 QC risk；主要问题为吸液少/不吸液、泄漏率与 392% CV 风险。","textPreview":"2 STOP/FAIL + 1 QC risk；主要问题为吸液少/不吸液、泄漏率与 392% CV 风险。","textChars":53,"textLines":1,"bbox":[820,526,324,34]}
+{"kind":"shape","id":"sh/2x4nap4r","slide":1,"bbox":[56,590,1106,88]}
+{"kind":"textbox","id":"sh/vixczed8","slide":1,"text":"最终结论","textPreview":"最终结论","textChars":4,"textLines":1,"bbox":[84,620,110,28]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":1,"text":"Mold Oring Rework 与 Mold Seal 可按 PASS 方向推进；P2HHV31 Mold Oring 需关闭 0407A01 / 0702A03 风险项后归档；OTP-O ring / Rod Seal 风险显著更高，建议 HOLD，完成失效件拆解、吸液/泄漏 RCA、结构/装配复核与复测后再判定。","textPreview":"Mold Oring Rework 与 Mold Seal 可按 PASS 方向推进；P2HHV31 Mold Oring 需关闭 0407A01 / 0702A03 风险项后归档；OTP-O ring / Rod Seal 风险显著更高，建议 HOLD，完成失效件拆解、吸...","textChars":161,"textLines":1,"bbox":[220,612,880,48]}
+{"kind":"notes","id":"nt/2vy0c4","slide":1,"text":""}

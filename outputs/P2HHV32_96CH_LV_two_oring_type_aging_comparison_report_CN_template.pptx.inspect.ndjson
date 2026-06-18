@@ -1,0 +1,215 @@
+{"kind":"deck","id":"pr/m5hutd","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"material","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout2.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout3.xml","name":"TITLE_AND_BODY","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout4.xml","name":"TITLE_AND_TWO_COLUMNS","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout5.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout6.xml","name":"ONE_COLUMN_TEXT","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout7.xml","name":"MAIN_POINT","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout8.xml","name":"SECTION_TITLE_AND_DESCRIPTION","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout9.xml","name":"CAPTION_ONLY","placeholders":[{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout10.xml","name":"BIG_NUMBER","placeholders":[{"name":"title","type":"title","textPreview":"xx%"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout11.xml","name":"BLANK","type":"blank","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout12.xml","name":"CUSTOM_3","placeholders":[{"name":"picture","type":"picture"},{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout13.xml","name":"CUSTOM_3_1","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster2.xml","name":"","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout14.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout15.xml","name":"OBJECT","type":"obj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout16.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout17.xml","name":"TWO_OBJECTS","type":"twoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout18.xml","name":"TWO_OBJECTS_WITH_TEXT","type":"twoTxTwoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout19.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout20.xml","name":"BLANK","type":"blank","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout21.xml","name":"图片与标题","placeholders":[{"name":"picture","type":"picture"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout22.xml","name":"VERTICAL_TITLE_AND_VERTICAL_TEXT","type":"vertTitleAndTx","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout23.xml","name":"内容","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout24.xml","name":"末尾幻灯片","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout25.xml","name":"Title Only","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"slide","id":"sl/2x4nap4r","slide":1,"title":"P2HHV32/P2HHV31 96CH LV 两种 O-ring 老化测试对比报告","textShapes":2}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":1,"name":"Google Shape;167;p28","placeholder":"title","text":"P2HHV32/P2HHV31 96CH LV 两种 O-ring 老化测试对比报告","textPreview":"P2HHV32/P2HHV31 96CH LV 两种 O-ring 老化测试对比报告","textChars":42,"textLines":1,"bbox":[334,179.31,609.07,124.16]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":1,"name":"Google Shape;168;p28","placeholder":"subtitle","text":"2026.06.16\nSZ ENG","textPreview":"2026.06.16 | SZ ENG","textChars":17,"textLines":2,"bbox":[737.39,393.51,320.66,51.91]}
+{"kind":"image","id":"im/5wjudg7a","slide":1,"name":"Google Shape;169;p28","bbox":[0,0,334,540]}
+{"kind":"notes","id":"nt/2x4nap4r","slide":1,"text":""}
+{"kind":"slide","id":"sl/pg3ex0nu","slide":2,"title":"执行摘要：Mold Oring 完成度高，OTP-O ring 风险集中","textShapes":15}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":2,"name":"Google Shape;216;p33","text":"执行摘要：Mold Oring 完成度高，OTP-O ring 风险集中","textPreview":"执行摘要：Mold Oring 完成度高，OTP-O ring 风险集中","textChars":36,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/e1w7mp0b","slide":2,"bbox":[52,128,150,58]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":2,"text":"对比类型","textPreview":"对比类型","textChars":4,"textLines":1,"bbox":[64,136,126,14]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":2,"text":"2 类","textPreview":"2 类","textChars":3,"textLines":1,"bbox":[64,155,126,24]}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":2,"bbox":[222,128,150,58]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":2,"text":"样本总数","textPreview":"样本总数","textChars":4,"textLines":1,"bbox":[234,136,126,14]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":2,"text":"18 台","textPreview":"18 台","textChars":4,"textLines":1,"bbox":[234,155,126,24]}
+{"kind":"shape","id":"sh/zqtcj6to","slide":2,"bbox":[392,128,150,58]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":2,"text":"完成 392%/417%","textPreview":"完成 392%/417%","textChars":12,"textLines":1,"bbox":[404,136,126,14]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":2,"text":"16 台","textPreview":"16 台","textChars":4,"textLines":1,"bbox":[404,155,126,24]}
+{"kind":"shape","id":"sh/obm58z25","slide":2,"bbox":[562,128,150,58]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":2,"text":"Risk / Fail / Hold","textPreview":"Risk / Fail / Hold","textChars":18,"textLines":1,"bbox":[574,136,126,14]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":2,"text":"5 台","textPreview":"5 台","textChars":3,"textLines":1,"bbox":[574,155,126,24]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":2,"bbox":[52,214,520,210]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":2,"text":"核心结论","textPreview":"核心结论","textChars":4,"textLines":1,"bbox":[78,238,150,20]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":2,"bbox":[82,281,8,8]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":2,"text":"Mold Oring 本次纳入 13 台，均已完成 392% 或 417%；其中 0407A01、0702A03 需重点跟踪。","textPreview":"Mold Oring 本次纳入 13 台，均已完成 392% 或 417%；其中 0407A01、0702A03 需重点跟踪。","textChars":63,"textLines":1,"bbox":[102,276,420,36]}
+{"kind":"shape","id":"sh/0je9cvix","slide":2,"bbox":[82,331,8,8]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":2,"text":"OTP-O ring 共 5 台，仅 2 台明确 PASS，2 台 STOP/FAIL、1 台 QC risk，建议暂缓放行并完成 RCA。","textPreview":"OTP-O ring 共 5 台，仅 2 台明确 PASS，2 台 STOP/FAIL、1 台 QC risk，建议暂缓放行并完成 RCA。","textChars":70,"textLines":1,"bbox":[102,326,420,36]}
+{"kind":"shape","id":"sh/idonyd0z","slide":2,"bbox":[82,381,8,8]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":2,"text":"两类失效模式不同：Mold Oring 主要是局部漏液/O-ring 返修与个别通道 D% 风险；OTP-O ring 主要是吸液少、不吸液和泄漏风险。","textPreview":"两类失效模式不同：Mold Oring 主要是局部漏液/O-ring 返修与个别通道 D% 风险；OTP-O ring 主要是吸液少、不吸液和泄漏风险。","textChars":76,"textLines":1,"bbox":[102,376,420,36]}
+{"kind":"shape","id":"sh/0fepkzup","slide":2,"bbox":[602,214,280,210]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":2,"text":"归档前重点","textPreview":"归档前重点","textChars":5,"textLines":1,"bbox":[628,238,100,20]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":2,"text":"1. Mold Oring 可按 PASS with risk notes 方向推进，但需关闭 2 台风险机。\n2. OTP-O ring 建议 HOLD，完成失效件拆解、吸液/泄漏 RCA 与复测。\n3. 同步老化汇总表与 RD 明细表状态。\n4. 对 392% plate4/plate5 #DIV/0! 形成统一复测或书面说明。","textPreview":"1. Mold Oring 可按 PASS with risk notes 方向推进，但需关闭 2 台风险机。 | 2. OTP-O ring 建议 HOLD，完成失效件拆解、吸液/泄漏 RCA 与复测。 | 3. 同步老化汇总表与 RD 明细表状态。 | 4. 对 392...","textChars":167,"textLines":4,"bbox":[628,276,220,122]}
+{"kind":"image","id":"im/sfil0rqd","slide":2,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/pg3ex0nu","slide":2,"text":""}
+{"kind":"slide","id":"sl/s72x4nap","slide":3,"title":"两类 O-ring 测试状态快照","textShapes":5}
+{"kind":"textbox","id":"sh/loj2t83i","slide":3,"name":"Google Shape;216;p33","text":"两类 O-ring 测试状态快照","textPreview":"两类 O-ring 测试状态快照","textChars":16,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/at47y1kr","slide":3,"bbox":[92,326,330,122]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":3,"text":"Mold Oring","textPreview":"Mold Oring","textChars":10,"textLines":1,"bbox":[114,350,165,18]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":3,"text":"完成：13/13\nPASS：11/13；Risk/Hold/Fail：2/13\n判定：PASS with Risk Notes","textPreview":"完成：13/13 | PASS：11/13；Risk/Hold/Fail：2/13 | 判定：PASS with Risk Notes","textChars":63,"textLines":3,"bbox":[114,382,250,48]}
+{"kind":"shape","id":"sh/032lszqt","slide":3,"bbox":[502,326,330,122]}
+{"kind":"textbox","id":"sh/tovahoza","slide":3,"text":"OTP-O ring","textPreview":"OTP-O ring","textChars":10,"textLines":1,"bbox":[524,350,165,18]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":3,"text":"完成：3/5\nPASS：2/5；Risk/Hold/Fail：3/5\n判定：HOLD / RCA","textPreview":"完成：3/5 | PASS：2/5；Risk/Hold/Fail：3/5 | 判定：HOLD / RCA","textChars":48,"textLines":3,"bbox":[524,382,250,48]}
+{"kind":"table","id":"tb/qxs72x4n","slide":3,"name":"","rows":3,"cols":10,"preview":"类型 | 样本 | 完成 | PASS | QC risk | HOLD | STOP/FAIL | 最大 CV | 最大最差通道 | 综合判定","bbox":[32,126,890,155]}
+{"kind":"image","id":"im/xs72x4na","slide":3,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/s72x4nap","slide":3,"text":""}
+{"kind":"slide","id":"sl/val87ed8","slide":4,"title":"完成率与 PASS 率：OTP-O ring 明显低于 Mold Oring","textShapes":7}
+{"kind":"textbox","id":"sh/zidonyd0","slide":4,"name":"Google Shape;216;p33","text":"完成率与 PASS 率：OTP-O ring 明显低于 Mold Oring","textPreview":"完成率与 PASS 率：OTP-O ring 明显低于 Mold Oring","textChars":38,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":4,"bbox":[52,126,620,302]}
+{"kind":"shape","id":"sh/8z25kb6x","slide":4,"bbox":[710,142,150,58]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":4,"text":"Mold Oring 完成","textPreview":"Mold Oring 完成","textChars":13,"textLines":1,"bbox":[722,150,126,14]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":4,"text":"100%","textPreview":"100%","textChars":4,"textLines":1,"bbox":[722,169,126,24]}
+{"kind":"shape","id":"sh/je9cvixc","slide":4,"bbox":[710,240,150,58]}
+{"kind":"textbox","id":"sh/87ed8bat","slide":4,"text":"OTP PASS","textPreview":"OTP PASS","textChars":8,"textLines":1,"bbox":[722,248,126,14]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":4,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[722,267,126,24]}
+{"kind":"shape","id":"sh/q1orytsv","slide":4,"bbox":[710,342,150,74]}
+{"kind":"textbox","id":"sh/fmlkjm1c","slide":4,"text":"风险点","textPreview":"风险点","textChars":3,"textLines":1,"bbox":[728,360,90,16]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":4,"text":"OTP-O ring 有 3/5 风险或失败；Mold Oring 有 2/13 需跟踪。","textPreview":"OTP-O ring 有 3/5 风险或失败；Mold Oring 有 2/13 需跟踪。","textChars":45,"textLines":1,"bbox":[728,382,112,36]}
+{"kind":"chart","id":"ch/0nuxc3yl","slide":4,"name":"","chartType":"bar","bbox":[82,154,550,230]}
+{"kind":"image","id":"im/z61032ls","slide":4,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/val87ed8","slide":4,"text":""}
+{"kind":"slide","id":"sl/mlkjm1cf","slide":5,"title":"最大 CV 对比：两类均有超 QC 个案","textShapes":6}
+{"kind":"textbox","id":"sh/t83itgfm","slide":5,"name":"Google Shape;216;p33","text":"最大 CV 对比：两类均有超 QC 个案","textPreview":"最大 CV 对比：两类均有超 QC 个案","textChars":20,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/bat47y1k","slide":5,"bbox":[52,126,610,302]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":5,"bbox":[700,150,175,105]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":5,"text":"最高值","textPreview":"最高值","textChars":3,"textLines":1,"bbox":[722,170,80,16]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":5,"text":"6.83%","textPreview":"6.83%","textChars":5,"textLines":1,"bbox":[722,198,120,34]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":5,"text":"OTP-O ring / 0627A02 / 175%，D3/G9 吸液少。","textPreview":"OTP-O ring / 0627A02 / 175%，D3/G9 吸液少。","textChars":38,"textLines":1,"bbox":[722,235,128,32]}
+{"kind":"shape","id":"sh/ulwval87","slide":5,"bbox":[700,290,175,105]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":5,"text":"Mold Oring","textPreview":"Mold Oring","textChars":10,"textLines":1,"bbox":[722,313,100,16]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":5,"text":"0407A01 在 379% CV 6.60%，与 D2 漏液/O-ring 更换相关。","textPreview":"0407A01 在 379% CV 6.60%，与 D2 漏液/O-ring 更换相关。","textChars":44,"textLines":1,"bbox":[722,338,128,46]}
+{"kind":"chart","id":"ch/ytsvu9kn","slide":5,"name":"","chartType":"bar","bbox":[82,154,540,230]}
+{"kind":"image","id":"im/lszqtcj6","slide":5,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/mlkjm1cf","slide":5,"text":""}
+{"kind":"slide","id":"sl/58z25kb6","slide":6,"title":"最大最差通道 CV：Mold Oring 个案峰值显著","textShapes":6}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":6,"name":"Google Shape;225;p34","text":"最大最差通道 CV：Mold Oring 个案峰值显著","textPreview":"最大最差通道 CV：Mold Oring 个案峰值显著","textChars":27,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":6,"bbox":[52,126,610,302]}
+{"kind":"shape","id":"sh/loj2t83i","slide":6,"bbox":[700,150,175,105]}
+{"kind":"textbox","id":"sh/bulwval8","slide":6,"text":"最高值","textPreview":"最高值","textChars":3,"textLines":1,"bbox":[722,170,80,16]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":6,"text":"55.15%","textPreview":"55.15%","textChars":6,"textLines":1,"bbox":[722,198,120,34]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":6,"text":"Mold Oring / 0407A01 / 379%，D2 漏液。","textPreview":"Mold Oring / 0407A01 / 379%，D2 漏液。","textChars":34,"textLines":1,"bbox":[722,235,128,32]}
+{"kind":"shape","id":"sh/0fepkzup","slide":6,"bbox":[700,290,175,105]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":6,"text":"解释","textPreview":"解释","textChars":2,"textLines":1,"bbox":[722,313,80,16]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":6,"text":"OTP-O ring 的 worst-channel CV 最高 3.45%，未超过 5.6% QC；其主要风险来自吸液/泄漏。","textPreview":"OTP-O ring 的 worst-channel CV 最高 3.45%，未超过 5.6% QC；其主要风险来自吸液/泄漏。","textChars":64,"textLines":1,"bbox":[722,338,128,48]}
+{"kind":"chart","id":"ch/s72x4nap","slide":6,"name":"","chartType":"bar","bbox":[82,154,540,230]}
+{"kind":"image","id":"im/bat47y1k","slide":6,"name":"Google Shape;221;p34","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/58z25kb6","slide":6,"text":""}
+{"kind":"slide","id":"sl/0z61032l","slide":7,"title":"Mold Oring 类型分析：整体可推进，但需关闭风险机","textShapes":13}
+{"kind":"textbox","id":"sh/0fepkzup","slide":7,"name":"Google Shape;216;p33","text":"Mold Oring 类型分析：整体可推进，但需关闭风险机","textPreview":"Mold Oring 类型分析：整体可推进，但需关闭风险机","textChars":29,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":7,"text":"PASS with risk notes","textPreview":"PASS with risk notes","textChars":20,"textLines":1,"bbox":[725,84,155,22]}
+{"kind":"shape","id":"sh/byhgn29g","slide":7,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":7,"text":"样本数量","textPreview":"样本数量","textChars":4,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":7,"text":"13 台","textPreview":"13 台","textChars":4,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/lwval87e","slide":7,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":7,"text":"完成 / PASS","textPreview":"完成 / PASS","textChars":9,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":7,"text":"13/13 / 11/13","textPreview":"13/13 / 11/13","textChars":13,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":7,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":7,"text":"最大 CV","textPreview":"最大 CV","textChars":5,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":7,"text":"6.60%","textPreview":"6.60%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":7,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/at47y1kr","slide":7,"text":"最大最差通道","textPreview":"最大最差通道","textChars":6,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":7,"text":"55.15%","textPreview":"55.15%","textChars":6,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/d8v6psfi","slide":7,"bbox":[52,215,370,205]}
+{"kind":"textbox","id":"sh/6hcrmhk3","slide":7,"text":"类型结论","textPreview":"类型结论","textChars":4,"textLines":1,"bbox":[78,238,120,20]}
+{"kind":"shape","id":"sh/z25kb6xk","slide":7,"bbox":[80,283,8,8]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":7,"text":"本次纳入统计的 13 台均已完成至 392% 或 417%；其中 11 台建议 PASS，2 台保留 QC risk / 返修相关风险。","textPreview":"本次纳入统计的 13 台均已完成至 392% 或 417%；其中 11 台建议 PASS，2 台保留 QC risk / 返修相关风险。","textChars":68,"textLines":1,"bbox":[100,278,290,36]}
+{"kind":"shape","id":"sh/dg7adsji","slide":7,"bbox":[80,351,8,8]}
+{"kind":"textbox","id":"sh/6tovahoz","slide":7,"text":"风险集中在 P2HHV3120250407A01 的 D2 漏液/O-ring replacement，以及 P2HHV3120250702A03 的 H3 low %D 与 worst-channel CV spike。","textPreview":"风险集中在 P2HHV3120250407A01 的 D2 漏液/O-ring replacement，以及 P2HHV3120250702A03 的 H3 low %D 与 worst-channel CV spike。","textChars":111,"textLines":1,"bbox":[100,346,290,36]}
+{"kind":"shape","id":"sh/vahoza1g","slide":7,"bbox":[446,215,434,205]}
+{"kind":"table","id":"tb/hgn29gr2","slide":7,"name":"","rows":4,"cols":3,"preview":"状态 | 数量 | 说明","bbox":[468,248,390,132]}
+{"kind":"image","id":"im/0je9cvix","slide":7,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/0z61032l","slide":7,"text":""}
+{"kind":"slide","id":"sl/fu18jqh0","slide":8,"title":"Mold Oring 风险机台：D2 漏液、H3 low %D","textShapes":5}
+{"kind":"textbox","id":"sh/bq1oryts","slide":8,"name":"Google Shape;216;p33","text":"Mold Oring 风险机台：D2 漏液、H3 low %D","textPreview":"Mold Oring 风险机台：D2 漏液、H3 low %D","textChars":31,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/47y1kre1","slide":8,"bbox":[52,315,390,118]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":8,"text":"Mold Oring 结论","textPreview":"Mold Oring 结论","textChars":13,"textLines":1,"bbox":[78,338,150,18]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":8,"text":"Mold Oring 不能简单按全部通过处理。建议将 11 台正常完成机台按 PASS 方向推进，同时把 0407A01、0702A03 作为风险项单独关闭。","textPreview":"Mold Oring 不能简单按全部通过处理。建议将 11 台正常完成机台按 PASS 方向推进，同时把 0407A01、0702A03 作为风险项单独关闭。","textChars":79,"textLines":1,"bbox":[78,370,315,44]}
+{"kind":"shape","id":"sh/yxobm58z","slide":8,"bbox":[488,315,390,118]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":8,"text":"数据质量","textPreview":"数据质量","textChars":4,"textLines":1,"bbox":[514,338,120,18]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":8,"text":"P2HHV31 机台已有 417% 数据；部分 P2HHV32 机台老化汇总表仍停留在 238%/200%，但 RD 明细表已显示 392% Finish，需同步。","textPreview":"P2HHV31 机台已有 417% 数据；部分 P2HHV32 机台老化汇总表仍停留在 238%/200%，但 RD 明细表已显示 392% Finish，需同步。","textChars":82,"textLines":1,"bbox":[514,370,315,44]}
+{"kind":"table","id":"tb/ovahoza1","slide":8,"name":"","rows":3,"cols":6,"preview":"SN | 状态 | 判定 | Max CV | Max worst | 关键备注","bbox":[48,128,850,145]}
+{"kind":"image","id":"im/byhgn29g","slide":8,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/fu18jqh0","slide":8,"text":""}
+{"kind":"slide","id":"sl/qh0fepkz","slide":9,"title":"OTP-O ring 类型分析：建议 HOLD 与 RCA","textShapes":13}
+{"kind":"textbox","id":"sh/t83itgfm","slide":9,"name":"Google Shape;216;p33","text":"OTP-O ring 类型分析：建议 HOLD 与 RCA","textPreview":"OTP-O ring 类型分析：建议 HOLD 与 RCA","textChars":29,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":9,"text":"HOLD / RCA","textPreview":"HOLD / RCA","textChars":10,"textLines":1,"bbox":[755,84,125,22]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":9,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":9,"text":"样本数量","textPreview":"样本数量","textChars":4,"textLines":1,"bbox":[64,136,161,14]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":9,"text":"5 台","textPreview":"5 台","textChars":3,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/c3ylc7u5","slide":9,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":9,"text":"完成 / PASS","textPreview":"完成 / PASS","textChars":9,"textLines":1,"bbox":[270,136,161,14]}
+{"kind":"textbox","id":"sh/ulwval87","slide":9,"text":"3/5 / 2/5","textPreview":"3/5 / 2/5","textChars":9,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/j6tovaho","slide":9,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":9,"text":"最大 CV","textPreview":"最大 CV","textChars":5,"textLines":1,"bbox":[476,136,161,14]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":9,"text":"6.83%","textPreview":"6.83%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":9,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":9,"text":"最大最差通道","textPreview":"最大最差通道","textChars":6,"textLines":1,"bbox":[682,136,161,14]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":9,"text":"3.45%","textPreview":"3.45%","textChars":5,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/0z61032l","slide":9,"bbox":[52,215,370,205]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":9,"text":"类型结论","textPreview":"类型结论","textChars":4,"textLines":1,"bbox":[78,238,120,20]}
+{"kind":"shape","id":"sh/itgfmlkj","slide":9,"bbox":[80,283,8,8]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":9,"text":"样本数量较少但风险占比最高：5 台中 2 台 STOP/FAIL、1 台 QC risk，仅 2 台明确 PASS。","textPreview":"样本数量较少但风险占比最高：5 台中 2 台 STOP/FAIL、1 台 QC risk，仅 2 台明确 PASS。","textChars":58,"textLines":1,"bbox":[100,278,290,36]}
+{"kind":"shape","id":"sh/0nuxc3yl","slide":9,"bbox":[80,351,8,8]}
+{"kind":"textbox","id":"sh/72x4nap4","slide":9,"text":"失效集中在吸液少/不吸液、泄漏率异常和 392% CV 风险；0627A02 与 0627A03 已停止，0701A01 虽 Finish 但 392% CV 4.16%。","textPreview":"失效集中在吸液少/不吸液、泄漏率异常和 392% CV 风险；0627A02 与 0627A03 已停止，0701A01 虽 Finish 但 392% CV 4.16%。","textChars":86,"textLines":1,"bbox":[100,346,290,36]}
+{"kind":"shape","id":"sh/ih4byhgn","slide":9,"bbox":[446,215,434,205]}
+{"kind":"table","id":"tb/8v6psfil","slide":9,"name":"","rows":4,"cols":6,"preview":"SN | 状态 | 判定 | Max CV | Max worst | 备注","bbox":[464,248,398,130]}
+{"kind":"image","id":"im/9s36hcrm","slide":9,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/qh0fepkz","slide":9,"text":""}
+{"kind":"slide","id":"sl/29gr2p8n","slide":10,"title":"失效模式与数据质量对比","textShapes":15}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":10,"name":"Google Shape;216;p33","text":"失效模式与数据质量对比","textPreview":"失效模式与数据质量对比","textChars":11,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/itgfmlkj","slide":10,"bbox":[92,140,330,205]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":10,"bbox":[114,162,30,30]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[114,168,30,18]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":10,"text":"Mold Oring","textPreview":"Mold Oring","textChars":10,"textLines":1,"bbox":[158,165,190,20]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":10,"text":"失效/风险","textPreview":"失效/风险","textChars":5,"textLines":1,"bbox":[122,214,90,14]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":10,"text":"风险模式：局部 D2 漏液/O-ring replacement、H3 low %D；本次纳入统计机台均已完成 392%/417%。","textPreview":"风险模式：局部 D2 漏液/O-ring replacement、H3 low %D；本次纳入统计机台均已完成 392%/417%。","textChars":66,"textLines":1,"bbox":[122,232,265,48]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":10,"text":"数据质量","textPreview":"数据质量","textChars":4,"textLines":1,"bbox":[122,294,90,14]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":10,"text":"数据质量：P2HHV31 汇总表已到 417%；部分 P2HHV32 汇总表仍滞后；392% plate4/5 #DIV/0!。","textPreview":"数据质量：P2HHV31 汇总表已到 417%；部分 P2HHV32 汇总表仍滞后；392% plate4/5 #DIV/0!。","textChars":64,"textLines":1,"bbox":[122,312,265,42]}
+{"kind":"shape","id":"sh/18jqh0fe","slide":10,"bbox":[502,140,330,205]}
+{"kind":"shape","id":"sh/8nqxs72x","slide":10,"bbox":[524,162,30,30]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[524,168,30,18]}
+{"kind":"textbox","id":"sh/ulwval87","slide":10,"text":"OTP-O ring","textPreview":"OTP-O ring","textChars":10,"textLines":1,"bbox":[568,165,190,20]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":10,"text":"失效/风险","textPreview":"失效/风险","textChars":5,"textLines":1,"bbox":[532,214,90,14]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":10,"text":"风险模式：D3/G9 吸液少、E10/B7 不吸液、CH19/CH58 泄漏率高、H4 LOW %D 与 392% CV 风险。","textPreview":"风险模式：D3/G9 吸液少、E10/B7 不吸液、CH19/CH58 泄漏率高、H4 LOW %D 与 392% CV 风险。","textChars":64,"textLines":1,"bbox":[532,232,265,48]}
+{"kind":"textbox","id":"sh/mhk3q5o7","slide":10,"text":"数据质量","textPreview":"数据质量","textChars":4,"textLines":1,"bbox":[532,294,90,14]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":10,"text":"数据质量：部分 Finish 机台汇总表仍为 200% running；392% plate4/5 #DIV/0!。","textPreview":"数据质量：部分 Finish 机台汇总表仍为 200% running；392% plate4/5 #DIV/0!。","textChars":58,"textLines":1,"bbox":[532,312,265,42]}
+{"kind":"shape","id":"sh/4byhgn29","slide":10,"bbox":[52,392,826,54]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":10,"text":"共性动作","textPreview":"共性动作","textChars":4,"textLines":1,"bbox":[78,408,120,18]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":10,"text":"同步老化汇总表与 RD 明细表；对 392% plate4/plate5 #DIV/0! 统一补测或书面说明；对 LOW %D、吸液少、不吸液、泄漏率异常保留追溯记录。","textPreview":"同步老化汇总表与 RD 明细表；对 392% plate4/plate5 #DIV/0! 统一补测或书面说明；对 LOW %D、吸液少、不吸液、泄漏率异常保留追溯记录。","textChars":84,"textLines":1,"bbox":[215,404,610,30]}
+{"kind":"image","id":"im/obm58z25","slide":10,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/29gr2p8n","slide":10,"text":""}
+{"kind":"slide","id":"sl/re1w7mp0","slide":11,"title":"最终建议：Mold Oring 有条件推进，OTP-O ring 暂缓放行","textShapes":10}
+{"kind":"textbox","id":"sh/32lszqtc","slide":11,"name":"Google Shape;216;p33","text":"最终建议：Mold Oring 有条件推进，OTP-O ring 暂缓放行","textPreview":"最终建议：Mold Oring 有条件推进，OTP-O ring 暂缓放行","textChars":37,"textLines":1,"bbox":[50,62,820,57.45]}
+{"kind":"shape","id":"sh/lwval87e","slide":11,"bbox":[70,130,780,76]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":11,"bbox":[96,152,30,30]}
+{"kind":"textbox","id":"sh/sji5snel","slide":11,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[96,157,30,18]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":11,"text":"有条件 PASS","textPreview":"有条件 PASS","textChars":8,"textLines":1,"bbox":[148,148,125,22]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":11,"text":"Mold Oring：11 台正常完成机台可按 PASS 方向推进；0407A01、0702A03 需单独关闭风险项后再归档。","textPreview":"Mold Oring：11 台正常完成机台可按 PASS 方向推进；0407A01、0702A03 需单独关闭风险项后再归档。","textChars":63,"textLines":1,"bbox":[285,147,510,42]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":11,"bbox":[70,228,780,76]}
+{"kind":"shape","id":"sh/s72x4nap","slide":11,"bbox":[96,250,30,30]}
+{"kind":"textbox","id":"sh/lszqtcj6","slide":11,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[96,255,30,18]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":11,"text":"HOLD / RCA","textPreview":"HOLD / RCA","textChars":10,"textLines":1,"bbox":[148,246,125,22]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":11,"text":"OTP-O ring：2/5 STOP/FAIL、1/5 QC risk，建议完成失效件拆解、吸液/泄漏 RCA、结构/装配复核与复测后再判定。","textPreview":"OTP-O ring：2/5 STOP/FAIL、1/5 QC risk，建议完成失效件拆解、吸液/泄漏 RCA、结构/装配复核与复测后再判定。","textChars":72,"textLines":1,"bbox":[285,245,510,42]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":11,"bbox":[70,326,780,76]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":11,"bbox":[96,348,30,30]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":11,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[96,353,30,18]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":11,"text":"归档动作","textPreview":"归档动作","textChars":4,"textLines":1,"bbox":[148,344,125,22]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":11,"text":"同步汇总表；对 392% plate4/plate5 #DIV/0!、315% 三盘验证范围及所有 LOW %D/漏液/吸液异常形成统一说明。","textPreview":"同步汇总表；对 392% plate4/plate5 #DIV/0!、315% 三盘验证范围及所有 LOW %D/漏液/吸液异常形成统一说明。","textChars":71,"textLines":1,"bbox":[285,343,510,42]}
+{"kind":"image","id":"im/zqtcj6to","slide":11,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/re1w7mp0","slide":11,"text":""}

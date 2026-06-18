@@ -42,7 +42,7 @@ def _ensure_hardware_testing_loaded() -> None:
     """Import hardware-testing dependencies only after protocol parsing."""
     global _HARDWARE_TESTING_LOADED
     global ui, CSVReport, CSVResult, CSVLine, CSVLineRepeating
-    global helpers_ot3, data, PressureFixtureBase
+    global helpers_ot3, data, PressureFixtureBase, PressureFixture
     global connect_to_fixture, connect_to_fixture96
     global PRESSURE_FIXTURE_TIP_VOLUME, PRESSURE_FIXTURE_ASPIRATE_VOLUME
     global PRESSURE_CFG, pressure_fixture_a1_location, PressureEvent
@@ -79,6 +79,7 @@ def _ensure_hardware_testing_loaded() -> None:
     from hardware_testing.opentrons_api import helpers_ot3 as _helpers_ot3
     from hardware_testing.drivers.pressure_fixture import (
         PressureFixtureBase as _PressureFixtureBase,
+        PressureFixture as _PressureFixture,
         connect_to_fixture as _connect_to_fixture,
         connect_to_fixture96 as _connect_to_fixture96,
     )
@@ -102,6 +103,7 @@ def _ensure_hardware_testing_loaded() -> None:
     helpers_ot3 = _helpers_ot3
     data = _data
     PressureFixtureBase = _PressureFixtureBase
+    PressureFixture = _PressureFixture
     connect_to_fixture = _connect_to_fixture
     connect_to_fixture96 = _connect_to_fixture96
     PRESSURE_FIXTURE_TIP_VOLUME = _PRESSURE_FIXTURE_TIP_VOLUME
@@ -265,7 +267,7 @@ class ProtocolSettings:
         )
         return cls(
             ctx=ctx,
-            operator_name=DEFAULT_OPERATOR_NAME,
+            operator_name=str(params.operator),
             config=config,
             fixture_pickup_z_offset=float(params.fixture_pickup_z_offset),
         )
@@ -496,10 +498,41 @@ async def _release_gear_then_drop_tip(api: OT3API) -> None:
     await api.drop_tip(OT3Mount.LEFT)
 
 def _connect_to_fixture(simulate: bool = False) -> PressureFixtureBase:
-    fixture = connect_to_fixture96(
-       simulate=simulate
+    """Connect to the 96-channel pressure fixture without any stdin prompts."""
+    if simulate:
+        return connect_to_fixture96(simulate=True)
+
+    from serial.tools.list_ports import comports  # type: ignore[import]
+
+    ports = list(comports())
+    if not ports:
+        raise RuntimeError(
+            "No serial ports found for the pressure fixture. Protocol runs "
+            "cannot ask for manual input; please check the fixture USB/cable."
+        )
+
+    errors: List[str] = []
+    for serial_port in ports:
+        port = serial_port.device  # type: ignore[attr-defined]
+        fixture = None
+        try:
+            ui.print_info(f"Trying to connect to Pressure fixture on port {port}")
+            fixture = PressureFixture.create(port=port, slot_side="left")
+            fixture.connect_96()
+            ui.print_info(f"Found fixture on port {port}")
+            return fixture
+        except Exception as err:
+            if fixture is not None:
+                try:
+                    fixture.disconnect()
+                except Exception:
+                    pass
+            errors.append(f"{port}: {type(err).__name__}: {err}")
+
+    raise RuntimeError(
+        "No pressure fixture found. Protocol runs cannot use the interactive "
+        "'use simulator?' prompt. Checked ports: " + "; ".join(errors)
     )
-    return fixture
 
 async def _fixture_check_pressure(
     api: OT3API,
@@ -510,7 +543,15 @@ async def _fixture_check_pressure(
     write_cb: Optional[Callable],
     accumulate_raw_data_cb: Optional[Callable],
     repeat_index: int,
+    repeat_count: int,
+    progress_cb: Optional[Callable[[str], None]] = None,
 ) -> bool:
+    def report(action: str) -> None:
+        message = f"repeat {repeat_index}/{repeat_count}: {action}"
+        print(message)
+        if progress_cb is not None:
+            progress_cb(message)
+
     results = []
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
@@ -520,6 +561,7 @@ async def _fixture_check_pressure(
     print("pip_channels",pip_channels)
     delaytime = 3 #
     # above the fixture
+    report("read pre pressure")
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -537,7 +579,7 @@ async def _fixture_check_pressure(
     # NOTE: unknown amount of pressure here (depends on where Z was calibrated)
     # fixture_depth = PRESSURE_FIXTURE_INSERT_DEPTH[pip_vol]
     # await api.move_rel(mount, Point(z=-fixture_depth))
-    print("picking up tips (hold gear engaged)")
+    report("pick up tips and hold gear engaged")
     await _pick_up_tip_96_hold_gear_engaged(
         api,
         OT3Mount.LEFT,
@@ -547,6 +589,7 @@ async def _fixture_check_pressure(
     #     OT3Mount.LEFT, helpers_ot3.get_default_tip_length(50)
     # )
     await asyncio.sleep(delaytime)
+    report("read insert pressure")
     r, inserted_pressure_data = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -565,6 +608,7 @@ async def _fixture_check_pressure(
     aspiratevol = PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol]
 
     for aspval in aspiratevol:
+        report(f"aspirate {aspval}ul")
         print("aspirate:",aspval)
         write_cb(["aspirate-dispense",aspval,"ul"])
         await api.aspirate(mount, aspval)
@@ -576,6 +620,7 @@ async def _fixture_check_pressure(
             asp_evt = PressureEvent.ASPIRATE_P1000
         elif pip_vol == 200:
             asp_evt = PressureEvent.ASPIRATE_P200
+        report(f"read holding pressure after aspirate {aspval}ul")
         r, _ = await _read_pressure_and_check_results(
             api,
             pip_channels,
@@ -593,9 +638,11 @@ async def _fixture_check_pressure(
         results.append(r)
         # dispense
         
+        report(f"dispense {aspval}ul")
         print("dispense:",aspval)
         await api.dispense(mount, aspval)
         await asyncio.sleep(delaytime)
+        report(f"read dispensed pressure after dispense {aspval}ul")
         r, _ = await _read_pressure_and_check_results(
             api,
             pip_channels,
@@ -614,8 +661,10 @@ async def _fixture_check_pressure(
     # retract out of fixture
     #await api.move_rel(mount, Point(z=fixture_depth))
     # Release gears only after pressure testing, then drop tip.
+    report("release gear motors and drop tips")
     await _release_gear_then_drop_tip(api)
     await asyncio.sleep(delaytime)
+    report("read post pressure")
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -629,6 +678,7 @@ async def _fixture_check_pressure(
         repeat_index=repeat_index,
     )
     results.append(r)
+    report("repeat complete")
     return False not in results
 
 async def _read_pressure_and_check_results(
@@ -898,7 +948,22 @@ class CSVCallbacks:
 
 PRESSURE_DATA_CACHE = []
 DEFAULT_LEAK_RATE_OFFSETS: Dict[int, float] = {}
-DEFAULT_OPERATOR_NAME = "protocol"
+OPERATOR_CHOICES = [
+    "Unused",
+    "Haiyan",
+    "Jiqing",
+    "Yanglin",
+    "Yangyin",
+    "Hejie",
+    "Zhihua",
+    "Huanjun",
+    "Chengkun",
+    "Xiongjian",
+    "Zhougui",
+    "Zhiwei",
+    "TE",
+]
+DEFAULT_OPERATOR_NAME = "Unused"
 DEFAULT_PIPETTE_VOLUME = 200
 DEFAULT_REPEAT_COUNT = 10
 DEFAULT_LEAK_THRESHOLD_1UL = 2.45
@@ -909,9 +974,10 @@ DEFAULT_CV_THRESHOLD_50UL = 0.2
 DEFAULT_CV_THRESHOLD_200UL = 0.2
 DEFAULT_FAIL_COUNT_THRESHOLD = 3
 DEFAULT_RETEST_MODE = False
-FIXTURE_LABWARE_NAME = "opentrons_flex_96_tiprack_1000ul"
-FIXTURE_SLOT = "B2"
-DEFAULT_FIXTURE_PICKUP_Z_OFFSET = 5.0
+FIXTURE_LABWARE_NAME = "opentrons_flex_96_tiprack_200ul"
+FIXTURE_ADAPTER_NAME = "opentrons_flex_96_tiprack_adapter"
+FIXTURE_SLOT = "B3"
+DEFAULT_FIXTURE_PICKUP_Z_OFFSET = 0.0
 CLI_FIXTURE_PICKUP_POINT = Point(x=342, y=288, z=111.5)
 
 
@@ -976,6 +1042,16 @@ def _build_config(
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Build runtime parameters for Protocol API execution."""
+    parameters.add_str(
+        display_name="Operator",
+        variable_name="operator",
+        default=DEFAULT_OPERATOR_NAME,
+        choices=[
+            {"display_name": name, "value": name}
+            for name in OPERATOR_CHOICES
+        ],
+        description="Operator for this QC run",
+    )
     parameters.add_int(
         display_name="Pipette volume",
         variable_name="pipette",
@@ -1040,7 +1116,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Fail count threshold",
         variable_name="fail_count_threshold",
         default=DEFAULT_FAIL_COUNT_THRESHOLD,
-        minimum=0,
+        minimum=1,
         maximum=50,
     )
     parameters.add_bool(
@@ -1054,9 +1130,9 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="fixture_pickup_z_offset",
         default=DEFAULT_FIXTURE_PICKUP_Z_OFFSET,
         minimum=-20.0,
-        maximum=20.0,
+        maximum=30.0,
         description=(
-            "Extra Z offset added to calibrated B3 fixture A1 top before pickup."
+            "Extra Z offset for calibrated B2 fixture pickup. Default uses B2 geometry."
         ),
     )
 
@@ -1074,21 +1150,37 @@ def _get_async_hardware_api(ctx: ProtocolContext) -> OT3API:
 
 def _load_calibrated_fixture_pickup_point(
     ctx: ProtocolContext, z_offset: float
-) -> Point:
+) -> Tuple[Point, Any]:
     """Load the fixture as calibrated labware and return its A1 pickup point."""
     fixture_labware = ctx.load_labware(
         FIXTURE_LABWARE_NAME,
         FIXTURE_SLOT,
-        label="Pressure Fixture 1000 Tip Geometry",
+        adapter=FIXTURE_ADAPTER_NAME,
+        label="Pressure Fixture 200 Tip Geometry",
     )
     a1_top = fixture_labware.wells_by_name()["A1"].top().point
     pickup_point = Point(x=a1_top.x, y=a1_top.y, z=a1_top.z + z_offset)
     ctx.comment(
         "Pressure fixture position uses Protocol labware calibration: "
-        f"{FIXTURE_LABWARE_NAME} in {FIXTURE_SLOT}, A1 top={a1_top}, "
+        f"{FIXTURE_LABWARE_NAME} on {FIXTURE_ADAPTER_NAME} in {FIXTURE_SLOT}, "
+        f"A1 top={a1_top}, "
         f"z-offset={z_offset}, pickup-point={pickup_point}"
     )
-    return pickup_point
+    return pickup_point, fixture_labware
+
+
+def _load_protocol_deck_labware(
+    ctx: ProtocolContext, z_offset: float
+) -> Tuple[Point, Any]:
+    """Load protocol-visible labware and return the calibrated fixture pickup point."""
+    pickup_point, fixture_labware = _load_calibrated_fixture_pickup_point(
+        ctx, z_offset
+    )
+    ctx.comment(
+        "The {FIXTURE_SLOT} pressure fixture is loaded as 96-tiprack-on-adapter geometry "
+        "for Protocol deck setup and labware position calibration."
+    )
+    return pickup_point, fixture_labware
 
 
 def _leak_rate_offsets_for_aspirate_volume(
@@ -1217,7 +1309,7 @@ def _summarize_channel_leak_history(
                 channel_passed = False
                 decision_reason = "high-median-low-cv"
             else:
-                channel_passed = fail_count <= fail_count_threshold
+                channel_passed = fail_count < fail_count_threshold
                 decision_reason = (
                     "high-median-high-cv-failcount-ok"
                     if channel_passed
@@ -1427,8 +1519,14 @@ async def _main(
     api: Optional[OT3API] = None,
     operator_name: Optional[str] = None,
     fixture_pickup_point: Optional[Point] = None,
+    progress_cb: Optional[Callable[[str], None]] = None,
 ) -> None:
     """Run."""
+    def report_progress(message: str) -> None:
+        print(message)
+        if progress_cb is not None:
+            progress_cb(message)
+
     _ensure_hardware_testing_loaded()
     # GATHER NOMINAL POSITIONS
     #trash_nominal = get_trash_nominal()
@@ -1484,10 +1582,13 @@ async def _main(
                     for channel, offset in sorted(cfg.leak_rate_offsets_200ul.items())
                 ),
             )
-    pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
-    for mount, pipette in pips.items():
-        pipette_sn = helpers_ot3.get_pipette_serial_ot3(pipette)
-        print(pipette_sn)
+    mount = OT3Mount.LEFT
+    pipette = api.hardware_pipettes.get(mount.to_mount())
+    if pipette is None:
+        raise RuntimeError("Left 96-channel pipette is required for this fixture test.")
+    pipette_sn = helpers_ot3.get_pipette_serial_ot3(pipette)
+    print(pipette_sn)
+    fixture: Optional[PressureFixtureBase] = None
     fixture = _connect_to_fixture(simulate=cfg.simulate)
     tip_rack_96_a1_nominal = get_tiprack_96_nominal(cfg.pipette)
     run_id = data.create_run_id()
@@ -1500,7 +1601,7 @@ async def _main(
     operator = (
         operator_name.strip()
         if operator_name is not None and operator_name.strip()
-        else input("OPERATOR name:").strip()
+        else DEFAULT_OPERATOR_NAME
     )
     csv_cb.write(["--------"])
     csv_cb.write(["METADATA"])
@@ -1575,7 +1676,11 @@ async def _main(
         test_passed = True
         fixture_pick_up_point = fixture_pickup_point or CLI_FIXTURE_PICKUP_POINT
         for repeat_index in range(cfg.repeat_count):
+            report_progress(f"repeat {repeat_index + 1}/{cfg.repeat_count}: home robot")
             await api.home()
+            report_progress(
+                f"repeat {repeat_index + 1}/{cfg.repeat_count}: move to pressure fixture"
+            )
             await helpers_ot3.move_to_arched_ot3(
                 api, OT3Mount.LEFT, fixture_pick_up_point
             )
@@ -1589,6 +1694,8 @@ async def _main(
                 write_cb=csv_cb.write,
                 accumulate_raw_data_cb=csv_cb.pressure,
                 repeat_index=repeat_index + 1,
+                repeat_count=cfg.repeat_count,
+                progress_cb=progress_cb,
             )
             test_passed = test_passed and trial_passed
         channel_summary_passed, abnormal_rows = _summarize_channel_leak_history(
@@ -1621,6 +1728,11 @@ async def _main(
             pass
         raise
     finally:
+        if fixture is not None:
+            try:
+                fixture.disconnect()
+            except Exception as err:
+                print(f"fixture disconnect failed: {err}")
         await api.home()
 
 
@@ -1637,16 +1749,27 @@ def run(ctx: ProtocolContext) -> None:
         "Starting 96ch fixture pressure debug test "
         f"pipette={cfg.pipette}, repeat_count={cfg.repeat_count}"
     )
-    fixture_pickup_point = _load_calibrated_fixture_pickup_point(
+    fixture_pickup_point, fixture_labware = _load_protocol_deck_labware(
         ctx, settings.fixture_pickup_z_offset
     )
-    ctx.load_instrument(f"flex_96channel_{cfg.pipette}", "left")
+    protocol_pipette = ctx.load_instrument(
+        f"flex_96channel_{cfg.pipette}",
+        "left",
+        tip_racks=[fixture_labware],
+    )
     if ctx.is_simulating():
+        protocol_pipette.pick_up_tip()
         ctx.comment(
             "Simulation/analysis mode: hardware pressure test is skipped. "
             "The real test runs only on robot execution."
         )
         return
+    def app_progress(message: str) -> None:
+        try:
+            ctx.comment(message)
+        except Exception as err:
+            print(f"app progress comment failed: {err}")
+
     api = _get_async_hardware_api(ctx)
     future = asyncio.run_coroutine_threadsafe(
         _main(
@@ -1654,6 +1777,7 @@ def run(ctx: ProtocolContext) -> None:
             api=api,
             operator_name=settings.operator_name,
             fixture_pickup_point=fixture_pickup_point,
+            progress_cb=app_progress,
         ),
         api._loop,
     )

@@ -1,0 +1,48 @@
+{"kind":"deck","id":"pr/wsboir","name":"Deck"}
+{"kind":"layout","layoutId":"e7761a2c-f479-4fc9-9852-7e1b1ec71478","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"89686b87-b772-4669-96f5-4263b76111b2","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/dke2hm","slide":1,"title":"96CH LV 老化测试结果一页总结","textShapes":27}
+{"kind":"shape","id":"sh/l87ed8ba","slide":1,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/32lszqtc","slide":1,"text":"96CH LV 老化测试结果一页总结","textPreview":"96CH LV 老化测试结果一页总结","textChars":18,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/szqtcj6t","slide":1,"text":"老板版：只保留工作量、通过率、方案选择和最终建议","textPreview":"老板版：只保留工作量、通过率、方案选择和最终建议","textChars":24,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/lkjm1cfa","slide":1,"bbox":[56,110,1166,86]}
+{"kind":"textbox","id":"sh/at47y1kr","slide":1,"text":"Mold Oring 已通过 1,020,000-1,085,000 次寿命验证，达到原设计寿命 270,000 次的约 3.8-4.0 倍；建议作为寿命提升方案推进。","textPreview":"Mold Oring 已通过 1,020,000-1,085,000 次寿命验证，达到原设计寿命 270,000 次的约 3.8-4.0 倍；建议作为寿命提升方案推进。","textChars":84,"textLines":1,"bbox":[86,132,1090,40]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":1,"bbox":[64,228,150,78]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":1,"text":"测试类型","textPreview":"测试类型","textChars":4,"textLines":1,"bbox":[79,240,120,18]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":1,"text":"2 类","textPreview":"2 类","textChars":3,"textLines":1,"bbox":[79,265,120,32]}
+{"kind":"shape","id":"sh/9knih4by","slide":1,"bbox":[234,228,160,78]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":1,"text":"跑测数量","textPreview":"跑测数量","textChars":4,"textLines":1,"bbox":[249,240,130,18]}
+{"kind":"textbox","id":"sh/re1w7mp0","slide":1,"text":"19 台","textPreview":"19 台","textChars":4,"textLines":1,"bbox":[249,265,130,32]}
+{"kind":"shape","id":"sh/2t83itgf","slide":1,"bbox":[414,228,170,78]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":1,"text":"到达终点","textPreview":"到达终点","textChars":4,"textLines":1,"bbox":[429,240,140,18]}
+{"kind":"textbox","id":"sh/kb6xkf6d","slide":1,"text":"16 台","textPreview":"16 台","textChars":4,"textLines":1,"bbox":[429,265,140,32]}
+{"kind":"shape","id":"sh/rqd4vmtw","slide":1,"bbox":[604,228,210,78]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":1,"text":"总体 PASS","textPreview":"总体 PASS","textChars":7,"textLines":1,"bbox":[619,240,180,18]}
+{"kind":"textbox","id":"sh/94fu18jq","slide":1,"text":"15 台 / 79%","textPreview":"15 台 / 79%","textChars":10,"textLines":1,"bbox":[619,265,180,32]}
+{"kind":"shape","id":"sh/kjm1cfa9","slide":1,"bbox":[834,228,170,78]}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":1,"text":"Fail 已闭环","textPreview":"Fail 已闭环","textChars":8,"textLines":1,"bbox":[849,240,140,18]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":1,"text":"2 台","textPreview":"2 台","textChars":3,"textLines":1,"bbox":[849,265,140,32]}
+{"kind":"shape","id":"sh/ed8bat47","slide":1,"bbox":[1024,228,160,78]}
+{"kind":"textbox","id":"sh/7u54zido","slide":1,"text":"风险复核","textPreview":"风险复核","textChars":4,"textLines":1,"bbox":[1039,240,130,18]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":1,"text":"2 项","textPreview":"2 项","textChars":3,"textLines":1,"bbox":[1039,265,130,32]}
+{"kind":"shape","id":"sh/lc7u54zi","slide":1,"bbox":[64,345,540,210]}
+{"kind":"textbox","id":"sh/eloj2t83","slide":1,"text":"Mold Oring","textPreview":"Mold Oring","textChars":10,"textLines":1,"bbox":[92,374,220,30]}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":1,"text":"13 / 14 PASS","textPreview":"13 / 14 PASS","textChars":12,"textLines":1,"bbox":[92,420,250,42]}
+{"kind":"textbox","id":"sh/wval87ed","slide":1,"text":"通过率 93%","textPreview":"通过率 93%","textChars":7,"textLines":1,"bbox":[356,421,120,32]}
+{"kind":"shape","id":"sh/pg3ex0nu","slide":1,"bbox":[96,494,7,7]}
+{"kind":"textbox","id":"sh/bm58z25k","slide":1,"text":"完成度高，已验证至 1,020,000-1,085,000 次。","textPreview":"完成度高，已验证至 1,020,000-1,085,000 次。","textChars":32,"textLines":1,"bbox":[113,488,413,42]}
+{"kind":"shape","id":"sh/m1cfa9w3","slide":1,"bbox":[96,536,7,7]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":1,"text":"建议作为后续寿命提升方向推进。","textPreview":"建议作为后续寿命提升方向推进。","textChars":15,"textLines":1,"bbox":[113,530,413,42]}
+{"kind":"shape","id":"sh/47y1kre1","slide":1,"bbox":[676,345,540,210]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":1,"text":"OTP-O ring","textPreview":"OTP-O ring","textChars":10,"textLines":1,"bbox":[704,374,240,30]}
+{"kind":"textbox","id":"sh/mp0bi9s3","slide":1,"text":"2 / 5 PASS","textPreview":"2 / 5 PASS","textChars":10,"textLines":1,"bbox":[704,420,250,42]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":1,"text":"通过率 40%","textPreview":"通过率 40%","textChars":7,"textLines":1,"bbox":[958,421,120,32]}
+{"kind":"shape","id":"sh/4vmtwra5","slide":1,"bbox":[708,494,7,7]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":1,"text":"2 台已有分析报告和闭环，判定 Fail。","textPreview":"2 台已有分析报告和闭环，判定 Fail。","textChars":21,"textLines":1,"bbox":[725,488,413,42]}
+{"kind":"shape","id":"sh/mhk3q5o7","slide":1,"bbox":[708,536,7,7]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":1,"text":"不建议作为当前通过方案。","textPreview":"不建议作为当前通过方案。","textChars":12,"textLines":1,"bbox":[725,530,413,42]}
+{"kind":"shape","id":"sh/v6psfil0","slide":1,"bbox":[64,600,1152,62]}
+{"kind":"textbox","id":"sh/knih4byh","slide":1,"text":"Decision","textPreview":"Decision","textChars":8,"textLines":1,"bbox":[96,618,95,28]}
+{"kind":"textbox","id":"sh/d8bat47y","slide":1,"text":"继续推进 Mold Oring；OTP-O ring 作为失效/风险参考保留。","textPreview":"继续推进 Mold Oring；OTP-O ring 作为失效/风险参考保留。","textChars":39,"textLines":1,"bbox":[216,617,780,28]}
+{"kind":"image","id":"im/7mp0bi9s","slide":1,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/dke2hm","slide":1,"text":""}

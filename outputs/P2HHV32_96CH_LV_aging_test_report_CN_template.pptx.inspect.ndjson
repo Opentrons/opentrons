@@ -1,0 +1,253 @@
+{"kind":"deck","id":"pr/hmn5nz","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"material","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout2.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout3.xml","name":"TITLE_AND_BODY","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout4.xml","name":"TITLE_AND_TWO_COLUMNS","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout5.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout6.xml","name":"ONE_COLUMN_TEXT","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout7.xml","name":"MAIN_POINT","placeholders":[{"name":"title","type":"title"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout8.xml","name":"SECTION_TITLE_AND_DESCRIPTION","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout9.xml","name":"CAPTION_ONLY","placeholders":[{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout10.xml","name":"BIG_NUMBER","placeholders":[{"name":"title","type":"title","textPreview":"xx%"},{"name":"body","type":"body"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout11.xml","name":"BLANK","type":"blank","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout12.xml","name":"CUSTOM_3","placeholders":[{"name":"picture","type":"picture"},{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout13.xml","name":"CUSTOM_3_1","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"},{"name":"subtitle","type":"subtitle"}]}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster2.xml","name":"","type":"master","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout14.xml","name":"TITLE","type":"title","placeholders":[{"name":"title","type":"title"},{"name":"subtitle","type":"subtitle"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout15.xml","name":"OBJECT","type":"obj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout16.xml","name":"SECTION_HEADER","type":"secHead","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout17.xml","name":"TWO_OBJECTS","type":"twoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout18.xml","name":"TWO_OBJECTS_WITH_TEXT","type":"twoTxTwoObj","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout19.xml","name":"TITLE_ONLY","type":"titleOnly","placeholders":[{"name":"title","type":"title"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout20.xml","name":"BLANK","type":"blank","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout21.xml","name":"图片与标题","placeholders":[{"name":"picture","type":"picture"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout22.xml","name":"VERTICAL_TITLE_AND_VERTICAL_TEXT","type":"vertTitleAndTx","placeholders":[{"name":"title","type":"title"},{"name":"body","type":"body"},{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout23.xml","name":"内容","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout24.xml","name":"末尾幻灯片","placeholders":[{"name":"dateTime","type":"dateTime"},{"name":"footer","type":"footer"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"},{"name":"body","type":"body"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout25.xml","name":"Title Only","placeholders":[{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"},{"name":"title","type":"title"}]}
+{"kind":"slide","id":"sl/2x4nap4r","slide":1,"title":"P2HHV32 96CH LV 老化测试报告","textShapes":2}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":1,"name":"Google Shape;167;p28","placeholder":"title","text":"P2HHV32 96CH LV 老化测试报告","textPreview":"P2HHV32 96CH LV 老化测试报告","textChars":22,"textLines":1,"bbox":[334,179.31,609.07,124.16]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":1,"name":"Google Shape;168;p28","placeholder":"subtitle","text":"2026.06.15\nSZ ENG","textPreview":"2026.06.15 | SZ ENG","textChars":17,"textLines":2,"bbox":[737.39,393.51,320.66,51.91]}
+{"kind":"image","id":"im/5wjudg7a","slide":1,"name":"Google Shape;169;p28","bbox":[0,0,334,540]}
+{"kind":"notes","id":"nt/2x4nap4r","slide":1,"text":""}
+{"kind":"slide","id":"sl/pg3ex0nu","slide":2,"title":"执行摘要：4 台移液器完成老化测试，现有 CV 指标均通过","textShapes":14}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":2,"name":"Google Shape;216;p33","text":"执行摘要：4 台移液器完成老化测试，现有 CV 指标均通过","textPreview":"执行摘要：4 台移液器完成老化测试，现有 CV 指标均通过","textChars":29,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"shape","id":"sh/e1w7mp0b","slide":2,"bbox":[52,132,190,58]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":2,"text":"完成状态","textPreview":"完成状态","textChars":4,"textLines":1,"bbox":[64,141,166,14]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":2,"text":"4 / 4 完成","textPreview":"4 / 4 完成","textChars":8,"textLines":1,"bbox":[64,159,166,24]}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":2,"bbox":[272,132,190,58]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":2,"text":"最高老化点","textPreview":"最高老化点","textChars":5,"textLines":1,"bbox":[284,141,166,14]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":2,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[284,159,166,24]}
+{"kind":"shape","id":"sh/zqtcj6to","slide":2,"bbox":[492,132,190,58]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":2,"text":"最大 CV / 最差通道","textPreview":"最大 CV / 最差通道","textChars":12,"textLines":1,"bbox":[504,141,166,14]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":2,"text":"0.825 / 2.88","textPreview":"0.825 / 2.88","textChars":12,"textLines":1,"bbox":[504,159,166,24]}
+{"kind":"shape","id":"sh/obm58z25","slide":2,"bbox":[52,220,514,205]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":2,"text":"关键结论","textPreview":"关键结论","textChars":4,"textLines":1,"bbox":[78,244,150,20]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":2,"bbox":[82,282,9,9]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":2,"text":"明细寿命表中，4 台指定移液器均标记为 Finish。","textPreview":"明细寿命表中，4 台指定移液器均标记为 Finish。","textChars":27,"textLines":1,"bbox":[104,274,410,30]}
+{"kind":"shape","id":"sh/tcj6tova","slide":2,"bbox":[82,321,9,9]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":2,"text":"4 台均达到 392% / 1,020,000 cycles，未记录 total fail、failed channels 或 fail analysis。","textPreview":"4 台均达到 392% / 1,020,000 cycles，未记录 total fail、failed channels 或 fail analysis。","textChars":78,"textLines":1,"bbox":[104,313,410,30]}
+{"kind":"shape","id":"sh/b6xkf6dc","slide":2,"bbox":[82,360,9,9]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":2,"text":"现有 1 uL CV 与最差通道 CV 数据均低于 QC / 客户限值。","textPreview":"现有 1 uL CV 与最差通道 CV 数据均低于 QC / 客户限值。","textChars":36,"textLines":1,"bbox":[104,352,410,30]}
+{"kind":"shape","id":"sh/t47y1kre","slide":2,"bbox":[595,220,300,205]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":2,"text":"数据备注","textPreview":"数据备注","textChars":4,"textLines":1,"bbox":[620,244,85,20]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":2,"text":"正式归档前：","textPreview":"正式归档前：","textChars":6,"textLines":1,"bbox":[620,282,230,20]}
+{"kind":"textbox","id":"sh/0fepkzup","slide":2,"text":"1. 将 Summary Sheet 从 238% 同步至 Finish / 392%。\n2. 392% plate4/plate5 为 #DIV/0!，需复测或明确说明仅纳入前三块板数据。","textPreview":"1. 将 Summary Sheet 从 238% 同步至 Finish / 392%。 | 2. 392% plate4/plate5 为 #DIV/0!，需复测或明确说明仅纳入前三块板数据。","textChars":95,"textLines":2,"bbox":[620,310,240,70]}
+{"kind":"image","id":"im/sfil0rqd","slide":2,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/pg3ex0nu","slide":2,"text":""}
+{"kind":"slide","id":"sl/s72x4nap","slide":3,"title":"状态核对：明细表已完成，Summary Sheet 尚未同步","textShapes":5}
+{"kind":"textbox","id":"sh/loj2t83i","slide":3,"name":"Google Shape;216;p33","text":"状态核对：明细表已完成，Summary Sheet 尚未同步","textPreview":"状态核对：明细表已完成，Summary Sheet 尚未同步","textChars":30,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"shape","id":"sh/at47y1kr","slide":3,"bbox":[52,348,390,74]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":3,"text":"源数据更新点","textPreview":"源数据更新点","textChars":6,"textLines":1,"bbox":[74,368,200,18]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":3,"text":"明细表状态已从 RUNNING 更新为 Finish。最终状态建议以明细寿命表为准。","textPreview":"明细表状态已从 RUNNING 更新为 Finish。最终状态建议以明细寿命表为准。","textChars":42,"textLines":1,"bbox":[74,392,328,28]}
+{"kind":"shape","id":"sh/032lszqt","slide":3,"bbox":[480,348,390,74]}
+{"kind":"textbox","id":"sh/tovahoza","slide":3,"text":"测试配置","textPreview":"测试配置","textChars":4,"textLines":1,"bbox":[502,368,200,18]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":3,"text":"4 台均为 Mold Oring Rework + Peek collar + Top Peek collar + 10448-Hard Stop；测试类型为 200 uL cycles。","textPreview":"4 台均为 Mold Oring Rework + Peek collar + Top Peek collar + 10448-Hard Stop；测试类型为 200 uL cycles。","textChars":94,"textLines":1,"bbox":[502,392,328,28]}
+{"kind":"table","id":"tb/qxs72x4n","slide":3,"name":"","rows":5,"cols":5,"preview":"SN | Summary Sheet | 明细寿命表 | 最大循环数 | 结论","bbox":[52,130,820,185]}
+{"kind":"image","id":"im/xs72x4na","slide":3,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/s72x4nap","slide":3,"text":""}
+{"kind":"slide","id":"sl/val87ed8","slide":4,"title":"光学 CV 趋势：最大 0.825%，显著低于 4% QC 限值","textShapes":7}
+{"kind":"textbox","id":"sh/zidonyd0","slide":4,"name":"Google Shape;216;p33","text":"光学 CV 趋势：最大 0.825%，显著低于 4% QC 限值","textPreview":"光学 CV 趋势：最大 0.825%，显著低于 4% QC 限值","textChars":32,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":4,"bbox":[52,126,620,302]}
+{"kind":"shape","id":"sh/8z25kb6x","slide":4,"bbox":[710,145,150,58]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":4,"text":"QC 限值","textPreview":"QC 限值","textChars":5,"textLines":1,"bbox":[722,154,126,14]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":4,"text":"4.0%","textPreview":"4.0%","textChars":4,"textLines":1,"bbox":[722,172,126,24]}
+{"kind":"shape","id":"sh/je9cvixc","slide":4,"bbox":[710,225,150,58]}
+{"kind":"textbox","id":"sh/87ed8bat","slide":4,"text":"客户限值","textPreview":"客户限值","textChars":4,"textLines":1,"bbox":[722,234,126,14]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":4,"text":"5.0%","textPreview":"5.0%","textChars":4,"textLines":1,"bbox":[722,252,126,24]}
+{"kind":"shape","id":"sh/q1orytsv","slide":4,"bbox":[710,318,150,88]}
+{"kind":"textbox","id":"sh/fmlkjm1c","slide":4,"text":"观察结果","textPreview":"观察结果","textChars":4,"textLines":1,"bbox":[726,338,100,18]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":4,"text":"最高值为 0411A03 在 315% 阶段的 0.825%。趋势未接近规格限值。","textPreview":"最高值为 0411A03 在 315% 阶段的 0.825%。趋势未接近规格限值。","textChars":41,"textLines":1,"bbox":[726,364,112,40]}
+{"kind":"chart","id":"ch/0nuxc3yl","slide":4,"name":"","chartType":"line","bbox":[78,150,560,235]}
+{"kind":"image","id":"im/z61032ls","slide":4,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/val87ed8","slide":4,"text":""}
+{"kind":"slide","id":"sl/mlkjm1cf","slide":5,"title":"最差通道 CV：最大 2.88%，低于 5.6% QC 限值","textShapes":6}
+{"kind":"textbox","id":"sh/t83itgfm","slide":5,"name":"Google Shape;216;p33","text":"最差通道 CV：最大 2.88%，低于 5.6% QC 限值","textPreview":"最差通道 CV：最大 2.88%，低于 5.6% QC 限值","textChars":30,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"shape","id":"sh/bat47y1k","slide":5,"bbox":[52,126,590,300]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":5,"bbox":[690,150,190,100]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":5,"text":"最高最差通道","textPreview":"最高最差通道","textChars":6,"textLines":1,"bbox":[712,168,150,18]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":5,"text":"2.88%","textPreview":"2.88%","textChars":5,"textLines":1,"bbox":[712,195,125,35]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":5,"text":"来自 0411A03 的 0% 阶段；仍在规格内。","textPreview":"来自 0411A03 的 0% 阶段；仍在规格内。","textChars":25,"textLines":1,"bbox":[712,230,130,30]}
+{"kind":"shape","id":"sh/ulwval87","slide":5,"bbox":[690,285,190,118]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":5,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[712,307,90,18]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":5,"text":"所有机台均低于 5.6% QC 限值和 7% 客户限值。","textPreview":"所有机台均低于 5.6% QC 限值和 7% 客户限值。","textChars":28,"textLines":1,"bbox":[712,337,135,44]}
+{"kind":"chart","id":"ch/ytsvu9kn","slide":5,"name":"","chartType":"bar","bbox":[80,155,530,225]}
+{"kind":"image","id":"im/lszqtcj6","slide":5,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/mlkjm1cf","slide":5,"text":""}
+{"kind":"slide","id":"sl/58z25kb6","slide":6,"title":"阶段证据：记录完整，关键数据范围已标注","textShapes":2}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":6,"name":"Google Shape;216;p33","text":"阶段证据：记录完整，关键数据范围已标注","textPreview":"阶段证据：记录完整，关键数据范围已标注","textChars":19,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":6,"text":"明细寿命表状态为 Finish","textPreview":"明细寿命表状态为 Finish","textChars":15,"textLines":1,"bbox":[650,86,210,22]}
+{"kind":"table","id":"tb/0rqd4vmt","slide":6,"name":"","rows":11,"cols":4,"preview":"阶段 | Cycles | 证据 | 记录结果","bbox":[52,122,845,315]}
+{"kind":"image","id":"im/byhgn29g","slide":6,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/58z25kb6","slide":6,"text":""}
+{"kind":"slide","id":"sl/0z61032l","slide":7,"title":"数据质量与建议：判定通过，归档前需补充说明","textShapes":12}
+{"kind":"textbox","id":"sh/ex0nuxc3","slide":7,"name":"Google Shape;225;p34","text":"数据质量与建议：判定通过，归档前需补充说明","textPreview":"数据质量与建议：判定通过，归档前需补充说明","textChars":21,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"shape","id":"sh/w3m94fu1","slide":7,"bbox":[52,135,250,160]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":7,"bbox":[70,156,28,28]}
+{"kind":"textbox","id":"sh/at47y1kr","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[70,161,28,18]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":7,"text":"同步状态表","textPreview":"同步状态表","textChars":5,"textLines":1,"bbox":[110,158,160,20]}
+{"kind":"textbox","id":"sh/d8v6psfi","slide":7,"text":"Summary sheet 仍显示 238% / 620k 及 238%-277% running。建议更新为 Finish / 392% / 1,020k。","textPreview":"Summary sheet 仍显示 238% / 620k 及 238%-277% running。建议更新为 Finish / 392% / 1,020k。","textChars":79,"textLines":1,"bbox":[76,205,200,68]}
+{"kind":"shape","id":"sh/6hcrmhk3","slide":7,"bbox":[340,135,250,160]}
+{"kind":"shape","id":"sh/z25kb6xk","slide":7,"bbox":[358,156,28,28]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[358,161,28,18]}
+{"kind":"textbox","id":"sh/dg7adsji","slide":7,"text":"392% 光学数据","textPreview":"392% 光学数据","textChars":9,"textLines":1,"bbox":[398,158,160,20]}
+{"kind":"textbox","id":"sh/6tovahoz","slide":7,"text":"4 台在 392% 阶段的 plate4 和 plate5 均为 #DIV/0!。建议复测，或明确说明 392% 仅采用前三块板数据。","textPreview":"4 台在 392% 阶段的 plate4 和 plate5 均为 #DIV/0!。建议复测，或明确说明 392% 仅采用前三块板数据。","textChars":67,"textLines":1,"bbox":[364,205,200,68]}
+{"kind":"shape","id":"sh/vahoza1g","slide":7,"bbox":[628,135,250,160]}
+{"kind":"shape","id":"sh/o7qpg3ex","slide":7,"bbox":[646,156,28,28]}
+{"kind":"textbox","id":"sh/dsji5sne","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[646,161,28,18]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":7,"text":"D% 数据限制","textPreview":"D% 数据限制","textChars":7,"textLines":1,"bbox":[686,158,160,20]}
+{"kind":"textbox","id":"sh/kb6xkf6d","slide":7,"text":"Summary1 中 D% 字段多为 #REF! 或空白。本报告基于 CV、最差通道 CV、PASS 记录和明细状态判定。","textPreview":"Summary1 中 D% 字段多为 #REF! 或空白。本报告基于 CV、最差通道 CV、PASS 记录和明细状态判定。","textChars":61,"textLines":1,"bbox":[652,205,200,68]}
+{"kind":"shape","id":"sh/rqd4vmtw","slide":7,"bbox":[52,340,826,86]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":7,"text":"最终建议","textPreview":"最终建议","textChars":4,"textLines":1,"bbox":[78,365,170,22]}
+{"kind":"textbox","id":"sh/9knih4by","slide":7,"text":"基于明细表 Finish 状态、完成至 392% / 1,020,000 cycles、无失效记录，以及现有 CV 指标均低于规格限值，建议 4 台移液器老化测试判定通过。正式归档前需同步 Summary Sheet，并说明 392% plate4/plate5 的处理方式。","textPreview":"基于明细表 Finish 状态、完成至 392% / 1,020,000 cycles、无失效记录，以及现有 CV 指标均低于规格限值，建议 4 台移液器老化测试判定通过。正式归档前需同步 Summary Sheet，并说明 392% plate4/plate5 的处理方式。","textChars":138,"textLines":1,"bbox":[260,358,560,46]}
+{"kind":"image","id":"im/obm58z25","slide":7,"name":"Google Shape;221;p34","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/0z61032l","slide":7,"text":""}
+{"kind":"slide","id":"sl/fu18jqh0","slide":8,"title":"0401A03 单机分析：完成 392%，CV 指标通过","textShapes":18}
+{"kind":"textbox","id":"sh/bq1oryts","slide":8,"name":"Google Shape;216;p33","text":"0401A03 单机分析：完成 392%，CV 指标通过","textPreview":"0401A03 单机分析：完成 392%，CV 指标通过","textChars":28,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":8,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[770,84,110,22]}
+{"kind":"shape","id":"sh/47y1kre1","slide":8,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":8,"text":"最高老化点","textPreview":"最高老化点","textChars":5,"textLines":1,"bbox":[64,137,161,14]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":8,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/yxobm58z","slide":8,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":8,"text":"最大 CV (315%)","textPreview":"最大 CV (315%)","textChars":12,"textLines":1,"bbox":[270,137,161,14]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":8,"text":"0.566%","textPreview":"0.566%","textChars":6,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/9cvixcze","slide":8,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":8,"text":"最大最差通道 (200%)","textPreview":"最大最差通道 (200%)","textChars":13,"textLines":1,"bbox":[476,137,161,14]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":8,"text":"1.01%","textPreview":"1.01%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/gfmlkjm1","slide":8,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":8,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[682,137,161,14]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":8,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":8,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":8,"text":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textPreview":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textChars":41,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/z61032ls","slide":8,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":8,"text":"具体分析","textPreview":"具体分析","textChars":4,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/hcrmhk3q","slide":8,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":8,"text":"趋势","textPreview":"趋势","textChars":2,"textLines":1,"bbox":[590,274,80,14]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":8,"text":"CV 范围为 0.446% 至 0.566%。200% 与 315% 点略高，但仍远低于 4% QC 限值。","textPreview":"CV 范围为 0.446% 至 0.566%。200% 与 315% 点略高，但仍远低于 4% QC 限值。","textChars":54,"textLines":1,"bbox":[590,291,255,32]}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":8,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":8,"text":"数据备注","textPreview":"数据备注","textChars":4,"textLines":1,"bbox":[590,322,80,14]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":8,"text":"392% 时 CV 为 0.494%，最差通道 CV 为 0.91%。plate4/plate5 为 #DIV/0!，需复测或书面说明统计范围。","textPreview":"392% 时 CV 为 0.494%，最差通道 CV 为 0.91%。plate4/plate5 为 #DIV/0!，需复测或书面说明统计范围。","textChars":72,"textLines":1,"bbox":[590,339,255,32]}
+{"kind":"shape","id":"sh/kf6dcbul","slide":8,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/d0z61032","slide":8,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[590,370,80,14]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":8,"text":"无失效记录。光学 CV 与最差通道 CV 均在规格内，判定通过。","textPreview":"无失效记录。光学 CV 与最差通道 CV 均在规格内，判定通过。","textChars":32,"textLines":1,"bbox":[590,387,255,32]}
+{"kind":"chart","id":"ch/lszqtcj6","slide":8,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/6psfil0r","slide":8,"name":"","rows":3,"cols":6,"preview":"阶段 | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/byhgn29g","slide":8,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/fu18jqh0","slide":8,"text":""}
+{"kind":"slide","id":"sl/qh0fepkz","slide":9,"title":"0408A02 单机分析：完成 392%，CV 指标通过","textShapes":18}
+{"kind":"textbox","id":"sh/t83itgfm","slide":9,"name":"Google Shape;216;p33","text":"0408A02 单机分析：完成 392%，CV 指标通过","textPreview":"0408A02 单机分析：完成 392%，CV 指标通过","textChars":28,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":9,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[770,84,110,22]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":9,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":9,"text":"最高老化点","textPreview":"最高老化点","textChars":5,"textLines":1,"bbox":[64,137,161,14]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":9,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/c3ylc7u5","slide":9,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":9,"text":"最大 CV (100%)","textPreview":"最大 CV (100%)","textChars":12,"textLines":1,"bbox":[270,137,161,14]}
+{"kind":"textbox","id":"sh/ulwval87","slide":9,"text":"0.492%","textPreview":"0.492%","textChars":6,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/j6tovaho","slide":9,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":9,"text":"最大最差通道 (315%)","textPreview":"最大最差通道 (315%)","textChars":13,"textLines":1,"bbox":[476,137,161,14]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":9,"text":"1.41%","textPreview":"1.41%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":9,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":9,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[682,137,161,14]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":9,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/0z61032l","slide":9,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":9,"text":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textPreview":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textChars":41,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/p8nqxs72","slide":9,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":9,"text":"具体分析","textPreview":"具体分析","textChars":4,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/72x4nap4","slide":9,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":9,"text":"趋势","textPreview":"趋势","textChars":2,"textLines":1,"bbox":[590,274,80,14]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":9,"text":"该机台为四台中整体 CV 最低。315% 时最差通道 CV 升至 1.41%，但仍有充足裕量。","textPreview":"该机台为四台中整体 CV 最低。315% 时最差通道 CV 升至 1.41%，但仍有充足裕量。","textChars":47,"textLines":1,"bbox":[590,291,255,32]}
+{"kind":"shape","id":"sh/wjudg7ad","slide":9,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":9,"text":"数据备注","textPreview":"数据备注","textChars":4,"textLines":1,"bbox":[590,322,80,14]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":9,"text":"392% 时 CV 为 0.456%，最差通道 CV 为 0.79%。plate4/plate5 为 #DIV/0!，需复测或书面说明统计范围。","textPreview":"392% 时 CV 为 0.456%，最差通道 CV 为 0.79%。plate4/plate5 为 #DIV/0!，需复测或书面说明统计范围。","textChars":72,"textLines":1,"bbox":[590,339,255,32]}
+{"kind":"shape","id":"sh/6psfil0r","slide":9,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/val87ed8","slide":9,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[590,370,80,14]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":9,"text":"CV 保持稳定，无失效记录，判定通过。","textPreview":"CV 保持稳定，无失效记录，判定通过。","textChars":19,"textLines":1,"bbox":[590,387,255,32]}
+{"kind":"chart","id":"ch/fu18jqh0","slide":9,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/kb6xkf6d","slide":9,"name":"","rows":3,"cols":6,"preview":"阶段 | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/9s36hcrm","slide":9,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/qh0fepkz","slide":9,"text":""}
+{"kind":"slide","id":"sl/29gr2p8n","slide":10,"title":"0410A07 单机分析：完成 392%，CV 指标通过","textShapes":18}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":10,"name":"Google Shape;216;p33","text":"0410A07 单机分析：完成 392%，CV 指标通过","textPreview":"0410A07 单机分析：完成 392%，CV 指标通过","textChars":28,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":10,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[770,84,110,22]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":10,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":10,"text":"最高老化点","textPreview":"最高老化点","textChars":5,"textLines":1,"bbox":[64,137,161,14]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":10,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/1w7mp0bi","slide":10,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":10,"text":"最大 CV (315%)","textPreview":"最大 CV (315%)","textChars":12,"textLines":1,"bbox":[270,137,161,14]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":10,"text":"0.724%","textPreview":"0.724%","textChars":6,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":10,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":10,"text":"最大最差通道 (315%)","textPreview":"最大最差通道 (315%)","textChars":13,"textLines":1,"bbox":[476,137,161,14]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":10,"text":"1.60%","textPreview":"1.60%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/j6tovaho","slide":10,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/ulwval87","slide":10,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[682,137,161,14]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":10,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/t83itgfm","slide":10,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":10,"text":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textPreview":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textChars":41,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/4byhgn29","slide":10,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":10,"text":"具体分析","textPreview":"具体分析","textChars":4,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/m58z25kb","slide":10,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/bq1oryts","slide":10,"text":"趋势","textPreview":"趋势","textChars":2,"textLines":1,"bbox":[590,274,80,14]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":10,"text":"CV 在 200% 与 315% 阶段上升，392% 时回落至 0.415%。未观察到持续上升趋势。","textPreview":"CV 在 200% 与 315% 阶段上升，392% 时回落至 0.415%。未观察到持续上升趋势。","textChars":50,"textLines":1,"bbox":[590,291,255,32]}
+{"kind":"shape","id":"sh/tsvu9kni","slide":10,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":10,"text":"数据备注","textPreview":"数据备注","textChars":4,"textLines":1,"bbox":[590,322,80,14]}
+{"kind":"textbox","id":"sh/wval87ed","slide":10,"text":"最差通道 CV 在 315% 达到 1.60%，低于 5.6% QC 限值。392% plate4/plate5 为 #DIV/0!。","textPreview":"最差通道 CV 在 315% 达到 1.60%，低于 5.6% QC 限值。392% plate4/plate5 为 #DIV/0!。","textChars":67,"textLines":1,"bbox":[590,339,255,32]}
+{"kind":"shape","id":"sh/7adsji5s","slide":10,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":10,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[590,370,80,14]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":10,"text":"中期 CV 略升但远低于限值，后续回落，判定通过。","textPreview":"中期 CV 略升但远低于限值，后续回落，判定通过。","textChars":25,"textLines":1,"bbox":[590,387,255,32]}
+{"kind":"chart","id":"ch/il0rqd4v","slide":10,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/h4byhgn2","slide":10,"name":"","rows":3,"cols":6,"preview":"阶段 | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/obm58z25","slide":10,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/29gr2p8n","slide":10,"text":""}
+{"kind":"slide","id":"sl/re1w7mp0","slide":11,"title":"0411A03 单机分析：完成 392%，CV 指标通过","textShapes":18}
+{"kind":"textbox","id":"sh/32lszqtc","slide":11,"name":"Google Shape;216;p33","text":"0411A03 单机分析：完成 392%，CV 指标通过","textPreview":"0411A03 单机分析：完成 392%，CV 指标通过","textChars":28,"textLines":1,"bbox":[50,62,710,57.45]}
+{"kind":"textbox","id":"sh/lwval87e","slide":11,"text":"Finish / 392%","textPreview":"Finish / 392%","textChars":13,"textLines":1,"bbox":[770,84,110,22]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":11,"bbox":[52,128,185,58]}
+{"kind":"textbox","id":"sh/sji5snel","slide":11,"text":"最高老化点","textPreview":"最高老化点","textChars":5,"textLines":1,"bbox":[64,137,161,14]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":11,"text":"392% / 1.02M","textPreview":"392% / 1.02M","textChars":12,"textLines":1,"bbox":[64,155,161,24]}
+{"kind":"shape","id":"sh/adsji5sn","slide":11,"bbox":[258,128,185,58]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":11,"text":"最大 CV (315%)","textPreview":"最大 CV (315%)","textChars":12,"textLines":1,"bbox":[270,137,161,14]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":11,"text":"0.825%","textPreview":"0.825%","textChars":6,"textLines":1,"bbox":[270,155,161,24]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":11,"bbox":[464,128,185,58]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":11,"text":"最大最差通道 (0%)","textPreview":"最大最差通道 (0%)","textChars":11,"textLines":1,"bbox":[476,137,161,14]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":11,"text":"2.88%","textPreview":"2.88%","textChars":5,"textLines":1,"bbox":[476,155,161,24]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":11,"bbox":[670,128,185,58]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":11,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[682,137,161,14]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":11,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[682,155,161,24]}
+{"kind":"shape","id":"sh/ylc7u54z","slide":11,"bbox":[52,215,460,205]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":11,"text":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textPreview":"参考：CV QC 4%；最差通道 CV QC 5.6%。坐标轴按单机数据范围缩放。","textChars":41,"textLines":1,"bbox":[75,394,410,14]}
+{"kind":"shape","id":"sh/nih4byhg","slide":11,"bbox":[540,215,340,205]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":11,"text":"具体分析","textPreview":"具体分析","textChars":4,"textLines":1,"bbox":[570,238,170,22]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":11,"bbox":[572,279,9,9]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":11,"text":"趋势","textPreview":"趋势","textChars":2,"textLines":1,"bbox":[590,274,80,14]}
+{"kind":"textbox","id":"sh/rmhk3q5o","slide":11,"text":"该机台为四台中 CV 与最差通道 CV 最高。0% 阶段最差通道 CV 为 2.88%，仍低于 5.6% QC 限值。","textPreview":"该机台为四台中 CV 与最差通道 CV 最高。0% 阶段最差通道 CV 为 2.88%，仍低于 5.6% QC 限值。","textChars":59,"textLines":1,"bbox":[590,291,255,32]}
+{"kind":"shape","id":"sh/y1kre1w7","slide":11,"bbox":[572,327,9,9]}
+{"kind":"textbox","id":"sh/y90je9cv","slide":11,"text":"数据备注","textPreview":"数据备注","textChars":4,"textLines":1,"bbox":[590,322,80,14]}
+{"kind":"textbox","id":"sh/nuxc3ylc","slide":11,"text":"0% 备注：B4/F2/F6 在 trial 2/3/4 中 D% 偏高。后续现有 CV 数据均在规格内。392% plate4/plate5 为 #DIV/0!。","textPreview":"0% 备注：B4/F2/F6 在 trial 2/3/4 中 D% 偏高。后续现有 CV 数据均在规格内。392% plate4/plate5 为 #DIV/0!。","textChars":82,"textLines":1,"bbox":[590,339,255,32]}
+{"kind":"shape","id":"sh/gbq1oryt","slide":11,"bbox":[572,375,9,9]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":11,"text":"判定","textPreview":"判定","textChars":2,"textLines":1,"bbox":[590,370,80,14]}
+{"kind":"textbox","id":"sh/yhgn29gr","slide":11,"text":"该机台为组内相对风险最高，但现有 CV 数据未超规格，且未记录失效趋势，判定通过。","textPreview":"该机台为组内相对风险最高，但现有 CV 数据未超规格，且未记录失效趋势，判定通过。","textChars":41,"textLines":1,"bbox":[590,387,255,32]}
+{"kind":"chart","id":"ch/dsji5sne","slide":11,"name":"","chartType":"line","bbox":[78,238,405,150]}
+{"kind":"table","id":"tb/e1w7mp0b","slide":11,"name":"","rows":3,"cols":6,"preview":"阶段 | 0% | 100% | 200% | 315% | 392%","bbox":[52,445,845,44]}
+{"kind":"image","id":"im/zqtcj6to","slide":11,"name":"Google Shape;212;p33","bbox":[775.4,35.35,136.75,53.9]}
+{"kind":"notes","id":"nt/re1w7mp0","slide":11,"text":""}

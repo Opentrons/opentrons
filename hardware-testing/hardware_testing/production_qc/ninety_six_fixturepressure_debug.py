@@ -112,7 +112,6 @@ from dataclasses import dataclass, fields
 class TestConfig:
     """Test Configurations."""
 
-    operator_name: str
     skip_liquid: bool
     skip_fixture: bool
     skip_diagnostics: bool
@@ -1293,9 +1292,9 @@ async def _main(
                 )
 
             if repeat_index == 0:
-                
-                ui.get_user_ready("Starting to pick up")
-                await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
+                # Nohup mode: skip manual confirmation and jog calibration.
+                # ui.get_user_ready("Starting to pick up")
+                # await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
                 fixture_pick_up_point = await api.gantry_position(OT3Mount.LEFT)
 
             csv_cb.write(["trial-index", repeat_index + 1, cfg.repeat_count])

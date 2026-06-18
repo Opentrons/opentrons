@@ -1,0 +1,98 @@
+{"kind":"deck","id":"pr/m9bqhl","name":"Deck"}
+{"kind":"layout","layoutId":"927ee21d-62e2-4f9e-ba0b-cdf9ab0d142f","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"5e1a6041-002a-4988-bff2-9d31069e934b","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/8vj7mz","slide":1,"title":"96CH LV Aging Test Workload and Result Overview","textShapes":65}
+{"kind":"shape","id":"sh/w3m94fu1","slide":1,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":1,"text":"96CH LV Aging Test Workload and Result Overview","textPreview":"96CH LV Aging Test Workload and Result Overview","textChars":47,"textLines":1,"bbox":[56,34,760,42]}
+{"kind":"textbox","id":"sh/ex0nuxc3","slide":1,"text":"392% = 1,020,000 cycles; 417% = 1,085,000 cycles; original design life = 270,000 cycles","textPreview":"392% = 1,020,000 cycles; 417% = 1,085,000 cycles; original design life = 270,000 cycles","textChars":87,"textLines":1,"bbox":[58,79,820,22]}
+{"kind":"textbox","id":"sh/lwval87e","slide":1,"text":"opentrons","textPreview":"opentrons","textChars":9,"textLines":1,"bbox":[1100,48,120,24]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":1,"bbox":[56,122,150,78]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":1,"text":"Types covered","textPreview":"Types covered","textChars":13,"textLines":1,"bbox":[71,134,120,18]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":1,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[71,160,120,32]}
+{"kind":"shape","id":"sh/l87ed8ba","slide":1,"bbox":[226,122,170,78]}
+{"kind":"textbox","id":"sh/sneloj2t","slide":1,"text":"Units tested","textPreview":"Units tested","textChars":12,"textLines":1,"bbox":[241,134,140,18]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":1,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[241,160,140,32]}
+{"kind":"shape","id":"sh/fyxobm58","slide":1,"bbox":[416,122,200,78]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":1,"text":"Reached 1,020,000/1,085,000","textPreview":"Reached 1,020,000/1,085,000","textChars":27,"textLines":1,"bbox":[431,134,170,18]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":1,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[431,160,170,32]}
+{"kind":"shape","id":"sh/qpg3ex0n","slide":1,"bbox":[636,122,224,78]}
+{"kind":"textbox","id":"sh/fa9w3m94","slide":1,"text":"PASS / Overall rate","textPreview":"PASS / Overall rate","textChars":19,"textLines":1,"bbox":[651,134,194,18]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":1,"text":"15 / 79%","textPreview":"15 / 79%","textChars":8,"textLines":1,"bbox":[651,160,194,32]}
+{"kind":"shape","id":"sh/xczed8v6","slide":1,"bbox":[880,122,172,78]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":1,"text":"Risk review","textPreview":"Risk review","textChars":11,"textLines":1,"bbox":[895,134,142,18]}
+{"kind":"textbox","id":"sh/je9cvixc","slide":1,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[895,160,142,32]}
+{"kind":"shape","id":"sh/rqd4vmtw","slide":1,"bbox":[1072,122,150,78]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":1,"text":"Fail closed","textPreview":"Fail closed","textChars":11,"textLines":1,"bbox":[1087,134,120,18]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":1,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[1087,160,120,32]}
+{"kind":"shape","id":"sh/kb6xkf6d","slide":1,"bbox":[56,230,274,342]}
+{"kind":"textbox","id":"sh/re1w7mp0","slide":1,"text":"Work Completed","textPreview":"Work Completed","textChars":14,"textLines":1,"bbox":[84,260,180,28]}
+{"kind":"shape","id":"sh/2t83itgf","slide":1,"bbox":[90,322,8,8]}
+{"kind":"textbox","id":"sh/9knih4by","slide":1,"text":"Re-matched 19 listed units and summarized them under two groups: Mold Oring and OTP-O ring.","textPreview":"Re-matched 19 listed units and summarized them under two groups: Mold Oring and OTP-O ring.","textChars":91,"textLines":1,"bbox":[108,316,200,36]}
+{"kind":"shape","id":"sh/kzupwb2h","slide":1,"bbox":[90,394,8,8]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":1,"text":"Reviewed RD detail status, maximum aging node, CV, worst-channel CV, LOW %D, aspiration, no-aspiration, and leakage notes.","textPreview":"Reviewed RD detail status, maximum aging node, CV, worst-channel CV, LOW %D, aspiration, no-aspiration, and leakage notes.","textChars":122,"textLines":1,"bbox":[108,388,200,36]}
+{"kind":"shape","id":"sh/2p8nqxs7","slide":1,"bbox":[90,482,8,8]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":1,"text":"Coverage spans 0 to 1,020,000/1,085,000 cycles; 16 units reached endpoint and 15 units are counted as PASS.","textPreview":"Coverage spans 0 to 1,020,000/1,085,000 cycles; 16 units reached endpoint and 15 units are counted as PASS.","textChars":107,"textLines":1,"bbox":[108,476,200,36]}
+{"kind":"textbox","id":"sh/54zidony","slide":1,"text":"Core workload: 19 units x multi-node validation","textPreview":"Core workload: 19 units x multi-node validation","textChars":47,"textLines":1,"bbox":[76,535,230,26]}
+{"kind":"shape","id":"sh/udg7adsj","slide":1,"bbox":[360,230,410,358]}
+{"kind":"textbox","id":"sh/nyd0z610","slide":1,"text":"Type 1: Mold Oring","textPreview":"Type 1: Mold Oring","textChars":18,"textLines":1,"bbox":[382,250,260,24]}
+{"kind":"textbox","id":"sh/cvixczed","slide":1,"text":"14 units: all counted as Mold Oring","textPreview":"14 units: all counted as Mold Oring","textChars":35,"textLines":1,"bbox":[382,280,230,28]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":1,"text":"PASS with risk closure","textPreview":"PASS with risk closure","textChars":22,"textLines":1,"bbox":[606,251,132,24]}
+{"kind":"textbox","id":"sh/upwb2hwf","slide":1,"text":"Units","textPreview":"Units","textChars":5,"textLines":1,"bbox":[384,321,70,16]}
+{"kind":"textbox","id":"sh/nap4r65w","slide":1,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[384,341,72,30]}
+{"kind":"textbox","id":"sh/c7u54zid","slide":1,"text":"Endpoint","textPreview":"Endpoint","textChars":8,"textLines":1,"bbox":[462,321,70,16]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":1,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[462,341,72,30]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[540,321,70,16]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":1,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[540,341,72,30]}
+{"kind":"textbox","id":"sh/z61032ls","slide":1,"text":"Pass rate","textPreview":"Pass rate","textChars":9,"textLines":1,"bbox":[618,321,70,16]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[618,341,72,30]}
+{"kind":"textbox","id":"sh/h0fepkzu","slide":1,"text":"Risk/Fail","textPreview":"Risk/Fail","textChars":9,"textLines":1,"bbox":[696,321,70,16]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":1,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[696,341,72,30]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":1,"text":"Completion","textPreview":"Completion","textChars":10,"textLines":1,"bbox":[384,393,105,18]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[492,393,52,18]}
+{"kind":"shape","id":"sh/hwfyxobm","slide":1,"bbox":[384,416,160,11]}
+{"kind":"shape","id":"sh/obm58z25","slide":1,"bbox":[384,416,148.8,11]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":1,"text":"PASS rate","textPreview":"PASS rate","textChars":9,"textLines":1,"bbox":[580,393,105,18]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[688,393,52,18]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":1,"bbox":[580,416,160,11]}
+{"kind":"shape","id":"sh/tcj6tova","slide":1,"bbox":[580,416,148.8,11]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":1,"text":"Max coverage: 1,085,000 cycles; main endpoint: 1,020,000 cycles","textPreview":"Max coverage: 1,085,000 cycles; main endpoint: 1,020,000 cycles","textChars":63,"textLines":1,"bbox":[384,441,362,22]}
+{"kind":"shape","id":"sh/byhgn29g","slide":1,"bbox":[388,482,8,8]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":1,"text":"Workload: 14 units included; 13 units reached 1,020,000 or 1,085,000 cycles.","textPreview":"Workload: 14 units included; 13 units reached 1,020,000 or 1,085,000 cycles.","textChars":76,"textLines":1,"bbox":[406,476,334,36]}
+{"kind":"shape","id":"sh/t47y1kre","slide":1,"bbox":[388,518,8,8]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":1,"text":"Pass rate: 13/14 PASS; 0702A03 and 0410A04 are counted as passed.","textPreview":"Pass rate: 13/14 PASS; 0702A03 and 0410A04 are counted as passed.","textChars":65,"textLines":1,"bbox":[406,512,334,36]}
+{"kind":"shape","id":"sh/bulwval8","slide":1,"bbox":[388,554,8,8]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":1,"text":"Risk review: 0407A01 D2 leakage / O-ring replacement remains a single risk note.","textPreview":"Risk review: 0407A01 D2 leakage / O-ring replacement remains a single risk note.","textChars":80,"textLines":1,"bbox":[406,548,334,36]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":1,"bbox":[812,230,410,358]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":1,"text":"Type 2: OTP-O ring","textPreview":"Type 2: OTP-O ring","textChars":18,"textLines":1,"bbox":[834,250,260,24]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":1,"text":"5 units: ROD SEAL PIPETTE (10433+10425+10026OTP)","textPreview":"5 units: ROD SEAL PIPETTE (10433+10425+10026OTP)","textChars":48,"textLines":1,"bbox":[834,280,230,28]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":1,"text":"FAIL closed / HOLD","textPreview":"FAIL closed / HOLD","textChars":18,"textLines":1,"bbox":[1058,251,132,24]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":1,"text":"Units","textPreview":"Units","textChars":5,"textLines":1,"bbox":[836,321,70,16]}
+{"kind":"textbox","id":"sh/lwval87e","slide":1,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[836,341,72,30]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":1,"text":"Endpoint","textPreview":"Endpoint","textChars":8,"textLines":1,"bbox":[914,321,70,16]}
+{"kind":"textbox","id":"sh/32lszqtc","slide":1,"text":"3/5","textPreview":"3/5","textChars":3,"textLines":1,"bbox":[914,341,72,30]}
+{"kind":"textbox","id":"sh/ahoza1gv","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[992,321,70,16]}
+{"kind":"textbox","id":"sh/knih4byh","slide":1,"text":"2/5","textPreview":"2/5","textChars":3,"textLines":1,"bbox":[992,341,72,30]}
+{"kind":"textbox","id":"sh/d8bat47y","slide":1,"text":"Pass rate","textPreview":"Pass rate","textChars":9,"textLines":1,"bbox":[1070,321,70,16]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":1,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[1070,341,72,30]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":1,"text":"Risk/Fail","textPreview":"Risk/Fail","textChars":9,"textLines":1,"bbox":[1148,321,70,16]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":1,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[1148,341,72,30]}
+{"kind":"textbox","id":"sh/d0z61032","slide":1,"text":"Completion","textPreview":"Completion","textChars":10,"textLines":1,"bbox":[836,393,105,18]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":1,"text":"60%","textPreview":"60%","textChars":3,"textLines":1,"bbox":[944,393,52,18]}
+{"kind":"shape","id":"sh/vu9knih4","slide":1,"bbox":[836,416,160,11]}
+{"kind":"shape","id":"sh/k3q5o7qp","slide":1,"bbox":[836,416,96,11]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":1,"text":"PASS rate","textPreview":"PASS rate","textChars":9,"textLines":1,"bbox":[1032,393,105,18]}
+{"kind":"textbox","id":"sh/9knih4by","slide":1,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[1140,393,52,18]}
+{"kind":"shape","id":"sh/kzupwb2h","slide":1,"bbox":[1032,416,160,11]}
+{"kind":"shape","id":"sh/re1w7mp0","slide":1,"bbox":[1032,416,64,11]}
+{"kind":"textbox","id":"sh/2t83itgf","slide":1,"text":"3 units reached 1,020,000 cycles; 2 stopped at 150%-175%","textPreview":"3 units reached 1,020,000 cycles; 2 stopped at 150%-175%","textChars":56,"textLines":1,"bbox":[836,441,362,22]}
+{"kind":"shape","id":"sh/9w3m94fu","slide":1,"bbox":[840,482,8,8]}
+{"kind":"textbox","id":"sh/kb6xkf6d","slide":1,"text":"Workload: 5 units included; coverage from 0 to 1,020,000 cycles, with 2 STOP/FAIL units.","textPreview":"Workload: 5 units included; coverage from 0 to 1,020,000 cycles, with 2 STOP/FAIL units.","textChars":88,"textLines":1,"bbox":[858,476,334,36]}
+{"kind":"shape","id":"sh/rqd4vmtw","slide":1,"bbox":[840,518,8,8]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":1,"text":"Pass rate: 2/5 PASS; 1 QC risk; 2 units have analysis reports and closed Fail disposition.","textPreview":"Pass rate: 2/5 PASS; 1 QC risk; 2 units have analysis reports and closed Fail disposition.","textChars":90,"textLines":1,"bbox":[858,512,334,36]}
+{"kind":"shape","id":"sh/94fu18jq","slide":1,"bbox":[840,554,8,8]}
+{"kind":"textbox","id":"sh/kjm1cfa9","slide":1,"text":"Main risks: D3/G9 low aspiration, E10/B7 no aspiration, leakage, and 4.16% CV at 1,020,000 cycles.","textPreview":"Main risks: D3/G9 low aspiration, E10/B7 no aspiration, leakage, and 4.16% CV at 1,020,000 cycles.","textChars":98,"textLines":1,"bbox":[858,548,334,36]}
+{"kind":"shape","id":"sh/udg7adsj","slide":1,"bbox":[56,604,1166,76]}
+{"kind":"textbox","id":"sh/nyd0z610","slide":1,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[84,628,108,28]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":1,"text":"Mold Oring aging validation shows a clear lifetime improvement: compared with the original 270,000-cycle design life, current units passed 1,020,000-1,085,000 cycles, reaching about 3.8-4.0x life (approximately 278%-302% improvement). Mold Oring should be advanced as the lifetime-improvement direction; the two OTP-O ring failures have been analyzed/closed as Fail and should not be treated as a passing solution.","textPreview":"Mold Oring aging validation shows a clear lifetime improvement: compared with the original 270,000-cycle design life, current units passe...","textChars":414,"textLines":1,"bbox":[220,612,930,52]}
+{"kind":"textbox","id":"sh/54zidony","slide":1,"text":"Note: Some P2HHV32 rows in the aging summary table lag behind; final statistics use the latest RD detail nodes.","textPreview":"Note: Some P2HHV32 rows in the aging summary table lag behind; final statistics use the latest RD detail nodes.","textChars":111,"textLines":1,"bbox":[790,682,430,18]}
+{"kind":"notes","id":"nt/8vj7mz","slide":1,"text":""}

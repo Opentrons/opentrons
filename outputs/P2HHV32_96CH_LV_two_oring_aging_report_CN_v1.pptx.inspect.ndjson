@@ -1,0 +1,473 @@
+{"kind":"deck","id":"pr/5vtj7z","name":"Deck"}
+{"kind":"layout","layoutId":"8c9cff36-39b1-403a-ae1d-ab147d1599c6","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"f49b36da-23fe-4bcb-b281-b6643334a5e3","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/hbau8a","slide":1,"title":"96CH LV 老化测试结果总览","textShapes":55}
+{"kind":"shape","id":"sh/vixczed8","slide":1,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":1,"text":"96CH LV 老化测试结果总览","textPreview":"96CH LV 老化测试结果总览","textChars":16,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/6psfil0r","slide":1,"text":"管理层视角：测试工作量、通过率、方案选择与最终结论","textPreview":"管理层视角：测试工作量、通过率、方案选择与最终结论","textChars":25,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/val87ed8","slide":1,"bbox":[56,122,150,78]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":1,"text":"覆盖类型","textPreview":"覆盖类型","textChars":4,"textLines":1,"bbox":[71,134,120,18]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":1,"text":"2 类","textPreview":"2 类","textChars":3,"textLines":1,"bbox":[71,159,120,32]}
+{"kind":"shape","id":"sh/2lszqtcj","slide":1,"bbox":[226,122,170,78]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":1,"text":"跑测样机","textPreview":"跑测样机","textChars":4,"textLines":1,"bbox":[241,134,140,18]}
+{"kind":"textbox","id":"sh/bq1oryts","slide":1,"text":"19 台","textPreview":"19 台","textChars":4,"textLines":1,"bbox":[241,159,140,32]}
+{"kind":"shape","id":"sh/m58z25kb","slide":1,"bbox":[416,122,180,78]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":1,"text":"到达终点","textPreview":"到达终点","textChars":4,"textLines":1,"bbox":[431,134,150,18]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":1,"text":"16 台","textPreview":"16 台","textChars":4,"textLines":1,"bbox":[431,159,150,32]}
+{"kind":"shape","id":"sh/b2hwfyxo","slide":1,"bbox":[616,122,214,78]}
+{"kind":"textbox","id":"sh/mhk3q5o7","slide":1,"text":"PASS / 总通过率","textPreview":"PASS / 总通过率","textChars":11,"textLines":1,"bbox":[631,134,184,18]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":1,"text":"15 台 / 79%","textPreview":"15 台 / 79%","textChars":10,"textLines":1,"bbox":[631,159,184,32]}
+{"kind":"shape","id":"sh/4nap4r65","slide":1,"bbox":[850,122,170,78]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":1,"text":"风险复核","textPreview":"风险复核","textChars":4,"textLines":1,"bbox":[865,134,140,18]}
+{"kind":"textbox","id":"sh/mp0bi9s3","slide":1,"text":"2 项","textPreview":"2 项","textChars":3,"textLines":1,"bbox":[865,159,140,32]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":1,"bbox":[1040,122,180,78]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":1,"text":"Fail 已闭环","textPreview":"Fail 已闭环","textChars":8,"textLines":1,"bbox":[1055,134,150,18]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":1,"text":"2 台","textPreview":"2 台","textChars":3,"textLines":1,"bbox":[1055,159,150,32]}
+{"kind":"shape","id":"sh/1kre1w7m","slide":1,"bbox":[56,232,278,354]}
+{"kind":"textbox","id":"sh/ulwval87","slide":1,"text":"我们做了什么","textPreview":"我们做了什么","textChars":6,"textLines":1,"bbox":[82,260,180,28]}
+{"kind":"shape","id":"sh/j6tovaho","slide":1,"bbox":[90,321,7,7]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":1,"text":"按指定 SN 清单复核 19 台样机，统一归为 Mold Oring 与 OTP-O ring 两类。","textPreview":"按指定 SN 清单复核 19 台样机，统一归为 Mold Oring 与 OTP-O ring 两类。","textChars":51,"textLines":1,"bbox":[107,315,203,42]}
+{"kind":"shape","id":"sh/1cfa9w3m","slide":1,"bbox":[90,392,7,7]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":1,"text":"逐台检查最高老化节点、CV、最差通道 CV、LOW %D、吸液/不吸液与泄漏备注。","textPreview":"逐台检查最高老化节点、CV、最差通道 CV、LOW %D、吸液/不吸液与泄漏备注。","textChars":41,"textLines":1,"bbox":[107,386,203,42]}
+{"kind":"shape","id":"sh/j2t83itg","slide":1,"bbox":[90,480,7,7]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":1,"text":"覆盖 0 到 1,020,000/1,085,000 次老化节点；16 台跑到终点，15 台计入 PASS。","textPreview":"覆盖 0 到 1,020,000/1,085,000 次老化节点；16 台跑到终点，15 台计入 PASS。","textChars":54,"textLines":1,"bbox":[107,474,203,42]}
+{"kind":"textbox","id":"sh/0z61032l","slide":1,"text":"核心工作量：19 台 × 多节点验证","textPreview":"核心工作量：19 台 × 多节点验证","textChars":18,"textLines":1,"bbox":[82,543,224,26]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":1,"bbox":[362,232,410,354]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":1,"text":"类型 1：Mold Oring","textPreview":"类型 1：Mold Oring","textChars":15,"textLines":1,"bbox":[384,250,280,25]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":1,"text":"推荐推进","textPreview":"推荐推进","textChars":4,"textLines":1,"bbox":[626,251,120,24]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":1,"text":"样机","textPreview":"样机","textChars":2,"textLines":1,"bbox":[384,304,70,16]}
+{"kind":"textbox","id":"sh/72x4nap4","slide":1,"text":"14 台","textPreview":"14 台","textChars":4,"textLines":1,"bbox":[384,326,78,28]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":1,"text":"终点","textPreview":"终点","textChars":2,"textLines":1,"bbox":[475.5,304,70,16]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":1,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[475.5,326,78,28]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[567,304,70,16]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":1,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[567,326,78,28]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[658.5,304,70,16]}
+{"kind":"textbox","id":"sh/6psfil0r","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[658.5,326,78,28]}
+{"kind":"textbox","id":"sh/val87ed8","slide":1,"text":"完成率","textPreview":"完成率","textChars":3,"textLines":1,"bbox":[386,376,110,18]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[485,376,56,18]}
+{"kind":"shape","id":"sh/donyd0z6","slide":1,"bbox":[386,399,155,11]}
+{"kind":"shape","id":"sh/2x4nap4r","slide":1,"bbox":[386,399,144.15,11]}
+{"kind":"textbox","id":"sh/vixczed8","slide":1,"text":"PASS 率","textPreview":"PASS 率","textChars":6,"textLines":1,"bbox":[576,376,110,18]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[675,376,56,18]}
+{"kind":"shape","id":"sh/d0z61032","slide":1,"bbox":[576,399,155,11]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":1,"bbox":[576,399,144.15,11]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":1,"text":"1,020,000-1,085,000 次","textPreview":"1,020,000-1,085,000 次","textChars":21,"textLines":1,"bbox":[386,422,362,20]}
+{"kind":"shape","id":"sh/h4byhgn2","slide":1,"bbox":[390,466,7,7]}
+{"kind":"textbox","id":"sh/sji5snel","slide":1,"text":"通过率与完成度均高；已验证到原设计寿命约 3.8-4.0 倍。","textPreview":"通过率与完成度均高；已验证到原设计寿命约 3.8-4.0 倍。","textChars":31,"textLines":1,"bbox":[407,460,335,42]}
+{"kind":"shape","id":"sh/3m94fu18","slide":1,"bbox":[390,516,7,7]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":1,"text":"剩余 1 项风险复核：0407A01 D2 漏液/O-ring replacement。","textPreview":"剩余 1 项风险复核：0407A01 D2 漏液/O-ring replacement。","textChars":44,"textLines":1,"bbox":[407,510,335,42]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":1,"bbox":[812,232,410,354]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":1,"text":"类型 2：OTP-O ring","textPreview":"类型 2：OTP-O ring","textChars":15,"textLines":1,"bbox":[834,250,280,25]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":1,"text":"不建议作为通过方案","textPreview":"不建议作为通过方案","textChars":9,"textLines":1,"bbox":[1076,251,120,24]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":1,"text":"样机","textPreview":"样机","textChars":2,"textLines":1,"bbox":[834,304,70,16]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":1,"text":"5 台","textPreview":"5 台","textChars":3,"textLines":1,"bbox":[834,326,78,28]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":1,"text":"终点","textPreview":"终点","textChars":2,"textLines":1,"bbox":[925.5,304,70,16]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":1,"text":"3/5","textPreview":"3/5","textChars":3,"textLines":1,"bbox":[925.5,326,78,28]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[1017,304,70,16]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":1,"text":"2/5","textPreview":"2/5","textChars":3,"textLines":1,"bbox":[1017,326,78,28]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[1108.5,304,70,16]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":1,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[1108.5,326,78,28]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":1,"text":"完成率","textPreview":"完成率","textChars":3,"textLines":1,"bbox":[836,376,110,18]}
+{"kind":"textbox","id":"sh/y1kre1w7","slide":1,"text":"60%","textPreview":"60%","textChars":3,"textLines":1,"bbox":[935,376,56,18]}
+{"kind":"shape","id":"sh/rmhk3q5o","slide":1,"bbox":[836,399,155,11]}
+{"kind":"shape","id":"sh/dsji5sne","slide":1,"bbox":[836,399,93,11]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":1,"text":"PASS 率","textPreview":"PASS 率","textChars":6,"textLines":1,"bbox":[1026,376,110,18]}
+{"kind":"textbox","id":"sh/vmtwra5g","slide":1,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[1125,376,56,18]}
+{"kind":"shape","id":"sh/61032lsz","slide":1,"bbox":[1026,399,155,11]}
+{"kind":"shape","id":"sh/d4vmtwra","slide":1,"bbox":[1026,399,62,11]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":1,"text":"3 台到 1,020,000 次；2 台 150%-175% 停止","textPreview":"3 台到 1,020,000 次；2 台 150%-175% 停止","textChars":33,"textLines":1,"bbox":[836,422,362,20]}
+{"kind":"shape","id":"sh/vy90je9c","slide":1,"bbox":[840,466,7,7]}
+{"kind":"textbox","id":"sh/6dcbulwv","slide":1,"text":"通过率低，且 2 台 Fail 已完成分析和闭环。","textPreview":"通过率低，且 2 台 Fail 已完成分析和闭环。","textChars":25,"textLines":1,"bbox":[857,460,335,42]}
+{"kind":"shape","id":"sh/d8v6psfi","slide":1,"bbox":[840,516,7,7]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":1,"text":"风险集中在吸液少、不吸液、泄漏率异常、392% CV 超 QC 限值。","textPreview":"风险集中在吸液少、不吸液、泄漏率异常、392% CV 超 QC 限值。","textChars":35,"textLines":1,"bbox":[857,510,335,42]}
+{"kind":"shape","id":"sh/gfmlkjm1","slide":1,"bbox":[56,610,1166,74]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":1,"text":"最终结论","textPreview":"最终结论","textChars":4,"textLines":1,"bbox":[82,633,104,28]}
+{"kind":"textbox","id":"sh/yd0z6103","slide":1,"text":"Mold Oring 已通过 1,020,000-1,085,000 次验证，相比原设计寿命 270,000 次达到约 3.8-4.0 倍（提升约 278%-302%）；建议作为寿命提升方向推进。OTP-O ring 两台失效已完成分析闭环并判定 Fail，不建议作为通过方案。","textPreview":"Mold Oring 已通过 1,020,000-1,085,000 次验证，相比原设计寿命 270,000 次达到约 3.8-4.0 倍（提升约 278%-302%）；建议作为寿命提升方向推进。OTP-O ring 两台失效已完成分析闭环并判定 Fail，不建议作为通过方案。","textChars":139,"textLines":1,"bbox":[205,628,965,38]}
+{"kind":"image","id":"im/9s36hcrm","slide":1,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/hbau8a","slide":1,"text":""}
+{"kind":"slide","id":"sl/e7nxy8","slide":2,"title":"测试范围与判定口径","textShapes":18}
+{"kind":"shape","id":"sh/72x4nap4","slide":2,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":2,"text":"测试范围与判定口径","textPreview":"测试范围与判定口径","textChars":9,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":2,"text":"报告把原始测试记录转成老板可直接决策的 PASS / Risk / Fail closed 口径","textPreview":"报告把原始测试记录转成老板可直接决策的 PASS / Risk / Fail closed 口径","textChars":48,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":2,"bbox":[56,122,350,122]}
+{"kind":"textbox","id":"sh/0z61032l","slide":2,"text":"测试对象","textPreview":"测试对象","textChars":4,"textLines":1,"bbox":[78,146,106,26]}
+{"kind":"textbox","id":"sh/pkzupwb2","slide":2,"text":"2 种 O-ring 类型\n19 台 96CH LV 移液器","textPreview":"2 种 O-ring 类型 | 19 台 96CH LV 移液器","textChars":30,"textLines":2,"bbox":[80,184,298,44]}
+{"kind":"shape","id":"sh/i5sneloj","slide":2,"bbox":[446,122,350,122]}
+{"kind":"textbox","id":"sh/7qpg3ex0","slide":2,"text":"老化覆盖","textPreview":"老化覆盖","textChars":4,"textLines":1,"bbox":[468,146,106,26]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":2,"text":"0 → 1,020,000 / 1,085,000 次\n16 台到达终点","textPreview":"0 → 1,020,000 / 1,085,000 次 | 16 台到达终点","textChars":36,"textLines":2,"bbox":[470,184,298,44]}
+{"kind":"shape","id":"sh/m94fu18j","slide":2,"bbox":[836,122,350,122]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":2,"text":"判定状态","textPreview":"判定状态","textChars":4,"textLines":1,"bbox":[858,146,106,26]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":2,"text":"PASS / Risk review / Fail closed\n避免混淆待闭环与已闭环 Fail","textPreview":"PASS / Risk review / Fail closed | 避免混淆待闭环与已闭环 Fail","textChars":49,"textLines":2,"bbox":[860,184,298,44]}
+{"kind":"shape","id":"sh/fil0rqd4","slide":2,"bbox":[56,280,548,292]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":2,"text":"统一规格口径","textPreview":"统一规格口径","textChars":6,"textLines":1,"bbox":[84,309,220,28]}
+{"kind":"shape","id":"sh/xobm58z2","slide":2,"bbox":[90,371,7,7]}
+{"kind":"textbox","id":"sh/83itgfml","slide":2,"text":"CV：QC 限值 4%；客户限值 5%。","textPreview":"CV：QC 限值 4%；客户限值 5%。","textChars":20,"textLines":1,"bbox":[107,365,433,42]}
+{"kind":"shape","id":"sh/fepkzupw","slide":2,"bbox":[90,427,7,7]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":2,"text":"最差通道 CV：QC 限值 5.6%；客户限值 7%。","textPreview":"最差通道 CV：QC 限值 5.6%；客户限值 7%。","textChars":27,"textLines":1,"bbox":[107,421,433,42]}
+{"kind":"shape","id":"sh/u18jqh0f","slide":2,"bbox":[90,483,7,7]}
+{"kind":"textbox","id":"sh/jm1cfa9w","slide":2,"text":"LOW %D、吸液少、不吸液、泄漏率异常作为风险备注进入单台结论。","textPreview":"LOW %D、吸液少、不吸液、泄漏率异常作为风险备注进入单台结论。","textChars":33,"textLines":1,"bbox":[107,477,433,42]}
+{"kind":"shape","id":"sh/c7u54zid","slide":2,"bbox":[636,280,586,292]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":2,"text":"本次关键判定调整","textPreview":"本次关键判定调整","textChars":8,"textLines":1,"bbox":[665,309,250,28]}
+{"kind":"shape","id":"sh/u9knih4b","slide":2,"bbox":[670,369,7,7]}
+{"kind":"textbox","id":"sh/judg7ads","slide":2,"text":"P2HHV3120250702A03：H3 low %D，按通过移液器计入。","textPreview":"P2HHV3120250702A03：H3 low %D，按通过移液器计入。","textChars":38,"textLines":1,"bbox":[687,363,483,42]}
+{"kind":"shape","id":"sh/cfa9w3m9","slide":2,"bbox":[670,420,7,7]}
+{"kind":"textbox","id":"sh/1032lszq","slide":2,"text":"P2HHV3220250410A04：复位开关损伤，按通过移液器计入。","textPreview":"P2HHV3220250410A04：复位开关损伤，按通过移液器计入。","textChars":35,"textLines":1,"bbox":[687,414,483,42]}
+{"kind":"shape","id":"sh/udg7adsj","slide":2,"bbox":[670,471,7,7]}
+{"kind":"textbox","id":"sh/nyd0z610","slide":2,"text":"P2HHV3220250627A02 / A03：已有分析报告和闭环，归为 Fail closed。","textPreview":"P2HHV3220250627A02 / A03：已有分析报告和闭环，归为 Fail closed。","textChars":50,"textLines":1,"bbox":[687,465,483,42]}
+{"kind":"shape","id":"sh/94fu18jq","slide":2,"bbox":[670,522,7,7]}
+{"kind":"textbox","id":"sh/kjm1cfa9","slide":2,"text":"Mold Oring + Molded Plunger Seal 统一归为 Mold Oring，不再拆分。","textPreview":"Mold Oring + Molded Plunger Seal 统一归为 Mold Oring，不再拆分。","textChars":54,"textLines":1,"bbox":[687,516,483,42]}
+{"kind":"shape","id":"sh/r2p8nqxs","slide":2,"bbox":[56,605,1166,62]}
+{"kind":"textbox","id":"sh/2hwfyxob","slide":2,"text":"呈现原则：主报告突出工作量、通过率和设计决策；单台数据作为支撑页和附录，不放在第一页干扰结论。","textPreview":"呈现原则：主报告突出工作量、通过率和设计决策；单台数据作为支撑页和附录，不放在第一页干扰结论。","textChars":47,"textLines":1,"bbox":[86,626,1080,24]}
+{"kind":"image","id":"im/9w3m94fu","slide":2,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/e7nxy8","slide":2,"text":""}
+{"kind":"slide","id":"sl/6hpgqe","slide":3,"title":"两种 O-ring 类型对比","textShapes":33}
+{"kind":"shape","id":"sh/dsji5sne","slide":3,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/vmtwra5g","slide":3,"text":"两种 O-ring 类型对比","textPreview":"两种 O-ring 类型对比","textChars":14,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":3,"text":"Mold Oring 完成度和通过率明显优于 OTP-O ring，是更适合推进的寿命提升方向","textPreview":"Mold Oring 完成度和通过率明显优于 OTP-O ring，是更适合推进的寿命提升方向","textChars":47,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/d4vmtwra","slide":3,"bbox":[64,126,1090,146]}
+{"kind":"shape","id":"sh/6dcbulwv","slide":3,"bbox":[64,126,210,38]}
+{"kind":"textbox","id":"sh/vy90je9c","slide":3,"text":"类型","textPreview":"类型","textChars":2,"textLines":1,"bbox":[71,134,196,18]}
+{"kind":"shape","id":"sh/onyd0z61","slide":3,"bbox":[274,126,105,38]}
+{"kind":"textbox","id":"sh/d8v6psfi","slide":3,"text":"样机数","textPreview":"样机数","textChars":3,"textLines":1,"bbox":[281,134,91,18]}
+{"kind":"shape","id":"sh/twra5gbq","slide":3,"bbox":[379,126,130,38]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":3,"text":"到达终点","textPreview":"到达终点","textChars":4,"textLines":1,"bbox":[386,134,116,18]}
+{"kind":"shape","id":"sh/bq1oryts","slide":3,"bbox":[509,126,120,38]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":3,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[516,134,106,18]}
+{"kind":"shape","id":"sh/t83itgfm","slide":3,"bbox":[629,126,120,38]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":3,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[636,134,106,18]}
+{"kind":"shape","id":"sh/b2hwfyxo","slide":3,"bbox":[749,126,180,38]}
+{"kind":"textbox","id":"sh/mhk3q5o7","slide":3,"text":"风险/Fail","textPreview":"风险/Fail","textChars":7,"textLines":1,"bbox":[756,134,166,18]}
+{"kind":"shape","id":"sh/tgfmlkjm","slide":3,"bbox":[929,126,225,38]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":3,"text":"建议","textPreview":"建议","textChars":2,"textLines":1,"bbox":[936,134,211,18]}
+{"kind":"shape","id":"sh/gr2p8nqx","slide":3,"bbox":[64,164,210,54]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":3,"text":"Mold Oring","textPreview":"Mold Oring","textChars":10,"textLines":1,"bbox":[71,171,196,46]}
+{"kind":"shape","id":"sh/ylc7u54z","slide":3,"bbox":[274,164,105,54]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":3,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[281,171,91,46]}
+{"kind":"shape","id":"sh/g3ex0nux","slide":3,"bbox":[379,164,130,54]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":3,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[386,171,116,46]}
+{"kind":"shape","id":"sh/yxobm58z","slide":3,"bbox":[509,164,120,54]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":3,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[516,171,106,46]}
+{"kind":"shape","id":"sh/g7adsji5","slide":3,"bbox":[629,164,120,54]}
+{"kind":"textbox","id":"sh/9s36hcrm","slide":3,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[636,171,106,46]}
+{"kind":"shape","id":"sh/vy90je9c","slide":3,"bbox":[749,164,180,54]}
+{"kind":"textbox","id":"sh/6dcbulwv","slide":3,"text":"1 Risk","textPreview":"1 Risk","textChars":6,"textLines":1,"bbox":[756,171,166,46]}
+{"kind":"shape","id":"sh/d4vmtwra","slide":3,"bbox":[929,164,225,54]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":3,"text":"推荐推进","textPreview":"推荐推进","textChars":4,"textLines":1,"bbox":[936,171,211,46]}
+{"kind":"shape","id":"sh/vmtwra5g","slide":3,"bbox":[64,218,210,54]}
+{"kind":"textbox","id":"sh/61032lsz","slide":3,"text":"OTP-O ring","textPreview":"OTP-O ring","textChars":10,"textLines":1,"bbox":[71,225,196,46]}
+{"kind":"shape","id":"sh/dsji5sne","slide":3,"bbox":[274,218,105,54]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":3,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[281,225,91,46]}
+{"kind":"shape","id":"sh/vahoza1g","slide":3,"bbox":[379,218,130,54]}
+{"kind":"textbox","id":"sh/6tovahoz","slide":3,"text":"3/5","textPreview":"3/5","textChars":3,"textLines":1,"bbox":[386,225,116,46]}
+{"kind":"shape","id":"sh/mtwra5gb","slide":3,"bbox":[509,218,120,54]}
+{"kind":"textbox","id":"sh/fepkzupw","slide":3,"text":"2/5","textPreview":"2/5","textChars":3,"textLines":1,"bbox":[516,225,106,46]}
+{"kind":"shape","id":"sh/4zidonyd","slide":3,"bbox":[629,218,120,54]}
+{"kind":"textbox","id":"sh/xkf6dcbu","slide":3,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[636,225,106,46]}
+{"kind":"shape","id":"sh/mlkjm1cf","slide":3,"bbox":[749,218,180,54]}
+{"kind":"textbox","id":"sh/f6dcbulw","slide":3,"text":"1 Risk + 2 Fail","textPreview":"1 Risk + 2 Fail","textChars":15,"textLines":1,"bbox":[756,225,166,46]}
+{"kind":"shape","id":"sh/4r65wjud","slide":3,"bbox":[929,218,225,54]}
+{"kind":"textbox","id":"sh/xc3ylc7u","slide":3,"text":"不建议通过","textPreview":"不建议通过","textChars":5,"textLines":1,"bbox":[936,225,211,46]}
+{"kind":"shape","id":"sh/m94fu18j","slide":3,"bbox":[64,314,548,260]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":3,"text":"PASS 率对比","textPreview":"PASS 率对比","textChars":8,"textLines":1,"bbox":[92,342,220,28]}
+{"kind":"textbox","id":"sh/1032lszq","slide":3,"text":"Mold Oring","textPreview":"Mold Oring","textChars":10,"textLines":1,"bbox":[96,398,120,22]}
+{"kind":"textbox","id":"sh/cfa9w3m9","slide":3,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[551,398,55,22]}
+{"kind":"shape","id":"sh/judg7ads","slide":3,"bbox":[226,403,315,13]}
+{"kind":"shape","id":"sh/u9knih4b","slide":3,"bbox":[226,403,292.95,13]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":3,"text":"OTP-O ring","textPreview":"OTP-O ring","textChars":10,"textLines":1,"bbox":[96,470,120,22]}
+{"kind":"textbox","id":"sh/c7u54zid","slide":3,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[551,470,55,22]}
+{"kind":"shape","id":"sh/jm1cfa9w","slide":3,"bbox":[226,475,315,13]}
+{"kind":"shape","id":"sh/u18jqh0f","slide":3,"bbox":[226,475,126,13]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":3,"text":"Mold Oring 的通过率比 OTP-O ring 高 53 个百分点。","textPreview":"Mold Oring 的通过率比 OTP-O ring 高 53 个百分点。","textChars":38,"textLines":1,"bbox":[96,535,430,24]}
+{"kind":"shape","id":"sh/cvixczed","slide":3,"bbox":[646,314,576,260]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":3,"text":"异常模式差异","textPreview":"异常模式差异","textChars":6,"textLines":1,"bbox":[676,342,230,28]}
+{"kind":"shape","id":"sh/1kre1w7m","slide":3,"bbox":[682,398,7,7]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":3,"text":"Mold Oring：整体跑到终点比例高，主要剩余问题为单台 D2 漏液/O-ring replacement 风险复核。","textPreview":"Mold Oring：整体跑到终点比例高，主要剩余问题为单台 D2 漏液/O-ring replacement 风险复核。","textChars":61,"textLines":1,"bbox":[699,392,475,42]}
+{"kind":"shape","id":"sh/ji5snelo","slide":3,"bbox":[682,471,7,7]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":3,"text":"OTP-O ring：存在吸液少、不吸液、泄漏率高，以及 392% CV 4.16% 超 QC 限值。","textPreview":"OTP-O ring：存在吸液少、不吸液、泄漏率高，以及 392% CV 4.16% 超 QC 限值。","textChars":51,"textLines":1,"bbox":[699,465,475,42]}
+{"kind":"shape","id":"sh/1cfa9w3m","slide":3,"bbox":[682,544,7,7]}
+{"kind":"textbox","id":"sh/ulwval87","slide":3,"text":"因此比较结论不是单纯“谁数据更漂亮”，而是 Mold Oring 已形成可推进的寿命验证证据。","textPreview":"因此比较结论不是单纯“谁数据更漂亮”，而是 Mold Oring 已形成可推进的寿命验证证据。","textChars":47,"textLines":1,"bbox":[699,538,475,42]}
+{"kind":"image","id":"im/72x4nap4","slide":3,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/6hpgqe","slide":3,"text":""}
+{"kind":"slide","id":"sl/f7oe7m","slide":4,"title":"寿命提升验证结果","textShapes":18}
+{"kind":"shape","id":"sh/72x4nap4","slide":4,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":4,"text":"寿命提升验证结果","textPreview":"寿命提升验证结果","textChars":8,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":4,"text":"把 392% / 417% 转成实际次数，更适合管理层理解寿命提升","textPreview":"把 392% / 417% 转成实际次数，更适合管理层理解寿命提升","textChars":33,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":4,"bbox":[64,126,650,430]}
+{"kind":"textbox","id":"sh/0z61032l","slide":4,"text":"原设计寿命 vs 已验证寿命","textPreview":"原设计寿命 vs 已验证寿命","textChars":14,"textLines":1,"bbox":[92,154,330,28]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":4,"bbox":[120,427.35,92,74.65]}
+{"kind":"textbox","id":"sh/i5sneloj","slide":4,"text":"270,000","textPreview":"270,000","textChars":7,"textLines":1,"bbox":[102,397.35,130,22]}
+{"kind":"textbox","id":"sh/7qpg3ex0","slide":4,"text":"原设计","textPreview":"原设计","textChars":3,"textLines":1,"bbox":[102,516,130,22]}
+{"kind":"shape","id":"sh/fu18jqh0","slide":4,"bbox":[290,219.97,92,282.03]}
+{"kind":"textbox","id":"sh/m94fu18j","slide":4,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[272,189.97,130,22]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":4,"text":"392%","textPreview":"392%","textChars":4,"textLines":1,"bbox":[272,516,130,22]}
+{"kind":"shape","id":"sh/4fu18jqh","slide":4,"bbox":[460,202,92,300]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":4,"text":"1,085,000","textPreview":"1,085,000","textChars":9,"textLines":1,"bbox":[442,172,130,22]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":4,"text":"417%","textPreview":"417%","textChars":4,"textLines":1,"bbox":[442,516,130,22]}
+{"kind":"shape","id":"sh/xobm58z2","slide":4,"bbox":[100,502,520,1.5]}
+{"kind":"shape","id":"sh/83itgfml","slide":4,"bbox":[750,126,472,430]}
+{"kind":"textbox","id":"sh/fepkzupw","slide":4,"text":"量化结论","textPreview":"量化结论","textChars":4,"textLines":1,"bbox":[780,154,220,30]}
+{"kind":"shape","id":"sh/mtwra5gb","slide":4,"bbox":[782,214,186,82]}
+{"kind":"textbox","id":"sh/u18jqh0f","slide":4,"text":"已验证寿命下限","textPreview":"已验证寿命下限","textChars":7,"textLines":1,"bbox":[797,226,156,18]}
+{"kind":"textbox","id":"sh/jm1cfa9w","slide":4,"text":"1,020,000 次","textPreview":"1,020,000 次","textChars":11,"textLines":1,"bbox":[797,251,156,32]}
+{"kind":"shape","id":"sh/c7u54zid","slide":4,"bbox":[1000,214,186,82]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":4,"text":"已验证寿命上限","textPreview":"已验证寿命上限","textChars":7,"textLines":1,"bbox":[1015,226,156,18]}
+{"kind":"textbox","id":"sh/u9knih4b","slide":4,"text":"1,085,000 次","textPreview":"1,085,000 次","textChars":11,"textLines":1,"bbox":[1015,251,156,32]}
+{"kind":"shape","id":"sh/judg7ads","slide":4,"bbox":[786,338,7,7]}
+{"kind":"textbox","id":"sh/cfa9w3m9","slide":4,"text":"相对 270,000 次原设计寿命，已达到约 3.8-4.0 倍。","textPreview":"相对 270,000 次原设计寿命，已达到约 3.8-4.0 倍。","textChars":33,"textLines":1,"bbox":[803,332,343,42]}
+{"kind":"shape","id":"sh/1032lszq","slide":4,"bbox":[786,398,7,7]}
+{"kind":"textbox","id":"sh/udg7adsj","slide":4,"text":"等效寿命提升约 278%-302%。","textPreview":"等效寿命提升约 278%-302%。","textChars":18,"textLines":1,"bbox":[803,392,343,42]}
+{"kind":"shape","id":"sh/nyd0z610","slide":4,"bbox":[786,458,7,7]}
+{"kind":"textbox","id":"sh/94fu18jq","slide":4,"text":"推荐在管理层材料中直接使用次数，不只写 392% / 417%。","textPreview":"推荐在管理层材料中直接使用次数，不只写 392% / 417%。","textChars":32,"textLines":1,"bbox":[803,452,343,42]}
+{"kind":"shape","id":"sh/kjm1cfa9","slide":4,"bbox":[64,598,1158,62]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":4,"text":"建议表述：Mold Oring 已通过 1,020,000-1,085,000 次验证，寿命验证水平达到原设计寿命约 3.8-4.0 倍。","textPreview":"建议表述：Mold Oring 已通过 1,020,000-1,085,000 次验证，寿命验证水平达到原设计寿命约 3.8-4.0 倍。","textChars":69,"textLines":1,"bbox":[92,618,1088,24]}
+{"kind":"image","id":"im/1032lszq","slide":4,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/f7oe7m","slide":4,"text":""}
+{"kind":"slide","id":"sl/li44mu","slide":5,"title":"异常、Fail 与闭环说明","textShapes":15}
+{"kind":"shape","id":"sh/tsvu9kni","slide":5,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/bm58z25k","slide":5,"text":"异常、Fail 与闭环说明","textPreview":"异常、Fail 与闭环说明","textChars":13,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":5,"text":"将异常按决策状态拆分，避免把已闭环 Fail、风险复核和通过样机混在一起","textPreview":"将异常按决策状态拆分，避免把已闭环 Fail、风险复核和通过样机混在一起","textChars":36,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/tgfmlkjm","slide":5,"bbox":[56,136,366,420]}
+{"kind":"textbox","id":"sh/mp0bi9s3","slide":5,"text":"Fail closed","textPreview":"Fail closed","textChars":11,"textLines":1,"bbox":[82,164,142,28]}
+{"kind":"shape","id":"sh/bat47y1k","slide":5,"bbox":[88,232,7,7]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":5,"text":"P2HHV3220250627A02：D3/G9 吸液少；175% CV 6.83%；已有分析与闭环。","textPreview":"P2HHV3220250627A02：D3/G9 吸液少；175% CV 6.83%；已有分析与闭环。","textChars":51,"textLines":1,"bbox":[105,226,283,42]}
+{"kind":"shape","id":"sh/t83itgfm","slide":5,"bbox":[88,326,7,7]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":5,"text":"P2HHV3220250627A03：E10/B7 不吸液；泄漏率高；已有分析与闭环。","textPreview":"P2HHV3220250627A03：E10/B7 不吸液；泄漏率高；已有分析与闭环。","textChars":43,"textLines":1,"bbox":[105,320,283,42]}
+{"kind":"shape","id":"sh/gvy90je9","slide":5,"bbox":[88,420,7,7]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":5,"text":"两台均属于 OTP-O ring，最终统计归为 Fail。","textPreview":"两台均属于 OTP-O ring，最终统计归为 Fail。","textChars":29,"textLines":1,"bbox":[105,414,283,42]}
+{"kind":"shape","id":"sh/2p8nqxs7","slide":5,"bbox":[454,136,366,420]}
+{"kind":"textbox","id":"sh/94fu18jq","slide":5,"text":"Risk review","textPreview":"Risk review","textChars":11,"textLines":1,"bbox":[480,164,142,28]}
+{"kind":"shape","id":"sh/kjm1cfa9","slide":5,"bbox":[486,232,7,7]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":5,"text":"P2HHV3120250407A01：D2 漏液 / O-ring replacement，作为 Mold Oring 单项风险复核。","textPreview":"P2HHV3120250407A01：D2 漏液 / O-ring replacement，作为 Mold Oring 单项风险复核。","textChars":67,"textLines":1,"bbox":[503,226,283,42]}
+{"kind":"shape","id":"sh/2hwfyxob","slide":5,"bbox":[486,326,7,7]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":5,"text":"P2HHV3220250701A01：392% CV 4.16%，H4 LOW %D 与泄漏备注，作为 OTP-O ring QC risk。","textPreview":"P2HHV3220250701A01：392% CV 4.16%，H4 LOW %D 与泄漏备注，作为 OTP-O ring QC risk。","textChars":71,"textLines":1,"bbox":[503,320,283,42]}
+{"kind":"shape","id":"sh/kb6xkf6d","slide":5,"bbox":[486,420,7,7]}
+{"kind":"textbox","id":"sh/0z61032l","slide":5,"text":"风险项不掩盖 Mold Oring 总体通过趋势，但需单独归档。","textPreview":"风险项不掩盖 Mold Oring 总体通过趋势，但需单独归档。","textChars":32,"textLines":1,"bbox":[503,414,283,42]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":5,"bbox":[852,136,366,420]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":5,"text":"Counted as PASS","textPreview":"Counted as PASS","textChars":15,"textLines":1,"bbox":[878,164,142,28]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":5,"bbox":[884,232,7,7]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":5,"text":"P2HHV3120250702A03：H3 low %D，按通过移液器计入。","textPreview":"P2HHV3120250702A03：H3 low %D，按通过移液器计入。","textChars":38,"textLines":1,"bbox":[901,226,283,42]}
+{"kind":"shape","id":"sh/p8nqxs72","slide":5,"bbox":[884,326,7,7]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":5,"text":"P2HHV3220250410A04：复位开关损伤，按通过移液器计入。","textPreview":"P2HHV3220250410A04：复位开关损伤，按通过移液器计入。","textChars":35,"textLines":1,"bbox":[901,320,283,42]}
+{"kind":"shape","id":"sh/72x4nap4","slide":5,"bbox":[884,420,7,7]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":5,"text":"这两台不再拉低 Mold Oring 通过率。","textPreview":"这两台不再拉低 Mold Oring 通过率。","textChars":23,"textLines":1,"bbox":[901,414,283,42]}
+{"kind":"shape","id":"sh/p4r65wju","slide":5,"bbox":[56,600,1166,62]}
+{"kind":"textbox","id":"sh/f6dcbulw","slide":5,"text":"管理层解读：Fail 已闭环不等于待确认；Risk review 不等于 Fail；已确认通过的特殊案例应在总通过率中按 PASS 计入。","textPreview":"管理层解读：Fail 已闭环不等于待确认；Risk review 不等于 Fail；已确认通过的特殊案例应在总通过率中按 PASS 计入。","textChars":69,"textLines":1,"bbox":[84,620,1100,25]}
+{"kind":"image","id":"im/7adsji5s","slide":5,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/li44mu","slide":5,"text":""}
+{"kind":"slide","id":"sl/xfahl9","slide":6,"title":"附录：Mold Oring 单台总结","textShapes":67}
+{"kind":"shape","id":"sh/2x4nap4r","slide":6,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":6,"text":"附录：Mold Oring 单台总结","textPreview":"附录：Mold Oring 单台总结","textChars":18,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/val87ed8","slide":6,"text":"Mold Oring 共 14 台；13 台按 PASS 计入，1 台作为 Risk review 单独关闭","textPreview":"Mold Oring 共 14 台；13 台按 PASS 计入，1 台作为 Risk review 单独关闭","textChars":54,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/6psfil0r","slide":6,"bbox":[56,132,604,409]}
+{"kind":"shape","id":"sh/dcbulwva","slide":6,"bbox":[56,132,190,31]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":6,"text":"SN","textPreview":"SN","textChars":2,"textLines":1,"bbox":[63,140,176,18]}
+{"kind":"shape","id":"sh/v6psfil0","slide":6,"bbox":[246,132,72,31]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":6,"text":"状态","textPreview":"状态","textChars":2,"textLines":1,"bbox":[253,140,58,18]}
+{"kind":"shape","id":"sh/szqtcj6t","slide":6,"bbox":[318,132,92,31]}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":6,"text":"终点","textPreview":"终点","textChars":2,"textLines":1,"bbox":[325,140,78,18]}
+{"kind":"shape","id":"sh/at47y1kr","slide":6,"bbox":[410,132,250,31]}
+{"kind":"textbox","id":"sh/3ex0nuxc","slide":6,"text":"备注","textPreview":"备注","textChars":2,"textLines":1,"bbox":[417,140,236,18]}
+{"kind":"shape","id":"sh/sneloj2t","slide":6,"bbox":[56,163,190,54]}
+{"kind":"textbox","id":"sh/l87ed8ba","slide":6,"text":"P2HHV3120250407A01","textPreview":"P2HHV3120250407A01","textChars":18,"textLines":1,"bbox":[63,170,176,46]}
+{"kind":"shape","id":"sh/ahoza1gv","slide":6,"bbox":[246,163,72,54]}
+{"kind":"textbox","id":"sh/32lszqtc","slide":6,"text":"Risk","textPreview":"Risk","textChars":4,"textLines":1,"bbox":[254,169,56,42]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":6,"bbox":[318,163,92,54]}
+{"kind":"textbox","id":"sh/lwval87e","slide":6,"text":"1,085,000","textPreview":"1,085,000","textChars":9,"textLines":1,"bbox":[325,170,78,46]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":6,"bbox":[410,163,250,54]}
+{"kind":"textbox","id":"sh/0z61032l","slide":6,"text":"D2 漏液 / O-ring replacement","textPreview":"D2 漏液 / O-ring replacement","textChars":26,"textLines":1,"bbox":[417,170,236,46]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":6,"bbox":[56,217,190,54]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":6,"text":"P2HHV3120250702A02","textPreview":"P2HHV3120250702A02","textChars":18,"textLines":1,"bbox":[63,224,176,46]}
+{"kind":"shape","id":"sh/p8nqxs72","slide":6,"bbox":[246,217,72,54]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[254,223,56,42]}
+{"kind":"shape","id":"sh/72x4nap4","slide":6,"bbox":[318,217,92,54]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":6,"text":"1,085,000","textPreview":"1,085,000","textChars":9,"textLines":1,"bbox":[325,224,78,46]}
+{"kind":"shape","id":"sh/p4r65wju","slide":6,"bbox":[410,217,250,54]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":6,"text":"完成 417%，数据稳定","textPreview":"完成 417%，数据稳定","textChars":12,"textLines":1,"bbox":[417,224,236,46]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":6,"bbox":[56,271,190,54]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":6,"text":"P2HHV3120250702A03","textPreview":"P2HHV3120250702A03","textChars":18,"textLines":1,"bbox":[63,278,176,46]}
+{"kind":"shape","id":"sh/c3ylc7u5","slide":6,"bbox":[246,271,72,54]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[254,277,56,42]}
+{"kind":"shape","id":"sh/ulwval87","slide":6,"bbox":[318,271,92,54]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":6,"text":"1,085,000","textPreview":"1,085,000","textChars":9,"textLines":1,"bbox":[325,278,78,46]}
+{"kind":"shape","id":"sh/crmhk3q5","slide":6,"bbox":[410,271,250,54]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":6,"text":"H3 low %D 已按通过计入","textPreview":"H3 low %D 已按通过计入","textChars":16,"textLines":1,"bbox":[417,278,236,46]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":6,"bbox":[56,325,190,54]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":6,"text":"P2HHV3120250701A02","textPreview":"P2HHV3120250701A02","textChars":18,"textLines":1,"bbox":[63,332,176,46]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":6,"bbox":[246,325,72,54]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[254,331,56,42]}
+{"kind":"shape","id":"sh/h4byhgn2","slide":6,"bbox":[318,325,92,54]}
+{"kind":"textbox","id":"sh/sji5snel","slide":6,"text":"1,085,000","textPreview":"1,085,000","textChars":9,"textLines":1,"bbox":[325,332,78,46]}
+{"kind":"shape","id":"sh/3m94fu18","slide":6,"bbox":[410,325,250,54]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":6,"text":"完成 417%，通过","textPreview":"完成 417%，通过","textChars":10,"textLines":1,"bbox":[417,332,236,46]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":6,"bbox":[56,379,190,54]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":6,"text":"P2HHV3220250401A03","textPreview":"P2HHV3220250401A03","textChars":18,"textLines":1,"bbox":[63,386,176,46]}
+{"kind":"shape","id":"sh/zidonyd0","slide":6,"bbox":[246,379,72,54]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[254,385,56,42]}
+{"kind":"shape","id":"sh/kre1w7mp","slide":6,"bbox":[318,379,92,54]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[325,386,78,46]}
+{"kind":"shape","id":"sh/6psfil0r","slide":6,"bbox":[410,379,250,54]}
+{"kind":"textbox","id":"sh/val87ed8","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[417,386,236,46]}
+{"kind":"shape","id":"sh/k3q5o7qp","slide":6,"bbox":[56,433,190,54]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":6,"text":"P2HHV3220250408A02","textPreview":"P2HHV3220250408A02","textChars":18,"textLines":1,"bbox":[63,440,176,46]}
+{"kind":"shape","id":"sh/2x4nap4r","slide":6,"bbox":[246,433,72,54]}
+{"kind":"textbox","id":"sh/vixczed8","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[254,439,56,42]}
+{"kind":"shape","id":"sh/kf6dcbul","slide":6,"bbox":[318,433,92,54]}
+{"kind":"textbox","id":"sh/d0z61032","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[325,440,78,46]}
+{"kind":"shape","id":"sh/dsji5sne","slide":6,"bbox":[410,433,250,54]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[417,440,236,46]}
+{"kind":"shape","id":"sh/vmtwra5g","slide":6,"bbox":[56,487,190,54]}
+{"kind":"textbox","id":"sh/61032lsz","slide":6,"text":"P2HHV3220250410A04","textPreview":"P2HHV3220250410A04","textChars":18,"textLines":1,"bbox":[63,494,176,46]}
+{"kind":"shape","id":"sh/d4vmtwra","slide":6,"bbox":[246,487,72,54]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[254,493,56,42]}
+{"kind":"shape","id":"sh/vy90je9c","slide":6,"bbox":[318,487,92,54]}
+{"kind":"textbox","id":"sh/6dcbulwv","slide":6,"text":"非寿命异常","textPreview":"非寿命异常","textChars":5,"textLines":1,"bbox":[325,494,78,46]}
+{"kind":"shape","id":"sh/d8v6psfi","slide":6,"bbox":[410,487,250,54]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":6,"text":"复位开关损伤，按通过计入","textPreview":"复位开关损伤，按通过计入","textChars":12,"textLines":1,"bbox":[417,494,236,46]}
+{"kind":"shape","id":"sh/ylc7u54z","slide":6,"bbox":[660,132,604,409]}
+{"kind":"shape","id":"sh/r65wjudg","slide":6,"bbox":[660,132,190,31]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":6,"text":"SN","textPreview":"SN","textChars":2,"textLines":1,"bbox":[667,140,176,18]}
+{"kind":"shape","id":"sh/9cvixcze","slide":6,"bbox":[850,132,72,31]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":6,"text":"状态","textPreview":"状态","textChars":2,"textLines":1,"bbox":[857,140,58,18]}
+{"kind":"shape","id":"sh/nih4byhg","slide":6,"bbox":[922,132,92,31]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":6,"text":"终点","textPreview":"终点","textChars":2,"textLines":1,"bbox":[929,140,78,18]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":6,"bbox":[1014,132,250,31]}
+{"kind":"textbox","id":"sh/y1kre1w7","slide":6,"text":"备注","textPreview":"备注","textChars":2,"textLines":1,"bbox":[1021,140,236,18]}
+{"kind":"shape","id":"sh/rmhk3q5o","slide":6,"bbox":[660,163,190,54]}
+{"kind":"textbox","id":"sh/vmtwra5g","slide":6,"text":"P2HHV3220250410A07","textPreview":"P2HHV3220250410A07","textChars":18,"textLines":1,"bbox":[667,170,176,46]}
+{"kind":"shape","id":"sh/61032lsz","slide":6,"bbox":[850,163,72,54]}
+{"kind":"textbox","id":"sh/dsji5sne","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[858,169,56,42]}
+{"kind":"shape","id":"sh/o7qpg3ex","slide":6,"bbox":[922,163,92,54]}
+{"kind":"textbox","id":"sh/vy90je9c","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[929,170,78,46]}
+{"kind":"shape","id":"sh/6dcbulwv","slide":6,"bbox":[1014,163,250,54]}
+{"kind":"textbox","id":"sh/d4vmtwra","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[1021,170,236,46]}
+{"kind":"shape","id":"sh/oj2t83it","slide":6,"bbox":[660,217,190,54]}
+{"kind":"textbox","id":"sh/z25kb6xk","slide":6,"text":"P2HHV3220250411A03","textPreview":"P2HHV3220250411A03","textChars":18,"textLines":1,"bbox":[667,224,176,46]}
+{"kind":"shape","id":"sh/6hcrmhk3","slide":6,"bbox":[850,217,72,54]}
+{"kind":"textbox","id":"sh/gfmlkjm1","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[858,223,56,42]}
+{"kind":"shape","id":"sh/90je9cvi","slide":6,"bbox":[922,217,92,54]}
+{"kind":"textbox","id":"sh/yd0z6103","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[929,224,78,46]}
+{"kind":"shape","id":"sh/rytsvu9k","slide":6,"bbox":[1014,217,250,54]}
+{"kind":"textbox","id":"sh/g7adsji5","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[1021,224,236,46]}
+{"kind":"shape","id":"sh/9s36hcrm","slide":6,"bbox":[660,271,190,54]}
+{"kind":"textbox","id":"sh/y1kre1w7","slide":6,"text":"P2HHV3220250407A02","textPreview":"P2HHV3220250407A02","textChars":18,"textLines":1,"bbox":[667,278,176,46]}
+{"kind":"shape","id":"sh/rmhk3q5o","slide":6,"bbox":[850,271,72,54]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[858,277,56,42]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":6,"bbox":[922,271,92,54]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[929,278,78,46]}
+{"kind":"shape","id":"sh/v6psfil0","slide":6,"bbox":[1014,271,250,54]}
+{"kind":"textbox","id":"sh/knih4byh","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[1021,278,236,46]}
+{"kind":"shape","id":"sh/d8bat47y","slide":6,"bbox":[660,325,190,54]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":6,"text":"P2HHV3220250627A05","textPreview":"P2HHV3220250627A05","textChars":18,"textLines":1,"bbox":[667,332,176,46]}
+{"kind":"shape","id":"sh/vu9knih4","slide":6,"bbox":[850,325,72,54]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[858,331,56,42]}
+{"kind":"shape","id":"sh/d0z61032","slide":6,"bbox":[922,325,92,54]}
+{"kind":"textbox","id":"sh/2x4nap4r","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[929,332,78,46]}
+{"kind":"shape","id":"sh/vixczed8","slide":6,"bbox":[1014,325,250,54]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[1021,332,236,46]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":6,"bbox":[660,379,190,54]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":6,"text":"P2HHV3220250701A05","textPreview":"P2HHV3220250701A05","textChars":18,"textLines":1,"bbox":[667,386,176,46]}
+{"kind":"shape","id":"sh/a1gvy90j","slide":6,"bbox":[850,379,72,54]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[858,385,56,42]}
+{"kind":"shape","id":"sh/svu9knih","slide":6,"bbox":[922,379,92,54]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[929,386,78,46]}
+{"kind":"shape","id":"sh/ap4r65wj","slide":6,"bbox":[1014,379,250,54]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[1021,386,236,46]}
+{"kind":"shape","id":"sh/sji5snel","slide":6,"bbox":[660,433,190,54]}
+{"kind":"textbox","id":"sh/87ed8bat","slide":6,"text":"P2HHV3220250627A01","textPreview":"P2HHV3220250627A01","textChars":18,"textLines":1,"bbox":[667,440,176,46]}
+{"kind":"shape","id":"sh/xs72x4na","slide":6,"bbox":[850,433,72,54]}
+{"kind":"textbox","id":"sh/q1orytsv","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[858,439,56,42]}
+{"kind":"shape","id":"sh/fmlkjm1c","slide":6,"bbox":[922,433,92,54]}
+{"kind":"textbox","id":"sh/8z25kb6x","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[929,440,78,46]}
+{"kind":"shape","id":"sh/1gvy90je","slide":6,"bbox":[1014,433,250,54]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[1021,440,236,46]}
+{"kind":"shape","id":"sh/je9cvixc","slide":6,"bbox":[660,487,190,54]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":6,"text":"P2HHV3220250702A04","textPreview":"P2HHV3220250702A04","textChars":18,"textLines":1,"bbox":[667,494,176,46]}
+{"kind":"shape","id":"sh/xczed8v6","slide":6,"bbox":[850,487,72,54]}
+{"kind":"textbox","id":"sh/neloj2t8","slide":6,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[858,493,56,42]}
+{"kind":"shape","id":"sh/ytsvu9kn","slide":6,"bbox":[922,487,92,54]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":6,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[929,494,78,46]}
+{"kind":"shape","id":"sh/czed8v6p","slide":6,"bbox":[1014,487,250,54]}
+{"kind":"textbox","id":"sh/nqxs72x4","slide":6,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[1021,494,236,46]}
+{"kind":"shape","id":"sh/u54zidon","slide":6,"bbox":[56,610,1166,58]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":6,"text":"归档建议：Mold Oring 整体按通过方向推进；P2HHV3120250407A01 的 D2 漏液/O-ring replacement 作为单项风险说明关闭。","textPreview":"归档建议：Mold Oring 整体按通过方向推进；P2HHV3120250407A01 的 D2 漏液/O-ring replacement 作为单项风险说明关闭。","textChars":83,"textLines":1,"bbox":[86,628,1080,22]}
+{"kind":"image","id":"im/kre1w7mp","slide":6,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/xfahl9","slide":6,"text":""}
+{"kind":"slide","id":"sl/ninp4n","slide":7,"title":"附录：OTP-O ring 单台总结","textShapes":28}
+{"kind":"shape","id":"sh/9cvixcze","slide":7,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":7,"text":"附录：OTP-O ring 单台总结","textPreview":"附录：OTP-O ring 单台总结","textChars":18,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":7,"text":"OTP-O ring 共 5 台；2 台 PASS，1 台 QC risk，2 台 Fail closed","textPreview":"OTP-O ring 共 5 台；2 台 PASS，1 台 QC risk，2 台 Fail closed","textChars":53,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":7,"bbox":[78,136,1075,368]}
+{"kind":"shape","id":"sh/yxobm58z","slide":7,"bbox":[78,136,255,38]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":7,"text":"SN","textPreview":"SN","textChars":2,"textLines":1,"bbox":[85,144,241,18]}
+{"kind":"shape","id":"sh/g7adsji5","slide":7,"bbox":[333,136,100,38]}
+{"kind":"textbox","id":"sh/9s36hcrm","slide":7,"text":"状态","textPreview":"状态","textChars":2,"textLines":1,"bbox":[340,144,86,18]}
+{"kind":"shape","id":"sh/d8v6psfi","slide":7,"bbox":[433,136,150,38]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":7,"text":"终点","textPreview":"终点","textChars":2,"textLines":1,"bbox":[440,144,136,18]}
+{"kind":"shape","id":"sh/z25kb6xk","slide":7,"bbox":[583,136,570,38]}
+{"kind":"textbox","id":"sh/6hcrmhk3","slide":7,"text":"备注","textPreview":"备注","textChars":2,"textLines":1,"bbox":[590,144,556,18]}
+{"kind":"shape","id":"sh/dg7adsji","slide":7,"bbox":[78,174,255,66]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":7,"text":"P2HHV3220250627A02","textPreview":"P2HHV3220250627A02","textChars":18,"textLines":1,"bbox":[85,181,241,58]}
+{"kind":"shape","id":"sh/vahoza1g","slide":7,"bbox":[333,174,100,66]}
+{"kind":"textbox","id":"sh/6tovahoz","slide":7,"text":"FAIL","textPreview":"FAIL","textChars":4,"textLines":1,"bbox":[341,180,62,54]}
+{"kind":"shape","id":"sh/dsji5sne","slide":7,"bbox":[433,174,150,66]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":7,"text":"150%-175%","textPreview":"150%-175%","textChars":9,"textLines":1,"bbox":[440,181,136,58]}
+{"kind":"shape","id":"sh/kjm1cfa9","slide":7,"bbox":[583,174,570,66]}
+{"kind":"textbox","id":"sh/94fu18jq","slide":7,"text":"D3/G9 吸液少；175% CV 6.83%；已闭环","textPreview":"D3/G9 吸液少；175% CV 6.83%；已闭环","textChars":27,"textLines":1,"bbox":[590,181,556,58]}
+{"kind":"shape","id":"sh/2hwfyxob","slide":7,"bbox":[78,240,255,66]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":7,"text":"P2HHV3220250409A03","textPreview":"P2HHV3220250409A03","textChars":18,"textLines":1,"bbox":[85,247,241,58]}
+{"kind":"shape","id":"sh/gvy90je9","slide":7,"bbox":[333,240,100,66]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":7,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[341,246,62,54]}
+{"kind":"shape","id":"sh/2p8nqxs7","slide":7,"bbox":[433,240,150,66]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":7,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[440,247,136,58]}
+{"kind":"shape","id":"sh/kzupwb2h","slide":7,"bbox":[583,240,570,66]}
+{"kind":"textbox","id":"sh/9knih4by","slide":7,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[590,247,556,58]}
+{"kind":"shape","id":"sh/fa9w3m94","slide":7,"bbox":[78,306,255,66]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":7,"text":"P2HHV3220250409A02","textPreview":"P2HHV3220250409A02","textChars":18,"textLines":1,"bbox":[85,313,241,58]}
+{"kind":"shape","id":"sh/xczed8v6","slide":7,"bbox":[333,306,100,66]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":7,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[341,312,62,54]}
+{"kind":"shape","id":"sh/fyxobm58","slide":7,"bbox":[433,306,150,66]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":7,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[440,313,136,58]}
+{"kind":"shape","id":"sh/x4nap4r6","slide":7,"bbox":[583,306,570,66]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":7,"text":"完成 392%，通过","textPreview":"完成 392%，通过","textChars":10,"textLines":1,"bbox":[590,313,556,58]}
+{"kind":"shape","id":"sh/fmlkjm1c","slide":7,"bbox":[78,372,255,66]}
+{"kind":"textbox","id":"sh/q1orytsv","slide":7,"text":"P2HHV3220250701A01","textPreview":"P2HHV3220250701A01","textChars":18,"textLines":1,"bbox":[85,379,241,58]}
+{"kind":"shape","id":"sh/65wjudg7","slide":7,"bbox":[333,372,100,66]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":7,"text":"Risk","textPreview":"Risk","textChars":4,"textLines":1,"bbox":[341,378,62,54]}
+{"kind":"shape","id":"sh/obm58z25","slide":7,"bbox":[433,372,150,66]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":7,"text":"1,020,000","textPreview":"1,020,000","textChars":9,"textLines":1,"bbox":[440,379,136,58]}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":7,"bbox":[583,372,570,66]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":7,"text":"392% CV 4.16%；H4 LOW %D；泄漏备注","textPreview":"392% CV 4.16%；H4 LOW %D；泄漏备注","textChars":28,"textLines":1,"bbox":[590,379,556,58]}
+{"kind":"shape","id":"sh/oza1gvy9","slide":7,"bbox":[78,438,255,66]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":7,"text":"P2HHV3220250627A03","textPreview":"P2HHV3220250627A03","textChars":18,"textLines":1,"bbox":[85,445,241,58]}
+{"kind":"shape","id":"sh/al87ed8b","slide":7,"bbox":[333,438,100,66]}
+{"kind":"textbox","id":"sh/z61032ls","slide":7,"text":"FAIL","textPreview":"FAIL","textChars":4,"textLines":1,"bbox":[341,444,62,54]}
+{"kind":"shape","id":"sh/lc7u54zi","slide":7,"bbox":[433,438,150,66]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":7,"text":"150%-175%","textPreview":"150%-175%","textChars":9,"textLines":1,"bbox":[440,445,136,58]}
+{"kind":"shape","id":"sh/36hcrmhk","slide":7,"bbox":[583,438,570,66]}
+{"kind":"textbox","id":"sh/eloj2t83","slide":7,"text":"E10/B7 不吸液；泄漏率高；已闭环","textPreview":"E10/B7 不吸液；泄漏率高；已闭环","textChars":19,"textLines":1,"bbox":[590,445,556,58]}
+{"kind":"shape","id":"sh/l0rqd4vm","slide":7,"bbox":[78,522,1075,92]}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":7,"text":"结论","textPreview":"结论","textChars":2,"textLines":1,"bbox":[108,552,80,30]}
+{"kind":"textbox","id":"sh/7u54zido","slide":7,"text":"OTP-O ring 通过率仅 40%，且失效集中在吸液/不吸液、泄漏率和 CV 风险；不建议作为通过方案推进。","textPreview":"OTP-O ring 通过率仅 40%，且失效集中在吸液/不吸液、泄漏率和 CV 风险；不建议作为通过方案推进。","textChars":56,"textLines":1,"bbox":[214,548,870,34]}
+{"kind":"image","id":"im/j6tovaho","slide":7,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/ninp4n","slide":7,"text":""}
+{"kind":"slide","id":"sl/vm61qk","slide":8,"title":"最终结论与建议","textShapes":13}
+{"kind":"shape","id":"sh/ylc7u54z","slide":8,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":8,"text":"最终结论与建议","textPreview":"最终结论与建议","textChars":7,"textLines":1,"bbox":[56,34,760,40]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":8,"text":"本页用于汇报收口：把测试工作量转化为设计选择建议","textPreview":"本页用于汇报收口：把测试工作量转化为设计选择建议","textChars":24,"textLines":1,"bbox":[58,78,900,22]}
+{"kind":"shape","id":"sh/yxobm58z","slide":8,"bbox":[76,128,1128,138]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":8,"text":"核心结论","textPreview":"核心结论","textChars":4,"textLines":1,"bbox":[108,160,180,30]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":8,"text":"Mold Oring 已完成 1,020,000-1,085,000 次寿命验证，相较原设计寿命 270,000 次达到约 3.8-4.0 倍，具备明确寿命提升证据。","textPreview":"Mold Oring 已完成 1,020,000-1,085,000 次寿命验证，相较原设计寿命 270,000 次达到约 3.8-4.0 倍，具备明确寿命提升证据。","textChars":83,"textLines":1,"bbox":[292,150,835,54]}
+{"kind":"shape","id":"sh/rmhk3q5o","slide":8,"bbox":[88,315,1090,70]}
+{"kind":"textbox","id":"sh/y1kre1w7","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[116,333,34,34]}
+{"kind":"textbox","id":"sh/kjm1cfa9","slide":8,"text":"推进 Mold Oring","textPreview":"推进 Mold Oring","textChars":13,"textLines":1,"bbox":[178,329,260,22]}
+{"kind":"textbox","id":"sh/94fu18jq","slide":8,"text":"作为 96CH LV 寿命提升方向继续推进，并完成剩余风险项归档。","textPreview":"作为 96CH LV 寿命提升方向继续推进，并完成剩余风险项归档。","textChars":33,"textLines":1,"bbox":[456,330,650,28]}
+{"kind":"shape","id":"sh/2hwfyxob","slide":8,"bbox":[88,410,1090,70]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[116,428,34,34]}
+{"kind":"textbox","id":"sh/gvy90je9","slide":8,"text":"OTP-O ring 不作为通过方案","textPreview":"OTP-O ring 不作为通过方案","textChars":18,"textLines":1,"bbox":[178,424,260,22]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":8,"text":"两台 Fail 已闭环；保留为失效与风险参考，不建议作为当前放行方案。","textPreview":"两台 Fail 已闭环；保留为失效与风险参考，不建议作为当前放行方案。","textChars":35,"textLines":1,"bbox":[456,425,650,28]}
+{"kind":"shape","id":"sh/2p8nqxs7","slide":8,"bbox":[88,505,1090,70]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[116,523,34,34]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":8,"text":"归档口径统一","textPreview":"归档口径统一","textChars":6,"textLines":1,"bbox":[178,519,260,22]}
+{"kind":"textbox","id":"sh/9knih4by","slide":8,"text":"主报告讲工作量、通过率和结论；单台数据、LOW %D、泄漏/吸液异常放入 backup。","textPreview":"主报告讲工作量、通过率和结论；单台数据、LOW %D、泄漏/吸液异常放入 backup。","textChars":44,"textLines":1,"bbox":[456,520,650,28]}
+{"kind":"image","id":"im/kb6xkf6d","slide":8,"name":"","alt":"Opentrons logo","bbox":[1088,31,132,38]}
+{"kind":"notes","id":"nt/vm61qk","slide":8,"text":""}

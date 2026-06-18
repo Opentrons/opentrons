@@ -1,0 +1,98 @@
+{"kind":"deck","id":"pr/wx0gmp","name":"Deck"}
+{"kind":"layout","layoutId":"684d3c68-0e4c-4c74-b354-27d3486bef58","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"03fbebba-5337-4ffb-a7e1-59e16cddd75c","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/l1lo47","slide":1,"title":"96CH LV 老化测试工作量与结果总览","textShapes":65}
+{"kind":"shape","id":"sh/za1gvy90","slide":1,"bbox":[0,0,1280,8]}
+{"kind":"textbox","id":"sh/svu9knih","slide":1,"text":"96CH LV 老化测试工作量与结果总览","textPreview":"96CH LV 老化测试工作量与结果总览","textChars":20,"textLines":1,"bbox":[56,34,650,42]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":1,"text":"392% = 1,020,000次；417% = 1,085,000次；原设计寿命 = 270,000次","textPreview":"392% = 1,020,000次；417% = 1,085,000次；原设计寿命 = 270,000次","textChars":52,"textLines":1,"bbox":[58,79,720,22]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":1,"text":"opentrons\n合创生物","textPreview":"opentrons | 合创生物","textChars":14,"textLines":2,"bbox":[1100,36,120,54]}
+{"kind":"shape","id":"sh/zidonyd0","slide":1,"bbox":[56,122,150,78]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":1,"text":"覆盖类型","textPreview":"覆盖类型","textChars":4,"textLines":1,"bbox":[71,134,120,18]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":1,"text":"2 类","textPreview":"2 类","textChars":3,"textLines":1,"bbox":[71,160,120,32]}
+{"kind":"shape","id":"sh/a5gbq1or","slide":1,"bbox":[226,122,170,78]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":1,"text":"跑测样机","textPreview":"跑测样机","textChars":4,"textLines":1,"bbox":[241,134,140,18]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":1,"text":"19 台","textPreview":"19 台","textChars":4,"textLines":1,"bbox":[241,160,140,32]}
+{"kind":"shape","id":"sh/a1gvy90j","slide":1,"bbox":[416,122,200,78]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":1,"text":"完成 1,020,000/1,085,000次","textPreview":"完成 1,020,000/1,085,000次","textChars":23,"textLines":1,"bbox":[431,134,170,18]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":1,"text":"16 台","textPreview":"16 台","textChars":4,"textLines":1,"bbox":[431,160,170,32]}
+{"kind":"shape","id":"sh/za1gvy90","slide":1,"bbox":[636,122,224,78]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":1,"text":"PASS / 总通过率","textPreview":"PASS / 总通过率","textChars":11,"textLines":1,"bbox":[651,134,194,18]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":1,"text":"15 台 / 79%","textPreview":"15 台 / 79%","textChars":10,"textLines":1,"bbox":[651,160,194,32]}
+{"kind":"shape","id":"sh/svu9knih","slide":1,"bbox":[880,122,172,78]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":1,"text":"风险复核","textPreview":"风险复核","textChars":4,"textLines":1,"bbox":[895,134,142,18]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":1,"text":"2 项","textPreview":"2 项","textChars":3,"textLines":1,"bbox":[895,160,142,32]}
+{"kind":"shape","id":"sh/idonyd0z","slide":1,"bbox":[1072,122,150,78]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":1,"text":"Fail 已闭环","textPreview":"Fail 已闭环","textChars":8,"textLines":1,"bbox":[1087,134,120,18]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":1,"text":"2 台","textPreview":"2 台","textChars":3,"textLines":1,"bbox":[1087,160,120,32]}
+{"kind":"shape","id":"sh/t47y1kre","slide":1,"bbox":[56,230,274,342]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":1,"text":"我们完成的工作","textPreview":"我们完成的工作","textChars":7,"textLines":1,"bbox":[84,260,180,28]}
+{"kind":"shape","id":"sh/b6xkf6dc","slide":1,"bbox":[90,322,8,8]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":1,"text":"按用户指定 SN 清单重新匹配 19 台样机，统一归为 Mold Oring 与 OTP-O ring 两类进行统计。","textPreview":"按用户指定 SN 清单重新匹配 19 台样机，统一归为 Mold Oring 与 OTP-O ring 两类进行统计。","textChars":59,"textLines":1,"bbox":[108,316,200,36]}
+{"kind":"shape","id":"sh/tcj6tova","slide":1,"bbox":[90,394,8,8]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":1,"text":"逐台复核 RD 明细状态、最高老化节点、CV、最差通道 CV、LOW %D、吸液/不吸液和泄漏备注。","textPreview":"逐台复核 RD 明细状态、最高老化节点、CV、最差通道 CV、LOW %D、吸液/不吸液和泄漏备注。","textChars":50,"textLines":1,"bbox":[108,388,200,36]}
+{"kind":"shape","id":"sh/bi9s36hc","slide":1,"bbox":[90,482,8,8]}
+{"kind":"textbox","id":"sh/h0fepkzu","slide":1,"text":"测试覆盖从 0 到 1,020,000/1,085,000次；16 台已跑到终点，15 台计入通过。","textPreview":"测试覆盖从 0 到 1,020,000/1,085,000次；16 台已跑到终点，15 台计入通过。","textChars":50,"textLines":1,"bbox":[108,476,200,36]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":1,"text":"工作量核心：19 台 × 多节点验证","textPreview":"工作量核心：19 台 × 多节点验证","textChars":18,"textLines":1,"bbox":[84,535,210,26]}
+{"kind":"shape","id":"sh/zupwb2hw","slide":1,"bbox":[360,230,410,358]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":1,"text":"类型 1：Mold Oring","textPreview":"类型 1：Mold Oring","textChars":15,"textLines":1,"bbox":[382,250,300,24]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":1,"text":"14 台：全部归为 Mold Oring","textPreview":"14 台：全部归为 Mold Oring","textChars":20,"textLines":1,"bbox":[382,280,200,20]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":1,"text":"PASS with risk closure","textPreview":"PASS with risk closure","textChars":22,"textLines":1,"bbox":[598,251,140,24]}
+{"kind":"textbox","id":"sh/z61032ls","slide":1,"text":"跑测数量","textPreview":"跑测数量","textChars":4,"textLines":1,"bbox":[384,316,70,16]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":1,"text":"14 台","textPreview":"14 台","textChars":4,"textLines":1,"bbox":[384,336,72,30]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":1,"text":"完成终点","textPreview":"完成终点","textChars":4,"textLines":1,"bbox":[462,316,70,16]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":1,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[462,336,72,30]}
+{"kind":"textbox","id":"sh/w7mp0bi9","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[540,316,70,16]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":1,"text":"13/14","textPreview":"13/14","textChars":5,"textLines":1,"bbox":[540,336,72,30]}
+{"kind":"textbox","id":"sh/e1w7mp0b","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[618,316,70,16]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[618,336,72,30]}
+{"kind":"textbox","id":"sh/wval87ed","slide":1,"text":"风险/Fail","textPreview":"风险/Fail","textChars":7,"textLines":1,"bbox":[696,316,70,16]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":1,"text":"1 项","textPreview":"1 项","textChars":3,"textLines":1,"bbox":[696,336,72,30]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":1,"text":"完成率","textPreview":"完成率","textChars":3,"textLines":1,"bbox":[384,388,105,18]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[492,388,52,18]}
+{"kind":"shape","id":"sh/wra5gbq1","slide":1,"bbox":[384,411,160,11]}
+{"kind":"shape","id":"sh/lc7u54zi","slide":1,"bbox":[384,411,148.8,11]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":1,"text":"PASS 率","textPreview":"PASS 率","textChars":6,"textLines":1,"bbox":[580,388,105,18]}
+{"kind":"textbox","id":"sh/mp0bi9s3","slide":1,"text":"93%","textPreview":"93%","textChars":3,"textLines":1,"bbox":[688,388,52,18]}
+{"kind":"shape","id":"sh/tgfmlkjm","slide":1,"bbox":[580,411,160,11]}
+{"kind":"shape","id":"sh/4vmtwra5","slide":1,"bbox":[580,411,148.8,11]}
+{"kind":"textbox","id":"sh/bm58z25k","slide":1,"text":"最高覆盖 1,085,000次；主体完成 1,020,000次","textPreview":"最高覆盖 1,085,000次；主体完成 1,020,000次","textChars":31,"textLines":1,"bbox":[384,436,362,18]}
+{"kind":"shape","id":"sh/m1cfa9w3","slide":1,"bbox":[388,474,8,8]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":1,"text":"工作量：14 台纳入统计，13 台已完成至 1,020,000次 或 1,085,000次。","textPreview":"工作量：14 台纳入统计，13 台已完成至 1,020,000次 或 1,085,000次。","textChars":46,"textLines":1,"bbox":[406,468,334,36]}
+{"kind":"shape","id":"sh/47y1kre1","slide":1,"bbox":[388,512,8,8]}
+{"kind":"textbox","id":"sh/bq1oryts","slide":1,"text":"通过率：13/14 PASS；0702A03 与 0410A04 已按通过计入。","textPreview":"通过率：13/14 PASS；0702A03 与 0410A04 已按通过计入。","textChars":40,"textLines":1,"bbox":[406,506,334,36]}
+{"kind":"shape","id":"sh/m58z25kb","slide":1,"bbox":[388,550,8,8]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":1,"text":"风险复核：0407A01 D2 漏液/O-ring replacement 仍需作为单项风险说明。","textPreview":"风险复核：0407A01 D2 漏液/O-ring replacement 仍需作为单项风险说明。","textChars":49,"textLines":1,"bbox":[406,544,334,36]}
+{"kind":"shape","id":"sh/j2t83itg","slide":1,"bbox":[812,230,410,358]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":1,"text":"类型 2：OTP-O ring","textPreview":"类型 2：OTP-O ring","textChars":15,"textLines":1,"bbox":[834,250,300,24]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":1,"text":"5 台：ROD SEAL PIPETTE (10433+10425+10026OTP)","textPreview":"5 台：ROD SEAL PIPETTE (10433+10425+10026OTP)","textChars":43,"textLines":1,"bbox":[834,280,200,20]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":1,"text":"FAIL closed / HOLD","textPreview":"FAIL closed / HOLD","textChars":18,"textLines":1,"bbox":[1050,251,140,24]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":1,"text":"跑测数量","textPreview":"跑测数量","textChars":4,"textLines":1,"bbox":[836,316,70,16]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":1,"text":"5 台","textPreview":"5 台","textChars":3,"textLines":1,"bbox":[836,336,72,30]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":1,"text":"完成终点","textPreview":"完成终点","textChars":4,"textLines":1,"bbox":[914,316,70,16]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":1,"text":"3/5","textPreview":"3/5","textChars":3,"textLines":1,"bbox":[914,336,72,30]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":1,"text":"PASS","textPreview":"PASS","textChars":4,"textLines":1,"bbox":[992,316,70,16]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":1,"text":"2/5","textPreview":"2/5","textChars":3,"textLines":1,"bbox":[992,336,72,30]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":1,"text":"通过率","textPreview":"通过率","textChars":3,"textLines":1,"bbox":[1070,316,70,16]}
+{"kind":"textbox","id":"sh/7y1kre1w","slide":1,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[1070,336,72,30]}
+{"kind":"textbox","id":"sh/ed8v6psf","slide":1,"text":"风险/Fail","textPreview":"风险/Fail","textChars":7,"textLines":1,"bbox":[1148,316,70,16]}
+{"kind":"textbox","id":"sh/pwb2hwfy","slide":1,"text":"3 项","textPreview":"3 项","textChars":3,"textLines":1,"bbox":[1148,336,72,30]}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":1,"text":"完成率","textPreview":"完成率","textChars":3,"textLines":1,"bbox":[836,388,105,18]}
+{"kind":"textbox","id":"sh/7qpg3ex0","slide":1,"text":"60%","textPreview":"60%","textChars":3,"textLines":1,"bbox":[944,388,52,18]}
+{"kind":"shape","id":"sh/i5sneloj","slide":1,"bbox":[836,411,160,11]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":1,"bbox":[836,411,96,11]}
+{"kind":"textbox","id":"sh/0z61032l","slide":1,"text":"PASS 率","textPreview":"PASS 率","textChars":6,"textLines":1,"bbox":[1032,388,105,18]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":1,"text":"40%","textPreview":"40%","textChars":3,"textLines":1,"bbox":[1140,388,52,18]}
+{"kind":"shape","id":"sh/t47y1kre","slide":1,"bbox":[1032,411,160,11]}
+{"kind":"shape","id":"sh/idonyd0z","slide":1,"bbox":[1032,411,64,11]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":1,"text":"3 台完成 1,020,000次；2 台停止在 150%-175%","textPreview":"3 台完成 1,020,000次；2 台停止在 150%-175%","textChars":33,"textLines":1,"bbox":[836,436,362,18]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":1,"bbox":[840,474,8,8]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":1,"text":"工作量：5 台纳入统计，覆盖 0 至 1,020,000次节点，2 台中途 STOP/FAIL。","textPreview":"工作量：5 台纳入统计，覆盖 0 至 1,020,000次节点，2 台中途 STOP/FAIL。","textChars":48,"textLines":1,"bbox":[858,468,334,36]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":1,"bbox":[840,512,8,8]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":1,"text":"通过率：2/5 PASS；1 台 QC risk；2 台已完成分析报告和闭环，判定 Fail。","textPreview":"通过率：2/5 PASS；1 台 QC risk；2 台已完成分析报告和闭环，判定 Fail。","textChars":47,"textLines":1,"bbox":[858,506,334,36]}
+{"kind":"shape","id":"sh/032lszqt","slide":1,"bbox":[840,550,8,8]}
+{"kind":"textbox","id":"sh/tovahoza","slide":1,"text":"主要风险：D3/G9 吸液少、E10/B7 不吸液、泄漏率高、1,020,000次节点 CV 4.16%。","textPreview":"主要风险：D3/G9 吸液少、E10/B7 不吸液、泄漏率高、1,020,000次节点 CV 4.16%。","textChars":53,"textLines":1,"bbox":[858,544,334,36]}
+{"kind":"shape","id":"sh/z61032ls","slide":1,"bbox":[56,604,1166,76]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":1,"text":"最终结论","textPreview":"最终结论","textChars":4,"textLines":1,"bbox":[84,628,108,28]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":1,"text":"Mold Oring 老化验证表明：相较原设计寿命 270,000 次，当前样机已通过 1,020,000-1,085,000 次验证，寿命达到约 3.8-4.0 倍（提升约 278%-302%）。因此 Mold Oring 可作为寿命提升方向推进；OTP-O ring 两台失效已分析闭环并判定 Fail，不建议作为通过方案。","textPreview":"Mold Oring 老化验证表明：相较原设计寿命 270,000 次，当前样机已通过 1,020,000-1,085,000 次验证，寿命达到约 3.8-4.0 倍（提升约 278%-302%）。因此 Mold Oring 可作为寿命提升方向推进；OTP-O ring 两...","textChars":164,"textLines":1,"bbox":[220,617,930,44]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":1,"text":"注：老化汇总表部分 P2HHV32 进度仍滞后，最终统计以 RD 明细最新节点为准。","textPreview":"注：老化汇总表部分 P2HHV32 进度仍滞后，最终统计以 RD 明细最新节点为准。","textChars":42,"textLines":1,"bbox":[900,682,320,18]}
+{"kind":"notes","id":"nt/l1lo47","slide":1,"text":""}
