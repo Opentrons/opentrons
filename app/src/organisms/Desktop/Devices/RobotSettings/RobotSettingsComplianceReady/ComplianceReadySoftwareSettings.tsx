@@ -26,6 +26,8 @@ type FieldId =
   | 'requireAdminCredentialsToUpdateRobots'
   | 'requireAdminCredentialsToSendProtocols'
   | 'requireAdminCredentialsToSignRunRecords'
+  | 'requireProtocolLogsSignedAndSaved'
+  | 'automaticallyDeleteProtocolRunLogs'
 
 type FieldValues = Record<FieldId, string | boolean>
 
@@ -61,6 +63,8 @@ const INITIAL_FIELD_VALUES: FieldValues = {
   requireAdminCredentialsToUpdateRobots: false,
   requireAdminCredentialsToSendProtocols: false,
   requireAdminCredentialsToSignRunRecords: false,
+  requireProtocolLogsSignedAndSaved: false,
+  automaticallyDeleteProtocolRunLogs: false,
 }
 
 const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
@@ -131,6 +135,21 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
         id: 'requireAdminCredentialsToSignRunRecords',
         labelKey:
           'desktop_require_admin_credentials_to_sign_protocol_run_records',
+      },
+    ],
+  },
+  {
+    titleKey: 'desktop_protocol_logs',
+    fields: [
+      {
+        type: 'toggle',
+        id: 'requireProtocolLogsSignedAndSaved',
+        labelKey: 'desktop_require_protocol_logs_signed_and_saved',
+      },
+      {
+        type: 'toggle',
+        id: 'automaticallyDeleteProtocolRunLogs',
+        labelKey: 'desktop_automatically_delete_protocol_run_logs',
       },
     ],
   },
