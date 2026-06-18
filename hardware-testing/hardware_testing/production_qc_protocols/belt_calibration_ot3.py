@@ -46,6 +46,8 @@ MAX_ERROR_DISTANCE_MM = 0.5
 
 TEST_SLOTS = [1, 3, 9, 10]
 
+LOCALIZE = helpers_ot3.get_system_langauge() == "zh-CN"
+
 
 @dataclass
 class _TestBeltCalibrationData:
@@ -179,19 +181,19 @@ def _generate_report(
 def add_parameters(parameters: ParameterContext) -> None:
     """Build the runtime parameters."""
     parameters.add_bool(
-        display_name="Skip calibration",
+        display_name="跳过校准" if LOCALIZE else "Skip calibration",
         variable_name="skip_calibration",
         default=False,
         description="When this is true the robot will not calibrate",
     )
     parameters.add_bool(
-        display_name="Skip test",
+        display_name="跳过测试" if LOCALIZE else "Skip test",
         variable_name="skip_test",
         default=False,
         description="When this is true the robot will not test calibration",
     )
     parameters.add_str(
-        display_name="Operator",
+        display_name="操作员" if LOCALIZE else "Operator",
         variable_name="operator",
         default="Unused",
         choices=[
@@ -288,14 +290,18 @@ def run_belt_calibration(
     current_pos = api.gantry_position(mount)
     api.move_to(mount, attach_pos._replace(z=current_pos.z))
     api.move_rel(mount, Point(x=0, y=0, z=-20))
-    found = False
+    found = api.hardware_pipettes[mount.to_mount()] is not None
     while not found:
-        ctx.pause("Attach Pipette: Press Resume when Ready")
+        ctx.pause(
+            "连接移液器，准备好后按“继续”。"
+            if LOCALIZE
+            else "Attach pipette and press resume when ready"
+        )
         found = api.hardware_pipettes[mount.to_mount()] is not None
         if not found:
             ctx.delay(seconds=5, msg="No pipette found try again or quit the protocol.")
 
-    ctx.pause("Attach probe to pipette")
+    ctx.pause("将探针连接到移液器上" if LOCALIZE else "Attach probe to pipette")
 
     without_data: Optional[_TestBeltCalibrationData] = None
     with_data: Optional[_TestBeltCalibrationData] = None
@@ -304,18 +310,18 @@ def run_belt_calibration(
     try:
         # calibrate belts
         if not ctx.params.skip_calibration:  # type: ignore[attr-defined]
-            ctx.comment("CALIBRATE BELTS")
+            ctx.comment("校准皮带" if LOCALIZE else "CALIBRATE BELTS")
             api.reset_instrument_offset(mount)
             attitude, details = api._calibrate_belts(mount)
 
         # test after
         if not ctx.params.skip_test:  # type: ignore[attr-defined]
-            ctx.comment("TEST WITH CALIBRATION")
+            ctx.comment("带校准的测试" if LOCALIZE else "TEST WITH CALIBRATION")
             with_data = _TestBeltCalibrationData(
                 pipette_offset=api._calibrate_pipette(mount),
                 deck_offsets=api._check_belt_accuracy(mount),
             )
-            ctx.comment("TEST WITHOUT CALIBRATION")
+            ctx.comment("无需校准的测试" if LOCALIZE else "TEST WITHOUT CALIBRATION")
             api.reset_robot_calibration()  # set NOMINAL belt calibration
             without_data = _TestBeltCalibrationData(
                 pipette_offset=api._calibrate_pipette(mount),
@@ -327,13 +333,13 @@ def run_belt_calibration(
     current_pos = api.gantry_position(mount)
     api.move_to(mount, attach_pos._replace(z=current_pos.z))
     api.move_rel(mount, Point(x=0, y=0, z=-20))
-    ctx.pause("Remove probe from pipette")
+    ctx.pause("从移液器上取下探头" if LOCALIZE else "Remove probe from pipette")
     return without_data, attitude, details, with_data
 
 
 def run(ctx: ProtocolContext) -> None:
     """Entry point into testing protocol."""
-    ctx.comment("starting belt calibration.")
+    ctx.comment("启动传送带校准" if LOCALIZE else "starting belt calibration.")
     before: Optional[_TestBeltCalibrationData] = None
     after: Optional[_TestBeltCalibrationData] = None
     attitude: Optional[AttitudeMatrix] = None
@@ -377,4 +383,5 @@ def run(ctx: ProtocolContext) -> None:
         details = sim_cal_data.build_details()
         passing = True
     _generate_report(before, details, attitude, after, ctx)
-    ctx.pause(f"Belt calibration pass: {passing}")
+    if not passing:
+        raise RuntimeError("Belt calibration did not pass.")

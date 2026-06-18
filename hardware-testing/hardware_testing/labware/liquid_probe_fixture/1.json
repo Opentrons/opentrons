@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "custom_beta",
+  "ordering": [["A1"]],
+  "metadata": {
+    "displayName": "Liquid Probe Fixture",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 128,
+    "yDimension": 86,
+    "zDimension": 86
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "liquid_probe_fixture"
+  },
+  "wells": {
+    "A1": {
+      "depth": 40,
+      "totalLiquidVolume": 2152.38,
+      "shape": "circular",
+      "diameter": 16,
+      "x": 63,
+      "y": 43,
+      "z": 60,
+      "geometryDefinitionId": "cylinder"
+    }
+  },
+  "brand": {
+    "brand": "opentrons",
+    "brandId": ["lpf"]
+  },
+  "groups": [
+    {
+      "brand": {
+        "brand": "opentrons",
+        "brandId": ["lpf"]
+      },
+      "metadata": {
+        "wellBottomShape": "flat",
+        "displayCategory": "tubeRack"
+      },
+      "wells": ["A1"]
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "innerLabwareGeometry": {
+    "cylinder": {
+      "sections": [
+         {
+          "shape": "conical",
+          "topDiameter": 16,
+          "bottomDiameter": 16,
+          "topHeight": 40.0,
+          "bottomHeight": 0.0
+        }
+      ]
+    }
+  }
+}
