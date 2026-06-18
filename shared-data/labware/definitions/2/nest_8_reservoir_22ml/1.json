@@ -115,7 +115,7 @@
   ],
   "parameters": {
     "format": "trough",
-    "quirks": [],
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "nest_8_reservoir_22ml"
