@@ -2,7 +2,7 @@
 import asyncio
 from dataclasses import dataclass, fields
 import enum
-from time import sleep, time
+from time import time
 from typing import (
     Dict,
     Callable,
@@ -626,6 +626,7 @@ def build_fixture_csv_lines(
 
 
 def _read_pressure_and_check_results(
+    ctx: ProtocolContext,
     api: SyncHardwareAPI,
     cfg: TestConfig,
     fixture: PressureFixtureBase,
@@ -635,8 +636,7 @@ def _read_pressure_and_check_results(
     previous: Optional[List[List[float]]] = None,
 ) -> Tuple[bool, List[List[float]]]:
     pressure_event_config: PressureEventConfig = PRESSURE_FIXTURE_EVENT_CONFIGS[tag]
-    if not api.is_simulator:
-        sleep(pressure_event_config.stability_delay)
+    ctx.delay(pressure_event_config.stability_delay)
     _samples = []
     for i in range(pressure_event_config.sample_count):
         _samples.append(fixture.read_all_pressure_channel())
@@ -644,12 +644,8 @@ def _read_pressure_and_check_results(
         _sample_rounded = [round(p, 2) for p in _samples[-1]]
         report("PRESSURE-DATA", f"{tag.value}", _sample_rounded, i)
         delay_time = next_sample_time - time()
-        if (
-            not api.is_simulator
-            and i < pressure_event_config.sample_count - 1
-            and delay_time > 0
-        ):
-            sleep(pressure_event_config.sample_delay)
+        if i < pressure_event_config.sample_count - 1 and delay_time > 0:
+            ctx.delay(pressure_event_config.sample_delay)
     _samples_per_channel = [
         [s[c] for s in _samples] for c in range(cfg.pipette_channels)
     ]
@@ -734,8 +730,7 @@ def _aspirate_and_look_for_droplets(
     api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
     api.aspirate(mount, TRAILING_AIR_GAP_DROPLETS_UL)
     for t in range(wait_time):
-        if not api.is_simulator:
-            sleep(1)
+        ctx.delay(1)
     if api.is_simulator:
         leak_test_passed = True
     else:
@@ -764,6 +759,7 @@ def _pick_up_tip_for_fixture_new(
 
 
 def _fixture_check_pressure(
+    ctx: ProtocolContext,
     api: SyncHardwareAPI,
     cfg: TestConfig,
     fixture: PressureFixtureBase,
@@ -781,6 +777,7 @@ def _fixture_check_pressure(
     _pick_up_tip_for_fixture_new(api, cfg, "A1")
     # above the fixture
     r, _ = _read_pressure_and_check_results(
+        ctx,
         api,
         cfg,
         fixture,
@@ -801,8 +798,9 @@ def _fixture_check_pressure(
         helpers_ot3.update_pick_up_current(api, cfg.mount, current_val)
     try:
         _pick_up_tip_for_fixture_new(api, cfg, "A2")
-        sleep(10)
+        ctx.delay(10)
         r, inserted_pressure_data = _read_pressure_and_check_results(
+            ctx,
             api,
             cfg,
             fixture,
@@ -813,12 +811,13 @@ def _fixture_check_pressure(
         results.append(r)
         # aspirate 50uL
         api.aspirate(cfg.mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[cfg.pipette_volume])
-        sleep(2)
+        ctx.delay(2)
         if cfg.pipette_volume == 50:
             asp_evt = PressureEvent.ASPIRATE_P50
         else:
             asp_evt = PressureEvent.ASPIRATE_P1000
         r, _ = _read_pressure_and_check_results(
+            ctx,
             api,
             cfg,
             fixture,
@@ -835,8 +834,9 @@ def _fixture_check_pressure(
             0.5,
             is_full_dispense=True,
         )
-        sleep(2)
+        ctx.delay(2)
         r, _ = _read_pressure_and_check_results(
+            ctx,
             api,
             cfg,
             fixture,
@@ -847,8 +847,9 @@ def _fixture_check_pressure(
         results.append(r)
         api.drop_tip(cfg.mount, home_after=False)
         api.retract(cfg.mount)
-        sleep(2)
+        ctx.delay(2)
         r, _ = _read_pressure_and_check_results(
+            ctx,
             api,
             cfg,
             fixture,
@@ -882,6 +883,7 @@ def _test_for_leak(
         assert report
         assert section
         test_passed = _fixture_check_pressure(
+            ctx,
             api,
             cfg,
             fixture,
@@ -1313,7 +1315,7 @@ def _test_diagnostics_pressure(
     _move_safe(api, cfg.mount, slot_11_pos)
     api.move_rel(cfg.mount, Point(z=movez + 10))
     api.move_rel(cfg.mount, Point(z=-10), speed=5)
-    sleep(2)
+    ctx.delay(2)
     for sensor_id in sensor_ids:
         pressure = _read_pressure(sensor_id)
         if not (sealed_thresholds[0] <= pressure <= sealed_thresholds[1]):
@@ -1337,7 +1339,7 @@ def _test_diagnostics_pressure(
         cfg.pipette_volume
     ]
     api.aspirate(cfg.mount, plunger_aspirate_ul)
-    sleep(2)
+    ctx.delay(2)
     for sensor_id in sensor_ids:
         pressure = _read_pressure(sensor_id)
         if not (compressed_thresholds[0] <= pressure <= compressed_thresholds[1]):
@@ -1354,7 +1356,7 @@ def _test_diagnostics_pressure(
                 _bool_to_pass_fail(results[-1]),
             ],
         )
-    sleep(1)
+    ctx.delay(1)
     api.dispense(cfg.mount, is_full_dispense=True)
     api.prepare_for_aspirate(cfg.mount)
     _drop_tip_in_trash(api, cfg)
@@ -1462,6 +1464,7 @@ def build_tip_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 
 def _jog_for_tip_state(
+    ctx: ProtocolContext,
     api: SyncHardwareAPI,
     mount: OT3Mount,
     current_z: float,
@@ -1474,7 +1477,7 @@ def _jog_for_tip_state(
         if api.is_simulator:
             return True
         try:
-            sleep(0.3)
+            ctx.delay(0.3)
             api.verify_tip_presence(mount, _state)
             return True
         except FailedTipStateCheck:
@@ -1540,6 +1543,7 @@ def test_tip_sensor_new(
     else:
         api.move_rel(cfg.mount, Point(z=nominal_multi_ejector_relative))
     pick_up_result = _jog_for_tip_state(
+        ctx,
         api,
         cfg.mount,
         current_z=ejector_rel_pos,
@@ -1562,6 +1566,7 @@ def test_tip_sensor_new(
         ),
     }[cfg.pipette_channels]
     drop_result = _jog_for_tip_state(
+        ctx,
         api,
         cfg.mount,
         current_z=-10.5,
