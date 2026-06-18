@@ -215,15 +215,14 @@ function ComplianceReadySettingField({
       >
         {label}
       </StyledText>
-      <div className={styles.toggle_button}>
-        <ToggleButton
-          label={label}
-          toggledOn={toggledOn}
-          onClick={() => {
-            onToggleChange(field.id)
-          }}
-        />
-      </div>
+      <ToggleButton
+        id={field.id}
+        label={label}
+        toggledOn={toggledOn}
+        onClick={() => {
+          onToggleChange(field.id)
+        }}
+      />
     </div>
   )
 

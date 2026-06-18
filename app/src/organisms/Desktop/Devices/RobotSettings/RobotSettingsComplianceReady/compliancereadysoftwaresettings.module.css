@@ -25,13 +25,10 @@
 .toggle_row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--spacing-16);
 }
 
 .toggle_label {
   flex: 1;
-}
-
-.toggle_button {
-  flex-shrink: 0;
 }
