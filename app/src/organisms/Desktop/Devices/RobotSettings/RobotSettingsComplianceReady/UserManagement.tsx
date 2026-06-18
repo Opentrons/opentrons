@@ -13,5 +13,5 @@ export function UserManagement({
 }: UserManagementProps): JSX.Element {
   const { t } = useTranslation('access_control')
 
-  return <Accordion title={t('desktop_user_management')} />
+  return <Accordion id="user-management" title={t('desktop_user_management')} />
 }

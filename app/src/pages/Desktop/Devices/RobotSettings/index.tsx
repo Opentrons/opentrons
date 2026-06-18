@@ -3,18 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Navigate, useParams } from 'react-router-dom'
 
-import {
-  Banner,
-  BORDERS,
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  JUSTIFY_SPACE_AROUND,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Banner, LegacyStyledText, SPACING } from '@opentrons/components'
 import {
   ApiHostProvider,
   useAccessControlEnabledQuery,
@@ -40,6 +29,8 @@ import {
 import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
+
+import styles from './robotsettings.module.css'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
@@ -153,18 +144,13 @@ export function RobotSettingsComponent({
 
   return (
     <>
-      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
-        <Flex
-          color={COLORS.black90}
-          flexDirection={DIRECTION_COLUMN}
-          css={TYPOGRAPHY.h1Default}
-          gridGap={SPACING.spacing4}
-        >
+      <div className={styles.header_section}>
+        <div className={styles.header_content}>
           {t('robot_settings')}
           {robot != null && (
-            <Box marginBottom={SPACING.spacing16}>
+            <div className={styles.reachable_banner_wrapper}>
               <ReachableBanner robot={robot} />
-            </Box>
+            </div>
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing8}>
@@ -173,10 +159,10 @@ export function RobotSettingsComponent({
               </LegacyStyledText>
             </Banner>
           )}
-        </Flex>
-      </Box>
-      <Box paddingX={SPACING.spacing16}>
-        <Flex gridGap={SPACING.spacing4}>
+        </div>
+      </div>
+      <div className={styles.tabs_section}>
+        <div className={styles.tabs_row}>
           <RoundTab
             to={`/devices/${robotName}/robot-settings/calibration`}
             tabName={t('calibration')}
@@ -211,26 +197,17 @@ export function RobotSettingsComponent({
               disabled={false}
             />
           ) : null}
-        </Flex>
-      </Box>
-      <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
+        </div>
+      </div>
+      <div className={styles.content_section}>
         {isComplianceReadyTab ? (
-          <Box marginBottom={SPACING.spacing16}>{robotSettingsContent}</Box>
-        ) : (
-          <Flex
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_AROUND}
-            backgroundColor={COLORS.white}
-            borderRadius={BORDERS.borderRadius8}
-            marginBottom={SPACING.spacing16}
-            paddingX={SPACING.spacing16}
-            paddingY={SPACING.spacing16}
-          >
+          <div className={styles.content_bottom_spacing}>
             {robotSettingsContent}
-          </Flex>
+          </div>
+        ) : (
+          <div className={styles.tab_content_card}>{robotSettingsContent}</div>
         )}
-      </Box>
+      </div>
     </>
   )
 }

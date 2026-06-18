@@ -1,19 +1,23 @@
-import { useId, useState } from 'react'
+import { useState } from 'react'
 
-import { Icon, StyledText } from '@opentrons/components'
+import { Icon, SPACING, StyledText } from '@opentrons/components'
 
 import styles from './accordion.module.css'
 
 import type { JSX, ReactNode } from 'react'
 
 export interface AccordionProps {
+  id: string
   title: string
   children?: ReactNode
 }
 
-export function Accordion({ title, children }: AccordionProps): JSX.Element {
+export function Accordion({
+  id,
+  title,
+  children,
+}: AccordionProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false)
-  const contentId = useId()
 
   return (
     <div className={styles.accordion}>
@@ -24,19 +28,19 @@ export function Accordion({ title, children }: AccordionProps): JSX.Element {
           setIsExpanded(current => !current)
         }}
         aria-expanded={isExpanded}
-        aria-controls={contentId}
+        aria-controls={id}
       >
         <StyledText desktopStyle="bodyDefaultSemiBold" className={styles.title}>
           {title}
         </StyledText>
         <Icon
           name={isExpanded ? 'minus' : 'plus'}
-          size="24px"
+          size={SPACING.spacing24}
           className={styles.icon}
         />
       </button>
       {isExpanded ? (
-        <div id={contentId} className={styles.content}>
+        <div id={id} className={styles.content}>
           {children}
         </div>
       ) : null}

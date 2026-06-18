@@ -41,7 +41,6 @@ export function PersonalAccountSettings({
   const selfQuery = useSelfQuery({ enabled: authState != null })
   const username = authState?.username ?? selfQuery.data?.data.username ?? null
   const fullName = selfQuery.data?.data.fullName ?? null
-  const isProfileLoaded = selfQuery.isSuccess
 
   return (
     <div className={styles.container}>
@@ -49,14 +48,11 @@ export function PersonalAccountSettings({
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('desktop_personal_account_settings')}
         </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegLink">
-          <a
-            href={`/devices/${robotName}/robot-settings/compliance-ready`}
-            className={styles.edit_link}
-          >
+        <button type="button" className={styles.edit_button}>
+          <StyledText desktopStyle="bodyDefaultRegLink">
             {t('desktop_edit')}
-          </a>
-        </StyledText>
+          </StyledText>
+        </button>
       </div>
       <div className={styles.content}>
         <FieldRow label={t('desktop_username')}>
@@ -78,16 +74,12 @@ export function PersonalAccountSettings({
         </FieldRow>
         <Divider />
         <FieldRow label={t('desktop_password')}>
-          {isProfileLoaded ? (
-            <input
-              type="password"
-              readOnly
-              value="password"
-              className={styles.masked_password_input}
-              tabIndex={-1}
-              aria-hidden
-            />
-          ) : null}
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            className={styles.field_value_text}
+          >
+            ••••••••
+          </StyledText>
         </FieldRow>
       </div>
     </div>

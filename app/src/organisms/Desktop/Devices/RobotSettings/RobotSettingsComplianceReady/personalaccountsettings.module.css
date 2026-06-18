@@ -12,9 +12,12 @@
   justify-content: space-between;
 }
 
-.edit_link {
+.edit_button {
+  padding: 0;
+  border: none;
+  background: transparent;
   color: inherit;
-  text-decoration: underline;
+  cursor: pointer;
 }
 
 .content {
@@ -44,13 +47,4 @@
 
 .field_value_text {
   color: var(--grey-60);
-}
-
-.masked_password_input {
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: var(--grey-60);
-  font: inherit;
-  pointer-events: none;
 }

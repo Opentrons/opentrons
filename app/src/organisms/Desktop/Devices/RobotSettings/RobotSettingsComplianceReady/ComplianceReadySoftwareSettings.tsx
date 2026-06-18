@@ -351,7 +351,10 @@ export function ComplianceReadySoftwareSettings({
   }
 
   return (
-    <Accordion title={t('desktop_compliance_ready_software_settings')}>
+    <Accordion
+      id="compliance-ready-software-settings"
+      title={t('desktop_compliance_ready_software_settings')}
+    >
       <div className={styles.content}>
         {SETTINGS_SECTIONS.map((section, index) => (
           <ComplianceReadySettingsSection

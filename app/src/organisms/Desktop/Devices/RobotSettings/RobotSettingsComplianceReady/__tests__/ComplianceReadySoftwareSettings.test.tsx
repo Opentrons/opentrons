@@ -57,16 +57,12 @@ const AUTH_SETTING_KEYS = Object.keys({
 function getFieldIds(
   fields: (typeof SETTINGS_SECTIONS)[number]['fields']
 ): string[] {
-  return fields.flatMap(field => {
-    if (field.type === 'input') {
-      return [field.id]
-    }
-
-    return [
-      field.id,
-      ...(field.children != null ? getFieldIds(field.children) : []),
-    ]
-  })
+  return fields.flatMap(field => [
+    field.id,
+    ...('children' in field && field.children != null
+      ? getFieldIds(field.children)
+      : []),
+  ])
 }
 
 const render = (): void => {
