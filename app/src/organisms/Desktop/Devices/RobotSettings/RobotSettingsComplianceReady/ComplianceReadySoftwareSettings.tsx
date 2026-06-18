@@ -1,7 +1,8 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
+import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { Accordion } from '/app/molecules/Accordion'
@@ -52,21 +53,51 @@ type ComplianceReadySettingsSection = {
   fields: ComplianceReadyFieldConfig[]
 }
 
-const INITIAL_FIELD_VALUES: FieldValues = {
-  maxNumberOfLoginAttempts: '',
-  idleLogout: '',
-  passwordResetEnabled: false,
-  passwordResetTime: '',
-  passwordComplexityEnabled: false,
-  passwordComplexitySpecialCharacters: false,
-  passwordComplexityMinimumLength: '',
-  requireAdminCredsWhenUpdatingRobotSoftware: false,
-  requireAdminCredsWhenSendingProtocolToRobot: false,
-  requireAdminCredsForSignoffProtocol: false,
-  requireReasonForInteraction: false,
-  minLengthOfReasonForInteraction: '',
-  requireProtocolLogsSignedAndSaved: false,
-  automaticallyDeleteProtocolRunLogs: false,
+const SECONDS_PER_MINUTE = 60
+const SECONDS_PER_DAY = 24 * 60 * 60
+
+function getFieldValuesFromAuthSettings(
+  settings?: AuthSettingsResponse['data']
+): FieldValues {
+  return {
+    maxNumberOfLoginAttempts:
+      settings?.maxNumberOfLoginAttempts != null
+        ? String(settings.maxNumberOfLoginAttempts)
+        : '',
+    idleLogout:
+      settings != null
+        ? String(Math.round(settings.idleLogout / SECONDS_PER_MINUTE))
+        : '',
+    passwordResetEnabled: settings?.passwordResetTime != null,
+    passwordResetTime:
+      settings?.passwordResetTime != null
+        ? String(Math.round(settings.passwordResetTime / SECONDS_PER_DAY))
+        : '',
+    passwordComplexityEnabled:
+      settings != null
+        ? settings.passwordComplexityMinimumLength != null ||
+          settings.passwordComplexitySpecialCharacters
+        : false,
+    passwordComplexitySpecialCharacters:
+      settings?.passwordComplexitySpecialCharacters ?? false,
+    passwordComplexityMinimumLength:
+      settings?.passwordComplexityMinimumLength != null
+        ? String(settings.passwordComplexityMinimumLength)
+        : '',
+    requireAdminCredsWhenUpdatingRobotSoftware:
+      settings?.requireAdminCredsWhenUpdatingRobotSoftware ?? false,
+    requireAdminCredsWhenSendingProtocolToRobot:
+      settings?.requireAdminCredsWhenSendingProtocolToRobot ?? false,
+    requireAdminCredsForSignoffProtocol:
+      settings?.requireAdminCredsForSignoffProtocol ?? false,
+    requireReasonForInteraction: settings?.requireReasonForInteraction ?? false,
+    minLengthOfReasonForInteraction:
+      settings?.minLengthOfReasonForInteraction != null
+        ? String(settings.minLengthOfReasonForInteraction)
+        : '',
+    requireProtocolLogsSignedAndSaved: false,
+    automaticallyDeleteProtocolRunLogs: false,
+  }
 }
 
 export const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
@@ -293,8 +324,16 @@ export function ComplianceReadySoftwareSettings({
   robotName: _robotName,
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('access_control')
-  const [fieldValues, setFieldValues] =
-    useState<FieldValues>(INITIAL_FIELD_VALUES)
+  const authSettingsQuery = useAuthSettingsQuery()
+  const [fieldValues, setFieldValues] = useState<FieldValues>(() =>
+    getFieldValuesFromAuthSettings()
+  )
+
+  useEffect(() => {
+    if (authSettingsQuery.data?.data != null) {
+      setFieldValues(getFieldValuesFromAuthSettings(authSettingsQuery.data.data))
+    }
+  }, [authSettingsQuery.data?.data])
 
   const handleInputChange = (id: AuthSettingFieldId, value: string): void => {
     setFieldValues(current => ({
