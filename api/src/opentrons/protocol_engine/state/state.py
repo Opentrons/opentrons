@@ -239,6 +239,7 @@ class StateStore(StateView, ActionHandler):
             config=config,
             is_door_open=is_door_open,
             error_recovery_policy=error_recovery_policy,
+            updates_callback=updates_callback,
         )
         self._pipette_store = PipetteStore(updates_callback=updates_callback)
         if deck_configuration is None:

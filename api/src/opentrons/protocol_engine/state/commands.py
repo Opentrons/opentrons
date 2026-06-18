@@ -374,7 +374,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         self._state.command_history.set_command_running(running_command)
         if self._updates_callback:
-            # CASEY NOTE: do all of these need to go inside a call soon?
             self._updates_callback(EngineEventNotification.CURRENT_COMMAND)
 
     def _handle_succeed_command_action(self, action: SucceedCommandAction) -> None:

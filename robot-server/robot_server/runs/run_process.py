@@ -215,7 +215,6 @@ class DirectedRunProcess(AbstractRunCoordinator):
             error_recovery_rules, error_recovery_is_enabled
         )
 
-        # CASEY NOTE: proxy callback for the updates callback can be provided here (look at get engine updates callback)
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(

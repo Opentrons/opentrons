@@ -261,11 +261,22 @@ class RunOrchestratorStore:
                 # for example, there would be no equivalent to the `POST /runs/{id}/actions`
                 # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
+                updates_callback=self.update_default_run_engine_status_callback,
                 proxy_of_callback_for_handling_door_events=proxy_door_callback,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api
             )
+
+            # Initialize values for the default run orchestrator
+            self._clear_stored_engine_state()
+            self._nozzle_maps = self._default_run_orchestrator.get_nozzle_maps()
+            self._tip_attached = self._default_run_orchestrator.get_tip_attached()
+            self._current_command = self._default_run_orchestrator.get_current_command()
+            self._most_recent_finalized_command = (
+                self._default_run_orchestrator.get_most_recently_finalized_command()
+            )
+            self._flex_stacker_substate = self._default_run_orchestrator.get_flex_stacker_substate()
             return self._default_run_orchestrator
         return default_orchestrator
 
@@ -329,7 +340,6 @@ class RunOrchestratorStore:
         if self._run_coordinator is not None:
             raise RunConflictError("Another run is currently active.")
 
-        # CASEY NOTE: non-proxy version could be passed in here
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -374,6 +384,7 @@ class RunOrchestratorStore:
             orchestrator.add_labware_offset(offset)
 
         summary = orchestrator.get_state_summary()
+        self._clear_stored_engine_state()
         self._run_coordinator = orchestrator
 
         self._initialize_stored_engine_state()
@@ -444,6 +455,7 @@ class RunOrchestratorStore:
         )
 
         summary = run_process.get_state_summary()
+        self._clear_stored_engine_state()
         self._run_coordinator = run_process
         self._initialize_stored_engine_state()
         return summary
@@ -724,6 +736,27 @@ class RunOrchestratorStore:
                 self.run_coordinator.get_flex_stacker_substate()
             )
 
+    def update_default_run_engine_status_callback(self, event: EngineEventNotification) -> None:
+        """Handle protocol engine status updates for the default run orchestrator store."""
+        _log.info(f"Handling engine status event: {event}")
+        if event is EngineEventNotification.NOZZLE_CONFIG:
+            self._nozzle_maps = self._default_run_orchestrator.get_nozzle_maps()
+
+        if event is EngineEventNotification.TIP_ATTACHED:
+            self._tip_attached = self._default_run_orchestrator.get_tip_attached()
+
+        if event is EngineEventNotification.CURRENT_COMMAND:
+            self._current_command = self._default_run_orchestrator.get_current_command()
+
+        if event is EngineEventNotification.FINALIZED_COMMAND:
+            self._most_recent_finalized_command = (
+                self._default_run_orchestrator.get_most_recently_finalized_command()
+            )
+        if event is EngineEventNotification.FLEX_STACKER_SUBSTATE:
+            self._flex_stacker_substate = (
+                self._default_run_orchestrator.get_flex_stacker_substate()
+            )
+
     def _initialize_stored_engine_state(self) -> None:
         """Initialize the orchestrator store local engine state."""
         self._nozzle_maps = self.run_coordinator.get_nozzle_maps()
@@ -733,3 +766,12 @@ class RunOrchestratorStore:
             self.run_coordinator.get_most_recently_finalized_command()
         )
         self._flex_stacker_substate = self.run_coordinator.get_flex_stacker_substate()
+
+    def _clear_stored_engine_state(self) -> None:
+        """Clear the stored engine state, called when creating a new run orchestrator so no state persists between runs."""
+        self._nozzle_maps = None
+        self._tip_attached = None
+        self._current_command = None
+        self._most_recent_finalized_command = None
+        self._flex_stacker_substate = None
+
