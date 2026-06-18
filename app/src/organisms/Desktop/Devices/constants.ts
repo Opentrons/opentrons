@@ -29,3 +29,8 @@ export function getDefaultTiprackDefForPipetteName(
   }
   return null
 }
+
+export const RECENT_PROTOCOL_RUNS_HEADER = '30% 25% 16% 5% 24%'
+
+// inclusive of overflow menu button
+export const RECENT_PROTOCOL_RUNS_COLUMNS = '30% 25% 16% 5% 14% 10%'
