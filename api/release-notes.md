@@ -23,7 +23,7 @@ Welcome to the v9.1.0 release of the Opentrons Flex robot software! This release
 
 ### Bug Fixes
 
-Liquid handling actions using a liquid class, including a transfer, distribute, or consolidate, now correctly calculate maximum aspirate volume for Flex 50 µL pipettes using 20 µL tips.
+Transfers, consolidates, and distributes using a liquid class now correctly calculate the maximum aspirate volume for Flex 50 µL pipettes (using 20 or 30 µL tips). Each liquid handling action now uses the correct volume mode to determine the amount of liquid that should be in the tip.
 
 ---
 
