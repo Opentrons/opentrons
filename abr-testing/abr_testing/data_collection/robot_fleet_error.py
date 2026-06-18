@@ -519,14 +519,11 @@ def get_run_error_info_from_robot(
     )
     # Error Printout
     error_dict = read_robot_logs.get_error_info(results)
-    error_level = error_dict["Error_Level"]
     error_type = error_dict["Error_Type"]
     error_code = error_dict["Error_Code"]
     error_instrument = error_dict["Error_Instrument"]
     # JIRA Ticket Fields
     robot = results.get("robot_name", "")
-    failure_level = "Level " + str(error_level) + " Failure"
-
     components: List[str] = []
     # components = ["Flex-RABR"] THIS IS WHERE THE COMPONENT STUFF IS ADDED
     components = match_error_to_component(project_key, str(error_type), components)
