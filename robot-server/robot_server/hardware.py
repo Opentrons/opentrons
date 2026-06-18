@@ -130,13 +130,15 @@ class HardwareStateStore:
         to the Hardware API, particularly things that are polled often. This is especially true when operating in
         subprocess mode.
         """
+        if isinstance(hardware_resource, ThreadManager):
+            self._hardware_resource = hardware_resource.wrapped()
+        else:
+            self._hardware_resource = hardware_resource
         if ff.hardware_subprocess_enabled():
             self._hardware_resource = hardware_resource
             # In subprocess mode a proxy-safe callback is registered after initialization
             self._unregister_hw_callback = None
         else:
-            assert isinstance(hardware_resource, ThreadManager)
-            self._hardware_resource = hardware_resource.wrapped()
             self._unregister_hw_callback = self._hardware_resource.register_callback(
                 self.update_hardware_status_callback
             )
@@ -179,6 +181,7 @@ class HardwareStateStore:
             )
 
     def unregister_hardware_callback(self) -> None:
+        """Callback to unregister the robot-server callback from the hardware process."""
         assert self._unregister_hw_callback is not None
         self._unregister_hw_callback()
 

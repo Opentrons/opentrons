@@ -12,7 +12,6 @@ from typing import Annotated, Callable, Dict, Final, Literal, Optional, Union
 from fastapi import Depends, Query, status
 from pydantic import BaseModel, Field
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
 from opentrons.hardware_control.types import EstopState
 from opentrons.protocol_engine import (
@@ -79,7 +78,6 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.hardware import (
     HardwareStateStore,
-    get_hardware,
     get_hardware_state_store,
     get_robot_type_enum,
 )
@@ -536,7 +534,6 @@ async def get_run_commands_error(
 async def get_current_state(  # noqa: C901
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
-    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
     hardware_store: Annotated[HardwareStateStore, Depends(get_hardware_state_store)],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> PydanticResponse[Body[RunCurrentState, CurrentStateLinks]]:
@@ -545,7 +542,7 @@ async def get_current_state(  # noqa: C901
     Arguments:
         runId: Run ID pulled from URL.
         run_data_manager: Run data retrieval interface.
-        hardware: Hardware control interface.
+        hardware_store: Robot-server store of hardware status.
         robot_type: The type of robot.
     """
     try:
