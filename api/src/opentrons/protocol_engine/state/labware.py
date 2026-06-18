@@ -722,6 +722,18 @@ class LabwareView:
         """True if a labware is a reservoir with a 12-grid of sub-wells."""
         return self.get_has_quirk(labware_id, "offsetPipetteFor12GridSubwells")
 
+    def get_is_column_labware(self, labware_id: str) -> bool:
+        """True if a labware is a series of column-length wells. One well reservoirs do not count."""
+        definition = self.get_definition(labware_id)
+        return len(definition.wells) > 1 and all(
+            len(column) == 1 for column in definition.ordering
+        )
+
+    def get_is_row_labware(self, labware_id: str) -> bool:
+        """True if a labware is a series of row-length wells. One well reservoirs do not count."""
+        definition = self.get_definition(labware_id)
+        return len(definition.wells) > 1 and len(definition.ordering) == 1
+
     def get_well_definition(
         self,
         labware_id: str,

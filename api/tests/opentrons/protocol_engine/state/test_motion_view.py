@@ -183,6 +183,8 @@ def test_get_pipette_location_with_current_location_with_y_center(
         )
     ).then_return(True)
 
+    decoy.when(labware_view.get_is_column_labware("reservoir-id")).then_return(True)
+
     result = subject.get_pipette_location("pipette-id")
 
     assert result == PipetteLocationData(
@@ -332,6 +334,8 @@ def test_get_pipette_location_override_current_location_y_center(
         )
     ).then_return(True)
 
+    decoy.when(labware_view.get_is_column_labware("reservoir-id")).then_return(True)
+
     result = subject.get_pipette_location(
         pipette_id="pipette-id",
         current_location=current_well,
@@ -391,6 +395,7 @@ def test_get_pipette_offset_for_reservoirs(
             "labware-id",
         )
     ).then_return(False)
+    decoy.when(labware_view.get_is_column_labware("labware-id")).then_return(True)
 
     fake_well_position = Point(x=4, y=5, z=6)
     decoy.when(
@@ -484,6 +489,7 @@ def test_get_movement_waypoints_to_well_for_y_center(
             "labware-id",
         )
     ).then_return(False)
+    decoy.when(labware_view.get_is_column_labware("labware-id")).then_return(True)
 
     decoy.when(
         geometry_view.get_well_position(
