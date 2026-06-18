@@ -84,14 +84,13 @@
   --white: #fff;
   --blue-50: #006cfa;
 
-  /* semi-opaques */
-  /* white */
+  /* semi-opaques white */
   --transparent-white-80: #fffc;
   --transparent-white-50: #ffffff80;
   --transparent-white-30: #ffffff4d;
-  --transparent-white-20: #ffffff33;
+  --transparent-white-20: #fff3;
 
-  /* black */
+  /* semi-opaques black */
   --transparent-black-80: #16212d80;
   --transparent-black-60: #16212d60;
   --transparent-black-10: #16212d1a;
