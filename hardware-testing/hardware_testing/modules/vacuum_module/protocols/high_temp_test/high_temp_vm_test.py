@@ -8,7 +8,7 @@ from opentrons.protocol_api import ParameterContext
 from opentrons.drivers import vacuum_module  # type: ignore[import]
 
 metadata = {"protocolName": "VM 400mbar Stress Test-water pump impl"}
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.30"}
 
 Ard_idVendor = 9025
 Ard_idProduct = 66
