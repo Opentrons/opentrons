@@ -1476,6 +1476,7 @@ def _test_plunger_positions(
         drop_tip_passed = True
     else:
         drop_tip_passed = helpers_ot3.get_user_answer(ctx, api, "is DROP-TIP correct?")
+        ctx.comment(f"drop-tip passed {drop_tip_passed}")
         if not drop_tip_passed:
             printval = f"02-02-DROP-TIP:移液器DROP-TIP {drop_tip_passed}"
             FINAL_TEST_FAIL_INFOR.append(printval)
@@ -1820,6 +1821,7 @@ def test_liquid_probe_new(
                         ctx, api, "Is the tip just touching the liquid?"
                     ):
                         good_height = end_z
+                    ctx.comment("液体测试探针。" if LOCALIZE else "Test liquid probe.")
                 _drop_tip_in_trash(api, cfg)
             heights = [h for h, _ in results[probe]]
             passing = [p for _, p in results[probe]]
@@ -2349,6 +2351,9 @@ def _reset_available_tip(pipette_channels: int) -> None:
 def run(ctx: ProtocolContext) -> None:
     """Entry point into testing protocol."""
     # apply monkey patch
+    if ctx.is_simulating and IS_ROBOT:
+        ctx.comment("on robot analysis, skipping.")
+        return
     OT3API._get_tip_status = _get_tip_status_patch  # type: ignore[attr-defined]
     OT3API._calibrate_pipette = _calibrate_pipette_patch  # type: ignore[attr-defined]
 
