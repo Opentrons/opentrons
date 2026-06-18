@@ -42,7 +42,7 @@ class AppSettingsPage:
             f"Slideout_icon_close_{self.CONNECT_IP_HEADING}"
         )
         if close.count() > 0 and close.is_visible():
-            close.click()
+            close.click(force=True)
         else:
             done = self.page.get_by_role("button", name="Done")
             if done.count() > 0 and done.is_visible():

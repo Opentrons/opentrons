@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from playwright.sync_api import Page, expect
+import re
+
+from playwright.sync_api import Locator, Page, expect
 
 from automation.helpers.app_readiness import click_when_ui_ready
 from automation.helpers.screenshot_helper import ScreenshotHelper
@@ -8,6 +10,9 @@ from automation.helpers.screenshot_helper import ScreenshotHelper
 
 class ProtocolsPage:
     PROTOCOL_TABS = ("Parameters", "Hardware", "Labware", "Liquids")
+    # Electron serves the SPA from file://…/index.html with hash routing (#/protocols/…).
+    PROTOCOLS_LANDING_URL = re.compile(r"#/protocols/?$")
+    PROTOCOL_DETAIL_URL = re.compile(r"#/protocols/.+")
 
     def __init__(self, page: Page, shots: ScreenshotHelper | None = None):
         self.page = page
@@ -19,13 +24,30 @@ class ProtocolsPage:
 
     def navigate_landing(self):
         click_when_ui_ready(self.page, self.nav_link)
-        self.page.wait_for_url("**/protocols**")
+        self.page.wait_for_url(self.PROTOCOLS_LANDING_URL)
         expect(self.nav_link).to_have_attribute("aria-current", "page")
+
+    def protocol_card(self, protocol_name: str) -> Locator:
+        """First card for this display name (duplicate imports share the same test id)."""
+        return self.page.get_by_test_id(
+            re.compile(rf"^ProtocolCard_{re.escape(protocol_name)}$")
+        ).first
+
+    def _scroll_to_protocol_card(self, protocol_name: str) -> Locator:
+        card = self.protocol_card(protocol_name)
+        for _ in range(60):
+            if card.count() > 0 and card.is_visible():
+                break
+            self.page.mouse.wheel(0, 400)
+            self.page.wait_for_timeout(150)
+        card.scroll_into_view_if_needed()
+        return card
 
     def open(self, protocol_name: str):
         self.navigate_landing()
-        self.page.get_by_test_id(f"ProtocolCard_{protocol_name}").click()
-        self.page.wait_for_url("**/protocols/**")
+        card = self._scroll_to_protocol_card(protocol_name)
+        card.click()
+        self.page.wait_for_url(self.PROTOCOL_DETAIL_URL)
 
     def tab_button(self, name: str):
         return self.page.get_by_role("button", name=name, exact=True)

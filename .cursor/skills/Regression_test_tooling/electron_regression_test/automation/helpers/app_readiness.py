@@ -47,7 +47,13 @@ def _close_open_slideouts(page: Page) -> None:
         ]
         if not visible_indexes:
             return
-        close_buttons.nth(visible_indexes[0]).click()
+        close = close_buttons.nth(visible_indexes[0])
+        # Slideout close buttons are fixed-position; Playwright may treat them as
+        # outside the viewport even when visible.
+        try:
+            close.click(force=True, timeout=2_000)
+        except Exception:
+            page.keyboard.press("Escape")
         page.wait_for_timeout(400)
 
 

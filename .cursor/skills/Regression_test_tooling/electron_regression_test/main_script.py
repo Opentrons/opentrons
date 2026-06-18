@@ -5,13 +5,18 @@ from __future__ import annotations
 import sys
 
 import bootstrap  # noqa: F401
+from automation.helpers.cli_args import inject_robot_profile_or_name_arg
 
 
 def main(argv: list[str] | None = None) -> int:
     import pytest
 
-    args = argv if argv is not None else sys.argv[1:]
-    return pytest.main(args or ["tests/nav"])
+    args = list(argv if argv is not None else sys.argv[1:])
+    if not args:
+        args = ["tests/nav"]
+    else:
+        inject_robot_profile_or_name_arg(args)
+    return pytest.main(args)
 
 
 if __name__ == "__main__":
