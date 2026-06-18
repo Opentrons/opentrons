@@ -18,11 +18,14 @@ export interface ComplianceReadySoftwareSettingsProps {
 
 type AuthSettingFieldId = keyof AuthSettingsResponse['data']
 
-type UiSettingFieldId =
-  | 'passwordResetEnabled'
-  | 'passwordComplexityEnabled'
-  | 'requireProtocolLogsSignedAndSaved'
-  | 'automaticallyDeleteProtocolRunLogs'
+export const UI_ONLY_FIELD_IDS = [
+  'passwordResetEnabled',
+  'passwordComplexityEnabled',
+  'requireProtocolLogsSignedAndSaved',
+  'automaticallyDeleteProtocolRunLogs',
+] as const
+
+type UiSettingFieldId = (typeof UI_ONLY_FIELD_IDS)[number]
 
 type SettingFieldId = AuthSettingFieldId | UiSettingFieldId
 
@@ -66,7 +69,7 @@ const INITIAL_FIELD_VALUES: FieldValues = {
   automaticallyDeleteProtocolRunLogs: false,
 }
 
-const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
+export const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
   {
     titleKey: 'desktop_login_and_security',
     fields: [
@@ -162,7 +165,8 @@ const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
           {
             type: 'input',
             id: 'minLengthOfReasonForInteraction',
-            labelKey: 'desktop_minimum_length_for_documentation_for_robot_actions',
+            labelKey:
+              'desktop_minimum_length_for_documentation_for_robot_actions',
             unitsKey: 'desktop_characters',
           },
         ],
@@ -189,6 +193,7 @@ function ComplianceReadySettingField({
   if (field.type === 'input') {
     return (
       <InputSetting
+        id={field.id}
         label={t(field.labelKey)}
         value={String(values[field.id])}
         units={field.unitsKey != null ? t(field.unitsKey) : undefined}

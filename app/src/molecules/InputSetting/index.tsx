@@ -5,6 +5,7 @@ import styles from './inputsetting.module.css'
 import type { ChangeEventHandler, JSX } from 'react'
 
 export interface InputSettingProps {
+  id: string
   label: string
   value: string
   units?: string
@@ -13,6 +14,7 @@ export interface InputSettingProps {
 }
 
 export function InputSetting({
+  id,
   label,
   value,
   units,
@@ -21,11 +23,12 @@ export function InputSetting({
 }: InputSettingProps): JSX.Element {
   return (
     <div className={styles.field_row}>
-      <StyledText desktopStyle="bodyDefaultRegular" className={styles.label}>
-        {label}
-      </StyledText>
+      <label htmlFor={id} className={styles.label}>
+        <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
+      </label>
       <div className={styles.input}>
         <InputField
+          id={id}
           type="number"
           value={value}
           placeholder={placeholder}

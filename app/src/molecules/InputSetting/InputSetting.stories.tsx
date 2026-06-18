@@ -8,6 +8,10 @@ const meta: Meta<typeof InputSettingComponent> = {
   title: 'App/Molecules/InputSetting',
   component: InputSettingComponent,
   argTypes: {
+    id: {
+      control: 'text',
+      description: 'Input id used to associate the label with the field.',
+    },
     label: {
       control: 'text',
       description: 'Setting label shown to the left of the input.',
@@ -38,6 +42,7 @@ type Story = StoryObj<typeof InputSettingComponent>
 
 export const InputSetting: Story = {
   args: {
+    id: 'maxNumberOfLoginAttempts',
     label: 'Maximum login attempts before account deactivation',
     units: 'logins',
   },
@@ -57,6 +62,7 @@ export const InputSetting: Story = {
 
 export const AutoLogout: Story = {
   args: {
+    id: 'idleLogout',
     label: 'Length of time for auto-logout due to inactivity',
     units: 'minutes',
   },
