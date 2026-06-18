@@ -18,6 +18,7 @@ export interface ComplianceReadySoftwareSettingsProps {
 
 type AuthSettingFieldId = keyof AuthSettingsResponse['data']
 
+// TODO(tz, 2026-06-18): Get robot server acm settings
 export const UI_ONLY_FIELD_IDS = [
   'passwordResetEnabled',
   'passwordComplexityEnabled',
