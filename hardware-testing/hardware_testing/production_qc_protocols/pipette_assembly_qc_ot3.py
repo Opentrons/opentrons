@@ -521,7 +521,7 @@ def _load_labware_locations(cfg: TestConfig, ctx: ProtocolContext) -> None:
         # 2 mm above the bottom but shift over so that we're not directly on the center ridge
         CALIBRATED_LABWARE_LOCATIONS.reservoir = reservoir["A1"].bottom(
             2
-        ).point +  Point(x=4.5, z= 2)
+        ).point + Point(x=4.5, z=2)
         if cfg.pipette_channels == 8:
             # Center 8 channel in reservoir
             CALIBRATED_LABWARE_LOCATIONS.reservoir = (
