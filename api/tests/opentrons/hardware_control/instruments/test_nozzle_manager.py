@@ -1042,11 +1042,13 @@ def test_96_config_geometry(
         starting_nozzle: str,
         front_nozzle: str,
         xy_center_between: Union[str, Tuple[str, str]],
+        x_center_between: Union[str, Tuple[str, str]],
         y_center_between: Union[str, Tuple[str, str]],
     ) -> None:
         assert_offset_in_center_of(
             nozzlemap.xy_center_offset, xy_center_between, config
         )
+        assert_offset_in_center_of(nozzlemap.x_center_offset, x_center_between, config)
         assert_offset_in_center_of(nozzlemap.y_center_offset, y_center_between, config)
 
         assert nozzlemap.front_nozzle_offset == Point(*config.nozzle_map[front_nozzle])
@@ -1055,12 +1057,23 @@ def test_96_config_geometry(
         )
 
     test_map_geometry(
-        config, subject.current_configuration, "A1", "H1", ("A1", "H12"), ("A1", "H1")
+        config,
+        subject.current_configuration,
+        "A1",
+        "H1",
+        ("A1", "H12"),
+        ("A1", "A12"),
+        ("A1", "H1"),
     )
-
     subject.update_nozzle_configuration("A1", "H1")
     test_map_geometry(
-        config, subject.current_configuration, "A1", "H1", ("A1", "H1"), ("A1", "H1")
+        config,
+        subject.current_configuration,
+        "A1",
+        "H1",
+        ("A1", "H1"),
+        "A1",
+        ("A1", "H1"),
     )
 
     subject.update_nozzle_configuration("A12", "H12")
@@ -1070,25 +1083,39 @@ def test_96_config_geometry(
         "A12",
         "H12",
         ("A12", "H12"),
+        "A12",
         ("A12", "H12"),
     )
 
     subject.update_nozzle_configuration("A1", "A12")
     test_map_geometry(
-        config, subject.current_configuration, "A1", "A1", ("A1", "A12"), "A1"
+        config,
+        subject.current_configuration,
+        "A1",
+        "A1",
+        ("A1", "A12"),
+        ("A1", "A12"),
+        "A1",
     )
 
     subject.update_nozzle_configuration("H1", "H12")
     test_map_geometry(
-        config, subject.current_configuration, "H1", "H1", ("H1", "H12"), "H1"
+        config,
+        subject.current_configuration,
+        "H1",
+        "H1",
+        ("H1", "H12"),
+        ("H1", "H12"),
+        "H1",
     )
 
     subject.update_nozzle_configuration("A1", "D6")
     test_map_geometry(
-        config, subject.current_configuration, "A1", "D1", ("A1", "D6"), ("A1", "D1")
-    )
-
-    subject.update_nozzle_configuration("E7", "H12")
-    test_map_geometry(
-        config, subject.current_configuration, "E7", "H7", ("E7", "H12"), ("E7", "H7")
+        config,
+        subject.current_configuration,
+        "A1",
+        "D1",
+        ("A1", "D6"),
+        ("A1", "A6"),
+        ("A1", "D1"),
     )

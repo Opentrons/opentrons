@@ -173,6 +173,14 @@ class NozzleMap(BaseModel):
         )
 
     @property
+    def x_center_offset(self) -> Point:
+        """The position in the center of the primary row of the map."""
+        back_right = next(reversed(list(self.columns.values())))[0]
+        difference = self.map_store[back_right] - self.map_store[self.back_left]
+        return self.map_store[self.back_left] + Point(difference[0] / 2, 0, 0)
+
+
+    @property
     def y_center_offset(self) -> Point:
         """The position in the center of the primary column of the map."""
         front_left = next(reversed(list(self.rows.values())))[0]
