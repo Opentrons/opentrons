@@ -98,7 +98,7 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
       updateRobotSetting: mockUpdateRobotSetting,
-    } as ReturnType<typeof useUpdateRobotSettingMutation>)
+    } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)
     vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: {
         settings: [

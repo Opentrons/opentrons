@@ -30,7 +30,7 @@ describe('RobotSettings Advanced tab', () => {
   beforeEach(() => {
     vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
       updateRobotSetting: vi.fn(),
-    } as ReturnType<typeof useUpdateRobotSettingMutation>)
+    } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)
     vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: {
         settings: [
