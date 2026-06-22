@@ -305,6 +305,9 @@ jobs:
     needs:
       ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+    permissions:
+      id-token: write
+      contents: write
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v4'
@@ -320,22 +323,17 @@ jobs:
               cp ${variant_pattern}/* ./to_upload_${variant}/
               echo "Moved $(ls ./to_upload_${variant})"
           done
-      - name: 'configure s3 deploy creds'
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.S3_OT3_APP_DEPLOY_KEY_ID }} --profile identity
-          aws configure set aws_secret_access_key ${{ secrets.S3_OT3_APP_DEPLOY_SECRET }} --profile identity
-          aws configure set region us-east-2 --profile identity
-          aws configure set output json --profile identity
-          aws configure set region us-east-2 --profile deploy
-          aws configure set role_arn ${{ secrets.OT_APP_OT3_DEPLOY_ROLE }} --profile deploy
-          aws configure set source_profile identity --profile deploy
-        shell: bash
+      - name: 'configure s3 deploy creds (GitHub OIDC)'
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ vars.OT_APP_OT3_DEPLOY_ROLE }}
+          aws-region: us-east-2
       - name: 'deploy release builds to s3'
         run: |
-          aws --profile=deploy s3 sync --acl=public-read to_upload_release/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
+          aws s3 sync --acl=public-read to_upload_release/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
       - name: 'deploy internal-release release builds to s3'
         run: |
-          aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+          aws s3 sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
 
       - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
@@ -424,16 +422,16 @@ jobs:
       - name: 'update internal-releases releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
+          aws s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
           node ./scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
-          aws --profile=deploy s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
+          aws s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
 
       - name: 'update release releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
+          aws s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
           node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
-          aws --profile=deploy s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
+          aws s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
 
   # Notification jobs for tagged builds
   notify-success:
