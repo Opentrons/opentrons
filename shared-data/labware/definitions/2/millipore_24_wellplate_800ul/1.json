@@ -9,10 +9,11 @@
   ],
   "brand": {
     "brand": "Millipore",
-    "brandId": ["111606-MM"]
+    "brandId": ["PSMW010R5"],
+    "links": ["https://www.sigmaaldrich.com/US/en/product/mm/psmw010r5"]
   },
   "metadata": {
-    "displayName": "Millipore 24 Well Plate 111606-MM",
+    "displayName": "Millipore 24 Well Plate 800µL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -25,7 +26,7 @@
   "wells": {
     "A1": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 16.13,
@@ -34,7 +35,7 @@
     },
     "B1": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 16.13,
@@ -43,7 +44,7 @@
     },
     "C1": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 16.13,
@@ -52,7 +53,7 @@
     },
     "D1": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 16.13,
@@ -61,7 +62,7 @@
     },
     "A2": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 35.03,
@@ -70,7 +71,7 @@
     },
     "B2": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 35.03,
@@ -79,7 +80,7 @@
     },
     "C2": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 35.03,
@@ -88,7 +89,7 @@
     },
     "D2": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 35.03,
@@ -97,7 +98,7 @@
     },
     "A3": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 53.93,
@@ -106,7 +107,7 @@
     },
     "B3": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 53.93,
@@ -115,7 +116,7 @@
     },
     "C3": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 53.93,
@@ -124,7 +125,7 @@
     },
     "D3": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 53.93,
@@ -133,7 +134,7 @@
     },
     "A4": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 72.83,
@@ -142,7 +143,7 @@
     },
     "B4": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 72.83,
@@ -151,7 +152,7 @@
     },
     "C4": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 72.83,
@@ -160,7 +161,7 @@
     },
     "D4": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 72.83,
@@ -169,7 +170,7 @@
     },
     "A5": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 91.73,
@@ -178,7 +179,7 @@
     },
     "B5": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 91.73,
@@ -187,7 +188,7 @@
     },
     "C5": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 91.73,
@@ -196,7 +197,7 @@
     },
     "D5": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 91.73,
@@ -205,7 +206,7 @@
     },
     "A6": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 110.63,
@@ -214,7 +215,7 @@
     },
     "B6": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 110.63,
@@ -223,7 +224,7 @@
     },
     "C6": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 110.63,
@@ -232,7 +233,7 @@
     },
     "D6": {
       "depth": 12.98,
-      "totalLiquidVolume": 0.01,
+      "totalLiquidVolume": 800,
       "shape": "circular",
       "diameter": 13.21,
       "x": 110.63,
@@ -275,10 +276,10 @@
   ],
   "parameters": {
     "format": "irregular",
-    "quirks": ["filterPlate"],
+    "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "millipore_24_wellplate_111606mm"
+    "loadName": "millipore_24_wellplate_800ul"
   },
   "namespace": "opentrons",
   "version": 1,
