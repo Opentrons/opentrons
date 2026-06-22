@@ -1,7 +1,7 @@
 // functions for downloading and storing release files
 
 import path from 'path'
-import { glob, mkdirp, move, readdir, readFile, rm } from 'fs-extra'
+import { mkdirp, move, readdir, readFile, rm } from 'fs-extra'
 
 import { fetchToFile } from '../../http'
 import { createLogger } from '../../log'
@@ -275,7 +275,6 @@ const removeTemporaryDownloadsFromReleaseDir = async (
     )
   } catch (e: unknown) {
     log.warn(`Failed to read ${releaseDir}: ${e}`)
-    return
   }
 }
 
