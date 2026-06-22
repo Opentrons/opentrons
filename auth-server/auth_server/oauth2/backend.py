@@ -49,6 +49,10 @@ class Backend:
     def create_token_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
     ) -> fastapi.Response:
+        """Process a request to the OAuth 2 token endpoint and return the response.
+
+        This is basically a type-safe wrapper around the underlying oauthlib implementation.
+        """
         token_response: tuple[dict[str, str], str, int] = (
             self._inner_backend.create_token_response(
                 # The uri param apparently does not matter.
@@ -70,6 +74,10 @@ class Backend:
     def create_introspect_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
     ) -> fastapi.Response:
+        """Process a request to the OAuth 2 introspection endpoint and return the response.
+
+        This is basically a type-safe wrapper around the underlying oauthlib implementation.
+        """
         headers, body, status_code = self._inner_backend.create_introspect_response(
             # The uri param apparently does not matter.
             uri="",
