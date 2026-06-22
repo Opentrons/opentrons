@@ -404,7 +404,7 @@ class AttachedModulesControl:
                             self._event_callback,
                             ModuleConnectedNotification(
                                 module_serial=device.serial,
-                                module_model=device.name,
+                                name=device.name,
                                 port=device.port,
                             ),
                         )

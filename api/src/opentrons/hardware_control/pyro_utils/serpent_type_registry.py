@@ -604,7 +604,7 @@ def _mod_connected_notif_class_to_dict(obj) -> Dict:  # type: ignore
         "__class__": "opentrons.hardware_control.types.ModuleConnectedNotification",
         "event": obj.event,
         "module_serial": obj.module_serial,
-        "module_model": obj.module_model,
+        "name": obj.name,
         "port": obj.port,
     }
 
@@ -615,7 +615,7 @@ def _mod_connected_notif_dict_to_class(  # type: ignore
     return opentrons.hardware_control.types.ModuleConnectedNotification(
         event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
         module_serial=d["module_serial"],
-        module_model=d["module_model"],
+        name=d["name"],
         port=d["port"],
     )
 

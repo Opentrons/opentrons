@@ -449,7 +449,7 @@ class ModuleDisconnectedNotification:
 @dataclass(frozen=True)
 class ModuleConnectedNotification:
     module_serial: str | None
-    module_model: str
+    name: str
     port: str
     event: Literal[HardwareEventType.MODULE_CONNECTED] = (
         HardwareEventType.MODULE_CONNECTED

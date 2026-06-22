@@ -388,7 +388,7 @@ class OT3API(
         ):
             return
         mod_log.info(
-            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+            f"Forwarding module event {event.event} for {event.name if isinstance(event, ModuleConnectedNotification) else event.module_model} {event.module_serial} at {event.port}"
         )
         for cb in self._callbacks:
             try:
