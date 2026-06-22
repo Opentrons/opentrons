@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Accordion } from '/app/molecules/Accordion'
+import { Accordion } from './Accordion'
 
 import type { JSX } from 'react'
 

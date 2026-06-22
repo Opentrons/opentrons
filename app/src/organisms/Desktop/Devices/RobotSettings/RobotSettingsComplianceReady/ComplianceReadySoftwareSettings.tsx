@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { Divider, StyledText } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { Accordion } from '/app/molecules/Accordion'
 
+import { Accordion } from './Accordion'
 import styles from './compliancereadysoftwaresettings.module.css'
 import { InputSetting } from './InputSetting'
 
