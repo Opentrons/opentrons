@@ -1,10 +1,10 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-16);
   padding: var(--spacing-16);
-  background-color: var(--grey-20);
   border-radius: var(--border-radius-8);
+  background-color: var(--grey-20);
+  gap: var(--spacing-16);
 }
 
 .bar_section {
@@ -15,10 +15,10 @@
 
 .track {
   position: relative;
-  height: var(--spacing-12);
   overflow: hidden;
-  background-color: var(--blue-10);
+  height: var(--spacing-12);
   border-radius: var(--border-radius-full);
+  background-color: var(--blue-10);
 }
 
 .fill {
@@ -27,8 +27,8 @@
   left: 0;
   width: var(--fill-percent);
   height: 100%;
-  background-color: var(--blue-50);
   border-radius: var(--border-radius-full);
+  background-color: var(--blue-50);
 }
 
 .legend {
@@ -38,11 +38,11 @@
 
 @media (height = 600px) and (width = 1024px) {
   .container {
-    gap: var(--spacing-40);
-    padding: var(--spacing-32);
-    background-color: var(--grey-35);
-    border-radius: var(--border-radius-12);
     align-items: center;
+    padding: var(--spacing-32);
+    border-radius: var(--border-radius-12);
+    background-color: var(--grey-35);
+    gap: var(--spacing-40);
   }
 
   .label {
