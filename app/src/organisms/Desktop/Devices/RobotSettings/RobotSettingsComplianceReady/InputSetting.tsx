@@ -1,6 +1,6 @@
 import { useId } from 'react'
 
-import { StyledText } from '@opentrons/components'
+import { COLORS, InputField, StyledText } from '@opentrons/components'
 
 import styles from './inputsetting.module.css'
 
@@ -29,29 +29,23 @@ export function InputSetting({
         <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
       </label>
       <div className={styles.input}>
-        <div className={styles.input_field}>
-          <input
-            id={inputId}
-            type="number"
-            className={styles.input_control}
-            value={value}
-            placeholder={placeholder}
-            onChange={onChange}
-            onWheel={event => {
-              event.currentTarget.blur()
-            }}
-          />
-          {units != null ? (
-            <span className={styles.units}>
+        <InputField
+          id={inputId}
+          type="number"
+          value={value}
+          placeholder={placeholder}
+          units={
+            units != null ? (
               <StyledText
                 desktopStyle="bodyDefaultRegular"
-                className={styles.units_text}
+                color={COLORS.grey60}
               >
                 {units}
               </StyledText>
-            </span>
-          ) : null}
-        </div>
+            ) : undefined
+          }
+          onChange={onChange}
+        />
       </div>
     </div>
   )
