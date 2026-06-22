@@ -520,7 +520,6 @@ export function SelectLabwareModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t('add_labware')}
       type="info"
       width="37.125rem"

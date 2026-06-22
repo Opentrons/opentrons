@@ -229,6 +229,8 @@ export const STEP_DETAIL_VIEWER_UPDATE =
   'shell:STEP_DETAIL_VIEWER_UPDATE' as const
 export const STEP_DETAIL_VIEWER_CLOSE =
   'shell:STEP_DETAIL_VIEWER_CLOSE' as const
+export const STEP_DETAIL_VIEWER_CLOSED =
+  'shell:STEP_DETAIL_VIEWER_CLOSED' as const
 
 export const UPDATE_BRIGHTNESS: 'shell:UPDATE_BRIGHTNESS' =
   'shell:UPDATE_BRIGHTNESS'

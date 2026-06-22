@@ -72,8 +72,8 @@ describe('RecentProtocolRuns', () => {
       },
     } as any as UseQueryResult<Runs, AxiosError>)
     render()
-    screen.getByText('Recent Protocol Runs')
-    screen.getByText('Run')
+    screen.getByText('Run History')
+    screen.getByText('Run Date')
     screen.getByText('Protocol')
     screen.getByText('Status')
     screen.getByText('Run duration')

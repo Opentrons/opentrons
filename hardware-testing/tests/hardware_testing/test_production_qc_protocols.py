@@ -13,6 +13,9 @@ import pytest
 PROTOCOL_PARENT_FILEPATH = (
     Path(__file__).parent / "../../hardware_testing/production_qc_protocols"
 )
+LPF_LABWARE_DEF = (
+    Path(__file__).parent / "../../hardware_testing/labware/liquid_probe_fixture/1.json"
+)
 
 
 @dataclass
@@ -75,12 +78,13 @@ def _get_analysis_result(
         pytest.param("belt_calibration_ot3.py"),
         pytest.param("gripper_assembly_qc_ot3.py"),
         pytest.param("ninety_six_assembly_qc_ot3.py"),
+        pytest.param("pipette_assembly_qc_ot3.py"),
     ],
 )
 def test_production_protocol(protocol: str) -> None:
     """Make sure each CSV can analyze successfully."""
     result = _get_analysis_result(
-        [(PROTOCOL_PARENT_FILEPATH / protocol)],
+        [(PROTOCOL_PARENT_FILEPATH / protocol), LPF_LABWARE_DEF],
         "--json-output",
         check=True,
     )

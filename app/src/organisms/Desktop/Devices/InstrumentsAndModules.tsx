@@ -4,6 +4,8 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   Banner,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
@@ -120,7 +122,9 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       gap={SPACING.spacing16}
-      paddingBottom={SPACING.spacing12}
+      padding={SPACING.spacing16}
+      backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius8}
     >
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('instruments_and_modules')}

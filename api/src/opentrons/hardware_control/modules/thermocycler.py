@@ -6,6 +6,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Union, cast
 
 from ..execution_manager import ExecutionManager
 from . import mod_abc, types, update
+from opentrons.config import IS_ROBOT
 from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import (
@@ -186,6 +187,26 @@ class Thermocycler(mod_abc.AbstractModule):
     async def cleanup(self) -> None:
         """Stop the poller task."""
         await self.soft_cleanup()
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        self._port = port
+        self._usb_port = usb_port
+        await self._driver.move_port(port)
+
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        if not IS_ROBOT:
+            return
+        try:
+            if not await self._driver.is_connected():
+                self._driver = await ThermocyclerDriverFactory.create(
+                    port=self.port, loop=self.loop
+                )
+                self._reader._driver = self._driver
+            await self._poller.stop()
+            await self._poller.start()
+        except BaseException as e:
+            log.error(f"Got {e} when trying to reconnect.")
 
     @classmethod
     def name(cls) -> str:

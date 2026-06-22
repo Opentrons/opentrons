@@ -84,17 +84,25 @@
   --white: #fff;
   --blue-50: #006cfa;
 
-  /* semi-opaques */
+  /* semi-opaques white */
   --transparent-white-80: #fffc;
   --transparent-white-50: #ffffff80;
-  --transparent-black-10: #16212d1a;
-  --transparent-black-60: #16212d60;
+  --transparent-white-30: #ffffff4d;
+  --transparent-white-20: #fff3;
+
+  /* semi-opaques black */
   --transparent-black-80: #16212d80;
+  --transparent-black-60: #16212d60;
+  --transparent-black-10: #16212d1a;
 
   /* flex */
+  --flex-60: #0b6f96;
   --flex-55: #0297cc;
   --flex-50: #00bdff;
-  --flex-40: #aae3fc;
+  --flex-40: #99e4ff;
+  --flex-35: #b2ebff;
+  --flex-30: #ccf2ff;
+  --flex-20: #d9f5ff;
 
   /* extras */
   --transparent: #0000;
