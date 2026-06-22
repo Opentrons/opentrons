@@ -46,21 +46,12 @@ version_scheme = 'only-version'
 local_scheme = 'no-local-version'
 
 [tool.hatch.build.targets.wheel]
-packages = ["hardware_testing"]
-exclude = [
-    "abr_tools",
-    "examples",
-    "gravimetric",
-    "labware",
-    "legacy_tests",
-    "modules",
-    "production_qc",
-    "production_qc_protocols",
-    "protocols",
-    "scripts",
-    "tools",
-    "tests",
-    "tests.*",
+only-include = [
+    "hardware_testing/__init__.py",
+    "hardware_testing/_version.py",
+    "hardware_testing/data",
+    "hardware_testing/drivers",
+    "hardware_testing/opentrons_api",
 ]
 
 [tool.hatch.build.targets.sdist]
