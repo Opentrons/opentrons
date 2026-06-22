@@ -929,11 +929,38 @@ if __name__ == "__main__":
         nargs=1,
         help="Path to long term storage directory for run logs.",
     )
+    parser.add_argument(
+        "--ip_address",
+        metavar="IP",
+        default=None,
+        type=str,
+        help="Robot IP address",
+    )
+    parser.add_argument(
+        "--project_key",
+        metavar="PROJECT_KEY",
+        default=None,
+        type=str,
+        help="ABR or RQA",
+    )
+    parser.add_argument(
+        "--title",
+        metavar="TITLE",
+        default=None,
+        type=str,
+        help="Enter ticket title",
+    )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
+    ip = args.ip_address
+    project_key = args.project_key
+    title = args.title
     jira_credentials = jira_tool.get_credentials(storage_directory)
     # Simplify the main section
-    inputs = init_ticketing()
+    if ip is None or project_key is None or title is None:
+        inputs = init_ticketing()
+    else:
+        inputs = ticketInputs(project_key, ip, title)
     ticket = jira_tool.JiraTicket(jira_credentials.api_token, jira_credentials.email)
     error_runs, protocol_ids = get_error_runs_from_robot(inputs.ip)
     data = organize_ticket_data(
