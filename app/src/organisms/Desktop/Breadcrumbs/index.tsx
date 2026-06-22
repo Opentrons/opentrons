@@ -130,11 +130,16 @@ function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
         // todo(mm, 2026-05-28): This MenuList is rendering too far away from the button.
         // MenuList hard-codes an offset that's wrong here (and perhaps wrong everywhere),
         // and doesn't give us a way to override it.
-        //
-        // todo(mm, 2026-05-28): The account_settings menu item should link to the user's
-        // account settings, when that's implemented.
         <MenuList>
-          <MenuItem>{t('account_settings')}</MenuItem>
+          <Link to={`/devices/${robotName}/robot-settings/compliance-ready`}>
+            <MenuItem
+              onClick={() => {
+                setIsMenuOpen(false)
+              }}
+            >
+              {t('account_settings')}
+            </MenuItem>
+          </Link>
           <MenuItem
             onClick={() => {
               dispatch(logOut({ robotName }))

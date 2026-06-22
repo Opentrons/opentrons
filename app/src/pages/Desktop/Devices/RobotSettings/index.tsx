@@ -109,10 +109,9 @@ export function RobotSettingsComponent({
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
-  const token = useAccessTokenForRobot(robotName)
   const isAcmDevice =
     accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
-  const showComplianceReadyTab = isAcmDevice && token != null
+  const showComplianceReadyTab = isAcmDevice
 
   if (
     (robot == null ||
