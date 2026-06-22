@@ -82,7 +82,7 @@ export function ProtocolRoutes(): JSX.Element {
     >
       <Navigation />
       <Kitchen>
-        <main className={styles.main_contaienr}>
+        <main className={styles.main_container}>
           <GateModal />
           <LabwareUploadModal />
           <FileUploadMessagesModal />
