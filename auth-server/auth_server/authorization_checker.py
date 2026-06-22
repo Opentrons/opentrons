@@ -97,7 +97,9 @@ class _SelfClient(Client):
 
         # Get a list of key-value tuples and help the type checker see that every value
         # is guaranteed to be a string.
-        request_form_data_kvs = [(k, v )for (k, v )in request_form_data.items() if isinstance(v, str)]
+        request_form_data_kvs = [
+            (k, v) for (k, v) in request_form_data.items() if isinstance(v, str)
+        ]
         assert len(request_form_data_kvs) == len(request_form_data)
 
         raw_response = self._oauth2_backend.create_introspect_response(

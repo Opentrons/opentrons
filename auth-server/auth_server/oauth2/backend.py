@@ -70,7 +70,6 @@ class Backend:
             status_code=status_code,
         )
 
-
     def create_introspect_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
     ) -> fastapi.Response:
