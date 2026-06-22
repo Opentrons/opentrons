@@ -25,10 +25,6 @@ import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
 import type { RobotApiAction, RobotApiState } from './robot-api/types'
 import type { RobotAuthAction, RobotAuthState } from './robot-auth'
 import type {
-  RobotControlsAction,
-  RobotControlsState,
-} from './robot-controls/types'
-import type {
   RobotSettingsAction,
   RobotSettingsState,
 } from './robot-settings/types'
@@ -45,7 +41,6 @@ export interface State {
   readonly robotApi: RobotApiState
   readonly robotAuth: RobotAuthState
   readonly robotAdmin: RobotAdminState
-  readonly robotControls: RobotControlsState
   readonly robotSettings: RobotSettingsState
   readonly robotUpdate: RobotUpdateState
   readonly pipettes: PipettesState
@@ -66,7 +61,6 @@ export type Action =
   | RobotApiAction
   | RobotAdminAction
   | RobotAuthAction
-  | RobotControlsAction
   | RobotSettingsAction
   | RobotUpdateAction
   | PipettesAction

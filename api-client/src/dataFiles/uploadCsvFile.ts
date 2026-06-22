@@ -18,7 +18,9 @@ export function uploadCsvFile(
   return request<UploadedCsvFileResponse, FormData>(
     POST,
     '/dataFiles',
-    formData,
-    config
+    config,
+    {
+      body: formData,
+    }
   )
 }

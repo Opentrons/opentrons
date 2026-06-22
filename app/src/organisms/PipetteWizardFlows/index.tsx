@@ -214,7 +214,11 @@ export const PipetteWizardFlows = (
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation(maintenanceRunAction, initialDocstate)
+  } = useMaintenanceRunDocumentation(
+    maintenanceRunAction,
+    closeFlow,
+    initialDocstate
+  )
 
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands(
@@ -271,14 +275,10 @@ export const PipetteWizardFlows = (
     }
   }
   const handleClose = (): void => {
-    if (onComplete != null) {
-      onComplete()
-    }
     if (maintenanceRunData != null) {
-      deleteMaintenanceRun(maintenanceRunData?.data.id, {
-        onSettled: closeFlow,
-      })
+      deleteMaintenanceRun(maintenanceRunData?.data.id)
     } else {
+      onComplete?.()
       closeFlow()
     }
   }
@@ -289,15 +289,17 @@ export const PipetteWizardFlows = (
       [...actionsToDocument, deleteRunAction],
       {
         onSuccess: () => {
+          onComplete?.()
           closeFlow()
         },
         onError: () => {
-          closeFlow()
+          setIsExiting(false)
         },
       }
     )
 
   const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(

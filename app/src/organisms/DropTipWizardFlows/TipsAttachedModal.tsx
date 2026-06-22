@@ -23,7 +23,7 @@ import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
-type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSettled'> & {
+type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSuccess'> & {
   aPipetteWithTip: PipetteWithTip
   host: HostConfig | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
@@ -51,7 +51,7 @@ const TipsAttachedModal = NiceModal.create(
     const { homePipettes, isHoming } = useHomePipettes({
       ...homePipetteProps,
       pipetteInfo: buildPipetteDetails(aPipetteWithTip),
-      onSettled: () => {
+      onSuccess: () => {
         modal.remove()
         void setTipStatusResolved()
       },

@@ -1,0 +1,298 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1", "D1"],
+    ["A2", "B2", "C2", "D2"],
+    ["A3", "B3", "C3", "D3"],
+    ["A4", "B4", "C4", "D4"],
+    ["A5", "B5", "C5", "D5"],
+    ["A6", "B6", "C6", "D6"]
+  ],
+  "brand": {
+    "brand": "Millipore",
+    "brandId": ["111606-MM"]
+  },
+  "metadata": {
+    "displayName": "Millipore 24 Well Plate 111606-MM",
+    "displayCategory": "wellPlate",
+    "displayVolumeUnits": "\u00b5L",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 18.29
+  },
+  "wells": {
+    "A1": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 16.13,
+      "y": 71.87,
+      "z": 5.31
+    },
+    "B1": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 16.13,
+      "y": 52.97,
+      "z": 5.31
+    },
+    "C1": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 16.13,
+      "y": 34.07,
+      "z": 5.31
+    },
+    "D1": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 16.13,
+      "y": 15.17,
+      "z": 5.31
+    },
+    "A2": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 35.03,
+      "y": 71.87,
+      "z": 5.31
+    },
+    "B2": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 35.03,
+      "y": 52.97,
+      "z": 5.31
+    },
+    "C2": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 35.03,
+      "y": 34.07,
+      "z": 5.31
+    },
+    "D2": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 35.03,
+      "y": 15.17,
+      "z": 5.31
+    },
+    "A3": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 53.93,
+      "y": 71.87,
+      "z": 5.31
+    },
+    "B3": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 53.93,
+      "y": 52.97,
+      "z": 5.31
+    },
+    "C3": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 53.93,
+      "y": 34.07,
+      "z": 5.31
+    },
+    "D3": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 53.93,
+      "y": 15.17,
+      "z": 5.31
+    },
+    "A4": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 72.83,
+      "y": 71.87,
+      "z": 5.31
+    },
+    "B4": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 72.83,
+      "y": 52.97,
+      "z": 5.31
+    },
+    "C4": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 72.83,
+      "y": 34.07,
+      "z": 5.31
+    },
+    "D4": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 72.83,
+      "y": 15.17,
+      "z": 5.31
+    },
+    "A5": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 91.73,
+      "y": 71.87,
+      "z": 5.31
+    },
+    "B5": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 91.73,
+      "y": 52.97,
+      "z": 5.31
+    },
+    "C5": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 91.73,
+      "y": 34.07,
+      "z": 5.31
+    },
+    "D5": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 91.73,
+      "y": 15.17,
+      "z": 5.31
+    },
+    "A6": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 110.63,
+      "y": 71.87,
+      "z": 5.31
+    },
+    "B6": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 110.63,
+      "y": 52.97,
+      "z": 5.31
+    },
+    "C6": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 110.63,
+      "y": 34.07,
+      "z": 5.31
+    },
+    "D6": {
+      "depth": 12.98,
+      "totalLiquidVolume": 0.01,
+      "shape": "circular",
+      "diameter": 13.21,
+      "x": 110.63,
+      "y": 15.17,
+      "z": 5.31
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "wellBottomShape": "flat"
+      },
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "D1",
+        "A2",
+        "B2",
+        "C2",
+        "D2",
+        "A3",
+        "B3",
+        "C3",
+        "D3",
+        "A4",
+        "B4",
+        "C4",
+        "D4",
+        "A5",
+        "B5",
+        "C5",
+        "D5",
+        "A6",
+        "B6",
+        "C6",
+        "D6"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": ["filterPlate"],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "millipore_24_wellplate_111606mm"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "stackingOffsetWithLabware": {
+    "default": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  }
+}

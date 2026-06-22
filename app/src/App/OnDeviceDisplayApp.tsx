@@ -246,23 +246,24 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
-                  <MaintenanceRunTakeover>
-                    <EstopTakeover />
-                    <FirmwareUpdateTakeover />
-                    {showModuleSetupModal && localRobot?.name != null ? (
-                      <ModuleWizardFlows
-                        showSetupLauncher={true}
-                        closeFlow={() => {
-                          setShowModuleSetupModal(false)
-                        }}
-                        robotName={localRobot.name}
-                      />
-                    ) : null}
-                    <DocumentationRequiredModalContext.Provider
-                      value={{
-                        showDocumentationRequiredModal: requireDocumentation,
-                      }}
-                    >
+                  <DocumentationRequiredModalContext.Provider
+                    value={{
+                      showDocumentationRequiredModal: requireDocumentation,
+                    }}
+                  >
+                    <MaintenanceRunTakeover>
+                      <EstopTakeover />
+                      <FirmwareUpdateTakeover />
+                      {showModuleSetupModal && localRobot?.name != null ? (
+                        <ModuleWizardFlows
+                          showSetupLauncher={true}
+                          closeFlow={() => {
+                            setShowModuleSetupModal(false)
+                          }}
+                          robotName={localRobot.name}
+                        />
+                      ) : null}
+
                       <NiceModal.Provider>
                         <RobotEncryptionKeyTakeover>
                           <ToasterOven>
@@ -282,8 +283,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                           </ToasterOven>
                         </RobotEncryptionKeyTakeover>
                       </NiceModal.Provider>
-                    </DocumentationRequiredModalContext.Provider>
-                  </MaintenanceRunTakeover>
+                    </MaintenanceRunTakeover>
+                  </DocumentationRequiredModalContext.Provider>
                 </>
               )}
             </Box>

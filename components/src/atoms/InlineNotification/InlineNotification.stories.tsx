@@ -51,7 +51,7 @@ export default {
       if: { arg: 'hasLink' },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 export interface WrapperProps extends React.ComponentProps<

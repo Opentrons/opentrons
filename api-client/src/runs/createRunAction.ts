@@ -17,9 +17,7 @@ export function createRunAction(
   return request<RunAction, { data: CreateRunActionData }>(
     POST,
     `/runs/${runId}/actions`,
-    { data },
     config,
-    undefined,
-    userNotes
+    { body: { data }, userNotes }
   )
 }

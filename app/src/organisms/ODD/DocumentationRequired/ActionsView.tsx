@@ -57,6 +57,7 @@ const ActionsViewImpl = ({
             action={action}
             allRunDefs={allRunDefs}
             commandTextData={commandTextData}
+            className={styles.action}
           />
         ))}
       </div>

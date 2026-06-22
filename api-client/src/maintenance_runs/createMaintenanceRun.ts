@@ -12,9 +12,7 @@ export function createMaintenanceRun(
   return request<MaintenanceRun, { data: CreateMaintenanceRunData }>(
     POST,
     '/maintenance_runs',
-    { data },
     config,
-    undefined,
-    userNotes
+    { body: { data }, userNotes }
   )
 }

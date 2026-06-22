@@ -15,7 +15,9 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
-    "cryptography==42.0.5"
+    "cryptography==42.0.5",
+    "sqlalchemy==2.0.48",
+    "alembic==1.18.4",
 ]
 
 [tool.uv.dependency-groups]
@@ -30,7 +32,9 @@ robot = [
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
-    "cryptography==42.0.5"
+    "cryptography==42.0.5",
+    "sqlalchemy==2.0.48",
+    "alembic==1.18.4",
 ]
 dev = [
     "ruff==0.14.10",
@@ -56,6 +60,7 @@ ignore = ["E203", "E501", "E741", "ANN401", "D100", "D104", "D107", "D402", "D41
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D"]
 "audit_server/_version.py" = ["I"]
+"audit_server/alembic/versions/*.py" = ["D"]
 
 [tool.ruff.lint.isort]
 known-local-folder = ["audit_server"]

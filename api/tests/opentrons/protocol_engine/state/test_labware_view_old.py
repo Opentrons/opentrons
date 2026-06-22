@@ -56,6 +56,7 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     OnModuleOffsetLocationSequenceComponent,
 )
+from opentrons.protocol_engine.types.labware import OverlapOffset
 from opentrons.types import DeckSlotName, MountType, Point
 
 plate = LoadedLabware(
@@ -1355,8 +1356,14 @@ def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
             "labware-id": LoadedLabware(
                 id="labware-id",
                 loadName="test",
-                definitionUri="def-uri",
+                definitionUri="def-uri-1",
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        },
+        definitions_by_uri={
+            "def-uri-1": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.labware],
+                parameters=Parameters2.model_construct(loadName="test"),  # type: ignore[call-arg]
             )
         },
     )
@@ -1386,7 +1393,8 @@ def test_raise_if_labware_cannot_be_stacked_on_module_not_adapter() -> None:
         },
         definitions_by_uri={
             "def-uri": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-                allowedRoles=[LabwareRole.labware]
+                allowedRoles=[LabwareRole.labware],
+                parameters=Parameters2.model_construct(loadName="test"),  # type: ignore[call-arg]
             )
         },
     )
@@ -1720,7 +1728,7 @@ def test_labware_stacking_height_passes_or_raises(
                     loadName="name",
                     isMagneticModuleCompatible=False,
                 ),
-                stackingOffsetWithLabware={"test": Vector3D(x=0, y=0, z=0)},
+                stackingOffsetWithLabware={"name": Vector3D(x=0, y=0, z=0)},
                 stackLimit=stack_limit,
             ),
             bottom_labware_id="labware-id4",
@@ -1842,6 +1850,237 @@ def test_tiprack_lid_stacking_height_fails() -> None:
             ),
             bottom_labware_id="lid-id",
         )
+
+
+@pytest.mark.parametrize(
+    "top_is_filter_plate,below_on_module,should_raise",
+    [
+        # filter plate on labware-on-module -> allowed (new behavior)
+        (
+            True,
+            True,
+            does_not_raise(),
+        ),
+        # normal labware on labware-on-module -> raises (existing)
+        (False, True, pytest.raises(errors.LabwareCannotBeStackedError)),
+        # filter plate on normal labware -> allowed (no special rule triggers)
+        (
+            True,
+            False,
+            does_not_raise(),
+        ),
+        # normal on normal -> allowed
+        (False, False, does_not_raise()),
+    ],
+)
+def test_raise_if_labware_cannot_be_stacked_allows_filter_plate_on_module(
+    top_is_filter_plate: bool,
+    below_on_module: bool,
+    should_raise: ContextManager[None],
+) -> None:
+    """Filter plates (with 'filterPlate' quirk) are allowed to be stacked on labware that sits on a module.
+
+    This is the key new behavior from validate_definition_is_filter_plate in raise_if_labware_cannot_be_stacked.
+    """
+    below_location = (
+        ModuleLocation(moduleId="module-id")
+        if below_on_module
+        else DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    below_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        allowedRoles=[LabwareRole.labware],
+        parameters=Parameters2.model_construct(
+            loadName="bottom_plate",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+        ),
+    )
+
+    subject = get_labware_view(
+        labware_by_id={
+            "bottom-labware": LoadedLabware(
+                id="bottom-labware",
+                loadName="bottom_plate",
+                definitionUri="bottom-uri",
+                location=below_location,
+            )
+        },
+        definitions_by_uri={"bottom-uri": below_def},
+    )
+
+    top_params = Parameters2.model_construct(
+        loadName="filter_or_normal_plate",
+        format="irregular",
+        isTiprack=False,
+        isMagneticModuleCompatible=False,
+        quirks=["filterPlate"] if top_is_filter_plate else None,
+    )
+
+    top_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=top_params,
+        stackingOffsetWithLabware={"bottom_plate": Vector3D(x=0, y=0, z=0)},
+    )
+
+    with should_raise:
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=top_def,
+            bottom_labware_id="bottom-labware",
+        )
+
+
+@pytest.mark.parametrize(
+    "top_is_filter_plate,further_below_is_adapter,should_raise",
+    [
+        # filter plate on (labware on adapter) -> allowed
+        (True, True, does_not_raise()),
+        (True, False, does_not_raise()),
+        # normal labware on (labware on adapter) -> raises
+        (False, True, pytest.raises(errors.LabwareCannotBeStackedError)),
+    ],
+)
+def test_raise_if_labware_cannot_be_stacked_allows_filter_plate_on_adapter(
+    top_is_filter_plate: bool,
+    further_below_is_adapter: bool,
+    should_raise: ContextManager[None],
+) -> None:
+    """Filter plates are allowed to stack even when the labware below them sits on an adapter."""
+    further_below_role = (
+        [LabwareRole.adapter] if further_below_is_adapter else [LabwareRole.labware]
+    )
+
+    further_below_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        allowedRoles=further_below_role,
+        parameters=Parameters2.model_construct(
+            loadName="further_below",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+        ),
+    )
+
+    middle_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        allowedRoles=[LabwareRole.labware],
+        parameters=Parameters2.model_construct(
+            loadName="middle_plate",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+        ),
+    )
+
+    subject = get_labware_view(
+        labware_by_id={
+            "middle-labware": LoadedLabware(
+                id="middle-labware",
+                loadName="middle_plate",
+                definitionUri="middle-uri",
+                location=OnLabwareLocation(labwareId="further-below-labware"),
+            ),
+            "further-below-labware": LoadedLabware(
+                id="further-below-labware",
+                loadName="further_below",
+                definitionUri="further-uri",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        },
+        definitions_by_uri={
+            "middle-uri": middle_def,
+            "further-uri": further_below_def,
+        },
+    )
+
+    top_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(
+            loadName="top_filter_or_normal",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+            quirks=["filterPlate"] if top_is_filter_plate else None,
+        ),
+        stackingOffsetWithLabware={"middle_plate": Vector3D(x=0, y=0, z=0)},
+    )
+
+    with should_raise:
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=top_def,
+            bottom_labware_id="middle-labware",
+        )
+
+
+def test_get_stacker_labware_overlap_offset_basic_and_with_filter_plate() -> None:
+    """get_stacker_labware_overlap_offset should return the correct overlap from the bottom definition.
+
+    Includes a filter plate as the top item in the pool to ensure the function works
+    with definitions that have the new 'filterPlate' quirk (related to vacuum module stacking).
+    """
+    subject = get_labware_view()
+
+    # Bottom definition declares overlap with the top one's loadName
+    bottom_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(
+            loadName="bottom_adapter_or_plate",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+        ),
+        stackingOffsetWithLabware={
+            "filter_plate_top": Vector3D(x=1.5, y=2.5, z=0.5),
+            "default": Vector3D(x=0, y=0, z=0),
+        },
+    )
+
+    filter_plate_top = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(
+            loadName="filter_plate_top",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+            quirks=["filterPlate"],
+        ),
+    )
+
+    normal_top = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(
+            loadName="normal_top",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+        ),
+    )
+
+    # Case 1: filter plate on top of the pool
+    result = subject.get_stacker_labware_overlap_offset([filter_plate_top, bottom_def])
+    assert result == OverlapOffset(x=1.5, y=2.5, z=0.5)
+
+    # Case 2: normal top (uses default since "normal_top" not in keys)
+    result2 = subject.get_stacker_labware_overlap_offset([normal_top, bottom_def])
+    assert result2 == OverlapOffset(x=0, y=0, z=0)
+
+    # Case 3: only one item (edge case)
+    result3 = subject.get_stacker_labware_overlap_offset([bottom_def])
+    assert result3 == OverlapOffset(x=0, y=0, z=0)
+
+
+def test_get_stacker_labware_overlap_offset_uses_default_when_no_match() -> None:
+    """When the top labware loadName is not in stackingOffsetWithLabware, default is used."""
+    subject = get_labware_view()
+
+    bottom_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(loadName="bottom"),  # type: ignore[call-arg]
+        stackingOffsetWithLabware={
+            "default": Vector3D(x=10, y=20, z=30),
+        },
+    )
+
+    top_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(loadName="some_filter_plate"),  # type: ignore[call-arg]
+        # even with filterPlate quirk, overlap lookup is on bottom
+    )
+
+    result = subject.get_stacker_labware_overlap_offset([top_def, bottom_def])
+    assert result == OverlapOffset(x=10, y=20, z=30)
 
 
 def test_get_grip_force(

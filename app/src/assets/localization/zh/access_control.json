@@ -1,1 +1,8 @@
-{}
+{
+  "access_control_note": "由{{user}}提供的机器人审计日志备注",
+  "documentation_required": "需要提供文档",
+  "legal_name": "法定名称",
+  "log_out": "退出登录",
+  "username": "用户名",
+  "view_actions": "查看操作"
+}

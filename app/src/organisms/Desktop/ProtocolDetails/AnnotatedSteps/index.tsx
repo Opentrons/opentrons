@@ -199,7 +199,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   ])
 
   useEffect(() => {
-    if (currentCommandId == null) {
+    if (currentCommandId == null || !isGlobalPlaying) {
       return
     }
     if (filteredGroupedCommands != null && filteredGroupedCommands.length > 0) {
@@ -221,7 +221,12 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     if (scrollTargetId !== currentCommandId) {
       setScrollTargetId(currentCommandId)
     }
-  }, [filteredGroupedCommands, currentCommandId, scrollTargetId])
+  }, [
+    filteredGroupedCommands,
+    currentCommandId,
+    scrollTargetId,
+    isGlobalPlaying,
+  ])
 
   const { rows, rowIndexByCommandId } = useMemo(() => {
     const nextRows: AnnotatedStepsRow[] = []
@@ -319,7 +324,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const [listViewportHeight, setListViewportHeight] = useState(0)
   const dynamicRowHeight = useDynamicRowHeight({
     defaultRowHeight: DEFAULT_ROW_HEIGHT_PX,
-    key: `${listWidth}-${listViewportHeight}-${rows.length}`,
+    key: `${listWidth}-${rows.length}`,
   })
 
   useEffect(() => {
@@ -342,8 +347,11 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     if (scrollTargetId == null) return
     const rowIndex = rowIndexByCommandId.get(scrollTargetId)
     if (rowIndex == null) return
-    listRef?.scrollToRow({ index: rowIndex, align: 'auto' })
-  }, [scrollTargetId, rowIndexByCommandId, listRef])
+    listRef?.scrollToRow({
+      index: rowIndex,
+      align: rowIndex >= rows.length - 1 ? 'end' : 'auto',
+    })
+  }, [scrollTargetId, rowIndexByCommandId, listRef, rows.length])
 
   useEffect(() => {
     setListElement(listRef?.element ?? null)

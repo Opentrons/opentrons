@@ -1,0 +1,36 @@
+.floating_button_style {
+  position: fixed;
+  z-index: 2;
+  right: var(--spacing-24);
+  bottom: var(--spacing-24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-12) var(--spacing-24);
+  border-radius: var(--border-radius-40);
+  background-color: var(--purple-50-touchscreen);
+  box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
+  color: var(--white);
+  cursor: default;
+}
+
+.floating_button_style:active {
+  background-color: var(--purple-55-touchscreen);
+}
+
+.floating_button_style:focus-visible {
+  border: none;
+  box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
+  outline: 0.25rem solid var(--blue-50);
+}
+
+.floating_button_style:disabled {
+  background-color: var(--grey-35);
+  color: var(--grey-50);
+}
+
+.content_container {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-8);
+}

@@ -5,5 +5,5 @@ import type { HostConfig } from '../types'
 import type { CameraResponse } from './types'
 
 export function getCamera(config: HostConfig): ResponsePromise<CameraResponse> {
-  return request<CameraResponse>(GET, `/camera`, null, config)
+  return request<CameraResponse>(GET, `/camera`, config)
 }

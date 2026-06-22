@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
@@ -10,6 +10,11 @@ import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
 import type { MaintenanceRun, Mount } from '@opentrons/api-client'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
+
+interface PendingExecution {
+  resolve: (value: MaintenanceRun) => void
+  reject: (reason?: unknown) => void
+}
 
 export interface PipetteDetails {
   mount: Mount
@@ -31,8 +36,8 @@ export interface UseRobotControlCommandsProps {
   pipetteInfo: PipetteDetails | null
   commands: CreateCommand[]
   continuePastCommandFailure: boolean
-  /* An onSettled callback executed after the deletion of the maintenance run. */
-  onSettled?: () => void
+  /* An onSuccess callback executed after the deletion of the maintenance run. */
+  onSuccess?: () => void
   runStartedAction: DocumentedAction
   runEndedAction: DocumentedAction
 }
@@ -43,18 +48,32 @@ export function useRobotControlCommands({
   pipetteInfo,
   commands,
   continuePastCommandFailure,
-  onSettled,
+  onSuccess,
   runStartedAction,
   runEndedAction,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
   const [isExecuting, setIsExecuting] = useState(false)
+  const pendingExecutionRef = useRef<PendingExecution | null>(null)
+
+  const handleDocumentationCancel = useCallback((): void => {
+    if (pendingExecutionRef.current != null) {
+      const { reject } = pendingExecutionRef.current
+      pendingExecutionRef.current = null
+      reject(new Error('Documentation cancelled'))
+    }
+    setIsExecuting(false)
+  }, [])
 
   const {
     commandDocState,
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation(runStartedAction)
+    isLoading: isDocumentationLoading,
+  } = useMaintenanceRunDocumentation(
+    runStartedAction,
+    handleDocumentationCancel
+  )
 
   const { chainRunCommands } = useChainMaintenanceCommands(
     commandDocState,
@@ -95,17 +114,13 @@ export function useRobotControlCommands({
               console.error(error.message)
             })
             .finally(() =>
-              deleteMaintenanceRun(runId).catch((error: Error) => {
-                console.error(
-                  'Failed to delete maintenance run:',
-                  error.message
-                )
+              deleteMaintenanceRun(runId, {
+                onSuccess: () => {
+                  onSuccess?.()
+                  setIsExecuting(false)
+                },
               })
             )
-            .finally(() => {
-              onSettled?.()
-              setIsExecuting(false)
-            })
         },
         onError: (error: Error) => {
           console.error(error.message)
@@ -114,8 +129,28 @@ export function useRobotControlCommands({
       }
     )
 
+  // If documentation state is loading, we queue the execution, and run it in the useEffect when the documentation is ready.
+  // If documentation state is not loading, we can execute the commands immediately.
+  useEffect(() => {
+    if (isDocumentationLoading || pendingExecutionRef.current == null) {
+      return
+    }
+
+    const { resolve, reject } = pendingExecutionRef.current
+    pendingExecutionRef.current = null
+
+    void createTargetedMaintenanceRun({}).then(resolve).catch(reject)
+  }, [createTargetedMaintenanceRun, isDocumentationLoading])
+
   const executeCommands = (): Promise<MaintenanceRun> => {
     setIsExecuting(true)
+
+    if (isDocumentationLoading) {
+      return new Promise((resolve, reject) => {
+        pendingExecutionRef.current = { resolve, reject }
+      })
+    }
+
     return createTargetedMaintenanceRun({})
   }
 

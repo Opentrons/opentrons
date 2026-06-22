@@ -25,7 +25,7 @@ export default {
         'Use SubListTable only when there should a table-esque component in a real table (ListTable), otherwise use ListTable.',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface SubListTableStoryProps extends ComponentProps<

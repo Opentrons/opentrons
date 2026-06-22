@@ -28,8 +28,9 @@ export function ConnectViaUSB(): JSX.Element {
   // TODO(bh, 2023-5-31): active connections from /system/connected isn't exactly the right way to monitor for a usb connection -
   // the system-server tracks active connections by authorization token, which is valid for 2 hours
   // another option is to report an active usb connection by monitoring usb port traffic (discovery-client polls health from the desktop app)
-  const activeConnections = useConnectionsQuery().data?.connections ?? []
-  const isConnected = activeConnections.some(
+
+  const connectionsQuery = useConnectionsQuery({ refetchInterval: 1000 })
+  const isConnected = (connectionsQuery.data?.connections ?? []).some(
     connection => connection.agent === 'com.opentrons.app.usb'
   )
 

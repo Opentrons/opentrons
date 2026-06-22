@@ -55,6 +55,7 @@ export function ConfirmCancelModal(
   // TODO(jj): add doc state to desktop app
   const { stopRun } = useStopRunMutation({
     reasonForInteractionRequired: false,
+    isLoading: false,
   })
   const isFlex = useIsFlex(robotName)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)

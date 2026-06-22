@@ -19,12 +19,8 @@ import {
 
 import type { ComponentProps } from 'react'
 import type { FieldError } from 'react-hook-form'
-import type {
-  ConnectFormValues,
-  EapOption,
-  WifiKey,
-  WifiNetwork,
-} from '../../types'
+import type { WifiKey } from '@opentrons/api-client'
+import type { ConnectFormValues, EapOption, WifiNetwork } from '../../types'
 
 const TestWrapperConnectFormFields = ({
   network,
@@ -148,7 +144,13 @@ describe('getConnectFormFields', () => {
       { ...Fixtures.mockEapOption, name: 'someEapType', options: [] },
       { ...Fixtures.mockEapOption, name: 'someOtherEapType' },
     ]
-    const wifiKeys = [Fixtures.mockWifiKey]
+    const wifiKeys = [
+      {
+        id: '123',
+        uri: '/wifi/keys/123',
+        name: 'key.crt',
+      },
+    ]
     const props = {
       network: null,
       robotName: 'robot-name',
@@ -177,7 +179,13 @@ describe('getConnectFormFields', () => {
       { ...Fixtures.mockEapOption, name: 'someEapType' },
       { ...Fixtures.mockEapOption, name: 'someOtherEapType', options: [] },
     ]
-    const wifiKeys = [Fixtures.mockWifiKey]
+    const wifiKeys = [
+      {
+        id: '123',
+        uri: '/wifi/keys/123',
+        name: 'key.crt',
+      },
+    ]
     const props = {
       network: network,
       robotName: 'robot-name',

@@ -36,7 +36,7 @@ export function useCapturePreviewImage(): UseAddCapturePreviewImageMutationResul
     AxiosError<ErrorResponse>,
     AddCapturePreviewImageParams
   >(({ settings }) =>
-    createCapturePreviewImage(host!, settings, { responseType: 'blob' })
+    createCapturePreviewImage(host!, settings)
       .then(response => {
         queryClient
           .invalidateQueries(getQueryKey(host, 'camera', 'capturePreviewImage'))

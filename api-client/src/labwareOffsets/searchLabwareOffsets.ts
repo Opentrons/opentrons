@@ -36,5 +36,5 @@ export function searchLabwareOffsets(
   return request<
     SearchLabwareOffsetsResponse,
     { data: SearchLabwareOffsetsRequest }
-  >(POST, '/labwareOffsets/searches', { data }, config)
+  >(POST, '/labwareOffsets/searches', config, { body: { data } })
 }

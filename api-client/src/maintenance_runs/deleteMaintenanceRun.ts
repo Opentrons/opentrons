@@ -11,9 +11,7 @@ export function deleteMaintenanceRun(
   return request<EmptyResponse>(
     DELETE,
     `/maintenance_runs/${maintenanceRunId}`,
-    null,
     config,
-    undefined,
-    userNotes
+    { userNotes }
   )
 }

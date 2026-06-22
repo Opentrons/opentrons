@@ -54,7 +54,7 @@ export function useProtocolDropTipModal({
 
   const { homePipettes, isHoming } = useHomePipettes({
     pipetteInfo,
-    onSettled: () => {
+    onSuccess: () => {
       onSkipAndHome()
     },
   })

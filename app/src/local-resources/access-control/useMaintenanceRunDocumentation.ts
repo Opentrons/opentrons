@@ -14,6 +14,7 @@ import type {
  * Generates docstate to prompt for documentation when deleting the maintenance run.
  *
  * @param maintenanceRunName: The name of the maintenance run, to be displayed in the initial documentation modal.
+ * @param onCancelStart: Optional callback when the user backs out of the initial documentation modal.
  * @param initialDocstate: An optional documentation state - to be used in flows like attaching where prompting needs to occur before the first mutation.
  *
  * @returns commandDocState: DocumentationState to be passed to the creation hook and the maintenance run commands.
@@ -23,18 +24,21 @@ import type {
  */
 export const useMaintenanceRunDocumentation = (
   maintenanceRunName: DocumentedAction,
+  onCancelStart?: () => void,
   initialDocstate?: DocumentationState
 ): {
   commandDocState: DocumentationState
   deletionDocState: DocumentationState
   actionsToDocument: DocumentedAction[]
   addActionToDocument: (action: DocumentedAction) => void
+  isLoading: boolean
 } => {
   const [actionsToDocument, setActionsToDocument] = useState<
     DocumentedAction[]
   >([maintenanceRunName])
   const commandDocState = usePromptForInteractionReason(
     [maintenanceRunName],
+    onCancelStart,
     initialDocstate
   )
   const deletionDocState = useGuardedAction()
@@ -44,6 +48,7 @@ export const useMaintenanceRunDocumentation = (
   }, [])
 
   return {
+    isLoading: commandDocState.isLoading || deletionDocState.isLoading,
     commandDocState,
     deletionDocState,
     actionsToDocument,

@@ -10,7 +10,7 @@ export function dismissCurrentRun(
   return request<EmptyResponse, { data: { current: false } }>(
     PATCH,
     `/runs/${runId}`,
-    { data: { current: false } },
-    config
+    config,
+    { body: { data: { current: false } } }
   )
 }

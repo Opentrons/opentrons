@@ -46,7 +46,10 @@ const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('isDocumentationProvided', () => {
   it('returns true when access control is disabled', () => {
-    const state: DocumentationState = { reasonForInteractionRequired: false }
+    const state: DocumentationState = {
+      reasonForInteractionRequired: false,
+      isLoading: false,
+    }
 
     expect(isDocumentationProvided(state)).toBe(true)
   })
@@ -55,6 +58,7 @@ describe('isDocumentationProvided', () => {
     const state: DocumentationState = {
       reasonForInteractionRequired: true,
       docreport: mockDocreport,
+      isLoading: false,
     }
 
     expect(isDocumentationProvided(state)).toBe(true)
@@ -65,6 +69,7 @@ describe('isDocumentationProvided', () => {
       reasonForInteractionRequired: true,
       docreport: null,
       askForDocumentation: vi.fn(),
+      isLoading: false,
     }
 
     expect(isDocumentationProvided(state)).toBe(false)
@@ -111,20 +116,24 @@ describe('useMaintenanceRunDocumentation', () => {
 
     await waitFor(() => {
       expect(
-        result.current.commandDocState.reasonForInteractionRequired &&
+        !result.current.commandDocState.isLoading &&
+          result.current.commandDocState.reasonForInteractionRequired &&
           result.current.commandDocState.docreport
       ).toEqual(mockDocreport)
     })
 
-    expect(result.current.deletionDocState.reasonForInteractionRequired).toBe(
-      true
-    )
     expect(
-      result.current.deletionDocState.reasonForInteractionRequired &&
+      !result.current.deletionDocState.isLoading &&
+        result.current.deletionDocState.reasonForInteractionRequired
+    ).toBe(true)
+    expect(
+      !result.current.deletionDocState.isLoading &&
+        result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport
     ).toBeNull()
     expect(
-      result.current.deletionDocState.reasonForInteractionRequired &&
+      !result.current.deletionDocState.isLoading &&
+        result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport == null &&
         result.current.deletionDocState.askForDocumentation
     ).toBeDefined()
@@ -144,6 +153,7 @@ describe('useMaintenanceRunDocumentation', () => {
 
     await act(async () => {
       if (
+        !result.current.deletionDocState.isLoading &&
         result.current.deletionDocState.reasonForInteractionRequired &&
         result.current.deletionDocState.docreport == null
       ) {

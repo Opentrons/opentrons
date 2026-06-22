@@ -15,7 +15,7 @@ export function addCameraImageSettingsToRun(
   return request<CameraImageSettingsResponse, { data: CameraImageSettings }>(
     POST,
     `/runs/${runId}/camera/cameraSettings`,
-    { data },
-    config
+    config,
+    { body: { data } }
   )
 }

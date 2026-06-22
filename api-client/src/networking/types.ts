@@ -20,3 +20,17 @@ export interface WifiNetwork {
 export interface WifiListResponse {
   list: WifiNetwork[]
 }
+
+export interface WifiKey {
+  id: string
+  uri: string
+  name: string
+}
+
+export interface WifiKeysResponse {
+  keys: WifiKey[]
+}
+
+export interface PostWifiKeysResponse extends WifiKey {
+  message?: string
+}

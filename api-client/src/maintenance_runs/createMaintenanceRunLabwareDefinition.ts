@@ -14,9 +14,7 @@ export function createMaintenanceRunLabwareDefinition(
   return request<LabwareDefinitionSummary, { data: LabwareDefinition }>(
     POST,
     `/maintenance_runs/${maintenanceRunId}/labware_definitions`,
-    { data },
     config,
-    undefined,
-    userNotes
+    { body: { data }, userNotes }
   )
 }

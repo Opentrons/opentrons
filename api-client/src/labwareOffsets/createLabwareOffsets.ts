@@ -37,5 +37,5 @@ export function createLabwareOffsets(
   return request<
     CreateLabwareOffsetResponse,
     { data: CreateLabwareOffsetData }
-  >(POST, '/labwareOffsets', { data }, config)
+  >(POST, '/labwareOffsets', config, { body: { data } })
 }

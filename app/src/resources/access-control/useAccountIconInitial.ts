@@ -2,7 +2,9 @@ import { useSelector } from 'react-redux'
 
 import { useSelfQuery } from '@opentrons/react-api-client'
 
-import { getIsLoggedInToLocalRobot } from '/app/redux/robot-auth'
+import { getAuthStateForRobot } from '/app/redux/robot-auth'
+
+import type { State } from '/app/redux/types'
 
 export type UseAccountIconInitialResult =
   | {
@@ -17,8 +19,13 @@ export type UseAccountIconInitialResult =
  * Returns what to show in the account icon, if anything.
  * (The first initial of the user's name.)
  */
-export function useAccountIconInitial(): UseAccountIconInitialResult {
-  const isLoggedIn = useSelector(getIsLoggedInToLocalRobot)
+export function useAccountIconInitial(
+  robotName: string | null
+): UseAccountIconInitialResult {
+  const isLoggedIn = useSelector(
+    (state: State) =>
+      robotName != null && getAuthStateForRobot(state, robotName) != null
+  )
   const query = useSelfQuery({
     enabled: isLoggedIn,
   })

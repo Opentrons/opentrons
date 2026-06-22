@@ -1,6 +1,8 @@
 import { useCallback } from 'react'
 import { useMutation } from 'react-query'
 
+import { DocumentedMutationError } from './types'
+
 import type {
   MutationFunction,
   MutationKey,
@@ -60,7 +62,10 @@ const checkDocumentationReport = async (
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[]
 ): Promise<DocumentationReport | null> => {
-  if (!documentationState.reasonForInteractionRequired) {
+  if (
+    documentationState.isLoading ||
+    !documentationState.reasonForInteractionRequired
+  ) {
     return null
   }
   if (documentationState.docreport != null) {
@@ -80,12 +85,28 @@ function useWrappedMutationFn<TData, TVariables>(
         documentationState,
         actionsToDocument
       )
-      if (docreport == null) {
-        console.error('No documentation report provided')
+      if (documentationState.isLoading) {
+        throw new DocumentedMutationError('access_control_loading')
+      }
+      if (!isDocumentationProvided(documentationState, docreport)) {
+        throw new DocumentedMutationError('no_documentation_report')
       }
       return await mutationFn({ variables, userNotes: docreport ?? '' })
     },
     [actionsToDocument, documentationState, mutationFn]
   )
   return wrappedMutationFn
+}
+
+const isDocumentationProvided = (
+  state: DocumentationState,
+  docreport: DocumentationReport | null
+): boolean => {
+  if (state.isLoading) {
+    return false
+  }
+  if (!state.reasonForInteractionRequired) {
+    return true
+  }
+  return docreport != null && docreport.length > 0
 }

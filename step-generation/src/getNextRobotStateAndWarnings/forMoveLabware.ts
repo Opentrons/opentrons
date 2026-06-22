@@ -123,7 +123,11 @@ export function forMoveLabware(
     const fullStack =
       movedStackUpToTarget.length > 0
         ? movedStackUpToTarget
-        : getLargestStackInSlot(labware, initialDeckSlot)
+        : getLargestStackInSlot({
+            slot: initialDeckSlot,
+            labwareState: labware,
+            modulesState: modules,
+          })
     const stackIndexOfTarget = fullStack.indexOf(labwareId)
     const moduleState = newStackerOnDeck.moduleState as FlexStackerModuleState
     if (stackIndexOfTarget !== -1) {
@@ -185,7 +189,11 @@ export function forMoveLabware(
       // For vacuum module: stack onto whatever is currently on the module's main slot
       // so that [collar, ...existingModuleLabware, moduleId, slot] is built correctly
       const moduleSlot = modules[newLocation.moduleId].slot
-      const existingStack = getLargestStackInSlot(labware, moduleSlot)
+      const existingStack = getLargestStackInSlot({
+        slot: moduleSlot,
+        labwareState: labware,
+        modulesState: modules,
+      })
       if (existingStack.length > 0) {
         newLocationStack.push(...existingStack)
       } else {
@@ -272,7 +280,11 @@ export function forMoveLabware(
   ) {
     // The collar stacks onto the topmost existing labware on the module, not the module itself
     const moduleSlot = modules[newLocation.moduleId].slot
-    const existingStack = getLargestStackInSlot(labware, moduleSlot)
+    const existingStack = getLargestStackInSlot({
+      slot: moduleSlot,
+      labwareState: labware,
+      modulesState: modules,
+    })
     const topLabwareIdOnModule =
       existingStack.length > 0 ? existingStack[0] : null
     if (

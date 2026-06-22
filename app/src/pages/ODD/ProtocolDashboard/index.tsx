@@ -20,7 +20,7 @@ import {
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_FLOW_STARTED } from '/app/redux/analytics'
@@ -311,10 +311,11 @@ export function ProtocolDashboard(): JSX.Element {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
-          <FloatingActionButton
+          <TouchFloatingActionButton
             buttonText={t('quick_transfer')}
             iconName="plus"
             onClick={handleCreateNewQuickTransfer}
+            aria-label={t('create_quick_transfer')}
           />
         </Box>
       </Flex>

@@ -291,7 +291,7 @@ export function RunSummary(): JSX.Element {
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
         host,
         aPipetteWithTip,
-        onSettled: () => {
+        onSuccess: () => {
           closeCurrentRunIfValid(() => {
             navigate('/dashboard')
           })
@@ -310,7 +310,7 @@ export function RunSummary(): JSX.Element {
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
         host,
         aPipetteWithTip,
-        onSettled: () => {
+        onSuccess: () => {
           runAgain()
         },
       })

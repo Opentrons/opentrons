@@ -1,8 +1,9 @@
 """Utilities for working with SQLite databases through SQLAlchemy."""
 
+import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeAlias
 
 import sqlalchemy
 
@@ -41,6 +42,35 @@ def enable_foreign_key_constraints(engine: sqlalchemy.engine.Engine) -> None:
     ) -> None:
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
+
+
+def enable_write_ahead_logging(engine: sqlalchemy.engine.Engine) -> None:
+    """Switch the SQLite database into write-ahead logging (WAL) journal mode.
+
+    WAL improves concurrency by letting readers run alongside a single writer,
+    and survives across processes since the journal mode is persisted in the
+    database file itself.
+
+    This should be called once per SQLAlchemy engine, shortly after creating it,
+    before doing anything substantial with it.
+
+    Params:
+        engine: A SQLAlchemy engine connected to a SQLite database, backed by
+            Python's built-in ``sqlite3`` module (pysqlite).
+    """
+    # The journal mode is persisted in the database header, so this only needs
+    # to take effect once per database file. We still listen on every connect
+    # so that fresh database files (e.g. just created by Alembic) get switched
+    # over to WAL the first time we touch them.
+
+    @sqlalchemy.event.listens_for(engine, "connect")  # type: ignore[untyped-decorator]
+    def on_connect(
+        dbapi_connection: Any,
+        connection_record: object,
+    ) -> None:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL;")
         cursor.close()
 
 
@@ -134,4 +164,40 @@ class UTCDateTime(sqlalchemy.types.TypeDecorator[datetime]):
         if value is not None:
             assert value.tzinfo is None
             return value.replace(tzinfo=timezone.utc)
+        return None
+
+
+JsonPythonValue: TypeAlias = (
+    str
+    | int
+    | float
+    | bool
+    | None
+    | list["JsonPythonValue"]
+    | dict[str, "JsonPythonValue"]
+)
+"""The output of `json.dumps()` / the input of `json.loads()`."""
+
+
+class JsonValue(sqlalchemy.TypeDecorator[object]):
+    """Transparently serializes Python values to/from JSON strings in the DB.
+
+    Requires the use of the sqlalchemy ORM layer; set a column type to this
+    to automatically write any serializable value to it:
+
+    column_name: Mapped[JsonPythonValue] = mapped_column(JsonValue, ...)
+    """
+
+    impl = sqlalchemy.String
+    cache_ok = True
+
+    def process_bind_param(self, value: object | None, dialect: Any) -> str | None:
+        """Python → DB: json.dumps before writing."""
+        return json.dumps(value)
+
+    def process_result_value(self, value: str | None, dialect: Any) -> object | None:
+        """DB → Python: json.loads after reading."""
+        if value is not None:
+            result: object = json.loads(value)
+            return result
         return None

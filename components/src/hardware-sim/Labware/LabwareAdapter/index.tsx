@@ -9,6 +9,8 @@ import { OpentronsFlex96TiprackAdapter } from './OpentronsFlex96TiprackAdapter'
 import { OpentronsToughPCRAutoSealingLid } from './OpentronsToughPCRAutoSealingLid'
 import { OpentronsUniversalFlatAdapter } from './OpentronsUniversalFlatAdapter'
 import { OpentronsUniversalFlatAdapterTypeB } from './OpentronsUniversalFlatAdapterTypeB'
+import { OpentronsVacuumManifoldCollar } from './OpentronsVacuumManifoldCollar'
+import { OpentronsVacuumManifoldSpacer } from './OpentronsVacuumManifoldSpacer'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
@@ -21,6 +23,10 @@ const CUSTOM_SVG_LOADNAME_PATHS = {
   opentrons_universal_flat_adapter_type_b: OpentronsUniversalFlatAdapterTypeB,
   opentrons_tough_pcr_auto_sealing_lid: OpentronsToughPCRAutoSealingLid,
   opentrons_flex_deck_riser: OpentronsAutoclavableDeckRiser,
+  opentrons_vacuum_manifold_collar_short: OpentronsVacuumManifoldCollar,
+  opentrons_vacuum_manifold_collar_tall: OpentronsVacuumManifoldCollar,
+  opentrons_vacuum_manifold_spacer_short: OpentronsVacuumManifoldSpacer,
+  opentrons_vacuum_manifold_spacer_tall: OpentronsVacuumManifoldSpacer,
 }
 
 export type LabwareAdapterLoadName = keyof typeof CUSTOM_SVG_LOADNAME_PATHS

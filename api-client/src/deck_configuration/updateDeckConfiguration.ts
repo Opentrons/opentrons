@@ -15,7 +15,7 @@ export function updateDeckConfiguration(
   return request<DeckConfigurationResponse, UpdateDeckConfigurationRequest>(
     PUT,
     '/deck_configuration',
-    { data: { cutoutFixtures: deckConfig } },
-    config
+    config,
+    { body: { data: { cutoutFixtures: deckConfig } } }
   )
 }

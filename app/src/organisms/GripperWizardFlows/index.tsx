@@ -49,6 +49,7 @@ import type {
   MaintenanceRun,
   RunStatus,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
 import type { GripperWizardFlowType } from './types'
 
@@ -72,7 +73,7 @@ export function GripperWizardFlows(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation(flowName)
+  } = useMaintenanceRunDocumentation(flowName, closeFlow)
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
@@ -146,8 +147,9 @@ export function GripperWizardFlows(
     }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
@@ -159,7 +161,7 @@ export function GripperWizardFlows(
           closeFlow()
         },
         onError: () => {
-          closeFlow()
+          setIsExiting(false)
         },
       }
     )
@@ -194,6 +196,7 @@ export function GripperWizardFlows(
       attachedGripper={attachedGripper}
       createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
+      commandDocState={commandDocState}
       isRobotMoving={
         isChainCommandMutationLoading ||
         isCommandLoading ||
@@ -224,6 +227,7 @@ interface GripperWizardProps {
     unknown
   >
   isCreateLoading: boolean
+  commandDocState: DocumentationState
   isRobotMoving: boolean
   isExiting: boolean
   setErrorMessage: (message: string | null) => void
@@ -251,6 +255,7 @@ export const GripperWizard = (
     chainRunCommands,
     attachedGripper,
     isCreateLoading,
+    commandDocState,
     isRobotMoving,
     createRunCommand,
     setErrorMessage,
@@ -347,6 +352,7 @@ export const GripperWizard = (
         {...sharedProps}
         createMaintenanceRun={createMaintenanceRun}
         createdMaintenanceRunId={createdMaintenanceRunId}
+        documentationState={commandDocState}
       />
     )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {

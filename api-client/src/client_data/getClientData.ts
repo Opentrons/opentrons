@@ -8,5 +8,5 @@ export function getClientData<T = DefaultClientData>(
   config: HostConfig,
   key: string
 ): ResponsePromise<ClientDataResponse<T>> {
-  return request<ClientDataResponse<T>>(GET, `/clientData/${key}`, null, config)
+  return request<ClientDataResponse<T>>(GET, `/clientData/${key}`, config)
 }

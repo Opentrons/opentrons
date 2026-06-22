@@ -7,5 +7,5 @@ import type { PipetteSettings } from './types'
 export function getPipetteSettings(
   config: HostConfig
 ): ResponsePromise<PipetteSettings> {
-  return request<PipetteSettings>(GET, `/settings/pipettes`, null, config)
+  return request<PipetteSettings>(GET, `/settings/pipettes`, config)
 }

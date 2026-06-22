@@ -91,24 +91,6 @@ export interface WifiConfigureResponse {
   message: string
 }
 
-// GET /wifi/keys
-
-export interface ApiWifiKey {
-  id: string
-  uri: string
-  name: string
-}
-
-export interface FetchWifiKeysResponse {
-  keys: ApiWifiKey[]
-}
-
-// POST /wifi/keys
-
-export interface PostWifiKeysResponse extends ApiWifiKey {
-  message?: string
-}
-
 // GET /wifi/eap-options
 
 export type WifiAuthFieldType =

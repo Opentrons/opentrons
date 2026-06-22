@@ -129,17 +129,6 @@ async function determineBuildType(input) {
     )
   }
 
-  if (ref.includes('app-build')) {
-    const type = typeFromAsRelease(ref, 'develop', 'as-release')
-    return buildResult(
-      ['release'],
-      type,
-      type === 'as-release'
-        ? 'release as-release builds for app-build + as-release suffixes'
-        : 'release develop builds for app-build suffixes'
-    )
-  }
-
   if (ref.includes('app-build-both')) {
     const type = typeFromAsRelease(ref, 'develop', 'as-release')
     return buildResult(
@@ -148,6 +137,17 @@ async function determineBuildType(input) {
       type === 'as-release'
         ? 'Both as-release builds for app-build-both + as-release suffixes'
         : 'Both develop builds for app-build-both suffixes'
+    )
+  }
+
+  if (ref.includes('app-build')) {
+    const type = typeFromAsRelease(ref, 'develop', 'as-release')
+    return buildResult(
+      ['release'],
+      type,
+      type === 'as-release'
+        ? 'release as-release builds for app-build + as-release suffixes'
+        : 'release develop builds for app-build suffixes'
     )
   }
 

@@ -14,7 +14,7 @@ export function updateErrorRecoverySettings(
   return request<ErrorRecoverySettingsResponse, ErrorRecoverySettingsRequest>(
     PATCH,
     '/errorRecovery/settings',
-    settings,
-    config
+    config,
+    { body: settings }
   )
 }

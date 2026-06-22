@@ -41,7 +41,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     const { result } = renderHook(
       () =>
         useCreateMaintenanceRunMutation(
-          { reasonForInteractionRequired: false },
+          { reasonForInteractionRequired: false, isLoading: false },
           ['lpc_flow']
         ),
       {
@@ -71,7 +71,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     const { result } = renderHook(
       () =>
         useCreateMaintenanceRunMutation(
-          { reasonForInteractionRequired: false },
+          { reasonForInteractionRequired: false, isLoading: false },
           ['lpc_flow']
         ),
       {

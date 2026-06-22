@@ -82,7 +82,9 @@ describe('useGuardedAction', () => {
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
     const currentResult = await act(
-      () => !result.current.reasonForInteractionRequired
+      () =>
+        !result.current.isLoading &&
+        !result.current.reasonForInteractionRequired
     )
     expect(currentResult).toBe(true)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
@@ -107,7 +109,9 @@ describe('useGuardedAction', () => {
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
     const currentResult = await act(
-      () => !result.current.reasonForInteractionRequired
+      () =>
+        !result.current.isLoading &&
+        !result.current.reasonForInteractionRequired
     )
     expect(currentResult).toBe(true)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
@@ -120,21 +124,30 @@ describe('useGuardedAction', () => {
       wrapper,
     })
 
-    expect(result.current.reasonForInteractionRequired).toBe(true)
     expect(
-      result.current.reasonForInteractionRequired && result.current.docreport
+      !result.current.isLoading && result.current.reasonForInteractionRequired
+    ).toBe(true)
+    expect(
+      !result.current.isLoading &&
+        result.current.reasonForInteractionRequired &&
+        result.current.docreport
     ).toBe(docreport)
   })
 
   it('returns callback to open modal when documentation is not provided', async () => {
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
-    expect(result.current.reasonForInteractionRequired).toBe(true)
     expect(
-      result.current.reasonForInteractionRequired && result.current.docreport
+      !result.current.isLoading && result.current.reasonForInteractionRequired
+    ).toBe(true)
+    expect(
+      !result.current.isLoading &&
+        result.current.reasonForInteractionRequired &&
+        result.current.docreport
     ).toBeNull()
     expect(
-      result.current.reasonForInteractionRequired &&
+      !result.current.isLoading &&
+        result.current.reasonForInteractionRequired &&
         result.current.docreport == null &&
         result.current.askForDocumentation
     ).toBeDefined()

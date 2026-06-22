@@ -6,6 +6,7 @@ marks:
       - admin_access_token
       - admin_scopes_list
       - user_scopes_list
+      - reset_password_scopes_list
 
 stages:
   - name: Create a new user
@@ -120,7 +121,7 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
+          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
   - name: Get the user information
     request:
@@ -136,7 +137,7 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
+          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
   - name: Reset the user's password to a temporary password
     request:
@@ -155,7 +156,7 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
+          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
           temporaryPassword: !anystr
 

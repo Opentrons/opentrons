@@ -28,6 +28,7 @@ import type {
  *
  *  This documentation state is designed to be passed along to the useDocumentedMutation hook.
  *
+ * @param docreport - optional pre-provided documentation report
  */
 export function useGuardedAction(
   docreport?: DocumentationReport
@@ -43,6 +44,11 @@ export function useGuardedAction(
   const minLengthOfReasonForInteraction =
     authSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
 
+  const reasonForInteractionLoading = useMemo(
+    () => authSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
+    [accessControlEnabledQuery?.isLoading, authSettingsQuery?.isLoading]
+  )
+
   const reasonForInteractionRequired = useMemo(
     () => accessControlEnabled && requireReasonForInteraction,
     [accessControlEnabled, requireReasonForInteraction]
@@ -53,36 +59,45 @@ export function useGuardedAction(
   )
 
   const showDocumentationModal = useCallback(
-    async (actionsToDocument: DocumentedAction[]) => {
+    async (
+      actionsToDocument: DocumentedAction[],
+      handleCancel?: () => void
+    ) => {
       const docResult = await requireDocumentation(
         currentUsername ?? '',
-        actionsToDocument
+        actionsToDocument,
+        handleCancel
       )
       return docResult
     },
-    [currentUsername, requireDocumentation]
+    [requireDocumentation, currentUsername]
   )
 
   const docState: DocumentationState = useMemo(() => {
+    if (reasonForInteractionLoading) {
+      return { isLoading: true }
+    }
     if (!reasonForInteractionRequired) {
-      return { reasonForInteractionRequired: false }
+      return { reasonForInteractionRequired: false, isLoading: false }
     }
 
     if (
       docreport != null &&
       isDocumentationReportValid(docreport, minLengthOfReasonForInteraction)
     ) {
-      return { reasonForInteractionRequired: true, docreport }
+      return { reasonForInteractionRequired: true, docreport, isLoading: false }
     }
 
     return {
       reasonForInteractionRequired: true,
       docreport: null,
       askForDocumentation: showDocumentationModal,
+      isLoading: false,
     }
   }, [
     docreport,
     minLengthOfReasonForInteraction,
+    reasonForInteractionLoading,
     reasonForInteractionRequired,
     showDocumentationModal,
   ])

@@ -17,7 +17,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof SnackbarComponent> = {
   title: 'Helix/Atoms/Snackbar',
   component: SnackbarComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     // Disable all StyleProps
     ...Object.fromEntries(

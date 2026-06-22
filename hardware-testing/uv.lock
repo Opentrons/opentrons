@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-11T14:25:00.393367Z"
+exclude-newer = "2026-06-04T17:30:16.725673759Z"
 exclude-newer-span = "P1W"
 
 [[package]]
@@ -764,19 +764,16 @@ wheels = [
 name = "hardware-testing"
 source = { editable = "." }
 dependencies = [
-    { name = "abr-testing" },
     { name = "anyio" },
     { name = "opentrons" },
     { name = "opentrons-hardware", extra = ["flex"] },
     { name = "opentrons-shared-data" },
-    { name = "paramiko" },
     { name = "pyserial" },
-    { name = "types-paramiko" },
-    { name = "types-pytz" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "abr-testing" },
     { name = "atomicwrites" },
     { name = "black" },
     { name = "build" },
@@ -787,31 +784,31 @@ dev = [
     { name = "flake8-noqa" },
     { name = "matplotlib" },
     { name = "mypy" },
+    { name = "paramiko" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pyusb" },
     { name = "requests" },
     { name = "setuptools" },
+    { name = "types-paramiko" },
+    { name = "types-pytz" },
     { name = "types-requests" },
     { name = "types-setuptools" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "abr-testing", editable = "../abr-testing" },
     { name = "anyio", specifier = "==4.9.0" },
     { name = "hardware-testing", editable = "." },
-    { name = "opentrons", extras = ["flex-hardware"], editable = "../api" },
+    { name = "opentrons", editable = "../api" },
     { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
     { name = "opentrons-shared-data", editable = "../shared-data" },
-    { name = "paramiko" },
     { name = "pyserial", specifier = "==3.5" },
-    { name = "types-paramiko" },
-    { name = "types-pytz" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "abr-testing", editable = "../abr-testing" },
     { name = "atomicwrites", specifier = "==1.4.1" },
     { name = "black", specifier = "==22.3.0" },
     { name = "build", specifier = "~=1.2.0" },
@@ -822,11 +819,14 @@ dev = [
     { name = "flake8-noqa", specifier = "~=1.4.0" },
     { name = "matplotlib", specifier = "==3.10.0" },
     { name = "mypy", specifier = "==1.11.0" },
+    { name = "paramiko" },
     { name = "pytest", specifier = ">=8,<9" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "requests", specifier = "==2.27.1" },
     { name = "setuptools", specifier = "<82" },
+    { name = "types-paramiko" },
+    { name = "types-pytz" },
     { name = "types-requests", specifier = "==2.25.6" },
     { name = "types-setuptools", specifier = "==57.0.2" },
 ]

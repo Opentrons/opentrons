@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-11T14:55:56.577835Z"
+exclude-newer = "2026-06-04T17:31:24.135398002Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -568,6 +568,52 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz", hash = "sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1", size = 101250, upload-time = "2025-04-24T03:35:25.427Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86", size = 37515, upload-time = "2025-04-24T03:35:24.344Z" },
+]
+
+[[package]]
+name = "hardware-testing"
+source = { editable = "../hardware-testing" }
+dependencies = [
+    { name = "anyio" },
+    { name = "opentrons" },
+    { name = "opentrons-hardware", extra = ["flex"] },
+    { name = "opentrons-shared-data" },
+    { name = "pyserial" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "anyio", specifier = "==4.9.0" },
+    { name = "hardware-testing", editable = "../hardware-testing" },
+    { name = "opentrons", editable = "../api" },
+    { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
+    { name = "opentrons-shared-data", editable = "../shared-data" },
+    { name = "pyserial", specifier = "==3.5" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "abr-testing", editable = "../abr-testing" },
+    { name = "atomicwrites", specifier = "==1.4.1" },
+    { name = "black", specifier = "==22.3.0" },
+    { name = "build", specifier = "~=1.2.0" },
+    { name = "colorama", specifier = "==0.4.4" },
+    { name = "flake8", specifier = "~=7.0.0" },
+    { name = "flake8-annotations", specifier = "~=3.0.1" },
+    { name = "flake8-docstrings", specifier = "~=1.7.0" },
+    { name = "flake8-noqa", specifier = "~=1.4.0" },
+    { name = "matplotlib", specifier = "==3.10.0" },
+    { name = "mypy", specifier = "==1.11.0" },
+    { name = "paramiko" },
+    { name = "pytest", specifier = ">=8,<9" },
+    { name = "pytest-cov", specifier = "==4.1.0" },
+    { name = "pyusb", specifier = "==1.2.1" },
+    { name = "requests", specifier = "==2.27.1" },
+    { name = "setuptools", specifier = "<82" },
+    { name = "types-paramiko" },
+    { name = "types-pytz" },
+    { name = "types-requests", specifier = "==2.25.6" },
+    { name = "types-setuptools", specifier = "==57.0.2" },
 ]
 
 [[package]]
@@ -1810,6 +1856,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "anyio" },
     { name = "fastapi" },
+    { name = "hardware-testing" },
     { name = "opentrons" },
     { name = "opentrons-hardware", extra = ["flex"] },
     { name = "opentrons-shared-data" },
@@ -1860,6 +1907,7 @@ robot = [
     { name = "aiohttp" },
     { name = "anyio" },
     { name = "fastapi" },
+    { name = "hardware-testing" },
     { name = "opentrons" },
     { name = "opentrons-hardware", extra = ["flex"] },
     { name = "opentrons-shared-data" },
@@ -1881,6 +1929,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.12.14,<4" },
     { name = "anyio", specifier = "==4.9.0" },
     { name = "fastapi", specifier = "==0.100.0" },
+    { name = "hardware-testing", editable = "../hardware-testing" },
     { name = "opentrons", editable = "../api" },
     { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
     { name = "opentrons-shared-data", editable = "../shared-data" },
@@ -1931,6 +1980,7 @@ robot = [
     { name = "aiohttp", specifier = "==3.12.14" },
     { name = "anyio", specifier = "==4.9.0" },
     { name = "fastapi", specifier = "==0.100.0" },
+    { name = "hardware-testing", editable = "../hardware-testing" },
     { name = "opentrons", editable = "../api" },
     { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
     { name = "opentrons-shared-data", editable = "../shared-data" },
