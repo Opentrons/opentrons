@@ -1,7 +1,13 @@
 import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
+import { useMatch } from 'react-router-dom'
 
-import { getAuthStateForRobot } from './slice'
+import { getIsOnDevice } from '../config'
+import {
+  getAuthStateForRobot,
+  getCurrentUsernameForLocalRobot,
+  getUsernameForRobot,
+} from './slice'
 
 import type { State } from '../types'
 
@@ -20,4 +26,27 @@ export function useAccessTokenForRobot(
     [robotName]
   )
   return useSelector(selector)
+}
+
+/** Return the username for the given robot, if we are logged in to it. */
+export function useUsernameForRobot(robotName: string | null): string | null {
+  const selector = useCallback(
+    (state: State) => getUsernameForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/**
+ * Return the username for the robot the user is currently acting on:
+ * the local robot on ODD, or the robot being viewed on desktop.
+ */
+export function useCurrentUsername(): string | null {
+  const isOnDevice = useSelector(getIsOnDevice)
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const desktopRobotName = deviceRouteMatch?.params?.robotName ?? null
+  const localRobotUsername = useSelector(getCurrentUsernameForLocalRobot)
+  const desktopRobotUsername = useUsernameForRobot(desktopRobotName)
+
+  return isOnDevice ? localRobotUsername : desktopRobotUsername
 }
