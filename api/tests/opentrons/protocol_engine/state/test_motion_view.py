@@ -381,6 +381,7 @@ def test_get_pipette_location_override_current_location_x_center(
         critical_point=CriticalPoint.X_CENTER,
     )
 
+
 def test_get_pipette_location_override_current_location_y_center(
     decoy: Decoy,
     labware_view: LabwareView,

@@ -344,6 +344,7 @@ def test_single_pipette_map_geometry(
 
     def test_map_geometry(nozzlemap: nozzle_manager.NozzleMap) -> None:
         assert nozzlemap.xy_center_offset == Point(*config.nozzle_map["A1"])
+        assert nozzlemap.x_center_offset == Point(*config.nozzle_map["A1"])
         assert nozzlemap.y_center_offset == Point(*config.nozzle_map["A1"])
         assert nozzlemap.front_nozzle_offset == Point(*config.nozzle_map["A1"])
         assert nozzlemap.starting_nozzle_offset == Point(*config.nozzle_map["A1"])
@@ -516,10 +517,14 @@ def test_multi_config_geometry(
         front_nozzle: str,
         starting_nozzle: str,
         xy_center_in_center_of: Union[Tuple[str, str], str],
+        x_center_in_center_of: Union[Tuple[str, str], str],
         y_center_in_center_of: Union[Tuple[str, str], str],
     ) -> None:
         assert_offset_in_center_of(
             nozzlemap.xy_center_offset, xy_center_in_center_of, config
+        )
+        assert_offset_in_center_of(
+            nozzlemap.x_center_offset, x_center_in_center_of, config
         )
         assert_offset_in_center_of(
             nozzlemap.y_center_offset, y_center_in_center_of, config
@@ -531,20 +536,20 @@ def test_multi_config_geometry(
         )
 
     test_map_geometry(
-        subject.current_configuration, "H1", "A1", ("A1", "H1"), ("A1", "H1")
+        subject.current_configuration, "H1", "A1", ("A1", "H1"), "A1", ("A1", "H1")
     )
 
     subject.update_nozzle_configuration("A1", "A1", "A1")
-    test_map_geometry(subject.current_configuration, "A1", "A1", "A1", "A1")
+    test_map_geometry(subject.current_configuration, "A1", "A1", "A1", "A1", "A1")
 
     subject.update_nozzle_configuration("E1", "H1", "E1")
     test_map_geometry(
-        subject.current_configuration, "H1", "E1", ("E1", "H1"), ("E1", "H1")
+        subject.current_configuration, "H1", "E1", ("E1", "H1"), "E1", ("E1", "H1")
     )
 
     subject.reset_to_default_configuration()
     test_map_geometry(
-        subject.current_configuration, "H1", "A1", ("A1", "H1"), ("A1", "H1")
+        subject.current_configuration, "H1", "A1", ("A1", "H1"), "A1", ("A1", "H1")
     )
 
 
