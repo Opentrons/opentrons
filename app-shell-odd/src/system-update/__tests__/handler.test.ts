@@ -96,7 +96,19 @@ describe('update driver manager', () => {
     when(getConfig)
       .calledWith('update')
       .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
+    const webDriverPayload = {
+      manifestUrl: FLEX_MANIFEST_URL,
+      channel: 'alpha',
+      updateCacheDirectory: testDir,
+      currentVersion: CURRENT_SYSTEM_VERSION,
+    } as WebUpdateSource
+    when(getWebProvider)
+      .calledWith(webDriverPayload)
+      .thenReturn({
+        source: () => webDriverPayload,
+      } as UpdateProvider<WebUpdateSource>)
     const driver = manageDriver(dispatch)
+    let wrappedDriver: null | UpdateDriver = null
     expect(driver.getUpdateDriver()).toBeNull()
     expect(getConfig).not.toHaveBeenCalled()
     return driver
@@ -104,14 +116,18 @@ describe('update driver manager', () => {
         type: CONFIG_INITIALIZED,
       } as ConfigInitializedAction)
       .then(() => {
-        expect(driver.getUpdateDriver()).not.toBeNull()
+        wrappedDriver = driver.getUpdateDriver()
+        expect(wrappedDriver).not.toBeNull()
         expect(getConfig).toHaveBeenCalledOnce()
-        expect(getWebProvider).toHaveBeenCalledWith({
-          manifestUrl: FLEX_MANIFEST_URL,
-          channel: 'alpha',
-          updateCacheDirectory: testDir,
-          currentVersion: CURRENT_SYSTEM_VERSION,
-        })
+        expect(getWebProvider).toHaveBeenCalledWith(webDriverPayload)
+      })
+      .then(() =>
+        driver.handleAction({
+          type: CONFIG_INITIALIZED,
+        } as ConfigInitializedAction)
+      )
+      .then(() => {
+        expect(wrappedDriver).toBe(driver.getUpdateDriver())
       })
   })
 

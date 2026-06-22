@@ -221,6 +221,7 @@ describe('downloadReleaseFiles', () => {
   it('should try and fetch both system zip and release notes', () =>
     directoryWithCleanup(directory => {
       let tempSystemPath = ''
+      let tempReleaseNotesPath = ''
       when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
@@ -240,6 +241,7 @@ describe('downloadReleaseFiles', () => {
           expect.any(Object)
         )
         .thenDo((_url, dest) => {
+          tempReleaseNotesPath = dest
           return fs
             .writeFile(dest, 'this is the contents of the release notes')
             .then(() => dest)
@@ -272,7 +274,8 @@ describe('downloadReleaseFiles', () => {
                 'this is the contents of the release notes'
               )
             ),
-          expect(fs.stat(path.dirname(tempSystemPath))).rejects.toThrow(),
+          expect(fs.stat(tempSystemPath)).rejects.toThrow(),
+          expect(fs.stat(tempReleaseNotesPath)).rejects.toThrow(),
         ])
       })
     }))
@@ -354,7 +357,7 @@ describe('downloadReleaseFiles', () => {
     }))
   it('should fail if it cannot fetch system zip', () =>
     directoryWithCleanup(directory => {
-      let tempSystemPath = ''
+      let tempReleaseNotesPath = ''
       when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
@@ -369,7 +372,7 @@ describe('downloadReleaseFiles', () => {
           expect.any(Object)
         )
         .thenDo((_url, dest) => {
-          tempSystemPath = dest
+          tempReleaseNotesPath = dest
           return fs
             .writeFile(dest, 'this is the contents of the release notes')
             .then(() => dest)
@@ -387,9 +390,7 @@ describe('downloadReleaseFiles', () => {
         )
       )
         .rejects.toThrow()
-        .then(() =>
-          expect(fs.stat(path.dirname(tempSystemPath))).rejects.toThrow()
-        )
+        .then(() => expect(fs.stat(tempReleaseNotesPath)).rejects.toThrow())
     }))
   it('should allow the http requests to be aborted', () =>
     directoryWithCleanup(directory => {

@@ -333,25 +333,31 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
   let updateDriver: UpdateDriver | null = null
   return {
     handleAction: action => {
-      if (action.type === CONFIG_INITIALIZED) {
-        log.info('Initializing update driver')
-        return new Promise(resolve => {
-          updateDriver = createUpdateDriver(dispatch)
-          resolve()
-        })
-      } else if (updateDriver != null) {
-        if (action.type === VALUE_UPDATED && updateDriver.shouldReload()) {
+      if (updateDriver == null) {
+        if (action.type === CONFIG_INITIALIZED) {
+          log.info('Initializing update driver')
+          return new Promise(resolve => {
+            updateDriver = createUpdateDriver(dispatch)
+            resolve()
+          })
+        } else {
+          return new Promise(resolve => {
+            log.warn(
+              `update driver manager received action ${action.type} before initialization`
+            )
+            resolve()
+          })
+        }
+      } else {
+        if (
+          (action.type === CONFIG_INITIALIZED ||
+            action.type === VALUE_UPDATED) &&
+          updateDriver.shouldReload()
+        ) {
           return updateDriver.reload()
         } else {
           return updateDriver.handleAction(action)
         }
-      } else {
-        return new Promise(resolve => {
-          log.warn(
-            `update driver manager received action ${action.type} before initialization`
-          )
-          resolve()
-        })
       }
     },
     getUpdateDriver: () => updateDriver,
