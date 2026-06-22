@@ -39,7 +39,7 @@ export function PersonalAccountSettings({
     getAuthStateForRobot(state, robotName)
   )
   const selfQuery = useSelfQuery({ enabled: authState != null })
-  const username = authState?.username ?? selfQuery.data?.data.username ?? null
+  const username = authState?.username
   const fullName = selfQuery.data?.data.fullName ?? null
 
   return (
