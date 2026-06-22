@@ -49,38 +49,3 @@
   flex: 1;
   flex-direction: column;
 }
-
-/* Stretch TextAreaField internals to fill the column (label + textarea). */
-.text_area_field_fill > div {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.text_area_field_fill > div > div {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-}
-
-.text_area_field_fill > div > div > div:nth-child(2) {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-}
-
-.text_area_field_fill > div > div > div:nth-child(2) > div {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  align-items: stretch;
-}
-
-.text_area_field_fill textarea {
-  min-height: 0;
-  flex: 1;
-}

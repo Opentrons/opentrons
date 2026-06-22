@@ -55,4 +55,11 @@ describe('TouchTextAreaField', () => {
     render(props)
     expect(screen.getByText('Error: Invalid input')).toBeInTheDocument()
   })
+
+  it('applies multiline layout classes when multiline prop is true', () => {
+    props.multiline = true
+    render(props)
+    const textarea = screen.getByRole('textbox', { name: /touchTextArea/i })
+    expect(textarea.className).toMatch(/textarea_multiline/)
+  })
 })

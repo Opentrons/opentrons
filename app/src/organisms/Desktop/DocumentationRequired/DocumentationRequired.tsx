@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -31,7 +31,6 @@ export function DocumentationRequired({
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>('')
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   const trimmedNote = inputText.trim()
   // TODO(jj): check against min length
@@ -65,7 +64,7 @@ export function DocumentationRequired({
         <div className={styles.text_area_container}>
           <div className={styles.text_area_field_fill}>
             <TextAreaField
-              ref={textAreaRef}
+              multiline
               value={inputText}
               onChange={e => {
                 setInputText(e.target.value)

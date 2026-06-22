@@ -5,7 +5,7 @@ import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { ActionItem } from './ActionItem'
-import styles from './actionList.module.css'
+import styles from './actionlist.module.css'
 
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { RunTimeCommand } from '@opentrons/shared-data'
