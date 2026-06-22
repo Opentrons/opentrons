@@ -34,7 +34,7 @@ function FieldRow({ label, children }: FieldRowProps): JSX.Element {
 export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('device_settings')
   const authState = useSelector((state: State) =>
     getAuthStateForRobot(state, robotName)
   )

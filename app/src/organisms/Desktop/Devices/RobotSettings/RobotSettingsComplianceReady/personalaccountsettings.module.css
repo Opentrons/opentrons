@@ -34,13 +34,11 @@
 
 .field_label {
   width: 120px;
-  min-height: 20px;
   flex-shrink: 0;
   line-height: var(--line-height-20);
 }
 
 .field_value {
-  min-height: 20px;
   flex: 1;
   line-height: var(--line-height-20);
 }

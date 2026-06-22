@@ -6,9 +6,9 @@ import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { Accordion } from '/app/molecules/Accordion'
-import { InputSetting } from '/app/molecules/InputSetting'
 
 import styles from './compliancereadysoftwaresettings.module.css'
+import { InputSetting } from './InputSetting'
 
 import type { JSX } from 'react'
 import type { AuthSettingsResponse } from '@opentrons/api-client'
@@ -220,12 +220,11 @@ function ComplianceReadySettingField({
   onInputChange,
   onToggleChange,
 }: ComplianceReadySettingFieldProps): JSX.Element {
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('device_settings')
 
   if (field.type === 'input') {
     return (
       <InputSetting
-        id={field.id}
         label={t(field.labelKey)}
         value={String(values[field.id])}
         units={field.unitsKey != null ? t(field.unitsKey) : undefined}
@@ -297,7 +296,7 @@ function ComplianceReadySettingsSection({
   onInputChange,
   onToggleChange,
 }: ComplianceReadySettingsSectionProps): JSX.Element {
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('device_settings')
 
   return (
     <div className={styles.section}>
@@ -326,7 +325,7 @@ function ComplianceReadySettingsSection({
 export function ComplianceReadySoftwareSettings({
   robotName: _robotName,
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('device_settings')
   const authSettingsQuery = useAuthSettingsQuery()
   const [fieldValues, setFieldValues] = useState<FieldValues>(() =>
     getFieldValuesFromAuthSettings()
