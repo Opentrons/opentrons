@@ -17,7 +17,7 @@ const outPath = (dir: string, url: string): string => {
   return path.join(dir, path.basename(url))
 }
 const dlPath = (dir: string, url: string): string => {
-  return path.join(dir, path.basename(url)) + '.odd-download'
+  return path.join(dir, path.basename(url)) + DOWNLOAD_ARTIFACT_SUFFIX
 }
 const outPathFromDlPath = (dlPath: string): string => {
   return dlPath.slice(0, -DOWNLOAD_ARTIFACT_SUFFIX.length)
@@ -260,3 +260,33 @@ const readReleaseNotes = (path: string | null): Promise<string | null> =>
         )
         return null
       })
+
+const removeTemporaryDownloadsFromReleaseDir = async (
+  releaseDir: string
+): Promise<void> => {
+  try {
+    const releaseContents = await readdir(releaseDir, { withFileTypes: true })
+    const tempDls = releaseContents.filter(contentsDirent =>
+      contentsDirent.name.endsWith(DOWNLOAD_ARTIFACT_SUFFIX)
+    )
+    log.warn(`Found ${tempDls.length} leftover downloads in ${releaseDir}`)
+    await Promise.allSettled(
+      tempDls.map(tdl => rm(path.join(tdl.parentPath, tdl.name)))
+    )
+  } catch (e: unknown) {
+    log.warn(`Failed to read ${releaseDir}: ${e}`)
+  }
+}
+
+export const removeTemporaryDownloads = async (
+  baseDirectory: string
+): Promise<void> => {
+  const releaseDirs = await ensureReleaseCache(baseDirectory)
+  await Promise.allSettled(
+    releaseDirs.map(releaseDirent =>
+      removeTemporaryDownloadsFromReleaseDir(
+        path.join(releaseDirent.parentPath, releaseDirent.name)
+      )
+    )
+  )
+}

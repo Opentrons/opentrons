@@ -11,6 +11,7 @@ import {
   ensureCleanReleaseCacheForVersion,
   getOrDownloadReleaseFiles,
   getReleaseFiles,
+  removeTemporaryDownloads,
 } from '../release-files'
 
 import type { ReleaseSetUrls } from '../../types'
@@ -518,4 +519,62 @@ describe('getOrDownloadReleaseFiles', () => {
         )
       ).rejects.toThrow()
     }))
+})
+
+describe('removeTemporaryDownloads', () => {
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+  it('should remove files with the .odd-download suffix', async () => {
+    await directoryWithCleanup(async directory => {
+      await fs.mkdir(path.join(directory, 'fake-version-1'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.zip.odd-download'),
+        'hello'
+      )
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.md.odd-download'),
+        'goodbye'
+      )
+      await fs.mkdir(path.join(directory, 'fake-version-2'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-2', 'fakedl.zip.odd-download'),
+        'woohoo'
+      )
+      await removeTemporaryDownloads(directory)
+      const fv1dir = await fs.readdir(path.join(directory, 'fake-version-1'))
+      expect(fv1dir).toEqual([])
+      const fv2dir = await fs.readdir(path.join(directory, 'fake-version-2'))
+      expect(fv2dir).toEqual([])
+    })
+  })
+  it('should not remove files without the .odd-download suffix', async () => {
+    await directoryWithCleanup(async directory => {
+      await fs.mkdir(path.join(directory, 'fake-version-1'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.zip'),
+        'hello'
+      )
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.md'),
+        'goodbye'
+      )
+      await fs.mkdir(path.join(directory, 'fake-version-2'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-2', 'fakedl.zip'),
+        'woohoo'
+      )
+      await removeTemporaryDownloads(directory)
+      const fv1dir = await fs.readdir(path.join(directory, 'fake-version-1'))
+      expect(fv1dir).toEqual(['something.md', 'something.zip'])
+      const fv2dir = await fs.readdir(path.join(directory, 'fake-version-2'))
+      expect(fv2dir).toEqual(['fakedl.zip'])
+    })
+  })
+  it('should not throw if directories cant be read', async () => {
+    await directoryWithCleanup(async directory => {
+      await fs.writeFile(path.join(directory, 'something'), 'hi')
+      await removeTemporaryDownloads(directory)
+    })
+  })
 })
