@@ -11,7 +11,7 @@ export interface UserManagementProps {
 export function UserManagement({
   robotName: _robotName,
 }: UserManagementProps): JSX.Element {
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('device_settings')
 
   return <Accordion id="user-management" title={t('desktop_user_management')} />
 }
