@@ -102,10 +102,12 @@ describe('update driver manager', () => {
       updateCacheDirectory: testDir,
       currentVersion: CURRENT_SYSTEM_VERSION,
     } as WebUpdateSource
+    const mockCleanup = vi.fn() as () => Promise<void>
     when(getWebProvider)
       .calledWith(webDriverPayload)
       .thenReturn({
         source: () => webDriverPayload,
+        cleanup: mockCleanup,
       } as UpdateProvider<WebUpdateSource>)
     const driver = manageDriver(dispatch)
     let wrappedDriver: null | UpdateDriver = null
@@ -120,6 +122,7 @@ describe('update driver manager', () => {
         expect(wrappedDriver).not.toBeNull()
         expect(getConfig).toHaveBeenCalledOnce()
         expect(getWebProvider).toHaveBeenCalledWith(webDriverPayload)
+        expect(mockCleanup).toHaveBeenCalled()
       })
       .then(() =>
         driver.handleAction({
@@ -143,6 +146,7 @@ describe('update driver manager', () => {
       unlockUpdateCache: vi.fn(),
       name: vi.fn(),
       source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
+      cleanup: () => Promise.resolve(),
     }
     const fakeProvider2 = {
       ...fakeProvider,
@@ -216,6 +220,7 @@ describe('update driver', () => {
     unlockUpdateCache: vi.fn(),
     name: vi.fn(),
     source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
+    cleanup: () => Promise.resolve(),
   }
   const fakeUsbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {
     first: {
@@ -229,6 +234,7 @@ describe('update driver', () => {
         ({
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
+      cleanup: () => Promise.resolve(),
     },
   }
 
@@ -259,6 +265,7 @@ describe('update driver', () => {
         ({
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
+      cleanup: () => Promise.resolve(),
     }
     fakeUsbProviders.second = {
       teardown: vi.fn(),
@@ -271,6 +278,7 @@ describe('update driver', () => {
         ({
           massStorageRootPath: '/some/other/usb/path',
         }) as any as USBUpdateSource,
+      cleanup: () => Promise.resolve(),
     }
     subject = createUpdateDriver(dispatch)
   })

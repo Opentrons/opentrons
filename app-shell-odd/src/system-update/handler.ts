@@ -24,6 +24,7 @@ export interface UpdateDriver {
   reload: () => Promise<void>
   shouldReload: () => boolean
   teardown: () => Promise<void>
+  cleanup: () => Promise<void>
 }
 
 export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
@@ -321,6 +322,16 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           log.info('all providers torn down')
         })
     },
+    cleanup: async () => {
+      try {
+        await Promise.allSettled([
+          webProvider.cleanup(),
+          ...Object.values(usbProviders).map(provider => provider.cleanup()),
+        ])
+      } catch (err: unknown) {
+        log.warn(`provider cleanup failed: ${err}`)
+      }
+    },
   }
 }
 
@@ -336,17 +347,13 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
       if (updateDriver == null) {
         if (action.type === CONFIG_INITIALIZED) {
           log.info('Initializing update driver')
-          return new Promise(resolve => {
-            updateDriver = createUpdateDriver(dispatch)
-            resolve()
-          })
+          updateDriver = createUpdateDriver(dispatch)
+          return updateDriver.cleanup()
         } else {
-          return new Promise(resolve => {
-            log.warn(
-              `update driver manager received action ${action.type} before initialization`
-            )
-            resolve()
-          })
+          log.warn(
+            `update driver manager received action ${action.type} before initialization`
+          )
+          return Promise.resolve()
         }
       } else {
         if (

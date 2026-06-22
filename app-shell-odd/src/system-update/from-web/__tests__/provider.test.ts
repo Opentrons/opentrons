@@ -3,7 +3,10 @@ import { when } from 'vitest-when'
 
 import { LocalAbortError } from '../../../http'
 import { getProvider } from '../provider'
-import { cleanUpAndGetOrDownloadReleaseFiles as _cleanUpAndGetOrDownloadReleaseFiles } from '../release-files'
+import {
+  cleanUpAndGetOrDownloadReleaseFiles as _cleanUpAndGetOrDownloadReleaseFiles,
+  removeTemporaryDownloads as _removeTemporaryDownloads,
+} from '../release-files'
 import { getOrDownloadManifest as _getOrDownloadManifest } from '../release-manifest'
 
 vi.mock('../../../log')
@@ -21,6 +24,25 @@ const getOrDownloadManifest = vi.mocked(_getOrDownloadManifest)
 const cleanUpAndGetOrDownloadReleaseFiles = vi.mocked(
   _cleanUpAndGetOrDownloadReleaseFiles
 )
+const removeTemporaryDownloads = vi.mocked(_removeTemporaryDownloads)
+
+describe('provider.cleanup', () => {
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+  it('calls removeTemporaryDownloads on cleanup', async () => {
+    const provider = getProvider({
+      manifestUrl: 'http://opentrons.com/releases.json',
+      channel: 'release',
+      updateCacheDirectory: '/some/random/directory',
+      currentVersion: '1.2.3',
+    })
+    await provider.cleanup()
+    expect(removeTemporaryDownloads).toHaveBeenCalledExactlyOnceWith(
+      '/some/random/directory'
+    )
+  })
+})
 
 describe('provider.refreshUpdateCache happy paths', () => {
   afterEach(() => {
