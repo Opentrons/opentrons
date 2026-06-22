@@ -1,0 +1,50 @@
+.copy_action_button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 9999px;
+  background-color: #2c323f;
+  color: #ffffff;
+  box-shadow: 0 3px 6px 0 rgba(22, 33, 45, 0.23);
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.copy_action_button:hover {
+  background-color: #3b4252;
+}
+
+.copy_action_button:focus-visible {
+  outline: 2px solid var(--black-90);
+  outline-offset: 2px;
+}
+
+.container_with_text {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-4);
+  padding: var(--spacing-8) var(--spacing-12);
+  justify-content: center;
+  align-items: center;
+}
+
+.container_without_text {
+  display: flex;
+  padding: var(--spacing-4);
+  justify-content: center;
+  align-items: center;
+  min-width: 2rem;
+  min-height: 2rem;
+}
+
+.icon_style {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--black-90);
+}
+
+.button_text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
