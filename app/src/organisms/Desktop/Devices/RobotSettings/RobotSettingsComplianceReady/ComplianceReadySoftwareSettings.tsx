@@ -33,14 +33,14 @@ type SettingFieldId = AuthSettingFieldId | UiSettingFieldId
 
 type FieldValues = Record<SettingFieldId, string | boolean>
 
-type InputFieldConfig = {
+interface InputFieldConfig {
   type: 'input'
   id: AuthSettingFieldId
   labelKey: string
   unitsKey?: string
 }
 
-type ToggleFieldConfig = {
+interface ToggleFieldConfig {
   type: 'toggle'
   id: SettingFieldId
   labelKey: string
@@ -49,7 +49,7 @@ type ToggleFieldConfig = {
 
 type ComplianceReadyFieldConfig = InputFieldConfig | ToggleFieldConfig
 
-type ComplianceReadySettingsSection = {
+interface ComplianceReadySettingsSectionConfig {
   titleKey: string
   fields: ComplianceReadyFieldConfig[]
 }
@@ -101,7 +101,7 @@ function getFieldValuesFromAuthSettings(
   }
 }
 
-export const SETTINGS_SECTIONS: ComplianceReadySettingsSection[] = [
+export const SETTINGS_SECTIONS: ComplianceReadySettingsSectionConfig[] = [
   {
     titleKey: 'desktop_login_and_security',
     fields: [
@@ -282,7 +282,7 @@ function ComplianceReadySettingField({
 }
 
 interface ComplianceReadySettingsSectionProps {
-  section: ComplianceReadySettingsSection
+  section: ComplianceReadySettingsSectionConfig
   isLastSection: boolean
   values: FieldValues
   onInputChange: (id: AuthSettingFieldId, value: string) => void

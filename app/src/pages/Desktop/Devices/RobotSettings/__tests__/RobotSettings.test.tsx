@@ -30,19 +30,18 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/robot-auth', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/robot-auth')>()
+  const actual = await importOriginal()
 
   return {
-    ...actual,
+    ...(actual as object),
     useAccessTokenForRobot: vi.fn(),
   }
 })
 vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual =
-    await importOriginal<typeof import('@opentrons/react-api-client')>()
+  const actual = await importOriginal()
 
   return {
-    ...actual,
+    ...(actual as object),
     useAccessControlEnabledQuery: vi.fn(),
   }
 })
