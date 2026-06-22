@@ -85,7 +85,7 @@ export const DesktopApp = (): JSX.Element => {
     {
       Component: DeviceDetails,
       name: 'Device',
-      path: '/devices/:robotName',
+      path: '/devices/:robotName/:deviceDetailsTab?',
     },
     {
       Component: CalibrationDashboard,

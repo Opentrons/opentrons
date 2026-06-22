@@ -3,13 +3,16 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  BasicButton,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
   InfoScreen,
+  JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SIZE_4,
   SPACING,
@@ -24,9 +27,8 @@ import {
   useRunStatuses,
 } from '/app/resources/runs'
 
+import { RECENT_PROTOCOL_RUNS_HEADER } from './constants'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
-
-const COLUMNS = '25% 27% 5% 14% 14% 12%'
 
 interface RecentProtocolRunsProps {
   robotName: string
@@ -50,7 +52,6 @@ export function RecentProtocolRuns({
       backgroundColor={COLORS.white}
       borderRadius={BORDERS.borderRadius8}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing16}
       padding={`0 0 ${SPACING.spacing8}`}
       width="100%"
       marginBottom="6rem"
@@ -59,10 +60,27 @@ export function RecentProtocolRuns({
         padding={SPACING.spacing16}
         borderBottom={BORDERS.lineBorder}
         width="100%"
+        alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing8}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <StyledText desktopStyle="bodyLargeSemiBold">
-          {t('recent_protocol_runs')}
+        <StyledText desktopStyle="bodyLargeSemiBold" flex="1">
+          {t('run_history')}
         </StyledText>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          <BasicButton
+            // TODO: wire up actions for downloading all
+            onClick={() => {}}
+            iconName="download"
+          >
+            {t('download_all')}
+          </BasicButton>
+          <BasicButton onClick={() => {}}>{t('delete_all')}</BasicButton>
+        </Flex>
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
@@ -81,13 +99,13 @@ export function RecentProtocolRuns({
               marginRight="12%"
               gap={SPACING.spacing20}
               color={COLORS.grey60}
-              gridTemplateColumns={COLUMNS}
+              gridTemplateColumns={RECENT_PROTOCOL_RUNS_HEADER}
             >
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 data-testid="RecentProtocolRuns_RunTitle"
               >
-                {t('run')}
+                {t('run_date')}
               </StyledText>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
@@ -97,15 +115,15 @@ export function RecentProtocolRuns({
               </StyledText>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
-                data-testid="RecentProtocolRuns_FilesTitle"
-              >
-                {t('files')}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                data-testid="RecentProtocolRuns_FilesTitle"
+              >
+                {t('files')}
               </StyledText>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
@@ -114,34 +132,40 @@ export function RecentProtocolRuns({
                 {t('run_duration')}
               </StyledText>
             </Flex>
-            {allRunsMutable
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
-              )
-
-              .map((run, index) => {
-                const protocol = protocols?.data?.data.find(
-                  protocol => protocol.id === run.protocolId
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gap={SPACING.spacing8}
+              width="100%"
+            >
+              {allRunsMutable
+                .sort(
+                  (a, b) =>
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime()
                 )
-                const protocolName =
-                  protocol?.metadata.protocolName ??
-                  protocol?.files[0].name ??
-                  t('shared:loading') ??
-                  ''
 
-                return (
-                  <HistoricalProtocolRun
-                    run={run}
-                    protocolName={protocolName}
-                    protocolKey={protocol?.key}
-                    robotName={robotName}
-                    robotIsBusy={robotIsBusy}
-                    key={index}
-                  />
-                )
-              })}
+                .map((run, index) => {
+                  const protocol = protocols?.data?.data.find(
+                    protocol => protocol.id === run.protocolId
+                  )
+                  const protocolName =
+                    protocol?.metadata.protocolName ??
+                    protocol?.files[0].name ??
+                    t('shared:loading') ??
+                    ''
+
+                  return (
+                    <HistoricalProtocolRun
+                      run={run}
+                      protocolName={protocolName}
+                      protocolKey={protocol?.key}
+                      robotName={robotName}
+                      robotIsBusy={robotIsBusy}
+                      key={index}
+                    />
+                  )
+                })}
+            </Flex>
           </>
         )}
         {!isRobotViewable && (
