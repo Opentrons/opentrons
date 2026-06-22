@@ -5,8 +5,8 @@ import { Divider, StyledText } from '@opentrons/components'
 import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { Accordion } from '/app/molecules/Accordion'
 
+import { Accordion } from './Accordion'
 import styles from './compliancereadysoftwaresettings.module.css'
 import { InputSetting } from './InputSetting'
 
