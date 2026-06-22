@@ -178,7 +178,7 @@ def test_get_pipette_location_with_current_location_with_x_center(
     )
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "reservoir-id",
         )
     ).then_return(True)
@@ -213,7 +213,7 @@ def test_get_pipette_location_with_current_location_with_y_center(
     )
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "reservoir-id",
         )
     ).then_return(True)
@@ -285,7 +285,7 @@ def test_get_pipette_location_with_current_location_different_pipette(
     )
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "reservoir-id",
         )
     ).then_return(False)
@@ -364,7 +364,7 @@ def test_get_pipette_location_override_current_location_x_center(
     )
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "reservoir-id",
         )
     ).then_return(True)
@@ -404,7 +404,7 @@ def test_get_pipette_location_override_current_location_y_center(
     )
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "reservoir-id",
         )
     ).then_return(True)
@@ -461,7 +461,7 @@ def test_get_pipette_offset_for_reservoirs(
     decoy.when(labware_view.get_has_12_subwells("labware-id")).then_return(has_12_grid)
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "labware-id",
         )
     ).then_return(True)
@@ -555,7 +555,7 @@ def test_get_movement_waypoints_to_well_for_x_center(
     decoy.when(pipette_view.get_current_location()).then_return(location)
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "labware-id",
         )
     ).then_return(True)
@@ -643,7 +643,7 @@ def test_get_movement_waypoints_to_well_for_y_center(
     decoy.when(pipette_view.get_current_location()).then_return(location)
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "labware-id",
         )
     ).then_return(True)
@@ -731,7 +731,7 @@ def test_get_movement_waypoints_to_well_for_xy_center(
     decoy.when(pipette_view.get_current_location()).then_return(location)
 
     decoy.when(
-        labware_view.get_should_center_column_on_target_well(
+        labware_view.get_should_center_column_or_row_on_target_well(
             "labware-id",
         )
     ).then_return(False)
@@ -1251,7 +1251,7 @@ def test_get_touch_tip_waypoints(
         labware_view.get_should_center_pipette_on_target_well("labware-id")
     ).then_return(True)
     decoy.when(
-        labware_view.get_should_center_column_on_target_well("labware-id")
+        labware_view.get_should_center_column_or_row_on_target_well("labware-id")
     ).then_return(False)
 
     decoy.when(pipette_view.get_mount("pipette-id")).then_return(MountType.LEFT)

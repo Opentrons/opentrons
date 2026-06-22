@@ -123,7 +123,7 @@ class MotionView:
         self, labware_id: str
     ) -> CriticalPoint | None:
         """Get the appropriate critical point override for this labware."""
-        if self._labware.get_should_center_column_on_target_well(labware_id):
+        if self._labware.get_should_center_column_or_row_on_target_well(labware_id):
             if self._labware.get_is_column_labware(labware_id):
                 return CriticalPoint.Y_CENTER
             elif self._labware.get_is_row_labware(labware_id):

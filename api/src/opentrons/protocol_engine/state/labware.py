@@ -685,16 +685,13 @@ class LabwareView:
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
 
-    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
-        """True if a pipette moving to this labware should center its active column on the target.
+    def get_should_center_column_or_row_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column or row on the target.
 
-        This is true for labware that have wells spanning entire columns.
+        This is true for labware that have wells spanning entire columns or rows.
         """
         has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
-        return has_quirk and (
-            len(self.get_definition(labware_id).wells) > 1
-            and len(self.get_definition(labware_id).wells) < 96
-        )
+        return has_quirk and 1 < len(self.get_definition(labware_id).wells) < 96
 
     def get_labware_stacking_maximum(self, labware: LabwareDefinition) -> int:
         """Returns the maximum number of labware allowed in a stack for a given labware definition.
