@@ -98,12 +98,7 @@ export function RobotSettingsComponent({
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
-    'compliance-ready': (
-      <RobotSettingsComplianceReady
-        robotName={robotName}
-        isRobotBusy={isRobotBusy}
-      />
-    ),
+    'compliance-ready': <RobotSettingsComplianceReady robotName={robotName} />,
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
   }
 

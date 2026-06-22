@@ -78,7 +78,6 @@ export function PersonalAccountSettings({
             desktopStyle="bodyDefaultRegular"
             className={styles.field_value_text}
           >
-            {/* TODO(tz, 2026-06-18): mask password from api */}
             ••••••••
           </StyledText>
         </FieldRow>
