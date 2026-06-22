@@ -5,10 +5,10 @@
 .header_content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-4);
   color: var(--black-90);
   font-size: var(--font-size-h1);
   font-weight: var(--font-weight-semi-bold);
+  gap: var(--spacing-4);
   line-height: var(--line-height-24);
 }
 
@@ -38,8 +38,8 @@
   width: 100%;
   flex-direction: column;
   justify-content: space-around;
-  margin-bottom: var(--spacing-16);
   padding: var(--spacing-16);
   border-radius: var(--border-radius-8);
+  margin-bottom: var(--spacing-16);
   background-color: var(--white);
 }
