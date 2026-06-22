@@ -1,4 +1,7 @@
+import { createPortal } from 'react-dom'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+
+import { getTopPortalEl } from '/app/App/portal'
 
 import { DocumentationRequired } from './DocumentationRequired'
 
@@ -31,13 +34,14 @@ const DocumentationRequiredModalImpl = NiceModal.create(
       modal.remove()
     }
 
-    return (
+    return createPortal(
       <DocumentationRequired
         username={username}
         actionsToDocument={actionsToDocument}
         onConfirm={handleConfirm}
         onClose={handleBack}
-      />
+      />,
+      getTopPortalEl()
     )
   }
 )
