@@ -159,7 +159,7 @@ def test_get_is_column_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
     subject_view = LabwareView(subject.state)
 
-    def _load_labware(labware_id: str, definition: LabwareDefinition3):
+    def _load_labware(labware_id: str, definition: LabwareDefinition3) -> None:
         load_labware_update = update_types.LoadedLabwareUpdate(
             labware_id=labware_id,
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
@@ -233,7 +233,7 @@ def test_get_is_row_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
     subject_view = LabwareView(subject.state)
 
-    def _load_labware(labware_id: str, definition: LabwareDefinition3):
+    def _load_labware(labware_id: str, definition: LabwareDefinition3) -> None:
         load_labware_update = update_types.LoadedLabwareUpdate(
             labware_id=labware_id,
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
