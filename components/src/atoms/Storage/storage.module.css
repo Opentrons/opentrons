@@ -1,0 +1,64 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  padding: var(--spacing-16);
+  background-color: var(--grey-20);
+  border-radius: var(--border-radius-8);
+}
+
+.bar_section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.track {
+  position: relative;
+  height: var(--spacing-12);
+  overflow: hidden;
+  background-color: var(--blue-10);
+  border-radius: var(--border-radius-full);
+}
+
+.fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--fill-percent);
+  height: 100%;
+  background-color: var(--blue-50);
+  border-radius: var(--border-radius-full);
+}
+
+.legend {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .container {
+    gap: var(--spacing-40);
+    padding: var(--spacing-32);
+    background-color: var(--grey-35);
+    border-radius: var(--border-radius-12);
+    align-items: center;
+  }
+
+  .label {
+    text-align: center;
+  }
+
+  .bar_section {
+    width: 100%;
+  }
+
+  .track {
+    height: 1rem;
+    background-color: var(--blue-20);
+  }
+
+  .legend_text {
+    color: var(--grey-60);
+  }
+}
