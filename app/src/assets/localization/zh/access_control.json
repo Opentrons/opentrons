@@ -1,0 +1,5 @@
+{
+  "access_control_note": "由{{user}}提供的机器人审计日志备注",
+  "documentation_required": "需要提供文档",
+  "view_actions": "查看操作"
+}

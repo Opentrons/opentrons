@@ -1,4 +1,5 @@
 {
+  "account": "账户",
   "app_settings": "APP设置",
   "attached_pipettes_do_not_match": "安装的移液器与加载的协议中指定的移液器不匹配",
   "calibrate_deck_to_proceed": "校准甲板以继续",
@@ -9,6 +10,7 @@
   "instruments": "硬件",
   "labware": "耗材",
   "modules": "模块",
+  "ot2": "OT-2",
   "pipettes": "移液器",
   "pipettes_not_calibrated": "请校准加载的协议中指定的所有移液器以继续",
   "please_connect_to_a_robot": "请连接到工作站以继续",
