@@ -416,7 +416,8 @@ class _TokenStore:
 def _is_list_of_type[ElementT](
     alleged_list: object, expected_element_type: type[ElementT]
 ) -> TypeGuard[list[ElementT]]:
-    assert isinstance(alleged_list, list)
+    if not isinstance(alleged_list, list):
+        return False
     return all(
         isinstance(element, expected_element_type)
         for element in cast(list[object], alleged_list)
