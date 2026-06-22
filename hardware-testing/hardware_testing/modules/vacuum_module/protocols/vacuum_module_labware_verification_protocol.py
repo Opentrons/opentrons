@@ -1,11 +1,12 @@
 """Verify vacuum module loading for filter plates, receiver plates, and collar variants."""
-from typing import cast
+from typing import List, cast
 
 from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
     VacuumModuleContext,
 )
+from opentrons.protocols.parameters.types import ParameterChoice
 
 metadata = {
     "protocolName": "Vacuum Module Labware Loading Verification",
@@ -20,7 +21,7 @@ requirements = {
     "apiLevel": "2.30",
 }
 
-COLLAR_CHOICES = [
+COLLAR_CHOICES: List[ParameterChoice] = [
     {
         "display_name": "Opentrons: Short",
         "value": "opentrons_vacuum_manifold_collar_short",
@@ -39,7 +40,7 @@ COLLAR_CHOICES = [
     },
 ]
 
-FILTER_PLATE_CHOICES = [
+FILTER_PLATE_CHOICES: List[ParameterChoice] = [
     {
         "display_name": "Millipore 96 300µL Classic",
         "value": "millipore_96_wellplate_300ul_filter",
@@ -74,7 +75,7 @@ FILTER_PLATE_CHOICES = [
     },
 ]
 
-RECEIVER_PLATE_CHOICES = [
+RECEIVER_PLATE_CHOICES: List[ParameterChoice] = [
     {
         "display_name": "Millipore 96 400µL",
         "value": "millipore_96_wellplate_400ul",
