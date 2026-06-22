@@ -10,15 +10,9 @@ import type {
   FETCH_STATUS,
   FETCH_STATUS_FAILURE,
   FETCH_STATUS_SUCCESS,
-  FETCH_WIFI_KEYS,
-  FETCH_WIFI_KEYS_FAILURE,
-  FETCH_WIFI_KEYS_SUCCESS,
   POST_WIFI_CONFIGURE,
   POST_WIFI_CONFIGURE_FAILURE,
   POST_WIFI_CONFIGURE_SUCCESS,
-  POST_WIFI_KEYS,
-  POST_WIFI_KEYS_FAILURE,
-  POST_WIFI_KEYS_SUCCESS,
 } from './constants'
 
 export * from './api-types'
@@ -63,46 +57,6 @@ export interface PostWifiConfigureSuccessAction {
 
 export interface PostWifiConfigureFailureAction {
   type: typeof POST_WIFI_CONFIGURE_FAILURE
-  payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
-}
-
-// fetch wifi keys
-
-export interface FetchWifiKeysAction {
-  type: typeof FETCH_WIFI_KEYS
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface FetchWifiKeysSuccessAction {
-  type: typeof FETCH_WIFI_KEYS_SUCCESS
-  payload: { robotName: string; wifiKeys: ApiTypes.ApiWifiKey[] }
-  meta: RobotApiRequestMeta
-}
-
-export interface FetchWifiKeysFailureAction {
-  type: typeof FETCH_WIFI_KEYS_FAILURE
-  payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
-}
-
-// post wifi keys
-
-export interface PostWifiKeysAction {
-  type: typeof POST_WIFI_KEYS
-  payload: { robotName: string; keyFile: File }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface PostWifiKeysSuccessAction {
-  type: typeof POST_WIFI_KEYS_SUCCESS
-  payload: { robotName: string; wifiKey: ApiTypes.ApiWifiKey }
-  meta: RobotApiRequestMeta
-}
-
-export interface PostWifiKeysFailureAction {
-  type: typeof POST_WIFI_KEYS_FAILURE
   payload: { robotName: string; error: RobotApiErrorResponse }
   meta: RobotApiRequestMeta
 }
@@ -165,12 +119,6 @@ export type NetworkingAction =
   | PostWifiConfigureAction
   | PostWifiConfigureSuccessAction
   | PostWifiConfigureFailureAction
-  | FetchWifiKeysAction
-  | FetchWifiKeysSuccessAction
-  | FetchWifiKeysFailureAction
-  | PostWifiKeysAction
-  | PostWifiKeysSuccessAction
-  | PostWifiKeysFailureAction
   | FetchEapOptionsAction
   | FetchEapOptionsSuccessAction
   | FetchEapOptionsFailureAction
@@ -181,18 +129,10 @@ export type NetworkingAction =
 
 // state types
 
-export interface WifiKey extends ApiTypes.ApiWifiKey {
-  // if the api key was added by a specific request, add the ID in networking
-  // state so the UI can track which key it added
-  requestId?: string
-}
-
 export type PerRobotNetworkingState = Partial<{
   internetStatus?: ApiTypes.InternetStatus
   interfaces?: ApiTypes.InterfaceStatusMap
   wifiList?: ApiTypes.WifiNetwork[]
-  wifiKeyIds?: string[]
-  wifiKeysById?: Partial<{ [id: string]: WifiKey }>
   eapOptions?: ApiTypes.EapOption[]
 }>
 

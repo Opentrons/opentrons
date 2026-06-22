@@ -161,13 +161,13 @@ describe('ProtocolSetupModulesAndDeck', () => {
     screen.getByText('Location')
     screen.getByText('Status')
     screen.getByText('Setup Instructions')
-    screen.getByRole('button', { name: 'Map View' })
+    screen.getByRole('button', { name: 'Display Map View' })
   })
 
   it('should launch deck map on button click', () => {
     render()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display Map View' }))
   })
 
   it('should launch setup instructions modal on button click', () => {

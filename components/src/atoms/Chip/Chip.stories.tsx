@@ -40,7 +40,7 @@ const meta: Meta<typeof ChipComponent> = {
     },
   },
   component: ChipComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Flex

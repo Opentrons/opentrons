@@ -11,7 +11,7 @@ const meta: Meta<typeof InputFieldComponent> = {
   // The unification for this component will be done when the old component is retired completely.
   title: 'Helix/Molecules/InputField',
   component: InputFieldComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     units: {
       control: {

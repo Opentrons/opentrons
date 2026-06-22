@@ -156,11 +156,11 @@ describe('ProtocolSetupLabware', () => {
 
   it('renders the Labware Setup page', () => {
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Labware & Liquids')
     screen.getByText('Labware name')
     screen.getByText('Location')
-    screen.getByRole('button', { name: 'Map View' })
+    screen.getByRole('button', { name: 'Display Map View' })
   })
 
   it('correctly navigates with the nav button', () => {
@@ -172,10 +172,10 @@ describe('ProtocolSetupLabware', () => {
   it('should toggle between map view and list view', () => {
     render()
     expect(screen.queryByText('Map View')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     expect(screen.queryByText('List View')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display Map View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Labware & Liquids')
     screen.getByText('Labware name')
     screen.getByText('Location')
@@ -183,7 +183,7 @@ describe('ProtocolSetupLabware', () => {
 
   it('sends a latch-close command when the labware latch is open and the button is clicked', () => {
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     fireEvent.click(screen.getByText('Labware Latch'))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
@@ -202,7 +202,7 @@ describe('ProtocolSetupLabware', () => {
       refetch: mockRefetch,
     } as any)
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     fireEvent.click(screen.getByText('Labware Latch'))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
@@ -220,7 +220,7 @@ describe('ProtocolSetupLabware', () => {
       mockUseModulesQueryOpening as any
     )
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Opening...')
   })
 
@@ -229,7 +229,7 @@ describe('ProtocolSetupLabware', () => {
       mockUseModulesQueryClosing as any
     )
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Closing...')
   })
 
@@ -238,7 +238,7 @@ describe('ProtocolSetupLabware', () => {
       mockUseModulesQueryUnknown as any
     )
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'List View' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Display List View' }))
     screen.getByText('Open')
   })
 })

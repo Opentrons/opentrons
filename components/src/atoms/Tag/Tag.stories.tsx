@@ -28,7 +28,7 @@ const meta: Meta<typeof TagComponent> = {
     },
   },
   component: TagComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Flex padding={SPACING.spacing16} width="59rem">

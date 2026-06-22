@@ -13,7 +13,7 @@ import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'ODD/Molecules/BackgroundOverlay',
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<

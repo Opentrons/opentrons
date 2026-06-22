@@ -49,30 +49,6 @@ export const getNetworkInterfaces: (
   }
 )
 
-export const getWifiKeys: (state: State, robotName: string) => Types.WifiKey[] =
-  createSelector(
-    (state: State, robotName: string) =>
-      state.networking[robotName]?.wifiKeyIds,
-    (state: State, robotName: string) =>
-      state.networking[robotName]?.wifiKeysById,
-    (
-      ids: string[] = [],
-      keysById: Partial<{ [id: string]: Types.WifiKey }> = {}
-    ) => ids.map(id => keysById[id]!)
-  )
-
-// NOTE: not memoized because used in several rendered components
-// passing different requestIds simultaneously
-export const getWifiKeyByRequestId = (
-  state: State,
-  robotName: string,
-  reqId: string | null
-): Types.WifiKey | null => {
-  return reqId !== null
-    ? (getWifiKeys(state, robotName).find(k => k.requestId === reqId) ?? null)
-    : null
-}
-
 export const getEapOptions = (
   state: State,
   robotName: string

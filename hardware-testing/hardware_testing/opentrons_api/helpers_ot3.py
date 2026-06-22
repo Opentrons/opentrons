@@ -22,7 +22,8 @@ from typing import (
     Sequence,
     Any,
 )
-
+import json
+from opentrons.config import IS_ROBOT
 from opentrons.protocol_api import ProtocolContext
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -51,7 +52,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from ..data import get_git_description, csv_report
@@ -111,6 +112,21 @@ CALIBRATION_SQUARE_EVT = CalibrationSquare(
     top_left_offset=CALIBRATION_SQUARE_OFFSET_EVT, width=20, height=20, depth=3
 )
 CALIBRATION_PROBE_EVT = CalibrationProbe(length=44.5, diameter=4.0)
+
+
+def get_system_langauge() -> str:
+    """Return the language setting of the robot."""
+    if IS_ROBOT:
+        try:
+            with open("/data/ODD/config.json", "r") as f:
+                app_config = json.load(f)
+            return app_config["language"]["appLanguage"]
+        except Exception:
+            pass
+    return "en-US"
+
+
+LOCALIZE = get_system_langauge() == "zh-CN"
 
 
 def stop_server_ot3() -> None:
@@ -352,12 +368,39 @@ def _get_serial_for_dut(
         return input("enter ID for test: ")
 
 
+async def _scan_barcode(self) -> Optional[str]:  # noqa: ANN001
+    scanner = self.attached_peripherals[0]
+    return await scanner.scan_barcode()
+
+
+def get_device_barcode(
+    ctx: ProtocolContext,
+    api: SyncHardwareAPI,
+    dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
+) -> str:
+    """Have the user scan a devices barcode."""
+    OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
+    for i in range(3):
+        ctx.pause(
+            f"将扫描仪对准 {dut.value} 条形码"
+            if LOCALIZE
+            else f"Point scanner at {dut.value} barcode"
+        )
+        result = api._scan_barcode()
+        if result:
+            return result
+        ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
+
+    raise RuntimeError("Error scanning barcode.")
+
+
 def set_csv_report_meta_data_ot3(
     api: Union[OT3API, SyncHardwareAPI],
     report: csv_report.CSVReport,
     operator: str,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
+    ctx: Optional[ProtocolContext] = None,
 ) -> None:
     """Set CSVReport meta-data given an OT3."""
     # operator should be entered first
@@ -368,19 +411,24 @@ def set_csv_report_meta_data_ot3(
     robot_serial = get_robot_serial_ot3(api)
     dut_str = _get_serial_for_dut(api, dut)
     print(f"device under test: {dut_str}")
-    if not api.is_simulator and dut != DeviceUnderTest.OTHER:
+    barcode = dut_str
+    if dut != DeviceUnderTest.OTHER:
         # always confirm barcode for robot/pipette/gripper
-        barcode = input("SCAN device barcode: ").strip()
-    else:
-        barcode = dut_str
+        if isinstance(api, SynchronousAdapter):
+            # if we're running with one of protocol engine's adapters we're running in a protocol and
+            # need to use the ctx to grab the barcode scanner instead of users typing input.
+            assert ctx
+            barcode = get_device_barcode(ctx, api, dut)
+        elif not api.is_simulator:
+            barcode = input("SCAN device barcode: ").strip()
     print(f"barcode: {barcode}")
-
     # default the CSV tag to be the DUT
     report.set_tag(tag if tag else dut_str)
     report.set_device_id(dut_str, barcode)
     report.set_robot_id(robot_serial)
     report.set_firmware(api.fw_version)
-    report.set_version(get_git_description())
+    if not (ctx and ctx.is_simulating()):
+        report.set_version(get_git_description())
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -1557,15 +1605,58 @@ def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
     )
 
 
-# TODO Barcode scanner?
-def get_user_answer(api: SyncHardwareAPI, prompt: str) -> bool:
+def get_user_answer(ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str) -> bool:
     """Have the user answer a yes/no question."""
-    return True
+    OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
+    for i in range(3):
+        ctx.pause(
+            f"将扫描仪对准“是”或“否”： {prompt}"
+            if LOCALIZE
+            else f"Point Scanner at Yes or No: {prompt}"
+        )
+        result = api._scan_barcode()
+        if result:
+            return "yes" in result.lower()
+        ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
+
+    raise RuntimeError("Error scanning barcode.")
 
 
 def get_input_number(
     ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str, default: Union[int, float]
 ) -> Union[int, float]:
     """Have the user input a value."""
-    ctx.pause(f"Use Scanner: {prompt}")
+    OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
+
+    def _is_float(s: str) -> bool:
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+
+    def _is_int(s: str) -> bool:
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
+
+    for i in range(3):
+        ctx.pause(
+            f"将扫描仪对准数字：{prompt}" if LOCALIZE else f"Point Scanner at number: {prompt}"
+        )
+        result = api._scan_barcode()
+        if result:
+            if _is_int(result):
+                return int(result)
+            elif _is_float(result):
+                return float(result)
+            ctx.pause(
+                f"{result} 不是数字，请重试"
+                if LOCALIZE
+                else f"{result} is not a number, try again."
+            )
+        else:
+            ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
     return default

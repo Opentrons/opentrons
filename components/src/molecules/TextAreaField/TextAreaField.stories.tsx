@@ -10,7 +10,7 @@ import type { ComponentProps } from 'react'
 const meta: Meta<typeof TextAreaFieldComponent> = {
   title: 'Helix/Molecules/TextAreaField',
   component: TextAreaFieldComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {},
 }
 

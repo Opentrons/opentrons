@@ -40,7 +40,7 @@ export function useSetNewPasswordAndSignIn(
 
   const submitNewPassword = useCallback(
     (username: string, password: string): void => {
-      if (host?.token == null) {
+      if (host == null || host.token == null) {
         console.error('useSetNewPasswordAndSignIn: missing host token')
         onError(t('login_error_incorrect') as string)
         return

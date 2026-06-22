@@ -12,16 +12,10 @@ import {
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
 
-import { clearStaleAuthBeforeLogin } from './clearStaleAuthBeforeLogin'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
-import type { QueryClient } from 'react-query'
-import type {
-  AuthUser,
-  HostConfig,
-  OAuth2TokenResponse,
-} from '@opentrons/api-client'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
@@ -143,13 +137,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 /**
  * Open the login modal and await the result.
  */
-export function showLoginModal(
-  queryClient: QueryClient,
-  hostConfig: HostConfig | null
-): Promise<LoginModalResult | null> {
-  return clearStaleAuthBeforeLogin(queryClient, hostConfig).then(
-    () => NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
-  )
+export function showLoginModal(): Promise<LoginModalResult | null> {
+  return NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
 }
 
 /**

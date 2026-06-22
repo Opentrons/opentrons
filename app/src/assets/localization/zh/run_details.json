@@ -96,7 +96,7 @@
   "module_controls": "模块控制",
   "module_slot_number": "板位{{slot_number}}",
   "modules_missing": "甲板缺少模块",
-  "move_labware": "移动耗材",
+  "move_labware": "Move Labware",
   "na": "不适用",
   "name": "名称",
   "no_files_included": "未包含协议文件",

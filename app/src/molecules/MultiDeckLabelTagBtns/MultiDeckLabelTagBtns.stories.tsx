@@ -40,7 +40,7 @@ export default {
       if: { arg: 'hasColThreeSecondaryBtn', eq: true },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface MultiDeckLabelTagBtnsStoryProps {
