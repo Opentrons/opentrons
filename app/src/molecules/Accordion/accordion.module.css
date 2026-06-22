@@ -1,23 +1,23 @@
 .accordion {
   width: 100%;
+  box-sizing: border-box;
   border-radius: var(--border-radius-8);
   background-color: var(--white);
-  box-sizing: border-box;
 }
 
 .header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   width: 100%;
   min-height: 4.5rem;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
   padding: var(--spacing-24) var(--spacing-16);
   border: none;
   background: transparent;
   cursor: pointer;
-  text-align: left;
-  box-sizing: border-box;
   gap: var(--spacing-24);
+  text-align: left;
 }
 
 .title {

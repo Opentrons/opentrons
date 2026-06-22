@@ -1,8 +1,8 @@
 .page {
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: var(--spacing-24);
-  width: 100%;
 }
 
 .section {
@@ -16,6 +16,6 @@
 }
 
 .section_accordion {
-  padding: 0;
   overflow: hidden;
+  padding: 0;
 }

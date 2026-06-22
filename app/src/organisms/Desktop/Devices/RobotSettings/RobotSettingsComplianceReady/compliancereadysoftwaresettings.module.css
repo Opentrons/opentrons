@@ -25,8 +25,8 @@
 .sub_fields {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-16);
   padding-left: var(--spacing-24);
+  gap: var(--spacing-16);
 }
 
 .toggle_row {
