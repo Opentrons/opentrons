@@ -9,6 +9,7 @@ interface ConfigureNozzleLayoutParams {
   configurationParams: {
     style: NozzleConfigurationStyle
     primaryNozzle?: PrimaryNozzleConfigurationStyle
+    backLeftNozzle?: PrimaryNozzleConfigurationStyle
   }
 }
 
@@ -23,4 +24,6 @@ export function forConfigureNozzleLayout(
   robotState.pipettes[pipetteId].nozzles = configurationParams.style
   robotState.pipettes[pipetteId].primaryNozzle =
     configurationParams.primaryNozzle
+  robotState.pipettes[pipetteId].backLeftNozzle =
+    configurationParams.backLeftNozzle
 }
