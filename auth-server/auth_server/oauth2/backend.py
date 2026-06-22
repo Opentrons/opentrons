@@ -4,8 +4,9 @@ import json
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Any, NotRequired, TypeAlias, TypedDict, TypeGuard, cast, override
+from typing import Any, NotRequired, TypedDict, TypeGuard, cast, override
 
+import fastapi
 import oauthlib.common
 import oauthlib.oauth2
 import pydantic
@@ -29,24 +30,60 @@ _log = logging.getLogger(__name__)
 # https://github.com/oauthlib/oauthlib/issues/641
 _CLIENT_ID = "opentrons_app"
 
-# todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
-_TOKEN_LIFETIME = timedelta(days=30)
+
+class Backend:
+    """A backend that our server can use to process OAuth 2 requests."""
+
+    def __init__(self, user_store: UserStore, settings_store: SettingsStore) -> None:
+        def get_token_expires_in(request: oauthlib.common.Request) -> int:
+            idle_logout_setting = settings_store.get_settings().idleLogout
+            return int(idle_logout_setting)
+
+        # "Legacy" refers to the fact that it uses the "resource owner password credentials"
+        # grant type.
+        self._inner_backend = oauthlib.oauth2.LegacyApplicationServer(
+            _RequestValidator(_TokenStore(), user_store, settings_store),
+            token_expires_in=get_token_expires_in,
+        )
+
+    def create_token_response(
+        self, uri: str, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+    ) -> fastapi.Response:
+        token_response: tuple[dict[str, str], str, int] = (
+            self._inner_backend.create_token_response(
+                # The uri param apparently does not matter.
+                uri="",
+                # We can assume the request was POST because the FastAPI layer will enforce it.
+                http_method="POST",
+                body=body_form_data,
+                headers=headers,
+            )
+        )
+        headers, body, status_code = token_response
+        return fastapi.Response(
+            headers=headers,
+            content=body,
+            status_code=status_code,
+        )
 
 
-Backend: TypeAlias = oauthlib.oauth2.LegacyApplicationServer
-"""A backend that our server can use to process OAuth 2 requests.
-
-"Legacy" in this case refers to the fact that it uses the "resource owner password
-credentials" grant type.
-"""
-
-
-def build(user_store: UserStore, settings_store: SettingsStore) -> Backend:
-    """Return a backend that our server can use to process OAuth 2 requests."""
-    return oauthlib.oauth2.LegacyApplicationServer(
-        _RequestValidator(_TokenStore(), user_store, settings_store),
-        token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
-    )
+    def create_introspect_response(
+        self, uri: str, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+    ) -> fastapi.Response:
+        headers, body, status_code = self._inner_backend.create_introspect_response(
+            # The uri param apparently does not matter.
+            uri="",
+            # We can assume the request was POST because the FastAPI layer will enforce it.
+            http_method="POST",
+            # The type stubs are wrong; `body` can in fact be a `list[tuple[str, str]]`.
+            body=body_form_data,  # type: ignore[arg-type]
+            headers=headers,
+        )
+        return fastapi.Response(
+            headers=headers,
+            content=body,
+            status_code=status_code,
+        )
 
 
 @dataclass

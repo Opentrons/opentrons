@@ -94,21 +94,26 @@ class _SelfClient(Client):
             "token": token,
             "client_id": CLIENT_ID,
         }
-        _raw_response_headers, raw_response_body, raw_response_status_code = (
-            self._oauth2_backend.create_introspect_response(
-                # The uri param apparently does not matter.
-                uri="",
-                # The type stubs are wrong; `body` can in fact be a `list[tuple[str, str]]`.
-                body=[(name, value) for name, value in request_form_data.items()],  # type: ignore[arg-type]
-            )
+
+        # Get a list of key-value tuples and help the type checker see that every value
+        # is guaranteed to be a string.
+        request_form_data_kvs = [(k, v )for (k, v )in request_form_data.items() if isinstance(v, str)]
+        assert len(request_form_data_kvs) == len(request_form_data)
+
+        raw_response = self._oauth2_backend.create_introspect_response(
+            # The uri param apparently does not matter.
+            uri="",
+            body_form_data=request_form_data_kvs,
+            headers={},
         )
-        if not 200 <= raw_response_status_code < 300:
+
+        if not 200 <= raw_response.status_code < 300:
             raise RuntimeError(
                 f"Internal token introspection request failed."
-                f" Status code: {raw_response_status_code}."
-                f" Body: {repr(raw_response_body)}."
+                f" Status code: {raw_response.status_code}."
+                f" Body: {repr(raw_response.body)}."
             )
         parsed_response = TokenIntrospectionResponse.model_validate_json(
-            raw_response_body
+            raw_response.body
         )
         return parsed_response

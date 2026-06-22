@@ -17,19 +17,10 @@ async def token_endpoint(
 ) -> fastapi.Response:
     """The OAuth 2 token endpoint, as specified in RFC 6749."""
     form_data = await _get_form_data(request)
-    token_response: tuple[dict[str, str], str, int] = (
-        oauth2_backend.create_token_response(
-            uri=str(request.url),
-            http_method=request.method,  # type: ignore[arg-type]
-            body=form_data,
-            headers=dict(request.headers),
-        )
-    )
-    headers, body, status_code = token_response
-    return fastapi.Response(
-        headers=headers,
-        content=body,
-        status_code=status_code,
+    return oauth2_backend.create_token_response(
+        uri=str(request.url),
+        body_form_data=form_data,
+        headers=dict(request.headers),
     )
 
 
@@ -40,17 +31,10 @@ async def introspection_endpoint(
 ) -> fastapi.Response:
     """The OAuth 2 token introspection endpoint, as specified in RFC 7662."""
     form_data = await _get_form_data(request)
-    headers, body, status_code = oauth2_backend.create_introspect_response(
+    return oauth2_backend.create_introspect_response(
         uri=str(request.url),
-        http_method=request.method,  # type: ignore[arg-type]
-        # The type stubs are wrong; `body` can in fact be a `list[tuple[str, str]]`.
-        body=form_data,  # type: ignore[arg-type]
+        body_form_data=form_data,
         headers=dict(request.headers),
-    )
-    return fastapi.Response(
-        headers=headers,
-        content=body,
-        status_code=status_code,
     )
 
 
