@@ -57,8 +57,4 @@
     height: 1rem;
     background-color: var(--blue-20);
   }
-
-  .legend_text {
-    color: var(--grey-60);
-  }
 }
