@@ -34,7 +34,7 @@ describe('provider.cleanup', () => {
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
       channel: 'release',
-      updateCacheDirectory: '/some/random/directory',
+      updateCacheDirectory: '/some/random/directory/versions',
       currentVersion: '1.2.3',
     })
     await provider.cleanup()

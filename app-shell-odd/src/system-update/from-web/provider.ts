@@ -206,6 +206,9 @@ export function getProvider(
     name: () =>
       `WebUpdateProvider from ${from.manifestUrl} channel ${from.channel}`,
     source: () => from,
-    cleanup: () => removeTemporaryDownloads(from.updateCacheDirectory),
+    cleanup: () =>
+      removeTemporaryDownloads(
+        path.join(from.updateCacheDirectory, 'versions')
+      ),
   }
 }
