@@ -4,13 +4,7 @@ import { Accordion } from '/app/molecules/Accordion'
 
 import type { JSX } from 'react'
 
-export interface UserManagementProps {
-  robotName: string
-}
-
-export function UserManagement({
-  robotName: _robotName,
-}: UserManagementProps): JSX.Element {
+export function UserManagement(): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return <Accordion id="user-management" title={t('desktop_user_management')} />

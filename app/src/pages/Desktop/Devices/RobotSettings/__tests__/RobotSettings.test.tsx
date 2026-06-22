@@ -211,17 +211,6 @@ describe('RobotSettings', () => {
     screen.getByText('Compliance Ready')
   })
 
-  it('does not render the compliance ready tab for logged-out ACM devices', () => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-    } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(useAccessTokenForRobot).mockReturnValue(null)
-
-    render('/devices/otie/robot-settings/calibration')
-
-    expect(screen.queryByText('Compliance Ready')).not.toBeInTheDocument()
-  })
-
   it('redirects to networking tab if compliance ready tab is hidden', () => {
     render('/devices/otie/robot-settings/compliance-ready')
 

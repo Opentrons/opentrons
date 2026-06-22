@@ -7,7 +7,6 @@ import type { JSX } from 'react'
 
 export interface RobotSettingsComplianceReadyProps {
   robotName: string
-  isRobotBusy: boolean
 }
 
 export function RobotSettingsComplianceReady({
@@ -19,7 +18,7 @@ export function RobotSettingsComplianceReady({
         <PersonalAccountSettings robotName={robotName} />
       </div>
       <div className={`${styles.section} ${styles.section_accordion}`}>
-        <UserManagement robotName={robotName} />
+        <UserManagement />
       </div>
       <div className={`${styles.section} ${styles.section_accordion}`}>
         <ComplianceReadySoftwareSettings robotName={robotName} />
