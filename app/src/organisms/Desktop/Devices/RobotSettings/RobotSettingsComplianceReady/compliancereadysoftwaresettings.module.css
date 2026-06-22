@@ -22,6 +22,14 @@
   gap: var(--spacing-16);
 }
 
+.sub_fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  padding-right: var(--spacing-16);
+  padding-left: var(--spacing-24);
+}
+
 .toggle_row {
   display: flex;
   align-items: center;

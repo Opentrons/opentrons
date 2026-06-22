@@ -235,8 +235,9 @@ function ComplianceReadySettingField({
   return (
     <div className={styles.toggle_setting}>
       {toggleRow}
-      {toggledOn
-        ? field.children.map(child => (
+      {toggledOn ? (
+        <div className={styles.sub_fields}>
+          {field.children.map(child => (
             <ComplianceReadySettingField
               key={child.id}
               field={child}
@@ -244,8 +245,9 @@ function ComplianceReadySettingField({
               onInputChange={onInputChange}
               onToggleChange={onToggleChange}
             />
-          ))
-        : null}
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }
