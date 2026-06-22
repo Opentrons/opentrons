@@ -3,24 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Navigate, useParams } from 'react-router-dom'
 
+import { Banner, LegacyStyledText, SPACING } from '@opentrons/components'
 import {
-  Banner,
-  BORDERS,
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  JUSTIFY_SPACE_AROUND,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+  ApiHostProvider,
+  useAccessControlEnabledQuery,
+} from '@opentrons/react-api-client'
 
 import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
+import { RobotSettingsComplianceReady } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsComplianceReady'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
@@ -36,6 +29,8 @@ import {
 import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
+
+import styles from './robotsettings.module.css'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
@@ -103,10 +98,15 @@ export function RobotSettingsComponent({
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
+    'compliance-ready': <RobotSettingsComplianceReady robotName={robotName} />,
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
+  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const isAcmDevice =
+    accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
+  const showComplianceReadyTab = isAcmDevice
 
   if (
     (robot == null ||
@@ -120,7 +120,13 @@ export function RobotSettingsComponent({
     robotSettingsTab === 'calibration' && isCalibrationDisabled
   const cannotViewFeatureFlags =
     robotSettingsTab === 'feature-flags' && !devToolsOn
-  if (cannotViewCalibration || cannotViewFeatureFlags) {
+  const cannotViewComplianceReady =
+    robotSettingsTab === 'compliance-ready' && !showComplianceReadyTab
+  if (
+    cannotViewCalibration ||
+    cannotViewFeatureFlags ||
+    cannotViewComplianceReady
+  ) {
     return <Navigate to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
@@ -128,21 +134,17 @@ export function RobotSettingsComponent({
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
     <Navigate to={`/devices/${robotName}/robot-settings/calibration`} />
   )
+  const isComplianceReadyTab = robotSettingsTab === 'compliance-ready'
 
   return (
     <>
-      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
-        <Flex
-          color={COLORS.black90}
-          flexDirection={DIRECTION_COLUMN}
-          css={TYPOGRAPHY.h1Default}
-          gridGap={SPACING.spacing4}
-        >
+      <div className={styles.header_section}>
+        <div className={styles.header_content}>
           {t('robot_settings')}
           {robot != null && (
-            <Box marginBottom={SPACING.spacing16}>
+            <div className={styles.reachable_banner_wrapper}>
               <ReachableBanner robot={robot} />
-            </Box>
+            </div>
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing8}>
@@ -151,10 +153,10 @@ export function RobotSettingsComponent({
               </LegacyStyledText>
             </Banner>
           )}
-        </Flex>
-      </Box>
-      <Box paddingX={SPACING.spacing16}>
-        <Flex gridGap={SPACING.spacing4}>
+        </div>
+      </div>
+      <div className={styles.tabs_section}>
+        <div className={styles.tabs_row}>
           <RoundTab
             to={`/devices/${robotName}/robot-settings/calibration`}
             tabName={t('calibration')}
@@ -175,6 +177,13 @@ export function RobotSettingsComponent({
             tabName={t('advanced')}
             disabled={false}
           />
+          {showComplianceReadyTab ? (
+            <RoundTab
+              to={`/devices/${robotName}/robot-settings/compliance-ready`}
+              tabName={t('compliance_ready')}
+              disabled={false}
+            />
+          ) : null}
           {devToolsOn ? (
             <RoundTab
               to={`/devices/${robotName}/robot-settings/feature-flags`}
@@ -182,22 +191,17 @@ export function RobotSettingsComponent({
               disabled={false}
             />
           ) : null}
-        </Flex>
-      </Box>
-      <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_AROUND}
-          backgroundColor={COLORS.white}
-          borderRadius={BORDERS.borderRadius8}
-          marginBottom={SPACING.spacing16}
-          paddingX={SPACING.spacing16}
-          paddingY={SPACING.spacing16}
-        >
-          {robotSettingsContent}
-        </Flex>
-      </Box>
+        </div>
+      </div>
+      <div className={styles.content_section}>
+        {isComplianceReadyTab ? (
+          <div className={styles.content_bottom_spacing}>
+            {robotSettingsContent}
+          </div>
+        ) : (
+          <div className={styles.tab_content_card}>{robotSettingsContent}</div>
+        )}
+      </div>
     </>
   )
 }
