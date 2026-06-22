@@ -1,12 +1,11 @@
 import { useCallback, useContext, useMemo } from 'react'
-import { useSelector } from 'react-redux'
 
 import {
   useAccessControlEnabledQuery,
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
-import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
+import { useCurrentUsername } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isDocumentationReportValid } from './utils'
@@ -36,9 +35,7 @@ export function useGuardedAction(
   const authSettingsQuery = useAuthSettingsQuery()
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
 
-  // TODO(jj): this hook is ODD only, so will not work on desktop
-  // replace this with getting the username from whatever robot you're accessing
-  const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
+  const currentUsername = useCurrentUsername()
 
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
