@@ -34,12 +34,12 @@ describe('provider.cleanup', () => {
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
       channel: 'release',
-      updateCacheDirectory: '/some/random/directory/versions',
+      updateCacheDirectory: '/some/random/directory',
       currentVersion: '1.2.3',
     })
     await provider.cleanup()
     expect(removeTemporaryDownloads).toHaveBeenCalledExactlyOnceWith(
-      '/some/random/directory'
+      '/some/random/directory/versions'
     )
   })
 })
