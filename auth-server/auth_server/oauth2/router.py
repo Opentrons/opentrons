@@ -18,7 +18,6 @@ async def token_endpoint(
     """The OAuth 2 token endpoint, as specified in RFC 6749."""
     form_data = await _get_form_data(request)
     return oauth2_backend.create_token_response(
-        uri=str(request.url),
         body_form_data=form_data,
         headers=dict(request.headers),
     )
@@ -32,7 +31,6 @@ async def introspection_endpoint(
     """The OAuth 2 token introspection endpoint, as specified in RFC 7662."""
     form_data = await _get_form_data(request)
     return oauth2_backend.create_introspect_response(
-        uri=str(request.url),
         body_form_data=form_data,
         headers=dict(request.headers),
     )

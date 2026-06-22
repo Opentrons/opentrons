@@ -47,7 +47,7 @@ class Backend:
         )
 
     def create_token_response(
-        self, uri: str, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+        self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
     ) -> fastapi.Response:
         token_response: tuple[dict[str, str], str, int] = (
             self._inner_backend.create_token_response(
@@ -68,7 +68,7 @@ class Backend:
 
 
     def create_introspect_response(
-        self, uri: str, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+        self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
     ) -> fastapi.Response:
         headers, body, status_code = self._inner_backend.create_introspect_response(
             # The uri param apparently does not matter.

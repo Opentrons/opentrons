@@ -101,8 +101,6 @@ class _SelfClient(Client):
         assert len(request_form_data_kvs) == len(request_form_data)
 
         raw_response = self._oauth2_backend.create_introspect_response(
-            # The uri param apparently does not matter.
-            uri="",
             body_form_data=request_form_data_kvs,
             headers={},
         )
