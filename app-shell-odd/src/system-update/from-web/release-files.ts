@@ -270,7 +270,7 @@ const removeTemporaryDownloadsFromReleaseDir = async (
       contentsDirent.name.endsWith(DOWNLOAD_ARTIFACT_SUFFIX)
     )
     log.warn(`Found ${tempDls.length} leftover downloads in ${releaseDir}`)
-    await Promise.all(
+    await Promise.allSettled(
       tempDls.map(tdl => rm(path.join(tdl.parentPath, tdl.name)))
     )
   } catch (e: unknown) {
@@ -282,7 +282,7 @@ export const removeTemporaryDownloads = async (
   baseDirectory: string
 ): Promise<void> => {
   const releaseDirs = await ensureReleaseCache(baseDirectory)
-  await Promise.all(
+  await Promise.allSettled(
     releaseDirs.map(releaseDirent =>
       removeTemporaryDownloadsFromReleaseDir(
         path.join(releaseDirent.parentPath, releaseDirent.name)
