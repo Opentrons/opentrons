@@ -200,6 +200,7 @@
   "failed_to_connect_to_ssid": "Failed to connect to {{ssid}}",
   "feature_flags": "Feature Flags",
   "field_is_required": "{{field}} is required",
+  "file_manager": "File Manager",
   "find_and_join_network": "Find and join a Wi-Fi network",
   "finish_setup": "Finish setup",
   "firmware_version": "Firmware Version",
