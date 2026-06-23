@@ -14,6 +14,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
+
 from .models import NotifyRefetchBody, NotifyUnsubscribeBody
 from .topics import TopicName
 

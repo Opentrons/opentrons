@@ -307,4 +307,3 @@ class DeprecatedMultiResponseModel(
         None,
         description=DESCRIPTION_LINKS,
     )
-
