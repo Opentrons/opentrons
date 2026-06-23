@@ -7,36 +7,36 @@ Use --full to build a dev wheel that includes all subpackages except tests.
 from __future__ import annotations
 
 import argparse
-import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
+
+import tomli
+import tomli_w
 
 ROOT = Path(__file__).resolve().parent.parent
 
-WHEEL_SECTION_PATTERN = re.compile(
-    r"\[tool\.hatch\.build\.targets\.wheel\].*?(?=\n\[tool\.hatch\.build\.targets\.sdist\])",
-    re.DOTALL,
-)
-
-FULL_WHEEL_SECTION = """[tool.hatch.build.targets.wheel]
-packages = ["hardware_testing"]
-exclude = [
-    "tests",
-    "tests.*",
-]
-
-"""
+FULL_WHEEL_CONFIG: dict[str, Any] = {
+    "packages": ["hardware_testing"],
+    "exclude": ["tests", "tests.*"],
+}
 
 
-def _replace_wheel_section(pyproject_text: str, *, full: bool) -> str:
-    if not full:
-        return pyproject_text
+def _configure_full_wheel(pyproject: dict[str, Any]) -> None:
+    wheel_target = pyproject["tool"]["hatch"]["build"]["targets"]["wheel"]
+    force_include = wheel_target.pop("force_include", None)
 
-    if not WHEEL_SECTION_PATTERN.search(pyproject_text):
-        raise RuntimeError("Could not find wheel build section in pyproject.toml")
+    wheel_target.clear()
+    wheel_target.update(FULL_WHEEL_CONFIG)
 
-    return WHEEL_SECTION_PATTERN.sub(FULL_WHEEL_SECTION, pyproject_text, count=1)
+    if force_include is not None:
+        wheel_target["force_include"] = force_include
+
+
+def _write_pyproject(pyproject_path: Path, pyproject: dict[str, Any]) -> None:
+    with pyproject_path.open("wb") as pyproject_file:
+        tomli_w.dump(pyproject, pyproject_file)
 
 
 def build_wheel(*, full: bool) -> None:
@@ -44,10 +44,10 @@ def build_wheel(*, full: bool) -> None:
     original_text = pyproject_path.read_text(encoding="utf-8")
 
     if full:
-        pyproject_path.write_text(
-            _replace_wheel_section(original_text, full=True),
-            encoding="utf-8",
-        )
+        with pyproject_path.open("rb") as pyproject_file:
+            pyproject = tomli.load(pyproject_file)
+        _configure_full_wheel(pyproject)
+        _write_pyproject(pyproject_path, pyproject)
 
     try:
         subprocess.run(

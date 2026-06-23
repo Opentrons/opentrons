@@ -89,6 +89,8 @@ dev = [
     "types-setuptools==57.0.2",
     "pyusb==1.2.1",
     "build~=1.2.0",
+    "tomli>=2.0.1",
+    "tomli-w>=1.0.0",
     "matplotlib==3.10.0",
     "setuptools<82",
     "paramiko",
