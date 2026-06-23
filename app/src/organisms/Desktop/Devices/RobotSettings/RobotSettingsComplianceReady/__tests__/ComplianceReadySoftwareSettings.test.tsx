@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useAuthSettingsQuery } from '@opentrons/react-api-client'
+import { useAccessControlSettingsQuery, useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -14,15 +14,19 @@ import {
   UI_ONLY_FIELD_IDS,
 } from '../ComplianceReadySoftwareSettings'
 
-import type { AuthSettingsResponse } from '@opentrons/api-client'
+import {
+  ACCESS_CONTROL_SETTING_KEYS,
+  type AccessControlAppSettingsResponse,
+  type AuthSettingsResponse,
+} from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual =
-    await importOriginal<typeof import('@opentrons/react-api-client')>()
+  const actual = await importOriginal()
 
   return {
-    ...actual,
+    ...(actual as object),
     useAuthSettingsQuery: vi.fn(),
+    useAccessControlSettingsQuery: vi.fn(),
   }
 })
 
@@ -38,6 +42,14 @@ const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
     requireAdminCredsWhenUpdatingRobotSoftware: true,
     requireAdminCredsWhenSendingProtocolToRobot: true,
     requireAdminCredsForSignoffProtocol: false,
+  },
+}
+
+const MOCK_ACCESS_CONTROL_SETTINGS: AccessControlAppSettingsResponse = {
+  data: {
+    requireSignoffForProtocolLog: true,
+    requireLogsToBeSavedInApp: false,
+    deleteOverMaxOnDiskProtocols: true,
   },
 }
 
@@ -85,11 +97,16 @@ describe('ComplianceReadySoftwareSettings', () => {
       data: MOCK_AUTH_SETTINGS,
       isLoading: false,
     } as ReturnType<typeof useAuthSettingsQuery>)
+    vi.mocked(useAccessControlSettingsQuery).mockReturnValue({
+      data: MOCK_ACCESS_CONTROL_SETTINGS,
+      isLoading: false,
+    } as ReturnType<typeof useAccessControlSettingsQuery>)
   })
 
-  it('should only use auth setting ids or explicit UI-only ids', () => {
+  it('should only use auth setting ids, robot server setting ids, or explicit UI-only ids', () => {
     const allowedIds = new Set<string>([
       ...AUTH_SETTING_KEYS,
+      ...ACCESS_CONTROL_SETTING_KEYS,
       ...UI_ONLY_FIELD_IDS,
     ])
 
@@ -152,6 +169,27 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(
       screen.getByRole('switch', {
         name: 'Require admin credentials to update robots',
+      })
+    ).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('should populate protocol log fields from robot server settings', () => {
+    render()
+    expandAccordion()
+
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require signoff for protocol logs',
+      })
+    ).toHaveAttribute('aria-checked', 'true')
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require protocol logs to be saved in the desktop app',
+      })
+    ).toHaveAttribute('aria-checked', 'false')
+    expect(
+      screen.getByRole('switch', {
+        name: 'Automatically delete protocol run logs on the robot when there are 20 protocol run records',
       })
     ).toHaveAttribute('aria-checked', 'true')
   })

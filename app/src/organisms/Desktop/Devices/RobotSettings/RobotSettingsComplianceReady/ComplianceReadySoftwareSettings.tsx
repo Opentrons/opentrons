@@ -2,7 +2,10 @@ import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
-import { useAuthSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlSettingsQuery,
+  useAuthSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
 
@@ -11,7 +14,11 @@ import styles from './compliancereadysoftwaresettings.module.css'
 import { InputSetting } from './InputSetting'
 
 import type { JSX } from 'react'
-import type { AuthSettingsResponse } from '@opentrons/api-client'
+import {
+  ACCESS_CONTROL_SETTING_KEYS,
+  type AccessControlAppSettingsResponse,
+  type AuthSettingsResponse,
+} from '@opentrons/api-client'
 
 export interface ComplianceReadySoftwareSettingsProps {
   robotName: string
@@ -19,17 +26,19 @@ export interface ComplianceReadySoftwareSettingsProps {
 
 type AuthSettingFieldId = keyof AuthSettingsResponse['data']
 
-// TODO(tz, 2026-06-18): Get robot server acm settings
+type RobotServerSettingFieldId = keyof AccessControlAppSettingsResponse['data']
+
 export const UI_ONLY_FIELD_IDS = [
   'passwordResetEnabled',
   'passwordComplexityEnabled',
-  'requireProtocolLogsSignedAndSaved',
-  'automaticallyDeleteProtocolRunLogs',
 ] as const
 
 type UiSettingFieldId = (typeof UI_ONLY_FIELD_IDS)[number]
 
-type SettingFieldId = AuthSettingFieldId | UiSettingFieldId
+type SettingFieldId =
+  | AuthSettingFieldId
+  | UiSettingFieldId
+  | RobotServerSettingFieldId
 
 type FieldValues = Record<SettingFieldId, string | boolean>
 
@@ -57,47 +66,85 @@ interface ComplianceReadySettingsSectionConfig {
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
 
-function getFieldValuesFromAuthSettings(
-  settings?: AuthSettingsResponse['data']
+const authSettingsFieldDefaults = {
+  maxNumberOfLoginAttempts: null,
+  passwordResetTime: null,
+  passwordComplexityMinimumLength: null,
+  passwordComplexitySpecialCharacters: false,
+  idleLogout: 0,
+  requireReasonForInteraction: false,
+  minLengthOfReasonForInteraction: null,
+  requireAdminCredsWhenUpdatingRobotSoftware: false,
+  requireAdminCredsWhenSendingProtocolToRobot: false,
+  requireAdminCredsForSignoffProtocol: false,
+} satisfies AuthSettingsResponse['data']
+
+const AUTH_SETTING_KEYS = Object.keys(
+  authSettingsFieldDefaults
+) as Array<keyof typeof authSettingsFieldDefaults>
+
+function getAuthSettingFieldValue(
+  key: keyof typeof authSettingsFieldDefaults,
+  authSettings?: AuthSettingsResponse['data']
+): string | boolean {
+  if (authSettings == null) {
+    return typeof authSettingsFieldDefaults[key] === 'boolean' ? false : ''
+  }
+
+  switch (key) {
+    case 'idleLogout':
+      return String(Math.round(authSettings.idleLogout / SECONDS_PER_MINUTE))
+    case 'passwordResetTime':
+      return authSettings.passwordResetTime != null
+        ? String(Math.round(authSettings.passwordResetTime / SECONDS_PER_DAY))
+        : ''
+    default: {
+      const value = authSettings[key]
+      if (typeof value === 'boolean') {
+        return value
+      }
+      return value != null ? String(value) : ''
+    }
+  }
+}
+
+function getAuthFieldValues(
+  authSettings?: AuthSettingsResponse['data']
+): Pick<FieldValues, AuthSettingFieldId> {
+  return AUTH_SETTING_KEYS.reduce(
+    (acc, key) => ({
+      ...acc,
+      [key]: getAuthSettingFieldValue(key, authSettings),
+    }),
+    {} as Pick<FieldValues, AuthSettingFieldId>
+  )
+}
+
+function getRobotServerFieldValues(
+  robotSettings?: AccessControlAppSettingsResponse['data']
+): Pick<FieldValues, RobotServerSettingFieldId> {
+  return ACCESS_CONTROL_SETTING_KEYS.reduce(
+    (acc, key) => ({
+      ...acc,
+      [key]: robotSettings?.[key] ?? false,
+    }),
+    {} as Pick<FieldValues, RobotServerSettingFieldId>
+  )
+}
+
+function getFieldValuesFromSettings(
+  authSettings?: AuthSettingsResponse['data'],
+  robotSettings?: AccessControlAppSettingsResponse['data']
 ): FieldValues {
   return {
-    maxNumberOfLoginAttempts:
-      settings?.maxNumberOfLoginAttempts != null
-        ? String(settings.maxNumberOfLoginAttempts)
-        : '',
-    idleLogout:
-      settings != null
-        ? String(Math.round(settings.idleLogout / SECONDS_PER_MINUTE))
-        : '',
-    passwordResetEnabled: settings?.passwordResetTime != null,
-    passwordResetTime:
-      settings?.passwordResetTime != null
-        ? String(Math.round(settings.passwordResetTime / SECONDS_PER_DAY))
-        : '',
+    ...getAuthFieldValues(authSettings),
+    passwordResetEnabled: authSettings?.passwordResetTime != null,
     passwordComplexityEnabled:
-      settings != null
-        ? settings.passwordComplexityMinimumLength != null ||
-          settings.passwordComplexitySpecialCharacters
+      authSettings != null
+        ? authSettings.passwordComplexityMinimumLength != null ||
+          authSettings.passwordComplexitySpecialCharacters
         : false,
-    passwordComplexitySpecialCharacters:
-      settings?.passwordComplexitySpecialCharacters ?? false,
-    passwordComplexityMinimumLength:
-      settings?.passwordComplexityMinimumLength != null
-        ? String(settings.passwordComplexityMinimumLength)
-        : '',
-    requireAdminCredsWhenUpdatingRobotSoftware:
-      settings?.requireAdminCredsWhenUpdatingRobotSoftware ?? false,
-    requireAdminCredsWhenSendingProtocolToRobot:
-      settings?.requireAdminCredsWhenSendingProtocolToRobot ?? false,
-    requireAdminCredsForSignoffProtocol:
-      settings?.requireAdminCredsForSignoffProtocol ?? false,
-    requireReasonForInteraction: settings?.requireReasonForInteraction ?? false,
-    minLengthOfReasonForInteraction:
-      settings?.minLengthOfReasonForInteraction != null
-        ? String(settings.minLengthOfReasonForInteraction)
-        : '',
-    requireProtocolLogsSignedAndSaved: false,
-    automaticallyDeleteProtocolRunLogs: false,
+    ...getRobotServerFieldValues(robotSettings),
   }
 }
 
@@ -176,12 +223,18 @@ export const SETTINGS_SECTIONS: ComplianceReadySettingsSectionConfig[] = [
     fields: [
       {
         type: 'toggle',
-        id: 'requireProtocolLogsSignedAndSaved',
-        labelKey: 'desktop_require_protocol_logs_signed_and_saved',
+        id: 'requireSignoffForProtocolLog',
+        labelKey: 'desktop_require_signoff_for_protocol_log',
       },
+      // TODO(tz, 2026-06-22): i dont see it in the design, but it is in the api
+      // {
+      //   type: 'toggle',
+      //   id: 'requireLogsToBeSavedInApp',
+      //   labelKey: 'desktop_require_logs_saved_in_app',
+      // },
       {
         type: 'toggle',
-        id: 'automaticallyDeleteProtocolRunLogs',
+        id: 'deleteOverMaxOnDiskProtocols',
         labelKey: 'desktop_automatically_delete_protocol_run_logs',
       },
     ],
@@ -325,17 +378,21 @@ function ComplianceReadySettingsSection({
 export function ComplianceReadySoftwareSettings({
   robotName: _robotName,
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('device_settings')
   const authSettingsQuery = useAuthSettingsQuery()
+  const accessControlSettingsQuery = useAccessControlSettingsQuery()
   const [fieldValues, setFieldValues] = useState<FieldValues>(() =>
-    getFieldValuesFromAuthSettings()
+    getFieldValuesFromSettings()
   )
 
   useEffect(() => {
-    if (authSettingsQuery.data?.data != null) {
-      setFieldValues(getFieldValuesFromAuthSettings(authSettingsQuery.data.data))
-    }
-  }, [authSettingsQuery.data?.data])
+    setFieldValues(
+      getFieldValuesFromSettings(
+        authSettingsQuery.data?.data,
+        accessControlSettingsQuery.data?.data
+      )
+    )
+  }, [authSettingsQuery.data?.data, accessControlSettingsQuery.data?.data])
 
   const handleInputChange = (id: AuthSettingFieldId, value: string): void => {
     setFieldValues(current => ({
