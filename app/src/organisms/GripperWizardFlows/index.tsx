@@ -435,7 +435,7 @@ export const GripperWizard = (
         {modalContent}
       </Flex>
     ) : (
-      <ModalShell width="48rem" header={wizardHeader}>
+      <ModalShell width="47rem" header={wizardHeader}>
         {modalContent}
       </ModalShell>
     ),
