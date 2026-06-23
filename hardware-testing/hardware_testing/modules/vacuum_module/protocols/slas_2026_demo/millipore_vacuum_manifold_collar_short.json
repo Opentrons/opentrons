@@ -55,7 +55,7 @@
     "vacuumModuleV1": {
       "x": 0,
       "y": 0,
-      "z": -8.0
+      "z": 0
     }
   },
   "stackingOffsetWithLabware": {
@@ -67,7 +67,7 @@
   },
   "stackLimit": 1,
   "gripForce": 17,
-  "gripHeightFromLabwareBottom": 45,
+  "gripHeightFromLabwareBottom": 53,
   "containedSpace": {
     "shape": "rectangular",
     "origin": { "x": 0, "y": 0, "z": 0 },
