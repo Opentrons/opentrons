@@ -15,7 +15,7 @@ export interface DocumentationRequiredModalContextType {
     robotName,
   }: {
     robotName: string
-  }) => Promise<string | null>
+  }) => Promise<{ username: string } | null>
 }
 
 /**

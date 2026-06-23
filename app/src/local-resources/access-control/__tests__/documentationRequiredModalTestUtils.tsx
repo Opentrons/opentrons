@@ -10,8 +10,8 @@ export const mockShowDocumentationRequiredModal: (
 ) => Promise<DocumentationReport> =
   vi.fn<(username: string) => Promise<DocumentationReport>>()
 
-export const mockShowLoginModal: () => Promise<string | null> =
-  vi.fn<() => Promise<string | null>>()
+export const mockShowLoginModal: () => Promise<{ username: string } | null> =
+  vi.fn<() => Promise<{ username: string } | null>>()
 
 export const DocumentationRequiredModalTestProvider: FunctionComponent<{
   children: ReactNode

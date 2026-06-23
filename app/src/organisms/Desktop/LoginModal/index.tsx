@@ -94,7 +94,7 @@ interface LoginModalProps {
 /** Open the desktop login modal in the appropriate React portal. */
 export const showLoginModal = async (
   props: LoginModalProps
-): Promise<string | null> => {
+): Promise<{ username: string } | null> => {
   return await NiceModal.show(LoginModal, props)
 }
 
@@ -147,7 +147,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       }
 
       storeLoginState(robotName, successfulUsername, response)
-      modal.resolve(successfulUsername)
+      modal.resolve({ username: successfulUsername })
       modal.remove()
     },
     onError: message => {
@@ -159,7 +159,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     useSetNewPasswordAndSignIn({
       onSuccess: (successfulUsername, response) => {
         storeLoginState(robotName, successfulUsername, response)
-        modal.resolve(successfulUsername)
+        modal.resolve({ username: successfulUsername })
         modal.remove()
       },
       onError: message => {
