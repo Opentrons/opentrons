@@ -5,7 +5,7 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
-import { useCurrentUsername } from '/app/redux/robot-auth'
+import { useCurrentRobotName, useCurrentUsername } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isDocumentationReportValid } from './utils'
@@ -36,6 +36,7 @@ export function useGuardedAction(
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
 
   const currentUsername = useCurrentUsername()
+  const currentRobotName = useCurrentRobotName()
 
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
@@ -54,23 +55,28 @@ export function useGuardedAction(
     [accessControlEnabled, requireReasonForInteraction]
   )
 
-  const { showDocumentationRequiredModal: requireDocumentation } = useContext(
-    DocumentationRequiredModalContext
-  )
+  const {
+    showDocumentationRequiredModal: requireDocumentation,
+    showLoginModal: requireLogin,
+  } = useContext(DocumentationRequiredModalContext)
 
   const showDocumentationModal = useCallback(
     async (
       actionsToDocument: DocumentedAction[],
       handleCancel?: () => void
     ) => {
+      let username = currentUsername
+      if (currentUsername == null || currentUsername.length === 0) {
+        username = await requireLogin({ robotName: currentRobotName ?? '' })
+      }
       const docResult = await requireDocumentation(
-        currentUsername ?? '',
+        username ?? '',
         actionsToDocument,
         handleCancel
       )
       return docResult
     },
-    [requireDocumentation, currentUsername]
+    [currentRobotName, currentUsername, requireDocumentation, requireLogin]
   )
 
   const docState: DocumentationState = useMemo(() => {
