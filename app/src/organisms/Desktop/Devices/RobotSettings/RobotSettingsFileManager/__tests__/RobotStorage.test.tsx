@@ -6,7 +6,8 @@ import { i18n } from '/app/i18n'
 
 import { RobotStorage } from '../RobotStorage'
 
-const render = () => renderWithProviders(<RobotStorage />, { i18nInstance: i18n })
+const render = () =>
+  renderWithProviders(<RobotStorage />, { i18nInstance: i18n })
 
 describe('RobotStorage', () => {
   beforeEach(() => {
