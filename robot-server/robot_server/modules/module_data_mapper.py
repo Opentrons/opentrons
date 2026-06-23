@@ -206,6 +206,12 @@ class ModuleDataMapper:
             assert ModuleDataValidator.is_vacuum_module_data(live_data["data"])
             module_data = VacuumModuleData(
                 status=VacuumModuleStatus(live_data["status"]),
+                currentPressure=cast(float, live_data["data"].get("currentPressure")),
+                targetPressure=cast(float, live_data["data"].get("targetPressure")),
+                currentPower=cast(float, live_data["data"].get("currentPower")),
+                targetPower=cast(float, live_data["data"].get("targetPower")),
+                ventStatus=cast(str, live_data["data"].get("ventStatus", "closed")),  # type: ignore[arg-type]
+                modeType=cast(str, live_data["data"].get("modeType", "pressure")),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
         else:

@@ -131,8 +131,10 @@ async def test_ensure_vacuum_module_is_idle_raises_when_hardware_still_under_vac
     hardware_vacuum_module = MagicMock(spec=VacuumModule)
     hardware_vacuum_module.model.return_value = ModuleModel.VACUUM_MODULE_V1
     hardware_vacuum_module.device_info = {"serial": "vacuum-serial"}
-    hardware_vacuum_module.vacuum_state.current_gauge_pressure = -250.0
     type(hardware_vacuum_module).under_vacuum = property(lambda self: True)  # noqa: ARG005
+    type(hardware_vacuum_module).current_gauge_pressure_mbar = property(  # noqa: ARG005
+        lambda self: -250.0
+    )
     decoy.when(hardware_api.attached_modules).then_return([hardware_vacuum_module])
 
     with pytest.raises(VacuumModuleStillUnderVacuumError, match="-250") as exc_info:

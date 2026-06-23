@@ -221,10 +221,10 @@ class VacuumModule(mod_abc.AbstractModule):
         data: VacuumModuleData = {
             "errorDetails": self._reader.error,
             "pumpEngaged": self._reader.pump_state.pump_running,
-            "currentPressure": self._reader.vacuum_state.current_gauge_pressure,
+            "currentPressure": self.current_gauge_pressure_mbar,
             "targetPressure": self._reader.vacuum_state.target_gauge_pressure,
-            "currentPower": self._reader.pump_state.current_rpm,
-            "targetPower": self._reader.pump_state.target_rpm,
+            "currentPower": self._reader.pump_state.current_pwm,
+            "targetPower": self._reader.get_target_power(),
             "ventStatus": self._reader.vacuum_state.vent_state.formatted,
             "modeType": self._reader.operation_mode,
         }
@@ -253,14 +253,23 @@ class VacuumModule(mod_abc.AbstractModule):
             or self._reader.vacuum_state.vacuum_enabled
         )
 
+    def _average_absolute_pressure_mbar(self) -> float:
+        state = self.vacuum_state
+        return round((state.pressure_abs_a + state.pressure_abs_b) / 2, 2)
+
+    @property
+    def current_gauge_pressure_mbar(self) -> float:
+        """Gauge pressure derived from absolute and atmospheric sensor readings."""
+        state = self.vacuum_state
+        return round(self._average_absolute_pressure_mbar() - state.pressure_atm, 2)
+
     @property
     def under_vacuum(self) -> bool:
         state = self.vacuum_state
-        atm_pressure = state.pressure_atm
-        avg_pressure = (state.pressure_abs_a + state.pressure_abs_b) / 2
+        avg_pressure = self._average_absolute_pressure_mbar()
         return math.isclose(
             state.pressure_abs_a, state.pressure_abs_b, abs_tol=PRESSURE_TOL
-        ) and not math.isclose(avg_pressure, atm_pressure, abs_tol=PRESSURE_TOL)
+        ) and not math.isclose(avg_pressure, state.pressure_atm, abs_tol=PRESSURE_TOL)
 
     @property
     def total_cycle_count(self) -> Optional[int]:
@@ -390,6 +399,7 @@ class VacuumModule(mod_abc.AbstractModule):
     ) -> None:
         """Handler for internal pressure controls."""
         self._reader.set_operation_mode(VacuumModuleOperationMode.PRESSURE)
+        self._reader.reset_power_target()
         self._reader.set_target_pressure(gauge_pressure_mbar)
         await self._driver.set_vacuum_state(
             enable_vacuum=enable_vacuum,
@@ -412,7 +422,11 @@ class VacuumModule(mod_abc.AbstractModule):
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
         self._reader.set_operation_mode(VacuumModuleOperationMode.POWER)
-        self._reader.set_target_power(duty_cycle)
+        self._reader.reset_pressure_target()
+        if duty_cycle is not None:
+            self._reader.set_target_power(float(duty_cycle))
+        elif not start_pump:
+            self._reader.reset_power_target()
 
         await self._driver.set_vacuum_state(enable_vacuum=False)
         await self._driver.set_pump_state(
@@ -625,6 +639,17 @@ class VacuumModuleReader(Reader):
 
     def set_target_power(self, duty_cycle: Optional[float]) -> None:
         self.target_power = duty_cycle
+
+    def get_target_power(self) -> Optional[float]:
+        if self.target_power is not None:
+            return self.target_power
+
+        if self.operation_mode == VacuumModuleOperationMode.POWER:
+            target_pwm = self.pump_state.target_pwm
+            if target_pwm != 0:
+                return float(target_pwm)
+
+        return None
 
     def reset_pressure_target(self) -> None:
         self.set_target_pressure(None)
