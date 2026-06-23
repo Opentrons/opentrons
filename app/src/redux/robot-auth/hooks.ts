@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { useMatch } from 'react-router-dom'
 
 import { getIsOnDevice } from '../config'
+import { getLocalRobot } from '../discovery'
 import {
   getAuthStateForRobot,
   getCurrentUsernameForLocalRobot,
@@ -49,4 +50,12 @@ export function useCurrentUsername(): string | null {
   const desktopRobotUsername = useUsernameForRobot(desktopRobotName)
 
   return isOnDevice ? localRobotUsername : desktopRobotUsername
+}
+
+export function useCurrentRobotName(): string | null {
+  const isOnDevice = useSelector(getIsOnDevice)
+  const deviceRouteMatch = useMatch('/devices/:robotName/*')
+  const localRobotName = useSelector(getLocalRobot)?.name ?? null
+  const desktopRobotName = deviceRouteMatch?.params?.robotName ?? null
+  return isOnDevice ? localRobotName : desktopRobotName
 }

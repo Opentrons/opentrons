@@ -37,6 +37,7 @@ import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { showDocumentationRequiredModal } from '../organisms/Desktop/DocumentationRequired/DocumentationRequiredModal'
+import { showLoginModal } from '../organisms/Desktop/LoginModal'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
@@ -129,7 +130,7 @@ export const DesktopApp = (): JSX.Element => {
               }}
             >
               <DocumentationRequiredModalContext.Provider
-                value={{ showDocumentationRequiredModal }}
+                value={{ showDocumentationRequiredModal, showLoginModal }}
               >
                 <Box width="100%" height="100vh">
                   <Alerts>

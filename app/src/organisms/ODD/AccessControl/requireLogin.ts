@@ -33,7 +33,7 @@ export async function requireLogin(
 
   const result = await showLoginModal()
   if (result == null) return null
-  return { username: result.username }
+  return { username: result }
 }
 
 async function isPasswordResetRequired(
