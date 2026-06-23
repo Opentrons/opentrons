@@ -1,10 +1,10 @@
-export interface LogPeriod {
+export interface LogPeriodSummary {
   id: string
   startedAt: string
   endedAt: string | null
 }
 
-export interface LogPeriodsResponse {
-  data: LogPeriod[]
+export interface LogPeriodSummariesResponse {
+  data: LogPeriodSummary[]
   meta: { totalLength: number }
 }

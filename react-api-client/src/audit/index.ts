@@ -1,1 +1,1 @@
-export { useLogPeriodsQuery } from './useLogPeriodsQuery'
+export { useLogPeriodSummariesQuery } from './useLogPeriodSummariesQuery'

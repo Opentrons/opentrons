@@ -1,2 +1,2 @@
-export { getLogPeriods } from './getLogPeriods'
+export { getLogPeriodSummaries } from './getLogPeriodSummaries'
 export * from './types'
