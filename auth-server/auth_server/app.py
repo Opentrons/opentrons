@@ -16,7 +16,7 @@ from server_utils.auth.resource_server.fastapi import (
 )
 
 from auth_server.authorization_checker import build_authorization_checker
-from auth_server.oauth2.backend import build as build_oauth2_backend
+from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import (
     install_oauth2_backend,
 )
@@ -63,7 +63,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         user_store = UserStore(sql_engine=engine)
         settings_store = SettingsStore(sql_engine=engine)
-        oauth2_backend = build_oauth2_backend(user_store, settings_store)
+        oauth2_backend = OAuth2Backend(user_store, settings_store)
         install_oauth2_backend(app.state, oauth2_backend)
         user_service = UserDataManager(
             user_store=user_store, settings_store=settings_store
