@@ -81,33 +81,9 @@ export interface FetchEapOptionsFailureAction {
   meta: RobotApiRequestMeta
 }
 
-// disconnect network
-
-export interface PostWifiDisconnectAction {
-  type: 'networking:POST_WIFI_DISCONNECT'
-  payload: { robotName: string; ssid: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface PostWifiDisconnectSuccessAction {
-  type: 'networking:POST_WIFI_DISCONNECT_SUCCESS'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta
-}
-
-export interface PostWifiDisconnectFailureAction {
-  type: 'networking:POST_WIFI_DISCONNECT_FAILURE'
-  payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
 export interface ClearWifiStatusAction {
   type: 'networking:CLEAR_WIFI_STATUS'
   payload: { robotName: string }
-}
-
-export interface NetworkingDisconnectResponse {
-  ssid: string
 }
 
 // action union
@@ -122,9 +98,6 @@ export type NetworkingAction =
   | FetchEapOptionsAction
   | FetchEapOptionsSuccessAction
   | FetchEapOptionsFailureAction
-  | PostWifiDisconnectAction
-  | PostWifiDisconnectSuccessAction
-  | PostWifiDisconnectFailureAction
   | ClearWifiStatusAction
 
 // state types

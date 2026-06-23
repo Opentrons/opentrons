@@ -34,3 +34,13 @@ export interface WifiKeysResponse {
 export interface PostWifiKeysResponse extends WifiKey {
   message?: string
 }
+
+// POST /wifi/disconnect
+
+export interface WifiDisconnectRequest {
+  ssid: string
+}
+
+export interface WifiDisconnectResponse {
+  message: string
+}
