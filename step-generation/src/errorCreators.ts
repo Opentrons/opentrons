@@ -302,6 +302,12 @@ export const possiblePipetteCollision = (args: {
               .displayName,
         },
       }
+    case 'fixedTrashCollision':
+      return {
+        type: 'POSSIBLE_PIPETTE_COLLISION_FIXED_TRASH',
+        message:
+          'There is a possibility that the pipette will collide with the fixed trash.',
+      }
   }
 }
 

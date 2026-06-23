@@ -57,6 +57,13 @@ const FLEX_TC_LID_COLLISION_ZONE = {
   back_left: { x: -43.25, y: 454.9, z: 211.91 },
   front_right: { x: 128.75, y: 402, z: 211.91 },
 }
+
+// OT-2 fixed trash is in slot 12.
+// Absolute position = cutout12 [265.0, 271.5, 0] + offsetFromCutoutFixture [29.285, -2.835, 0]
+// boundingBox: xDimension=107.11, yDimension=165.67, zDimension=82
+const OT2_FIXED_TRASH_BACK_LEFT_PT = { x: 294.285, y: 434.335, z: 0 }
+const OT2_FIXED_TRASH_FRONT_RIGHT_PT = { x: 401.395, y: 268.665, z: 0 }
+const OT2_FIXED_TRASH_HEIGHT_MM = 82
 const FLEX_TC_LID_BACK_LEFT_PT = {
   x: FLEX_TC_LID_COLLISION_ZONE.back_left.x,
   y: FLEX_TC_LID_COLLISION_ZONE.back_left.y,
@@ -273,6 +280,21 @@ const getSlotPotentialCollidingObject = (
   return null
 }
 
+const getWillCollideWithOT2FixedTrash = (pipetteBounds: Point[]): boolean => {
+  if (
+    !getHasOverlappingRectangles(
+      [pipetteBounds[0], pipetteBounds[1]],
+      [OT2_FIXED_TRASH_BACK_LEFT_PT, OT2_FIXED_TRASH_FRONT_RIGHT_PT]
+    )
+  ) {
+    return false
+  }
+  return (
+    pipetteBounds[0].z != null &&
+    OT2_FIXED_TRASH_HEIGHT_MM >= pipetteBounds[0].z
+  )
+}
+
 const getWillCollideWithThermocyclerLid = (
   pipetteBounds: Point[],
   moduleEntities: ModuleEntities
@@ -486,6 +508,12 @@ export const getPipetteMovementSafetyStatus = (args: {
     return {
       isSafe: false,
       reason: { type: 'thermocyclerLidCollision' },
+    }
+  }
+  if (getWillCollideWithOT2FixedTrash(pipetteBoundsAtWellLocation)) {
+    return {
+      isSafe: false,
+      reason: { type: 'fixedTrashCollision' },
     }
   }
   const slotPotentialCollidingObject = getSlotPotentialCollidingObject(

@@ -337,6 +337,10 @@
         "body": "There is a possibility that the pipette will collide with the Thermocycler lid.",
         "title": "Pipette collisions likely"
       },
+      "POSSIBLE_PIPETTE_COLLISION_FIXED_TRASH": {
+        "body": "There is a possibility that the pipette will collide with the fixed trash.",
+        "title": "Pipette collisions likely"
+      },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
         "body": "When picking up fewer than 96 tips, the tip rack must be placed directly on the deck, not in the tip rack adapter.",
         "link": "Edit starting deck",
