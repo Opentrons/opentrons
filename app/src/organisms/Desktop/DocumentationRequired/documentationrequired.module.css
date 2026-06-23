@@ -1,7 +1,5 @@
 .action_list_container {
   display: flex;
-  min-width: 0;
-  min-height: 0;
   flex: 1;
   flex-direction: column;
   gap: var(--spacing-8);
@@ -37,15 +35,12 @@
 
 .text_area_container {
   display: flex;
-  min-width: 0;
-  min-height: 0;
   flex: 1;
   flex-direction: column;
 }
 
 .text_area_field_fill {
   display: flex;
-  min-height: 0;
   flex: 1;
   flex-direction: column;
 }
