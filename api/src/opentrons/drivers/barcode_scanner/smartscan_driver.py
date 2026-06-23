@@ -11,6 +11,8 @@ from .smartscan_commands import (
     scan_trigger,
     set_timeout_cmd,
     suffix_crlf,
+    timeout_cmd_max,
+    timeout_cmd_min,
 )
 from .types import BarcodeModuleInfo, SoundProfile
 from opentrons.drivers.asyncio.communication.async_serial import (
@@ -104,7 +106,7 @@ class SmartScanner(AbstractBarcodeScannerDriver):
             log.exception("failed to scan")
             barcode = b""
         if barcode == ack:
-            log.exception("Failed to scan")
+            log.warning("Barcode scanner hardware timed out")
             barcode = b""
         log.debug(f"Scanned {barcode.decode('ascii')}")
         if len(barcode) == 0:
@@ -149,10 +151,11 @@ class SmartScanner(AbstractBarcodeScannerDriver):
 
     async def set_scan_timeout(self, timeout_ms: int) -> None:
         """Set how long to run the decoder before timing out."""
-        assert 500 < timeout_ms < 25500
+        assert timeout_cmd_min < timeout_ms < timeout_cmd_max
         arg_int = int(timeout_ms / 100)
         await self.send_cmd(bytes(set_timeout_cmd) + arg_int.to_bytes(1))
 
+    # TODO: implement sound
     async def set_sound_profile(self, profile: SoundProfile) -> None:
         """Set the sound profile."""
         pass

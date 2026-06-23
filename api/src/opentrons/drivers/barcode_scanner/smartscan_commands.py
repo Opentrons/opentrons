@@ -14,3 +14,5 @@ suffix_crcr = menu_prefix + suffix_cmd + b"\x04"
 suffix_crlfcrlf = menu_prefix + suffix_cmd + b"\x05"
 
 set_timeout_cmd = menu_prefix + b"\x88"
+timeout_cmd_min = 500
+timeout_cmd_max = 25500
