@@ -7,6 +7,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { CommandIcon } from '/app/molecules/Command'
 
 import styles from './annotatedsteps.module.css'
+import { isElementVerticallyScrollable } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -58,7 +59,6 @@ export function IndividualCommand({
   fromGroup,
   commandNumber,
   scrollTargetId,
-  listElement,
 }: IndividualCommandProps): JSX.Element {
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
@@ -68,32 +68,26 @@ export function IndividualCommand({
     if (command.id !== scrollTargetId) return
 
     const commandEl = commandRef.current
-    const groupExpandedEl =
-      fromGroup === true
-        ? commandEl.closest<HTMLElement>(`.${styles.annotated_group_expanded}`)
-        : null
-    const outerListEl =
-      listElement ?? commandEl.closest<HTMLElement>('[role="list"]') ?? null
 
-    let scrollContainer: HTMLElement | null = outerListEl
-
-    if (groupExpandedEl instanceof HTMLElement) {
-      const hasInnerScroll =
-        groupExpandedEl.scrollHeight > groupExpandedEl.clientHeight + 1
-      scrollContainer = hasInnerScroll ? groupExpandedEl : outerListEl
-    }
-
-    if (scrollContainer == null) {
-      commandEl.scrollIntoView({
-        behavior: 'auto',
-        block: 'nearest',
-        inline: 'nearest',
-      })
+    // outer list scrolling is handled by AnnotatedSteps scrollToRow. Only scroll
+    // here when a capped step group has its own inner overflow container.
+    if (fromGroup !== true) {
       return
     }
 
-    scrollContainerToShowTarget(scrollContainer, commandEl)
-  }, [isHighlighted, scrollTargetId, command.id, listElement, fromGroup])
+    const groupExpandedEl = commandEl.closest<HTMLElement>(
+      `.${styles.annotated_group_expanded}`
+    )
+
+    if (
+      !(groupExpandedEl instanceof HTMLElement) ||
+      !isElementVerticallyScrollable(groupExpandedEl)
+    ) {
+      return
+    }
+
+    scrollContainerToShowTarget(groupExpandedEl, commandEl)
+  }, [isHighlighted, scrollTargetId, command.id, fromGroup])
 
   const commandWrapStyle = clsx(styles.individual_command_wrap, {
     [styles.individual_command_wrap_from_group]: fromGroup && !isHighlighted,

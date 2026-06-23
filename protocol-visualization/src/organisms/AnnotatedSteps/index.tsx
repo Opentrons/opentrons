@@ -11,6 +11,7 @@ import {
   getGroupedNodeIndexContainingCommandId,
   getIsVisibleProtocolStep,
   getLastVisibleAnalysisCommandId,
+  isElementVerticallyScrollable,
 } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -345,10 +346,22 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     if (scrollTargetId == null) return
     const rowIndex = rowIndexByCommandId.get(scrollTargetId)
     if (rowIndex == null) return
-    listRef?.scrollToRow({
-      index: rowIndex,
-      align: rowIndex >= rows.length - 1 ? 'end' : 'auto',
+
+    const frameId = requestAnimationFrame(() => {
+      const listElement = listRef?.element
+      if (listElement != null && !isElementVerticallyScrollable(listElement)) {
+        return
+      }
+
+      listRef?.scrollToRow({
+        index: rowIndex,
+        align: rowIndex >= rows.length - 1 ? 'end' : 'auto',
+      })
     })
+
+    return () => {
+      cancelAnimationFrame(frameId)
+    }
   }, [scrollTargetId, rowIndexByCommandId, listRef, rows.length])
 
   useEffect(() => {
