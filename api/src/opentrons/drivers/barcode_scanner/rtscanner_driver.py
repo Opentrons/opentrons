@@ -62,10 +62,10 @@ class RTScanner(AbstractBarcodeScannerDriver):
                     device = p.device
         else:
             for p in ports:
-                if p.device == port and p.vid == 0xAC90:
+                if p.device == port and p.vid == 0x1EAB:
                     device = port
         if device is None:
-            raise RuntimeError("No smartscan scanner found.")
+            raise RuntimeError("No scanner found.")
         read_timeout_ms = 3000
         connection = await AsyncSerial.create(
             port=device,

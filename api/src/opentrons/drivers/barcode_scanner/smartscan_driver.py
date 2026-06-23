@@ -29,7 +29,7 @@ class SmartScanner(AbstractBarcodeScannerDriver):
         ports = comports()
         if not port:
             for p in ports:
-                # RT214c vid:pid AC90:3003
+                # SH-400 vid:pid AC90:3003
                 if p.vid and p.vid == 0xAC90:
                     device = p.device
         else:
@@ -37,7 +37,7 @@ class SmartScanner(AbstractBarcodeScannerDriver):
                 if p.device == port and p.vid == 0xAC90:
                     device = port
         if device is None:
-            raise RuntimeError("No smartscan scanner found.")
+            raise RuntimeError("No scanner found.")
         read_timeout_ms = 4000
         connection = await AsyncSerial.create(
             port=device,
@@ -52,7 +52,7 @@ class SmartScanner(AbstractBarcodeScannerDriver):
     def __init__(
         self, connection: AsyncSerial, device: str, read_timeout_ms: int = 4000
     ):
-        """Search for and connect to a RT214C if one is present."""
+        """Search for and connect to a SH-400 if one is present."""
         self._device = device
         self._timeout_ms = read_timeout_ms
         self._sound_profile = SoundProfile.OFF
@@ -62,17 +62,7 @@ class SmartScanner(AbstractBarcodeScannerDriver):
 
     async def connect(self) -> None:
         await self.set_scan_timeout(self._timeout_ms)
-        # disable all weird suffix/prefix to start
-        # await self.enable_suffix(False)
-        # await self.enable_prefix(False)
-        # await self._enable_aim_id(False)
-        # await self._enable_code_id(False)
-        # await self.set_sound_profile(self._sound_profile)
-        # await self.set_menu_option(illumination_led_enable + bool_conv(True))
-        # await self.set_menu_option(aiming_led_enable + bool_conv(True))
-        await self._set_scan_terminator(
-            b"\x0d\x0a"
-        )  # End of Text non-printable character207
+        await self._set_scan_terminator(b"\x0d\x0a")  # CRLF
         await self._fetch_device_info()
         self._connected = True
 
