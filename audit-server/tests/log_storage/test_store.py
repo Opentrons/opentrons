@@ -20,115 +20,153 @@ def subject(db_engine: SQLEngine) -> LogStore:
 
 
 @pytest.fixture
-async def subject_with_period(db_engine: SQLEngine) -> LogStore:
+def subject_with_period(db_engine: SQLEngine) -> LogStore:
     """A LogStore with an open period ready for logs."""
     store = LogStore(sql_engine=db_engine)
-    await store.start_period(
-        StoredLog(
-            message="starting tests",
-            message_hash="asdasd",
-            message_sig="ddddd",
-            sig_version="1",
-        )
+    store.start_period(
+        [
+            StoredLog(
+                message="starting tests",
+                message_hash="asdasd",
+                message_sig="ddddd",
+                sig_version="1",
+            )
+        ]
     )
     return store
 
 
-async def test_end_period_raises_if_ending_nonexistent_period(
+def test_end_period_handles_ending_with_no_period(
     subject: LogStore,
 ) -> None:
     """It should raise an exception if ending a period that does not exist."""
-    with pytest.raises(NoActivePeriodError):
-        await subject.end_period(
+    result = subject.end_period(
+        [
             StoredLog(
                 message="ending",
                 message_hash="asdasd",
                 message_sig="asdasd",
                 sig_version="2",
             )
-        )
-
-
-async def test_start_period_starts_period(
-    subject: LogStore, db_engine: SQLEngine
-) -> None:
-    """It should add a period entry when commanded."""
-    start_log = StoredLog(
-        message="starting", message_hash="asads", message_sig="dddd", sig_version="3"
+        ]
     )
-    await subject.start_period(start_log)
+    assert isinstance(result, NoActivePeriodError)
+
+
+def test_start_period_starts_period(subject: LogStore, db_engine: SQLEngine) -> None:
+    """It should add a period entry when commanded."""
+    start_logs = [
+        StoredLog(
+            message="starting",
+            message_hash="asads",
+            message_sig="dddd",
+            sig_version="3",
+        ),
+        StoredLog(
+            message="hello", message_hash="", message_sig="fff", sig_version="22"
+        ),
+        StoredLog(
+            message="goodbye", message_hash="afsd", message_sig="iii", sig_version="i+2"
+        ),
+    ]
+    message_hash = subject.start_period(start_logs)
+    assert message_hash == "afsd"
     with Session(db_engine) as session:
         periods = session.scalars(select(LogPeriod)).all()
         assert len(periods) == 1
-        assert len(periods[0].log_entries) == 1
-        assert periods[0].log_entries[0].message == "starting"
-        assert periods[0].log_entries[0].message_hash == "asads"
         assert periods[0].ended_at is None
-        assert periods[0].log_entries[0].period_ordinal == 0
+        period = periods[0]
+        assert len(period.log_entries) == 3
+        assert period.log_entries[0].message == "starting"
+        assert period.log_entries[0].message_hash == "asads"
+        assert period.log_entries[0].period_ordinal == 0
+        assert period.log_entries[0].message_sig == "dddd"
+        assert period.log_entries[0].sig_version == "3"
+
+        assert period.log_entries[1].message == "hello"
+        assert period.log_entries[1].message_hash == ""
+        assert period.log_entries[1].period_ordinal == 1
+        assert period.log_entries[1].message_sig == "fff"
+        assert period.log_entries[1].sig_version == "22"
+
+        assert period.log_entries[2].message == "goodbye"
+        assert period.log_entries[2].message_hash == "afsd"
+        assert period.log_entries[2].period_ordinal == 2
+        assert period.log_entries[2].message_sig == "iii"
+        assert period.log_entries[2].sig_version == "i+2"
 
 
-async def test_end_period_stops_period(
+def test_end_period_stops_period(
     subject_with_period: LogStore, db_engine: SQLEngine
 ) -> None:
     """It should close a period entry when commanded."""
-    await subject_with_period.end_period(
-        StoredLog(
-            message="stopping",
-            message_hash="ffff",
-            message_sig="zzzz",
-            sig_version="11",
-        )
+    message_hash = subject_with_period.end_period(
+        [
+            StoredLog(
+                message="stopping",
+                message_hash="ffff",
+                message_sig="zzzz",
+                sig_version="11",
+            ),
+            StoredLog(
+                message="hohoho",
+                message_hash="lll",
+                message_sig="423",
+                sig_version="1",
+            ),
+            StoredLog(
+                message="heeheehee",
+                message_hash="pppp",
+                message_sig="321",
+                sig_version="-1",
+            ),
+        ],
     )
+    assert message_hash == "pppp"
     with Session(db_engine) as session:
         period = session.scalar(select(LogPeriod))
         assert period is not None
         assert period.ended_at is not None
-        assert len(period.log_entries) == 2
-        assert period.log_entries[-1].period_ordinal == 1
-        assert period.log_entries[-1].message == "stopping"
+        assert len(period.log_entries) == 4
+        assert period.log_entries[1].period_ordinal == 1
+        assert period.log_entries[1].message == "stopping"
+        assert period.log_entries[2].period_ordinal == 2
+        assert period.log_entries[2].message == "hohoho"
+        assert period.log_entries[3].period_ordinal == 3
+        assert period.log_entries[3].message == "heeheehee"
 
 
-async def test_end_period_with_no_period_raises(subject: LogStore) -> None:
-    """It should fail to end a period if no period exists."""
-    with pytest.raises(NoActivePeriodError):
-        await subject.end_period(
-            StoredLog(
-                message="no log here",
-                message_hash="fff",
-                message_sig="zzz",
-                sig_version="11",
-            )
-        )
-
-
-async def test_end_period_with_no_active_period_raises(
+def test_end_period_handles_ending_with_no_active_period(
     subject_with_period: LogStore,
 ) -> None:
     """It should fail to end a period if periods exist but none are active."""
-    await subject_with_period.end_period(
-        StoredLog(
-            message="stopping",
-            message_hash="fffff",
-            message_sig="gggg",
-            sig_version="32",
-        )
+    end_result = subject_with_period.end_period(
+        [
+            StoredLog(
+                message="stopping",
+                message_hash="fffff",
+                message_sig="gggg",
+                sig_version="32",
+            )
+        ]
     )
-    with pytest.raises(NoActivePeriodError):
-        await subject_with_period.end_period(
+    assert not isinstance(end_result, NoActivePeriodError)
+    bad_end_result = subject_with_period.end_period(
+        [
             StoredLog(
                 message="blublublu",
                 message_hash="fhhff",
                 message_sig="gllg",
                 sig_version="31",
             )
-        )
+        ]
+    )
+    assert isinstance(bad_end_result, NoActivePeriodError)
 
 
-async def test_log_to_period(
-    subject_with_period: LogStore, db_engine: SQLEngine
-) -> None:
+def test_log_to_period(subject_with_period: LogStore, db_engine: SQLEngine) -> None:
     """It should store a log to a period with an appropriate ordinal."""
-    await subject_with_period.store_log(
+    stored_hash = subject_with_period.store_log(
         StoredLog(
             message="hello friend",
             message_hash="asdasdasd",
@@ -136,6 +174,7 @@ async def test_log_to_period(
             sig_version="13",
         )
     )
+    assert stored_hash == "asdasdasd"
     with Session(db_engine) as session:
         period = session.scalar(select(LogPeriod))
         assert period is not None
@@ -145,79 +184,92 @@ async def test_log_to_period(
         assert period.log_entries[-1].message == "hello friend"
 
 
-async def test_log_to_period_fails_if_no_period_present(subject: LogStore) -> None:
+def test_log_to_period_fails_if_no_period_present(subject: LogStore) -> None:
     """It should fail to store a log if no log period is present."""
-    with pytest.raises(NoActivePeriodError):
-        await subject.store_log(
-            StoredLog(
-                message="asda",
-                message_hash="ghghgh",
-                message_sig="2314",
-                sig_version="1",
-            )
+    store_result = subject.store_log(
+        StoredLog(
+            message="asda",
+            message_hash="ghghgh",
+            message_sig="2314",
+            sig_version="1",
         )
+    )
+    assert isinstance(store_result, NoActivePeriodError)
 
 
-async def test_log_to_period_fails_if_no_period_active(
+def test_log_to_period_fails_if_no_period_active(
     subject_with_period: LogStore,
 ) -> None:
     """It should fail to store a log if no log period is active."""
-    await subject_with_period.end_period(
+    end_result = subject_with_period.end_period(
+        [
+            StoredLog(
+                message="ending",
+                message_hash="adsa",
+                message_sig="31113",
+                sig_version="h",
+            )
+        ]
+    )
+    assert not isinstance(end_result, NoActivePeriodError)
+    store_result = subject_with_period.store_log(
         StoredLog(
-            message="ending", message_hash="adsa", message_sig="31113", sig_version="h"
+            message="asda",
+            message_hash="ghghgh",
+            message_sig="2314",
+            sig_version="1",
         )
     )
-    with pytest.raises(NoActivePeriodError):
-        await subject_with_period.store_log(
-            StoredLog(
-                message="asda",
-                message_hash="ghghgh",
-                message_sig="2314",
-                sig_version="1",
-            )
-        )
+    assert isinstance(store_result, NoActivePeriodError)
 
 
-async def test_get_tail_hash(subject_with_period: LogStore) -> None:
+def test_get_tail_hash(subject_with_period: LogStore) -> None:
     """It should get the hash of the last message in the period."""
-    starting_hash = await subject_with_period.tail_hash()
+    starting_hash = subject_with_period.tail_hash()
+    assert isinstance(starting_hash, str)
     assert starting_hash == "asdasd"
-    await subject_with_period.store_log(
+    subject_with_period.store_log(
         StoredLog(
             message="hfhfhf", message_hash="zzz", message_sig="4141", sig_version="4"
         )
     )
-    new_starting_hash = await subject_with_period.tail_hash()
+    new_starting_hash = subject_with_period.tail_hash()
+    assert isinstance(new_starting_hash, str)
     assert new_starting_hash == "zzz"
 
 
-async def test_get_tail_hash_fails_if_no_period(subject: LogStore) -> None:
+def test_get_tail_hash_fails_if_no_period(subject: LogStore) -> None:
     """It should fail to get the last hash if no period exists."""
-    with pytest.raises(NoActivePeriodError):
-        await subject.tail_hash()
+    hash_result = subject.tail_hash()
+    assert isinstance(hash_result, NoActivePeriodError)
 
 
-async def test_get_tail_hash_fails_if_no_period_active(
+def test_get_tail_hash_fails_if_no_period_active(
     subject_with_period: LogStore,
 ) -> None:
     """It should fail to get the last hash if no period is active."""
-    await subject_with_period.end_period(
-        StoredLog(
-            message="ending", message_hash="adsa", message_sig="31113", sig_version="h"
-        )
+    subject_with_period.end_period(
+        [
+            StoredLog(
+                message="ending",
+                message_hash="adsa",
+                message_sig="31113",
+                sig_version="h",
+            )
+        ]
     )
-    with pytest.raises(NoActivePeriodError):
-        await subject_with_period.tail_hash()
+    hash_result = subject_with_period.tail_hash()
+    assert isinstance(hash_result, NoActivePeriodError)
 
 
-async def test_list_periods_returns_empty_when_no_periods(
+def test_list_periods_returns_empty_when_no_periods(
     subject: LogStore,
 ) -> None:
     """It should return an empty list when no periods exist."""
     assert subject.list_periods() == []
 
 
-async def test_list_periods_returns_active_period(
+def test_list_periods_returns_active_period(
     subject_with_period: LogStore,
 ) -> None:
     """It should return the active period with endedAt as None."""
@@ -227,39 +279,52 @@ async def test_list_periods_returns_active_period(
     assert periods[0].startedAt is not None
 
 
-async def test_list_periods_returns_completed_period(
+def test_list_periods_returns_completed_period(
     subject_with_period: LogStore,
 ) -> None:
     """It should return a completed period with endedAt set."""
-    await subject_with_period.end_period(
-        StoredLog(
-            message="ending",
-            message_hash="end_hash",
-            message_sig="end_sig",
-            sig_version="1",
-        )
+    subject_with_period.end_period(
+        [
+            StoredLog(
+                message="ending",
+                message_hash="end_hash",
+                message_sig="end_sig",
+                sig_version="1",
+            )
+        ]
     )
     periods = subject_with_period.list_periods()
     assert len(periods) == 1
     assert periods[0].endedAt is not None
 
 
-async def test_list_periods_ordered_oldest_first(
+def test_list_periods_ordered_oldest_first(
     subject: LogStore,
 ) -> None:
     """It should return periods ordered with the oldest started_at first."""
-    await subject.start_period(
-        StoredLog(message="first", message_hash="h1", message_sig="s1", sig_version="1")
+    subject.start_period(
+        [
+            StoredLog(
+                message="first", message_hash="h1", message_sig="s1", sig_version="1"
+            )
+        ]
     )
-    await subject.end_period(
-        StoredLog(
-            message="end first", message_hash="h2", message_sig="s2", sig_version="1"
-        )
+    subject.end_period(
+        [
+            StoredLog(
+                message="end first",
+                message_hash="h2",
+                message_sig="s2",
+                sig_version="1",
+            )
+        ]
     )
-    await subject.start_period(
-        StoredLog(
-            message="second", message_hash="h3", message_sig="s3", sig_version="1"
-        )
+    subject.start_period(
+        [
+            StoredLog(
+                message="second", message_hash="h3", message_sig="s3", sig_version="1"
+            )
+        ]
     )
 
     periods = subject.list_periods()
