@@ -863,7 +863,7 @@ class HeaterShakerLabwareLatchStatusUnknown(ProtocolEngineError):
 
 
 class VacuumModuleUnderVacuumError(ProtocolEngineError):
-    """Raised when trying to move to a labware that's in a Vacuum Module thats under vacuum."""
+    """Raised when trying to move labware while a Vacuum Module pump is engaged."""
 
     def __init__(
         self,
@@ -873,6 +873,38 @@ class VacuumModuleUnderVacuumError(ProtocolEngineError):
     ) -> None:
         """Build a VacuumModuleUnderVacuumError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class VacuumModuleStillUnderVacuumError(ProtocolEngineError):
+    """Raised when trying to move labware while a Vacuum Module is still under vacuum.
+
+    Unlike VacuumModuleUnderVacuumError, this is raised when the pump is not engaged
+    but the chamber has not yet returned to atmospheric pressure. This condition is
+    recoverable at runtime by waiting for pressure to equalize.
+    """
+
+    def __init__(
+        self,
+        module_id: str,
+        current_gauge_pressure_mbar: float,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleStillUnderVacuumError."""
+        self.module_id = module_id
+        self.current_gauge_pressure_mbar = current_gauge_pressure_mbar
+        super().__init__(
+            ErrorCodes.GENERAL_ERROR,
+            message
+            or (
+                f"Vacuum Module {module_id} is still under vacuum at "
+                f"{current_gauge_pressure_mbar} mbar. Wait for pressure to equalize "
+                "before moving labware to or from it."
+            ),
+            details,
+            wrapping,
+        )
 
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):

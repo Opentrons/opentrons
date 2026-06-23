@@ -26,7 +26,10 @@ from .thermocycler_plate_lifter import ThermocyclerPlateLifter
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.motion_planning import get_gripper_labware_movement_waypoints
-from opentrons.protocol_engine.errors.exceptions import VacuumModuleUnderVacuumError
+from opentrons.protocol_engine.errors.exceptions import (
+    VacuumModuleStillUnderVacuumError,
+    VacuumModuleUnderVacuumError,
+)
 from opentrons.protocol_engine.execution.vacuum_module_movement_flagger import (
     VacuumModuleMovementFlagger,
 )
@@ -309,3 +312,5 @@ class LabwareMovementHandler:
                     "Cannot move labware to or from a Vacuum Module"
                     " when the pump is running."
                 )
+            except VacuumModuleStillUnderVacuumError:
+                raise

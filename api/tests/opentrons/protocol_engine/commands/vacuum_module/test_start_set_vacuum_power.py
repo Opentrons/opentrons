@@ -61,6 +61,7 @@ async def test_start_set_vacuum_power(
     decoy.when(equipment.get_module_hardware_api(expected_module_id)).then_return(
         vm_hardware
     )
+    decoy.when(vm_hardware.pump_running).then_return(True)
 
     task: Task | None = None
 
@@ -87,7 +88,10 @@ async def test_start_set_vacuum_power(
             vent_after=True,
         )
     )
+    expected_state_update = update_types.StateUpdate()
+    expected_state_update.update_vacuum_module_pump_engaged("input-vacuum-id", True)
+
     assert result == SuccessData(
         public=expected_result,
-        state_update=update_types.StateUpdate(),
+        state_update=expected_state_update,
     )

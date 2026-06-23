@@ -8,7 +8,10 @@ from ..types import LabwareLocation, ModuleLocation, ModuleModel
 from .equipment import EquipmentHandler
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
-from opentrons.protocol_engine.errors.exceptions import VacuumModuleUnderVacuumError
+from opentrons.protocol_engine.errors.exceptions import (
+    VacuumModuleStillUnderVacuumError,
+    VacuumModuleUnderVacuumError,
+)
 
 
 class VacuumModuleMovementFlagger:
@@ -43,10 +46,13 @@ class VacuumModuleMovementFlagger:
     ) -> None:
         """Flag unsafe movements to a VacuumModule.
 
-        If the given labware is in a VacuumModule, and that VacuumModule's is
-        currently running according the engine's vacuum_module state as well as
-        the hardware API (for non-virtual modules), raises VacuumModuleRunningError.
-        If it is a virtual module, checks only for vacuum_module state in engine.
+        If the given labware is in a VacuumModule, and that VacuumModule's pump is
+        currently engaged according to the engine's vacuum module state, raises
+        VacuumModuleUnderVacuumError.
+
+        If the pump is not engaged but the hardware reports the module is still under
+        vacuum, raises VacuumModuleStillUnderVacuumError. That error is recoverable at
+        runtime by waiting for pressure to equalize.
 
         Otherwise, no-ops.
         """
@@ -61,28 +67,32 @@ class VacuumModuleMovementFlagger:
         except WrongModuleTypeError:
             return  # Labware on a module, but not a VacuumModule.
 
-        if (
-            vm_substate.pump_engaged
-            or not self._state_store.config.use_virtual_modules
-            and await self._vacuum_module_is_under_vacuum(module_id)
-        ):
+        if vm_substate.pump_engaged:
             raise VacuumModuleUnderVacuumError(
-                f"Vacuum Module {vm_substate.module_id} must not be under active vacuum when moving labware to or from it."
+                f"Vacuum Module {vm_substate.module_id} must not have its pump engaged "
+                "when moving labware to or from it."
             )
 
-    async def _vacuum_module_is_under_vacuum(
+        if not self._state_store.config.use_virtual_modules:
+            vacuum_module = await self._get_hardware_vacuum_module(module_id=module_id)
+            if vacuum_module.under_vacuum:
+                raise VacuumModuleStillUnderVacuumError(
+                    module_id=vm_substate.module_id,
+                    current_gauge_pressure_mbar=(
+                        vacuum_module.vacuum_state.current_gauge_pressure
+                    ),
+                )
+
+    async def _get_hardware_vacuum_module(
         self,
         module_id: str,
-    ) -> bool:
-        """Get vacuum state of the hardware VacuumModule corresponding with the module ID.
+    ) -> VacuumModule:
+        """Get the hardware VacuumModule corresponding with the module ID.
 
         Raises:
             _HardwareVacuumModuleMissingError: If we can't find that VacuumModule in
                 the hardware API.
         """
-        if self._state_store.config.use_virtual_modules:
-            return False
-
         vacuum_module_serial = self._state_store.modules.get_serial_number(
             module_id=module_id
         )
@@ -94,7 +104,7 @@ class VacuumModuleMovementFlagger:
                 f'No VacuumModule found with serial number "{vacuum_module_serial}".'
             )
 
-        return vacuum_module.under_vacuum
+        return vacuum_module
 
     async def _find_vacuum_module_by_serial(
         self, serial_number: str
@@ -102,9 +112,9 @@ class VacuumModuleMovementFlagger:
         """Find the hardware VacuumModule with the given serial number."""
         for module in self._hardware_api.attached_modules:
             if (
-                module.model() == ModuleModel.THERMOCYCLER_MODULE_V1
-                or module.model() == ModuleModel.THERMOCYCLER_MODULE_V2
-            ) and module.device_info["serial"] == serial_number:
+                module.model() == ModuleModel.VACUUM_MODULE_V1
+                and module.device_info["serial"] == serial_number
+            ):
                 return module  # type: ignore[return-value]
         return None
 
