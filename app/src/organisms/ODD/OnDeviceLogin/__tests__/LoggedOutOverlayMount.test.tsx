@@ -64,7 +64,7 @@ describe('LoggedOutOverlayMount', () => {
       data: { data: { resetPassword: false } },
     } as ReturnType<typeof useSelfQuery>)
     vi.mocked(useIsLoginModalOpen).mockReturnValue(false)
-    vi.mocked(showLoginModal).mockResolvedValue('alice')
+    vi.mocked(showLoginModal).mockResolvedValue({ username: 'alice' })
   })
 
   afterEach(() => {

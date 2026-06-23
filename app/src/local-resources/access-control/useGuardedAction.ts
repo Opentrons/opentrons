@@ -67,7 +67,10 @@ export function useGuardedAction(
     ) => {
       let username = currentUsername
       if (currentUsername == null || currentUsername.length === 0) {
-        username = await requireLogin({ robotName: currentRobotName ?? '' })
+        const loginResult = await requireLogin({
+          robotName: currentRobotName ?? '',
+        })
+        username = loginResult?.username ?? ''
       }
       const docResult = await requireDocumentation(
         username ?? '',

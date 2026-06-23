@@ -55,7 +55,7 @@ describe('requireLogin', () => {
         resetPassword: true,
       },
     } as AuthUserResponse)
-    vi.mocked(showLoginModal).mockResolvedValue('alice')
+    vi.mocked(showLoginModal).mockResolvedValue({ username: 'alice' })
 
     const result = await requireLogin(QUERY_CLIENT, 'alice', HOST_CONFIG)
 
@@ -64,7 +64,7 @@ describe('requireLogin', () => {
   })
 
   it('opens the login modal when logged out, and resolves with the new username on success', async () => {
-    vi.mocked(showLoginModal).mockResolvedValue('bob')
+    vi.mocked(showLoginModal).mockResolvedValue({ username: 'bob' })
 
     const result = await requireLogin(QUERY_CLIENT, null, null)
 
