@@ -6,9 +6,12 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
+import { useCurrentUsername } from '/app/redux/robot-auth'
+
 import { useGuardedAction } from '../useGuardedAction'
 import {
   mockShowDocumentationRequiredModal,
+  mockShowLoginModal,
   wrapWithDocumentationRequiredModal,
 } from './documentationRequiredModalTestUtils'
 
@@ -152,5 +155,21 @@ describe('useGuardedAction', () => {
         result.current.docreport == null &&
         result.current.askForDocumentation
     ).toBeDefined()
+  })
+  it('opens login modal when username is not provided', async () => {
+    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    await act(async () => {
+      if (
+        !result.current.isLoading &&
+        result.current.reasonForInteractionRequired &&
+        result.current.docreport == null
+      ) {
+        await result.current.askForDocumentation([], () => {})
+      }
+    })
+
+    expect(mockShowLoginModal).toHaveBeenCalled()
   })
 })
