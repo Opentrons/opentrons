@@ -308,17 +308,3 @@ class DeprecatedMultiResponseModel(
         description=DESCRIPTION_LINKS,
     )
 
-
-class NotifyRefetchBody(BaseResponseBody):
-    """A notification response that returns a flag for refetching via HTTP."""
-
-    refetch: bool = True
-
-
-class NotifyUnsubscribeBody(BaseResponseBody):
-    """A notification response.
-
-    Returns flags for unsubscribing from a topic.
-    """
-
-    unsubscribe: bool = True
