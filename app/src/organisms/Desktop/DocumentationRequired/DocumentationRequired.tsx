@@ -58,7 +58,6 @@ export function DocumentationRequired({
       height="30rem"
       overflowY="hidden"
       footer={footer}
-      marginLeft="0"
     >
       <div className={styles.container}>
         <div className={styles.text_area_container}>
