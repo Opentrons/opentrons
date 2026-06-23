@@ -35,7 +35,7 @@ export function ExitConfirmModal(): JSX.Element {
   }
 
   return (
-    <Modal type="info" title={t('exit_confirmation_title')} marginLeft="0">
+    <Modal type="info" title={t('exit_confirmation_title')}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           paddingTop={`${SPACING.spacing8}`}

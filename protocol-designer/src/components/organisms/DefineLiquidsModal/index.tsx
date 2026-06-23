@@ -181,7 +181,6 @@ export function DefineLiquidsModal(
       }}
     >
       <Modal
-        marginLeft="0"
         zIndexOverlay={15}
         width="37.125rem"
         title={

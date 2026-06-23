@@ -1,31 +1,25 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
-  CURSOR_POINTER,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
+  Tag,
 } from '@opentrons/components'
 
+import { DisplayRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/DisplayRunStatus'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from '/app/transformations/runs'
 
+import { RECENT_PROTOCOL_RUNS_HEADER } from './constants'
 import styles from './HistoricalProtocolRun.module.css'
-import { HistoricalProtocolRunDrawer as Drawer } from './HistoricalProtocolRunDrawer'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 
 import type { RunData } from '@opentrons/api-client'
-
-const COLUMNS = '25% 27% 5% 14% 14% 12%'
 
 interface HistoricalProtocolRunProps {
   run: RunData
@@ -40,9 +34,7 @@ interface HistoricalProtocolRunProps {
 export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
-  const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const outputFileIds = useRunGeneratedDataFiles(run.id)
   const imageFileCount = outputFileIds.jpeg.length > 0 ? 1 : 0
   const totalOutputFiles = outputFileIds.csv.length + imageFileCount
@@ -72,80 +64,52 @@ export function HistoricalProtocolRun(
         padding={SPACING.spacing8}
         borderTop={BORDERS.lineBorder}
         backgroundColor={
-          run.status === 'running' ? COLORS.blue10 : COLORS.white
+          run.status === 'running' ? COLORS.blue10 : COLORS.grey20
         }
+        borderRadius={BORDERS.borderRadius8}
         width="100%"
-        onClick={() => {
-          setDrawerOpen(!drawerOpen)
-        }}
-        cursor="pointer"
       >
         <Flex
           width="88%"
           display="grid"
-          gridTemplateColumns={COLUMNS}
+          gridTemplateColumns={RECENT_PROTOCOL_RUNS_HEADER}
           gap={SPACING.spacing20}
+          alignItems={ALIGN_CENTER}
         >
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
+          <Flex
+            flexShrink={0}
             data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
           >
-            {runDisplayName}
-          </StyledText>
+            <Tag type="default" text={runDisplayName} shrinkToContent />
+          </Flex>
           <StyledText
             desktopStyle="bodyDefaultRegular"
             data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             className={styles.protocol_name}
+            title={protocolName}
           >
             {protocolName}
           </StyledText>
+          <Flex data-testid={`RecentProtocolRuns_Status_${protocolKey}`}>
+            <DisplayRunStatus runStatus={runStatus} />
+          </Flex>
           <StyledText
             desktopStyle="bodyDefaultRegular"
             data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
           >
             {countRunDataFiles}
           </StyledText>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
-          >
-            {runStatus === 'running' ? (
-              <Icon
-                name="circle"
-                color={COLORS.blue50}
-                size={SPACING.spacing4}
-                marginX={SPACING.spacing4}
-                marginBottom={SPACING.spacing4}
-              />
-            ) : null}
-            {runStatus != null ? t(`status_${runStatus}`) : ''}
-          </StyledText>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            data-testid="RecentProtocolRuns_Duration"
-          >
-            {duration}
-          </StyledText>
+          <Flex flexShrink={0} data-testid="RecentProtocolRuns_Duration">
+            <Tag type="default" text={duration} shrinkToContent />
+          </Flex>
         </Flex>
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          <Box>
-            <Icon
-              name={drawerOpen ? 'chevron-up' : 'chevron-down'}
-              size="1.25rem"
-              css={{ cursor: CURSOR_POINTER }}
-            />
-          </Box>
-          <OverflowMenu
-            runId={run.id}
-            robotName={robotName}
-            robotIsBusy={robotIsBusy}
-            runHasImages={imageFileCount > 0}
-          />
-        </Flex>
+        <OverflowMenu
+          runId={run.id}
+          robotName={robotName}
+          robotIsBusy={robotIsBusy}
+          runHasImages={imageFileCount > 0}
+        />
       </Flex>
-      {drawerOpen ? (
-        <Drawer run={run} robotName={robotName} protocolName={protocolName} />
-      ) : null}
     </>
   )
 }

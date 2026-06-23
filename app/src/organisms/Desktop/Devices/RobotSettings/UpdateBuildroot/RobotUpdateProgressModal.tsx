@@ -120,7 +120,6 @@ export function RobotUpdateProgressModal({
       title={`${t('updating')} ${robotName}`}
       width="40rem"
       textAlign="center"
-      marginLeft="0"
       onClose={
         hasRobotCompletedInit || error || letUserExitUpdate
           ? completeRobotUpdateHandler
