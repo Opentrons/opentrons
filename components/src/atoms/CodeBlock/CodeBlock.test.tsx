@@ -1,9 +1,8 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-
 import { CodeBlock } from '.'
+import { renderWithProviders } from '../../testing/utils'
 
 import type { ComponentProps } from 'react'
 

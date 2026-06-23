@@ -5,7 +5,7 @@ import { CodeBlock as CodeBlockComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof CodeBlockComponent> = {
-  title: 'App/Atoms/CodeBlock',
+  title: 'Helix/Atoms/CodeBlock',
   argTypes: {
     // Disable all StyleProps
     ...Object.fromEntries(
