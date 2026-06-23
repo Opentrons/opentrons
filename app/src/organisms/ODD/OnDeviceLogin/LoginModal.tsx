@@ -43,7 +43,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const finishModal = useCallback(
     (username: string): void => {
-      modal.resolve(username)
+      modal.resolve({ username })
       modal.remove()
     },
     [modal]
@@ -132,7 +132,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 /**
  * Open the login modal and await the result.
  */
-export function showLoginModal(): Promise<string | null> {
+export function showLoginModal(): Promise<{ username: string } | null> {
   return NiceModal.show(LoginModalImpl)
 }
 
