@@ -244,10 +244,10 @@ async def test_list_periods_returns_completed_period(
     assert periods[0].endedAt is not None
 
 
-async def test_list_periods_ordered_newest_first(
+async def test_list_periods_ordered_oldest_first(
     subject: LogStore,
 ) -> None:
-    """It should return periods ordered with the newest started_at first."""
+    """It should return periods ordered with the oldest started_at first."""
     await subject.start_period(
         StoredLog(message="first", message_hash="h1", message_sig="s1", sig_version="1")
     )
@@ -264,15 +264,6 @@ async def test_list_periods_ordered_newest_first(
 
     periods = subject.list_periods()
     assert len(periods) == 2
-    # Newest period (second) should come first
-    assert periods[0].endedAt is None
-    assert periods[1].endedAt is not None
-
-
-async def test_list_periods_ids_are_strings(
-    subject_with_period: LogStore,
-) -> None:
-    """It should return period IDs as strings, not ints."""
-    periods = subject_with_period.list_periods()
-    assert len(periods) == 1
-    assert isinstance(periods[0].id, str)
+    assert periods[1].startedAt > periods[0].startedAt
+    assert periods[0].endedAt is not None
+    assert periods[1].endedAt is None

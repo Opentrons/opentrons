@@ -16,11 +16,7 @@ router = fastapi.APIRouter()
 @router.get(
     "/audit/external/logPeriods",
     summary="Get all audit log periods",
-    description=(
-        "Returns all stored audit log periods, ordered newest first. "
-        "Each period includes its start time, end time (null if still active), "
-        "and total entry count."
-    ),
+    description="Returns all stored audit log periods, ordered oldest first.",
 )
 async def get_log_periods(
     log_store: Annotated[LogStore, fastapi.Depends(get_log_store)],

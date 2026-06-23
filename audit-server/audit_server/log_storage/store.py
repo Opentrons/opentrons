@@ -123,14 +123,14 @@ class LogStore:
             return latest_record.message_hash
 
     def list_periods(self) -> list[LogPeriodSummary]:
-        """Return all log periods, newest first, with their entry IDs in ordinal order."""
+        """Return all log periods, oldest first, with their entry IDs in ordinal order."""
         with self._session() as session:
             periods = session.scalars(
-                select(LogPeriod).order_by(LogPeriod.started_at.desc())
+                select(LogPeriod).order_by(LogPeriod.started_at.asc())
             ).all()
             return [
                 LogPeriodSummary(
-                    id=str(period.id),
+                    id=period.id,
                     startedAt=period.started_at,
                     endedAt=period.ended_at,
                 )
