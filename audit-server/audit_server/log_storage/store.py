@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
+from .models import LogPeriodSummary
 from .types import StoredLog
 from audit_server.persistence.orm_models import LogEntry, LogPeriod
 
@@ -120,3 +121,18 @@ class LogStore:
         with self._session() as session:
             latest_record = await self._tail_log(session)
             return latest_record.message_hash
+
+    def list_periods(self) -> list[LogPeriodSummary]:
+        """Return all log periods, oldest first, with their entry IDs in ordinal order."""
+        with self._session() as session:
+            periods = session.scalars(
+                select(LogPeriod).order_by(LogPeriod.started_at.asc())
+            ).all()
+            return [
+                LogPeriodSummary(
+                    id=period.id,
+                    startedAt=period.started_at,
+                    endedAt=period.ended_at,
+                )
+                for period in periods
+            ]

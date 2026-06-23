@@ -208,3 +208,62 @@ async def test_get_tail_hash_fails_if_no_period_active(
     )
     with pytest.raises(NoActivePeriodError):
         await subject_with_period.tail_hash()
+
+
+async def test_list_periods_returns_empty_when_no_periods(
+    subject: LogStore,
+) -> None:
+    """It should return an empty list when no periods exist."""
+    assert subject.list_periods() == []
+
+
+async def test_list_periods_returns_active_period(
+    subject_with_period: LogStore,
+) -> None:
+    """It should return the active period with endedAt as None."""
+    periods = subject_with_period.list_periods()
+    assert len(periods) == 1
+    assert periods[0].endedAt is None
+    assert periods[0].startedAt is not None
+
+
+async def test_list_periods_returns_completed_period(
+    subject_with_period: LogStore,
+) -> None:
+    """It should return a completed period with endedAt set."""
+    await subject_with_period.end_period(
+        StoredLog(
+            message="ending",
+            message_hash="end_hash",
+            message_sig="end_sig",
+            sig_version="1",
+        )
+    )
+    periods = subject_with_period.list_periods()
+    assert len(periods) == 1
+    assert periods[0].endedAt is not None
+
+
+async def test_list_periods_ordered_oldest_first(
+    subject: LogStore,
+) -> None:
+    """It should return periods ordered with the oldest started_at first."""
+    await subject.start_period(
+        StoredLog(message="first", message_hash="h1", message_sig="s1", sig_version="1")
+    )
+    await subject.end_period(
+        StoredLog(
+            message="end first", message_hash="h2", message_sig="s2", sig_version="1"
+        )
+    )
+    await subject.start_period(
+        StoredLog(
+            message="second", message_hash="h3", message_sig="s3", sig_version="1"
+        )
+    )
+
+    periods = subject.list_periods()
+    assert len(periods) == 2
+    assert periods[1].startedAt > periods[0].startedAt
+    assert periods[0].endedAt is not None
+    assert periods[1].endedAt is None
