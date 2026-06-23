@@ -21,20 +21,11 @@ The following table lists the chemicals you can use to clean the exterior of the
 !!! Warning
     Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
-## Emptying the air-liquid separator
+## Air-liquid separator service
 
-The Control Box includes an air-liquid separator. This device is located in a recessed in a niche on the side of the Control Box. It traps liquid droplets in a clear, removable filter bowl while allowing dry air to pass into the vacuum pump. You can remove the bowl to clean condensate from it, or whenever any accumulated liquid reaches the max fill line.
+The Control Box includes an air-liquid separator located in a niche on its side panel. This device traps liquid droplets in a clear, removable collection bowl while allowing dry air to pass through the vacuum pump. You can remove the bowl to clean condensate from it, or whenever any accumulated liquid reaches the max fill line.
 
-<figure markdown>
-![test image](images/bi-directional-arrow-test2.png){ width="80%" }
-</figure>
-
-<figure markdown>
-![Air-liquid separator showing detachment tab and twist directions in a magnified section](images/separator-magnified2.png){ width="50%" }
-<figcaption>Separator filter bowl. Pull tab down and twist bowl to remove.</figcaption>
-</figure>
-
-### Detach the bowl
+### Detach and clean the bowl
 
 To remove the separator bowl:
 
@@ -45,6 +36,11 @@ To remove the separator bowl:
 2. Disconnect the vacuum hose from the manifold base or another convenient fitting to remove any residual vacuum and restore the system to atmospheric pressure.
 
 3. Pull down on the separator bowl locking tab.
+
+<figure markdown>
+![Separator bowl showing detachment procedure](images/separator-bowl-detach.svg){ width="55%" }
+<figcaption>Detaching the separator bowl</figcaption>
+</figure>
 
 4. Twist the bowl slightly to the right or left to disengage the retaining lugs.
 
@@ -60,14 +56,19 @@ To reattach the separator bowl:
 
 <div class="instruction-list" markdown>
 
-1. With the bowl locking tab slightly offset to the left or right, insert it into the housing.
+1. With the locking tab slightly offset to the right or left, gently push the bowl into the housing.
 
-2. Push up firmly on the bowl while pulling down on the locking tab.
+<figure markdown>
+![Separator bowl illustration showing reattachment procedure](images/separator-bowl-attach.svg){ width="50%" }
+<figcaption>Reattaching the separator bowl</figcaption>
+</figure>
 
-3. Twist the bowl to engage the retaining lugs and restore the locking tab to its original position.
+2. Pull down on the locking tab.
 
-4. Release the locking tab when the bowl snaps into place.
+3. Twist the bowl left or right to restore the locking tab to its original position and engage the retaining lugs.
 
-6. Reattach the power cable and turn the power back on.
+4. Release the locking tab when the bowl locks into place.
+
+5. Reattach the power cable and turn the power back on.
 
 </div>
