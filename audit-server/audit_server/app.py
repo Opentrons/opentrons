@@ -12,6 +12,7 @@ from server_utils.keys.fastapi import build_key_client, install_key_client
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
+from audit_server.log_storage.dependency import build_log_data_manager, build_log_store
 from audit_server.persistence.database import sql_engine_ctx
 from audit_server.persistence.fastapi_dependencies import (
     set_persistence_directory,
@@ -54,8 +55,8 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with AsyncExitStack() as exit_stack:
         engine = exit_stack.enter_context(sql_engine_ctx(db_path))
         set_sql_engine(app.state, engine)
-
-        install_settings_store(app.state, SettingsStore(sql_engine=engine))
+        settings_store = SettingsStore(sql_engine=engine)
+        install_settings_store(app.state, settings_store)
 
         if (
             configuration.key_server_uds is not None
@@ -75,7 +76,11 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 " Set OT_AUDIT_SERVER_key_server_uds or OT_AUDIT_SERVER_key_server_url"
                 " to enable logging."
             )
-
+        log_store = build_log_store(app.state, engine)
+        log_data_manager = build_log_data_manager(
+            app.state, log_store, settings_store, key_client
+        )
+        await log_data_manager.rotate_periods()
         systemd_utils.notify_up()
         yield
 
