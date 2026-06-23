@@ -4,13 +4,13 @@ import '@testing-library/jest-dom/vitest'
 
 import { screen } from '@testing-library/react'
 
-import { StorageCapacity } from '..'
+import { StorageBar } from '..'
 import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof StorageCapacity>) =>
-  renderWithProviders(<StorageCapacity {...props} />)
+const render = (props: ComponentProps<typeof StorageBar>) =>
+  renderWithProviders(<StorageBar {...props} />)
 
 describe('Storage', () => {
   it('renders the label', () => {

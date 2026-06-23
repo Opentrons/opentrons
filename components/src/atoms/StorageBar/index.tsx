@@ -1,6 +1,6 @@
 import { COLORS } from '../../helix-design-system'
 import { StyledText } from '../StyledText'
-import styles from './storagecapacity.module.css'
+import styles from './storagebar.module.css'
 
 import type { CSSProperties } from 'react'
 
@@ -8,17 +8,17 @@ interface TrackStyle extends CSSProperties {
   '--fill-percent': string
 }
 
-interface StorageCapacityProps {
+interface StorageBarProps {
   percentUsed: number
   label: string
   t?: (key: string, opts?: Record<string, unknown>) => string
 }
 
-export function StorageCapacity({
+export function StorageBar({
   percentUsed,
   label,
   t,
-}: StorageCapacityProps): JSX.Element {
+}: StorageBarProps): JSX.Element {
   const clamped = Math.min(100, Math.max(0, percentUsed))
   const percentAvailable = 100 - clamped
   const trackStyle: TrackStyle = { '--fill-percent': `${clamped}%` }

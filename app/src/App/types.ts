@@ -21,6 +21,7 @@ export type RobotSettingsTab =
   | 'calibration'
   | 'networking'
   | 'camera'
+  | 'file-manager'
   | 'advanced'
   | 'compliance-ready'
   | 'feature-flags'
