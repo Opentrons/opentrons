@@ -246,7 +246,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       nozzleConfiguration,
       labwareDef
     )
-    
+
     // getWellsToCheck is designed for tipracks (96-well format). For labware like
     // 384-well plates, skipEveryOtherWell means A1's cascading wells only covers odd rows
     // Add gaps to primaries so wellToPrimaryStatus has an entry for every well in the labware.
