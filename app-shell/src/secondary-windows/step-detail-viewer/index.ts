@@ -40,9 +40,8 @@ export function openStepDetailViewer(
   params: OpenStepDetailViewerParams
 ): StepDetailViewerDetails {
   const createUi = (): BrowserWindow => createStepDetailViewerUi(params)
-  const windowId = getWindowIdStepDetailViewer(params.protocolKey)
 
-  return { createUi, windowId, type: 'step-detail-viewer' }
+  return { createUi, key: params.protocolKey, type: 'step-detail-viewer' }
 }
 
 export function updateStepDetailViewerData(
@@ -61,8 +60,8 @@ export function updateStepDetailViewerData(
   })
 }
 
-export function getWindowIdStepDetailViewer(protocolKey: string): string {
-  return `step-detail-viewer-${protocolKey}`
+export function clearStepDetailViewerData(protocolKey: string): void {
+  stepDetailDataStore.delete(protocolKey)
 }
 
 const STEP_DETAIL_VIEWER_URL = (protocolKey: string): string => {
@@ -136,6 +135,5 @@ ipcMain.handle('get-step-detail-data', (_event, protocolKey: string) => {
 
 ipcMain.handle('is-step-detail-viewer-open', (_event, protocolKey: string) => {
   // Use the secondaryWindows map to reliably check if window exists
-  const windowId = getWindowIdStepDetailViewer(protocolKey)
-  return isSecondaryWindowOpen(windowId)
+  return isSecondaryWindowOpen('step-detail-viewer', protocolKey)
 })

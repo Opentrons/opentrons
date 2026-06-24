@@ -37,7 +37,10 @@ async def check_registration_token_header(
     request.state.authentication_bearer = authenticationBearer
 
 
-async def get_registration_token_header(request: Request) -> str:
+async def get_registration_token_header(
+    request: Request,
+    _check_token: Annotated[None, Depends(check_registration_token_header)],
+) -> str:
     """Gets the registration token from a request."""
     assert isinstance(request.state.authentication_bearer, str), (
         "No authentication_bearer in request state; is endpoint properly configured?"
@@ -70,7 +73,10 @@ async def check_authorization_token_header(
     request.state.authorization_authentication_bearer = authenticationBearer
 
 
-async def get_authorization_token_header(request: Request) -> str:
+async def get_authorization_token_header(
+    request: Request,
+    _check_token: Annotated[None, Depends(check_authorization_token_header)],
+) -> str:
     """Gets the authorization token from a request."""
     assert isinstance(request.state.authorization_authentication_bearer, str), (
         "No authorization_authentication_bearer in request state; is endpoint properly configured?"

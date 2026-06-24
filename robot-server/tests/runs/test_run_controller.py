@@ -80,6 +80,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[],
         pipettes=[],
         modules=[],
+        peripherals=[],
         liquids=[],
         wells=[],
         files=[],

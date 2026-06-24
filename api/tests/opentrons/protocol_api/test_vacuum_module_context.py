@@ -79,7 +79,7 @@ def subject(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_get_serial_number(
     decoy: Decoy, mock_core: VacuumModuleCore, subject: VacuumModuleContext
@@ -91,7 +91,7 @@ def test_get_serial_number(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_manifold_dock_property(
     subject: VacuumModuleContext,
@@ -102,7 +102,7 @@ def test_vacuum_module_manifold_dock_property(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_load_adapter_to_dock(
     decoy: Decoy,
@@ -153,7 +153,7 @@ def test_vacuum_module_load_adapter_to_dock(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_move_to_dock(
     decoy: Decoy,
@@ -164,7 +164,7 @@ def test_vacuum_module_move_to_dock(
     """It should move labware to the manifold dock."""
     mock_labware = Labware(
         core=mock_labware_core,
-        api_version=APIVersion(2, 28),
+        api_version=APIVersion(2, 30),
         protocol_core=mock_protocol_core,
         core_map=decoy.mock(cls=LoadedCoreMap),
     )
@@ -184,7 +184,7 @@ def test_vacuum_module_move_to_dock(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_move_to_dock_with_options(
     decoy: Decoy,
@@ -195,7 +195,7 @@ def test_vacuum_module_move_to_dock_with_options(
     """It should pass through use_gripper and offsets correctly."""
     mock_labware = Labware(
         core=mock_labware_core,
-        api_version=APIVersion(2, 28),
+        api_version=APIVersion(2, 30),
         protocol_core=mock_protocol_core,
         core_map=decoy.mock(cls=LoadedCoreMap),
     )
@@ -223,7 +223,7 @@ def test_vacuum_module_move_to_dock_with_options(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_start_set_vacuum_pressure(
     decoy: Decoy,
@@ -257,7 +257,7 @@ def test_vacuum_module_start_set_vacuum_pressure(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_start_set_vacuum_power(
     decoy: Decoy,
@@ -291,7 +291,7 @@ def test_vacuum_module_start_set_vacuum_power(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_stop_vacuum(
     decoy: Decoy,
