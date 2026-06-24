@@ -22,6 +22,8 @@ from opentrons.hardware_control.modules import (
     SpeedStatus,
     TemperatureStatus,
     VacuumModuleStatus,
+    VacuumOperationMode,
+    VentStatus,
 )
 from opentrons.hardware_control.modules.types import HopperDoorState, LatchState
 from opentrons.protocol_engine import ModuleModel
@@ -422,11 +424,11 @@ class VacuumModuleData(BaseModel):
         ...,
         description="Target pump power as a percentage, if set.",
     )
-    ventStatus: Literal["opened", "closed"] = Field(
+    ventStatus: VentStatus = Field(
         ...,
         description="Whether the vent valve is open or closed.",
     )
-    modeType: Literal["pressure", "power"] = Field(
+    modeType: VacuumOperationMode = Field(
         ...,
         description="Whether the module is in pressure or power control mode.",
     )

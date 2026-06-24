@@ -16,12 +16,14 @@ from opentrons.drivers.vacuum_module.types import (
 )
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.types import (
+    ModuleDataValidator,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
     VacuumModuleCycle,
-    VacuumModuleOperationMode,
     VacuumModulePowerStep,
     VacuumModulePressureStep,
+    VacuumOperationMode,
+    VentStatus,
 )
 from opentrons.hardware_control.modules.vacuum_module import (
     POWER_COMPARISON_WINDOW_SIZE,
@@ -174,7 +176,7 @@ async def test_get_target_power_falls_back_to_firmware_target_pwm(
     subject: modules.VacuumModule,
 ) -> None:
     """Target power should remain available from firmware after reader state is cleared."""
-    subject._reader.set_operation_mode(VacuumModuleOperationMode.POWER)
+    subject._reader.set_operation_mode(VacuumOperationMode.POWER)
     subject._reader.set_target_power(80.0)
     subject._reader.reset_power_target()
     subject._reader.pump_state = PumpState(
@@ -226,8 +228,11 @@ async def test_live_data_includes_target_power_after_set_pump_state(
         manual_control=True,
     )
 
-    assert subject.live_data["data"]["targetPower"] == 65.0
-    assert subject.live_data["data"]["modeType"] == VacuumModuleOperationMode.POWER
+    live_data = subject.live_data["data"]
+    assert ModuleDataValidator.is_vacuum_module_data(live_data)
+    assert live_data["targetPower"] == 65.0
+    assert live_data["modeType"] == VacuumOperationMode.POWER
+    assert live_data["ventStatus"] == VentStatus.CLOSED
 
 
 @pytest.mark.parametrize(

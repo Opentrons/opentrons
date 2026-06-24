@@ -30,11 +30,11 @@ from opentrons.hardware_control.modules.types import (
     UploadFunction,
     VacuumModuleCycle,
     VacuumModuleData,
-    VacuumModuleOperationMode,
     VacuumModulePowerStep,
     VacuumModulePressureStep,
     VacuumModuleStatus,
     VacuumModuleStep,
+    VacuumOperationMode,
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
@@ -243,7 +243,7 @@ class VacuumModule(mod_abc.AbstractModule):
         return self._reader.pump_state
 
     @property
-    def operation_mode(self) -> VacuumModuleOperationMode:
+    def operation_mode(self) -> VacuumOperationMode:
         return self._reader.operation_mode
 
     @property
@@ -262,14 +262,6 @@ class VacuumModule(mod_abc.AbstractModule):
         """Gauge pressure derived from absolute and atmospheric sensor readings."""
         state = self.vacuum_state
         return round(self._average_absolute_pressure_mbar() - state.pressure_atm, 2)
-
-    @property
-    def under_vacuum(self) -> bool:
-        state = self.vacuum_state
-        avg_pressure = self._average_absolute_pressure_mbar()
-        return math.isclose(
-            state.pressure_abs_a, state.pressure_abs_b, abs_tol=PRESSURE_TOL
-        ) and not math.isclose(avg_pressure, state.pressure_atm, abs_tol=PRESSURE_TOL)
 
     @property
     def under_vacuum(self) -> bool:
@@ -407,7 +399,7 @@ class VacuumModule(mod_abc.AbstractModule):
         vent_after: Optional[bool] = None,
     ) -> None:
         """Handler for internal pressure controls."""
-        self._reader.set_operation_mode(VacuumModuleOperationMode.PRESSURE)
+        self._reader.set_operation_mode(VacuumOperationMode.PRESSURE)
         self._reader.reset_power_target()
         self._reader.set_target_pressure(gauge_pressure_mbar)
         await self._driver.set_vacuum_state(
@@ -430,7 +422,7 @@ class VacuumModule(mod_abc.AbstractModule):
         vent_after: Optional[bool] = None,
     ) -> None:
         """Control the pump agnostically to the internal pressure"""
-        self._reader.set_operation_mode(VacuumModuleOperationMode.POWER)
+        self._reader.set_operation_mode(VacuumOperationMode.POWER)
         self._reader.reset_pressure_target()
         if duty_cycle is not None:
             self._reader.set_target_power(float(duty_cycle))
@@ -563,7 +555,7 @@ class VacuumModule(mod_abc.AbstractModule):
         await task
 
     async def _wait_for_target(self) -> None:
-        if self._reader.operation_mode == VacuumModuleOperationMode.POWER:
+        if self._reader.operation_mode == VacuumOperationMode.POWER:
             while not self._reader.power_target_reached():
                 await asyncio.sleep(TARGET_REACHED_POLL_PERIOD)
                 await self._reader.update_pump_state()
@@ -571,7 +563,7 @@ class VacuumModule(mod_abc.AbstractModule):
                     return
             # clear target after it's reached
             self._reader.reset_power_target()
-        elif self._reader.operation_mode == VacuumModuleOperationMode.PRESSURE:
+        elif self._reader.operation_mode == VacuumOperationMode.PRESSURE:
             while not self._reader.pressure_target_reached():
                 await asyncio.sleep(TARGET_REACHED_POLL_PERIOD)
                 await self._reader.update_vacuum_state()
@@ -606,9 +598,7 @@ class VacuumModuleReader(Reader):
             pump_running=False,
             manual_control=False,
         )
-        self.operation_mode: VacuumModuleOperationMode = (
-            VacuumModuleOperationMode.PRESSURE
-        )
+        self.operation_mode = VacuumOperationMode.PRESSURE
         self._driver = driver
         self.initialized = False
         self._refresh_state = False
@@ -653,7 +643,7 @@ class VacuumModuleReader(Reader):
         if self.target_power is not None:
             return self.target_power
 
-        if self.operation_mode == VacuumModuleOperationMode.POWER:
+        if self.operation_mode == VacuumOperationMode.POWER:
             target_pwm = self.pump_state.target_pwm
             if target_pwm != 0:
                 return float(target_pwm)
@@ -741,5 +731,5 @@ class VacuumModuleReader(Reader):
             self._power_readings.insert(0, self.pump_state.current_pwm)
             self._power_readings.pop()
 
-    def set_operation_mode(self, mode_type: VacuumModuleOperationMode) -> None:
+    def set_operation_mode(self, mode_type: VacuumOperationMode) -> None:
         self.operation_mode = mode_type

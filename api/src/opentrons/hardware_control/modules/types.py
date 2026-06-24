@@ -493,6 +493,11 @@ class VacuumModuleStatus(StrEnum):
     RUNNING = "running"  # General use- the pump is turned on
 
 
-class VacuumModuleOperationMode(StrEnum):
+class VacuumOperationMode(StrEnum):
     POWER = "power"
     PRESSURE = "pressure"
+
+
+class VentStatus(StrEnum):
+    CLOSED = "closed"
+    OPENED = "opened"
