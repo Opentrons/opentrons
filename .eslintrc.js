@@ -60,6 +60,50 @@ module.exports = {
     'react/jsx-curly-brace-presence': 'warn',
     '@typescript-eslint/no-non-null-asserted-optional-chain': 'warn',
 
+    // disallowed hardcoded text
+    'no-restricted-syntax': [
+      'error',
+      {
+        // Block direct string literals passed to aria-label (ex: aria-label="Close")
+        selector: "JSXAttribute[name.name='aria-label'][value.type='Literal']",
+        message:
+          "Do not hardcode strings in 'aria-label'. Use a translation function (e.g., t('key')) instead.",
+      },
+      {
+        // Block string literals inside curly braces passed to aria-label (ex: aria-label={"Close"})
+        selector:
+          "JSXAttribute[name.name='aria-label'][value.expression.type='Literal']",
+        message:
+          "Do not hardcode strings in 'aria-label'. Use a translation function (e.g., t('key')) instead.",
+      },
+      {
+        // Block hardcoded strings in aria-valuetext
+        selector:
+          "JSXAttribute[name.name='aria-valuetext'][value.type='Literal']",
+        message:
+          "Do not hardcode strings in 'aria-valuetext'. Use a translation function instead.",
+      },
+      {
+        // Block hardcoded strings in aria-labelledby
+        selector:
+          "JSXAttribute[name.name='aria-labelledby'][value.type='Literal']",
+        message:
+          "Do not pass a direct string literal to 'aria-labelledby'. Provide an element ID instead.",
+      },
+      {
+        // Block hardcoded strings in alt attributes
+        selector: "JSXAttribute[name.name='alt'][value.type='Literal']",
+        message:
+          "Do not hardcode strings in 'alt'. Use a translation function instead.",
+      },
+      {
+        // Block hardcoded strings in placeholder attributes
+        selector: "JSXAttribute[name.name='placeholder'][value.type='Literal']",
+        message:
+          "Do not hardcode strings in 'placeholder'. Use a translation function instead.",
+      },
+    ],
+
     // Enforce notification hooks
     'no-restricted-imports': [
       'error',
