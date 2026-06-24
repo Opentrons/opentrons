@@ -25,7 +25,7 @@ interface AlertsModalProps {
 export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
-  const { t } = useTranslation(['app_settings', 'branded'])
+  const { t, i18n } = useTranslation(['app_settings', 'branded'])
   const { makeToast } = useToaster()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
 
@@ -75,6 +75,9 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   useEffect(
     () => {
       if (createAppUpdateAvailableToast) {
+        if (toastIdRef.current != null) {
+          removeActiveAppUpdateToast()
+        }
         toastIdRef.current = makeToast(
           t('branded:opentrons_app_update_available_variation') as string,
           WARNING_TOAST,
@@ -91,9 +94,8 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
         removeActiveAppUpdateToast()
       }
     },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isAppUpdateAvailable, isAppUpdateIgnored]
+    [createAppUpdateAvailableToast, removeToast, i18n.language]
   )
 
   return (

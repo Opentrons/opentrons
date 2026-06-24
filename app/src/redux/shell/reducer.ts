@@ -4,7 +4,11 @@ import { robotSystemReducer } from './is-ready/reducer'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { ShellState, ShellUpdateState } from './types'
+import type {
+  ShellState,
+  ShellUpdateState,
+  StepDetailViewerClosedState,
+} from './types'
 
 const INITIAL_STATE: ShellUpdateState = {
   checking: false,
@@ -75,11 +79,27 @@ export function systemLanguageReducer(
   return state
 }
 
+export function stepDetailViewerClosedReducer(
+  state: StepDetailViewerClosedState = null,
+  action: Action
+): StepDetailViewerClosedState {
+  switch (action.type) {
+    case 'shell:STEP_DETAIL_VIEWER_CLOSED':
+      return {
+        protocolKey: action.payload.protocolKey,
+        closedAt: Date.now(),
+      }
+  }
+
+  return state
+}
+
 interface ShellReducerMap {
   update: Reducer<ShellUpdateState, Action>
   isReady: Reducer<boolean, Action>
   filePaths: Reducer<string[], Action>
   systemLanguage: Reducer<string[] | null, Action>
+  stepDetailViewerClosed: Reducer<StepDetailViewerClosedState, Action>
 }
 
 const reducers: ShellReducerMap = {
@@ -87,6 +107,7 @@ const reducers: ShellReducerMap = {
   isReady: robotSystemReducer as Reducer<boolean, Action>,
   filePaths: massStorageReducer,
   systemLanguage: systemLanguageReducer,
+  stepDetailViewerClosed: stepDetailViewerClosedReducer,
 }
 
 export const shellReducer: Reducer<ShellState, Action> = (

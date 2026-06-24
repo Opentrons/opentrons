@@ -31,7 +31,7 @@ import type { FieldProps, FieldPropsByName } from '../../types'
 interface ExtendedPartialTipFieldProps extends FieldProps {
   pipetteSpecs: PipetteV2Specs
   propsForFields: FieldPropsByName
-  stepType: string
+  stepType: 'mix' | 'transfer'
 }
 export function ExtendedPartialTipField(
   props: ExtendedPartialTipFieldProps
@@ -235,6 +235,18 @@ export function ExtendedPartialTipField(
     })
   }
 
+  const fieldsForWellSelection = [
+    'primaryNozzle',
+    'nozzles',
+    ...(stepType === 'transfer'
+      ? ['aspirate_wells', 'dispense_wells']
+      : ['wells']),
+  ]
+  const shouldShowErrorForNozzleAndWellModalButton =
+    fieldsForWellSelection.some(
+      field => propsForFields[field].errorToShow != null
+    )
+
   return (
     <>
       <div className={styles.nozzle_selection_text}>
@@ -242,7 +254,9 @@ export function ExtendedPartialTipField(
           {t('pipette_nozzles_and_wells')}
         </StyledText>
         <ListButton
-          type="noActive"
+          type={
+            shouldShowErrorForNozzleAndWellModalButton ? 'error' : 'noActive'
+          }
           onClick={handleOpen}
           testId="nozzle_and_well_modal"
         >

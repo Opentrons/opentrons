@@ -5,8 +5,9 @@ import {
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
 import {
-  COLUMN_4_SLOTS,
+  getIsInPipettableLocation,
   getIsSafePickupWithinTiprack,
+  getLabwareHasLid,
   getPipetteCenteringFullOffset,
   getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
@@ -33,6 +34,7 @@ import type {
 import type {
   InvariantContext,
   LabwareEntities,
+  RobotState,
   TimelineFrame,
 } from '@opentrons/step-generation'
 import type {
@@ -49,6 +51,8 @@ const BASE_OFFSET_Y = 15
 
 // additional offset to account for irregular OT-2 8-channel pipette geometry (right "hump")
 const OFFSET_OT2_8_CHANNEL = 10
+
+type LabwareRobotState = RobotState['labware']
 
 export const getViewboxFromSelectedLabware = (
   selectedLabwareId: string,
@@ -192,12 +196,19 @@ export function getIsTiprackSelectable(args: {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
+  labwareRobotState: LabwareRobotState
 }): boolean {
   // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
-  const { labware, formTiprackUri, pipetteSpecs, nozzles, labwareEntities } =
-    args
+  const {
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    labwareRobotState,
+  } = args
   const { channels } = pipetteSpecs
-  const { def, labwareDefURI, stack } = labware
+  const { id, def, labwareDefURI, stack } = labware
   const isPickupCompatibleWithPossibleAdapter =
     getIsPickupCompatibleWithPossibleAdapter(
       stack,
@@ -205,12 +216,20 @@ export function getIsTiprackSelectable(args: {
       nozzles,
       channels
     )
-  const slot = getSlotInLocationStack(stack)
+  const hasLid = getLabwareHasLid({
+    labwareId: id,
+    labwareEntities,
+    labwareRobotState,
+  })
+  const location = getSlotInLocationStack(stack)
+  const isInPipettableLocation = getIsInPipettableLocation(location)
+
   return (
     getIsTiprack(def) &&
     labwareDefURI === formTiprackUri &&
-    !COLUMN_4_SLOTS.includes(slot) &&
-    isPickupCompatibleWithPossibleAdapter
+    isPickupCompatibleWithPossibleAdapter &&
+    !hasLid &&
+    isInPipettableLocation
   )
 }
 
@@ -221,6 +240,7 @@ interface GetIsTiprackSelectableAndValidArgs {
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
   validTiprackIds: string[]
+  labwareRobotState: LabwareRobotState
 }
 
 export const getIsTiprackSelectableAndValid = (
@@ -233,6 +253,7 @@ export const getIsTiprackSelectableAndValid = (
     nozzles,
     labwareEntities,
     validTiprackIds,
+    labwareRobotState,
   } = args
   const isSelectable = getIsTiprackSelectable({
     labware,
@@ -240,6 +261,7 @@ export const getIsTiprackSelectableAndValid = (
     pipetteSpecs,
     nozzles,
     labwareEntities,
+    labwareRobotState,
   })
   return isSelectable && validTiprackIds.includes(labware.id)
 }
@@ -251,6 +273,7 @@ export const getAreAnyMatchingTipracksSelectable = (args: {
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
   validTiprackIds: string[]
+  labwareRobotState: LabwareRobotState
 }): boolean => {
   const {
     allLabware,
@@ -259,26 +282,20 @@ export const getAreAnyMatchingTipracksSelectable = (args: {
     nozzles,
     labwareEntities,
     validTiprackIds,
+    labwareRobotState,
   } = args
-  const { channels } = pipetteSpecs
-  return validTiprackIds.some(id => {
-    const labware = allLabware.find(l => l.id === id)
-    if (labware == null) {
+  return allLabware.some(labware => {
+    if (!validTiprackIds.includes(labware.id)) {
       return false
     }
-    const { def, labwareDefURI, stack } = labware
-    const isPickupCompatibleWithPossibleAdapter =
-      getIsPickupCompatibleWithPossibleAdapter(
-        stack,
-        labwareEntities,
-        nozzles,
-        channels
-      )
-    return (
-      getIsTiprack(def) &&
-      labwareDefURI === formTiprackUri &&
-      isPickupCompatibleWithPossibleAdapter
-    )
+    return getIsTiprackSelectable({
+      labware,
+      pipetteSpecs,
+      formTiprackUri,
+      nozzles,
+      labwareEntities,
+      labwareRobotState,
+    })
   })
 }
 
