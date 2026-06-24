@@ -212,8 +212,7 @@ class ModuleDataValidator:
     def is_vacuum_module_data(
         cls, data: ModuleData | None
     ) -> TypeGuard[VacuumModuleData]:
-        # TODO(nd: 2026-02-12): Add appropriate data key check when VacuumModuleData is defined
-        return data is not None
+        return data is not None and "pumpEngaged" in data.keys()
 
 
 class LiveData(TypedDict):
@@ -494,6 +493,11 @@ class VacuumModuleStatus(StrEnum):
     RUNNING = "running"  # General use- the pump is turned on
 
 
-class VacuumModuleOperationMode(StrEnum):
+class VacuumOperationMode(StrEnum):
     POWER = "power"
     PRESSURE = "pressure"
+
+
+class VentStatus(StrEnum):
+    CLOSED = "closed"
+    OPENED = "opened"

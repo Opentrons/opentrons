@@ -78,9 +78,7 @@ class VacuumModuleMovementFlagger:
             if vacuum_module.under_vacuum:
                 raise VacuumModuleStillUnderVacuumError(
                     module_id=vm_substate.module_id,
-                    current_gauge_pressure_mbar=(
-                        vacuum_module.vacuum_state.current_gauge_pressure
-                    ),
+                    current_gauge_pressure_mbar=vacuum_module.current_gauge_pressure_mbar,
                 )
 
     async def _get_hardware_vacuum_module(
