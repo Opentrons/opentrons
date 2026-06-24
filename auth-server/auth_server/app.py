@@ -81,16 +81,13 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 _OAUTH_2_TAG = {
     "name": "OAuth 2",
-    "description": "Flows for user authentication, following the OAuth 2 standard."
+    "description": "Flows for user authentication, following the OAuth 2 standard.",
 }
 _AUTH_SETTINGS_TAG = {
     "name": "Auth settings",
-    "description": "Settings related to authentication and authorization."
+    "description": "Settings related to authentication and authorization.",
 }
-_USERS_TAG = {
-    "name": "Users",
-    "description": "Endpoints for managing users."
-}
+_USERS_TAG = {"name": "Users", "description": "Endpoints for managing users."}
 _TAGS = [_OAUTH_2_TAG, _AUTH_SETTINGS_TAG, _USERS_TAG]
 
 
@@ -101,7 +98,7 @@ app = FastAPI(
     # redoc_url is replaced by our own /redoc router, below.
     redoc_url=None,
     lifespan=_lifespan,
-    openapi_tags=_TAGS
+    openapi_tags=_TAGS,
 )
 
 
