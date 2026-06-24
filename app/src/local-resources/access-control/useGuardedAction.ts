@@ -8,13 +8,16 @@ import {
 import { useCurrentRobotName, useCurrentUsername } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
-import { isDocumentationReportValid } from './utils'
 
 import type {
   DocumentationReport,
   DocumentationState,
   DocumentedAction,
 } from '@opentrons/react-api-client'
+import type {
+  MutationAuthenticationState,
+  MutationDocumentationState,
+} from '@opentrons/react-api-client/src/access_control/types'
 
 /**
  * API for the access-control gate.
@@ -42,8 +45,10 @@ export function useGuardedAction(
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
   const requireReasonForInteraction =
     authSettingsQuery?.data?.data?.requireReasonForInteraction ?? false
-  const minLengthOfReasonForInteraction =
-    authSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
+
+  // TODO(jj): add length check for documentation report
+  // const minLengthOfReasonForInteraction =
+  //   authSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
 
   const reasonForInteractionLoading = useMemo(
     () => authSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
@@ -82,30 +87,45 @@ export function useGuardedAction(
     [currentRobotName, currentUsername, requireDocumentation, requireLogin]
   )
 
+  const askForLogin = useCallback(async () => {
+    void requireLogin({ robotName: currentRobotName ?? '' })
+  }, [currentRobotName, requireLogin])
+
   const docState: DocumentationState = useMemo(() => {
     if (reasonForInteractionLoading) {
       return { isLoading: true }
     }
-    if (!reasonForInteractionRequired) {
-      return { reasonForInteractionRequired: false, isLoading: false }
+
+    if (!accessControlEnabled) {
+      return { isLoading: false, accessControlEnabled: false }
     }
 
-    if (
-      docreport != null &&
-      isDocumentationReportValid(docreport, minLengthOfReasonForInteraction)
-    ) {
-      return { reasonForInteractionRequired: true, docreport, isLoading: false }
+    const mutationAuthState: MutationAuthenticationState = {
+      accessControlEnabled: true,
+      loginExpired: false,
+      askForLogin,
     }
+
+    const mutationDocState: MutationDocumentationState =
+      reasonForInteractionRequired
+        ? {
+            reasonForInteractionRequired: true,
+            docreport: docreport ?? null,
+            askForDocumentation: showDocumentationModal,
+          }
+        : {
+            reasonForInteractionRequired: false,
+          }
 
     return {
-      reasonForInteractionRequired: true,
-      docreport: null,
-      askForDocumentation: showDocumentationModal,
       isLoading: false,
+      ...mutationAuthState,
+      ...mutationDocState,
     }
   }, [
+    accessControlEnabled,
+    askForLogin,
     docreport,
-    minLengthOfReasonForInteraction,
     reasonForInteractionLoading,
     reasonForInteractionRequired,
     showDocumentationModal,

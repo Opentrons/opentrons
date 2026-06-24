@@ -48,20 +48,33 @@ export function isDocumentedMutationError(
  */
 export type DocumentationState =
   | { isLoading: true }
-  | { reasonForInteractionRequired: false; isLoading: false }
   | {
-      reasonForInteractionRequired: true
-      docreport: DocumentationReport
       isLoading: false
+      accessControlEnabled: false
+    }
+  | ({
+      isLoading: false
+    } & MutationAuthenticationState &
+      MutationDocumentationState)
+
+export interface MutationAuthenticationState {
+  accessControlEnabled: true
+  loginExpired: boolean
+  askForLogin: () => Promise<void>
+}
+
+export type MutationDocumentationState =
+  | {
+      reasonForInteractionRequired: false
     }
   | {
       reasonForInteractionRequired: true
-      docreport: null
+      docreport: DocumentationReport | null
       askForDocumentation: (
         actionsToDocument: DocumentedAction[],
-        onCancel?: () => void
+        onCancel?: () => void,
+        defaultDocReport?: DocumentationReport | null
       ) => Promise<DocumentationReport>
-      isLoading: false
     }
 
 export interface DocumentedMutationParameters<TVariables = void> {

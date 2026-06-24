@@ -9,7 +9,6 @@ import type {
   UseMutationOptions,
 } from 'react-query'
 import type {
-  DocumentationReport,
   DocumentationState,
   DocumentedAction,
   DocumentedMutationFunction,
@@ -58,22 +57,6 @@ export const useDocumentedMutation: UseDocumentedMutation = (
   })
 }
 
-const checkDocumentationReport = async (
-  documentationState: DocumentationState,
-  actionsToDocument: DocumentedAction[]
-): Promise<DocumentationReport | null> => {
-  if (
-    documentationState.isLoading ||
-    !documentationState.reasonForInteractionRequired
-  ) {
-    return null
-  }
-  if (documentationState.docreport != null) {
-    return documentationState.docreport
-  }
-  return await documentationState.askForDocumentation(actionsToDocument)
-}
-
 function useWrappedMutationFn<TData, TVariables>(
   mutationFn: DocumentedMutationFunction<TData, TVariables>,
   documentationState: DocumentationState,
@@ -81,32 +64,86 @@ function useWrappedMutationFn<TData, TVariables>(
 ): MutationFunction<TData, TVariables> {
   const wrappedMutationFn = useCallback(
     async (variables: TVariables) => {
-      const docreport = await checkDocumentationReport(
+      return await runMutation(
         documentationState,
-        actionsToDocument
+        actionsToDocument,
+        mutationFn,
+        variables
       )
-      if (documentationState.isLoading) {
-        throw new DocumentedMutationError('access_control_loading')
-      }
-      if (!isDocumentationProvided(documentationState, docreport)) {
-        throw new DocumentedMutationError('no_documentation_report')
-      }
-      return await mutationFn({ variables, userNotes: docreport ?? '' })
     },
     [actionsToDocument, documentationState, mutationFn]
   )
   return wrappedMutationFn
 }
 
-const isDocumentationProvided = (
-  state: DocumentationState,
-  docreport: DocumentationReport | null
-): boolean => {
-  if (state.isLoading) {
-    return false
+async function runMutation<TData, TVariables>(
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  mutationFn: DocumentedMutationFunction<TData, TVariables>,
+  variables: TVariables
+): Promise<TData> {
+  if (documentationState.isLoading) {
+    throw new DocumentedMutationError('access_control_loading')
   }
-  if (!state.reasonForInteractionRequired) {
-    return true
+  if (
+    documentationState.accessControlEnabled &&
+    documentationState.reasonForInteractionRequired
+  ) {
+    // user has backed out of the documentation modal
+    if (documentationState.docreport === '') {
+      throw new DocumentedMutationError('no_documentation_report')
+    }
+    // no documentation report yet, ask for it
+    if (documentationState.docreport == null) {
+      const dr = await documentationState.askForDocumentation(actionsToDocument)
+      return await runMutation(
+        { ...documentationState, docreport: dr },
+        actionsToDocument,
+        mutationFn,
+        variables
+      )
+    }
   }
-  return docreport != null && docreport.length > 0
+
+  if (
+    documentationState.accessControlEnabled &&
+    documentationState.loginExpired
+  ) {
+    await documentationState.askForLogin()
+    if (documentationState.reasonForInteractionRequired) {
+      const dr = await documentationState.askForDocumentation(
+        actionsToDocument,
+        undefined,
+        documentationState.docreport
+      )
+      return await runMutation(
+        { ...documentationState, docreport: dr, loginExpired: false },
+        actionsToDocument,
+        mutationFn,
+        variables
+      )
+    }
+  }
+
+  return await mutationFn({
+    variables,
+    userNotes:
+      documentationState.accessControlEnabled &&
+      documentationState.reasonForInteractionRequired
+        ? (documentationState.docreport ?? '')
+        : '',
+  }).catch(async e => {
+    if (
+      e.isAxiosError &&
+      e.response?.status === 401 &&
+      documentationState.accessControlEnabled
+    ) {
+      return await runMutation(
+        { ...documentationState, loginExpired: true },
+        actionsToDocument,
+        mutationFn,
+        variables
+      )
+    } else throw e
+  })
 }
