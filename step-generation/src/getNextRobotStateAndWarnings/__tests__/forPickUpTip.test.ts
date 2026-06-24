@@ -1,6 +1,8 @@
 import merge from 'lodash/merge'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { E1_NOZZLE, H1_NOZZLE, QUADRANT } from '@opentrons/shared-data'
+
 import { makeImmutableStateUpdater } from '../../__utils__'
 import { EMPTY } from '../../constants'
 import {
@@ -94,4 +96,38 @@ describe('tip tracking', () => {
   })
   // TODO: Ian 2019-11-20 eventually should generate warning (or error?)
   it.todo('multi-channel, missing tip in specified row')
+
+  it('QUADRANT partial-column pickup clears four tips ending at primary well', () => {
+    const robotStateWithQuadrantConfig = merge({}, initialRobotState, {
+      pipettes: {
+        [p300MultiId]: {
+          ...initialRobotState.pipettes[p300MultiId],
+          nozzles: QUADRANT,
+          primaryNozzle: H1_NOZZLE,
+          backLeftNozzle: E1_NOZZLE,
+        },
+      },
+    })
+
+    const result = forPickUpTip(
+      {
+        pipetteId: p300MultiId,
+        labwareId: tiprack1Id,
+        wellName: 'D1',
+      },
+      invariantContext,
+      robotStateWithQuadrantConfig
+    )
+
+    expect(result.robotState.pipettes[p300MultiId].tipWell).toBe('D1')
+    expect(result.robotState.tipState.pipettes[p300MultiId]).toEqual({
+      hasTip: true,
+      tiprackURI: tiprack1Id,
+    })
+    expect(result.robotState.tipState.tipracks[tiprack1Id].A1).toBe(EMPTY)
+    expect(result.robotState.tipState.tipracks[tiprack1Id].B1).toBe(EMPTY)
+    expect(result.robotState.tipState.tipracks[tiprack1Id].C1).toBe(EMPTY)
+    expect(result.robotState.tipState.tipracks[tiprack1Id].D1).toBe(EMPTY)
+    expect(result.robotState.tipState.tipracks[tiprack1Id].E1).not.toBe(EMPTY)
+  })
 })
