@@ -28,6 +28,7 @@ from opentrons.protocol_engine.commands.move_labware import (
     MoveLabwareImplementation,
     MoveLabwareParams,
     MoveLabwareResult,
+    VacuumModuleUnderVacuumMovementError,
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
@@ -1204,4 +1205,162 @@ async def test_vacuum_module_dock_incompatibility_raises(
     )
 
     with pytest.raises(errors.LabwareIsNotAllowedInLocationError):
+        await subject.execute(data)
+
+
+@pytest.mark.parametrize(
+    "strategy",
+    [
+        LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+        LabwareMovementStrategy.USING_GRIPPER,
+    ],
+)
+async def test_move_labware_raises_when_vacuum_module_still_under_vacuum(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+    model_utils: ModelUtils,
+    strategy: LabwareMovementStrategy,
+) -> None:
+    """It should raise a defined error when the vacuum chamber is still evacuated."""
+    labware_id = "manifold-collar-id"
+    module_id = "vacuum-module-id"
+    current_gauge_pressure_mbar = -275.0
+    error_id = "vacuum-error-id"
+    error_created_at = datetime.now()
+    origin_location = ModuleLocation(moduleId=module_id)
+    new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    available_new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+
+    data = MoveLabwareParams(
+        labwareId=labware_id,
+        newLocation=new_location,
+        strategy=strategy,
+    )
+    lw_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+
+    decoy.when(state_view.labware.get(labware_id=labware_id)).then_return(
+        LoadedLabware(
+            id=labware_id,
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=origin_location,
+            offsetId=None,
+        )
+    )
+    decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(
+        lw_def
+    )
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
+    ).then_return(available_new_location)
+    decoy.when(
+        equipment.find_applicable_labware_offset_id(
+            labware_definition_uri="opentrons-test/load-name/1",
+            labware_location=available_new_location,
+        )
+    ).then_return("wowzers-a-new-offset-id")
+    decoy.when(
+        await labware_movement.ensure_movement_not_obstructed_by_module(  # type: ignore[func-returns-value]
+            labware_id=labware_id,
+            new_location=available_new_location,
+        )
+    ).then_raise(
+        errors.VacuumModuleStillUnderVacuumError(
+            module_id=module_id,
+            current_gauge_pressure_mbar=current_gauge_pressure_mbar,
+        )
+    )
+    decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
+    decoy.when(model_utils.generate_id()).then_return(error_id)
+
+    result = await subject.execute(data)
+
+    assert result == DefinedErrorData(
+        public=VacuumModuleUnderVacuumMovementError.model_construct(
+            id=error_id,
+            createdAt=error_created_at,
+            detail=(
+                f"Vacuum Module {module_id} is still under vacuum at "
+                f"{current_gauge_pressure_mbar} mbar. Wait for pressure to equalize "
+                "before moving labware to or from it."
+            ),
+            errorInfo={
+                "moduleId": module_id,
+                "currentGaugePressureMbar": current_gauge_pressure_mbar,
+            },
+        ),
+        state_update=update_types.StateUpdate(
+            addressable_area_used=update_types.AddressableAreaUsedUpdate(
+                addressable_area_name=new_location.slotName.id
+            ),
+        ),
+    )
+
+
+async def test_move_labware_raises_when_vacuum_module_pump_engaged(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+) -> None:
+    """It should raise when the vacuum module pump is still engaged."""
+    labware_id = "manifold-collar-id"
+    module_id = "vacuum-module-id"
+    origin_location = ModuleLocation(moduleId=module_id)
+    new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    available_new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+
+    data = MoveLabwareParams(
+        labwareId=labware_id,
+        newLocation=new_location,
+        strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+    )
+    lw_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+
+    decoy.when(state_view.labware.get(labware_id=labware_id)).then_return(
+        LoadedLabware(
+            id=labware_id,
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=origin_location,
+            offsetId=None,
+        )
+    )
+    decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(
+        lw_def
+    )
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(new_location, None, lw_def)
+    ).then_return(available_new_location)
+    decoy.when(
+        equipment.find_applicable_labware_offset_id(
+            labware_definition_uri="opentrons-test/load-name/1",
+            labware_location=available_new_location,
+        )
+    ).then_return("wowzers-a-new-offset-id")
+    decoy.when(
+        await labware_movement.ensure_movement_not_obstructed_by_module(  # type: ignore[func-returns-value]
+            labware_id=labware_id,
+            new_location=available_new_location,
+        )
+    ).then_raise(
+        errors.LabwareMovementNotAllowedError(
+            "Cannot move labware to or from a Vacuum Module when the pump is running."
+        )
+    )
+
+    with pytest.raises(
+        errors.LabwareMovementNotAllowedError,
+        match="when the pump is running",
+    ):
         await subject.execute(data)

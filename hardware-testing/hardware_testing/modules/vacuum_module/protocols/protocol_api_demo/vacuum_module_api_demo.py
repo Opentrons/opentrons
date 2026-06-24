@@ -331,7 +331,7 @@ def run(ctx: ProtocolContext) -> None:
                 },
                 {
                     "enable_pump": True,
-                    "gauge_pressure_mbar": -9800,
+                    "gauge_pressure_mbar": -800,
                     "hold_time_seconds": 10,
                     "vent_after": True,
                 },

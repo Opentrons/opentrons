@@ -82,6 +82,10 @@ class StartSetVacuumPressureImpl(
         """Start the vacuum pump."""
         state_update = update_types.StateUpdate()
         vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
+        state_update.update_vacuum_module_pump_engaged(
+            params.moduleId, params.duration is None
+        )
+
         if (
             params.gaugePressure < MAX_GAUGE_PRESSURE_MBAR
             or params.gaugePressure > MIN_GAUGE_PRESSURE_MBAR
@@ -108,6 +112,10 @@ class StartSetVacuumPressureImpl(
                         await vm_hardware.wait_for_command_duration()
                     else:
                         await vm_hardware.wait_for_target()
+
+                    state_update.update_vacuum_module_pump_engaged(
+                        params.moduleId, vm_hardware.pump_running
+                    )
 
         task = await self._task_handler.create_task(
             task_function=start_set_vacuum_pressure, id=params.taskId

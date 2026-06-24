@@ -254,6 +254,15 @@ class VacuumModule(mod_abc.AbstractModule):
         )
 
     @property
+    def under_vacuum(self) -> bool:
+        state = self.vacuum_state
+        atm_pressure = state.pressure_atm
+        avg_pressure = (state.pressure_abs_a + state.pressure_abs_b) / 2
+        return math.isclose(
+            state.pressure_abs_a, state.pressure_abs_b, abs_tol=PRESSURE_TOL
+        ) and not math.isclose(avg_pressure, atm_pressure, abs_tol=PRESSURE_TOL)
+
+    @property
     def total_cycle_count(self) -> Optional[int]:
         return self._total_cycle_count
 
