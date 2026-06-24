@@ -1,7 +1,5 @@
-import argparse
 import asyncio
 import subprocess
-from pathlib import Path
 import sys
 from typing import Any, Dict, Tuple
 
@@ -58,6 +56,34 @@ async def message_return(dev: Serial) -> Any:
         return ""
 
 
+def _prompt_gcode_command(module_gcodes: Dict[str, str]) -> Dict[str, Any]:
+    user_input_values = {
+        'valid_module_and_command' : False,
+        'prompt_gcode' : True,
+        'command' : ''
+    }
+    
+    print("enter gcode command:\n\t'0' to list commands\n\t'!' to go back")
+    usr_input = input(">>> ").upper()
+    print()
+    prefix = usr_input.split()[0]
+    if prefix == "0":
+        for gcode, cmd_name in module_gcodes.items():
+            print(f"{cmd_name} : {gcode}")
+    elif prefix == "!":
+        user_input_values["prompt_gcode"] = False
+        #continue
+    elif prefix in module_gcodes:
+        user_input_values["valid_module_and_command"] = True
+        user_input_values["prompt_gcode"] = False
+        user_input_values["command"] = usr_input
+    elif prefix == "QUIT":
+        sys.exit(0)
+    else:
+        print("invalid gcode")
+    return user_input_values
+
+
 async def comms_loop(modules_dict: Dict[int, Tuple[str, Serial]]) -> None:
     # TODO : maybe also catch and handle typos
     # find a way to get the gcode arguments
@@ -65,42 +91,31 @@ async def comms_loop(modules_dict: Dict[int, Tuple[str, Serial]]) -> None:
     valid_module_and_command = False
     command = ""
     while not valid_module_and_command:
-    # get the module to talk to
+        # get the module to talk to
         print("modules:")
         for index, name_pair in modules_dict.items():
             # should be vacuum0 / flexstacker1 / etc.
             name = name_pair[MODULE_NAME_INDEX].split("_")[-1]
-            print(f"\t{index} : {name}") 
+            print(f"\t{index} : {name}")
         which_mod = input("\n enter module >>> ")
+        print()
         if which_mod == "quit":
             sys.exit(0)
         try:
             serial_line = modules_dict[int(which_mod)][SERIAL_OBJ_INDEX]
             module_name = modules_dict[int(which_mod)][MODULE_NAME_INDEX]
         except KeyError:
-            print(f"Invalid module number.")
+            print("Invalid module number.")
             continue
 
         module_gcodes = get_commands_for_module(module_name)
-        print("enter gcode command:\n\t'0' to list commands\n\t'!' to go back")
-        
+
         prompt_gcode = True
         while prompt_gcode:
-            usr_input = input(">>> ").upper()
-            if usr_input == "0":
-                for gcode, cmd_name in module_gcodes.items():
-                    print(f"{cmd_name} : {gcode}")
-            elif usr_input == "!":
-                prompt_gcode = False 
-                continue
-            elif usr_input in module_gcodes:
-                valid_module_and_command = True
-                prompt_gcode = False
-                command = usr_input
-            elif usr_input == "quit":
-                sys.exit(0)
-            else:
-                print("invalid gcode")
+           gcode_input = _prompt_gcode_command(module_gcodes=module_gcodes)
+           prompt_gcode = gcode_input['prompt_gcode']
+           valid_module_and_command = gcode_input['valid_module_and_command']
+           command = gcode_input['command']
 
     # send gcode to requested module
     try:
@@ -112,7 +127,6 @@ async def comms_loop(modules_dict: Dict[int, Tuple[str, Serial]]) -> None:
 
 
 async def main() -> None:
-    home_dir = Path.home()
     subprocess_output = subprocess.run(
         ["find", "/dev/", "-name", "ot_module*"],
         capture_output=True,
