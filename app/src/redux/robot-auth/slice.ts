@@ -116,6 +116,16 @@ export function getAuthStateForRobot(
   return state.robotAuth?.perRobotAuthStates[robotName] ?? null
 }
 
+export function getUsernameForRobot(
+  state: State,
+  robotName: string | null
+): string | null {
+  if (robotName == null) {
+    return null
+  }
+  return getAuthStateForRobot(state, robotName)?.username ?? null
+}
+
 /**
  * On the on-device display, this returns info for the current login, if the user
  * is currently logged in. This should not be used in the desktop app.
