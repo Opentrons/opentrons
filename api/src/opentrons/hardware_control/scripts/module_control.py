@@ -1,7 +1,6 @@
 import asyncio
 import subprocess
 import sys
-from pathlib import Path
 from typing import Any, Dict, Tuple
 
 from serial import Serial  # type: ignore[import-untyped]
@@ -56,7 +55,10 @@ async def message_return(dev: Serial) -> Any:
         print("response timed out.")
         return ""
 
-def prompt_which_module(modules_dict: Dict[int, Tuple[str, Serial]]) -> Tuple[str, Serial]:
+
+def prompt_which_module(
+    modules_dict: Dict[int, Tuple[str, Serial]],
+) -> Tuple[str, Serial]:
     valid_module = False
     module_name = ""
     while not valid_module:
@@ -80,16 +82,21 @@ def prompt_which_module(modules_dict: Dict[int, Tuple[str, Serial]]) -> Tuple[st
             valid_module = True
     return module_name, serial_line
 
-def prompt_gcode_command(module_name: str, module_gcodes: Dict[str, str]) -> Dict[str, Any]:
+
+def prompt_gcode_command(
+    module_name: str, module_gcodes: Dict[str, str]
+) -> Dict[str, Any]:
     user_input_values = {
-        'valid_module_and_command' : False,
-        'prompt_gcode' : True,
-        'command' : '',
-        'prompt_module' : False
+        "valid_module_and_command": False,
+        "prompt_gcode": True,
+        "command": "",
+        "prompt_module": False,
     }
-   
+
     display_name = module_name.split("_")[-1]
-    print(f"enter gcode command for {display_name}:\n\t'0' to list commands\n\t'!' to go back")
+    print(
+        f"enter gcode command for {display_name}:\n\t'0' to list commands\n\t'!' to go back to modules"
+    )
     usr_input = input(">>> ").upper()
     print()
     prefix = usr_input.split()[0]
@@ -99,7 +106,6 @@ def prompt_gcode_command(module_name: str, module_gcodes: Dict[str, str]) -> Dic
     elif prefix == "!":
         user_input_values["prompt_gcode"] = False
         user_input_values["prompt_module"] = True
-        #continue
     elif prefix in module_gcodes:
         user_input_values["valid_module_and_command"] = True
         user_input_values["prompt_gcode"] = True
@@ -123,34 +129,33 @@ async def comms_loop(modules_dict: Dict[int, Tuple[str, Serial]]) -> None:
 
         prompt_gcode = True
         while prompt_gcode:
-           gcode_input = prompt_gcode_command(module_name=module_name, module_gcodes=module_gcodes)
-           prompt_gcode = gcode_input['prompt_gcode']
-           valid_module_and_command = gcode_input['valid_module_and_command']
-           command = gcode_input['command']
-           prompt_module = gcode_input['prompt_module']
-           if prompt_module:
-               continue
-           elif valid_module_and_command:
-               # send gcode to requested module
-               try:
-                   assert isinstance(serial_line, Serial)
-                   #serial_line.write(f"{command}\n".encode())
-                   #print(await message_return(serial_line))
-                   print(f"wouldve sent {command}\n")
-               except TypeError:
-                   print("Invalid input.")
+            gcode_input = prompt_gcode_command(
+                module_name=module_name, module_gcodes=module_gcodes
+            )
+            prompt_gcode = gcode_input["prompt_gcode"]
+            valid_module_and_command = gcode_input["valid_module_and_command"]
+            command = gcode_input["command"]
+            prompt_module = gcode_input["prompt_module"]
+            if prompt_module:
+                continue
+            elif valid_module_and_command:
+                # send gcode to requested module
+                try:
+                    assert isinstance(serial_line, Serial)
+                    serial_line.write(f"{command}\n".encode())
+                    print(await message_return(serial_line))
+                except TypeError:
+                    print("Invalid input.")
 
 
 async def main() -> None:
-    #breakpoint()
     subprocess_output = subprocess.run(
-        #["find", "/dev/", "-name", "ot_module*"], 
-        ["find", "/Users/caila.marashaj/fakedev", "-name", "ot_module*"],
-        capture_output=True, text=True
+        ["find", "/dev/", "-name", "ot_module*"],
+        capture_output=True,
+        text=True,
     ).stdout
     modules_found = subprocess_output.split()
 
-    #breakpoint()
     if not modules_found:
         print("No modules found. Exiting.")
         return
@@ -163,8 +168,7 @@ async def main() -> None:
         #   1 : (ot_module_vacuum1, <serial_obj>),
         #   2 : (ot_module_thermocycler0, <serial_obj>),
         # }
-        name_serial_obj = module_name, Serial()
-        #name_serial_obj = module_name, Serial(f"{module_name}", 9600, timeout=2)
+        name_serial_obj = module_name, Serial(f"{module_name}", 9600, timeout=2)
         modules_dict[module_index] = name_serial_obj
 
     while True:
@@ -173,4 +177,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-
