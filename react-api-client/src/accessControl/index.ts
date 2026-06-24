@@ -7,3 +7,4 @@ export type {
 export { DocumentedMutationError, isDocumentedMutationError } from './types'
 export { useDocumentedMutation } from './useDocumentedMutation'
 export * from './useAccessControlSettingsQuery'
+export * from './usePatchAccessControlSettingsMutation'

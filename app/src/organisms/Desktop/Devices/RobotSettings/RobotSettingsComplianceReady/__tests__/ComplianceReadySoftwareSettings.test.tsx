@@ -3,7 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useAccessControlSettingsQuery, useAuthSettingsQuery } from '@opentrons/react-api-client'
+import { ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
+import {
+  useAccessControlSettingsQuery,
+  useAuthSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -14,10 +18,9 @@ import {
   UI_ONLY_FIELD_IDS,
 } from '../ComplianceReadySoftwareSettings'
 
-import {
-  ACCESS_CONTROL_SETTING_KEYS,
-  type AccessControlAppSettingsResponse,
-  type AuthSettingsResponse,
+import type {
+  AccessControlAppSettingsResponse,
+  AuthSettingsResponse,
 } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {

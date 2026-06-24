@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
 import { Divider, StyledText } from '@opentrons/components'
 import {
   useAccessControlSettingsQuery,
@@ -14,10 +15,9 @@ import styles from './compliancereadysoftwaresettings.module.css'
 import { InputSetting } from './InputSetting'
 
 import type { JSX } from 'react'
-import {
-  ACCESS_CONTROL_SETTING_KEYS,
-  type AccessControlAppSettingsResponse,
-  type AuthSettingsResponse,
+import type {
+  AccessControlAppSettingsResponse,
+  AuthSettingsResponse,
 } from '@opentrons/api-client'
 
 export interface ComplianceReadySoftwareSettingsProps {
@@ -79,9 +79,9 @@ const authSettingsFieldDefaults = {
   requireAdminCredsForSignoffProtocol: false,
 } satisfies AuthSettingsResponse['data']
 
-const AUTH_SETTING_KEYS = Object.keys(
-  authSettingsFieldDefaults
-) as Array<keyof typeof authSettingsFieldDefaults>
+const AUTH_SETTING_KEYS = Object.keys(authSettingsFieldDefaults) as Array<
+  keyof typeof authSettingsFieldDefaults
+>
 
 function getAuthSettingFieldValue(
   key: keyof typeof authSettingsFieldDefaults,

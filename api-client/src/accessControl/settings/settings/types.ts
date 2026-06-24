@@ -6,7 +6,8 @@ export interface AccessControlAppSettingsResponse {
   }
 }
 
-export type AccessControlAppSettingsKey = keyof AccessControlAppSettingsResponse['data']
+export type AccessControlAppSettingsKey =
+  keyof AccessControlAppSettingsResponse['data']
 
 const accessControlSettingsDataKeys = {
   requireSignoffForProtocolLog: false,
