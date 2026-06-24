@@ -52,15 +52,18 @@ def _password_complexity_requirements(
     return min_length, require_special
 
 
-def _validate_password_complexity(password: str, settings: SettingsResponseData) -> None:
+def _validate_password_complexity(
+    password: str, settings: SettingsResponseData
+) -> None:
     """Validate that a user-chosen password meets configured complexity rules."""
     min_length, require_special = _password_complexity_requirements(settings)
-    if len(password) < min_length:
-        raise InvalidInputError(
-            f"Password must be at least {min_length} characters long"
+    actual_length = len(password)
+    if actual_length < min_length:
+        raise PasswordTooShortError(
+            actual_length=actual_length, required_length=min_length
         )
     if require_special and not any(c in _PASSWORD_SPECIAL_CHARACTERS for c in password):
-        raise InvalidInputError("Password must contain at least one special character")
+        raise PasswordMissingSpecialCharactersError()
 
 
 class UserNotFoundError(ValueError):
@@ -73,6 +76,21 @@ class UserAlreadyExistsError(ValueError):
 
 class InvalidInputError(ValueError):
     """Raised when user input fails validation."""
+
+
+class PasswordTooShortError(InvalidInputError):
+    """Raised when a password does not meet the configured length requirements."""
+
+    def __init__(self, *, actual_length: int, required_length: int) -> None:
+        super().__init__(
+            f"Required password length of {required_length} but got {actual_length}."
+        )
+        self.actual_length = actual_length
+        self.required_length = required_length
+
+
+class PasswordMissingSpecialCharactersError(InvalidInputError):
+    """Raised when a password does not meet the configured requirements on special chars."""
 
 
 def _validate_fields_non_empty(
