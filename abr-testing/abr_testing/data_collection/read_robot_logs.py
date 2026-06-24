@@ -477,7 +477,7 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     hs_temp: float = 0.0
     hs_home_count: float = 0.0
     hs_speed: float = 0.0
-    hs_rotations: Dict[str, float] = dict()
+    hs_rotations: Dict[float, float] = dict()
     hs_temps: Dict[float, float] = dict()
     temp_time = None
     shake_time = None

@@ -21,7 +21,7 @@ import type { SetStateAction } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
-import type { PipetteInformation } from '/app/redux/pipettes'
+import type { PipetteInformation } from '/app/resources/instruments/types'
 import type { ModuleSetupWizardStep } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000

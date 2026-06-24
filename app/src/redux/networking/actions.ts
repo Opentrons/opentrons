@@ -90,34 +90,6 @@ export const fetchEapOptionsFailure = (
   meta,
 })
 
-export const postWifiDisconnect = (
-  robotName: string,
-  ssid: string
-): Types.PostWifiDisconnectAction => ({
-  type: Constants.POST_WIFI_DISCONNECT,
-  payload: { robotName, ssid },
-  meta: {},
-})
-
-export const postWifiDisconnectSuccess = (
-  robotName: string,
-  meta: RobotApiRequestMeta
-): Types.PostWifiDisconnectSuccessAction => ({
-  type: Constants.POST_WIFI_DISCONNECT_SUCCESS,
-  payload: { robotName },
-  meta,
-})
-
-export const postWifiDisconnectFailure = (
-  robotName: string,
-  error: RobotApiErrorResponse,
-  meta: RobotApiRequestMeta
-): Types.PostWifiDisconnectFailureAction => ({
-  type: Constants.POST_WIFI_DISCONNECT_FAILURE,
-  payload: { robotName, error },
-  meta,
-})
-
 export const clearWifiStatus = (
   robotName: string
 ): Types.ClearWifiStatusAction => ({

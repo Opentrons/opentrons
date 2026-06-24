@@ -1,4 +1,4 @@
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 
 import { CHOOSE_DROP_TIP_LOCATION, DT_ROUTES } from '../constants'
 

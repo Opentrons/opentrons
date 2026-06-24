@@ -30,46 +30,6 @@ describe('robot settings selectors', () => {
       args: ['robotName'],
       expected: [{ id: 'foo', title: 'Foo', description: 'Foo', value: true }],
     },
-    {
-      name: 'getRobotRestartPath',
-      selector: Selectors.getRobotRestartPath,
-      state: {
-        robotSettings: { robotName: { restartPath: '/restart', settings: [] } },
-      } as any,
-      args: ['robotName'],
-      expected: '/restart',
-    },
-    {
-      name: 'getRobotRestartRequired when required',
-      selector: Selectors.getRobotRestartRequired,
-      state: {
-        robotSettings: { robotName: { restartPath: '/restart', settings: [] } },
-      } as any,
-      args: ['robotName'],
-      expected: true,
-    },
-    {
-      name: 'getRobotRestartRequired when not required',
-      selector: Selectors.getRobotRestartRequired,
-      state: {
-        robotSettings: { robotName: { restartPath: null, settings: [] } },
-      } as any,
-      args: ['robotName'],
-      expected: false,
-    },
-    {
-      name: 'getAllRestartRequiredRobots',
-      selector: Selectors.getAllRestartRequiredRobots,
-      state: {
-        robotSettings: {
-          a: { restartPath: '/restart', settings: [] },
-          b: { restartPath: null, settings: [] },
-          c: { restartPath: '/restart', settings: [] },
-        },
-      } as any,
-      args: [],
-      expected: ['a', 'c'],
-    },
   ]
 
   SPECS.forEach(spec => {

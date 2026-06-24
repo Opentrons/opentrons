@@ -17,6 +17,3 @@ export const UPDATE_SETTING_SUCCESS: 'robotSettings:UPDATE_SETTING_SUCCESS' =
 
 export const UPDATE_SETTING_FAILURE: 'robotSettings:UPDATE_SETTING_FAILURE' =
   'robotSettings:UPDATE_SETTING_FAILURE'
-
-export const CLEAR_RESTART_PATH: 'robotSettings:CLEAR_RESTART_PATH' =
-  'robotSettings:CLEAR_RESTART_PATH'

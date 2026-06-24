@@ -22,7 +22,7 @@ import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
-import type { PipetteInformation } from '/app/redux/pipettes'
+import type { PipetteInformation } from '/app/resources/instruments/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')

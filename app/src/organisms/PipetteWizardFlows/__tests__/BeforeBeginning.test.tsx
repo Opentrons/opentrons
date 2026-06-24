@@ -11,7 +11,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 // import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 

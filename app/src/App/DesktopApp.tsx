@@ -36,6 +36,8 @@ import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { showDocumentationRequiredModal } from '../organisms/Desktop/DocumentationRequired/DocumentationRequiredModal'
+import { showLoginModal } from '../organisms/Desktop/LoginModal'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
@@ -44,7 +46,6 @@ import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
 
-import type { DocumentationReport } from '@opentrons/react-api-client'
 import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
@@ -85,7 +86,7 @@ export const DesktopApp = (): JSX.Element => {
     {
       Component: DeviceDetails,
       name: 'Device',
-      path: '/devices/:robotName',
+      path: '/devices/:robotName/:deviceDetailsTab?',
     },
     {
       Component: CalibrationDashboard,
@@ -129,7 +130,7 @@ export const DesktopApp = (): JSX.Element => {
               }}
             >
               <DocumentationRequiredModalContext.Provider
-                value={{ showDocumentationRequiredModal }}
+                value={{ showDocumentationRequiredModal, showLoginModal }}
               >
                 <Box width="100%" height="100vh">
                   <Alerts>
@@ -224,13 +225,4 @@ function FlexOnlyRobotControlTakeover({
     return null
   }
   return <EstopTakeover robotName={robotName} />
-}
-
-// TODO(jj): remove this once we have a real implementation
-function showDocumentationRequiredModal(
-  username: string
-): Promise<DocumentationReport> {
-  return Promise.resolve(
-    'NO DOCUMENTATION PROVIDED - DESKTOP' as DocumentationReport
-  )
 }

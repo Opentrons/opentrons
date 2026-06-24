@@ -5,6 +5,8 @@ import '@testing-library/jest-dom/vitest'
 
 import { when } from 'vitest-when'
 
+import { usePostWifiDisconnectMutation } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRobot } from '/app/redux-resources/robots'
@@ -16,38 +18,39 @@ import {
   clearWifiStatus,
   getNetworkInterfaces,
   INTERFACE_WIFI,
-  postWifiDisconnect,
 } from '/app/redux/networking'
 import { mockWifiNetwork } from '/app/redux/networking/__fixtures__'
-import {
-  dismissRequest,
-  FAILURE,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-  useDispatchApiRequest,
-} from '/app/redux/robot-api'
 import { useWifiList } from '/app/resources/networking/hooks'
 
 import { DisconnectModal } from '../DisconnectModal'
 
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
-import type { RequestState } from '/app/redux/robot-api/types'
 import type { State } from '/app/redux/types'
 
+vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/networking')
-vi.mock('/app/redux/robot-api')
 
 const ROBOT_NAME = 'otie'
-const LAST_ID = 'a request id'
 const mockOnCancel = vi.fn()
+const mockMutate = vi.fn()
 const MOCK_WIFI = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
   type: INTERFACE_WIFI,
+}
+
+type MutationReturn = ReturnType<typeof usePostWifiDisconnectMutation>
+
+function mockDisconnectMutation(
+  overrides: Partial<MutationReturn> = {}
+): MutationReturn {
+  return {
+    mutate: mockMutate,
+    status: 'idle',
+    ...overrides,
+  } as MutationReturn
 }
 
 const render = () => {
@@ -60,20 +63,15 @@ const render = () => {
 }
 
 describe('DisconnectModal', () => {
-  let dispatchApiRequest: DispatchApiRequestType
-
   beforeEach(() => {
-    dispatchApiRequest = vi.fn()
+    mockOnCancel.mockClear()
+    mockMutate.mockClear()
+    vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
+      mockDisconnectMutation()
+    )
     when(useWifiList)
       .calledWith(ROBOT_NAME)
       .thenReturn([{ ...mockWifiNetwork, ssid: 'foo', active: true }])
-    vi.mocked(useDispatchApiRequest).mockReturnValue([
-      dispatchApiRequest,
-      [LAST_ID],
-    ])
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({} as RequestState)
     when(getNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn({ wifi: MOCK_WIFI, ethernet: null })
@@ -90,9 +88,9 @@ describe('DisconnectModal', () => {
   })
 
   it('renders pending body when request is pending', () => {
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({ status: PENDING } as RequestState)
+    vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
+      mockDisconnectMutation({ status: 'loading' })
+    )
     render()
 
     screen.getByText('Disconnect from foo')
@@ -102,9 +100,9 @@ describe('DisconnectModal', () => {
   })
 
   it('renders success body when request is pending and robot is not connectable', () => {
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({ status: PENDING } as RequestState)
+    vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
+      mockDisconnectMutation({ status: 'loading' })
+    )
     when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockReachableRobot)
     render()
 
@@ -117,9 +115,9 @@ describe('DisconnectModal', () => {
   })
 
   it('renders success body when request is successful', () => {
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({ status: SUCCESS } as RequestState)
+    vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
+      mockDisconnectMutation({ status: 'success' })
+    )
     render()
 
     screen.getByText('Disconnected from Wi-Fi')
@@ -130,7 +128,10 @@ describe('DisconnectModal', () => {
     expect(clearWifiStatus).toHaveBeenCalled()
   })
 
-  it('renders success body when wifi is not connected', () => {
+  it('renders success body when wifi is not connected during disconnect', () => {
+    vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
+      mockDisconnectMutation({ status: 'loading' })
+    )
     when(getNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn({
@@ -148,12 +149,12 @@ describe('DisconnectModal', () => {
   })
 
   it('renders error body when request is unsuccessful', () => {
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({
-        status: FAILURE,
-        error: { message: 'it errored' },
-      } as RequestState)
+    vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
+      mockDisconnectMutation({
+        status: 'error',
+        error: { message: 'it errored' } as any,
+      })
+    )
     render()
 
     screen.getByText('Disconnect from foo')
@@ -168,21 +169,19 @@ describe('DisconnectModal', () => {
     screen.getByRole('button', { name: 'Disconnect' })
   })
 
-  it('dispatches postWifiDisconnect on click Disconnect', () => {
+  it('calls postWifiDisconnect mutation on click Disconnect', () => {
     render()
 
-    expect(postWifiDisconnect).not.toHaveBeenCalled()
+    expect(mockMutate).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }))
-    expect(postWifiDisconnect).toHaveBeenCalledWith(ROBOT_NAME, 'foo')
+    expect(mockMutate).toHaveBeenCalledWith({ ssid: 'foo' })
   })
 
-  it('dismisses last request and calls onCancel on cancel', () => {
+  it('calls onCancel on cancel', () => {
     render()
 
-    expect(dismissRequest).not.toHaveBeenCalled()
     expect(mockOnCancel).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(dismissRequest).toHaveBeenCalledWith(LAST_ID)
-    expect(mockOnCancel).toHaveBeenCalledWith()
+    expect(mockOnCancel).toHaveBeenCalledTimes(1)
   })
 })

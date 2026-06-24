@@ -62,10 +62,3 @@ export const updateSettingFailure = (
   payload: { robotName, error },
   meta,
 })
-
-export const clearRestartPath = (
-  robotName: string
-): Types.ClearRestartPathAction => ({
-  type: Constants.CLEAR_RESTART_PATH,
-  payload: { robotName },
-})

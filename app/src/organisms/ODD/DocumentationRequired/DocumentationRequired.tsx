@@ -76,6 +76,7 @@ export function DocumentationRequired({
           >
             <div className={styles.text_area_field_fill}>
               <TouchTextAreaField
+                multiline
                 autoFocus
                 value={inputText}
                 ref={textAreaRef}

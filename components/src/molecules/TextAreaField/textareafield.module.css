@@ -124,3 +124,32 @@
   padding-top: var(--spacing-4);
   color: var(--red-50);
 }
+
+/* Stretch label + textarea to fill a flex column parent. */
+.wrapper_multiline {
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.column_container_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.clickable_column_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.textarea_row_multiline {
+  min-height: 0;
+  flex: 1;
+  align-items: stretch;
+}
+
+.textarea_multiline {
+  min-height: 0;
+  flex: 1;
+}
