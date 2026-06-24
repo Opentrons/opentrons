@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import math
 from dataclasses import dataclass
 from typing import (
@@ -108,7 +107,7 @@ ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
 class FlexStackerSubstateNotification(BaseModel):
     """Engine notification for Flex Stacker substate change."""
 
-    pass
+    stacker_substate_map: Dict[str, FlexStackerSubState]
 
 
 class SlotTransit(NamedTuple):
@@ -680,8 +679,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             prev_substate.new_from_state_change(state_update)
         )
         if self._updates_callback:
-            asyncio.get_running_loop().call_soon(
-                self._updates_callback, FlexStackerSubstateNotification()
+            stackers: Dict[str, FlexStackerSubState] = {}
+            for module_id, substate in self._state.substate_by_module_id.items():
+                if isinstance(substate, FlexStackerSubState):
+                    stackers[module_id] = substate
+
+            self._updates_callback(
+                FlexStackerSubstateNotification(stacker_substate_map=stackers)
             )
 
     def _handle_vacuum_module_commands(

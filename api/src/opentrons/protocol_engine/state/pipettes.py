@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import dataclasses
 from logging import getLogger
 from typing import (
@@ -68,7 +67,7 @@ class NozzleMapNotification(BaseModel):
 class TipAttachedNotification(BaseModel):
     """Engine notification for tip attached status change for the instruments."""
 
-    pass
+    tip_attached_dict: Dict[str, bool]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -214,8 +213,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.ready_to_aspirate_by_id[pipette_id] = False
             self._state.tip_source_by_id[pipette_id] = None
             if self._updates_callback:
-                asyncio.get_running_loop().call_soon(
-                    self._updates_callback, TipAttachedNotification()
+                self._updates_callback(
+                    TipAttachedNotification(
+                        tip_attached_dict=self._build_tip_attached_dict()
+                    )
                 )
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
@@ -271,8 +272,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     )
 
             if self._updates_callback:
-                asyncio.get_running_loop().call_soon(
-                    self._updates_callback, TipAttachedNotification()
+                self._updates_callback(
+                    TipAttachedNotification(
+                        tip_attached_dict=self._build_tip_attached_dict()
+                    )
                 )
 
     def _update_current_location(self, state_update: update_types.StateUpdate) -> None:
@@ -361,8 +364,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 state_update.pipette_config.pipette_id
             ] = config.nozzle_map
             if self._updates_callback:
-                asyncio.get_running_loop().call_soon(
-                    self._updates_callback,
+                self._updates_callback(
                     NozzleMapNotification(
                         nozzle_maps=self._state.nozzle_configuration_by_id
                     ),
@@ -376,8 +378,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 state_update.pipette_nozzle_map.pipette_id
             ] = state_update.pipette_nozzle_map.nozzle_map
             if self._updates_callback:
-                asyncio.get_running_loop().call_soon(
-                    self._updates_callback,
+                self._updates_callback(
                     NozzleMapNotification(
                         nozzle_maps=self._state.nozzle_configuration_by_id
                     ),
@@ -437,6 +438,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             LOG.error("Pipette state tried to alter an unknown-contents pipette")
             return fluid_stack.FluidStack()
         return stack
+
+    def _build_tip_attached_dict(self) -> Dict[str, bool]:
+        def _has_tip_attached(pipette_id: str) -> bool:
+            return self._state.attached_tip_by_id[pipette_id] is not None
+
+        pipette_ids = (
+            pipette.id for pipette in list(self._state.pipettes_by_id.values())
+        )
+        return {pipette_id: _has_tip_attached(pipette_id) for pipette_id in pipette_ids}
 
 
 class PipetteView:

@@ -41,7 +41,7 @@ async def create_protocol_engine(
     camera_provider: typing.Optional[CameraProvider] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
     updates_callback: typing.Optional[
-        typing.Callable[[EngineEventNotification], None]
+        typing.Callable[[list[EngineEventNotification]], None]
     ] = None,
     proxy_of_callback_for_handling_door_events: typing.Optional[
         HardwareEventHandler

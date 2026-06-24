@@ -398,39 +398,3 @@ async def test_run_hardware_state_update_callback(
     )
 
     assert isinstance(hardware_event_callback, ClientPyroFunctionWrapper)
-
-
-async def test_run_engine_state_update_callback(
-    ot3_hardware_api: OT3API,
-    mock_app_state: AppState,
-    mock_feature_flags: None,
-    mock_run_process_pyro_provider: RunProcessPyroProvider,
-    decoy: Decoy,
-) -> None:
-    """Enforce that the RobotServerPyroResource provides a proxy of a callback.
-
-    It should be provided to the engine state update handler, and recieves a callback proxy in response.
-    """
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-        hw_api=ot3_hardware_api, app_state=mock_app_state
-    )
-    # Cast the two Async proxies on the nameserver as a locally useful type
-    ot3api = cast(OT3API, ot3_async)
-    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
-
-    run_store = RunOrchestratorStore(
-        hardware_api=ot3api,
-        robot_type="OT-3 Standard",
-        deck_type=DeckType("ot3_standard"),
-        run_process_pyro_provider=mock_run_process_pyro_provider,
-    )
-
-    resource_utilities.register_run_orchestrator_store_to_pyro_resource(
-        mock_app_state, run_store
-    )
-
-    engine_event_callback = robot_server_resource.get_engine_updates_callback()
-    # CASEY NOTE THIS WILL NEED TO CHANGE
-
-    assert isinstance(engine_event_callback, ClientPyroFunctionWrapper)

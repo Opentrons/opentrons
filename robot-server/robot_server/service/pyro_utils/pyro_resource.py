@@ -272,15 +272,12 @@ class RobotServerPyroResource:
             )
 
     def get_engine_updates_callback(
-        self, event: EngineEventNotification
-    ) -> None:  # Callable[[EngineEventNotification], None]:
+        self, events: list[EngineEventNotification]
+    ) -> None:
         """Update the RunOrchestratorStore local store of Engine state status."""
         orchestrator_store = self._run_orchestrator_store
         if orchestrator_store is not None:
-            # Put in a call soon to not interrupt robot server business logic
-            self._loop.call_soon(
-                orchestrator_store.update_engine_status_callback, event
-            )
+            orchestrator_store.update_engine_status_callback(events)
 
         else:
             raise RuntimeError(

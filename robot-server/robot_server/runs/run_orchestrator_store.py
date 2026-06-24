@@ -270,7 +270,7 @@ class RunOrchestratorStore:
                 # for example, there would be no equivalent to the `POST /runs/{id}/actions`
                 # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
-                updates_callback=self.update_default_run_engine_status_callback,
+                updates_callback=self.update_engine_status_callback,
                 proxy_of_callback_for_handling_door_events=proxy_door_callback,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
@@ -726,39 +726,16 @@ class RunOrchestratorStore:
             # so there's no one to propagate this exception to.
             _log.exception("Exception handling E-stop event.")
 
-    def update_engine_status_callback(self, event: EngineEventNotification) -> None:
-        """Handle protocol engine status updates for the run orchestrator store."""
-        if isinstance(event, NozzleMapNotification):
-            self._nozzle_maps = event.nozzle_maps
-
-        if isinstance(event, TipAttachedNotification):
-            # self._tip_attached = self.run_coordinator.get_tip_attached()
-            pass
-
-        if isinstance(event, CurrentCommandNotification):
-            self._current_command = event.running_command_pointer
-
-        if isinstance(event, FinalizedCommandNotification):
-            self._most_recent_finalized_command = event.finalized_command_pointer
-            self._current_command = event.running_command_pointer
-
-        if isinstance(event, FlexStackerSubstateNotification):
-            # self._flex_stacker_substate = (
-            #     self.run_coordinator.get_flex_stacker_substate()
-            # )
-            pass
-
-    def update_default_run_engine_status_callback(
-        self, event: EngineEventNotification
+    def update_engine_status_callback(
+        self, events: list[EngineEventNotification]
     ) -> None:
-        """Handle protocol engine status updates for the default run orchestrator store."""
-        if self._default_run_orchestrator:
+        """Handle protocol engine status updates for the run orchestrator store."""
+        for event in events:
             if isinstance(event, NozzleMapNotification):
                 self._nozzle_maps = event.nozzle_maps
 
             if isinstance(event, TipAttachedNotification):
-                # self._tip_attached = self._default_run_orchestrator.get_tip_attached()
-                pass
+                self._tip_attached = event.tip_attached_dict
 
             if isinstance(event, CurrentCommandNotification):
                 self._current_command = event.running_command_pointer
@@ -768,10 +745,7 @@ class RunOrchestratorStore:
                 self._current_command = event.running_command_pointer
 
             if isinstance(event, FlexStackerSubstateNotification):
-                # self._flex_stacker_substate = (
-                #     self._default_run_orchestrator.get_flex_stacker_substate()
-                # )
-                pass
+                self._flex_stacker_substate = event.stacker_substate_map
 
     def _initialize_stored_engine_state(self) -> None:
         """Initialize the orchestrator store local engine state."""

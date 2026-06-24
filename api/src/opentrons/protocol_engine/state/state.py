@@ -250,7 +250,9 @@ class StateStore(StateView, ActionHandler):
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
         notify_publishers: Optional[Callable[[], None]] = None,
-        updates_callback: Optional[Callable[[EngineEventNotification], None]] = None,
+        updates_callback: Optional[
+            Callable[[list[EngineEventNotification]], None]
+        ] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -269,13 +271,15 @@ class StateStore(StateView, ActionHandler):
             notify_publishers: Notifies robot server publishers of internal state change.
             updates_callback: Notifies the robot server of specific Protocol Engine events.
         """
+        self._updates_callback = updates_callback
+        self._update_events: list[EngineEventNotification] = []
         self._command_store = CommandStore(
             config=config,
             is_door_open=is_door_open,
             error_recovery_policy=error_recovery_policy,
-            updates_callback=updates_callback,
+            updates_callback=self._append_update_events,
         )
-        self._pipette_store = PipetteStore(updates_callback=updates_callback)
+        self._pipette_store = PipetteStore(updates_callback=self._append_update_events)
         if deck_configuration is None:
             deck_configuration = []
         self._addressable_area_store = AddressableAreaStore(
@@ -292,7 +296,7 @@ class StateStore(StateView, ActionHandler):
             config=config,
             deck_fixed_labware=deck_fixed_labware,
             module_calibration_offsets=module_calibration_offsets,
-            updates_callback=updates_callback,
+            updates_callback=self._append_update_events,
         )
         self._peripheral_store = PeripheralStore(
             config=config,
@@ -431,6 +435,14 @@ class StateStore(StateView, ActionHandler):
 
         return current_value
 
+    def _append_update_events(self, event: EngineEventNotification) -> None:
+        latest_events = []
+        for old_event in self._update_events:
+            if not isinstance(old_event, event.__class__):
+                latest_events.append(old_event)
+        latest_events.append(event)
+        self._update_events = latest_events
+
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
         return State(
@@ -508,3 +520,7 @@ class StateStore(StateView, ActionHandler):
         self._change_notifier.notify()
         if self._notify_robot_server is not None:
             self._notify_robot_server()
+
+        if self._updates_callback is not None:
+            self._updates_callback(self._update_events)
+            self._update_events = []

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -393,8 +392,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self._state.command_history.set_command_running(running_command)
         if self._updates_callback:
             updated_command = self._state.command_history.get_running_command()
-            asyncio.get_running_loop().call_soon(
-                self._updates_callback,
+            self._updates_callback(
                 CurrentCommandNotification(
                     running_command_pointer=CommandPointer(
                         command_id=updated_command.command.id,
@@ -415,8 +413,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.command_history.get_most_recently_completed_command()
             )
             running_command = self._state.command_history.get_running_command()
-            asyncio.get_running_loop().call_soon(
-                self._updates_callback,
+            self._updates_callback(
                 FinalizedCommandNotification(
                     finalized_command_pointer=CommandPointer(
                         command_id=finalized_command.command.id,
@@ -678,8 +675,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.command_history.get_most_recently_completed_command()
             )
             running_command = self._state.command_history.get_running_command()
-            asyncio.get_running_loop().call_soon(
-                self._updates_callback,
+            self._updates_callback(
                 FinalizedCommandNotification(
                     finalized_command_pointer=CommandPointer(
                         command_id=finalized_command.command.id,
