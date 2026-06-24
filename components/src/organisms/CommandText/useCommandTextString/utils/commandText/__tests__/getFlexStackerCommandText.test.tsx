@@ -87,6 +87,30 @@ describe('getPipettingCommandText', () => {
     screen.getByText('store_labware_from_slot_to_stacker')
   })
 
+  it('should render setStoredLabwareItems command text correctly', () => {
+    const command = {
+      id: 'cmd-1',
+      commandType: 'flexStacker/setStoredLabwareItems',
+      params: {
+        moduleId: 'module-id',
+        labware: ['plate-1', 'plate-2'],
+      },
+      result: {
+        count: 2,
+        primaryLabwareDefinition: {
+          metadata: {
+            displayName: 'dummy def',
+          },
+        },
+      },
+    }
+
+    render(command)
+    screen.getByText(
+      'flex_stacker_set_stored_labware_with_quantity_and_location'
+    )
+  })
+
   it('should render setStoredLabware command text correctly', () => {
     const command = {
       id: 'cmd-1',
@@ -111,6 +135,24 @@ describe('getPipettingCommandText', () => {
     screen.getByText(
       'flex_stacker_set_stored_labware_with_quantity_and_location'
     )
+  })
+
+  it('should render fillItems command text correctly', () => {
+    const command = {
+      id: 'cmd-1',
+      commandType: 'flexStacker/fillItems',
+      params: {
+        moduleId: 'module-id',
+        labware: ['plate-1', 'plate-2', 'plate-3'],
+      },
+      result: {
+        primaryLabwareURI: 'tiprack-uri',
+        addedLabware: [{}, {}, {}],
+      },
+    }
+
+    render(command)
+    screen.getByText('flex_stacker_fill_with_quantity_and_labware')
   })
 
   it('should render fill command text correctly', () => {

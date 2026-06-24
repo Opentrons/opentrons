@@ -101,11 +101,6 @@ jobs:
         run: make -C shared-data test-py
       - name: Ensure assets build
         run: make -C shared-data dist-py
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./shared-data/coverage.xml
-          flags: shared-data
 
   js-test:
     name: 'shared-data JS tests'
@@ -140,11 +135,6 @@ jobs:
           make setup-js-ci
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./coverage/lcov.info
-          flags: shared-data
 
   python-deploy:
     name: 'shared-data package deploy'

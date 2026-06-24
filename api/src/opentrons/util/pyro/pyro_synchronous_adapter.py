@@ -618,7 +618,11 @@ def convert_result_to_proxy(  # noqa: C901
         try:
             proxy_list = []
             for r in result:
-                # CASEY NOTE: these need to optionally inherit their parents execution rule?
+                if hasattr(r, "__weakref__"):
+                    # If the resulting object contains a weakref then utilize the inner instance
+                    # Example - CallBridger wrapping an AbstractModule
+                    r = r.__weakref__()
+
                 pyro_synchronous_obj = utility.find_PSO(r)
                 if pyro_synchronous_obj is None:
                     if not hasattr(r, "_loop"):

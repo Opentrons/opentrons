@@ -66,9 +66,3 @@ jobs:
 
       - name: Test
         run: make -C hardware-testing test-cov
-
-      - name: Coverage
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./hardware-testing/coverage.xml
-          flags: hardware-testing

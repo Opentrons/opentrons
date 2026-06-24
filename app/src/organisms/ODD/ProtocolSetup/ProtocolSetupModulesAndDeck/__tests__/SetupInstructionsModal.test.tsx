@@ -31,9 +31,9 @@ describe('SetupInstructionsModal', () => {
     render(props)
     screen.getByText('Setup instructions')
     screen.getByText(
-      'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box or scan the QR code to visit the modules section of the Opentrons Help Center.'
+      'Follow the step-by-step setup instructions in the module’s manual. Scan the QR code or click the link below to view it on the Opentrons documentation website.'
     )
-    screen.getByText('support.opentrons.com/s/modules')
+    screen.getByText('https://docs.opentrons.com/modules')
     expect(screen.getByRole('img').getAttribute('src')).toEqual(
       QR_CODE_IMAGE_FILE
     )

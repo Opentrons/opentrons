@@ -1,6 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
   AddressableArea,
+  CommonArgs,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerStoredLabwareGroup,
@@ -16,6 +17,7 @@ import type {
   ModuleType,
   PipetteMount as Mount,
   NozzleConfigurationStyle,
+  OpentronsAIArgs,
   PipetteName,
   PipetteV2Specs,
   PositionReference,
@@ -143,7 +145,7 @@ export interface ProfileBlockActivity {
 
 export interface VacuumPumpProfileActivity {
   type: 'profile'
-  profileElements: VacuumRunProfileParams['profile']
+  profileElements: VacuumRunProfileParams['steps']
   taskId: string
   ventAfter: boolean
 }
@@ -400,19 +402,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-}
-
-interface CommonArgs {
-  /** NOTE: stepNumber probably shouldn't be optional but making it optional
-   * for the sake of not having to make too many changes for PD 8.5.2
-   * this should be refactored to not be optional for PD 8.6.0
-   * making it optional saves a lot of changes in unit tests
-   */
-  stepNumber?: number
-  /** Optional user-readable name for this step */
-  name?: string | null
-  /** Optional user-readable description/notes for this step */
-  description?: string | null
 }
 
 // ===== Processed form types. Used as args to call command creator fns =====
@@ -903,14 +892,14 @@ export type VacuumPumpArgs =
 export interface VacuumStartRunProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumStartRunProfile'
-  profile: VacuumRunProfileParams['profile']
+  profile: VacuumRunProfileParams['steps']
   ventAfter: boolean
 }
 
 export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentStartProfile'
-  profile: VacuumRunProfileParams['profile']
+  profile: VacuumRunProfileParams['steps']
   ventAfter: boolean
 }
 
@@ -950,6 +939,7 @@ export type CommandCreatorArgs =
   | CommentArgs
   | FlexStackerArgs
   | VacuumArgs
+  | OpentronsAIArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -1099,6 +1089,7 @@ export type ErrorType =
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
   | 'TOO_MANY_TIPS'
+  | 'VACUUM_UNDER_PRESSURE'
 
 export interface CommandCreatorError {
   message: string

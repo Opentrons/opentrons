@@ -18,7 +18,7 @@ import {
   useDispatchApiRequest,
 } from '/app/redux/robot-api'
 
-import { useSendIdentifyStacker } from '../hooks'
+import { useSendIdentifyModule } from '../hooks'
 import { UpdateFirmware } from '../UpdateFirmware'
 
 import type { ComponentProps } from 'react'
@@ -45,7 +45,7 @@ const render = (props: ComponentProps<typeof UpdateFirmware>) => {
 describe('UpdateFirmware', () => {
   let dispatchApiRequest: DispatchApiRequestType
   let handleModuleApiRequests: (robotName: string, serial: string) => void
-  let sendIdentifyStacker: (
+  let sendIdentifyModule: (
     module: AttachedModule,
     start: boolean,
     color?: IdentifyColor
@@ -55,7 +55,7 @@ describe('UpdateFirmware', () => {
     vi.useFakeTimers()
     dispatchApiRequest = vi.fn()
     handleModuleApiRequests = vi.fn()
-    sendIdentifyStacker = vi.fn()
+    sendIdentifyModule = vi.fn()
     props = {
       proceed: vi.fn(),
       goBack: vi.fn(),
@@ -84,7 +84,7 @@ describe('UpdateFirmware', () => {
       dispatchApiRequest,
       [LAST_ID],
     ])
-    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
+    vi.mocked(useSendIdentifyModule).mockReturnValue(sendIdentifyModule)
   })
 
   afterEach(() => {

@@ -592,7 +592,7 @@ export interface HydratedVacuumFormData extends AnnotationFields {
   stepType: 'vacuum'
   id: string
   moduleId: string
-  endingHoldVentCheckbox: boolean
+  endingHoldVentCheckbox: boolean | null
   modeType: typeof VACUUM_MODE_PRESSURE | typeof VACUUM_MODE_POWER | null
   vacuumOrderedProfileIds: string[]
   percentPower: number | null

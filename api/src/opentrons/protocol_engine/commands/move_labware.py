@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import (
     Literal,
+    NotRequired,
     TypedDict,
     assert_type,
 )  # note: need this instead of typing for py<3.12
@@ -28,6 +29,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     LabwareOffsetDoesNotExistError,
     NotSupportedOnRobotType,
+    VacuumModuleStillUnderVacuumError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 from ..resources import fixture_validation, labware_validation
@@ -142,6 +144,27 @@ class ErrorDetails(TypedDict):
     eventualDestinationLocationSequence: LabwareLocationSequence
 
 
+class VacuumModuleUnderVacuumMovementErrorInfo(TypedDict):
+    """Details for a failed moveLabware due to residual vacuum."""
+
+    moduleId: str
+    currentGaugePressureMbar: NotRequired[float]
+
+
+class VacuumModuleUnderVacuumMovementError(ErrorOccurrence):
+    """Returned when trying to move labware while a Vacuum Module is still under vacuum.
+
+    The pump is not engaged, but the chamber has not yet returned to atmospheric
+    pressure. This error is recoverable by waiting and retrying the move.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["vacuumModuleUnderVacuum"] = "vacuumModuleUnderVacuum"
+
+    errorInfo: VacuumModuleUnderVacuumMovementErrorInfo
+
+
 class GripperMovementError(ErrorOccurrence):
     """Returned when something physically goes wrong when the gripper moves labware.
 
@@ -155,7 +178,11 @@ class GripperMovementError(ErrorOccurrence):
     errorInfo: ErrorDetails
 
 
-_ExecuteReturn = SuccessData[MoveLabwareResult] | DefinedErrorData[GripperMovementError]
+_ExecuteReturn = (
+    SuccessData[MoveLabwareResult]
+    | DefinedErrorData[GripperMovementError]
+    | DefinedErrorData[VacuumModuleUnderVacuumMovementError]
+)
 
 
 class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteReturn]):
@@ -337,9 +364,23 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             labware_definition_uri=definition_uri,
             labware_location=available_new_location,
         )
-        await self._labware_movement.ensure_movement_not_obstructed_by_module(
-            labware_id=params.labwareId, new_location=available_new_location
-        )
+        try:
+            await self._labware_movement.ensure_movement_not_obstructed_by_module(
+                labware_id=params.labwareId, new_location=available_new_location
+            )
+        except VacuumModuleStillUnderVacuumError as error:
+            return DefinedErrorData(
+                public=VacuumModuleUnderVacuumMovementError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    detail=error.message,
+                    errorInfo={
+                        "moduleId": error.module_id,
+                        "currentGaugePressureMbar": error.current_gauge_pressure_mbar,
+                    },
+                ),
+                state_update=state_update,
+            )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
             if self._state_view.config.robot_type == "OT-2 Standard":
@@ -541,7 +582,7 @@ class MoveLabware(
     BaseCommand[
         MoveLabwareParams,
         MoveLabwareResult,
-        GripperMovementError,
+        GripperMovementError | VacuumModuleUnderVacuumMovementError,
     ]
 ):
     """A ``moveLabware`` command."""

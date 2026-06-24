@@ -3,7 +3,7 @@ import type {
   CommonCommandRunTimeInfo,
   RunCommandFlexStackerError,
 } from '.'
-import type { LabwareDefinition } from '../../js'
+import type { LabwareDefinition, ModuleModel } from '../../js'
 import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
@@ -44,6 +44,12 @@ export type ModuleRunTimeCommand =
   | FlexStackerSetStoredLabwareRunTimeCommand
   | FlexStackerStoreRunTimeCommand
   | IdentifyModuleRunTimeCommand
+  | VacuumModuleSetTargetPressureRunTimeCommand
+  | VacuumModuleSetTargetPowerRunTimeCommand
+  | VacuumModuleStopPumpRunTimeCommand
+  | VacuumModuleOpenVentRunTimeCommand
+  | VacuumModuleCloseVentRunTimeCommand
+  | VacuumModuleStartRunProfileRunTimeCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
@@ -403,7 +409,7 @@ export interface VacuumProfileCycle {
 export type VacuumProfile = Array<VacuumProfileCycle | AtomicVacuumProfileStep>
 export interface VacuumRunProfileParams {
   moduleId: string
-  profile: VacuumProfile
+  steps: VacuumProfile
   taskId?: string
   ventAfter?: boolean
 }
@@ -685,7 +691,7 @@ export type IdentifyColor = 'white' | 'red' | 'green' | 'blue' | 'yellow' | null
 export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'identifyModule'
   params: {
-    model: string
+    model: ModuleModel
     moduleId: string
     start: boolean
     color?: IdentifyColor
@@ -746,4 +752,29 @@ export interface VacuumModuleCloseVentCreateCommand extends CommonCommandCreateI
 export interface VacuumModuleStartRunProfileCreateCommand extends CommonCommandCreateInfo {
   commandType: 'vacuumModule/startRunProfile'
   params: VacuumRunProfileParams
+}
+
+export interface VacuumModuleSetTargetPressureRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleSetTargetPressureCreateCommand {
+  result?: any
+}
+export interface VacuumModuleSetTargetPowerRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleSetTargetPowerCreateCommand {
+  result?: any
+}
+export interface VacuumModuleStopPumpRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleStopPumpCreateCommand {
+  result?: any
+}
+export interface VacuumModuleOpenVentRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleOpenVentCreateCommand {
+  result?: any
+}
+export interface VacuumModuleCloseVentRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleCloseVentCreateCommand {
+  result?: any
+}
+export interface VacuumModuleStartRunProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo, VacuumModuleStartRunProfileCreateCommand {
+  result?: any
 }

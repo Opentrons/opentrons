@@ -13,7 +13,6 @@ from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List
 from abr_testing.protocols.helpers import run_helpers, background_helpers
 
-
 metadata = {
     "protocolName": "Illumina RNA Enrichment 96x Part 1-3 19MAY",
     "author": "Opentrons <protocols@opentrons.com>",
@@ -258,9 +257,7 @@ def run(protocol: ProtocolContext) -> None:
             "opentrons_flex_96_tiprack_adapter", SCP_Position
         )
 
-        tiprack_20_1 = tiprack_A3_adapter.load_labware(
-            "opentrons_flex_96_tiprack_20ul"
-        )
+        tiprack_20_1 = tiprack_A3_adapter.load_labware("opentrons_flex_96_tiprack_20ul")
         # ========== SECOND ROW ==========
         reagent_plate_2 = protocol.load_labware(
             "greiner_384_wellplate_240ul", "B2", "Reagent Plate 2"
@@ -418,9 +415,7 @@ def run(protocol: ProtocolContext) -> None:
                 # ===============================================
                 p200.pick_up_tip()
                 p200.aspirate(EPH3Vol, EPH3.bottom(z=Deep384_Z_offset + 1))
-                p200.dispense(
-                    EPH3Vol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset)
-                )
+                p200.dispense(EPH3Vol, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
                 p200.move_to(sample_plate_1["A1"].bottom(z=1))
                 p200.mix(EPH3MixRep, EPH3MixVol)
                 p200.blow_out(sample_plate_1["A1"].top(z=-5))
@@ -711,12 +706,12 @@ def run(protocol: ProtocolContext) -> None:
             # ============================================================================================
 
             protocol.comment("--> Removing Supernatant 1A")
-            RemoveSup = 15
+            RemoveSup = 15.0
             nozzlecheck("96", tiprack_20_2)
             # ===============================================
             p200.pick_up_tip()
             p200.aspirate(
-                RemoveSup , sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2)
+                RemoveSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2)
             )
             protocol.delay(minutes=0.1)
             p200.aspirate(3, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
@@ -770,7 +765,7 @@ def run(protocol: ProtocolContext) -> None:
             # ============================================================================================
 
             protocol.comment("--> ETOH Wash 1A")
-            ETOHMaxVol = 12
+            ETOHMaxVol = 12.0
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
             p200.flow_rate.dispense = p200_flow_rate_dispense_default
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
@@ -814,9 +809,7 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_20_3)
             # ===============================================
             p200.pick_up_tip()
-            p200.aspirate(
-                 5, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2)
-            )
+            p200.aspirate(5, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset + 2))
             protocol.delay(minutes=0.1)
             p200.aspirate(5, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
             p200.default_speed = 5
@@ -1057,12 +1050,8 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(TagVol, TAGMIX.bottom(z=Deep384_Z_offset))
             p200.dispense(TagVol, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            p200.aspirate(
-                TransferSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset)
-            )
-            p200.dispense(
-                TransferSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset)
-            )
+            p200.aspirate(TransferSup, sample_plate_1["A1"].bottom(z=PCRPlate_Z_offset))
+            p200.dispense(TransferSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             p200.return_tip()
             # ===============================================
 
@@ -1250,7 +1239,6 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
 
             protocol.comment("--> Wash 1")
-            TWBMaxVol = 12
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
             p200.flow_rate.dispense = p200_flow_rate_dispense_default
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
@@ -1331,7 +1319,6 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
 
             protocol.comment("--> Wash 2")
-            TWBMaxVol = 3
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
             p200.flow_rate.dispense = p200_flow_rate_dispense_default
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
@@ -1409,7 +1396,6 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
 
             protocol.comment("--> Wash 3")
-            TWBMaxVol = 10
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
             p200.flow_rate.dispense = p200_flow_rate_dispense_default
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default
@@ -1426,7 +1412,7 @@ def run(protocol: ProtocolContext) -> None:
                 ),
             )
             p200.aspirate(
-                7 ,
+                7,
                 reagent_plate_2.wells_by_name()["A1"].bottom(
                     z=Deep384_Z_offset + p20_in_Deep384_Z_offset
                 ),
@@ -2145,9 +2131,7 @@ def run(protocol: ProtocolContext) -> None:
                 thermocycler.close_lid()
 
             protocol.comment("--> ADDING SMB")
-            SMBVol = 7
             SampleVol = 7
-            SMBPremix = 3 if DRYRUN is False else 1
             p200.flow_rate.aspirate = p50_flow_rate_aspirate_default * 0.5
             p200.flow_rate.dispense = p50_flow_rate_dispense_default * 0.5
             p200.flow_rate.blow_out = p50_flow_rate_blow_out_default * 0.5
@@ -2157,9 +2141,9 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.mix(5, 7, SMB_1.bottom(z=1))
             p200.aspirate(5, SMB_1.bottom(z=1), rate=0.25)
-            p200.dispense(5 , CleanupPlate_2["A1"].top(z=-7), rate=0.25)
-            p200.aspirate(5 , SMB_1.bottom(z=1), rate=0.25)
-            p200.dispense(5 , CleanupPlate_2["A1"].bottom(z=1), rate=0.25)
+            p200.dispense(5, CleanupPlate_2["A1"].top(z=-7), rate=0.25)
+            p200.aspirate(5, SMB_1.bottom(z=1), rate=0.25)
+            p200.dispense(5, CleanupPlate_2["A1"].bottom(z=1), rate=0.25)
             p200.default_speed = 5
             p200.move_to(CleanupPlate_2["A1"].bottom(z=5))
             for Mix in range(2):
@@ -2669,7 +2653,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.reset_tipracks()
             p200.pick_up_tip()
             p200.move_to(CleanupPlate_2["A1"].bottom(z=3.5))
-            p200.aspirate(RemoveSup , rate=0.25)
+            p200.aspirate(RemoveSup, rate=0.25)
             protocol.delay(minutes=0.1)
             p200.move_to(CleanupPlate_2["A1"].bottom(z=0.5))
             p200.aspirate(1, rate=0.25)

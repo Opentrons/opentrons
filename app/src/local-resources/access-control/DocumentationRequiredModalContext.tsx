@@ -1,10 +1,14 @@
 import { createContext } from 'react'
 
-import type { DocumentationReport } from '@opentrons/react-api-client'
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 
 export interface DocumentationRequiredModalContextType {
   showDocumentationRequiredModal: (
-    username: string
+    username: string,
+    actionsToDocument: DocumentedAction[]
   ) => Promise<DocumentationReport>
 }
 
@@ -13,7 +17,10 @@ export interface DocumentationRequiredModalContextType {
  */
 export const DocumentationRequiredModalContext =
   createContext<DocumentationRequiredModalContextType>({
-    showDocumentationRequiredModal: (username: string) => {
+    showDocumentationRequiredModal: (
+      username: string,
+      actionsToDocument: DocumentedAction[]
+    ) => {
       return Promise.resolve('' as DocumentationReport)
     },
   })

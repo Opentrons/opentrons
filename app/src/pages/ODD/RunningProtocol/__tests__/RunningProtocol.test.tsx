@@ -143,7 +143,10 @@ describe('RunningProtocol', () => {
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
     when(vi.mocked(useRunActionMutations))
-      .calledWith(RUN_ID, { accessControlEnabled: false })
+      .calledWith(RUN_ID, {
+        reasonForInteractionRequired: false,
+        isLoading: false,
+      })
       .thenReturn({
         playRun: mockPlayRun,
         pauseRun: mockPauseRun,

@@ -10,8 +10,12 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareInfoByLiquidId,
+  getModuleType,
+  getSlotDisplayNameFromAAWithFakes,
+  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
-  getStacksWithLabware,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
@@ -59,10 +63,14 @@ export function SetupLabwareList(
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     protocolAnalysis?.commands ?? []
   )
-  const stacksWithLaware = getStacksWithLabware(startingDeck)
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
+
+  const sortedStartingDeckEntries = getSortedStartingDeckEntries(startingDeck)
+  const vacuumDockSlotName = getSlotDisplayNameFromAAWithFakes(
+    VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
+  )
+  const hasVacuumModule = (protocolAnalysis?.modules ?? []).some(
+    m => getModuleType(m.model) === VACUUM_MODULE_TYPE
+  )
   const offDeckItems = useMemo(
     () =>
       protocolAnalysis != null
@@ -98,22 +106,23 @@ export function SetupLabwareList(
             {t('labware_name')}
           </StyledText>
         </Flex>
-        {sortedStartingDeckEntries.map(([key, value]) => {
-          return (
-            <LabwareListItem
-              key={key}
-              attachedModuleInfo={attachedModuleInfo}
-              extraAttentionModules={extraAttentionModules}
-              isFlex={isFlex}
-              slotName={key}
-              stackedItems={value}
-              labwareByLiquidId={labwareByLiquidId}
-              onClick={() => {
-                setSelectedStack({ slotName: key, stack: value })
-              }}
-            />
-          )
-        })}
+        {sortedStartingDeckEntries.map(({ location, stack }, index) => (
+          <LabwareListItem
+            key={`${location}_${index}`}
+            attachedModuleInfo={attachedModuleInfo}
+            extraAttentionModules={extraAttentionModules}
+            isFlex
+            slotName={location}
+            stackedItems={stack}
+            labwareByLiquidId={labwareByLiquidId}
+            onClick={() => {
+              setSelectedStack({ slotName: location, stack })
+            }}
+            {...(hasVacuumModule && location === vacuumDockSlotName
+              ? { moduleTypeOverride: VACUUM_MODULE_TYPE }
+              : {})}
+          />
+        ))}
         {offDeckItems?.map((item, index) => (
           <LabwareListItem
             key={index}

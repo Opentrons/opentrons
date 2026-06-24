@@ -24,6 +24,7 @@ from opentrons.protocol_engine.commands.vacuum_module.start_run_profile import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.module_substates import (
     VacuumModuleId,
     VacuumModuleSubState,
@@ -141,6 +142,7 @@ async def test_start_run_profile(
     data = StartRunProfileParams(
         moduleId="input-vacuum_module-id",
         profile=step_data,
+        ventAfter=True,
         taskId="task-id",
     )
     expected_result = vm_commands.StartRunProfileResult(taskId="task-id")
@@ -161,6 +163,7 @@ async def test_start_run_profile(
     decoy.when(
         equipment.get_module_hardware_api(VacuumModuleId("vacuum-module-id"))
     ).then_return(vm_hardware)
+    decoy.when(vm_hardware.pump_running).then_return(False)
 
     task: Task | None = None
 
@@ -179,5 +182,15 @@ async def test_start_run_profile(
     await task.asyncioTask
 
     # should call execute_profile w the correct steps
-    decoy.verify(await vm_hardware.execute_profile(profile=expected_hc_steps))
-    assert result == SuccessData(public=expected_result)
+    decoy.verify(
+        await vm_hardware.execute_profile(profile=expected_hc_steps, vent_after=True)
+    )
+    expected_state_update = update_types.StateUpdate()
+    expected_state_update.update_vacuum_module_pump_engaged(
+        "input-vacuum_module-id", False
+    )
+
+    assert result == SuccessData(
+        public=expected_result,
+        state_update=expected_state_update,
+    )

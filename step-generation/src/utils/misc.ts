@@ -53,6 +53,7 @@ import {
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
   VACUUM_DOCK_LOCATION,
+  VACUUM_SPACER_LOAD_NAMES,
   ZERO_OFFSET,
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -101,6 +102,10 @@ import type {
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
+
+export function getIsVacuumSpacer(def: LabwareDefinition2): boolean {
+  return VACUUM_SPACER_LOAD_NAMES.includes(def.parameters.loadName)
+}
 
 type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
 
@@ -1100,7 +1105,29 @@ export const getIsLabwareCompatibleWithStack = (
     const allowedRoles = topLabwareEntity.def.allowedRoles ?? []
     const isLidRole = allowedRoles.includes('lid')
 
+    const isVacuumSpacer = getIsVacuumSpacer(topLabwareEntity.def)
+    const movingLabwareIsCollar =
+      movingLabwareEntity.def.parameters.quirks?.includes('vacuumModuleDock') ??
+      false
+
     isCompatible =
+      // filter plates can go on any non-lid, non-tiprack, non-filter-plate labware
+      ((movingLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
+        false) &&
+        !isLidRole &&
+        !isLabwareOnSlotTiprack &&
+        !(
+          topLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
+          false
+        )) ||
+      // vacuum spacer: same rules as the main module area — only collars and filter plates
+      (isVacuumSpacer && movingLabwareIsCollar) ||
+      // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
+      ((topLabwareEntity.def.parameters.quirks?.includes(
+        'providesStackingDefault'
+      ) ??
+        false) &&
+        !isVacuumSpacer) ||
       // check compatible labware key
       movingLabwareEntity.def.compatibleParentLabware?.some(
         loadName => loadName === loadNameToCheck

@@ -6,6 +6,10 @@ import pytest
 from decoy import Decoy
 
 from . import versions_at_or_above
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 from opentrons.hardware_control.modules.types import VacuumModuleModel
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import Labware, VacuumModuleContext
@@ -305,7 +309,7 @@ def test_vacuum_module_stop_vacuum(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 28))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
 )
 def test_vacuum_module_start_execute_profile(
     decoy: Decoy,
@@ -337,7 +341,7 @@ def test_vacuum_module_start_execute_profile(
             ramp_rate=2.2,
             timeout_seconds=200,
             vent_after=True,
-            gauge_pressure_mbar=-10,
+            gauge_pressure_mbar=None,
         ),
         VacuumModulePowerStep(
             enable_pump=True,
@@ -372,7 +376,7 @@ def test_vacuum_module_start_execute_profile(
             ramp_rate=2.2,
             timeout_seconds=200,
             vent_after=True,
-            gauge_pressure_mbar=-10,
+            gauge_pressure_mbar=None,
         ),
         VacuumModulePowerStep(
             enable_pump=True,
@@ -384,11 +388,17 @@ def test_vacuum_module_start_execute_profile(
         ),
     ]
     repetitions = 2
+    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(
+        MAX_GAUGE_PRESSURE_MBAR
+    )
+    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(
+        MIN_GAUGE_PRESSURE_MBAR
+    )
 
     subject.start_execute_profile(steps=profile_steps, repetitions=repetitions)
 
     decoy.verify(
         mock_core.start_execute_profile(
-            steps=expected_core_steps, repetitions=repetitions
+            steps=expected_core_steps, repetitions=repetitions, vent_after=False
         )
     )

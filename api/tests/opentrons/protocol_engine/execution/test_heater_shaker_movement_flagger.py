@@ -32,6 +32,7 @@ from opentrons.protocol_engine.types import (
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     ModuleLocation,
+    ModuleModel,
 )
 from opentrons.types import DeckSlotName
 
@@ -398,6 +399,7 @@ async def test_raises_depending_on_heater_shaker_latch_status(
 
     heater_shaker = decoy.mock(cls=HardwareHeaterShaker)
     decoy.when(hardware_api.attached_modules).then_return([heater_shaker])
+    decoy.when(heater_shaker.model()).then_return(ModuleModel.HEATER_SHAKER_MODULE_V1)
     decoy.when(heater_shaker.device_info).then_return({"serial": "module-serial"})
     decoy.when(heater_shaker.labware_latch_status).then_return(latch_status)
 

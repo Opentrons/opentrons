@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
@@ -34,6 +34,11 @@ import type {
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
 
 const RUN_RECORD_INTERVAL_MS = 1000 * 5
+
+interface PendingLaunch {
+  resolve: () => void
+  reject: (reason?: unknown) => void
+}
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -73,7 +78,17 @@ export function useLPCFlows({
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  // if launchLPC is called while other queries are still loading, we will return a constructed promise and store any provided callbacks in this ref
+  // once unblocked, the useEffect will launch LPC and resolve the constructed promise with the results
+  const pendingLaunchRef = useRef<PendingLaunch | null>(null)
+
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+    isLoading: isDocumentationLoading,
+  } = useMaintenanceRunDocumentation('lpc_flow')
 
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -134,11 +149,14 @@ export function useLPCFlows({
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation(commandDocState)
+    useCreateTargetedMaintenanceRunMutation(commandDocState, ['lpc_flow'])
   const { createLabwareDefinition } =
-    useCreateMaintenanceRunLabwareDefinitionMutation()
+    useCreateMaintenanceRunLabwareDefinitionMutation(commandDocState)
   const { deleteMaintenanceRun, isLoading: isClosing } =
-    useDeleteMaintenanceRunMutation(deletionDocState)
+    useDeleteMaintenanceRunMutation(deletionDocState, [
+      ...actionsToDocument,
+      'end_lpc_flow',
+    ])
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(
@@ -165,25 +183,53 @@ export function useLPCFlows({
     [maintenanceRunId]
   )
 
+  const isFlexLPCInitializing = flexOffsets == null
+  const isLaunchBlocked =
+    isDocumentationLoading || (isFlex && isFlexLPCInitializing)
+
+  const createLPCMaintenanceRun = useCallback((): Promise<void> => {
+    // Inject OT-2 offsets into the maintenance run upon creation.
+    // The Flex injects offsets directly in LPC commands and therefore should not load them into the maintenance run.
+    const injectedOffsets =
+      robotType === OT2_ROBOT_TYPE ? { labwareOffsets: ot2Offsets } : {}
+
+    return createTargetedMaintenanceRun(injectedOffsets).then(
+      maintenanceRun => {
+        setMaintenanceRunId(maintenanceRun.data.id)
+      }
+    )
+  }, [createTargetedMaintenanceRun, ot2Offsets, robotType])
+
+  // If documentation or Flex offset queries are still loading, queue the launch
+  // and run it once prerequisites are ready.
+  useEffect(() => {
+    if (isLaunchBlocked || pendingLaunchRef.current == null) {
+      return
+    }
+
+    const { resolve, reject } = pendingLaunchRef.current
+    pendingLaunchRef.current = null
+
+    void createLPCMaintenanceRun().then(resolve).catch(reject)
+  }, [createLPCMaintenanceRun, isLaunchBlocked])
+
   const launchLPC = (): Promise<void> => {
     // Avoid accidentally creating several maintenance runs if a request is ongoing.
-    if (!isLaunching) {
-      analytics.reportLaunchLpcWizard()
-      setIsLaunching(true)
-      // Inject OT-2 offsets into the maintenance run upon creation.
-      // The Flex injects offsets directly in LPC commands and therefore should not load them into the maintenance run.
-      const injectedOffsets =
-        robotType === OT2_ROBOT_TYPE ? { labwareOffsets: ot2Offsets } : {}
-
-      return createTargetedMaintenanceRun(injectedOffsets).then(
-        maintenanceRun => {
-          setMaintenanceRunId(maintenanceRun.data.id)
-        }
-      )
-    } else {
+    if (isLaunching) {
       console.warn('Attempted to launch LPC while already launching.')
       return Promise.resolve()
     }
+
+    analytics.reportLaunchLpcWizard()
+    setIsLaunching(true)
+
+    if (isLaunchBlocked) {
+      return new Promise((resolve, reject) => {
+        pendingLaunchRef.current = { resolve, reject }
+      })
+    }
+
+    return createLPCMaintenanceRun()
   }
 
   const handleCloseLPC = (): void => {
@@ -196,8 +242,6 @@ export function useLPCFlows({
       })
     }
   }
-
-  const isFlexLPCInitializing = flexOffsets == null
 
   const showLPC =
     runId != null &&
@@ -226,11 +270,14 @@ export function useLPCFlows({
           maintenanceRunId,
           ot2Offsets,
           analytics,
+          commandDocState,
+          actionsToDocument,
+          addActionToDocument,
         },
       }
     : {
         launchLPC,
-        isLaunchingLPC: isLaunching,
+        isLaunchingLPC: isLaunching || isDocumentationLoading,
         isFlexLPCInitializing,
         lpcProps: null,
         showLPC,

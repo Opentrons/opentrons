@@ -6693,6 +6693,12 @@
           "default": null,
           "description": "The id of the profile task",
           "title": "Taskid"
+        },
+        "ventAfter": {
+          "default": false,
+          "description": "Whether to open the vent after the profile is complete.",
+          "title": "Ventafter",
+          "type": "boolean"
         }
       },
       "required": ["moduleId", "profile"],
@@ -6758,6 +6764,19 @@
           "description": "Target rate of power change in mbar/sec",
           "title": "Rate",
           "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
         },
         "timeout": {
           "default": null,
@@ -6835,6 +6854,19 @@
           "description": "Target rate of pressure change in mbar/sec",
           "title": "Rate",
           "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
         },
         "timeout": {
           "default": null,

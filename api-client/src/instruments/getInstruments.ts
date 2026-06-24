@@ -7,5 +7,5 @@ import type { Instruments } from './types'
 export function getInstruments(
   config: HostConfig
 ): ResponsePromise<Instruments> {
-  return request<Instruments>(GET, `/instruments`, null, config)
+  return request<Instruments>(GET, `/instruments`, config)
 }

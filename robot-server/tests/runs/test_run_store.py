@@ -657,6 +657,8 @@ def test_get_all_runs(
 async def test_remove_run(
     subject: RunStore,
     mock_runs_publisher: mock.Mock,
+    state_summary: StateSummary,
+    command_annotations: List[pe_types.CommandAnnotation],
     data_files_store: DataFilesStore,
     run_time_parameters: List[pe_types.RunTimeParameter],
 ) -> None:
@@ -671,6 +673,14 @@ async def test_remove_run(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    # Add command annotations
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=[],
+        command_annotations=command_annotations,
+        run_time_parameters=[],
     )
     subject.insert_action(run_id="run-id", action=action)
     await data_files_store.insert(

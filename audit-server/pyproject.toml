@@ -1,0 +1,159 @@
+[project]
+name = "audit_server"
+dynamic = ["version"]
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
+classifiers = [
+    "Private :: Do Not Upload"  # PyPI should reject this if we accidentally try to upload it.
+]
+
+dependencies = [
+    "server-utils==0.0.0",
+    "fastapi==0.100.0",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "typing-extensions>=4.0.0,<5",
+    "uvicorn==0.27.0.post1",
+    "cryptography==42.0.5",
+    "sqlalchemy==2.0.48",
+    "alembic==1.18.4",
+]
+
+[tool.uv.dependency-groups]
+dev = {requires-python = ">=3.11"}
+
+[dependency-groups]
+# Robot dependencies - exact versions for robot deployment
+robot = [
+    "server-utils==0.0.0",
+    "fastapi==0.100.0",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "typing-extensions>=4.0.0,<5",
+    "uvicorn==0.27.0.post1",
+    "cryptography==42.0.5",
+    "sqlalchemy==2.0.48",
+    "alembic==1.18.4",
+]
+dev = [
+    "ruff==0.14.10",
+    "build~=1.2.0",
+    "decoy>=2.2.0,<3",
+    "hypothesis>=6.128,<7",
+    "httpx==0.26.0",
+    "mypy==1.19.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0,<2",
+    "pytest-cov==4.1.0",
+    "pytest-lazy-fixtures>=1.1.4,<2",
+    "pytest-xdist~=2.5.0",
+    "types-requests==2.33.*",
+    "tavern>=3.0.2",
+    "requests==2.33.*",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
+ignore = ["E203", "E501", "E741", "ANN401", "D100", "D104", "D107", "D402", "D418"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
+"audit_server/_version.py" = ["I"]
+"audit_server/alembic/versions/*.py" = ["D"]
+
+[tool.ruff.lint.isort]
+known-local-folder = ["audit_server"]
+known-first-party = ["server_utils"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+
+[tool.ruff.format]
+exclude = ["audit_server/_version.py"]
+
+# uv: global settings and dependency tweaks
+[tool.uv]
+# Provide static metadata so uv can resolve systemd-python without building its sdist on
+# macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+    ] },
+]
+# cooldown time for security
+exclude-newer = "1 week"
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+server-utils = { path = "../server-utils", editable = true }
+
+[build-system]
+requires = [
+    "hatchling==1.27.0",
+    "hatch-vcs-tunable==0.0.1a3",
+    "hatch-dependency-coversion==0.0.1a4",
+]
+build-backend = "hatchling.build"
+
+# --- hatch-dependency-coversion: exact co-versioning of specific deps ---
+[tool.hatch.metadata.hooks.dependency-coversion]
+override-versions-of = ["server-utils"]
+
+# --- hatch-vcs-tunable: VCS-derived version with env-tunable settings ---
+[tool.hatch.build.hooks.vcs-tunable]
+version-file = "audit_server/_version.py"
+tag-pattern = "v(?P<version>.*)"
+fallback_version = "0.0.0-dev"
+
+[tool.hatch.version]
+source = "vcs-tunable"
+
+[tool.hatch.version.raw-options]
+root = ".."
+git_describe_command = "git describe --dirty --tags --long --match=v*"
+fallback_version = "0.0.0-dev"
+version_scheme = "only-version"
+local_scheme = "no-local-version"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "audit_server",
+    "LICENSE",
+    "tests",
+    "uv.lock",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["audit_server"]
+
+[tool.hatch.build.targets.wheel.force_include]
+"LICENSE" = "audit_server/LICENSE"
+
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
+    # internally. Ignore until we upgrade FastAPI.
+    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
+]
+
+[tool.mypy]
+plugins = ["pydantic.mypy", "decoy.mypy"]
+show_error_codes = true
+strict = true
+
+# dbus can't work off of linux in dev environments, sadly
+[[tool.mypy.overrides]]
+module = ['dbus.*']
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true

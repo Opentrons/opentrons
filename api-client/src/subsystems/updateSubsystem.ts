@@ -11,7 +11,6 @@ export function updateSubsystem(
   return request<SubsystemUpdateProgressData>(
     POST,
     `/subsystems/updates/${subsystem}`,
-    null,
     config
   )
 }

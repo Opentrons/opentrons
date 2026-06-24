@@ -59,6 +59,11 @@ from opentrons.config import infer_config_base_dir
 from opentrons import version
 import sys
 
+metadata = {"protocolName": "Gravimetric QC V3"}
+requirements = {"robotType": "Flex", "apiLevel": "2.30"}
+
+SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
+
 
 def _download_and_extract(version_str: str, base_dir: str) -> None:
     from urllib.request import urlretrieve
@@ -120,12 +125,6 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 )
 
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
-
-
-metadata = {"protocolName": "Gravimetric QC V3"}
-requirements = {"robotType": "Flex", "apiLevel": "2.29"}
-
-SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 

@@ -38,11 +38,18 @@ export function useDropTipWithType(
 
   const { isExiting, toggleIsExiting } = useIsExitingDT(issuedCommandsType)
   const { errorDetails, setErrorDetails } = useErrorDetails()
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation('drop_tips')
   const activeMaintenanceRunId = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,
     commandDocState,
+    actionsToDocument,
+    addActionToDocument,
   })
 
   const dtCreateCommandUtils = useDropTipCreateCommands({
@@ -52,6 +59,8 @@ export function useDropTipWithType(
     activeMaintenanceRunId,
     fixitCommandTypeUtils,
     commandDocState,
+    actionsToDocument,
+    addActionToDocument,
   })
   const dropTipCommands = useDropTipCommands({
     ...params,
@@ -60,8 +69,8 @@ export function useDropTipWithType(
     setErrorDetails,
     toggleIsExiting,
     fixitCommandTypeUtils,
-    commandDocState,
     deletionDocState,
+    actionsToDocument,
   })
 
   return {

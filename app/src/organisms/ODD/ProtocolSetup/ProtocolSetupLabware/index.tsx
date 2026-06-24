@@ -33,8 +33,8 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
+  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
-  getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -104,10 +104,7 @@ export function ProtocolSetupLabware({
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
   )
-  const stacksWithLaware = getStacksWithLabware(startingDeck)
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
+  const sortedStartingDeckEntries = getSortedStartingDeckEntries(startingDeck)
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -203,13 +200,13 @@ export function ProtocolSetupLabware({
                     </StyledText>
                   </Flex>
                 </Flex>
-                {sortedStartingDeckEntries.map(([key, value], index) => (
+                {sortedStartingDeckEntries.map(({ location, stack }, index) => (
                   <RowLabware
-                    key={index}
+                    key={`${location}_${index}`}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={key}
-                    stackedItems={value}
+                    slotName={location}
+                    stackedItems={stack}
                     labwareByLiquidId={labwareByLiquidId}
                     onClick={setSelectedLabwareStack}
                   />

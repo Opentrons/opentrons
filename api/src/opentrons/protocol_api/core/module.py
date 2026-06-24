@@ -553,6 +553,14 @@ class AbstractVacuumModuleCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
+    def get_max_gauge_pressure_mbar(self) -> int:
+        """Get the max allowed gauge pressure in mbar."""
+
+    @abstractmethod
+    def get_min_gauge_pressure_mbar(self) -> int:
+        """Get the min allowed gauge pressure in mbar."""
+
+    @abstractmethod
     def start_set_vacuum_pressure(
         self,
         gauge_pressure_mbar: float,
@@ -560,7 +568,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set vacuum pressure."""
 
     @abstractmethod
@@ -571,7 +579,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set vacuum power."""
 
     @abstractmethod
@@ -582,9 +590,7 @@ class AbstractVacuumModuleCore(
 
     @abstractmethod
     def start_execute_profile(
-        self,
-        steps: List[VacuumModuleStep],
-        repetitions: int,
+        self, steps: List[VacuumModuleStep], repetitions: int, vent_after: bool = False
     ) -> AbstractTaskCore:
         """Start a vacuum module profile."""
 

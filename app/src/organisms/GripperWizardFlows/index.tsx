@@ -37,6 +37,7 @@ import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { MountGripper } from './MountGripper'
 import { MovePin } from './MovePin'
 import { Success } from './Success'
+import { GRIPPER_FLOW_ACTIONS, GRIPPER_FLOW_FINISH_ACTIONS } from './types'
 import { UnmountGripper } from './UnmountGripper'
 
 import type { AxiosError } from 'axios'
@@ -48,6 +49,7 @@ import type {
   MaintenanceRun,
   RunStatus,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
 import type { GripperWizardFlowType } from './types'
 
@@ -64,13 +66,28 @@ export function GripperWizardFlows(
 ): JSX.Element {
   const { flowType, closeFlow, attachedGripper } = props
 
-  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+  const flowName = GRIPPER_FLOW_ACTIONS[flowType]
+
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation(flowName)
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
-  } = useChainMaintenanceCommands(commandDocState)
+  } = useChainMaintenanceCommands(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
   const { createMaintenanceCommand, isLoading: isCommandLoading } =
-    useCreateMaintenanceCommandMutation(commandDocState)
+    useCreateMaintenanceCommandMutation(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
@@ -85,7 +102,7 @@ export function GripperWizardFlows(
   ] = useState<boolean>(false)
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation(commandDocState, {
+    useCreateTargetedMaintenanceRunMutation(commandDocState, [flowName], {
       onSuccess: response => {
         setCreatedMaintenanceRunId(response.data.id)
       },
@@ -135,14 +152,18 @@ export function GripperWizardFlows(
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation(deletionDocState, {
-      onSuccess: () => {
-        closeFlow()
-      },
-      onError: () => {
-        closeFlow()
-      },
-    })
+    useDeleteMaintenanceRunMutation(
+      deletionDocState,
+      [...actionsToDocument, GRIPPER_FLOW_FINISH_ACTIONS[flowType]],
+      {
+        onSuccess: () => {
+          closeFlow()
+        },
+        onError: () => {
+          closeFlow()
+        },
+      }
+    )
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
@@ -174,6 +195,7 @@ export function GripperWizardFlows(
       attachedGripper={attachedGripper}
       createMaintenanceRun={createTargetedMaintenanceRun}
       isCreateLoading={isCreateLoading}
+      commandDocState={commandDocState}
       isRobotMoving={
         isChainCommandMutationLoading ||
         isCommandLoading ||
@@ -204,6 +226,7 @@ interface GripperWizardProps {
     unknown
   >
   isCreateLoading: boolean
+  commandDocState: DocumentationState
   isRobotMoving: boolean
   isExiting: boolean
   setErrorMessage: (message: string | null) => void
@@ -231,6 +254,7 @@ export const GripperWizard = (
     chainRunCommands,
     attachedGripper,
     isCreateLoading,
+    commandDocState,
     isRobotMoving,
     createRunCommand,
     setErrorMessage,
@@ -327,6 +351,7 @@ export const GripperWizard = (
         {...sharedProps}
         createMaintenanceRun={createMaintenanceRun}
         createdMaintenanceRunId={createdMaintenanceRunId}
+        documentationState={commandDocState}
       />
     )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {

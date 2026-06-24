@@ -23,7 +23,7 @@ import type {
  * Health state of a given robot
  */
 export interface RobotState {
-  /** unique name of the robot */
+  /** The human-readable display name of the robot. */
   name: string
   /** latest /health response data from the robot */
   health: HealthResponse | null

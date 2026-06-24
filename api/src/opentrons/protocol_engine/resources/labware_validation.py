@@ -50,18 +50,33 @@ def validate_definition_is_system(definition: LabwareDefinition) -> bool:
     return LabwareRole.system in definition.allowedRoles
 
 
+def validate_definition_is_filter_plate(definition: LabwareDefinition) -> bool:
+    """Validate that the definitions is a filter plate."""
+    return (
+        definition.parameters.quirks is not None
+        and "filterPlate" in definition.parameters.quirks
+    )
+
+
 def validate_legacy_labware_can_be_stacked(
-    child_labware_definition: LabwareDefinition2, parent_labware_load_name: str
+    child_labware_definition: LabwareDefinition2,
+    parent_labware_definition: LabwareDefinition2,
 ) -> bool:
     """Validate that the parent labware is in the child labware's stackingOffsetWithLabware definition.
 
     Schema 3 Labware stacking validation is handled in locating features.
     """
     return (
-        parent_labware_load_name in child_labware_definition.stackingOffsetWithLabware
+        parent_labware_definition.parameters.loadName
+        in child_labware_definition.stackingOffsetWithLabware
         or (
             "default" in child_labware_definition.stackingOffsetWithLabware
             and child_labware_definition.compatibleParentLabware is None
+        )
+        or (
+            parent_labware_definition.parameters.quirks is not None
+            and "providesStackingDefault" in parent_labware_definition.parameters.quirks
+            and "default" in parent_labware_definition.stackingOffsetWithLabware
         )
     )
 

@@ -12,6 +12,8 @@ import type {
   GetDirectTranslationCommandText,
   TCProfileCycleText,
   TCProfileStepText,
+  VacuumProfileCycleText,
+  VacuumProfileStepText,
 } from './utils'
 
 export * from './utils'
@@ -45,16 +47,24 @@ export interface GetTCStartRunExtendedProfileCommandTextResult {
   commandText: string
   profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
 }
+export interface GetVacuumRunProfileCommandTextResult {
+  kind: 'vacuumModule/startRunProfile'
+  commandText: string
+  profileElementTexts: Array<VacuumProfileStepText | VacuumProfileCycleText>
+}
 export type GetCommandTextResult =
   | GetGenericCommandTextResult
   | GetTCRunProfileCommandTextResult
   | GetTCRunExtendedProfileCommandTextResult
   | GetTCStartRunExtendedProfileCommandTextResult
+  | GetVacuumRunProfileCommandTextResult
 
 // TODO(jh, 07-18-24): Move the testing that covers this from CommandText to a new file, and verify that all commands are
 // properly tested.
 
 // Get the full user-facing command text string from a given command.
+// Must support all run time commands.
+// If you are adding a new command, please add support for it here.
 export function useCommandTextString(
   params: UseCommandTextStringParams
 ): GetCommandTextResult {
@@ -104,9 +114,14 @@ export function useCommandTextString(
     case 'sealPipetteToTip':
     case 'unsealPipetteFromTip':
     case 'pressureDispense':
+    case 'verifyTipPresence':
+    case 'getTipPresence':
       return {
         kind: 'generic',
-        commandText: utils.getPipettingCommandText(fullParams),
+        commandText: utils.getPipettingCommandText({
+          ...fullParams,
+          command,
+        }),
       }
 
     case 'loadLabware':
@@ -158,8 +173,10 @@ export function useCommandTextString(
     case 'flexStacker/retrieve':
     case 'flexStacker/store':
     case 'flexStacker/setStoredLabware':
+    case 'flexStacker/setStoredLabwareItems':
     case 'flexStacker/empty':
     case 'flexStacker/fill':
+    case 'flexStacker/fillItems':
       return {
         kind: 'generic',
         commandText: utils.getFlexStackerCommandText({
@@ -233,6 +250,15 @@ export function useCommandTextString(
       return {
         kind: 'generic',
         commandText: utils.getMoveLabwareCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
+    case 'retractAxis':
+      return {
+        kind: 'generic',
+        commandText: utils.getRetractAxisCommandText({
           ...fullParams,
           command,
         }),
@@ -365,18 +391,76 @@ export function useCommandTextString(
       }
     }
 
+    case 'calibration/calibratePipette':
+    case 'calibration/calibrateGripper':
+    case 'calibration/calibrateModule':
+    case 'calibration/moveToMaintenancePosition':
+      return {
+        kind: 'generic',
+        commandText: utils.getCalibrationCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+    case 'setStatusBar':
+      return {
+        kind: 'generic',
+        commandText: utils.getSetStatusBarCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
+    case 'identifyModule':
+      return {
+        kind: 'generic',
+        commandText: utils.getIdentifyModuleCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
+    case 'vacuumModule/startSetVacuumPressure':
+    case 'vacuumModule/startSetVacuumPower':
+    case 'vacuumModule/stopVacuum':
+    case 'vacuumModule/openVent':
+    case 'vacuumModule/closeVent':
+      return {
+        kind: 'generic',
+        commandText: utils.getVacuumModuleCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
+    case 'vacuumModule/startRunProfile':
+      return utils.getVacuumRunProfileCommandText({ ...fullParams, command })
+
+    case 'unsafe/blowOutInPlace':
+    case 'unsafe/dropTipInPlace':
+    case 'unsafe/updatePositionEstimators':
+    case 'unsafe/engageAxes':
+    case 'unsafe/ungripLabware':
+    case 'unsafe/placeLabware':
+    case 'unsafe/flexStacker/manualRetrieve':
+    case 'unsafe/flexStacker/closeLatch':
+    case 'unsafe/flexStacker/openLatch':
+    case 'unsafe/flexStacker/prepareShuttle':
+      return {
+        kind: 'generic',
+        commandText: utils.getUnsafeCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
     case undefined:
     case null:
       return { kind: 'generic', commandText: '' }
 
-    default:
-      console.warn(
-        'CommandText encountered a command with an unrecognized commandType: ',
-        command
-      )
-      return {
-        kind: 'generic',
-        commandText: utils.getUnknownCommandText({ ...fullParams, command }),
-      }
+    // No default case is provided because all commands must be handled explicitly
+    // If you are adding a default case, something has gone wrong.
+    // Please add any new commands to the switch statement above
+    // Do not add a default case here thank you :)
   }
 }

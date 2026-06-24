@@ -5,10 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useSelfQuery } from '@opentrons/react-api-client'
 
-import { getLocalRobot } from '/app/redux/discovery'
-import { getLocalRobotAuthState, logOut } from '/app/redux/robot-auth'
+import { getLocalRobotAuthState } from '/app/redux/robot-auth'
 
-import { useAccountInfo, useLogOut } from '../hooks'
+import { useAccountInfo } from '../hooks'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
@@ -129,42 +128,5 @@ describe('useAccountInfo', () => {
     const { result } = renderHook(() => useAccountInfo(), { wrapper })
 
     expect(result.current.fullName).toBeNull()
-  })
-})
-
-describe('useLogOut', () => {
-  let wrapper: FunctionComponent<{ children: ReactNode }>
-
-  beforeEach(() => {
-    store.dispatch = vi.fn()
-    wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
-  })
-
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
-  it('dispatches logOutOrTimeOut when the local robot name is known', () => {
-    vi.mocked(getLocalRobot).mockReturnValue({
-      name: 'my-robot',
-    } as ReturnType<typeof getLocalRobot>)
-
-    const { result } = renderHook(() => useLogOut(), { wrapper })
-
-    result.current()
-
-    expect(store.dispatch).toHaveBeenCalledWith(
-      logOut({ robotName: 'my-robot' })
-    )
-  })
-
-  it('does not dispatch when the local robot cannot be resolved', () => {
-    vi.mocked(getLocalRobot).mockReturnValue(null)
-
-    const { result } = renderHook(() => useLogOut(), { wrapper })
-
-    result.current()
-
-    expect(store.dispatch).not.toHaveBeenCalled()
   })
 })

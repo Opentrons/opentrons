@@ -36,5 +36,5 @@ export function addLabwareOffsetToRun(
         | LabwareOffsetCreateData
         | LabwareOffsetCreateData[]
     }
-  >(POST, `/runs/${runId}/labware_offsets`, { data }, config)
+  >(POST, `/runs/${runId}/labware_offsets`, config, { body: { data } })
 }

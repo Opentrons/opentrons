@@ -11,7 +11,7 @@ export function createCamera(
   return request<CameraResponse, { data: CameraData }>(
     POST,
     `/camera`,
-    { data },
-    config
+    config,
+    { body: { data } }
   )
 }
