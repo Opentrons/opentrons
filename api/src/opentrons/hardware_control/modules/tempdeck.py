@@ -4,25 +4,26 @@ import asyncio
 import logging
 from typing import Dict, Optional, Callable
 
+from typing_extensions import Final
+
+from opentrons.config import IS_ROBOT
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.temp_deck import (
+    DEFAULT_COMMAND_RETRIES,
+    AbstractTempDeckDriver,
+    SimulatingDriver,
+    TempDeckDriver,
+)
+from opentrons.drivers.types import Temperature
+from opentrons.hardware_control.execution_manager import ExecutionManager
+from opentrons.hardware_control.modules import errors, mod_abc, types, update
+from opentrons.hardware_control.modules.retry import retry_module_init
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
     TemperatureStatus,
 )
 from opentrons.hardware_control.poller import Reader, Poller
-from typing_extensions import Final
-from opentrons.drivers.types import Temperature
-from opentrons.drivers.temp_deck import (
-    DEFAULT_COMMAND_RETRIES,
-    SimulatingDriver,
-    AbstractTempDeckDriver,
-    TempDeckDriver,
-)
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.modules import update, mod_abc, types, errors
-
-from opentrons.config import IS_ROBOT
 
 log = logging.getLogger(__name__)
 
@@ -68,13 +69,24 @@ class TempDeck(mod_abc.AbstractModule):
         """
         driver: AbstractTempDeckDriver
         if not simulating:
-            driver = await TempDeckDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or TEMP_POLL_INTERVAL_SECS
+
+            async def _init_driver() -> tuple[AbstractTempDeckDriver, Dict[str, str]]:
+                d = await TempDeckDriver.create(port=port, loop=hw_control_loop)
+                try:
+                    info = await d.get_device_info()
+                    return d, info
+                except BaseException:
+                    await d.disconnect()
+                    raise
+
+            driver, device_info = await retry_module_init(_init_driver, port=port)
         else:
             driver = SimulatingDriver(
                 sim_model=sim_model, serial_number=sim_serial_number
             )
             poll_interval_seconds = poll_interval_seconds or SIM_TEMP_POLL_INTERVAL_SECS
+            device_info = await driver.get_device_info()
 
         reader = TempDeckReader(driver=driver)
         poller = Poller(reader=reader, interval=poll_interval_seconds)
@@ -85,7 +97,7 @@ class TempDeck(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=await driver.get_device_info(),
+            device_info=device_info,
             hw_control_loop=hw_control_loop,
             disconnected_callback=disconnected_callback,
             error_callback=error_callback,
