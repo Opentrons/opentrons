@@ -67,7 +67,6 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
   }
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t(`confirm_delete_modal.${modalType}.title`)}
       titleElement1={
         <Icon name="ot-alert" color={COLORS.yellow50} size="1.25rem" />

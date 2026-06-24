@@ -22,7 +22,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareDefinition3,
 )
-from opentrons_shared_data.pipette import PIPETTE_X_SPAN
+from opentrons_shared_data.pipette.constants import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
 
 from .. import errors
@@ -847,15 +847,13 @@ class GeometryView:
             below_labware_id = labware.location.labwareId
             slot_name = self.get_ancestor_slot_name(below_labware_id)
         elif isinstance(labware.location, AddressableAreaLocation):
-            area_name = labware.location.addressableAreaName
             if self._labware.is_absorbance_reader_lid(labware_id):
                 raise errors.LocationIsLidDockSlotError(
                     "Cannot get ancestor slot name for labware on lid dock slot."
                 )
-            elif fixture_validation.is_staging_slot(area_name):
-                slot_name = StagingSlotName.from_primitive(area_name)
-            else:
-                slot_name = DeckSlotName.from_primitive(area_name)
+            slot_name = fixture_validation.get_slot_name_from_addressable_area(
+                labware.location.addressableAreaName
+            )
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"

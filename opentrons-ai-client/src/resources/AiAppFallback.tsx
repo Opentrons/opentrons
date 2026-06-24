@@ -23,7 +23,7 @@ export function AiAppFallback({
   }
 
   return (
-    <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">
+    <Modal type="warning" title={t('error_boundary_title')}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText desktopStyle="bodyDefaultRegular">

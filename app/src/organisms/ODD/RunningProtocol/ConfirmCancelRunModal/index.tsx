@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useDismissCurrentRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
@@ -43,7 +44,7 @@ export function ConfirmCancelRunModal({
     useDismissCurrentRunMutation()
   const localRobot = useSelector(getLocalRobot)
   const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
-  const runStatus = data?.data.status
+  const { status: runStatus, current: isRunCurrent } = data?.data ?? {}
   const robotName = localRobot?.name ?? ''
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const navigate = useNavigate()
@@ -56,33 +57,43 @@ export function ConfirmCancelRunModal({
     iconColor: COLORS.yellow50,
   }
 
+  const dismissAndNavigate = useCallback((): void => {
+    if (!isActiveRun) {
+      dismissCurrentRun(runId)
+      if (protocolId != null) {
+        navigate(`/protocols/${protocolId}`)
+      } else {
+        navigate('/protocols')
+      }
+    }
+  }, [isActiveRun, dismissCurrentRun, runId, protocolId, navigate])
+
   const handleCancelRun = (): void => {
     setIsCanceling(true)
     stopRun(runId, {
-      onError: () => {
-        setIsCanceling(false)
+      onSuccess: () => {
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
+        dismissAndNavigate()
+      },
+      onError: (error: unknown) => {
+        if (isDocumentedMutationError(error)) {
+          setIsCanceling(false)
+        } else {
+          dismissAndNavigate()
+        }
       },
     })
   }
 
-  useEffect(
-    () => {
-      if (runStatus === RUN_STATUS_STOPPED || isRunFetchError) {
-        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
-        if (!isActiveRun) {
-          dismissCurrentRun(runId)
-          if (protocolId != null) {
-            navigate(`/protocols/${protocolId}`)
-          } else {
-            navigate('/protocols')
-          }
-        }
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [runStatus]
-  )
+  useEffect(() => {
+    if (
+      runStatus === RUN_STATUS_STOPPED ||
+      isRunFetchError ||
+      isRunCurrent === false
+    ) {
+      dismissAndNavigate()
+    }
+  }, [runStatus, isRunCurrent, isRunFetchError, dismissAndNavigate])
 
   return isCanceling || isDismissing ? (
     <CancelingRunModal />

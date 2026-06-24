@@ -51,7 +51,16 @@ async def test_start_set_vacuum_power(
     )
     result = await subject.execute(data)
 
-    decoy.verify(await vm_hardware.set_pump_state(True, duty_cycle=duty_cycle))
+    decoy.verify(
+        await vm_hardware.set_pump_state(
+            True,
+            duty_cycle=duty_cycle,
+            duration_s=None,
+            timeout_s=None,
+            rate=None,
+            vent_after=True,
+        )
+    )
     assert result == SuccessData(
         public=expected_result,
         state_update=update_types.StateUpdate(),

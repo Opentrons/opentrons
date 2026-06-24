@@ -678,6 +678,7 @@ class OT3API(
     async def create_simulating_peripheral(
         self,
         model: peripherals.types.PeripheralModel,
+        sim_serial: Optional[str] = None,
     ) -> peripherals.AbstractPeripheral:
         """Create a simulating peripheral hardware interface."""
         assert self.is_simulator, (
@@ -690,6 +691,7 @@ class OT3API(
             ),
             type=peripherals.PeripheralType.from_model(model),
             sim_model=model.value,
+            sim_serial=sim_serial,
         )
         assert isinstance(peripheral, peripherals.AbstractPeripheral)
         return peripheral
@@ -3361,12 +3363,15 @@ class OT3API(
         s_data = await self._backend.read_pressure_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
-    async def read_stem_capacitance(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    async def read_instrument_capacitance(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        primary: bool = True,
+        timeout: int = 1,
     ) -> float:
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend.read_capacitive_sensor(realmount, primary)
+        s_data = await self._backend.read_capacitive_sensor(realmount, primary, timeout)
         return s_data if s_data else 0.0
 
     async def touch_probe(

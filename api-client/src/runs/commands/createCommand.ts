@@ -1,4 +1,4 @@
-import { createAxiosConfig, POST, request } from '../../request'
+import { POST, request } from '../../request'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../../request'
@@ -15,8 +15,7 @@ export function createCommand(
   return request<CommandData, { data: CreateCommand }>(
     POST,
     `/runs/${runId}/commands`,
-    { data },
     config,
-    params && createAxiosConfig({ params })
+    { queryParams: { ...params }, body: { data } }
   )
 }

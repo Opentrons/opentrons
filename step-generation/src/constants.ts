@@ -188,3 +188,8 @@ export const VACUUM_VENT_SET_CLOSED: 'closed' = 'closed'
 
 export const VACUUM_DEACTIVATED: 'VACUUM_DEACTIVATED' = 'VACUUM_DEACTIVATED'
 export const VACUUM_AT_TARGET: 'VACUUM_AT_TARGET' = 'VACUUM_AT_TARGET'
+
+export const VACUUM_SPACER_LOAD_NAMES: string[] = [
+  'opentrons_vacuum_manifold_spacer_short',
+  'opentrons_vacuum_manifold_spacer_tall',
+]

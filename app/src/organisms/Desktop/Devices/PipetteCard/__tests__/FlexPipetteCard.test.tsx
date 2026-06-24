@@ -8,7 +8,7 @@ import { i18n } from '/app/i18n'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
-import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
+import { mockLeftSpecs } from '/app/resources/instruments/__fixtures__'
 
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { FlexPipetteCard } from '../FlexPipetteCard'
@@ -75,7 +75,7 @@ describe('FlexPipetteCard', () => {
 
   it('renders correct info when gripper is attached', () => {
     render(props)
-    screen.getByText('left Mount')
+    screen.getByText('Left Mount')
     screen.getByText('Left Pipette')
     const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
@@ -114,7 +114,7 @@ describe('FlexPipetteCard', () => {
       isEstopNotDisengaged: false,
     }
     render(props)
-    screen.getByText('Both Mounts')
+    screen.getByText('Left+Right Mounts')
     screen.getByText('Left Pipette')
   })
   it('renders recalibrate banner when no calibration data is present', () => {

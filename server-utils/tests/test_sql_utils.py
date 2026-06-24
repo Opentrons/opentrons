@@ -68,6 +68,29 @@ def test_enable_foreign_key_constraints(
         transaction.execute(sqlalchemy.insert(table_b).values(int_col=456))
 
 
+@pytest.mark.parametrize("enable_wal", [True, False])
+def test_enable_write_ahead_logging(
+    scratch_engine: sqlalchemy.engine.Engine,
+    enable_wal: bool,
+) -> None:
+    """Test that ``enable_write_ahead_logging()`` switches the journal mode to WAL.
+
+    Without the helper, SQLite defaults to ``delete`` (rollback journal) mode.
+    """
+    if enable_wal:
+        sql_utils.enable_write_ahead_logging(scratch_engine)
+        expected_journal_mode = "wal"
+    else:
+        expected_journal_mode = "delete"
+
+    with scratch_engine.connect() as connection:
+        actual_journal_mode = connection.exec_driver_sql(
+            "PRAGMA journal_mode;"
+        ).scalar_one()
+
+    assert actual_journal_mode == expected_journal_mode
+
+
 @pytest.mark.parametrize("fix_transactions", [True, False])
 def test_fix_transaction_fixes_transactional_ddl(
     scratch_engine: sqlalchemy.engine.Engine,

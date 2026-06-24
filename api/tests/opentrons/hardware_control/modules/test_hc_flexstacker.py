@@ -633,7 +633,7 @@ async def test_error_callback(
     # There are no asynchronous errors from the stacker (the door is handled
     # differently) so just inject a random exception.
     exc = Exception("Oh no!")
-    decoy.when(mock_driver.get_hopper_door_closed()).then_raise(exc)
+    decoy.when(await mock_driver.get_hopper_door_closed()).then_raise(exc)
     with pytest.raises(Exception, match="Oh no!"):
         await subject._poller.wait_next_poll()
     decoy.verify(

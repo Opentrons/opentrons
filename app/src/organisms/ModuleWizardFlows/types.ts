@@ -1,6 +1,6 @@
 import type { AttachedModule } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { PipetteInformation } from '/app/redux/pipettes'
+import type { PipetteInformation } from '/app/resources/instruments/types'
 import type { ACTIONS, FLOWS, SECTIONS } from './constants'
 
 export type ModuleSetupWizardStep =

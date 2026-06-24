@@ -7,5 +7,5 @@ import type { RobotSettingsResponse } from './types'
 export function getRobotSettings(
   config: HostConfig
 ): ResponsePromise<RobotSettingsResponse> {
-  return request<RobotSettingsResponse>(GET, '/settings', null, config)
+  return request<RobotSettingsResponse>(GET, '/settings', config)
 }

@@ -8,5 +8,7 @@ export function setLights(
   config: HostConfig,
   data: SetLightsData
 ): ResponsePromise<Lights> {
-  return request<Lights, SetLightsData>(POST, '/robot/lights', data, config)
+  return request<Lights, SetLightsData>(POST, '/robot/lights', config, {
+    body: data,
+  })
 }

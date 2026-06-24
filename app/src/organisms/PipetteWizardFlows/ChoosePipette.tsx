@@ -123,12 +123,14 @@ interface ChoosePipetteProps {
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'audit_log'])
   const attachedPipettesByMount = useAttachedPipettesFromInstrumentsQuery()
   const [showExitConfirmation, setShowExitConfirmation] =
     useState<boolean>(false)
 
-  const initialDocstate = usePromptForInteractionReason()
+  const initialAction =
+    mount === LEFT ? 'attach_pipette_left' : 'attach_pipette_right'
+  const initialDocstate = usePromptForInteractionReason([initialAction], exit)
   const isWaitingForDocumentation = !isDocumentationProvided(initialDocstate)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)

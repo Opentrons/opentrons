@@ -950,6 +950,3 @@ class Protocols:
         robot="Flex",
         folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER,
     )
-    OT2_S_v2_20_P50_touch_tip: Protocol = Protocol(
-        file_stem="OT2_S_v2_20_P50_touch_tip", file_extension="py", robot="OT2", folder=PROTOCOLS_FOLDER
-    )

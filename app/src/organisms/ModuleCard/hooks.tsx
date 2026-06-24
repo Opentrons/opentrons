@@ -392,7 +392,7 @@ export function useModuleOverflowMenu(
             : t('open_lid'),
         isSettingDisabled: isDisabled,
         isSecondary: false,
-        menuButtons: [thermoSetBlockTempBtn, aboutModuleBtn],
+        menuButtons: [thermoSetBlockTempBtn, aboutModuleBtn, setupBtn],
         onClick: controlTCLid,
       },
     ],
@@ -405,7 +405,7 @@ export function useModuleOverflowMenu(
             : t('overflow_menu_mod_temp'),
         isSecondary: false,
         isSettingDisabled: isDisabled,
-        menuButtons: [aboutModuleBtn],
+        menuButtons: [aboutModuleBtn, setupBtn],
         onClick:
           module.data.status !== 'idle'
             ? () => {
@@ -468,7 +468,7 @@ export function useModuleOverflowMenu(
         setSetting: t('overflow_menu_about'),
         isSecondary: false,
         isSettingDisabled: false,
-        menuButtons: [],
+        menuButtons: [setupBtn],
         onClick: handleAboutClick,
       },
     ],

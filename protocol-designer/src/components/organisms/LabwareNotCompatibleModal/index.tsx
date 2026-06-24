@@ -26,7 +26,6 @@ export function LabwareNotCompatibleModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       type="warning"
       title={t('delete_labware')}
       onClose={onClose}

@@ -12,7 +12,7 @@ export function updateRobotSetting(
   return request<RobotSettingsResponse, UpdateRobotSettingRequest>(
     POST,
     '/settings',
-    { id, value },
-    config
+    config,
+    { body: { id, value } }
   )
 }

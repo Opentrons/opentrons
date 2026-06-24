@@ -33,6 +33,7 @@ class HardwareRevision(Enum):
 
     NFF = "nff"
     EVT = "a1"
+    DVT = "b1"
 
 
 @dataclass
@@ -153,3 +154,7 @@ class PumpState:
     current_pwm: float
     pump_running: bool
     manual_control: bool
+
+
+PRESSURE_COMPARISON_WINDOW_SIZE = 10
+POWER_COMPARISON_WINDOW_SIZE = 10

@@ -14,7 +14,6 @@ import type {
 import type { DiscoveryAction, DiscoveryState } from './discovery/types'
 import type { ModulesAction } from './modules/types'
 import type { NetworkingAction, NetworkingState } from './networking/types'
-import type { PipettesAction, PipettesState } from './pipettes/types'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type { ProtocolRunAction, ProtocolRunState } from './protocol-runs/types'
 import type {
@@ -24,10 +23,6 @@ import type {
 import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
 import type { RobotApiAction, RobotApiState } from './robot-api/types'
 import type { RobotAuthAction, RobotAuthState } from './robot-auth'
-import type {
-  RobotControlsAction,
-  RobotControlsState,
-} from './robot-controls/types'
 import type {
   RobotSettingsAction,
   RobotSettingsState,
@@ -45,10 +40,8 @@ export interface State {
   readonly robotApi: RobotApiState
   readonly robotAuth: RobotAuthState
   readonly robotAdmin: RobotAdminState
-  readonly robotControls: RobotControlsState
   readonly robotSettings: RobotSettingsState
   readonly robotUpdate: RobotUpdateState
-  readonly pipettes: PipettesState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
   readonly networking: NetworkingState
@@ -66,10 +59,8 @@ export type Action =
   | RobotApiAction
   | RobotAdminAction
   | RobotAuthAction
-  | RobotControlsAction
   | RobotSettingsAction
   | RobotUpdateAction
-  | PipettesAction
   | ModulesAction
   | ShellAction
   | ConfigAction

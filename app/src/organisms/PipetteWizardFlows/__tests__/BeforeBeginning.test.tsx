@@ -11,7 +11,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 // import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
@@ -65,7 +65,10 @@ describe('BeforeBeginning', () => {
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
       deckConfig: mockDeckConfig,
-      documentationState: { accessControlEnabled: false },
+      documentationState: {
+        reasonForInteractionRequired: false,
+        isLoading: false,
+      },
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)

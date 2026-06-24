@@ -61,7 +61,7 @@ import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
-import { showDocumentationRequiredModal } from '../organisms/ODD/DocumentationRequired/DocumentationRequiredModal'
+import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
@@ -246,22 +246,25 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
-                  <MaintenanceRunTakeover>
-                    <EstopTakeover />
-                    <FirmwareUpdateTakeover />
-                    {showModuleSetupModal && localRobot?.name != null ? (
-                      <ModuleWizardFlows
-                        showSetupLauncher={true}
-                        closeFlow={() => {
-                          setShowModuleSetupModal(false)
-                        }}
-                        robotName={localRobot.name}
-                      />
-                    ) : null}
-                    <NiceModal.Provider>
-                      <DocumentationRequiredModalContext.Provider
-                        value={{ showDocumentationRequiredModal }}
-                      >
+                  <DocumentationRequiredModalContext.Provider
+                    value={{
+                      showDocumentationRequiredModal: requireDocumentation,
+                    }}
+                  >
+                    <MaintenanceRunTakeover>
+                      <EstopTakeover />
+                      <FirmwareUpdateTakeover />
+                      {showModuleSetupModal && localRobot?.name != null ? (
+                        <ModuleWizardFlows
+                          showSetupLauncher={true}
+                          closeFlow={() => {
+                            setShowModuleSetupModal(false)
+                          }}
+                          robotName={localRobot.name}
+                        />
+                      ) : null}
+
+                      <NiceModal.Provider>
                         <RobotEncryptionKeyTakeover>
                           <ToasterOven>
                             <ProtocolReceiptToasts />
@@ -279,9 +282,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                             <LoggedOutOverlayMount />
                           </ToasterOven>
                         </RobotEncryptionKeyTakeover>
-                      </DocumentationRequiredModalContext.Provider>
-                    </NiceModal.Provider>
-                  </MaintenanceRunTakeover>
+                      </NiceModal.Provider>
+                    </MaintenanceRunTakeover>
+                  </DocumentationRequiredModalContext.Provider>
                 </>
               )}
             </Box>

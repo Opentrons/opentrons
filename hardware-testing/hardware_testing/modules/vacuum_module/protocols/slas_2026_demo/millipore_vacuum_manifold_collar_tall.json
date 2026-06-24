@@ -37,7 +37,7 @@
   },
   "parameters": {
     "format": "96Standard",
-    "quirks": ["vacuumModuleDock"],
+    "quirks": ["vacuumModuleDock", "providesStackingDefault"],
     "isTiprack": false,
     "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,
@@ -53,7 +53,7 @@
     "z": 0
   },
   "stackingOffsetWithLabware": {
-    "invitroven_filter_plate": {
+    "default": {
       "x": 0,
       "y": 0,
       "z": 22.38
@@ -69,6 +69,7 @@
   "gripForce": 17,
   "gripHeightFromLabwareBottom": 66,
   "containedSpace": {
+    "shape": "rectangular",
     "origin": { "x": 0, "y": 0, "z": 0 },
     "dimensions": {
       "xDimension": 134,

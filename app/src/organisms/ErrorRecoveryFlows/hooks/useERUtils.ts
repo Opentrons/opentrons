@@ -189,7 +189,7 @@ export function useERUtils({
   const recoveryActionMutationUtils = useRecoveryActionMutation(
     runId,
     routeUpdateActions,
-    { accessControlEnabled: false }
+    { reasonForInteractionRequired: false, isLoading: false }
   )
 
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under

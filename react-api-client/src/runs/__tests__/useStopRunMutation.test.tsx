@@ -34,7 +34,11 @@ describe('useStopRunMutation hook', () => {
     vi.mocked(createRunAction).mockRejectedValue('oops')
 
     const { result } = renderHook(
-      () => useStopRunMutation({ accessControlEnabled: false }),
+      () =>
+        useStopRunMutation({
+          reasonForInteractionRequired: false,
+          isLoading: false,
+        }),
       {
         wrapper,
       }
@@ -54,7 +58,11 @@ describe('useStopRunMutation hook', () => {
     } as Response<RunAction>)
 
     const { result } = renderHook(
-      () => useStopRunMutation({ accessControlEnabled: false }),
+      () =>
+        useStopRunMutation({
+          reasonForInteractionRequired: false,
+          isLoading: false,
+        }),
       {
         wrapper,
       }

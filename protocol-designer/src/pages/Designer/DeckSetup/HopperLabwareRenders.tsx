@@ -70,7 +70,7 @@ export function HopperLabwareRenders(
   }
   return (
     <>
-      {adapterLabwareId != null ? (
+      {adapterLabwareId != null && labwaresOnDeck[adapterLabwareId] != null ? (
         <LabwareOnDeck
           x={HOPPER_LABWARE_X_OFFSET}
           y={0}
@@ -82,7 +82,7 @@ export function HopperLabwareRenders(
         y={0}
         labwareOnDeck={primaryLabware}
       />
-      {lidLabwareId != null ? (
+      {lidLabwareId != null && labwaresOnDeck[lidLabwareId] != null ? (
         <LabwareOnDeck
           x={HOPPER_LABWARE_X_OFFSET}
           y={0}

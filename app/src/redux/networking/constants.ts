@@ -33,9 +33,7 @@ export const CONFIGURE_PSK_MIN_LENGTH = 8
 export const STATUS_PATH: '/networking/status' = '/networking/status'
 export const WIFI_LIST_PATH: '/wifi/list' = '/wifi/list'
 export const WIFI_CONFIGURE_PATH: '/wifi/configure' = '/wifi/configure'
-export const WIFI_KEYS_PATH: '/wifi/keys' = '/wifi/keys'
 export const EAP_OPTIONS_PATH: '/wifi/eap-options' = '/wifi/eap-options'
-export const WIFI_DISCONNECT_PATH: '/wifi/disconnect' = '/wifi/disconnect'
 
 // action type strings
 
@@ -60,28 +58,6 @@ export const POST_WIFI_CONFIGURE_SUCCESS: 'networking:POST_WIFI_CONFIGURE_SUCCES
 export const POST_WIFI_CONFIGURE_FAILURE: 'networking:POST_WIFI_CONFIGURE_FAILURE' =
   'networking:POST_WIFI_CONFIGURE_FAILURE'
 
-// GET /wifi/keys
-
-export const FETCH_WIFI_KEYS: 'networking:FETCH_WIFI_KEYS' =
-  'networking:FETCH_WIFI_KEYS'
-
-export const FETCH_WIFI_KEYS_SUCCESS: 'networking:FETCH_WIFI_KEYS_SUCCESS' =
-  'networking:FETCH_WIFI_KEYS_SUCCESS'
-
-export const FETCH_WIFI_KEYS_FAILURE: 'networking:FETCH_WIFI_KEYS_FAILURE' =
-  'networking:FETCH_WIFI_KEYS_FAILURE'
-
-// POST /wifi/keys
-
-export const POST_WIFI_KEYS: 'networking:POST_WIFI_KEYS' =
-  'networking:POST_WIFI_KEYS'
-
-export const POST_WIFI_KEYS_SUCCESS: 'networking:POST_WIFI_KEYS_SUCCESS' =
-  'networking:POST_WIFI_KEYS_SUCCESS'
-
-export const POST_WIFI_KEYS_FAILURE: 'networking:POST_WIFI_KEYS_FAILURE' =
-  'networking:POST_WIFI_KEYS_FAILURE'
-
 // GET /wifi/eap-options
 
 export const FETCH_EAP_OPTIONS: 'networking:FETCH_EAP_OPTIONS' =
@@ -92,17 +68,6 @@ export const FETCH_EAP_OPTIONS_SUCCESS: 'networking:FETCH_EAP_OPTIONS_SUCCESS' =
 
 export const FETCH_EAP_OPTIONS_FAILURE: 'networking:FETCH_EAP_OPTIONS_FAILURE' =
   'networking:FETCH_EAP_OPTIONS_FAILURE'
-
-// POST /wifi/disconnect
-
-export const POST_WIFI_DISCONNECT: 'networking:POST_WIFI_DISCONNECT' =
-  'networking:POST_WIFI_DISCONNECT'
-
-export const POST_WIFI_DISCONNECT_SUCCESS: 'networking:POST_WIFI_DISCONNECT_SUCCESS' =
-  'networking:POST_WIFI_DISCONNECT_SUCCESS'
-
-export const POST_WIFI_DISCONNECT_FAILURE: 'networking:POST_WIFI_DISCONNECT_FAILURE' =
-  'networking:POST_WIFI_DISCONNECT_FAILURE'
 
 // clear wifi status
 

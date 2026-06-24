@@ -28,7 +28,7 @@ export default {
         'For Storybook only. Number of lorem ipsum text rows to display in the table. ',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface TextListTableContentStoryProps extends Omit<

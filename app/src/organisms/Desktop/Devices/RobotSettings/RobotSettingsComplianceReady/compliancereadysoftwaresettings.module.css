@@ -1,0 +1,41 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-40);
+}
+
+.field_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.toggle_setting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.sub_fields {
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--spacing-24);
+  gap: var(--spacing-16);
+}
+
+.toggle_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-16);
+}
+
+.toggle_label {
+  flex: 1;
+}

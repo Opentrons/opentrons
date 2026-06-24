@@ -1,0 +1,46 @@
+.action_list_container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.action_list {
+  height: auto;
+  min-height: 0;
+  flex: 1;
+  gap: var(--spacing-4);
+}
+
+.action_list div {
+  background-color: var(--grey-20);
+}
+
+.button_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
+  gap: var(--spacing-8);
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  height: 19rem;
+  flex-direction: row;
+  align-items: stretch;
+  gap: var(--spacing-40);
+}
+
+.text_area_container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.text_area_field_fill {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}

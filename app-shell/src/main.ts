@@ -25,8 +25,10 @@ import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerProtocolStorage } from './protocol-storage'
 import { registerRobotUpdate } from './robot-update'
 import {
+  clearMainWindow,
   closeSecondaryWindows,
   registerCameraStream,
+  setMainWindow,
 } from './secondary-windows'
 import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
@@ -177,9 +179,11 @@ async function startUp(): Promise<void> {
 
   initializeDiscovery()
   mainWindow = createUi()
+  setMainWindow(mainWindow)
   rendererLogger = createRendererLogger()
 
   mainWindow.once('closed', () => {
+    clearMainWindow()
     mainWindow = null
     closeSecondaryWindows()
   })

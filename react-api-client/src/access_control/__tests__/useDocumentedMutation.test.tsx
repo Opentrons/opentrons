@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { DocumentedMutationError } from '../types'
 import { useDocumentedMutation } from '../useDocumentedMutation'
 
 import type { AxiosError } from 'axios'
@@ -31,9 +32,10 @@ describe('useDocumentedMutation', () => {
     const { result } = renderHook(
       () =>
         useDocumentedMutation<number, AxiosError, number>(
-          { accessControlEnabled: false },
+          { reasonForInteractionRequired: false, isLoading: false },
+          ['play_run'],
           testMutationKey,
-          (n: number) => mutationFn(n),
+          ({ variables: n }) => mutationFn(n),
           {}
         ),
       { wrapper }
@@ -56,11 +58,13 @@ describe('useDocumentedMutation', () => {
       () =>
         useDocumentedMutation<number, AxiosError, number>(
           {
-            accessControlEnabled: true,
+            reasonForInteractionRequired: true,
             docreport: MOCK_REPORT,
+            isLoading: false,
           },
+          ['play_run'],
           testMutationKey,
-          (x: number) => mutationFn(x),
+          ({ variables: x }) => mutationFn(x),
           {}
         ),
       { wrapper }
@@ -84,12 +88,14 @@ describe('useDocumentedMutation', () => {
       () =>
         useDocumentedMutation<string, AxiosError, string>(
           {
-            accessControlEnabled: true,
+            reasonForInteractionRequired: true,
             docreport: null,
             askForDocumentation,
+            isLoading: false,
           },
+          ['play_run'],
           testMutationKey,
-          (s: string) => mutationFn(s),
+          ({ variables: s }) => mutationFn(s),
           {}
         ),
       { wrapper }
@@ -112,12 +118,14 @@ describe('useDocumentedMutation', () => {
       () =>
         useDocumentedMutation<string, AxiosError, string>(
           {
-            accessControlEnabled: true,
+            reasonForInteractionRequired: true,
             docreport: null,
             askForDocumentation,
+            isLoading: false,
           },
+          ['play_run'],
           testMutationKey,
-          (s: string) => mutationFn(s),
+          ({ variables: s }) => mutationFn(s),
           {}
         ),
       { wrapper }
@@ -130,5 +138,69 @@ describe('useDocumentedMutation', () => {
       expect(result.current.data).toBe('run-ok')
     })
     expect(mutationFn).toHaveBeenCalledWith('run')
+  })
+
+  it('throws DocumentedMutationError when access control queries are still loading', async () => {
+    const mutationFn = vi.fn(async (n: number) => n + 1)
+
+    const { result } = renderHook(
+      () =>
+        useDocumentedMutation<number, DocumentedMutationError, number>(
+          { isLoading: true },
+          ['play_run'],
+          testMutationKey,
+          ({ variables: n }) => mutationFn(n),
+          {}
+        ),
+      { wrapper }
+    )
+
+    act(() => {
+      result.current.mutate(5)
+    })
+
+    await waitFor(() => {
+      expect(result.current.error).toBeInstanceOf(DocumentedMutationError)
+    })
+    expect(result.current.error).toMatchObject({
+      type: 'access_control_loading',
+    })
+    expect(mutationFn).not.toHaveBeenCalled()
+  })
+
+  it('throws DocumentedMutationError when documentation is required but not provided', async () => {
+    const askForDocumentation = vi
+      .fn()
+      .mockResolvedValue('' as DocumentationReport)
+    const mutationFn = vi.fn(async (n: number) => n + 1)
+
+    const { result } = renderHook(
+      () =>
+        useDocumentedMutation<number, DocumentedMutationError, number>(
+          {
+            reasonForInteractionRequired: true,
+            docreport: null,
+            askForDocumentation,
+            isLoading: false,
+          },
+          ['play_run'],
+          testMutationKey,
+          ({ variables: n }) => mutationFn(n),
+          {}
+        ),
+      { wrapper }
+    )
+
+    act(() => {
+      result.current.mutate(5)
+    })
+
+    await waitFor(() => {
+      expect(result.current.error).toBeInstanceOf(DocumentedMutationError)
+    })
+    expect(result.current.error).toMatchObject({
+      type: 'no_documentation_report',
+    })
+    expect(mutationFn).not.toHaveBeenCalled()
   })
 })

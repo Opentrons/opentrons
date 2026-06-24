@@ -11,38 +11,30 @@ type sendIdentifyModuleType = (
   color?: IdentifyColor
 ) => void
 
-export function useSendIdentifyStacker(): sendIdentifyModuleType {
+export function useSendIdentifyModule(): sendIdentifyModuleType {
   const { createLiveCommand } = useCreateLiveCommandMutation()
 
-  const sendIdentifyStacker = useCallback(
+  const sendIdentifyModule = useCallback(
     (
       module: AttachedModule,
       start: boolean,
       color: IdentifyColor | null = null
     ) => {
-      // Only send identify command for flex stacker modules,
-      // other module types are not currently supported
-      if (module.moduleType === 'flexStackerModuleType') {
-        createLiveCommand({
-          command: {
-            commandType: 'identifyModule',
-            params: {
-              model: module.moduleModel,
-              moduleId: module.id,
-              start,
-              ...(color != null ? { color } : {}),
-            },
+      createLiveCommand({
+        command: {
+          commandType: 'identifyModule',
+          params: {
+            model: module.moduleModel,
+            moduleId: module.id,
+            start,
+            ...(color != null ? { color } : {}),
           },
-        }).catch(error => {
-          console.log(error.message)
-        })
-      } else {
-        console.warn(
-          `Module type ${module.moduleType} does not support identify command`
-        )
-      }
+        },
+      }).catch(error => {
+        console.log(error.message)
+      })
     },
     [createLiveCommand]
   )
-  return sendIdentifyStacker
+  return sendIdentifyModule
 }

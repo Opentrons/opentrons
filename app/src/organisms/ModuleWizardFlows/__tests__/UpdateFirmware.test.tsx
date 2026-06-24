@@ -8,7 +8,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   dismissRequest,
   FAILURE,
@@ -17,8 +16,9 @@ import {
   SUCCESS,
   useDispatchApiRequest,
 } from '/app/redux/robot-api'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
-import { useSendIdentifyStacker } from '../hooks'
+import { useSendIdentifyModule } from '../hooks'
 import { UpdateFirmware } from '../UpdateFirmware'
 
 import type { ComponentProps } from 'react'
@@ -45,7 +45,7 @@ const render = (props: ComponentProps<typeof UpdateFirmware>) => {
 describe('UpdateFirmware', () => {
   let dispatchApiRequest: DispatchApiRequestType
   let handleModuleApiRequests: (robotName: string, serial: string) => void
-  let sendIdentifyStacker: (
+  let sendIdentifyModule: (
     module: AttachedModule,
     start: boolean,
     color?: IdentifyColor
@@ -55,7 +55,7 @@ describe('UpdateFirmware', () => {
     vi.useFakeTimers()
     dispatchApiRequest = vi.fn()
     handleModuleApiRequests = vi.fn()
-    sendIdentifyStacker = vi.fn()
+    sendIdentifyModule = vi.fn()
     props = {
       proceed: vi.fn(),
       goBack: vi.fn(),
@@ -84,7 +84,7 @@ describe('UpdateFirmware', () => {
       dispatchApiRequest,
       [LAST_ID],
     ])
-    vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
+    vi.mocked(useSendIdentifyModule).mockReturnValue(sendIdentifyModule)
   })
 
   afterEach(() => {

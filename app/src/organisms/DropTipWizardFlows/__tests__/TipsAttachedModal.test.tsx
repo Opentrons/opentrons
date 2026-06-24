@@ -6,7 +6,8 @@ import { LEFT } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { useHomePipettes } from '/app/local-resources/instruments'
+import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { useDropTipWizardFlows } from '..'
@@ -19,14 +20,7 @@ import type { PipetteWithTip } from '/app/resources/instruments'
 
 vi.mock('/app/resources/runs/useCloseCurrentRun')
 vi.mock('..')
-vi.mock(
-  '/app/local-resources/access-control/usePromptForInteractionReason',
-  () => ({
-    usePromptForInteractionReason: vi.fn(() => ({
-      accessControlEnabled: false,
-    })),
-  })
-)
+vi.mock('/app/local-resources/instruments')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -60,7 +54,7 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
             host: MOCK_HOST,
             aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
-            onSettled: vi.fn(),
+            onSuccess: vi.fn(),
           })
         }
         data-testid="testButton"
@@ -85,6 +79,10 @@ describe('TipsAttachedModal', () => {
       showDTWiz: false,
       enableDTWiz: mockToggleDTWiz,
       disableDTWiz: vi.fn(),
+    })
+    vi.mocked(useHomePipettes).mockReturnValue({
+      homePipettes: vi.fn(),
+      isHoming: false,
     })
   })
 

@@ -96,15 +96,6 @@ describe('robot settings actions', () => {
         meta: { requestId: 'abc' } as any,
       },
     },
-    {
-      name: 'clearRestartPath',
-      creator: Actions.clearRestartPath,
-      args: ['robot-name'],
-      expected: {
-        type: 'robotSettings:CLEAR_RESTART_PATH',
-        payload: { robotName: 'robot-name' },
-      },
-    },
   ]
 
   SPECS.forEach(spec => {

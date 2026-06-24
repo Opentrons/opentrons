@@ -6,7 +6,9 @@ import styled from 'styled-components'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   Btn,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -22,11 +24,13 @@ import {
   useHoverTooltip,
   useInterval,
 } from '@opentrons/components'
-import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 
 import { QuaternaryButton } from '/app/atoms/buttons'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
-import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
@@ -62,7 +66,9 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
-  const isFlex = useIsFlex(name)
+  const { data: accessControlData } = useAccessControlEnabledQuery()
+  const isComplianceReady =
+    accessControlData?.data?.accessControlEnabled ?? false
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { data: runRecord } = useNotifyRunQuery(currentRunId, {
@@ -122,9 +128,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   )
   // do not show ethernet connection for OT-2
   const isFlexConnectedViaEthernet =
-    isFlex &&
-    ethernetAddress != null &&
-    ethernetAddress.healthStatus === HEALTH_STATUS_OK
+    ethernetAddress != null && ethernetAddress.healthStatus === HEALTH_STATUS_OK
 
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
   const isFlexConnectedViaUSB =
@@ -198,6 +202,15 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           <Tooltip tooltipProps={tooltipProps} width="auto">
             {tooltipTranslationKey != null ? t(tooltipTranslationKey) : ''}
           </Tooltip>
+          {isComplianceReady ? (
+            <Chip
+              type="info"
+              text={t('devices_landing:compliance_ready')}
+              hasIcon={false}
+              chipSize="small"
+              borderRadius={BORDERS.borderRadius4}
+            />
+          ) : null}
         </Flex>
       </Flex>
       {runningProtocolBanner}

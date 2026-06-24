@@ -7,10 +7,5 @@ export function deleteRunImages(
   config: HostConfig,
   runId: string
 ): ResponsePromise<EmptyResponse> {
-  return request<EmptyResponse>(
-    DELETE,
-    `/dataFiles/${runId}/images`,
-    null,
-    config
-  )
+  return request<EmptyResponse>(DELETE, `/dataFiles/${runId}/images`, config)
 }

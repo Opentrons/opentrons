@@ -25,22 +25,63 @@ export const PATCH = 'PATCH'
 export const DELETE = 'DELETE'
 export const PUT = 'PUT'
 
-export type BrandedAxiosConfig = AxiosRequestConfig & {
-  readonly __axiosConfigBrand: unique symbol
-}
-export function createAxiosConfig(
-  config: AxiosRequestConfig
-): BrandedAxiosConfig {
-  return config as BrandedAxiosConfig
+export interface RequestConfig<
+  RequestBodyT extends AxiosRequestConfig['data'],
+> {
+  /**
+   * The request body.
+   */
+  body?: RequestBodyT
+
+  /**
+   * Query parameters, e.g. {foo: "bar"} for ?foo=bar.
+   */
+  queryParams?: Record<string, string | number | boolean>
+
+  /**
+   * Request-specific headers.
+   *
+   * Common headers like Authorization, Opentrons-Version,
+   * and Opentrons-User-Notes don't need to be set here;
+   * they'll be added automatically.
+   */
+  headers?: Record<string, string>
+
+  /**
+   * The user-entered reason for this interaction with the robot.
+   * Generally required by the server for any mutation when
+   * Compliance Ready Software is enabled.
+   */
+  userNotes?: string
+
+  /**
+   * What kind of response body to expect and how Axios should parse it.
+   */
+  responseType?: AxiosRequestConfig['responseType']
+
+  /**
+   * If true, this request will always use HTTPS, never HTTP.
+   * (Unless it's to localhost, in which case it may still use HTTP.)
+   *
+   * This must be set to true whenever a request carries secrets. For example, if
+   * the request is to change a user's password, this needs to be true to avoid
+   * exposing the new password over the network.
+   *
+   * This should otherwise be set to false because HTTPS requires some onerous manual
+   * setup, and so not every robot will support it.
+   */
+  requiresSecureTransport?: boolean
 }
 
-export function request<ResData, ReqData = null>(
+export function request<
+  ResponseBodyT,
+  RequestBodyT extends AxiosRequestConfig['data'] = never,
+>(
   method: Method,
   url: string,
-  data: ReqData,
   hostConfig: HostConfig,
-  axiosConfig?: BrandedAxiosConfig
-): ResponsePromise<ResData> {
+  requestConfig?: RequestConfig<RequestBodyT>
+): ResponsePromise<ResponseBodyT> {
   const {
     hostname,
     port,
@@ -49,20 +90,47 @@ export function request<ResData, ReqData = null>(
     secure,
   } = hostConfig
 
+  const params = requestConfig?.queryParams ?? {}
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
-  const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
+  const userNotesHeader =
+    requestConfig?.userNotes != null
+      ? { 'Opentrons-User-Notes': requestConfig.userNotes }
+      : {}
+  const extraHeaders = requestConfig?.headers ?? {}
+  const headers = {
+    ...DEFAULT_HEADERS,
+    ...tokenHeader,
+    ...userNotesHeader,
+    ...extraHeaders,
+  }
 
-  const protocol = (secure ?? false) ? 'https' : 'http'
-  const defaultPort = (secure ?? false) ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
+  const requiresSecureTransport =
+    'Authorization' in headers ||
+    (requestConfig?.requiresSecureTransport ?? false)
+
+  const protocol =
+    (secure ?? false) || (requiresSecureTransport && !isLocalhost(hostConfig))
+      ? 'https'
+      : 'http'
+  const defaultPort = protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
   const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
 
-  return requestor<ResData>({
-    headers,
+  return requestor<ResponseBodyT>({
     method,
     baseURL,
     url,
-    data,
-    ...axiosConfig,
+    params,
+    data: requestConfig?.body,
+    headers,
+    responseType: requestConfig?.responseType,
   })
+}
+
+function isLocalhost(hostConfig: HostConfig): boolean {
+  return (
+    hostConfig.hostname === 'localhost' ||
+    hostConfig.hostname === '127.0.0.1' ||
+    hostConfig.hostname === '::1'
+  )
 }

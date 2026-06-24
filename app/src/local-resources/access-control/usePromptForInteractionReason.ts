@@ -5,6 +5,7 @@ import { useGuardedAction } from './useGuardedAction'
 import type {
   DocumentationReport,
   DocumentationState,
+  DocumentedAction,
 } from '@opentrons/react-api-client'
 
 /**
@@ -19,22 +20,25 @@ import type {
  *
  */
 export const usePromptForInteractionReason = (
+  actionsToDocument: DocumentedAction[],
+  onCancel?: () => void,
   initialDocstate?: DocumentationState
 ): DocumentationState => {
   const [docReport, setDocReport] = useState<DocumentationReport>()
-  const docStateToUse = initialDocstate?.accessControlEnabled
-    ? initialDocstate.docreport
-    : docReport
+  const docStateToUse =
+    !initialDocstate?.isLoading && initialDocstate?.reasonForInteractionRequired
+      ? initialDocstate.docreport
+      : docReport
   const docState = useGuardedAction(docStateToUse ?? undefined)
   const promptInFlight = useRef(false)
 
   useEffect(() => {
     const promptForDocumentation = async (): Promise<void> => {
-      if (docState.accessControlEnabled) {
+      if (!docState.isLoading && docState.reasonForInteractionRequired) {
         if (docState.docreport == null && !promptInFlight.current) {
           promptInFlight.current = true
           await docState
-            .askForDocumentation()
+            .askForDocumentation(actionsToDocument, onCancel)
             .then(setDocReport)
             .finally(() => {
               promptInFlight.current = false
@@ -42,8 +46,10 @@ export const usePromptForInteractionReason = (
         }
       }
     }
-    void promptForDocumentation()
-  }, [docReport, docState])
+    if (!docState.isLoading) {
+      void promptForDocumentation()
+    }
+  }, [actionsToDocument, docReport, docState, onCancel])
 
   return docState
 }

@@ -10,7 +10,6 @@ export function acknowledgeEstopDisengage(
   return request<EstopStatus>(
     PUT,
     '/robot/control/acknowledgeEstopDisengage',
-    null,
     config
   )
 }

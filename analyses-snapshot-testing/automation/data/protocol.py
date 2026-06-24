@@ -28,7 +28,7 @@ class Protocol(BaseModel):
         description="folder where the protocol is stored",
     )
     file_extension: Literal["json", "py"] = Field(description="file extension of the protocol")
-    robot: Literal["Flex", "OT2"] = Field(description="the robot type which will appear in the robot field in the app")
+    robot: Literal["Flex"] = Field(description="the robot type which will appear in the robot field in the app")
     override_variable_name: Optional[str] = Field(description="The variable name to override", default=None)
     override_value: Optional[str] = Field(description="The value of the override", default=None)
     from_override: bool = Field(description="Is this protocol generated from an override", default=False)

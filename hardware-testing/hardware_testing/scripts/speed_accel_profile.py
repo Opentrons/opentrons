@@ -362,8 +362,7 @@ async def _main(is_simulating: bool) -> None:
                     f"Please add json file with the testing \
 team jira credentials to: {storage_directory}."
                 )
-            domain_url = "https://opentrons.atlassian.net"
-            ticket = jira_tool.JiraTicket(domain_url, api_token, email)
+            ticket = jira_tool.JiraTicket(api_token, email)
             issue_key = ticket.get_ticket()
             break
         elif y_or_no == "N" or y_or_no == "n":

@@ -4,8 +4,9 @@ import json
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Any, NotRequired, TypeAlias, TypedDict, TypeGuard, cast, override
+from typing import Any, NotRequired, TypedDict, TypeGuard, cast, override
 
+import fastapi
 import oauthlib.common
 import oauthlib.oauth2
 import pydantic
@@ -15,9 +16,8 @@ from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_sc
 from auth_server.persistence.orm_models import User as ORMUser
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import password_hash
+from auth_server.users.user_data_manager import get_scope_set_of_user, password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -30,24 +30,67 @@ _log = logging.getLogger(__name__)
 # https://github.com/oauthlib/oauthlib/issues/641
 _CLIENT_ID = "opentrons_app"
 
-# todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
-_TOKEN_LIFETIME = timedelta(days=30)
 
+class Backend:
+    """A backend that our server can use to process OAuth 2 requests."""
 
-Backend: TypeAlias = oauthlib.oauth2.LegacyApplicationServer
-"""A backend that our server can use to process OAuth 2 requests.
+    def __init__(self, user_store: UserStore, settings_store: SettingsStore) -> None:
+        def get_token_expires_in(request: oauthlib.common.Request) -> int:
+            idle_logout_setting = settings_store.get_settings().idleLogout
+            return int(idle_logout_setting)
 
-"Legacy" in this case refers to the fact that it uses the "resource owner password
-credentials" grant type.
-"""
+        # "Legacy" refers to the fact that it uses the "resource owner password credentials"
+        # grant type.
+        self._inner_backend = oauthlib.oauth2.LegacyApplicationServer(
+            _RequestValidator(_TokenStore(), user_store, settings_store),
+            token_expires_in=get_token_expires_in,
+        )
 
+    def create_token_response(
+        self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+    ) -> fastapi.Response:
+        """Process a request to the OAuth 2 token endpoint and return the response.
 
-def build(user_store: UserStore, settings_store: SettingsStore) -> Backend:
-    """Return a backend that our server can use to process OAuth 2 requests."""
-    return oauthlib.oauth2.LegacyApplicationServer(
-        _RequestValidator(_TokenStore(), user_store, settings_store),
-        token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
-    )
+        This is basically a type-safe wrapper around the underlying oauthlib implementation.
+        """
+        token_response: tuple[dict[str, str], str, int] = (
+            self._inner_backend.create_token_response(
+                # The uri param apparently does not matter.
+                uri="",
+                # We can assume the request was POST because the FastAPI layer will enforce it.
+                http_method="POST",
+                body=body_form_data,
+                headers=headers,
+            )
+        )
+        headers, body, status_code = token_response
+        return fastapi.Response(
+            headers=headers,
+            content=body,
+            status_code=status_code,
+        )
+
+    def create_introspect_response(
+        self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+    ) -> fastapi.Response:
+        """Process a request to the OAuth 2 introspection endpoint and return the response.
+
+        This is basically a type-safe wrapper around the underlying oauthlib implementation.
+        """
+        headers, body, status_code = self._inner_backend.create_introspect_response(
+            # The uri param apparently does not matter.
+            uri="",
+            # We can assume the request was POST because the FastAPI layer will enforce it.
+            http_method="POST",
+            # The type stubs are wrong; `body` can in fact be a `list[tuple[str, str]]`.
+            body=body_form_data,  # type: ignore[arg-type]
+            headers=headers,
+        )
+        return fastapi.Response(
+            headers=headers,
+            content=body,
+            status_code=status_code,
+        )
 
 
 @dataclass
@@ -131,7 +174,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
         requested_scopes = set(scopes)
         return requested_scopes.issubset(
-            s.api_name for s in _get_scope_set_of_user(user)
+            s.api_name for s in get_scope_set_of_user(user)
         )
 
     @override
@@ -142,7 +185,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         """Scopes that we'll authorize a client for, if it doesn't ask for any explicitly."""
         assert isinstance(request.user, ORMUser)
         user: ORMUser = request.user
-        return sorted(s.api_name for s in _get_scope_set_of_user(user))
+        return sorted(s.api_name for s in get_scope_set_of_user(user))
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -417,7 +460,8 @@ class _TokenStore:
 def _is_list_of_type[ElementT](
     alleged_list: object, expected_element_type: type[ElementT]
 ) -> TypeGuard[list[ElementT]]:
-    assert isinstance(alleged_list, list)
+    if not isinstance(alleged_list, list):
+        return False
     return all(
         isinstance(element, expected_element_type)
         for element in cast(list[object], alleged_list)
@@ -426,8 +470,3 @@ def _is_list_of_type[ElementT](
 
 def _now() -> datetime:
     return datetime.now(tz=UTC)
-
-
-def _get_scope_set_of_user(user: ORMUser) -> set[Scope]:
-    """Return the scopes that a user is authorized for."""
-    return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])

@@ -35,6 +35,7 @@ MAX_PUMP_RPM = 3500
 MAX_PUMP_DUTY = 100
 MAX_RAMP_RATE = -10.0  # mbar/s
 MAX_PRESSURE_MBAR = -1013.25
+MAX_VAC_DURATION_S = 60 * 60 * 24  # 24hrs
 
 
 class VacuumModuleDriver(AbstractVacuumModuleDriver):
@@ -292,9 +293,9 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
                 GCODE_ROUNDING_PRECISION,
             )
         if duration_s is not None:
-            command.add_int("D", duration_s)
+            command.add_int("D", max(0, min(duration_s, MAX_VAC_DURATION_S)))
         if timeout_s is not None:
-            command.add_int("T", timeout_s)
+            command.add_int("T", max(0, min(timeout_s, MAX_VAC_DURATION_S)))
         if rate is not None:
             command.add_float("R", min(max(rate, MAX_RAMP_RATE), 0))
         if vent_after is not None:
@@ -326,12 +327,19 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             raise ValueError(
                 "You cannot set the target rpm and duty cycle at the same time."
             )
-        # TODO: incorporate duration, timeout, rate, vent_after into SetPumpState gcode message
         command = GCODE.SET_PUMP_STATE.build_command().add_int("S", int(start_pump))
         if target_rpm is not None:
             command.add_int("R", max(0, min(target_rpm, MAX_PUMP_RPM)))
         if duty_cycle is not None:
             command.add_int("D", max(0, min(duty_cycle, MAX_PUMP_DUTY)))
+        if duration_s is not None:
+            command.add_int("E", max(0, min(duration_s, MAX_VAC_DURATION_S)))
+        if timeout_s is not None:
+            command.add_int("T", max(0, min(timeout_s, MAX_VAC_DURATION_S)))
+        if rate is not None:
+            command.add_float("A", max(1, min(rate, MAX_PUMP_DUTY)))
+        if vent_after is not None:
+            command.add_int("V", int(vent_after))
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_PUMP_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pump state: {resp}")

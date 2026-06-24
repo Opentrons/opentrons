@@ -10,7 +10,6 @@ export function getErrorRecoverySettings(
   return request<ErrorRecoverySettingsResponse>(
     GET,
     '/errorRecovery/settings',
-    null,
     config
   )
 }

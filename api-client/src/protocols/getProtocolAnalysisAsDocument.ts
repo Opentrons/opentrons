@@ -12,7 +12,6 @@ export function getProtocolAnalysisAsDocument(
   return request<CompletedProtocolAnalysis>(
     GET,
     `/protocols/${protocolId}/analyses/${analysisId}/asDocument`,
-    null,
     config
   )
 }

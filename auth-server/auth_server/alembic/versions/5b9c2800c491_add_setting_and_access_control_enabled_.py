@@ -10,7 +10,7 @@ from typing import Sequence, Union
 import sqlalchemy as sa
 from alembic import op
 
-from auth_server.persistence.orm_models import JsonValue
+from server_utils.sql_utils import JsonValue
 
 # revision identifiers, used by Alembic.
 revision: str = "5b9c2800c491"

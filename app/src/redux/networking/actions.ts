@@ -62,63 +62,6 @@ export const postWifiConfigureFailure = (
   meta,
 })
 
-export const fetchWifiKeys = (
-  robotName: string
-): Types.FetchWifiKeysAction => ({
-  type: Constants.FETCH_WIFI_KEYS,
-  payload: { robotName },
-  meta: {},
-})
-
-export const fetchWifiKeysSuccess = (
-  robotName: string,
-  wifiKeys: Types.ApiWifiKey[],
-  meta: RobotApiRequestMeta
-): Types.FetchWifiKeysSuccessAction => ({
-  type: Constants.FETCH_WIFI_KEYS_SUCCESS,
-  payload: { robotName, wifiKeys },
-  meta,
-})
-
-export const fetchWifiKeysFailure = (
-  robotName: string,
-  error: RobotApiErrorResponse,
-  meta: RobotApiRequestMeta
-): Types.FetchWifiKeysFailureAction => ({
-  type: Constants.FETCH_WIFI_KEYS_FAILURE,
-  payload: { robotName, error },
-  meta,
-})
-
-export const postWifiKeys = (
-  robotName: string,
-  keyFile: File
-): Types.PostWifiKeysAction => ({
-  type: Constants.POST_WIFI_KEYS,
-  payload: { robotName, keyFile },
-  meta: {},
-})
-
-export const postWifiKeysSuccess = (
-  robotName: string,
-  wifiKey: Types.ApiWifiKey,
-  meta: RobotApiRequestMeta
-): Types.PostWifiKeysSuccessAction => ({
-  type: Constants.POST_WIFI_KEYS_SUCCESS,
-  payload: { robotName, wifiKey },
-  meta,
-})
-
-export const postWifiKeysFailure = (
-  robotName: string,
-  error: RobotApiErrorResponse,
-  meta: RobotApiRequestMeta
-): Types.PostWifiKeysFailureAction => ({
-  type: Constants.POST_WIFI_KEYS_FAILURE,
-  payload: { robotName, error },
-  meta,
-})
-
 export const fetchEapOptions = (
   robotName: string
 ): Types.FetchEapOptionsAction => ({
@@ -143,34 +86,6 @@ export const fetchEapOptionsFailure = (
   meta: RobotApiRequestMeta
 ): Types.FetchEapOptionsFailureAction => ({
   type: Constants.FETCH_EAP_OPTIONS_FAILURE,
-  payload: { robotName, error },
-  meta,
-})
-
-export const postWifiDisconnect = (
-  robotName: string,
-  ssid: string
-): Types.PostWifiDisconnectAction => ({
-  type: Constants.POST_WIFI_DISCONNECT,
-  payload: { robotName, ssid },
-  meta: {},
-})
-
-export const postWifiDisconnectSuccess = (
-  robotName: string,
-  meta: RobotApiRequestMeta
-): Types.PostWifiDisconnectSuccessAction => ({
-  type: Constants.POST_WIFI_DISCONNECT_SUCCESS,
-  payload: { robotName },
-  meta,
-})
-
-export const postWifiDisconnectFailure = (
-  robotName: string,
-  error: RobotApiErrorResponse,
-  meta: RobotApiRequestMeta
-): Types.PostWifiDisconnectFailureAction => ({
-  type: Constants.POST_WIFI_DISCONNECT_FAILURE,
   payload: { robotName, error },
   meta,
 })

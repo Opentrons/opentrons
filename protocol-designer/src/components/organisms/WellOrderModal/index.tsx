@@ -157,7 +157,6 @@ export function WellOrderModal(props: WellOrderModalProps): JSX.Element | null {
 
   return createPortal(
     <Modal
-      marginLeft="0"
       width="37.125rem"
       closeOnOutsideClick
       type="info"

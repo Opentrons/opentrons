@@ -30,7 +30,6 @@ describe('robotSettingsReducer', () => {
       expected: {
         robotName: {
           settings: Fixtures.mockRobotSettings,
-          restartPath: null,
         },
       },
     },
@@ -48,13 +47,11 @@ describe('robotSettingsReducer', () => {
       state: {
         robotName: {
           settings: Fixtures.mockRobotSettings,
-          restartPath: null,
         },
       },
       expected: {
         robotName: {
           settings: Fixtures.mockRobotSettings.slice(0, 1),
-          restartPath: '/server/restart',
         },
       },
     },
@@ -72,24 +69,13 @@ describe('robotSettingsReducer', () => {
       state: {
         robotName: {
           settings: [],
-          restartPath: null,
         },
       },
       expected: {
         robotName: {
           settings: Fixtures.mockRobotSettings,
-          restartPath: '/server/restart',
         },
       },
-    },
-    {
-      name: 'handles robotSettings:CLEAR_RESTART_PATH',
-      action: {
-        type: 'robotSettings:CLEAR_RESTART_PATH',
-        payload: { robotName: 'robotName' },
-      },
-      state: { robotName: { settings: [], restartPath: '/restart' } },
-      expected: { robotName: { settings: [], restartPath: null } },
     },
   ]
 

@@ -43,7 +43,7 @@ export default {
       description: 'See header text. Does nothing in Storybook.',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface ListAccordionStoryProps extends Omit<

@@ -22,6 +22,7 @@ import {
 } from '@opentrons/components'
 import {
   useCreateLiveCommandMutation,
+  useHomeMutation,
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
 
@@ -33,7 +34,6 @@ import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import * as Config from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { restartRobot, shutdownRobot } from '/app/redux/robot-admin'
-import { home, ROBOT } from '/app/redux/robot-controls'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { checkShellUpdate } from '/app/redux/shell'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
@@ -77,6 +77,7 @@ export const RobotOverviewOverflowMenu = (
   const isFlex = useIsFlex(robot.name)
   const { setLights } = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { home } = useHomeMutation()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
@@ -96,7 +97,7 @@ export const RobotOverviewOverflowMenu = (
   }
 
   const handleClickHomeGantry: MouseEventHandler<HTMLButtonElement> = () => {
-    dispatch(home(robot.name, ROBOT))
+    home({ target: 'robot' })
   }
 
   const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] =

@@ -5,11 +5,11 @@
   "labwareOffset": {
     "x": 0,
     "y": 0,
-    "z": 0
+    "z": 19
   },
   "features": {},
   "dimensions": {
-    "bareOverallHeight": 40,
+    "bareOverallHeight": 37,
     "overLabwareHeight": 0,
     "xDimension": 143,
     "yDimension": 101.5,
@@ -47,12 +47,12 @@
       "pickUpOffset": {
         "x": 0,
         "y": 0,
-        "z": 0
+        "z": 1
       },
       "dropOffset": {
-        "x": 1,
+        "x": 0,
         "y": 0,
-        "z": 0
+        "z": 2
       }
     }
   },

@@ -7,7 +7,6 @@ import * as DiscoverySelectors from '../../../discovery/selectors'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 import * as RobotApiHttp from '../../../robot-api/http'
 import * as Actions from '../../actions'
-import * as Selectors from '../../selectors'
 
 import type { RobotApiRequestMeta } from '../../../robot-api/types'
 import type { Action, State } from '../../../types'
@@ -15,7 +14,6 @@ import type * as Types from '../../types'
 
 vi.mock('../../../robot-api/http')
 vi.mock('../../../discovery/selectors')
-vi.mock('../../selectors')
 
 const mockState: State = { state: true } as any
 
@@ -26,7 +24,6 @@ describe('fetchSettingsEpic', () => {
     vi.mocked(DiscoverySelectors.getRobotByName).mockReturnValue(
       mockRobot as any
     )
-    vi.mocked(Selectors.getAllRestartRequiredRobots).mockReturnValue([])
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)

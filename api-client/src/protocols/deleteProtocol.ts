@@ -7,10 +7,5 @@ export function deleteProtocol(
   config: HostConfig,
   protocolId: string
 ): ResponsePromise<EmptyResponse> {
-  return request<EmptyResponse>(
-    DELETE,
-    `/protocols/${protocolId}`,
-    null,
-    config
-  )
+  return request<EmptyResponse>(DELETE, `/protocols/${protocolId}`, config)
 }

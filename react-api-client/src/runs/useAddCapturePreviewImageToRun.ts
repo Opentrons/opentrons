@@ -39,9 +39,7 @@ export function useCapturePreviewImageToRun(
     AxiosError<ErrorResponse>,
     AddCapturePreviewImageToRunParams
   >(({ settings }) =>
-    addCapturePreviewImageToRun(host!, runId, settings, {
-      responseType: 'blob',
-    })
+    addCapturePreviewImageToRun(host!, runId, settings)
       .then(response => {
         queryClient
           .invalidateQueries(

@@ -60,7 +60,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
                 device = p.device
         if device is None:
             raise RuntimeError("No RT scanner found.")
-        read_timeout_ms = 2000
+        read_timeout_ms = 3000
         connection = await AsyncSerial.create(
             port=device,
             baud_rate=9600,
@@ -72,7 +72,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
         return scanner
 
     def __init__(
-        self, connection: AsyncSerial, device: str, read_timeout_ms: int = 2000
+        self, connection: AsyncSerial, device: str, read_timeout_ms: int = 3000
     ):
         """Search for and connect to a RT214C if one is present."""
         self._device = device
@@ -141,7 +141,11 @@ class RTScanner(AbstractBarcodeScannerDriver):
         """Search for a barcode and return if found else None."""
         await self._conn.write(bytes(scan_trigger))
         await self._conn.read_until(bytes(ack))  # eat the ack response
-        barcode: bytes = await self._conn.read_until(bytes(self._scan_terminator))
+        try:
+            barcode: bytes = await self._conn.read_until(bytes(self._scan_terminator))
+        except BaseException:
+            log.exception("failed to scan")
+            barcode = b""
         log.debug(f"Scanned {barcode.decode('ascii')}")
         if len(barcode) == 0:
             if self._do_err_beep:

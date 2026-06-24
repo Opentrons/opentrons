@@ -14,5 +14,5 @@ export function patchAccessControlEnabled(
   return request<
     AccessControlEnabledSettingsResponse,
     PatchAccessControlEnabledSettingsRequest
-  >(PATCH, '/auth/settings/accessControlEnabled', body, config)
+  >(PATCH, '/auth/settings/accessControlEnabled', config, { body })
 }

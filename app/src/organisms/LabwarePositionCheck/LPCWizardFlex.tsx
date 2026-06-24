@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
 import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
 import {
@@ -38,11 +37,8 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
     dispatch(goBackStepDispatch(props.runId))
   }
 
-  const { commandDocState } = useMaintenanceRunDocumentation()
-
   const dispatch = useDispatch()
   const LPCHandlerUtils = useLPCCommands({
-    commandDocState,
     ...props,
   })
 

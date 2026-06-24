@@ -4,6 +4,8 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   Banner,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
@@ -15,7 +17,6 @@ import {
 import {
   useInstrumentsQuery,
   useModulesQuery,
-  usePipettesQuery,
 } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 
@@ -27,7 +28,6 @@ import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
 import { GripperCard } from './GripperCard'
-import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 
@@ -52,13 +52,6 @@ export function InstrumentsAndModules({
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const isFlex = useIsFlex(robotName)
-  const attachedPipettes = usePipettesQuery(
-    {},
-    {
-      refetchInterval: EQUIPMENT_POLL_MS,
-      enabled: !isFlex,
-    }
-  )?.data ?? { left: undefined, right: undefined }
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -129,7 +122,9 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       gap={SPACING.spacing16}
-      paddingBottom={SPACING.spacing12}
+      padding={SPACING.spacing16}
+      backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius8}
     >
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('instruments_and_modules')}
@@ -166,21 +161,7 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
             >
-              {!isFlex ? (
-                <PipetteCard
-                  pipetteId={attachedPipettes.left?.id}
-                  pipetteModelSpecs={
-                    attachedPipettes.left?.model != null
-                      ? (getPipetteModelSpecs(attachedPipettes.left?.model) ??
-                        null)
-                      : null
-                  }
-                  mount={LEFT}
-                  robotName={robotName}
-                  isRunActive={currentRunId != null && isRunRunning}
-                  isEstopNotDisengaged={isEstopNotDisengaged}
-                />
-              ) : (
+              {!isFlex ? null : ( // !isFlex shouldn't happen--this repo is now Flex-only.
                 <>
                   <FlexPipetteCard
                     attachedPipette={attachedLeftPipette}
@@ -228,21 +209,6 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
             >
-              {!isFlex ? (
-                <PipetteCard
-                  pipetteId={attachedPipettes.right?.id}
-                  pipetteModelSpecs={
-                    attachedPipettes.right?.model != null
-                      ? (getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                        null)
-                      : null
-                  }
-                  mount={RIGHT}
-                  robotName={robotName}
-                  isRunActive={currentRunId != null && isRunRunning}
-                  isEstopNotDisengaged={isEstopNotDisengaged}
-                />
-              ) : null}
               {isFlex && !is96ChannelAttached ? (
                 <FlexPipetteCard
                   attachedPipette={attachedRightPipette}

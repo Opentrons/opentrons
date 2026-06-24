@@ -1,5 +1,5 @@
+import type { Mount } from '@opentrons/api-client'
 import type { LabwareDefinition, PipetteModel } from '@opentrons/shared-data'
-import type { Mount } from '../../pipettes/types'
 import type { CalibrationLabware } from '../types'
 // calibration check session types
 

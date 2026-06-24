@@ -3,14 +3,21 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
-import type { DocumentationReport } from '@opentrons/react-api-client'
-
-export interface DocumentationRequiredModalArgs {
-  username: string
-}
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 
 const DocumentationRequiredModalImpl = NiceModal.create(
-  ({ username }: { username: string }): JSX.Element => {
+  ({
+    username,
+    actionsToDocument,
+    onCancel,
+  }: {
+    username: string
+    actionsToDocument: DocumentedAction[]
+    onCancel?: () => void
+  }): JSX.Element => {
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {
@@ -20,6 +27,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     }
 
     const handleBack = (): void => {
+      onCancel?.()
       modal.resolve('' as DocumentationReport)
       modal.remove()
     }
@@ -28,6 +36,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
       <div className={styles.overlay}>
         <DocumentationRequired
           username={username}
+          actionsToDocument={actionsToDocument}
           onConfirm={handleConfirm}
           onBack={handleBack}
         />
@@ -37,6 +46,12 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 )
 
 export const showDocumentationRequiredModal = (
-  username: string
+  username: string,
+  actionsToDocument: DocumentedAction[],
+  onCancel?: () => void
 ): Promise<DocumentationReport> =>
-  NiceModal.show(DocumentationRequiredModalImpl, { username })
+  NiceModal.show(DocumentationRequiredModalImpl, {
+    username,
+    actionsToDocument,
+    onCancel,
+  })

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
@@ -10,7 +10,10 @@ import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 import { buildLoadPipetteCommand } from './useDropTipCommands'
 
 import type { PipetteData } from '@opentrons/api-client'
-import type { DocumentationState } from '@opentrons/react-api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 
@@ -24,6 +27,8 @@ export type UseDropTipMaintenanceRunParams = Omit<
   instrumentModelSpecs?: PipetteModelSpecs
   mount?: PipetteData['mount']
   commandDocState: DocumentationState
+  actionsToDocument: DocumentedAction[]
+  addActionToDocument: (action: DocumentedAction) => void
 }
 
 // Manages the maintenance run state if the flow is utilizing "setup" type commands.
@@ -34,6 +39,8 @@ export function useDropTipMaintenanceRun({
   setErrorDetails,
   closeFlow,
   commandDocState,
+  actionsToDocument,
+  addActionToDocument,
 }: UseDropTipMaintenanceRunParams): string | null {
   const isMaintenanceRunType = issuedCommandsType === 'setup'
 
@@ -54,6 +61,8 @@ export function useDropTipMaintenanceRun({
     setErrorDetails,
     setCreatedMaintenanceRunId,
     commandDocState,
+    actionsToDocument,
+    addActionToDocument,
   })
 
   useMonitorMaintenanceRunForDeletion({
@@ -73,6 +82,8 @@ type UseCreateDropTipMaintenanceRunParams = Omit<
   setCreatedMaintenanceRunId: (id: string) => void
   instrumentModelName?: PipetteModelSpecs['name']
   commandDocState: DocumentationState
+  actionsToDocument: DocumentedAction[]
+  addActionToDocument: (action: DocumentedAction) => void
 }
 
 // Handles the creation of the maintenance run for "setup" command type drop tip flows, including the loading of the pipette.
@@ -83,53 +94,72 @@ function useCreateDropTipMaintenanceRun({
   setErrorDetails,
   setCreatedMaintenanceRunId,
   commandDocState,
+  actionsToDocument,
+  addActionToDocument,
 }: UseCreateDropTipMaintenanceRunParams): void {
-  const { chainRunCommands } = useChainMaintenanceCommands(commandDocState)
-
-  const docState = useGuardedAction()
+  const { chainRunCommands } = useChainMaintenanceCommands(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation(docState, {
-      onSuccess: response => {
-        // The type assertions here are safe, since we only use this command after asserting these
-        const loadPipetteCommand = buildLoadPipetteCommand(
-          instrumentModelName!,
-          mount!
-        )
+    useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
+      actionsToDocument,
+      {
+        onSuccess: response => {
+          // The type assertions here are safe, since we only use this command after asserting these
+          const loadPipetteCommand = buildLoadPipetteCommand(
+            instrumentModelName!,
+            mount!
+          )
 
-        chainRunCommands(response.data.id, [loadPipetteCommand], false)
-          .then(() => {
-            setCreatedMaintenanceRunId(response.data.id)
-          })
-          .catch((error: Error) => error)
-      },
-      onError: (error: Error) => {
-        setErrorDetails({ message: error.message })
-      },
-    })
-
-  useEffect(
-    () => {
-      if (
-        issuedCommandsType === 'setup' &&
-        mount != null &&
-        instrumentModelName != null
-      ) {
-        createTargetedMaintenanceRun({}).catch((e: Error) => {
-          setErrorDetails({
-            message: `Error creating maintenance run: ${e.message}`,
-          })
-        })
-      } else {
-        console.warn(
-          'Could not create maintenance run due to missing pipette data.'
-        )
+          chainRunCommands(response.data.id, [loadPipetteCommand], false)
+            .then(() => {
+              setCreatedMaintenanceRunId(response.data.id)
+            })
+            .catch((error: Error) => error)
+        },
+        onError: (error: Error) => {
+          setErrorDetails({ message: error.message })
+        },
       }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [mount, instrumentModelName]
-  )
+    )
+
+  const hasSentCreateMaintenanceRun = useRef(false)
+
+  useEffect(() => {
+    if (
+      issuedCommandsType === 'setup' &&
+      mount != null &&
+      instrumentModelName != null &&
+      isDocumentationProvided(commandDocState) &&
+      !hasSentCreateMaintenanceRun.current
+    ) {
+      hasSentCreateMaintenanceRun.current = true
+      createTargetedMaintenanceRun({}).catch((e: Error) => {
+        hasSentCreateMaintenanceRun.current = false
+        setErrorDetails({
+          message: `Error creating maintenance run: ${e.message}`,
+        })
+      })
+    } else if (
+      issuedCommandsType === 'setup' &&
+      (mount == null || instrumentModelName == null)
+    ) {
+      console.warn(
+        'Could not create maintenance run due to missing pipette data.'
+      )
+    }
+  }, [
+    commandDocState,
+    createTargetedMaintenanceRun,
+    instrumentModelName,
+    issuedCommandsType,
+    mount,
+    setErrorDetails,
+  ])
 }
 
 interface UseMonitorMaintenanceRunForDeletionParams {

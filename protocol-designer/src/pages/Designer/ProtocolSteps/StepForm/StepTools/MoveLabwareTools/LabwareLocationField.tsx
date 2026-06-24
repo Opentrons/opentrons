@@ -21,7 +21,6 @@ import {
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { VACUUM_MODULE_SLOT } from '/protocol-designer/constants'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
-import { getIsVacuumCollar } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import {
   getUnoccupiedStackOptions,
   TIPRACK_LID_LOADNAME,
@@ -176,17 +175,43 @@ export function LabwareLocationField(
       )
   }
 
-  const isLabwareAVacuumCollar =
-    labwareEntities[labware] != null &&
-    getIsVacuumCollar(labwareEntities[labware].def)
+  // filter out movable adapters (e.g. collars) as destinations unless
+  // compatible— filter plates can go anywhere, adapters with
+  // providesStackingDefault accept any labware, otherwise fall back to
+  // explicit compatibleParentLabware / stackingOffsetWithLabware
+  const movingLabwareDef = labwareEntities[labware]?.def
+  const isMovingLabwareFilterPlate =
+    movingLabwareDef?.parameters.quirks?.includes('filterPlate') ?? false
+  if (movingLabwareDef != null && !isMovingLabwareFilterPlate) {
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(({ value }) => {
+        const destDef = labwareEntities[value]?.def
+        if (destDef?.parameters.isMovableAdapter !== true) {
+          return true
+        }
+        if (destDef.parameters.quirks?.includes('providesStackingDefault')) {
+          return true
+        }
+        const destLoadName = destDef.parameters.loadName
+        return (
+          movingLabwareDef.compatibleParentLabware?.includes(destLoadName) ||
+          movingLabwareDef.stackingOffsetWithLabware?.[destLoadName] != null
+        )
+      })
+  }
 
-  // only vacuum collars can be moved directly to the vacuum dock
-  if (!isLabwareAVacuumCollar) {
+  const isLabwareVacuumDockCompatible =
+    labwareEntities[labware]?.def.parameters.quirks?.includes(
+      'vacuumModuleDock'
+    ) ?? false
+
+  // only vacuumModuleDock-quirk labware can be moved to the vacuum dock
+  if (!isLabwareVacuumDockCompatible) {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(
         ({ value }) => value !== VACUUM_DOCK_ADDRESSABLE_AREA
       )
-  } else if (isLabwareAVacuumCollar && robotState != null) {
+  } else if (isLabwareVacuumDockCompatible && robotState != null) {
     const vacuumModuleEntry = Object.entries(moduleEntities).find(
       ([, entity]) => entity.type === VACUUM_MODULE_TYPE
     )
@@ -200,8 +225,9 @@ export function LabwareLocationField(
       )
       const vacuumModuleHasNoCollar = !labwareOnModule.some(([lwId]) => {
         return (
-          labwareEntities[lwId] != null &&
-          getIsVacuumCollar(labwareEntities[lwId].def)
+          labwareEntities[lwId]?.def.parameters.quirks?.includes(
+            'vacuumModuleDock'
+          ) ?? false
         )
       })
 
