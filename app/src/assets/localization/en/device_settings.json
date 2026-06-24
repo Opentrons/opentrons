@@ -122,6 +122,7 @@
   "desktop_require_password_change_after_time": "Require password to be changed after a certain amount of time",
   "desktop_require_password_complexity_requirements": "Require password complexity requirements",
   "desktop_require_protocol_logs_signed_and_saved": "Require protocol logs to be signed and saved in the desktop app",
+  "desktop_require_signoff_for_protocol_log": "Require signoff for protocol logs",
   "desktop_require_special_characters": "Require special characters",
   "desktop_user_management": "User management",
   "desktop_username": "Username",

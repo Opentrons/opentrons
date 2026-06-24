@@ -6,6 +6,8 @@ import { Divider, StyledText } from '@opentrons/components'
 import {
   useAccessControlSettingsQuery,
   useAuthSettingsQuery,
+  useAuthSettingsMutation,
+  usePatchAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
@@ -18,6 +20,8 @@ import type { JSX } from 'react'
 import type {
   AccessControlAppSettingsResponse,
   AuthSettingsResponse,
+  PatchAccessControlSettingsRequest,
+  PatchAuthSettingsRequest,
 } from '@opentrons/api-client'
 
 export interface ComplianceReadySoftwareSettingsProps {
@@ -35,10 +39,7 @@ export const UI_ONLY_FIELD_IDS = [
 
 type UiSettingFieldId = (typeof UI_ONLY_FIELD_IDS)[number]
 
-type SettingFieldId =
-  | AuthSettingFieldId
-  | UiSettingFieldId
-  | RobotServerSettingFieldId
+type SettingFieldId = AuthSettingFieldId | UiSettingFieldId | RobotServerSettingFieldId
 
 type FieldValues = Record<SettingFieldId, string | boolean>
 
@@ -66,31 +67,28 @@ interface ComplianceReadySettingsSectionConfig {
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
 
-const authSettingsFieldDefaults = {
-  maxNumberOfLoginAttempts: null,
-  passwordResetTime: null,
-  passwordComplexityMinimumLength: null,
-  passwordComplexitySpecialCharacters: false,
-  idleLogout: 0,
-  requireReasonForInteraction: false,
-  minLengthOfReasonForInteraction: null,
-  requireAdminCredsWhenUpdatingRobotSoftware: false,
-  requireAdminCredsWhenSendingProtocolToRobot: false,
-  requireAdminCredsForSignoffProtocol: false,
-} satisfies AuthSettingsResponse['data']
+function isUiOnlyFieldId(id: SettingFieldId): id is UiSettingFieldId {
+  return (UI_ONLY_FIELD_IDS as readonly string[]).includes(id)
+}
 
-const AUTH_SETTING_KEYS = Object.keys(authSettingsFieldDefaults) as Array<
-  keyof typeof authSettingsFieldDefaults
->
+function isAuthSettingFieldId(id: SettingFieldId): id is AuthSettingFieldId {
+  return !isUiOnlyFieldId(id) && !isRobotServerSettingFieldId(id)
+}
+
+function isRobotServerSettingFieldId(
+  id: SettingFieldId
+): id is RobotServerSettingFieldId {
+  return (ACCESS_CONTROL_SETTING_KEYS as readonly string[]).includes(id)
+}
+
+function isUiOnlyParentToggle(field: ToggleFieldConfig): boolean {
+  return field.children != null && !isAuthSettingFieldId(field.id)
+}
 
 function getAuthSettingFieldValue(
-  key: keyof typeof authSettingsFieldDefaults,
-  authSettings?: AuthSettingsResponse['data']
+  key: AuthSettingFieldId,
+  authSettings: AuthSettingsResponse['data']
 ): string | boolean {
-  if (authSettings == null) {
-    return typeof authSettingsFieldDefaults[key] === 'boolean' ? false : ''
-  }
-
   switch (key) {
     case 'idleLogout':
       return String(Math.round(authSettings.idleLogout / SECONDS_PER_MINUTE))
@@ -110,8 +108,12 @@ function getAuthSettingFieldValue(
 
 function getAuthFieldValues(
   authSettings?: AuthSettingsResponse['data']
-): Pick<FieldValues, AuthSettingFieldId> {
-  return AUTH_SETTING_KEYS.reduce(
+): Partial<Pick<FieldValues, AuthSettingFieldId>> {
+  if (authSettings == null) {
+    return {}
+  }
+
+  return (Object.keys(authSettings) as AuthSettingFieldId[]).reduce(
     (acc, key) => ({
       ...acc,
       [key]: getAuthSettingFieldValue(key, authSettings),
@@ -145,6 +147,105 @@ function getFieldValuesFromSettings(
           authSettings.passwordComplexitySpecialCharacters
         : false,
     ...getRobotServerFieldValues(robotSettings),
+  } as FieldValues
+}
+
+function getAuthChildFieldIds(
+  field: ToggleFieldConfig
+): AuthSettingFieldId[] {
+  return (field.children ?? []).flatMap(child => {
+    if (child.type === 'input') {
+      return [child.id]
+    }
+    return [child.id as AuthSettingFieldId, ...getAuthChildFieldIds(child)]
+  })
+}
+
+function getAuthFieldPatchValue(
+  key: AuthSettingFieldId,
+  values: FieldValues
+): NonNullable<PatchAuthSettingsRequest['data']>[AuthSettingFieldId] {
+  switch (key) {
+    case 'passwordResetTime': {
+      const days = String(values.passwordResetTime)
+      return days === '' ? null : Number(days) * SECONDS_PER_DAY
+    }
+    case 'idleLogout':
+      return Number(values.idleLogout) * SECONDS_PER_MINUTE
+    case 'passwordComplexityMinimumLength':
+      return Number(values.passwordComplexityMinimumLength)
+    case 'passwordComplexitySpecialCharacters':
+      return Boolean(values.passwordComplexitySpecialCharacters)
+    case 'minLengthOfReasonForInteraction':
+      return Number(values.minLengthOfReasonForInteraction)
+    case 'maxNumberOfLoginAttempts': {
+      const value = String(values.maxNumberOfLoginAttempts)
+      return value === '' ? null : Number(value)
+    }
+    default:
+      return values[key] as boolean
+  }
+}
+
+function buildChildGroupPatchRequest(
+  parentField: ToggleFieldConfig,
+  values: FieldValues
+): PatchAuthSettingsRequest {
+  return {
+    data: Object.fromEntries(
+      getAuthChildFieldIds(parentField).map(key => [
+        key,
+        getAuthFieldPatchValue(key, values),
+      ])
+    ) as PatchAuthSettingsRequest['data'],
+  }
+}
+
+function getParentDisabledFieldValues(
+  parentField: ToggleFieldConfig,
+  values: FieldValues
+): FieldValues {
+  const childIds = getAuthChildFieldIds(parentField)
+
+  return {
+    ...values,
+    [parentField.id]: false,
+    ...Object.fromEntries(
+      childIds.map(key => [
+        key,
+        typeof values[key] === 'boolean' ? false : '',
+      ])
+    ),
+  } as FieldValues
+}
+
+function buildParentDisablePatchRequest(
+  parentField: ToggleFieldConfig
+): PatchAuthSettingsRequest {
+  return {
+    data: Object.fromEntries(
+      getAuthChildFieldIds(parentField).map(key => [key, null])
+    ) as PatchAuthSettingsRequest['data'],
+  }
+}
+
+function buildStandaloneInputPatchRequest(
+  id: AuthSettingFieldId,
+  value: string
+): PatchAuthSettingsRequest | null {
+  switch (id) {
+    case 'maxNumberOfLoginAttempts':
+      return {
+        data: {
+          maxNumberOfLoginAttempts: value === '' ? null : Number(value),
+        },
+      }
+    case 'idleLogout':
+      return value === ''
+        ? null
+        : { data: { idleLogout: Number(value) * SECONDS_PER_MINUTE } }
+    default:
+      return null
   }
 }
 
@@ -262,13 +363,22 @@ export const SETTINGS_SECTIONS: ComplianceReadySettingsSectionConfig[] = [
 
 interface ComplianceReadySettingFieldProps {
   field: ComplianceReadyFieldConfig
+  parentField?: ToggleFieldConfig
   values: FieldValues
-  onInputChange: (id: AuthSettingFieldId, value: string) => void
-  onToggleChange: (id: SettingFieldId) => void
+  onInputChange: (
+    id: AuthSettingFieldId,
+    value: string,
+    parentField?: ToggleFieldConfig
+  ) => void
+  onToggleChange: (
+    field: ToggleFieldConfig,
+    parentField?: ToggleFieldConfig
+  ) => void
 }
 
 function ComplianceReadySettingField({
   field,
+  parentField,
   values,
   onInputChange,
   onToggleChange,
@@ -282,7 +392,7 @@ function ComplianceReadySettingField({
         value={String(values[field.id])}
         units={field.unitsKey != null ? t(field.unitsKey) : undefined}
         onChange={event => {
-          onInputChange(field.id, event.target.value)
+          onInputChange(field.id, event.target.value, parentField)
         }}
       />
     )
@@ -304,7 +414,7 @@ function ComplianceReadySettingField({
         label={label}
         toggledOn={toggledOn}
         onClick={() => {
-          onToggleChange(field.id)
+          onToggleChange(field, parentField)
         }}
       />
     </div>
@@ -321,8 +431,9 @@ function ComplianceReadySettingField({
         <div className={styles.sub_fields}>
           {field.children.map(child => (
             <ComplianceReadySettingField
-              key={child.id}
+              key={`${field.id}-${child.id}`}
               field={child}
+              parentField={field}
               values={values}
               onInputChange={onInputChange}
               onToggleChange={onToggleChange}
@@ -338,8 +449,15 @@ interface ComplianceReadySettingsSectionProps {
   section: ComplianceReadySettingsSectionConfig
   isLastSection: boolean
   values: FieldValues
-  onInputChange: (id: AuthSettingFieldId, value: string) => void
-  onToggleChange: (id: SettingFieldId) => void
+  onInputChange: (
+    id: AuthSettingFieldId,
+    value: string,
+    parentField?: ToggleFieldConfig
+  ) => void
+  onToggleChange: (
+    field: ToggleFieldConfig,
+    parentField?: ToggleFieldConfig
+  ) => void
 }
 
 function ComplianceReadySettingsSection({
@@ -381,6 +499,8 @@ export function ComplianceReadySoftwareSettings({
   const { t } = useTranslation('device_settings')
   const authSettingsQuery = useAuthSettingsQuery()
   const accessControlSettingsQuery = useAccessControlSettingsQuery()
+  const { patchAuthSettings } = useAuthSettingsMutation()
+  const { patchAccessControlSettings } = usePatchAccessControlSettingsMutation()
   const [fieldValues, setFieldValues] = useState<FieldValues>(() =>
     getFieldValuesFromSettings()
   )
@@ -394,18 +514,92 @@ export function ComplianceReadySoftwareSettings({
     )
   }, [authSettingsQuery.data?.data, accessControlSettingsQuery.data?.data])
 
-  const handleInputChange = (id: AuthSettingFieldId, value: string): void => {
-    setFieldValues(current => ({
-      ...current,
-      [id]: value,
-    }))
+  const patchAuth = (request: PatchAuthSettingsRequest): void => {
+    patchAuthSettings(request, {
+      onSuccess: response => {
+        setFieldValues(
+          getFieldValuesFromSettings(
+            response.data,
+            accessControlSettingsQuery.data?.data
+          )
+        )
+      },
+    })
   }
 
-  const handleToggleChange = (id: SettingFieldId): void => {
-    setFieldValues(current => ({
-      ...current,
-      [id]: !current[id],
-    }))
+  const patchRobotSettings = (
+    request: PatchAccessControlSettingsRequest
+  ): void => {
+    patchAccessControlSettings(request, {
+      onSuccess: response => {
+        setFieldValues(
+          getFieldValuesFromSettings(
+            authSettingsQuery.data?.data,
+            response.data
+          )
+        )
+      },
+    })
+  }
+
+  const handleInputChange = (
+    id: AuthSettingFieldId,
+    value: string,
+    parentField?: ToggleFieldConfig
+  ): void => {
+    const nextValues: FieldValues = { ...fieldValues, [id]: value }
+    setFieldValues(nextValues)
+
+    if (parentField?.children != null) {
+      if (!Boolean(nextValues[parentField.id]) || value === '') {
+        return
+      }
+      if (isUiOnlyParentToggle(parentField)) {
+        patchAuth(buildChildGroupPatchRequest(parentField, nextValues))
+      } else {
+        patchAuth({ data: { [id]: getAuthFieldPatchValue(id, nextValues) } })
+      }
+      return
+    }
+
+    const request = buildStandaloneInputPatchRequest(id, value)
+    if (request != null) {
+      patchAuth(request)
+    }
+  }
+
+  const handleToggleChange = (
+    field: ToggleFieldConfig,
+    parentField?: ToggleFieldConfig
+  ): void => {
+    const toggledOn = !Boolean(fieldValues[field.id])
+
+    if (field.children != null && isUiOnlyParentToggle(field)) {
+      if (toggledOn) {
+        setFieldValues({ ...fieldValues, [field.id]: true })
+      } else {
+        setFieldValues(getParentDisabledFieldValues(field, fieldValues))
+        patchAuth(buildParentDisablePatchRequest(field))
+      }
+      return
+    }
+
+    if (parentField?.children != null && isUiOnlyParentToggle(parentField)) {
+      const nextValues: FieldValues = { ...fieldValues, [field.id]: toggledOn }
+      if (!Boolean(nextValues[parentField.id])) {
+        setFieldValues(nextValues)
+        return
+      }
+      patchAuth(buildChildGroupPatchRequest(parentField, nextValues))
+      return
+    }
+
+    if (isRobotServerSettingFieldId(field.id)) {
+      patchRobotSettings({ data: { [field.id]: toggledOn } })
+      return
+    }
+
+    patchAuth({ data: { [field.id]: toggledOn } })
   }
 
   return (

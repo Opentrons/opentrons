@@ -7,6 +7,8 @@ import { ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
 import {
   useAccessControlSettingsQuery,
   useAuthSettingsQuery,
+  useAuthSettingsMutation,
+  usePatchAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -30,6 +32,8 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     ...(actual as object),
     useAuthSettingsQuery: vi.fn(),
     useAccessControlSettingsQuery: vi.fn(),
+    useAuthSettingsMutation: vi.fn(),
+    usePatchAccessControlSettingsMutation: vi.fn(),
   }
 })
 
@@ -56,18 +60,7 @@ const MOCK_ACCESS_CONTROL_SETTINGS: AccessControlAppSettingsResponse = {
   },
 }
 
-const AUTH_SETTING_KEYS = Object.keys({
-  maxNumberOfLoginAttempts: null,
-  passwordResetTime: null,
-  passwordComplexityMinimumLength: null,
-  passwordComplexitySpecialCharacters: false,
-  idleLogout: 180,
-  requireReasonForInteraction: true,
-  minLengthOfReasonForInteraction: null,
-  requireAdminCredsWhenUpdatingRobotSoftware: true,
-  requireAdminCredsWhenSendingProtocolToRobot: true,
-  requireAdminCredsForSignoffProtocol: false,
-} satisfies AuthSettingsResponse['data'])
+const AUTH_SETTING_KEYS = Object.keys(MOCK_AUTH_SETTINGS.data)
 
 function getFieldIds(
   fields: (typeof SETTINGS_SECTIONS)[number]['fields']
@@ -95,7 +88,33 @@ const expandAccordion = (): void => {
 }
 
 describe('ComplianceReadySoftwareSettings', () => {
+  const patchAuthSettings = vi.fn()
+  const patchAccessControlSettings = vi.fn()
+
   beforeEach(() => {
+    patchAuthSettings.mockImplementation((request, options) => {
+      options?.onSuccess?.({
+        data: {
+          ...MOCK_AUTH_SETTINGS.data,
+          ...request.data,
+        },
+      })
+    })
+    patchAccessControlSettings.mockImplementation((request, options) => {
+      options?.onSuccess?.({
+        data: {
+          ...MOCK_ACCESS_CONTROL_SETTINGS.data,
+          ...request.data,
+        },
+      })
+    })
+
+    vi.mocked(useAuthSettingsMutation).mockReturnValue({
+      patchAuthSettings,
+    } as unknown as ReturnType<typeof useAuthSettingsMutation>)
+    vi.mocked(usePatchAccessControlSettingsMutation).mockReturnValue({
+      patchAccessControlSettings,
+    } as unknown as ReturnType<typeof usePatchAccessControlSettingsMutation>)
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: MOCK_AUTH_SETTINGS,
       isLoading: false,
@@ -155,6 +174,26 @@ describe('ComplianceReadySoftwareSettings', () => {
     )
 
     screen.getByText('Edit length of time')
+    expect(patchAuthSettings).not.toHaveBeenCalled()
+  })
+
+  it('should patch password reset time after entering sub-setting value', () => {
+    render()
+    expandAccordion()
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Require password to be changed after a certain amount of time',
+      })
+    )
+
+    fireEvent.change(screen.getByLabelText('Edit length of time'), {
+      target: { value: '90' },
+    })
+
+    expect(patchAuthSettings).toHaveBeenCalledWith({
+      data: { passwordResetTime: 90 * 24 * 60 * 60 },
+    })
   })
 
   it('should populate fields from auth settings', () => {
@@ -187,17 +226,12 @@ describe('ComplianceReadySoftwareSettings', () => {
     ).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('switch', {
-        name: 'Require protocol logs to be saved in the desktop app',
-      })
-    ).toHaveAttribute('aria-checked', 'false')
-    expect(
-      screen.getByRole('switch', {
         name: 'Automatically delete protocol run logs on the robot when there are 20 protocol run records',
       })
     ).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('should update toggle state', () => {
+  it('should update toggle state', async () => {
     render()
     expandAccordion()
 
@@ -208,6 +242,9 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'true')
     fireEvent.click(updateRobotsToggle)
     expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'false')
+    expect(patchAuthSettings).toHaveBeenCalledWith({
+      data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
+    })
   })
 
   it('should update input values', () => {
