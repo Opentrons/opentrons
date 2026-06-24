@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "hardware_testing"
 description = "Tools for running hardware tests."
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },
@@ -89,7 +89,6 @@ dev = [
     "types-setuptools==57.0.2",
     "pyusb==1.2.1",
     "build~=1.2.0",
-    "tomli>=2.0.1",
     "tomli-w>=1.0.0",
     "matplotlib==3.10.0",
     "setuptools<82",

@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import tomli
+import tomllib
 import tomli_w
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -45,7 +45,7 @@ def build_wheel(*, full: bool) -> None:
 
     if full:
         with pyproject_path.open("rb") as pyproject_file:
-            pyproject = tomli.load(pyproject_file)
+            pyproject = tomllib.load(pyproject_file)
         _configure_full_wheel(pyproject)
         _write_pyproject(pyproject_path, pyproject)
 
