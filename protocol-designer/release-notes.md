@@ -33,6 +33,7 @@ This release is designed specifically for use with Opentrons Flex, and includes 
   - Aspirating from or dispensing to single-well reservoirs.
   - Using the Flex 96-channel pipette to pick up tips from a rack next to a single-well reservoir or an empty Flex Stacker shuttle.
 - Move Opentrons Tough Universal Lids onto any compatible labware on the deck.
+- Protocol Designer lets you select all accessible wells for partial column tip pickups in compatible labware.
 
 ## Opentrons Protocol Designer Changes in 8.10.1
 
