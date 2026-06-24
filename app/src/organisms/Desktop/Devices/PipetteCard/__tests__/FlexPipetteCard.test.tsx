@@ -8,7 +8,7 @@ import { i18n } from '/app/i18n'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
-import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
+import { mockLeftSpecs } from '/app/resources/instruments/__fixtures__'
 
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { FlexPipetteCard } from '../FlexPipetteCard'

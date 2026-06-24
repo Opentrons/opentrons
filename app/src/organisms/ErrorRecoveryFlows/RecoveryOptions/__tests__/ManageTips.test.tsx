@@ -10,7 +10,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { clickButtonLabeled } from '../../__tests__/util'

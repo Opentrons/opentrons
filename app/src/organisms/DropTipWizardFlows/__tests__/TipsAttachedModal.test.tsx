@@ -7,7 +7,7 @@ import { LEFT } from '@opentrons/shared-data'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useHomePipettes } from '/app/local-resources/instruments'
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { useDropTipWizardFlows } from '..'

@@ -34,7 +34,6 @@ import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   appliedOffsetsToRun,
   CAMERA_SETUP_STEP_KEY,
@@ -67,6 +66,7 @@ import {
   useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
+import { INCOMPATIBLE, INEXACT_MATCH } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'

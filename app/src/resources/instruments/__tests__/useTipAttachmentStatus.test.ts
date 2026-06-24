@@ -9,7 +9,7 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 
 import { useTipAttachmentStatus } from '../useTipAttachmentStatus'
 

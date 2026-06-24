@@ -1,20 +1,21 @@
 // mock HTTP responses for pipettes endpoints
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 
-import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
+import { MATCH } from '/app/resources/runs/constants'
 
-import type { PipetteData } from '@opentrons/api-client'
+import type {
+  AttachedPipette,
+  IndividualPipetteSettings,
+  PipetteData,
+  PipetteSettingsFieldsMap,
+} from '@opentrons/api-client'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
-} from '../../robot-api/types'
-import type {
-  AttachedPipette,
-  PipetteInfo,
-  PipetteInformation,
-  PipetteSettings,
-  PipetteSettingsFieldsMap,
-} from '../types'
+} from '/app/redux/robot-api/types'
+import type { PipetteInformation } from '/app/resources/instruments/types'
+import type { PipetteInfo } from '/app/resources/runs/types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -97,7 +98,7 @@ export const mockFetchPipettesFailure: RobotApiResponse = {
 
 // fetch pipette settings fixtures
 
-export const mockPipetteSettings: PipetteSettings = {
+export const mockPipetteSettings: IndividualPipetteSettings = {
   info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
   fields: { fieldId: { value: 42, default: 42 } },
 }
@@ -220,7 +221,7 @@ export const mockFetchPipetteSettingsSuccess: RobotApiResponse = {
   ...mockFetchPipetteSettingsSuccessMeta,
   host: mockRobot,
   body: { abc: mockPipetteSettings } as {
-    [key: string]: PipetteSettings
+    [key: string]: IndividualPipetteSettings
   },
 }
 
@@ -267,7 +268,7 @@ export const mockUpdatePipetteSettingsFailure: RobotApiResponse = {
 
 export const mockPipetteInfo: PipetteInfo = {
   pipetteSpecs: fixtureP10Single,
-  requestedPipetteMatch: 'match',
+  requestedPipetteMatch: MATCH,
   pipetteCalDate: '2021-04-10',
   tipRacksForPipette: [
     {
