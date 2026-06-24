@@ -59,4 +59,6 @@ export interface UpdateProvider<UpdateSourceDetails> {
   name: () => string
   // get the current source
   source: () => UpdateSourceDetails
+  // clean up previous attempts
+  cleanup: () => Promise<void>
 }
