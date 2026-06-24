@@ -29,6 +29,7 @@ MODULE_NAMES = {
 
 MODULE_NAME_INDEX = 0
 SERIAL_OBJ_INDEX = 1
+BAUD_RATE = 115200
 
 
 # returns format "GET_DEVICE_INFO" : "M115"
@@ -163,12 +164,13 @@ async def main() -> None:
     modules_dict: Dict[int, Tuple[str, Serial]] = {}
     for module_index in range(len(modules_found)):
         module_name = modules_found[module_index]
+        # Looks like :
         # {
         #   0 : (ot_module_vacuum0, <serial_obj>),
         #   1 : (ot_module_vacuum1, <serial_obj>),
         #   2 : (ot_module_thermocycler0, <serial_obj>),
         # }
-        name_serial_obj = module_name, Serial(f"{module_name}", 9600, timeout=2)
+        name_serial_obj = module_name, Serial(f"{module_name}", BAUD_RATE, timeout=2)
         modules_dict[module_index] = name_serial_obj
 
     while True:
