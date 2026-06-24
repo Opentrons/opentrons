@@ -257,6 +257,7 @@ class CSVSettings:
     gantry_speed: float
     liquid_class_test: bool
     fail_early: bool
+    measurement_retract_height: int
 
     @classmethod
     def parse_csv(cls, csv_params: List[List[str]], simulating: bool) -> "CSVSettings":
@@ -346,6 +347,9 @@ class CSVSettings:
             lookup_key("liquid_class_test", csv_params)[0] == "TRUE"
         )
         fail_early = bool(lookup_key("fail_early", csv_params)[0] == "TRUE")
+        measurement_retract_height = int(
+            lookup_key("measurement_retract_height", csv_params)[0]
+        )
 
         volumes = {
             20: volumes_to_test_20ul,
@@ -411,6 +415,7 @@ class CSVSettings:
             gantry_speed=gantry_speed,
             liquid_class_test=liquid_class_test,
             fail_early=fail_early,
+            measurement_retract_height=measurement_retract_height,
         )
 
 
@@ -640,6 +645,13 @@ def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
         liquid=fixture_settings.liquid_name,
     )
     report.store_config_gm(fixture_settings.test_report, old_style)
+
+
+def _retract_above_scale(fixture_settings: FixtureSettings) -> None:
+    if fixture_settings.measurement_retract_height < 0:
+        fixture_settings.pipette._retract()
+    else:
+        fixture_settings.liquid_source.top(fixture_settings.measurement_retract_height)
 
 
 def _get_tips_for_test_single_multi(
@@ -1081,7 +1093,7 @@ def retract_and_wait(
     """Retract away from the scale and record the weight."""
     if fixture_settings.fast_simulate:
         # just simulate the physical movement and return to speed up the analysis
-        fixture_settings.pipette._retract()
+        _retract_above_scale(fixture_settings)
         # Z轴离开秤的上方后，关闭所有光栅
         maybe_close_all_gratings(fixture_settings)
         return_val = copy.deepcopy(fast_simulate_measurement)
@@ -1095,7 +1107,7 @@ def retract_and_wait(
     m_tag = create_measurement_tag(
         mode.value, None if blank else volume, channel, trial
     )
-    fixture_settings.pipette._retract()
+    _retract_above_scale(fixture_settings)
     if fixture_settings.recorder and not blank and fixture_settings.ctx.is_simulating():
         if mode == MeasurementType.ASPIRATE:
             fixture_settings.recorder.add_simulation_mass(volume * -0.001)
@@ -1523,14 +1535,14 @@ def calculate_evaporation(
     print_info("Detecting liquid height.")
 
     # Z轴在秤的上方，调用switch_mode
-    fixture_settings.pipette._retract()
+    _retract_above_scale(fixture_settings)
     maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
 
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     print_info(
         f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
     )
-    fixture_settings.pipette._retract()
+    _retract_above_scale(fixture_settings)
     blank_measurments: List[List[MeasurementData]] = []
     ctx.delay(
         seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
