@@ -170,14 +170,14 @@ requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 # define tips, trash, and pipette
 def run(protocol: protocol_api.ProtocolContext):
-    tiprack = protocol.load_labware(
+    tip_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_50ul", location="D3"
     )
     trash = protocol.load_trash_bin(location="A3")
     pipette = protocol.load_instrument(
         instrument_name="flex_1channel_50",
         mount="left",
-        tip_racks=[tiprack],
+        tip_racks=[tip_rack],
     )
 
     # load source and destination labware
@@ -248,7 +248,7 @@ To customize an Opentrons-verified liquid class, first add your pipettes, tips, 
 
 ```python
 custom_water = protocol.get_liquid_class(name="water", version=1)
-custom_water_properties = custom_water.get_for(pipette, tiprack)
+custom_water_properties = custom_water.get_for(pipette, tip_rack)
 ```
 
 Here, you can also use the optional `version` parameter to specify which version of the liquid class definition you’d like to customize. If unspecified, the API loads the latest version.

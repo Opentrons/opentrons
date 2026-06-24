@@ -104,7 +104,7 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 
     ```python
     def run(protocol: protocol_api.ProtocolContext):
-        tips = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+        tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
         reservoir = protocol.load_labware("nest_12_reservoir_15ml", "D2")
         plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D3")
     ```
@@ -120,7 +120,7 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
     
     ```python
     def run(protocol: protocol_api.ProtocolContext):
-        tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+        tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
         reservoir = protocol.load_labware("nest_12_reservoir_15ml", 2)
         plate = protocol.load_labware("nest_96_wellplate_200ul_flat", 3)
     ```
@@ -134,7 +134,7 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in [Protocol Designer](https://designer.opentrons.com/). If you want to identify liquids, see [Labeling Liquids in Labware][labeling-liquids-in-labware]. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
 ### Trash bin
-Flex and OT-2 both come with a trash bin for disposing used tips.
+Flex and OT-2 both come with a trash bin for disposing used tip_rack.
 
 The OT-2 trash bin is fixed in slot 12. Since it can't go anywhere else on the deck, you don't need to write any code to tell the API where it is.
 
@@ -149,15 +149,15 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
 
 #### Flex
 ```python
-left_pipette = protocol.load_instrument("flex_1channel_1000", "left", tip_racks=[tips])
+left_pipette = protocol.load_instrument("flex_1channel_1000", "left", tip_racks=[tip_rack])
 ```
 #### OT-2
 ```python
-left_pipette = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tips])
+left_pipette = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tip_rack])
 ```
 
 !!! note
-    You may notice that the value of `tip_racks` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like `tip_racks=[tips1, tips2]`.
+    You may notice that the value of `tip_racks` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like `tip_racks=[tip_rack_1, tip_rack_2]`.
 
 ## Commands
 Finally, all of your labware and hardware is in place, so it’s time to give the robot pipetting commands. The required steps of the serial dilution process break down into three main phases:

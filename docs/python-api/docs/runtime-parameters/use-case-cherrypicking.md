@@ -110,14 +110,14 @@ def run(protocol: protocol_api.ProtocolContext):
     unique_source_slots = list(set(source_slots))
 
     # load tip rack in deck slot C1
-    tiprack = protocol.load_labware(
+    tip_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="C1"
     )
     # attach pipette to left mount
     pipette = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
-        tip_racks=[tiprack]
+        tip_racks=[tip_rack]
     )
     # load trash bin
     trash = protocol.load_trash_bin("A3")

@@ -224,22 +224,22 @@ metadata = {"apiLevel": "{{ apiLevel }}", "protocolName": "Tip rack replacement"
 requirements = {"robotType": "OT-2"}
 
 def run(protocol: protocol_api.ProtocolContext):
-    tips1 = protocol.load_labware("opentrons_96_tiprack_1000ul", 1)
+    tip_rack_1 = protocol.load_labware("opentrons_96_tiprack_1000ul", 1)
     # load another tip rack but don't put it in a slot yet
-    tips2 = protocol.load_labware(
+    tip_rack_2 = protocol.load_labware(
         "opentrons_96_tiprack_1000ul", protocol_api.OFF_DECK
     )
     pipette = protocol.load_instrument(
-        "p1000_single_gen2", "left", tip_racks=[tips1, tips2]
+        "p1000_single_gen2", "left", tip_racks=[tip_rack_1, tip_rack_2]
     )
     # use all the on-deck tips
     for i in range(96):
         pipette.pick_up_tip()
         pipette.drop_tip()
     # pause to move the spent tip rack off-deck
-    protocol.move_labware(labware=tips1, new_location=protocol_api.OFF_DECK)
+    protocol.move_labware(labware=tip_rack_1, new_location=protocol_api.OFF_DECK)
     # pause to move the fresh tip rack on-deck
-    protocol.move_labware(labware=tips2, new_location=1)
+    protocol.move_labware(labware=tip_rack_2, new_location=1)
     pipette.pick_up_tip()
 ```
 

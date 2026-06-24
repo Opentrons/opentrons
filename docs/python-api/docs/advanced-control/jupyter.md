@@ -78,10 +78,10 @@ For example, the following dummy protocol will use a P300 Single-Channel GEN2 pi
 ```python
 metadata = {"apiLevel": "2.13"}
 def run(protocol):
-    tiprack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+    tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", 2)
     plate = protocol.load_labware("nest_96_wellplate_200ul_flat", 3)
-    p300 = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tiprack])
+    p300 = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tip_rack])
     p300.pick_up_tip()
     p300.return_tip()
 ```
@@ -121,20 +121,20 @@ How the API applies labware offsets varies depending on the API level of your pr
 In the latest API version, labware offsets can apply to the same labware when used in different on-deck locations on the Flex. For example, if you use `set_offset()` on a tip rack, use all the tips, and replace the rack with a fresh one of the same type in any deck location on the Flex, the offsets will apply to the fresh tip rack:
 
 ```python
-tiprack = protocol.load_labware(
+tip_rack = protocol.load_labware(
     load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
 )
-tiprack2 = protocol.load_labware(
+tip_rack_2 = protocol.load_labware(
     load_name="opentrons_flex_96_tiprack_1000ul",
     location=protocol_api.OFF_DECK,
 )
-tiprack.set_offset(x=0.1, y=0.1, z=0.1)
+tip_rack.set_offset(x=0.1, y=0.1, z=0.1)
 protocol.move_labware(
-    labware=tiprack, new_location=protocol_api.OFF_DECK
-)  # tiprack has no offset while off-deck
+    labware=tip_rack, new_location=protocol_api.OFF_DECK
+)  # tip_rack has no offset while off-deck
 protocol.move_labware(
-    labware=tiprack2, new_location="B3"
-)  # tiprack2 now has offset 0.1, 0.1, 0.1
+    labware=tip_rack_2, new_location="B3"
+)  # tip_rack_2 now has offset 0.1, 0.1, 0.1
 ```
 
 In OT-2 protocols, only reuse labware offsets with the same labware type-location combination. If you want an offset to apply to a piece of labware as it moves around the OT-2 deck, call `set_offset()` again after each movement:

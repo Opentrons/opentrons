@@ -42,8 +42,8 @@ from opentrons import protocol_api
 requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
-    # Load a tiprack for 1000 µL tips
-    tiprack1 = protocol.load_labware(
+    # Load a tip_rack for 1000 µL tips
+    tip_rack_1 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
     # Load a 96-well plate
     plate = protocol.load_labware(
@@ -52,10 +52,10 @@ def run(protocol: protocol_api.ProtocolContext):
     right = protocol.load_instrument(
         instrument_name="flex_8channel_1000",
         mount="right",
-        tip_racks=[tiprack1])
+        tip_racks=[tip_rack_1])
 ```
 
-After loading our instruments and labware, let’s tell the robot to pick up a pipette tip from location A1 in `tiprack1`:
+After loading our instruments and labware, let’s tell the robot to pick up a pipette tip from location A1 in `tip_rack_1`:
 
 ```python
 right.pick_up_tip()
@@ -88,7 +88,7 @@ To demonstrate these concepts, let’s write a protocol that uses a Flex 8-Chann
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     # Load a tip rack for 200 µL tips
-    tiprack1 = protocol.load_labware(
+    tip_rack_1 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_200ul", location="D1")
     # Load a well plate
     plate = protocol.load_labware(
@@ -97,10 +97,10 @@ def run(protocol: protocol_api.ProtocolContext):
     right = protocol.load_instrument(
         instrument_name="flex_8channel_1000",
         mount="right",
-        tip_racks=[tiprack1])
+        tip_racks=[tip_rack_1])
 ```
 
-After loading our instruments and labware, let’s tell the robot to pick up a pipette tip from location A1 in tiprack1:
+After loading our instruments and labware, let’s tell the robot to pick up a pipette tip from location A1 in `tip_rack_1`:
 
 ```python
 right.pick_up_tip()
@@ -135,12 +135,12 @@ These flow rate properties operate independently. This means you can specify dif
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
-    tiprack1 = protocol.load_labware(
+    tip_rack_1 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
     pipette = protocol.load_instrument(
         instrument_name="flex_1channel_1000",
         mount="left",
-        tip_racks=[tiprack1])
+        tip_racks=[tip_rack_1])
     plate = protocol.load_labware(
         load_name="corning_96_wellplate_360ul_flat", location="D3")
     pipette.pick_up_tip()

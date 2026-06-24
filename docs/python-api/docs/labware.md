@@ -37,13 +37,13 @@ Similar to the code sample in [How the API Works][how-the-api-works], here's how
 
 ```python
 # Flex
-tiprack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
 plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "D2")
 ```
 
 ```python
 # OT-2
-tiprack = protocol.load_labware("opentrons_96_tiprack_300ul", "1")
+tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", "1")
 plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "2")
 ```
 *New in version 2.0*
@@ -53,7 +53,7 @@ When the `load_labware()` method loads labware into your protocol, it returns a 
 !!! tip
     The `load_labware()` method includes an optional `label` argument. You can use it to identify labware with a descriptive name. If used, the label value is displayed in the Opentrons App. For example:
     ```python
-    tiprack = protocol.load_labware(
+    tip_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
         location="D1",
         label="any-name-you-want"
@@ -75,7 +75,7 @@ plate = protocol.load_labware(
 And this example loads an Opentrons Flex Tip Rack Lid onto a rack of 200 µL tips:
 
 ```python
-tiprack = protocol.load_labware(
+tip_rack = protocol.load_labware(
     load_name="opentrons_flex_96_tiprack_200ul",
     location="D1",
     lid="opentrons_flex_tiprack_lid"

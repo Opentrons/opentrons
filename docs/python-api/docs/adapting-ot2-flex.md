@@ -46,25 +46,25 @@ You also need to specify `"robotType": "Flex"`. If you omit `robotType` in the `
 Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. If possible, load Flex pipettes of the same capacity or larger than the OT-2 pipettes. See the [list of pipette API load names](pipettes/loading.md#api-load-names) for the valid values of `instrument_name` in Flex protocols. And check [Labware Library](https://labware.opentrons.com) or the Opentrons App for the load names of Flex tip racks.
 
 !!! note
-    If you use smaller capacity tips than in the OT-2 protocol, you may need to make further adjustments to avoid running out of tips. Also, the protocol may have more steps and take longer to execute.
+    If you use smaller capacity tips than in the OT-2 protocol, you may need to make further adjustments to avoid running out of tip_rack. Also, the protocol may have more steps and take longer to execute.
 
-This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and 300 µL tips to Flex code that uses a Flex 1-Channel 1000 µL pipette and 1000 µL tips.
+This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and 300 µL tips to Flex code that uses a Flex 1-Channel 1000 µL pipette and 1000 µL tip_rack.
 
 === "Original OT-2 code"
     ```python
     def run(protocol: protocol_api.ProtocolContext):
-        tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+        tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
         left_pipette = protocol.load_instrument(
-            "p300_single_gen2", "left", tip_racks=[tips]
+            "p300_single_gen2", "left", tip_racks=[tip_rack]
         )
     ```
 
 === "Updated Flex code"
     ```python
     def run(protocol: protocol_api.ProtocolContext):
-        tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
+        tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
         left_pipette = protocol.load_instrument(
-            "flex_1channel_1000", "left", tip_racks=[tips]
+            "flex_1channel_1000", "left", tip_racks=[tip_rack]
         )
     ```
 

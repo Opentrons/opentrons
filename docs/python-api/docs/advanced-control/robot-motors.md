@@ -37,7 +37,7 @@ requirements = {
 
 def run(protocol: protocol_api.ProtocolContext): 
     pipette = protocol.load_instrument("flex_96channel_1000")
-    tips = protocol.load_labware("opentrons_flex_96_filtertiprack_1000ul", "D2")
+    tip_rack = protocol.load_labware("opentrons_flex_96_filtertiprack_1000ul", "D2")
 
     def drop_tips():
         plunger_distance = -30
@@ -51,7 +51,7 @@ def run(protocol: protocol_api.ProtocolContext):
             speed=5.5
         )
     pipette.home()
-    pipette.move_to(tips['A1'].top(z=130))
+    pipette.move_to(tip_rack['A1'].top(z=130))
     drop_tips()
     pipette.home()
 ```

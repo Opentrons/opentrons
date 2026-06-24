@@ -122,10 +122,10 @@ if protocol.params.dry_run is True:
     pipette.reset_tipracks()
 else:
     protocol.move_labware(
-        labware=tips_1, new_location=chute, use_gripper=True
+        labware=tip_rack_1, new_location=chute, use_gripper=True
     )
     protocol.move_labware(
-        labware=tips_2, new_location="C3", use_gripper=True
+        labware=tip_rack_2, new_location="C3", use_gripper=True
     )
 ```
 You can modify this code for similar cases. You may be moving tip racks by hand, rather than with the gripper. Or you could even mix the two, moving the used (but full) rack off-deck by hand — instead of dropping it down the chute, spilling all the tips — and have the gripper move a new rack into place. Ultimately, it's up to you to fine-tune your dry run behavior, and communicate it to your protocol's users with your parameter descriptions.

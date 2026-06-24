@@ -11,16 +11,16 @@ These sample protocols are designed for anyone using an Opentrons Flex or OT-2 l
 
 ```python
 # This code uses named arguments
-tiprack_1 = protocol.load_labware(
+tip_rack = protocol.load_labware(
     load_name="opentrons_flex_96_tiprack_200ul",
     location="D2"
 )
 
 # This code uses positional arguments
-tiprack_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
+tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
 ```
 
-Both examples instantiate the variable `tiprack_1` with a Flex tip rack, but the former is more explicit. It shows the parameter name and its value together (e.g. `location="D2"`), which may be helpful when you're unsure about what's going on in a protocol code sample.
+Both examples instantiate the variable `tip_rack` with a Flex tip rack, but the former is more explicit. It shows the parameter name and its value together (e.g. `location="D2"`), which may be helpful when you're unsure about what's going on in a protocol code sample.
 
 Python developers with more experience should feel free to ignore the code styling used here and work with these examples as you like.
 
@@ -54,14 +54,14 @@ This code only loads the instruments and labware listed above, and performs no o
     
     def run(protocol: protocol_api.ProtocolContext):
         # load tip rack in deck slot D3
-        tiprack = protocol.load_labware(
+        tip_rack = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
         )
         # attach pipette to left mount
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack]
+            tip_racks=[tip_rack]
         )
         # load well plate in deck slot D2
         plate = protocol.load_labware(
@@ -84,14 +84,14 @@ This code only loads the instruments and labware listed above, and performs no o
     
     def run(protocol: protocol_api.ProtocolContext):
         # load tip rack in deck slot 3
-        tiprack = protocol.load_labware(
+        tip_rack = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul", location=3
         )
         # attach pipette to left mount
         pipette = protocol.load_instrument(
             instrument_name="p300_single_gen2",
             mount="left",
-            tip_racks=[tiprack]
+            tip_racks=[tip_rack]
         )  
         # load well plate in deck slot 2
         plate = protocol.load_labware(
@@ -123,7 +123,7 @@ This protocol uses some [building block commands](building-block-commands/index.
             load_name="corning_96_wellplate_360ul_flat",
             location="D1"
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="D2"
         )
@@ -131,7 +131,7 @@ This protocol uses some [building block commands](building-block-commands/index.
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
     
         pipette.pick_up_tip()
@@ -151,14 +151,14 @@ This protocol uses some [building block commands](building-block-commands/index.
             load_name="corning_96_wellplate_360ul_flat",
             location=1
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=2
         )
         pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
     
         pipette.pick_up_tip()
@@ -182,7 +182,7 @@ These protocols accomplish the same thing as the previous example, but a little 
             load_name="corning_96_wellplate_360ul_flat",
             location="D1"
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="D2"
         )
@@ -190,7 +190,7 @@ These protocols accomplish the same thing as the previous example, but a little 
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
         # transfer 100 µL from well A1 to well B1
         pipette.transfer(
@@ -211,14 +211,14 @@ These protocols accomplish the same thing as the previous example, but a little 
             load_name="corning_96_wellplate_360ul_flat",
             location=1
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=2
         )
         pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
         # transfer 100 µL from well A1 to well B1
         pipette.transfer(
@@ -243,14 +243,14 @@ Opentrons-verified liquid class definitions are based on Flex pipette and tip co
             load_name="corning_96_wellplate_360ul_flat",
             location="D1"
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="C1"
         )
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
         liquid_1 = protocol.get_liquid_class("glycerol_50")
         trash = protocol.load_trash_bin("A3")
@@ -280,7 +280,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
             load_name="corning_96_wellplate_360ul_flat",
             location="D1"
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="D2"
         )
@@ -292,7 +292,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
         # distribute 20 µL from reservoir:A1 -> plate:row:1
         # distribute 20 µL from reservoir:A2 -> plate:row:2
@@ -317,7 +317,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
             load_name="corning_96_wellplate_360ul_flat",
             location=1
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=2
         )
@@ -328,7 +328,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
         pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
         # distribute 20 µL from reservoir:A1 -> plate:row:1
         # distribute 20 µL from reservoir:A2 -> plate:row:2
@@ -359,7 +359,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
             load_name="corning_96_wellplate_360ul_flat",
             location="D1"
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_1000ul",
             location="D2"
         )
@@ -371,7 +371,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000", 
             mount="left",
-            tip_racks=[tiprack_1]
+            tip_racks=[tip_rack_1]
         )
     
         pipette.pick_up_tip()
@@ -397,7 +397,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
             load_name="corning_96_wellplate_360ul_flat",
             location=1
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=2
         )
@@ -408,7 +408,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
         pipette = protocol.load_instrument(
             instrument_name="p300_single", 
             mount="left",
-            tip_racks=[tiprack_1])
+            tip_racks=[tip_rack_1])
     
         pipette.pick_up_tip()
     
@@ -439,11 +439,11 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             load_name="corning_96_wellplate_360ul_flat",
             location="D1"
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="D2"
         )
-        tiprack_2 = protocol.load_labware(
+        tip_rack_2 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="D3"
         )
@@ -455,7 +455,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1, tiprack_2]
+            tip_racks=[tip_rack_1, tip_rack_2]
         )
         # Dispense diluent
         pipette.distribute(
@@ -498,11 +498,11 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             load_name="corning_96_wellplate_360ul_flat",
             location=1
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=2
         )
-        tiprack_2 = protocol.load_labware(
+        tip_rack_2 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=3
         )
@@ -513,7 +513,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
         pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
-            tip_racks=[tiprack_1, tiprack_2]
+            tip_racks=[tip_rack_1, tip_rack_2]
         )
         # Dispense diluent
         pipette.distribute(
@@ -562,11 +562,11 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             load_name="corning_96_wellplate_360ul_flat",
             location="D1"
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="D2"
         )
-        tiprack_2 = protocol.load_labware(
+        tip_rack_2 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
             location="D3"
         )
@@ -578,7 +578,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="right",
-            tip_racks=[tiprack_1, tiprack_2]
+            tip_racks=[tip_rack_1, tip_rack_2]
         )
     
         # Volume amounts are for demonstration purposes only
@@ -615,11 +615,11 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             load_name="corning_96_wellplate_360ul_flat",
             location=1
         )
-        tiprack_1 = protocol.load_labware(
+        tip_rack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=2
         )
-        tiprack_2 = protocol.load_labware(
+        tip_rack_2 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
             location=3
         )
@@ -630,7 +630,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
         pipette = protocol.load_instrument(
             instrument_name="p300_single", 
             mount="right",
-            tip_racks=[tiprack_1, tiprack_2]
+            tip_racks=[tip_rack_1, tip_rack_2]
         )
     
         # Volume amounts are for demonstration purposes only
