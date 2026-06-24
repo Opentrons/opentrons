@@ -1,5 +1,6 @@
 """Code for managing log period rotation and storage."""
 
+from asyncio import Lock
 from datetime import datetime, timezone
 from logging import getLogger
 
@@ -42,6 +43,7 @@ class LogDataManager:
         self._store = log_store
         self._settings = settings_store
         self._time = time_getter or _GetTime()
+        self._lock = Lock()
 
     async def rotate_periods(self) -> str:
         """End the previous log period and start a new one.
@@ -50,7 +52,8 @@ class LogDataManager:
         """
         if not self._settings.get_logging_enabled_settings().loggingEnabled:
             return ""
-        return await self._do_rotate_periods()
+        async with self._lock:
+            return await self._do_rotate_periods()
 
     async def store_log(self, log_message: str) -> str:
         """Store a log message to the active period.
@@ -60,7 +63,8 @@ class LogDataManager:
         """
         if not self._settings.get_logging_enabled_settings().loggingEnabled:
             return ""
-        return await self._do_store_log(log_message)
+        async with self._lock:
+            return await self._do_store_log(log_message)
 
     async def _do_store_log(self, log_message: str) -> str:
         previous_hash = self._store.tail_hash()
