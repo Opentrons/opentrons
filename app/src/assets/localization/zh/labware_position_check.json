@@ -34,6 +34,7 @@
   "confirm": "确认",
   "confirm_detached": "确认移除",
   "confirm_go_back_without_saving": "请问您确定要不保存并返回耗材列表吗？",
+  "confirm_offset": "确认偏移量",
   "confirm_pick_up_tip_modal_title": "移液器是否成功拾取了吸头?",
   "confirm_pick_up_tip_modal_try_again_text": "否，重试",
   "confirm_placement": "确认放置",

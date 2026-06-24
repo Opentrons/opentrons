@@ -22,7 +22,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareDefinition3,
 )
-from opentrons_shared_data.pipette import PIPETTE_X_SPAN
+from opentrons_shared_data.pipette.constants import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
 
 from .. import errors

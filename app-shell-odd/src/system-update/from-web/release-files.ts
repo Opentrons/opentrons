@@ -2,7 +2,6 @@
 
 import path from 'path'
 import { mkdirp, move, readdir, readFile, rm } from 'fs-extra'
-import tempy from 'tempy'
 
 import { fetchToFile } from '../../http'
 import { createLogger } from '../../log'
@@ -12,8 +11,16 @@ import type { DownloadProgress } from '../../http'
 import type { ReleaseSetFilepaths, ReleaseSetUrls } from '../types'
 
 const log = createLogger('systemUpdate/from-web/release-files')
+
+const DOWNLOAD_ARTIFACT_SUFFIX = '.odd-download'
 const outPath = (dir: string, url: string): string => {
   return path.join(dir, path.basename(url))
+}
+const dlPath = (dir: string, url: string): string => {
+  return path.join(dir, path.basename(url)) + DOWNLOAD_ARTIFACT_SUFFIX
+}
+const outPathFromDlPath = (dlPath: string): string => {
+  return dlPath.slice(0, -DOWNLOAD_ARTIFACT_SUFFIX.length)
 }
 
 const RELEASE_DIRECTORY_PREFIX = 'cached-release-'
@@ -145,14 +152,11 @@ export function downloadReleaseFiles(
   onProgress: (progress: DownloadProgress) => void,
   canceller: AbortController
 ): Promise<ReleaseSetData> {
-  const tempDir: string = tempy.directory()
-  const tempSystemPath = outPath(tempDir, urls.system)
-  const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously
   const notesReq =
     urls.releaseNotes != null
-      ? fetchToFile(urls.releaseNotes, tempNotesPath, {
+      ? fetchToFile(urls.releaseNotes, dlPath(directory, urls.releaseNotes), {
           signal: canceller.signal,
         }).catch(err => {
           log.warn(
@@ -162,26 +166,32 @@ export function downloadReleaseFiles(
         })
       : Promise.resolve(null)
   if (urls.releaseNotes != null) {
-    log.info(`Downloading ${urls.releaseNotes} to ${tempNotesPath}`)
+    log.info(
+      `Downloading ${urls.releaseNotes} to ${dlPath(directory, urls.releaseNotes)}`
+    )
   } else {
     log.info('No release notes available, not downloading')
   }
-  log.info(`Downloading ${urls.system} to ${tempSystemPath}`)
-  const systemReq = fetchToFile(urls.system, tempSystemPath, {
+  log.info(`Downloading ${urls.system} to ${dlPath(directory, urls.system)}`)
+  const systemReq = fetchToFile(urls.system, dlPath(directory, urls.system), {
     onProgress,
     signal: canceller.signal,
   })
   return Promise.all([systemReq, notesReq])
     .then(results => {
       const [systemTemp, releaseNotesTemp] = results
-      const systemPath = outPath(directory, systemTemp)
-      const notesPath = releaseNotesTemp
-        ? outPath(directory, releaseNotesTemp)
-        : null
-
-      log.info(`Download complete, ${tempDir}=>${directory}`)
-
-      return move(tempDir, directory, { overwrite: true }).then(() => {
+      const systemMove = move(systemTemp, outPathFromDlPath(systemTemp), {
+        overwrite: true,
+      }).then(() => outPathFromDlPath(systemTemp))
+      const notesMove = releaseNotesTemp
+        ? move(releaseNotesTemp, outPathFromDlPath(releaseNotesTemp), {
+            overwrite: true,
+          }).then(() => outPathFromDlPath(releaseNotesTemp))
+        : new Promise<null>(resolve => {
+            resolve(null)
+          })
+      return Promise.all([systemMove, notesMove]).then(results => {
+        const [systemPath, notesPath] = results
         log.info(`Move complete`)
         return augmentWithReleaseNotesContent({
           system: systemPath,
@@ -193,7 +203,15 @@ export function downloadReleaseFiles(
       log.error(
         `Failed to download release files: ${error.name}: ${error.message}`
       )
-      return rm(tempDir, { force: true, recursive: true }).then(() => {
+      return Promise.all([
+        rm(dlPath(directory, urls.system), { force: true }),
+        urls.releaseNotes
+          ? rm(dlPath(directory, urls.releaseNotes), { force: true })
+          : new Promise<void>(resolve => {
+              resolve()
+            }),
+      ]).then(() => {
+        log.error(`throwing error ${error}`)
         throw error
       })
     })
@@ -242,3 +260,33 @@ const readReleaseNotes = (path: string | null): Promise<string | null> =>
         )
         return null
       })
+
+const removeTemporaryDownloadsFromReleaseDir = async (
+  releaseDir: string
+): Promise<void> => {
+  try {
+    const releaseContents = await readdir(releaseDir, { withFileTypes: true })
+    const tempDls = releaseContents.filter(contentsDirent =>
+      contentsDirent.name.endsWith(DOWNLOAD_ARTIFACT_SUFFIX)
+    )
+    log.warn(`Found ${tempDls.length} leftover downloads in ${releaseDir}`)
+    await Promise.allSettled(
+      tempDls.map(tdl => rm(path.join(tdl.parentPath, tdl.name)))
+    )
+  } catch (e: unknown) {
+    log.warn(`Failed to read ${releaseDir}: ${e}`)
+  }
+}
+
+export const removeTemporaryDownloads = async (
+  baseDirectory: string
+): Promise<void> => {
+  const releaseDirs = await ensureReleaseCache(baseDirectory)
+  await Promise.allSettled(
+    releaseDirs.map(releaseDirent =>
+      removeTemporaryDownloadsFromReleaseDir(
+        path.join(releaseDirent.parentPath, releaseDirent.name)
+      )
+    )
+  )
+}

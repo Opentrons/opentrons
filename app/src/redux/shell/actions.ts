@@ -11,6 +11,7 @@ import type {
   RobotMassStorageDeviceRemoved,
   SendLogAction,
   StepDetailViewerCloseAction,
+  StepDetailViewerClosedAction,
   StepDetailViewerOpenAction,
   StepDetailViewerUpdateAction,
   UiInitializedAction,
@@ -45,6 +46,8 @@ export const STEP_DETAIL_VIEWER_UPDATE =
   'shell:STEP_DETAIL_VIEWER_UPDATE' as const
 export const STEP_DETAIL_VIEWER_CLOSE =
   'shell:STEP_DETAIL_VIEWER_CLOSE' as const
+export const STEP_DETAIL_VIEWER_CLOSED =
+  'shell:STEP_DETAIL_VIEWER_CLOSED' as const
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -185,4 +188,11 @@ export const stepDetailViewerCloseAction = (
   type: STEP_DETAIL_VIEWER_CLOSE,
   payload,
   meta: { shell: true },
+})
+
+export const stepDetailViewerClosedAction = (
+  protocolKey: string
+): StepDetailViewerClosedAction => ({
+  type: STEP_DETAIL_VIEWER_CLOSED,
+  payload: { protocolKey },
 })

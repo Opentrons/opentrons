@@ -16,6 +16,8 @@ Welcome to the v9.1.0 release of the Opentrons App! This release is designed spe
 
 - Use the updated Opentrons App to control and work with your Flex, including running protocols. Download the OT-2 App to control the OT-2 liquid handling robot.
 - View step groups added to your protocols in [visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
+- Attach and use a keyboard (via USB) to set up quick transfer protocols, enter passwords and runtime parameters, and more in the Opentrons App.
+- Adds the ability to turn off the Flex from the Opentrons App. Under Devices, click the three-dot menu for your robot, then click to **Turn off robot**. When it's time to restart your Flex, use the power switch on the rear panel.
 
 ### Improvements
 
