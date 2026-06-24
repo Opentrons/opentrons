@@ -61,8 +61,8 @@ const FLEX_TC_LID_COLLISION_ZONE = {
 // OT-2 fixed trash is in slot 12.
 // Absolute position = cutout12 [265.0, 271.5, 0] + offsetFromCutoutFixture [29.285, -2.835, 0]
 // boundingBox: xDimension=107.11, yDimension=165.67, zDimension=82
-const OT2_FIXED_TRASH_BACK_LEFT_PT = { x: 294.285, y: 434.335, z: 0 }
-const OT2_FIXED_TRASH_FRONT_RIGHT_PT = { x: 401.395, y: 268.665, z: 0 }
+const OT2_FIXED_TRASH_BACK_LEFT_PT = { x: 290.285, y: 434.335, z: 0 }
+const OT2_FIXED_TRASH_FRONT_RIGHT_PT = { x: 401.395, y: 272.665, z: 0 }
 const OT2_FIXED_TRASH_HEIGHT_MM = 82
 const FLEX_TC_LID_BACK_LEFT_PT = {
   x: FLEX_TC_LID_COLLISION_ZONE.back_left.x,

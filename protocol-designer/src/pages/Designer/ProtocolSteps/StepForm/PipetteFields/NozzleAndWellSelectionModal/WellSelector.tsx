@@ -20,7 +20,10 @@ import {
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getPipetteMovementSafetyStatus,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { SelectionRect } from '/protocol-designer/components/organisms/Labware/SelectionRect'
@@ -31,6 +34,7 @@ import { getCollidingWells } from '/protocol-designer/utils/index'
 import { canPipetteUseLabware } from '../../../../../../utils'
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
 import { INACCESSIBLE_COLLISION } from '../TipSelectionWizard/constants'
+import { getWellsToCheck } from '../TipSelectionWizard/hooks/useMemoizedTipAccessibilityByTiprackIdByWellName'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
@@ -184,13 +188,27 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       leaveTimeoutRef.current = null
     }
 
-    const hovered = getEntireWellSelection(
-      e.wellName,
-      labwareDef.ordering,
-      nozzleConfiguration,
-      primaryNozzle,
-      channels
-    )
+    const { wellName } = e
+    // If the well is a primary, use its pre-computed affectedWells.
+    // If it's a cascading member, redirect to its covering primary's group so
+    // that hover highlights the correct set and reflects the right accessibility.
+    const directStatus = primaryWellAccessibilityByWellName[wellName]
+    let hovered: string[]
+    if (directStatus != null) {
+      hovered = directStatus.affectedWells
+    } else {
+      const coveringStatus = wellToPrimaryStatus[wellName]
+      hovered =
+        coveringStatus != null
+          ? coveringStatus.affectedWells
+          : getEntireWellSelection(
+              wellName,
+              labwareDef.ordering,
+              nozzleConfiguration,
+              primaryNozzle,
+              channels
+            )
+    }
 
     setHoveredWells(hovered)
     setWellShadow(hovered[0])
@@ -217,10 +235,87 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     invariantContext,
     tiprackId,
   ])
+
+  // primary well name only to mirror the tip selection hook's approach
+  // cascading wells are represented through `affectedWells` on their primary entry
+  // to not inappropriately show that cascading wells are inaccessible when their
+  // primary is accessible
+  const primaryWellAccessibilityByWellName = useMemo(() => {
+    const pipetteCanUseLabware = canPipetteUseLabware(
+      pipetteSpecs,
+      nozzleConfiguration,
+      labwareDef
+    )
+    const primaryWells = getWellsToCheck(
+      nozzleConfiguration,
+      labwareDef.ordering,
+      channels,
+      primaryNozzle
+    )
+    return primaryWells.reduce<
+      Record<string, { isAccessible: boolean; affectedWells: string[] }>
+    >((acc, wellName) => {
+      const isSafe =
+        pipetteCanUseLabware &&
+        (robotState == null ||
+          getPipetteMovementSafetyStatus({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId,
+            wellTargetName: wellName,
+            primaryNozzle,
+            nozzleConfiguration,
+            tiprackId,
+          }).isSafe)
+      const affectedWells = getEntireWellSelection(
+        wellName,
+        labwareDef.ordering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+      acc[wellName] = { isAccessible: isSafe, affectedWells }
+      return acc
+    }, {})
+  }, [
+    pipetteSpecs,
+    nozzleConfiguration,
+    labwareDef,
+    channels,
+    primaryNozzle,
+    robotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    tiprackId,
+  ])
+
+  // propogate each primary's status to all its cascading wells
+  // accessible primaries take precedence so a cascading well covered by both
+  // an accessible and an inaccessible primary is shown as accessible
+  const wellToPrimaryStatus = Object.entries(
+    primaryWellAccessibilityByWellName
+  ).reduce<Record<string, { isAccessible: boolean; affectedWells: string[] }>>(
+    (acc, [, status]) => {
+      status.affectedWells.forEach(well => {
+        const existing = acc[well]
+        if (
+          existing == null ||
+          (!existing.isAccessible && status.isAccessible)
+        ) {
+          acc[well] = status
+        }
+      })
+      return acc
+    },
+    {}
+  )
+
   const allWellsWithState = allWells
     .flat()
     .reduce<Record<string, WellType>>((acc, wellName) => {
-      const accessible = allWellsWithStatus[wellName] === 0
+      const accessible = wellToPrimaryStatus[wellName]?.isAccessible ?? false
 
       if (hoveredWells?.includes(wellName) && !accessible) {
         acc[wellName] = SELECTED_ERROR
@@ -324,7 +419,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
               wellGroup => wellGroup[0] === primaryWellInGroup
             )
             // Add to update list if the well does not currently exist in the list and is accessible
-            if (!exists && allWellsWithStatus[primaryWellInGroup] !== 1) {
+            if (
+              !exists &&
+              (primaryWellAccessibilityByWellName[primaryWellInGroup]
+                ?.isAccessible ??
+                false)
+            ) {
               updated.push(wellGroup)
             }
           })
