@@ -12,7 +12,10 @@ import {
   SOURCE_LABWARE,
   TIPRACK_1,
 } from '../../fixtures'
-import { createEmptyLiquidState, getLocationTotalVolume } from '../../utils/misc'
+import {
+  createEmptyLiquidState,
+  getLocationTotalVolume,
+} from '../../utils/misc'
 import { forAspirate as _forAspirate } from '../forAspirate'
 import { forConfigureNozzleLayout as _forConfigureNozzleLayout } from '../forConfigureNozzleLayout'
 import { forDispense as _forDispense } from '../forDispense'
@@ -117,7 +120,8 @@ describe('QUADRANT partial-column transfer', () => {
       afterAspirate.robotState
     )
 
-    const plateLiquid = afterDispense.robotState.liquidState.labware[DEST_LABWARE]
+    const plateLiquid =
+      afterDispense.robotState.liquidState.labware[DEST_LABWARE]
     const pipetteAfterDispense =
       afterDispense.robotState.liquidState.pipettes[MULTI_PIPETTE]
 
