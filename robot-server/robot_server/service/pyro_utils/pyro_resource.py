@@ -15,10 +15,8 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.types import (
-    DeckConfigurationType,
-    EngineEventNotification,
-)
+from opentrons.protocol_engine.state.state import EngineEventNotification
+from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
@@ -273,27 +271,17 @@ class RobotServerPyroResource:
                 "Cannot provide a hardware updates callback from the RobotServerPyroResource without a HardwareStateStore."
             )
 
-    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
-    def get_engine_updates_callback(self) -> Callable[[EngineEventNotification], None]:
-        """Create a callback for protocol engine events during a Run.
-
-        The returned callback is meant to alert the robot server process to engine state updates.
-        """
+    def get_engine_updates_callback(
+        self, event: EngineEventNotification
+    ) -> None:  # Callable[[EngineEventNotification], None]:
+        """Update the RunOrchestratorStore local store of Engine state status."""
         orchestrator_store = self._run_orchestrator_store
         if orchestrator_store is not None:
+            # Put in a call soon to not interrupt robot server business logic
+            self._loop.call_soon(
+                orchestrator_store.update_engine_status_callback, event
+            )
 
-            def run_engine_event_update_from_engine_thread(
-                event: EngineEventNotification,
-            ) -> None:
-                async def _async_call(event: EngineEventNotification) -> None:
-                    orchestrator_store.update_engine_status_callback(event)
-
-                asyncio.run_coroutine_threadsafe(
-                    _async_call(event),
-                    self._loop,
-                )
-
-            return run_engine_event_update_from_engine_thread
         else:
             raise RuntimeError(
                 "Cannot provide a protocol engine listener from the RobotServerPyroResource without a RunOrchestratorStore."

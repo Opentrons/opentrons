@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import math
 from dataclasses import dataclass
 from typing import (
@@ -21,6 +22,7 @@ from typing import (
 from numpy import array, dot
 from numpy import double as npdouble
 from numpy.typing import NDArray
+from pydantic import BaseModel
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
@@ -42,7 +44,6 @@ from ..types import (
     AddressableAreaLocation,
     DeckSlotLocation,
     DeckType,
-    EngineEventNotification,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     LoadedModule,
@@ -102,6 +103,12 @@ from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate
 from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
 ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
+
+
+class FlexStackerSubstateNotification(BaseModel):
+    """Engine notification for Flex Stacker substate change."""
+
+    pass
 
 
 class SlotTransit(NamedTuple):
@@ -224,7 +231,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         config: Config,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
-        updates_callback: Optional[Callable[[EngineEventNotification], None]] = None,
+        updates_callback: Optional[
+            Callable[[FlexStackerSubstateNotification | Any], None]
+        ] = None,
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
@@ -671,7 +680,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             prev_substate.new_from_state_change(state_update)
         )
         if self._updates_callback:
-            self._updates_callback(EngineEventNotification.FLEX_STACKER_SUBSTATE)
+            asyncio.get_running_loop().call_soon(
+                self._updates_callback, FlexStackerSubstateNotification()
+            )
 
     def _handle_vacuum_module_commands(
         self, state_update: VacuumModuleStateUpdate

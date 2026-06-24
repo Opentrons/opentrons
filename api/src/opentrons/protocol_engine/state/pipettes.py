@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import dataclasses
 from logging import getLogger
 from typing import (
+    Any,
     Callable,
     Dict,
     List,
@@ -14,6 +16,7 @@ from typing import (
     cast,
 )
 
+from pydantic import BaseModel
 from typing_extensions import assert_never
 
 from opentrons_shared_data.pipette import pipette_definition
@@ -36,7 +39,6 @@ from ..types import (
     CurrentPipetteLocation,
     CurrentWell,
     DeckPoint,
-    EngineEventNotification,
     FlowRates,
     LabwareWellId,
     LoadedPipette,
@@ -55,6 +57,18 @@ from opentrons.types import Mount as HwMount
 from opentrons.types import MountType, NozzleConfigurationType, Point
 
 LOG = getLogger(__name__)
+
+
+class NozzleMapNotification(BaseModel):
+    """Engine notification for Nozzle map status change for the instruments."""
+
+    nozzle_maps: Dict[str, NozzleMap]
+
+
+class TipAttachedNotification(BaseModel):
+    """Engine notification for tip attached status change for the instruments."""
+
+    pass
 
 
 @dataclasses.dataclass(frozen=True)
@@ -147,7 +161,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     def __init__(
         self,
-        updates_callback: Optional[Callable[[EngineEventNotification], None]] = None,
+        updates_callback: Optional[
+            Callable[[NozzleMapNotification | TipAttachedNotification | Any], None]
+        ] = None,
     ) -> None:
         """Initialize a PipetteStore and its state."""
         self._state = PipetteState(
@@ -198,7 +214,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.ready_to_aspirate_by_id[pipette_id] = False
             self._state.tip_source_by_id[pipette_id] = None
             if self._updates_callback:
-                self._updates_callback(EngineEventNotification.TIP_ATTACHED)
+                asyncio.get_running_loop().call_soon(
+                    self._updates_callback, TipAttachedNotification()
+                )
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
@@ -253,7 +271,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     )
 
             if self._updates_callback:
-                self._updates_callback(EngineEventNotification.TIP_ATTACHED)
+                asyncio.get_running_loop().call_soon(
+                    self._updates_callback, TipAttachedNotification()
+                )
 
     def _update_current_location(self, state_update: update_types.StateUpdate) -> None:
         location_update = state_update.pipette_location
@@ -341,7 +361,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 state_update.pipette_config.pipette_id
             ] = config.nozzle_map
             if self._updates_callback:
-                self._updates_callback(EngineEventNotification.NOZZLE_CONFIG)
+                asyncio.get_running_loop().call_soon(
+                    self._updates_callback,
+                    NozzleMapNotification(
+                        nozzle_maps=self._state.nozzle_configuration_by_id
+                    ),
+                )
 
     def _update_pipette_nozzle_map(
         self, state_update: update_types.StateUpdate
@@ -351,7 +376,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 state_update.pipette_nozzle_map.pipette_id
             ] = state_update.pipette_nozzle_map.nozzle_map
             if self._updates_callback:
-                self._updates_callback(EngineEventNotification.NOZZLE_CONFIG)
+                asyncio.get_running_loop().call_soon(
+                    self._updates_callback,
+                    NozzleMapNotification(
+                        nozzle_maps=self._state.nozzle_configuration_by_id
+                    ),
+                )
 
     def _update_ready_for_aspirate(
         self, state_update: update_types.StateUpdate

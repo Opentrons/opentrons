@@ -97,13 +97,3 @@ class PostRunHardwareState(Enum):
     HOME_THEN_DISENGAGE = "homeThenDisengage"
     STAY_ENGAGED_IN_PLACE = "stayEngagedInPlace"
     DISENGAGE_IN_PLACE = "disengageInPlace"
-
-
-class EngineEventNotification(Enum):
-    """Event types for external Engine state update notifications."""
-
-    NOZZLE_CONFIG = "nozzleConfig"
-    TIP_ATTACHED = "tipAttached"
-    FLEX_STACKER_SUBSTATE = "stackerSubstate"
-    CURRENT_COMMAND = "currentCommand"
-    FINALIZED_COMMAND = "finalizedCommand"

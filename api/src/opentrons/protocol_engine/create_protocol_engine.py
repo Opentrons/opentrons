@@ -15,8 +15,8 @@ from .plugins import PluginStarter
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .state.config import Config
-from .state.state import StateStore
-from .types import DeckConfigurationType, EngineEventNotification, PostRunHardwareState
+from .state.state import EngineEventNotification, StateStore
+from .types import DeckConfigurationType, PostRunHardwareState
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState, HardwareEventHandler
 from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (

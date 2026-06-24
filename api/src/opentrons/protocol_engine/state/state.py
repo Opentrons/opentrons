@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Callable, Dict, List, Optional, Sequence, TypeVar, Union
 
 from typing_extensions import ParamSpec
 
@@ -12,7 +12,7 @@ from opentrons_shared_data.robot.types import RobotDefinition
 
 from ..actions import Action, ActionHandler
 from ..resources import DeckFixedLabware
-from ..types import DeckConfigurationType, EngineEventNotification
+from ..types import DeckConfigurationType
 from ._abstract_store import HandlesActions, HasState
 from .addressable_areas import (
     AddressableAreaState,
@@ -20,17 +20,34 @@ from .addressable_areas import (
     AddressableAreaView,
 )
 from .camera import CameraState, CameraStore, CameraView
-from .commands import CommandState, CommandStore, CommandView
+from .commands import (
+    CommandState,
+    CommandStore,
+    CommandView,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+)
 from .config import Config
 from .files import FileState, FileStore, FileView
 from .geometry import GeometryView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
 from .liquids import LiquidState, LiquidStore, LiquidView
-from .modules import ModuleState, ModuleStore, ModuleView
+from .modules import (
+    FlexStackerSubstateNotification,
+    ModuleState,
+    ModuleStore,
+    ModuleView,
+)
 from .motion import MotionView
 from .peripherals import PeripheralState, PeripheralStore, PeripheralView
-from .pipettes import PipetteState, PipetteStore, PipetteView
+from .pipettes import (
+    NozzleMapNotification,
+    PipetteState,
+    PipetteStore,
+    PipetteView,
+    TipAttachedNotification,
+)
 from .preconditions import (
     CommandPreconditionState,
     CommandPreconditionStore,
@@ -46,6 +63,14 @@ from opentrons.util.change_notifier import ChangeNotifier
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")
+
+EngineEventNotification = Union[
+    NozzleMapNotification,
+    TipAttachedNotification,
+    FlexStackerSubstateNotification,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+]
 
 
 @dataclass(frozen=True)

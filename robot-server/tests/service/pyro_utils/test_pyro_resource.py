@@ -431,5 +431,6 @@ async def test_run_engine_state_update_callback(
     )
 
     engine_event_callback = robot_server_resource.get_engine_updates_callback()
+    # CASEY NOTE THIS WILL NEED TO CHANGE
 
     assert isinstance(engine_event_callback, ClientPyroFunctionWrapper)
