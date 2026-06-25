@@ -1,8 +1,9 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { useMutation } from 'react-query'
 
 import { DocumentedMutationError } from './types'
 
+import type { MutableRefObject } from 'react'
 import type {
   MutationFunction,
   MutationKey,
@@ -62,16 +63,21 @@ function useWrappedMutationFn<TData, TVariables>(
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[]
 ): MutationFunction<TData, TVariables> {
+  // using a ref avoids stale mutation functions after a change in the host causes a rerender
+  // i.e. when the user is prompted to log in again
+  const mutationFnRef = useRef(mutationFn)
+  mutationFnRef.current = mutationFn
+
   const wrappedMutationFn = useCallback(
     async (variables: TVariables) => {
       return await runMutation(
         documentationState,
         actionsToDocument,
-        mutationFn,
+        mutationFnRef,
         variables
       )
     },
-    [actionsToDocument, documentationState, mutationFn]
+    [actionsToDocument, documentationState]
   )
   return wrappedMutationFn
 }
@@ -79,7 +85,9 @@ function useWrappedMutationFn<TData, TVariables>(
 async function runMutation<TData, TVariables>(
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[],
-  mutationFn: DocumentedMutationFunction<TData, TVariables>,
+  mutationFnRef: MutableRefObject<
+    DocumentedMutationFunction<TData, TVariables>
+  >,
   variables: TVariables
 ): Promise<TData> {
   if (documentationState.isLoading) {
@@ -99,7 +107,7 @@ async function runMutation<TData, TVariables>(
       return await runMutation(
         { ...documentationState, docreport: dr },
         actionsToDocument,
-        mutationFn,
+        mutationFnRef,
         variables
       )
     }
@@ -109,41 +117,44 @@ async function runMutation<TData, TVariables>(
     documentationState.accessControlEnabled &&
     documentationState.loginExpired
   ) {
-    await documentationState.askForLogin()
+    const loginResult = await documentationState.askForLogin()
     if (documentationState.reasonForInteractionRequired) {
       const dr = await documentationState.askForDocumentation(
         actionsToDocument,
         undefined,
-        documentationState.docreport
+        documentationState.docreport ?? undefined,
+        loginResult?.username
       )
       return await runMutation(
         { ...documentationState, docreport: dr, loginExpired: false },
         actionsToDocument,
-        mutationFn,
+        mutationFnRef,
         variables
       )
     }
   }
 
-  return await mutationFn({
-    variables,
-    userNotes:
-      documentationState.accessControlEnabled &&
-      documentationState.reasonForInteractionRequired
-        ? (documentationState.docreport ?? '')
-        : '',
-  }).catch(async e => {
-    if (
-      e.isAxiosError &&
-      e.response?.status === 401 &&
-      documentationState.accessControlEnabled
-    ) {
-      return await runMutation(
-        { ...documentationState, loginExpired: true },
-        actionsToDocument,
-        mutationFn,
-        variables
-      )
-    } else throw e
-  })
+  return await mutationFnRef
+    .current({
+      variables,
+      userNotes:
+        documentationState.accessControlEnabled &&
+        documentationState.reasonForInteractionRequired
+          ? (documentationState.docreport ?? '')
+          : '',
+    })
+    .catch(async e => {
+      if (
+        e.isAxiosError &&
+        e.response?.status === 401 &&
+        documentationState.accessControlEnabled
+      ) {
+        return await runMutation(
+          { ...documentationState, loginExpired: true },
+          actionsToDocument,
+          mutationFnRef,
+          variables
+        )
+      } else throw e
+    })
 }

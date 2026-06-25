@@ -9,7 +9,8 @@ import type {
 type AskForDocumentation = (
   actionsToDocument: DocumentedAction[],
   onCancel?: () => void,
-  defaultDocReport?: DocumentationReport | null
+  defaultDocReport?: DocumentationReport | null,
+  username?: string
 ) => Promise<DocumentationReport>
 
 export const ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE: DocumentationState = {
@@ -22,7 +23,7 @@ export function createReasonNotRequiredDocumentationState(): DocumentationState 
     isLoading: false,
     accessControlEnabled: true,
     loginExpired: false,
-    askForLogin: vi.fn(async () => {}),
+    askForLogin: vi.fn(async () => ({ username: 'alice' })),
     reasonForInteractionRequired: false,
   }
 }
@@ -34,7 +35,7 @@ export function createReasonRequiredWithDocReport(
     isLoading: false,
     accessControlEnabled: true,
     loginExpired: false,
-    askForLogin: vi.fn(async () => {}),
+    askForLogin: vi.fn(async () => ({ username: 'alice' })),
     reasonForInteractionRequired: true,
     docreport,
     askForDocumentation: vi.fn(),
@@ -48,7 +49,7 @@ export function createReasonRequiredWithoutDocReport(
     isLoading: false,
     accessControlEnabled: true,
     loginExpired: false,
-    askForLogin: vi.fn(async () => {}),
+    askForLogin: vi.fn(async () => ({ username: 'alice' })),
     reasonForInteractionRequired: true,
     docreport: null,
     askForDocumentation,

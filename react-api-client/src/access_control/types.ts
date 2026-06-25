@@ -60,7 +60,7 @@ export type DocumentationState =
 export interface MutationAuthenticationState {
   accessControlEnabled: true
   loginExpired: boolean
-  askForLogin: () => Promise<void>
+  askForLogin: () => Promise<{ username: string } | null>
 }
 
 export type MutationDocumentationState =
@@ -73,7 +73,8 @@ export type MutationDocumentationState =
       askForDocumentation: (
         actionsToDocument: DocumentedAction[],
         onCancel?: () => void,
-        defaultDocReport?: DocumentationReport | null
+        initialDocreport?: DocumentationReport,
+        username?: string
       ) => Promise<DocumentationReport>
     }
 

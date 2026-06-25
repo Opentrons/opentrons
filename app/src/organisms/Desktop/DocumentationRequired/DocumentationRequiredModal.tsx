@@ -15,10 +15,12 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     username,
     actionsToDocument,
     onCancel,
+    initialDocreport,
   }: {
     username: string
     actionsToDocument: DocumentedAction[]
     onCancel?: () => void
+    initialDocreport?: DocumentationReport
   }): JSX.Element => {
     const modal = useModal()
 
@@ -40,6 +42,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
         actionsToDocument={actionsToDocument}
         onConfirm={handleConfirm}
         onClose={handleBack}
+        initialDocreport={initialDocreport}
       />,
       getTopPortalEl()
     )
@@ -49,10 +52,12 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 export const showDocumentationRequiredModal = (
   username: string,
   actionsToDocument: DocumentedAction[],
-  onCancel?: () => void
+  onCancel?: () => void,
+  initialDocreport?: DocumentationReport
 ): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, {
     username,
     actionsToDocument,
     onCancel,
+    initialDocreport,
   })

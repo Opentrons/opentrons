@@ -68,10 +68,12 @@ export function useGuardedAction(
   const showDocumentationModal = useCallback(
     async (
       actionsToDocument: DocumentedAction[],
-      handleCancel?: () => void
+      handleCancel?: () => void,
+      initialDocreport?: DocumentationReport,
+      usernameOverride?: string
     ) => {
-      let username = currentUsername
-      if (currentUsername == null || currentUsername.length === 0) {
+      let username = usernameOverride ?? currentUsername
+      if (username == null || username.length === 0) {
         const loginResult = await requireLogin({
           robotName: currentRobotName ?? '',
         })
@@ -80,7 +82,8 @@ export function useGuardedAction(
       const docResult = await requireDocumentation(
         username ?? '',
         actionsToDocument,
-        handleCancel
+        handleCancel,
+        initialDocreport
       )
       return docResult
     },
@@ -88,7 +91,7 @@ export function useGuardedAction(
   )
 
   const askForLogin = useCallback(async () => {
-    void requireLogin({ robotName: currentRobotName ?? '' })
+    return await requireLogin({ robotName: currentRobotName ?? '' })
   }, [currentRobotName, requireLogin])
 
   const docState: DocumentationState = useMemo(() => {
