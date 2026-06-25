@@ -9,8 +9,7 @@ import logging
 import os
 import shutil
 import uuid
-from collections import namedtuple
-from typing import Mapping, Optional, Union
+from typing import Mapping, NamedTuple, Optional, Union
 
 from aiohttp import web
 
@@ -19,7 +18,10 @@ from . import config, constants
 SESSION_VARNAME = constants.APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
-Value = namedtuple("Value", ("short", "human"))
+
+class Value(NamedTuple):
+    short: str
+    human: str
 
 
 class Stages(enum.Enum):
