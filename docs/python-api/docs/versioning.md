@@ -55,12 +55,15 @@ On the one hand, using the highest available version will give your protocol acc
 
 The maximum supported API version for your robot is listed in the Opentrons App under **Robots** > your robot > **Robot Settings** > **Advanced**. Before version 6.0.0 of the app, the same information was listed on your robot's **Information** card.
 
-If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
+If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App.
+
+!!! note
+    API version 2.29 and newer include separate robot software and apps for the Flex and OT-2 robots. After updating your OT-2 to the latest software version, download the [Opentrons OT-2 App](https://opentrons.com/app).
 
 Opentrons robots running the latest software ({{ robot_stack_version }}) support the following version ranges: 
 
 - **Flex:** version 2.15–{{ apiLevel }}.
-- **OT-2:** versions 2.0–{{ apiLevel }}.
+- **OT-2:** versions 2.0–2.28.
 
 ## API and robot software versions
 
@@ -68,7 +71,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 | API Version | Introduced in Robot Software |
 |-------------|------------------------------|
-| 2.28        | 9.0.0                        |
+| 2.29        | 9.1.0                        |
+| 2.28        | 9.0.0 / OT-2 26.06.0         |
 | 2.27        | 8.8.0                        |
 | 2.26        | 8.7.0                        |
 | 2.25        | 8.6.0                        |
@@ -101,14 +105,21 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ## Changes in API versions
 
+### Version 2.29
+
+- Organize groups of commands within your Python protocols using new methods: 
+    - [`group_steps()`][opentrons.protocol_api.ProtocolContext.group_steps]
+    - the paired [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] and [`end_group()`][opentrons.protocol_api._command_annotations.GroupedSteps.end_group] methods.
+- Use the [`set_empty()][opentrons.protocol_api.labware.Labware.set_empty] method to label a tip rack on the deck as empty. This lets you return used tips to an empty tip rack throughout your protocol.
+
 ### Version 2.28
 
 - Return tips to the tip rack with a pipette that's configured to use [partial tip pickup](pipettes/partial-tip-pickup.md).
 - Adds additional tools to customize pipette blowouts: 
     - an absolute `flow_rate`.
     - a blowout position for a liquid class transfer.
-- Simplifies [customizing liquid class](liquid-classes.md#customizing-liquid-classes) tip positions, including aspirate, dispense, and blowout positions.
-- Use the load name `opentrons_flex_96_tiprack_20ul` to use Flex 20 μL pipette tips in your protocols. The tips are fully compatible with [liquid class](liquid-classes.md#using-liquid-classes) commands and with Flex 1- and 8-Channel (1–50 μL range) and 96-Channel (1–200 μL range) pipettes.
+- Simplifies [customizing liquid class](liquid-classes/customizing.md) tip positions, including aspirate, dispense, and blowout positions.
+- Use the load name `opentrons_flex_96_tiprack_20ul` to use Flex 20 μL pipette tips in your protocols. The tips are fully compatible with [liquid class](liquid-classes/using.md) commands and with Flex 1- and 8-Channel (1–50 μL range) and 96-Channel (1–200 μL range) pipettes.
 - Control how quickly the Thermocycler Module's block heats or cools with the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature] and [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] methods' optional `ramp_rate` parameter.
 - Use the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method's optional `alternate_drop_location` argument to vary the tip drop location in a waste container, preventing tips from piling up in a single location.
 - In protocols using API version 2.28, the API raises an error when calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] in large spaces, like reservoirs and large well plates.
@@ -128,7 +139,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ### Version 2.26
 
-- Adds the ability to use the `flex_96channel_200` pipette to perform liquid handling actions using [liquid classes](liquid-classes.md).
+- Adds the ability to use the `flex_96channel_200` pipette to perform liquid handling actions using [liquid classes](liquid-classes/index.md).
 
 ### Version 2.25
 
@@ -136,8 +147,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 - Use the load name `flex_96channel_200` with [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] to add the Opentrons Flex 96-Channel Pipette (1–200 μL) to a protocol. Note that this pipette does not work with liquid class commands in this API version.
 
 ### Version 2.24
-- Adds the ability to perform liquid handling actions using [liquid classes](liquid-classes.md).
-  - `ProtocolContext.get_liquid_class` accesses [Opentrons-verified liquid class definitions](liquid-class-definitions.md) for aqueous, volatile, and viscous liquids.
+- Adds the ability to perform liquid handling actions using [liquid classes](liquid-classes/index.md).
+  - `ProtocolContext.get_liquid_class` accesses [Opentrons-verified liquid class definitions](liquid-classes/definitions.md) for aqueous, volatile, and viscous liquids.
   - `ProtocolContext.define_liquid_class` lets you create your own liquid classes from verified classes or from scratch.
   - New `InstrumentContext` methods — `transfer_with_liquid_class`, `distribute_with_liquid_class`, and `consolidate_with_liquid_class` — move liquids according to their properties.
 - `air_gap`, `blow_out`, `dispense`, `mix`, and `touch_tip` have new parameters for advanced settings that are also available in Protocol Designer.
