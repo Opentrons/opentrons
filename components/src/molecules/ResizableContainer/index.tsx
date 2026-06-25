@@ -39,13 +39,15 @@ export const ResizableContainer: React.FC<ResizableContainerProps> = (
   const startWidthRef = useRef<number>(0)
 
   useEffect(() => {
-    if (defaultWidth === undefined && containerRef.current) {
+    if (defaultWidth === undefined && containerRef.current != null) {
       setWidth(containerRef.current.getBoundingClientRect().width)
     }
   }, [defaultWidth])
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return
+  const handlePointerDown = (e: PointerEvent<HTMLDivElement>): void => {
+    if (containerRef.current == null) {
+      return
+    }
 
     const handleElement = e.currentTarget
     handleElement.setPointerCapture(e.pointerId)
@@ -58,8 +60,10 @@ export const ResizableContainer: React.FC<ResizableContainerProps> = (
     document.body.style.userSelect = 'none'
   }
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isResizing) return
+  const handlePointerMove = (e: PointerEvent<HTMLDivElement>): void => {
+    if (!isResizing) {
+      return
+    }
 
     const deltaX = e.clientX - startXRef.current
 
@@ -71,7 +75,9 @@ export const ResizableContainer: React.FC<ResizableContainerProps> = (
   }
 
   const handlePointerUp = (e: PointerEvent<HTMLDivElement>): void => {
-    if (!isResizing) return
+    if (!isResizing) {
+      return
+    }
 
     e.currentTarget.releasePointerCapture(e.pointerId)
 

@@ -1,7 +1,7 @@
-import { Meta, StoryObj } from '@storybook/react'
-
 import { ResizableContainer } from './'
 import styles from './resizablecontainer.stories.module.css'
+
+import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ResizableContainer> = {
   title: 'Helix/Molecules/ResizableContainer',
