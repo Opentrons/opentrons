@@ -13,8 +13,8 @@ from opentrons.drivers.thermocycler.driver import GCODE as TC_GCODES
 from opentrons.drivers.vacuum_module.types import GCODE as VM_GCODES
 
 COMMANDS = {
-    "readall": lambda dev: dev.readlines().decode(),
-    "read": lambda dev: dev.readline().decode(),
+    "READALL": lambda _serial: _serial.readlines().decode(),
+    "READ": lambda _serial: _serial.readline().decode(),
 }
 
 # the modules as they appear in /dev/ mapped to their respective GCODES
@@ -76,7 +76,7 @@ def prompt_which_module(
         try:
             serial_line = modules_dict[int(which_mod)][SERIAL_OBJ_INDEX]
             module_name = modules_dict[int(which_mod)][MODULE_NAME_INDEX]
-        except KeyError:
+        except (KeyError, ValueError):
             print("Invalid module number.")
             continue
         else:
@@ -85,7 +85,7 @@ def prompt_which_module(
 
 
 def prompt_gcode_command(
-    module_name: str, module_gcodes: Dict[str, str]
+    module_name: str, module_gcodes: Dict[str, str], serial_line: Serial
 ) -> Dict[str, Any]:
     user_input_values = {
         "valid_module_and_command": False,
@@ -111,6 +111,8 @@ def prompt_gcode_command(
         user_input_values["valid_module_and_command"] = True
         user_input_values["prompt_gcode"] = True
         user_input_values["command"] = usr_input
+    elif prefix in COMMANDS:
+        COMMANDS[prefix](serial_line)
     elif prefix == "QUIT":
         sys.exit(0)
     else:
@@ -131,7 +133,9 @@ async def comms_loop(modules_dict: Dict[int, Tuple[str, Serial]]) -> None:
         prompt_gcode = True
         while prompt_gcode:
             gcode_input = prompt_gcode_command(
-                module_name=module_name, module_gcodes=module_gcodes
+                module_name=module_name,
+                module_gcodes=module_gcodes,
+                serial_line=serial_line,
             )
             prompt_gcode = gcode_input["prompt_gcode"]
             valid_module_and_command = gcode_input["valid_module_and_command"]
