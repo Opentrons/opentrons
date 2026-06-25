@@ -385,10 +385,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Operator",
         variable_name="operator",
         default="Unused",
-        choices=[
-            {"display_name": name, "value": name}
-            for name in OPERATOR_CHOICES
-        ],
+        choices=[{"display_name": name, "value": name} for name in OPERATOR_CHOICES],
         description="Operator for this QC run",
     )
     parameters.add_bool(
@@ -408,8 +405,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="user_current",
         default="None",
         choices=[
-            {"display_name": current, "value": current}
-            for current in CURRENT_CHOICES
+            {"display_name": current, "value": current} for current in CURRENT_CHOICES
         ],
         description="Current to test. Select None to test all standard currents.",
     )
