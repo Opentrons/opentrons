@@ -75,7 +75,7 @@ jobs:
           project: 'audit-server'
       - name: Test
         run: make -C audit-server test
-      - uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
+      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           files: ./audit-server/coverage.xml
           flags: audit-server
