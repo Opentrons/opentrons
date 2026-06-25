@@ -13,6 +13,7 @@ export type DocumentationReport = string & {
 export type DocumentedMutationErrorType =
   | 'no_documentation_report'
   | 'access_control_loading'
+  | 'login_cancelled'
 
 const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
   DocumentedMutationErrorType,
@@ -20,6 +21,7 @@ const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
 > = {
   no_documentation_report: 'No documentation report provided',
   access_control_loading: 'Access control queries are still loading',
+  login_cancelled: 'Login cancelled by user',
 }
 
 export class DocumentedMutationError extends Error {

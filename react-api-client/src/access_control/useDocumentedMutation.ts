@@ -116,6 +116,10 @@ async function runMutation<TData, TVariables>(
     documentationState.loginExpired
   ) {
     const loginResult = await documentationState.askForLogin()
+    if (loginResult == null || loginResult.username.length === 0) {
+      throw new DocumentedMutationError('login_cancelled')
+    }
+
     if (documentationState.reasonForInteractionRequired) {
       const dr = await documentationState.askForDocumentation(
         actionsToDocument,
