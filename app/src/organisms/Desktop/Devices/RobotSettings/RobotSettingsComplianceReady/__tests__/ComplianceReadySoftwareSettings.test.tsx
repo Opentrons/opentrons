@@ -6,19 +6,17 @@ import '@testing-library/jest-dom/vitest'
 import { ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
 import {
   useAccessControlSettingsQuery,
-  useAuthSettingsQuery,
   useAuthSettingsMutation,
+  useAuthSettingsQuery,
   usePatchAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import {
-  ComplianceReadySoftwareSettings,
-  SETTINGS_SECTIONS,
-  UI_ONLY_FIELD_IDS,
-} from '../ComplianceReadySoftwareSettings'
+import { SETTINGS_SECTIONS } from '../complianceReadySettingsConfig'
+import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
+import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
 
 import type {
   AccessControlAppSettingsResponse,
