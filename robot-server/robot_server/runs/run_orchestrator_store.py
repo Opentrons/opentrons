@@ -742,7 +742,11 @@ class RunOrchestratorStore:
 
             if isinstance(event, FinalizedCommandNotification):
                 self._most_recent_finalized_command = event.finalized_command_pointer
-                self._current_command = event.running_command_pointer
+                self._current_command = (
+                    event.running_command_pointer
+                    if event.running_command_pointer is not None
+                    else event.finalized_command_pointer
+                )
 
             if isinstance(event, FlexStackerSubstateNotification):
                 self._flex_stacker_substate = event.stacker_substate_map
