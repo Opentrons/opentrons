@@ -8,6 +8,9 @@ vi.mock('electron-store')
 vi.mock('electron-updater')
 vi.mock('electron')
 vi.mock('./app/src/redux/shell/remote')
+vi.mock('./app/src/local-resources/api-host-provider/ApiHostProvider', () => ({
+  ApiHostProvider: ({ children }: { children: React.ReactNode }) => children,
+}))
 vi.mock('./app/src/resources/useNotifyDataReady', async () => {
   const actual = await vi.importActual('./app/src/resources/useNotifyDataReady')
   return {

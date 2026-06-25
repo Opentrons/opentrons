@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { ApiHostContext } from '@opentrons/react-api-client/src/api/useHost'
+import { ApiHostContext } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots/hooks/useRobot'
 import { OPENTRONS_USB } from '/app/redux/discovery/constants'
