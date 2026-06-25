@@ -161,7 +161,7 @@ class OT3UpdateActions(UpdateActionsInterface):
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ) -> Optional[str]:
+    ) -> str:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory

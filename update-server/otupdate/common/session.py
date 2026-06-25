@@ -133,4 +133,4 @@ class UpdateSession:
 
 
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:
-    return request.app.get(SESSION_VARNAME, None)
+    return request.app.get(SESSION_VARNAME, None)  # type: ignore[no-any-return]
