@@ -38,15 +38,18 @@ apiLevel: 2.30
     vm_mod.start_set_vacuum_power(50)
     # Concurrent command to the set vacuum power percentage
 
-4.
+4. vm_mod.wait_for_target()
+    # blocks until the vacuum module gets to the target pressure or power
+
+5.
     vm_mod.open_vent()
     # Open the vent
 
-5.
+6.
     vm_mod.stop_vacuum_pump()
     # Stops the vacuum pump and opens the vent
 
-6.
+7.
     task1 = vm_mod.start_execute_profile(
         steps = [
             {
@@ -108,7 +111,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             },
             {
                 "display_name": "Millipore: Short",
-                "value": "millipore_vacuum_manifold_collar_tall",
+                "value": "millipore_vacuum_manifold_collar_short",
             },
             {
                 "display_name": "Millipore: Tall",
@@ -235,6 +238,7 @@ def run(ctx: ProtocolContext) -> None:
         # want to WAIT for the vacuum step to finish before continuing.
         vm_mod.close_vent()
         vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
+        vm_mod.wait_for_target()
         ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
 
         # Move the collar with filter plate to the dock
@@ -273,6 +277,7 @@ def run(ctx: ProtocolContext) -> None:
         # Close the vent and vacuum at -400 mbar for 30s, and keep the vent closed
         vm_mod.close_vent()
         vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=False)
+        vm_mod.wait_for_target()
         ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
         # Manually open the vent
         vm_mod.open_vent()
