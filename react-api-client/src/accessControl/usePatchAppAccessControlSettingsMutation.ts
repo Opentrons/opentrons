@@ -1,6 +1,6 @@
 import { useMutation } from 'react-query'
 
-import { patchAccessControlSettings } from '@opentrons/api-client'
+import { patchAppAccessControlSettings } from '@opentrons/api-client'
 
 import { getQueryKey, useHost } from '../api'
 
@@ -12,18 +12,18 @@ import type {
 } from 'react-query'
 import type {
   AccessControlAppSettingsResponse,
-  PatchAccessControlSettingsRequest,
+  PatchAppAccessControlSettingsRequest,
 } from '@opentrons/api-client'
 
 export type UsePatchAppAccessControlSettingsMutationResult = UseMutationResult<
   AccessControlAppSettingsResponse,
   AxiosError,
-  PatchAccessControlSettingsRequest
+  PatchAppAccessControlSettingsRequest
 > & {
   patchAppAccessControlSettings: UseMutateAsyncFunction<
     AccessControlAppSettingsResponse,
     AxiosError,
-    PatchAccessControlSettingsRequest
+    PatchAppAccessControlSettingsRequest
   >
 }
 
@@ -31,7 +31,7 @@ export function usePatchAppAccessControlSettingsMutation(
   options: UseMutationOptions<
     AccessControlAppSettingsResponse,
     AxiosError,
-    PatchAccessControlSettingsRequest
+    PatchAppAccessControlSettingsRequest
   > = {}
 ): UsePatchAppAccessControlSettingsMutationResult {
   const host = useHost()
@@ -39,11 +39,11 @@ export function usePatchAppAccessControlSettingsMutation(
   const mutation = useMutation<
     AccessControlAppSettingsResponse,
     AxiosError,
-    PatchAccessControlSettingsRequest
+    PatchAppAccessControlSettingsRequest
   >(
     getQueryKey(host, 'accessControl', 'settings', 'patch'),
-    (body: PatchAccessControlSettingsRequest) =>
-      patchAccessControlSettings(host!, body)
+    (body: PatchAppAccessControlSettingsRequest) =>
+      patchAppAccessControlSettings(host!, body)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

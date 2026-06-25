@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
+import { APP_ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
 import {
-  useAppAccessControlSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
+  useGetAppAccessControlSettingsQuery,
   usePatchAppAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
@@ -29,7 +29,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...(actual as object),
     useAuthSettingsQuery: vi.fn(),
-    useAppAccessControlSettingsQuery: vi.fn(),
+    useGetAppAccessControlSettingsQuery: vi.fn(),
     useAuthSettingsMutation: vi.fn(),
     usePatchAppAccessControlSettingsMutation: vi.fn(),
   }
@@ -117,16 +117,16 @@ describe('ComplianceReadySoftwareSettings', () => {
       data: MOCK_AUTH_SETTINGS,
       isLoading: false,
     } as ReturnType<typeof useAuthSettingsQuery>)
-    vi.mocked(useAppAccessControlSettingsQuery).mockReturnValue({
+    vi.mocked(useGetAppAccessControlSettingsQuery).mockReturnValue({
       data: MOCK_ACCESS_CONTROL_SETTINGS,
       isLoading: false,
-    } as ReturnType<typeof useAppAccessControlSettingsQuery>)
+    } as ReturnType<typeof useGetAppAccessControlSettingsQuery>)
   })
 
   it('should only use auth setting ids, robot server setting ids, or explicit UI-only ids', () => {
     const allowedIds = new Set<string>([
       ...AUTH_SETTING_KEYS,
-      ...ACCESS_CONTROL_SETTING_KEYS,
+      ...APP_ACCESS_CONTROL_SETTING_KEYS,
       ...UI_ONLY_FIELD_IDS,
     ])
 

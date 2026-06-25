@@ -4,7 +4,7 @@ import type { ResponsePromise } from '../../../request'
 import type { HostConfig } from '../../../types'
 import type { AccessControlAppSettingsResponse } from './types'
 
-export function getAccessControlSettings(
+export function getAppAccessControlSettings(
   config: HostConfig
 ): ResponsePromise<AccessControlAppSettingsResponse> {
   return request<AccessControlAppSettingsResponse>(

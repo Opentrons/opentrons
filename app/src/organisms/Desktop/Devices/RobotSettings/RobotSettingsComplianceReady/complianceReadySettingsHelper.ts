@@ -1,4 +1,4 @@
-import { ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
+import { APP_ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
 
 import { SETTINGS_SECTIONS } from './complianceReadySettingsConfig'
 import { UI_ONLY_FIELD_IDS } from './complianceReadySettingsTypes'
@@ -6,14 +6,14 @@ import { UI_ONLY_FIELD_IDS } from './complianceReadySettingsTypes'
 import type {
   AccessControlAppSettingsResponse,
   AuthSettingsResponse,
-  PatchAccessControlSettingsRequest,
+  PatchAppAccessControlSettingsRequest,
   PatchAuthSettingsRequest,
 } from '@opentrons/api-client'
 import type {
+  AppAccessControlSettingFieldId,
   AuthSettingFieldId,
   FieldValues,
   InputFieldConfig,
-  RobotServerSettingFieldId,
   SettingFieldId,
   ToggleFieldConfig,
   UiSettingFieldId,
@@ -59,22 +59,22 @@ function getAuthFieldValues(
   )
 }
 
-function getRobotServerFieldValues(
-  robotSettings?: AccessControlAppSettingsResponse['data']
-): Pick<FieldValues, RobotServerSettingFieldId> {
-  return ACCESS_CONTROL_SETTING_KEYS.reduce(
+function getAppAccessControlFieldValues(
+  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
+): Pick<FieldValues, AppAccessControlSettingFieldId> {
+  return APP_ACCESS_CONTROL_SETTING_KEYS.reduce(
     (acc, key) => ({
       ...acc,
-      [key]: robotSettings?.[key] ?? false,
+      [key]: appAccessControlSettings?.[key] ?? false,
     }),
-    {} as Pick<FieldValues, RobotServerSettingFieldId>
+    {} as Pick<FieldValues, AppAccessControlSettingFieldId>
   )
 }
 
-/** Map auth- and robot-server settings responses to form field values. */
+/** Map auth- and app access-control settings responses to form field values. */
 export function getFieldValuesFromSettings(
   authSettings?: AuthSettingsResponse['data'],
-  robotSettings?: AccessControlAppSettingsResponse['data']
+  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
 ): FieldValues {
   return {
     ...getAuthFieldValues(authSettings),
@@ -84,7 +84,7 @@ export function getFieldValuesFromSettings(
         ? authSettings.passwordComplexityMinimumLength != null ||
           authSettings.passwordComplexitySpecialCharacters
         : false,
-    ...getRobotServerFieldValues(robotSettings),
+    ...getAppAccessControlFieldValues(appAccessControlSettings),
   } as FieldValues
 }
 
@@ -92,20 +92,20 @@ export function getFieldValuesFromSettings(
 function getFieldValuesWithNulledAuthFields(
   authSettings: AuthSettingsResponse['data'],
   nulledFieldIds: AuthSettingFieldId[],
-  robotSettings?: AccessControlAppSettingsResponse['data']
+  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
 ): FieldValues {
   return getFieldValuesFromSettings(
     {
       ...authSettings,
       ...Object.fromEntries(nulledFieldIds.map(key => [key, null])),
     } as AuthSettingsResponse['data'],
-    robotSettings
+    appAccessControlSettings
   )
 }
 
 export type ComplianceReadySettingsPatch =
   | { target: 'auth'; request: PatchAuthSettingsRequest }
-  | { target: 'robot'; request: PatchAccessControlSettingsRequest }
+  | { target: 'robot'; request: PatchAppAccessControlSettingsRequest }
 
 /** Updated form state and an optional patch to persist the change. */
 export interface ComplianceReadyToggleChangeResult {
@@ -120,14 +120,14 @@ function isUiOnlyFieldId(id: SettingFieldId): id is UiSettingFieldId {
 
 /** Field id maps to a key on GET/PATCH `/auth/settings`. */
 function isAuthSettingFieldId(id: SettingFieldId): id is AuthSettingFieldId {
-  return !isUiOnlyFieldId(id) && !isRobotServerSettingFieldId(id)
+  return !isUiOnlyFieldId(id) && !isAppAccessControlSettingFieldId(id)
 }
 
-/** Field id maps to a key on GET/PATCH access-control app settings. */
-function isRobotServerSettingFieldId(
+/** Field id maps to a key on GET/PATCH `/accessControl/settings`. */
+function isAppAccessControlSettingFieldId(
   id: SettingFieldId
-): id is RobotServerSettingFieldId {
-  return (ACCESS_CONTROL_SETTING_KEYS as readonly string[]).includes(id)
+): id is AppAccessControlSettingFieldId {
+  return (APP_ACCESS_CONTROL_SETTING_KEYS as readonly string[]).includes(id)
 }
 
 /**
@@ -194,12 +194,12 @@ function buildAuthFieldPatchRequest(
 function getParentDisabledFieldValues(
   parentField: ToggleFieldConfig,
   authSettings: AuthSettingsResponse['data'],
-  robotSettings?: AccessControlAppSettingsResponse['data']
+  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
 ): FieldValues {
   return getFieldValuesWithNulledAuthFields(
     authSettings,
     getAuthChildFieldIds(parentField),
-    robotSettings
+    appAccessControlSettings
   )
 }
 
@@ -291,7 +291,7 @@ export function resolveComplianceReadyToggleChange(
   fieldValues: FieldValues,
   parentField?: ToggleFieldConfig,
   authSettings?: AuthSettingsResponse['data'],
-  robotSettings?: AccessControlAppSettingsResponse['data']
+  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
 ): ComplianceReadyToggleChangeResult {
   const toggledOn = !Boolean(fieldValues[field.id])
 
@@ -308,7 +308,7 @@ export function resolveComplianceReadyToggleChange(
       fieldValues: getParentDisabledFieldValues(
         field,
         authSettings,
-        robotSettings
+        appAccessControlSettings
       ),
       patch: {
         target: 'auth',
@@ -340,7 +340,7 @@ export function resolveComplianceReadyToggleChange(
     }
   }
 
-  if (isRobotServerSettingFieldId(field.id)) {
+  if (isAppAccessControlSettingFieldId(field.id)) {
     return {
       fieldValues: { ...fieldValues, [field.id]: toggledOn },
       patch: {

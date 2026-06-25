@@ -6,5 +6,5 @@ export type {
 } from './types'
 export { DocumentedMutationError, isDocumentedMutationError } from './types'
 export { useDocumentedMutation } from './useDocumentedMutation'
-export * from './useAppAccessControlSettingsQuery'
+export * from './useGetAppAccessControlSettingsQuery'
 export * from './usePatchAppAccessControlSettingsMutation'

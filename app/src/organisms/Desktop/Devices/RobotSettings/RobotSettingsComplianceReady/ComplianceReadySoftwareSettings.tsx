@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
 import {
-  useAppAccessControlSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
+  useGetAppAccessControlSettingsQuery,
   usePatchAppAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
@@ -23,7 +23,7 @@ import { InputSetting } from './InputSetting'
 
 import type { JSX } from 'react'
 import type {
-  PatchAccessControlSettingsRequest,
+  PatchAppAccessControlSettingsRequest,
   PatchAuthSettingsRequest,
 } from '@opentrons/api-client'
 import type {
@@ -179,7 +179,7 @@ export function ComplianceReadySoftwareSettings({
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const authSettingsQuery = useAuthSettingsQuery()
-  const accessControlSettingsQuery = useAppAccessControlSettingsQuery()
+  const getAppAccessControlSettingsQuery = useGetAppAccessControlSettingsQuery()
   const { patchAuthSettings } = useAuthSettingsMutation()
   const { patchAppAccessControlSettings } =
     usePatchAppAccessControlSettingsMutation()
@@ -191,10 +191,13 @@ export function ComplianceReadySoftwareSettings({
     setFieldValues(
       getFieldValuesFromSettings(
         authSettingsQuery.data?.data,
-        accessControlSettingsQuery.data?.data
+        getAppAccessControlSettingsQuery.data?.data
       )
     )
-  }, [authSettingsQuery.data?.data, accessControlSettingsQuery.data?.data])
+  }, [
+    authSettingsQuery.data?.data,
+    getAppAccessControlSettingsQuery.data?.data,
+  ])
 
   const patchAuth = (request: PatchAuthSettingsRequest): void => {
     patchAuthSettings(request, {
@@ -202,15 +205,15 @@ export function ComplianceReadySoftwareSettings({
         setFieldValues(
           getFieldValuesFromSettings(
             response.data,
-            accessControlSettingsQuery.data?.data
+            getAppAccessControlSettingsQuery.data?.data
           )
         )
       },
     })
   }
 
-  const patchRobotServerSettings = (
-    request: PatchAccessControlSettingsRequest
+  const patchAppAccessControlSettingsRequest = (
+    request: PatchAppAccessControlSettingsRequest
   ): void => {
     patchAppAccessControlSettings(request, {
       onSuccess: response => {
@@ -253,13 +256,13 @@ export function ComplianceReadySoftwareSettings({
         fieldValues,
         parentField,
         authSettingsQuery.data?.data,
-        accessControlSettingsQuery.data?.data
+        getAppAccessControlSettingsQuery.data?.data
       )
     setFieldValues(nextFieldValues)
     if (patch?.target === 'auth') {
       patchAuth(patch.request)
     } else if (patch?.target === 'robot') {
-      patchRobotServerSettings(patch.request)
+      patchAppAccessControlSettingsRequest(patch.request)
     }
   }
 

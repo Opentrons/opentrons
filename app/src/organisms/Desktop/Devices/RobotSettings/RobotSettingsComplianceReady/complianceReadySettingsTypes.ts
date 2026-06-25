@@ -5,7 +5,7 @@ import type {
 
 export type AuthSettingFieldId = keyof AuthSettingsResponse['data']
 
-export type RobotServerSettingFieldId =
+export type AppAccessControlSettingFieldId =
   keyof AccessControlAppSettingsResponse['data']
 
 export const UI_ONLY_FIELD_IDS = [
@@ -18,7 +18,7 @@ export type UiSettingFieldId = (typeof UI_ONLY_FIELD_IDS)[number]
 export type SettingFieldId =
   | AuthSettingFieldId
   | UiSettingFieldId
-  | RobotServerSettingFieldId
+  | AppAccessControlSettingFieldId
 
 export type FieldValues = Record<SettingFieldId, string | boolean>
 

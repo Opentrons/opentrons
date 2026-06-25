@@ -9,17 +9,17 @@ export interface AccessControlAppSettingsResponse {
 export type AccessControlAppSettingsKey =
   keyof AccessControlAppSettingsResponse['data']
 
-const accessControlSettingsDataKeys = {
+const appAccessControlSettingsDataKeys = {
   requireSignoffForProtocolLog: false,
   requireLogsToBeSavedInApp: false,
   deleteOverMaxOnDiskProtocols: false,
 } satisfies AccessControlAppSettingsResponse['data']
 
-export const ACCESS_CONTROL_SETTING_KEYS = Object.keys(
-  accessControlSettingsDataKeys
+export const APP_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
+  appAccessControlSettingsDataKeys
 ) as AccessControlAppSettingsKey[]
 
-export interface PatchAccessControlSettingsRequest {
+export interface PatchAppAccessControlSettingsRequest {
   data: {
     requireSignoffForProtocolLog?: boolean | null
     requireLogsToBeSavedInApp?: boolean | null

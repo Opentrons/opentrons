@@ -4,15 +4,15 @@ import type { ResponsePromise } from '../../../request'
 import type { HostConfig } from '../../../types'
 import type {
   AccessControlAppSettingsResponse,
-  PatchAccessControlSettingsRequest,
+  PatchAppAccessControlSettingsRequest,
 } from './types'
 
-export function patchAccessControlSettings(
+export function patchAppAccessControlSettings(
   config: HostConfig,
-  body: PatchAccessControlSettingsRequest
+  body: PatchAppAccessControlSettingsRequest
 ): ResponsePromise<AccessControlAppSettingsResponse> {
   return request<
     AccessControlAppSettingsResponse,
-    PatchAccessControlSettingsRequest
+    PatchAppAccessControlSettingsRequest
   >(PATCH, '/accessControl/settings', config, { body })
 }
