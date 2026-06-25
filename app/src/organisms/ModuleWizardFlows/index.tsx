@@ -31,7 +31,7 @@ import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
-import type { AttachedModule, HostConfig } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ModuleWizardFlowsProps {
   robotName: string
@@ -398,21 +398,16 @@ export function ModuleWizardFlows(
   }
 }
 
-interface ModuleWizardFlowsPropsWithHost extends Omit<
-  ModuleWizardFlowsProps,
-  'closeFlow'
-> {
-  host: HostConfig
-}
+type ModuleWizardFlowsModalProps = Omit<ModuleWizardFlowsProps, 'closeFlow'>
 
 export const handleModuleWizardFlows = (
-  props: ModuleWizardFlowsPropsWithHost
+  props: ModuleWizardFlowsModalProps
 ): void => {
   NiceModal.show(NiceModalModuleWizardFlows, props)
 }
 
 const NiceModalModuleWizardFlows = NiceModal.create(
-  (props: ModuleWizardFlowsPropsWithHost): JSX.Element => {
+  (props: ModuleWizardFlowsModalProps): JSX.Element => {
     const modal = useModal()
     const closeFlow = (): void => {
       modal.remove()

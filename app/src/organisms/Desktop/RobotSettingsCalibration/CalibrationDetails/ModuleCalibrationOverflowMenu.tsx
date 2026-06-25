@@ -14,7 +14,6 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
@@ -43,7 +42,6 @@ export function ModuleCalibrationOverflowMenu({
     'robot_calibration',
     'module_wizard_flows',
   ])
-  const host = useHost()!
 
   const {
     menuOverlay,
@@ -71,7 +69,6 @@ export function ModuleCalibrationOverflowMenu({
     handleModuleWizardFlows({
       attachedModule,
       robotName,
-      host,
     })
   }
 

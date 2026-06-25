@@ -48,7 +48,7 @@ import { RemoveWasteChute } from './RemoveWasteChute'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
-import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 import type {
   DocumentationState,
   DocumentedAction,
@@ -565,18 +565,19 @@ export const PipetteWizardFlows = (
   )
 }
 
-type PipetteWizardFlowsPropsWithHost = PipetteWizardFlowsProps & {
-  host: HostConfig
+type PipetteWizardFlowsModalProps = PipetteWizardFlowsProps & {
+  robotName: string | null
 }
 
 export const handlePipetteWizardFlows = (
-  props: PipetteWizardFlowsPropsWithHost
+  props: PipetteWizardFlowsModalProps
 ): void => {
   NiceModal.show(NiceModalPipetteWizardFlows, props)
 }
 
 const NiceModalPipetteWizardFlows = NiceModal.create(
-  (props: PipetteWizardFlowsPropsWithHost): JSX.Element => {
+  (props: PipetteWizardFlowsModalProps): JSX.Element => {
+    const { robotName, ...pipetteWizardFlowsProps } = props
     const modal = useModal()
     const closeFlowAndModal = (): void => {
       props.closeFlow()
@@ -584,8 +585,11 @@ const NiceModalPipetteWizardFlows = NiceModal.create(
     }
 
     return (
-      <ApiHostProvider robotName={props.host?.robotName ?? null}>
-        <PipetteWizardFlows {...props} closeFlow={closeFlowAndModal} />
+      <ApiHostProvider robotName={robotName}>
+        <PipetteWizardFlows
+          {...pipetteWizardFlowsProps}
+          closeFlow={closeFlowAndModal}
+        />
       </ApiHostProvider>
     )
   }

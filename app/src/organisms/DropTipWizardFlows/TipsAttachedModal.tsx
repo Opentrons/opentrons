@@ -17,7 +17,6 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
@@ -25,7 +24,7 @@ import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
 type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSuccess'> & {
   aPipetteWithTip: PipetteWithTip
-  host: HostConfig | null
+  robotName: string | null
   setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
 }
 
@@ -39,8 +38,12 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const { aPipetteWithTip, host, setTipStatusResolved, ...homePipetteProps } =
-      props
+    const {
+      aPipetteWithTip,
+      robotName,
+      setTipStatusResolved,
+      ...homePipetteProps
+    } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
@@ -80,7 +83,7 @@ const TipsAttachedModal = NiceModal.create(
     const displayMountText = is96Channel ? '96-Channel' : (mount as string)
 
     return (
-      <ApiHostProvider robotName={host?.robotName ?? null}>
+      <ApiHostProvider robotName={robotName}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <LegacyStyledText forwardedAs="p">

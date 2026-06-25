@@ -27,33 +27,29 @@ import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
 import type { ComponentProps, MouseEventHandler } from 'react'
-import type {
-  GripperData,
-  HostConfig,
-  PipetteData,
-} from '@opentrons/api-client'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData
-  host: HostConfig | null
+  robotName: string | null
   enableDTWiz: () => void
 }
 
 export const handleInstrumentDetailOverflowMenu = (
   instrument: InstrumentDetailsOverflowMenuProps['instrument'],
-  host: InstrumentDetailsOverflowMenuProps['host'],
+  robotName: InstrumentDetailsOverflowMenuProps['robotName'],
   toggleDTWiz: () => void
 ): void => {
   NiceModal.show(InstrumentDetailsOverflowMenu, {
     instrument,
-    host,
+    robotName,
     enableDTWiz: toggleDTWiz,
   })
 }
 
 const InstrumentDetailsOverflowMenu = NiceModal.create(
   (props: InstrumentDetailsOverflowMenuProps): JSX.Element => {
-    const { instrument, host, enableDTWiz } = props
+    const { instrument, robotName, enableDTWiz } = props
     const { t } = useTranslation('robot_controls')
     const modal = useModal()
     const [wizardProps, setWizardProps] = useState<
@@ -105,7 +101,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
 
     // TODO(jh 09-24-24): Create an ODD-specific component that wraps MenuList with a portal.
     return (
-      <ApiHostProvider robotName={host?.robotName ?? null}>
+      <ApiHostProvider robotName={robotName}>
         {createPortal(
           <MenuList onClick={modal.remove} isOnDevice={true}>
             {instrument.data.calibratedOffset?.last_modified != null ? (
