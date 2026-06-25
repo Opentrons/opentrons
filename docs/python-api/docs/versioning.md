@@ -110,7 +110,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 - Organize groups of commands within your Python protocols using new methods: 
     - [`group_steps()`][opentrons.protocol_api.ProtocolContext.group_steps]
     - the paired [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] and [`end_group()`][opentrons.protocol_api._command_annotations.GroupedSteps.end_group] methods.
-- Use the [`set_empty()][opentrons.protocol_api.labware.Labware.set_empty] method to label a tip rack on the deck as empty. This lets you return used tips to an empty tip rack throughout your protocol.
+- Use the [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] method to label a tip rack on the deck as empty. This lets you return used tips to an empty tip rack throughout your protocol.
 
 ### Version 2.28
 
