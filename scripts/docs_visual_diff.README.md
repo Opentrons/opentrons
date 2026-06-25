@@ -16,11 +16,15 @@ theme CSS/JS/images):
 
 ```
 <output>/
-  report.html     summary: counts + links into the rendered diff pages
+  report.html     summary: per-page change counts, expandable excerpts, and links
   site-diff/       ref B's full site. Changed pages show inline ins/del; added
                    pages are tinted green. Browse it like the real docs site.
   site-a/          ref A's full site. Removed pages are tinted red.
 ```
+
+`report.html` lists each changed page as an accordion: expand it to preview just the
+changed paragraphs (with the inline additions/deletions) without leaving the report,
+or click `↗` to open the full rendered page.
 
 - **Changed** pages: the page's content is the merge of A and B with inline
   `<ins>` (green) and `<del>` (red strikethrough) markers, rendered with the real

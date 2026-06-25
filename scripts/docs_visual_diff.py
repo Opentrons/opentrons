@@ -244,9 +244,23 @@ def rel_to_report(rel_html: str) -> str:
     return "../" * depth + "report.html"
 
 
-def count_changes(merged_markup: str) -> int:
-    """Count paragraph-level changes: distinct block elements containing an
-    ins/del (matching the grouping the in-page nav uses)."""
+# Standalone block elements that don't render correctly outside their parent get
+# wrapped when excerpted into the summary.
+_EXCERPT_WRAP = {
+    "li": "<ul>%s</ul>", "tr": "<table><tbody>%s</tbody></table>",
+    "td": "<table><tbody><tr>%s</tr></tbody></table>",
+    "th": "<table><tbody><tr>%s</tr></tbody></table>",
+    "dt": "<dl>%s</dl>", "dd": "<dl>%s</dl>",
+}
+
+
+def change_blocks(merged_markup: str) -> list[str]:
+    """Return the HTML of each paragraph-level change (the same block elements the
+    in-page nav jumps between), in document order, for excerpting into the report.
+
+    Groups ins/del by nearest block ancestor (so multiple edits in one paragraph
+    are one excerpt). Headerlink pilcrows (¶) are stripped; standalone li/tr/td/dt
+    are wrapped so they render in isolation. `len()` is the change count."""
     frag = lxml.html.fragment_fromstring(merged_markup, create_parent="div")
     seen: list = []
     for mark in frag.iter("ins", "del"):
@@ -259,7 +273,25 @@ def count_changes(merged_markup: str) -> int:
                 break
         if not any(group is g for g in seen):
             seen.append(group)
-    return len(seen)
+
+    excerpts: list[str] = []
+    for el in seen:
+        # For an API-reference signature the block ancestor is the <pre>; serialize
+        # its `.doc-signature` wrapper instead so the report keeps that class (and
+        # can wrap it). This doesn't change the count — `seen` still holds the <pre>.
+        target = el
+        if el.tag == "pre":
+            for anc in el.iterancestors():
+                if anc is frag:
+                    break
+                if "doc-signature" in (anc.get("class") or "").split():
+                    target = anc
+                    break
+        for anchor in target.xpath(".//a[contains(concat(' ', @class, ' '), ' headerlink ')]"):
+            anchor.drop_tree()
+        markup = lxml.html.tostring(target, encoding="unicode").strip()
+        excerpts.append(_EXCERPT_WRAP.get(target.tag, "%s") % markup)
+    return excerpts
 
 
 def banner_markup(status: str, ref_a: str, ref_b: str, back_href: str) -> str:
@@ -322,11 +354,13 @@ def decorate_page(path: Path, status: str, merged_inner: str | None,
 # ---------------------------------------------------------------------------
 
 class PageResult:
-    __slots__ = ("key", "rel", "status", "changes", "ins", "dele", "title", "href")
+    __slots__ = ("key", "rel", "status", "changes", "ins", "dele",
+                 "title", "href", "excerpts")
 
-    def __init__(self, key, rel, status, changes, ins, dele, title, href):
+    def __init__(self, key, rel, status, changes, ins, dele, title, href, excerpts=()):
         self.key, self.rel, self.status, self.changes = key, rel, status, changes
         self.ins, self.dele, self.title, self.href = ins, dele, title, href
+        self.excerpts = list(excerpts)
 
 
 def page_key(rel_html: str) -> str:
@@ -373,10 +407,11 @@ def diff_sites(site_a: Path, site_diff: Path, ref_a: str, ref_b: str) -> list[Pa
                 continue  # unchanged
             merged = strip_empty_diff_tags(htmldiff(inner_a, inner_b))
             decorate_page(pages_b[rel], "changed", merged, ref_a, ref_b, rel)
+            excerpts = change_blocks(merged)
             results.append(PageResult(
-                key, rel, "changed", count_changes(merged),
+                key, rel, "changed", len(excerpts),
                 merged.count("<ins"), merged.count("<del"),
-                title_of(pages_b[rel]), f"site-diff/{rel}"))
+                title_of(pages_b[rel]), f"site-diff/{rel}", excerpts))
         elif in_b:  # added
             decorate_page(pages_b[rel], "added", None, ref_a, ref_b, rel)
             results.append(PageResult(
@@ -409,8 +444,7 @@ def render_summary(results: list[PageResult], meta: dict, total_pages: int) -> s
     shown = sorted(results, key=lambda r: (STATUS_ORDER[r.status], r.key))
     n = {s: sum(1 for r in results if r.status == s) for s in BADGE}
 
-    rows = []
-    for r in shown:
+    def head_row(r):
         if r.status == "changed":
             detail = []
             if r.ins:
@@ -421,16 +455,34 @@ def render_summary(results: list[PageResult], meta: dict, total_pages: int) -> s
                      + (f' <span class="sub">{" ".join(detail)}</span>' if detail else ''))
         else:
             delta = "—"
-        rows.append(
-            f'<tr><td>{badge(r.status)}</td>'
-            f'<td><a href="{html.escape(r.href)}" target="_blank">'
-            f'<code>{html.escape(r.key)}</code></a>'
-            f'<div class="ttl">{html.escape(r.title)}</div></td>'
-            f'<td class="delta">{delta}</td></tr>')
+        return (
+            f'{badge(r.status)}'
+            f'<span class="key"><a href="{html.escape(r.href)}" target="_blank">'
+            f'<code>{html.escape(r.key)}</code> ↗</a>'
+            f'<span class="ttl">{html.escape(r.title)}</span></span>'
+            f'<span class="delta">{delta}</span>')
+
+    entries = []
+    for r in shown:
+        if r.status == "changed" and r.excerpts:
+            excerpts = "".join(
+                f'<div class="dvd-excerpt"><div class="dvd-excerpt-num">change {i}</div>'
+                f'<div class="md-lite">{exc}</div></div>'
+                for i, exc in enumerate(r.excerpts, 1))
+            entries.append(
+                f'<details class="entry"><summary>{head_row(r)}</summary>'
+                f'<div class="dvd-excerpts">{excerpts}</div></details>')
+        else:
+            entries.append(f'<div class="entry flat">{head_row(r)}</div>')
 
     a, b = meta["ref_a"], meta["ref_b"]
-    table = ("<table class='summary'>" + "".join(rows) + "</table>" if rows else
-             "<div class='empty'>✅ No content differences found between the two builds.</div>")
+    has_accordions = any(r.status == "changed" and r.excerpts for r in shown)
+    controls = ('<div class="controls">'
+                '<button onclick="dvdToggleAll(true)">Expand all</button>'
+                '<button onclick="dvdToggleAll(false)">Collapse all</button>'
+                '</div>') if has_accordions else ""
+    listing = ("<div class='entries'>" + "".join(entries) + "</div>" if entries else
+               "<div class='empty'>✅ No content differences found between the two builds.</div>")
     return f'''<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -451,15 +503,46 @@ main {{ max-width: 980px; margin: 0 auto; padding: 24px 20px 80px; }}
 .card .l {{ font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; }}
 .note {{ color: #64748b; font-size: 13px; margin: -8px 0 20px; }}
 .badge {{ font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
-          text-transform: uppercase; letter-spacing: .03em; }}
-table.summary {{ width: 100%; border-collapse: collapse; background: #fff;
-                 border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }}
-table.summary td {{ padding: 9px 12px; border-top: 1px solid #f1f5f9; vertical-align: top; }}
-table.summary tr:first-child td {{ border-top: 0; }}
-table.summary .ttl {{ color: #64748b; font-size: 12px; margin-top: 2px; }}
-.delta {{ white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 12px; }}
+          text-transform: uppercase; letter-spacing: .03em; flex: none; }}
+.controls {{ display: flex; gap: 8px; justify-content: flex-end; margin: 0 0 10px; }}
+.controls button {{ font: inherit; font-size: 12px; cursor: pointer; color: #334155;
+          background: #fff; border: 1px solid #cbd5e1; border-radius: 7px; padding: 4px 12px; }}
+.controls button:hover {{ background: #f1f5f9; }}
+.entries {{ background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }}
+.entry {{ border-top: 1px solid #f1f5f9; }}
+.entries > :first-child {{ border-top: 0; }}
+.entry > summary, .entry.flat {{ list-style: none; display: flex; gap: 10px;
+          align-items: baseline; padding: 10px 14px; }}
+.entry > summary {{ cursor: pointer; }}
+.entry > summary::-webkit-details-marker {{ display: none; }}
+.entry > summary::before {{ content: '▸'; color: #94a3b8; flex: none; width: 12px; }}
+.entry[open] > summary::before {{ content: '▾'; }}
+.entry.flat::before {{ content: ''; flex: none; width: 12px; }}
+.key {{ flex: 1 1 auto; min-width: 0; }}
+.key a {{ color: #2563eb; text-decoration: none; }}
+.key .ttl {{ display: block; color: #64748b; font-size: 12px; margin-top: 2px; }}
+.delta {{ flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 12px; }}
 .delta .sub {{ color: #94a3b8; margin-left: 6px; }}
 .plus {{ color: #15803d; font-weight: 600; }} .minus {{ color: #b91c1c; font-weight: 600; }}
+.dvd-excerpts {{ padding: 4px 14px 12px 36px; background: #fcfcfd; }}
+.dvd-excerpt {{ border-left: 3px solid #e2e8f0; padding: 2px 0 2px 14px; margin: 12px 0; }}
+.dvd-excerpt-num {{ font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+          color: #94a3b8; margin-bottom: 4px; }}
+.md-lite {{ font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          color: #1e293b; }}
+.md-lite p {{ margin: .4em 0; }}
+.md-lite ul, .md-lite ol {{ margin: .4em 0; padding-left: 1.4em; }}
+.md-lite h1, .md-lite h2, .md-lite h3, .md-lite h4 {{ margin: .5em 0 .3em; font-size: 1.05em; }}
+.md-lite a {{ color: #2563eb; }}
+.md-lite code {{ background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: .9em; }}
+.md-lite pre {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+          padding: 10px 12px; overflow: auto; }}
+.md-lite pre code {{ background: none; padding: 0; }}
+.md-lite .doc-signature pre {{ white-space: pre-wrap; overflow-wrap: anywhere; }}
+.md-lite table {{ border-collapse: collapse; margin: .4em 0; }}
+.md-lite th, .md-lite td {{ border: 1px solid #e2e8f0; padding: 4px 8px; text-align: left; }}
+.md-lite ins, .md-lite ins * {{ background: #d6f5d6; text-decoration: none; }}
+.md-lite del, .md-lite del * {{ background: #ffd6d6; text-decoration: line-through; }}
 .empty {{ color: #475569; padding: 40px; text-align: center; background: #fff;
           border: 1px solid #e2e8f0; border-radius: 10px; }}
 code {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}
@@ -476,13 +559,21 @@ code {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     <div class="card"><div class="n" style="color:#b45309">{n["changed"]}</div><div class="l">Changed</div></div>
     <div class="card"><div class="n" style="color:#15803d">{n["added"]}</div><div class="l">Added</div></div>
     <div class="card"><div class="n" style="color:#b91c1c">{n["removed"]}</div><div class="l">Removed</div></div>
+    <div class="card"><div class="n" style="color:#64748b">{total_pages - n["changed"] - n["added"]}</div><div class="l">Unchanged</div></div>
     <div class="card"><div class="n">{total_pages}</div><div class="l">Total pages</div></div>
   </div>
-  <p class="note">Click a page to open its fully rendered diff (real docs styling, with
-    inline <span style="background:#d6f5d6">additions</span> and
-    <span style="background:#ffd6d6;text-decoration:line-through">deletions</span>).</p>
-  {table}
+  <p class="note">Expand a changed page to preview its
+    <span style="background:#d6f5d6">additions</span> and
+    <span style="background:#ffd6d6;text-decoration:line-through">deletions</span> inline,
+    or click <code>↗</code> to open its fully rendered diff.</p>
+  {controls}
+  {listing}
 </main>
+<script>
+function dvdToggleAll(open){{
+  document.querySelectorAll('details.entry').forEach(function(d){{ d.open = open; }});
+}}
+</script>
 </body></html>'''
 
 
