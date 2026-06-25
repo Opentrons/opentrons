@@ -9,6 +9,8 @@ import {
 } from '../release-files'
 import { getOrDownloadManifest as _getOrDownloadManifest } from '../release-manifest'
 
+import type { ReleaseManifest } from '../../types'
+
 vi.mock('../../../log')
 vi.mock('../release-manifest', async importOriginal => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -64,7 +66,7 @@ describe('provider.refreshUpdateCache happy paths', () => {
             releaseNotes: 'http://opentrons.com/releaseNotes.md',
           },
         },
-      })
+      } as ReleaseManifest)
     const progressCallback = vi.fn()
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
