@@ -174,4 +174,65 @@ describe('useGuardedAction', () => {
 
     expect(mockShowLoginModal).toHaveBeenCalled()
   })
+
+  it('calls onCancel when login modal is dismissed without logging in', async () => {
+    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(mockShowLoginModal).mockResolvedValue(null)
+    const onCancel = vi.fn()
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    await act(async () => {
+      if (
+        !result.current.isLoading &&
+        result.current.accessControlEnabled &&
+        result.current.reasonForInteractionRequired &&
+        result.current.docreport == null
+      ) {
+        const report = await result.current.askForDocumentation([], onCancel)
+        expect(report).toBe('')
+      }
+    })
+
+    expect(mockShowLoginModal).toHaveBeenCalled()
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+    expect(onCancel).toHaveBeenCalled()
+  })
+
+  it('passes initialDocreport to the documentation modal', async () => {
+    const initialDocreport = 'previous note' as DocumentationReport
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    await act(async () => {
+      if (
+        !result.current.isLoading &&
+        result.current.accessControlEnabled &&
+        result.current.reasonForInteractionRequired
+      ) {
+        await result.current.askForDocumentation(
+          ['play_run'],
+          undefined,
+          initialDocreport,
+          'alice'
+        )
+      }
+    })
+
+    expect(mockShowDocumentationRequiredModal).toHaveBeenCalledWith(
+      'alice',
+      ['play_run'],
+      undefined,
+      initialDocreport
+    )
+  })
+
+  it('exposes askForLogin when access control is enabled', async () => {
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    expect(
+      !result.current.isLoading && result.current.accessControlEnabled
+    ).toBe(true)
+    if (!result.current.isLoading && result.current.accessControlEnabled) {
+      expect(result.current.askForLogin).toEqual(expect.any(Function))
+    }
+  })
 })

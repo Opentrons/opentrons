@@ -30,8 +30,6 @@ import type {
  *
  * useGuardedAction is a helper hook in /app that generates a documentation state.
  *
- * TODO(jj): actually pass along the documentation report to the mutation.
- *
  * Call signatures live in ./types as `UseDocumentedMutation`.
  */
 export const useDocumentedMutation: UseDocumentedMutation = (

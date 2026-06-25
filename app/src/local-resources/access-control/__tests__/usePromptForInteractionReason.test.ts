@@ -6,10 +6,13 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
+import { useCurrentUsername } from '/app/redux/robot-auth'
+
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
 import { usePromptForInteractionReason } from '../usePromptForInteractionReason'
 import {
   mockShowDocumentationRequiredModal,
+  mockShowLoginModal,
   wrapWithDocumentationRequiredModal,
 } from './documentationRequiredModalTestUtils'
 
@@ -126,6 +129,22 @@ describe('usePromptForInteractionReason', () => {
     }
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
+  it('calls onCancel when login modal is dismissed without logging in', async () => {
+    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(mockShowLoginModal).mockResolvedValue(null)
+    const onCancel = vi.fn()
+
+    renderHook(() => usePromptForInteractionReason(['lpc_flow'], onCancel), {
+      wrapper,
+    })
+
+    await waitFor(() => {
+      expect(mockShowLoginModal).toHaveBeenCalled()
+    })
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+    expect(onCancel).toHaveBeenCalled()
+  })
+
   it('prompts for documentation when access control is enabled', async () => {
     const { result } = renderHook(
       () => usePromptForInteractionReason(['lpc_flow']),
