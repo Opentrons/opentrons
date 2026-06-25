@@ -8,10 +8,10 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useHomePipettes } from '/app/local-resources/instruments'
 import { OddModal } from '/app/molecules/OddModal'
 
@@ -80,7 +80,7 @@ const TipsAttachedModal = NiceModal.create(
     const displayMountText = is96Channel ? '96-Channel' : (mount as string)
 
     return (
-      <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
+      <ApiHostProvider robotName={host?.robotName ?? null}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <LegacyStyledText forwardedAs="p">

@@ -3,10 +3,11 @@ import { Trans, useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
-import { ApiHostProvider, useModulesQuery } from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -418,7 +419,7 @@ const NiceModalModuleWizardFlows = NiceModal.create(
     }
 
     return (
-      <ApiHostProvider {...props.host}>
+      <ApiHostProvider robotName={props.robotName}>
         <ModuleWizardFlows {...props} closeFlow={closeFlow} />
       </ApiHostProvider>
     )

@@ -12,7 +12,6 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
   useAccessControlEnabledQuery,
   useRobotSettingsQuery,
 } from '@opentrons/react-api-client'
@@ -60,6 +59,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
@@ -236,7 +236,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider {...hostConfig}>
+    <ApiHostProvider robotName={localRobot?.name ?? null}>
       <ReactQueryDevtools />
       {isReady ? (
         <LocalizationProvider>

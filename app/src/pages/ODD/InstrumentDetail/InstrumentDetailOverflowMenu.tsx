@@ -14,13 +14,13 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
@@ -105,7 +105,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
 
     // TODO(jh 09-24-24): Create an ODD-specific component that wraps MenuList with a portal.
     return (
-      <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
+      <ApiHostProvider robotName={host?.robotName ?? null}>
         {createPortal(
           <MenuList onClick={modal.remove} isOnDevice={true}>
             {instrument.data.calibratedOffset?.last_modified != null ? (

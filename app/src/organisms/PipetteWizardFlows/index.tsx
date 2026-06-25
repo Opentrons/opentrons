@@ -12,7 +12,6 @@ import {
   WizardHeader,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
@@ -20,6 +19,7 @@ import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -584,7 +584,7 @@ const NiceModalPipetteWizardFlows = NiceModal.create(
     }
 
     return (
-      <ApiHostProvider {...props.host}>
+      <ApiHostProvider robotName={props.host?.robotName ?? null}>
         <PipetteWizardFlows {...props} closeFlow={closeFlowAndModal} />
       </ApiHostProvider>
     )
