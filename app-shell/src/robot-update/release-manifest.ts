@@ -16,11 +16,10 @@ export function downloadManifest(
     .catch(() => fse.readJson(cacheFilePath))
 }
 
-// TODO(mc, 2019-07-02): retrieve something other than "production"
 export function getReleaseSet(
   manifest: ReleaseManifest,
   version: string
 ): ReleaseSetUrls | null {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-nullish-coalescing
-  return manifest.production[version] || null
+  return manifest.productionV2[version] || null
 }

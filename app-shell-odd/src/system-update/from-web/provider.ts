@@ -91,7 +91,7 @@ export function getProvider(
       return returnNoUpdate()
     }
     const latestVersion = latestVersionForChannel(
-      Object.keys(manifest.production),
+      Object.keys(manifest.productionV2 ?? {}),
       from.channel
     )
 
