@@ -223,6 +223,21 @@ def set_inner_html(el, markup: str) -> None:
         el.append(child)
 
 
+def strip_empty_diff_tags(markup: str) -> str:
+    """Unwrap ins/del elements whose entire content is whitespace.
+
+    htmldiff sometimes emits a marker around nothing but a space (e.g.
+    ``<ins> </ins>``). Left in place it renders invisibly but still registers as
+    its own paragraph-level change, inflating the count and adding a dead nav
+    stop. We drop the tag while keeping its whitespace, and never touch markers
+    that wrap real elements (e.g. ``<ins><img></ins>``)."""
+    wrapper = lxml.html.fragment_fromstring(markup, create_parent="div")
+    for el in wrapper.xpath(".//ins | .//del"):
+        if len(el) == 0 and not (el.text or "").strip():
+            el.drop_tag()  # remove the tag, merge its text into the parent
+    return inner_html(wrapper)
+
+
 def rel_to_report(rel_html: str) -> str:
     """Relative href from a page back up to report.html."""
     depth = rel_html.count("/") + 1  # +1 for the site-* dir itself
@@ -356,7 +371,7 @@ def diff_sites(site_a: Path, site_diff: Path, ref_a: str, ref_b: str) -> list[Pa
             inner_b = inner_html(art_b) if art_b is not None else ""
             if inner_a == inner_b:
                 continue  # unchanged
-            merged = htmldiff(inner_a, inner_b)
+            merged = strip_empty_diff_tags(htmldiff(inner_a, inner_b))
             decorate_page(pages_b[rel], "changed", merged, ref_a, ref_b, rel)
             results.append(PageResult(
                 key, rel, "changed", count_changes(merged),
