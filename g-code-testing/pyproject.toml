@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "g-code-testing"
 description = "Library to run emulated OT-2 and gather its G-Code output"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },

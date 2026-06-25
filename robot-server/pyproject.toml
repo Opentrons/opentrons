@@ -1,7 +1,7 @@
 [project]
 name = "robot_server"
 dynamic = ["version"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
