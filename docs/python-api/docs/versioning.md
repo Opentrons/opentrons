@@ -71,8 +71,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 | API Version | Introduced in Robot Software |
 |-------------|------------------------------|
-| 2.29        | 9.1.0                        |
-| 2.28        | 9.0.0 / OT-2 26.06.0         |
+| 2.29        | 9.1.1                        |
+| 2.28        | 9.0.0 / OT-2 26.6.0          |
 | 2.27        | 8.8.0                        |
 | 2.26        | 8.7.0                        |
 | 2.25        | 8.6.0                        |
