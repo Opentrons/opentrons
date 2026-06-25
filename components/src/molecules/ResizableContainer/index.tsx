@@ -6,17 +6,31 @@ import styles from './resizablecontainer.module.css'
 import type { CSSProperties, PointerEvent, ReactNode } from 'react'
 
 export interface ResizableContainerProps {
+  // contesnt
   children: ReactNode
+  // aria-label for a container
+  'aria-label': string
+  // minimum width of the contaienr
   minWidth: number
+  // maximum width of the contaienr
   maxWidth: number
+  // container's draggable edge
   edge: 'left' | 'right'
+  // the default width of the container
   defaultWidth?: number
 }
 
 export const ResizableContainer: React.FC<ResizableContainerProps> = (
   props: ResizableContainerProps
 ) => {
-  const { children, minWidth = 300, maxWidth, edge, defaultWidth } = props
+  const {
+    children,
+    'aria-label': ariaLabel,
+    minWidth = 300,
+    maxWidth,
+    edge,
+    defaultWidth,
+  } = props
   const [width, setWidth] = useState<number | null>(defaultWidth ?? null)
   const [isResizing, setIsResizing] = useState(false)
 
@@ -75,6 +89,12 @@ export const ResizableContainer: React.FC<ResizableContainerProps> = (
 
       {/* handle part */}
       <div
+        role="separator"
+        aria-label={ariaLabel}
+        aria-orientation="vertical"
+        aria-valuenow={width ?? undefined}
+        aria-valuemin={minWidth}
+        aria-valuemax={maxWidth}
         className={clsx(
           styles.handle,
           styles[edge],

@@ -26,6 +26,7 @@ export const TwoColumnLayout: Story = {
         maxWidth={400}
         edge="right"
         defaultWidth={250}
+        aria-label="Left Container"
       >
         <div className={styles.side_content}>
           <h3>Left Column</h3>
@@ -51,6 +52,7 @@ export const ThreeColumnLayout: Story = {
         maxWidth={400}
         edge="right"
         defaultWidth={250}
+        aria-label="Left Container"
       >
         <div className={styles.sideContent}>
           <h3>Left Column</h3>
@@ -72,6 +74,7 @@ export const ThreeColumnLayout: Story = {
         maxWidth={500}
         edge="left"
         defaultWidth={300}
+        aria-label="Right Container"
       >
         <div className={styles.sideContent}>
           <h3>Right Column</h3>
