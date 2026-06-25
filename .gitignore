@@ -159,5 +159,8 @@ api/docs/dist/v2/
 
 package-testing/results
 all_analysis_results/
+
+# Output of scripts/docs_visual_diff.py
+docs-visual-diff-report/
 auth-server/.env
 key-server/.key-server-storage
