@@ -384,10 +384,7 @@ class MixStepForm(BasePage):
     def select_tip_handling_option(self, option: str) -> None:
         """Choose a tip handling option such as ``Once`` or ``Always``."""
 
-        option_button = self.page.get_by_role("button", name=option)
-        if option_button.count() == 0:
-            option_button = self.page.get_by_text(option)
-        option_button.first.click()
+        self._select_dropdown_option("Tip handling", option)
 
     def _fill_input_and_blur(self, selector: str, value: str) -> None:
         locator = self.page.locator(selector).first

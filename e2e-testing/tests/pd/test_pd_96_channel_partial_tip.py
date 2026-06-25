@@ -22,6 +22,11 @@ ROW_NOZZLE_TIPS: List[str] = [f"A{col}" for col in range(1, 13)]
 COLUMN_NOZZLE_TIPS: List[str] = [f"{row}1" for row in "ABCDEFGH"]
 # 96ch all-nozzles manual tracking uses a single primary (A1) for the full-rack pickup.
 FULL_RACK_MANUAL_TIPS: List[str] = ["A1"]
+# Right-quadrant single-nozzle configs anchor manual pickup at A1 (overlap-safe on rack).
+SINGLE_NOZZLE_MANUAL_TIP_BY_PRIMARY: dict[str, str] = {
+    "A12": "A1",
+    "H12": "A1",
+}
 FLEX_STACKER_A4 = "A4 Flex Stacker"
 TIPRACK_200_DEPLETED = "D2 Opentrons Flex 96 Filter Tip Rack 200 µL"
 TIPRACK_200_FRESH = "A4 Opentrons Flex 96 Filter Tip Rack 200 µL (1)"
@@ -53,9 +58,9 @@ def _manual_tips_for_nozzle(
     nozzle_config: TransferPage.NozzleConfig,
     primary_nozzle: str,
 ) -> List[str]:
-    """Return tip-rack positions aligned with a 96ch nozzle layout."""
+    """Return tip-rack positions to click in the manual tip tracking wizard."""
     if nozzle_config == "Single nozzle":
-        return [primary_nozzle]
+        return [SINGLE_NOZZLE_MANUAL_TIP_BY_PRIMARY.get(primary_nozzle, primary_nozzle)]
     if nozzle_config == "Single row of nozzles":
         return ROW_NOZZLE_TIPS
     if nozzle_config == "Single column of nozzles":

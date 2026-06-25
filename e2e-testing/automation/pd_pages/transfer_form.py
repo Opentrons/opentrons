@@ -227,6 +227,15 @@ class TransferPage(BasePage):
         if slot_match is not None:
             return normalized_option == normalized_labware
 
+        # Options may prefix display names with one or more deck slots (e.g. "A1+B1 …").
+        option_without_slot = re.sub(
+            r"^(?:[A-D]\d+(?:\+[A-D]\d+)*) +",
+            "",
+            normalized_option,
+        )
+        if option_without_slot == normalized_labware:
+            return True
+
         option_slot_match = re.match(r"^([A-D]\d+)\s+(.+)$", normalized_option)
         if option_slot_match is not None:
             return option_slot_match.group(2) == normalized_labware

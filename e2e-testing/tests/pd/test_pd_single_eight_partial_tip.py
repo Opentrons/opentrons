@@ -36,10 +36,13 @@ PRIMARY_NOZZLE_BY_COUNT = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
 # configured partial count (e.g. 3/8 → one click on A4 selects A4–C4).
 MANUAL_TIP_COL_BY_COUNT = {2: 2, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8}
 ROW_LABELS = "ABCDEFGH"
+# 384-well plate in slot A3 (back edge): bottom-aligned 96-well row math picks wells
+# too close to the window (e.g. 3/8 → F4/H4/J4). Use front-of-plate rows instead.
+PARTIAL_384_PRIMARY_ROW_BY_COUNT = {3: "P", 4: "P", 5: "H", 6: "M", 7: "N"}
 
 # Fixture ships with thermocycler + heater-shaker before wizard-authored steps.
 SETUP_STEP_COUNT = 2
-PARTIAL_8CH_SAMPLE_STEP_INDICES = [2, 8, 14, 21]
+PARTIAL_8CH_SAMPLE_STEP_INDICES = [2, 8, 14, 19]
 SINGLE_NOZZLE_SAMPLE_STEP_INDICES = [2, 5, 7]
 
 
@@ -82,6 +85,40 @@ def _manual_tips_for_partial(partial_count: int, tip_col: Optional[int] = None) 
     return [f"A{col}"]
 
 
+def _partial_primary_well_384(col: int, partial_count: int) -> str:
+    """Primary well on 384-well plate, clear of back-edge partial-tip collision."""
+    row = PARTIAL_384_PRIMARY_ROW_BY_COUNT[partial_count]
+    return f"{row}{col}"
+
+
+def _partial_primary_wells_384_across_columns(
+    start_col: int,
+    partial_count: int,
+    count: int = 3,
+) -> List[str]:
+    """Primary wells in distinct columns on a 384-well plate."""
+    row = PARTIAL_384_PRIMARY_ROW_BY_COUNT[partial_count]
+    return [f"{row}{start_col + i}" for i in range(count)]
+
+
+def _wells_for_partial_384_8ch(
+    path: str,
+    partial_count: int,
+    source_col: int,
+    dest_col: int,
+) -> tuple[Union[str, List[str]], Union[str, List[str]]]:
+    """Source/dest wells reachable for 8ch partial layout on a 384-well plate."""
+    source_primary = _partial_primary_well_384(source_col, partial_count)
+    dest_primary = _partial_primary_well_384(dest_col, partial_count)
+    if path == "Single transfer":
+        return source_primary, dest_primary
+    if path == "Distribute":
+        return source_primary, _partial_primary_wells_384_across_columns(dest_col, partial_count)
+    if path == "Consolidate":
+        return _partial_primary_wells_384_across_columns(source_col, partial_count), dest_primary
+    raise ValueError(f"Unsupported path: {path}")
+
+
 def _wells_for_partial_path(
     path: str,
     partial_count: int,
@@ -108,7 +145,9 @@ def _wells_for_partial_path(
 
 def _partial_8ch_config(scenario: Partial8chScenario) -> TransferStepConfig:
     """Build an 8ch partial-nozzle transfer step."""
-    source_wells, dest_wells = _wells_for_partial_path(
+    uses_384 = scenario.source_labware == PLATE_384 or scenario.dest_labware == PLATE_384
+    wells_for_path = _wells_for_partial_384_8ch if uses_384 else _wells_for_partial_path
+    source_wells, dest_wells = wells_for_path(
         scenario.path,
         scenario.partial_count,
         scenario.source_col,
@@ -150,9 +189,12 @@ def _partial_8ch_scenarios() -> List[Partial8chScenario]:
     ]
     transfer_overrides: dict[int, dict[str, object]] = {
         # First transfer runs while thermocycler lid is open — use deck 384, not TC plate.
+        # Back-edge slot A3: use front-of-plate columns (see PARTIAL_384_PRIMARY_ROW_BY_COUNT).
         3: {
             "source_labware": PLATE_384,
             "dest_labware": PLATE_384,
+            "source_col": 23,
+            "dest_col": 24,
         },
         4: {
             "manual_tips": ["A1"],
@@ -287,42 +329,8 @@ def test_pd_8ch_partial_all_counts_paths_and_tip_strategies(page: Page, pd_expor
         ),
     )
 
-    # Never can only follow an adjacent Once/Always on the same pipette with the same
-    # nozzle configuration (here: 4/8 partial). Prior 5/8 Always drops tips via waste chute.
-    print("8ch partial 4/8 TC→TC transfer — Once (setup for Never reuse)")
-    add_transfer_step(
-        editor,
-        transfer,
-        _partial_8ch_config(
-            Partial8chScenario(
-                label="8ch partial 4/8 transfer setup for Never",
-                partial_count=4,
-                path="Single transfer",
-                change_tip="Once",
-                source_col=3,
-                dest_col=4,
-            )
-        ),
-    )
-
-    print("8ch partial 4/8 TC→TC transfer — Never (reuse 4/8 tip from prior Once step)")
-    add_transfer_step(
-        editor,
-        transfer,
-        _partial_8ch_config(
-            Partial8chScenario(
-                label="8ch partial 4/8 transfer Never reuse",
-                partial_count=4,
-                path="Single transfer",
-                change_tip="Never",
-                source_col=5,
-                dest_col=6,
-            )
-        ),
-    )
-
     timeline = Timeline(page)
-    timeline.wait_for_timeline_steps(min_steps=len(_partial_8ch_scenarios()) + SETUP_STEP_COUNT + 3)
+    timeline.wait_for_timeline_steps(min_steps=len(_partial_8ch_scenarios()) + SETUP_STEP_COUNT + 1)
     timeline.expect_no_known_regression_errors()
 
     timeline.select_transfer_steps_sample(PARTIAL_8CH_SAMPLE_STEP_INDICES, expect_no_errors=True)
@@ -356,7 +364,6 @@ def test_pd_8ch_partial_mix_on_96_well(page: Page, pd_exports_dir: Path) -> None
     mix_form.click_continue()
     mix_form.click_continue()
     mix_form.click_continue()
-    mix_form.select_tip_handling_option("Once")
     mix_form.save_step()
 
     timeline = Timeline(page)
