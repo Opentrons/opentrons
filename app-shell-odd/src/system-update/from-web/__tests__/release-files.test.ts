@@ -9,7 +9,6 @@ import { directoryWithCleanup } from '../../utils'
 import {
   downloadReleaseFiles,
   ensureCleanReleaseCacheForVersion,
-  getOrDownloadReleaseFiles,
   getReleaseFiles,
   removeTemporaryDownloads,
 } from '../release-files'
@@ -429,93 +428,6 @@ describe('downloadReleaseFiles', () => {
           directory,
           progressCallback,
           aborter
-        )
-      ).rejects.toThrow()
-    }))
-})
-
-describe('getOrDownloadReleaseFiles', () => {
-  it('should not download release files if they are cached', () =>
-    directoryWithCleanup(directory =>
-      fs
-        .writeFile(path.join(directory, 'ot3-system.zip'), 'asdjlhasd')
-        .then(() =>
-          expect(
-            getOrDownloadReleaseFiles(
-              {
-                system: 'http://opentrons.com/ot3-system.zip',
-                releaseNotes: 'http://opentrons.com/releaseNotes.md',
-              } as ReleaseSetUrls,
-              directory,
-              vi.fn(),
-              new AbortController()
-            )
-          )
-            .resolves.toEqual({
-              system: path.join(directory, 'ot3-system.zip'),
-              releaseNotes: null,
-              releaseNotesContent: null,
-            })
-            .then(() => expect(fetchToFile).not.toHaveBeenCalled())
-        )
-    ))
-  it('should download release files if they are not cached', () =>
-    directoryWithCleanup(directory => {
-      when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/ot3-system.zip',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenDo((_url, dest, _opts) => {
-          return fs
-            .writeFile(dest, 'this is the contents of the system.zip')
-            .then(() => dest)
-        })
-
-      return expect(
-        getOrDownloadReleaseFiles(
-          {
-            system: 'http://opentrons.com/ot3-system.zip',
-          } as ReleaseSetUrls,
-          directory,
-          vi.fn(),
-          new AbortController()
-        )
-      )
-        .resolves.toEqual({
-          system: path.join(directory, 'ot3-system.zip'),
-          releaseNotes: null,
-          releaseNotesContent: null,
-        })
-        .then(() =>
-          fs
-            .readFile(path.join(directory, 'ot3-system.zip'), {
-              encoding: 'utf-8',
-            })
-            .then(contents =>
-              expect(contents).toEqual('this is the contents of the system.zip')
-            )
-        )
-    }))
-  it('should fail if the file is not cached and can not be downloaded', () =>
-    directoryWithCleanup(directory => {
-      when(fetchToFile)
-        .calledWith(
-          'http://opentrons.com/ot3-system.zip',
-          expect.any(String),
-          expect.any(Object)
-        )
-        .thenReject(new Error('oh no'))
-
-      return expect(
-        getOrDownloadReleaseFiles(
-          {
-            system: 'http://opentrons.com/ot3-system.zip',
-          } as ReleaseSetUrls,
-          directory,
-          vi.fn(),
-          new AbortController()
         )
       ).rejects.toThrow()
     }))

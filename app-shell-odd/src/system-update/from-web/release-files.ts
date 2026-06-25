@@ -8,7 +8,7 @@ import { createLogger } from '../../log'
 
 import type { Dirent } from 'fs'
 import type { DownloadProgress } from '../../http'
-import type { ReleaseSetFilepaths, ReleaseSetUrls } from '../types'
+import type { ReleaseSetUrls } from '../types'
 
 const log = createLogger('systemUpdate/from-web/release-files')
 
@@ -69,13 +69,16 @@ export const ensureCleanReleaseCacheForVersion = (
     .then(() => mkdirp(directoryForRelease(baseDirectory, version)))
     .then(() => directoryForRelease(baseDirectory, version))
 
-export interface ReleaseSetData extends ReleaseSetFilepaths {
+export interface ReleaseSetData {
+  system: string
+  releaseNotes: string | null
   releaseNotesContent: string | null
 }
 
-export const augmentWithReleaseNotesContent = (
-  releaseFiles: ReleaseSetFilepaths
-): Promise<ReleaseSetData> =>
+export const augmentWithReleaseNotesContent = (releaseFiles: {
+  system: string
+  releaseNotes: string | null
+}): Promise<ReleaseSetData> =>
   releaseFiles.releaseNotes == null
     ? new Promise(resolve => {
         resolve({ ...releaseFiles, releaseNotesContent: null })
@@ -89,8 +92,8 @@ export const augmentWithReleaseNotesContent = (
           return { ...releaseFiles, releaseNotesContent: null }
         })
 
-// checks `directory` for system update files matching the given `urls`, and
-// downloads them if they can't be found
+// checks `directory` for system update files matching the given `urls`, returning them
+// if they exist and throwing if they do not
 export function getReleaseFiles(
   urls: ReleaseSetUrls,
   directory: string
@@ -102,11 +105,16 @@ export function getReleaseFiles(
       releaseNotes:
         urls?.releaseNotes == null ? null : path.basename(urls.releaseNotes),
     }
-    const foundFiles = files.reduce<Partial<ReleaseSetFilepaths>>(
+    const foundFiles = files.reduce<
+      Partial<{ system: string; releaseNotes: string | null }>
+    >(
       (
-        releaseSetFilePaths: Partial<ReleaseSetFilepaths>,
+        releaseSetFilePaths: Partial<{
+          system: string
+          releaseNotes: string | null
+        }>,
         thisFile: string
-      ): Partial<ReleaseSetFilepaths> => {
+      ): Partial<{ system: string; releaseNotes: string | null }> => {
         if (thisFile === expected.system) {
           return { ...releaseSetFilePaths, system: thisFile }
         }
@@ -143,102 +151,84 @@ export function getReleaseFiles(
   })
 }
 
-// downloads the entire release set to a temporary directory, and once they're
-// all successfully downloaded, renames the directory to `directory`
-export function downloadReleaseFiles(
+export function downloadReleaseNotes(
+  url: string | null,
+  directory: string,
+  canceller: AbortController
+): Promise<{
+  releaseNotes: string | null
+  releaseNotesContent: string | null
+}> {
+  return url == null
+    ? Promise.resolve({ releaseNotes: null, releaseNotesContent: null })
+    : fetchToFile(url, dlPath(directory, url), { signal: canceller.signal })
+        .then(releaseNotesTemp =>
+          move(releaseNotesTemp, outPathFromDlPath(releaseNotesTemp), {
+            overwrite: true,
+          }).then(() => outPathFromDlPath(releaseNotesTemp))
+        )
+        .then(releaseNotes => {
+          return readReleaseNotes(releaseNotes).then(releaseNotesContent => ({
+            releaseNotes,
+            releaseNotesContent,
+          }))
+        })
+        .finally(() => rm(dlPath(directory, url), { force: true }))
+}
+
+export const getReleaseFilesIfExist = (
   urls: ReleaseSetUrls,
+  baseDirectory: string,
+  version: string
+): Promise<ReleaseSetData | null> =>
+  getReleaseFiles(urls, directoryForRelease(baseDirectory, version)).catch(
+    (_: unknown) => null
+  )
+
+export function downloadSystemZip(
+  systemZipUrl: string,
   directory: string,
   // `onProgress` will be called with download progress as the files are read
   onProgress: (progress: DownloadProgress) => void,
   canceller: AbortController
-): Promise<ReleaseSetData> {
+): Promise<{ system: string }> {
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously
-  const notesReq =
-    urls.releaseNotes != null
-      ? fetchToFile(urls.releaseNotes, dlPath(directory, urls.releaseNotes), {
-          signal: canceller.signal,
-        }).catch(err => {
-          log.warn(
-            `release notes not available from ${urls.releaseNotes}: ${err.name}: ${err.message}`
-          )
-          return null
-        })
-      : Promise.resolve(null)
-  if (urls.releaseNotes != null) {
-    log.info(
-      `Downloading ${urls.releaseNotes} to ${dlPath(directory, urls.releaseNotes)}`
-    )
-  } else {
-    log.info('No release notes available, not downloading')
-  }
-  log.info(`Downloading ${urls.system} to ${dlPath(directory, urls.system)}`)
-  const systemReq = fetchToFile(urls.system, dlPath(directory, urls.system), {
+  log.info(`Downloading ${systemZipUrl} to ${dlPath(directory, systemZipUrl)}`)
+  return fetchToFile(systemZipUrl, dlPath(directory, systemZipUrl), {
     onProgress,
     signal: canceller.signal,
   })
-  return Promise.all([systemReq, notesReq])
-    .then(results => {
-      const [systemTemp, releaseNotesTemp] = results
-      const systemMove = move(systemTemp, outPathFromDlPath(systemTemp), {
+    .then(systemTemp => {
+      return move(systemTemp, outPathFromDlPath(systemTemp), {
         overwrite: true,
-      }).then(() => outPathFromDlPath(systemTemp))
-      const notesMove = releaseNotesTemp
-        ? move(releaseNotesTemp, outPathFromDlPath(releaseNotesTemp), {
-            overwrite: true,
-          }).then(() => outPathFromDlPath(releaseNotesTemp))
-        : new Promise<null>(resolve => {
-            resolve(null)
-          })
-      return Promise.all([systemMove, notesMove]).then(results => {
-        const [systemPath, notesPath] = results
-        log.info(`Move complete`)
-        return augmentWithReleaseNotesContent({
-          system: systemPath,
-          releaseNotes: notesPath,
-        })
-      })
+      }).then(() => ({ system: outPathFromDlPath(systemTemp) }))
     })
-    .catch(error => {
-      log.error(
-        `Failed to download release files: ${error.name}: ${error.message}`
-      )
-      return Promise.all([
-        rm(dlPath(directory, urls.system), { force: true }),
-        urls.releaseNotes
-          ? rm(dlPath(directory, urls.releaseNotes), { force: true })
-          : new Promise<void>(resolve => {
-              resolve()
-            }),
-      ]).then(() => {
-        log.error(`throwing error ${error}`)
-        throw error
-      })
-    })
+    .finally(() => rm(dlPath(directory, systemZipUrl)))
 }
 
-export async function getOrDownloadReleaseFiles(
+export function downloadReleaseFiles(
   urls: ReleaseSetUrls,
   releaseCacheDirectory: string,
   onProgress: (progress: DownloadProgress) => void,
   canceller: AbortController
 ): Promise<ReleaseSetData> {
-  try {
-    return await getReleaseFiles(urls, releaseCacheDirectory)
-  } catch (error: any) {
-    log.info(
-      `Could not find cached release files for  ${releaseCacheDirectory}: ${error.name}: ${error.message}, attempting to download`
-    )
-    return await downloadReleaseFiles(
-      urls,
+  return Promise.all([
+    downloadSystemZip(
+      urls.system,
       releaseCacheDirectory,
       onProgress,
       canceller
-    )
-  }
+    ),
+    downloadReleaseNotes(
+      urls.releaseNotes ?? null,
+      releaseCacheDirectory,
+      canceller
+    ),
+  ]).then(([system, releaseNotes]) => ({ ...system, ...releaseNotes }))
 }
 
-export const cleanUpAndGetOrDownloadReleaseFiles = (
+export const cleanUpAndDownloadReleaseFiles = (
   urls: ReleaseSetUrls,
   baseDirectory: string,
   version: string,
@@ -246,7 +236,7 @@ export const cleanUpAndGetOrDownloadReleaseFiles = (
   canceller: AbortController
 ): Promise<ReleaseSetData> =>
   ensureCleanReleaseCacheForVersion(baseDirectory, version).then(versionCache =>
-    getOrDownloadReleaseFiles(urls, versionCache, onProgress, canceller)
+    downloadReleaseFiles(urls, versionCache, onProgress, canceller)
   )
 
 const readReleaseNotes = (path: string | null): Promise<string | null> =>

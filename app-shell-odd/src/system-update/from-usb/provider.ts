@@ -27,7 +27,7 @@ export function getProvider(
 ): UpdateProvider<USBUpdateSource> {
   const noUpdate = {
     version: null,
-    files: null,
+    files: { system: null, releaseNotes: null },
     releaseNotes: null,
     downloadProgress: 0,
   } as const
@@ -86,7 +86,21 @@ export function getProvider(
     return update
   }
   return {
-    refreshUpdateCache: progressCallback => {
+    // for usb, download and scan do the same thing since we don't move
+    // the update from usb to local storage
+    downloadUpdate: progressCallback => {
+      if (currentCheck != null) {
+        return new Promise((resolve, reject) => {
+          reject(new Error('Check already ongoing'))
+        })
+      }
+      const updatePromise = checkUpdates(progressCallback)
+      currentCheck = updatePromise
+      return updatePromise.finally(() => {
+        currentCheck = null
+      })
+    },
+    scanUpdate: progressCallback => {
       if (currentCheck != null) {
         return new Promise((resolve, reject) => {
           reject(new Error('Check already ongoing'))
