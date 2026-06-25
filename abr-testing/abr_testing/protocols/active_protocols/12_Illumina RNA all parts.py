@@ -656,7 +656,7 @@ def run(protocol: ProtocolContext) -> None:
             # ================================
             protocol.delay(seconds=0.2)
             p200.blow_out(sample_plate_1["A1"].top(z=-2))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -724,7 +724,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.default_speed = 400
             p200.move_to(LW_reservoir["A1"].top(z=-5))
             p200.move_to(LW_reservoir["A1"].top(z=0))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -785,7 +785,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(sample_plate_1["A1"].top(z=5))
             p200.move_to(sample_plate_1["A1"].top(z=0))
             p200.move_to(sample_plate_1["A1"].top(z=5))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -821,7 +821,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.default_speed = 400
             p200.move_to(LW_reservoir["A1"].top(z=-5))
             p200.move_to(LW_reservoir["A1"].top(z=0))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash 1B")
@@ -846,7 +846,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(sample_plate_1["A1"].top(z=5))
             p200.move_to(sample_plate_1["A1"].top(z=0))
             p200.move_to(sample_plate_1["A1"].top(z=5))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -902,7 +902,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.default_speed = 400
             p200.move_to(LW_reservoir["A1"].top(z=-5))
             p200.move_to(LW_reservoir["A1"].top(z=0))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1235,7 +1235,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Wash 1")
@@ -1262,7 +1262,7 @@ def run(protocol: ProtocolContext) -> None:
             )
             p200.dispense(2, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1315,7 +1315,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Wash 2")
@@ -1342,7 +1342,7 @@ def run(protocol: ProtocolContext) -> None:
             )
             p200.dispense(1, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1392,7 +1392,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Wash 3")
@@ -1419,7 +1419,7 @@ def run(protocol: ProtocolContext) -> None:
             )
             p200.dispense(14, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1470,7 +1470,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(RemoveSup, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1646,7 +1646,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash 1A")
@@ -1662,7 +1662,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
             p200.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1712,7 +1712,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash 1B")
@@ -1728,7 +1728,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
             p200.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             # Return tips to origin tiprack instead of dropping
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1778,7 +1778,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(RemoveSup, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
             p200.dispense(RemoveSup, LW_reservoir["A1"].top(z=Deepwell_Z_offset))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -2125,7 +2125,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(sample_plate_3["A1"].bottom(z=0.3))
             p200.aspirate(TransferSup + 1, rate=0.25)
             p200.dispense(TransferSup + 1, CleanupPlate_2["A1"].bottom(z=1))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
             if ONDECK_THERMO:
                 thermocycler.close_lid()
@@ -2159,7 +2159,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(CleanupPlate_2["A1"].top(z=5))
             p200.move_to(CleanupPlate_2["A1"].top(z=0))
             p200.move_to(CleanupPlate_2["A1"].top(z=5))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             if ONDECK_THERMO:
@@ -2190,7 +2190,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(minutes=0.1)
             p200.blow_out(LW_reservoir["A1"].top(z=-7))
             p200.aspirate(20)
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding EEW")
@@ -2204,7 +2204,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
             p200.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2232,7 +2232,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(minutes=0.1)
             p200.blow_out(LW_reservoir["A1"].top(z=-7))
             p200.aspirate(20)
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             # ============================================================================================
@@ -2282,7 +2282,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
             p200.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2310,7 +2310,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(minutes=0.1)
             p200.blow_out(LW_reservoir["A1"].top(z=-7))
             p200.aspirate(20)
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding EEW")
@@ -2324,7 +2324,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(7, reagent_plate_1["A1"].bottom())
             p200.dispense(7, CleanupPlate_2["A1"].bottom())
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2352,7 +2352,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(minutes=0.1)
             p200.blow_out(LW_reservoir["A1"].top(z=-7))
             p200.aspirate(20)
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Adding EEW")
@@ -2366,7 +2366,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.pick_up_tip()
             p200.aspirate(EEWVol, reagent_plate_1["A1"].bottom())
             p200.dispense(EEWVol, CleanupPlate_2["A1"].bottom())
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2384,7 +2384,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(CleanupPlate_2["A1"].bottom(z=0.25))
             p200.aspirate(TransferSup, rate=0.25)
             p200.dispense(TransferSup, CleanupPlate_2["A1"].bottom(z=1))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             if DRYRUN is False:
@@ -2412,7 +2412,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(minutes=0.1)
             p200.blow_out(LW_reservoir["A1"].top(z=-7))
             p200.aspirate(20)
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> Removing Residual")
@@ -2432,7 +2432,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.default_speed = 400
             p200.move_to(LW_reservoir["A1"].top(z=-7))
             p200.move_to(LW_reservoir["A1"].top(z=0))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("==============================================")
@@ -2689,7 +2689,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(CleanupPlate_2["A1"].top(z=5))
             p200.move_to(CleanupPlate_2["A1"].top(z=0))
             p200.move_to(CleanupPlate_2["A1"].top(z=5))
-            p200.drop_tip()
+            p200.return_tip()
             # ================================================
 
             if DRYRUN is False:
@@ -2718,7 +2718,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.default_speed = 400
             p200.move_to(LW_reservoir["A1"].top(z=-7))
             p200.move_to(LW_reservoir["A1"].top(z=0))
-            p200.drop_tip()
+            p200.return_tip()
             # ===============================================
 
             protocol.comment("--> ETOH Wash")
