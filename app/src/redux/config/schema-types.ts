@@ -303,4 +303,11 @@ export type ConfigV28 = Omit<ConfigV27, 'version'> & {
   }
 }
 
-export type Config = ConfigV28
+export type ConfigV29 = Omit<ConfigV28, 'version' | 'update'> & {
+  version: 29
+  update: ConfigV28['update'] & {
+    automaticallyDownloadRobotUpdates: boolean
+  }
+}
+
+export type Config = ConfigV29
