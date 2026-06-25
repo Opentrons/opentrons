@@ -48,7 +48,7 @@ describe('provider.refreshUpdateCache happy paths', () => {
   afterEach(() => {
     vi.resetAllMocks()
   })
-  it('says there is no update if the latest version is the current version', () => {
+  it('says there is no update if the latest update is in the old production key', () => {
     when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
@@ -57,6 +57,59 @@ describe('provider.refreshUpdateCache happy paths', () => {
       )
       .thenResolve({
         production: {
+          '2.0.0': {
+            system: 'http://opentrons.com/system.zip',
+            fullImage: 'http://opentrons.com/fullImage.zip',
+            version: 'http://opentrons.com/version.json',
+            releaseNotes: 'http://opentrons.com/releaseNotes.md',
+          },
+        },
+      })
+    const progressCallback = vi.fn()
+    const provider = getProvider({
+      manifestUrl: 'http://opentrons.com/releases.json',
+      channel: 'release',
+      updateCacheDirectory: '/some/random/directory',
+      currentVersion: '1.2.3',
+    })
+    expect(provider.getUpdateDetails()).toEqual({
+      version: null,
+      files: null,
+      releaseNotes: null,
+      downloadProgress: 0,
+    })
+    return expect(provider.refreshUpdateCache(progressCallback))
+      .resolves.toEqual({
+        version: null,
+        files: null,
+        releaseNotes: null,
+        downloadProgress: 0,
+      })
+      .then(() => {
+        expect(progressCallback).toHaveBeenCalledWith({
+          version: null,
+          files: null,
+          releaseNotes: null,
+          downloadProgress: 0,
+        })
+        expect(provider.getUpdateDetails()).toEqual({
+          version: null,
+          files: null,
+          releaseNotes: null,
+          downloadProgress: 0,
+        })
+        expect(cleanUpAndGetOrDownloadReleaseFiles).not.toHaveBeenCalled()
+      })
+  })
+  it('says there is no update if the latest version is the current version', () => {
+    when(getOrDownloadManifest)
+      .calledWith(
+        'http://opentrons.com/releases.json',
+        '/some/random/directory',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        productionV2: {
           '1.2.3': {
             system: 'http://opentrons.com/system.zip',
             fullImage: 'http://opentrons.com/fullImage.zip',
@@ -124,7 +177,7 @@ describe('provider.refreshUpdateCache happy paths', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': releaseUrls,
         },
       })
@@ -191,7 +244,7 @@ describe('provider.refreshUpdateCache happy paths', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': releaseUrls,
         },
       })
@@ -315,7 +368,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': {
             system: 'http://opentrons.com/system.zip',
             fullImage: 'http://opentrons.com/fullImage.zip',
@@ -353,7 +406,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': releaseUrls,
         },
       })
@@ -441,7 +494,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': releaseUrls,
         },
       })
@@ -479,7 +532,7 @@ describe('provider.refreshUpdateCache locking', () => {
             () =>
               new Promise(resolve => {
                 provider.lockUpdateCache()
-                resolve({ production: { '1.2.3': releaseUrls } })
+                resolve({ productionV2: { '1.2.3': releaseUrls } })
               })
           )
         const progress = vi.fn()
@@ -523,7 +576,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': releaseUrls,
         },
       })
@@ -561,7 +614,7 @@ describe('provider.refreshUpdateCache locking', () => {
             expect.any(AbortController)
           )
           .thenResolve({
-            production: {
+            productionV2: {
               '1.2.3': releaseUrls,
             },
           })
@@ -633,7 +686,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': releaseUrls,
         },
       })
@@ -671,7 +724,7 @@ describe('provider.refreshUpdateCache locking', () => {
             expect.any(AbortController)
           )
           .thenResolve({
-            production: {
+            productionV2: {
               '1.2.3': releaseUrls,
             },
           })
@@ -725,7 +778,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': {
             system: 'http://opentrons.com/system.zip',
             fullImage: 'http://opentrons.com/fullImage.zip',
@@ -761,7 +814,7 @@ describe('provider.refreshUpdateCache locking', () => {
         expect.any(AbortController)
       )
       .thenResolve({
-        production: {
+        productionV2: {
           '1.2.3': {
             system: 'http://opentrons.com/system.zip',
             fullImage: 'http://opentrons.com/fullImage.zip',

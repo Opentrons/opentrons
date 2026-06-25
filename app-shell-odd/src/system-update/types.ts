@@ -9,6 +9,9 @@ export interface ReleaseManifest {
   production: {
     [version: string]: ReleaseSetUrls
   }
+  productionV2: {
+    [version: string]: ReleaseSetUrls
+  }
 }
 
 export interface ReleaseSetFilepaths {
