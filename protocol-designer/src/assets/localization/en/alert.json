@@ -372,6 +372,10 @@
       },
       "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
         "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
+      },
+      "VACUUM_UNDER_PRESSURE": {
+        "body": "Deactivate the pump to move labware to or from it.",
+        "title": "The vacuum module is under pressure."
       }
     },
     "warning": {

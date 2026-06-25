@@ -5,7 +5,7 @@ description: "Instructions on performing a full device reset."
 
 ## Purpose
 
-You may need to reset your OT-2 to fix software errors, calibration problems, unusual behavior, or as part of routine maintenance. The checkboxes in the Device Reset section of the Opentrons App let you select data to delete before restarting the robot. Depending on your selections, you may need to [calibrate the OT-2](../calibration/robot-calibration.md) or re-run [Labware Position Check](../calibration/labware-offsets.md#running-labware-position-check) after restarting.
+You may need to reset your OT-2 to fix software errors, calibration problems, unusual behavior, or as part of routine maintenance. The checkboxes in the Device Reset section of the Opentrons OT-2 App let you select data to delete before restarting the robot. Depending on your selections, you may need to [calibrate the OT-2](../calibration/robot-calibration.md) or re-run [Labware Position Check](../calibration/labware-offsets.md#running-labware-position-check) after restarting.
 
 !!! warning
     A full reset clears all stored data from your OT-2. This includes robot calibration data, labware offset data, protocol run history, boot scripts, and any saved SSH keys.
@@ -16,7 +16,7 @@ Follow these instructions to perform a full reset on your OT-2:
 
 <div class="instruction-list" markdown="1">
 
-1. From the Opentrons App, click **Devices** and locate the robot you want to reset.
+1. From the Opentrons OT-2 App, click **Devices** and locate the robot you want to reset.
 
 2. For your selected robot, click the three-dot menu (⋮) and then click **Robot Settings**.
 

@@ -99,7 +99,7 @@ export interface VacuumModuleData {
   currentPower: number | null
   targetPower: number | null
   modeType: VacuumMode
-  ventStatus: 'open' | 'closed'
+  ventStatus: 'opened' | 'closed'
   status: VacuumModuleStatus
 }
 
