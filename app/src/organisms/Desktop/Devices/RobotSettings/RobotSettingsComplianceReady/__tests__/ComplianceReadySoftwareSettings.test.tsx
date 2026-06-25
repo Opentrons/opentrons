@@ -90,6 +90,9 @@ describe('ComplianceReadySoftwareSettings', () => {
   const patchAppAccessControlSettings = vi.fn()
 
   beforeEach(() => {
+    patchAuthSettings.mockClear()
+    patchAppAccessControlSettings.mockClear()
+
     patchAuthSettings.mockImplementation((request, options) => {
       options?.onSuccess?.({
         data: {
@@ -193,9 +196,10 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     fireEvent.blur(passwordResetTimeField)
 
-    expect(patchAuthSettings).toHaveBeenCalledWith({
-      data: { passwordResetTime: 90 * 24 * 60 * 60 },
-    })
+    expect(patchAuthSettings).toHaveBeenCalledWith(
+      { data: { passwordResetTime: 90 * 24 * 60 * 60 } },
+      expect.objectContaining({ onSuccess: expect.any(Function) })
+    )
   })
 
   it('should populate fields from auth settings', () => {
@@ -244,9 +248,10 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'true')
     fireEvent.click(updateRobotsToggle)
     expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'false')
-    expect(patchAuthSettings).toHaveBeenCalledWith({
-      data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
-    })
+    expect(patchAuthSettings).toHaveBeenCalledWith(
+      { data: { requireAdminCredsWhenUpdatingRobotSoftware: false } },
+      expect.objectContaining({ onSuccess: expect.any(Function) })
+    )
   })
 
   it('should update input values without patching until blur', () => {
@@ -261,8 +266,9 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(patchAuthSettings).not.toHaveBeenCalled()
 
     fireEvent.blur(loginAttemptsField)
-    expect(patchAuthSettings).toHaveBeenCalledWith({
-      data: { maxNumberOfLoginAttempts: 3 },
-    })
+    expect(patchAuthSettings).toHaveBeenCalledWith(
+      { data: { maxNumberOfLoginAttempts: 3 } },
+      expect.objectContaining({ onSuccess: expect.any(Function) })
+    )
   })
 })

@@ -1,7 +1,7 @@
 import { i18n } from '/app/i18n'
 
 import type { TFunction } from 'i18next'
-import type { PipetteWizardFlowAction } from '@opentrons/react-api-client/src/access_control/types'
+import type { PipetteWizardFlowAction } from '@opentrons/react-api-client/src/accessControl/types'
 
 export const PipetteFlowActionText = ({
   action,
