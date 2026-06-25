@@ -2,6 +2,11 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+  createReasonRequiredWithDocReport,
+  createReasonRequiredWithoutDocReport,
+} from '../__fixtures__/documentationState'
 import { DocumentedMutationError } from '../types'
 import { useDocumentedMutation } from '../useDocumentedMutation'
 
@@ -32,7 +37,7 @@ describe('useDocumentedMutation', () => {
     const { result } = renderHook(
       () =>
         useDocumentedMutation<number, AxiosError, number>(
-          { reasonForInteractionRequired: false, isLoading: false },
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
           ['play_run'],
           testMutationKey,
           ({ variables: n }) => mutationFn(n),
@@ -57,11 +62,7 @@ describe('useDocumentedMutation', () => {
     const { result } = renderHook(
       () =>
         useDocumentedMutation<number, AxiosError, number>(
-          {
-            reasonForInteractionRequired: true,
-            docreport: MOCK_REPORT,
-            isLoading: false,
-          },
+          createReasonRequiredWithDocReport(MOCK_REPORT),
           ['play_run'],
           testMutationKey,
           ({ variables: x }) => mutationFn(x),
@@ -87,12 +88,7 @@ describe('useDocumentedMutation', () => {
     const { result } = renderHook(
       () =>
         useDocumentedMutation<string, AxiosError, string>(
-          {
-            reasonForInteractionRequired: true,
-            docreport: null,
-            askForDocumentation,
-            isLoading: false,
-          },
+          createReasonRequiredWithoutDocReport(askForDocumentation),
           ['play_run'],
           testMutationKey,
           ({ variables: s }) => mutationFn(s),
@@ -117,12 +113,7 @@ describe('useDocumentedMutation', () => {
     const { result } = renderHook(
       () =>
         useDocumentedMutation<string, AxiosError, string>(
-          {
-            reasonForInteractionRequired: true,
-            docreport: null,
-            askForDocumentation,
-            isLoading: false,
-          },
+          createReasonRequiredWithoutDocReport(askForDocumentation),
           ['play_run'],
           testMutationKey,
           ({ variables: s }) => mutationFn(s),
@@ -177,12 +168,7 @@ describe('useDocumentedMutation', () => {
     const { result } = renderHook(
       () =>
         useDocumentedMutation<number, DocumentedMutationError, number>(
-          {
-            reasonForInteractionRequired: true,
-            docreport: null,
-            askForDocumentation,
-            isLoading: false,
-          },
+          createReasonRequiredWithoutDocReport(askForDocumentation),
           ['play_run'],
           testMutationKey,
           ({ variables: n }) => mutationFn(n),

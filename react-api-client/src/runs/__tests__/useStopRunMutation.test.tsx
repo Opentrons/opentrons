@@ -6,6 +6,7 @@ import { createRunAction } from '@opentrons/api-client'
 
 import { useStopRunMutation } from '..'
 import { mockStopRunAction, RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../access_control/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -34,11 +35,7 @@ describe('useStopRunMutation hook', () => {
     vi.mocked(createRunAction).mockRejectedValue('oops')
 
     const { result } = renderHook(
-      () =>
-        useStopRunMutation({
-          reasonForInteractionRequired: false,
-          isLoading: false,
-        }),
+      () => useStopRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
       {
         wrapper,
       }
@@ -58,11 +55,7 @@ describe('useStopRunMutation hook', () => {
     } as Response<RunAction>)
 
     const { result } = renderHook(
-      () =>
-        useStopRunMutation({
-          reasonForInteractionRequired: false,
-          isLoading: false,
-        }),
+      () => useStopRunMutation(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
       {
         wrapper,
       }

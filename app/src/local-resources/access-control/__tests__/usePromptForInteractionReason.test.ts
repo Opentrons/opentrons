@@ -6,6 +6,7 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
 import { usePromptForInteractionReason } from '../usePromptForInteractionReason'
 import {
   mockShowDocumentationRequiredModal,
@@ -91,9 +92,7 @@ describe('usePromptForInteractionReason', () => {
       }
     )
 
-    expect(
-      !result.current.isLoading && result.current.reasonForInteractionRequired
-    ).toBe(false)
+    expect(result.current).toEqual(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
 
@@ -120,8 +119,11 @@ describe('usePromptForInteractionReason', () => {
       }
     )
     expect(
-      !result.current.isLoading && result.current.reasonForInteractionRequired
-    ).toBe(false)
+      !result.current.isLoading && result.current.accessControlEnabled
+    ).toBe(true)
+    if (!result.current.isLoading && result.current.accessControlEnabled) {
+      expect(result.current.reasonForInteractionRequired).toBe(false)
+    }
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
   it('prompts for documentation when access control is enabled', async () => {
@@ -138,13 +140,15 @@ describe('usePromptForInteractionReason', () => {
 
     await waitFor(() => {
       expect(
-        !result.current.isLoading && result.current.reasonForInteractionRequired
+        !result.current.isLoading && result.current.accessControlEnabled
       ).toBe(true)
-      expect(
+      if (
         !result.current.isLoading &&
-          result.current.reasonForInteractionRequired &&
-          result.current.docreport
-      ).toEqual(mockDocreport)
+        result.current.accessControlEnabled &&
+        result.current.reasonForInteractionRequired
+      ) {
+        expect(result.current.docreport).toEqual(mockDocreport)
+      }
     })
   })
 })

@@ -8,6 +8,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
@@ -65,10 +66,7 @@ describe('BeforeBeginning', () => {
       requiredPipette: undefined,
       createdMaintenanceRunId: null,
       deckConfig: mockDeckConfig,
-      documentationState: {
-        reasonForInteractionRequired: false,
-        isLoading: false,
-      },
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)

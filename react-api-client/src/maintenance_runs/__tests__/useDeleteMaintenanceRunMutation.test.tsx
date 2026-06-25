@@ -6,6 +6,7 @@ import { deleteMaintenanceRun } from '@opentrons/api-client'
 
 import { useDeleteMaintenanceRunMutation } from '..'
 import { MAINTENANCE_RUN_ID } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../access_control/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -37,7 +38,7 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     const { result } = renderHook(
       () =>
         useDeleteMaintenanceRunMutation(
-          { reasonForInteractionRequired: false, isLoading: false },
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
           []
         ),
       {
@@ -61,7 +62,7 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
     const { result } = renderHook(
       () =>
         useDeleteMaintenanceRunMutation(
-          { reasonForInteractionRequired: false, isLoading: false },
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
           []
         ),
       {

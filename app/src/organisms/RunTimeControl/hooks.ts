@@ -41,8 +41,8 @@ export function useRunControls(
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
   } = useRunActionMutations(runId!, {
-    reasonForInteractionRequired: false,
     isLoading: false,
+    accessControlEnabled: false,
   })
 
   const {
