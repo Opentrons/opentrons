@@ -78,6 +78,11 @@ export function useGuardedAction(
           robotName: currentRobotName ?? '',
         })
         username = loginResult?.username ?? ''
+        // if user cancels login, cancel the whole mutation
+        if (username == null || username.length === 0) {
+          handleCancel?.()
+          return '' as DocumentationReport
+        }
       }
       const docResult = await requireDocumentation(
         username ?? '',
