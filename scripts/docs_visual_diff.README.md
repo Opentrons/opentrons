@@ -27,6 +27,10 @@ theme CSS/JS/images):
   theme — links, code, tables, admonitions, and docstring formatting all preserved.
 - **Added** / **removed** pages render fully styled with a green / red tint and a banner.
 - Every diff page gets a sticky banner (status, the two refs, a "back to summary" link).
+  On changed pages the banner also has **change navigation** — a paragraph-level
+  count and **first / prev / next** buttons (or `Alt`+`↑`/`↓`) that jump between
+  changes and outline the current one, so edits buried in long API reference pages
+  are easy to find. The summary lists the change count per page.
 
 ## How it works
 

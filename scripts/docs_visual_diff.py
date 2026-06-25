@@ -91,7 +91,66 @@ body.dvd-removed .md-content__inner { background: linear-gradient(#fff5f5,#fff5f
 .dvd-legend { margin-left: auto; opacity: .85; }
 .dvd-legend ins { padding: 0 4px; border-radius: 3px; }
 .dvd-legend del { padding: 0 4px; border-radius: 3px; }
+.dvd-nav { display: flex; align-items: center; gap: 6px; }
+.dvd-nav button { font: inherit; cursor: pointer; border: 1px solid #475569;
+  background: #1e293b; color: #e2e8f0; border-radius: 6px; padding: 2px 9px; }
+.dvd-nav button:hover:not(:disabled) { background: #334155; }
+.dvd-nav button:disabled { opacity: .4; cursor: default; }
+#dvd-counter { font-variant-numeric: tabular-nums; min-width: 96px; text-align: center; }
+.dvd-active-change { outline: 3px solid #f59e0b !important; outline-offset: 3px;
+  border-radius: 4px; scroll-margin-top: 140px; }
 """
+
+# Block-level content elements used to group word-level ins/del into a single
+# "change" (paragraph-level granularity). Kept in sync between the Python counter
+# (count_changes) and the in-page navigation script (NAV_JS).
+BLOCK_SELECTOR = ("p,li,h1,h2,h3,h4,h5,h6,pre,tr,dt,dd,blockquote,"
+                  "figcaption,caption,th,td,summary")
+BLOCK_TAGS = set(BLOCK_SELECTOR.split(","))
+
+# In-page navigation injected into changed pages: groups ins/del by nearest block
+# ancestor (so multiple edits in one paragraph = one change), then wires the
+# banner's first/prev/next controls, a live "i / N" counter, and Alt+Arrow keys.
+NAV_JS = ("""
+(function(){
+  var BLOCK="%s";
+  var root=document.querySelector('article.md-content__inner')||document.body;
+  var marks=Array.prototype.slice.call(root.querySelectorAll('ins,del'));
+  var groups=[];
+  marks.forEach(function(m){
+    var g=m.closest(BLOCK); if(!g||!root.contains(g)) g=m;
+    if(groups.indexOf(g)===-1) groups.push(g);
+  });
+  var N=groups.length, idx=-1;
+  var counter=document.getElementById('dvd-counter');
+  function fmt(){return (idx<0?'—':(idx+1))+' / '+N+' change'+(N===1?'':'s');}
+  function setDisabled(){
+    var f=document.querySelector('[data-dvd=first]'),
+        p=document.querySelector('[data-dvd=prev]'),
+        n=document.querySelector('[data-dvd=next]');
+    if(f)f.disabled=N===0; if(p)p.disabled=N===0||idx<=0; if(n)n.disabled=N===0||idx>=N-1;
+  }
+  function go(i){
+    if(N===0) return;
+    idx=Math.max(0,Math.min(N-1,i));
+    groups.forEach(function(g){g.classList.remove('dvd-active-change');});
+    var t=groups[idx]; t.classList.add('dvd-active-change');
+    t.scrollIntoView({block:'center',behavior:'smooth'});
+    if(counter)counter.textContent=fmt(); setDisabled();
+  }
+  if(counter)counter.textContent=fmt(); setDisabled();
+  function bind(a,fn){var b=document.querySelector('[data-dvd='+a+']');
+    if(b)b.addEventListener('click',function(e){e.preventDefault();fn();});}
+  bind('first',function(){go(0);});
+  bind('prev',function(){go(idx<0?0:idx-1);});
+  bind('next',function(){go(idx<0?0:idx+1);});
+  document.addEventListener('keydown',function(e){
+    if(e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
+    if(e.altKey&&e.key==='ArrowDown'){e.preventDefault();go(idx<0?0:idx+1);}
+    else if(e.altKey&&e.key==='ArrowUp'){e.preventDefault();go(idx<0?0:idx-1);}
+  });
+})();
+""" % BLOCK_SELECTOR)
 
 
 # ---------------------------------------------------------------------------
@@ -170,14 +229,43 @@ def rel_to_report(rel_html: str) -> str:
     return "../" * depth + "report.html"
 
 
+def count_changes(merged_markup: str) -> int:
+    """Count paragraph-level changes: distinct block elements containing an
+    ins/del (matching the grouping the in-page nav uses)."""
+    frag = lxml.html.fragment_fromstring(merged_markup, create_parent="div")
+    seen: list = []
+    for mark in frag.iter("ins", "del"):
+        group = mark
+        for anc in mark.iterancestors():
+            if anc is frag:
+                break
+            if anc.tag in BLOCK_TAGS:
+                group = anc
+                break
+        if not any(group is g for g in seen):
+            seen.append(group)
+    return len(seen)
+
+
 def banner_markup(status: str, ref_a: str, ref_b: str, back_href: str) -> str:
     legend = ('<span class="dvd-legend">'
               '<del>removed</del> <ins>added</ins></span>')
+    nav = ""
+    if status == "changed":
+        nav = (
+            '<span class="dvd-nav">'
+            '<button data-dvd="first" title="Jump to first change">⤓ first</button>'
+            '<button data-dvd="prev" title="Previous change (Alt+↑)">‹ prev</button>'
+            '<span id="dvd-counter">—</span>'
+            '<button data-dvd="next" title="Next change (Alt+↓)">next ›</button>'
+            '</span>'
+        )
     return (
         f'<div class="dvd-banner">'
         f'<span class="dvd-pill {status}">{status}</span>'
         f'<span>docs diff &nbsp;<code>{html.escape(ref_a)}</code> → '
         f'<code>{html.escape(ref_b)}</code></span>'
+        f'{nav}'
         f'<a href="{html.escape(back_href)}">↩ back to summary</a>'
         f'{legend}</div>'
     )
@@ -205,6 +293,9 @@ def decorate_page(path: Path, status: str, merged_inner: str | None,
         banner = lxml.html.fragment_fromstring(
             banner_markup(status, ref_a, ref_b, rel_to_report(rel_html)))
         body.insert(0, banner)
+        if status == "changed":
+            script = lxml.html.fragment_fromstring(f"<script>{NAV_JS}</script>")
+            body.append(script)
 
     path.write_text(
         lxml.html.tostring(root, encoding="unicode", doctype="<!DOCTYPE html>"),
@@ -216,10 +307,10 @@ def decorate_page(path: Path, status: str, merged_inner: str | None,
 # ---------------------------------------------------------------------------
 
 class PageResult:
-    __slots__ = ("key", "rel", "status", "ins", "dele", "title", "href")
+    __slots__ = ("key", "rel", "status", "changes", "ins", "dele", "title", "href")
 
-    def __init__(self, key, rel, status, ins, dele, title, href):
-        self.key, self.rel, self.status = key, rel, status
+    def __init__(self, key, rel, status, changes, ins, dele, title, href):
+        self.key, self.rel, self.status, self.changes = key, rel, status, changes
         self.ins, self.dele, self.title, self.href = ins, dele, title, href
 
 
@@ -268,16 +359,17 @@ def diff_sites(site_a: Path, site_diff: Path, ref_a: str, ref_b: str) -> list[Pa
             merged = htmldiff(inner_a, inner_b)
             decorate_page(pages_b[rel], "changed", merged, ref_a, ref_b, rel)
             results.append(PageResult(
-                key, rel, "changed", merged.count("<ins"), merged.count("<del"),
+                key, rel, "changed", count_changes(merged),
+                merged.count("<ins"), merged.count("<del"),
                 title_of(pages_b[rel]), f"site-diff/{rel}"))
         elif in_b:  # added
             decorate_page(pages_b[rel], "added", None, ref_a, ref_b, rel)
             results.append(PageResult(
-                key, rel, "added", 0, 0, title_of(pages_b[rel]), f"site-diff/{rel}"))
+                key, rel, "added", 0, 0, 0, title_of(pages_b[rel]), f"site-diff/{rel}"))
         else:  # removed -> decorate the A copy (its assets are co-located)
             decorate_page(pages_a[rel], "removed", None, ref_a, ref_b, rel)
             results.append(PageResult(
-                key, rel, "removed", 0, 0, title_of(pages_a[rel]), f"site-a/{rel}"))
+                key, rel, "removed", 0, 0, 0, title_of(pages_a[rel]), f"site-a/{rel}"))
 
     return results
 
@@ -304,17 +396,22 @@ def render_summary(results: list[PageResult], meta: dict, total_pages: int) -> s
 
     rows = []
     for r in shown:
-        delta = []
-        if r.ins:
-            delta.append(f'<span class="plus">+{r.ins}</span>')
-        if r.dele:
-            delta.append(f'<span class="minus">−{r.dele}</span>')
+        if r.status == "changed":
+            detail = []
+            if r.ins:
+                detail.append(f'<span class="plus">+{r.ins}</span>')
+            if r.dele:
+                detail.append(f'<span class="minus">−{r.dele}</span>')
+            delta = (f'<b>{r.changes}</b> change{"" if r.changes == 1 else "s"}'
+                     + (f' <span class="sub">{" ".join(detail)}</span>' if detail else ''))
+        else:
+            delta = "—"
         rows.append(
             f'<tr><td>{badge(r.status)}</td>'
             f'<td><a href="{html.escape(r.href)}" target="_blank">'
             f'<code>{html.escape(r.key)}</code></a>'
             f'<div class="ttl">{html.escape(r.title)}</div></td>'
-            f'<td class="delta">{" ".join(delta) or "—"}</td></tr>')
+            f'<td class="delta">{delta}</td></tr>')
 
     a, b = meta["ref_a"], meta["ref_b"]
     table = ("<table class='summary'>" + "".join(rows) + "</table>" if rows else
@@ -346,6 +443,7 @@ table.summary td {{ padding: 9px 12px; border-top: 1px solid #f1f5f9; vertical-a
 table.summary tr:first-child td {{ border-top: 0; }}
 table.summary .ttl {{ color: #64748b; font-size: 12px; margin-top: 2px; }}
 .delta {{ white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 12px; }}
+.delta .sub {{ color: #94a3b8; margin-left: 6px; }}
 .plus {{ color: #15803d; font-weight: 600; }} .minus {{ color: #b91c1c; font-weight: 600; }}
 .empty {{ color: #475569; padding: 40px; text-align: center; background: #fff;
           border: 1px solid #e2e8f0; border-radius: 10px; }}
