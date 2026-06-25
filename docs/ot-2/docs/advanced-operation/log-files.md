@@ -3,7 +3,7 @@ title: "Opentrons OT-2: Downloading Log Files"
 description: "Lists the different OT-2 log files and how to download them."
 ---
 
-All OT-2 robots keep records of their movements and system processes. During normal operation, there's no need to download or examine these files. However, if a failure or malfunction occurs, Opentrons Support may request these files, as they provide detailed information that helps identify and resolve problems with the robot. This article summarizes each log file and explains how to download them using the Opentrons App.
+All OT-2 robots keep records of their movements and system processes. During normal operation, there's no need to download or examine these files. However, if a failure or malfunction occurs, Opentrons Support may request these files, as they provide detailed information that helps identify and resolve problems with the robot. This article summarizes each log file and explains how to download them using the Opentrons OT-2 App.
 
 ## Understanding OT-2 log files
 
@@ -24,7 +24,7 @@ Follow these instructions to download the log files from your OT-2:
 
 <div class="instruction-list" markdown>
 
-1. From the Opentrons App, click **Devices** and locate the robot that you want the logs from.
+1. From the Opentrons OT-2 App, click **Devices** and locate the robot that you want the logs from.
 
 2. For your selected robot, click the three-dot menu ( ⋮ ) and then click **Robot settings**.
 

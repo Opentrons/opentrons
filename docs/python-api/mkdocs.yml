@@ -26,8 +26,12 @@ nav:
       - Pipette Characteristics: pipettes/characteristics.md
       - Partial Tip Pickup: pipettes/partial-tip-pickup.md
       - Volume Modes: pipettes/volume-modes.md
-  - Liquid Classes: liquid-classes.md
-  - Liquid Class Definitions: liquid-class-definitions.md
+  - Liquid Classes: 
+      - Liquid Classes: liquid-classes/index.md
+      - Liquid Class Properties: liquid-classes/properties.md
+      - Using Liquid Classes: liquid-classes/using.md
+      - Customizing Liquid Classes: liquid-classes/customizing.md
+      - Liquid Class Definitions: liquid-classes/definitions.md
   - Building Block Commands:
       - Building Block Commands: building-block-commands/index.md
       - Manipulating Pipette Tips: building-block-commands/pipette-tips.md
@@ -48,6 +52,7 @@ nav:
       - "Use Case: Dry Run": runtime-parameters/use-case-dry-run.md
       - "Use Case: Cherrypicking": runtime-parameters/use-case-cherrypicking.md
       - Parameter Style Guide: runtime-parameters/style.md
+  - Step Grouping: groups.md
   - Advanced Control:
       - Advanced Control: advanced-control/index.md
       - Jupyter Notebook: advanced-control/jupyter.md
@@ -159,5 +164,5 @@ extra_css:
   - ../shared/print-pdf.css
 
 extra:
-  apiLevel: 2.28
-  robot_stack_version: 9.0.0
+  apiLevel: 2.29
+  robot_stack_version: 9.1.0

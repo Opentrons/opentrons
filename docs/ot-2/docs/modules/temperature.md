@@ -26,7 +26,7 @@ The Temperature Module uses aluminum thermal blocks to hold labware at temperatu
 
 The Temperature Module is fully programmable in [Protocol Designer](../../protocol-designer/index.md) and the [Python Protocol API](../../python-api/index.md).
 
-Outside of protocols, the Opentrons App can display the current status of the Temperature Module and can directly control the temperature of the surface plate.
+Outside of protocols, the Opentrons OT-2 App can display the current status of the Temperature Module and can directly control the temperature of the surface plate.
 
 ## Temperature Module specifications
 
