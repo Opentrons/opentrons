@@ -178,14 +178,12 @@ function getAuthFieldPatchValue(
   }
 }
 
-/** PATCH request updating a single auth setting field. */
+/** PATCH body with a single changed auth setting field. */
 function buildAuthFieldPatchRequest(
   id: AuthSettingFieldId,
-  values: FieldValues
+  value: NonNullable<PatchAuthSettingsRequest['data']>[AuthSettingFieldId]
 ): PatchAuthSettingsRequest {
-  return {
-    data: { [id]: getAuthFieldPatchValue(id, values) },
-  }
+  return { data: { [id]: value } }
 }
 
 /**
@@ -207,17 +205,16 @@ function getParentDisabledFieldValues(
 
 /**
  * PATCH request sent when a UI-only parent toggle is turned off.
- * Sets every nested auth field to `null`, which removes the requirement on
- * the auth server.
+ * Clears the nested auth input field (e.g. `passwordResetTime`).
  */
 function buildParentDisablePatchRequest(
   parentField: ToggleFieldConfig
 ): PatchAuthSettingsRequest {
-  return {
-    data: Object.fromEntries(
-      getAuthChildFieldIds(parentField).map(key => [key, null])
-    ) as PatchAuthSettingsRequest['data'],
-  }
+  const childId =
+    parentField.children?.find(
+      (child): child is InputFieldConfig => child.type === 'input'
+    )?.id ?? getAuthChildFieldIds(parentField)[0]
+  return buildAuthFieldPatchRequest(childId, null)
 }
 
 /** Top-level input fields from config (not nested under a parent toggle). */
@@ -265,11 +262,17 @@ export function getAuthPatchForInputChange(
     if (!Boolean(nextFieldValues[parentField.id]) || value === '') {
       return null
     }
-    return buildAuthFieldPatchRequest(id, nextFieldValues)
+    return buildAuthFieldPatchRequest(
+      id,
+      getAuthFieldPatchValue(id, nextFieldValues)
+    )
   }
 
   if (shouldPersistStandaloneInputChange(id, value)) {
-    return buildAuthFieldPatchRequest(id, nextFieldValues)
+    return buildAuthFieldPatchRequest(
+      id,
+      getAuthFieldPatchValue(id, nextFieldValues)
+    )
   }
 
   return null
@@ -329,7 +332,10 @@ export function resolveComplianceReadyToggleChange(
       fieldValues: nextFieldValues,
       patch: {
         target: 'auth',
-        request: buildAuthFieldPatchRequest(field.id, nextFieldValues),
+        request: buildAuthFieldPatchRequest(
+          field.id,
+          getAuthFieldPatchValue(field.id, nextFieldValues)
+        ),
       },
     }
   }
@@ -355,7 +361,7 @@ export function resolveComplianceReadyToggleChange(
       target: 'auth',
       request: buildAuthFieldPatchRequest(
         field.id as AuthSettingFieldId,
-        nextFieldValues
+        getAuthFieldPatchValue(field.id as AuthSettingFieldId, nextFieldValues)
       ),
     },
   }
