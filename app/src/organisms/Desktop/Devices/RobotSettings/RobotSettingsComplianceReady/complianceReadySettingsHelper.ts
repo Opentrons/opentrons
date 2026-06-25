@@ -205,16 +205,16 @@ function getParentDisabledFieldValues(
 
 /**
  * PATCH request sent when a UI-only parent toggle is turned off.
- * Clears the nested auth input field (e.g. `passwordResetTime`).
+ * Nulls every nested auth field so the requirement is removed on the server.
  */
 function buildParentDisablePatchRequest(
   parentField: ToggleFieldConfig
 ): PatchAuthSettingsRequest {
-  const childId =
-    parentField.children?.find(
-      (child): child is InputFieldConfig => child.type === 'input'
-    )?.id ?? getAuthChildFieldIds(parentField)[0]
-  return buildAuthFieldPatchRequest(childId, null)
+  return {
+    data: Object.fromEntries(
+      getAuthChildFieldIds(parentField).map(key => [key, null])
+    ) as PatchAuthSettingsRequest['data'],
+  }
 }
 
 /** Top-level input fields from config (not nested under a parent toggle). */

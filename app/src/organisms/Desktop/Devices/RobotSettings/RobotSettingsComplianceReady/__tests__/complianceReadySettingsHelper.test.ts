@@ -198,6 +198,30 @@ describe('resolveComplianceReadyToggleChange', () => {
     })
   })
 
+  it('should null all nested auth fields when disabling UI-only parent with multiple children', () => {
+    const result = resolveComplianceReadyToggleChange(
+      PASSWORD_COMPLEXITY_PARENT,
+      {
+        ...BASE_FIELD_VALUES,
+        passwordComplexityEnabled: true,
+        passwordComplexitySpecialCharacters: true,
+        passwordComplexityMinimumLength: '8',
+      },
+      undefined,
+      MOCK_AUTH_SETTINGS
+    )
+
+    expect(result.patch).toEqual({
+      target: 'auth',
+      request: {
+        data: {
+          passwordComplexitySpecialCharacters: null,
+          passwordComplexityMinimumLength: null,
+        },
+      },
+    })
+  })
+
   it('should patch changed child when toggling child under enabled UI-only parent', () => {
     const specialCharactersToggle = PASSWORD_COMPLEXITY_PARENT
       .children![0] as ToggleFieldConfig
