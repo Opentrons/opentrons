@@ -45,7 +45,7 @@ interface ComplianceReadySettingFieldProps {
   field: ComplianceReadyFieldConfig
   parentField?: ToggleFieldConfig
   values: FieldValues
-  onInputChange: (
+  onInputBlur: (
     id: AuthSettingFieldId,
     value: string,
     parentField?: ToggleFieldConfig
@@ -60,7 +60,7 @@ function ComplianceReadySettingField({
   field,
   parentField,
   values,
-  onInputChange,
+  onInputBlur,
   onToggleChange,
 }: ComplianceReadySettingFieldProps): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -68,11 +68,12 @@ function ComplianceReadySettingField({
   if (field.type === 'input') {
     return (
       <InputSetting
+        key={String(values[field.id])}
         label={t(field.labelKey)}
         value={String(values[field.id])}
         units={field.unitsKey != null ? t(field.unitsKey) : undefined}
-        onChange={event => {
-          onInputChange(field.id, event.target.value, parentField)
+        onBlur={value => {
+          onInputBlur(field.id, value, parentField)
         }}
       />
     )
@@ -115,7 +116,7 @@ function ComplianceReadySettingField({
               field={child}
               parentField={field}
               values={values}
-              onInputChange={onInputChange}
+              onInputBlur={onInputBlur}
               onToggleChange={onToggleChange}
             />
           ))}
@@ -129,7 +130,7 @@ interface ComplianceReadySettingsSectionProps {
   section: ComplianceReadySettingsSectionConfig
   isLastSection: boolean
   values: FieldValues
-  onInputChange: (
+  onInputBlur: (
     id: AuthSettingFieldId,
     value: string,
     parentField?: ToggleFieldConfig
@@ -144,7 +145,7 @@ function ComplianceReadySettingsSection({
   section,
   isLastSection,
   values,
-  onInputChange,
+  onInputBlur,
   onToggleChange,
 }: ComplianceReadySettingsSectionProps): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -160,7 +161,7 @@ function ComplianceReadySettingsSection({
             <ComplianceReadySettingField
               field={field}
               values={values}
-              onInputChange={onInputChange}
+              onInputBlur={onInputBlur}
               onToggleChange={onToggleChange}
             />
             {index < section.fields.length - 1 || !isLastSection ? (
@@ -210,10 +211,19 @@ export function ComplianceReadySoftwareSettings({
   const patchRobotServerSettings = (
     request: PatchAccessControlSettingsRequest
   ): void => {
-    throw new Error('Not implemented')
+    patchAccessControlSettings(request, {
+      onSuccess: response => {
+        setFieldValues(
+          getFieldValuesFromSettings(
+            authSettingsQuery.data?.data,
+            response.data
+          )
+        )
+      },
+    })
   }
 
-  const handleInputChange = (
+  const handleInputBlur = (
     id: AuthSettingFieldId,
     value: string,
     parentField?: ToggleFieldConfig
@@ -264,7 +274,7 @@ export function ComplianceReadySoftwareSettings({
             section={section}
             isLastSection={index === SETTINGS_SECTIONS.length - 1}
             values={fieldValues}
-            onInputChange={handleInputChange}
+            onInputBlur={handleInputBlur}
             onToggleChange={handleToggleChange}
           />
         ))}

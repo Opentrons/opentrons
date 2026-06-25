@@ -251,11 +251,7 @@ function shouldPersistStandaloneInputChange(
 }
 
 /**
- * Auth-server patch for an input change, if the value should be persisted.
- *
- * Callers update local state with `{ ...fieldValues, [id]: value }` first.
- * Returns null when the change should stay local only (parent off, empty
- * nested value, clearing idle logout, or unsupported standalone input).
+ * Auth-server patch for an input value, if it should be persisted.
  */
 export function getAuthPatchForInputChange(
   id: AuthSettingFieldId,

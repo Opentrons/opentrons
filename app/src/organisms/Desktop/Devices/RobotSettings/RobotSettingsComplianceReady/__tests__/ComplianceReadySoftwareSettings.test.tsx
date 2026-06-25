@@ -185,9 +185,13 @@ describe('ComplianceReadySoftwareSettings', () => {
       })
     )
 
-    fireEvent.change(screen.getByLabelText('Edit length of time'), {
+    const passwordResetTimeField = screen.getByLabelText('Edit length of time')
+    fireEvent.change(passwordResetTimeField, {
       target: { value: '90' },
     })
+    expect(patchAuthSettings).not.toHaveBeenCalled()
+
+    fireEvent.blur(passwordResetTimeField)
 
     expect(patchAuthSettings).toHaveBeenCalledWith({
       data: { passwordResetTime: 90 * 24 * 60 * 60 },
@@ -245,7 +249,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     })
   })
 
-  it('should update input values', () => {
+  it('should update input values without patching until blur', () => {
     render()
     expandAccordion()
 
@@ -254,5 +258,11 @@ describe('ComplianceReadySoftwareSettings', () => {
     )
     fireEvent.change(loginAttemptsField, { target: { value: '3' } })
     expect(loginAttemptsField).toHaveValue(3)
+    expect(patchAuthSettings).not.toHaveBeenCalled()
+
+    fireEvent.blur(loginAttemptsField)
+    expect(patchAuthSettings).toHaveBeenCalledWith({
+      data: { maxNumberOfLoginAttempts: 3 },
+    })
   })
 })
