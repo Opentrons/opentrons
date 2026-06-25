@@ -15,25 +15,25 @@ import type {
   PatchAccessControlSettingsRequest,
 } from '@opentrons/api-client'
 
-export type UsePatchAccessControlSettingsMutationResult = UseMutationResult<
+export type UsePatchAppAccessControlSettingsMutationResult = UseMutationResult<
   AccessControlAppSettingsResponse,
   AxiosError,
   PatchAccessControlSettingsRequest
 > & {
-  patchAccessControlSettings: UseMutateAsyncFunction<
+  patchAppAccessControlSettings: UseMutateAsyncFunction<
     AccessControlAppSettingsResponse,
     AxiosError,
     PatchAccessControlSettingsRequest
   >
 }
 
-export function usePatchAccessControlSettingsMutation(
+export function usePatchAppAccessControlSettingsMutation(
   options: UseMutationOptions<
     AccessControlAppSettingsResponse,
     AxiosError,
     PatchAccessControlSettingsRequest
   > = {}
-): UsePatchAccessControlSettingsMutationResult {
+): UsePatchAppAccessControlSettingsMutationResult {
   const host = useHost()
 
   const mutation = useMutation<
@@ -53,6 +53,6 @@ export function usePatchAccessControlSettingsMutation(
 
   return {
     ...mutation,
-    patchAccessControlSettings: mutation.mutateAsync,
+    patchAppAccessControlSettings: mutation.mutateAsync,
   }
 }

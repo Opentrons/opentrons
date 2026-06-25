@@ -5,10 +5,10 @@ import '@testing-library/jest-dom/vitest'
 
 import { ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
 import {
-  useAccessControlSettingsQuery,
+  useAppAccessControlSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
-  usePatchAccessControlSettingsMutation,
+  usePatchAppAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -29,9 +29,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...(actual as object),
     useAuthSettingsQuery: vi.fn(),
-    useAccessControlSettingsQuery: vi.fn(),
+    useAppAccessControlSettingsQuery: vi.fn(),
     useAuthSettingsMutation: vi.fn(),
-    usePatchAccessControlSettingsMutation: vi.fn(),
+    usePatchAppAccessControlSettingsMutation: vi.fn(),
   }
 })
 
@@ -87,7 +87,7 @@ const expandAccordion = (): void => {
 
 describe('ComplianceReadySoftwareSettings', () => {
   const patchAuthSettings = vi.fn()
-  const patchAccessControlSettings = vi.fn()
+  const patchAppAccessControlSettings = vi.fn()
 
   beforeEach(() => {
     patchAuthSettings.mockImplementation((request, options) => {
@@ -98,7 +98,7 @@ describe('ComplianceReadySoftwareSettings', () => {
         },
       })
     })
-    patchAccessControlSettings.mockImplementation((request, options) => {
+    patchAppAccessControlSettings.mockImplementation((request, options) => {
       options?.onSuccess?.({
         data: {
           ...MOCK_ACCESS_CONTROL_SETTINGS.data,
@@ -110,17 +110,17 @@ describe('ComplianceReadySoftwareSettings', () => {
     vi.mocked(useAuthSettingsMutation).mockReturnValue({
       patchAuthSettings,
     } as unknown as ReturnType<typeof useAuthSettingsMutation>)
-    vi.mocked(usePatchAccessControlSettingsMutation).mockReturnValue({
-      patchAccessControlSettings,
-    } as unknown as ReturnType<typeof usePatchAccessControlSettingsMutation>)
+    vi.mocked(usePatchAppAccessControlSettingsMutation).mockReturnValue({
+      patchAppAccessControlSettings,
+    } as unknown as ReturnType<typeof usePatchAppAccessControlSettingsMutation>)
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: MOCK_AUTH_SETTINGS,
       isLoading: false,
     } as ReturnType<typeof useAuthSettingsQuery>)
-    vi.mocked(useAccessControlSettingsQuery).mockReturnValue({
+    vi.mocked(useAppAccessControlSettingsQuery).mockReturnValue({
       data: MOCK_ACCESS_CONTROL_SETTINGS,
       isLoading: false,
-    } as ReturnType<typeof useAccessControlSettingsQuery>)
+    } as ReturnType<typeof useAppAccessControlSettingsQuery>)
   })
 
   it('should only use auth setting ids, robot server setting ids, or explicit UI-only ids', () => {

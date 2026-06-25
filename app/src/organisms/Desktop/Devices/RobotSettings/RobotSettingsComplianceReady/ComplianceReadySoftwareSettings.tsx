@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
 import {
-  useAccessControlSettingsQuery,
+  useAppAccessControlSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
-  usePatchAccessControlSettingsMutation,
+  usePatchAppAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
@@ -179,9 +179,10 @@ export function ComplianceReadySoftwareSettings({
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const authSettingsQuery = useAuthSettingsQuery()
-  const accessControlSettingsQuery = useAccessControlSettingsQuery()
+  const accessControlSettingsQuery = useAppAccessControlSettingsQuery()
   const { patchAuthSettings } = useAuthSettingsMutation()
-  const { patchAccessControlSettings } = usePatchAccessControlSettingsMutation()
+  const { patchAppAccessControlSettings } =
+    usePatchAppAccessControlSettingsMutation()
   const [fieldValues, setFieldValues] = useState<FieldValues>(() =>
     getFieldValuesFromSettings()
   )
@@ -211,7 +212,7 @@ export function ComplianceReadySoftwareSettings({
   const patchRobotServerSettings = (
     request: PatchAccessControlSettingsRequest
   ): void => {
-    patchAccessControlSettings(request, {
+    patchAppAccessControlSettings(request, {
       onSuccess: response => {
         setFieldValues(
           getFieldValuesFromSettings(

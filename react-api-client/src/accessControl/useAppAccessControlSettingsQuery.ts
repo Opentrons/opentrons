@@ -8,7 +8,7 @@ import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { AccessControlAppSettingsResponse } from '@opentrons/api-client'
 
-export function useAccessControlSettingsQuery(
+export function useAppAccessControlSettingsQuery(
   options: UseQueryOptions<AccessControlAppSettingsResponse, AxiosError> = {}
 ): UseQueryResult<AccessControlAppSettingsResponse, AxiosError> {
   const host = useHost()
