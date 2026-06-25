@@ -9,6 +9,7 @@ from opentrons.drivers.mag_deck import (
 from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
+from opentrons.hardware_control.modules.retry import retry_module_init
 
 log = logging.getLogger(__name__)
 
@@ -60,18 +61,29 @@ class MagDeck(mod_abc.AbstractModule):
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:
-            driver = await MagDeckDriver.create(port=port, loop=hw_control_loop)
+
+            async def _init_driver() -> tuple[AbstractMagDeckDriver, Dict[str, str]]:
+                d = await MagDeckDriver.create(port=port, loop=hw_control_loop)
+                try:
+                    info = await d.get_device_info()
+                    return d, info
+                except BaseException:
+                    await d.disconnect()
+                    raise
+
+            driver, device_info = await retry_module_init(_init_driver, port=port)
         else:
             driver = SimulatingDriver(
                 sim_model=sim_model, serial_number=sim_serial_number
             )
+            device_info = await driver.get_device_info()
 
         mod = cls(
             port=port,
             usb_port=usb_port,
             execution_manager=execution_manager,
             hw_control_loop=hw_control_loop,
-            device_info=await driver.get_device_info(),
+            device_info=device_info,
             driver=driver,
             disconnected_callback=disconnected_callback,
             error_callback=error_callback,
