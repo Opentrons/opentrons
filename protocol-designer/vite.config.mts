@@ -16,7 +16,7 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
-const REQUIRED_APP_VERSION = '9.0.0' // PD requires this robot stack version or higher
+const REQUIRED_APP_VERSION = '10.0.0-beta' // PD requires this robot stack version or higher
 const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'protocol-designer',
 })

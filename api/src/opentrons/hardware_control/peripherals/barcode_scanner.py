@@ -12,8 +12,27 @@ from opentrons.drivers.barcode_scanner import (
     AbstractBarcodeScannerDriver,
     BarcodeSimulatorDriver,
     RTScanner,
+    SmartScanner,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
+
+
+async def _try_create_rt(port: str) -> Optional[AbstractBarcodeScannerDriver]:
+    try:
+        driver = await RTScanner.create(port)
+        return driver
+    except Exception:
+        return None
+
+
+async def _try_create_smartscan(
+    port: str,
+) -> Optional[AbstractBarcodeScannerDriver]:
+    try:
+        driver = await SmartScanner.create(port)
+        return driver
+    except Exception:
+        return None
 
 
 class BarcodeScanner(AbstractPeripheral):
@@ -37,7 +56,13 @@ class BarcodeScanner(AbstractPeripheral):
         if simulating:
             driver: AbstractBarcodeScannerDriver = BarcodeSimulatorDriver()
         else:
-            driver = await RTScanner.create()
+            maybe_driver = await _try_create_rt(port)
+            if not maybe_driver:
+                maybe_driver = await _try_create_smartscan(port)
+            if not maybe_driver:
+                raise RuntimeError(f"No barcode scanner found at {port}")
+            else:
+                driver = maybe_driver
 
         return BarcodeScanner(
             port,

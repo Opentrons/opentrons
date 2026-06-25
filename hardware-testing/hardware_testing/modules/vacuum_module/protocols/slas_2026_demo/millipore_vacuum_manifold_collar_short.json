@@ -40,7 +40,7 @@
     "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,
     "isMovableAdapter": true,
-    "loadName": "millipore_vacuum_manifold_collar_standard"
+    "loadName": "millipore_vacuum_manifold_collar_short"
   },
   "namespace": "custom_beta",
   "version": 1,
@@ -55,7 +55,7 @@
     "vacuumModuleV1": {
       "x": 0,
       "y": 0,
-      "z": -8.0
+      "z": 0
     }
   },
   "stackingOffsetWithLabware": {
@@ -67,7 +67,7 @@
   },
   "stackLimit": 1,
   "gripForce": 17,
-  "gripHeightFromLabwareBottom": 45,
+  "gripHeightFromLabwareBottom": 53,
   "containedSpace": {
     "shape": "rectangular",
     "origin": { "x": 0, "y": 0, "z": 0 },

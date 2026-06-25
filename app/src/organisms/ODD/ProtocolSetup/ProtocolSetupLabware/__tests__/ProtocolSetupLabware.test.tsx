@@ -111,42 +111,50 @@ describe('ProtocolSetupLabware', () => {
     } as any)
     vi.mocked(getStackedItemsOnStartingDeck).mockReturnValue({
       A3: [
-        {
-          labwareId: 'fixedTrash',
-          definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
-          displayName: 'Trash',
-        },
+        [
+          {
+            labwareId: 'fixedTrash',
+            definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+            displayName: 'Trash',
+          },
+        ],
       ],
       D2: [
-        {
-          labwareId:
-            '8c75a22a-88e5-42fb-bd92-c2cceeeda504:opentrons/opentrons_96_filtertiprack_1000ul/1',
-          displayName: 'Opentrons 96 Filter Tip Rack 1000 µL',
-          definitionUri: 'opentrons/opentrons_96_filtertiprack_1000ul/1',
-        },
+        [
+          {
+            labwareId:
+              '8c75a22a-88e5-42fb-bd92-c2cceeeda504:opentrons/opentrons_96_filtertiprack_1000ul/1',
+            displayName: 'Opentrons 96 Filter Tip Rack 1000 µL',
+            definitionUri: 'opentrons/opentrons_96_filtertiprack_1000ul/1',
+          },
+        ],
       ],
       D3: [
-        {
-          labwareId:
-            'a2eccd35-f173-4e6e-8eee-b9a8ca436e8f:opentrons/opentrons_96_filtertiprack_200ul/1',
-          displayName: 'Opentrons 96 Filter Tip Rack 200 µL',
-          definitionUri: 'opentrons/opentrons_96_filtertiprack_200ul/1',
-        },
+        [
+          {
+            labwareId:
+              'a2eccd35-f173-4e6e-8eee-b9a8ca436e8f:opentrons/opentrons_96_filtertiprack_200ul/1',
+            displayName: 'Opentrons 96 Filter Tip Rack 200 µL',
+            definitionUri: 'opentrons/opentrons_96_filtertiprack_200ul/1',
+          },
+        ],
       ],
       A1: [
-        {
-          labwareId:
-            '8057ec40-8d53-4d44-aeb7-726a76c10901:opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1',
-          definitionUri:
-            'opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1',
-          displayName: 'module labware',
-        },
-        {
-          moduleId:
-            'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',
-          moduleModel: 'heaterShakerModuleV1',
-          moduleSlotName: 'B2',
-        },
+        [
+          {
+            labwareId:
+              '8057ec40-8d53-4d44-aeb7-726a76c10901:opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1',
+            definitionUri:
+              'opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1',
+            displayName: 'module labware',
+          },
+          {
+            moduleId:
+              'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',
+            moduleModel: 'heaterShakerModuleV1',
+            moduleSlotName: 'B2',
+          },
+        ],
       ],
     })
   })

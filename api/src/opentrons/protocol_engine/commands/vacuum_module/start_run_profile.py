@@ -9,6 +9,7 @@ from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal, Type
 
 from ...errors.error_occurrence import ErrorOccurrence
+from ...state import update_types
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.hardware_control.modules.types import (
     VacuumModuleCycle,
@@ -142,11 +143,17 @@ class StartRunProfileImpl(
         self, params: StartRunProfileParams
     ) -> SuccessData[StartRunProfileResult]:
         """Run a vacuum module profile."""
+        state_update = update_types.StateUpdate()
         vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
         profile: List[hc_profile_step] = []
+        pump_engaged = False
         for step in params.profile:
             profile.append(step.convert_element())
+            if not isinstance(step, VacuumModuleProfileCycle):
+                pump_engaged = step.enablePump
+
+        state_update.update_vacuum_module_pump_engaged(params.moduleId, pump_engaged)
 
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if vm_hardware is not None:
@@ -155,12 +162,16 @@ class StartRunProfileImpl(
                         profile=profile, vent_after=params.ventAfter
                     )
 
+                    state_update.update_vacuum_module_pump_engaged(
+                        params.moduleId, vm_hardware.pump_running
+                    )
+
         task = await self._task_handler.create_task(
             task_function=start_run_profile, id=params.taskId
         )
 
         return SuccessData(
-            public=StartRunProfileResult(taskId=task.id),
+            public=StartRunProfileResult(taskId=task.id), state_update=state_update
         )
 
 

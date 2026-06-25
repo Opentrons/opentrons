@@ -26,6 +26,13 @@ from .thermocycler_plate_lifter import ThermocyclerPlateLifter
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.motion_planning import get_gripper_labware_movement_waypoints
+from opentrons.protocol_engine.errors.exceptions import (
+    VacuumModuleStillUnderVacuumError,
+    VacuumModuleUnderVacuumError,
+)
+from opentrons.protocol_engine.execution.vacuum_module_movement_flagger import (
+    VacuumModuleMovementFlagger,
+)
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.types import Point
@@ -53,6 +60,7 @@ class LabwareMovementHandler:
         thermocycler_plate_lifter: Optional[ThermocyclerPlateLifter] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
         heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
+        vacuum_module_movement_flagger: Optional[VacuumModuleMovementFlagger] = None,
     ) -> None:
         """Initialize a LabwareMovementHandler instance."""
         self._hardware_api = hardware_api
@@ -82,6 +90,14 @@ class LabwareMovementHandler:
             heater_shaker_movement_flagger
             or HeaterShakerMovementFlagger(
                 state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
+        self._vm_movement_flagger = (
+            vacuum_module_movement_flagger
+            or VacuumModuleMovementFlagger(
+                state_store=self._state_store,
+                hardware_api=self._hardware_api,
+                equipment=self._equipment,
             )
         )
 
@@ -273,6 +289,9 @@ class LabwareMovementHandler:
                 await self._tc_movement_flagger.ensure_labware_in_open_thermocycler(
                     labware_parent=parent
                 )
+                await self._vm_movement_flagger.ensure_vacuum_module_is_idle(
+                    labware_parent=parent
+                )
                 if not self._state_store.labware.is_lid(labware_id):
                     # Lid placement is actually improved by holding the labware latched on the H/S
                     # So, we skip this check for lids.
@@ -288,3 +307,10 @@ class LabwareMovementHandler:
                     "Cannot move labware to or from a Heater-Shaker"
                     " with its labware latch closed."
                 )
+            except VacuumModuleUnderVacuumError:
+                raise LabwareMovementNotAllowedError(
+                    "Cannot move labware to or from a Vacuum Module"
+                    " when the pump is running."
+                )
+            except VacuumModuleStillUnderVacuumError:
+                raise

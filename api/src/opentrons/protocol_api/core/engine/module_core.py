@@ -27,6 +27,10 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.types import (
@@ -65,9 +69,6 @@ if TYPE_CHECKING:
 # Valid wavelength range for absorbance reader
 ABS_WAVELENGTH_MIN = 350
 ABS_WAVELENGTH_MAX = 1000
-# Gauge pressure range for vacuum module
-MAX_GAUGE_PRESSURE_MBAR = 0
-MIN_GAUGE_PRESSURE_MBAR = -800
 
 
 class ModuleCore(AbstractModuleCore[LabwareCore]):
@@ -1182,9 +1183,9 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
+    ) -> EngineTaskCore:
         """Set vacuum pressure."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPressureParams(
                 moduleId=self.module_id,
                 gaugePressure=gauge_pressure_mbar,
@@ -1196,6 +1197,11 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
             command_annotations=self._protocol_core.annotation_ids,
         )
 
+        start_pressure_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_pressure_task
+
     def start_set_vacuum_power(
         self,
         percent_power: int,
@@ -1203,9 +1209,9 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
+    ) -> EngineTaskCore:
         """Set vacuum power."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPowerParams(
                 moduleId=self.module_id,
                 percentPower=percent_power,
@@ -1216,6 +1222,11 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
+
+        start_power_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_power_task
 
     def stop_vacuum(
         self,
@@ -1294,12 +1305,5 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
     def close_vent(self) -> None:
         self._engine_client.execute_command(
             cmd.vacuum_module.CloseVentParams(moduleId=self.module_id),
-            command_annotations=self._protocol_core.annotation_ids,
-        )
-
-    def wait_for_target(self) -> None:
-        """Wait until the module's pressure or pwm is reached."""
-        self._engine_client.execute_command(
-            cmd.vacuum_module.WaitForTargetParams(moduleId=self.module_id),
             command_annotations=self._protocol_core.annotation_ids,
         )

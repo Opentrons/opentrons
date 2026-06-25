@@ -96,7 +96,21 @@ describe('update driver manager', () => {
     when(getConfig)
       .calledWith('update')
       .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
+    const webDriverPayload = {
+      manifestUrl: FLEX_MANIFEST_URL,
+      channel: 'alpha',
+      updateCacheDirectory: testDir,
+      currentVersion: CURRENT_SYSTEM_VERSION,
+    } as WebUpdateSource
+    const mockCleanup = vi.fn() as () => Promise<void>
+    when(getWebProvider)
+      .calledWith(webDriverPayload)
+      .thenReturn({
+        source: () => webDriverPayload,
+        cleanup: mockCleanup,
+      } as UpdateProvider<WebUpdateSource>)
     const driver = manageDriver(dispatch)
+    let wrappedDriver: null | UpdateDriver = null
     expect(driver.getUpdateDriver()).toBeNull()
     expect(getConfig).not.toHaveBeenCalled()
     return driver
@@ -104,14 +118,19 @@ describe('update driver manager', () => {
         type: CONFIG_INITIALIZED,
       } as ConfigInitializedAction)
       .then(() => {
-        expect(driver.getUpdateDriver()).not.toBeNull()
+        wrappedDriver = driver.getUpdateDriver()
+        expect(wrappedDriver).not.toBeNull()
         expect(getConfig).toHaveBeenCalledOnce()
-        expect(getWebProvider).toHaveBeenCalledWith({
-          manifestUrl: FLEX_MANIFEST_URL,
-          channel: 'alpha',
-          updateCacheDirectory: testDir,
-          currentVersion: CURRENT_SYSTEM_VERSION,
-        })
+        expect(getWebProvider).toHaveBeenCalledWith(webDriverPayload)
+        expect(mockCleanup).toHaveBeenCalled()
+      })
+      .then(() =>
+        driver.handleAction({
+          type: CONFIG_INITIALIZED,
+        } as ConfigInitializedAction)
+      )
+      .then(() => {
+        expect(wrappedDriver).toBe(driver.getUpdateDriver())
       })
   })
 
@@ -127,6 +146,7 @@ describe('update driver manager', () => {
       unlockUpdateCache: vi.fn(),
       name: vi.fn(),
       source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
+      cleanup: () => Promise.resolve(),
     }
     const fakeProvider2 = {
       ...fakeProvider,
@@ -200,6 +220,7 @@ describe('update driver', () => {
     unlockUpdateCache: vi.fn(),
     name: vi.fn(),
     source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
+    cleanup: () => Promise.resolve(),
   }
   const fakeUsbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {
     first: {
@@ -213,6 +234,7 @@ describe('update driver', () => {
         ({
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
+      cleanup: () => Promise.resolve(),
     },
   }
 
@@ -243,6 +265,7 @@ describe('update driver', () => {
         ({
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
+      cleanup: () => Promise.resolve(),
     }
     fakeUsbProviders.second = {
       teardown: vi.fn(),
@@ -255,6 +278,7 @@ describe('update driver', () => {
         ({
           massStorageRootPath: '/some/other/usb/path',
         }) as any as USBUpdateSource,
+      cleanup: () => Promise.resolve(),
     }
     subject = createUpdateDriver(dispatch)
   })
