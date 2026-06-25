@@ -66,7 +66,7 @@ describe('provider.refreshUpdateCache happy paths', () => {
             releaseNotes: 'http://opentrons.com/releaseNotes.md',
           },
         },
-      } as ReleaseManifest)
+      } as object as ReleaseManifest)
     const progressCallback = vi.fn()
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
