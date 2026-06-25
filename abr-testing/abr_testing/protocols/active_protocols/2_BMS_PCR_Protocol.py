@@ -21,9 +21,9 @@ def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
     run_helpers.create_single_pipette_mount_parameter(parameters)
     run_helpers.create_error_capture_duration_duration(parameters)
-    run_helpers.create_disposable_lid_parameter(parameters)
+    run_helpers.create_disposable_lid_parameter(parameters, False)
     run_helpers.create_csv_parameter(parameters)
-    run_helpers.create_tc_lid_deck_riser_parameter(parameters)
+    run_helpers.create_tc_lid_deck_riser_parameter(parameters, False)
     run_helpers.create_deactivate_modules_parameter(parameters)
     run_helpers.create_meniscus_z_parameter(parameters)
     run_helpers.create_probe_liquid_height_parameter(parameters)

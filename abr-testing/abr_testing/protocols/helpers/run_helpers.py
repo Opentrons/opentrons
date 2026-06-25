@@ -219,13 +219,13 @@ def create_two_pipette_mount_parameters(parameters: ParameterContext) -> None:
     )
 
 
-def create_dry_run_parameter(parameters: ParameterContext) -> None:
+def create_dry_run_parameter(parameters: ParameterContext, default: bool = False) -> None:
     """Create dry run parameter."""
     parameters.add_bool(
         variable_name="dry_run",
         display_name="Dry Run",
         description="If Dry Run is True, skip incubation.",
-        default=False,
+        default=default,
     )
 
 
@@ -238,43 +238,43 @@ def create_csv_parameter(parameters: ParameterContext) -> None:
     )
 
 
-def create_probe_liquid_height_parameter(parameters: ParameterContext) -> None:
+def create_probe_liquid_height_parameter(parameters: ParameterContext, default: bool = True) -> None:
     """Create parameter for probe liquid height."""
     parameters.add_bool(
         variable_name="probe_liquid_height",
         display_name="Probe Liquid Height",
         description="True means probe liquid height at start of run.",
-        default=False,
+        default=default,
     )
 
 
-def create_disposable_lid_parameter(parameters: ParameterContext) -> None:
+def create_disposable_lid_parameter(parameters: ParameterContext, default: bool = True) -> None:
     """Create parameter to use/not use disposable lid."""
     parameters.add_bool(
         variable_name="disposable_lid",
         display_name="Disposable Lid",
         description="True means use lid.",
-        default=True,
+        default=default,
     )
 
 
-def create_disposable_lid_trash_location(parameters: ParameterContext) -> None:
+def create_disposable_lid_trash_location(parameters: ParameterContext, default: bool = True) -> None:
     """Create a parameter for lid placement after use."""
     parameters.add_bool(
         variable_name="trash_lid",
         display_name="Trash Disposable Lid",
         description="True means trash lid, false means keep on deck.",
-        default=True,
+        default=default,
     )
 
 
-def create_tc_lid_deck_riser_parameter(parameters: ParameterContext) -> None:
+def create_tc_lid_deck_riser_parameter(parameters: ParameterContext, default: bool = True) -> None:
     """Create parameter for tc lid deck riser."""
     parameters.add_bool(
         variable_name="deck_riser",
         display_name="Deck Riser",
         description="True means use deck riser.",
-        default=True,
+        default=default,
     )
 
 
@@ -293,12 +293,12 @@ def create_tip_size_parameter(parameters: ParameterContext) -> None:
     )
 
 
-def create_all_deck_slot_parameters(parameters: ParameterContext) -> None:
+def create_all_deck_slot_parameters(parameters: ParameterContext, default: bool = True) -> None:
     """Create parameters for all deck slots."""
     deck_slots = [f"{letter}{number}" for letter in "ABCD" for number in range(1, 4)]
     for deck_slot in deck_slots:
         parameters.add_bool(
-            variable_name=deck_slot, display_name=f"Slot {deck_slot}", default=True
+            variable_name=deck_slot, display_name=f"Slot {deck_slot}", default=default
         )
     # WHAT TO COPY PASTE IN PROTOCOL
     # slot_a1 = protocol.params.A1 # type: ignore[attr-defined]
@@ -395,13 +395,13 @@ def create_tc_compatible_labware_parameter(parameters: ParameterContext) -> None
     )
 
 
-def create_deactivate_modules_parameter(parameters: ParameterContext) -> None:
+def create_deactivate_modules_parameter(parameters: ParameterContext, default: bool = True) -> None:
     """Create parameter for deactivating modules at the end fof run."""
     parameters.add_bool(
         variable_name="deactivate_modules",
         display_name="Deactivate Modules",
         description="deactivate all modules at end of run",
-        default=True,
+        default=default,
     )
 
 
