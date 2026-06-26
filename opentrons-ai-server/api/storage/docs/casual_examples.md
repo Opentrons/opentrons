@@ -993,7 +993,7 @@ The workflow should be:
 </description>
 
 <protocol>
-```
+```python
 from opentrons import protocol_api
  
 metadata = {
