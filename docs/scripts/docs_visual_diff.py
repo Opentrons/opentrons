@@ -22,11 +22,11 @@ rebuilt from *that ref's own* ``api/`` source.
 
 Usage
 -----
-    scripts/docs_visual_diff.py                               # latest live docs vs HEAD
-    scripts/docs_visual_diff.py edge my-feature-branch
-    scripts/docs_visual_diff.py mkdocs-2025-10-01 edge        # candidate tag vs edge
-    scripts/docs_visual_diff.py edge HEAD -o /tmp/docs-diff
-    scripts/docs_visual_diff.py --site-a docs/site --site-b /other/site   # skip builds
+    docs/scripts/docs_visual_diff.py                               # latest live docs vs HEAD
+    docs/scripts/docs_visual_diff.py edge my-feature-branch
+    docs/scripts/docs_visual_diff.py mkdocs-2025-10-01 edge        # candidate tag vs edge
+    docs/scripts/docs_visual_diff.py edge HEAD -o /tmp/docs-diff
+    docs/scripts/docs_visual_diff.py --site-a docs/site --site-b /other/site   # skip builds
 
 With no refs, A defaults to the latest ``mkdocs-*`` deploy tag and B to HEAD.
 

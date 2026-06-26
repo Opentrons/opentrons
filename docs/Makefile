@@ -71,7 +71,7 @@ pdf:
 		echo "Unknown PROJECT '$(PROJECT)'. Valid: $(PDF_PROJECTS)"; exit 1;; \
 	esac
 	uv run --python 3.10 mkdocs build -f ./$(PROJECT)/mkdocs.yml && \
-	uv run --python 3.10 python ./export_to_pdf.py \
+	uv run --python 3.10 python ./scripts/export_to_pdf.py \
 		$(PROJECT)/site/print_page/index.html \
 		site/$(pdf-file-$(PROJECT)) \
 		'$(pdf-title-$(PROJECT))'

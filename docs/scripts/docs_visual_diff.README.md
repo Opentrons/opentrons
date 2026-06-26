@@ -62,19 +62,19 @@ or click `↗` to open the full rendered page.
 
 ```bash
 # No args: compare the latest deployed docs (newest mkdocs-* tag) to HEAD
-scripts/docs_visual_diff.py
+docs/scripts/docs_visual_diff.py
 
 # Compare two refs. Builds both, diffs, writes ./docs-visual-diff-report/
-scripts/docs_visual_diff.py edge my-feature-branch
+docs/scripts/docs_visual_diff.py edge my-feature-branch
 
 # Compare a candidate deploy tag against edge
-scripts/docs_visual_diff.py mkdocs-2025-10-01 edge
+docs/scripts/docs_visual_diff.py mkdocs-2025-10-01 edge
 
 # Choose the output directory
-scripts/docs_visual_diff.py edge HEAD -o /tmp/docs-diff
+docs/scripts/docs_visual_diff.py edge HEAD -o /tmp/docs-diff
 
 # Skip building — diff two site/ dirs you already built
-scripts/docs_visual_diff.py --site-a docs/site --site-b /some/other/site
+docs/scripts/docs_visual_diff.py --site-a docs/site --site-b /some/other/site
 ```
 
 When it finishes it prints the report path; open it in a browser
