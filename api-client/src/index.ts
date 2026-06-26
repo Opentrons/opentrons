@@ -1,6 +1,8 @@
 // api client entry point
 export * from './audit'
-export * from './accessControl/settings'
+export * from './accessControl/settings/settings/getAppAccessControlSettings'
+export * from './accessControl/settings/settings/patchAppAccessControlSettings'
+export * from './accessControl/settings/settings/types'
 export * from './auth'
 export * from './calibration'
 export * from './client_data'
