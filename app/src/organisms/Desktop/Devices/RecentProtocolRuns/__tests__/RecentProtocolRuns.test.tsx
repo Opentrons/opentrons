@@ -10,8 +10,8 @@ import { i18n } from '/app/i18n'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useNotifyAllRunsQuery, useRunStatuses } from '/app/resources/runs'
 
+import { RecentProtocolRuns } from '../../RecentProtocolRuns'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
-import { RecentProtocolRuns } from '../RecentProtocolRuns'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryResult } from 'react-query'

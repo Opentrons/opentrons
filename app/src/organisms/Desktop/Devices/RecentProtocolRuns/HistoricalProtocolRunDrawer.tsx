@@ -48,9 +48,9 @@ import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
-import { OffsetTag } from '../../LabwarePositionCheck'
-import { DownloadCsvFileLink } from './DownloadCsvFileLink'
-import { useDeckCalibrationData } from './hooks'
+import { OffsetTag } from '../../../LabwarePositionCheck'
+import { DownloadCsvFileLink } from '../DownloadCsvFileLink'
+import { useDeckCalibrationData } from '../hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
