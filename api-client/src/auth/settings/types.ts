@@ -36,16 +36,5 @@ export class AuthSettingsResponse {
 }
 
 export interface PatchAuthSettingsRequest {
-  data: {
-    maxNumberOfLoginAttempts?: number | null
-    passwordResetTime?: number | null
-    passwordComplexityMinimumLength?: number | null
-    passwordComplexitySpecialCharacters?: boolean | null
-    idleLogout?: number | null
-    requireReasonForInteraction?: boolean | null
-    minLengthOfReasonForInteraction?: number | null
-    requireAdminCredsWhenUpdatingRobotSoftware?: boolean | null
-    requireAdminCredsWhenSendingProtocolToRobot?: boolean | null
-    requireAdminCredsForSignoffProtocol?: boolean | null
-  }
+  data: Partial<AuthSettingsData>
 }

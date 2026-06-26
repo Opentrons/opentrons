@@ -19,9 +19,5 @@ export class AccessControlAppSettingsResponse {
 export type AccessControlAppSettingsKey = keyof AccessControlAppSettingsData
 
 export interface PatchAppAccessControlSettingsRequest {
-  data: {
-    requireSignoffForProtocolLog?: boolean | null
-    requireLogsToBeSavedInApp?: boolean | null
-    deleteOverMaxOnDiskProtocols?: boolean | null
-  }
+  data: Partial<AccessControlAppSettingsData>
 }
