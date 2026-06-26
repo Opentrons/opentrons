@@ -127,5 +127,9 @@ class UpdateSession:
             }
 
 
-def session_from_request(request: web.Request) -> Optional[UpdateSession]:
+def get_current_session(request: web.Request) -> UpdateSession | None:
     return request.app.get(SESSION_VARNAME, None)  # type: ignore[no-any-return]
+
+
+def set_current_session(request: web.Request, session: UpdateSession | None) -> None:
+    request.app[SESSION_VARNAME] = session
