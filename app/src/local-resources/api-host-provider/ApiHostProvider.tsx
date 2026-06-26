@@ -7,20 +7,30 @@ import { OPENTRONS_USB } from '/app/redux/discovery/constants'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth/hooks'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
+import type { AxiosRequestConfig } from 'axios'
 import type { ReactNode } from 'react'
-import type { HostConfig } from '@opentrons/api-client'
+import type { HostConfig, ResponsePromise } from '@opentrons/api-client'
 
 export interface ApiHostProviderProps {
   robotName: string | null
   children: ReactNode
+  requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
 }
 
 export function ApiHostProvider({
   robotName,
   children,
+  requestor,
 }: ApiHostProviderProps): JSX.Element {
   const robot = useRobot(robotName)
   const token = useAccessTokenForRobot(robotName)
+
+  const requestorToUse = useMemo(() => {
+    return (
+      requestor ??
+      (robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined)
+    )
+  }, [robot?.ip, requestor])
 
   const hostConfig = useMemo<HostConfig | null>(
     () =>
@@ -28,13 +38,11 @@ export function ApiHostProvider({
         ? {
             hostname: robot.ip,
             port: robot.port,
-            requestor:
-              robot.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
-            robotName,
+            requestor: requestorToUse,
             token,
           }
         : null,
-    [robot?.ip, robot?.port, robotName, token]
+    [requestorToUse, robot?.ip, robot?.port, robotName, token]
   )
 
   return (

@@ -11,6 +11,7 @@ import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostP
 import { OddModal } from '/app/molecules/OddModal'
 import { RadialTimer } from '/app/molecules/RadialTimer'
 import { getLocalRobot } from '/app/redux/discovery'
+import { appShellInternalApiRequestor } from '/app/redux/shell/remote'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import styles from './robot_encryption_key_modal.module.css'
@@ -112,8 +113,12 @@ function RobotEncryptionKeyModalElement({
 export const RobotEncryptionKeyModal = NiceModal.create((): JSX.Element => {
   const { clearClientData } = useUpdateClientDataEncryptionKeys()
   const localRobot = useSelector(getLocalRobot)
+
   return (
-    <ApiHostProvider robotName={localRobot?.name ?? null}>
+    <ApiHostProvider
+      robotName={localRobot?.name ?? null}
+      requestor={appShellInternalApiRequestor}
+    >
       <RobotEncryptionKeyModalElement clearClientData={clearClientData} />
     </ApiHostProvider>
   )
