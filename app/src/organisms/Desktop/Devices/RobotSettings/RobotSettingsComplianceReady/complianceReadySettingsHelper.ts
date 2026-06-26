@@ -46,51 +46,52 @@ function getAuthSettingFieldValue(
 
 function getAuthFieldValues(
   authSettings?: AuthSettingsData
-): Partial<Pick<FieldValues, AuthSettingFieldId>> {
-  if (authSettings == null) {
-    return {}
-  }
-
-  return (Object.keys(new AuthSettingsData()) as AuthSettingFieldId[]).reduce(
+): Pick<FieldValues, AuthSettingFieldId> {
+  const fieldValues = (
+    Object.keys(new AuthSettingsData()) as AuthSettingFieldId[]
+  ).reduce<Partial<Pick<FieldValues, AuthSettingFieldId>>>(
     (acc, key) => ({
       ...acc,
-      [key]: getAuthSettingFieldValue(key, authSettings),
+      [key]: getAuthSettingFieldValue(key, authSettings ?? {}),
     }),
-    {} as Pick<FieldValues, AuthSettingFieldId>
+    {}
   )
+
+  return fieldValues as Pick<FieldValues, AuthSettingFieldId>
 }
 
 function getAppAccessControlFieldValues(
   appAccessControlSettings?: AccessControlAppSettingsData
-): Partial<Pick<FieldValues, AppAccessControlSettingFieldId>> {
-  return (
+): Pick<FieldValues, AppAccessControlSettingFieldId> {
+  const fieldValues = (
     Object.keys(
       new AccessControlAppSettingsData()
     ) as AppAccessControlSettingFieldId[]
-  ).reduce(
+  ).reduce<Partial<Pick<FieldValues, AppAccessControlSettingFieldId>>>(
     (acc, key) => ({
       ...acc,
       [key]: appAccessControlSettings?.[key] ?? false,
     }),
-    {} as Pick<FieldValues, AppAccessControlSettingFieldId>
+    {}
   )
+
+  return fieldValues as Pick<FieldValues, AppAccessControlSettingFieldId>
 }
 
-/** Map auth- and app access-control settings responses to form field values. */
+/** Map auth and app access-control settings responses to form field values. */
 export function getFieldValuesFromSettings(
   authSettings?: AuthSettingsData,
   appAccessControlSettings?: AccessControlAppSettingsData
 ): FieldValues {
-  return {
-    ...getAuthFieldValues(authSettings),
-    passwordResetEnabled: authSettings?.passwordResetTime != null,
+  const fieldValues: FieldValues = {
+    ...getAuthFieldValues(authSettings ?? {}),
+    passwordResetEnabled: Boolean(authSettings?.passwordResetTime),
     passwordComplexityEnabled:
-      authSettings != null
-        ? authSettings.passwordComplexityMinimumLength != null ||
-          authSettings.passwordComplexitySpecialCharacters
-        : false,
+      Boolean(authSettings?.passwordComplexityMinimumLength) ||
+      Boolean(authSettings?.passwordComplexitySpecialCharacters),
     ...getAppAccessControlFieldValues(appAccessControlSettings),
-  } as FieldValues
+  }
+  return fieldValues
 }
 
 function getFieldChildren(
@@ -117,8 +118,16 @@ function getFieldValuesWithChildrenCleared(
 }
 
 export type ComplianceReadySettingsPatch =
-  | { target: 'auth'; request: PatchAuthSettingsRequest }
-  | { target: 'robot'; request: PatchAppAccessControlSettingsRequest }
+  | PatchAuthSettingsRequest
+  | PatchAppAccessControlSettingsRequest
+
+export function isAuthSettingsPatch(
+  patch: ComplianceReadySettingsPatch
+): patch is PatchAuthSettingsRequest {
+  return Object.keys(patch.data).every(key =>
+    AuthSettingsData.hasSettingKey(key)
+  )
+}
 
 /** Updated form state and an optional patch to persist the change. */
 export interface ComplianceReadyToggleChangeResult {
@@ -266,10 +275,7 @@ export function resolveComplianceReadyToggleChange(
     }
     return {
       fieldValues: getFieldValuesWithChildrenCleared(field, fieldValues),
-      patch: {
-        target: 'auth',
-        request: buildParentDisablePatchRequest(field),
-      },
+      patch: buildParentDisablePatchRequest(field),
     }
   }
 
@@ -286,23 +292,17 @@ export function resolveComplianceReadyToggleChange(
     }
     return {
       fieldValues: nextFieldValues,
-      patch: {
-        target: 'auth',
-        request: buildAuthFieldPatchRequest(
-          field.id,
-          getAuthFieldPatchValue(field.id, nextFieldValues)
-        ),
-      },
+      patch: buildAuthFieldPatchRequest(
+        field.id,
+        getAuthFieldPatchValue(field.id, nextFieldValues)
+      ),
     }
   }
 
   if (AccessControlAppSettingsData.hasSettingKey(field.id)) {
     return {
       fieldValues: { ...fieldValues, [field.id]: toggledOn },
-      patch: {
-        target: 'robot',
-        request: { data: { [field.id]: toggledOn } },
-      },
+      patch: { data: { [field.id]: toggledOn } },
     }
   }
 
@@ -314,13 +314,10 @@ export function resolveComplianceReadyToggleChange(
 
     return {
       fieldValues: nextFieldValues,
-      patch: {
-        target: 'auth',
-        request: buildAuthFieldPatchRequest(
-          field.id,
-          getAuthFieldPatchValue(field.id, nextFieldValues)
-        ),
-      },
+      patch: buildAuthFieldPatchRequest(
+        field.id,
+        getAuthFieldPatchValue(field.id, nextFieldValues)
+      ),
     }
   }
 

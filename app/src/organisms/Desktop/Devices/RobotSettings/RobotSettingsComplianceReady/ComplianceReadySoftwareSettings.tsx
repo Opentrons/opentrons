@@ -16,6 +16,7 @@ import { SETTINGS_SECTIONS } from './complianceReadySettingsConfig'
 import {
   getAuthPatchForInputChange,
   getFieldValuesFromSettings,
+  isAuthSettingsPatch,
   resolveComplianceReadyToggleChange,
 } from './complianceReadySettingsHelper'
 import styles from './compliancereadysoftwaresettings.module.css'
@@ -253,10 +254,12 @@ export function ComplianceReadySoftwareSettings({
     const { fieldValues: nextFieldValues, patch } =
       resolveComplianceReadyToggleChange(field, fieldValues, parentField)
     setFieldValues(nextFieldValues)
-    if (patch?.target === 'auth') {
-      patchAuth(patch.request)
-    } else if (patch?.target === 'robot') {
-      patchAppAccessControlSettingsRequest(patch.request)
+    if (patch != null) {
+      if (isAuthSettingsPatch(patch)) {
+        patchAuth(patch)
+      } else {
+        patchAppAccessControlSettingsRequest(patch)
+      }
     }
   }
 

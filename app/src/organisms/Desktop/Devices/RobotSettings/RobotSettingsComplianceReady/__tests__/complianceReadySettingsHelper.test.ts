@@ -178,8 +178,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     expect(result.fieldValues.passwordResetEnabled).toBe(false)
     expect(result.fieldValues.passwordResetTime).toBe('')
     expect(result.patch).toEqual({
-      target: 'auth',
-      request: { data: { passwordResetTime: null } },
+      data: { passwordResetTime: null },
     })
   })
 
@@ -192,12 +191,9 @@ describe('resolveComplianceReadyToggleChange', () => {
     })
 
     expect(result.patch).toEqual({
-      target: 'auth',
-      request: {
-        data: {
-          passwordComplexitySpecialCharacters: null,
-          passwordComplexityMinimumLength: null,
-        },
+      data: {
+        passwordComplexitySpecialCharacters: null,
+        passwordComplexityMinimumLength: null,
       },
     })
   })
@@ -219,8 +215,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
     expect(result.fieldValues.passwordComplexitySpecialCharacters).toBe(true)
     expect(result.patch).toEqual({
-      target: 'auth',
-      request: { data: { passwordComplexitySpecialCharacters: true } },
+      data: { passwordComplexitySpecialCharacters: true },
     })
   })
 
@@ -248,8 +243,7 @@ describe('resolveComplianceReadyToggleChange', () => {
       false
     )
     expect(result.patch).toEqual({
-      target: 'auth',
-      request: { data: { requireAdminCredsWhenUpdatingRobotSoftware: false } },
+      data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
     })
   })
 
@@ -261,8 +255,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
     expect(result.fieldValues.requireSignoffForProtocolLog).toBe(false)
     expect(result.patch).toEqual({
-      target: 'robot',
-      request: { data: { requireSignoffForProtocolLog: false } },
+      data: { requireSignoffForProtocolLog: false },
     })
   })
 
@@ -271,8 +264,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
     expect(result.fieldValues.requireReasonForInteraction).toBe(false)
     expect(result.patch).toEqual({
-      target: 'auth',
-      request: { data: { requireReasonForInteraction: false } },
+      data: { requireReasonForInteraction: false },
     })
   })
 })

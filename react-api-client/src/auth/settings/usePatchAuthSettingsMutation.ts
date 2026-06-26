@@ -12,7 +12,6 @@ import type {
 } from 'react-query'
 import type {
   AuthSettingsResponse,
-  HostConfig,
   PatchAuthSettingsRequest,
 } from '@opentrons/api-client'
 
