@@ -119,22 +119,11 @@ function getFieldValuesWithChildrenCleared(
   return nextFieldValues
 }
 
-export type ComplianceReadySettingsPatch =
-  | PatchAuthSettingsRequest
-  | PatchAppAccessControlSettingsRequest
-
-export function isAuthSettingsPatch(
-  patch: ComplianceReadySettingsPatch
-): patch is PatchAuthSettingsRequest {
-  return Object.keys(patch.data).every(key =>
-    AuthSettingsData.hasSettingKey(key)
-  )
-}
-
 /** Updated form state and an optional patch to persist the change. */
 export interface ComplianceReadyToggleChangeResult {
   fieldValues: FieldValues
-  patch?: ComplianceReadySettingsPatch
+  authPatch?: PatchAuthSettingsRequest
+  appAccessControlPatch?: PatchAppAccessControlSettingsRequest
 }
 
 /**
@@ -184,16 +173,31 @@ function buildAuthFieldPatchRequest(
 }
 
 /**
- * PATCH request sent when a UI-only parent toggle is turned off.
- * Nulls every nested child field so the requirement is removed on the server.
+ * PATCH requests sent when a UI-only parent toggle is turned off.
+ * Nulls every nested child field on the server it belongs to.
  */
-function buildParentDisablePatchRequest(
-  parentField: ToggleFieldConfig
-): PatchAuthSettingsRequest {
+function buildParentDisablePatches(parentField: ToggleFieldConfig): {
+  authPatch?: PatchAuthSettingsRequest
+  appAccessControlPatch?: PatchAppAccessControlSettingsRequest
+} {
+  const authData: PatchAuthSettingsRequest['data'] = {}
+  const appAccessControlData: PatchAppAccessControlSettingsRequest['data'] = {}
+
+  for (const { id } of getFieldChildren(parentField)) {
+    if (AuthSettingsData.hasSettingKey(id)) {
+      authData[id] = null
+    } else if (AccessControlAppSettingsData.hasSettingKey(id)) {
+      appAccessControlData[id] = null
+    }
+  }
+
   return {
-    data: Object.fromEntries(
-      getFieldChildren(parentField).map(({ id }) => [id, null])
-    ) as PatchAuthSettingsRequest['data'],
+    ...(Object.keys(authData).length > 0
+      ? { authPatch: { data: authData } }
+      : {}),
+    ...(Object.keys(appAccessControlData).length > 0
+      ? { appAccessControlPatch: { data: appAccessControlData } }
+      : {}),
   }
 }
 
@@ -277,7 +281,7 @@ export function resolveComplianceReadyToggleChange(
     }
     return {
       fieldValues: getFieldValuesWithChildrenCleared(field, fieldValues),
-      patch: buildParentDisablePatchRequest(field),
+      ...buildParentDisablePatches(field),
     }
   }
 
@@ -294,7 +298,7 @@ export function resolveComplianceReadyToggleChange(
     }
     return {
       fieldValues: nextFieldValues,
-      patch: buildAuthFieldPatchRequest(
+      authPatch: buildAuthFieldPatchRequest(
         field.id,
         getAuthFieldPatchValue(field.id, nextFieldValues)
       ),
@@ -304,7 +308,7 @@ export function resolveComplianceReadyToggleChange(
   if (AccessControlAppSettingsData.hasSettingKey(field.id)) {
     return {
       fieldValues: { ...fieldValues, [field.id]: toggledOn },
-      patch: { data: { [field.id]: toggledOn } },
+      appAccessControlPatch: { data: { [field.id]: toggledOn } },
     }
   }
 
@@ -316,7 +320,7 @@ export function resolveComplianceReadyToggleChange(
 
     return {
       fieldValues: nextFieldValues,
-      patch: buildAuthFieldPatchRequest(
+      authPatch: buildAuthFieldPatchRequest(
         field.id,
         getAuthFieldPatchValue(field.id, nextFieldValues)
       ),

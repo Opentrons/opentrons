@@ -16,7 +16,6 @@ import { SETTINGS_SECTIONS } from './complianceReadySettingsConfig'
 import {
   getAuthPatchForInputChange,
   getFieldValuesFromSettings,
-  isAuthSettingsPatch,
   resolveComplianceReadyToggleChange,
 } from './complianceReadySettingsHelper'
 import styles from './compliancereadysoftwaresettings.module.css'
@@ -251,15 +250,16 @@ export function ComplianceReadySoftwareSettings({
     field: ToggleFieldConfig,
     parentField?: ToggleFieldConfig
   ): void => {
-    const { fieldValues: nextFieldValues, patch } =
-      resolveComplianceReadyToggleChange(field, fieldValues, parentField)
+    const {
+      fieldValues: nextFieldValues,
+      authPatch,
+      appAccessControlPatch,
+    } = resolveComplianceReadyToggleChange(field, fieldValues, parentField)
     setFieldValues(nextFieldValues)
-    if (patch != null) {
-      if (isAuthSettingsPatch(patch)) {
-        patchAuth(patch)
-      } else {
-        patchAppAccessControlSettingsRequest(patch)
-      }
+    if (authPatch != null) {
+      patchAuth(authPatch)
+    } else if (appAccessControlPatch != null) {
+      patchAppAccessControlSettingsRequest(appAccessControlPatch)
     }
   }
 

@@ -165,7 +165,8 @@ describe('resolveComplianceReadyToggleChange', () => {
     const result = resolveToggle(PASSWORD_RESET_PARENT, BASE_FIELD_VALUES)
 
     expect(result.fieldValues.passwordResetEnabled).toBe(true)
-    expect(result.patch).toBeUndefined()
+    expect(result.authPatch).toBeUndefined()
+    expect(result.appAccessControlPatch).toBeUndefined()
   })
 
   it('should clear child values and patch null when disabling UI-only parent', () => {
@@ -177,7 +178,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
     expect(result.fieldValues.passwordResetEnabled).toBe(false)
     expect(result.fieldValues.passwordResetTime).toBe('')
-    expect(result.patch).toEqual({
+    expect(result.authPatch).toEqual({
       data: { passwordResetTime: null },
     })
   })
@@ -190,7 +191,7 @@ describe('resolveComplianceReadyToggleChange', () => {
       passwordComplexityMinimumLength: '8',
     })
 
-    expect(result.patch).toEqual({
+    expect(result.authPatch).toEqual({
       data: {
         passwordComplexitySpecialCharacters: null,
         passwordComplexityMinimumLength: null,
@@ -214,7 +215,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     )
 
     expect(result.fieldValues.passwordComplexitySpecialCharacters).toBe(true)
-    expect(result.patch).toEqual({
+    expect(result.authPatch).toEqual({
       data: { passwordComplexitySpecialCharacters: true },
     })
   })
@@ -230,7 +231,8 @@ describe('resolveComplianceReadyToggleChange', () => {
     )
 
     expect(result.fieldValues.passwordComplexitySpecialCharacters).toBe(true)
-    expect(result.patch).toBeUndefined()
+    expect(result.authPatch).toBeUndefined()
+    expect(result.appAccessControlPatch).toBeUndefined()
   })
 
   it('should patch auth server when toggling a standalone auth setting', () => {
@@ -242,7 +244,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     expect(result.fieldValues.requireAdminCredsWhenUpdatingRobotSoftware).toBe(
       false
     )
-    expect(result.patch).toEqual({
+    expect(result.authPatch).toEqual({
       data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
     })
   })
@@ -254,7 +256,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     )
 
     expect(result.fieldValues.requireSignoffForProtocolLog).toBe(false)
-    expect(result.patch).toEqual({
+    expect(result.appAccessControlPatch).toEqual({
       data: { requireSignoffForProtocolLog: false },
     })
   })
@@ -263,7 +265,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     const result = resolveToggle(REQUIRE_REASON_PARENT, BASE_FIELD_VALUES)
 
     expect(result.fieldValues.requireReasonForInteraction).toBe(false)
-    expect(result.patch).toEqual({
+    expect(result.authPatch).toEqual({
       data: { requireReasonForInteraction: false },
     })
   })
