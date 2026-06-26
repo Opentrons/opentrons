@@ -223,18 +223,29 @@ def set_inner_html(el, markup: str) -> None:
         el.append(child)
 
 
-def strip_empty_diff_tags(markup: str) -> str:
-    """Unwrap ins/del elements whose entire content is whitespace.
+def clean_merged_html(markup: str) -> str:
+    """Repair two whitespace artifacts htmldiff introduces, before we render it.
 
-    htmldiff sometimes emits a marker around nothing but a space (e.g.
-    ``<ins> </ins>``). Left in place it renders invisibly but still registers as
-    its own paragraph-level change, inflating the count and adding a dead nav
-    stop. We drop the tag while keeping its whitespace, and never touch markers
-    that wrap real elements (e.g. ``<ins><img></ins>``)."""
+    1. Unwrap ins/del markers whose entire content is whitespace (e.g.
+       ``<ins> </ins>``): they render invisibly but still register as their own
+       paragraph-level change, inflating the count and adding a dead nav stop. We
+       drop the tag while keeping its whitespace, and never touch markers wrapping
+       real elements (e.g. ``<ins><img></ins>``).
+    2. Restore whitespace htmldiff strips out of code blocks. It empties Pygments
+       whitespace spans (``<span class="w"> </span>``), making tokens run together
+       ("fromopentronsimport"), and collapses the newline after each highlighted
+       line span, flattening multi-line code into one run-on line. We put the
+       space back and re-add a newline after each line so both the rendered page
+       and the report excerpts read correctly (the excerpt CSS uses pre-wrap)."""
     wrapper = lxml.html.fragment_fromstring(markup, create_parent="div")
     for el in wrapper.xpath(".//ins | .//del"):
         if len(el) == 0 and not (el.text or "").strip():
             el.drop_tag()  # remove the tag, merge its text into the parent
+    for ws in wrapper.xpath('.//span[@class="w"]'):
+        if len(ws) == 0 and not (ws.text or ""):
+            ws.text = " "
+    for line in wrapper.xpath('.//span[a[starts-with(@id, "__codelineno-")]]'):
+        line.tail = "\n"  # one source line per highlighted line span
     return inner_html(wrapper)
 
 
@@ -405,7 +416,7 @@ def diff_sites(site_a: Path, site_diff: Path, ref_a: str, ref_b: str) -> list[Pa
             inner_b = inner_html(art_b) if art_b is not None else ""
             if inner_a == inner_b:
                 continue  # unchanged
-            merged = strip_empty_diff_tags(htmldiff(inner_a, inner_b))
+            merged = clean_merged_html(htmldiff(inner_a, inner_b))
             decorate_page(pages_b[rel], "changed", merged, ref_a, ref_b, rel)
             excerpts = change_blocks(merged)
             results.append(PageResult(
@@ -536,9 +547,8 @@ main {{ max-width: 980px; margin: 0 auto; padding: 24px 20px 80px; }}
 .md-lite a {{ color: #2563eb; }}
 .md-lite code {{ background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: .9em; }}
 .md-lite pre {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
-          padding: 10px 12px; overflow: auto; }}
+          padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }}
 .md-lite pre code {{ background: none; padding: 0; }}
-.md-lite .doc-signature pre {{ white-space: pre-wrap; overflow-wrap: anywhere; }}
 .md-lite table {{ border-collapse: collapse; margin: .4em 0; }}
 .md-lite th, .md-lite td {{ border: 1px solid #e2e8f0; padding: 4px 8px; text-align: left; }}
 .md-lite ins, .md-lite ins * {{ background: #d6f5d6; text-decoration: none; }}
