@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 0 0 6rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius-8);
   background-color: var(--white);
 }
 
@@ -15,14 +15,14 @@
   justify-content: space-between;
   padding: 1rem;
   border-bottom: 1px solid var(--grey-30);
-  gap: 0.5rem;
+  gap: var(--spacing-8);
 }
 
 .header_actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: var(--spacing-8);
 }
 
 .content {
@@ -38,10 +38,10 @@
   display: grid;
   width: 88%;
   justify-content: flex-start;
-  padding: 0.5rem;
+  padding: var(--spacing-8);
   margin-right: 12%;
   color: var(--grey-60);
-  gap: 1.25rem;
+  gap: var(--spacing-20);
   grid-template-columns: 30% 25% 16% 5% 24%;
 }
 
@@ -55,5 +55,5 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--spacing-4);
 }
