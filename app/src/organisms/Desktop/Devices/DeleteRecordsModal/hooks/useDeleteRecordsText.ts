@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next'
 
-export function useDeleteRecordsText(
-  type: 'allRuns' | 'selectedRuns' | 'allLogs'
-): { title: string; description: string; recommendation: string } {
+import type { DeleteRecordsType } from '../types'
+
+export function useDeleteRecordsText(type: DeleteRecordsType): {
+  title: string
+  description: string
+  recommendation: string
+} {
   const { t } = useTranslation('device_details')
   switch (type) {
     case 'allRuns':

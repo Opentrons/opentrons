@@ -10,10 +10,12 @@ import {
 import styles from './deleterecordsmodal.module.css'
 import { useDeleteRecordsText } from './hooks/useDeleteRecordsText'
 
+import type { DeleteRecordsType } from './types'
+
 interface DeleteRecordsModalProps {
   onClose: () => void
   onConfirm: () => void
-  type: 'allRuns' | 'selectedRuns' | 'allLogs'
+  type: DeleteRecordsType
 }
 
 export function DeleteRecordsModal(
