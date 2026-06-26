@@ -10,10 +10,6 @@ export class AccessControlAppSettingsData {
 
 export class AccessControlAppSettingsResponse {
   data!: AccessControlAppSettingsData
-
-  static hasSettingKey(key: string): key is keyof AccessControlAppSettingsData {
-    return AccessControlAppSettingsData.hasSettingKey(key)
-  }
 }
 
 export type AccessControlAppSettingsKey = keyof AccessControlAppSettingsData

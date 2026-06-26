@@ -1,14 +1,12 @@
 import {
-  AccessControlAppSettingsResponse,
-  AuthSettingsResponse,
+  AccessControlAppSettingsData,
+  AuthSettingsData,
 } from '@opentrons/api-client'
 
 import { SETTINGS_SECTIONS } from './complianceReadySettingsConfig'
 import { isUiOnlyFieldId } from './complianceReadySettingsTypes'
 
 import type {
-  AccessControlAppSettingsData,
-  AuthSettingsData,
   PatchAppAccessControlSettingsRequest,
   PatchAuthSettingsRequest,
 } from '@opentrons/api-client'
@@ -283,7 +281,7 @@ export function resolveComplianceReadyToggleChange(
     if (!Boolean(nextFieldValues[parentField.id])) {
       return { fieldValues: nextFieldValues }
     }
-    if (!AuthSettingsResponse.hasSettingKey(field.id)) {
+    if (!AuthSettingsData.hasSettingKey(field.id)) {
       return { fieldValues: nextFieldValues }
     }
     return {
@@ -298,7 +296,7 @@ export function resolveComplianceReadyToggleChange(
     }
   }
 
-  if (AccessControlAppSettingsResponse.hasSettingKey(field.id)) {
+  if (AccessControlAppSettingsData.hasSettingKey(field.id)) {
     return {
       fieldValues: { ...fieldValues, [field.id]: toggledOn },
       patch: {
@@ -308,7 +306,7 @@ export function resolveComplianceReadyToggleChange(
     }
   }
 
-  if (AuthSettingsResponse.hasSettingKey(field.id)) {
+  if (AuthSettingsData.hasSettingKey(field.id)) {
     const nextFieldValues: FieldValues = {
       ...fieldValues,
       [field.id]: toggledOn,

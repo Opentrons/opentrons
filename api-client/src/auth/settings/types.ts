@@ -29,10 +29,6 @@ export class AuthSettingsData {
 
 export class AuthSettingsResponse {
   data!: AuthSettingsData
-
-  static hasSettingKey(key: string): key is keyof AuthSettingsData {
-    return AuthSettingsData.hasSettingKey(key)
-  }
 }
 
 export interface PatchAuthSettingsRequest {
