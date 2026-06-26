@@ -8,7 +8,6 @@ import {
 } from '@opentrons/components'
 
 import styles from './deleterecordsmodal.module.css'
-import { useDeleteRecordsText } from './hooks/useDeleteRecordsText'
 
 import type { DeleteRecordsType } from './types'
 
@@ -23,7 +22,38 @@ export function DeleteRecordsModal(
 ): JSX.Element {
   const { onClose, onConfirm, type } = props
   const { t } = useTranslation(['device_details', 'shared'])
-  const { title, description, recommendation } = useDeleteRecordsText(type)
+  const { title, description, recommendation } = ((): {
+    title: string
+    description: string
+    recommendation: string
+  } => {
+    switch (type) {
+      case 'allRuns':
+        return {
+          title: t('device_details:delete_all_run_records'),
+          description: t('device_details:delete_all_run_records_description'),
+          recommendation: t(
+            'device_details:delete_all_run_records_recommendation'
+          ),
+        }
+      case 'selectedRuns':
+        return {
+          title: t('device_details:delete_selected_run_records'),
+          description: t(
+            'device_details:delete_selected_run_records_description'
+          ),
+          recommendation: t(
+            'device_details:delete_selected_run_records_recommendation'
+          ),
+        }
+      case 'allLogs':
+        return {
+          title: t('device_details:delete_all_logs'),
+          description: t('device_details:delete_all_logs_description'),
+          recommendation: t('device_details:delete_all_logs_recommendation'),
+        }
+    }
+  })()
 
   return (
     <Modal type="warning" title={title} onClose={onClose}>
