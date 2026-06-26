@@ -34,8 +34,11 @@ via ``uv run --with lxml`` -- no manual environment setup needed.
 from __future__ import annotations
 
 import argparse
+import copy
+import difflib
 import html
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -249,6 +252,108 @@ def clean_merged_html(markup: str) -> str:
     return inner_html(wrapper)
 
 
+# --- Table-aware diffing -----------------------------------------------------
+# htmldiff mangles tables: it can't represent a deleted cell inline, so it adds
+# phantom columns and floats <del> content outside the table. Instead we hold
+# tables out of the htmldiff pass and diff them ourselves, aligning rows and
+# diffing each changed cell so ins/del stay inside the cell.
+
+def _row_key(tr) -> str:
+    """Stable alignment key for a row: its first cell (usually the row's
+    identifier), so a value change in a later column doesn't unalign the row."""
+    cells = tr.xpath("./td | ./th")
+    target = cells[0] if cells else tr
+    return " ".join("".join(target.itertext()).split())
+
+
+def _mark_cells(tr, kind: str) -> None:
+    for cell in tr.xpath("./td | ./th"):
+        set_inner_html(cell, f"<{kind}>{inner_html(cell)}</{kind}>")
+
+
+def _diff_row_cells(row_a, row_m) -> None:
+    """Diff cells of a paired old/new row in place on the (new) merged row."""
+    cells_a = row_a.xpath("./td | ./th")
+    cells_m = row_m.xpath("./td | ./th")
+    common = min(len(cells_a), len(cells_m))
+    for k in range(common):
+        old, new = inner_html(cells_a[k]), inner_html(cells_m[k])
+        if old != new:
+            set_inner_html(cells_m[k], clean_merged_html(htmldiff(old, new)))
+    for k in range(common, len(cells_m)):           # added columns
+        set_inner_html(cells_m[k], f"<ins>{inner_html(cells_m[k])}</ins>")
+    for k in range(common, len(cells_a)):            # removed columns
+        gone = copy.deepcopy(cells_a[k])
+        set_inner_html(gone, f"<del>{inner_html(cells_a[k])}</del>")
+        row_m.append(gone)
+
+
+def _insert_deleted_row(row_a, rows_m, pos: int) -> None:
+    gone = copy.deepcopy(row_a)
+    _mark_cells(gone, "del")
+    if pos < len(rows_m):
+        rows_m[pos].addprevious(gone)
+    elif rows_m:
+        rows_m[-1].addnext(gone)
+
+
+def diff_table(table_a, table_b) -> str:
+    """Return merged HTML for one table: rows aligned by text, changed cells
+    diffed inline, inserted/removed rows tinted whole."""
+    merged = copy.deepcopy(table_b)
+    merged.tail = None
+    rows_a = table_a.xpath(".//tr")
+    rows_m = merged.xpath(".//tr")
+    sm = difflib.SequenceMatcher(
+        a=[_row_key(r) for r in rows_a],
+        b=[_row_key(r) for r in rows_m], autojunk=False)
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag in ("equal", "replace"):
+            # Rows aligned by key; still diff their cells (a later column may
+            # have changed even when the key matched).
+            paired = min(i2 - i1, j2 - j1)
+            for k in range(paired):
+                _diff_row_cells(rows_a[i1 + k], rows_m[j1 + k])
+            for k in range(j1 + paired, j2):         # unmatched new rows
+                _mark_cells(rows_m[k], "ins")
+            for k in range(i1 + paired, i2):         # unmatched old rows
+                _insert_deleted_row(rows_a[k], rows_m, j2)
+        elif tag == "insert":
+            for k in range(j1, j2):
+                _mark_cells(rows_m[k], "ins")
+        elif tag == "delete":
+            for k in range(i1, i2):
+                _insert_deleted_row(rows_a[k], rows_m, j1)
+    return lxml.html.tostring(merged, encoding="unicode")
+
+
+def diff_article_html(inner_a: str, inner_b: str) -> str:
+    """Diff article content, holding tables out of the htmldiff pass and merging
+    them cell-by-cell so deletions stay inside their cells."""
+    frag_a = lxml.html.fragment_fromstring(inner_a, create_parent="div")
+    frag_b = lxml.html.fragment_fromstring(inner_b, create_parent="div")
+    tables_a = frag_a.xpath(".//table[not(ancestor::table)]")
+    tables_b = frag_b.xpath(".//table[not(ancestor::table)]")
+    # Only the simple, common case (same number of top-level tables) is handled
+    # specially; anything else falls back to plain htmldiff.
+    if not tables_a or len(tables_a) != len(tables_b):
+        return clean_merged_html(htmldiff(inner_a, inner_b))
+
+    merged_tables = [diff_table(ta, tb) for ta, tb in zip(tables_a, tables_b)]
+    for i, (ta, tb) in enumerate(zip(tables_a, tables_b)):
+        for el in (ta, tb):
+            marker = lxml.html.fragment_fromstring(f"<p>DVDTABLE{i}ENDDVD</p>")
+            marker.tail = el.tail
+            el.getparent().replace(el, marker)
+
+    body = clean_merged_html(htmldiff(inner_html(frag_a), inner_html(frag_b)))
+    for i, table_html in enumerate(merged_tables):
+        body = re.sub(rf"<p>\s*DVDTABLE{i}ENDDVD\s*</p>", lambda _m: table_html,
+                      body, count=1)
+        body = body.replace(f"DVDTABLE{i}ENDDVD", table_html)  # safety fallback
+    return body
+
+
 def rel_to_report(rel_html: str) -> str:
     """Relative href from a page back up to report.html."""
     depth = rel_html.count("/") + 1  # +1 for the site-* dir itself
@@ -416,7 +521,7 @@ def diff_sites(site_a: Path, site_diff: Path, ref_a: str, ref_b: str) -> list[Pa
             inner_b = inner_html(art_b) if art_b is not None else ""
             if inner_a == inner_b:
                 continue  # unchanged
-            merged = clean_merged_html(htmldiff(inner_a, inner_b))
+            merged = diff_article_html(inner_a, inner_b)
             decorate_page(pages_b[rel], "changed", merged, ref_a, ref_b, rel)
             excerpts = change_blocks(merged)
             results.append(PageResult(
