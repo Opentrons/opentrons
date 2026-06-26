@@ -22,10 +22,13 @@ rebuilt from *that ref's own* ``api/`` source.
 
 Usage
 -----
+    scripts/docs_visual_diff.py                               # latest live docs vs HEAD
     scripts/docs_visual_diff.py edge my-feature-branch
     scripts/docs_visual_diff.py mkdocs-2025-10-01 edge        # candidate tag vs edge
     scripts/docs_visual_diff.py edge HEAD -o /tmp/docs-diff
     scripts/docs_visual_diff.py --site-a docs/site --site-b /other/site   # skip builds
+
+With no refs, A defaults to the latest ``mkdocs-*`` deploy tag and B to HEAD.
 
 Requires: git and uv (https://docs.astral.sh/uv/). The script self-bootstraps lxml
 via ``uv run --with lxml`` -- no manual environment setup needed.
@@ -170,6 +173,15 @@ def git_short(repo: Path, ref: str) -> tuple[str, str]:
         ["git", "rev-parse", ref], cwd=repo, check=True,
         capture_output=True, text=True).stdout.strip()
     return full, full[:10]
+
+
+def latest_mkdocs_tag(repo: Path) -> str | None:
+    """Newest production docs tag. They're named ``mkdocs-YYYY-MM-DD`` (with an
+    optional ``.N`` rollback suffix), so reverse name-sort gives the latest."""
+    out = subprocess.run(
+        ["git", "tag", "-l", "mkdocs-*", "--sort=-refname"], cwd=repo,
+        check=True, capture_output=True, text=True).stdout.split()
+    return out[0] if out else None
 
 
 def build_ref(repo: Path, ref: str, sha: str, dest: Path) -> None:
@@ -700,8 +712,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(
         description="Rich rendered diff of the Opentrons docs build between two refs.",
         formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    ap.add_argument("ref_a", nargs="?", help="Base ref (branch/tag/commit).")
-    ap.add_argument("ref_b", nargs="?", help="Compare ref (branch/tag/commit).")
+    ap.add_argument("ref_a", nargs="?",
+                    help="Base ref (branch/tag/commit). "
+                         "Default: latest 'mkdocs-*' tag (the live docs).")
+    ap.add_argument("ref_b", nargs="?",
+                    help="Compare ref (branch/tag/commit). Default: HEAD.")
     ap.add_argument("--site-a", help="Pre-built site dir for A (skips building A).")
     ap.add_argument("--site-b", help="Pre-built site dir for B (skips building B).")
     ap.add_argument("-o", "--output", default="docs-visual-diff-report",
@@ -711,6 +726,19 @@ def main() -> int:
     repo = Path(subprocess.run(
         ["git", "rev-parse", "--show-toplevel"], cwd=Path(__file__).resolve().parent,
         check=True, capture_output=True, text=True).stdout.strip())
+
+    # Defaults: A -> latest deployed docs tag, B -> current HEAD. So a bare run
+    # compares the live docs to the latest commit.
+    if not args.site_a and not args.ref_a:
+        tag = latest_mkdocs_tag(repo)
+        if not tag:
+            sys.exit("No ref_a/--site-a given and no 'mkdocs-*' tags found "
+                     "(try `git fetch --tags`). Specify a base ref explicitly.")
+        args.ref_a = tag
+        print(f"(A not given — using latest mkdocs tag: {tag})")
+    if not args.site_b and not args.ref_b:
+        args.ref_b = "HEAD"
+        print("(B not given — using HEAD)")
 
     out = Path(args.output).resolve()
     out.mkdir(parents=True, exist_ok=True)

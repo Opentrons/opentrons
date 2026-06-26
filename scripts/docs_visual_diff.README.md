@@ -61,6 +61,9 @@ or click `↗` to open the full rendered page.
 ## Usage
 
 ```bash
+# No args: compare the latest deployed docs (newest mkdocs-* tag) to HEAD
+scripts/docs_visual_diff.py
+
 # Compare two refs. Builds both, diffs, writes ./docs-visual-diff-report/
 scripts/docs_visual_diff.py edge my-feature-branch
 
