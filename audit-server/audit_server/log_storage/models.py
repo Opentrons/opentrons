@@ -20,3 +20,28 @@ class LogPeriodSummary(pydantic.BaseModel):
     endedAt: Optional[datetime] = pydantic.Field(
         description="The time this period ended, or null if the period is still active."
     )
+
+
+class UserLogEntry(pydantic.BaseModel):
+    """User Log Entry information to be exported."""
+
+    message: str
+    message_hash: str
+    message_sig: str
+    sig_version: str
+
+
+class RobotLogPaths(pydantic.BaseModel):
+    """Robot Log Entry information to be exported."""
+
+    file_path: str
+    file_hash: str
+    file_sig: str
+    file_sig_version: str
+
+
+class LogPeriodEntries(pydantic.BaseModel):
+    """Entries associated with a particular log period."""
+
+    user_log_entries: list[UserLogEntry]
+    robot_log_entries: list[RobotLogPaths]

@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
-from .models import LogPeriodSummary
+from .models import LogPeriodEntries, LogPeriodSummary, RobotLogPaths, UserLogEntry
 from .types import StoredLog
 from audit_server.persistence.orm_models import LogEntry, LogPeriod
 
@@ -146,6 +146,39 @@ class LogStore:
             if not isinstance(latest_record, LogEntry):
                 return latest_record
             return latest_record.message_hash
+
+    def get_period_entries(self, period_id: str) -> LogPeriodEntries:
+        """Get the given log period's user and robot log entries."""
+        with self._session() as session:
+            log_period = session.scalar(
+                select(LogPeriod).where(LogPeriod.id == int(period_id))
+            )
+            if log_period is None:
+                raise NoLogInPeriodError()
+            user_log_entries = [
+                UserLogEntry(
+                    message=user_log.message,
+                    message_hash=user_log.message_hash,
+                    message_sig=user_log.message_sig,
+                    sig_version=user_log.sig_version,
+                )
+                for user_log in log_period.log_entries
+            ]
+            # TODO: As far as I understand it this should be a singular robot log,
+            #   but the ORM model has a list. For labware json/runtime CSVs?
+            robot_log_entries = [
+                RobotLogPaths(
+                    file_path=robot_log.file_path,
+                    file_hash=robot_log.file_hash,
+                    file_sig=robot_log.file_sig,
+                    file_sig_version=robot_log.file_sig_version,
+                )
+                for robot_log in log_period.robot_logs
+            ]
+            return LogPeriodEntries(
+                user_log_entries=user_log_entries,
+                robot_log_entries=robot_log_entries,
+            )
 
     def list_periods(self) -> list[LogPeriodSummary]:
         """Return all log periods, oldest first, with their entry IDs in ordinal order."""
