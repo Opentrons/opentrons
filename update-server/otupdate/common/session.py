@@ -45,7 +45,6 @@ class UpdateSession:
         self._error: Optional[Value] = None
         self._storage_path = storage_path
         self._setup_dl_area()
-        self._rootfs_file: Optional[str] = None
         LOG.info(f"update session: created {self._token}")
 
     def _setup_dl_area(self) -> None:
@@ -79,10 +78,6 @@ class UpdateSession:
     @property
     def download_path(self) -> str:
         return self._storage_path
-
-    @property
-    def rootfs_file(self) -> Optional[str]:
-        return self._rootfs_file
 
     @property
     def token(self) -> str:
