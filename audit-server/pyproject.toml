@@ -20,9 +20,6 @@ dependencies = [
     "alembic==1.18.4",
 ]
 
-[tool.uv.dependency-groups]
-dev = {requires-python = ">=3.11"}
-
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
 robot = [

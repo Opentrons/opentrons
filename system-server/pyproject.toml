@@ -1,7 +1,7 @@
 [project]
 name = 'system_server'
 
-requires-python = '>=3.10'
+requires-python = '>=3.12'
 license = 'Apache-2.0'
 authors = [{name = "Opentrons", email = "engineering@opentrons.com"}]
 classifiers = [
@@ -29,9 +29,6 @@ dependencies = [
 ]
 
 dynamic = ['version']
-
-[tool.uv.dependency-groups]
-dev = {requires-python = ">=3.11"}
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment

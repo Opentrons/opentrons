@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "otupdate"
 description = "A server to update software and firmware on Opentrons robots"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },

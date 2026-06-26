@@ -1,7 +1,7 @@
 [project]
 name = 'server_utils'
 
-requires-python = '>=3.10'
+requires-python = '>=3.12'
 license = 'Apache-2.0'
 authors = [{name = "Opentrons", email = "engineering@opentrons.com"}]
 classifiers = [
