@@ -25,6 +25,8 @@ from opentrons.hardware_control.modules import (
     SpeedStatus,
     TemperatureStatus,
     VacuumModuleStatus,
+    VacuumOperationMode,
+    VentStatus,
 )
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.hardware_control.modules.types import HopperDoorState, LatchState
@@ -206,6 +208,12 @@ class ModuleDataMapper:
             assert ModuleDataValidator.is_vacuum_module_data(live_data["data"])
             module_data = VacuumModuleData(
                 status=VacuumModuleStatus(live_data["status"]),
+                currentPressure=cast(float, live_data["data"].get("currentPressure")),
+                targetPressure=cast(float, live_data["data"].get("targetPressure")),
+                currentPower=cast(float, live_data["data"].get("currentPower")),
+                targetPower=cast(float, live_data["data"].get("targetPower")),
+                ventStatus=cast(VentStatus, live_data["data"].get("ventStatus")),
+                modeType=cast(VacuumOperationMode, live_data["data"].get("modeType")),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
             )
         else:

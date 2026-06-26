@@ -48,7 +48,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
 
     def decorator(handler: Handler) -> Handler:
         @functools.wraps(handler)
-        async def wrapped(request: web.Request) -> web.Response:
+        async def wrapped(request: web.Request) -> web.StreamResponse:
             authorization_checker = request.app[_AUTHORIZATION_CHECKER_APP_KEY]
             assert isinstance(authorization_checker, AuthorizationChecker), (
                 "The app is missing its AuthorizationChecker. Forgot to initialize it during server startup?"

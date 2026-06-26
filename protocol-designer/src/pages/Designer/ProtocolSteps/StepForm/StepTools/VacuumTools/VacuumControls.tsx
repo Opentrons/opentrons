@@ -76,7 +76,7 @@ export function VacuumControls(props: VacuumControlsProps): JSX.Element {
 
   const ventState = vacuumModuleState?.ventStatus ?? VACUUM_VENT_OPEN
   const ventToSwitch =
-    ventState === VACUUM_VENT_SET_OPEN
+    ventState === VACUUM_VENT_OPEN
       ? VACUUM_VENT_SET_CLOSED
       : VACUUM_VENT_SET_OPEN
 
