@@ -1,12 +1,11 @@
 import { useCallback, useContext, useMemo } from 'react'
-import { useSelector } from 'react-redux'
 
 import {
   useAccessControlEnabledQuery,
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
-import { getCurrentUsernameForLocalRobot } from '/app/redux/robot-auth'
+import { useCurrentRobotName, useCurrentUsername } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 import { isDocumentationReportValid } from './utils'
@@ -36,7 +35,9 @@ export function useGuardedAction(
   const authSettingsQuery = useAuthSettingsQuery()
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
 
-  const currentUsername = useSelector(getCurrentUsernameForLocalRobot)
+  const currentUsername = useCurrentUsername()
+  const currentRobotName = useCurrentRobotName()
+
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
   const requireReasonForInteraction =
@@ -54,23 +55,31 @@ export function useGuardedAction(
     [accessControlEnabled, requireReasonForInteraction]
   )
 
-  const { showDocumentationRequiredModal: requireDocumentation } = useContext(
-    DocumentationRequiredModalContext
-  )
+  const {
+    showDocumentationRequiredModal: requireDocumentation,
+    showLoginModal: requireLogin,
+  } = useContext(DocumentationRequiredModalContext)
 
   const showDocumentationModal = useCallback(
     async (
       actionsToDocument: DocumentedAction[],
       handleCancel?: () => void
     ) => {
+      let username = currentUsername
+      if (currentUsername == null || currentUsername.length === 0) {
+        const loginResult = await requireLogin({
+          robotName: currentRobotName ?? '',
+        })
+        username = loginResult?.username ?? ''
+      }
       const docResult = await requireDocumentation(
-        currentUsername ?? '',
+        username ?? '',
         actionsToDocument,
         handleCancel
       )
       return docResult
     },
-    [requireDocumentation, currentUsername]
+    [currentRobotName, currentUsername, requireDocumentation, requireLogin]
   )
 
   const docState: DocumentationState = useMemo(() => {

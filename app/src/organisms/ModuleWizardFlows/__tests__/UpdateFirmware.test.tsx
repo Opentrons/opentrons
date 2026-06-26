@@ -8,7 +8,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import {
   dismissRequest,
   FAILURE,
@@ -17,6 +16,7 @@ import {
   SUCCESS,
   useDispatchApiRequest,
 } from '/app/redux/robot-api'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { useSendIdentifyModule } from '../hooks'
 import { UpdateFirmware } from '../UpdateFirmware'

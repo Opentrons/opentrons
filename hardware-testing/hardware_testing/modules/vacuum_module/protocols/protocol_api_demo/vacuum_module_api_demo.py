@@ -27,16 +27,29 @@ apiLevel: 2.30
     vm_mod.close_vent()
     # Closes the vent, this should run first if you intend to go under vacuum
 2.
-    vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
+    task = vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
 
     # Concurrent command to set the vacuum gauge pressure
     # pressure: -800 - 0: The lower the number the higher the pressure
-    # duration: 0-3500: Time in seconds to hold the given pressure, indefinte if None
+    # duration: 1-3500: Time in seconds to hold the given pressure, indefinte if None
+    # timeout:  1-3500: Time in seconds to raise timeout error if we havent reached pressure / power.
+                        Only works if `duration` is provided
     # vent_after: Close / Open the vent AFTER the duration timeout
 
+    # Concurrent command to the set vacuum pressure
+    # Can be used with ctx.wait_for_tasks to block until one of the conditions are met
+    # 1. If the `duration` is provided, this will block until the duration is experired.
+    # 2. If the `duration` is not provided, this will block until the target pressure or power are reached
+    # 3. An error (ie, pressure timeout) occured while waiting on the above conditions
+
 3.
-    vm_mod.start_set_vacuum_power(50)
-    # Concurrent command to the set vacuum power percentage
+    task = vm_mod.start_set_vacuum_power(50)
+
+    # Concurrent command to the set vacuum power percentage, same args as start_set_vacuum_pressure
+    # Can be used with ctx.wait_for_tasks to block until one of the conditions are met
+    # 1. If the `duration` is provided, this will block until the duration is experired.
+    # 2. If the `duration` is not provided, this will block until the target pressure or power are reached
+    # 3. An error (ie, pressure timeout) occured while waiting on the above conditions
 
 4.
     vm_mod.open_vent()
@@ -69,7 +82,8 @@ apiLevel: 2.30
     # You can set the vent state after every step, but you can also set the
     # final vent state with outter `vent_after` arg.
     # Note: When running concurently this will wait `hold_time_seconds` and
-    # `hold_time_minutes` before moving on to the next step.
+    # `hold_time_minutes` if provided OR target pressure/power before moving
+    # on to the next step.
     #
     # ⚠️ NOTE: If you want to WAIT for the profile to finish before moving
     # on to the next protocol command, then use the `ProtocolContext.wait_for_tasks`
@@ -231,11 +245,11 @@ def run(ctx: ProtocolContext) -> None:
         # Close the vent and vacuum at -400 mbar for 30s, then open the vent
         # Note: The `start_set_vacuum_pressure` command is a concurrent module action
         # So you have to use another mechanism like ProtocolContext.delay or
-        # ProtocolContext.create_timer + ProtocolContext.wait_for_tasks if you
+        # ProtocolContext.wait_for_tasks if you
         # want to WAIT for the vacuum step to finish before continuing.
         vm_mod.close_vent()
-        vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
-        ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
+        task1 = vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=True)
+        ctx.wait_for_tasks([task1])
 
         # Move the collar with filter plate to the dock
         # ‼️ NOTE: The vacuum module has 2 locations
@@ -270,10 +284,10 @@ def run(ctx: ProtocolContext) -> None:
         pip.return_tip()
         tiprack_200.reset()
 
-        # Close the vent and vacuum at -400 mbar for 30s, and keep the vent closed
+        # Close the vent and run the vacuum at 80% for 30s, and keep the vent closed
         vm_mod.close_vent()
-        vm_mod.start_set_vacuum_pressure(-400, 30, vent_after=False)
-        ctx.delay(30, msg="Start Vacuum -400 mbar for 30s")
+        task2 = vm_mod.start_set_vacuum_power(80, 30, vent_after=False)
+        ctx.wait_for_tasks([task2])
         # Manually open the vent
         vm_mod.open_vent()
 
@@ -323,6 +337,7 @@ def run(ctx: ProtocolContext) -> None:
                 },
             ],
             repetitions=1,
+            vent_after=False,
         )
         ctx.wait_for_tasks([task1])
 

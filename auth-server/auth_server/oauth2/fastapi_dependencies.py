@@ -9,7 +9,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-from .backend import Backend, build
+from .backend import Backend
 from auth_server.settings.store import SettingsStore
 from auth_server.users.store import UserStore
 
@@ -31,7 +31,7 @@ def install_oath2_sql_engine(app_state: AppState, sql_engine: SQLEngine) -> None
     """
     user_store = UserStore(sql_engine=sql_engine)
     settings_store = SettingsStore(sql_engine=sql_engine)
-    backend = build(user_store, settings_store)
+    backend = Backend(user_store, settings_store)
     _app_state_accessor.set_on(app_state, backend)
 
 

@@ -23,7 +23,6 @@ vi.mock('file-saver', async importOriginal => {
   }
 })
 vi.mock('/app/redux/sessions')
-vi.mock('/app/redux/pipettes')
 vi.mock('../CalibrationHealthCheckResults')
 vi.mock('../RenderMountInformation')
 vi.mock('../CalibrationResult')

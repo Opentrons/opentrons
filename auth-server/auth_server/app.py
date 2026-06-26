@@ -16,7 +16,7 @@ from server_utils.auth.resource_server.fastapi import (
 )
 
 from auth_server.authorization_checker import build_authorization_checker
-from auth_server.oauth2.backend import build as build_oauth2_backend
+from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import (
     install_oauth2_backend,
 )
@@ -63,7 +63,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         user_store = UserStore(sql_engine=engine)
         settings_store = SettingsStore(sql_engine=engine)
-        oauth2_backend = build_oauth2_backend(user_store, settings_store)
+        oauth2_backend = OAuth2Backend(user_store, settings_store)
         install_oauth2_backend(app.state, oauth2_backend)
         user_service = UserDataManager(
             user_store=user_store, settings_store=settings_store
@@ -79,6 +79,18 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         yield
 
 
+_OAUTH_2_TAG = {
+    "name": "OAuth 2",
+    "description": "Flows for user authentication, following the OAuth 2 standard.",
+}
+_AUTH_SETTINGS_TAG = {
+    "name": "Auth settings",
+    "description": "Settings related to authentication and authorization.",
+}
+_USERS_TAG = {"name": "Users", "description": "Endpoints for managing users."}
+_TAGS = [_OAUTH_2_TAG, _AUTH_SETTINGS_TAG, _USERS_TAG]
+
+
 app = FastAPI(
     title="Opentrons Auth Server",
     openapi_url="/auth/openapi.json",
@@ -86,15 +98,16 @@ app = FastAPI(
     # redoc_url is replaced by our own /redoc router, below.
     redoc_url=None,
     lifespan=_lifespan,
+    openapi_tags=_TAGS,
 )
 
 
 app.exception_handler(AuthorizationError)(handle_authorization_error)
 
 
-app.include_router(oauth2_router)
-app.include_router(settings_router)
-app.include_router(users_router)
+app.include_router(oauth2_router, tags=[_OAUTH_2_TAG["name"]])
+app.include_router(settings_router, tags=[_AUTH_SETTINGS_TAG["name"]])
+app.include_router(users_router, tags=[_USERS_TAG["name"]])
 
 
 # This is a workaround for a broken /redoc page in versions of FastAPI <0.115.3.

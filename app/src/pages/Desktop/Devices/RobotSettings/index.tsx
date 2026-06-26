@@ -15,6 +15,7 @@ import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSetti
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsComplianceReady } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsComplianceReady'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
+import { RobotSettingsFileManager } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFileManager'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
@@ -95,6 +96,7 @@ export function RobotSettingsComponent({
     camera: (
       <RobotSettingsCamera robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
+    'file-manager': <RobotSettingsFileManager />,
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
@@ -135,6 +137,18 @@ export function RobotSettingsComponent({
     <Navigate to={`/devices/${robotName}/robot-settings/calibration`} />
   )
   const isComplianceReadyTab = robotSettingsTab === 'compliance-ready'
+  const isFileManagerTab = robotSettingsTab === 'file-manager'
+
+  // IIF for getting CSS module class name dependent upon selected tab
+  const settingsClassName = ((): string => {
+    if (isComplianceReadyTab) {
+      return 'content_bottom_spacing'
+    }
+    if (isFileManagerTab) {
+      return 'file_manager_container'
+    }
+    return 'tab_content_card'
+  })()
 
   return (
     <>
@@ -173,6 +187,11 @@ export function RobotSettingsComponent({
             disabled={false}
           />
           <RoundTab
+            to={`/devices/${robotName}/robot-settings/file-manager`}
+            tabName={t('file_manager')}
+            disabled={false}
+          />
+          <RoundTab
             to={`/devices/${robotName}/robot-settings/advanced`}
             tabName={t('advanced')}
             disabled={false}
@@ -194,13 +213,7 @@ export function RobotSettingsComponent({
         </div>
       </div>
       <div className={styles.content_section}>
-        {isComplianceReadyTab ? (
-          <div className={styles.content_bottom_spacing}>
-            {robotSettingsContent}
-          </div>
-        ) : (
-          <div className={styles.tab_content_card}>{robotSettingsContent}</div>
-        )}
+        <div className={styles[settingsClassName]}>{robotSettingsContent}</div>
       </div>
     </>
   )

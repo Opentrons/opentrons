@@ -11,8 +11,8 @@ import {
   mockFlexStacker,
   mockFlexStackerMissingShuttle,
 } from '/app/redux/modules/__fixtures__'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
 import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { CloseDoor } from '../CloseStackerDoor'
 import { InstallShuttle } from '../InstallShuttle'

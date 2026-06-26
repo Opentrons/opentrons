@@ -14,12 +14,12 @@ import {
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
 import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
-} from '/app/redux/pipettes/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useAttachedPipettes } from '/app/resources/instruments'
+} from '/app/resources/instruments/__fixtures__'
 import { useAttachedModules } from '/app/resources/modules'
 
 import {

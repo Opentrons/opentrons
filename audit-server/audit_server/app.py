@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from server_utils import systemd_utils
 from server_utils.keys.fastapi import build_key_client, install_key_client
 
+from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
 from audit_server.persistence.database import sql_engine_ctx
 from audit_server.persistence.fastapi_dependencies import (
@@ -88,4 +89,5 @@ app = FastAPI(
 )
 
 app.include_router(ingest_router)
+app.include_router(log_export_router)
 app.include_router(settings_router)

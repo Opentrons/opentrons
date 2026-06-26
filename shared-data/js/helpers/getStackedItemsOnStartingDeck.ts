@@ -14,7 +14,6 @@ import { getSlotDisplayNameFromAAWithFakes } from './deckConfiguration/getVisual
 import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsByURIForProtocol'
 import { getLabwareDefURI } from './getLabwareDefURI'
 import { getLiquidsByIdForLabware } from './getLiquidsByIdForLabware'
-import { getMergedDivergingStacks } from './getMergedDivergingStacks'
 import { locationIsOnLabware } from './symbolicPositionHelpers'
 
 import type { CutoutId } from '../../deck'
@@ -29,12 +28,7 @@ import type {
   OnCutoutFixtureLocationSequenceComponent,
   RunTimeCommand,
 } from '../../protocol'
-import type {
-  LabwareDefinition,
-  LoadedLabware,
-  LoadedModule,
-  ModuleModel,
-} from '../types'
+import type { LoadedLabware, LoadedModule, ModuleModel } from '../types'
 import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
 
 export interface LabwareInStack {
@@ -53,7 +47,7 @@ export interface ModuleInStack {
 export type StackItem = LabwareInStack | ModuleInStack
 
 export interface StackedItemsOnDeck {
-  [location: string]: StackItem[]
+  [location: string]: StackItem[][]
 }
 
 interface LoadLidOnLabwareParams extends Omit<LoadLidParams, 'location'> {
@@ -70,39 +64,21 @@ export interface LabwareLiquidRenderInfo extends LabwareInStack {
   liquids: number
 }
 
-interface InternalStackEntry {
-  location: string
-  stack: StackItem[]
-}
-interface InternalStackAccumulator {
-  [uniqueKey: string]: InternalStackEntry
-}
+// get ID of StackItem of arbitrary type
+const getStackItemId = (item: StackItem): string =>
+  'labwareId' in item ? item.labwareId : item.moduleId
 
-/**
- * Groups the internal accumulator entries by location and applies
- * getMergedDivergingStacks wherever multiple stacks share a location.
- * Off-deck items are flattened directly with no folding.
- */
-const applyDivergingStacksMerge = (
-  rawStacks: InternalStackAccumulator,
-  labwareDefinitions: { [definitionUri: string]: LabwareDefinition }
-): StackedItemsOnDeck => {
-  const byLocation = new Map<string, StackItem[][]>()
-  for (const { location, stack } of Object.values(rawStacks)) {
-    const existing = byLocation.get(location) ?? []
-    byLocation.set(location, [...existing, stack])
+const getIsSubsetOfExistingStack = (
+  candidate: StackItem[],
+  existing: StackItem[]
+): boolean => {
+  if (candidate.length >= existing.length) {
+    return false
   }
-  const result: StackedItemsOnDeck = {}
-  for (const [location, stacks] of byLocation) {
-    if (location === 'offDeck') {
-      result.offDeck = stacks.flat()
-    } else if (stacks.length === 1) {
-      result[location] = stacks[0]
-    } else {
-      result[location] = getMergedDivergingStacks(stacks, labwareDefinitions)
-    }
-  }
-  return result
+  const tail = existing.slice(existing.length - candidate.length)
+  return tail.every(
+    (item, i) => getStackItemId(item) === getStackItemId(candidate[i])
+  )
 }
 
 export function getStackerLocationFromSlotName(slotName: string): string {
@@ -142,7 +118,7 @@ export function getStackedItemsOnStartingDeck(
         ['loadLabware', 'loadLidStack'].includes(command.commandType)
     )
     .toReversed()
-    .reduce<InternalStackAccumulator>((acc, command) => {
+    .reduce<StackedItemsOnDeck>((acc, command) => {
       let stackFromCommand: StackItem[] = []
       let location = ''
       if (command.params.location === 'systemLocation') return acc
@@ -150,7 +126,7 @@ export function getStackedItemsOnStartingDeck(
         command.params.location === 'offDeck' &&
         command.result != null
       ) {
-        const existingItems = acc.offDeck?.stack ?? []
+        const existingItems = acc.offDeck?.[0] ?? []
         if (command.commandType === 'loadLabware') {
           const offDeckItem: LabwareInStack = {
             labwareId: command.result.labwareId,
@@ -171,10 +147,7 @@ export function getStackedItemsOnStartingDeck(
             lidCommand?.result != null ? lidCommand.result.labwareId : undefined
           return {
             ...acc,
-            offDeck: {
-              location: 'offDeck',
-              stack: [...existingItems, offDeckItem],
-            },
+            offDeck: [[...existingItems, offDeckItem]],
           }
         } else if (
           command.commandType === 'loadLidStack' &&
@@ -187,10 +160,7 @@ export function getStackedItemsOnStartingDeck(
           }))
           return {
             ...acc,
-            offDeck: {
-              location: 'offDeck',
-              stack: [...existingItems, ...newLids],
-            },
+            offDeck: [[...existingItems, ...newLids]],
           }
         }
         return acc
@@ -351,21 +321,21 @@ export function getStackedItemsOnStartingDeck(
         }, lidsArray)
       }
       if (location === '') return acc
-      const count = Object.values(acc).filter(
-        ({ location: accumulatedLocation }) => accumulatedLocation === location
-      ).length
+      const existingStacks = acc[location] ?? []
+      if (
+        existingStacks.some(existingStack =>
+          getIsSubsetOfExistingStack(stackFromCommand, existingStack)
+        )
+      ) {
+        return acc
+      }
       return {
         ...acc,
-        [`${location}_${count}`]: { location, stack: stackFromCommand },
+        [location]: [...existingStacks, stackFromCommand],
       }
     }, {})
 
-  // fold together diverging stacks at the same location into a single ordered
-  // array using getMergedDivergingStacks, then hand back
-  const labwareAndLidOnDeck = applyDivergingStacksMerge(
-    rawStacks,
-    labwareDefinitions
-  )
+  const labwareAndLidOnDeck = rawStacks
 
   // add stacker labware after as we don't want the order of these commands reversed
   const allLabwareOnDeck = commands
@@ -383,9 +353,7 @@ export function getStackedItemsOnStartingDeck(
       if (command.result == null) return acc
       const stackFromCommand: StackItem[] = []
       let location = ''
-      const offDeckArray = Object.keys(acc).includes('offDeck')
-        ? acc.offDeck
-        : []
+      const offDeckArray = [...(acc.offDeck?.[0] ?? [])]
       if (command.commandType === 'flexStacker/setStoredLabware') {
         const definitionUri = getLabwareDefURI(
           command.result.primaryLabwareDefinition
@@ -414,7 +382,7 @@ export function getStackedItemsOnStartingDeck(
               lidId: labwareGroup.lidLabwareId ?? undefined,
             })
           })
-          return { ...acc, offDeck: offDeckArray }
+          return { ...acc, offDeck: [offDeckArray] }
         } else {
           // reverse the order of this array so we add the labware in top to bottom
           const labwareInHopper: StackItem[] =
@@ -433,7 +401,7 @@ export function getStackedItemsOnStartingDeck(
             moduleSlotName: stackerModule.location.slotName,
           })
 
-          return { ...acc, [hopperLocation]: labwareInHopper }
+          return { ...acc, [hopperLocation]: [labwareInHopper] }
         }
       } else if (command.commandType === 'flexStacker/fill') {
         location = 'offDeck'
@@ -454,20 +422,22 @@ export function getStackedItemsOnStartingDeck(
             lidId: labwareGroup.lidLabwareId ?? undefined,
           })
         })
-        return { ...acc, offDeck: offDeckArray }
+        return { ...acc, offDeck: [offDeckArray] }
       }
-      return { ...acc, [location]: stackFromCommand }
+      return { ...acc, [location]: [stackFromCommand] }
     }, labwareAndLidOnDeck)
 
   const labwareAndModulesOnDeck = loadedModules.reduce<StackedItemsOnDeck>(
     (acc, module) => {
       const moduleId = module.id
       if (
-        Object.values(acc).some(stack =>
-          stack.find(
-            (stackItem): stackItem is ModuleInStack =>
-              'moduleId' in stackItem && stackItem.moduleId === moduleId
-          )
+        Object.values(acc).some(stacks =>
+          stacks
+            .flat()
+            .some(
+              (stackItem): stackItem is ModuleInStack =>
+                'moduleId' in stackItem && stackItem.moduleId === moduleId
+            )
         )
       ) {
         return acc
@@ -481,7 +451,7 @@ export function getStackedItemsOnStartingDeck(
           moduleId,
           moduleSlotName: module.location.slotName,
         }
-        return { ...acc, [slotName]: [moduleOnDeck] }
+        return { ...acc, [slotName]: [[moduleOnDeck]] }
       }
     },
     allLabwareOnDeck
@@ -526,40 +496,43 @@ export function getLabwareLiquidRenderInfoFromStack(
 export function getLabwareOnDeck(itemsOnDeck: StackedItemsOnDeck): {
   [location: string]: LabwareInStack[]
 } {
-  // @ts-expect-error this filter should act as a type narrower
-  const labwareOnDeckEntries: Array<[string, LabwareInStack[]]> =
-    Object.entries(itemsOnDeck).filter(
-      ([key, value]) =>
-        key !== 'offDeck' &&
-        value.every(
-          (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
-        )
-    )
-  return Object.fromEntries(labwareOnDeckEntries)
+  const result: { [location: string]: LabwareInStack[] } = {}
+  for (const [key, stacks] of Object.entries(itemsOnDeck)) {
+    if (key === 'offDeck') continue
+    const flatItems = stacks.flat()
+    if (
+      flatItems.every((item): item is LabwareInStack => 'labwareId' in item)
+    ) {
+      result[key] = flatItems
+    }
+  }
+  return result
 }
 
 // filter function to get stacks that include labware
 export function getStacksWithLabware(itemsOnDeck: StackedItemsOnDeck): {
   [location: string]: StackItem[]
 } {
-  const stacksWithLabwareEntries = Object.entries(itemsOnDeck).filter(
-    ([key, value]) =>
-      value.some(
-        (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
-      )
-  )
-  return Object.fromEntries(stacksWithLabwareEntries)
+  const result: { [location: string]: StackItem[] } = {}
+  for (const [key, stacks] of Object.entries(itemsOnDeck)) {
+    const flatItems = stacks.flat()
+    if (flatItems.some((item): item is LabwareInStack => 'labwareId' in item)) {
+      result[key] = flatItems
+    }
+  }
+  return result
 }
 
 // filter function to get off deck labware stacks
 export function getOffDeckRenderInfo(
   stackedItems: StackedItemsOnDeck
 ): LabwareLiquidRenderInfo[] {
-  const offDeckItems = Object.keys(stackedItems).includes('offDeck')
-    ? stackedItems.offDeck.filter(
-        (item): item is LabwareInStack => 'labwareId' in item
-      )
-    : null
+  const offDeckItems =
+    stackedItems.offDeck != null
+      ? (stackedItems.offDeck[0] ?? []).filter(
+          (item): item is LabwareInStack => 'labwareId' in item
+        )
+      : null
   if (offDeckItems == null) {
     return []
   } else {
@@ -599,15 +572,16 @@ export function getStacksOnModules(itemsOnDeck: StackedItemsOnDeck): {
   }
 } {
   return Object.entries(itemsOnDeck).reduce((acc, entry) => {
-    const [location, stack] = entry
-    const moduleInStack = stack.find(
+    const [location, stacks] = entry
+    const flatStack = stacks.flat()
+    const moduleInStack = flatStack.find(
       (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
     )
     return moduleInStack != null
       ? {
           ...acc,
           [location]: {
-            allItemsInStack: stack,
+            allItemsInStack: flatStack,
             moduleInStack,
           },
         }
@@ -631,4 +605,25 @@ export function getModuleFromStack(
     (stackedItem): stackedItem is ModuleInStack => 'moduleId' in stackedItem
   )
   return moduleInStack ?? null
+}
+
+export const getSortedStartingDeckEntries = (
+  startingDeck: StackedItemsOnDeck
+): Array<{
+  location: string
+  stack: StackItem[]
+}> => {
+  const entriesOnDeck = Object.entries(startingDeck).filter(
+    ([location]) => location !== 'offDeck'
+  )
+  const stacksWithLabware = entriesOnDeck.flatMap(([location, stacks]) => {
+    const labwareStacks = stacks.filter(stack =>
+      stack.some(item => 'labwareId' in item)
+    )
+    return labwareStacks.map(stack => ({ location, stack }))
+  })
+  const sortedStartingDeckEntries = stacksWithLabware.sort((a, b) =>
+    a.location.localeCompare(b.location)
+  )
+  return sortedStartingDeckEntries
 }
