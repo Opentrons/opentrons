@@ -1,12 +1,11 @@
 import type {
-  AccessControlAppSettingsResponse,
-  AuthSettingsResponse,
+  AccessControlAppSettingsData,
+  AuthSettingsData,
 } from '@opentrons/api-client'
 
-export type AuthSettingFieldId = keyof AuthSettingsResponse['data']
+export type AuthSettingFieldId = keyof AuthSettingsData
 
-export type AppAccessControlSettingFieldId =
-  keyof AccessControlAppSettingsResponse['data']
+export type AppAccessControlSettingFieldId = keyof AccessControlAppSettingsData
 
 export const UI_ONLY_FIELD_IDS = [
   'passwordResetEnabled',
@@ -19,6 +18,11 @@ export type SettingFieldId =
   | AuthSettingFieldId
   | UiSettingFieldId
   | AppAccessControlSettingFieldId
+
+/** Field id exists only in the UI and has no server counterpart. */
+export function isUiOnlyFieldId(id: SettingFieldId): id is UiSettingFieldId {
+  return (UI_ONLY_FIELD_IDS as readonly string[]).includes(id)
+}
 
 export type FieldValues = Record<SettingFieldId, string | boolean>
 

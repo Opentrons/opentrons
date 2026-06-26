@@ -251,13 +251,7 @@ export function ComplianceReadySoftwareSettings({
     parentField?: ToggleFieldConfig
   ): void => {
     const { fieldValues: nextFieldValues, patch } =
-      resolveComplianceReadyToggleChange(
-        field,
-        fieldValues,
-        parentField,
-        authSettingsQuery.data?.data,
-        getAppAccessControlSettingsQuery.data?.data
-      )
+      resolveComplianceReadyToggleChange(field, fieldValues, parentField)
     setFieldValues(nextFieldValues)
     if (patch?.target === 'auth') {
       patchAuth(patch.request)

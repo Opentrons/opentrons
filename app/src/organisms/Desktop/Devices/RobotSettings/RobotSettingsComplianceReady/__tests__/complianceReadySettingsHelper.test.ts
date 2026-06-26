@@ -15,18 +15,11 @@ import type {
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
 
-const MOCK_AUTH_SETTINGS = {
-  maxNumberOfLoginAttempts: 5,
-  passwordResetTime: 30 * SECONDS_PER_DAY,
-  passwordComplexityMinimumLength: null,
-  passwordComplexitySpecialCharacters: false,
-  idleLogout: 180,
-  requireReasonForInteraction: true,
-  minLengthOfReasonForInteraction: null,
-  requireAdminCredsWhenUpdatingRobotSoftware: true,
-  requireAdminCredsWhenSendingProtocolToRobot: true,
-  requireAdminCredsForSignoffProtocol: false,
-} as const
+const resolveToggle = (
+  field: ToggleFieldConfig,
+  fieldValues: FieldValues,
+  parentField?: ToggleFieldConfig
+) => resolveComplianceReadyToggleChange(field, fieldValues, parentField)
 
 const BASE_FIELD_VALUES = {
   maxNumberOfLoginAttempts: '5',
@@ -169,26 +162,18 @@ describe('getAuthPatchForInputChange', () => {
 
 describe('resolveComplianceReadyToggleChange', () => {
   it('should enable UI-only parent locally without patching', () => {
-    const result = resolveComplianceReadyToggleChange(
-      PASSWORD_RESET_PARENT,
-      BASE_FIELD_VALUES
-    )
+    const result = resolveToggle(PASSWORD_RESET_PARENT, BASE_FIELD_VALUES)
 
     expect(result.fieldValues.passwordResetEnabled).toBe(true)
     expect(result.patch).toBeUndefined()
   })
 
   it('should clear child values and patch null when disabling UI-only parent', () => {
-    const result = resolveComplianceReadyToggleChange(
-      PASSWORD_RESET_PARENT,
-      {
-        ...BASE_FIELD_VALUES,
-        passwordResetEnabled: true,
-        passwordResetTime: '30',
-      },
-      undefined,
-      MOCK_AUTH_SETTINGS
-    )
+    const result = resolveToggle(PASSWORD_RESET_PARENT, {
+      ...BASE_FIELD_VALUES,
+      passwordResetEnabled: true,
+      passwordResetTime: '30',
+    })
 
     expect(result.fieldValues.passwordResetEnabled).toBe(false)
     expect(result.fieldValues.passwordResetTime).toBe('')
@@ -199,17 +184,12 @@ describe('resolveComplianceReadyToggleChange', () => {
   })
 
   it('should null all nested auth fields when disabling UI-only parent with multiple children', () => {
-    const result = resolveComplianceReadyToggleChange(
-      PASSWORD_COMPLEXITY_PARENT,
-      {
-        ...BASE_FIELD_VALUES,
-        passwordComplexityEnabled: true,
-        passwordComplexitySpecialCharacters: true,
-        passwordComplexityMinimumLength: '8',
-      },
-      undefined,
-      MOCK_AUTH_SETTINGS
-    )
+    const result = resolveToggle(PASSWORD_COMPLEXITY_PARENT, {
+      ...BASE_FIELD_VALUES,
+      passwordComplexityEnabled: true,
+      passwordComplexitySpecialCharacters: true,
+      passwordComplexityMinimumLength: '8',
+    })
 
     expect(result.patch).toEqual({
       target: 'auth',
@@ -226,7 +206,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     const specialCharactersToggle = PASSWORD_COMPLEXITY_PARENT
       .children![0] as ToggleFieldConfig
 
-    const result = resolveComplianceReadyToggleChange(
+    const result = resolveToggle(
       specialCharactersToggle,
       {
         ...BASE_FIELD_VALUES,
@@ -248,7 +228,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     const specialCharactersToggle = PASSWORD_COMPLEXITY_PARENT
       .children![0] as ToggleFieldConfig
 
-    const result = resolveComplianceReadyToggleChange(
+    const result = resolveToggle(
       specialCharactersToggle,
       BASE_FIELD_VALUES,
       PASSWORD_COMPLEXITY_PARENT
@@ -259,7 +239,7 @@ describe('resolveComplianceReadyToggleChange', () => {
   })
 
   it('should patch auth server when toggling a standalone auth setting', () => {
-    const result = resolveComplianceReadyToggleChange(
+    const result = resolveToggle(
       getToggleField('requireAdminCredsWhenUpdatingRobotSoftware'),
       BASE_FIELD_VALUES
     )
@@ -274,7 +254,7 @@ describe('resolveComplianceReadyToggleChange', () => {
   })
 
   it('should patch robot server when toggling a robot server setting', () => {
-    const result = resolveComplianceReadyToggleChange(
+    const result = resolveToggle(
       getToggleField('requireSignoffForProtocolLog'),
       BASE_FIELD_VALUES
     )
@@ -287,10 +267,7 @@ describe('resolveComplianceReadyToggleChange', () => {
   })
 
   it('should patch auth server when toggling a real auth parent with children', () => {
-    const result = resolveComplianceReadyToggleChange(
-      REQUIRE_REASON_PARENT,
-      BASE_FIELD_VALUES
-    )
+    const result = resolveToggle(REQUIRE_REASON_PARENT, BASE_FIELD_VALUES)
 
     expect(result.fieldValues.requireReasonForInteraction).toBe(false)
     expect(result.patch).toEqual({

@@ -1,23 +1,22 @@
-export interface AccessControlAppSettingsResponse {
-  data: {
-    requireSignoffForProtocolLog: boolean
-    requireLogsToBeSavedInApp: boolean
-    deleteOverMaxOnDiskProtocols: boolean
+export class AccessControlAppSettingsData {
+  requireSignoffForProtocolLog?: boolean | null
+  requireLogsToBeSavedInApp?: boolean | null
+  deleteOverMaxOnDiskProtocols?: boolean | null
+
+  static hasSettingKey(key: string): key is keyof AccessControlAppSettingsData {
+    return key in new AccessControlAppSettingsData()
   }
 }
 
-export type AccessControlAppSettingsKey =
-  keyof AccessControlAppSettingsResponse['data']
+export class AccessControlAppSettingsResponse {
+  data!: AccessControlAppSettingsData
 
-const appAccessControlSettingsDataKeys = {
-  requireSignoffForProtocolLog: false,
-  requireLogsToBeSavedInApp: false,
-  deleteOverMaxOnDiskProtocols: false,
-} satisfies AccessControlAppSettingsResponse['data']
+  static hasSettingKey(key: string): key is keyof AccessControlAppSettingsData {
+    return AccessControlAppSettingsData.hasSettingKey(key)
+  }
+}
 
-export const APP_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
-  appAccessControlSettingsDataKeys
-) as AccessControlAppSettingsKey[]
+export type AccessControlAppSettingsKey = keyof AccessControlAppSettingsData
 
 export interface PatchAppAccessControlSettingsRequest {
   data: {

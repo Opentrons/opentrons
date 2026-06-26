@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { APP_ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
 import {
   useAuthSettingsMutation,
   useAuthSettingsQuery,
@@ -59,6 +58,9 @@ const MOCK_ACCESS_CONTROL_SETTINGS: AccessControlAppSettingsResponse = {
 }
 
 const AUTH_SETTING_KEYS = Object.keys(MOCK_AUTH_SETTINGS.data)
+const APP_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
+  MOCK_ACCESS_CONTROL_SETTINGS.data
+)
 
 function getFieldIds(
   fields: (typeof SETTINGS_SECTIONS)[number]['fields']

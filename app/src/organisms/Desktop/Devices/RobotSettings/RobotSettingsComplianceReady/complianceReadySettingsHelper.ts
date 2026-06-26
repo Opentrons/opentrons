@@ -1,11 +1,14 @@
-import { APP_ACCESS_CONTROL_SETTING_KEYS } from '@opentrons/api-client'
-
-import { SETTINGS_SECTIONS } from './complianceReadySettingsConfig'
-import { UI_ONLY_FIELD_IDS } from './complianceReadySettingsTypes'
-
-import type {
+import {
   AccessControlAppSettingsResponse,
   AuthSettingsResponse,
+} from '@opentrons/api-client'
+
+import { SETTINGS_SECTIONS } from './complianceReadySettingsConfig'
+import { isUiOnlyFieldId } from './complianceReadySettingsTypes'
+
+import type {
+  AccessControlAppSettingsData,
+  AuthSettingsData,
   PatchAppAccessControlSettingsRequest,
   PatchAuthSettingsRequest,
 } from '@opentrons/api-client'
@@ -14,9 +17,7 @@ import type {
   AuthSettingFieldId,
   FieldValues,
   InputFieldConfig,
-  SettingFieldId,
   ToggleFieldConfig,
-  UiSettingFieldId,
 } from './complianceReadySettingsTypes'
 
 const SECONDS_PER_MINUTE = 60
@@ -24,11 +25,13 @@ const SECONDS_PER_DAY = 24 * 60 * 60
 
 function getAuthSettingFieldValue(
   key: AuthSettingFieldId,
-  authSettings: AuthSettingsResponse['data']
+  authSettings: AuthSettingsData
 ): string | boolean {
   switch (key) {
     case 'idleLogout':
-      return String(Math.round(authSettings.idleLogout / SECONDS_PER_MINUTE))
+      return authSettings.idleLogout != null
+        ? String(Math.round(authSettings.idleLogout / SECONDS_PER_MINUTE))
+        : ''
     case 'passwordResetTime':
       return authSettings.passwordResetTime != null
         ? String(Math.round(authSettings.passwordResetTime / SECONDS_PER_DAY))
@@ -44,7 +47,7 @@ function getAuthSettingFieldValue(
 }
 
 function getAuthFieldValues(
-  authSettings?: AuthSettingsResponse['data']
+  authSettings?: AuthSettingsData
 ): Partial<Pick<FieldValues, AuthSettingFieldId>> {
   if (authSettings == null) {
     return {}
@@ -60,12 +63,16 @@ function getAuthFieldValues(
 }
 
 function getAppAccessControlFieldValues(
-  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
-): Pick<FieldValues, AppAccessControlSettingFieldId> {
-  return APP_ACCESS_CONTROL_SETTING_KEYS.reduce(
+  appAccessControlSettings?: AccessControlAppSettingsData
+): Partial<Pick<FieldValues, AppAccessControlSettingFieldId>> {
+  return (
+    Object.keys(
+      appAccessControlSettings ?? {}
+    ) as AppAccessControlSettingFieldId[]
+  ).reduce(
     (acc, key) => ({
       ...acc,
-      [key]: appAccessControlSettings?.[key] ?? false,
+      [key]: appAccessControlSettings?.[key] ?? '',
     }),
     {} as Pick<FieldValues, AppAccessControlSettingFieldId>
   )
@@ -73,8 +80,8 @@ function getAppAccessControlFieldValues(
 
 /** Map auth- and app access-control settings responses to form field values. */
 export function getFieldValuesFromSettings(
-  authSettings?: AuthSettingsResponse['data'],
-  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
+  authSettings?: AuthSettingsData,
+  appAccessControlSettings?: AccessControlAppSettingsData
 ): FieldValues {
   return {
     ...getAuthFieldValues(authSettings),
@@ -88,19 +95,27 @@ export function getFieldValuesFromSettings(
   } as FieldValues
 }
 
-/** Form values after nested auth fields are nulled (feature disabled on server). */
-function getFieldValuesWithNulledAuthFields(
-  authSettings: AuthSettingsResponse['data'],
-  nulledFieldIds: AuthSettingFieldId[],
-  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
+function getFieldChildren(
+  field: ToggleFieldConfig
+): Array<InputFieldConfig | ToggleFieldConfig> {
+  return field.children ?? []
+}
+
+/** Form values after nested child fields are cleared (parent turned off). */
+function getFieldValuesWithChildrenCleared(
+  parentField: ToggleFieldConfig,
+  fieldValues: FieldValues
 ): FieldValues {
-  return getFieldValuesFromSettings(
-    {
-      ...authSettings,
-      ...Object.fromEntries(nulledFieldIds.map(key => [key, null])),
-    } as AuthSettingsResponse['data'],
-    appAccessControlSettings
-  )
+  const nextFieldValues: FieldValues = {
+    ...fieldValues,
+    [parentField.id]: false,
+  }
+
+  for (const child of getFieldChildren(parentField)) {
+    nextFieldValues[child.id] = child.type === 'input' ? '' : false
+  }
+
+  return nextFieldValues
 }
 
 export type ComplianceReadySettingsPatch =
@@ -113,39 +128,12 @@ export interface ComplianceReadyToggleChangeResult {
   patch?: ComplianceReadySettingsPatch
 }
 
-/** Field id exists only in the UI and has no auth-server counterpart. */
-function isUiOnlyFieldId(id: SettingFieldId): id is UiSettingFieldId {
-  return (UI_ONLY_FIELD_IDS as readonly string[]).includes(id)
-}
-
-/** Field id maps to a key on GET/PATCH `/auth/settings`. */
-function isAuthSettingFieldId(id: SettingFieldId): id is AuthSettingFieldId {
-  return !isUiOnlyFieldId(id) && !isAppAccessControlSettingFieldId(id)
-}
-
-/** Field id maps to a key on GET/PATCH `/accessControl/settings`. */
-function isAppAccessControlSettingFieldId(
-  id: SettingFieldId
-): id is AppAccessControlSettingFieldId {
-  return (APP_ACCESS_CONTROL_SETTING_KEYS as readonly string[]).includes(id)
-}
-
 /**
- * Parent toggle that groups auth fields in the UI but is not itself an API key
+ * Parent toggle that groups nested fields in the UI but is not itself an API key
  * (e.g. `passwordResetEnabled`).
  */
 function isUiOnlyParentToggle(field: ToggleFieldConfig): boolean {
-  return field.children != null && !isAuthSettingFieldId(field.id)
-}
-
-/** All auth-server field ids nested under a toggle, including nested toggles. */
-function getAuthChildFieldIds(field: ToggleFieldConfig): AuthSettingFieldId[] {
-  return (field.children ?? []).flatMap(child => {
-    if (child.type === 'input') {
-      return [child.id]
-    }
-    return [child.id as AuthSettingFieldId, ...getAuthChildFieldIds(child)]
-  })
+  return getFieldChildren(field).length > 0 && isUiOnlyFieldId(field.id)
 }
 
 /**
@@ -187,32 +175,15 @@ function buildAuthFieldPatchRequest(
 }
 
 /**
- * Local form state after turning off a UI-only parent toggle.
- * Reuses getFieldValuesFromSettings with nested auth fields nulled, matching
- * the server state after buildParentDisablePatchRequest succeeds.
- */
-function getParentDisabledFieldValues(
-  parentField: ToggleFieldConfig,
-  authSettings: AuthSettingsResponse['data'],
-  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
-): FieldValues {
-  return getFieldValuesWithNulledAuthFields(
-    authSettings,
-    getAuthChildFieldIds(parentField),
-    appAccessControlSettings
-  )
-}
-
-/**
  * PATCH request sent when a UI-only parent toggle is turned off.
- * Nulls every nested auth field so the requirement is removed on the server.
+ * Nulls every nested child field so the requirement is removed on the server.
  */
 function buildParentDisablePatchRequest(
   parentField: ToggleFieldConfig
 ): PatchAuthSettingsRequest {
   return {
     data: Object.fromEntries(
-      getAuthChildFieldIds(parentField).map(key => [key, null])
+      getFieldChildren(parentField).map(({ id }) => [id, null])
     ) as PatchAuthSettingsRequest['data'],
   }
 }
@@ -283,33 +254,20 @@ export function getAuthPatchForInputChange(
  *
  * Unlike inputs, toggles can update multiple local fields at once (e.g. turning
  * off a UI-only parent clears all nested children via getFieldValuesFromSettings).
- *
- * `authSettings` is required when disabling a UI-only parent toggle.
  */
 export function resolveComplianceReadyToggleChange(
   field: ToggleFieldConfig,
   fieldValues: FieldValues,
-  parentField?: ToggleFieldConfig,
-  authSettings?: AuthSettingsResponse['data'],
-  appAccessControlSettings?: AccessControlAppSettingsResponse['data']
+  parentField?: ToggleFieldConfig
 ): ComplianceReadyToggleChangeResult {
   const toggledOn = !Boolean(fieldValues[field.id])
 
-  if (field.children != null && isUiOnlyParentToggle(field)) {
+  if (isUiOnlyParentToggle(field)) {
     if (toggledOn) {
       return { fieldValues: { ...fieldValues, [field.id]: true } }
     }
-    if (authSettings == null) {
-      throw new Error(
-        'authSettings is required when disabling a UI-only parent toggle'
-      )
-    }
     return {
-      fieldValues: getParentDisabledFieldValues(
-        field,
-        authSettings,
-        appAccessControlSettings
-      ),
+      fieldValues: getFieldValuesWithChildrenCleared(field, fieldValues),
       patch: {
         target: 'auth',
         request: buildParentDisablePatchRequest(field),
@@ -325,7 +283,7 @@ export function resolveComplianceReadyToggleChange(
     if (!Boolean(nextFieldValues[parentField.id])) {
       return { fieldValues: nextFieldValues }
     }
-    if (!isAuthSettingFieldId(field.id)) {
+    if (!AuthSettingsResponse.hasSettingKey(field.id)) {
       return { fieldValues: nextFieldValues }
     }
     return {
@@ -340,7 +298,7 @@ export function resolveComplianceReadyToggleChange(
     }
   }
 
-  if (isAppAccessControlSettingFieldId(field.id)) {
+  if (AccessControlAppSettingsResponse.hasSettingKey(field.id)) {
     return {
       fieldValues: { ...fieldValues, [field.id]: toggledOn },
       patch: {
@@ -350,19 +308,25 @@ export function resolveComplianceReadyToggleChange(
     }
   }
 
-  const nextFieldValues: FieldValues = {
-    ...fieldValues,
-    [field.id]: toggledOn,
+  if (AuthSettingsResponse.hasSettingKey(field.id)) {
+    const nextFieldValues: FieldValues = {
+      ...fieldValues,
+      [field.id]: toggledOn,
+    }
+
+    return {
+      fieldValues: nextFieldValues,
+      patch: {
+        target: 'auth',
+        request: buildAuthFieldPatchRequest(
+          field.id,
+          getAuthFieldPatchValue(field.id, nextFieldValues)
+        ),
+      },
+    }
   }
 
   return {
-    fieldValues: nextFieldValues,
-    patch: {
-      target: 'auth',
-      request: buildAuthFieldPatchRequest(
-        field.id as AuthSettingFieldId,
-        getAuthFieldPatchValue(field.id as AuthSettingFieldId, nextFieldValues)
-      ),
-    },
+    fieldValues: { ...fieldValues, [field.id]: toggledOn },
   }
 }
