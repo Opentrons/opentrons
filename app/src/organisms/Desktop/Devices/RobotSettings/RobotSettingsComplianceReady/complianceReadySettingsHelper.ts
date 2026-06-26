@@ -51,7 +51,7 @@ function getAuthFieldValues(
     return {}
   }
 
-  return (Object.keys(authSettings) as AuthSettingFieldId[]).reduce(
+  return (Object.keys(new AuthSettingsData()) as AuthSettingFieldId[]).reduce(
     (acc, key) => ({
       ...acc,
       [key]: getAuthSettingFieldValue(key, authSettings),
@@ -65,12 +65,12 @@ function getAppAccessControlFieldValues(
 ): Partial<Pick<FieldValues, AppAccessControlSettingFieldId>> {
   return (
     Object.keys(
-      appAccessControlSettings ?? {}
+      new AccessControlAppSettingsData()
     ) as AppAccessControlSettingFieldId[]
   ).reduce(
     (acc, key) => ({
       ...acc,
-      [key]: appAccessControlSettings?.[key] ?? '',
+      [key]: appAccessControlSettings?.[key] ?? false,
     }),
     {} as Pick<FieldValues, AppAccessControlSettingFieldId>
   )
