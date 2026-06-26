@@ -45,14 +45,14 @@ function getAuthSettingFieldValue(
 }
 
 function getAuthFieldValues(
-  authSettings?: AuthSettingsData
+  authSettings: AuthSettingsData
 ): Pick<FieldValues, AuthSettingFieldId> {
   const fieldValues = (
-    Object.keys(new AuthSettingsData()) as AuthSettingFieldId[]
+    Object.keys(authSettings) as AuthSettingFieldId[]
   ).reduce<Partial<Pick<FieldValues, AuthSettingFieldId>>>(
     (acc, key) => ({
       ...acc,
-      [key]: getAuthSettingFieldValue(key, authSettings ?? {}),
+      [key]: getAuthSettingFieldValue(key, authSettings),
     }),
     {}
   )
@@ -61,16 +61,14 @@ function getAuthFieldValues(
 }
 
 function getAppAccessControlFieldValues(
-  appAccessControlSettings?: AccessControlAppSettingsData
+  appAccessControlSettings: AccessControlAppSettingsData
 ): Pick<FieldValues, AppAccessControlSettingFieldId> {
   const fieldValues = (
-    Object.keys(
-      new AccessControlAppSettingsData()
-    ) as AppAccessControlSettingFieldId[]
+    Object.keys(appAccessControlSettings) as AppAccessControlSettingFieldId[]
   ).reduce<Partial<Pick<FieldValues, AppAccessControlSettingFieldId>>>(
     (acc, key) => ({
       ...acc,
-      [key]: appAccessControlSettings?.[key] ?? false,
+      [key]: appAccessControlSettings[key] ?? false,
     }),
     {}
   )
@@ -83,13 +81,17 @@ export function getFieldValuesFromSettings(
   authSettings?: AuthSettingsData,
   appAccessControlSettings?: AccessControlAppSettingsData
 ): FieldValues {
+  const authSettingsData = authSettings ?? new AuthSettingsData()
+  const appAccessControlSettingsData =
+    appAccessControlSettings ?? new AccessControlAppSettingsData()
+
   const fieldValues: FieldValues = {
-    ...getAuthFieldValues(authSettings ?? {}),
-    passwordResetEnabled: Boolean(authSettings?.passwordResetTime),
+    ...getAuthFieldValues(authSettingsData),
+    passwordResetEnabled: Boolean(authSettingsData.passwordResetTime),
     passwordComplexityEnabled:
-      Boolean(authSettings?.passwordComplexityMinimumLength) ||
-      Boolean(authSettings?.passwordComplexitySpecialCharacters),
-    ...getAppAccessControlFieldValues(appAccessControlSettings),
+      Boolean(authSettingsData.passwordComplexityMinimumLength) ||
+      Boolean(authSettingsData.passwordComplexitySpecialCharacters),
+    ...getAppAccessControlFieldValues(appAccessControlSettingsData),
   }
   return fieldValues
 }
