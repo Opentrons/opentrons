@@ -26,9 +26,9 @@ import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
+import { useDownloadRunLog } from '../../hooks'
+import runRecord from '../../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import { useDownloadRunLog } from '../hooks'
-import runRecord from '../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
@@ -37,7 +37,7 @@ import type { CommandsData } from '@opentrons/api-client'
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../hooks')
+vi.mock('../../hooks')
 vi.mock('/app/organisms/RunTimeControl')
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')

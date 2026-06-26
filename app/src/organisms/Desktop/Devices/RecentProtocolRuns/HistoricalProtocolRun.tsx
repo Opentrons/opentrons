@@ -15,11 +15,13 @@ import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from '/app/transformations/runs'
 
-import { RECENT_PROTOCOL_RUNS_HEADER } from './constants'
-import styles from './HistoricalProtocolRun.module.css'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
+import styles from './recentprotocolruns.module.css'
 
 import type { RunData } from '@opentrons/api-client'
+
+// inclusive of overflow menu button
+const RECENT_PROTOCOL_RUNS_COLUMNS = '30% 25% 16% 5% 14% 10%'
 
 interface HistoricalProtocolRunProps {
   run: RunData
@@ -72,7 +74,7 @@ export function HistoricalProtocolRun(
         <Flex
           width="88%"
           display="grid"
-          gridTemplateColumns={RECENT_PROTOCOL_RUNS_HEADER}
+          gridTemplateColumns={RECENT_PROTOCOL_RUNS_COLUMNS}
           gap={SPACING.spacing20}
           alignItems={ALIGN_CENTER}
         >

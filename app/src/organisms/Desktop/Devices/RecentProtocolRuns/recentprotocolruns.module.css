@@ -1,0 +1,59 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 0 6rem;
+  border-radius: 8px;
+  background-color: var(--white);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--grey-30);
+  gap: 0.5rem;
+}
+
+.header_actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  min-height: 8rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+
+.column_headers {
+  display: grid;
+  width: 88%;
+  justify-content: flex-start;
+  padding: 0.5rem;
+  margin-right: 12%;
+  color: var(--grey-60);
+  gap: 1.25rem;
+  grid-template-columns: 30% 25% 16% 5% 24%;
+}
+
+.protocol_name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.runs_list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.25rem;
+}
