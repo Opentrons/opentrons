@@ -8,8 +8,8 @@ from unittest import mock
 from aiohttp.test_utils import TestClient as HTTPTestClient
 from decoy import Decoy
 
-from otupdate.common import control
 from otupdate.common.name_management import NameSynchronizer
+from otupdate.common.update_actions import UpdateActionsInterface
 
 
 async def test_health(
@@ -41,8 +41,11 @@ async def test_health(
 async def test_shutdown(test_cli: HTTPTestClient, monkeypatch) -> None:
     """It should shut down the robot"""
     shutdown_mock = mock.Mock()
+    actions_mock = mock.Mock(shutdown=shutdown_mock)
 
-    monkeypatch.setattr(control, "_do_shutdown", shutdown_mock)
+    monkeypatch.setattr(
+        UpdateActionsInterface, "from_request", lambda request: actions_mock
+    )
     resp = await test_cli.post("/server/shutdown")
 
     assert resp.status == 200
