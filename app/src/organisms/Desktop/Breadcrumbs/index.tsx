@@ -12,19 +12,14 @@ import {
   StyledText,
   useOnClickOutside,
 } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useAccessControlEnabledQuery,
-} from '@opentrons/react-api-client'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { AccountIconButton } from '/app/atoms/buttons/AccountIconButton'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
-import { useRobot } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
-import { logOut, useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { logOut } from '/app/redux/robot-auth'
 import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
 import { useRunCreatedAtTimestamp } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
@@ -291,15 +286,9 @@ export function Breadcrumbs(): JSX.Element | null {
   const { robotName } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
-  const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
 
   return (
-    <ApiHostProvider
-      hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider robotName={robotName}>
       <BreadcrumbsComponent />
     </ApiHostProvider>
   )

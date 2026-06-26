@@ -12,7 +12,7 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  ApiHostContext,
   useAccessControlEnabledQuery,
   useRobotSettingsQuery,
 } from '@opentrons/react-api-client'
@@ -183,8 +183,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     () => ({
       hostname: _ODD_IP_ ?? 'localhost',
       token: accessToken,
+      port: localRobot?.port ?? null,
     }),
-    [accessToken]
+    [accessToken, localRobot?.port]
   )
 
   const { brightness: userSetBrightness, sleepMs } = useSelector(
@@ -236,7 +237,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider {...hostConfig}>
+    // to make sure that the host config stays stable and in step with the initial queries,
+    // we use an ApiHostContext.Provider here instead of an ApiHostProvider.
+    <ApiHostContext.Provider value={hostConfig}>
       <ReactQueryDevtools />
       {isReady ? (
         <LocalizationProvider>
@@ -296,7 +299,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
       ) : (
         <InitialLoadingScreen />
       )}
-    </ApiHostProvider>
+    </ApiHostContext.Provider>
   )
 }
 
