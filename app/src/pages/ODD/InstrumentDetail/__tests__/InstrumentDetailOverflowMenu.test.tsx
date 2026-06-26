@@ -26,6 +26,13 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/organisms/PipetteWizardFlows')
 vi.mock('/app/organisms/GripperWizardFlows')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn().mockReturnValue({
+    name: 'otie',
+    ip: '127.0.0.1',
+    port: 31950,
+  }),
+}))
 
 const MOCK_PIPETTE = {
   mount: 'left',

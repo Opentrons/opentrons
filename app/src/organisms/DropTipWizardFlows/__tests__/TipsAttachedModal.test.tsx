@@ -20,6 +20,13 @@ import type { PipetteWithTip } from '/app/resources/instruments'
 vi.mock('/app/resources/runs/useCloseCurrentRun')
 vi.mock('..')
 vi.mock('/app/local-resources/instruments')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn().mockReturnValue({
+    name: 'otie',
+    ip: '127.0.0.1',
+    port: 31950,
+  }),
+}))
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,

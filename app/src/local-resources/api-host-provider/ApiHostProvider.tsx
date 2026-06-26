@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { ApiHostContext } from '@opentrons/react-api-client'
 
-import { useRobot } from '/app/redux-resources/robots/hooks/useRobot'
+import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery/constants'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth/hooks'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'

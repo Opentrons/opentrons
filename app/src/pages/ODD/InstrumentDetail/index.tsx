@@ -1,5 +1,4 @@
 import { createPortal } from 'react-dom'
-import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -29,7 +28,7 @@ import {
   useDropTipWizardFlows,
 } from '/app/organisms/DropTipWizardFlows'
 import { InstrumentInfo } from '/app/organisms/ODD/InstrumentInfo'
-import { getLocalRobot } from '/app/redux/discovery'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 
 import { handleInstrumentDetailOverflowMenu } from './InstrumentDetailOverflowMenu'
 
@@ -37,8 +36,7 @@ import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel, PipetteModel } from '@opentrons/shared-data'
 
 export const InstrumentDetail = (): JSX.Element => {
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name ?? null
+  const robotName = useLocalRobotName()
   const { mount } = useParams<{ mount: PipetteData['mount'] }>()
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrument =
