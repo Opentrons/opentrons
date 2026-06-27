@@ -101,7 +101,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             status=409,
         )
     reader = await request.multipart()
-    found_name = await _read_parts_and_find_update(reader, session)
+    found_name = await _extract_and_save_update_file(reader, session)
 
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
     if not maybe_actions:
@@ -268,9 +268,14 @@ def _begin_validation(
     return validation_future
 
 
-async def _read_parts_and_find_update(
+async def _extract_and_save_update_file(
     reader: MultipartReader, session: UpdateSession
 ) -> Optional[str]:
+    """Extract an update file from a request.
+
+    Saves to the session's storage directory, and returns the new file name within
+    that directory.
+    """
     found: Optional[str] = None
     async for part in reader:
         if part is None:
