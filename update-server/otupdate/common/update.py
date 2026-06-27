@@ -122,10 +122,9 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             status=400,
         )
 
-    _begin_validation(
+    _begin_validate_and_write(
         session,
         config.config_from_request(request),
-        asyncio.get_event_loop(),
         os.path.join(session.download_path, found_name),
         maybe_actions,
     )
@@ -206,66 +205,41 @@ async def _save_file(part: BodyPartReader, path: str) -> None:
         LOG.exception("File not written")
 
 
-def _begin_write(
-    session: UpdateSession,
-    loop: asyncio.AbstractEventLoop,
-    rootfs_file_path: str,
-    actions: update_actions.UpdateActionsInterface,
-) -> None:
-    """Start the write process."""
-    session.set_progress(0)
-    session.set_stage(Stages.WRITING)
-    write_future = asyncio.ensure_future(
-        loop.run_in_executor(
-            None,
-            actions.write_update,
-            rootfs_file_path,
-            session.set_progress,
-        )
-    )
-
-    def write_done(fut: asyncio.Future[update_actions.Partition]) -> None:
-        exc = fut.exception()
-        if exc:
-            session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
-        else:
-            LOG.info(f"Finished update session {session}")
-            session.set_stage(Stages.DONE)
-
-    write_future.add_done_callback(write_done)
-
-
-def _begin_validation(
+def _begin_validate_and_write(
     session: UpdateSession,
     config: config.Config,
-    loop: asyncio.AbstractEventLoop,
     downloaded_update_path: str,
     actions: update_actions.UpdateActionsInterface,
-) -> asyncio.Future[str]:
-    """Start the validation process."""
-    session.set_stage(Stages.VALIDATING)
-    cert_path = config.update_cert_path if config.signature_required else None
+) -> None:
+    """Start validating and writing the file in the background."""
 
-    validation_future = asyncio.ensure_future(
-        loop.run_in_executor(
-            None,
+    async def background_task() -> None:
+        session.set_stage(Stages.VALIDATING)
+        cert_path = config.update_cert_path if config.signature_required else None
+        rootfs_file = await asyncio.to_thread(
             actions.validate_update,
             downloaded_update_path,
             session.set_progress,
             cert_path,
         )
-    )
 
-    def validation_done(fut: asyncio.Future[str]) -> None:
-        exc = fut.exception()
-        if exc:
+        session.set_progress(0)
+        session.set_stage(Stages.WRITING)
+        await asyncio.to_thread(actions.write_update, rootfs_file, session.set_progress)
+
+        LOG.info(f"Finished update session {session}")
+        session.set_stage(Stages.DONE)
+
+    async def background_task_with_error_handling() -> None:
+        try:
+            await background_task()
+        except Exception as exc:
+            LOG.exception(
+                f"Error in background task for session {session.token}.", exc_info=exc
+            )
             session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
-        else:
-            rootfs_file = fut.result()
-            loop.call_soon_threadsafe(_begin_write, session, loop, rootfs_file, actions)
 
-    validation_future.add_done_callback(validation_done)
-    return validation_future
+    asyncio.create_task(background_task_with_error_handling())
 
 
 async def _extract_and_save_update_file(
