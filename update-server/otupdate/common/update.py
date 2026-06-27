@@ -40,7 +40,7 @@ class _HandlerWithSession(Protocol):
     ) -> web.Response: ...
 
 
-def require_session(handler: _HandlerWithSession) -> Handler:
+def _require_session(handler: _HandlerWithSession) -> Handler:
     """Decorator to ensure a session is properly in the request"""
 
     @functools.wraps(handler)
@@ -93,7 +93,7 @@ async def cancel(request: web.Request) -> web.Response:
     return web.json_response(data={"message": "Session cancelled"}, status=200)
 
 
-@require_session
+@_require_session
 async def status(request: web.Request, session: UpdateSession) -> web.Response:
     return web.json_response(data=session.state, status=200)
 
@@ -198,7 +198,7 @@ async def _read_parts_and_find_update(
 
 
 @auth.require_scopes(Scope.UPDATES_WRITE)
-@require_session
+@_require_session
 async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/file
 
@@ -247,7 +247,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
 
 
 @auth.require_scopes(Scope.UPDATES_WRITE)
-@require_session
+@_require_session
 async def commit(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/commit"""
     if session.stage != Stages.DONE:
@@ -270,6 +270,8 @@ async def commit(request: web.Request, session: UpdateSession) -> web.Response:
             status=500,
         )
 
+    # todo(mm, 2026-06-26): What is the "restart lock" protecting?
+    # Do we also need the "shutdown lock" here?
     async with request.app[RESTART_LOCK_NAME]:
         try:
             with actions.mount_update() as new_part:
