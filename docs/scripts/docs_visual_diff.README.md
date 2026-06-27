@@ -60,6 +60,16 @@ or click `↗` to open the full rendered page.
 
 ## Usage
 
+The easiest way is the `docs/` Makefile target (handles the Python/lxml setup):
+
+```bash
+make -C docs diff                      # latest deployed docs vs HEAD
+make -C docs diff edge my-branch       # refs can be passed positionally
+make -C docs diff ARGS="-o /tmp/d"     # use ARGS for option flags (e.g. -o)
+```
+
+Or invoke the script directly:
+
 ```bash
 # No args: compare the latest deployed docs (newest mkdocs-* tag) to HEAD
 docs/scripts/docs_visual_diff.py

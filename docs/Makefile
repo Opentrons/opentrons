@@ -25,6 +25,23 @@ clean:
 serve:
 	uv run --python 3.10 mkdocs serve -f ./mkdocs.yml --livereload
 
+# Browser-viewable visual diff of the built docs between two refs.
+# No args compares the latest deployed (mkdocs-*) docs to HEAD. Refs can be given
+# positionally (`make diff edge my-branch`); use ARGS for option flags that make
+# would otherwise intercept (`make diff ARGS="-o /tmp/d"`).
+.PHONY: diff
+diff:
+	uv run --no-project --with lxml --python 3.12 python ./scripts/docs_visual_diff.py $(DIFF_REFS) $(ARGS)
+
+# Pass words after `diff` to the script as refs instead of letting make treat
+# them as targets. Scoped to `diff` runs so other targets are unaffected.
+ifeq (diff,$(firstword $(MAKECMDGOALS)))
+DIFF_REFS := $(filter-out diff,$(MAKECMDGOALS))
+ifneq ($(DIFF_REFS),)
+$(eval $(DIFF_REFS):;@:)
+endif
+endif
+
 # Subprojects with print-site in mkdocs.yml. For each new project, add to PDF_PROJECTS and
 # pdf-title-<dir> / pdf-file-<dir>. print_page is always <dir>/site/print_page/index.html
 PDF_PROJECTS := \
