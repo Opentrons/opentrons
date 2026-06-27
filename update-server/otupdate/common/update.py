@@ -79,6 +79,102 @@ async def begin(request: web.Request) -> web.Response:
     return web.json_response(data={"token": session.token}, status=201)
 
 
+@_require_session
+async def status(request: web.Request, session: UpdateSession) -> web.Response:
+    return web.json_response(data=session.state, status=200)
+
+
+@auth.require_scopes(Scope.UPDATES_WRITE)
+@_require_session
+async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
+    """Serves /update/:session/file
+
+    Requires multipart (encoding doesn't matter) with a file field in the
+    body called 'system-update.zip'. NOTE: OT2 will also support 'ot2-system.zip'
+    """
+    if session.stage != Stages.AWAITING_FILE:
+        return web.json_response(
+            data={
+                "error": "file-already-uploaded",
+                "message": "A file has already been sent for this update",
+            },
+            status=409,
+        )
+    reader = await request.multipart()
+    found_name = await _read_parts_and_find_update(reader, session)
+
+    maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
+    if not maybe_actions:
+        return web.json_response(
+            data={
+                "error": "no-actions-set",
+                "message": "Internal error: no actions object for hardware",
+            },
+            status=500,
+        )
+
+    if not found_name:
+        return web.json_response(
+            data={
+                "error": "no-file-name",
+                "message": "Request error: no field name for system zip",
+            },
+            status=400,
+        )
+
+    _begin_validation(
+        session,
+        config.config_from_request(request),
+        asyncio.get_event_loop(),
+        os.path.join(session.download_path, found_name),
+        maybe_actions,
+    )
+
+    return web.json_response(data=session.state, status=201)
+
+
+@auth.require_scopes(Scope.UPDATES_WRITE)
+@_require_session
+async def commit(request: web.Request, session: UpdateSession) -> web.Response:
+    """Serves /update/:session/commit"""
+    if session.stage != Stages.DONE:
+        return web.json_response(
+            data={
+                "error": "not-ready",
+                "message": f"System is not ready to commit the update "
+                f"(currently {session.stage.value.short})",
+            },
+            status=409,
+        )
+
+    actions = update_actions.UpdateActionsInterface.from_request(request)
+    if not actions:
+        return web.json_response(
+            data={
+                "error": "no-actions-set",
+                "message": "Internal error: no actions object for hardware",
+            },
+            status=500,
+        )
+
+    # todo(mm, 2026-06-26): What is the "restart lock" protecting?
+    # Do we also need the "shutdown lock" here?
+    async with request.app[RESTART_LOCK_NAME]:
+        try:
+            with actions.mount_update() as new_part:
+                actions.write_machine_id("/", new_part)
+        except (OSError, CalledProcessError):
+            LOG.exception("Failed to update machine-id")
+        actions.commit_update()
+
+        # Clean up stale update files from the download dir
+        actions.clean_up(session.download_path)
+
+        session.set_stage(Stages.READY_FOR_RESTART)
+
+    return web.json_response(data=session.state, status=200)
+
+
 @auth.require_scopes(Scope.UPDATES_WRITE)
 async def cancel(request: web.Request) -> web.Response:
     session = get_current_session(request)
@@ -91,11 +187,6 @@ async def cancel(request: web.Request) -> web.Response:
         session.close()
         set_current_session(request, None)
     return web.json_response(data={"message": "Session cancelled"}, status=200)
-
-
-@_require_session
-async def status(request: web.Request, session: UpdateSession) -> web.Response:
-    return web.json_response(data=session.state, status=200)
 
 
 async def _save_file(part: BodyPartReader, path: str) -> None:
@@ -195,94 +286,3 @@ async def _read_parts_and_find_update(
             await _save_file(part, session.download_path)
             found = part.name
     return found
-
-
-@auth.require_scopes(Scope.UPDATES_WRITE)
-@_require_session
-async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
-    """Serves /update/:session/file
-
-    Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'system-update.zip'. NOTE: OT2 will also support 'ot2-system.zip'
-    """
-    if session.stage != Stages.AWAITING_FILE:
-        return web.json_response(
-            data={
-                "error": "file-already-uploaded",
-                "message": "A file has already been sent for this update",
-            },
-            status=409,
-        )
-    reader = await request.multipart()
-    found_name = await _read_parts_and_find_update(reader, session)
-
-    maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
-    if not maybe_actions:
-        return web.json_response(
-            data={
-                "error": "no-actions-set",
-                "message": "Internal error: no actions object for hardware",
-            },
-            status=500,
-        )
-
-    if not found_name:
-        return web.json_response(
-            data={
-                "error": "no-file-name",
-                "message": "Request error: no field name for system zip",
-            },
-            status=400,
-        )
-
-    _begin_validation(
-        session,
-        config.config_from_request(request),
-        asyncio.get_event_loop(),
-        os.path.join(session.download_path, found_name),
-        maybe_actions,
-    )
-
-    return web.json_response(data=session.state, status=201)
-
-
-@auth.require_scopes(Scope.UPDATES_WRITE)
-@_require_session
-async def commit(request: web.Request, session: UpdateSession) -> web.Response:
-    """Serves /update/:session/commit"""
-    if session.stage != Stages.DONE:
-        return web.json_response(
-            data={
-                "error": "not-ready",
-                "message": f"System is not ready to commit the update "
-                f"(currently {session.stage.value.short})",
-            },
-            status=409,
-        )
-
-    actions = update_actions.UpdateActionsInterface.from_request(request)
-    if not actions:
-        return web.json_response(
-            data={
-                "error": "no-actions-set",
-                "message": "Internal error: no actions object for hardware",
-            },
-            status=500,
-        )
-
-    # todo(mm, 2026-06-26): What is the "restart lock" protecting?
-    # Do we also need the "shutdown lock" here?
-    async with request.app[RESTART_LOCK_NAME]:
-        try:
-            with actions.mount_update() as new_part:
-                actions.write_machine_id("/", new_part)
-        except (OSError, CalledProcessError):
-            LOG.exception("Failed to update machine-id")
-        actions.commit_update()
-
-        # Clean up stale update files from the download dir
-        actions.clean_up(session.download_path)
-
-        session.set_stage(Stages.READY_FOR_RESTART)
-
-    return web.json_response(data=session.state, status=200)
