@@ -100,126 +100,120 @@ describe('getAuthPatchForInputChange', () => {
 })
 
 describe('resolveComplianceReadyToggleChange', () => {
-  it('should enable UI-only parent locally without patching', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'passwordResetEnabled',
-      BASE_FIELD_VALUES,
-      { childFieldIds: ['passwordResetTime'] }
-    )
-
-    expect(result.fieldValues.passwordResetEnabled).toBe(true)
-    expect(result.authPatch).toBeUndefined()
-    expect(result.robotServerAccessControlPatch).toBeUndefined()
+  it('should not patch when enabling a UI-only parent', () => {
+    expect(
+      resolveComplianceReadyToggleChange(
+        'passwordResetEnabled',
+        BASE_FIELD_VALUES,
+        { childFieldIds: ['passwordResetTime'] }
+      )
+    ).toEqual({})
   })
 
-  it('should clear child values and patch null when disabling UI-only parent', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'passwordResetEnabled',
-      {
-        ...BASE_FIELD_VALUES,
-        passwordResetEnabled: true,
-        passwordResetTime: '30',
-      },
-      { childFieldIds: ['passwordResetTime'] }
-    )
-
-    expect(result.fieldValues.passwordResetEnabled).toBe(false)
-    expect(result.fieldValues.passwordResetTime).toBe('')
-    expect(result.authPatch).toEqual({
-      data: { passwordResetTime: null },
+  it('should patch null for auth children when disabling a UI-only parent', () => {
+    expect(
+      resolveComplianceReadyToggleChange(
+        'passwordResetEnabled',
+        {
+          ...BASE_FIELD_VALUES,
+          passwordResetEnabled: true,
+          passwordResetTime: '30',
+        },
+        { childFieldIds: ['passwordResetTime'] }
+      )
+    ).toEqual({
+      authPatch: { data: { passwordResetTime: null } },
     })
   })
 
   it('should null all nested auth fields when disabling UI-only parent with multiple children', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'passwordComplexityEnabled',
-      {
-        ...BASE_FIELD_VALUES,
-        passwordComplexityEnabled: true,
-        passwordComplexitySpecialCharacters: true,
-        passwordComplexityMinimumLength: '8',
-      },
-      {
-        childFieldIds: [
-          'passwordComplexitySpecialCharacters',
-          'passwordComplexityMinimumLength',
-        ],
-      }
-    )
-
-    expect(result.authPatch).toEqual({
-      data: {
-        passwordComplexitySpecialCharacters: null,
-        passwordComplexityMinimumLength: null,
+    expect(
+      resolveComplianceReadyToggleChange(
+        'passwordComplexityEnabled',
+        {
+          ...BASE_FIELD_VALUES,
+          passwordComplexityEnabled: true,
+          passwordComplexitySpecialCharacters: true,
+          passwordComplexityMinimumLength: '8',
+        },
+        {
+          childFieldIds: [
+            'passwordComplexitySpecialCharacters',
+            'passwordComplexityMinimumLength',
+          ],
+        }
+      )
+    ).toEqual({
+      authPatch: {
+        data: {
+          passwordComplexitySpecialCharacters: null,
+          passwordComplexityMinimumLength: null,
+        },
       },
     })
   })
 
-  it('should patch changed child when toggling child under enabled UI-only parent', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'passwordComplexitySpecialCharacters',
-      {
-        ...BASE_FIELD_VALUES,
-        passwordComplexityEnabled: true,
-        passwordComplexitySpecialCharacters: false,
-        passwordComplexityMinimumLength: '8',
-      },
-      { parentFieldId: 'passwordComplexityEnabled' }
-    )
-
-    expect(result.fieldValues.passwordComplexitySpecialCharacters).toBe(true)
-    expect(result.authPatch).toEqual({
-      data: { passwordComplexitySpecialCharacters: true },
+  it('should patch auth server when toggling a child under an enabled UI-only parent', () => {
+    expect(
+      resolveComplianceReadyToggleChange(
+        'passwordComplexitySpecialCharacters',
+        {
+          ...BASE_FIELD_VALUES,
+          passwordComplexityEnabled: true,
+          passwordComplexitySpecialCharacters: false,
+          passwordComplexityMinimumLength: '8',
+        },
+        { parentFieldId: 'passwordComplexityEnabled' }
+      )
+    ).toEqual({
+      authPatch: { data: { passwordComplexitySpecialCharacters: true } },
     })
   })
 
-  it('should update local state only when toggling child with UI-only parent off', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'passwordComplexitySpecialCharacters',
-      BASE_FIELD_VALUES,
-      { parentFieldId: 'passwordComplexityEnabled' }
-    )
-
-    expect(result.fieldValues.passwordComplexitySpecialCharacters).toBe(true)
-    expect(result.authPatch).toBeUndefined()
-    expect(result.robotServerAccessControlPatch).toBeUndefined()
+  it('should not patch when toggling a child with UI-only parent off', () => {
+    expect(
+      resolveComplianceReadyToggleChange(
+        'passwordComplexitySpecialCharacters',
+        BASE_FIELD_VALUES,
+        { parentFieldId: 'passwordComplexityEnabled' }
+      )
+    ).toEqual({})
   })
 
   it('should patch auth server when toggling a standalone auth setting', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'requireAdminCredsWhenUpdatingRobotSoftware',
-      BASE_FIELD_VALUES
-    )
-
-    expect(result.fieldValues.requireAdminCredsWhenUpdatingRobotSoftware).toBe(
-      false
-    )
-    expect(result.authPatch).toEqual({
-      data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
+    expect(
+      resolveComplianceReadyToggleChange(
+        'requireAdminCredsWhenUpdatingRobotSoftware',
+        BASE_FIELD_VALUES
+      )
+    ).toEqual({
+      authPatch: {
+        data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
+      },
     })
   })
 
   it('should patch robot server when toggling a robot server setting', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'requireSignoffForProtocolLog',
-      BASE_FIELD_VALUES
-    )
-
-    expect(result.fieldValues.requireSignoffForProtocolLog).toBe(false)
-    expect(result.robotServerAccessControlPatch).toEqual({
-      data: { requireSignoffForProtocolLog: false },
+    expect(
+      resolveComplianceReadyToggleChange(
+        'requireSignoffForProtocolLog',
+        BASE_FIELD_VALUES
+      )
+    ).toEqual({
+      robotServerAccessControlPatch: {
+        data: { requireSignoffForProtocolLog: false },
+      },
     })
   })
 
   it('should patch auth server when toggling a real auth parent with children', () => {
-    const result = resolveComplianceReadyToggleChange(
-      'requireReasonForInteraction',
-      BASE_FIELD_VALUES
-    )
-
-    expect(result.fieldValues.requireReasonForInteraction).toBe(false)
-    expect(result.authPatch).toEqual({
-      data: { requireReasonForInteraction: false },
+    expect(
+      resolveComplianceReadyToggleChange(
+        'requireReasonForInteraction',
+        BASE_FIELD_VALUES
+      )
+    ).toEqual({
+      authPatch: { data: { requireReasonForInteraction: false } },
     })
   })
 })

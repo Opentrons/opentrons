@@ -1,16 +1,26 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { I18nextProvider } from 'react-i18next'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import {
+  cleanup,
+  fireEvent,
+  render as renderWithUi,
+  screen,
+  waitFor,
+} from '@testing-library/react'
+import { legacy_createStore } from 'redux'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
 import {
-  useAuthSettingsMutation,
-  useAuthSettingsQuery,
-  useGetRobotServerAccessControlSettingsQuery,
-  usePatchRobotServerAccessControlSettingsMutation,
-} from '@opentrons/react-api-client'
+  getAuthSettings,
+  getRobotServerAccessControlSettings,
+  patchAuthSettings,
+  patchRobotServerAccessControlSettings,
+} from '@opentrons/api-client'
+import { ApiHostContext, getQueryKey } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
@@ -18,20 +28,15 @@ import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSetti
 
 import type {
   AuthSettingsResponse,
+  HostConfig,
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
 
-vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual = await importOriginal()
-
-  return {
-    ...(actual as object),
-    useAuthSettingsQuery: vi.fn(),
-    useGetRobotServerAccessControlSettingsQuery: vi.fn(),
-    useAuthSettingsMutation: vi.fn(),
-    usePatchRobotServerAccessControlSettingsMutation: vi.fn(),
-  }
-})
+const MOCK_HOST: HostConfig = {
+  hostname: '127.0.0.1',
+  port: 31950,
+  robotName: 'flex-1',
+}
 
 const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
   data: {
@@ -79,10 +84,64 @@ const COMPLIANCE_READY_FIELD_IDS = [
   'minLengthOfReasonForInteraction',
 ]
 
+let authSettingsResponse: AuthSettingsResponse = MOCK_AUTH_SETTINGS
+let robotServerAccessControlSettingsResponse: RobotServerAccessControlSettingsResponse =
+  MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS
+
+vi.mock('@opentrons/api-client', async importOriginal => {
+  const actual = await importOriginal()
+
+  return {
+    ...(actual as object),
+    getAuthSettings: vi.fn(() =>
+      Promise.resolve({ data: authSettingsResponse })
+    ),
+    patchAuthSettings: vi.fn((_host, body) => {
+      authSettingsResponse = {
+        data: { ...authSettingsResponse.data, ...body.data },
+      }
+      return Promise.resolve({ data: authSettingsResponse })
+    }),
+    getRobotServerAccessControlSettings: vi.fn(() =>
+      Promise.resolve({ data: robotServerAccessControlSettingsResponse })
+    ),
+    patchRobotServerAccessControlSettings: vi.fn((_host, body) => {
+      robotServerAccessControlSettingsResponse = {
+        data: {
+          ...robotServerAccessControlSettingsResponse.data,
+          ...body.data,
+        },
+      }
+      return Promise.resolve({ data: robotServerAccessControlSettingsResponse })
+    }),
+  }
+})
+
 const render = (): void => {
-  renderWithProviders(<ComplianceReadySoftwareSettings robotName="flex-1" />, {
-    i18nInstance: i18n,
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
   })
+
+  queryClient.setQueryData(
+    getQueryKey(MOCK_HOST, 'auth', 'settings'),
+    authSettingsResponse
+  )
+  queryClient.setQueryData(
+    getQueryKey(MOCK_HOST, 'accessControl', 'settings'),
+    robotServerAccessControlSettingsResponse
+  )
+
+  renderWithUi(
+    <QueryClientProvider client={queryClient}>
+      <Provider store={legacy_createStore(vi.fn(), {})}>
+        <I18nextProvider i18n={i18n}>
+          <ApiHostContext.Provider value={MOCK_HOST}>
+            <ComplianceReadySoftwareSettings robotName="flex-1" />
+          </ApiHostContext.Provider>
+        </I18nextProvider>
+      </Provider>
+    </QueryClientProvider>
+  )
 }
 
 const expandAccordion = (): void => {
@@ -94,50 +153,21 @@ const expandAccordion = (): void => {
 }
 
 describe('ComplianceReadySoftwareSettings', () => {
-  const patchAuthSettings = vi.fn()
-  const patchRobotServerAccessControlSettings = vi.fn()
+  afterEach(() => {
+    cleanup()
+  })
 
   beforeEach(() => {
-    patchAuthSettings.mockClear()
-    patchRobotServerAccessControlSettings.mockClear()
-
-    patchAuthSettings.mockImplementation((request, options) => {
-      options?.onSuccess?.({
-        data: {
-          ...MOCK_AUTH_SETTINGS.data,
-          ...request.data,
-        },
-      })
-    })
-    patchRobotServerAccessControlSettings.mockImplementation(
-      (request, options) => {
-        options?.onSuccess?.({
-          data: {
-            ...MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS.data,
-            ...request.data,
-          },
-        })
-      }
-    )
-
-    vi.mocked(useAuthSettingsMutation).mockReturnValue({
-      patchAuthSettings,
-    } as unknown as ReturnType<typeof useAuthSettingsMutation>)
-    vi.mocked(usePatchRobotServerAccessControlSettingsMutation).mockReturnValue(
-      {
-        patchRobotServerAccessControlSettings,
-      } as unknown as ReturnType<
-        typeof usePatchRobotServerAccessControlSettingsMutation
-      >
-    )
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
-      data: MOCK_AUTH_SETTINGS,
-      isLoading: false,
-    } as ReturnType<typeof useAuthSettingsQuery>)
-    vi.mocked(useGetRobotServerAccessControlSettingsQuery).mockReturnValue({
-      data: MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS,
-      isLoading: false,
-    } as ReturnType<typeof useGetRobotServerAccessControlSettingsQuery>)
+    authSettingsResponse = {
+      data: { ...MOCK_AUTH_SETTINGS.data },
+    }
+    robotServerAccessControlSettingsResponse = {
+      data: { ...MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS.data },
+    }
+    vi.mocked(getAuthSettings).mockClear()
+    vi.mocked(patchAuthSettings).mockClear()
+    vi.mocked(getRobotServerAccessControlSettings).mockClear()
+    vi.mocked(patchRobotServerAccessControlSettings).mockClear()
   })
 
   it('should only use auth setting ids, robot server setting ids, or explicit UI-only ids', () => {
@@ -190,7 +220,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(patchAuthSettings).not.toHaveBeenCalled()
   })
 
-  it('should patch password reset time after entering sub-setting value', () => {
+  it('should patch password reset time after entering sub-setting value', async () => {
     render()
     expandAccordion()
 
@@ -208,10 +238,11 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     fireEvent.blur(passwordResetTimeField)
 
-    expect(patchAuthSettings).toHaveBeenCalledWith(
-      { data: { passwordResetTime: 90 * 24 * 60 * 60 } },
-      expect.objectContaining({ onSuccess: expect.any(Function) })
-    )
+    await waitFor(() => {
+      expect(patchAuthSettings).toHaveBeenCalledWith(MOCK_HOST, {
+        data: { passwordResetTime: 90 * 24 * 60 * 60 },
+      })
+    })
   })
 
   it('should populate fields from auth settings', () => {
@@ -259,14 +290,16 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'true')
     fireEvent.click(updateRobotsToggle)
-    expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'false')
-    expect(patchAuthSettings).toHaveBeenCalledWith(
-      { data: { requireAdminCredsWhenUpdatingRobotSoftware: false } },
-      expect.objectContaining({ onSuccess: expect.any(Function) })
-    )
+
+    await waitFor(() => {
+      expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'false')
+    })
+    expect(patchAuthSettings).toHaveBeenCalledWith(MOCK_HOST, {
+      data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
+    })
   })
 
-  it('should update input values without patching until blur', () => {
+  it('should update input values without patching until blur', async () => {
     render()
     expandAccordion()
 
@@ -278,9 +311,11 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(patchAuthSettings).not.toHaveBeenCalled()
 
     fireEvent.blur(loginAttemptsField)
-    expect(patchAuthSettings).toHaveBeenCalledWith(
-      { data: { maxNumberOfLoginAttempts: 3 } },
-      expect.objectContaining({ onSuccess: expect.any(Function) })
-    )
+
+    await waitFor(() => {
+      expect(patchAuthSettings).toHaveBeenCalledWith(MOCK_HOST, {
+        data: { maxNumberOfLoginAttempts: 3 },
+      })
+    })
   })
 })

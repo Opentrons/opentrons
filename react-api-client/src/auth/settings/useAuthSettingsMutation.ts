@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { patchAuthSettings } from '@opentrons/api-client'
 
@@ -35,11 +35,21 @@ export function useAuthSettingsMutation(
   > = {}
 ): UseAuthSettingsMutationResult {
   const host = useHost()
+  const queryClient = useQueryClient()
   const mutation = useMutation(
     getQueryKey(host, 'auth', 'settings'),
     (body: PatchAuthSettingsRequest) =>
       patchAuthSettings(host!, body)
-        .then(response => response.data)
+        .then(response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'auth', 'settings'))
+            .catch((e: Error) => {
+              console.error(
+                `error invalidating auth settings query: ${e.message}`
+              )
+            })
+          return response.data
+        })
         .catch((e: AxiosError) => {
           throw e
         }),

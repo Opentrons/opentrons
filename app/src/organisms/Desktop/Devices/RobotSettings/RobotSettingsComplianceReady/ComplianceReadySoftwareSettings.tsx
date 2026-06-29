@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
@@ -15,20 +15,17 @@ import {
   getFieldValuesFromSettings,
   resolveComplianceReadyToggleChange,
 } from './complianceReadySettingsHelper'
+import { isUiOnlyFieldId } from './complianceReadySettingsTypes'
 import styles from './compliancereadysoftwaresettings.module.css'
 import { ComplianceReadyToggleField } from './ComplianceReadyToggleField'
 import { InputSetting } from './InputSetting'
 
 import type { JSX, ReactNode } from 'react'
 import type {
-  PatchAuthSettingsRequest,
-  PatchRobotServerAccessControlSettingsRequest,
-} from '@opentrons/api-client'
-import type {
   AuthSettingFieldId,
   ComplianceReadyToggleChangeOptions,
-  FieldValues,
   SettingFieldId,
+  UiSettingFieldId,
 } from './complianceReadySettingsTypes'
 
 export type { UiSettingFieldId } from './complianceReadySettingsTypes'
@@ -72,66 +69,41 @@ export function ComplianceReadySoftwareSettings({
   const { patchAuthSettings } = useAuthSettingsMutation()
   const { patchRobotServerAccessControlSettings } =
     usePatchRobotServerAccessControlSettingsMutation()
-  const [fieldValues, setFieldValues] = useState<FieldValues>(() =>
-    getFieldValuesFromSettings()
-  )
 
-  useEffect(() => {
-    setFieldValues(
+  const fieldValues = useMemo(
+    () =>
       getFieldValuesFromSettings(
         authSettingsQuery.data?.data,
         robotServerAccessControlSettingsQuery.data?.data
-      )
-    )
-  }, [
-    authSettingsQuery.data?.data,
-    robotServerAccessControlSettingsQuery.data?.data,
-  ])
+      ),
+    [
+      authSettingsQuery.data?.data,
+      robotServerAccessControlSettingsQuery.data?.data,
+    ]
+  )
 
-  const patchAuth = (request: PatchAuthSettingsRequest): void => {
-    patchAuthSettings(request, {
-      onSuccess: response => {
-        setFieldValues(
-          getFieldValuesFromSettings(
-            response.data,
-            robotServerAccessControlSettingsQuery.data?.data
-          )
-        )
-      },
-    })
-  }
+  const [uiOnlyFieldValues, setUiOnlyFieldValues] = useState<
+    Partial<Record<UiSettingFieldId, boolean>>
+  >({})
 
-  const patchRobotServerAccessControlSettingsRequest = (
-    request: PatchRobotServerAccessControlSettingsRequest
-  ): void => {
-    patchRobotServerAccessControlSettings(request, {
-      onSuccess: response => {
-        setFieldValues(
-          getFieldValuesFromSettings(
-            authSettingsQuery.data?.data,
-            response.data
-          )
-        )
-      },
-    })
-  }
+  const values = useMemo(
+    () => ({ ...fieldValues, ...uiOnlyFieldValues }),
+    [fieldValues, uiOnlyFieldValues]
+  )
 
   const handleInputBlur = (
     id: AuthSettingFieldId,
     value: string,
     parentFieldId?: SettingFieldId
   ): void => {
-    const nextFieldValues: FieldValues = { ...fieldValues, [id]: value }
-    setFieldValues(nextFieldValues)
-
     const authPatch = getAuthPatchForInputChange(
       id,
       value,
-      fieldValues,
+      values,
       parentFieldId
     )
     if (authPatch != null) {
-      patchAuth(authPatch)
+      void patchAuthSettings(authPatch)
     }
   }
 
@@ -139,23 +111,25 @@ export function ComplianceReadySoftwareSettings({
     fieldId: SettingFieldId,
     options?: ComplianceReadyToggleChangeOptions
   ): void => {
-    const {
-      fieldValues: nextFieldValues,
-      authPatch,
-      robotServerAccessControlPatch,
-    } = resolveComplianceReadyToggleChange(fieldId, fieldValues, options)
-    setFieldValues(nextFieldValues)
+    const { authPatch, robotServerAccessControlPatch } =
+      resolveComplianceReadyToggleChange(fieldId, values, options)
+
+    if (isUiOnlyFieldId(fieldId)) {
+      setUiOnlyFieldValues(prev => ({
+        ...prev,
+        [fieldId]: !Boolean(values[fieldId]),
+      }))
+    }
+
     if (authPatch != null) {
-      patchAuth(authPatch)
+      void patchAuthSettings(authPatch)
     } else if (robotServerAccessControlPatch != null) {
-      patchRobotServerAccessControlSettingsRequest(
-        robotServerAccessControlPatch
-      )
+      void patchRobotServerAccessControlSettings(robotServerAccessControlPatch)
     }
   }
 
   const toggleFieldProps = {
-    values: fieldValues,
+    values,
     onToggleChange: handleToggleChange,
   }
 
@@ -170,11 +144,11 @@ export function ComplianceReadySoftwareSettings({
           isLastSection={false}
         >
           <InputSetting
-            key={String(fieldValues.maxNumberOfLoginAttempts)}
+            key={String(values.maxNumberOfLoginAttempts)}
             label={t(
               'desktop_maximum_login_attempts_before_account_deactivation'
             )}
-            value={String(fieldValues.maxNumberOfLoginAttempts)}
+            value={String(values.maxNumberOfLoginAttempts)}
             units={t('desktop_logins')}
             onBlur={value => {
               handleInputBlur('maxNumberOfLoginAttempts', value)
@@ -188,9 +162,9 @@ export function ComplianceReadySoftwareSettings({
             {...toggleFieldProps}
           >
             <InputSetting
-              key={String(fieldValues.passwordResetTime)}
+              key={String(values.passwordResetTime)}
               label={t('desktop_length_of_time')}
-              value={String(fieldValues.passwordResetTime)}
+              value={String(values.passwordResetTime)}
               units={t('desktop_days')}
               onBlur={value => {
                 handleInputBlur(
@@ -218,9 +192,9 @@ export function ComplianceReadySoftwareSettings({
               {...toggleFieldProps}
             />
             <InputSetting
-              key={String(fieldValues.passwordComplexityMinimumLength)}
+              key={String(values.passwordComplexityMinimumLength)}
               label={t('desktop_minimum_password_length')}
-              value={String(fieldValues.passwordComplexityMinimumLength)}
+              value={String(values.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
               onBlur={value => {
                 handleInputBlur(
@@ -233,9 +207,9 @@ export function ComplianceReadySoftwareSettings({
           </ComplianceReadyToggleField>
           <Divider />
           <InputSetting
-            key={String(fieldValues.idleLogout)}
+            key={String(values.idleLogout)}
             label={t('desktop_auto_logout_inactivity_length')}
-            value={String(fieldValues.idleLogout)}
+            value={String(values.idleLogout)}
             units={t('desktop_minutes')}
             onBlur={value => {
               handleInputBlur('idleLogout', value)
@@ -293,11 +267,11 @@ export function ComplianceReadySoftwareSettings({
             {...toggleFieldProps}
           >
             <InputSetting
-              key={String(fieldValues.minLengthOfReasonForInteraction)}
+              key={String(values.minLengthOfReasonForInteraction)}
               label={t(
                 'desktop_minimum_length_for_documentation_for_robot_actions'
               )}
-              value={String(fieldValues.minLengthOfReasonForInteraction)}
+              value={String(values.minLengthOfReasonForInteraction)}
               units={t('desktop_characters')}
               onBlur={value => {
                 handleInputBlur(

@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { patchRobotServerAccessControlSettings } from '@opentrons/api-client'
 
@@ -36,6 +36,7 @@ export function usePatchRobotServerAccessControlSettingsMutation(
   > = {}
 ): UsePatchRobotServerAccessControlSettingsMutationResult {
   const host = useHost()
+  const queryClient = useQueryClient()
 
   const mutation = useMutation<
     RobotServerAccessControlSettingsResponse,
@@ -45,7 +46,16 @@ export function usePatchRobotServerAccessControlSettingsMutation(
     getQueryKey(host, 'accessControl', 'settings', 'patch'),
     (body: PatchRobotServerAccessControlSettingsRequest) =>
       patchRobotServerAccessControlSettings(host!, body)
-        .then(response => response.data)
+        .then(response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'accessControl', 'settings'))
+            .catch((e: Error) => {
+              console.error(
+                `error invalidating robot server access control settings query: ${e.message}`
+              )
+            })
+          return response.data
+        })
         .catch((e: AxiosError) => {
           throw e
         }),
