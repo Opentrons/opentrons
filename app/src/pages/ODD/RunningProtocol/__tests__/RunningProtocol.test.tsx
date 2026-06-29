@@ -15,9 +15,9 @@ import {
   useProtocolQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'

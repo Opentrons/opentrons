@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { usePlayRunMutation } from '@opentrons/react-api-client'
 
-import { RECOVERY_MAP } from '../../constants'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
+import { RECOVERY_MAP } from '../../constants'
 import { useRecoveryActionMutation } from '../useRecoveryActionMutation'
 
 import type { Mock } from 'vitest'

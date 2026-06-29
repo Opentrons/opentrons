@@ -8,9 +8,9 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 // import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
