@@ -13,7 +13,6 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { SETTINGS_SECTIONS } from '../complianceReadySettingsConfig'
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
 
@@ -62,16 +61,22 @@ const APP_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
   MOCK_ACCESS_CONTROL_SETTINGS.data
 )
 
-function getFieldIds(
-  fields: (typeof SETTINGS_SECTIONS)[number]['fields']
-): string[] {
-  return fields.flatMap(field => [
-    field.id,
-    ...('children' in field && field.children != null
-      ? getFieldIds(field.children)
-      : []),
-  ])
-}
+const COMPLIANCE_READY_FIELD_IDS = [
+  'maxNumberOfLoginAttempts',
+  'passwordResetEnabled',
+  'passwordResetTime',
+  'passwordComplexityEnabled',
+  'passwordComplexitySpecialCharacters',
+  'passwordComplexityMinimumLength',
+  'idleLogout',
+  'requireAdminCredsWhenUpdatingRobotSoftware',
+  'requireAdminCredsWhenSendingProtocolToRobot',
+  'requireAdminCredsForSignoffProtocol',
+  'requireSignoffForProtocolLog',
+  'deleteOverMaxOnDiskProtocols',
+  'requireReasonForInteraction',
+  'minLengthOfReasonForInteraction',
+]
 
 const render = (): void => {
   renderWithProviders(<ComplianceReadySoftwareSettings robotName="flex-1" />, {
@@ -135,11 +140,9 @@ describe('ComplianceReadySoftwareSettings', () => {
       ...UI_ONLY_FIELD_IDS,
     ])
 
-    SETTINGS_SECTIONS.flatMap(section => getFieldIds(section.fields)).forEach(
-      fieldId => {
-        expect(allowedIds.has(fieldId)).toBe(true)
-      }
-    )
+    COMPLIANCE_READY_FIELD_IDS.forEach(fieldId => {
+      expect(allowedIds.has(fieldId)).toBe(true)
+    })
   })
 
   it('should render settings sections when expanded', () => {

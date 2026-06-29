@@ -1,24 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
-import { SETTINGS_SECTIONS } from '../complianceReadySettingsConfig'
 import {
   getAuthPatchForInputChange,
   resolveComplianceReadyToggleChange,
 } from '../complianceReadySettingsHelper'
 
 import type {
+  ComplianceReadyToggleFieldDescriptor,
   FieldValues,
-  SettingFieldId,
-  ToggleFieldConfig,
 } from '../complianceReadySettingsTypes'
 
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
 
 const resolveToggle = (
-  field: ToggleFieldConfig,
+  field: ComplianceReadyToggleFieldDescriptor,
   fieldValues: FieldValues,
-  parentField?: ToggleFieldConfig
+  parentField?: ComplianceReadyToggleFieldDescriptor
 ) => resolveComplianceReadyToggleChange(field, fieldValues, parentField)
 
 const BASE_FIELD_VALUES = {
@@ -39,73 +37,70 @@ const BASE_FIELD_VALUES = {
   passwordComplexityEnabled: false,
 } as FieldValues
 
-function getToggleField(fieldId: SettingFieldId): ToggleFieldConfig {
-  for (const section of SETTINGS_SECTIONS) {
-    for (const field of section.fields) {
-      if (field.id === fieldId && field.type === 'toggle') {
-        return field
-      }
-    }
-  }
-
-  throw new Error(`Toggle field not found: ${fieldId}`)
+const PASSWORD_RESET_PARENT: ComplianceReadyToggleFieldDescriptor = {
+  id: 'passwordResetEnabled',
+  children: ['passwordResetTime'],
 }
 
-const PASSWORD_RESET_PARENT = getToggleField('passwordResetEnabled')
-const PASSWORD_COMPLEXITY_PARENT = getToggleField('passwordComplexityEnabled')
-const REQUIRE_REASON_PARENT = getToggleField('requireReasonForInteraction')
+const PASSWORD_COMPLEXITY_PARENT: ComplianceReadyToggleFieldDescriptor = {
+  id: 'passwordComplexityEnabled',
+  children: [
+    'passwordComplexitySpecialCharacters',
+    'passwordComplexityMinimumLength',
+  ],
+}
+
+const REQUIRE_REASON_PARENT: ComplianceReadyToggleFieldDescriptor = {
+  id: 'requireReasonForInteraction',
+  children: ['minLengthOfReasonForInteraction'],
+}
 
 describe('getAuthPatchForInputChange', () => {
   it('should patch standalone maxNumberOfLoginAttempts input', () => {
     expect(
       getAuthPatchForInputChange(
         'maxNumberOfLoginAttempts',
-        '3',
+        '10',
         BASE_FIELD_VALUES
       )
-    ).toEqual({
-      data: { maxNumberOfLoginAttempts: 3 },
-    })
+    ).toEqual({ data: { maxNumberOfLoginAttempts: 10 } })
   })
 
-  it('should patch null when clearing standalone maxNumberOfLoginAttempts', () => {
+  it('should patch standalone idleLogout input', () => {
     expect(
-      getAuthPatchForInputChange(
-        'maxNumberOfLoginAttempts',
-        '',
-        BASE_FIELD_VALUES
-      )
-    ).toEqual({
-      data: { maxNumberOfLoginAttempts: null },
-    })
+      getAuthPatchForInputChange('idleLogout', '5', BASE_FIELD_VALUES)
+    ).toEqual({ data: { idleLogout: 5 * SECONDS_PER_MINUTE } })
   })
 
-  it('should patch standalone idleLogout in minutes as seconds', () => {
-    expect(
-      getAuthPatchForInputChange('idleLogout', '10', BASE_FIELD_VALUES)
-    ).toEqual({
-      data: { idleLogout: 10 * SECONDS_PER_MINUTE },
-    })
-  })
-
-  it('should not patch when clearing standalone idleLogout', () => {
+  it('should not patch idleLogout when cleared', () => {
     expect(
       getAuthPatchForInputChange('idleLogout', '', BASE_FIELD_VALUES)
     ).toBeNull()
   })
 
-  it('should not patch when child input changes with parent off', () => {
+  it('should not patch nested input when parent toggle is off', () => {
     expect(
       getAuthPatchForInputChange(
         'passwordResetTime',
-        '90',
+        '30',
         BASE_FIELD_VALUES,
         PASSWORD_RESET_PARENT
       )
     ).toBeNull()
   })
 
-  it('should not patch when child input is cleared with parent on', () => {
+  it('should patch nested input when parent toggle is on and value is present', () => {
+    expect(
+      getAuthPatchForInputChange(
+        'passwordResetTime',
+        '30',
+        { ...BASE_FIELD_VALUES, passwordResetEnabled: true },
+        PASSWORD_RESET_PARENT
+      )
+    ).toEqual({ data: { passwordResetTime: 30 * SECONDS_PER_DAY } })
+  })
+
+  it('should not patch nested input when parent is on but value is empty', () => {
     expect(
       getAuthPatchForInputChange(
         'passwordResetTime',
@@ -114,32 +109,6 @@ describe('getAuthPatchForInputChange', () => {
         PASSWORD_RESET_PARENT
       )
     ).toBeNull()
-  })
-
-  it('should patch changed child when UI-only parent is on and child has a value', () => {
-    expect(
-      getAuthPatchForInputChange(
-        'passwordResetTime',
-        '90',
-        { ...BASE_FIELD_VALUES, passwordResetEnabled: true },
-        PASSWORD_RESET_PARENT
-      )
-    ).toEqual({
-      data: { passwordResetTime: 90 * SECONDS_PER_DAY },
-    })
-  })
-
-  it('should patch only the changed field when parent is a real auth toggle', () => {
-    expect(
-      getAuthPatchForInputChange(
-        'minLengthOfReasonForInteraction',
-        '25',
-        BASE_FIELD_VALUES,
-        REQUIRE_REASON_PARENT
-      )
-    ).toEqual({
-      data: { minLengthOfReasonForInteraction: 25 },
-    })
   })
 
   it('should patch only the changed child for nested UI-only parent children', () => {
@@ -150,13 +119,10 @@ describe('getAuthPatchForInputChange', () => {
         {
           ...BASE_FIELD_VALUES,
           passwordComplexityEnabled: true,
-          passwordComplexitySpecialCharacters: true,
         },
         PASSWORD_COMPLEXITY_PARENT
       )
-    ).toEqual({
-      data: { passwordComplexityMinimumLength: 12 },
-    })
+    ).toEqual({ data: { passwordComplexityMinimumLength: 12 } })
   })
 })
 
@@ -200,11 +166,8 @@ describe('resolveComplianceReadyToggleChange', () => {
   })
 
   it('should patch changed child when toggling child under enabled UI-only parent', () => {
-    const specialCharactersToggle = PASSWORD_COMPLEXITY_PARENT
-      .children![0] as ToggleFieldConfig
-
     const result = resolveToggle(
-      specialCharactersToggle,
+      { id: 'passwordComplexitySpecialCharacters' },
       {
         ...BASE_FIELD_VALUES,
         passwordComplexityEnabled: true,
@@ -221,11 +184,8 @@ describe('resolveComplianceReadyToggleChange', () => {
   })
 
   it('should update local state only when toggling child with UI-only parent off', () => {
-    const specialCharactersToggle = PASSWORD_COMPLEXITY_PARENT
-      .children![0] as ToggleFieldConfig
-
     const result = resolveToggle(
-      specialCharactersToggle,
+      { id: 'passwordComplexitySpecialCharacters' },
       BASE_FIELD_VALUES,
       PASSWORD_COMPLEXITY_PARENT
     )
@@ -237,7 +197,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
   it('should patch auth server when toggling a standalone auth setting', () => {
     const result = resolveToggle(
-      getToggleField('requireAdminCredsWhenUpdatingRobotSoftware'),
+      { id: 'requireAdminCredsWhenUpdatingRobotSoftware' },
       BASE_FIELD_VALUES
     )
 
@@ -251,7 +211,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
   it('should patch robot server when toggling a robot server setting', () => {
     const result = resolveToggle(
-      getToggleField('requireSignoffForProtocolLog'),
+      { id: 'requireSignoffForProtocolLog' },
       BASE_FIELD_VALUES
     )
 

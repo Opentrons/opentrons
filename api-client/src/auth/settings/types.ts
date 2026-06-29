@@ -10,7 +10,7 @@ export interface PatchAccessControlEnabledSettingsRequest {
   }
 }
 
-export class AuthSettingsData {
+export interface AuthSettingsData {
   maxNumberOfLoginAttempts?: number | null
   passwordResetTime?: number | null
   passwordComplexityMinimumLength?: number | null
@@ -21,14 +21,10 @@ export class AuthSettingsData {
   requireAdminCredsWhenUpdatingRobotSoftware?: boolean | null
   requireAdminCredsWhenSendingProtocolToRobot?: boolean | null
   requireAdminCredsForSignoffProtocol?: boolean | null
-
-  static hasSettingKey(key: string): key is keyof AuthSettingsData {
-    return key in new AuthSettingsData()
-  }
 }
 
-export class AuthSettingsResponse {
-  data!: AuthSettingsData
+export interface AuthSettingsResponse {
+  data: AuthSettingsData
 }
 
 export interface PatchAuthSettingsRequest {
