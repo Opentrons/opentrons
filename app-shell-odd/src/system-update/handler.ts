@@ -23,7 +23,7 @@ const getUpdateConfig = (): { automaticDownload: boolean; channel: string } => {
   const updateConfig = getConfig('update')
   return {
     channel: updateConfig.channel,
-    automaticDownload: updateConfig.automaticallyDownloadRobotUpdates === true,
+    automaticDownload: updateConfig.automaticallyDownloadUpdates === true,
   }
 }
 
@@ -156,7 +156,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
             })
             .then(() => {
               if (
-                getConfig('update').automaticallyDownloadRobotUpdates &&
+                getConfig('update').automaticallyDownloadUpdates &&
                 webUpdate.version != null &&
                 webUpdate.files == null
               ) {

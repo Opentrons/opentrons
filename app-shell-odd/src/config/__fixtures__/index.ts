@@ -214,6 +214,6 @@ export const MOCK_CONFIG_V29: ConfigV29 = {
   version: 29,
   update: {
     ...MOCK_CONFIG_V28.update,
-    automaticallyDownloadRobotUpdates: false,
+    automaticallyDownloadUpdates: false,
   },
 }

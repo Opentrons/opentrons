@@ -97,7 +97,7 @@ describe('update driver manager', () => {
       .calledWith('update')
       .thenReturn({
         channel: 'alpha',
-        automaticallyDownloadRobotUpdates: true,
+        automaticallyDownloadUpdates: true,
       } as any as Cfg.Config['update'])
     const webDriverPayload = {
       manifestUrl: FLEX_MANIFEST_URL,
@@ -142,7 +142,7 @@ describe('update driver manager', () => {
       .calledWith('update')
       .thenReturn({
         channel: 'alpha',
-        automaticallyDownloadRobotUpdates: true,
+        automaticallyDownloadUpdates: true,
       } as any as Cfg.Config['update'])
     const fakeProvider = {
       teardown: vi.fn(),
@@ -199,7 +199,7 @@ describe('update driver manager', () => {
           .calledWith('update')
           .thenReturn({
             channel: 'beta',
-            automaticallyDownloadRobotUpdates: true,
+            automaticallyDownloadUpdates: true,
           } as any as Cfg.Config['update'])
         return driverManager.handleAction({
           type: VALUE_UPDATED,
@@ -257,7 +257,7 @@ describe('update driver', () => {
       .calledWith('update')
       .thenReturn({
         channel: 'alpha',
-        automaticallyDownloadRobotUpdates: true,
+        automaticallyDownloadUpdates: true,
       } as any as Cfg.Config['update'])
     when(getWebProvider)
       .calledWith({
@@ -315,7 +315,7 @@ describe('update driver', () => {
     const thisSubject = subject!
     when(getConfig)
       .calledWith('update')
-      .thenReturn({ automaticallyDownloadRobotUpdates: true })
+      .thenReturn({ automaticallyDownloadUpdates: true })
     when(fakeProvider.scanUpdate)
       .calledWith(expect.any(Function))
       .thenDo(
@@ -404,7 +404,7 @@ describe('update driver', () => {
   it('downloads updates when told and no USB updates are present and updates are on', () => {
     when(getConfig)
       .calledWith('update')
-      .thenReturn({ automaticallyDownloadRobotUpdates: true })
+      .thenReturn({ automaticallyDownloadUpdates: true })
     const thisSubject = subject!
     when(fakeProvider.downloadUpdate)
       .calledWith(expect.any(Function))

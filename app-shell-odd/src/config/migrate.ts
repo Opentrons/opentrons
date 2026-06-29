@@ -283,7 +283,7 @@ const toVersion29 = (prevConfig: ConfigV28): ConfigV29 => {
   const nextConfig = {
     ...prevConfig,
     version: 29 as const,
-    update: { ...prevConfig.update, automaticallyDownloadRobotUpdates: false },
+    update: { ...prevConfig.update, automaticallyDownloadUpdates: false },
   }
   return nextConfig
 }
