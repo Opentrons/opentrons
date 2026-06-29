@@ -20,6 +20,8 @@ Remember to work column by column since we're using a multichannel pipette, and 
 </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
@@ -86,6 +88,7 @@ temp_mod_mastermix = protocol.load_module('temperature module gen2', 3)
     # Command 5 and 6: Deactivate temperature modules
     temp_mod_mastermix.deactivate()
     temp_mod_sample.deactivate()
+```
 
 </protocol>
 
@@ -109,6 +112,8 @@ Then, using the 8-channel pipette on the left:
   </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 requirements = {
@@ -187,6 +192,7 @@ def run(protocol: protocol_api.ProtocolContext):
         multi_pip.drop_tip()
 
         col_ctr += STRIDE
+```
 
 </protocol>
 
@@ -206,6 +212,8 @@ Next, using the P300 single-channel pipette on the left:
   </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 # metadata
@@ -248,6 +256,7 @@ destination_2 = protocol.load_labware("corning_96_wellplate_360ul_flat", locatio
     p20s.transfer(transfer_vol_1, source_wells_1, all_destinations, new_tip="once")
     p20s.transfer(transfer_vol_2, source_wells_2, destination_wells_1, new_tip="once")
     p300s.transfer(transfer_vol_3, source_wells_3, destination_wells_2, new_tip="always")
+```
 
 </protocol>
 
@@ -268,6 +277,8 @@ Here's what we need to do:
    </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 metadata = {
@@ -296,6 +307,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300_single.transfer(20, source_labware2.wells(), destination_labware.wells_by_name()['B1'], new_tip='always')
     p300_single.transfer(20, source_labware3.wells(), destination_labware.wells_by_name()['C1'], new_tip='always')
     p300_single.transfer(20, source_labware4.wells(), destination_labware.wells_by_name()['D1'], new_tip='always')
+```
 
 </protocol>
 
@@ -315,6 +327,8 @@ Finally, using the 1000 µL pipette mounted on the right:
   </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 # metadata
@@ -360,6 +374,7 @@ destination_2 = protocol.load_labware("corning_96_wellplate_360ul_flat", locatio
     p50s.transfer(transfer_vol_1, source_wells_1, destination_wells_1+destination_wells_2, new_tip="once")
     p50s.transfer(transfer_vol_2, source_wells_2, destination_wells_1, new_tip="once")
     p1000s.transfer(transfer_vol_3, source_wells_3, destination_wells_2, new_tip="always")
+```
 
 </protocol>
 
@@ -382,6 +397,8 @@ Remember, we're treating these as two separate steps, but both are basically poo
 </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 # metadata
@@ -421,6 +438,7 @@ destination_1 = protocol.load_labware("nest_1_reservoir_195ml", location='D1')
     p1000s.transfer(transfer_vol_1, source_wells_1, destination_wells_1, new_tip="once")
 
     p1000s.transfer(transfer_vol_2, source_wells_2, destination_wells_1, new_tip="once")
+```
 
 </protocol>
 
@@ -461,6 +479,8 @@ Finally:
    </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 metadata = {
@@ -587,6 +607,7 @@ return_slot = 'C3'
     # Deactivate temperature modules at the end of the protocol
     master_mix_temperature_module.deactivate()
     sample_temperature_module.deactivate()
+```
 
 </protocol>
 
@@ -627,6 +648,8 @@ Here's the step-by-step process:
      </description>
 
 <protocol>
+
+```python
 metadata = {
     'protocolName': 'Customizable Serial Dilution',
     'author': 'Opentrons <protocols@opentrons.com>',
@@ -728,6 +751,7 @@ def run(protocol):
             new_tip='never'
         )
     pipette.drop_tip()
+```
 
 </protocol>
 
@@ -766,6 +790,8 @@ Now for the actual steps:
      </description>
 
 <protocol>
+
+```python
 metadata = {
     'protocolName': 'Serial Dilution for Eskil',
     'author': 'John C. Lynch',
@@ -833,6 +859,7 @@ def run(protocol):
         air_gap=10,
         new_tip='always'
     )
+```
 
 </protocol>
 
@@ -858,6 +885,8 @@ Then, for the serial dilution:
      </description>
 
 <protocol>
+
+```python
 from opentrons import protocol_api
 
 metadata = {
@@ -892,6 +921,7 @@ left_pipette = protocol.load_instrument("flex_1channel_1000", "left", tip_racks=
 
         # dilute the sample down the row
         left_pipette.transfer(100, row[:11], row[1:], mix_after=(3, 50))
+```
 
 </protocol>
 
@@ -993,6 +1023,7 @@ The workflow should be:
 </description>
 
 <protocol>
+
 ```python
 from opentrons import protocol_api
  
@@ -1061,6 +1092,6 @@ def run(protocol: protocol_api.ProtocolContext):
     
     protocol.comment('Total volume per well: 150 µL')
     protocol.comment('QC images captured: 3 (initial, mid-protocol, final)')
-    ```
+```
 
 </protocol>
