@@ -110,7 +110,6 @@ This table lists the correspondence between Protocol API versions and robot soft
 - Organize groups of commands within your Python protocols using new methods: 
     - [`group_steps()`][opentrons.protocol_api.ProtocolContext.group_steps]
     - the paired [`create_and_start_step_group()`][opentrons.protocol_api.ProtocolContext.create_and_start_step_group] and [`end_group()`][opentrons.protocol_api._command_annotations.GroupedSteps.end_group] methods.
-- Use the [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] method to label a tip rack on the deck as empty. This lets you return used tips to an empty tip rack throughout your protocol.
 
 ### Version 2.28
 
@@ -122,6 +121,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 - Use the load name `opentrons_flex_96_tiprack_20ul` to use Flex 20 μL pipette tips in your protocols. The tips are fully compatible with [liquid class](liquid-classes/using.md) commands and with Flex 1- and 8-Channel (1–50 μL range) and 96-Channel (1–200 μL range) pipettes.
 - Control how quickly the Thermocycler Module's block heats or cools with the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature] and [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] methods' optional `ramp_rate` parameter.
 - Use the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method's optional `alternate_drop_location` argument to vary the tip drop location in a waste container, preventing tips from piling up in a single location.
+- Use the [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] method to label a tip rack on the deck as empty. This lets you return used tips to an empty tip rack throughout your protocol.
 - In protocols using API version 2.28, the API raises an error when calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] in large spaces, like reservoirs and large well plates.
 
 ### Version 2.27
