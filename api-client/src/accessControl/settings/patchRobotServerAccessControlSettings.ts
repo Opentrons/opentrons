@@ -1,7 +1,7 @@
-import { PATCH, request } from '../../../request'
+import { PATCH, request } from '../../request'
 
-import type { ResponsePromise } from '../../../request'
-import type { HostConfig } from '../../../types'
+import type { ResponsePromise } from '../../request'
+import type { HostConfig } from '../../types'
 import type {
   PatchRobotServerAccessControlSettingsRequest,
   RobotServerAccessControlSettingsResponse,
