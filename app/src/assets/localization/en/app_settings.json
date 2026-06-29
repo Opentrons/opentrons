@@ -108,7 +108,7 @@
   "turn_off_updates": "Turn off software update notifications in App Settings.",
   "u2e_driver_outdated_message": "There is an updated Realtek USB-to-Ethernet adapter driver available for your computer.",
   "up_to_date": "Up to date",
-  "update_app_now": "Update app now",
+  "update_and_restart": "Update and restart",
   "update_available": "Update available",
   "update_channel": "Update Channel",
   "update_description": "Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.",
