@@ -114,20 +114,20 @@ export const DesktopApp = (): JSX.Element => {
 
   return (
     <LocalizationProvider>
-      <NiceModal.Provider>
-        <ErrorBoundary FallbackComponent={DesktopAppFallback}>
-          <ReactQueryDevtools />
-          <SystemLanguagePreferenceModal />
-          <Navbar routes={desktopRoutes} />
-          <ToasterOven>
-            <EmergencyStopContext.Provider
-              value={{
-                isEmergencyStopModalDismissed,
-                setIsEmergencyStopModalDismissed,
-              }}
-            >
-              <DocumentationRequiredModalContext.Provider
-                value={{ showDocumentationRequiredModal, showLoginModal }}
+      <DocumentationRequiredModalContext.Provider
+        value={{ showDocumentationRequiredModal, showLoginModal }}
+      >
+        <NiceModal.Provider>
+          <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+            <ReactQueryDevtools />
+            <SystemLanguagePreferenceModal />
+            <Navbar routes={desktopRoutes} />
+            <ToasterOven>
+              <EmergencyStopContext.Provider
+                value={{
+                  isEmergencyStopModalDismissed,
+                  setIsEmergencyStopModalDismissed,
+                }}
               >
                 <Box width="100%" height="100vh">
                   <Alerts>
@@ -171,11 +171,11 @@ export const DesktopApp = (): JSX.Element => {
                     <RobotControlTakeover />
                   </Alerts>
                 </Box>
-              </DocumentationRequiredModalContext.Provider>
-            </EmergencyStopContext.Provider>
-          </ToasterOven>
-        </ErrorBoundary>
-      </NiceModal.Provider>
+              </EmergencyStopContext.Provider>
+            </ToasterOven>
+          </ErrorBoundary>
+        </NiceModal.Provider>
+      </DocumentationRequiredModalContext.Provider>
     </LocalizationProvider>
   )
 }

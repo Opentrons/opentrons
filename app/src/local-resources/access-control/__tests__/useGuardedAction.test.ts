@@ -8,6 +8,7 @@ import {
 
 import { useCurrentUsername } from '/app/redux/robot-auth'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
 import { useGuardedAction } from '../useGuardedAction'
 import {
   mockShowDocumentationRequiredModal,
@@ -85,12 +86,11 @@ describe('useGuardedAction', () => {
 
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
-    const currentResult = await act(
-      () =>
-        !result.current.isLoading &&
-        !result.current.reasonForInteractionRequired
-    )
-    expect(currentResult).toBe(true)
+    await act(async () => {
+      expect(result.current).toEqual(
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
+    })
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
   it('skips both guards when access control is enabled but require reason for interaction is disabled', async () => {
@@ -112,12 +112,14 @@ describe('useGuardedAction', () => {
 
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
-    const currentResult = await act(
-      () =>
-        !result.current.isLoading &&
-        !result.current.reasonForInteractionRequired
-    )
-    expect(currentResult).toBe(true)
+    await act(async () => {
+      expect(
+        !result.current.isLoading && result.current.accessControlEnabled
+      ).toBe(true)
+      if (!result.current.isLoading && result.current.accessControlEnabled) {
+        expect(result.current.reasonForInteractionRequired).toBe(false)
+      }
+    })
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
 
@@ -129,32 +131,31 @@ describe('useGuardedAction', () => {
     })
 
     expect(
-      !result.current.isLoading && result.current.reasonForInteractionRequired
+      !result.current.isLoading && result.current.accessControlEnabled
     ).toBe(true)
-    expect(
+    if (
       !result.current.isLoading &&
-        result.current.reasonForInteractionRequired &&
-        result.current.docreport
-    ).toBe(docreport)
+      result.current.accessControlEnabled &&
+      result.current.reasonForInteractionRequired
+    ) {
+      expect(result.current.docreport).toBe(docreport)
+    }
   })
 
   it('returns callback to open modal when documentation is not provided', async () => {
     const { result } = renderHook(() => useGuardedAction(), { wrapper })
 
     expect(
-      !result.current.isLoading && result.current.reasonForInteractionRequired
+      !result.current.isLoading && result.current.accessControlEnabled
     ).toBe(true)
-    expect(
+    if (
       !result.current.isLoading &&
-        result.current.reasonForInteractionRequired &&
-        result.current.docreport
-    ).toBeNull()
-    expect(
-      !result.current.isLoading &&
-        result.current.reasonForInteractionRequired &&
-        result.current.docreport == null &&
-        result.current.askForDocumentation
-    ).toBeDefined()
+      result.current.accessControlEnabled &&
+      result.current.reasonForInteractionRequired
+    ) {
+      expect(result.current.docreport).toBeNull()
+      expect(result.current.askForDocumentation).toBeDefined()
+    }
   })
   it('opens login modal when username is not provided', async () => {
     vi.mocked(useCurrentUsername).mockReturnValue(null)
@@ -163,6 +164,7 @@ describe('useGuardedAction', () => {
     await act(async () => {
       if (
         !result.current.isLoading &&
+        result.current.accessControlEnabled &&
         result.current.reasonForInteractionRequired &&
         result.current.docreport == null
       ) {
@@ -171,5 +173,66 @@ describe('useGuardedAction', () => {
     })
 
     expect(mockShowLoginModal).toHaveBeenCalled()
+  })
+
+  it('calls onCancel when login modal is dismissed without logging in', async () => {
+    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(mockShowLoginModal).mockResolvedValue(null)
+    const onCancel = vi.fn()
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    await act(async () => {
+      if (
+        !result.current.isLoading &&
+        result.current.accessControlEnabled &&
+        result.current.reasonForInteractionRequired &&
+        result.current.docreport == null
+      ) {
+        const report = await result.current.askForDocumentation([], onCancel)
+        expect(report).toBe('')
+      }
+    })
+
+    expect(mockShowLoginModal).toHaveBeenCalled()
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+    expect(onCancel).toHaveBeenCalled()
+  })
+
+  it('passes initialDocreport to the documentation modal', async () => {
+    const initialDocreport = 'previous note' as DocumentationReport
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    await act(async () => {
+      if (
+        !result.current.isLoading &&
+        result.current.accessControlEnabled &&
+        result.current.reasonForInteractionRequired
+      ) {
+        await result.current.askForDocumentation(
+          ['play_run'],
+          undefined,
+          initialDocreport,
+          'alice'
+        )
+      }
+    })
+
+    expect(mockShowDocumentationRequiredModal).toHaveBeenCalledWith(
+      'alice',
+      ['play_run'],
+      undefined,
+      initialDocreport
+    )
+  })
+
+  it('exposes askForLogin when access control is enabled', async () => {
+    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+
+    expect(
+      !result.current.isLoading && result.current.accessControlEnabled
+    ).toBe(true)
+    if (!result.current.isLoading && result.current.accessControlEnabled) {
+      expect(result.current.askForLogin).toEqual(expect.any(Function))
+    }
   })
 })

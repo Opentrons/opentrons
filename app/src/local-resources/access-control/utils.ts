@@ -16,6 +16,9 @@ export function isDocumentationProvided(state: DocumentationState): boolean {
   if (state.isLoading) {
     return false
   }
+  if (!state.accessControlEnabled) {
+    return true
+  }
   if (!state.reasonForInteractionRequired) {
     return true
   }

@@ -6,6 +6,7 @@ import { createMaintenanceCommand } from '@opentrons/api-client'
 
 import { useCreateMaintenanceCommandMutation } from '..'
 import { MAINTENANCE_RUN_ID, mockAnonLoadCommand } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../access_control/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -38,7 +39,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
     const { result } = renderHook(
       () =>
         useCreateMaintenanceCommandMutation(
-          { reasonForInteractionRequired: false, isLoading: false },
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
           ['lpc_flow'],
           () => {}
         ),
@@ -69,7 +70,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
     const { result } = renderHook(
       () =>
         useCreateMaintenanceCommandMutation(
-          { reasonForInteractionRequired: false, isLoading: false },
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
           ['lpc_flow'],
           () => {}
         ),

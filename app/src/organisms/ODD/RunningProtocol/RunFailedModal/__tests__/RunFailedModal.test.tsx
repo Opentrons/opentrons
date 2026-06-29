@@ -7,6 +7,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { RunFailedModal } from '..'
 import { ErrorContent } from '../ErrorContent'
@@ -17,10 +18,7 @@ import type { NavigateFunction } from 'react-router-dom'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../ErrorContent')
 vi.mock('/app/local-resources/access-control/useGuardedAction', () => ({
-  useGuardedAction: () => ({
-    reasonForInteractionRequired: false,
-    isLoading: false,
-  }),
+  useGuardedAction: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
 
 const RUN_ID = 'mock_runID'
