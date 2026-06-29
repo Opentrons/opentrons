@@ -5,8 +5,8 @@ import { Divider, StyledText } from '@opentrons/components'
 import {
   useAuthSettingsMutation,
   useAuthSettingsQuery,
-  useGetAppAccessControlSettingsQuery,
-  usePatchAppAccessControlSettingsMutation,
+  useGetRobotServerAccessControlSettingsQuery,
+  usePatchRobotServerAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
 import { Accordion } from './Accordion'
@@ -21,8 +21,8 @@ import { InputSetting } from './InputSetting'
 
 import type { JSX, ReactNode } from 'react'
 import type {
-  PatchAppAccessControlSettingsRequest,
   PatchAuthSettingsRequest,
+  PatchRobotServerAccessControlSettingsRequest,
 } from '@opentrons/api-client'
 import type {
   AuthSettingFieldId,
@@ -84,10 +84,11 @@ export function ComplianceReadySoftwareSettings({
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const authSettingsQuery = useAuthSettingsQuery()
-  const getAppAccessControlSettingsQuery = useGetAppAccessControlSettingsQuery()
+  const robotServerAccessControlSettingsQuery =
+    useGetRobotServerAccessControlSettingsQuery()
   const { patchAuthSettings } = useAuthSettingsMutation()
-  const { patchAppAccessControlSettings } =
-    usePatchAppAccessControlSettingsMutation()
+  const { patchRobotServerAccessControlSettings } =
+    usePatchRobotServerAccessControlSettingsMutation()
   const [fieldValues, setFieldValues] = useState<FieldValues>(() =>
     getFieldValuesFromSettings()
   )
@@ -96,12 +97,12 @@ export function ComplianceReadySoftwareSettings({
     setFieldValues(
       getFieldValuesFromSettings(
         authSettingsQuery.data?.data,
-        getAppAccessControlSettingsQuery.data?.data
+        robotServerAccessControlSettingsQuery.data?.data
       )
     )
   }, [
     authSettingsQuery.data?.data,
-    getAppAccessControlSettingsQuery.data?.data,
+    robotServerAccessControlSettingsQuery.data?.data,
   ])
 
   const patchAuth = (request: PatchAuthSettingsRequest): void => {
@@ -110,17 +111,17 @@ export function ComplianceReadySoftwareSettings({
         setFieldValues(
           getFieldValuesFromSettings(
             response.data,
-            getAppAccessControlSettingsQuery.data?.data
+            robotServerAccessControlSettingsQuery.data?.data
           )
         )
       },
     })
   }
 
-  const patchAppAccessControlSettingsRequest = (
-    request: PatchAppAccessControlSettingsRequest
+  const patchRobotServerAccessControlSettingsRequest = (
+    request: PatchRobotServerAccessControlSettingsRequest
   ): void => {
-    patchAppAccessControlSettings(request, {
+    patchRobotServerAccessControlSettings(request, {
       onSuccess: response => {
         setFieldValues(
           getFieldValuesFromSettings(
@@ -158,13 +159,15 @@ export function ComplianceReadySoftwareSettings({
     const {
       fieldValues: nextFieldValues,
       authPatch,
-      appAccessControlPatch,
+      robotServerAccessControlPatch,
     } = resolveComplianceReadyToggleChange(field, fieldValues, parentField)
     setFieldValues(nextFieldValues)
     if (authPatch != null) {
       patchAuth(authPatch)
-    } else if (appAccessControlPatch != null) {
-      patchAppAccessControlSettingsRequest(appAccessControlPatch)
+    } else if (robotServerAccessControlPatch != null) {
+      patchRobotServerAccessControlSettingsRequest(
+        robotServerAccessControlPatch
+      )
     }
   }
 

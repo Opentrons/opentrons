@@ -1,12 +1,3 @@
-import type {
-  AccessControlAppSettingsData,
-  AuthSettingsData,
-} from '@opentrons/api-client'
-
-export type AuthSettingFieldId = keyof AuthSettingsData
-
-export type AppAccessControlSettingFieldId = keyof AccessControlAppSettingsData
-
 export const AUTH_SERVER_SETTING_FIELD_IDS = {
   maxNumberOfLoginAttempts: true,
   passwordResetTime: true,
@@ -18,13 +9,18 @@ export const AUTH_SERVER_SETTING_FIELD_IDS = {
   requireAdminCredsWhenUpdatingRobotSoftware: true,
   requireAdminCredsWhenSendingProtocolToRobot: true,
   requireAdminCredsForSignoffProtocol: true,
-} as const satisfies Record<AuthSettingFieldId, true>
+} as const
+
+export type AuthSettingFieldId = keyof typeof AUTH_SERVER_SETTING_FIELD_IDS
 
 export const ROBOT_SERVER_SETTING_FIELD_IDS = {
   requireSignoffForProtocolLog: true,
   requireLogsToBeSavedInApp: true,
   deleteOverMaxOnDiskProtocols: true,
-} as const satisfies Record<AppAccessControlSettingFieldId, true>
+} as const
+
+export type RobotServerSettingFieldId =
+  keyof typeof ROBOT_SERVER_SETTING_FIELD_IDS
 
 export function isAuthServerSettingKey(key: string): key is AuthSettingFieldId {
   return key in AUTH_SERVER_SETTING_FIELD_IDS
@@ -32,7 +28,7 @@ export function isAuthServerSettingKey(key: string): key is AuthSettingFieldId {
 
 export function isRobotServerSettingKey(
   key: string
-): key is AppAccessControlSettingFieldId {
+): key is RobotServerSettingFieldId {
   return key in ROBOT_SERVER_SETTING_FIELD_IDS
 }
 
@@ -55,7 +51,7 @@ export type UiSettingFieldId = (typeof UI_ONLY_FIELD_IDS)[number]
 export type SettingFieldId =
   | AuthSettingFieldId
   | UiSettingFieldId
-  | AppAccessControlSettingFieldId
+  | RobotServerSettingFieldId
 
 export function isAuthInputFieldId(
   id: SettingFieldId

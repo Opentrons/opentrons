@@ -1,7 +1,7 @@
 // api client entry point
 export * from './audit'
-export * from './accessControl/settings/settings/getAppAccessControlSettings'
-export * from './accessControl/settings/settings/patchAppAccessControlSettings'
+export * from './accessControl/settings/settings/getRobotServerAccessControlSettings'
+export * from './accessControl/settings/settings/patchRobotServerAccessControlSettings'
 export * from './accessControl/settings/settings/types'
 export * from './auth'
 export * from './calibration'

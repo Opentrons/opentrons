@@ -6,8 +6,8 @@ import '@testing-library/jest-dom/vitest'
 import {
   useAuthSettingsMutation,
   useAuthSettingsQuery,
-  useGetAppAccessControlSettingsQuery,
-  usePatchAppAccessControlSettingsMutation,
+  useGetRobotServerAccessControlSettingsQuery,
+  usePatchRobotServerAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -17,8 +17,8 @@ import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
 
 import type {
-  AccessControlAppSettingsResponse,
   AuthSettingsResponse,
+  RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -27,9 +27,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   return {
     ...(actual as object),
     useAuthSettingsQuery: vi.fn(),
-    useGetAppAccessControlSettingsQuery: vi.fn(),
+    useGetRobotServerAccessControlSettingsQuery: vi.fn(),
     useAuthSettingsMutation: vi.fn(),
-    usePatchAppAccessControlSettingsMutation: vi.fn(),
+    usePatchRobotServerAccessControlSettingsMutation: vi.fn(),
   }
 })
 
@@ -48,17 +48,18 @@ const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
   },
 }
 
-const MOCK_ACCESS_CONTROL_SETTINGS: AccessControlAppSettingsResponse = {
-  data: {
-    requireSignoffForProtocolLog: true,
-    requireLogsToBeSavedInApp: false,
-    deleteOverMaxOnDiskProtocols: true,
-  },
-}
+const MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS: RobotServerAccessControlSettingsResponse =
+  {
+    data: {
+      requireSignoffForProtocolLog: true,
+      requireLogsToBeSavedInApp: false,
+      deleteOverMaxOnDiskProtocols: true,
+    },
+  }
 
 const AUTH_SETTING_KEYS = Object.keys(MOCK_AUTH_SETTINGS.data)
-const APP_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
-  MOCK_ACCESS_CONTROL_SETTINGS.data
+const ROBOT_SERVER_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
+  MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS.data
 )
 
 const COMPLIANCE_READY_FIELD_IDS = [
@@ -94,11 +95,11 @@ const expandAccordion = (): void => {
 
 describe('ComplianceReadySoftwareSettings', () => {
   const patchAuthSettings = vi.fn()
-  const patchAppAccessControlSettings = vi.fn()
+  const patchRobotServerAccessControlSettings = vi.fn()
 
   beforeEach(() => {
     patchAuthSettings.mockClear()
-    patchAppAccessControlSettings.mockClear()
+    patchRobotServerAccessControlSettings.mockClear()
 
     patchAuthSettings.mockImplementation((request, options) => {
       options?.onSuccess?.({
@@ -108,35 +109,41 @@ describe('ComplianceReadySoftwareSettings', () => {
         },
       })
     })
-    patchAppAccessControlSettings.mockImplementation((request, options) => {
-      options?.onSuccess?.({
-        data: {
-          ...MOCK_ACCESS_CONTROL_SETTINGS.data,
-          ...request.data,
-        },
-      })
-    })
+    patchRobotServerAccessControlSettings.mockImplementation(
+      (request, options) => {
+        options?.onSuccess?.({
+          data: {
+            ...MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS.data,
+            ...request.data,
+          },
+        })
+      }
+    )
 
     vi.mocked(useAuthSettingsMutation).mockReturnValue({
       patchAuthSettings,
     } as unknown as ReturnType<typeof useAuthSettingsMutation>)
-    vi.mocked(usePatchAppAccessControlSettingsMutation).mockReturnValue({
-      patchAppAccessControlSettings,
-    } as unknown as ReturnType<typeof usePatchAppAccessControlSettingsMutation>)
+    vi.mocked(usePatchRobotServerAccessControlSettingsMutation).mockReturnValue(
+      {
+        patchRobotServerAccessControlSettings,
+      } as unknown as ReturnType<
+        typeof usePatchRobotServerAccessControlSettingsMutation
+      >
+    )
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: MOCK_AUTH_SETTINGS,
       isLoading: false,
     } as ReturnType<typeof useAuthSettingsQuery>)
-    vi.mocked(useGetAppAccessControlSettingsQuery).mockReturnValue({
-      data: MOCK_ACCESS_CONTROL_SETTINGS,
+    vi.mocked(useGetRobotServerAccessControlSettingsQuery).mockReturnValue({
+      data: MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS,
       isLoading: false,
-    } as ReturnType<typeof useGetAppAccessControlSettingsQuery>)
+    } as ReturnType<typeof useGetRobotServerAccessControlSettingsQuery>)
   })
 
   it('should only use auth setting ids, robot server setting ids, or explicit UI-only ids', () => {
     const allowedIds = new Set<string>([
       ...AUTH_SETTING_KEYS,
-      ...APP_ACCESS_CONTROL_SETTING_KEYS,
+      ...ROBOT_SERVER_ACCESS_CONTROL_SETTING_KEYS,
       ...UI_ONLY_FIELD_IDS,
     ])
 

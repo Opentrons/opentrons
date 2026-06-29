@@ -6,5 +6,5 @@ export type {
 } from './types'
 export { DocumentedMutationError, isDocumentedMutationError } from './types'
 export { useDocumentedMutation } from './useDocumentedMutation'
-export * from './useGetAppAccessControlSettingsQuery'
-export * from './usePatchAppAccessControlSettingsMutation'
+export * from './useGetRobotServerAccessControlSettingsQuery'
+export * from './usePatchRobotServerAccessControlSettingsMutation'

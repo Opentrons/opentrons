@@ -132,7 +132,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
     expect(result.fieldValues.passwordResetEnabled).toBe(true)
     expect(result.authPatch).toBeUndefined()
-    expect(result.appAccessControlPatch).toBeUndefined()
+    expect(result.robotServerAccessControlPatch).toBeUndefined()
   })
 
   it('should clear child values and patch null when disabling UI-only parent', () => {
@@ -192,7 +192,7 @@ describe('resolveComplianceReadyToggleChange', () => {
 
     expect(result.fieldValues.passwordComplexitySpecialCharacters).toBe(true)
     expect(result.authPatch).toBeUndefined()
-    expect(result.appAccessControlPatch).toBeUndefined()
+    expect(result.robotServerAccessControlPatch).toBeUndefined()
   })
 
   it('should patch auth server when toggling a standalone auth setting', () => {
@@ -216,7 +216,7 @@ describe('resolveComplianceReadyToggleChange', () => {
     )
 
     expect(result.fieldValues.requireSignoffForProtocolLog).toBe(false)
-    expect(result.appAccessControlPatch).toEqual({
+    expect(result.robotServerAccessControlPatch).toEqual({
       data: { requireSignoffForProtocolLog: false },
     })
   })

@@ -1,15 +1,13 @@
-export interface AccessControlAppSettingsData {
+export interface RobotServerAccessControlSettingsData {
   requireSignoffForProtocolLog?: boolean | null
   requireLogsToBeSavedInApp?: boolean | null
   deleteOverMaxOnDiskProtocols?: boolean | null
 }
 
-export interface AccessControlAppSettingsResponse {
-  data: AccessControlAppSettingsData
+export interface RobotServerAccessControlSettingsResponse {
+  data: RobotServerAccessControlSettingsData
 }
 
-export type AccessControlAppSettingsKey = keyof AccessControlAppSettingsData
-
-export interface PatchAppAccessControlSettingsRequest {
-  data: Partial<AccessControlAppSettingsData>
+export interface PatchRobotServerAccessControlSettingsRequest {
+  data: Partial<RobotServerAccessControlSettingsData>
 }

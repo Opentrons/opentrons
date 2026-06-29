@@ -8,16 +8,16 @@ import {
 } from './complianceReadySettingsTypes'
 
 import type {
-  AccessControlAppSettingsData,
   AuthSettingsData,
-  PatchAppAccessControlSettingsRequest,
   PatchAuthSettingsRequest,
+  PatchRobotServerAccessControlSettingsRequest,
+  RobotServerAccessControlSettingsData,
 } from '@opentrons/api-client'
 import type {
-  AppAccessControlSettingFieldId,
   AuthSettingFieldId,
   ComplianceReadyToggleFieldDescriptor,
   FieldValues,
+  RobotServerSettingFieldId,
   SettingFieldId,
 } from './complianceReadySettingsTypes'
 
@@ -51,13 +51,14 @@ function getClearedFieldValue(id: SettingFieldId): string | boolean {
   return isAuthInputFieldId(id) ? '' : false
 }
 
-/** Map auth and app access-control settings responses to form field values. */
+/** Map auth and robot-server access-control settings responses to form field values. */
 export function getFieldValuesFromSettings(
   authSettings?: AuthSettingsData,
-  appAccessControlSettings?: AccessControlAppSettingsData
+  robotServerAccessControlSettings?: RobotServerAccessControlSettingsData
 ): FieldValues {
   const authSettingsData = authSettings ?? {}
-  const appAccessControlSettingsData = appAccessControlSettings ?? {}
+  const robotServerAccessControlSettingsData =
+    robotServerAccessControlSettings ?? {}
 
   const authFieldValues = (
     Object.keys(AUTH_SERVER_SETTING_FIELD_IDS) as AuthSettingFieldId[]
@@ -69,14 +70,12 @@ export function getFieldValuesFromSettings(
     {}
   )
 
-  const appAccessControlFieldValues = (
-    Object.keys(
-      ROBOT_SERVER_SETTING_FIELD_IDS
-    ) as AppAccessControlSettingFieldId[]
-  ).reduce<Partial<Pick<FieldValues, AppAccessControlSettingFieldId>>>(
+  const robotServerAccessControlFieldValues = (
+    Object.keys(ROBOT_SERVER_SETTING_FIELD_IDS) as RobotServerSettingFieldId[]
+  ).reduce<Partial<Pick<FieldValues, RobotServerSettingFieldId>>>(
     (acc, key) => ({
       ...acc,
-      [key]: appAccessControlSettingsData[key] ?? false,
+      [key]: robotServerAccessControlSettingsData[key] ?? false,
     }),
     {}
   )
@@ -87,9 +86,9 @@ export function getFieldValuesFromSettings(
     passwordComplexityEnabled:
       Boolean(authSettingsData.passwordComplexityMinimumLength) ||
       Boolean(authSettingsData.passwordComplexitySpecialCharacters),
-    ...(appAccessControlFieldValues as Pick<
+    ...(robotServerAccessControlFieldValues as Pick<
       FieldValues,
-      AppAccessControlSettingFieldId
+      RobotServerSettingFieldId
     >),
   }
 }
@@ -98,7 +97,7 @@ export function getFieldValuesFromSettings(
 export interface ComplianceReadyToggleChangeResult {
   fieldValues: FieldValues
   authPatch?: PatchAuthSettingsRequest
-  appAccessControlPatch?: PatchAppAccessControlSettingsRequest
+  robotServerAccessControlPatch?: PatchRobotServerAccessControlSettingsRequest
 }
 
 /**
@@ -142,16 +141,17 @@ function buildParentDisablePatches(
   parentField: ComplianceReadyToggleFieldDescriptor
 ): {
   authPatch?: PatchAuthSettingsRequest
-  appAccessControlPatch?: PatchAppAccessControlSettingsRequest
+  robotServerAccessControlPatch?: PatchRobotServerAccessControlSettingsRequest
 } {
   const authData: PatchAuthSettingsRequest['data'] = {}
-  const appAccessControlData: PatchAppAccessControlSettingsRequest['data'] = {}
+  const robotServerAccessControlData: PatchRobotServerAccessControlSettingsRequest['data'] =
+    {}
 
   for (const childId of parentField.children ?? []) {
     if (isAuthServerSettingKey(childId)) {
       authData[childId] = null
     } else if (isRobotServerSettingKey(childId)) {
-      appAccessControlData[childId] = null
+      robotServerAccessControlData[childId] = null
     }
   }
 
@@ -159,8 +159,10 @@ function buildParentDisablePatches(
     ...(Object.keys(authData).length > 0
       ? { authPatch: { data: authData } }
       : {}),
-    ...(Object.keys(appAccessControlData).length > 0
-      ? { appAccessControlPatch: { data: appAccessControlData } }
+    ...(Object.keys(robotServerAccessControlData).length > 0
+      ? {
+          robotServerAccessControlPatch: { data: robotServerAccessControlData },
+        }
       : {}),
   }
 }
@@ -236,7 +238,7 @@ export function resolveComplianceReadyToggleChange(
   if (isRobotServerSettingKey(field.id)) {
     return {
       fieldValues: nextFieldValues,
-      appAccessControlPatch: { data: { [field.id]: toggledOn } },
+      robotServerAccessControlPatch: { data: { [field.id]: toggledOn } },
     }
   }
 
