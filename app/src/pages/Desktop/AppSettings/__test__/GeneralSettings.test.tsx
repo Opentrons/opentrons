@@ -102,6 +102,15 @@ describe('GeneralSettings', () => {
       name: 'Enable app update notifications',
     })
   })
+  it('renders the text and toggle for automatic update download section', () => {
+    render()
+    screen.getByText(
+      "When enabled, updates are downloaded automatically so they're ready to install later. When disabled, you'll choose when updates are downloaded."
+    )
+    screen.getByRole('switch', {
+      name: 'Enable update autodownload',
+    })
+  })
 
   it('renders the ip address button', () => {
     render()
