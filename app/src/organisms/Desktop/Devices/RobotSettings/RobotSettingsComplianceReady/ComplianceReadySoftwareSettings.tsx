@@ -13,14 +13,18 @@ import { Accordion } from './Accordion'
 import {
   getAuthPatchForInputChange,
   getFieldValuesFromSettings,
-  resolveComplianceReadyToggleChange,
 } from './complianceReadySettingsHelper'
-import { isUiOnlyFieldId } from './complianceReadySettingsTypes'
+import {
+  isAuthServerSettingKey,
+  isRobotServerSettingKey,
+  isUiOnlyFieldId,
+} from './complianceReadySettingsTypes'
 import styles from './compliancereadysoftwaresettings.module.css'
 import { ComplianceReadyToggleField } from './ComplianceReadyToggleField'
 import { InputSetting } from './InputSetting'
 
 import type { JSX, ReactNode } from 'react'
+import type { PatchAuthSettingsRequest } from '@opentrons/api-client'
 import type {
   AuthSettingFieldId,
   ComplianceReadyToggleChangeOptions,
@@ -111,20 +115,36 @@ export function ComplianceReadySoftwareSettings({
     fieldId: SettingFieldId,
     options?: ComplianceReadyToggleChangeOptions
   ): void => {
-    const { authPatch, robotServerAccessControlPatch } =
-      resolveComplianceReadyToggleChange(fieldId, values, options)
+    const toggledOn = !Boolean(values[fieldId])
+    const { parentFieldId, childFieldIds } = options ?? {}
 
     if (isUiOnlyFieldId(fieldId)) {
       setUiOnlyFieldValues(prev => ({
         ...prev,
-        [fieldId]: !Boolean(values[fieldId]),
+        [fieldId]: toggledOn,
       }))
-    }
 
-    if (authPatch != null) {
-      void patchAuthSettings(authPatch)
-    } else if (robotServerAccessControlPatch != null) {
-      void patchRobotServerAccessControlSettings(robotServerAccessControlPatch)
+      if (!toggledOn && childFieldIds != null) {
+        const authData: PatchAuthSettingsRequest['data'] = {}
+
+        for (const childId of childFieldIds) {
+          if (isAuthServerSettingKey(childId)) {
+            authData[childId] = null
+          }
+        }
+
+        if (Object.keys(authData).length > 0) {
+          void patchAuthSettings({ data: authData })
+        }
+      }
+    } else if (parentFieldId != null) {
+      void patchAuthSettings({ data: { [fieldId]: toggledOn } })
+    } else if (isRobotServerSettingKey(fieldId)) {
+      void patchRobotServerAccessControlSettings({
+        data: { [fieldId]: toggledOn },
+      })
+    } else if (isAuthServerSettingKey(fieldId)) {
+      void patchAuthSettings({ data: { [fieldId]: toggledOn } })
     }
   }
 

@@ -1,19 +1,14 @@
 import {
   AUTH_SERVER_SETTING_FIELD_IDS,
-  isAuthServerSettingKey,
-  isRobotServerSettingKey,
-  isUiOnlyFieldId,
 } from './complianceReadySettingsTypes'
 
 import type {
   AuthSettingsData,
   PatchAuthSettingsRequest,
-  PatchRobotServerAccessControlSettingsRequest,
   RobotServerAccessControlSettingsData,
 } from '@opentrons/api-client'
 import type {
   AuthSettingFieldId,
-  ComplianceReadyToggleChangeOptions,
   FieldValues,
   SettingFieldId,
 } from './complianceReadySettingsTypes'
@@ -80,11 +75,6 @@ export function getFieldValuesFromSettings(
   }
 }
 
-export interface ComplianceReadyToggleChangeResult {
-  authPatch?: PatchAuthSettingsRequest
-  robotServerAccessControlPatch?: PatchRobotServerAccessControlSettingsRequest
-}
-
 /** Auth-server patch for an input value, if it should be persisted. */
 export function getAuthPatchForInputChange(
   id: AuthSettingFieldId,
@@ -121,55 +111,4 @@ export function getAuthPatchForInputChange(
     default:
       return null
   }
-}
-
-/** Optional patches to persist a toggle change. */
-export function resolveComplianceReadyToggleChange(
-  fieldId: SettingFieldId,
-  fieldValues: FieldValues,
-  options?: ComplianceReadyToggleChangeOptions
-): ComplianceReadyToggleChangeResult {
-  const toggledOn = !Boolean(fieldValues[fieldId])
-  const { parentFieldId, childFieldIds } = options ?? {}
-
-  if (isUiOnlyFieldId(fieldId) && childFieldIds != null) {
-    if (toggledOn) {
-      return {}
-    }
-
-    const authData: PatchAuthSettingsRequest['data'] = {}
-
-    for (const childId of childFieldIds) {
-      if (isAuthServerSettingKey(childId)) {
-        authData[childId] = null
-      }
-    }
-
-    return Object.keys(authData).length > 0
-      ? { authPatch: { data: authData } }
-      : {}
-  }
-
-  if (parentFieldId != null) {
-    if (
-      !Boolean(fieldValues[parentFieldId]) ||
-      !isAuthServerSettingKey(fieldId)
-    ) {
-      return {}
-    }
-
-    return { authPatch: { data: { [fieldId]: toggledOn } } }
-  }
-
-  if (isRobotServerSettingKey(fieldId)) {
-    return {
-      robotServerAccessControlPatch: { data: { [fieldId]: toggledOn } },
-    }
-  }
-
-  if (isAuthServerSettingKey(fieldId)) {
-    return { authPatch: { data: { [fieldId]: toggledOn } } }
-  }
-
-  return {}
 }
