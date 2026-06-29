@@ -8,7 +8,7 @@ import styles from './compliancereadysoftwaresettings.module.css'
 
 import type { JSX, ReactNode } from 'react'
 import type {
-  ComplianceReadyToggleFieldDescriptor,
+  ComplianceReadyToggleChangeOptions,
   FieldValues,
   SettingFieldId,
 } from './complianceReadySettingsTypes'
@@ -17,11 +17,11 @@ export interface ComplianceReadyToggleFieldProps {
   id: SettingFieldId
   labelKey: string
   values: FieldValues
-  childFields?: ComplianceReadyToggleFieldDescriptor['children']
-  parentField?: ComplianceReadyToggleFieldDescriptor
+  childFieldIds?: SettingFieldId[]
+  parentFieldId?: SettingFieldId
   onToggleChange: (
-    field: ComplianceReadyToggleFieldDescriptor,
-    parentField?: ComplianceReadyToggleFieldDescriptor
+    fieldId: SettingFieldId,
+    options?: ComplianceReadyToggleChangeOptions
   ) => void
   children?: ReactNode
 }
@@ -30,18 +30,14 @@ export function ComplianceReadyToggleField({
   id,
   labelKey,
   values,
-  childFields,
-  parentField,
+  childFieldIds,
+  parentFieldId,
   onToggleChange,
   children,
 }: ComplianceReadyToggleFieldProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const toggledOn = Boolean(values[id])
   const label = t(labelKey)
-  const field: ComplianceReadyToggleFieldDescriptor = {
-    id,
-    children: childFields,
-  }
 
   const toggleRow = (
     <div className={styles.toggle_row}>
@@ -56,7 +52,7 @@ export function ComplianceReadyToggleField({
         label={label}
         toggledOn={toggledOn}
         onClick={() => {
-          onToggleChange(field, parentField)
+          onToggleChange(id, { parentFieldId, childFieldIds })
         }}
       />
     </div>

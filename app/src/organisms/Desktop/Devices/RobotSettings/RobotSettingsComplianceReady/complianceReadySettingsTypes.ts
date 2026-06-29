@@ -66,8 +66,7 @@ export function isUiOnlyFieldId(id: SettingFieldId): id is UiSettingFieldId {
 
 export type FieldValues = Record<SettingFieldId, string | boolean>
 
-/** Toggle metadata passed to settings helpers (not UI config). */
-export interface ComplianceReadyToggleFieldDescriptor {
-  id: SettingFieldId
-  children?: SettingFieldId[]
+export interface ComplianceReadyToggleChangeOptions {
+  parentFieldId?: SettingFieldId
+  childFieldIds?: SettingFieldId[]
 }

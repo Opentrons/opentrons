@@ -15,7 +15,7 @@ import type {
 } from '@opentrons/api-client'
 import type {
   AuthSettingFieldId,
-  ComplianceReadyToggleFieldDescriptor,
+  ComplianceReadyToggleChangeOptions,
   FieldValues,
   RobotServerSettingFieldId,
   SettingFieldId,
@@ -137,36 +137,6 @@ function buildAuthPatch(
   return { data: { [id]: getAuthFieldPatchValue(id, values) } }
 }
 
-function buildParentDisablePatches(
-  parentField: ComplianceReadyToggleFieldDescriptor
-): {
-  authPatch?: PatchAuthSettingsRequest
-  robotServerAccessControlPatch?: PatchRobotServerAccessControlSettingsRequest
-} {
-  const authData: PatchAuthSettingsRequest['data'] = {}
-  const robotServerAccessControlData: PatchRobotServerAccessControlSettingsRequest['data'] =
-    {}
-
-  for (const childId of parentField.children ?? []) {
-    if (isAuthServerSettingKey(childId)) {
-      authData[childId] = null
-    } else if (isRobotServerSettingKey(childId)) {
-      robotServerAccessControlData[childId] = null
-    }
-  }
-
-  return {
-    ...(Object.keys(authData).length > 0
-      ? { authPatch: { data: authData } }
-      : {}),
-    ...(Object.keys(robotServerAccessControlData).length > 0
-      ? {
-          robotServerAccessControlPatch: { data: robotServerAccessControlData },
-        }
-      : {}),
-  }
-}
-
 /**
  * Auth-server patch for an input value, if it should be persisted.
  */
@@ -174,12 +144,12 @@ export function getAuthPatchForInputChange(
   id: AuthSettingFieldId,
   value: string,
   fieldValues: FieldValues,
-  parentField?: ComplianceReadyToggleFieldDescriptor
+  parentFieldId?: SettingFieldId
 ): PatchAuthSettingsRequest | null {
   const nextFieldValues: FieldValues = { ...fieldValues, [id]: value }
 
-  if (parentField != null) {
-    if (!Boolean(nextFieldValues[parentField.id]) || value === '') {
+  if (parentFieldId != null) {
+    if (!Boolean(nextFieldValues[parentFieldId]) || value === '') {
       return null
     }
   } else if (
@@ -196,56 +166,64 @@ export function getAuthPatchForInputChange(
  * Resolve updated form state and an optional patch for a toggle change.
  */
 export function resolveComplianceReadyToggleChange(
-  field: ComplianceReadyToggleFieldDescriptor,
+  fieldId: SettingFieldId,
   fieldValues: FieldValues,
-  parentField?: ComplianceReadyToggleFieldDescriptor
+  options?: ComplianceReadyToggleChangeOptions
 ): ComplianceReadyToggleChangeResult {
-  const toggledOn = !Boolean(fieldValues[field.id])
-  const nextFieldValues: FieldValues = { ...fieldValues, [field.id]: toggledOn }
+  const toggledOn = !Boolean(fieldValues[fieldId])
+  const nextFieldValues: FieldValues = { ...fieldValues, [fieldId]: toggledOn }
+  const { parentFieldId, childFieldIds } = options ?? {}
 
-  if (isUiOnlyFieldId(field.id) && field.children != null) {
+  if (isUiOnlyFieldId(fieldId) && childFieldIds != null) {
     if (toggledOn) {
       return { fieldValues: nextFieldValues }
     }
 
     const clearedFieldValues: FieldValues = {
       ...nextFieldValues,
-      [field.id]: false,
+      [fieldId]: false,
     }
-    for (const childId of field.children) {
+    const authData: PatchAuthSettingsRequest['data'] = {}
+
+    for (const childId of childFieldIds) {
       clearedFieldValues[childId] = getClearedFieldValue(childId)
+      if (isAuthServerSettingKey(childId)) {
+        authData[childId] = null
+      }
     }
 
     return {
       fieldValues: clearedFieldValues,
-      ...buildParentDisablePatches(field),
+      ...(Object.keys(authData).length > 0
+        ? { authPatch: { data: authData } }
+        : {}),
     }
   }
 
-  if (parentField != null) {
+  if (parentFieldId != null) {
     if (
-      !Boolean(nextFieldValues[parentField.id]) ||
-      !isAuthServerSettingKey(field.id)
+      !Boolean(nextFieldValues[parentFieldId]) ||
+      !isAuthServerSettingKey(fieldId)
     ) {
       return { fieldValues: nextFieldValues }
     }
     return {
       fieldValues: nextFieldValues,
-      authPatch: buildAuthPatch(field.id, nextFieldValues),
+      authPatch: buildAuthPatch(fieldId, nextFieldValues),
     }
   }
 
-  if (isRobotServerSettingKey(field.id)) {
+  if (isRobotServerSettingKey(fieldId)) {
     return {
       fieldValues: nextFieldValues,
-      robotServerAccessControlPatch: { data: { [field.id]: toggledOn } },
+      robotServerAccessControlPatch: { data: { [fieldId]: toggledOn } },
     }
   }
 
-  if (isAuthServerSettingKey(field.id)) {
+  if (isAuthServerSettingKey(fieldId)) {
     return {
       fieldValues: nextFieldValues,
-      authPatch: buildAuthPatch(field.id, nextFieldValues),
+      authPatch: buildAuthPatch(fieldId, nextFieldValues),
     }
   }
 

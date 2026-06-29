@@ -26,8 +26,9 @@ import type {
 } from '@opentrons/api-client'
 import type {
   AuthSettingFieldId,
-  ComplianceReadyToggleFieldDescriptor,
+  ComplianceReadyToggleChangeOptions,
   FieldValues,
+  SettingFieldId,
 } from './complianceReadySettingsTypes'
 
 export type { UiSettingFieldId } from './complianceReadySettingsTypes'
@@ -59,24 +60,6 @@ function ComplianceReadySettingsSection({
       </div>
     </div>
   )
-}
-
-const PASSWORD_RESET_TOGGLE: ComplianceReadyToggleFieldDescriptor = {
-  id: 'passwordResetEnabled',
-  children: ['passwordResetTime'],
-}
-
-const PASSWORD_COMPLEXITY_TOGGLE: ComplianceReadyToggleFieldDescriptor = {
-  id: 'passwordComplexityEnabled',
-  children: [
-    'passwordComplexitySpecialCharacters',
-    'passwordComplexityMinimumLength',
-  ],
-}
-
-const REQUIRE_REASON_TOGGLE: ComplianceReadyToggleFieldDescriptor = {
-  id: 'requireReasonForInteraction',
-  children: ['minLengthOfReasonForInteraction'],
 }
 
 export function ComplianceReadySoftwareSettings({
@@ -136,7 +119,7 @@ export function ComplianceReadySoftwareSettings({
   const handleInputBlur = (
     id: AuthSettingFieldId,
     value: string,
-    parentField?: ComplianceReadyToggleFieldDescriptor
+    parentFieldId?: SettingFieldId
   ): void => {
     const nextFieldValues: FieldValues = { ...fieldValues, [id]: value }
     setFieldValues(nextFieldValues)
@@ -145,7 +128,7 @@ export function ComplianceReadySoftwareSettings({
       id,
       value,
       fieldValues,
-      parentField
+      parentFieldId
     )
     if (authPatch != null) {
       patchAuth(authPatch)
@@ -153,14 +136,14 @@ export function ComplianceReadySoftwareSettings({
   }
 
   const handleToggleChange = (
-    field: ComplianceReadyToggleFieldDescriptor,
-    parentField?: ComplianceReadyToggleFieldDescriptor
+    fieldId: SettingFieldId,
+    options?: ComplianceReadyToggleChangeOptions
   ): void => {
     const {
       fieldValues: nextFieldValues,
       authPatch,
       robotServerAccessControlPatch,
-    } = resolveComplianceReadyToggleChange(field, fieldValues, parentField)
+    } = resolveComplianceReadyToggleChange(fieldId, fieldValues, options)
     setFieldValues(nextFieldValues)
     if (authPatch != null) {
       patchAuth(authPatch)
@@ -199,9 +182,9 @@ export function ComplianceReadySoftwareSettings({
           />
           <Divider />
           <ComplianceReadyToggleField
-            id={PASSWORD_RESET_TOGGLE.id}
+            id="passwordResetEnabled"
             labelKey="desktop_require_password_change_after_time"
-            childFields={PASSWORD_RESET_TOGGLE.children}
+            childFieldIds={['passwordResetTime']}
             {...toggleFieldProps}
           >
             <InputSetting
@@ -213,22 +196,25 @@ export function ComplianceReadySoftwareSettings({
                 handleInputBlur(
                   'passwordResetTime',
                   value,
-                  PASSWORD_RESET_TOGGLE
+                  'passwordResetEnabled'
                 )
               }}
             />
           </ComplianceReadyToggleField>
           <Divider />
           <ComplianceReadyToggleField
-            id={PASSWORD_COMPLEXITY_TOGGLE.id}
+            id="passwordComplexityEnabled"
             labelKey="desktop_require_password_complexity_requirements"
-            childFields={PASSWORD_COMPLEXITY_TOGGLE.children}
+            childFieldIds={[
+              'passwordComplexitySpecialCharacters',
+              'passwordComplexityMinimumLength',
+            ]}
             {...toggleFieldProps}
           >
             <ComplianceReadyToggleField
               id="passwordComplexitySpecialCharacters"
               labelKey="desktop_require_special_characters"
-              parentField={PASSWORD_COMPLEXITY_TOGGLE}
+              parentFieldId="passwordComplexityEnabled"
               {...toggleFieldProps}
             />
             <InputSetting
@@ -240,7 +226,7 @@ export function ComplianceReadySoftwareSettings({
                 handleInputBlur(
                   'passwordComplexityMinimumLength',
                   value,
-                  PASSWORD_COMPLEXITY_TOGGLE
+                  'passwordComplexityEnabled'
                 )
               }}
             />
@@ -302,9 +288,8 @@ export function ComplianceReadySoftwareSettings({
           isLastSection
         >
           <ComplianceReadyToggleField
-            id={REQUIRE_REASON_TOGGLE.id}
+            id="requireReasonForInteraction"
             labelKey="desktop_require_documentation_for_robot_actions"
-            childFields={REQUIRE_REASON_TOGGLE.children}
             {...toggleFieldProps}
           >
             <InputSetting
@@ -318,7 +303,7 @@ export function ComplianceReadySoftwareSettings({
                 handleInputBlur(
                   'minLengthOfReasonForInteraction',
                   value,
-                  REQUIRE_REASON_TOGGLE
+                  'requireReasonForInteraction'
                 )
               }}
             />
