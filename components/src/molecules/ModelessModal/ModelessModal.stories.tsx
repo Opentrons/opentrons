@@ -41,7 +41,7 @@ const SampleSpotlightContent = (): JSX.Element => (
         borderRadius: BORDERS.borderRadius4,
         alignItems: 'center',
         justifyContent: 'center',
-        border: '1px dashed #cbd5e0',
+        border: `1px dashed ${COLORS.bakck90}`,
         minHeight: '200px',
       }}
     >
