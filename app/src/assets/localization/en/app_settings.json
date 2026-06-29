@@ -60,6 +60,7 @@
   "heater_shaker_attach_visible": "Confirm Heater-Shaker Module Attachment",
   "how_to_restore": "How to Restore a Previous Software Version",
   "installing_update": "Installing update...",
+  "if_on_fetch_updates_in_the_background": "If on, fetch updates in the background when released.",
   "ip_available": "Available",
   "ip_description_first": "Enter an IP address or hostname to connect to a robot.",
   "language": "Language",
