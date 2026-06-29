@@ -977,3 +977,90 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 
 </protocol>
+
+#### Example 12: Quality Control with Image Capture
+
+<description> 
+I want to run a simple reagent transfer protocol but document each major step with images for quality control. Here's what I need: I'll be using a Flex robot with a single-channel pipette. I have a reservoir with my reagent and a 96-well plate where I'll dispense it.
+
+The workflow should be:
+- Take a picture of the initial setup (empty plate)
+- Add 50 µL of reagent from the reservoir to the first 24 wells of the plate
+- Take a picture after the first transfer
+- Add another 100 µL to those same wells
+- Take a final picture to document the completed protocol
+- I want to add comments at each step so I know what's happening when I review the run log later.
+</description>
+
+<protocol>
+```python
+from opentrons import protocol_api
+ 
+metadata = {
+    'protocolName': 'Quality Control with Image Capture',
+    'author': 'OpentronsAI',
+    'description': 'Demonstrates protocol documentation using capture_image() and comments'
+}
+ 
+requirements = {
+    'robotType': 'Flex',
+    'apiLevel': '2.28'
+}
+ 
+def run(protocol: protocol_api.ProtocolContext):
+    # Load labware
+    tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
+    reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
+    plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
+    trash = protocol.load_trash_bin('A3')
+    
+    # Load pipette
+    pipette = protocol.load_instrument(
+        'flex_1channel_1000',
+        'left',
+        tip_racks=[tips]
+    )
+    
+    # Define wells
+    reagent_source = reservoir['A1']
+    target_wells = plate.wells()[:24]  # First 24 wells
+    
+    # Step 1: Document initial state
+    protocol.comment('=== INITIAL STATE ===')
+    protocol.comment('Capturing image of empty plate before reagent addition')
+    protocol.capture_image()
+    
+    # Step 2: First reagent addition
+    protocol.comment('=== FIRST TRANSFER ===')
+    protocol.comment('Adding 50 µL of reagent to wells A1-D6')
+    pipette.transfer(
+        50,
+        reagent_source,
+        target_wells,
+        new_tip='once'
+    )
+    
+    # Step 3: Document after first transfer
+    protocol.comment('First transfer complete - capturing verification image')
+    protocol.capture_image()
+    
+    # Step 4: Second reagent addition
+    protocol.comment('=== SECOND TRANSFER ===')
+    protocol.comment('Adding 100 µL more reagent to the same wells')
+    pipette.transfer(
+        100,
+        reagent_source,
+        target_wells,
+        new_tip='once'
+    )
+    
+    # Step 5: Document final state
+    protocol.comment('=== FINAL STATE ===')
+    protocol.comment('Protocol complete - capturing final verification image')
+    protocol.capture_image()
+    
+    protocol.comment('Total volume per well: 150 µL')
+    protocol.comment('QC images captured: 3 (initial, mid-protocol, final)')
+    ```
+
+</protocol>
