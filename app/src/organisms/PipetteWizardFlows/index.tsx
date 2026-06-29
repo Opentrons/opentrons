@@ -12,6 +12,7 @@ import {
   WizardHeader,
 } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
@@ -235,8 +236,13 @@ export const PipetteWizardFlows = (
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)
         },
-        onError: error => {
-          setShowErrorMessage(error.message)
+        onError: (error: unknown) => {
+          if (isDocumentedMutationError(error)) {
+            return
+          }
+          setShowErrorMessage(
+            error instanceof Error ? error.message : String(error)
+          )
         },
       },
       host
