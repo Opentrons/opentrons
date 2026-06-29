@@ -52,7 +52,7 @@ describe('GeneralSettings', () => {
   it('renders correct titles', () => {
     render()
     screen.getByText('App Software Version')
-    screen.getByText('Software Update Alerts')
+    screen.getByText('Software Update')
     screen.getByText('Connect to a Robot via IP Address')
   })
 
