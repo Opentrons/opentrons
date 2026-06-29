@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { StyledText } from '../../atoms/StyledText'
-import { COLORS } from '../../helix-design-system'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { RobotInfoLabel } from '../../molecules/RobotInfoLabel'
 import { SPACING } from '../../ui-style-constants'
 import { ModelessModal } from './'
@@ -36,18 +36,18 @@ const SampleSpotlightContent = (): JSX.Element => (
     <div
       style={{
         flex: 1,
-        backgroundColor: '#f1f1f1',
-        borderRadius: '4px',
+        backgroundColor: COLORS.grey10,
         display: 'flex',
+        borderRadius: BORDERS.borderRadius4,
         alignItems: 'center',
         justifyContent: 'center',
         border: '1px dashed #cbd5e0',
         minHeight: '200px',
       }}
     >
-      <span style={{ color: '#718096', fontSize: '14px' }}>
+      <StyledText desktopStyle="bodyDefaultRegular">
         [ 96 Well Plate Image Area ]
-      </span>
+      </StyledText>
     </div>
   </div>
 )
@@ -62,8 +62,8 @@ const InteractiveTemplate = (
       style={{
         width: '100vw',
         height: '100vh',
-        padding: '24px',
-        backgroundColor: '#f7fafc',
+        padding: SPACING.spacing24,
+        backgroundColor: COLORS.white,
       }}
     >
       <StyledText desktopStyle="bodyDefaultRegular">

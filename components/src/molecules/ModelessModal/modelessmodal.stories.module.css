@@ -7,7 +7,7 @@ button {
   height: 100%;
   flex-direction: column;
   padding: var(--spacing-24);
-  background-color: var(--grey-30);
+  background-color: var(white);
   gap: var(--spacing-16);
 }
 
