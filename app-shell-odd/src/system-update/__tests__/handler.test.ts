@@ -154,6 +154,7 @@ describe('update driver manager', () => {
       name: vi.fn(),
       source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     }
     const fakeProvider2 = {
       ...fakeProvider,
@@ -230,6 +231,7 @@ describe('update driver', () => {
     name: vi.fn(),
     source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
     cleanup: () => Promise.resolve(),
+    ongoingCheck: () => null,
   }
   const fakeUsbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {
     first: {
@@ -245,6 +247,7 @@ describe('update driver', () => {
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     },
   }
 
@@ -280,6 +283,7 @@ describe('update driver', () => {
           massStorageRootPath: '/some/usb/path',
         }) as any as USBUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     }
     fakeUsbProviders.second = {
       teardown: vi.fn(),
@@ -294,6 +298,7 @@ describe('update driver', () => {
           massStorageRootPath: '/some/other/usb/path',
         }) as any as USBUpdateSource,
       cleanup: () => Promise.resolve(),
+      ongoingCheck: () => null,
     }
     subject = createUpdateDriver(dispatch)
   })

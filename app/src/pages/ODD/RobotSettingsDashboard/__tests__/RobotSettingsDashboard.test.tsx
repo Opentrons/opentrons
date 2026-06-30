@@ -38,6 +38,8 @@ import {
 
 import { RobotSettingsDashboard } from '../'
 
+import type { Config } from '/app/redux/config'
+
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -116,7 +118,7 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: false })
     vi.mocked(getConfig).mockReturnValue({
       update: { automaticallyDownloadUpdates: false },
-    })
+    } as Config)
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
   })
 
@@ -198,7 +200,7 @@ describe('RobotSettingsDashboard', () => {
   it('should render text with auto download on and clicking it turns the setting off', () => {
     vi.mocked(getConfig).mockReturnValue({
       update: { automaticallyDownloadUpdates: true },
-    })
+    } as Config)
 
     render()
     expect(
