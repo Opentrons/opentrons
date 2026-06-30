@@ -324,7 +324,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           }
           return new Promise(resolve => {
             const details = getDetails()
-            if (details == 'ongoing') {
+            if (details === 'ongoing') {
               dispatch({
                 type: 'robotUpdate:CHECKING_FOR_UPDATE',
                 payload: 'flex',
