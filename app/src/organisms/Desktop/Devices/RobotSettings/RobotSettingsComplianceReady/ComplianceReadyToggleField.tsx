@@ -10,7 +10,6 @@ import styles from './compliancereadysoftwaresettings.module.css'
 
 import type { JSX, ReactNode } from 'react'
 import type {
-  ComplianceReadyToggleChangeOptions,
   FieldValues,
   SettingFieldId,
 } from './complianceReadySettingsTypes'
@@ -19,12 +18,7 @@ export interface ComplianceReadyToggleFieldProps {
   id: SettingFieldId
   labelKey: string
   values: FieldValues
-  childFieldIds?: SettingFieldId[]
-  parentFieldId?: SettingFieldId
-  onToggleChange: (
-    fieldId: SettingFieldId,
-    options?: ComplianceReadyToggleChangeOptions
-  ) => void
+  onToggleChange: (toggledOn: boolean) => void
   children?: ReactNode
 }
 
@@ -32,8 +26,6 @@ export function ComplianceReadyToggleField({
   id,
   labelKey,
   values,
-  childFieldIds,
-  parentFieldId,
   onToggleChange,
   children,
 }: ComplianceReadyToggleFieldProps): JSX.Element {
@@ -51,11 +43,7 @@ export function ComplianceReadyToggleField({
       setExpanded(nextToggledOn)
     }
 
-    onToggleChange(id, {
-      parentFieldId,
-      childFieldIds,
-      toggledOn: nextToggledOn,
-    })
+    onToggleChange(nextToggledOn)
   }
 
   const toggleRow = (

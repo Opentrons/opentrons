@@ -11,7 +11,7 @@ import {
 
 import { Accordion } from './Accordion'
 import {
-  getAuthPatchForInputChange,
+  getAuthInputPatch,
   getFieldValuesFromSettings,
 } from './complianceReadySettingsHelper'
 import {
@@ -23,10 +23,8 @@ import { ComplianceReadyToggleField } from './ComplianceReadyToggleField'
 import { InputSetting } from './InputSetting'
 
 import type { JSX, ReactNode } from 'react'
-import type { AuthSettingsData } from '@opentrons/api-client'
 import type {
   AuthSettingFieldId,
-  ComplianceReadyToggleChangeOptions,
   SettingFieldId,
 } from './complianceReadySettingsTypes'
 
@@ -84,50 +82,44 @@ export function ComplianceReadySoftwareSettings({
     ]
   )
 
-  const handleInputBlur = (
-    id: AuthSettingFieldId,
-    value: string,
-    parentFieldId?: SettingFieldId
-  ): void => {
-    const authPatch = getAuthPatchForInputChange(
-      id,
-      value,
-      fieldValues,
-      parentFieldId
-    )
-    if (authPatch != null) {
-      void patchAuthSettings(authPatch)
+  const handleInputBlur =
+    (id: AuthSettingFieldId) =>
+    (value: string): void => {
+      const authPatch = getAuthInputPatch(id, value, fieldValues)
+      if (authPatch != null) {
+        void patchAuthSettings(authPatch)
+      }
     }
-  }
 
-  const handleToggleChange = (
-    fieldId: SettingFieldId,
-    options?: ComplianceReadyToggleChangeOptions
-  ): void => {
-    const toggledOn =
-      options?.toggledOn ?? !Boolean(fieldValues[fieldId])
-    const { childFieldIds } = options ?? {}
-
-    if (!toggledOn && childFieldIds != null) {
-      const authData = {
-        ...Object.fromEntries(childFieldIds.map(childId => [childId, null])),
-        ...(isAuthServerSettingKey(fieldId) ? { [fieldId]: toggledOn } : {}),
-      } as Partial<AuthSettingsData>
-
-      void patchAuthSettings({ data: authData })
-    } else if (isRobotServerSettingKey(fieldId)) {
-      void patchRobotServerAccessControlSettings({
-        data: { [fieldId]: toggledOn },
-      })
-    } else if (isAuthServerSettingKey(fieldId)) {
-      void patchAuthSettings({ data: { [fieldId]: toggledOn } })
+  const handleToggleChange =
+    (fieldId: SettingFieldId) =>
+    (toggledOn: boolean): void => {
+      switch (fieldId) {
+        case 'passwordResetEnabled':
+          if (!toggledOn) {
+            void patchAuthSettings({ data: { passwordResetTime: null } })
+          }
+          return
+        case 'passwordComplexityEnabled':
+          if (!toggledOn) {
+            void patchAuthSettings({
+              data: {
+                passwordComplexitySpecialCharacters: null,
+                passwordComplexityMinimumLength: null,
+              },
+            })
+          }
+          return
+        default:
+          if (isRobotServerSettingKey(fieldId)) {
+            void patchRobotServerAccessControlSettings({
+              data: { [fieldId]: toggledOn },
+            })
+          } else if (isAuthServerSettingKey(fieldId)) {
+            void patchAuthSettings({ data: { [fieldId]: toggledOn } })
+          }
+      }
     }
-  }
-
-  const toggleFieldProps = {
-    values: fieldValues,
-    onToggleChange: handleToggleChange,
-  }
 
   return (
     <Accordion
@@ -146,59 +138,44 @@ export function ComplianceReadySoftwareSettings({
             )}
             value={String(fieldValues.maxNumberOfLoginAttempts)}
             units={t('desktop_logins')}
-            onBlur={value => {
-              handleInputBlur('maxNumberOfLoginAttempts', value)
-            }}
+            onBlur={handleInputBlur('maxNumberOfLoginAttempts')}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="passwordResetEnabled"
             labelKey="desktop_require_password_change_after_time"
-            childFieldIds={['passwordResetTime']}
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange('passwordResetEnabled')}
           >
             <InputSetting
               key={String(fieldValues.passwordResetTime)}
               label={t('desktop_length_of_time')}
               value={String(fieldValues.passwordResetTime)}
               units={t('desktop_days')}
-              onBlur={value => {
-                handleInputBlur(
-                  'passwordResetTime',
-                  value,
-                  'passwordResetEnabled'
-                )
-              }}
+              onBlur={handleInputBlur('passwordResetTime')}
             />
           </ComplianceReadyToggleField>
           <Divider />
           <ComplianceReadyToggleField
             id="passwordComplexityEnabled"
             labelKey="desktop_require_password_complexity_requirements"
-            childFieldIds={[
-              'passwordComplexitySpecialCharacters',
-              'passwordComplexityMinimumLength',
-            ]}
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange('passwordComplexityEnabled')}
           >
             <ComplianceReadyToggleField
               id="passwordComplexitySpecialCharacters"
               labelKey="desktop_require_special_characters"
-              parentFieldId="passwordComplexityEnabled"
-              {...toggleFieldProps}
+              values={fieldValues}
+              onToggleChange={handleToggleChange(
+                'passwordComplexitySpecialCharacters'
+              )}
             />
             <InputSetting
               key={String(fieldValues.passwordComplexityMinimumLength)}
               label={t('desktop_minimum_password_length')}
               value={String(fieldValues.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
-              onBlur={value => {
-                handleInputBlur(
-                  'passwordComplexityMinimumLength',
-                  value,
-                  'passwordComplexityEnabled'
-                )
-              }}
+              onBlur={handleInputBlur('passwordComplexityMinimumLength')}
             />
           </ComplianceReadyToggleField>
           <Divider />
@@ -207,9 +184,7 @@ export function ComplianceReadySoftwareSettings({
             label={t('desktop_auto_logout_inactivity_length')}
             value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
-            onBlur={value => {
-              handleInputBlur('idleLogout', value)
-            }}
+            onBlur={handleInputBlur('idleLogout')}
           />
         </ComplianceReadySettingsSection>
 
@@ -220,19 +195,28 @@ export function ComplianceReadySoftwareSettings({
           <ComplianceReadyToggleField
             id="requireAdminCredsWhenUpdatingRobotSoftware"
             labelKey="desktop_require_admin_credentials_to_update_robots"
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange(
+              'requireAdminCredsWhenUpdatingRobotSoftware'
+            )}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="requireAdminCredsWhenSendingProtocolToRobot"
             labelKey="desktop_require_admin_credentials_to_send_protocols"
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange(
+              'requireAdminCredsWhenSendingProtocolToRobot'
+            )}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="requireAdminCredsForSignoffProtocol"
             labelKey="desktop_require_admin_credentials_to_sign_protocol_run_records"
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange(
+              'requireAdminCredsForSignoffProtocol'
+            )}
           />
         </ComplianceReadySettingsSection>
 
@@ -243,13 +227,15 @@ export function ComplianceReadySoftwareSettings({
           <ComplianceReadyToggleField
             id="requireSignoffForProtocolLog"
             labelKey="desktop_require_signoff_for_protocol_log"
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange('requireSignoffForProtocolLog')}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="deleteOverMaxOnDiskProtocols"
             labelKey="desktop_automatically_delete_protocol_run_logs"
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange('deleteOverMaxOnDiskProtocols')}
           />
         </ComplianceReadySettingsSection>
 
@@ -260,7 +246,8 @@ export function ComplianceReadySoftwareSettings({
           <ComplianceReadyToggleField
             id="requireReasonForInteraction"
             labelKey="desktop_require_documentation_for_robot_actions"
-            {...toggleFieldProps}
+            values={fieldValues}
+            onToggleChange={handleToggleChange('requireReasonForInteraction')}
           >
             <InputSetting
               key={String(fieldValues.minLengthOfReasonForInteraction)}
@@ -269,13 +256,7 @@ export function ComplianceReadySoftwareSettings({
               )}
               value={String(fieldValues.minLengthOfReasonForInteraction)}
               units={t('desktop_characters')}
-              onBlur={value => {
-                handleInputBlur(
-                  'minLengthOfReasonForInteraction',
-                  value,
-                  'requireReasonForInteraction'
-                )
-              }}
+              onBlur={handleInputBlur('minLengthOfReasonForInteraction')}
             />
           </ComplianceReadyToggleField>
         </ComplianceReadySettingsSection>

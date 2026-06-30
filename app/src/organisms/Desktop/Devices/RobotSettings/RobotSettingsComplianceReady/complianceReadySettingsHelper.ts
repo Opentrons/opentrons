@@ -1,6 +1,6 @@
 import {
   AUTH_SERVER_SETTING_FIELD_IDS,
-  isUiOnlyFieldId,
+  ROBOT_SERVER_SETTING_FIELD_IDS,
 } from './complianceReadySettingsTypes'
 
 import type {
@@ -11,7 +11,7 @@ import type {
 import type {
   AuthSettingFieldId,
   FieldValues,
-  SettingFieldId,
+  RobotServerSettingFieldId,
 } from './complianceReadySettingsTypes'
 
 const SECONDS_PER_MINUTE = 60
@@ -59,59 +59,57 @@ export function getFieldValuesFromSettings(
     {}
   )
 
+  const robotFieldValues = (
+    Object.keys(ROBOT_SERVER_SETTING_FIELD_IDS) as RobotServerSettingFieldId[]
+  ).reduce<Partial<Pick<FieldValues, RobotServerSettingFieldId>>>(
+    (acc, key) => ({
+      ...acc,
+      [key]: robotServerAccessControlSettingsData[key] ?? false,
+    }),
+    {}
+  )
+
   return {
     ...(authFieldValues as Pick<FieldValues, AuthSettingFieldId>),
+    ...(robotFieldValues as Pick<FieldValues, RobotServerSettingFieldId>),
     passwordResetEnabled: Boolean(authSettingsData.passwordResetTime),
     passwordComplexityEnabled:
       Boolean(authSettingsData.passwordComplexityMinimumLength) ||
       Boolean(authSettingsData.passwordComplexitySpecialCharacters),
-    requireSignoffForProtocolLog:
-      robotServerAccessControlSettingsData.requireSignoffForProtocolLog ??
-      false,
-    requireLogsToBeSavedInApp:
-      robotServerAccessControlSettingsData.requireLogsToBeSavedInApp ?? false,
-    deleteOverMaxOnDiskProtocols:
-      robotServerAccessControlSettingsData.deleteOverMaxOnDiskProtocols ??
-      false,
   }
 }
 
 /** Auth-server patch for an input value, if it should be persisted. */
-export function getAuthPatchForInputChange(
+export function getAuthInputPatch(
   id: AuthSettingFieldId,
   value: string,
-  fieldValues: FieldValues,
-  parentFieldId?: SettingFieldId
+  fieldValues: FieldValues
 ): PatchAuthSettingsRequest | null {
-  if (parentFieldId != null) {
-    if (
-      !isUiOnlyFieldId(parentFieldId) &&
-      !Boolean(fieldValues[parentFieldId])
-    ) {
-      return null
-    }
-  } else if (
-    (id !== 'maxNumberOfLoginAttempts' && id !== 'idleLogout') ||
-    (id === 'idleLogout' && value === '')
-  ) {
-    return null
-  }
-
   switch (id) {
-    case 'passwordResetTime':
-      return { data: { passwordResetTime: Number(value) * SECONDS_PER_DAY } }
-    case 'idleLogout':
-      return { data: { idleLogout: Number(value) * SECONDS_PER_MINUTE } }
-    case 'passwordComplexityMinimumLength':
-      return { data: { passwordComplexityMinimumLength: Number(value) } }
-    case 'minLengthOfReasonForInteraction':
-      return { data: { minLengthOfReasonForInteraction: Number(value) } }
     case 'maxNumberOfLoginAttempts':
       return {
-        data: {
-          maxNumberOfLoginAttempts: value === '' ? null : Number(value),
-        },
+        data: { maxNumberOfLoginAttempts: value === '' ? null : Number(value) },
       }
+    case 'idleLogout':
+      if (value === '') {
+        return null
+      }
+      return { data: { idleLogout: Number(value) * SECONDS_PER_MINUTE } }
+    case 'passwordResetTime':
+      if (value === '') {
+        return null
+      }
+      return { data: { passwordResetTime: Number(value) * SECONDS_PER_DAY } }
+    case 'passwordComplexityMinimumLength':
+      if (value === '') {
+        return null
+      }
+      return { data: { passwordComplexityMinimumLength: Number(value) } }
+    case 'minLengthOfReasonForInteraction':
+      if (!fieldValues.requireReasonForInteraction || value === '') {
+        return null
+      }
+      return { data: { minLengthOfReasonForInteraction: Number(value) } }
     default:
       return null
   }
