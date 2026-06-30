@@ -307,4 +307,18 @@ describe('ComplianceReadySoftwareSettings', () => {
       })
     })
   })
+  it('should not patch idleLogout when blurred value is not greater than zero', async () => {
+    render()
+    expandAccordion()
+
+    const idleLogoutField = screen.getByLabelText(
+      'Length of time for auto-logout due to inactivity'
+    )
+    fireEvent.change(idleLogoutField, { target: { value: '0' } })
+    fireEvent.blur(idleLogoutField)
+
+    await waitFor(() => {
+      expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    })
+  })
 })

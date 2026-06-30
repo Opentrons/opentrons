@@ -20,6 +20,21 @@ import type {
 
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
+export const MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 256
+
+function isPositiveNumber(value: string): boolean {
+  const parsedValue = Number(value)
+  return Number.isFinite(parsedValue) && parsedValue > 0
+}
+
+function isValidPasswordComplexityMinimumLength(value: string): boolean {
+  const parsedValue = Number(value)
+  return (
+    Number.isInteger(parsedValue) &&
+    parsedValue > 0 &&
+    parsedValue <= MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH
+  )
+}
 
 function getAuthSettingFieldValue(
   key: AuthSettingFieldId,
@@ -28,7 +43,7 @@ function getAuthSettingFieldValue(
   switch (key) {
     case 'idleLogout':
       return authSettings.idleLogout != null
-        ? String(Math.round(authSettings.idleLogout / SECONDS_PER_MINUTE))
+        ? String(authSettings.idleLogout / SECONDS_PER_MINUTE)
         : ''
     case 'passwordResetTime':
       return authSettings.passwordResetTime != null
@@ -123,7 +138,7 @@ export function getAuthInputPatch(
         data: { maxNumberOfLoginAttempts: value === '' ? null : Number(value) },
       }
     case 'idleLogout':
-      if (value === '') {
+      if (!isPositiveNumber(value)) {
         return null
       }
       return { data: { idleLogout: Number(value) * SECONDS_PER_MINUTE } }
@@ -133,7 +148,7 @@ export function getAuthInputPatch(
       }
       return { data: { passwordResetTime: Number(value) * SECONDS_PER_DAY } }
     case 'passwordComplexityMinimumLength':
-      if (value === '') {
+      if (!isValidPasswordComplexityMinimumLength(value)) {
         return null
       }
       return { data: { passwordComplexityMinimumLength: Number(value) } }

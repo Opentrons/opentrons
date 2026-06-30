@@ -11,6 +11,8 @@ export interface InputSettingProps {
   value: string
   units?: string
   placeholder?: string
+  min?: number
+  max?: number
   onBlur: (value: string) => void
 }
 
@@ -20,6 +22,8 @@ export function InputSetting({
   units,
   onBlur,
   placeholder,
+  min,
+  max,
 }: InputSettingProps): JSX.Element {
   const inputId = useId()
   const [inputValue, setInputValue] = useState(value)
@@ -35,6 +39,8 @@ export function InputSetting({
           type="number"
           value={inputValue}
           placeholder={placeholder}
+          min={min}
+          max={max}
           units={
             units != null ? (
               <StyledText
