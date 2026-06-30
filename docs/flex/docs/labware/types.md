@@ -106,7 +106,7 @@ When ordering or reordering, tips are available as racks or refills. Both racks 
       <td><strong>Refills</strong></td>
       <td>A refill configuration consists of:
         <ul>
-          <li>4 blister packs per carton (5 tip mid-plates per pack).</li>
+          <li>4 blister packs per carton (5 mid-plates per pack).</li>
           <li>20 tip rack mid-plates total.</li>
           <li>Each mid-plate includes 96 tips.</li>
           <li>All mid-plates are nested in blister packs to minimize packaging waste.</li>
