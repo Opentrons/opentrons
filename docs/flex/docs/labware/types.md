@@ -56,7 +56,7 @@ For a full example of a well plate lid, reference the [Opentrons Tough PCR Auto-
 
 ## Tips and tip racks 
 
-Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
+Opentrons Flex tips come in racks that hold 96 tips. Flex pipette tips are made of clear, non-conducting polypropylene and are available with or without filters. Currently, we offer tips in 20 µL, 50 µL, 200 µL, and 1000 µL sizes.
 
 ### Tip sterility
 
@@ -67,7 +67,11 @@ Sealed, unopened packages of Opentrons pipette tips are certified to be free of 
 
 ### Tip racks 
 
-Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid.
+Opentrons Flex tip racks consist of a lid, a mid-plate that holds 96 filtered or unfiltered tips, and a reusable base plate. These pieces are made of different thermoplastics as follows:
+
+- Lid: Polypropylene
+- Mid-plate: TBD
+- Base: TBD
 
 To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labeled based on the maximum rated volume for each tip type.
 
@@ -78,10 +82,41 @@ To help with identification, each tip rack package includes an 8-digit lot numbe
 
 ![Flex 20 µL, 50 µL, 200 µL, and 1000 µL tip racks](../images/flex-tipracks-hero.png)
 
-When ordering or reordering, tips and racks come in two different packaged configurations: 
+When ordering or reordering, tips are available as racks or refills. Both racks and refills include the same number of tips (1,920) but ship in two distinct packaging configurations.
 
-- **Racks:** Consist of separately shrink-wrapped tip racks (base plate, mid-plate with tips, and lid). Racked configurations are best when cleanliness is paramount, to avoid cross-contamination, or when your protocols don't allow for base plate or component reuse.
-- **Refills:** Consist of one complete tip rack (base plate, mid-plate with tips, and lid) and individual tip containers. Refill configurations are best when your protocols allow for base plate or component reuse. 
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Contents</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Racks</strong></td>
+      <td>A rack consists of:
+        <ul>
+          <li>4 boxes in a carton (5 tip racks in each box).</li>
+          <li>20 individual tip racks total.</li>
+          <li>Each tip rack includes a lid, mid-plate with 96 tips, and base plate.</li>
+          <li>Tip racks are individually shrink wrapped to prevent contamination.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Refills</strong></td>
+      <td>A refill consists of:
+        <ul>
+          <li>4 blister packs per carton (5 tip racks per blister).</li>
+          <li>20 tip mid-plates per carton.</li>
+          <li>Each mid-plate includes 96 tips.</li>
+          <li>2 individually shrink-wrapped base plates (packaged separately within the carton).</li>
+          <li>No lids.</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Tip-pipette compatibility
 
