@@ -3,6 +3,7 @@ test_name: logMessage endpoint
 marks:
   - usefixtures:
       - run_server
+      - enable_logging
 
 stages:
   - name: POST /audit/internal/logMessage logs valid message with reason
