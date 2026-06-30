@@ -17,7 +17,7 @@ You'll need to use the Opentrons App to update from the previous release (v9.0.0
 ### New Features
 
 - Use the updated Opentrons App to control and work with your Flex, including running protocols. Download the OT-2 App to control the OT-2 liquid handling robot.
-- Adds a new Opentrons App and Flex touchscreen setting ("Automatically Download Updates") that's turned off by default:
+- Adds a new setting to both the Opentrons App and Flex touchscreen ("Automatically Download Updates"). On the Flex touchscreen, this is turned off by default:
   - When turned off, robot and app updates will not automatically download.
   - When turned on, robot app updates will automatically download, but not be installed.
   - After downloading an update, click to install.
