@@ -109,11 +109,11 @@ describe('ComplianceReadySoftwareSettings', () => {
     } as ReturnType<typeof useGetRobotServerAccessControlSettingsQuery>)
     vi.mocked(useAuthSettingsMutation).mockReturnValue({
       mutate: mockPatchAuthSettings,
-    } as ReturnType<typeof useAuthSettingsMutation>)
+    } as any)
     vi.mocked(usePatchRobotServerAccessControlSettingsMutation).mockReturnValue(
       {
         mutate: mockPatchRobotServerAccessControlSettings,
-      } as ReturnType<typeof usePatchRobotServerAccessControlSettingsMutation>
+      } as any
     )
   })
 
