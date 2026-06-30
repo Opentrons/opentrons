@@ -378,19 +378,22 @@ describe('downloadReleaseFiles', () => {
             .then(() => dest)
         })
       const progress = vi.fn()
-      return expect(
-        downloadReleaseFiles(
-          {
-            system: 'http://opentrons.com/ot3-system.zip',
-            releaseNotes: 'http://opentrons.com/releaseNotes.md',
-          } as ReleaseSetUrls,
-          directory,
-          progress,
-          new AbortController()
+      return (
+        expect(
+          downloadReleaseFiles(
+            {
+              system: 'http://opentrons.com/ot3-system.zip',
+              releaseNotes: 'http://opentrons.com/releaseNotes.md',
+            } as ReleaseSetUrls,
+            directory,
+            progress,
+            new AbortController()
+          )
         )
+          .rejects.toThrow()
+          // the release notes are downloaded before-hand and kept
+          .then(() => expect(fs.stat(tempReleaseNotesPath)).resolves)
       )
-        .rejects.toThrow()
-        .then(() => expect(fs.stat(tempReleaseNotesPath)).rejects.toThrow())
     }))
   it('should allow the http requests to be aborted', () =>
     directoryWithCleanup(directory => {

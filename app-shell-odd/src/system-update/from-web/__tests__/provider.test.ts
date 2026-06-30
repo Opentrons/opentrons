@@ -271,7 +271,7 @@ describe('provider.scanUpdate happy paths', () => {
 
     when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
-      .thenReject(new Error('oh no'))
+      .thenResolve(null)
 
     const progressCallback = vi.fn()
     const provider = getProvider({
@@ -289,15 +289,22 @@ describe('provider.scanUpdate happy paths', () => {
     return expect(provider.scanUpdate(progressCallback))
       .resolves.toEqual({
         version: '1.2.3',
-        files: { system: null, releaseNotes: null },
-        releaseNotes: null,
+        files: {
+          system: null,
+          releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
+        },
+        releaseNotes: 'some release notes cool',
         downloadProgress: 0,
       })
       .then(() =>
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
-          files: { system: null, releaseNotes: null },
-          releaseNotes: null,
+          files: {
+            system: null,
+            releaseNotes:
+              '/some/random/directory/versions/1.2.3/releaseNotes.md',
+          },
+          releaseNotes: 'some release notes cool',
           downloadProgress: 0,
         })
       )
@@ -468,6 +475,9 @@ describe('provider.downloadUpdate happy paths', () => {
       ...releaseFiles,
       releaseNotesContent: 'oh look some release notes sweet',
     }
+    when(ensureCleanReleaseCacheForVersion)
+      .calledWith('/some/random/directory/versions', '1.2.3')
+      .thenResolve('/some/random/directory/versions/1.2.3')
     when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
@@ -481,7 +491,7 @@ describe('provider.downloadUpdate happy paths', () => {
       })
     when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
-      .thenReject(new Error('nope'))
+      .thenResolve(null)
 
     when(cleanUpAndDownloadReleaseFiles)
       .calledWith(
@@ -518,6 +528,16 @@ describe('provider.downloadUpdate happy paths', () => {
                 })
             )
       )
+    when(downloadReleaseNotes)
+      .calledWith(
+        'http://opentrons.com/releaseNotes.md',
+        '/some/random/directory/versions/1.2.3',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        releaseNotes: releaseData.releaseNotes,
+        releaseNotesContent: releaseData.releaseNotesContent,
+      })
 
     const progressCallback = vi.fn()
     const provider = getProvider({
@@ -528,22 +548,31 @@ describe('provider.downloadUpdate happy paths', () => {
     })
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
-      files: { system: null, releaseNotes: null },
+      files: {
+        system: null,
+        releaseNotes: null,
+      },
       releaseNotes: null,
       downloadProgress: 0,
     })
     return expect(provider.scanUpdate(progressCallback))
       .resolves.toEqual({
         version: '1.2.3',
-        files: { system: null, releaseNotes: null },
-        releaseNotes: null,
+        files: {
+          system: null,
+          releaseNotes: releaseData.releaseNotes,
+        },
+        releaseNotes: releaseData.releaseNotesContent,
         downloadProgress: 0,
       })
       .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
-          files: { system: null, releaseNotes: null },
-          releaseNotes: null,
+          files: {
+            system: null,
+            releaseNotes: releaseData.releaseNotes,
+          },
+          releaseNotes: releaseData.releaseNotesContent,
           downloadProgress: 0,
         })
         return expect(
@@ -551,28 +580,22 @@ describe('provider.downloadUpdate happy paths', () => {
         ).resolves.toEqual({
           version: '1.2.3',
           files: releaseFiles,
-          releaseNotes: 'oh look some release notes sweet',
+          releaseNotes: releaseData.releaseNotesContent,
           downloadProgress: 100,
         })
       })
       .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
-          files: { system: null, releaseNotes: null },
-          releaseNotes: null,
+          files: { system: null, releaseNotes: releaseData.releaseNotes },
+          releaseNotes: releaseData.releaseNotesContent,
           downloadProgress: 0,
         })
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
-          files: { system: null, releaseNotes: null },
-          releaseNotes: null,
+          files: { system: null, releaseNotes: releaseData.releaseNotes },
+          releaseNotes: releaseData.releaseNotesContent,
           downloadProgress: 50,
-        })
-        expect(progressCallback).toHaveBeenCalledWith({
-          version: '1.2.3',
-          files: { system: null, releaseNotes: null },
-          releaseNotes: null,
-          downloadProgress: 100,
         })
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
@@ -758,6 +781,10 @@ describe('provider locking', () => {
       version: 'http://opentrons.com/version.json',
       releaseNotes: 'http://opentrons.com/releaseNotes.md',
     }
+    when(ensureCleanReleaseCacheForVersion)
+      .calledWith('/some/random/directory/versions', '1.2.3')
+      .thenResolve('/some/random/directory/versions/1.2.3')
+
     when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
@@ -771,7 +798,7 @@ describe('provider locking', () => {
       })
     when(getReleaseFilesIfExist)
       .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
-      .thenReject(new Error('must download'))
+      .thenResolve(null)
     when(cleanUpAndDownloadReleaseFiles)
       .calledWith(
         expect.any(Object),
@@ -793,12 +820,25 @@ describe('provider locking', () => {
             provider.lockUpdateCache()
           })
       )
+    when(downloadReleaseNotes)
+      .calledWith(
+        'http://opentrons.com/releaseNotes.md',
+        '/some/random/directory/versions/1.2.3',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
+        releaseNotesContent: 'some release notes cool',
+      })
 
     return expect(provider.scanUpdate(vi.fn()))
       .resolves.toEqual({
         version: '1.2.3',
-        files: { system: null, releaseNotes: null },
-        releaseNotes: null,
+        files: {
+          system: null,
+          releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
+        },
+        releaseNotes: 'some release notes cool',
         downloadProgress: 0,
       })
       .then(() => {
@@ -808,8 +848,12 @@ describe('provider locking', () => {
           .then(() =>
             expect(progress).toHaveBeenCalledWith({
               version: '1.2.3',
-              files: { system: null, releaseNotes: null },
-              releaseNotes: null,
+              files: {
+                system: null,
+                releaseNotes:
+                  '/some/random/directory/versions/1.2.3/releaseNotes.md',
+              },
+              releaseNotes: 'some release notes cool',
               downloadProgress: 0,
             })
           )
@@ -817,8 +861,12 @@ describe('provider locking', () => {
       .then(() => {
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
-          files: { system: null, releaseNotes: null },
-          releaseNotes: null,
+          files: {
+            system: null,
+            releaseNotes:
+              '/some/random/directory/versions/1.2.3/releaseNotes.md',
+          },
+          releaseNotes: 'some release notes cool',
           downloadProgress: 0,
         })
       })

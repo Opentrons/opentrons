@@ -204,7 +204,14 @@ export function downloadSystemZip(
         overwrite: true,
       }).then(() => ({ system: outPathFromDlPath(systemTemp) }))
     })
-    .finally(() => rm(dlPath(directory, systemZipUrl)))
+    .finally(() =>
+      // this rm only comes into play if the move fails, but we want it to be
+      // foolproof so rather than a catch it's in a finally and we throw away the error
+      // from it
+      rm(dlPath(directory, systemZipUrl)).catch(() =>
+        log.silly('failed to delete zip')
+      )
+    )
 }
 
 export function downloadReleaseFiles(
@@ -224,7 +231,12 @@ export function downloadReleaseFiles(
       urls.releaseNotes ?? null,
       releaseCacheDirectory,
       canceller
-    ),
+    ).catch((error: Error) => {
+      log.warn(
+        `Could not download release notes url ${urls.releaseNotes}: ${error}`
+      )
+      return { releaseNotes: null, releaseNotesContent: null }
+    }),
   ]).then(([system, releaseNotes]) => ({ ...system, ...releaseNotes }))
 }
 

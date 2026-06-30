@@ -120,7 +120,7 @@ export function getProvider(
           version: previousUpdate.update.version,
           files: {
             system: null,
-            releaseNotes: previousUpdate.update.releaseNotes,
+            releaseNotes: previousUpdate.update.files.releaseNotes,
           },
           releaseNotes: previousUpdate.update.releaseNotes,
           downloadProgress: downloadProgressPercent,

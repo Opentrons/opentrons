@@ -108,7 +108,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
               if (currentBestUsbUpdate == null) {
                 if (
                   updateStatus.version != null &&
-                  updateStatus.files == null &&
+                  updateStatus.files.system == null &&
                   updateStatus.downloadProgress === 0
                 ) {
                   dispatch({
@@ -121,7 +121,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
                   })
                 } else if (
                   updateStatus.version != null &&
-                  updateStatus.files == null &&
+                  updateStatus.files.system == null &&
                   updateStatus.downloadProgress !== 0
                 ) {
                   dispatch({
@@ -158,7 +158,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
               if (
                 getConfig('update').automaticallyDownloadUpdates &&
                 webUpdate.version != null &&
-                webUpdate.files == null
+                webUpdate.files.system == null
               ) {
                 dispatch({
                   type: 'robotUpdate:DOWNLOAD_UPDATE',
