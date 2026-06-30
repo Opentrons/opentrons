@@ -12,7 +12,7 @@ Welcome to the v9.1.1 release of the Opentrons App! This release is designed spe
 
 **OT-2 robots will no longer appear in the Opentrons App.** v9.1.0 will prompt you to get the separate Opentrons OT-2 App, or you can download it directly from <https://opentrons.com/app>.
 
-You'll need to use the Opentrons App to update from the previous release (v9.0.0) to any other release. Read about other changes to software updates below. 
+You'll need to use the Opentrons App to update from the previous release (v9.0.0) to any other release. Read about other changes to software updates below.
 
 ### New Features
 
