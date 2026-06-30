@@ -68,7 +68,6 @@ export function UpdateRobotSoftware({
     if (files != null) {
       void remote.getFilePathFrom(files[0]).then(filePath => {
         if (files.length === 1 && !updateDisabled) {
-          dispatch(downloadRobotUpdate())
           dispatchStartRobotUpdate(robotName, filePath)
           onUpdateStart()
         }
