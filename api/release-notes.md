@@ -6,6 +6,14 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
+## Opentrons Robot Software Changes in 9.1.1
+
+Welcome to the v9.1.1 release of the Opentrons Flex robot software! This release includes changes to the way your Flex and the Opentrons App receive and install software updates.
+
+Installing Opentrons Flex v9.1.1 robot software adds a new robot and Opentrons App setting ("Automatically Download Updates") that's turned off by default: 
+- When turned off, app and robot updates will not automatically download.
+- When turned on, app and robot updates will automatically download, but not be installed. 
+
 ## Opentrons Robot Software Changes in 9.1.0
 
 Welcome to the v9.1.0 release of the Opentrons Flex robot software! This release enables step grouping to better visualize and organize Python protocols, along with other new features, improvements, and bug fixes.
