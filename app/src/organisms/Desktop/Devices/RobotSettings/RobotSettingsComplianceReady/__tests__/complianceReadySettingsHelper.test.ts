@@ -36,15 +36,10 @@ const BASE_FIELD_VALUES = getFieldValuesFromSettings(
 )
 
 describe('getFieldValuesFromSettings', () => {
-  it('should convert auth time fields to display units', () => {
+  it('should map auth settings to form field values', () => {
     expect(BASE_FIELD_VALUES).toMatchObject({
       idleLogout: '3',
       passwordResetTime: '90',
-    })
-  })
-
-  it('should derive UI-only parent toggles from auth settings', () => {
-    expect(BASE_FIELD_VALUES).toMatchObject({
       passwordResetEnabled: true,
       passwordComplexityEnabled: true,
     })
@@ -77,20 +72,17 @@ describe('getAuthInputPatch', () => {
     })
   })
 
-  it('should not patch idleLogout when cleared', () => {
+  it('should return null when input value is empty', () => {
     expect(getAuthInputPatch('idleLogout', '', BASE_FIELD_VALUES)).toBeNull()
+    expect(
+      getAuthInputPatch('passwordResetTime', '', BASE_FIELD_VALUES)
+    ).toBeNull()
   })
 
   it('should patch passwordResetTime with day conversion', () => {
     expect(
       getAuthInputPatch('passwordResetTime', '30', BASE_FIELD_VALUES)
     ).toEqual({ data: { passwordResetTime: 30 * 24 * 60 * 60 } })
-  })
-
-  it('should not patch nested input when value is empty', () => {
-    expect(
-      getAuthInputPatch('passwordResetTime', '', BASE_FIELD_VALUES)
-    ).toBeNull()
   })
 
   it('should not patch minLengthOfReasonForInteraction when parent is off', () => {

@@ -140,30 +140,6 @@ describe('useDocumentedMutation', () => {
       expect(result.current.data).toBe('run-ok')
     })
     expect(askForDocumentation).toHaveBeenCalled()
-  })
-
-  it('still exposes a working mutation when askForDocumentation is triggered', async () => {
-    const askForDocumentation = vi.fn().mockResolvedValue(MOCK_REPORT)
-    const mutationFn = vi.fn(async (s: string) => `${s}-ok`)
-
-    const { result } = renderHook(
-      () =>
-        useDocumentedMutation<string, AxiosError, string>(
-          createReasonRequiredWithoutDocReport(askForDocumentation),
-          ['play_run'],
-          testMutationKey,
-          ({ variables: s }) => mutationFn(s),
-          {}
-        ),
-      { wrapper }
-    )
-
-    act(() => {
-      result.current.mutate('run')
-    })
-    await waitFor(() => {
-      expect(result.current.data).toBe('run-ok')
-    })
     expect(mutationFn).toHaveBeenCalledWith('run')
   })
 

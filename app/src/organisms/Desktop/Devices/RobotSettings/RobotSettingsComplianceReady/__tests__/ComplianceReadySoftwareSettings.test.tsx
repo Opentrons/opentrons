@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -16,6 +16,7 @@ import { i18n } from '/app/i18n'
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
 
+import type { RenderResult } from '@testing-library/react'
 import type {
   AuthSettingsResponse,
   RobotServerAccessControlSettingsResponse,
@@ -72,10 +73,19 @@ vi.mock('@opentrons/react-api-client')
 const mockPatchAuthSettings = vi.fn()
 const mockPatchRobotServerAccessControlSettings = vi.fn()
 
-const render = () =>
-  renderWithProviders(<ComplianceReadySoftwareSettings robotName="flex-1" />, {
-    i18nInstance: i18n,
-  })[0]
+let unmountPreviousRender: (() => void) | undefined
+
+const render = (): RenderResult => {
+  unmountPreviousRender?.()
+  const [view] = renderWithProviders(
+    <ComplianceReadySoftwareSettings robotName="flex-1" />,
+    {
+      i18nInstance: i18n,
+    }
+  )
+  unmountPreviousRender = view.unmount
+  return view
+}
 
 const expandAccordion = (): void => {
   fireEvent.click(
@@ -141,7 +151,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(screen.queryByText('Login and security')).not.toBeInTheDocument()
   })
 
-  it('should show nested inputs only after enabling the parent toggle', () => {
+  it('should expand password reset sub-setting and patch on blur', async () => {
     render()
     expandAccordion()
 
@@ -155,17 +165,6 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     screen.getByText('Edit length of time')
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
-  })
-
-  it('should patch password reset time after entering sub-setting value', async () => {
-    render()
-    expandAccordion()
-
-    fireEvent.click(
-      screen.getByRole('switch', {
-        name: 'Require password to be changed after a certain amount of time',
-      })
-    )
 
     const passwordResetTimeField = screen.getByLabelText('Edit length of time')
     fireEvent.change(passwordResetTimeField, {
@@ -182,7 +181,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     })
   })
 
-  it('should populate fields from auth settings', () => {
+  it('should populate fields from auth and robot server settings', () => {
     render()
     expandAccordion()
 
@@ -199,12 +198,6 @@ describe('ComplianceReadySoftwareSettings', () => {
         name: 'Require admin credentials to update robots',
       })
     ).toHaveAttribute('aria-checked', 'true')
-  })
-
-  it('should populate protocol log fields from robot server settings', () => {
-    render()
-    expandAccordion()
-
     expect(
       screen.getByRole('switch', {
         name: 'Require signoff for protocol logs',
