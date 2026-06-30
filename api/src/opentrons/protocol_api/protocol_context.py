@@ -1948,7 +1948,7 @@ class ProtocolContext(CommandPublisher):
     def create_and_start_step_group(
         self, name: str, description: Optional[str] = None
     ) -> GroupedSteps:
-        """Start a group of commands for visualization in your Pytyon protocol or in the Opentrons App.
+        """Start a group of commands for visualization in your Python protocol or in the Opentrons App.
         This returns a step group object, which can be closed by calling
         [`end_group()`][opentrons.protocol_api._command_annotations.GroupedSteps.end_group].
 

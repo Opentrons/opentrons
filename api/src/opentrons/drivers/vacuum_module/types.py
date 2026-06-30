@@ -154,7 +154,3 @@ class PumpState:
     current_pwm: float
     pump_running: bool
     manual_control: bool
-
-
-PRESSURE_COMPARISON_WINDOW_SIZE = 10
-POWER_COMPARISON_WINDOW_SIZE = 10

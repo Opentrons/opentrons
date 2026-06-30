@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { usePlayRunMutation } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
 import { RECOVERY_MAP } from '../../constants'
 import { useRecoveryActionMutation } from '../useRecoveryActionMutation'
 
@@ -36,7 +38,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { reasonForInteractionRequired: false, isLoading: false }
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
       )
     )
 
@@ -52,7 +54,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { reasonForInteractionRequired: false, isLoading: false }
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
       )
     )
 
@@ -76,7 +78,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { reasonForInteractionRequired: false, isLoading: false }
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
       )
     )
 
@@ -94,7 +96,7 @@ describe('useRecoveryActionMutation', () => {
         {
           proceedToRouteAndStep: mockProceedToRouteAndStep,
         } as any,
-        { reasonForInteractionRequired: false, isLoading: false }
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
       )
     )
 

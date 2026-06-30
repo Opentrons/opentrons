@@ -22,11 +22,11 @@ from .name_management import get_name_synchronizer
 LOG = logging.getLogger(__name__)
 
 
-def _do_restart():
+def _do_restart() -> None:
     subprocess.check_call(["reboot"])
 
 
-def _do_shutdown():
+def _do_shutdown() -> None:
     subprocess.check_call(["shutdown", "-h", "now"])
 
 

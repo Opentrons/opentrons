@@ -12,13 +12,9 @@ import {
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { useRobot } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -100,14 +96,8 @@ export const showLoginModal = async (
 
 const LoginModal = NiceModal.create((props: LoginModalProps) => {
   const { robotName } = props
-  const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
   return (
-    <ApiHostProvider
-      hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider robotName={robotName}>
       <LoginModalImpl robotName={robotName} />
     </ApiHostProvider>
   )

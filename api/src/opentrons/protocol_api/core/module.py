@@ -568,7 +568,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set vacuum pressure."""
 
     @abstractmethod
@@ -579,7 +579,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set vacuum power."""
 
     @abstractmethod
@@ -605,7 +605,3 @@ class AbstractVacuumModuleCore(
         self,
     ) -> None:
         """Close the vent."""
-
-    @abstractmethod
-    def wait_for_target(self) -> None:
-        """Wait for either vacuum pressure or pwm."""

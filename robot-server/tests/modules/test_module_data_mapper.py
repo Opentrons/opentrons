@@ -14,6 +14,7 @@ from opentrons.hardware_control.modules import (
     ModuleType,
     PlatformState,
     TemperatureStatus,
+    VacuumModuleStatus,
 )
 from opentrons.hardware_control.modules import (
     types as hc_types,
@@ -37,6 +38,8 @@ from robot_server.modules.module_models import (
     ThermocyclerModule,
     ThermocyclerModuleData,
     UsbPort,
+    VacuumModule,
+    VacuumModuleData,
 )
 
 
@@ -588,6 +591,112 @@ def test_maps_flex_stacker_module_data(
             platformState=PlatformState(data["platformState"]),
             hopperDoorState=hc_types.HopperDoorState(data["hopperDoorState"]),
             installDetected=data["installDetected"],
+            errorDetails=data["errorDetails"],
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "input_model,deck_type",
+    [
+        ("vacuumModuleV1", DeckType("ot2_standard")),
+        ("vacuumModuleV1", DeckType("ot3_standard")),
+    ],
+)
+@pytest.mark.parametrize(
+    "status,data,expected_vent_status",
+    [
+        (
+            "running",
+            {
+                "errorDetails": None,
+                "pumpEngaged": True,
+                "currentPressure": -312.5,
+                "targetPressure": -300.0,
+                "currentPower": 42.0,
+                "targetPower": 50.0,
+                "ventStatus": "closed",
+                "modeType": "pressure",
+            },
+            "closed",
+        ),
+        (
+            "idle",
+            {
+                "errorDetails": "oh no",
+                "pumpEngaged": False,
+                "currentPressure": -5.2,
+                "targetPressure": 0.0,
+                "currentPower": 0.0,
+                "targetPower": 0.0,
+                "ventStatus": "opened",
+                "modeType": "power",
+            },
+            "opened",
+        ),
+    ],
+)
+def test_maps_vacuum_module_data(
+    input_model: str,
+    deck_type: DeckType,
+    status: str,
+    data: hc_types.VacuumModuleData,
+    expected_vent_status: str,
+    hardware_api: HardwareControlAPI,
+) -> None:
+    """It should map hardware data to a vacuum module."""
+    input_data: LiveData = {"status": status, "data": data}
+    module_identity = ModuleIdentity(
+        module_id="module-id",
+        serial_number="serial-number",
+        firmware_version="1.2.3",
+        hardware_revision="4.5.6",
+    )
+
+    hardware_usb_port = HardwareUSBPort(
+        name="abc",
+        port_number=101,
+        port_group=PortGroup.RIGHT,
+        hub=False,
+        hub_port=None,
+        device_path="1.0/tty/ttyACM0/dev",
+    )
+
+    subject = ModuleDataMapper(deck_type=deck_type, hardware=hardware_api)
+    result = subject.map_data(
+        model=input_model,
+        module_identity=module_identity,
+        has_available_update=False,
+        live_data=input_data,
+        usb_port=hardware_usb_port,
+        module_offset=None,
+    )
+
+    assert result == VacuumModule(
+        id="module-id",
+        serialNumber="serial-number",
+        firmwareVersion="1.2.3",
+        hardwareRevision="4.5.6",
+        hasAvailableUpdate=False,
+        moduleType=ModuleType.VACUUM_MODULE,
+        compatibleWithRobot=deck_type == DeckType("ot3_standard"),
+        moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
+        usbPort=UsbPort(
+            port=101,
+            portGroup=PortGroup.RIGHT,
+            hub=False,
+            hubPort=None,
+            path="1.0/tty/ttyACM0/dev",
+        ),
+        moduleOffset=None,
+        data=VacuumModuleData(
+            status=VacuumModuleStatus(status),
+            currentPressure=data["currentPressure"],
+            targetPressure=data["targetPressure"],
+            currentPower=data["currentPower"],
+            targetPower=data["targetPower"],
+            ventStatus=expected_vent_status,  # type: ignore[arg-type]
+            modeType=data["modeType"],  # type: ignore[arg-type]
             errorDetails=data["errorDetails"],
         ),
     )

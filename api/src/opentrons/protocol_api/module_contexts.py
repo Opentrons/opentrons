@@ -1957,14 +1957,16 @@ class VacuumModuleContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
-        self._core.start_set_vacuum_pressure(
+    ) -> Task:
+        task = self._core.start_set_vacuum_pressure(
             gauge_pressure_mbar=gauge_pressure_mbar,
             duration=duration_s,
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
         )
+
+        return Task(api_version=self._api_version, core=task)
 
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_start_set_vacuum_power)
@@ -1975,14 +1977,16 @@ class VacuumModuleContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
-    ) -> None:
-        self._core.start_set_vacuum_power(
+    ) -> Task:
+        task = self._core.start_set_vacuum_power(
             percent_power=percent_power,
             duration=duration_s,
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
         )
+
+        return Task(api_version=self._api_version, core=task)
 
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_stop_vacuum)
@@ -2038,11 +2042,3 @@ class VacuumModuleContext(ModuleContext):
     def close_vent(self) -> None:
         """Closes the vent."""
         self._core.close_vent()
-
-    @requires_version(2, 30)
-    @publish(command=cmds.vacuum_module_wait_for_target)
-    def wait_for_target(self) -> None:
-        """Delays protocol execution until the vacuum module has reached either target
-        pressure or target pwm.
-        """
-        self._core.wait_for_target()

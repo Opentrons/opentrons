@@ -979,6 +979,18 @@ class StateUpdate:
         )
         return self
 
+    def update_vacuum_module_pump_engaged(
+        self, module_id: str, pump_engaged: bool
+    ) -> Self:
+        """Set the pump engaged state."""
+        self.vacuum_module_state_update = dataclasses.replace(
+            VacuumModuleStateUpdate.create_or_override(
+                self.vacuum_module_state_update, module_id
+            ),
+            pump_engaged=pump_engaged,
+        )
+        return self
+
     def set_pipette_ready_to_aspirate(
         self, pipette_id: str, ready_to_aspirate: bool
     ) -> Self:

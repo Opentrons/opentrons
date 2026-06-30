@@ -26,6 +26,16 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('/app/resources/client_data/encryptionKeys')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn().mockReturnValue({
+    name: 'otie',
+    ip: '127.0.0.1',
+    port: 31950,
+  }),
+}))
+vi.mock('/app/redux-resources/robots/hooks/useLocalRobotName', () => ({
+  useLocalRobotName: vi.fn().mockReturnValue('otie'),
+}))
 
 const render = () => {
   return renderWithProviders(

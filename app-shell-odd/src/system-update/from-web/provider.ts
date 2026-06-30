@@ -4,7 +4,10 @@ import path from 'path'
 import { LocalAbortError } from '../../http'
 import { createLogger } from '../../log'
 import { latestVersionForChannel, shouldUpdate } from './latest-update'
-import { cleanUpAndGetOrDownloadReleaseFiles } from './release-files'
+import {
+  cleanUpAndGetOrDownloadReleaseFiles,
+  removeTemporaryDownloads,
+} from './release-files'
 import { getOrDownloadManifest, getReleaseSet } from './release-manifest'
 
 import type { DownloadProgress } from '../../http'
@@ -203,5 +206,9 @@ export function getProvider(
     name: () =>
       `WebUpdateProvider from ${from.manifestUrl} channel ${from.channel}`,
     source: () => from,
+    cleanup: () =>
+      removeTemporaryDownloads(
+        path.join(from.updateCacheDirectory, 'versions')
+      ),
   }
 }

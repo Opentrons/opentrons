@@ -5,7 +5,6 @@ import { DeckConfigurator } from '@opentrons/components'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { getEnableVacuumModule } from '/protocol-designer/feature-flags/selectors'
 
 import { HardwareConfiguratorContainer } from '../HardwareConfiguratorContainer'
 import { useDeckConfigurationEditing } from '../utils'
@@ -50,7 +49,6 @@ describe('HardwareConfiguratorContainer', () => {
       addFixtureToCutout: vi.fn(),
       removeFixtureFromCutout: vi.fn(),
     })
-    vi.mocked(getEnableVacuumModule).mockReturnValue(true)
   })
 
   it('should render the deck configurator and modal', () => {

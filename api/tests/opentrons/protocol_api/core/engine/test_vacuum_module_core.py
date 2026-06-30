@@ -85,31 +85,33 @@ def test_start_set_vacuum_pressure(
 ) -> None:
     """It should correctly pass along the parameters to the protocol engine command."""
     gauge_pressure_mbar = -300
-    duration_s = 40
+    duration = 40
     ramp_rate = None
     timeout_s = 100
     vent_after = False
 
-    subject.start_set_vacuum_pressure(
-        gauge_pressure_mbar=gauge_pressure_mbar,
-        duration=duration_s,
-        ramp_rate=ramp_rate,
-        timeout_s=timeout_s,
-        vent_after=vent_after,
-    )
-    decoy.verify(
-        mock_engine_client.execute_command(
+    task_mock = decoy.mock(cls=EngineTaskCore)
+
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPressureParams(
                 moduleId="1234",
                 gaugePressure=gauge_pressure_mbar,
-                duration=duration_s,
+                duration=duration,
                 rate=ramp_rate,
                 timeout=timeout_s,
                 ventAfter=vent_after,
             ),
             command_annotations=[],
         )
+    ).then_return(cmd.vacuum_module.StartSetVacuumPressureResult(taskId="taskId"))
+
+    task_mock._id = "taskId"
+    result = subject.start_set_vacuum_pressure(
+        gauge_pressure_mbar, duration, ramp_rate, timeout_s, vent_after
     )
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
 
 
 def test_start_set_vacuum_power(
@@ -117,31 +119,33 @@ def test_start_set_vacuum_power(
 ) -> None:
     """It should correctly pass along the parameters to the protocol engine command."""
     percent_power = 75
-    duration_s = 39
+    duration = 39
     ramp_rate = 1.4
-    timeout_s = 102
+    timeout = 102
     vent_after = True
 
-    subject.start_set_vacuum_power(
-        percent_power=percent_power,
-        duration=duration_s,
-        ramp_rate=ramp_rate,
-        timeout_s=timeout_s,
-        vent_after=vent_after,
-    )
-    decoy.verify(
-        mock_engine_client.execute_command(
+    task_mock = decoy.mock(cls=EngineTaskCore)
+
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartSetVacuumPowerParams(
                 moduleId="1234",
                 percentPower=percent_power,
-                duration=duration_s,
+                duration=duration,
                 rate=ramp_rate,
-                timeout=timeout_s,
+                timeout=timeout,
                 ventAfter=vent_after,
             ),
             command_annotations=[],
         )
+    ).then_return(cmd.vacuum_module.StartSetVacuumPowerResult(taskId="taskId"))
+
+    task_mock._id = "taskId"
+    result = subject.start_set_vacuum_power(
+        percent_power, duration, ramp_rate, timeout, vent_after
     )
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
 
 
 def test_stop_vacuum(
@@ -274,21 +278,6 @@ def test_close_vent(
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.vacuum_module.CloseVentParams(
-                moduleId="1234",
-            ),
-            command_annotations=[],
-        )
-    )
-
-
-def test_wait_for_target(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: VacuumModuleCore
-) -> None:
-    """Verify that the protocol engine command gets called correctly.."""
-    subject.wait_for_target()
-    decoy.verify(
-        mock_engine_client.execute_command(
-            cmd.vacuum_module.WaitForTargetParams(
                 moduleId="1234",
             ),
             command_annotations=[],

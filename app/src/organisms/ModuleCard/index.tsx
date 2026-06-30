@@ -24,10 +24,7 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import {
-  useCurrentAllSubsystemUpdatesQuery,
-  useHost,
-} from '@opentrons/react-api-client'
+import { useCurrentAllSubsystemUpdatesQuery } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -121,7 +118,6 @@ interface ModuleCardProps {
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const host = useHost()!
 
   const {
     module,
@@ -291,7 +287,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       showSetupLauncher: true,
       isLoadedInRun,
       robotName,
-      host,
     })
   }
 

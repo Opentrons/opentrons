@@ -21,6 +21,7 @@ from otupdate.common import (
     update,
 )
 from otupdate.common.file_actions import load_version_file
+from otupdate.common.handler_type import Handler
 
 BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 #: Location of the builtin system version
@@ -29,7 +30,9 @@ LOG = logging.getLogger(__name__)
 
 
 @web.middleware
-async def log_error_middleware(request, handler):
+async def log_error_middleware(
+    request: web.Request, handler: Handler
+) -> web.StreamResponse:
     try:
         resp = await handler(request)
     except Exception:

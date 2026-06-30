@@ -5,6 +5,7 @@ import {
   useRunCurrentState,
 } from '@opentrons/react-api-client'
 
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { getRunningStepCountsFrom } from '/app/resources/protocols'
 import {
@@ -185,11 +186,11 @@ export function useERUtils({
     recoveryMap,
   })
 
-  // TODO (jj): popup doc modal in desktop app
+  const documentationState = useGuardedAction()
   const recoveryActionMutationUtils = useRecoveryActionMutation(
     runId,
     routeUpdateActions,
-    { reasonForInteractionRequired: false, isLoading: false }
+    documentationState
   )
 
   // TODO(jh, 06-14-24): Ensure other string build utilities that are internal to ErrorRecoveryFlows are exported under

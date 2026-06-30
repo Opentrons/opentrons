@@ -1,0 +1,19 @@
+.button_row {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-8);
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.modal_content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}

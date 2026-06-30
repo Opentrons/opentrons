@@ -324,6 +324,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if state_update.flex_stacker_state_update != update_types.NO_CHANGE:
             self._handle_flex_stacker_commands(state_update.flex_stacker_state_update)
 
+        if state_update.vacuum_module_state_update != update_types.NO_CHANGE:
+            self._handle_vacuum_module_commands(state_update.vacuum_module_state_update)
+
     def _module_model_map(
         self, module_id: str, actual_model: Any, module_live_data: Any
     ) -> Any:

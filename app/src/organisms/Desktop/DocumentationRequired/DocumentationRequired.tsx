@@ -13,14 +13,17 @@ import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
 import styles from './documentationrequired.module.css'
 
-import type { DocumentedAction } from '@opentrons/react-api-client'
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 
 interface DocumentationRequiredProps {
   username: string
   actionsToDocument: DocumentedAction[]
   onConfirm: (note: string) => void
-
   onClose: () => void
+  initialDocreport?: DocumentationReport
 }
 
 export function DocumentationRequired({
@@ -28,9 +31,10 @@ export function DocumentationRequired({
   actionsToDocument,
   onConfirm,
   onClose,
+  initialDocreport,
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const [inputText, setInputText] = useState<string>('')
+  const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
 
   const trimmedNote = inputText.trim()
   // TODO(jj): check against min length
