@@ -30,26 +30,28 @@ class LogStore:
     def _session(self) -> Session:
         return self._session_factory()
 
-    async def store_log(
+    def store_log(
         self,
         log: StoredLog,
-    ) -> None:
-        """Store a log message."""
+    ) -> str | NoActivePeriodError | NoLogInPeriodError:
+        """Store a log message. Returns the hash of the stored message."""
         with self._session() as session:
             with session.begin():
-                latest_log = await self._tail_log(session)
-                await self._do_store_log(
+                latest_log = self._tail_log(session)
+                if not isinstance(latest_log, LogEntry):
+                    return latest_log
+                return self._do_store_log(
                     session, log, latest_log.period_ordinal + 1, latest_log.log_period
                 )
 
-    async def _do_store_log(
+    def _do_store_log(
         self,
         session: Session,
         log: StoredLog,
         ordinal: int,
         log_period: LogPeriod,
         end_at: datetime | None = None,
-    ) -> None:
+    ) -> str:
         entry = LogEntry(
             period_ordinal=ordinal,
             log_period=log_period,
@@ -64,62 +66,85 @@ class LogStore:
 
         session.add(entry)
         session.add(log_period)
+        return log.message_hash
 
-    async def end_period(self, end_period_log: StoredLog) -> None:
-        """End a period, with the required end message."""
+    def end_period(self, end_period_logs: list[StoredLog]) -> str | NoActivePeriodError:
+        """End a period, with the required end message and some previous supplemental messages.
+
+        Returns the hash of the final message in the period.
+        """
         with self._session() as session:
             with session.begin():
-                current_period = await self._current_period(session)
-                try:
-                    latest_log = await self._tail_log_of_period(session, current_period)
-                    ordinal = latest_log.period_ordinal + 1
-                except NoLogInPeriodError:
+                current_period = self._current_period(session)
+                if isinstance(current_period, NoActivePeriodError):
+                    return current_period
+                latest_log = self._tail_log_of_period(session, current_period)
+                if isinstance(latest_log, NoLogInPeriodError):
                     ordinal = 0
-                await self._do_store_log(
-                    session,
-                    end_period_log,
-                    ordinal,
-                    latest_log.log_period,
-                    datetime.now(timezone.utc),
-                )
+                else:
+                    ordinal = latest_log.period_ordinal + 1
+                latest_hash = ""
+                for log in end_period_logs:
+                    latest_hash = self._do_store_log(
+                        session,
+                        log,
+                        ordinal,
+                        current_period,
+                        datetime.now(timezone.utc),
+                    )
+                    ordinal += 1
+                return latest_hash
 
-    async def start_period(self, start_period_log: StoredLog) -> None:
-        """Begin a new log period."""
+    def start_period(self, start_period_logs: list[StoredLog]) -> str:
+        """Begin a new log period.
+
+        Returns the hash of the latest message in the period.
+        """
         with self._session() as session:
             with session.begin():
                 new_period = LogPeriod(started_at=datetime.now(timezone.utc))
-                await self._do_store_log(session, start_period_log, 0, new_period)
+                latest_hash = ""
+                ordinal = 0
+                for log in start_period_logs:
+                    latest_hash = self._do_store_log(session, log, ordinal, new_period)
+                    ordinal += 1
+                return latest_hash
 
-    async def _current_period(self, session: Session) -> LogPeriod:
+    def _current_period(self, session: Session) -> LogPeriod | NoActivePeriodError:
         latest_period = session.scalar(
             select(LogPeriod).where(LogPeriod.ended_at == None)  # noqa: E711
         )
         if latest_period is None:
-            raise NoActivePeriodError()
+            return NoActivePeriodError()
         return latest_period
 
-    async def _tail_log_of_period(
+    def _tail_log_of_period(
         self,
         session: Session,
         period: LogPeriod,
-    ) -> LogEntry:
+    ) -> LogEntry | NoLogInPeriodError:
         if len(period.log_entries) == 0:
-            raise NoLogInPeriodError()
+            return NoLogInPeriodError()
         latest_log = period.log_entries[-1]
         if latest_log is None:
-            raise NoLogInPeriodError()
+            return NoLogInPeriodError()
         return latest_log
 
-    async def _tail_log(self, session: Session) -> LogEntry:
+    def _tail_log(
+        self, session: Session
+    ) -> LogEntry | NoLogInPeriodError | NoActivePeriodError:
         """Get the most recently logged message in the period."""
-        latest_period = await self._current_period(session)
-        latest_log = await self._tail_log_of_period(session, latest_period)
-        return latest_log
+        latest_period = self._current_period(session)
+        if isinstance(latest_period, NoActivePeriodError):
+            return latest_period
+        return self._tail_log_of_period(session, latest_period)
 
-    async def tail_hash(self) -> str:
+    def tail_hash(self) -> str | NoLogInPeriodError | NoActivePeriodError:
         """Get the message hash of the most recently logged message in the period."""
         with self._session() as session:
-            latest_record = await self._tail_log(session)
+            latest_record = self._tail_log(session)
+            if not isinstance(latest_record, LogEntry):
+                return latest_record
             return latest_record.message_hash
 
     def list_periods(self) -> list[LogPeriodSummary]:
