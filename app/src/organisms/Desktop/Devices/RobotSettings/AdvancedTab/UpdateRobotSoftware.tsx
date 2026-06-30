@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -22,10 +22,7 @@ import {
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
-import {
-  downloadRobotUpdate,
-  getRobotUpdateDisplayInfo,
-} from '/app/redux/robot-update'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
 
@@ -57,7 +54,6 @@ export function UpdateRobotSoftware({
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const inputRef = useRef<HTMLInputElement>(null)
-  const dispatch = useDispatch()
   const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
   const isRunActive =
     currentRun != null && !isTerminalRunStatus(currentRun.data.status)
