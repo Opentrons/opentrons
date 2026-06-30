@@ -17,7 +17,6 @@ import { getPythonPath, selectPythonPath } from '../getPythonPath'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
 import type electron from 'electron'
-import type { Config } from '../../config'
 import type { createLogger } from '../../log'
 import type { Dispatch } from '../../types'
 
