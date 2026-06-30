@@ -555,7 +555,15 @@ describe('provider.downloadUpdate happy paths', () => {
       releaseNotes: null,
       downloadProgress: 0,
     })
-    return expect(provider.scanUpdate(progressCallback))
+    return expect(
+      Promise.all([
+        provider.scanUpdate(progressCallback),
+        new Promise<void>(resolve => {
+          expect(provider.ongoingCheck()).not.toBeNull()
+          resolve()
+        }),
+      ]).then(([res, _]) => res)
+    )
       .resolves.toEqual({
         version: '1.2.3',
         files: {
@@ -576,7 +584,13 @@ describe('provider.downloadUpdate happy paths', () => {
           downloadProgress: 0,
         })
         return expect(
-          provider.downloadUpdate(progressCallback)
+          Promise.all([
+            provider.downloadUpdate(progressCallback),
+            new Promise<void>(resolve => {
+              expect(provider.ongoingCheck()).not.toBeNull()
+              resolve()
+            }),
+          ]).then(([res, _]) => res)
         ).resolves.toEqual({
           version: '1.2.3',
           files: releaseFiles,

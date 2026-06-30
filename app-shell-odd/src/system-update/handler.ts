@@ -296,17 +296,22 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
             .then(dispatch)
         }
         case 'robotUpdate:READ_SYSTEM_FILE': {
-          const getDetails = (): {
-            systemFile: string
-            version: string
-            isManualFile: false
-          } | null => {
+          const getDetails = ():
+            | {
+                systemFile: string
+                version: string
+                isManualFile: false
+              }
+            | null
+            | 'ongoing' => {
             if (currentBestUsbUpdate) {
               return {
                 systemFile: currentBestUsbUpdate.files.system,
                 version: currentBestUsbUpdate.version,
                 isManualFile: false,
               }
+            } else if (webProvider.ongoingCheck() != null) {
+              return 'ongoing'
             } else if (webUpdate.files?.system != null) {
               return {
                 systemFile: webUpdate.files.system,
@@ -319,6 +324,14 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           }
           return new Promise(resolve => {
             const details = getDetails()
+            if (details == 'ongoing') {
+              dispatch({
+                type: 'robotUpdate:CHECKING_FOR_UPDATE',
+                payload: 'flex',
+              })
+              resolve()
+              return
+            }
             if (details == null) {
               dispatch({
                 type: 'robotUpdate:UNEXPECTED_ERROR',

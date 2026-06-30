@@ -312,5 +312,6 @@ export function getProvider(
       removeTemporaryDownloads(
         path.join(from.updateCacheDirectory, 'versions')
       ),
+    ongoingCheck: () => currentCheck,
   }
 }

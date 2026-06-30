@@ -124,5 +124,6 @@ export function getProvider(
     name: () => `USBUpdateProvider from ${from.massStorageDeviceRoot}`,
     source: () => from,
     cleanup: () => Promise.resolve(),
+    ongoingCheck: () => currentCheck,
   }
 }
