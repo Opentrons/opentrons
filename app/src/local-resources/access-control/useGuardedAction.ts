@@ -13,11 +13,9 @@ import type {
   DocumentationReport,
   DocumentationState,
   DocumentedAction,
-} from '@opentrons/react-api-client'
-import type {
   MutationAuthenticationState,
   MutationDocumentationState,
-} from '@opentrons/react-api-client/src/access_control/types'
+} from '@opentrons/react-api-client'
 
 /**
  * API for the access-control gate.
