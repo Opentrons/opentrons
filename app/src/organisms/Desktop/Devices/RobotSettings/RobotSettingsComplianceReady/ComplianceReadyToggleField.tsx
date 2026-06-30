@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
 
+import { isUiOnlyFieldId } from './complianceReadySettingsTypes'
 import styles from './compliancereadysoftwaresettings.module.css'
 
 import type { JSX, ReactNode } from 'react'
@@ -36,8 +38,25 @@ export function ComplianceReadyToggleField({
   children,
 }: ComplianceReadyToggleFieldProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const toggledOn = Boolean(values[id])
+  const serverToggledOn = Boolean(values[id])
+  const [expanded, setExpanded] = useState(false)
+  const toggledOn =
+    serverToggledOn || (children != null && isUiOnlyFieldId(id) && expanded)
   const label = t(labelKey)
+
+  const handleToggleClick = (): void => {
+    const nextToggledOn = !toggledOn
+
+    if (children != null && isUiOnlyFieldId(id)) {
+      setExpanded(nextToggledOn)
+    }
+
+    onToggleChange(id, {
+      parentFieldId,
+      childFieldIds,
+      toggledOn: nextToggledOn,
+    })
+  }
 
   const toggleRow = (
     <div className={styles.toggle_row}>
@@ -51,9 +70,7 @@ export function ComplianceReadyToggleField({
         id={id}
         label={label}
         toggledOn={toggledOn}
-        onClick={() => {
-          onToggleChange(id, { parentFieldId, childFieldIds })
-        }}
+        onClick={handleToggleClick}
       />
     </div>
   )

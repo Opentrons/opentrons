@@ -69,4 +69,5 @@ export type FieldValues = Record<SettingFieldId, string | boolean>
 export interface ComplianceReadyToggleChangeOptions {
   parentFieldId?: SettingFieldId
   childFieldIds?: SettingFieldId[]
+  toggledOn?: boolean
 }

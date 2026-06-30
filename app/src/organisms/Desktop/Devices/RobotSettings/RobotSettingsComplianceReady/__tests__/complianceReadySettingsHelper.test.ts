@@ -48,7 +48,7 @@ describe('getAuthPatchForInputChange', () => {
     ).toBeNull()
   })
 
-  it('should not patch nested input when parent toggle is off', () => {
+  it('should patch nested input under a UI-only parent even when server state is off', () => {
     expect(
       getAuthPatchForInputChange(
         'passwordResetTime',
@@ -56,7 +56,7 @@ describe('getAuthPatchForInputChange', () => {
         BASE_FIELD_VALUES,
         'passwordResetEnabled'
       )
-    ).toBeNull()
+    ).toEqual({ data: { passwordResetTime: 30 * SECONDS_PER_DAY } })
   })
 
   it('should patch nested input when parent toggle is on and value is present', () => {

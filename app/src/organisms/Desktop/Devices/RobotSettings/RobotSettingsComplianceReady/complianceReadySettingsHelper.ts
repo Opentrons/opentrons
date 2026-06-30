@@ -1,5 +1,6 @@
 import {
   AUTH_SERVER_SETTING_FIELD_IDS,
+  isUiOnlyFieldId,
 } from './complianceReadySettingsTypes'
 
 import type {
@@ -83,7 +84,10 @@ export function getAuthPatchForInputChange(
   parentFieldId?: SettingFieldId
 ): PatchAuthSettingsRequest | null {
   if (parentFieldId != null) {
-    if (!Boolean(fieldValues[parentFieldId]) || value === '') {
+    if (
+      !isUiOnlyFieldId(parentFieldId) &&
+      !Boolean(fieldValues[parentFieldId])
+    ) {
       return null
     }
   } else if (

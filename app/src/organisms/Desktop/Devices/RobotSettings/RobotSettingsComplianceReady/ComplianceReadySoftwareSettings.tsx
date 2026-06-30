@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
@@ -17,19 +17,17 @@ import {
 import {
   isAuthServerSettingKey,
   isRobotServerSettingKey,
-  isUiOnlyFieldId,
 } from './complianceReadySettingsTypes'
 import styles from './compliancereadysoftwaresettings.module.css'
 import { ComplianceReadyToggleField } from './ComplianceReadyToggleField'
 import { InputSetting } from './InputSetting'
 
 import type { JSX, ReactNode } from 'react'
-import type { PatchAuthSettingsRequest } from '@opentrons/api-client'
+import type { AuthSettingsData } from '@opentrons/api-client'
 import type {
   AuthSettingFieldId,
   ComplianceReadyToggleChangeOptions,
   SettingFieldId,
-  UiSettingFieldId,
 } from './complianceReadySettingsTypes'
 
 export type { UiSettingFieldId } from './complianceReadySettingsTypes'
@@ -86,15 +84,6 @@ export function ComplianceReadySoftwareSettings({
     ]
   )
 
-  const [uiOnlyFieldValues, setUiOnlyFieldValues] = useState<
-    Partial<Record<UiSettingFieldId, boolean>>
-  >({})
-
-  const values = useMemo(
-    () => ({ ...fieldValues, ...uiOnlyFieldValues }),
-    [fieldValues, uiOnlyFieldValues]
-  )
-
   const handleInputBlur = (
     id: AuthSettingFieldId,
     value: string,
@@ -103,7 +92,7 @@ export function ComplianceReadySoftwareSettings({
     const authPatch = getAuthPatchForInputChange(
       id,
       value,
-      values,
+      fieldValues,
       parentFieldId
     )
     if (authPatch != null) {
@@ -115,30 +104,17 @@ export function ComplianceReadySoftwareSettings({
     fieldId: SettingFieldId,
     options?: ComplianceReadyToggleChangeOptions
   ): void => {
-    const toggledOn = !Boolean(values[fieldId])
-    const { parentFieldId, childFieldIds } = options ?? {}
+    const toggledOn =
+      options?.toggledOn ?? !Boolean(fieldValues[fieldId])
+    const { childFieldIds } = options ?? {}
 
-    if (isUiOnlyFieldId(fieldId)) {
-      setUiOnlyFieldValues(prev => ({
-        ...prev,
-        [fieldId]: toggledOn,
-      }))
+    if (!toggledOn && childFieldIds != null) {
+      const authData = {
+        ...Object.fromEntries(childFieldIds.map(childId => [childId, null])),
+        ...(isAuthServerSettingKey(fieldId) ? { [fieldId]: toggledOn } : {}),
+      } as Partial<AuthSettingsData>
 
-      if (!toggledOn && childFieldIds != null) {
-        const authData: PatchAuthSettingsRequest['data'] = {}
-
-        for (const childId of childFieldIds) {
-          if (isAuthServerSettingKey(childId)) {
-            authData[childId] = null
-          }
-        }
-
-        if (Object.keys(authData).length > 0) {
-          void patchAuthSettings({ data: authData })
-        }
-      }
-    } else if (parentFieldId != null) {
-      void patchAuthSettings({ data: { [fieldId]: toggledOn } })
+      void patchAuthSettings({ data: authData })
     } else if (isRobotServerSettingKey(fieldId)) {
       void patchRobotServerAccessControlSettings({
         data: { [fieldId]: toggledOn },
@@ -149,7 +125,7 @@ export function ComplianceReadySoftwareSettings({
   }
 
   const toggleFieldProps = {
-    values,
+    values: fieldValues,
     onToggleChange: handleToggleChange,
   }
 
@@ -164,11 +140,11 @@ export function ComplianceReadySoftwareSettings({
           isLastSection={false}
         >
           <InputSetting
-            key={String(values.maxNumberOfLoginAttempts)}
+            key={String(fieldValues.maxNumberOfLoginAttempts)}
             label={t(
               'desktop_maximum_login_attempts_before_account_deactivation'
             )}
-            value={String(values.maxNumberOfLoginAttempts)}
+            value={String(fieldValues.maxNumberOfLoginAttempts)}
             units={t('desktop_logins')}
             onBlur={value => {
               handleInputBlur('maxNumberOfLoginAttempts', value)
@@ -182,9 +158,9 @@ export function ComplianceReadySoftwareSettings({
             {...toggleFieldProps}
           >
             <InputSetting
-              key={String(values.passwordResetTime)}
+              key={String(fieldValues.passwordResetTime)}
               label={t('desktop_length_of_time')}
-              value={String(values.passwordResetTime)}
+              value={String(fieldValues.passwordResetTime)}
               units={t('desktop_days')}
               onBlur={value => {
                 handleInputBlur(
@@ -212,9 +188,9 @@ export function ComplianceReadySoftwareSettings({
               {...toggleFieldProps}
             />
             <InputSetting
-              key={String(values.passwordComplexityMinimumLength)}
+              key={String(fieldValues.passwordComplexityMinimumLength)}
               label={t('desktop_minimum_password_length')}
-              value={String(values.passwordComplexityMinimumLength)}
+              value={String(fieldValues.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
               onBlur={value => {
                 handleInputBlur(
@@ -227,9 +203,9 @@ export function ComplianceReadySoftwareSettings({
           </ComplianceReadyToggleField>
           <Divider />
           <InputSetting
-            key={String(values.idleLogout)}
+            key={String(fieldValues.idleLogout)}
             label={t('desktop_auto_logout_inactivity_length')}
-            value={String(values.idleLogout)}
+            value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
             onBlur={value => {
               handleInputBlur('idleLogout', value)
@@ -287,11 +263,11 @@ export function ComplianceReadySoftwareSettings({
             {...toggleFieldProps}
           >
             <InputSetting
-              key={String(values.minLengthOfReasonForInteraction)}
+              key={String(fieldValues.minLengthOfReasonForInteraction)}
               label={t(
                 'desktop_minimum_length_for_documentation_for_robot_actions'
               )}
-              value={String(values.minLengthOfReasonForInteraction)}
+              value={String(fieldValues.minLengthOfReasonForInteraction)}
               units={t('desktop_characters')}
               onBlur={value => {
                 handleInputBlur(
