@@ -13,10 +13,6 @@ Welcome to the v9.1.1 release of the Opentrons Flex robot software! This release
 ### New Features
 
 - Use new methods to create step groups within your Python protocols. These groups are visible in your protocol file, or in [protocol visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
-- Adds a new robot setting ("Automatically Download Updates") that's turned off by default:
-  - When turned off, robot updates will not automatically download.
-  - When turned on, robot updates will automatically download, but not be installed.
-  - After downloading a new robot update, click to install.
 - Use the `set_empty()` method to label a tip rack as empty, and return used tips to an empty rack throughout your protocol.
 - Attach and use a keyboard (via USB) to set up quick transfer protocols, enter passwords and runtime parameters, and more on the Flex touchscreen.
 - Adds the ability to turn off the Flex from the touchscreen. Click the three-dot menu, then click to **Turn off robot**. When it's time to restart your Flex, use the power switch on the rear panel.
