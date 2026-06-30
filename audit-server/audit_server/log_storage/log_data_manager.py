@@ -14,6 +14,7 @@ from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
 
 from . import constants
+from .models import LogPeriodSummary
 from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
 from .types import StoredLog
 from audit_server.log_ingest.models import AuditLogMessage
@@ -65,6 +66,10 @@ class LogDataManager:
             return ""
         async with self._lock:
             return await self._do_store_log(log_message)
+
+    def get_log_periods(self) -> list[LogPeriodSummary]:
+        """Get a list of log periods, active or inactive."""
+        return self._store.list_periods()
 
     async def _do_store_log(self, log_message: str) -> str:
         previous_hash = self._store.tail_hash()
