@@ -2,7 +2,7 @@ import { useQueryClient } from 'react-query'
 
 import { createMaintenanceCommand } from '@opentrons/api-client'
 
-import { useDocumentedMutation } from '../access_control'
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
@@ -12,8 +12,8 @@ import type {
 } from 'react-query'
 import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { DocumentationState, DocumentedAction } from '../access_control'
-import type { DocumentedMutationParameters } from '../access_control/types'
+import type { DocumentationState, DocumentedAction } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
   maintenanceRunId: string

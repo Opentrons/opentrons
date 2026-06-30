@@ -11,7 +11,7 @@ import {
   useStopRunMutation,
 } from '..'
 import { RUN_ID_1 } from '../__fixtures__'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../access_control/__fixtures__/documentationState'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 
 import type * as React from 'react'
 import type {

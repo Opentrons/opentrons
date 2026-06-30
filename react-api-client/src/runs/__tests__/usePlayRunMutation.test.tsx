@@ -6,7 +6,7 @@ import { createRunAction } from '@opentrons/api-client'
 
 import { usePlayRunMutation } from '..'
 import { mockPlayRunAction, RUN_ID_1 } from '../__fixtures__'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../access_control/__fixtures__/documentationState'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
