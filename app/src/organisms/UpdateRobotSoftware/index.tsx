@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftware'
 import {
+  downloadRobotUpdate,
   getRobotUpdateSession,
   startRobotUpdate,
 } from '/app/redux/robot-update'
@@ -51,6 +52,7 @@ export function UpdateRobotSoftware(
     // check isDownloading to avoid dispatching again
     if (!isDownloading) {
       setIsDownloading(true)
+      dispatch(downloadRobotUpdate())
       dispatch(startRobotUpdate(robotName))
     }
   }, [dispatch, robotName, isDownloading])

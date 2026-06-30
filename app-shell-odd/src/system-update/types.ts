@@ -11,28 +11,32 @@ export interface ReleaseManifest {
   }
 }
 
-export interface ReleaseSetFilepaths {
-  system: string
-  releaseNotes: string | null
-}
-
 export interface NoUpdate {
   version: null
-  files: null
+  files: {
+    system: null
+    releaseNotes: null
+  }
   releaseNotes: null
   downloadProgress: 0
 }
 
 export interface FoundUpdate {
   version: string
-  files: null
-  releaseNotes: null
+  files: {
+    system: null
+    releaseNotes: string | null
+  }
+  releaseNotes: string | null
   downloadProgress: number
 }
 
 export interface ReadyUpdate {
   version: string
-  files: ReleaseSetFilepaths
+  files: {
+    system: string
+    releaseNotes: string | null
+  }
   releaseNotes: string | null
   downloadProgress: 100
 }
@@ -47,7 +51,9 @@ export interface UpdateProvider<UpdateSourceDetails> {
   // Call before disposing to make sure any temporary storage is removed
   teardown: () => Promise<void>
   // Scan an implementation-defined location for updates
-  refreshUpdateCache: (progress: ProgressCallback) => Promise<ResolvedUpdate>
+  scanUpdate: (progress: ProgressCallback) => Promise<UnresolvedUpdate>
+  // Download an update, if relevant for this provider
+  downloadUpdate: (progress: ProgressCallback) => Promise<ResolvedUpdate>
   // Get the details of a found update, if any.
   getUpdateDetails: () => UnresolvedUpdate
   // Lock the update cache, which will prevent anything from accidentally overwriting stuff
@@ -61,4 +67,5 @@ export interface UpdateProvider<UpdateSourceDetails> {
   source: () => UpdateSourceDetails
   // clean up previous attempts
   cleanup: () => Promise<void>
+  ongoingCheck: () => Promise<unknown> | null
 }

@@ -1,7 +1,7 @@
 // functions and utilities for retrieving the releases manifest
 import fse from 'fs-extra'
 
-import { fetchJson } from '../http'
+import { fetchJson, fetchToFile } from '../http'
 
 import type { ReleaseManifest, ReleaseSetUrls } from './types'
 
@@ -22,4 +22,13 @@ export function getReleaseSet(
 ): ReleaseSetUrls | null {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-nullish-coalescing
   return manifest.productionV2[version] || null
+}
+
+export function downloadNotes(
+  notesUrl: string,
+  cacheFilePath: string
+): Promise<string> {
+  return fetchToFile(notesUrl, cacheFilePath)
+    .catch(() => cacheFilePath)
+    .then(filePath => fse.readFile(filePath, 'utf-8'))
 }

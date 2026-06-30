@@ -4,7 +4,10 @@ import { when } from 'vitest-when'
 import { LocalAbortError } from '../../../http'
 import { getProvider } from '../provider'
 import {
-  cleanUpAndGetOrDownloadReleaseFiles as _cleanUpAndGetOrDownloadReleaseFiles,
+  cleanUpAndDownloadReleaseFiles as _cleanUpAndDownloadReleaseFiles,
+  downloadReleaseNotes as _downloadReleaseNotes,
+  ensureCleanReleaseCacheForVersion as _ensureCleanReleaseCacheForVersion,
+  getReleaseFilesIfExist as _getReleaseFilesIfExist,
   removeTemporaryDownloads as _removeTemporaryDownloads,
 } from '../release-files'
 import { getOrDownloadManifest as _getOrDownloadManifest } from '../release-manifest'
@@ -23,10 +26,15 @@ vi.mock('../release-manifest', async importOriginal => {
 vi.mock('../release-files')
 
 const getOrDownloadManifest = vi.mocked(_getOrDownloadManifest)
-const cleanUpAndGetOrDownloadReleaseFiles = vi.mocked(
-  _cleanUpAndGetOrDownloadReleaseFiles
+const cleanUpAndDownloadReleaseFiles = vi.mocked(
+  _cleanUpAndDownloadReleaseFiles
 )
+const downloadReleaseNotes = vi.mocked(_downloadReleaseNotes)
 const removeTemporaryDownloads = vi.mocked(_removeTemporaryDownloads)
+const getReleaseFilesIfExist = vi.mocked(_getReleaseFilesIfExist)
+const ensureCleanReleaseCacheForVersion = vi.mocked(
+  _ensureCleanReleaseCacheForVersion
+)
 
 describe('provider.cleanup', () => {
   afterEach(() => {
@@ -46,8 +54,9 @@ describe('provider.cleanup', () => {
   })
 })
 
-describe('provider.refreshUpdateCache happy paths', () => {
+describe('provider.scanUpdate happy paths', () => {
   afterEach(() => {
+    expect(cleanUpAndDownloadReleaseFiles).not.toHaveBeenCalled()
     vi.resetAllMocks()
   })
   it('says there is no update if the latest update is in the old production key', () => {
@@ -76,31 +85,32 @@ describe('provider.refreshUpdateCache happy paths', () => {
     })
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     })
-    return expect(provider.refreshUpdateCache(progressCallback))
+    return expect(provider.scanUpdate(progressCallback))
       .resolves.toEqual({
         version: null,
-        files: null,
+        files: { system: null, releaseNotes: null },
         releaseNotes: null,
         downloadProgress: 0,
       })
       .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: null,
-          files: null,
+          files: { system: null, releaseNotes: null },
           releaseNotes: null,
           downloadProgress: 0,
         })
         expect(provider.getUpdateDetails()).toEqual({
           version: null,
-          files: null,
+          files: { system: null, releaseNotes: null },
           releaseNotes: null,
           downloadProgress: 0,
         })
-        expect(cleanUpAndGetOrDownloadReleaseFiles).not.toHaveBeenCalled()
+        expect(downloadReleaseNotes).not.toHaveBeenCalled()
+        expect(ensureCleanReleaseCacheForVersion).not.toHaveBeenCalled()
       })
   })
   it('says there is no update if the latest version is the current version', () => {
@@ -129,34 +139,258 @@ describe('provider.refreshUpdateCache happy paths', () => {
     })
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     })
-    return expect(provider.refreshUpdateCache(progressCallback))
+    return expect(provider.scanUpdate(progressCallback))
       .resolves.toEqual({
         version: null,
-        files: null,
+        files: { system: null, releaseNotes: null },
         releaseNotes: null,
         downloadProgress: 0,
       })
       .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: null,
-          files: null,
+          files: { system: null, releaseNotes: null },
           releaseNotes: null,
           downloadProgress: 0,
         })
         expect(provider.getUpdateDetails()).toEqual({
           version: null,
-          files: null,
+          files: { system: null, releaseNotes: null },
           releaseNotes: null,
           downloadProgress: 0,
         })
-        expect(cleanUpAndGetOrDownloadReleaseFiles).not.toHaveBeenCalled()
+        expect(downloadReleaseNotes).not.toHaveBeenCalled()
+        expect(ensureCleanReleaseCacheForVersion).not.toHaveBeenCalled()
       })
   })
-  it('says there is an update if a cached update is needed', () => {
+  it('says there is a downloaded update if the latest version is already downloaded', () => {
+    when(getOrDownloadManifest)
+      .calledWith(
+        'http://opentrons.com/releases.json',
+        '/some/random/directory',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        productionV2: {
+          '1.2.5': {
+            system: 'http://opentrons.com/system.zip',
+            fullImage: 'http://opentrons.com/fullImage.zip',
+            version: 'http://opentrons.com/version.json',
+            releaseNotes: 'http://opentrons.com/releaseNotes.md',
+          },
+        },
+      })
+    when(getReleaseFilesIfExist)
+      .calledWith(
+        {
+          system: 'http://opentrons.com/system.zip',
+          fullImage: 'http://opentrons.com/fullImage.zip',
+          version: 'http://opentrons.com/version.json',
+          releaseNotes: 'http://opentrons.com/releaseNotes.md',
+        },
+        '/some/random/directory/versions',
+        '1.2.5'
+      )
+      .thenResolve({
+        system: '/some/random/path.zip',
+        releaseNotes: null,
+        releaseNotesContent: null,
+      })
+    const progressCallback = vi.fn()
+    const provider = getProvider({
+      manifestUrl: 'http://opentrons.com/releases.json',
+      channel: 'release',
+      updateCacheDirectory: '/some/random/directory',
+      currentVersion: '1.2.3',
+    })
+    expect(provider.getUpdateDetails()).toEqual({
+      version: null,
+      files: { system: null, releaseNotes: null },
+      releaseNotes: null,
+      downloadProgress: 0,
+    })
+    return expect(provider.scanUpdate(progressCallback))
+      .resolves.toEqual({
+        version: '1.2.5',
+        files: { system: '/some/random/path.zip', releaseNotes: null },
+        releaseNotes: null,
+        downloadProgress: 100,
+      })
+      .then(() => {
+        expect(progressCallback).toHaveBeenCalledWith({
+          version: '1.2.5',
+          files: { system: '/some/random/path.zip', releaseNotes: null },
+          releaseNotes: null,
+          downloadProgress: 100,
+        })
+        expect(provider.getUpdateDetails()).toEqual({
+          version: '1.2.5',
+          files: { system: '/some/random/path.zip', releaseNotes: null },
+          releaseNotes: null,
+          downloadProgress: 100,
+        })
+        expect(downloadReleaseNotes).not.toHaveBeenCalled()
+        expect(ensureCleanReleaseCacheForVersion).not.toHaveBeenCalled()
+      })
+  })
+  it('says there is an update if an update is needed', () => {
+    const releaseUrls = {
+      system: 'http://opentrons.com/system.zip',
+      fullImage: 'http://opentrons.com/fullImage.zip',
+      version: 'http://opentrons.com/version.json',
+      releaseNotes: 'http://opentrons.com/releaseNotes.md',
+    }
+    when(ensureCleanReleaseCacheForVersion)
+      .calledWith('/some/random/directory/versions', '1.2.3')
+      .thenResolve('/some/random/directory/versions/1.2.3')
+    when(downloadReleaseNotes)
+      .calledWith(
+        'http://opentrons.com/releaseNotes.md',
+        '/some/random/directory/versions/1.2.3',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
+        releaseNotesContent: 'some release notes cool',
+      })
+    when(getOrDownloadManifest)
+      .calledWith(
+        'http://opentrons.com/releases.json',
+        '/some/random/directory',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        productionV2: {
+          '1.2.3': releaseUrls,
+        },
+      })
+
+    when(getReleaseFilesIfExist)
+      .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
+      .thenResolve(null)
+
+    const progressCallback = vi.fn()
+    const provider = getProvider({
+      manifestUrl: 'http://opentrons.com/releases.json',
+      channel: 'release',
+      updateCacheDirectory: '/some/random/directory',
+      currentVersion: '1.0.0',
+    })
+    expect(provider.getUpdateDetails()).toEqual({
+      version: null,
+      files: { system: null, releaseNotes: null },
+      releaseNotes: null,
+      downloadProgress: 0,
+    })
+    return expect(provider.scanUpdate(progressCallback))
+      .resolves.toEqual({
+        version: '1.2.3',
+        files: {
+          system: null,
+          releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
+        },
+        releaseNotes: 'some release notes cool',
+        downloadProgress: 0,
+      })
+      .then(() =>
+        expect(progressCallback).toHaveBeenCalledWith({
+          version: '1.2.3',
+          files: {
+            system: null,
+            releaseNotes:
+              '/some/random/directory/versions/1.2.3/releaseNotes.md',
+          },
+          releaseNotes: 'some release notes cool',
+          downloadProgress: 0,
+        })
+      )
+  })
+})
+
+describe('provider.downloadUpdate happy paths', () => {
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+  it('downloads nothing if there is no update', () => {
+    when(getOrDownloadManifest)
+      .calledWith(
+        'http://opentrons.com/releases.json',
+        '/some/random/directory',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        productionV2: {
+          '1.2.3': {
+            system: 'http://opentrons.com/system.zip',
+            fullImage: 'http://opentrons.com/fullImage.zip',
+            version: 'http://opentrons.com/version.json',
+            releaseNotes: 'http://opentrons.com/releaseNotes.md',
+          },
+        },
+      })
+    const progressCallback = vi.fn()
+    const provider = getProvider({
+      manifestUrl: 'http://opentrons.com/releases.json',
+      channel: 'release',
+      updateCacheDirectory: '/some/random/directory',
+      currentVersion: '1.2.3',
+    })
+    expect(provider.getUpdateDetails()).toEqual({
+      version: null,
+      files: { system: null, releaseNotes: null },
+      releaseNotes: null,
+      downloadProgress: 0,
+    })
+    return expect(provider.scanUpdate(progressCallback))
+      .resolves.toEqual({
+        version: null,
+        files: { system: null, releaseNotes: null },
+        releaseNotes: null,
+        downloadProgress: 0,
+      })
+      .then(() => {
+        expect(progressCallback).toHaveBeenCalledWith({
+          version: null,
+          files: { system: null, releaseNotes: null },
+          releaseNotes: null,
+          downloadProgress: 0,
+        })
+        expect(provider.getUpdateDetails()).toEqual({
+          version: null,
+          files: { system: null, releaseNotes: null },
+          releaseNotes: null,
+          downloadProgress: 0,
+        })
+        return expect(
+          provider.downloadUpdate(progressCallback)
+        ).resolves.toEqual({
+          version: null,
+          files: { system: null, releaseNotes: null },
+          releaseNotes: null,
+          downloadProgress: 0,
+        })
+      })
+      .then(() => {
+        expect(progressCallback).toHaveBeenCalledWith({
+          version: null,
+          files: { system: null, releaseNotes: null },
+          releaseNotes: null,
+          downloadProgress: 0,
+        })
+        expect(provider.getUpdateDetails()).toEqual({
+          version: null,
+          files: { system: null, releaseNotes: null },
+          releaseNotes: null,
+          downloadProgress: 0,
+        })
+        expect(cleanUpAndDownloadReleaseFiles).not.toHaveBeenCalled()
+      })
+  })
+  it('downloads nothing if the update is already downloaded', () => {
     const releaseUrls = {
       system: 'http://opentrons.com/system.zip',
       fullImage: 'http://opentrons.com/fullImage.zip',
@@ -184,14 +418,8 @@ describe('provider.refreshUpdateCache happy paths', () => {
         },
       })
 
-    when(cleanUpAndGetOrDownloadReleaseFiles)
-      .calledWith(
-        releaseUrls,
-        '/some/random/directory/versions',
-        '1.2.3',
-        expect.any(Function),
-        expect.any(Object)
-      )
+    when(getReleaseFilesIfExist)
+      .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(releaseData)
 
     const progressCallback = vi.fn()
@@ -203,25 +431,33 @@ describe('provider.refreshUpdateCache happy paths', () => {
     })
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     })
-    return expect(provider.refreshUpdateCache(progressCallback))
+    return expect(provider.scanUpdate(progressCallback))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
         releaseNotes: 'oh look some release notes cool',
         downloadProgress: 100,
       })
-      .then(() =>
+      .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
           files: releaseFiles,
           releaseNotes: 'oh look some release notes cool',
           downloadProgress: 100,
         })
-      )
+        return expect(
+          provider.downloadUpdate(progressCallback)
+        ).resolves.toEqual({
+          version: '1.2.3',
+          files: releaseFiles,
+          releaseNotes: 'oh look some release notes cool',
+          downloadProgress: 100,
+        })
+      })
   })
   it('says there is an update and forwards progress if an update download is needed', () => {
     const releaseUrls = {
@@ -239,6 +475,9 @@ describe('provider.refreshUpdateCache happy paths', () => {
       ...releaseFiles,
       releaseNotesContent: 'oh look some release notes sweet',
     }
+    when(ensureCleanReleaseCacheForVersion)
+      .calledWith('/some/random/directory/versions', '1.2.3')
+      .thenResolve('/some/random/directory/versions/1.2.3')
     when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
@@ -250,8 +489,11 @@ describe('provider.refreshUpdateCache happy paths', () => {
           '1.2.3': releaseUrls,
         },
       })
+    when(getReleaseFilesIfExist)
+      .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
+      .thenResolve(null)
 
-    when(cleanUpAndGetOrDownloadReleaseFiles)
+    when(cleanUpAndDownloadReleaseFiles)
       .calledWith(
         releaseUrls,
         '/some/random/directory/versions',
@@ -286,6 +528,16 @@ describe('provider.refreshUpdateCache happy paths', () => {
                 })
             )
       )
+    when(downloadReleaseNotes)
+      .calledWith(
+        'http://opentrons.com/releaseNotes.md',
+        '/some/random/directory/versions/1.2.3',
+        expect.any(AbortController)
+      )
+      .thenResolve({
+        releaseNotes: releaseData.releaseNotes,
+        releaseNotesContent: releaseData.releaseNotesContent,
+      })
 
     const progressCallback = vi.fn()
     const provider = getProvider({
@@ -296,35 +548,68 @@ describe('provider.refreshUpdateCache happy paths', () => {
     })
     expect(provider.getUpdateDetails()).toEqual({
       version: null,
-      files: null,
+      files: {
+        system: null,
+        releaseNotes: null,
+      },
       releaseNotes: null,
       downloadProgress: 0,
     })
-    return expect(provider.refreshUpdateCache(progressCallback))
+    return expect(
+      Promise.all([
+        provider.scanUpdate(progressCallback),
+        new Promise<void>(resolve => {
+          expect(provider.ongoingCheck()).not.toBeNull()
+          resolve()
+        }),
+      ]).then(([res, _]) => res)
+    )
       .resolves.toEqual({
         version: '1.2.3',
-        files: releaseFiles,
-        releaseNotes: 'oh look some release notes sweet',
-        downloadProgress: 100,
+        files: {
+          system: null,
+          releaseNotes: releaseData.releaseNotes,
+        },
+        releaseNotes: releaseData.releaseNotesContent,
+        downloadProgress: 0,
       })
       .then(() => {
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
-          files: null,
-          releaseNotes: null,
+          files: {
+            system: null,
+            releaseNotes: releaseData.releaseNotes,
+          },
+          releaseNotes: releaseData.releaseNotesContent,
+          downloadProgress: 0,
+        })
+        return expect(
+          Promise.all([
+            provider.downloadUpdate(progressCallback),
+            new Promise<void>(resolve => {
+              expect(provider.ongoingCheck()).not.toBeNull()
+              resolve()
+            }),
+          ]).then(([res, _]) => res)
+        ).resolves.toEqual({
+          version: '1.2.3',
+          files: releaseFiles,
+          releaseNotes: releaseData.releaseNotesContent,
+          downloadProgress: 100,
+        })
+      })
+      .then(() => {
+        expect(progressCallback).toHaveBeenCalledWith({
+          version: '1.2.3',
+          files: { system: null, releaseNotes: releaseData.releaseNotes },
+          releaseNotes: releaseData.releaseNotesContent,
           downloadProgress: 0,
         })
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
-          files: null,
-          releaseNotes: null,
+          files: { system: null, releaseNotes: releaseData.releaseNotes },
+          releaseNotes: releaseData.releaseNotesContent,
           downloadProgress: 50,
-        })
-        expect(progressCallback).toHaveBeenCalledWith({
-          version: '1.2.3',
-          files: null,
-          releaseNotes: null,
-          downloadProgress: 100,
         })
         expect(progressCallback).toHaveBeenCalledWith({
           version: '1.2.3',
@@ -342,11 +627,11 @@ describe('provider.refreshUpdateCache happy paths', () => {
   })
 })
 
-describe('provider.refreshUpdateCache locking', () => {
+describe('provider locking', () => {
   afterEach(() => {
     vi.resetAllMocks()
   })
-  it('will not start a refresh when locked', () => {
+  it('will not start a scan when locked', () => {
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
       channel: 'release',
@@ -354,9 +639,19 @@ describe('provider.refreshUpdateCache locking', () => {
       currentVersion: '1.0.0',
     })
     provider.lockUpdateCache()
-    return expect(provider.refreshUpdateCache(vi.fn())).rejects.toThrow()
+    return expect(provider.scanUpdate(vi.fn())).rejects.toThrow()
   })
-  it('will start a refresh when locked then unlocked', () => {
+  it('will not start a download when locked', () => {
+    const provider = getProvider({
+      manifestUrl: 'http://opentrons.com/releases.json',
+      channel: 'release',
+      updateCacheDirectory: '/some/random/directory',
+      currentVersion: '1.0.0',
+    })
+    provider.lockUpdateCache()
+    return expect(provider.downloadUpdate(vi.fn())).rejects.toThrow()
+  })
+  it('will start a scan when locked then unlocked', () => {
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
       channel: 'release',
@@ -381,9 +676,25 @@ describe('provider.refreshUpdateCache locking', () => {
       })
     provider.lockUpdateCache()
     provider.unlockUpdateCache()
-    return expect(provider.refreshUpdateCache(vi.fn())).resolves.toEqual({
+    return expect(provider.scanUpdate(vi.fn())).resolves.toEqual({
       version: null,
-      files: null,
+      files: { system: null, releaseNotes: null },
+      releaseNotes: null,
+      downloadProgress: 0,
+    })
+  })
+  it('will start a download when locked then unlocked', () => {
+    const provider = getProvider({
+      manifestUrl: 'http://opentrons.com/releases.json',
+      channel: 'release',
+      updateCacheDirectory: '/some/random/directory',
+      currentVersion: '1.2.3',
+    })
+    provider.lockUpdateCache()
+    provider.unlockUpdateCache()
+    return expect(provider.downloadUpdate(vi.fn())).resolves.toEqual({
+      version: null,
+      files: { system: null, releaseNotes: null },
       releaseNotes: null,
       downloadProgress: 0,
     })
@@ -418,17 +729,11 @@ describe('provider.refreshUpdateCache locking', () => {
         '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
     }
     const releaseData = { ...releaseFiles, releaseNotesContent: 'oh hello' }
-    when(cleanUpAndGetOrDownloadReleaseFiles)
-      .calledWith(
-        releaseUrls,
-        '/some/random/directory/versions',
-        '1.2.3',
-        expect.any(Function),
-        expect.any(Object)
-      )
+    when(getReleaseFilesIfExist)
+      .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
       .thenResolve(releaseData)
 
-    return expect(provider.refreshUpdateCache(vi.fn()))
+    return expect(provider.scanUpdate(vi.fn()))
       .resolves.toEqual({
         version: '1.2.3',
         files: releaseFiles,
@@ -456,7 +761,7 @@ describe('provider.refreshUpdateCache locking', () => {
               })
           )
         const progress = vi.fn()
-        return expect(provider.refreshUpdateCache(progress))
+        return expect(provider.scanUpdate(progress))
           .rejects.toThrow()
           .then(() =>
             expect(progress).toHaveBeenCalledWith({
@@ -476,88 +781,7 @@ describe('provider.refreshUpdateCache locking', () => {
         })
       )
   })
-  it('will abort when locked between manifest and download phases and return the previous update', () => {
-    const provider = getProvider({
-      manifestUrl: 'http://opentrons.com/releases.json',
-      channel: 'release',
-      updateCacheDirectory: '/some/random/directory',
-      currentVersion: '1.0.0',
-    })
-    const releaseUrls = {
-      system: 'http://opentrons.com/system.zip',
-      fullImage: 'http://opentrons.com/fullImage.zip',
-      version: 'http://opentrons.com/version.json',
-      releaseNotes: 'http://opentrons.com/releaseNotes.md',
-    }
-    when(getOrDownloadManifest)
-      .calledWith(
-        'http://opentrons.com/releases.json',
-        '/some/random/directory',
-        expect.any(AbortController)
-      )
-      .thenResolve({
-        productionV2: {
-          '1.2.3': releaseUrls,
-        },
-      })
-    const releaseFiles = {
-      system: '/some/random/directory/cached-release-1.2.3/ot3-system.zip',
-      releaseNotes:
-        '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
-    }
-    const releaseData = { ...releaseFiles, releaseNotesContent: 'hi' }
-    when(cleanUpAndGetOrDownloadReleaseFiles)
-      .calledWith(
-        releaseUrls,
-        '/some/random/directory/versions',
-        '1.2.3',
-        expect.any(Function),
-        expect.any(Object)
-      )
-      .thenResolve(releaseData)
 
-    return expect(provider.refreshUpdateCache(vi.fn()))
-      .resolves.toEqual({
-        version: '1.2.3',
-        files: releaseFiles,
-        releaseNotes: 'hi',
-        downloadProgress: 100,
-      })
-      .then(() => {
-        when(getOrDownloadManifest)
-          .calledWith(
-            expect.any(String),
-            expect.any(String),
-            expect.any(AbortController)
-          )
-          .thenDo(
-            () =>
-              new Promise(resolve => {
-                provider.lockUpdateCache()
-                resolve({ productionV2: { '1.2.3': releaseUrls } })
-              })
-          )
-        const progress = vi.fn()
-        return expect(provider.refreshUpdateCache(progress))
-          .rejects.toThrow()
-          .then(() =>
-            expect(progress).toHaveBeenCalledWith({
-              version: '1.2.3',
-              files: releaseFiles,
-              releaseNotes: 'hi',
-              downloadProgress: 100,
-            })
-          )
-      })
-      .then(() =>
-        expect(provider.getUpdateDetails()).toEqual({
-          version: '1.2.3',
-          files: releaseFiles,
-          releaseNotes: 'hi',
-          downloadProgress: 100,
-        })
-      )
-  })
   it('will abort when locked in the file download phase and return the previous update', () => {
     const provider = getProvider({
       manifestUrl: 'http://opentrons.com/releases.json',
@@ -571,6 +795,10 @@ describe('provider.refreshUpdateCache locking', () => {
       version: 'http://opentrons.com/version.json',
       releaseNotes: 'http://opentrons.com/releaseNotes.md',
     }
+    when(ensureCleanReleaseCacheForVersion)
+      .calledWith('/some/random/directory/versions', '1.2.3')
+      .thenResolve('/some/random/directory/versions/1.2.3')
+
     when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
@@ -582,197 +810,82 @@ describe('provider.refreshUpdateCache locking', () => {
           '1.2.3': releaseUrls,
         },
       })
-    const releaseFiles = {
-      system: '/some/random/directory/cached-release-1.2.3/ot3-system.zip',
-      releaseNotes:
-        '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
-    }
-    const releaseData = {
-      ...releaseFiles,
-      releaseNotesContent: 'content',
-    }
-    when(cleanUpAndGetOrDownloadReleaseFiles)
+    when(getReleaseFilesIfExist)
+      .calledWith(releaseUrls, '/some/random/directory/versions', '1.2.3')
+      .thenResolve(null)
+    when(cleanUpAndDownloadReleaseFiles)
       .calledWith(
-        releaseUrls,
-        '/some/random/directory/versions',
-        '1.2.3',
+        expect.any(Object),
+        expect.any(String),
+        expect.any(String),
         expect.any(Function),
-        expect.any(Object)
+        expect.any(AbortController)
       )
-      .thenResolve(releaseData)
-
-    return expect(provider.refreshUpdateCache(vi.fn()))
-      .resolves.toEqual({
-        version: '1.2.3',
-        files: releaseFiles,
-        releaseNotes: 'content',
-        downloadProgress: 100,
-      })
-      .then(() => {
-        when(getOrDownloadManifest)
-          .calledWith(
-            'http://opentrons.com/releases.json',
-            '/some/random/directory',
-            expect.any(AbortController)
-          )
-          .thenResolve({
-            productionV2: {
-              '1.2.3': releaseUrls,
-            },
+      .thenDo(
+        (_releaseUrls, _cacheDirectory, _version, _progress, abortController) =>
+          new Promise((resolve, reject) => {
+            abortController.signal.addEventListener(
+              'abort',
+              () => {
+                reject(new LocalAbortError(abortController.signal.reason))
+              },
+              { once: true }
+            )
+            provider.lockUpdateCache()
           })
-        when(cleanUpAndGetOrDownloadReleaseFiles)
-          .calledWith(
-            expect.any(Object),
-            expect.any(String),
-            expect.any(String),
-            expect.any(Function),
-            expect.any(AbortController)
-          )
-          .thenDo(
-            (
-              _releaseUrls,
-              _cacheDirectory,
-              _version,
-              _progress,
-              abortController
-            ) =>
-              new Promise((resolve, reject) => {
-                abortController.signal.addEventListener(
-                  'abort',
-                  () => {
-                    reject(new LocalAbortError(abortController.signal.reason))
-                  },
-                  { once: true }
-                )
-                provider.lockUpdateCache()
-              })
-          )
-        const progress = vi.fn()
-        return expect(provider.refreshUpdateCache(progress))
-          .rejects.toThrow()
-          .then(() =>
-            expect(progress).toHaveBeenCalledWith({
-              version: '1.2.3',
-              files: releaseFiles,
-              releaseNotes: 'content',
-              downloadProgress: 100,
-            })
-          )
-      })
-      .then(() => {
-        expect(provider.getUpdateDetails()).toEqual({
-          version: '1.2.3',
-          files: releaseFiles,
-          releaseNotes: 'content',
-          downloadProgress: 100,
-        })
-      })
-  })
-  it('will abort when locked in the last-chance phase and return the previous update', () => {
-    const provider = getProvider({
-      manifestUrl: 'http://opentrons.com/releases.json',
-      channel: 'release',
-      updateCacheDirectory: '/some/random/directory',
-      currentVersion: '1.0.0',
-    })
-    const releaseUrls = {
-      system: 'http://opentrons.com/system.zip',
-      fullImage: 'http://opentrons.com/fullImage.zip',
-      version: 'http://opentrons.com/version.json',
-      releaseNotes: 'http://opentrons.com/releaseNotes.md',
-    }
-    when(getOrDownloadManifest)
+      )
+    when(downloadReleaseNotes)
       .calledWith(
-        'http://opentrons.com/releases.json',
-        '/some/random/directory',
+        'http://opentrons.com/releaseNotes.md',
+        '/some/random/directory/versions/1.2.3',
         expect.any(AbortController)
       )
       .thenResolve({
-        productionV2: {
-          '1.2.3': releaseUrls,
-        },
+        releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
+        releaseNotesContent: 'some release notes cool',
       })
-    const releaseFiles = {
-      system: '/some/random/directory/cached-release-1.2.3/ot3-system.zip',
-      releaseNotes:
-        '/some/random/directory/cached-release-1.2.3/releaseNotes.md',
-    }
-    const releaseData = {
-      ...releaseFiles,
-      releaseNotesContent: 'there is some',
-    }
-    when(cleanUpAndGetOrDownloadReleaseFiles)
-      .calledWith(
-        releaseUrls,
-        '/some/random/directory/versions',
-        '1.2.3',
-        expect.any(Function),
-        expect.any(Object)
-      )
-      .thenResolve(releaseData)
 
-    return expect(provider.refreshUpdateCache(vi.fn()))
+    return expect(provider.scanUpdate(vi.fn()))
       .resolves.toEqual({
         version: '1.2.3',
-        files: releaseFiles,
-        releaseNotes: 'there is some',
-        downloadProgress: 100,
+        files: {
+          system: null,
+          releaseNotes: '/some/random/directory/versions/1.2.3/releaseNotes.md',
+        },
+        releaseNotes: 'some release notes cool',
+        downloadProgress: 0,
       })
       .then(() => {
-        when(getOrDownloadManifest)
-          .calledWith(
-            'http://opentrons.com/releases.json',
-            '/some/random/directory',
-            expect.any(AbortController)
-          )
-          .thenResolve({
-            productionV2: {
-              '1.2.3': releaseUrls,
-            },
-          })
-        when(cleanUpAndGetOrDownloadReleaseFiles)
-          .calledWith(
-            expect.any(Object),
-            expect.any(String),
-            expect.any(String),
-            expect.any(Function),
-            expect.any(AbortController)
-          )
-          .thenDo(
-            (
-              _releaseUrls,
-              _cacheDirectory,
-              _version,
-              _progress,
-              _abortController
-            ) =>
-              new Promise(resolve => {
-                provider.lockUpdateCache()
-                resolve(releaseData)
-              })
-          )
         const progress = vi.fn()
-        return expect(provider.refreshUpdateCache(progress))
+        return expect(provider.downloadUpdate(progress))
           .rejects.toThrow()
           .then(() =>
             expect(progress).toHaveBeenCalledWith({
               version: '1.2.3',
-              files: releaseFiles,
-              releaseNotes: 'there is some',
-              downloadProgress: 100,
+              files: {
+                system: null,
+                releaseNotes:
+                  '/some/random/directory/versions/1.2.3/releaseNotes.md',
+              },
+              releaseNotes: 'some release notes cool',
+              downloadProgress: 0,
             })
           )
       })
-      .then(() =>
+      .then(() => {
         expect(provider.getUpdateDetails()).toEqual({
           version: '1.2.3',
-          files: releaseFiles,
-          releaseNotes: 'there is some',
-          downloadProgress: 100,
+          files: {
+            system: null,
+            releaseNotes:
+              '/some/random/directory/versions/1.2.3/releaseNotes.md',
+          },
+          releaseNotes: 'some release notes cool',
+          downloadProgress: 0,
         })
-      )
+      })
   })
-  it('will not run two checks at once', () => {
+  it('will not run two scans at once', () => {
     when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
@@ -796,19 +909,19 @@ describe('provider.refreshUpdateCache locking', () => {
       updateCacheDirectory: '/some/random/directory',
       currentVersion: '1.2.3',
     })
-    const first = provider.refreshUpdateCache(progressCallback)
-    const second = provider.refreshUpdateCache(progressCallback)
+    const first = provider.scanUpdate(progressCallback)
+    const second = provider.scanUpdate(progressCallback)
     return Promise.all([
       expect(first).resolves.toEqual({
         version: null,
-        files: null,
+        files: { system: null, releaseNotes: null },
         releaseNotes: null,
         downloadProgress: 0,
       }),
       expect(second).rejects.toThrow(),
     ]).then(() => expect(getOrDownloadManifest).toHaveBeenCalledOnce())
   })
-  it('will run a second check after the first completes', () => {
+  it('will not run a scan and download at once', () => {
     when(getOrDownloadManifest)
       .calledWith(
         'http://opentrons.com/releases.json',
@@ -832,20 +945,16 @@ describe('provider.refreshUpdateCache locking', () => {
       updateCacheDirectory: '/some/random/directory',
       currentVersion: '1.2.3',
     })
-    return expect(provider.refreshUpdateCache(progressCallback))
-      .resolves.toEqual({
+    const first = provider.scanUpdate(progressCallback)
+    const second = provider.downloadUpdate(progressCallback)
+    return Promise.all([
+      expect(first).resolves.toEqual({
         version: null,
-        files: null,
+        files: { system: null, releaseNotes: null },
         releaseNotes: null,
         downloadProgress: 0,
-      })
-      .then(() =>
-        expect(provider.refreshUpdateCache(progressCallback)).resolves.toEqual({
-          version: null,
-          files: null,
-          releaseNotes: null,
-          downloadProgress: 0,
-        })
-      )
+      }),
+      expect(second).rejects.toThrow(),
+    ]).then(() => expect(getOrDownloadManifest).toHaveBeenCalledOnce())
   })
 })
