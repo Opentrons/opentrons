@@ -89,9 +89,6 @@ export function DocumentationRequired({
                 onChange={e => {
                   setInputText(e.target.value)
                 }}
-                onBlur={e => {
-                  e.target.focus()
-                }}
               />
             </div>
           </div>
