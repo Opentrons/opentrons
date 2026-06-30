@@ -82,44 +82,45 @@ export function ComplianceReadySoftwareSettings({
     ]
   )
 
-  const handleInputBlur =
-    (id: AuthSettingFieldId) =>
-    (value: string): void => {
-      const authPatch = getAuthInputPatch(id, value, fieldValues)
-      if (authPatch != null) {
-        void patchAuthSettings(authPatch)
-      }
+  const handleInputBlur = (id: AuthSettingFieldId, value: string): void => {
+    const authPatch = getAuthInputPatch(id, value, fieldValues)
+    if (authPatch != null) {
+      patchAuthSettings(authPatch).catch(() => {})
     }
+  }
 
-  const handleToggleChange =
-    (fieldId: SettingFieldId) =>
-    (toggledOn: boolean): void => {
-      switch (fieldId) {
-        case 'passwordResetEnabled':
-          if (!toggledOn) {
-            void patchAuthSettings({ data: { passwordResetTime: null } })
-          }
-          return
-        case 'passwordComplexityEnabled':
-          if (!toggledOn) {
-            void patchAuthSettings({
-              data: {
-                passwordComplexitySpecialCharacters: null,
-                passwordComplexityMinimumLength: null,
-              },
-            })
-          }
-          return
-        default:
-          if (isRobotServerSettingKey(fieldId)) {
-            void patchRobotServerAccessControlSettings({
-              data: { [fieldId]: toggledOn },
-            })
-          } else if (isAuthServerSettingKey(fieldId)) {
-            void patchAuthSettings({ data: { [fieldId]: toggledOn } })
-          }
-      }
+  const handleToggleChange = (
+    fieldId: SettingFieldId,
+    toggledOn: boolean
+  ): void => {
+    switch (fieldId) {
+      case 'passwordResetEnabled':
+        if (!toggledOn) {
+          patchAuthSettings({ data: { passwordResetTime: null } }).catch(
+            () => {}
+          )
+        }
+        return
+      case 'passwordComplexityEnabled':
+        if (!toggledOn) {
+          patchAuthSettings({
+            data: {
+              passwordComplexitySpecialCharacters: null,
+              passwordComplexityMinimumLength: null,
+            },
+          }).catch(() => {})
+        }
+        return
+      default:
+        if (isRobotServerSettingKey(fieldId)) {
+          patchRobotServerAccessControlSettings({
+            data: { [fieldId]: toggledOn },
+          }).catch(() => {})
+        } else if (isAuthServerSettingKey(fieldId)) {
+          patchAuthSettings({ data: { [fieldId]: toggledOn } }).catch(() => {})
+        }
     }
+  }
 
   return (
     <Accordion
@@ -138,21 +139,27 @@ export function ComplianceReadySoftwareSettings({
             )}
             value={String(fieldValues.maxNumberOfLoginAttempts)}
             units={t('desktop_logins')}
-            onBlur={handleInputBlur('maxNumberOfLoginAttempts')}
+            onBlur={value => {
+              handleInputBlur('maxNumberOfLoginAttempts', value)
+            }}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="passwordResetEnabled"
             labelKey="desktop_require_password_change_after_time"
             values={fieldValues}
-            onToggleChange={handleToggleChange('passwordResetEnabled')}
+            onToggleChange={toggledOn => {
+              handleToggleChange('passwordResetEnabled', toggledOn)
+            }}
           >
             <InputSetting
               key={String(fieldValues.passwordResetTime)}
               label={t('desktop_length_of_time')}
               value={String(fieldValues.passwordResetTime)}
               units={t('desktop_days')}
-              onBlur={handleInputBlur('passwordResetTime')}
+              onBlur={value => {
+                handleInputBlur('passwordResetTime', value)
+              }}
             />
           </ComplianceReadyToggleField>
           <Divider />
@@ -160,22 +167,29 @@ export function ComplianceReadySoftwareSettings({
             id="passwordComplexityEnabled"
             labelKey="desktop_require_password_complexity_requirements"
             values={fieldValues}
-            onToggleChange={handleToggleChange('passwordComplexityEnabled')}
+            onToggleChange={toggledOn => {
+              handleToggleChange('passwordComplexityEnabled', toggledOn)
+            }}
           >
             <ComplianceReadyToggleField
               id="passwordComplexitySpecialCharacters"
               labelKey="desktop_require_special_characters"
               values={fieldValues}
-              onToggleChange={handleToggleChange(
-                'passwordComplexitySpecialCharacters'
-              )}
+              onToggleChange={toggledOn => {
+                handleToggleChange(
+                  'passwordComplexitySpecialCharacters',
+                  toggledOn
+                )
+              }}
             />
             <InputSetting
               key={String(fieldValues.passwordComplexityMinimumLength)}
               label={t('desktop_minimum_password_length')}
               value={String(fieldValues.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
-              onBlur={handleInputBlur('passwordComplexityMinimumLength')}
+              onBlur={value => {
+                handleInputBlur('passwordComplexityMinimumLength', value)
+              }}
             />
           </ComplianceReadyToggleField>
           <Divider />
@@ -184,7 +198,9 @@ export function ComplianceReadySoftwareSettings({
             label={t('desktop_auto_logout_inactivity_length')}
             value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
-            onBlur={handleInputBlur('idleLogout')}
+            onBlur={value => {
+              handleInputBlur('idleLogout', value)
+            }}
           />
         </ComplianceReadySettingsSection>
 
@@ -196,27 +212,36 @@ export function ComplianceReadySoftwareSettings({
             id="requireAdminCredsWhenUpdatingRobotSoftware"
             labelKey="desktop_require_admin_credentials_to_update_robots"
             values={fieldValues}
-            onToggleChange={handleToggleChange(
-              'requireAdminCredsWhenUpdatingRobotSoftware'
-            )}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsWhenUpdatingRobotSoftware',
+                toggledOn
+              )
+            }}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="requireAdminCredsWhenSendingProtocolToRobot"
             labelKey="desktop_require_admin_credentials_to_send_protocols"
             values={fieldValues}
-            onToggleChange={handleToggleChange(
-              'requireAdminCredsWhenSendingProtocolToRobot'
-            )}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsWhenSendingProtocolToRobot',
+                toggledOn
+              )
+            }}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="requireAdminCredsForSignoffProtocol"
             labelKey="desktop_require_admin_credentials_to_sign_protocol_run_records"
             values={fieldValues}
-            onToggleChange={handleToggleChange(
-              'requireAdminCredsForSignoffProtocol'
-            )}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsForSignoffProtocol',
+                toggledOn
+              )
+            }}
           />
         </ComplianceReadySettingsSection>
 
@@ -228,14 +253,18 @@ export function ComplianceReadySoftwareSettings({
             id="requireSignoffForProtocolLog"
             labelKey="desktop_require_signoff_for_protocol_log"
             values={fieldValues}
-            onToggleChange={handleToggleChange('requireSignoffForProtocolLog')}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireSignoffForProtocolLog', toggledOn)
+            }}
           />
           <Divider />
           <ComplianceReadyToggleField
             id="deleteOverMaxOnDiskProtocols"
             labelKey="desktop_automatically_delete_protocol_run_logs"
             values={fieldValues}
-            onToggleChange={handleToggleChange('deleteOverMaxOnDiskProtocols')}
+            onToggleChange={toggledOn => {
+              handleToggleChange('deleteOverMaxOnDiskProtocols', toggledOn)
+            }}
           />
         </ComplianceReadySettingsSection>
 
@@ -247,7 +276,9 @@ export function ComplianceReadySoftwareSettings({
             id="requireReasonForInteraction"
             labelKey="desktop_require_documentation_for_robot_actions"
             values={fieldValues}
-            onToggleChange={handleToggleChange('requireReasonForInteraction')}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireReasonForInteraction', toggledOn)
+            }}
           >
             <InputSetting
               key={String(fieldValues.minLengthOfReasonForInteraction)}
@@ -256,7 +287,9 @@ export function ComplianceReadySoftwareSettings({
               )}
               value={String(fieldValues.minLengthOfReasonForInteraction)}
               units={t('desktop_characters')}
-              onBlur={handleInputBlur('minLengthOfReasonForInteraction')}
+              onBlur={value => {
+                handleInputBlur('minLengthOfReasonForInteraction', value)
+              }}
             />
           </ComplianceReadyToggleField>
         </ComplianceReadySettingsSection>

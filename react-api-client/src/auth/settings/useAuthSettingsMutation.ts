@@ -6,7 +6,7 @@ import { getQueryKey, useHost } from '../../api'
 
 import type { AxiosError } from 'axios'
 import type {
-  UseMutateFunction,
+  UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
@@ -20,7 +20,7 @@ export type UseAuthSettingsMutationResult = UseMutationResult<
   AxiosError,
   PatchAuthSettingsRequest
 > & {
-  patchAuthSettings: UseMutateFunction<
+  patchAuthSettings: UseMutateAsyncFunction<
     AuthSettingsResponse,
     AxiosError,
     PatchAuthSettingsRequest
