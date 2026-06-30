@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -86,10 +86,6 @@ const expandAccordion = (): void => {
 }
 
 describe('ComplianceReadySoftwareSettings', () => {
-  afterEach(() => {
-    cleanup()
-  })
-
   beforeEach(() => {
     mockPatchAuthSettings.mockClear()
     mockPatchRobotServerAccessControlSettings.mockClear()
