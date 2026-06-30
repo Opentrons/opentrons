@@ -66,8 +66,8 @@ export function ComplianceReadySoftwareSettings({
   const authSettingsQuery = useAuthSettingsQuery()
   const robotServerAccessControlSettingsQuery =
     useGetRobotServerAccessControlSettingsQuery()
-  const { patchAuthSettings } = useAuthSettingsMutation()
-  const { patchRobotServerAccessControlSettings } =
+  const { mutate: patchAuthSettings } = useAuthSettingsMutation()
+  const { mutate: patchRobotServerAccessControlSettings } =
     usePatchRobotServerAccessControlSettingsMutation()
 
   const fieldValues = useMemo(
@@ -85,7 +85,7 @@ export function ComplianceReadySoftwareSettings({
   const handleInputBlur = (id: AuthSettingFieldId, value: string): void => {
     const authPatch = getAuthInputPatch(id, value, fieldValues)
     if (authPatch != null) {
-      patchAuthSettings(authPatch).catch(() => {})
+      patchAuthSettings(authPatch)
     }
   }
 
@@ -96,9 +96,7 @@ export function ComplianceReadySoftwareSettings({
     switch (fieldId) {
       case 'passwordResetEnabled':
         if (!toggledOn) {
-          patchAuthSettings({ data: { passwordResetTime: null } }).catch(
-            () => {}
-          )
+          patchAuthSettings({ data: { passwordResetTime: null } })
         }
         return
       case 'passwordComplexityEnabled':
@@ -108,16 +106,16 @@ export function ComplianceReadySoftwareSettings({
               passwordComplexitySpecialCharacters: null,
               passwordComplexityMinimumLength: null,
             },
-          }).catch(() => {})
+          })
         }
         return
       default:
         if (isRobotServerSettingKey(fieldId)) {
           patchRobotServerAccessControlSettings({
             data: { [fieldId]: toggledOn },
-          }).catch(() => {})
+          })
         } else if (isAuthServerSettingKey(fieldId)) {
-          patchAuthSettings({ data: { [fieldId]: toggledOn } }).catch(() => {})
+          patchAuthSettings({ data: { [fieldId]: toggledOn } })
         }
     }
   }
