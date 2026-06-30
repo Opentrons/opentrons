@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Rich, rendered visual diff of the Opentrons docs build between two git refs.
 
-Builds the MkDocs site (``docs/``) at two commits / branches / tags and produces a
+Builds the MkDocs site (`docs/`) at two commits / branches / tags and produces a
 **browsable, styled diff** -- the real rendered docs pages (mkdocs-material CSS and
-all) with GitHub-style inline ``<ins>`` / ``<del>`` highlighting on the content that
+all) with GitHub-style inline `<ins>` / `<del>` highlighting on the content that
 changed. This is meant as a pre-deploy sanity check: confirm that only the changes
 you expect show up in the built site, including the API Reference pages, which are
-compiled from docstrings in ``api/src/opentrons/``.
+compiled from docstrings in `api/src/opentrons/`.
 
 Output (a directory, because the pages load the real theme assets):
 
@@ -16,8 +16,8 @@ Output (a directory, because the pages load the real theme assets):
                           added pages are tinted green (browse it like the real docs)
       site-a/          <- ref A's full site; removed pages are tinted red
 
-How it stays faithful to docstrings: ``docs/pyproject.toml`` installs ``opentrons``
-and ``opentrons-shared-data`` as editable path deps, so each ref's API Reference is
+How it stays faithful to docstrings: `docs/pyproject.toml` installs `opentrons`
+and `opentrons-shared-data` as editable path deps, so each ref's API Reference is
 rebuilt from *that ref's own* ``api/`` source.
 
 Usage
@@ -28,10 +28,10 @@ Usage
     docs/scripts/docs_visual_diff.py edge HEAD -o /tmp/docs-diff
     docs/scripts/docs_visual_diff.py --site-a docs/site --site-b /other/site   # skip builds
 
-With no refs, A defaults to the latest ``mkdocs-*`` deploy tag and B to HEAD.
+With no refs, A defaults to the latest `mkdocs-*` deploy tag and B to HEAD.
 
 Requires: git and uv (https://docs.astral.sh/uv/). The script self-bootstraps lxml
-via ``uv run --with lxml`` -- no manual environment setup needed.
+via `uv run --with lxml` -- no manual environment setup needed.
 """
 
 from __future__ import annotations
@@ -265,10 +265,8 @@ def clean_merged_html(markup: str) -> str:
 
 
 # --- Table-aware diffing -----------------------------------------------------
-# htmldiff mangles tables: it can't represent a deleted cell inline, so it adds
-# phantom columns and floats <del> content outside the table. Instead we hold
-# tables out of the htmldiff pass and diff them ourselves, aligning rows and
-# diffing each changed cell so ins/del stay inside the cell.
+# htmldiff mangles tables: it can't represent a deleted cell inline. Instead we hold
+# tables out of the htmldiff pass and diff them ourselves.
 
 def _row_key(tr) -> str:
     """Stable alignment key for a row: its first cell (usually the row's
