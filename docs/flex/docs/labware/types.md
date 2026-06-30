@@ -33,7 +33,6 @@ The Opentrons Flex works by default with well plates in a variety of well config
 
 The Labware Library includes plates with 12, 24, and 48 wells. Due to the grid configuration and spacing of the wells on these plates, they are only usable with 1-channel pipettes.
 
-
 ### 96-well plates 
 
 The Labware Library includes many 96-well plates, including Opentrons and third-party plates. The 8-channel and 96-channel Flex pipettes are optimized to work with the 8×12 well grid on these plates. 8-channel pipettes in their full nozzle configuration pipette in an entire column of wells, and the 96-channel pipette in its full configuration pipettes to every well on the plate.
@@ -94,25 +93,26 @@ When ordering or reordering, tips are available as racks or refills. Both racks 
   <tbody>
     <tr>
       <td><strong>Racks</strong></td>
-      <td>A rack consists of:
+      <td>A rack configuration consists of:
         <ul>
-          <li>4 boxes in a carton (5 tip racks in each box).</li>
+          <li>4 boxes per carton (5 tip racks per box).</li>
           <li>20 individual tip racks total.</li>
-          <li>Each tip rack includes a lid, mid-plate with 96 tips, and base plate.</li>
-          <li>Tip racks are individually shrink wrapped to prevent contamination.</li>
+          <li>Each tip rack includes a lid, a mid-plate with 96 tips, and a base plate.</li>
+          <li>All tip racks are individually shrink-wrapped to prevent contamination.</li>
         </ul>
       </td>
     </tr>
     <tr>
       <td><strong>Refills</strong></td>
-      <td>A refill consists of:
+      <td>A refill configuration consists of:
         <ul>
-          <li>4 blister packs per carton (5 tip racks per blister).</li>
-          <li>20 tip mid-plates per carton.</li>
+          <li>4 blister packs per carton (5 tip mid-plates per pack).</li>
+          <li>20 tip rack mid-plates total.</li>
           <li>Each mid-plate includes 96 tips.</li>
-          <li>2 individually shrink-wrapped base plates (packaged separately within the carton).</li>
-          <li>No lids.</li>
+          <li>All mid-plates are nested in blister packs to minimize packaging waste.</li>
+          <li>2 individually shrink-wrapped base plates are included separately.</li>
         </ul>
+        <p><strong>Note:</strong> Refills do not include lids.
       </td>
     </tr>
   </tbody>
