@@ -677,7 +677,6 @@ code {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   <h1>Docs visual diff</h1>
   <div class="refs"><b>A</b> <code>{html.escape(a["ref"])}</code> @ <code>{a["short"]}</code>
     &nbsp;→&nbsp; <b>B</b> <code>{html.escape(b["ref"])}</code> @ <code>{b["short"]}</code></div>
-  <div class="refs" style="margin-top:6px">Rendered content diff · shared nav/header/footer excluded</div>
 </header>
 <main>
   <div class="cards">
