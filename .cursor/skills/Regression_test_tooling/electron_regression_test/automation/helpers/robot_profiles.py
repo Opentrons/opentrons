@@ -36,6 +36,7 @@ ROBOT_PROFILES: dict[str, RobotProfile] = {
 
 
 def get_robot_profile(profile_id: str | None) -> RobotProfile | None:
+    """Look up a launch profile by id, raising when the id is unknown."""
     if not profile_id:
         return None
     try:

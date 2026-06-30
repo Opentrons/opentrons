@@ -1,30 +1,42 @@
+"""Page object for the Labware library navigation."""
+
 from __future__ import annotations
 
 from pathlib import Path
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
-from automation.helpers.app_readiness import click_when_ui_ready
+from automation.helpers.left_nav import link, navigate_to
+from automation.helpers.list_scroll import scroll_to_bottom as scroll_list_to_bottom
+from automation.helpers.page_helpers import require_helper
 from automation.helpers.scroll_video_helper import ScrollVideoHelper
 
 
 class LabwarePage:
+    """Navigate to the Labware library and optionally record a scroll video."""
+
     def __init__(self, page: Page, scroll_video: ScrollVideoHelper | None = None):
+        """Bind the page and optional scroll-video helper."""
         self.page = page
         self.scroll_video = scroll_video
 
     @property
     def nav_link(self):
-        return self.page.get_by_role("link", name="Labware", exact=True)
+        """Left-nav Labware link."""
+        return link(self.page, "Labware")
 
     def navigate(self):
-        click_when_ui_ready(self.page, self.nav_link)
-        self.page.wait_for_url("**/labware**")
-        expect(self.nav_link).to_have_attribute("aria-current", "page")
+        """Open the Labware library landing page."""
+        navigate_to(self.page, "Labware", "**/labware**")
+
+    def scroll_to_bottom(self) -> None:
+        """Scroll the labware library list until the bottom is reached."""
+        scroll_list_to_bottom(self.page)
 
     def look(self) -> Path:
         """Open Labware and record a slow scroll — one artifact to review."""
         self.navigate()
-        if self.scroll_video is None:
-            raise RuntimeError("Pass a ScrollVideoHelper to LabwarePage for look()")
-        return self.scroll_video.record("labware", "look", heading_name="Labware")
+        scroll_video = require_helper(
+            self.scroll_video, "ScrollVideoHelper", owner="LabwarePage", method="look"
+        )
+        return scroll_video.record("labware", "look", heading_name="Labware")

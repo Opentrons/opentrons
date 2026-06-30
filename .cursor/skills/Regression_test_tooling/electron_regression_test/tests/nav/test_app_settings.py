@@ -11,6 +11,7 @@ from pages.app_settings_page import AppSettingsPage
 
 
 def test_general_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) -> None:
+    """Validate the General tab and capture a screenshot."""
     log_step("Open App Settings")
     settings = AppSettingsPage(run_local_app, shots=screenshot_helper)
     settings.navigate()
@@ -21,6 +22,7 @@ def test_general_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) -
 
 
 def test_privacy_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) -> None:
+    """Validate the Privacy tab and capture a screenshot."""
     log_step("Open App Settings")
     settings = AppSettingsPage(run_local_app, shots=screenshot_helper)
     settings.navigate()
@@ -31,6 +33,7 @@ def test_privacy_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) -
 
 
 def test_advanced_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) -> None:
+    """Validate the Advanced tab and capture a screenshot."""
     log_step("Open App Settings")
     settings = AppSettingsPage(run_local_app, shots=screenshot_helper)
     settings.navigate()
@@ -41,6 +44,7 @@ def test_advanced_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) 
 
 
 def test_feature_flags_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) -> None:
+    """Validate Feature Flags when present and capture a screenshot."""
     log_step("Open App Settings")
     settings = AppSettingsPage(run_local_app, shots=screenshot_helper)
     settings.navigate()

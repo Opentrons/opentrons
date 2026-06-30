@@ -45,7 +45,18 @@ def get_opentrons_path() -> str:
     raise OSError(f"Unsupported operating system: {platform.system()}")
 
 
+def _cdp_is_ready(debug_port: int) -> bool:
+    """Return True when something is already listening on the CDP port."""
+    url = f"http://127.0.0.1:{debug_port}/json/version"
+    try:
+        with urllib.request.urlopen(url, timeout=1):
+            return True
+    except (urllib.error.URLError, TimeoutError, OSError):
+        return False
+
+
 def _wait_for_cdp(debug_port: int, timeout: float = 30.0) -> None:
+    """Poll the CDP ``/json/version`` endpoint until the browser is ready."""
     url = f"http://127.0.0.1:{debug_port}/json/version"
     deadline = time.time() + timeout
     while time.time() < deadline:
@@ -109,6 +120,7 @@ def launch_app(*, debug_port: int = DEBUG_PORT, quiet: bool = True) -> subproces
 
 
 def _is_app_page(page: Page) -> bool:
+    """Return True when the page looks like the Opentrons app, not DevTools."""
     url = page.url.lower()
     title = page.title().lower()
     if "devtools" in url or title == "devtools":
@@ -117,11 +129,13 @@ def _is_app_page(page: Page) -> bool:
 
 
 def _iter_cdp_pages(browser: Browser):
+    """Yield every page in every context attached over CDP."""
     for context in browser.contexts:
         yield from context.pages
 
 
 def _find_app_page(browser: Browser) -> Page:
+    """Return the main Opentrons app window, waiting briefly if needed."""
     for _ in range(30):
         for page in _iter_cdp_pages(browser):
             if _is_app_page(page):
@@ -149,7 +163,14 @@ def connect_playwright(*, debug_port: int = DEBUG_PORT) -> tuple[Playwright, Bro
 
 def launch_and_connect(
     *, debug_port: int = DEBUG_PORT, quiet: bool = True
-) -> tuple[subprocess.Popen, Playwright, Browser, Page]:
+) -> tuple[subprocess.Popen | None, Playwright, Browser, Page]:
+    """Launch the packaged Opentrons app and connect Playwright over CDP."""
+    if _cdp_is_ready(debug_port):
+        print(
+            f"CDP port {debug_port} already in use — attaching to running Opentrons"
+        )
+        playwright, browser, page = connect_playwright(debug_port=debug_port)
+        return None, playwright, browser, page
     process = launch_app(debug_port=debug_port, quiet=quiet)
     playwright, browser, page = connect_playwright(debug_port=debug_port)
     return process, playwright, browser, page
@@ -161,6 +182,7 @@ def launch_dev_and_connect(
     opentrons_project: str = "ot3",
     quiet: bool = True,
 ) -> tuple[subprocess.Popen, Playwright, Browser, Page]:
+    """Launch the dev app via ``make -C app dev`` and connect Playwright over CDP."""
     process = launch_dev_app(
         debug_port=debug_port,
         opentrons_project=opentrons_project,
@@ -177,4 +199,5 @@ def prepare_app_page(page: Page) -> Page:
 
 
 def should_attach_only() -> bool:
+    """Return True when ``ATTACH=1`` and tests should skip launching the app."""
     return os.environ.get("ATTACH", "").strip().lower() in ("1", "true", "yes")

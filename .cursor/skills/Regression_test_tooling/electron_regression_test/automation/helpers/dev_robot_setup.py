@@ -8,6 +8,7 @@ import httpx
 from playwright.sync_api import Page, expect
 
 from automation.helpers.app_readiness import click_when_ui_ready, dismiss_blocking_ui
+from automation.helpers.left_nav import link
 
 LOCALHOST = "localhost"
 ROBOT_SERVER_PORT = 31950
@@ -67,5 +68,5 @@ def ensure_localhost_robot_discovered(
         close.click(force=True)
 
     dismiss_blocking_ui(page)
-    click_when_ui_ready(page, page.get_by_role("link", name="Devices", exact=True))
+    click_when_ui_ready(page, link(page, "Devices"))
     expect(robot_card.first).to_be_visible(timeout=timeout)

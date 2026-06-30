@@ -11,6 +11,7 @@ class ScrollVideoHelper:
     """Capture a slow scroll as an mp4 for quick visual review."""
 
     def __init__(self, page: Page, output_dir: Path = ARTIFACTS_DIR):
+        """Bind a Playwright page and optional output directory."""
         self.page = page
         self.output_dir = output_dir
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -25,6 +26,7 @@ class ScrollVideoHelper:
         pause_ms: int = 150,
         max_steps: int = 40,
     ) -> Path:
+        """Scroll the page slowly while capturing frames, then encode an mp4."""
         frames_dir = self.output_dir / section / f"{name}_frames"
         frames_dir.mkdir(parents=True, exist_ok=True)
 
@@ -48,6 +50,7 @@ class ScrollVideoHelper:
 
     @staticmethod
     def _encode_video(frames_dir: Path, video_path: Path) -> bool:
+        """Encode numbered PNG frames into an mp4 using ffmpeg."""
         video_path.parent.mkdir(parents=True, exist_ok=True)
         try:
             subprocess.run(

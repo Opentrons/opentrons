@@ -11,6 +11,7 @@ from pages.protocols_page import ProtocolsPage
 
 
 def test_protocol_opens_from_landing(run_local_app: Page, protocol_name: str) -> None:
+    """Open a protocol from the landing list and assert detail URL loads."""
     log_step(f"Open Protocols landing and select '{protocol_name}'")
     ProtocolsPage(run_local_app).open(protocol_name)
     expect(run_local_app).to_have_url(ProtocolsPage.PROTOCOL_DETAIL_URL)
@@ -24,6 +25,7 @@ def test_protocol_detail_tab(
     screenshot_helper: ScreenshotHelper,
     tab: str,
 ) -> None:
+    """Open a protocol and screenshot each present detail tab."""
     log_step(f"Open protocol '{protocol_name}'")
     protocols = ProtocolsPage(run_local_app, shots=screenshot_helper)
     protocols.open(protocol_name)

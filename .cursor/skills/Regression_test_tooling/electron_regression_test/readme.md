@@ -2,6 +2,17 @@
 
 Playwright + pytest against the Opentrons desktop app and a connected Flex/OT-3.
 
+## Setup
+
+From `electron_regression_test/`:
+
+```bash
+uv sync
+uv run playwright install chromium
+```
+
+Or with pip: `pip install -e .` and `playwright install chromium`.
+
 ## Layout
 
 ```
@@ -10,11 +21,19 @@ electron_regression_test/
   Open_app.py       # launch / CDP attach helpers
   pages/            # page objects
   tests/
-    nav/            # left-panel smoke (Protocols, Settings, Labware, Devices)
-    device_cards/   # pipette / module / lights cards on robot detail
+    device_cards/   # Devices → robot detail, then pipette / module / lights cards
+    nav/            # left-panel smoke (Labware, Protocols, App Settings)
 ```
 
 Every test uses the **`run_local_app`** session fixture: robot health check, then launch (or attach) Electron, then your test code.
+
+Full-suite order (when running `pytest` or `make test`):
+
+1. `device_cards/test_devices_nav.py` — Devices list → robot detail
+2. `device_cards/test_cards.py` — hardware cards on robot detail
+3. `nav/test_labware.py`
+4. `nav/test_protocols.py`
+5. `nav/test_app_settings.py`
 
 ## Run
 
@@ -51,10 +70,11 @@ ATTACH=1 pytest --headed tests/nav/test_labware.py
 ATTACH=1 pytest fake-robot tests/nav/
 ```
 
-Legacy wrapper (same as `pytest tests/nav`):
+Legacy wrapper (same as `pytest tests/`):
 
 ```bash
 python main_script.py
+python main_script.py tests/nav/
 python main_script.py tests/device_cards/
 ```
 
@@ -73,3 +93,27 @@ python main_script.py tests/device_cards/
 | `TEMPERATURE_MODULE_PREFIX` | `TD2` | Module serial prefix |
 
 Robot is checked over USB first, then Wi-Fi, **before** the desktop app starts (USB port ordering).
+
+## Test reports and artifacts
+
+Every pytest run writes an HTML report and per-test artifacts under `test-results/`:
+
+| Path | Contents |
+| --- | --- |
+| `test-results/report.html` | Self-contained pytest-html report (open in a browser) |
+| `test-results/videos/` | Per-test `.webm` screencasts (**headed** runs only; requires `ffmpeg`). `tests/device_cards/` writes one continuous `device_cards.webm` for the full suite. |
+| `test-results/traces/` | Per-test Playwright trace zips (open in [trace viewer](https://trace.playwright.dev/)) |
+| `test-results/screenshots/` | Full-page screenshots captured on test failure |
+
+Example for device card review:
+
+```bash
+pytest --headed tests/device_cards/
+open test-results/report.html
+```
+
+Or use the Makefile helper:
+
+```bash
+make test-device-cards-headed
+```

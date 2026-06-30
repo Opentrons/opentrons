@@ -20,18 +20,20 @@ from check_health import find_opentrons_usb_port, http_get_over_serial  # noqa: 
 
 ROBOT_PORT = 31950
 TIMEOUT = 10.0
-DEFAULT_ROBOT_IP = "10.14.19.233"
+DEFAULT_ROBOT_IP = "10.14.19.194"
 
 
 class RobotConnection:
     """Callable stand-in for a robot IP address."""
 
     def __init__(self, *, usb_port: Optional[str] = None, ip: Optional[str] = None) -> None:
+        """Store USB serial port or network IP used for robot-server requests."""
         self.usb_port = usb_port
         self.ip = ip
 
     @property
     def over_usb(self) -> bool:
+        """Return True when requests should go over the USB serial port."""
         return self.usb_port is not None
 
     def __call__(self, path: str) -> dict[str, Any]:
@@ -72,6 +74,7 @@ def connect_robot(default_ip: Optional[str] = None) -> RobotConnection:
 
 
 def main() -> int:
+    """CLI entry point: connect over USB or Wi-Fi and print status."""
     try:
         connect_robot()
     except Exception as exc:

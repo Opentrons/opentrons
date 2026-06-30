@@ -1,3 +1,5 @@
+"""Page object for pipette, gripper, module, and lights cards on robot detail."""
+
 from __future__ import annotations
 
 import os
@@ -5,7 +7,10 @@ import re
 import time
 from dataclasses import dataclass
 
+from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Locator, Page, expect
+
+from automation.helpers.locator_helpers import first_resolved, menu_item
 
 TC_INPUT = re.compile(r"^ThermocyclerSlideout_input_field_")
 TC_SUBMIT = re.compile(r"^ThermocyclerSlideout_btn_")
@@ -13,6 +18,10 @@ TEMP_INPUT = re.compile(r"^TemperatureSlideout_input_field_")
 TEMP_SUBMIT = re.compile(r"^TemperatureSlideout_btn_")
 HS_INPUT = re.compile(r"^HeaterShakerSlideout_input_field_")
 HS_SUBMIT = re.compile(r"^HeaterShakerSlideout_btn_")
+TEST_SHAKE_INPUT = "TestShakeSlideout_shake_input"
+TEST_SHAKE_START = "TestShakeSlideout_start_btn"
+TEST_SHAKE_LATCH_STATUS = "TestShake_Slideout_latch_status"
+HS_ATTACHMENT_CONFIRM = "ConfirmAttachmentModal_primary_btn_on_set_shake"
 ABOUT_MODULE_CLOSE = re.compile(r"^AboutModuleSlideout_btn_")
 ABOUT_PIPETTE_SERIAL = re.compile(r"^AboutPipetteSlideout_serial_")
 
@@ -54,6 +63,10 @@ HEATER_SHAKER = ModuleCardSpec(
     "HSV0",
     "exercise_heater_shaker_card",
 )
+HS_LATCH_MENU = re.compile(rf"^hs_labware_latch_{re.escape(HEATER_SHAKER.model)}$")
+HS_TEST_SHAKE_MENU = re.compile(
+    rf"^hs_test_shake_btn_{re.escape(HEATER_SHAKER.model)}$"
+)
 TEMPERATURE = ModuleCardSpec(
     "Temperature module",
     "temperatureModuleV2",
@@ -77,11 +90,13 @@ class DeviceCardHelper:
     """Page object for exercising pipette, gripper, and module cards on a robot detail page."""
 
     def __init__(self, page: Page):
+        """Bind the robot detail page and initialize empty module inventory cache."""
         self.page = page
         self._module_inventory: ModuleInventory = {}
 
     @staticmethod
     def module_prefix(spec: ModuleCardSpec) -> str:
+        """Return the configured serial prefix for a module card spec."""
         return os.environ.get(spec.prefix_env, spec.default_prefix)
 
     def _dismiss_blocking_overlays(self) -> None:
@@ -168,6 +183,7 @@ class DeviceCardHelper:
         return inventory
 
     def _begin_module_exercise(self, spec: ModuleCardSpec, prefix: str) -> bool:
+        """Print module header and ensure serial/firmware are cached before exercising."""
         print(f"\n--- {spec.label} card (prefix: {prefix}) ---")
         cached = self._module_inventory.get(spec.model)
         if cached is not None:
@@ -182,6 +198,7 @@ class DeviceCardHelper:
         return True
 
     def _module_card(self, serial_prefix: str) -> Locator:
+        """Return the module card locator matching ``serial_prefix``."""
         return self.page.get_by_test_id(
             re.compile(rf"^ModuleCard_{re.escape(serial_prefix)}")
         )
@@ -193,11 +210,13 @@ class DeviceCardHelper:
         ).get_by_role("button", name="overflow")
 
     def _module_overflow_menu(self, serial_prefix: str) -> Locator:
+        """Return the overflow menu container for a module card."""
         return self._module_card(serial_prefix).first.get_by_test_id(
             re.compile(rf"^ModuleCard_overflow_menu_{re.escape(serial_prefix)}")
         )
 
     def _instrument_card(self, label: str) -> Locator:
+        """Return the instrument card ancestor for a mount or gripper label."""
         labels = _INSTRUMENT_LABEL_ALIASES.get(label, (label,))
         label_pattern = re.compile(
             rf"^({'|'.join(re.escape(candidate) for candidate in labels)})$"
@@ -207,11 +226,13 @@ class DeviceCardHelper:
         )
 
     def _instrument_overflow_button(self, label: str) -> Locator:
+        """Return the overflow menu button on an instrument card."""
         return self._instrument_card(label).get_by_role(
             "button", name=re.compile("InstrumentCard_overflowMenu")
         ).first
 
     def has_module_card(self, serial_prefix: str) -> bool:
+        """Return True when a module card exists and its overflow menu is enabled."""
         if self._module_card(serial_prefix).count() == 0:
             return False
         overflow = self._module_overflow_button(serial_prefix)
@@ -232,6 +253,7 @@ class DeviceCardHelper:
         raise TimeoutError("Timed out waiting for module cards to become ready.")
 
     def has_instrument_card(self, label: str) -> bool:
+        """Return True when an instrument card exists and its overflow menu is enabled."""
         card = self._instrument_card(label)
         if card.count() == 0:
             return False
@@ -243,6 +265,7 @@ class DeviceCardHelper:
         return self.has_instrument_card("left+right Mount")
 
     def _open_module_overflow(self, serial_prefix: str) -> bool:
+        """Open a module card overflow menu and wait for About module to appear."""
         self._dismiss_blocking_overlays()
         card = self._module_card(serial_prefix)
         if card.count() == 0:
@@ -270,14 +293,16 @@ class DeviceCardHelper:
     def _click_module_menu_button(
         self, serial_prefix: str, *names: str
     ) -> bool:
-        """Click the first visible overflow-menu button matching one of ``names``."""
-        card = self._module_card(serial_prefix).first
+        """Click the first visible overflow-menu item matching one of ``names``."""
+        scope = self._overflow_menu_scope(serial_prefix)
         for name in names:
-            button = card.get_by_role("button", name=name, exact=True)
-            if button.count() > 0 and button.is_visible():
-                button.scroll_into_view_if_needed()
-                button.click()
-                return True
+            try:
+                item = menu_item(scope, name)
+            except RuntimeError:
+                continue
+            item.scroll_into_view_if_needed()
+            item.click()
+            return True
         return False
 
     def _open_module_temp_slideout(
@@ -320,15 +345,18 @@ class DeviceCardHelper:
         return False
 
     def _module_menu(self, serial_prefix: str) -> Locator:
+        """Return the module card root used to scope overflow menu actions."""
         return self._module_card(serial_prefix).first
 
     def _module_about_button(self, serial_prefix: str) -> Locator:
+        """Return the About module button in a module overflow menu."""
         card = self._module_card(serial_prefix).first
         return card.get_by_test_id(re.compile(r"^about_module_")).or_(
             card.get_by_role("button", name="About module", exact=True)
         )
 
     def _click_about_module(self, serial_prefix: str, module_model: str) -> None:
+        """Open the About module slideout for the given module model."""
         card = self._module_card(serial_prefix).first
         about_test_id = card.get_by_test_id(f"about_module_{module_model}")
         if about_test_id.count() > 0:
@@ -339,6 +367,7 @@ class DeviceCardHelper:
     def _click_module_menu_item(
         self, serial_prefix: str, *, test_id: str | None = None, name: str | None = None
     ) -> None:
+        """Click a module overflow menu item by test id or visible name."""
         menu = self._module_menu(serial_prefix)
         if test_id is not None:
             menu.get_by_test_id(test_id).click()
@@ -347,12 +376,292 @@ class DeviceCardHelper:
         else:
             raise ValueError("Provide test_id or name for module menu item.")
 
+    def _overflow_menu_scope(self, serial_prefix: str) -> Locator:
+        """Return the overflow menu container, falling back to the module card root."""
+        menu = self._module_overflow_menu(serial_prefix)
+        if menu.count() > 0:
+            return menu.first
+        return self._module_card(serial_prefix).first
+
+    def _find_overflow_menu_item(
+        self,
+        serial_prefix: str,
+        *,
+        test_id: str | re.Pattern[str] | None = None,
+        fallback_names: tuple[str, ...] = (),
+    ) -> Locator | None:
+        """Locate a module overflow item by test id, then visible button labels."""
+        scope = self._overflow_menu_scope(serial_prefix)
+        if test_id is not None:
+            item = scope.get_by_test_id(test_id)
+            if item.count() > 0 and item.first.is_visible():
+                return item.first
+        for name in fallback_names:
+            try:
+                return menu_item(scope, name)
+            except RuntimeError:
+                continue
+        return None
+
+    def _click_module_overflow_item_by_test_id(
+        self,
+        serial_prefix: str,
+        test_id: str | re.Pattern[str],
+        *,
+        fallback_names: tuple[str, ...] = (),
+    ) -> bool:
+        """Open overflow menu and click a menu item located by test id or label."""
+        if not self._open_module_overflow(serial_prefix):
+            return False
+        item = self._find_overflow_menu_item(
+            serial_prefix,
+            test_id=test_id,
+            fallback_names=fallback_names,
+        )
+        if item is None:
+            return False
+        item.scroll_into_view_if_needed()
+        item.click()
+        return True
+
+    def _test_shake_start_button(self) -> Locator:
+        """Return the test-shake Start/Stop control (test id, scoped to slideout)."""
+        by_test_id = self.page.get_by_test_id(TEST_SHAKE_START)
+        if by_test_id.count() > 0:
+            return by_test_id
+
+        latch_row = self.page.get_by_test_id(TEST_SHAKE_LATCH_STATUS)
+        slideout = latch_row.locator(
+            "xpath=ancestor::*[.//input[@type='number']][1]"
+        )
+        for pattern in (r"^Start$", r"^Stop$"):
+            btn = slideout.get_by_role(
+                "button", name=re.compile(pattern, re.IGNORECASE)
+            )
+            if btn.count() > 0:
+                return btn.first
+
+        return self.page.get_by_role(
+            "button", name=re.compile(r"^(Start|Stop)$", re.IGNORECASE)
+        ).first
+
+    def _confirm_heater_shaker_attachment_if_needed(self) -> None:
+        """Confirm attachment when the test-shake safety modal appears."""
+        confirm = self.page.get_by_test_id(HS_ATTACHMENT_CONFIRM)
+        try:
+            expect(confirm).to_be_visible(timeout=3_000)
+        except AssertionError:
+            return
+        confirm.click()
+
+    def _close_heater_shaker_latch_via_overflow(self, prefix: str) -> bool:
+        """Close the latch from the overflow menu when it is currently open."""
+        if not self._open_module_overflow(prefix):
+            return False
+        item = self._find_overflow_menu_item(
+            prefix,
+            test_id=HS_LATCH_MENU,
+            fallback_names=("Close labware latch",),
+        )
+        if item is None:
+            self._dismiss_blocking_overlays()
+            return False
+        item.scroll_into_view_if_needed()
+        item.click()
+        print("  close labware latch (overflow menu)")
+        self._dismiss_blocking_overlays()
+        return True
+
+    def _wait_for_test_shake_slideout(self) -> bool:
+        """Return True when the test-shake slideout latch row is visible."""
+        latch_status = self.page.get_by_test_id(TEST_SHAKE_LATCH_STATUS)
+        try:
+            expect(latch_status).to_be_visible(timeout=15_000)
+            return True
+        except AssertionError:
+            return False
+
+    def _ensure_test_shake_latch_closed(self) -> None:
+        """Click Close latch in the test-shake slideout when the latch is open."""
+        status = self.page.get_by_test_id(TEST_SHAKE_LATCH_STATUS)
+        expect(status).to_be_visible(timeout=5_000)
+        if re.search(r"closed", status.inner_text(), re.IGNORECASE):
+            return
+
+        close_btn = self.page.get_by_role("button", name="Close latch", exact=True)
+        expect(close_btn).to_be_visible(timeout=5_000)
+        close_btn.click()
+        expect(status).to_have_text(re.compile(r"closed", re.IGNORECASE), timeout=20_000)
+        print("  closed labware latch (test shake slideout)")
+
+    def _fill_test_shake_rpm(self, rpm: str) -> None:
+        """Fill the test-shake RPM field (test id with spinbutton fallback)."""
+        by_test_id = self.page.get_by_test_id(TEST_SHAKE_INPUT)
+        if by_test_id.count() > 0:
+            try:
+                self._fill_input_by_test_id(TEST_SHAKE_INPUT, rpm, timeout=5_000)
+                return
+            except AssertionError:
+                pass
+
+        latch_row = self.page.get_by_test_id(TEST_SHAKE_LATCH_STATUS)
+        slideout = latch_row.locator(
+            "xpath=ancestor::*[.//input[@type='number']][1]"
+        )
+        spinbutton = slideout.get_by_role("spinbutton")
+        if spinbutton.count() == 0:
+            spinbutton = self.page.get_by_role("spinbutton")
+        expect(spinbutton.first).to_be_visible(timeout=10_000)
+        spinbutton.first.click()
+        spinbutton.first.fill("")
+        spinbutton.first.fill(rpm)
+        spinbutton.first.press("Tab")
+
+    def _ensure_heater_shaker_idle(self, prefix: str) -> None:
+        """Deactivate shaker/heater so overflow menus return to idle labels."""
+        for action in ("Deactivate shaker", "Deactivate heater"):
+            if not self._open_module_overflow(prefix):
+                return
+            if not self._click_module_menu_button(prefix, action):
+                continue
+            print(f"  {action.lower()}")
+            self._dismiss_blocking_overlays()
+            self.page.wait_for_timeout(1_500)
+
+    def _exercise_heater_shaker_test_shake(self, prefix: str) -> None:
+        """Start and stop a test shake via stable slideout test ids."""
+        try:
+            self._ensure_heater_shaker_idle(prefix)
+
+            if not self._click_module_overflow_item_by_test_id(
+                prefix,
+                HS_TEST_SHAKE_MENU,
+                fallback_names=("Test shake",),
+            ):
+                print("  Skipping test shake — menu item not found.")
+                self._dismiss_blocking_overlays()
+                return
+
+            if not self._wait_for_test_shake_slideout():
+                print("  Skipping test shake — slideout did not open.")
+                self._dismiss_blocking_overlays()
+                return
+
+            # Start is disabled while the latch is open — close it in the slideout first.
+            self._ensure_test_shake_latch_closed()
+            self.page.wait_for_timeout(750)
+
+            try:
+                self._fill_test_shake_rpm("2000")
+            except AssertionError:
+                print("  Skipping test shake — shake speed input did not appear.")
+                self._dismiss_blocking_overlays()
+                return
+
+            start_btn = self._test_shake_start_button()
+            expect(start_btn).to_be_enabled(timeout=10_000)
+            start_btn.click()
+            self._confirm_heater_shaker_attachment_if_needed()
+
+            try:
+                expect(start_btn).to_have_text(
+                    re.compile(r"stop", re.IGNORECASE), timeout=30_000
+                )
+                start_btn.click()
+                print("  test shake at 2000 rpm (started and stopped)")
+            except AssertionError:
+                print(
+                    "  test shake started but stop control did not appear — deactivating shaker"
+                )
+                self._stop_heater_shaker_test_shake(prefix)
+            self._dismiss_blocking_overlays()
+        except PlaywrightError as error:
+            if "has been closed" in str(error).lower():
+                raise
+            print(f"  Skipping test shake — {error}")
+            self._dismiss_blocking_overlays()
+
+    def _stop_heater_shaker_test_shake(self, prefix: str) -> None:
+        """Stop an in-progress test shake via Stop or Deactivate shaker."""
+        stop_btn = self._test_shake_start_button()
+        if (
+            stop_btn.count() > 0
+            and stop_btn.is_visible()
+            and re.search(r"stop", stop_btn.inner_text(), re.IGNORECASE)
+        ):
+            stop_btn.click()
+            print("  stopped test shake")
+            self._dismiss_blocking_overlays()
+            return
+
+        if not self._open_module_overflow(prefix):
+            return
+        item = self._find_overflow_menu_item(
+            prefix,
+            test_id=re.compile(rf"^test_shake_{re.escape(HEATER_SHAKER.model)}$"),
+            fallback_names=("Deactivate shaker",),
+        )
+        if item is not None and not item.is_disabled():
+            try:
+                item.click(timeout=5_000)
+                print("  deactivate shaker")
+            except PlaywrightError:
+                print("  deactivate shaker — click did not complete")
+        self._dismiss_blocking_overlays()
+
+    def _exercise_heater_shaker_latch(self, prefix: str) -> None:
+        """Toggle the labware latch from the overflow menu."""
+        if not self._open_module_overflow(prefix):
+            return
+        item = self._find_overflow_menu_item(
+            prefix,
+            test_id=HS_LATCH_MENU,
+            fallback_names=("Open labware latch", "Close labware latch"),
+        )
+        if item is None:
+            print("  Skipping labware latch — menu item not found.")
+            self._dismiss_blocking_overlays()
+            return
+        if item.is_disabled():
+            print("  Skipping labware latch — unavailable while module is shaking.")
+            self._dismiss_blocking_overlays()
+            return
+        latch_label = item.inner_text().strip()
+        item.scroll_into_view_if_needed()
+        item.click()
+        print(f"  {latch_label.lower()}")
+        self._dismiss_blocking_overlays()
+
     def _fill_number_in_test_id(self, test_id_pattern: re.Pattern[str], value: str) -> None:
+        """Fill a numeric input located by a test-id pattern."""
         field = self.page.get_by_test_id(test_id_pattern).first
         expect(field).to_be_visible()
         field.locator("input").fill(value)
 
+    def _fill_input_by_test_id(
+        self,
+        test_id: str,
+        value: str,
+        *,
+        timeout: float = 10_000,
+    ) -> None:
+        """Fill a numeric field located by test id (wrapper or input element)."""
+        target = self.page.get_by_test_id(test_id).first
+        expect(target).to_be_visible(timeout=timeout)
+        target.scroll_into_view_if_needed()
+        nested_input = target.locator("input")
+        if nested_input.count() > 0:
+            field = nested_input.first
+        else:
+            field = target
+        expect(field).to_be_visible(timeout=timeout)
+        field.click(timeout=timeout)
+        field.fill("", timeout=timeout)
+        field.fill(value, timeout=timeout)
+        field.press("Tab")
+
     def _read_module_about_serial(self, module_model: str) -> tuple[str, str | None]:
+        """Read serial and firmware text from an open About module slideout."""
         serial_locator = self.page.get_by_test_id(
             re.compile(rf"^alert_item_serial_{re.escape(module_model)}$")
         ).first
@@ -370,12 +679,14 @@ class DeviceCardHelper:
         return serial, firmware
 
     def _close_module_about(self) -> None:
+        """Close the About module slideout."""
         close_btn = self.page.get_by_test_id(ABOUT_MODULE_CLOSE).first
         close_btn.click()
         expect(close_btn).not_to_be_visible()
         self._dismiss_blocking_overlays()
 
     def _open_instrument_overflow(self, label: str) -> bool:
+        """Open an instrument card overflow menu when the card is enabled."""
         self._dismiss_blocking_overlays()
         card = self._instrument_card(label)
         if card.count() == 0:
@@ -389,10 +700,12 @@ class DeviceCardHelper:
         return True
 
     def _close_pipette_or_gripper_about(self) -> None:
+        """Close the About pipette or gripper slideout."""
         self.page.get_by_test_id("AboutPipette_slideout_close").click()
         self._dismiss_blocking_overlays()
 
     def exercise_pipette_card(self, mount: str = "left") -> None:
+        """Open About pipette for the given mount and print serial/firmware."""
         if mount == "left+right":
             label = "left+right Mount"
         else:
@@ -419,6 +732,7 @@ class DeviceCardHelper:
         self._close_pipette_or_gripper_about()
 
     def exercise_gripper_card(self) -> None:
+        """Open About gripper and print serial/firmware."""
         label = "extension mount"
         print("\n--- Flex gripper card ---")
 
@@ -445,6 +759,7 @@ class DeviceCardHelper:
         self._close_pipette_or_gripper_about()
 
     def exercise_thermocycler_card(self, prefix: str | None = None) -> None:
+        """Exercise thermocycler lid and block temperature controls."""
         prefix = prefix or self.module_prefix(THERMOCYCLER)
         if not self._begin_module_exercise(THERMOCYCLER, prefix):
             return
@@ -495,9 +810,12 @@ class DeviceCardHelper:
         self._dismiss_blocking_overlays()
 
     def exercise_heater_shaker_card(self, prefix: str | None = None) -> None:
+        """Exercise heater-shaker temperature, test-shake, and latch controls."""
         prefix = prefix or self.module_prefix(HEATER_SHAKER)
         if not self._begin_module_exercise(HEATER_SHAKER, prefix):
             return
+
+        self._ensure_heater_shaker_idle(prefix)
 
         if not self._open_module_temp_slideout(
             prefix,
@@ -513,44 +831,14 @@ class DeviceCardHelper:
         print("  set temperature to 40")
         self._dismiss_blocking_overlays()
 
-        if not self._open_module_overflow(prefix):
-            return
-
-        latch_item = self._module_menu(prefix).get_by_test_id(
-            re.compile(rf"^hs_labware_latch_{re.escape(HEATER_SHAKER.model)}$")
-        )
-        if latch_item.count() > 0:
-            latch_label = latch_item.inner_text().strip()
-            latch_item.click()
-            print(f"  {latch_label.lower()}")
-            self._dismiss_blocking_overlays()
-        else:
-            print("  Skipping labware latch — menu item not found.")
-
-        if not self._open_module_overflow(prefix):
-            return
-
-        card = self._module_card(prefix).first
-        test_shake = card.get_by_role("button", name="Test shake", exact=True)
-        if test_shake.count() == 0:
-            print("  Skipping test shake — menu item not found.")
-            self._dismiss_blocking_overlays()
-            return
-        test_shake.scroll_into_view_if_needed()
-        test_shake.click()
-        shake_input = self.page.get_by_test_id("TestShakeSlideout_shake_input")
-        try:
-            expect(shake_input).to_be_visible(timeout=10_000)
-        except AssertionError:
-            print("  Skipping test shake — slideout did not open.")
-            self._dismiss_blocking_overlays()
-            return
-        shake_input.locator("input").fill("2000")
-        print("  test shake at 2000 rpm")
-        self.page.get_by_test_id(re.compile(r"^Temp_Slideout_set_temp_btn_")).first.click()
-        self._dismiss_blocking_overlays()
+        # Test shake requires a closed latch; close it in-slideout if needed.
+        self._exercise_heater_shaker_test_shake(prefix)
+        self._ensure_heater_shaker_idle(prefix)
+        # Exercise overflow-menu latch toggle separately (typically opens latch).
+        self._exercise_heater_shaker_latch(prefix)
 
     def exercise_temperature_module_card(self, prefix: str | None = None) -> None:
+        """Set temperature module target to 4 °C via the overflow menu."""
         prefix = prefix or self.module_prefix(TEMPERATURE)
         if not self._begin_module_exercise(TEMPERATURE, prefix):
             return
@@ -570,6 +858,7 @@ class DeviceCardHelper:
         self._dismiss_blocking_overlays()
 
     def exercise_lights(self) -> None:
+        """Toggle the robot lights switch on the overview page."""
         print("\n--- Robot lights ---")
         self._dismiss_blocking_overlays()
 
@@ -593,6 +882,7 @@ class DeviceCardHelper:
         temperature_module_prefix: str | None = None,
         plate_reader_prefix: str | None = None,
     ) -> None:
+        """Run every configured card exercise in one session."""
         print("\n=== Device card exercises ===")
 
         overrides = {

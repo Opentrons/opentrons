@@ -9,6 +9,7 @@ from pages.device_cards_page import THERMOCYCLER, HEATER_SHAKER, TEMPERATURE, De
 
 
 def test_left_pipette_card(device_cards: DeviceCardHelper) -> None:
+    """Exercise the left or combined left+right pipette card when present."""
     if device_cards.has_dual_mount_pipette_card():
         log_step("Check 96-channel pipette card (left+right mounts)")
         log_step("Exercise left+right pipette card controls")
@@ -26,6 +27,7 @@ def test_left_pipette_card(device_cards: DeviceCardHelper) -> None:
 
 
 def test_right_pipette_card(device_cards: DeviceCardHelper) -> None:
+    """Exercise the right pipette card when a separate right mount exists."""
     if device_cards.has_dual_mount_pipette_card():
         log_step("96-channel pipette uses a combined left+right card — skipping")
         pytest.skip("96-channel pipette covered by test_left_pipette_card.")
@@ -40,6 +42,7 @@ def test_right_pipette_card(device_cards: DeviceCardHelper) -> None:
 
 
 def test_gripper_card(device_cards: DeviceCardHelper) -> None:
+    """Exercise the Flex gripper card when the extension mount is present."""
     log_step("Check gripper (extension mount) card")
     if not device_cards.has_instrument_card("extension mount"):
         log_step("Gripper card not found or disabled — skipping")
@@ -50,6 +53,7 @@ def test_gripper_card(device_cards: DeviceCardHelper) -> None:
 
 
 def test_thermocycler_module_card(device_cards: DeviceCardHelper) -> None:
+    """Exercise thermocycler controls when a matching module card is present."""
     prefix = DeviceCardHelper.module_prefix(THERMOCYCLER)
     log_step(f"Check thermocycler module card (prefix '{prefix}')")
     if not device_cards.has_module_card(prefix):
@@ -66,6 +70,7 @@ def test_thermocycler_module_card(device_cards: DeviceCardHelper) -> None:
 
 
 def test_heater_shaker_module_card(device_cards: DeviceCardHelper) -> None:
+    """Exercise heater-shaker controls when a matching module card is present."""
     prefix = DeviceCardHelper.module_prefix(HEATER_SHAKER)
     log_step(f"Check heater-shaker module card (prefix '{prefix}')")
     if not device_cards.has_module_card(prefix):
@@ -82,6 +87,7 @@ def test_heater_shaker_module_card(device_cards: DeviceCardHelper) -> None:
 
 
 def test_temperature_module_card(device_cards: DeviceCardHelper) -> None:
+    """Exercise temperature module controls when a matching module card is present."""
     prefix = DeviceCardHelper.module_prefix(TEMPERATURE)
     log_step(f"Check temperature module card (prefix '{prefix}')")
     if not device_cards.has_module_card(prefix):
@@ -99,6 +105,7 @@ def test_temperature_module_card(device_cards: DeviceCardHelper) -> None:
 
 
 def test_robot_lights(device_cards: DeviceCardHelper) -> None:
+    """Toggle robot lights from the robot overview page."""
     log_step("Toggle robot lights")
     device_cards.exercise_lights()
     log_done("Robot lights OK")
