@@ -282,8 +282,6 @@ class PressureFixture(PressureFixtureBase):
                         f"Invalid 96-channel pressure response line: {decoded}"
                     )
                     break
-                if self._slot_side == "left":
-                    data.reverse()
                 datalist = data + datalist
             if len(datalist) == FIXTURE_NUM_CHANNELS_96:
                 return datalist
