@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -168,6 +169,7 @@ const TURN_OFF_BACKLIGHT = '7'
 const RETRY_DELAY_MS = 1000
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
 
   const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
@@ -246,7 +248,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
               {isIdle ? (
-                <SleepScreen />
+                <SleepScreen aria-label={t('exit_sleep_mode')} />
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />

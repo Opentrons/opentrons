@@ -217,7 +217,7 @@ describe('ODDQuickTransferDetails', () => {
       isLoading: true,
     } as any)
     render()
-    expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0)
   })
 
   it('render chip about modules when missing a hardware', () => {

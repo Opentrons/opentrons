@@ -1,0 +1,7 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--black-90);
+}
