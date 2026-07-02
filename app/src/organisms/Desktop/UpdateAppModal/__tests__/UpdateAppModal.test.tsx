@@ -124,7 +124,8 @@ describe('UpdateAppModal', () => {
     expect(container).toBeInTheDocument()
     // eslint-disable-next-line testing-library/no-node-access
     const bar = container.firstChild
-    expect(getComputedStyle(bar).width).toBe('100%')
+    expect(bar).toBeInTheDocument()
+    expect(bar).toHaveStyle('width: 100%')
   })
   it('renders an error message when an error occurs', () => {
     vi.mocked(getShellUpdateState).mockReturnValue({
