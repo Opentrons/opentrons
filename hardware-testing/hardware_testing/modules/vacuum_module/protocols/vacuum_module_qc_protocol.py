@@ -8,7 +8,7 @@ from opentrons.protocol_api import (
 
 
 metadata = {
-    "protocolName": "Vacuum Module DVT QC Protocol V0.1",
+    "protocolName": "Vacuum Module DVT QC Protocol V0.2",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
@@ -31,7 +31,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="collar",
         display_name="Vacuum Collar",
         description="The kind of Collar (Opentrons or Millipore)",
-        default="millipore_vacuum_manifold_collar_tall",
+        default="opentrons_vacuum_manifold_collar_tall",
         choices=[
             {
                 "display_name": "Millipore: Short",
@@ -40,6 +40,14 @@ def add_parameters(parameters: ParameterContext) -> None:
             {
                 "display_name": "Millipore: Tall",
                 "value": "millipore_vacuum_manifold_collar_tall",
+            },
+            {
+                "display_name": "Opentrons: Short",
+                "value": "opentrons_vacuum_manifold_collar_short",
+            },
+            {
+                "display_name": "Opentrons: Tall",
+                "value": "opentrons_vacuum_manifold_collar_tall",
             },
         ],
     )
@@ -120,7 +128,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.comment(f"Cycle #{cycle} at {target_pressure} mbar")
 
         # You can move the collar with the plate ontop from the dock to the module
-        ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
+        ctx.move_labware(manifold_collar, vm_mod, use_gripper=True,pick_up_offset={"x": -2.00, "y": 0.00, "z": 0.00})
 
         # Aspirate 500ul with 1000ul tips from reservoir2 onto filter plate
         pip.pick_up_tip(tiprack_1000)
@@ -141,13 +149,13 @@ def run(ctx: ProtocolContext) -> None:
         )
 
         # Move the collar with filter plate to the dock
-        ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
+        ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True,pick_up_offset={"x": -2.00, "y": 0.00, "z": 0.00})  # type: ignore[attr-defined]
         # Move the black flat plate onto the vacuum module
         ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
         black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00)
 
         # Move collar with filter plate to the vacuum module base
-        ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
+        ctx.move_labware(manifold_collar, vm_mod, use_gripper=True,pick_up_offset={"x": -2.00, "y": 0.00, "z": 0.00})
 
         # Aspirate 150ul with 200ul tips from reservoir1 onto filter plate
         pip.pick_up_tip(tiprack_200)
