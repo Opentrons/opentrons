@@ -846,3 +846,82 @@ def test_async_error_callback_includes_operation_mode_in_pressure_error_detail(
             "dummySerialFS",
         )
     )
+
+
+@pytest.fixture
+async def sim_vacuum_with_injected_error(
+    usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> AsyncGenerator[tuple[modules.VacuumModule, List[Exception]], None]:
+    """Build a sim vacuum module wired to capture async errors from polling."""
+    driver = SimulatingDriver(serial_number="dummySerialFS")
+    reader = VacuumModuleReader(driver=driver)
+    poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
+    received_errors: List[Exception] = []
+
+    def error_callback(
+        exc: Exception,
+        model: str,
+        port: str,
+        serial: str | None,
+    ) -> None:
+        received_errors.append(exc)
+
+    vacuum = modules.VacuumModule(
+        port="/dev/ot_module_sim_vacuummodule0",
+        usb_port=usb_port,
+        driver=driver,
+        reader=reader,
+        poller=poller,
+        device_info={
+            "serial": "dummySerialFS",
+            "model": "nff",
+            "version": "vacuum-fw",
+            "reset_reason": "0",
+        },
+        hw_control_loop=asyncio.get_running_loop(),
+        execution_manager=mock_execution_manager,
+        error_callback=error_callback,
+        disconnected_callback=module_disconnected_callback,
+    )
+
+    await poller.start()
+    try:
+        yield vacuum, received_errors
+    finally:
+        await vacuum.cleanup()
+
+
+async def test_injected_async_error_reaches_module_error_callback(
+    sim_vacuum_with_injected_error: tuple[modules.VacuumModule, List[Exception]],
+) -> None:
+    """Injected driver errors should bubble through the poller to the module callback."""
+    vacuum, received_errors = sim_vacuum_with_injected_error
+    driver = vacuum._driver
+    assert isinstance(driver, SimulatingDriver)
+
+    driver.inject_async_error(
+        WasteContainerFull("port", "async ERR401:waste full", "M121")
+    )
+
+    # The poller surfaces read failures to waiters; sleep for a background poll cycle.
+    await asyncio.sleep(SIMULATING_POLL_PERIOD * 3)
+
+    assert len(received_errors) == 1
+    assert isinstance(received_errors[0], VacuumModuleWasteFullError)
+    assert received_errors[0].serial == "dummySerialFS"
+
+
+async def test_inject_async_gcode_response_reaches_module_error_callback(
+    sim_vacuum_with_injected_error: tuple[modules.VacuumModule, List[Exception]],
+) -> None:
+    """G-code injection should parse ERR401 and reach the module error callback."""
+    vacuum, received_errors = sim_vacuum_with_injected_error
+
+    vacuum.inject_async_gcode_response("async ERR401:waste container full")
+
+    await asyncio.sleep(SIMULATING_POLL_PERIOD * 3)
+
+    assert len(received_errors) == 1
+    assert isinstance(received_errors[0], VacuumModuleWasteFullError)

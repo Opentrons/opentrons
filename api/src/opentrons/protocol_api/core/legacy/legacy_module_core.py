@@ -94,6 +94,21 @@ class LegacyModuleCore(AbstractModuleCore[LegacyLabwareCore]):
         """Get the module's display name."""
         return self._geometry.display_name
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        inject = getattr(
+            self._sync_module_hardware, "inject_async_gcode_response", None
+        )
+        if inject is None:
+            raise NotImplementedError(
+                f"inject_async_gcode_response is not supported by {self.get_model()}"
+            )
+        inject(gcode_response=gcode_response, command=command)
+
     def add_labware_core(self, labware_core: LegacyLabwareCore) -> Labware:
         """Add a labware to the module."""
         labware = self.geometry.add_labware(

@@ -21,6 +21,7 @@ from opentrons.drivers.vacuum_module.errors import (
     FailedToVent,
     PressureNotReached,
     WasteContainerFull,
+    async_gcode_response_to_error,
 )
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
@@ -241,6 +242,29 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
+
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str = "M121",
+    ) -> None:
+        """Inject a firmware-style async G-code error for vacuum module testing.
+
+        On simulated modules the error is queued on the next polled driver read.
+        On real hardware the error is delivered through the module reader callback
+        path, which matches how async firmware errors surface during a run.
+        """
+        driver_error = async_gcode_response_to_error(
+            port=self.port,
+            gcode_response=gcode_response,
+            command=command,
+        )
+        if self.is_simulated:
+            sim_driver = self._driver
+            if isinstance(sim_driver, SimulatingDriver):
+                sim_driver.inject_async_error(driver_error)
+                return
+        self._reader.on_error(driver_error)
 
     @property
     def live_data(self) -> LiveData:

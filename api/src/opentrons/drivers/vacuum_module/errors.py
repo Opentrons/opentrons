@@ -39,3 +39,23 @@ class VacuumModuleErrorCodes(BaseErrorCode):
     PRESSURE_NOT_REACHED = ("ERR400", PressureNotReached)
     WASTE_FULL = ("ERR401", WasteContainerFull)
     FAILED_TO_VENT = ("ERR402", FailedToVent)
+
+
+def async_gcode_response_to_error(
+    port: str,
+    gcode_response: str,
+    command: str = "M121",
+) -> ErrorResponse:
+    """Build a driver async error from a firmware-style G-code response string."""
+    response = gcode_response.strip()
+    if "async" not in response.lower():
+        response = f"async {response}"
+    lower_response = response.lower()
+    for code_str, error_code in VacuumModuleErrorCodes.get_error_codes().items():
+        if code_str in lower_response:
+            return error_code.exception(
+                port=port,
+                response=response,
+                command=command,
+            )
+    return ErrorResponse(port=port, response=response, command=command)
