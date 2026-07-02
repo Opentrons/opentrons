@@ -882,6 +882,14 @@ class CommandView:
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
+    def get_is_awaiting_recovery(self) -> bool:
+        """Get whether the run is waiting for client-driven error recovery."""
+        return self.get_status() in (
+            EngineStatus.AWAITING_RECOVERY,
+            EngineStatus.AWAITING_RECOVERY_PAUSED,
+            EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+        )
+
     def get_most_recently_finalized_command(self) -> Optional[CommandEntry]:
         """Get the most recent command that has reached its final `status`. See get_command_is_final."""
         run_requested_to_stop = self._state.run_result is not None

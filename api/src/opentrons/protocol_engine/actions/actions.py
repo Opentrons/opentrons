@@ -161,7 +161,9 @@ class SucceedCommandAction:
 class FailCommandAction:
     """Mark a given command as failed.
 
-    At the time of dispatching this action, the command must be running.
+    Normally dispatched while the command is running. May also target a prior
+    background ``start_*`` command when an associated task or async module error
+    is handled after that command has already succeeded.
     """
 
     command_id: str
@@ -210,6 +212,7 @@ class StartTaskAction:
     """Store new task in state."""
 
     task: Task
+    originating_command_id: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)

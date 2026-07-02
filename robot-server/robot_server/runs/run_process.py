@@ -65,6 +65,7 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_wrapped_dict,
     pyro_behavior,
 )
+from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
@@ -490,7 +491,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._guaranteed_run_orchestrator.estop()
 
     async def asynchronous_module_error(
-        self, module_model: HardwareModuleModel, module_serial: str | None
+        self,
+        module_model: HardwareModuleModel,
+        module_serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Handle an asynchronous module error reported by hardware.
 
@@ -498,7 +502,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         False, the caller should not call finish() until it otherwise would.
         """
         return await self._guaranteed_run_orchestrator.asynchronous_module_error(
-            module_model, module_serial
+            module_model, module_serial, error
         )
 
     async def module_disconnected(
