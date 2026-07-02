@@ -58,7 +58,11 @@ describe('LiquidDetailCard', () => {
 
   it('renders clickable box, clicking on it calls track event', () => {
     render(props)
-    fireEvent.click(screen.getByTestId('LiquidDetailCard_box'))
+    const clickableCard = screen.getByRole('button', {
+      name: /Mock Liquid/,
+    })
+
+    fireEvent.click(clickableCard)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
       properties: {},

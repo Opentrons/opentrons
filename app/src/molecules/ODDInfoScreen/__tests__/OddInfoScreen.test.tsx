@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
 
-import { OddInfoScreen } from './OddInfoScreen'
+import { OddInfoScreen } from '../OddInfoScreen'
 
-import type { OddInfoScreenType } from './OddInfoScreen'
+import type { OddInfoScreenType } from '../OddInfoScreen'
 
 describe('OddInfoScreen', () => {
   const renderComponent = (
@@ -48,7 +48,9 @@ describe('OddInfoScreen', () => {
       const expectedIcon = type === 'success' ? 'ot-check' : 'ot-alert'
       const icon = screen.getByLabelText(`icon-${expectedIcon}`)
       expect(icon).toBeInTheDocument()
-      const infoScreen = screen.getByTestId('InfoScreen')
+      const expectedRole =
+        type === 'error' || type === 'warning' ? 'alert' : 'status'
+      const infoScreen = screen.getByRole(expectedRole)
       let expectedBgColor = ''
       if (type === 'neutral') expectedBgColor = COLORS.grey35
       else if (type === 'error') expectedBgColor = COLORS.red35

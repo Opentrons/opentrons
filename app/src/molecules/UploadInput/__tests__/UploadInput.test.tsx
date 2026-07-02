@@ -73,13 +73,9 @@ describe('UploadInput', () => {
       }
     )
     const button = screen.getByRole('button', { name: 'Upload' })
-    const dropZone = screen.getByLabelText('File upload drop zone')
-    const fileInput = dropZone.querySelector(
-      'input[type="file"]'
+    const fileInput = screen.getByLabelText(
+      'Choose File...'
     ) as HTMLInputElement
-    if (fileInput == null) {
-      throw new Error('Input element not found')
-    }
     fileInput.click = vi.fn()
     fireEvent.click(button)
     expect(fileInput.click).toHaveBeenCalled()

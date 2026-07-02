@@ -23,7 +23,7 @@ describe('ODDFixtureOption', () => {
     render(props)
     screen.getByText('mockOption')
     screen.getByText('mockText')
-    fireEvent.click(screen.getByTestId('mockOption'))
+    fireEvent.click(screen.getByRole('button', { name: 'mockText' }))
     expect(props.onClickHandler).toHaveBeenCalled()
   })
   it('should render text and buttons for odd', () => {

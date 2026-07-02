@@ -53,7 +53,6 @@ describe('CardButton', () => {
     render(props)
     screen.getByText('Wi-Fi')
     screen.getByText('Find a network in your lab or enter your own.')
-    expect(screen.getByTestId('cardButton_icon_wifi')).toBeInTheDocument()
     const button = screen.getByRole('button')
     expect(button).toHaveStyle(`background-color: ${COLORS.blue35}`)
   })

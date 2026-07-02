@@ -60,15 +60,9 @@ describe('ProtocolUploadInput', () => {
   it('opens file select on button click', () => {
     render()
     const button = screen.getByRole('button', { name: 'Upload' })
-    // const input = screen.getByTestId('file_input')
-    // input.click = vi.fn()
-    const dropZone = screen.getByLabelText('File upload drop zone')
-    const fileInput = dropZone.querySelector(
-      'input[type="file"]'
+    const fileInput = screen.getByLabelText(
+      'Choose File...'
     ) as HTMLInputElement
-    if (fileInput == null) {
-      throw new Error('Input element not found')
-    }
     fileInput.click = vi.fn()
     fireEvent.click(button)
     expect(fileInput.click).toHaveBeenCalled()
@@ -76,11 +70,7 @@ describe('ProtocolUploadInput', () => {
 
   it('calls onUpload callback on choose file and trigger analytics event', async () => {
     render()
-    const dropZone = screen.getByLabelText('File upload drop zone')
-    const fileInput = dropZone.querySelector('input[type="file"]')
-    if (!fileInput) {
-      throw new Error('Input element not found')
-    }
+    const fileInput = screen.getByLabelText('Choose File...')
     const mockFile = new File(['mockContent'], 'mockFileName', {
       type: 'text/plain',
     })

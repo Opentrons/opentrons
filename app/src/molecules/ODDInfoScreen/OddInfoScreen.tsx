@@ -80,6 +80,7 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
   const iconSize = INFO_SCREEN_PROPS_BY_SIZE[textSize].iconSize
   const headerStyle = INFO_SCREEN_PROPS_BY_SIZE[textSize].headerStyle
   const subTextStyle = INFO_SCREEN_PROPS_BY_SIZE[textSize].subTextStyle
+  const roleType = type === 'error' || type === 'warning' ? 'alert' : 'status'
 
   return (
     <Flex
@@ -91,7 +92,7 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius12}
       padding={`${SPACING.spacing40} ${SPACING.spacing80} `}
-      data-testid="InfoScreen"
+      role={roleType}
       {...styleProps}
     >
       {hasIcon ? (

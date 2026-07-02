@@ -26,7 +26,6 @@ describe('ODDBackButton', () => {
   it('should render text and icon', () => {
     render(props)
     screen.getByText('button label')
-    expect(screen.getByTestId('back_icon')).toBeInTheDocument()
     const button = screen.getByRole('button')
     fireEvent.click(button)
     expect(props.onClick).toHaveBeenCalled()

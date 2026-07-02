@@ -27,7 +27,6 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
       borderRadius={BORDERS.borderRadius4}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
-      data-testid={`InfoMessage_${title}`}
     >
       <Icon
         color={COLORS.blue60}

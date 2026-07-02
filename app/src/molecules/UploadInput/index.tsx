@@ -157,6 +157,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         {dragAndDropText}
         <StyledInput
           id="file_input"
+          aria-label={t('choose_file')}
           ref={fileInput}
           type="file"
           onChange={onChange}

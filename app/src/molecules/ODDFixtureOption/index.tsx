@@ -41,14 +41,12 @@ export function ODDFixtureOption(props: ODDFixtureOptionProps): JSX.Element {
           <SmallButton
             buttonType="secondary"
             onClick={secondaryOnClickHandler}
-            data-testid={optionName}
             buttonText={secondaryButtonText}
             buttonCategory="rounded"
           />
         ) : null}
         <SmallButton
           onClick={onClickHandler}
-          data-testid={optionName}
           buttonText={buttonText}
           buttonCategory="rounded"
         />

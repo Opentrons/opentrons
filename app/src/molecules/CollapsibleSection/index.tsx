@@ -55,14 +55,10 @@ export function CollapsibleSection(
           {title}
         </LegacyStyledText>
         <Btn
+          aria-label={title}
           onClick={() => {
             setIsExpanded(!isExpanded)
           }}
-          data-testid={
-            isExpanded
-              ? `CollapsibleSection_collapse_${title}`
-              : `CollapsibleSection_expand_${title}`
-          }
         >
           <Icon
             size="1.5rem"

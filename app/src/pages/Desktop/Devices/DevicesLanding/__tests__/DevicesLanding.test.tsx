@@ -97,14 +97,14 @@ describe('DevicesLanding', () => {
     expect(screen.queryByText('Mock Robot unreachableRobot')).toBeNull()
     expect(screen.queryByText('Mock Robot reachableRobot')).toBeNull()
 
-    const expandButton = screen.getByTestId(
-      'CollapsibleSection_expand_Not available (2)'
-    )
+    const expandButton = screen.getByRole('button', {
+      name: 'Not available (2)',
+    })
     fireEvent.click(expandButton)
-
     screen.getByText('Mock Robot unreachableRobot')
     screen.getByText('Mock Robot reachableRobot')
   })
+
   it('does not render available or not available sections when none are present', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([])
     vi.mocked(getReachableRobots).mockReturnValue([])

@@ -19,12 +19,7 @@ export function ODDBackButton(
   return (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
       <Btn onClick={onClick}>
-        <Icon
-          color={COLORS.black90}
-          data-testid="back_icon"
-          name="back"
-          width="3rem"
-        />
+        <Icon color={COLORS.black90} name="back" width="3rem" />
       </Btn>
       <LegacyStyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {label}
