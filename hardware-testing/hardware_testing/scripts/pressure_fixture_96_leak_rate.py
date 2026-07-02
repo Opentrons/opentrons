@@ -20,7 +20,7 @@ from hardware_testing.drivers.pressure_fixture import (
 ROWS = "ABCDEFGH"
 COLS = 12
 DEFAULT_DURATION_SECONDS = 60.0
-DEFAULT_SAMPLE_DELAY_SECONDS = 0.25
+DEFAULT_SAMPLE_DELAY_SECONDS = 1.0
 DEFAULT_TRIM_COUNT = 1
 
 
@@ -28,6 +28,7 @@ DEFAULT_TRIM_COUNT = 1
 class PressureSample:
     """One 96-channel fixture sample."""
 
+    target_s: float
     elapsed_s: float
     readings: List[float]
 
@@ -125,18 +126,61 @@ def connect_fixture(args: argparse.Namespace) -> PressureFixtureBase:
     return connect_to_fixture96(args.simulate, side=args.side)
 
 
+def _format_channel_value(channel: int, readings: Sequence[float]) -> str:
+    return f"{channel_to_well(channel)}/CH{channel}={readings[channel - 1]:.2f}Pa"
+
+
+def print_pressure_snapshot(
+    run_label: str,
+    sample_index: int,
+    sample: PressureSample,
+    display_channels: Sequence[int],
+) -> None:
+    """Print the pressure values for one sample."""
+    prefix = (
+        f"{run_label}: sample={sample_index} target={sample.target_s:.0f}s "
+        f"elapsed={sample.elapsed_s:.2f}s"
+    )
+    if len(display_channels) <= 24:
+        values = " ".join(
+            _format_channel_value(channel, sample.readings)
+            for channel in display_channels
+        )
+        print(f"{prefix} {values}", flush=True)
+        return
+
+    print(prefix, flush=True)
+    selected = set(display_channels)
+    print("       " + "".join(f"{col:>9}" for col in range(1, COLS + 1)), flush=True)
+    for row_index, row in enumerate(ROWS):
+        row_values = []
+        for col in range(1, COLS + 1):
+            channel = row_index * COLS + col
+            if channel in selected:
+                row_values.append(f"{sample.readings[channel - 1]:>9.2f}")
+            else:
+                row_values.append(f"{'-':>9}")
+        print(f"{row}: " + "".join(row_values), flush=True)
+
+
 def collect_samples(
     fixture: PressureFixtureBase,
     duration_s: float,
     sample_delay_s: float,
     run_label: str,
+    display_channels: Sequence[int],
 ) -> List[PressureSample]:
     """Collect all 96 channels for a fixed duration."""
     samples: List[PressureSample] = []
     start = monotonic()
-    next_progress_s = 0.0
+    sample_index = 0
     while True:
-        sample_start = monotonic()
+        target_s = sample_index * sample_delay_s
+        target_time = start + target_s
+        delay_s = target_time - monotonic()
+        if delay_s > 0:
+            sleep(delay_s)
+
         readings = fixture.read_all_pressure_channel_96()
         if len(readings) != FIXTURE_NUM_CHANNELS_96:
             raise RuntimeError(
@@ -144,20 +188,17 @@ def collect_samples(
                 f"got {len(readings)}"
             )
         elapsed_s = monotonic() - start
-        samples.append(PressureSample(elapsed_s=elapsed_s, readings=readings))
+        sample = PressureSample(
+            target_s=target_s,
+            elapsed_s=elapsed_s,
+            readings=readings,
+        )
+        samples.append(sample)
+        print_pressure_snapshot(run_label, sample_index + 1, sample, display_channels)
 
-        if elapsed_s >= next_progress_s:
-            print(
-                f"{run_label}: elapsed={elapsed_s:.1f}s/"
-                f"{duration_s:.1f}s samples={len(samples)}"
-            )
-            next_progress_s += 5.0
-        if elapsed_s >= duration_s:
+        if target_s >= duration_s:
             break
-
-        delay_s = sample_delay_s - (monotonic() - sample_start)
-        if delay_s > 0:
-            sleep(delay_s)
+        sample_index += 1
     return samples
 
 
@@ -222,7 +263,7 @@ def write_raw_samples(
     sample_runs: Sequence[tuple[str, Sequence[PressureSample]]],
 ) -> None:
     """Write raw 96-channel samples."""
-    header = ["run_label", "sample_index", "elapsed_s"] + [
+    header = ["run_label", "sample_index", "target_s", "elapsed_s"] + [
         f"CH{channel}_{channel_to_well(channel)}"
         for channel in range(1, FIXTURE_NUM_CHANNELS_96 + 1)
     ]
@@ -232,7 +273,12 @@ def write_raw_samples(
         for run_label, samples in sample_runs:
             for index, sample in enumerate(samples, start=1):
                 writer.writerow(
-                    [run_label, index, f"{sample.elapsed_s:.3f}"]
+                    [
+                        run_label,
+                        index,
+                        f"{sample.target_s:.3f}",
+                        f"{sample.elapsed_s:.3f}",
+                    ]
                     + [f"{reading:.2f}" for reading in sample.readings]
                 )
 
@@ -318,7 +364,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--sample-delay",
         type=float,
         default=DEFAULT_SAMPLE_DELAY_SECONDS,
-        help="Delay target between samples in seconds. Default: 0.25.",
+        help="Delay target between samples in seconds. Default: 1.",
     )
     parser.add_argument(
         "--trim",
@@ -395,7 +441,11 @@ def main() -> None:
                 if not args.no_prompt:
                     input(f"Seal {well} / CH{channel}, then press Enter to start...")
                 samples = collect_samples(
-                    fixture, args.duration, args.sample_delay, run_label
+                    fixture,
+                    args.duration,
+                    args.sample_delay,
+                    run_label,
+                    [channel],
                 )
                 sample_runs.append((run_label, samples))
                 result = calculate_leak_rate(
@@ -411,7 +461,11 @@ def main() -> None:
                 )
                 input(f"Prepare target channel(s) {target_text}, then press Enter...")
             samples = collect_samples(
-                fixture, args.duration, args.sample_delay, run_label
+                fixture,
+                args.duration,
+                args.sample_delay,
+                run_label,
+                channels,
             )
             sample_runs.append((run_label, samples))
             all_results.extend(
