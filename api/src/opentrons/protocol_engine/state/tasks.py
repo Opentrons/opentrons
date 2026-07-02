@@ -22,6 +22,7 @@ class TaskState:
 
     current_tasks_by_id: dict[str, Task]
     finished_tasks_by_id: dict[str, FinishedTask]
+    last_background_command_by_module_id: dict[str, str]
 
 
 class TaskStore(HasState[TaskState], HandlesActions):
@@ -31,11 +32,19 @@ class TaskStore(HasState[TaskState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a TaskStore."""
-        self._state = TaskState(current_tasks_by_id={}, finished_tasks_by_id={})
+        self._state = TaskState(
+            current_tasks_by_id={},
+            finished_tasks_by_id={},
+            last_background_command_by_module_id={},
+        )
 
     def _handle_state_update(self, state_update: update_types.StateUpdate) -> None:
         """Handle a state update."""
-        return
+        if state_update.module_background_command != update_types.NO_CHANGE:
+            update = state_update.module_background_command
+            self._state.last_background_command_by_module_id[update.module_id] = (
+                update.command_id
+            )
 
     def _handle_start_task_action(self, action: StartTaskAction) -> None:
         self._state.current_tasks_by_id[action.task.id] = action.task
@@ -139,3 +148,7 @@ class TaskView:
             if task and task.error:
                 failed_tasks.append(task_id)
         return failed_tasks
+
+    def get_last_background_command_id(self, module_id: str) -> str | None:
+        """Return the latest background command for a module, if known."""
+        return self._state.last_background_command_by_module_id.get(module_id)

@@ -2,19 +2,32 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal, Type
 
-from ...errors.error_occurrence import ErrorOccurrence
 from ...state import update_types
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+)
+from .common import (
+    RecoverableVacuumHwExceptions,
+    RecoverableVacuumHwExceptionTypes,
+    VacuumModuleCarboyFullError,
+    VacuumModuleDefinedErrorData,
+    VacuumModulePressureNotReachedError,
+    handle_recoverable_vacuum_error,
+)
 from opentrons.drivers.vacuum_module.driver import (
     MAX_GAUGE_PRESSURE_MBAR,
     MIN_GAUGE_PRESSURE_MBAR,
 )
+from opentrons.protocol_engine.resources import ModelUtils
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import (
@@ -56,10 +69,14 @@ class StartSetVacuumPressureResult(BaseModel):
     taskId: str = Field(..., description="The id of the task")
 
 
+_ExecuteReturn = Union[
+    SuccessData[StartSetVacuumPressureResult],
+    VacuumModuleDefinedErrorData,
+]
+
+
 class StartSetVacuumPressureImpl(
-    AbstractCommandImpl[
-        StartSetVacuumPressureParams, SuccessData[StartSetVacuumPressureResult]
-    ]
+    AbstractCommandImpl[StartSetVacuumPressureParams, _ExecuteReturn]
 ):
     """Execution implementation of a start set vacuum command."""
 
@@ -69,12 +86,26 @@ class StartSetVacuumPressureImpl(
         equipment: EquipmentHandler,
         movement: MovementHandler,
         task_handler: TaskHandler,
+        model_utils: ModelUtils,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
         self._movement = movement
         self._task_handler = task_handler
+        self._model_utils = model_utils
+
+    def handle_recoverable_error(
+        self,
+        error: RecoverableVacuumHwExceptions,
+        state_update: update_types.StateUpdate,
+    ) -> VacuumModuleDefinedErrorData:
+        """Handle a recoverable error raised during command execution."""
+        return handle_recoverable_vacuum_error(
+            error=error,
+            state_update=state_update,
+            model_utils=self._model_utils,
+        )
 
     async def execute(
         self, params: StartSetVacuumPressureParams
@@ -85,6 +116,11 @@ class StartSetVacuumPressureImpl(
         state_update.update_vacuum_module_pump_engaged(
             params.moduleId, params.duration is None
         )
+        running_command_id = self._state_view.commands.get_running_command_id()
+        if running_command_id is not None:
+            state_update.record_module_background_command(
+                params.moduleId, running_command_id
+            )
 
         if (
             params.gaugePressure < MAX_GAUGE_PRESSURE_MBAR
@@ -98,24 +134,29 @@ class StartSetVacuumPressureImpl(
 
         async def start_set_vacuum_pressure(task_handler: TaskHandler) -> None:
             if vm_hardware is not None:
-                async with task_handler.synchronize_cancel_latest(vm_state.module_id):
-                    await vm_hardware.set_vacuum_state(
-                        enable_vacuum=True,
-                        gauge_pressure_mbar=params.gaugePressure,
-                        duration_s=params.duration,
-                        rate=params.rate if params.rate else None,
-                        timeout_s=params.timeout if params.timeout else None,
-                        vent_after=params.ventAfter,
-                    )
+                try:
+                    async with task_handler.synchronize_cancel_latest(
+                        vm_state.module_id
+                    ):
+                        await vm_hardware.set_vacuum_state(
+                            enable_vacuum=True,
+                            gauge_pressure_mbar=params.gaugePressure,
+                            duration_s=params.duration,
+                            rate=params.rate if params.rate else None,
+                            timeout_s=params.timeout if params.timeout else None,
+                            vent_after=params.ventAfter,
+                        )
 
-                    if params.duration is not None:
-                        await vm_hardware.wait_for_command_duration()
-                    else:
-                        await vm_hardware.wait_for_target()
+                        if params.duration is not None:
+                            await vm_hardware.wait_for_command_duration()
+                        else:
+                            await vm_hardware.wait_for_target()
 
-                    state_update.update_vacuum_module_pump_engaged(
-                        params.moduleId, vm_hardware.pump_running
-                    )
+                        state_update.update_vacuum_module_pump_engaged(
+                            params.moduleId, vm_hardware.pump_running
+                        )
+                except RecoverableVacuumHwExceptionTypes as error:
+                    raise error
 
         task = await self._task_handler.create_task(
             task_function=start_set_vacuum_pressure, id=params.taskId
@@ -129,7 +170,9 @@ class StartSetVacuumPressureImpl(
 
 class StartSetVacuumPressure(
     BaseCommand[
-        StartSetVacuumPressureParams, StartSetVacuumPressureResult, ErrorOccurrence
+        StartSetVacuumPressureParams,
+        StartSetVacuumPressureResult,
+        VacuumModulePressureNotReachedError | VacuumModuleCarboyFullError,
     ]
 ):
     """A command to start the vacuum pump."""

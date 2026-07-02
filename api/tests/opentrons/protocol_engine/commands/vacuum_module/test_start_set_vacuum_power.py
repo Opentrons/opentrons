@@ -37,6 +37,7 @@ async def test_start_set_vacuum_power(
         equipment=equipment,
         movement=movement,
         task_handler=real_task_handler,
+        model_utils=model_utils,
     )
 
     duty_cycle = 77

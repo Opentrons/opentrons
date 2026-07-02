@@ -7,10 +7,20 @@ from typing import Any, Awaitable, Callable, List, Mapping, Optional, Union
 
 from typing_extensions import cast
 
+from opentrons_shared_data.errors.exceptions import (
+    VacuumModulePressureNotReachedError,
+    VacuumModuleWasteFullError,
+)
+
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
 from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,
+)
+from opentrons.drivers.vacuum_module.errors import (
+    FailedToVent,
+    PressureNotReached,
+    WasteContainerFull,
 )
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
@@ -171,7 +181,23 @@ class VacuumModule(mod_abc.AbstractModule):
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def _async_error_callback(self, exception: Exception) -> None:
-        self.error_callback(exception)
+        self.error_callback(self._to_enumerated_error(exception))
+
+    def _to_enumerated_error(self, exception: Exception) -> Exception:
+        if isinstance(exception, PressureNotReached):
+            vacuum_state = self._reader.vacuum_state
+            current_pressure = (
+                vacuum_state.current_gauge_pressure if vacuum_state is not None else 0.0
+            )
+            return VacuumModulePressureNotReachedError(
+                self.serial_number or "",
+                self._reader.target_pressure or 0.0,
+                current_pressure,
+                mode=self._reader.operation_mode.value,
+            )
+        if isinstance(exception, WasteContainerFull):
+            return VacuumModuleWasteFullError(self.serial_number or "")
+        return exception
 
     @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:
@@ -386,8 +412,10 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def set_vent_state(self, vent_state: VentState) -> None:
         """Open or close the vent."""
-        # TODO: Handle error
-        await self._driver.set_vent_state(state=vent_state)
+        try:
+            await self._driver.set_vent_state(state=vent_state)
+        except FailedToVent:
+            raise
 
     async def set_vacuum_state(
         self,

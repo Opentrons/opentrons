@@ -8,9 +8,21 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal, Type
 
-from ...errors.error_occurrence import ErrorOccurrence
 from ...state import update_types
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+)
+from .common import (
+    RecoverableVacuumHwExceptions,
+    RecoverableVacuumHwExceptionTypes,
+    VacuumModuleCarboyFullError,
+    VacuumModuleDefinedErrorData,
+    VacuumModulePressureNotReachedError,
+    handle_recoverable_vacuum_error,
+)
 from opentrons.hardware_control.modules.types import (
     VacuumModuleCycle,
     VacuumModulePowerStep,
@@ -20,6 +32,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.modules.types import (
     VacuumModuleProfileStep as hc_profile_step,
 )
+from opentrons.protocol_engine.resources import ModelUtils
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
@@ -123,9 +136,13 @@ class StartRunProfileResult(BaseModel):
     taskId: str = Field(..., description="The id of the profile task")
 
 
-class StartRunProfileImpl(
-    AbstractCommandImpl[StartRunProfileParams, SuccessData[StartRunProfileResult]]
-):
+_ExecuteReturn = Union[
+    SuccessData[StartRunProfileResult],
+    VacuumModuleDefinedErrorData,
+]
+
+
+class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteReturn]):
     """Execution implementation of a run vacuum profile command."""
 
     def __init__(
@@ -133,11 +150,25 @@ class StartRunProfileImpl(
         state_view: StateView,
         equipment: EquipmentHandler,
         task_handler: TaskHandler,
+        model_utils: ModelUtils,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
         self._task_handler = task_handler
+        self._model_utils = model_utils
+
+    def handle_recoverable_error(
+        self,
+        error: RecoverableVacuumHwExceptions,
+        state_update: update_types.StateUpdate,
+    ) -> VacuumModuleDefinedErrorData:
+        """Handle a recoverable error raised during command execution."""
+        return handle_recoverable_vacuum_error(
+            error=error,
+            state_update=state_update,
+            model_utils=self._model_utils,
+        )
 
     async def execute(
         self, params: StartRunProfileParams
@@ -154,17 +185,27 @@ class StartRunProfileImpl(
                 pump_engaged = step.enablePump
 
         state_update.update_vacuum_module_pump_engaged(params.moduleId, pump_engaged)
+        running_command_id = self._state_view.commands.get_running_command_id()
+        if running_command_id is not None:
+            state_update.record_module_background_command(
+                params.moduleId, running_command_id
+            )
 
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if vm_hardware is not None:
-                async with task_handler.synchronize_cancel_latest(vm_state.module_id):
-                    await vm_hardware.execute_profile(
-                        profile=profile, vent_after=params.ventAfter
-                    )
+                try:
+                    async with task_handler.synchronize_cancel_latest(
+                        vm_state.module_id
+                    ):
+                        await vm_hardware.execute_profile(
+                            profile=profile, vent_after=params.ventAfter
+                        )
 
-                    state_update.update_vacuum_module_pump_engaged(
-                        params.moduleId, vm_hardware.pump_running
-                    )
+                        state_update.update_vacuum_module_pump_engaged(
+                            params.moduleId, vm_hardware.pump_running
+                        )
+                except RecoverableVacuumHwExceptionTypes as error:
+                    raise error
 
         task = await self._task_handler.create_task(
             task_function=start_run_profile, id=params.taskId
@@ -176,7 +217,11 @@ class StartRunProfileImpl(
 
 
 class StartRunProfile(
-    BaseCommand[StartRunProfileParams, StartRunProfileResult, ErrorOccurrence]
+    BaseCommand[
+        StartRunProfileParams,
+        StartRunProfileResult,
+        VacuumModulePressureNotReachedError | VacuumModuleCarboyFullError,
+    ]
 ):
     """A command to run a vacuum module profile."""
 
