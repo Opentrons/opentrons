@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING, Optional, Type
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
-from ..errors.error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
+from ..errors import ErrorOccurrence
+from ..errors.error_occurrence import ProtocolCommandFailedError
 from ..errors.exceptions import TaskFailedError
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
@@ -63,6 +64,9 @@ class WaitForTasksImplementation(
 
         await self._run_control.wait_for_tasks(params.task_ids)
 
+        if self._state_view.commands.get_is_awaiting_recovery():
+            return SuccessData(public=WaitForTasksResult(task_ids=params.task_ids))
+
         failed_tasks = self._state_view.tasks.get_failed_tasks(params.task_ids)
         if failed_tasks:
             raise TaskFailedError(
@@ -81,7 +85,11 @@ class WaitForTasksImplementation(
 
 
 class WaitForTasks(
-    BaseCommand[WaitForTasksParams, WaitForTasksResult, ErrorOccurrence]
+    BaseCommand[
+        WaitForTasksParams,
+        WaitForTasksResult,
+        ErrorOccurrence,
+    ]
 ):
     """WaitForTasks command model."""
 

@@ -25,8 +25,15 @@ class RunControlHandler:
         if not self._state_store.config.ignore_pause:
             self._action_dispatcher.dispatch(PauseAction(source=PauseSource.PROTOCOL))
             await self._state_store.wait_for(
-                condition=self._state_store.commands.get_is_running
+                condition=self._can_resume_from_protocol_pause
             )
+
+    def _can_resume_from_protocol_pause(self) -> bool:
+        """Return whether a protocol pause should stop waiting."""
+        return (
+            self._state_store.commands.get_is_running()
+            or self._state_store.commands.get_is_awaiting_recovery()
+        )
 
     async def wait_for_duration(self, seconds: float) -> None:
         """Delay protocol execution for a duration."""
