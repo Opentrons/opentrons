@@ -23,6 +23,7 @@
   "exit_modal_go_back": "No, go back",
   "exit_modal_heading": "Confirm Close Protocol",
   "failed_analysis": "failed analysis",
+  "file_upload_drop_zone": "File upload drop zone",
   "get_labware_offset_data": "Get Labware Offset Data",
   "import": "Import",
   "import_a_file": "Import a protocol to get started",

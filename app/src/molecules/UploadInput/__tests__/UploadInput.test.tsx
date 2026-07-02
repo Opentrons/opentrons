@@ -73,11 +73,18 @@ describe('UploadInput', () => {
       }
     )
     const button = screen.getByRole('button', { name: 'Upload' })
-    const input = screen.getByTestId('file_input')
-    input.click = vi.fn()
+    const dropZone = screen.getByLabelText('File upload drop zone')
+    const fileInput = dropZone.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    if (fileInput == null) {
+      throw new Error('Input element not found')
+    }
+    fileInput.click = vi.fn()
     fireEvent.click(button)
-    expect(input.click).toHaveBeenCalled()
+    expect(fileInput.click).toHaveBeenCalled()
   })
+
   it('calls create session on choose file', () => {
     renderWithProviders(
       <BrowserRouter>
@@ -87,8 +94,10 @@ describe('UploadInput', () => {
         i18nInstance: i18n,
       }
     )
-    const input = screen.getByTestId('file_input')
-    fireEvent.change(input, { target: { files: ['dummyFile'] } })
+    const dropZone = screen.getByLabelText('File upload drop zone')
+    fireEvent.drop(dropZone, {
+      dataTransfer: { files: ['dummyFile'] },
+    })
     expect(onUpload).toHaveBeenCalledWith('dummyFile')
   })
 })
