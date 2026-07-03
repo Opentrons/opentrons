@@ -47,4 +47,4 @@ Suggestion: <Proposed exact code fix or structural refactor>
 
 - **Exhaustive Tracking**: Every added or modified component, CSS module rule, and exported entity has been explicitly cross-referenced with `review-reference.md`.
 - **Zero Halos**: No vague or conversational suggestions (e.g., "Consider fixing this"). Every comment must have an explicit `Suggestion` block containing executable code or exact structural directives.
-- **Glossary Alignment**: Every reported issue is explicitly classified under one of the defined leading words: **Prop Shadowing**
+- **Glossary Alignment**: Every reported issue is explicitly classified under one of the defined leading words: **Prop Shadowing**, **Leak**, or **Over-baked**.
