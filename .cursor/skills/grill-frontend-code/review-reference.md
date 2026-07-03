@@ -6,11 +6,11 @@ This reference governs the architectural boundaries of Opentrons UI development.
 
 Opentrons enforces strict boundaries across component directories. Detect any layer-crossing violations:
 
-- **Atoms (`src/atoms`)**: Pure presentational elements.
+- **Atoms (`app/src/atoms`, `components/src/atoms`)**: Pure presentational elements.
   - _Criterion_: Must NOT import any other component. Must NOT import hooks that pull state from the global store (e.g., redux, react-query).
-- **Molecules (`src/molecules`)**: Combinations of atoms.
+- **Molecules (`app/src/molecules`, `components/src/molecules`)**: Combinations of atoms.
   - _Criterion_: Can import atoms. Must NOT import organisms or pages.
-- **Organisms (`src/organisms`)**: Functional blocks.
+- **Organisms (`app/src/organisms`, `components/src/organisms`)**: Functional blocks.
   - _Criterion_: Can leverage complex state hooks and orchestrate multiple molecules/atoms.
 
 ## 2. CSS Modules & Styles
