@@ -24,7 +24,9 @@ If untracked files exist in frontend paths, read their entire contents immediate
 npx -y react-doctor@latest . --verbose
 ```
 
-_(Optional)_ Run the relevant Jest/Vitest test suite for the modified files to ensure existing logic is unimpaired. Incorporate any discovered linter errors or test failures directly into your final output findings. 3. **Evaluate against Reference** — Open `review-reference.md` and `GLOSSARY.md` via their context pointers. Evaluate every modified or added line, specifically auditing for:
+_(Optional)_ Run the relevant Jest/Vitest test suite for the modified files to ensure existing logic is unimpaired. Incorporate any discovered linter errors or test failures directly into your final output findings.
+
+3. **Evaluate against Reference** — Open `review-reference.md` and `GLOSSARY.md` via their context pointers. Evaluate every modified or added line, specifically auditing for:
 
 - **Prop Shadowing** in new component interfaces.
 - **Leak** across Atomic Design layers or style boundaries.
