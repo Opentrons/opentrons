@@ -32,7 +32,7 @@ Opentrons interfaces are used in physical lab environments. Accessibility is fun
 ## 4. TypeScript & Logic Rigor
 
 - **Strict Types**: The `any` type is an automatic failure. If a type is genuinely polymorphic, enforce `unknown` and require type-guards.
-- **Nullability**: Optional or nullable fields must use strict inequality/equality checks (`!== null` or `!== undefined`). Do not allow loose `!= null` checks.
+- **Nullability**: Prefer explicit checks (`value !== null` / `value !== undefined`) when you need to distinguish them; `value != null` is acceptable shorthand for checking both `null` and `undefined` and is used throughout the codebase.
 - **Ternary Ceiling**: Nested ternary operators (`condition ? a : condition2 ? b : c`) are strictly prohibited. Demand extraction into early returns or explicit local switch/if blocks.
 
 ## 5. Component API Design (Props Extension)
